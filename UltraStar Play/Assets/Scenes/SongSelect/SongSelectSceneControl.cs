@@ -37,7 +37,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public SongSelectFocusableNavigator focusableNavigator;
 
     [InjectedInInspector]
-    public SongPreviewControl songPreviewControl;
+    public SongSelectSongPreviewControl songPreviewControl;
 
     [InjectedInInspector]
     public SongSelectPlayerListControl playerListControl;
@@ -206,19 +206,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public SongOrderPickerControl SongOrderPickerControl { get; private set; }
 
+    [Inject]
     private SongSelectSceneData sceneData;
-    public SongSelectSceneData SceneData
-    {
-        get
-        {
-            if (sceneData == null)
-            {
-                sceneData = SceneNavigator.Instance.GetSceneData(new SongSelectSceneData());
-            }
-
-            return sceneData;
-        }
-    }
 
     private List<SongMeta> songMetas;
     private int lastSongMetasReloadFrame = -1;
@@ -240,6 +229,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SongMetaManager songMetaManager;
+    
     [Inject]
     private GameRoundManager gameRoundManager;
 
@@ -322,7 +314,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    public PartyModeSettings PartyModeSettings => SceneData.PartyModeSettings;
+    public PartyModeSettings PartyModeSettings => sceneData.PartyModeSettings;
     public bool HasPartyModeSettings => PartyModeSettings != null;
     public bool IsPartyModeRandomSongSelection => PartyModeSettings != null
                                                   && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random;
@@ -335,14 +327,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void Start()
     {
-        SongMetaManager.Instance.ScanFilesIfNotDoneYet();
+        songMetaManager.ScanFilesIfNotDoneYet();
         // Give the song search some time, otherwise the "no songs found" label flickers once.
         if (!SongMetaManager.IsSongScanFinished)
         {
             Thread.Sleep(100);
         }
-
-        sceneData = SceneNavigator.Instance.GetSceneData(new SongSelectSceneData());
 
         InitSongMetas();
 
@@ -448,7 +438,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
         {
-            uiManager.CreateNotificationVisualElement($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
+            UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
             UpdatePlayerSelectOverlayButtons();
         });
 
@@ -712,7 +702,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void InitSongMetas()
     {
-        songMetas = new List<SongMeta>(SongMetaManager.Instance.GetSongMetas());
+        songMetas = new List<SongMeta>(songMetaManager.GetSongMetas());
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
         noSongsFoundLabel.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
         noSongsFoundContainer.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
@@ -721,7 +711,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void Update()
     {
         // Check if new songs were loaded in background. Update scene if necessary.
-        if (songMetas.Count != SongMetaManager.Instance.GetSongMetas().Count
+        if (songMetas.Count != songMetaManager.GetSongMetas().Count
             && lastSongMetasReloadFrame + 10 < Time.frameCount)
         {
             InitSongMetas();
@@ -735,9 +725,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         lastSongMetasReloadFrame = Time.frameCount;
         UpdateFilteredSongs();
-        if (SceneData.SongMeta != null)
+        if (sceneData.SongMeta != null)
         {
-            songRouletteControl.SelectSong(SceneData.SongMeta);
+            songRouletteControl.SelectSong(sceneData.SongMeta);
         }
 
         songRouletteControl.Selection.Subscribe(newValue => OnSongSelectionChanged(newValue));
@@ -913,7 +903,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
         if (selectedPlayerProfiles.IsNullOrEmpty())
         {
-            uiManager.CreateNotificationVisualElement(TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_title));
+            UiManager.CreateNotification(TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_title));
             return null;
         }
         singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
@@ -944,14 +934,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         if (SelectedSong.FailedToLoadVoices)
         {
-            uiManager.CreateNotificationVisualElement("Failed to load song. Check log for details.");
+            UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
         }
 
         SingSceneData singSceneData = CreateSingSceneDataWithSelectedSongAndSettings();
         if (singSceneData != null)
         {
-            SceneNavigator.Instance.LoadScene(EScene.SingScene, singSceneData);
+            sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
         }
     }
 
@@ -959,13 +949,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         if (HasPartyModeSettings)
         {
-            uiManager.CreateNotificationVisualElement("Song editor not available in party mode");
+            UiManager.CreateNotification("Song editor not available in party mode");
             return;
         }
 
         if (songMeta.FailedToLoadVoices)
         {
-            uiManager.CreateNotificationVisualElement("Failed to load song. Check log for details.");
+            UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
         }
 
@@ -978,10 +968,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             editorSceneData.PlayerProfileToMicProfileMap = singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap;
             editorSceneData.SelectedPlayerProfiles = singSceneData.SingScenePlayerData.SelectedPlayerProfiles;
         }
-        editorSceneData.PreviousSceneData = SceneData;
+        editorSceneData.PreviousSceneData = sceneData;
         editorSceneData.PreviousScene = EScene.SongSelectScene;
 
-        SceneNavigator.Instance.LoadScene(EScene.SongEditorScene, editorSceneData);
+        sceneNavigator.LoadScene(EScene.SongEditorScene, editorSceneData);
     }
 
     private void SetEmptySongDetails()
@@ -1014,7 +1004,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
             string message = "Audio file resource does not exist: " + audioUri;
             Debug.Log(message);
-            uiManager.CreateNotificationVisualElement(message);
+            UiManager.CreateNotification(message);
             return;
         }
 
@@ -1024,7 +1014,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
             Debug.Log(message);
-            uiManager.CreateNotificationVisualElement(message);
+            UiManager.CreateNotification(message);
             return;
         }
 
@@ -1202,6 +1192,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(SceneNavigator.GetSceneData(CreateDefaultSceneData()));
         bb.BindExistingInstance(songRouletteControl);
         bb.BindExistingInstance(songSelectSceneInputControl);
         bb.BindExistingInstance(songAudioPlayer);
@@ -1216,6 +1207,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(focusableNavigator);
         bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
+    }
+
+    private SongSelectSceneData CreateDefaultSceneData()
+    {
+        return new SongSelectSceneData();
     }
 
     public void ToggleFavoritePlaylist()
@@ -1279,10 +1275,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && sceneTitle == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
 
         menuButton.text = TranslationManager.GetTranslation(R.Messages.menu);
@@ -1441,7 +1433,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void ShowCannotUseJokerMessage()
     {
-        uiManager.CreateNotificationVisualElement("No jokers left to change the song");
+        UiManager.CreateNotification("No jokers left to change the song");
     }
 
     public List<PlayerProfile> GetEnabledPlayerProfiles()

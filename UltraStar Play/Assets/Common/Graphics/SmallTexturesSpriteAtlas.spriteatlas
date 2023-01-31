@@ -33,63 +33,44 @@ SpriteAtlas:
     variantMultiplier: 1
     packables:
     - {fileID: 102900000, guid: 6f90ded3314a23f4ea0842ea48638f28, type: 3}
-    - {fileID: 102900000, guid: 9058f218a30b4ca499aa3608584c4cc5, type: 3}
     - {fileID: 102900000, guid: b25a54fc37b9389438e58e08c751d7d4, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
-    - 94d2a3c0a1960db459ed830ef1bcecab: 21300000
-    - a3752a11b653e7b478d17714e6f4ffef: 21300000
     - 1d183c612f1866943a54609ced7fece7: 21300000
     - 5deb6694a398abc4ab780d5d83778900: 21300000
     - 3406fac525d9a894b9906cb27b4def17: 21300000
-    - 2b09f4367842bc1418c7062bfe03f99a: 21300000
     - 83cbc846d56ee8d48b9ba347ed508287: 21300000
-    - ce4ec877e6c67f04fa72200d4f4c0cef: 21300000
     - f2d31bb76127a7545bb62af37e7e006f: 21300000
     - ecea42b89d4de5f42a25fd1a598b26a1: 21300000
-    - 59529359bfe0c5e448271d498db49b5d: 21300000
     - 7383f98aba0fc1f4c97010b513d5b884: 21300000
     - a6393dfa169b0764d80cb569f918b34c: 21300000
-    - 61452aab1f01ced43941cfc3deee9816: 21300000
     - bf5c110c09e41cf4dada1e8df10b9e6e: 21300000
     - e66e0c1db7133154d974db00d459e999: 21300000
     - f58c178fd3c06a743b8244d9281a79ab: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
-  - {fileID: 21300000, guid: 94d2a3c0a1960db459ed830ef1bcecab, type: 3}
-  - {fileID: 21300000, guid: a3752a11b653e7b478d17714e6f4ffef, type: 3}
   - {fileID: 21300000, guid: 1d183c612f1866943a54609ced7fece7, type: 3}
   - {fileID: 21300000, guid: 5deb6694a398abc4ab780d5d83778900, type: 3}
   - {fileID: 21300000, guid: 3406fac525d9a894b9906cb27b4def17, type: 3}
-  - {fileID: 21300000, guid: 2b09f4367842bc1418c7062bfe03f99a, type: 3}
   - {fileID: 21300000, guid: 83cbc846d56ee8d48b9ba347ed508287, type: 3}
-  - {fileID: 21300000, guid: ce4ec877e6c67f04fa72200d4f4c0cef, type: 3}
   - {fileID: 21300000, guid: f2d31bb76127a7545bb62af37e7e006f, type: 3}
   - {fileID: 21300000, guid: ecea42b89d4de5f42a25fd1a598b26a1, type: 3}
-  - {fileID: 21300000, guid: 59529359bfe0c5e448271d498db49b5d, type: 3}
   - {fileID: 21300000, guid: 7383f98aba0fc1f4c97010b513d5b884, type: 3}
   - {fileID: 21300000, guid: a6393dfa169b0764d80cb569f918b34c, type: 3}
-  - {fileID: 21300000, guid: 61452aab1f01ced43941cfc3deee9816, type: 3}
   - {fileID: 21300000, guid: bf5c110c09e41cf4dada1e8df10b9e6e, type: 3}
   - {fileID: 21300000, guid: e66e0c1db7133154d974db00d459e999, type: 3}
   - {fileID: 21300000, guid: f58c178fd3c06a743b8244d9281a79ab, type: 3}
   m_PackedSpriteNamesToIndex:
-  - silhouette-02
-  - silhouette-01
   - NoCover
   - '[score]rating_0'
   - '[score]rating_1'
-  - silhouette-06
   - '[score]rating_6'
-  - silhouette-04
   - '[score]rating_2'
   - DuetIcon
-  - silhouette-05
   - VideoIcon
   - '[score]rating_7'
-  - silhouette-03
   - '[score]rating_5'
   - '[score]rating_3'
   - '[score]rating_4'

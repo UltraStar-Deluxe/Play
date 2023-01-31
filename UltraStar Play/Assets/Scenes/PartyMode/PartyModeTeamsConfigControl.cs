@@ -88,7 +88,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
             AddTeam();
         }
 
-        PlayerProfile newGuestProfile = new("", EDifficulty.Medium, EAvatar.GenericPlayer01);
+        PlayerProfile newGuestProfile = new("", EDifficulty.Medium);
         string newGuestProfileName = GetDefaultGuestProfileName(newGuestProfile, partyModeSettings);
         newGuestProfile.Name = newGuestProfileName;
         partyModeSettings.teamSettings.teams.FirstOrDefault().guestPlayerProfiles.Add(newGuestProfile);

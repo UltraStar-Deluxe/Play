@@ -59,6 +59,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     private readonly float animationTimeInSeconds = 1f;
 
     public void OnInjectionFinished()
@@ -68,7 +71,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             ? GetTeamName()
             : PlayerProfile.Name;
         injector.WithRootVisualElement(playerImage)
-            .CreateAndInject<AvatarImageControl>();
+            .CreateAndInject<PlayerProfileImageControl>();
 
         // Song rating
         LoadSongRatingSprite(songRating.EnumValue, songRatingSprite =>
@@ -126,7 +129,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private void LoadSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
         if (settings.DeveloperSettings.disableDynamicThemes
-            || ThemeManager.Instance.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
+            || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
             LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
             return;
@@ -138,7 +141,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     {
         try
         {
-            ThemeMeta themeMeta = ThemeManager.Instance.GetCurrentTheme();
+            ThemeMeta themeMeta = themeManager.GetCurrentTheme();
             string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
             if (valueForSongRating.IsNullOrEmpty())
             {

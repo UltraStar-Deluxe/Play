@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using ProTrans;
 using System.Linq;
 using PortAudioForUnity;
 using UnityEngine;
@@ -112,6 +113,30 @@ public static class ApplicationUtils
         return diagonalInInches;
     }
 
+    public static string ReplacePathsWithDisplayString(string text)
+    {
+        if (PlatformUtils.IsAndroid)
+        {
+            string internalStorageTranslation = "Internal Storage";
+            string sdCardStorageTranslation = "SD Card";
+            if (ThreadUtils.IsMainThread())
+            {
+                // The ProTrans TranslationManager only works on the main thread.
+                internalStorageTranslation = TranslationManager.GetTranslation("androidInternalStorage");
+                sdCardStorageTranslation = TranslationManager.GetTranslation("androidSdCardStorage");
+            }
+
+            string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
+            internalStorageRoot = "F:\\";
+            string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);
+            return text
+                .Replace(internalStorageRoot, $"{internalStorageTranslation}/")
+                .Replace(sdCardStorageRoot, $"{sdCardStorageTranslation}/");
+        }
+
+        return text;
+    }
+    
     public static string GetGeneratedOutputFolderForSourceFilePath(string generatedFolderBasePath, string sourceFilePath)
     {
         // Include hash code of file path in the generated folder name

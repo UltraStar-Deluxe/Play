@@ -22,6 +22,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [InjectedInInspector]
     public List<SongRatingImageReference> songRatingImageReferences;
 
+    [InjectedInInspector]
+    public SongAudioPlayer songAudioPlayer;
+
+    [InjectedInInspector]
+    public SongPreviewControl songPreviewControl;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -67,27 +73,16 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [Inject]
     private GameRoundManager gameRoundManager;
 
+	[Inject]
     private SingingResultsSceneData sceneData;
-    public SingingResultsSceneData SceneData
-    {
-        get
-        {
-            if (sceneData == null)
-            {
-                sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SingingResultsSceneData>();
-            }
-
-            return sceneData;
-        }
-    }
 
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
 
-    private bool ShowHighScoresNext => !SceneData.IsMedley
+    private bool ShowHighScoresNext => !sceneData.IsMedley
                                        && !HasPartyModeSettings
-                                       && statistics.HasHighscore(SceneData.SongMetas.LastOrDefault());
+                                       && statistics.HasHighscore(sceneData.SongMetas.LastOrDefault());
 
     public static SingingResultsSceneControl Instance
     {
@@ -97,7 +92,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
     }
 
-    public PartyModeSettings PartyModeSettings => SceneData.partyModeSettings;
+    public PartyModeSettings PartyModeSettings => sceneData.partyModeSettings;
     public bool HasPartyModeSettings => PartyModeSettings != null;
     public bool HasFinalTeamResults => PartyModeUtils.IsFinalRound(PartyModeSettings);
 
@@ -122,6 +117,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         InitClickThoughToHiddenContinueButton();
 
+        songAudioPlayer.Init(sceneData.SongMetas.LastOrDefault());
+
+        songPreviewControl.PreviewDelayInSeconds = 0;
+        songPreviewControl.AudioFadeInDurationInSeconds = 2;
+        songPreviewControl.VideoFadeInDurationInSeconds = 2;
+        songPreviewControl.StartSongPreview(sceneData.SongMetas.LastOrDefault());
+
         ActivateLayout();
         FillLayout();
 
@@ -136,7 +138,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             return;
         }
 
-        PartyModeTeamSettings knockedOutTeam = GetKnockedOutTeam(SceneData.PlayerProfileToMicProfileMap.Keys.ToList());
+        PartyModeTeamSettings knockedOutTeam = GetKnockedOutTeam(sceneData.PlayerProfileToMicProfileMap.Keys.ToList());
 
         // Mark team as knocked out
         knockedOutTeam.isKnockedOut = true;
@@ -172,13 +174,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void FillLayout()
     {
-        if (SceneData.IsMedley)
+        if (sceneData.IsMedley)
         {
             songLabel.text = TranslationManager.GetTranslation(R.Messages.score_total);
         }
         else
         {
-            SongMeta songMeta = SceneData.SongMetas.LastOrDefault();
+            SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
             string titleText = songMeta.Title.IsNullOrEmpty() ? "" : songMeta.Title;
             string artistText = songMeta.Artist.IsNullOrEmpty() ? "" : " - " + songMeta.Artist;
             songLabel.text = titleText + artistText;
@@ -196,10 +198,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         singingResultsPlayerUiControls.Clear();
         int i = 0;
-        foreach (PlayerProfile playerProfile in SceneData.PlayerProfiles)
+        foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
-            SceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            PlayerScoreControlData playerScoreData = SceneData.GetPlayerScores(playerProfile);
+            sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
+            PlayerScoreControlData playerScoreData = sceneData.GetPlayerScores(playerProfile);
             SongRating songRating = GetSongRating(playerScoreData.TotalScore);
 
             Injector childInjector = UniInjectUtils.CreateInjector(injector);
@@ -224,11 +226,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void PrepareNPlayerLayout()
     {
-        int playerCount = SceneData.PlayerProfiles.Count;
+        int playerCount = sceneData.PlayerProfiles.Count;
         // Add elements to "square similar" grid
-        int columns = (int)Math.Sqrt(SceneData.PlayerProfiles.Count);
+        int columns = (int)Math.Sqrt(sceneData.PlayerProfiles.Count);
         int rows = (int)Math.Ceiling((float)playerCount / columns);
-        if (SceneData.PlayerProfiles.Count == 3)
+        if (sceneData.PlayerProfiles.Count == 3)
         {
             columns = 3;
             rows = 1;
@@ -261,7 +263,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
                 columnElement.Add(playerUi);
 
                 playerIndex++;
-                if (playerIndex >= SceneData.PlayerProfiles.Count)
+                if (playerIndex >= sceneData.PlayerProfiles.Count)
                 {
                     // Enough, i.e., one for every player.
                     return;
@@ -286,7 +288,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private VisualElement GetSelectedLayout()
     {
-        int playerCount = SceneData.PlayerProfiles.Count;
+        int playerCount = sceneData.PlayerProfiles.Count;
         if (playerCount == 1)
         {
             return onePlayerLayout;
@@ -304,8 +306,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         {
             // Go to highscore scene
             HighscoreSceneData highscoreSceneData = new();
-            highscoreSceneData.SongMeta = SceneData.SongMetas.LastOrDefault();
-            highscoreSceneData.Difficulty = SceneData.PlayerProfiles.FirstOrDefault().Difficulty;
+            highscoreSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
+            highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
             sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
         }
         else if (!HasPartyModeSettings && gameRoundManager.HasGameRounds)
@@ -328,8 +330,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             }
 
             SongSelectSceneData songSelectSceneData = new();
-            songSelectSceneData.SongMeta = SceneData.SongMetas.LastOrDefault();
-            songSelectSceneData.PartyModeSettings = SceneData.partyModeSettings;
+            songSelectSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
+            songSelectSceneData.PartyModeSettings = sceneData.partyModeSettings;
             sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
     }
@@ -355,10 +357,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
-        bb.BindExistingInstance(SceneData);
+        bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<SingingResultsSceneData>());
+        bb.BindExistingInstance(songAudioPlayer);
+        bb.BindExistingInstance(songPreviewControl);
         bb.BindExistingInstance(nextGameRoundUiControl);
         bb.BindExistingInstance(teamResultsUiControl);
         bb.Bind(nameof(teamResultUi)).ToExistingInstance(teamResultUi);
+
         return bb.GetBindings();
     }
 
@@ -389,7 +394,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
 
         // Determine first best and second best players of this round
-        List<PlayerProfile> unusedPlayerProfiles = SceneData.PlayerProfiles.ToList();
+        List<PlayerProfile> unusedPlayerProfiles = sceneData.PlayerProfiles.ToList();
         List<PlayerProfile> firstPlayers = GetTopPlayers(unusedPlayerProfiles);
         firstPlayers.ForEach(playerProfile => unusedPlayerProfiles.Remove(playerProfile));
 
@@ -417,10 +422,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
 
         int highestScore = playerProfiles
-            .Select(playerProfile => SceneData.GetPlayerScores(playerProfile).TotalScore)
+            .Select(playerProfile => sceneData.GetPlayerScores(playerProfile).TotalScore)
             .Max();
         return playerProfiles
-            .Where(playerProfile => SceneData.GetPlayerScores(playerProfile).TotalScore == highestScore)
+            .Where(playerProfile => sceneData.GetPlayerScores(playerProfile).TotalScore == highestScore)
             .ToList();
     }
 
@@ -456,7 +461,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private PlayerProfile GetPlayerProfileOfThisRound(PartyModeTeamSettings team)
     {
-        List<PlayerProfile> playerProfiles = SceneData.PlayerProfileToMicProfileMap.Keys.ToList();
+        List<PlayerProfile> playerProfiles = sceneData.PlayerProfileToMicProfileMap.Keys.ToList();
         PlayerProfile playerProfileOfTeam = playerProfiles.FirstOrDefault(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile) == team);
         return playerProfileOfTeam;
     }
@@ -469,6 +474,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             return 0;
         }
 
-        return SceneData.GetPlayerScores(playerProfileOfTeam).TotalScore;
+        return sceneData.GetPlayerScores(playerProfileOfTeam).TotalScore;
     }
 }

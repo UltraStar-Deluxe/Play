@@ -42,7 +42,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         InitItems();
 
         // Update settings
-        Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = playlistManager.GetPlaylistName(newPlaylist));
+        Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = newPlaylist.Name);
 
         // Show playlist name in button
         Selection.Subscribe(playlist => playlistChooserButton.text = playlistManager.GetPlaylistName(playlist));
@@ -130,7 +130,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         if (songSelectSceneControl.UsePartyModePlaylist)
         {
             // Changing the playlist is not allowed
-            UiManager.Instance.CreateNotificationVisualElement("Using playlist from party mode settings");
+            UiManager.CreateNotification("Using playlist from party mode settings");
             return;
         }
 

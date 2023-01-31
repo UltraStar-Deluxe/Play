@@ -1,0 +1,11 @@
+#TITLE:Tränenüberströmt nach Fußmassage
+#ARTIST:Käse und Gemüse
+#MP3:TestSong.ogg
+#BPM:200
+#GAP:0
+#LANGUAGE:German
+- 0
+: 4 3 9 Süße 
+: 8 3 9 Löwen
+: 12 3 9 babys!
+E

@@ -135,7 +135,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogError(ex);
-                uiManager.CreateNotificationVisualElement(ex.Message);
+                UiManager.CreateNotification(ex.Message);
             })
             .Subscribe(createdNotes =>
             {

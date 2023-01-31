@@ -39,6 +39,9 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     [Inject]
     private UiManager uiManager;
 
+    [Inject]
+    private SongSelectSceneData sceneData;
+
     [Inject(UxmlName = R.UxmlNames.gameRoundsOverlay)]
     private VisualElement gameRoundsOverlay;
 
@@ -167,7 +170,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     {
         RandomlySelectedSong = GetRandomSong();
         songRouletteControl.SelectSong(RandomlySelectedSong);
-        songSelectSceneControl.SceneData.SongMeta = RandomlySelectedSong;
+        sceneData.SongMeta = RandomlySelectedSong;
         Debug.Log($"Selected random song: {RandomlySelectedSong}");
     }
 
@@ -175,15 +178,15 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     {
         VisualElement jokerList = new();
         jokerList.AddToClassList("jokerList");
-        if (songSelectSceneControl.SceneData.PartyModeSettings.songSelectionSettings.jokerCount < 0)
+        if (sceneData.PartyModeSettings.songSelectionSettings.jokerCount < 0)
         {
             return jokerList;
         }
 
-        for (int i = 0; i < songSelectSceneControl.SceneData.PartyModeSettings.songSelectionSettings.jokerCount; i++)
+        for (int i = 0; i < sceneData.PartyModeSettings.songSelectionSettings.jokerCount; i++)
         {
             MaterialIcon jokerIcon = new();
-            jokerIcon.icon = "casino";
+            jokerIcon.Icon = "casino";
             jokerIcon.AddToClassList("jokerIcon");
             jokerList.Add(jokerIcon);
         }

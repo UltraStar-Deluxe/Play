@@ -171,7 +171,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             string errorMessage = GetTeamsConfigErrorMessage();
             if (!errorMessage.IsNullOrEmpty())
             {
-                uiManager.CreateNotificationVisualElement(errorMessage);
+                UiManager.CreateNotification(errorMessage);
                 return;
             }
 
@@ -182,7 +182,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             string errorMessage = GetSongSelectionConfigErrorMessage();
             if (!errorMessage.IsNullOrEmpty())
             {
-                uiManager.CreateNotificationVisualElement(errorMessage);
+                UiManager.CreateNotification(errorMessage);
                 return;
             }
 
@@ -193,7 +193,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             string errorMessage = GetRoundsConfigErrorMessage();
             if (!errorMessage.IsNullOrEmpty())
             {
-                uiManager.CreateNotificationVisualElement(errorMessage);
+                UiManager.CreateNotification(errorMessage);
                 return;
             }
 

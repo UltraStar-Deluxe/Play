@@ -63,7 +63,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         {
             for (int i = 1; i <= partyModeTeams; i++)
             {
-                PlayerProfile guestPlayerProfile = new($"Guest 0{i}", EDifficulty.Medium, EAvatar.GenericPlayer01);
+                PlayerProfile guestPlayerProfile = new($"Guest 0{i}", EDifficulty.Medium);
 
                 PartyModeTeamSettings teamSettings = new();
                 teamSettings.name = $"Team 0{i}";

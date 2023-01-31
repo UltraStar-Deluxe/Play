@@ -14,25 +14,13 @@ public class JobManager : MonoBehaviour, INeedInjection
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
     {
-        instance = null;
         jobsWithoutParent = new();
     }
 
     // Static field to be persisted across scenes
     private static List<Job> jobsWithoutParent = new();
 
-    private static JobManager instance;
-    public static JobManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = GameObjectUtils.FindComponentWithTag<JobManager>("JobManager");
-            }
-            return instance;
-        }
-    }
+    public static JobManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<JobManager>();
 
     [InjectedInInspector]
     public VisualTreeAsset jobListUi;
@@ -271,13 +259,5 @@ public class JobManager : MonoBehaviour, INeedInjection
             .CatchIgnore((Exception ex) => job.SetResult(EJobResult.Error))
             .Subscribe(_ => job.SetStatus(EJobStatus.Finished));
         return job;
-    }
-
-    private void OnDestroy()
-    {
-        if (Instance == this)
-        {
-            instance = null;
-        }
     }
 }

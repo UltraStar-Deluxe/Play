@@ -4,7 +4,7 @@
         <ui:VisualElement name="column">
             <ui:VisualElement name="row" style="flex-direction: row; align-items: flex-end; margin-left: 20px; margin-right: 20px;">
                 <ui:VisualElement name="playerInfoContainer" style="flex-direction: row; align-items: flex-end;">
-                    <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DefaultAvatars/silhouette-01.png?fileID=2800000&amp;guid=a3752a11b653e7b478d17714e6f4ffef&amp;type=3#silhouette-01&apos;); align-items: center;" />
+                    <ui:VisualElement name="playerImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit;" />
                     <ui:VisualElement name="playerNameContainer" style="margin-left: 10px; margin-right: 10px;">
                         <ui:VisualElement name="leadingPlayerIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/LeadingPlayerCrown.svg?fileID=7388822144124034973&amp;guid=8f8cd0bf8e4776546b467068aacdf098&amp;type=3#LeadingPlayerCrown&apos;); -unity-background-scale-mode: scale-to-fit; margin-top: -5px; margin-bottom: -5px; flex-shrink: 2;" />
                         <ui:Label text="Player 01" display-tooltip-when-elided="true" name="playerNameLabel" class="textOutline largeFont" style="-unity-text-align: middle-left; flex-shrink: 1;" />

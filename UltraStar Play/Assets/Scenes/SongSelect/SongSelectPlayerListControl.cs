@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         lastPlayerProfileToMicProfileMap = null;
     }
@@ -179,7 +179,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         List<MicProfile> usedMicProfiles = playerEntryControls.Where(it => it.MicProfile != null)
             .Select(it => it.MicProfile)
             .ToList();
-        List<MicProfile> enabledAndConnectedMicProfiles = SettingsManager.Instance.Settings.MicProfiles
+        List<MicProfile> enabledAndConnectedMicProfiles = settings.MicProfiles
             .Where(it => it.IsEnabled && it.IsConnected(serverSideConnectRequestManager))
             .ToList();
         List<MicProfile> unusedMicProfiles = enabledAndConnectedMicProfiles

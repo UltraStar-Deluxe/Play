@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -31,6 +33,9 @@ public class ApplyTranslationsOnSceneInjectionFinished : MonoBehaviour, INeedInj
 
     public void UpdateTranslatorsInScene()
     {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
         int count = 0;
         Scene scene = SceneManager.GetActiveScene();
         GameObject[] rootObjects = scene.GetRootGameObjects();
@@ -50,7 +55,7 @@ public class ApplyTranslationsOnSceneInjectionFinished : MonoBehaviour, INeedInj
         if ((translationManager.logInfoInEditMode && !Application.isPlaying)
             || (translationManager.logInfoInPlayMode && Application.isPlaying))
         {
-            Debug.Log($"Updated ITranslator instances in scene: {count}");
+            Debug.Log($"Updated {count} ITranslator instances in scene took {stopwatch.ElapsedMilliseconds} ms");
         }
     }
 }

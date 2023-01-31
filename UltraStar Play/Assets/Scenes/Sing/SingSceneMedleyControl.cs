@@ -57,7 +57,8 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        if (Math.Abs(songAudioPlayer.PositionInSongInMillis - CalculateMedleyEndInMillis()) < 1000)
+        if (!singSceneFinisher.IsSongFinished
+            && Math.Abs(songAudioPlayer.PositionInSongInMillis - CalculateMedleyEndInMillis()) < 1000)
         {
             Debug.Log($"Trigger medley song finish");
             singSceneFinisher.TriggerEarlySongFinish();
