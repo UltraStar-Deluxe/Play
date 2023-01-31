@@ -10,6 +10,7 @@ public static partial class R
         public const string background = "background";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string cancelButton = "cancelButton";
+        public const string changeVolumeContainer = "changeVolumeContainer";
         public const string chipsComboButton = "chipsComboButton";
         public const string chipsComboButtonIcon = "chipsComboButtonIcon";
         public const string chipsComboChipsList = "chipsComboChipsList";
@@ -127,5 +128,6 @@ public static partial class R
         public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";
+        public const string volumeSlider = "volumeSlider";
     }
 }

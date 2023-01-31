@@ -6,6 +6,8 @@ using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 using ProTrans;
+using UnityEditor.UIElements;
+using UnityEngine.Networking;
 using Button = UnityEngine.UIElements.Button;
 using IBinding = UniInject.IBinding;
 using Toggle = UnityEngine.UIElements.Toggle;
@@ -151,8 +153,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
     private VisualElement recordingDeviceColorIndicator;
 
+    [Inject(UxmlName = R.UxmlNames.volumeSlider)]
+    private SliderInt volumeSlider;
+
     [Inject]
     private Injector injector;
+
+    [Inject]
+    private MainGameHttpClient mainGameHttpClient;
 
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
@@ -163,6 +171,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private int frameCount;
 
     private readonly InputSimulationControl inputSimulationControl = new();
+
+    private bool isVolumeSliderInitialized;
 
     public void OnInjectionFinished()
     {
@@ -220,8 +230,31 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             UpdateSongList();
         });
 
+        mainGameHttpClient.ConnectionEventStream.Subscribe(_ => InitVolumeSlider());
+
         InitTabGroup();
         InitMenu();
+    }
+
+    private void InitVolumeSlider()
+    {
+        mainGameHttpClient.GetRequest("api/rest/config/volume",
+            response =>
+            {
+                if (isVolumeSliderInitialized)
+                {
+                    return;
+                }
+
+                isVolumeSliderInitialized = true;
+                PropertyUtils.TrySetIntFromString(response, newIntValue => volumeSlider.value = newIntValue);
+
+                Subject<int> volumeSliderValueChangedEventStream = new();
+                volumeSlider.RegisterValueChangedCallback(evt => volumeSliderValueChangedEventStream.OnNext(evt.newValue));
+                volumeSliderValueChangedEventStream
+                    .Throttle(TimeSpan.FromMilliseconds(200))
+                    .Subscribe(newValue => mainGameHttpClient.PostRequest($"api/rest/config/volume/{newValue}"));
+            });
     }
 
     private void InitTabGroup()
