@@ -21,6 +21,9 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
     [Inject]
     private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
+    private readonly Subject<bool> connectionEventStream = new();
+    public IObservable<bool> ConnectionEventStream => connectionEventStream;
+
     private void Start()
     {
         clientSideConnectRequestManager.ConnectEventStream
@@ -29,6 +32,8 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
             {
                 serverIPEndPoint = connectEvent.ServerIpEndPoint;
                 httpServerPort = connectEvent.HttpServerPort;
+
+                connectionEventStream.OnNext(true);
             });
     }
 
@@ -41,7 +46,7 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         return $"http://{serverIPEndPoint.Address}:{httpServerPort}{path}";
     }
 
-    public UnityWebRequest GetRequest(string path)
+    public IObservable<UnityWebRequestAsyncOperation> GetRequest(string path, Action<string> onSuccess = null)
     {
         ThrowIfNotConnected();
 
@@ -51,11 +56,14 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
             .SendWebRequest()
             .AsAsyncOperationObservable();
-        HandleRequest(unityWebRequest, asyncOperation);
-        return unityWebRequest;
+        HandleRequest(unityWebRequest, asyncOperation, onSuccess);
+        return asyncOperation;
     }
 
-    public UnityWebRequest PostRequest(string path, Dictionary<string, string> formFields = null)
+    public IObservable<UnityWebRequestAsyncOperation> PostRequest(
+        string path,
+        Dictionary<string, string> formFields = null,
+        Action<string> onSuccess = null)
     {
         ThrowIfNotConnected();
 
@@ -70,18 +78,17 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
             .SendWebRequest()
             .AsAsyncOperationObservable();
-        HandleRequest(unityWebRequest, asyncOperation);
-        return unityWebRequest;
+        HandleRequest(unityWebRequest, asyncOperation, onSuccess);
+        return asyncOperation;
     }
 
-    private void HandleRequest(
-        UnityWebRequest unityWebRequest,
-        IObservable<UnityWebRequestAsyncOperation> asyncOperationObservable)
+    private void HandleRequest(UnityWebRequest unityWebRequest,
+        IObservable<UnityWebRequestAsyncOperation> asyncOperationObservable, Action<string> onSuccess)
     {
         asyncOperationObservable.Subscribe(
             _ => RequestOnNext(unityWebRequest),
             ex => RequestOnError(unityWebRequest, ex),
-            () => RequestOnCompleted(unityWebRequest));
+            () => RequestOnCompleted(unityWebRequest, onSuccess));
     }
 
     private void RequestOnNext(UnityWebRequest unityWebRequest)
@@ -95,9 +102,14 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         Debug.LogException(ex);
     }
 
-    private void RequestOnCompleted(UnityWebRequest unityWebRequest)
+    private void RequestOnCompleted(UnityWebRequest unityWebRequest, Action<string> onSuccess)
     {
-        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Result: {unityWebRequest.result}");
+        string responseBody = unityWebRequest.downloadHandler.text;
+        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Result: {unityWebRequest.result}, response body: {responseBody}");
+        if (onSuccess != null)
+        {
+            MainThreadDispatcher.Send(_ => onSuccess(responseBody), null);
+        }
     }
 
     private void ThrowIfNotConnected()
