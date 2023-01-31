@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ProTrans;
 using UniInject;
@@ -12,15 +13,17 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UiManager : MonoBehaviour, INeedInjection, IBinder
+public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 {
-    public static UiManager Instance
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
     {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<UiManager>("UiManager");
-        }
+        relativePlayerProfileImagePathToAbsolutePath = new();
     }
+
+    public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
+
+    private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
     [InjectedInInspector]
     public VisualTreeAsset notificationOverlayVisualTreeAsset;
@@ -35,36 +38,35 @@ public class UiManager : MonoBehaviour, INeedInjection, IBinder
     public VisualTreeAsset accordionUi;
 
     [InjectedInInspector]
+    public Sprite fallbackPlayerProfileImage;
+
+    [InjectedInInspector]
     public VisualTreeAsset nextGameRoundInfoUi;
 
     [InjectedInInspector]
     public VisualTreeAsset nextGameRoundInfoPlayerEntryUi;
 
-    [InjectedInInspector]
-    public ShowFps showFpsPrefab;
-
-    [InjectedInInspector]
-    public List<AvatarImageReference> avatarImageReferences;
-
     [Inject]
     private Injector injector;
 
-    [Inject(Optional = true)]
+    [Inject]
     private UIDocument uiDocument;
 
-    private ShowFps showFpsInstance;
+    [Inject]
+    private SceneNavigator sceneNavigator;
 
-    private void Awake()
+    [Inject]
+    private Settings settings;
+
+    protected override object GetInstance()
     {
-        LeanTween.init(10000);
+        return Instance;
     }
 
-    private void Start()
+    protected override void AwakeSingleton()
     {
-        if (SettingsManager.Instance.Settings.DeveloperSettings.showFps)
-        {
-            CreateShowFpsInstance();
-        }
+        LeanTween.init(10000);
+        UpdatePlayerProfileImagePaths();
     }
 
     private void Update()
@@ -73,40 +75,10 @@ public class UiManager : MonoBehaviour, INeedInjection, IBinder
             .ForEach(contextMenuPopupControl => contextMenuPopupControl.Update());
     }
 
-    public void CreateShowFpsInstance()
+    private Label DoCreateNotification(
+        string text,
+        params string[] additionalTextClasses)
     {
-        if (showFpsInstance != null)
-        {
-            return;
-        }
-
-        showFpsInstance = Instantiate(showFpsPrefab);
-        injector.Inject(showFpsInstance);
-        // Move to front
-        showFpsInstance.transform.SetAsLastSibling();
-        showFpsInstance.transform.position = new Vector3(20, 20, 0);
-    }
-
-    public void DestroyShowFpsInstance()
-    {
-        if (showFpsInstance != null)
-        {
-            Destroy(showFpsInstance);
-        }
-    }
-
-    public void CreateNotificationVisualElement(string text)
-    {
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAction(() => DoCreateNotificationVisualElement(text)));
-    }
-
-    private void DoCreateNotificationVisualElement(string text)
-    {
-        if (uiDocument == null)
-        {
-            return;
-        }
-
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
@@ -124,6 +96,20 @@ public class UiManager : MonoBehaviour, INeedInjection, IBinder
 
         // Fade out then remove
         StartCoroutine(FadeOutVisualElement(notification, 2, 1));
+
+        return notificationLabel;
+    }
+
+    public void UpdatePlayerProfileImagePaths()
+    {
+        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages();
+    }
+
+    public static Label CreateNotification(
+        string text,
+        params string[] additionalTextClasses)
+    {
+        return Instance.DoCreateNotification(text, additionalTextClasses);
     }
 
     public static IEnumerator FadeOutVisualElement(
@@ -151,13 +137,6 @@ public class UiManager : MonoBehaviour, INeedInjection, IBinder
         {
             visualElement.parent.Remove(visualElement);
         }
-    }
-
-    public Sprite GetAvatarSprite(EAvatar avatar)
-    {
-        AvatarImageReference avatarImageReference = avatarImageReferences
-            .FirstOrDefault(it => it.avatar == avatar);
-        return avatarImageReference?.sprite;
     }
 
     public MessageDialogControl CreateMessageDialog(string dialogTitle)
@@ -210,16 +189,50 @@ public class UiManager : MonoBehaviour, INeedInjection, IBinder
         return accordionItemControl;
     }
 
-    public static UIDocument FindUiDocument()
+    public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
     {
-        GameObject uiDocGameObject = GameObject.FindWithTag("UIDocument");
-        if (uiDocGameObject != null)
+        if (imagePath.IsNullOrEmpty())
         {
-            return uiDocGameObject.GetComponent<UIDocument>();
+            onSuccess(fallbackPlayerProfileImage);
+            return;
         }
-        return null;
+
+        string matchingFullPath = GetAbsolutePlayerProfileImagePaths().FirstOrDefault(absolutePath =>
+        {
+            string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
+            string relativePathNormalized = PathUtils.NormalizePath(imagePath);
+            return absolutePathNormalized.EndsWith(relativePathNormalized);
+        });
+        if (matchingFullPath.IsNullOrEmpty())
+        {
+            Debug.LogWarning($"Cannot load player profile image with path '{imagePath}', no corresponding image file found.");
+            onSuccess(fallbackPlayerProfileImage);
+            return;
+        }
+
+        ImageManager.LoadSpriteFromUri(matchingFullPath, onSuccess);
     }
 
+    public List<string> GetAbsolutePlayerProfileImagePaths()
+    {
+        return relativePlayerProfileImagePathToAbsolutePath.Values.ToList();
+    }
+
+    public List<string> GetRelativePlayerProfileImagePaths(bool includeWebCamImages)
+    {
+        if (includeWebCamImages)
+        {
+            return relativePlayerProfileImagePathToAbsolutePath.Keys.ToList();
+        }
+        else
+        {
+            return relativePlayerProfileImagePathToAbsolutePath.Keys
+                .Where(relativePath => !relativePath.Contains(PlayerProfileUtils.PlayerProfileWebCamImagesFolderName))
+                .ToList();
+        }
+
+    }
+    
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();

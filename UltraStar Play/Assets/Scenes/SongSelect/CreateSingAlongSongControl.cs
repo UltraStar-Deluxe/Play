@@ -55,7 +55,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         if (lastProcessSongJob != null
             && lastProcessSongJob.Result.Value == EJobResult.Pending)
         {
-            uiManager.CreateNotificationVisualElement("Already processing a song.\nWait until the running tasks have finished.");
+            UiManager.CreateNotification("Already processing a song.\nWait until the running tasks have finished.");
             return;
         }
 
@@ -118,7 +118,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         Debug.LogError(ex);
                         speechRecognitionJob.SetResult(EJobResult.Error);
                         pitchDetectionJob.SetResult(EJobResult.Error);
-                        uiManager.CreateNotificationVisualElement(ex.Message);
+                        UiManager.CreateNotification(ex.Message);
                     })
                     .Subscribe(createdNotes =>
                     {

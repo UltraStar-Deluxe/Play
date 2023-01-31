@@ -18,13 +18,7 @@ public class GameRoundManager : MonoBehaviour, INeedInjection
 
     private static readonly List<GameRoundData> gameRoundDatas = new();
 
-    public static GameRoundManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<GameRoundManager>("GameRoundManager");
-        }
-    }
+    public static GameRoundManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<GameRoundManager>();
 
     public bool HasGameRounds => !GetGameRounds().IsNullOrEmpty();
 
@@ -83,7 +77,7 @@ public class GameRoundManager : MonoBehaviour, INeedInjection
 
         if (lastGameRound.SongMetas.Contains(songMeta))
         {
-            uiManager.CreateNotificationVisualElement("Song is already in list");
+            UiManager.CreateNotification("Song is already in list");
             return;
         }
 

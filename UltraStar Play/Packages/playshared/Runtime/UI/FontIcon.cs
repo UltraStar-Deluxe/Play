@@ -6,7 +6,19 @@ public abstract class FontIcon : Label
 {
     private static string missingIconText = "?";
 
-    public string icon;
+    private string icon;
+    public string Icon
+    {
+        get
+        {
+            return icon;
+        }
+        set
+        {
+            icon = value;
+            UpdateIcon();
+        }
+    }
 
     public new class UxmlTraits : VisualElement.UxmlTraits
     {
@@ -17,27 +29,33 @@ public abstract class FontIcon : Label
         {
             base.Init(ve, bag, cc);
             FontIcon target = ve as FontIcon;
+            target.Icon = icon.GetValueFromBag(bag, cc);
+        }
+    }
 
-            // Read additional attributes from XML
-            target.icon = icon.GetValueFromBag(bag, cc);
+    protected FontIcon()
+    {
+        Icon = "";
+    }
 
-            // Set USS classes and text (codepoint of the icon) to render the icon from a Font Asset.
-            if (string.IsNullOrEmpty(target.icon))
+    private void UpdateIcon()
+    {
+        // Set USS classes and text (codepoint of the icon) to render the icon from a Font Asset.
+        if (string.IsNullOrEmpty(icon))
+        {
+            text = "";
+        }
+        else
+        {
+            if (TryGetCodepointByIconName(icon, out string codepoint))
             {
-                target.text = "";
+                AddToClassList("fontIcon");
+                AddToClassList(GetIconFontUssClass());
+                text = "\\u" + codepoint;
             }
             else
             {
-                if (target.TryGetCodepointByIconName(target.icon, out string codepoint))
-                {
-                    target.AddToClassList("fontIcon");
-                    target.AddToClassList(target.GetIconFontUssClass());
-                    target.text = "\\u" + codepoint;
-                }
-                else
-                {
-                    target.text = missingIconText;
-                }
+                text = missingIconText;
             }
         }
     }

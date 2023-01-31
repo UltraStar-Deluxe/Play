@@ -17,25 +17,13 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
-        instance = null;
         lockObject = new();
         audioSeparationProcessCount = 0;
     }
     private static object lockObject = new();
     private static int audioSeparationProcessCount;
 
-    private static AudioSeparationManager instance;
-    public static AudioSeparationManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = GameObjectUtils.FindComponentWithTag<AudioSeparationManager>("AudioSeparationManager");
-            }
-            return instance;
-        }
-    }
+    public static AudioSeparationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioSeparationManager>();
 
     [Inject]
     private AudioManager audioManager;
@@ -111,7 +99,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     {
         if (audioSeparationProcessCount > 0)
         {
-            uiManager.CreateNotificationVisualElement("Already performing audio separation");
+            UiManager.CreateNotification("Already performing audio separation");
             return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing audio separation"));
         }
 

@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.achimmihca.portaudioforunity": {
+      "version": "https://github.com/achimmihca/PortAudioForUnity.git?path=PortAudioForUnity/Packages/com.achimmihca.portaudioforunity#472d7de6024274f3865f572399dc4c420fe70507",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "472d7de6024274f3865f572399dc4c420fe70507"
+    },
     "com.achimmihca.primeinputactions": {
       "version": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#v1.0.0",
       "depth": 0,
@@ -12,14 +19,28 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "v1.0.0"
+      "hash": "9d50e260346432ca05b6508b09e21f530ba3bae0"
     },
-    "com.achimmihca.uniinject": {
-      "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#v5.0.1",
+    "com.achimmihca.simplehttpserverforunity": {
+      "version": "https://github.com/achimmihca/SimpleHttpServerForUnity.git?path=SimpleHttpServerForUnity/Packages/com.achimmihca.simplehttpserverforunity#v1.0.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "04879fa41030fbd4e2a9ddc0c2350201f3a5630a"
+      "hash": "dca59973cd6eccc68f353d1489b50196c926e665"
+    },
+    "com.achimmihca.uniinject": {
+      "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#f8c6f93dabc03137957588f7d9e572fc623272b0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "f8c6f93dabc03137957588f7d9e572fc623272b0"
+    },
+    "com.achimmihca.utfunknownunity": {
+      "version": "https://github.com/achimmihca/UTF-Unknown-Unity.git?path=UTF-Unknown-Unity/Packages/com.achimmihca.utfunknownunity#v1.0.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "31253e868265494482a8bb32269942b0b2e3d17e"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -55,14 +76,14 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ext.nunit": {
-      "version": "2.0.3",
+      "version": "1.0.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.16",
+      "version": "3.0.17",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -71,7 +92,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.16",
+      "version": "2.0.17",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -103,7 +124,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.services.core": {
-      "version": "1.5.2",
+      "version": "1.7.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -352,15 +373,6 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {}
-    },
-    "com.unity.modules.unityanalytics": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      }
     },
     "com.unity.modules.unitywebrequest": {
       "version": "1.0.0",

@@ -16,7 +16,6 @@ public static partial class R
         public const string devModeContainer = "devModeContainer";
         public const string devModeLabel = "devModeLabel";
         public const string devModePicker = "devModePicker";
-        public const string fpsText = "fpsText";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
         public const string infoContainer = "infoContainer";
         public const string languageContainer = "languageContainer";
