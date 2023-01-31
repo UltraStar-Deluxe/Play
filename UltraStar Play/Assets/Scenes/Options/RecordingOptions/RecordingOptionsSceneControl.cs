@@ -209,8 +209,9 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                 }
                 else
                 {
-                    uiManager.CreateNotificationVisualElement(
-                        TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
+                    UiManager.CreateNotification(
+                        TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout),
+                        "error");
                 }
             });
 
@@ -412,10 +413,6 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
@@ -530,6 +527,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
             titleToContentMap,
             CloseHelp);
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
     }
 
     private void CloseHelp()

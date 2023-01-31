@@ -23,16 +23,17 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(AudioManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
+        bb.BindExistingInstance(WebCamManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
         bb.BindExistingInstance(StatsManager.Instance);
-        bb.BindExistingInstance(CoroutineManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
+        bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
+
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
         bb.BindExistingInstance(GameRoundManager.Instance);
-        bb.BindExistingInstance(JobManager.Instance);
-        bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
+        bb.BindExistingInstance(JobManager.Instance);   bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
@@ -43,8 +44,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(eventSystem);
 
         // Lazy binding of UIDocument, because it does not exist in every scene (yet)
-        bb.BindExistingInstanceLazy(() => UiManager.FindUiDocument());
-        bb.BindExistingInstanceLazy(() => new PanelHelper(UiManager.FindUiDocument()));
+        bb.BindExistingInstanceLazy(() => UIDocumentUtils.FindUIDocumentOrThrow());
+        bb.BindExistingInstanceLazy(() => new PanelHelper(UIDocumentUtils.FindUIDocumentOrThrow()));
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
         bb.Bind(typeof(ISettings)).ToExistingInstance(() => SettingsManager.Instance.Settings);

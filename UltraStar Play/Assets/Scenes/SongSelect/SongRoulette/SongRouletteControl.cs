@@ -27,7 +27,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     private Injector injector;
 
     [Inject]
-    private SongPreviewControl songPreviewControl;
+    private SongSelectSongPreviewControl songPreviewControl;
 
     [Inject]
     private PlaylistManager playlistManager;

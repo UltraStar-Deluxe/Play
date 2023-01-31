@@ -105,7 +105,7 @@ NavMeshSettings:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_BuildSettings:
-    serializedVersion: 2
+    serializedVersion: 3
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
@@ -118,7 +118,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualTileSize: 0
     tileSize: 256
-    accuratePlacement: 0
+    buildHeightMesh: 0
     maxJobWorkers: 0
     preserveTilesOutsideBounds: 0
     debug:
@@ -129,6 +129,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1197462286522570267, guid: 526f667f64d4f6949a1aa2bbba7ef376,
@@ -192,6 +193,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 526f667f64d4f6949a1aa2bbba7ef376, type: 3}
 --- !u!1 &1202561339
 GameObject:
@@ -242,6 +246,8 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 1296d2653c3d32e4a8cd8e99a69ed110, type: 3}
   - {fileID: 4900000, guid: 670162adbed1add498ccaf0d709abb4d, type: 3}
   - {fileID: 4900000, guid: c3213bc178de93b4198dd5d230cadd5e, type: 3}
+  - {fileID: 4900000, guid: c5662bdc8f9acef42bf7224f3dc7cc33, type: 3}
+  - {fileID: 4900000, guid: 9563c4792b574b14db495e680d8f3968, type: 3}
   - {fileID: 4900000, guid: fd949de9965211e4d8909c369ae6007f, type: 3}
 --- !u!1 &1698148302
 GameObject:

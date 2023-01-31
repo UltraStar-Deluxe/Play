@@ -105,41 +105,12 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorStatusBarControl statusBarControl = new();
     private readonly SongEditorSampleRecorderControl songEditorSampleRecorderControl = new();
 
-    public SongMeta SongMeta
-    {
-        get
-        {
-            return SceneData.SongMeta;
-        }
-    }
-
+    [Inject]
     private SongEditorSceneData sceneData;
-    public SongEditorSceneData SceneData
-    {
-        get
-        {
-            if (sceneData == null)
-            {
-                // Use of SceneNavigator.Instance because injection might not have been completed yet.
-                sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SongEditorSceneData>();
-            }
-            return sceneData;
-        }
-    }
+    private SongMeta SongMeta => sceneData.SongMeta;
 
     private readonly List<IDialogControl> openDialogControls = new();
     public bool IsAnyDialogOpen => openDialogControls.Count > 0;
-
-    private void Awake()
-    {
-        Debug.Log($"Start editing of '{SceneData.SongMeta.Title}' at {SceneData.PositionInSongInMillis} ms.");
-
-        songAudioPlayer.Init(SongMeta);
-        songVideoPlayer.SongMeta = SongMeta;
-
-        songAudioPlayer.PositionInSongInMillis = SceneData.PositionInSongInMillis;
-    }
-
     public void OnInjectionFinished()
     {
         injector.Inject(overviewAreaControl);
@@ -155,6 +126,11 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private void Start()
     {
+        Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInSongInMillis} ms.");
+        songAudioPlayer.Init(SongMeta);
+        songVideoPlayer.SongMeta = SongMeta;
+        songAudioPlayer.PositionInSongInMillis = sceneData.PositionInSongInMillis;
+
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(positionInSongInMillis => OnAudioPlaybackStarted(positionInSongInMillis));
         songAudioPlayer.PlaybackStoppedEventStream
@@ -413,7 +389,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             if (!File.Exists(path))
             {
                 Debug.Log($"File does not exist: {path}");
-                uiManager.CreateNotificationVisualElement($"File does not exist");
+                UiManager.CreateNotification($"File does not exist");
             }
             usePathCallback(path);
         }
@@ -446,10 +422,14 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     public List<IBinding> GetBindings()
     {
+        SongEditorSceneData songEditorSceneData = SceneNavigator.GetSceneDataOrThrow<SongEditorSceneData>();
+
         BindingBuilder bb = new();
         // Note that the SceneData and SongMeta are loaded on access here if not done yet.
-        bb.BindExistingInstance(SceneData);
-        bb.BindExistingInstance(SongMeta);
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(songEditorSceneData);
+        bb.BindExistingInstance(songEditorSceneData.SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteAreaControl);
@@ -469,7 +449,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songEditorSceneInputControl);
         bb.BindExistingInstance(issueAnalyzerControl);
         bb.BindExistingInstance(statusBarControl);
-        bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
         bb.Bind(nameof(issueSideBarEntryUi)).ToExistingInstance(issueSideBarEntryUi);
         bb.Bind(nameof(songPropertySideBarEntryUi)).ToExistingInstance(songPropertySideBarEntryUi);

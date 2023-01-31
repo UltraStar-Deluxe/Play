@@ -65,7 +65,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneControl singSceneControl;
 
-    private AvatarImageControl avatarImageControl;
+    [Inject]
+    private SingSceneData sceneData;
 
     private AbstractSingSceneNoteDisplayer noteDisplayer;
 
@@ -77,6 +78,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private int fadeOutAnimationId;
 
     private float displayNextPlayerProfileTimeInSeconds;
+
+    private PlayerProfileImageControl playerProfileImageControl;
 
     public void OnInjectionFinished()
     {
@@ -160,8 +163,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         // }
 
         playerNameLabel.text = playerProfile.Name;
-        avatarImageControl = injector.WithRootVisualElement(playerImage)
-            .CreateAndInject<AvatarImageControl>();
+        playerProfileImageControl = injector.WithRootVisualElement(playerImage)
+            .CreateAndInject<PlayerProfileImageControl>();
         if (micProfile != null)
         {
             playerScoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
@@ -170,7 +173,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void ChangeLayoutByPlayerCount()
     {
-        if (singSceneControl.SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 5)
+        if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 5)
         {
             RootVisualElement.AddToClassList("singScenePlayerUiSmall");
         }
@@ -385,7 +388,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         playerProfile = newCurrentPlayerProfile;
         playerNameLabel.text = newCurrentPlayerProfile.Name;
-        avatarImageControl.PlayerProfile = newCurrentPlayerProfile;
+        playerProfileImageControl.PlayerProfile = newCurrentPlayerProfile;
 
         // Highlight the change with an animation
         float animTimeInSeconds = 1.5f;

@@ -32,7 +32,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
     {
         songMetaChangeEventStream.Subscribe(_ =>
         {
-            issues = SongMetaAnalyzer.AnalyzeIssues(songMeta);
+            issues = SongMetaAnalyzer.AnalyzeIssues(songMeta, SongEditorIssueAnalyzerControl.MaxSongIssueCountPerMessage);
             UpdateIssueOverviewImage();
         });
 

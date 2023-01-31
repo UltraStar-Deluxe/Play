@@ -5,9 +5,9 @@ using UnityEngine.UIElements;
 
 public class ToogleButtonControl
 {
-    private Button button;
-    private VisualElement onIcon;
-    private VisualElement offIcon;
+    private readonly Button button;
+    private readonly VisualElement onIcon;
+    private readonly VisualElement offIcon;
 
     private bool isOn;
     public bool IsOn
@@ -23,7 +23,7 @@ public class ToogleButtonControl
         }
     }
 
-    private Subject<ValueChangedEvent<bool>> valueChangedEventStream = new();
+    private readonly Subject<ValueChangedEvent<bool>> valueChangedEventStream = new();
     public IObservable<ValueChangedEvent<bool>> ValueChangedEventStream => valueChangedEventStream;
 
     public ToogleButtonControl(

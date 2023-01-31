@@ -13,6 +13,8 @@ TagManager:
   - ClientSideMicrophoneDataSender
   - TranslationManager
   - InputManager
+  - DontDestroyOnLoadManager
+  - MainGameHttpClient
   layers:
   - Default
   - TransparentFX

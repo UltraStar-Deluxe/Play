@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-public class LyricsUtils
+public static class LyricsUtils
 {
     public static readonly char syllableSeparator = ';';
     public static readonly char sentenceSeparator = '\n';

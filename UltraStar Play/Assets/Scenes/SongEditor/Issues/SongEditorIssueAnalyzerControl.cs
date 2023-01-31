@@ -5,6 +5,8 @@ using UniRx;
 
 public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinishedListener
 {
+    public const int MaxSongIssueCountPerMessage = 10;
+
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
@@ -30,7 +32,7 @@ public class SongEditorIssueAnalyzerControl : INeedInjection, IInjectionFinished
 
     private void UpdateIssues()
     {
-        IReadOnlyCollection<SongIssue> issues = SongMetaAnalyzer.AnalyzeIssues(songMeta);
+        IReadOnlyCollection<SongIssue> issues = SongMetaAnalyzer.AnalyzeIssues(songMeta, MaxSongIssueCountPerMessage);
         if (issues.Count != lastIssueCount)
         {
             issuesEventStream.OnNext(issues);

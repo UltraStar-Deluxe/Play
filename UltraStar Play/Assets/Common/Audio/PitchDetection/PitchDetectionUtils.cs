@@ -75,7 +75,7 @@ public static class PitchDetectionUtils
     {
         if (pitchDetectionProcessCount > 0)
         {
-            UiManager.Instance.CreateNotificationVisualElement("Already performing pitch detection");
+            UiManager.CreateNotification("Already performing pitch detection");
             return Observable.Throw<PitchDetectionResult>(new IllegalStateException("Already performing pitch detection"));
         }
 

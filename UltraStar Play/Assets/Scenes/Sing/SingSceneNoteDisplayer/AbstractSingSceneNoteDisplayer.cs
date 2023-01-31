@@ -261,7 +261,6 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         float noteHeightPx = noteHeightPercent * targetNoteEntryContainer.resolvedStyle.height;
         float textHeight = NumberUtils.Limit(noteHeightPx + 2, 8, 12);
         label.style.fontSize = new StyleLength(new Length(textHeight, LengthUnit.Pixel));
-        Debug.Log($"text: {label.text}, noteHeightPx: {noteHeightPx}, textHeight: {textHeight}");
     }
 
     public string GetDisplayText(Note note)

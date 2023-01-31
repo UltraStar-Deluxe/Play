@@ -14,7 +14,7 @@ using UnityEngine.UIElements;
 public class NewVersionChecker : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         isGetTagsRequestDone = false;
         isGetVersionFileRequestDone = false;

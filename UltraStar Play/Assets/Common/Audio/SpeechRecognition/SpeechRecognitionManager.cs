@@ -13,28 +13,7 @@ using Vosk;
 
 public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposable
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void InitOnLoad()
-    {
-        instance = null;
-    }
-
-    private static SpeechRecognitionManager instance;
-    public static SpeechRecognitionManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                SpeechRecognitionManager instanceInScene = GameObjectUtils.FindComponentWithTag<SpeechRecognitionManager>("SpeechRecognitionManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
-            }
-            return instance;
-        }
-    }
+    public static SpeechRecognitionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SpeechRecognitionManager>();
 
     private readonly Dictionary<string, Model> pathToSpeechRecognitionModel = new();
     private VoskRecognizer lastVoskRecognizer;

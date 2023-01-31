@@ -1,11 +1,12 @@
-﻿using UniInject;
+﻿using PrimeInputActions;
+using UniInject;
 using UniRx;
 using UnityEngine;
 
 public class GlobalInputControl : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         volumeBeforeMute = -1;
     }
@@ -14,15 +15,15 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
-    
-    private void Start()
+
+    protected void Start()
     {
         // Toggle full-screen mode via F11
-        UltraStarPlayInputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
+        InputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
             .Subscribe(_ => ToggleFullscreen());
 
         // Mute / unmute audio via F12
-        UltraStarPlayInputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
+        InputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
             .Subscribe(_ => ToggleMuteAudio());
     }
 
@@ -39,20 +40,19 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
             }));
     }
 
-
     public void ToggleMuteAudio()
     {
         if (volumeBeforeMute >= 0)
         {
             settings.AudioSettings.VolumePercent = volumeBeforeMute;
             volumeBeforeMute = -1;
-            UiManager.Instance.CreateNotificationVisualElement("Unmute");
+            UiManager.CreateNotification("Unmute");
         }
         else
         {
             volumeBeforeMute = settings.AudioSettings.VolumePercent;
             settings.AudioSettings.VolumePercent = 0;
-            UiManager.Instance.CreateNotificationVisualElement("Mute");
+            UiManager.CreateNotification("Mute");
         }
     }
 }

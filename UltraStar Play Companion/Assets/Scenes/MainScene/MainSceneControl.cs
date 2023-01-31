@@ -46,10 +46,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.commitHashText)]
     private Label commitHashText;
-    
-    [Inject(UxmlName = R.UxmlNames.fpsText)]
-    private Label fpsText;
-    
+
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
 
@@ -136,8 +133,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.showSongViewButton)]
     private Button showSongViewButton;
 
+    [Inject(UxmlName = R.UxmlNames.showInputSimulationButton)]
+    private Button showInputSimulationButton;
+
     [Inject(UxmlName = R.UxmlNames.songViewContainer)]
     private VisualElement songViewContainer;
+
+    [Inject(UxmlName = R.UxmlNames.inputSimulationContainer)]
+    private VisualElement inputSimulationContainer;
 
     [Inject(UxmlName = R.UxmlNames.songSearchTextField)]
     private TextField songSearchTextField;
@@ -159,8 +162,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private float frameCountTime;
     private int frameCount;
 
+    private readonly InputSimulationControl inputSimulationControl = new();
+
     public void OnInjectionFinished()
     {
+        injector.Inject(inputSimulationControl);
+
         // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
             || !Microphone.devices.Contains(settings.MicProfile.Name))
@@ -223,6 +230,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         tabGroupControl.AllowNoContainerVisible = false;
         tabGroupControl.AddTabGroupButton(showMicViewButton, micViewContainer);
         tabGroupControl.AddTabGroupButton(showSongViewButton, songViewContainer);
+        tabGroupControl.AddTabGroupButton(showInputSimulationButton, inputSimulationContainer);
         tabGroupControl.ShowContainer(micViewContainer);
 
         showSongViewButton.RegisterCallbackButtonTriggered(() =>
@@ -271,7 +279,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private void OnDevModeEnabledChanged(bool isEnabled)
     {
-        fpsText.SetVisibleByDisplay(isEnabled);
         recordingDeviceInfo.SetVisibleByDisplay(isEnabled);
         connectionInfoText.SetVisibleByDisplay(isEnabled);
     }
@@ -288,18 +295,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && sceneTitle == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.companionApp_title);
         connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
         recordingDeviceLabel.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
         languageLabel.text = TranslationManager.GetTranslation(R.Messages.language);
         devModeLabel.text = TranslationManager.GetTranslation(R.Messages.devMode);
         visualizeAudioLabel.text = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
-        showMicViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showMicrophone);
-        showSongViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showSongs);
         closeMenuButton.text = TranslationManager.GetTranslation(R.Messages.back);
 
         recordingDevicePickerControl.UpdateLabelText();
@@ -378,20 +379,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             && audioWaveFormVisualization != null)
         {
             audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(micSampleRecorder.MicSamples);
-        }
-        UpdateFps();
-    }
-
-    private void UpdateFps()
-    {
-        frameCountTime += Time.deltaTime;
-        frameCount++;
-        if (frameCountTime > 1)
-        {
-            int fps = (int)(frameCount / frameCountTime);
-            fpsText.text = $"FPS: {fps}";
-            frameCount = 0;
-            frameCountTime = 0;
         }
     }
 
@@ -533,6 +520,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(micSampleRecorder);
         bb.BindExistingInstance(clientSideMicDataSender);
+        bb.BindExistingInstance(inputSimulationControl);
         return bb.GetBindings();
     }
 }

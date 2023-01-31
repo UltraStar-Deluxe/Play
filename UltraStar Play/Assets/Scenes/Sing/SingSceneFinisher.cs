@@ -22,6 +22,12 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
     [Inject]
     private SingSceneControl singSceneControl;
 
+    [Inject]
+    private SongMeta songMeta;
+
+    [Inject]
+    private SingSceneData sceneData;
+
     private double positionInSongInMillisOld;
 
     private void Update()
@@ -73,9 +79,9 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
 
             // Detect end of the song by #END tag of txt file.
             // This can be used to skip the ending of the audio file.
-            if (singSceneControl.SongMeta.End > 0
+            if (songMeta.End > 0
                 // #END tag is in milliseconds (but #START is in seconds)
-                && positionInSongInMillis > singSceneControl.SongMeta.End)
+                && positionInSongInMillis > songMeta.End)
             {
                 IsSongFinished = true;
             }

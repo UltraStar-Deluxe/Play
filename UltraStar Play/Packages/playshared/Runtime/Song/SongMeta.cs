@@ -235,7 +235,7 @@ public class SongMeta
             string path = Directory + Path.DirectorySeparatorChar + FileName;
             using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
             {
-                VoicesBuilder voicesBuilder = new(path, Encoding, Relative);
+                VoicesBuilder voicesBuilder = new(path, Encoding, Relative, false);
                 voices = new List<Voice>(voicesBuilder.GetVoices());
             }
 

@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 // Handles loading and caching of images.
 public static class ImageManager
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         spriteHolders.Clear();
         ClearCache();
@@ -21,8 +23,6 @@ public static class ImageManager
     // and removed from memory.
     private static readonly int criticalCacheSize = 50;
     private static readonly Dictionary<string, CachedSprite> spriteCache = new();
-
-    private static CoroutineManager coroutineManager;
 
     public static void AddSpriteHolder(ISpriteHolder spriteHolder)
     {
@@ -81,11 +81,7 @@ public static class ImageManager
             onSuccess(sprite);
         }
 
-        if (coroutineManager == null)
-        {
-            coroutineManager = CoroutineManager.Instance;
-        }
-        coroutineManager.StartCoroutineAlsoForEditor(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, onFailure));
+        UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, onFailure));
     }
 
     private static void AddSpriteToCache(Sprite sprite, string source)
@@ -102,7 +98,7 @@ public static class ImageManager
         spriteCache[source] = cachedSprite;
     }
 
-    public static void ClearCache()
+    private static void ClearCache()
     {
         foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
         {
@@ -111,7 +107,7 @@ public static class ImageManager
         spriteCache.Clear();
     }
 
-    private static void RemoveUnusedSpritesFromCache()
+    public static void RemoveUnusedSpritesFromCache()
     {
         HashSet<Sprite> usedSprites = new();
         // Remember the sprites of all registered ISpriteHolder as still in use.
