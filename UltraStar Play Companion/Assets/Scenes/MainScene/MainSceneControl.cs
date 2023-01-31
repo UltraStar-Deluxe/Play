@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 using ProTrans;
-using UnityEditor.UIElements;
 using UnityEngine.Networking;
 using Button = UnityEngine.UIElements.Button;
 using IBinding = UniInject.IBinding;
