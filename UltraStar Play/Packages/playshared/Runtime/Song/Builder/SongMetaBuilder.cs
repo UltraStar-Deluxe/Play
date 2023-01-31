@@ -8,9 +8,9 @@ using UnityEngine;
 
 public static class SongMetaBuilder
 {
-    public static SongMeta ParseFile(string path, out List<SongIssue> songIssues, Encoding enc = null)
+    public static SongMeta ParseFile(string path, out List<SongIssue> songIssues, Encoding enc, bool useUniversalCharsetDetector)
     {
-        using StreamReader reader = TxtReader.GetFileStreamReader(path, enc);
+        using StreamReader reader = TxtReader.GetFileStreamReader(path, enc, useUniversalCharsetDetector);
 
         songIssues = new();
 
@@ -69,7 +69,7 @@ public static class SongMetaBuilder
                 if (!newEncoding.Equals(reader.CurrentEncoding))
                 {
                     reader.Dispose();
-                    return ParseFile(path, out songIssues, newEncoding);
+                    return ParseFile(path, out songIssues, newEncoding, useUniversalCharsetDetector);
                 }
             }
             else if (requiredFields.ContainsKey(tagNameLowerCase))
@@ -132,7 +132,8 @@ public static class SongMetaBuilder
         string bodyLine;
         while ((bodyLine = reader.ReadLine()) != null)
         {
-            songBody.Append(bodyLine); //Ignorning the newlines for the hash
+            // Ignoring the newlines for the hash
+            songBody.Append(bodyLine);
         }
 
         //Hash the song file body

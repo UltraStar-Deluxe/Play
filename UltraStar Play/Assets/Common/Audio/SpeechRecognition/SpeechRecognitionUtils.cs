@@ -60,7 +60,7 @@ public static class SpeechRecognitionUtils
                 Debug.LogError(ex);
                 speechRecognitionJob.SetResult(EJobResult.Error);
                 createNotesFromSpeechRecognitionSubject.OnError(ex);
-                UiManager.Instance.CreateNotificationVisualElement(ex.Message);
+                UiManager.CreateNotification(ex.Message);
             })
             .Subscribe(_ =>
             {
@@ -84,7 +84,7 @@ public static class SpeechRecognitionUtils
                         Debug.LogError(ex);
                         speechRecognitionJob.SetResult(EJobResult.Error);
                         createNotesFromSpeechRecognitionSubject.OnError(ex);
-                        UiManager.Instance.CreateNotificationVisualElement(ex.Message);
+                        UiManager.CreateNotification(ex.Message);
                     })
                     .Subscribe(voskResultJson =>
                     {
@@ -147,7 +147,7 @@ public static class SpeechRecognitionUtils
     {
         if (speechRecognitionProcessCount > 0)
         {
-            UiManager.Instance.CreateNotificationVisualElement("Already performing speech recognition");
+            UiManager.CreateNotification("Already performing speech recognition");
             return Observable.Throw<bool>(new IllegalStateException("Already performing speech recognition"));
         }
 
@@ -196,7 +196,7 @@ public static class SpeechRecognitionUtils
     {
         if (speechRecognitionProcessCount > 0)
         {
-            UiManager.Instance.CreateNotificationVisualElement("Already performing speech recognition");
+            UiManager.CreateNotification("Already performing speech recognition");
             return Observable.Throw<VoskResultJson>(new IllegalStateException("Already performing speech recognition"));
         }
 

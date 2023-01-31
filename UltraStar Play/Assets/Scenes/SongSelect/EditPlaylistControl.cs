@@ -78,7 +78,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
             if (!errorMessage.IsNullOrEmpty())
             {
                 Debug.LogError(errorMessage);
-                uiManager.CreateNotificationVisualElement(errorMessage);
+                UiManager.CreateNotification(errorMessage);
             }
             HideEditPlaylistDialog();
         });
@@ -120,14 +120,14 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
     {
         if (currentPlaylist == null
             || currentPlaylist is UltraStarAllSongsPlaylist
-            || playlistManager.GetPlaylistName(currentPlaylist) == PlaylistManager.favoritesPlaylistName)
+            || playlistManager.IsFavoritesPlaylist(currentPlaylist))
         {
             return;
         }
 
         titleText = "Edit Playlist";
         editPlaylistDialogTitle.text = titleText;
-        playlistNameTextField.value = playlistManager.GetPlaylistName(currentPlaylist);
+        playlistNameTextField.value = currentPlaylist.Name;
         songSelectSceneControl.HideMenuOverlay();
         editPlaylistOverlay.ShowByDisplay();
 
@@ -163,22 +163,17 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         }
 
         // Try to rename playlist
-        string errorMessage = playlistManager.TrySetPlaylistName(currentPlaylist, newPlaylistName);
-        if (!errorMessage.IsNullOrEmpty())
+        if (!playlistManager.TrySetPlaylistName(currentPlaylist, newPlaylistName, out string errorMessage))
         {
-            // Show error in popup
+            // Show error in UI
             Debug.LogError(errorMessage);
-            uiManager.CreateNotificationVisualElement(errorMessage);
+            UiManager.CreateNotification(errorMessage);
         }
         editPlaylistOverlay.HideByDisplay();
     }
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && createPlaylistButton == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         playlistChooserDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_playlistDropdownTitle);
         editPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_editPlaylistButton);
         createPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_createPlaylistButton);

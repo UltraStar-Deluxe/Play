@@ -83,10 +83,6 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        if (!Application.isPlaying && backButton == null)
-        {
-            SceneInjectionManager.Instance.DoInjection();
-        }
         backgroundMusicVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
         previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
         volumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_volume);

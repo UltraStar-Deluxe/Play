@@ -3,38 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - SceneStartupController
-  - SceneNavigator
-  - I18NManager
-  - PlayerProfileManager
-  - SongMetaManager
-  - ApplicationManager
-  - ThemeManager
-  - SettingsManager
-  - EventSystem
-  - UiManager
-  - StatsManager
-  - Canvas
-  - ContextMenuManager
-  - CursorManager
-  - MidiManager
-  - AudioManager
-  - PlaylistManager
-  - CoroutineManager
-  - UIDocument
-  - SceneInjectionManager
-  - InputManager
-  - ServerSideConnectRequestManager
-  - TranslationManager
-  - StyleSheetControl
-  - ContextMenuPopupManager
-  - BackgroundMusicManager
-  - SceneChangeAnimationControl
-  - SpeechRecognitionManager
-  - AudioSeparationManager
-  - JobManager
-  - GameRoundManager
+  tags: []
   layers:
   - Default
   - TransparentFX

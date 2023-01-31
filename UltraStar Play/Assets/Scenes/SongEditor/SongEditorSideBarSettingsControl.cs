@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -79,9 +80,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.showNotePitchLabelToggle)]
     private Toggle showNotePitchLabelToggle;
-
-    [Inject(UxmlName = R.UxmlNames.splitSyllablesToggle)]
-    private Toggle splitSyllablesToggle;
 
     [Inject(UxmlName = R.UxmlNames.gridSizeTextField)]
     private TextField gridSizeTextField;
@@ -288,9 +286,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(speechRecognitionPhrasesTextField,
             () => settings.SongEditorSettings.SpeechRecognitionPhrases,
             newValue => settings.SongEditorSettings.SpeechRecognitionPhrases = newValue);
-        Bind(splitSyllablesToggle,
-            () => settings.SongEditorSettings.SplitSyllables,
-            newValue => settings.SongEditorSettings.SplitSyllables = newValue);
         Bind(speechRecognitionPitchTextField,
             () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.MidiNoteForSpeechRecognition),
             newValue =>
@@ -357,11 +352,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         // Grid size
         Bind(gridSizeTextField,
-            () => settings.SongEditorSettings.GridSizeInDevicePixels.ToString(),
-            newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.GridSizeInDevicePixels = newIntValue));
+            () => settings.SongEditorSettings.GridSizeInPx.ToString(CultureInfo.InvariantCulture),
+            newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.GridSizeInPx = newFloatValue));
         Bind(sentenceLineSizeTextField,
-            () => settings.SongEditorSettings.SentenceLineSizeInDevicePixels.ToString(),
-            newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.SentenceLineSizeInDevicePixels = newIntValue));
+            () => settings.SongEditorSettings.SentenceLineSizeInPx.ToString(CultureInfo.InvariantCulture),
+            newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.SentenceLineSizeInPx = newFloatValue));
     }
 
     private void CreateImportMidiFileDialog()

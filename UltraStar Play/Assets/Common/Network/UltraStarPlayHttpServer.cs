@@ -1,17 +1,12 @@
-using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using SimpleHttpServerForUnity;
-using UniInject;
 using UnityEngine;
 
-public class UltraStarPlayHttpServer : HttpServer, INeedInjection
+public class UltraStarPlayHttpServer : HttpServer
 {
-    [Inject]
-    private Settings settings;
-
     protected override void Awake()
     {
         if (!Application.isPlaying)
@@ -34,6 +29,7 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
             return;
         }
 
+        Settings settings = SettingsManager.Instance.Settings;
         host = !settings.OwnHost.IsNullOrEmpty()
             ? settings.OwnHost
             : IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);

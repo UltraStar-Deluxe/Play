@@ -19,6 +19,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [InjectedInInspector]
     public List<SongRatingImageReference> songRatingImageReferences;
 
+    [InjectedInInspector]
+    public SongAudioPlayer songAudioPlayer;
+
+    [InjectedInInspector]
+    public SongPreviewControl songPreviewControl;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -61,6 +67,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [Inject]
     private GameRoundManager gameRoundManager;
 
+	[Inject]
     private SingingResultsSceneData sceneData;
 
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
@@ -99,6 +106,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             .ForEach(visualElement => visualElement.pickingMode = visualElement is Button
                 ? PickingMode.Position
                 : PickingMode.Ignore);
+
+        songAudioPlayer.Init(sceneData.SongMetas.LastOrDefault());
+
+        songPreviewControl.PreviewDelayInSeconds = 0;
+        songPreviewControl.AudioFadeInDurationInSeconds = 2;
+        songPreviewControl.VideoFadeInDurationInSeconds = 2;
+        songPreviewControl.StartSongPreview(sceneData.SongMetas.LastOrDefault());
 
         ActivateLayout();
         FillLayout();
@@ -258,11 +272,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     public List<IBinding> GetBindings()
     {
-        sceneData = SceneNavigator.Instance.GetSceneDataOrThrow<SingingResultsSceneData>();
-
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
-        bb.BindExistingInstance(sceneData);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<SingingResultsSceneData>());
+        bb.BindExistingInstance(songAudioPlayer);
+        bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
     }
 

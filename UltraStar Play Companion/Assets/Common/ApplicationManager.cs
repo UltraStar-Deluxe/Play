@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniInject;
 using UnityEngine;
 
-public class ApplicationManager : MonoBehaviour
+public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static ApplicationManager Instance
     {
@@ -17,11 +18,30 @@ public class ApplicationManager : MonoBehaviour
     [Range(-1, 60)]
     public int targetFrameRate = 30;
 
-    void Start()
+
+    [Inject]
+    private Settings settings;
+
+    protected override object GetInstance()
     {
-        targetFrameRate = SettingsManager.Instance.Settings.TargetFps;
+        return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        targetFrameRate = settings.TargetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
+    }
+
+    protected override void OnEnableSingleton()
+    {
+        Application.logMessageReceivedThreaded += Log.HandleUnityLog;
+    }
+
+    protected override void OnDisableSingleton()
+    {
+        Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
     }
 
     void Update()
@@ -30,16 +50,6 @@ public class ApplicationManager : MonoBehaviour
         {
             Application.targetFrameRate = targetFrameRate;
         }
-    }
-
-    void OnEnable()
-    {
-        Application.logMessageReceivedThreaded += Log.HandleUnityLog;
-    }
-
-    void OnDisable()
-    {
-        Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
     }
 
     public bool HasCommandLineArgument(string argumentName)

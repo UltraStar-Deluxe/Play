@@ -7,7 +7,7 @@ public static class AddSpaceBetweenNotesUtils
     {
         if (spaceInBeats <= 0)
         {
-            UiManager.Instance.CreateNotificationVisualElement("Minimum amount of space (in beats) must be greater than 0.");
+            UiManager.CreateNotification("Minimum amount of space (in beats) must be greater than 0.");
             return;
         }
 

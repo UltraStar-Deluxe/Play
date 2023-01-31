@@ -39,7 +39,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         {
             if (!CanPlayAudio(out string errorMessage))
             {
-                uiManager.CreateNotificationVisualElement(errorMessage);
+                UiManager.CreateNotification(errorMessage);
                 return;
             }
             AudioSource.Play();
@@ -134,7 +134,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         AudioClip loadedAudioClip = audioManager.LoadAudioClipFromUri(audioClipUri, false);
         if (loadedAudioClip == null)
         {
-            uiManager.CreateNotificationVisualElement($"Failed to load {audioClipUri}");
+            UiManager.CreateNotification($"Failed to load {audioClipUri}");
             failedAudioClipPaths.Add(audioClipUri);
         }
 

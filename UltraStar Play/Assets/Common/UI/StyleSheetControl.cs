@@ -8,34 +8,33 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class StyleSheetControl : MonoBehaviour, INeedInjection
+public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         printScreenSize = true;
     }
 
-    public static StyleSheetControl Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<StyleSheetControl>("StyleSheetControl");
-        }
-    }
+    public static StyleSheetControl Instance => GameObjectUtils.FindComponentWithTag<StyleSheetControl>("StyleSheetControl");
 
     private static bool printScreenSize = true;
 
     [InjectedInInspector]
     public StyleSheet largeScreenStyleSheet;
 
-    [Inject(Optional = true)]
+    [Inject]
     private UIDocument uiDocument;
 
     [Inject]
     private Settings settings;
 
-    void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         if (printScreenSize)
         {
@@ -47,11 +46,6 @@ public class StyleSheetControl : MonoBehaviour, INeedInjection
 
     private void AddScreenSpecificStyleSheets()
     {
-        if (uiDocument == null)
-        {
-            return;
-        }
-
         if (Screen.dpi < 20 || Screen.dpi > 1000)
         {
             // Unlikely DPI value. Do nothing.
