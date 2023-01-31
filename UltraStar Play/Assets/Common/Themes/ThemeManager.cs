@@ -2,20 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniInject;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
-public class ThemeManager : MonoBehaviour, ISpriteHolder
+public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        instance = null;
-    }
-
     /**
      * Filename without extension of the theme that should be loaded by default
      */
@@ -23,22 +17,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
     private const string ThemeFolderName = "Themes";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
 
-    private static ThemeManager instance;
-    public static ThemeManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                ThemeManager instanceInScene = GameObjectUtils.FindComponentWithTag<ThemeManager>("ThemeManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
-            }
-            return instance;
-        }
-    }
+    public static ThemeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeManager>();
 
     public Material backgroundMaterial;
     public Material particleMaterial;
@@ -59,7 +38,20 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
     private Material backgroundMaterialCopy;
     private Material particleMaterialCopy;
-    private RenderTexture userInterfaceRenderTexture;
+
+    private RenderTexture uiRenderTexture;
+    public RenderTexture UiRenderTexture
+    {
+        get
+        {
+            if (uiRenderTexture == null)
+            {
+                uiRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
+            }
+
+            return uiRenderTexture;
+        }
+    }
 
     private readonly List<ThemeMeta> themeMetas = new();
 
@@ -71,49 +63,24 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
     private bool anyThemeLoaded;
 
-    private void Awake()
+    [Inject]
+    private Settings settings;
+
+    [Inject]
+    private UIDocument uiDocument;
+
+    protected override object GetInstance()
     {
-        if (this != Instance)
-        {
-            Destroy(gameObject);
-        }
+        return Instance;
     }
 
-    private void OnEnable()
+    protected override void StartSingleton()
     {
-        if (this != Instance)
-        {
-            return;
-        }
-
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        ImageManager.AddSpriteHolder(this);
     }
 
-    private void OnDisable()
+    public void UpdateSceneTextures(Texture transitionTexture)
     {
-        if (this != Instance)
-        {
-            return;
-        }
-
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    private void Start()
-    {
-        if (Instance == this)
-        {
-            ImageManager.AddSpriteHolder(this);
-        }
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
-    {
-        if (Instance != this)
-        {
-            return;
-        }
-
         if (backgroundMaterialCopy == null)
         {
             backgroundMaterialCopy = new Material(backgroundMaterial);
@@ -125,15 +92,10 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
 
         // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
-        if (userInterfaceRenderTexture == null)
-        {
-            userInterfaceRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
-        }
-        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
-        uiDocument.panelSettings.targetTexture = userInterfaceRenderTexture;
+        uiDocument.panelSettings.targetTexture = UiRenderTexture;
         BackgroundShaderControl.SetUiRenderTextures(
-            userInterfaceRenderTexture,
-            UltraStarPlaySceneChangeAnimationControl.Instance.uiCopyRenderTexture);
+            UiRenderTexture,
+            transitionTexture);
 
         if (anyThemeLoaded)
         {
@@ -145,9 +107,9 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
     }
 
-    public void LoadCurrentTheme()
+    private void LoadCurrentTheme()
     {
-        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+        if (settings.DeveloperSettings.disableDynamicThemes)
         {
             return;
         }
@@ -171,14 +133,50 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
             alreadyProcessedVisualElements.Clear();
-            ApplyThemeDynamicBackground(themeMeta);
+            ApplyThemeBackground(themeMeta);
             ApplyThemeSpecificStylesToVisualElementsInScene();
             anyThemeLoaded = true;
         }));
     }
 
+    private void ApplyThemeBackground(ThemeMeta themeMeta)
+    {
+        ApplyThemeStaticBackground(themeMeta);
+        ApplyThemeDynamicBackground(themeMeta);
+    }
+
+    private void ApplyThemeStaticBackground(ThemeMeta themeMeta)
+    {
+        VisualElement backgroundElement = uiDocument.rootVisualElement;
+        if (backgroundElement == null)
+        {
+            return;
+        }
+
+        if (!ThemeMetaUtils.HasStaticBackground(themeMeta))
+        {
+            backgroundElement.style.backgroundImage = new StyleBackground();
+            return;
+        }
+
+        ImageManager.LoadSpriteFromUri(themeMeta.ThemeJson.staticBackground.imagePath, loadedSprite =>
+        {
+            backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
+            if (!themeMeta.ThemeJson.staticBackground.scaleMode.IsNullOrEmpty()
+                && Enum.TryParse(themeMeta.ThemeJson.staticBackground.scaleMode, out ScaleMode scaleMode))
+            {
+                backgroundElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(scaleMode);
+            }
+        });
+    }
+
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
+        if (!ThemeMetaUtils.HasDynamicBackground(themeMeta))
+        {
+            return;
+        }
+
         DynamicBackgroundJson backgroundJson = themeMeta.ThemeJson?.dynamicBackground;
         if (backgroundJson == null)
         {
@@ -298,7 +296,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
         }
 
         // Destroy all instantiated assets
-        Destroy(userInterfaceRenderTexture);
+        Destroy(uiRenderTexture);
 
         if (backgroundMaterialCopy != null)
         {
@@ -315,13 +313,13 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
     public void SetCurrentTheme(ThemeMeta themeMeta)
     {
-        SettingsManager.Instance.Settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
+        settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
         LoadCurrentTheme();
     }
 
     public ThemeMeta GetCurrentTheme()
     {
-        return GetThemeByName(SettingsManager.Instance.Settings.GraphicSettings.themeName);
+        return GetThemeByName(settings.GraphicSettings.themeName);
     }
 
     public ThemeMeta GetThemeByName(string themeName)
@@ -367,8 +365,8 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
         List<string> themeFolders = new List<string>
         {
-            $"{Application.persistentDataPath}/{ThemeFolderName}",
             ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName),
+            GetAbsoluteUserDefinedThemesFolder(),
         };
 
         themeFolders.ForEach(themeFolder =>
@@ -391,7 +389,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
 
     public void ApplyThemeSpecificStylesToVisualElementsInScene()
     {
-        if (SettingsManager.Instance.Settings.DeveloperSettings.disableDynamicThemes)
+        if (settings.DeveloperSettings.disableDynamicThemes)
         {
             return;
         }
@@ -411,11 +409,7 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
             return;
         }
 
-        UIDocument uiDocument = GameObjectUtils.FindComponentWithTag<UIDocument>("UIDocument");
-        if (uiDocument == null)
-        {
-            return;
-        }
+        ApplyThemeStaticBackground(currentThemeMeta);
 
         VisualElement root = uiDocument.rootVisualElement;
 
@@ -505,5 +499,10 @@ public class ThemeManager : MonoBehaviour, ISpriteHolder
     public IReadOnlyCollection<Sprite> GetSprites()
     {
         return loadedSprites;
+    }
+
+    public static string GetAbsoluteUserDefinedThemesFolder()
+    {
+        return $"{Application.persistentDataPath}/{ThemeFolderName}";
     }
 }

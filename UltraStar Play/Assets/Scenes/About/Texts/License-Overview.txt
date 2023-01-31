@@ -47,3 +47,10 @@ Apache License 2.0
 
 - Vosk Speech Recognition Toolkit
     - https://github.com/alphacep/vosk-api
+
+Mozilla Public License
+----------------------
+- UTF-Unknown, based on Mozilla Universal Charset Detector
+    - https://github.com/achimmihca/UTF-Unknown-Unity (MPL 2.0)
+    - https://github.com/CharsetDetector/UTF-unknown  (MPL 1.1)
+    - https://github.com/errepi/ude (MPL 1.1)

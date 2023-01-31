@@ -11,24 +11,9 @@ using UnityEngine.SceneManagement;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class BackgroundMusicManager : MonoBehaviour, INeedInjection
+public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 {
-    private static BackgroundMusicManager instance;
-    public static BackgroundMusicManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                BackgroundMusicManager instanceInScene = GameObjectUtils.FindComponentWithTag<BackgroundMusicManager>("BackgroundMusicManager");
-                if (instanceInScene != null)
-                {
-                    GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
-                }
-            }
-            return instance;
-        }
-    }
+    public static BackgroundMusicManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BackgroundMusicManager>();
 
     private static readonly int timeInSecondsBeforeRestartingBackgroundMusic = 20;
     private static readonly List<EScene> scenesWithoutBackgroundMusic = new()
@@ -61,23 +46,22 @@ public class BackgroundMusicManager : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
     private float lastPauseTimeInSeconds;
 
-	private void Start()
+    protected override object GetInstance()
     {
-        BackgroundMusicManager self = this;
-        GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref self);
+        return Instance;
+    }
 
-        instance.UpdateBackgroundMusic();
-
-        if (!Application.isPlaying || instance != this)
-        {
-            return;
-        }
-
+    protected override void StartSingleton()
+    {
         settings.ObserveEveryValueChanged(it => it.AudioSettings.BackgroundMusicVolumePercent)
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => UpdateBackgroundMusic());
     }
 
     private void UpdateBackgroundMusic()

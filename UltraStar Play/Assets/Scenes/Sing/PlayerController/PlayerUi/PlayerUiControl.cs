@@ -59,6 +59,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneControl singSceneControl;
 
+    [Inject]
+    private SingSceneData sceneData;
+
     private AbstractSingSceneNoteDisplayer noteDisplayer;
 
     private int totalScoreAnimationId;
@@ -133,7 +136,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         playerNameLabel.text = playerProfile.Name;
         injector.WithRootVisualElement(playerImage)
-            .CreateAndInject<AvatarImageControl>();
+            .CreateAndInject<PlayerProfileImageControl>();
         if (micProfile != null)
         {
             playerScoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
@@ -142,7 +145,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void ChangeLayoutByPlayerCount()
     {
-        if (singSceneControl.SceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 5)
+        if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 5)
         {
             RootVisualElement.AddToClassList("singScenePlayerUiSmall");
         }

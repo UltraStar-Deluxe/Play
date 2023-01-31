@@ -1,0 +1,11 @@
+#TITLE:det finnes ikke d†rlig v‘r, bare d†rlige kl‘r
+#ARTIST:† v‘re midt i sm›r›yet
+#MP3:TestSong.ogg
+#BPM:200
+#GAP:0
+#LANGUAGE:Norwegian
+- 0
+: 4 3 9 Hel
+: 8 3 9 lo 
+: 12 3 9 world!
+E

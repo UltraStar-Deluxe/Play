@@ -28,7 +28,7 @@ public class AbstractAudioClipAction : INeedInjection
         {
             if (!songEditorSampleRecorderControl.HasRecordedAudio)
             {
-                uiManager.CreateNotificationVisualElement("No recorded audio found. Use a microphone to record audio first.");
+                UiManager.CreateNotification("No recorded audio found. Use a microphone to record audio first.");
                 return null;
             }
             return songEditorSampleRecorderControl.AudioClip;
@@ -37,7 +37,7 @@ public class AbstractAudioClipAction : INeedInjection
         {
             if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
             {
-                uiManager.CreateNotificationVisualElement("No vocals audio found. Separate the audio first.");
+                UiManager.CreateNotification("No vocals audio found. Separate the audio first.");
                 return null;
             }
             return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
@@ -46,7 +46,7 @@ public class AbstractAudioClipAction : INeedInjection
         {
             if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.InstrumentalAudio)))
             {
-                uiManager.CreateNotificationVisualElement("No instrumental audio found. Separate the audio first.");
+                UiManager.CreateNotification("No instrumental audio found. Separate the audio first.");
                 return null;
             }
             return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);

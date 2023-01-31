@@ -1,13 +1,32 @@
 ﻿using System.IO;
 using System.Text;
 using UnityEngine;
+using UtfUnknown;
 
 public static class TxtReader
 {
-    public static Encoding GuessFileEncoding(string srcFile)
+    public static StreamReader GetFileStreamReader(string path, Encoding encoding, bool useUniversalCharsetDetector)
+    {
+        if (path.IsNullOrEmpty()
+            || !File.Exists(path))
+        {
+            throw new UnityException($"Can not read file. No file exists in specified path: {path}");
+        }
+
+        if (encoding == null)
+        {
+            encoding = useUniversalCharsetDetector
+                ? GuessUnknownFileEncodingUsingUniversalCharsetDetector(path)
+                : GuessUnicodeFileEncoding(path);
+        }
+        StreamReader reader = new(path, encoding, true);
+        return reader;
+    }
+
+    private static Encoding GuessUnicodeFileEncoding(string path)
     {
         byte[] buffer = new byte[5];
-        FileStream file = new(srcFile, FileMode.Open, FileAccess.Read);
+        FileStream file = new(path, FileMode.Open, FileAccess.Read);
         file.Read(buffer, 0, 5);
         file.Close();
         if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf)
@@ -29,14 +48,18 @@ public static class TxtReader
         return Encoding.UTF8;
     }
 
-    public static StreamReader GetFileStreamReader(string path, Encoding enc)
+    private static Encoding GuessUnknownFileEncodingUsingUniversalCharsetDetector(string filePath)
     {
-        if (path == null || !File.Exists(path))
+        DetectionResult detectionResult = CharsetDetector.DetectFromFile(filePath);
+        Encoding encoding = detectionResult.Detected.Encoding;
+        string encodingName = detectionResult.Detected.EncodingName;
+        float confidence = detectionResult.Detected.Confidence;
+        if (encoding != null
+            && confidence > 0.6f)
         {
-            throw new UnityException($"Can not read file. No file exists in specified path: {path}");
+            return encoding;
         }
-        Encoding guessedEncoding = (enc ?? GuessFileEncoding(path));
-        StreamReader reader = new(path, guessedEncoding, true);
-        return reader;
+        Debug.LogWarning($"Could not determine encoding of file '{filePath}' with high confidence, using UTF8 as fallback. Encoding detection result was: encoding name: '{encodingName}', C# object '{encoding}', confidence: {confidence}");
+        return Encoding.UTF8;
     }
 }

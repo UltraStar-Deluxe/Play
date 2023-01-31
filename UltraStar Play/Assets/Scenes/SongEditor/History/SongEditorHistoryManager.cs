@@ -11,7 +11,7 @@ using UnityEngine;
 public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         songMetaToSongEditorMementoMap.Clear();
     }

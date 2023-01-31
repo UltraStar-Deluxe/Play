@@ -10,7 +10,7 @@ using UniRx;
 using UnityEngine;
 
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
-public class SongMetaManager : MonoBehaviour, INeedInjection
+public class SongMetaManager : AbstractSingletonBehaviour
 {
     private static readonly object scanLock = new();
 
@@ -22,19 +22,13 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
     private static List<SongIssue> SongWarnings => allSongIssues.Where(songIssue => songIssue.Severity == ESongIssueSeverity.Warning).ToList();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void Init()
+    static void StaticInit()
     {
         ResetSongMetas();
         lastSongDirs = null;
     }
 
-    public static SongMetaManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<SongMetaManager>("SongMetaManager");
-        }
-    }
+    public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
 
     // Static to be persisted across scenes.
     private static List<string> lastSongDirs;
@@ -51,12 +45,23 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
 
-    [Inject]
     private Settings settings;
+    private Settings Settings
+    {
+        get
+        {
+            if (settings == null)
+            {
+                settings = SettingsManager.Instance.Settings;
+            }
+
+            return settings;
+        }
+    }
 
     [Inject]
     private UiManager uiManager;
-
+    
     public static void ResetSongMetas()
     {
         lock (scanLock)
@@ -68,29 +73,36 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         }
     }
 
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
     public void ReloadSongMetas()
     {
         ResetSongMetas();
         ScanFilesIfNotDoneYet();
     }
 
-    private void Start()
+    protected override void StartSingleton()
     {
         RescanIfSongFoldersChanged();
     }
 
     private void RescanIfSongFoldersChanged()
     {
+        // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
+        // Thus, use the static instance.
         if (lastSongDirs == null)
         {
-            lastSongDirs = new List<string>(settings.GameSettings.songDirs);
+            lastSongDirs = new List<string>(Settings.GameSettings.songDirs);
         }
 
         if (isSongScanFinished
-            && !lastSongDirs.SequenceEqual(settings.GameSettings.songDirs))
+            && !lastSongDirs.SequenceEqual(Settings.GameSettings.songDirs))
         {
             Debug.Log("SongDirs have changed since last scan. Start rescan.");
-            lastSongDirs = new List<string>(settings.GameSettings.songDirs);
+            lastSongDirs = new List<string>(Settings.GameSettings.songDirs);
             ResetSongMetas();
             ScanFilesIfNotDoneYet();
         }
@@ -157,9 +169,11 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
     {
         Debug.Log("ScanFilesAsynchronously");
 
+        // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
+        // Thus, use the static instance.
         string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
         InitFolderIfNotDoneYet(generatedSongFolderAbsolutePath);
-
+        
         List<string> txtFiles;
         List<string> audioFiles;
         lock (scanLock)
@@ -340,7 +354,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         songIssues = new List<SongIssue>();
         try
         {
-            SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues);
+            SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues, null, Settings.DeveloperSettings.useUniversalCharsetDetector);
             songIssues.AddRange(parseFileIssues);
 
             List<SongIssue> mediaFormatIssues = SongMetaUtils.GetSupportedMediaFormatIssues(newSongMeta);
@@ -360,7 +374,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError(path);
+            Debug.LogError($"Failed to load {path}");
         }
 
         songMeta = null;
@@ -379,13 +393,13 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         catch (Exception e)
         {
             Debug.LogException(e);
-            uiManager.CreateNotificationVisualElement("Saving the file failed:\n" + e.Message);
+            UiManager.CreateNotification("Saving the file failed:\n" + e.Message);
             return;
         }
 
         if (!isAutoSave)
         {
-            uiManager.CreateNotificationVisualElement("Saved file");
+            UiManager.CreateNotification("Saved file");
         }
     }
 
@@ -394,7 +408,7 @@ public class SongMetaManager : MonoBehaviour, INeedInjection
         string absoluteFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
         try
         {
-            SongMeta other = SongMetaBuilder.ParseFile(absoluteFilePath, out List<SongIssue> _);
+            SongMeta other = SongMetaBuilder.ParseFile(absoluteFilePath, out List<SongIssue> _, songMeta.Encoding, false);
             songMeta.CopyValues(other);
         }
         catch (Exception e)

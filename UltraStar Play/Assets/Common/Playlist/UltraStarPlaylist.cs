@@ -1,10 +1,49 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 public class UltraStarPlaylist
 {
+    public string FilePath { get; private set; }
+    public string FileName => Path.GetFileNameWithoutExtension(FilePath);
+    public string Name
+    {
+        get
+        {
+            string headerName = GetHeaderValue("name");
+            if (!headerName.IsNullOrEmpty())
+            {
+                return headerName;
+            }
+            return FileName;
+        }
+    }
+
     private readonly List<UltraStartPlaylistLineEntry> lineEntries = new();
     private readonly HashSet<string> songHashes = new();
+    private readonly Dictionary<string, string> headerFields = new();
+
+    public UltraStarPlaylist(string filePath)
+    {
+        FilePath = filePath;
+    }
+
+    public string GetHeaderValue(string headerName)
+    {
+        if (headerFields.TryGetValue(headerName.ToUpperInvariant(), out string headerValue))
+        {
+            return headerValue;
+        }
+
+        return "";
+    }
+
+    public void SetFileName(string newValue)
+    {
+        string directoryPath = Path.GetDirectoryName(FilePath);
+        FilePath = directoryPath + $"/{newValue}{PlaylistManager.ultraStarPlaylistFileExtension}";
+        headerFields.Remove("NAME");
+    }
 
     public string[] GetLines()
     {
@@ -17,6 +56,10 @@ public class UltraStarPlaylist
         if (lineEntry is UltraStartPlaylistSongEntry songEntry)
         {
             songHashes.Add(GetHash(songEntry.Artist, songEntry.Title));
+        }
+        else if (lineEntry is UltraStartPlaylistHeaderEntry headerEntry)
+        {
+            headerFields[headerEntry.HeaderName] = headerEntry.HeaderValue;
         }
     }
 
@@ -33,6 +76,13 @@ public class UltraStarPlaylist
         }
     }
 
+    public List<UltraStartPlaylistSongEntry> GetSongEntries()
+    {
+        return lineEntries
+            .OfType<UltraStartPlaylistSongEntry>()
+            .ToList();
+    }
+
     public virtual bool HasSongEntry(string artist, string title)
     {
         return songHashes.Contains(GetHash(artist, title));
@@ -41,6 +91,15 @@ public class UltraStarPlaylist
     private string GetHash(string artist, string title)
     {
         return artist.Trim() + "-" + title.Trim();
+    }
+
+    public void RemoveHeaderField(string headerName)
+    {
+        headerFields.Remove(headerName.ToUpperInvariant());
+        UltraStartPlaylistLineEntry lineEntry = lineEntries
+            .FirstOrDefault(it => it is UltraStartPlaylistHeaderEntry headerEntry
+                                  && headerEntry.HeaderName == headerName.ToUpperInvariant());
+        lineEntries.Remove(lineEntry);
     }
 }
 
@@ -54,17 +113,23 @@ public class UltraStartPlaylistLineEntry
     }
 }
 
+public class UltraStartPlaylistHeaderEntry : UltraStartPlaylistLineEntry
+{
+    public string HeaderName { get; private set; }
+    public string HeaderValue { get; private set; }
+
+    public UltraStartPlaylistHeaderEntry(string line, string headerName, string headerValue)
+        : base(line)
+    {
+        HeaderName = headerName.ToUpperInvariant().Trim();
+        HeaderValue = headerValue.Trim();
+    }
+}
+
 public class UltraStartPlaylistSongEntry : UltraStartPlaylistLineEntry
 {
     public string Artist { get; private set; }
     public string Title { get; private set; }
-
-    public UltraStartPlaylistSongEntry(string artist, string title)
-        : base(QuoteIfNeeded(artist) + $" {UltraStarPlaylistParser.separator} " + QuoteIfNeeded(title))
-    {
-        Artist = artist;
-        Title = title;
-    }
 
     public UltraStartPlaylistSongEntry(string line, string artist, string title)
         : base(line)
@@ -73,9 +138,18 @@ public class UltraStartPlaylistSongEntry : UltraStartPlaylistLineEntry
         Title = title;
     }
 
+    public UltraStartPlaylistSongEntry(string artist, string title)
+        : this(QuoteIfNeeded(artist) + $" {UltraStarPlaylistParser.defaultSeparator} " + QuoteIfNeeded(title),
+            artist,
+            title)
+    {
+        Artist = artist;
+        Title = title;
+    }
+
     private static string QuoteIfNeeded(string text)
     {
-        return text.Contains(UltraStarPlaylistParser.separator)
+        return UltraStarPlaylistParser.separators.AnyMatch(separator => text.Contains(separator))
             ? $"\"{text}\""
             : text;
     }
