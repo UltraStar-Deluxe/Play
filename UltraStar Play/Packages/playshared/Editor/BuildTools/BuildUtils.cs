@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
+using UnityEngine;
 
 public static class BuildUtils
 {
@@ -32,15 +32,27 @@ public static class BuildUtils
 
         if (options.buildAppBundleForGooglePlay)
         {
-            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.All
-                                                         | AndroidArchitecture.ARMv7
-                                                         | AndroidArchitecture.ARM64
-                                                         | AndroidArchitecture.X86
-                                                         | AndroidArchitecture.X86_64;
+            // Build the app bundle also for 64bit CPU architectures.
+            // Otherwise it cannot be uploaded to Google Play.
+            // Note that this build takes considerably more time.
+            // Must set the scripting backend to IL2CPP to build for non-ARMv7 architectures.
+            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7
+                                                         | AndroidArchitecture.ARM64;
         }
         else
         {
+            // Build the app only for ARMv7 using Mono scripting backend.
+            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.Mono2x);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7;
+        }
+
+        if (options.buildTarget == BuildTarget.Android)
+        {
+            // Use the Unix time in minutes as version code.
+            // This ensures that the value is incremented for every new build.
+            // Using minutes (instead of milliseconds) makes the value small enough to fit into an int32.
+            PlayerSettings.Android.bundleVersionCode = (int)(TimeUtils.GetUnixTimeMilliseconds() / 1000 / 60);
         }
 
         if (options.configureKeystoreForAndroidBuild)
