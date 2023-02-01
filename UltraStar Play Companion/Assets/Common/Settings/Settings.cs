@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 
 [Serializable]
@@ -26,6 +25,8 @@ public class Settings : ISettings
     public int UdpPortOnClient { get; set; } = 34568;
     public string OwnHost { get; set; }
 
+    public float mousePadSensitivity = 1;
+    
     public void CreateAndSetClientId()
     {
         ClientId = Guid.NewGuid().ToString();
