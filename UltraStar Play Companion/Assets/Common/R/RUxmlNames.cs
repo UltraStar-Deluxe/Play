@@ -55,6 +55,7 @@ public static partial class R
         public const string micViewContainer = "micViewContainer";
         public const string networkConfigContainer = "networkConfigContainer";
         public const string nextItemButton = "nextItemButton";
+        public const string nextItemIcon = "nextItemIcon";
         public const string notificationLabel = "notificationLabel";
         public const string notificationOverlay = "notificationOverlay";
         public const string okButton = "okButton";
@@ -63,6 +64,7 @@ public static partial class R
         public const string ownHostLabel = "ownHostLabel";
         public const string ownHostTextField = "ownHostTextField";
         public const string previousItemButton = "previousItemButton";
+        public const string previousItemIcon = "previousItemIcon";
         public const string recordingDeviceColorIndicator = "recordingDeviceColorIndicator";
         public const string recordingDeviceContainer = "recordingDeviceContainer";
         public const string recordingDeviceInfo = "recordingDeviceInfo";
