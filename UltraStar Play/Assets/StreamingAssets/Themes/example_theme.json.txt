@@ -62,6 +62,14 @@
         "uiShadowOffset": { "x": -16, "y": 10 }
     },
 
+    // This group defines the parameters for a static background image
+    "staticBackground": {
+        // Path to the image. Can be absolute or relative to the theme file
+        "imagePath": "backgrounds/open-sign-1836961_1920.jpg",
+        // Scale mode for the image. Can be one of 'StretchToFill', 'ScaleAndCrop', 'ScaleToFit'
+        "scaleMode": "ScaleAndCrop",
+    },
+
     // Defines the paths to custom icons for the song rating emojis.
     // If not set, default icons will be used.
     "songRatingIcons": {

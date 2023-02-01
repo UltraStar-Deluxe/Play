@@ -29,7 +29,7 @@
                         <MaterialIcon name="songIssueIcon" icon="warning" class="rounded" />
                     </ui:Button>
                     <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
-                        <MaterialIcon name="helpIcon" icon="help_outline" />
+                        <MaterialIcon name="helpIcon" icon="help_outline" picking-mode="Ignore" />
                     </ui:Button>
                     <ui:Button text="Back" name="backButton" class="controlMinWidth" />
                 </ui:VisualElement>

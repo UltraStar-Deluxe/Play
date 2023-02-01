@@ -182,6 +182,7 @@ public static partial class R
         public const string duetLegendIcon = "duetLegendIcon";
         public const string duetLegendLabel = "duetLegendLabel";
         public const string dummyButton = "dummyButton";
+        public const string dummyContent = "dummyContent";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
         public const string editionPropertyContainer = "editionPropertyContainer";

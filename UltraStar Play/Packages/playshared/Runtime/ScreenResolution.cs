@@ -1,8 +1,10 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 // The Resolution type of Unity is not serialized for some reason.
 // Thus, use this wrapper instead.
-public struct ScreenResolution
+public struct ScreenResolution : IEqualityComparer<ScreenResolution>
 {
     public int Width { get; set; }
     public int Height { get; set; }
@@ -23,5 +25,15 @@ public struct ScreenResolution
     public override string ToString()
     {
         return $"{Width} x {Height} @ {RefreshRate} Hz";
+    }
+
+    public bool Equals(ScreenResolution x, ScreenResolution y)
+    {
+        return x.Width == y.Width && x.Height == y.Height && x.RefreshRate == y.RefreshRate;
+    }
+
+    public int GetHashCode(ScreenResolution obj)
+    {
+        return HashCode.Combine(obj.Width, obj.Height, obj.RefreshRate);
     }
 }
