@@ -6,7 +6,7 @@ public static class UltraStarPlayBuildTools
     private static readonly string appName = "UltraStar Play";
 
     [MenuItem("Tools/Build/Build for release (Windows, macOS, Linux, signed apk, signed app bundle)")]
-    public static void BuildAll()
+    public static void BuildAllForRelease()
     {
         BuildWindows64();
         BuildMacOS();
