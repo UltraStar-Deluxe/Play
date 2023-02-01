@@ -12,19 +12,26 @@ public static class ThemeMetaUtils
         return StringUtils.ToTitleCase(themeMeta.FileNameWithoutExtension);
     }
 
-    public static string GetAbsoluteFilePath(ThemeMeta themeMeta, string themeRelativePath)
+    public static string GetAbsoluteFilePath(ThemeMeta themeMeta, string path)
     {
-        return $"{Path.GetDirectoryName(themeMeta.AbsoluteFilePath)}/{themeRelativePath}";
+        if (PathUtils.IsAbsolutePath(path))
+        {
+            return path;
+        }
+
+        return $"{Path.GetDirectoryName(themeMeta.AbsoluteFilePath)}/{path}";
     }
 
-    public static bool HasStaticBackground(ThemeMeta themeMeta)
+    public static bool HasStaticBackground(ThemeMeta themeMeta, Settings settings)
     {
-        return themeMeta.ThemeJson.staticBackground != null
+        return !settings.DeveloperSettings.disableDynamicThemes
+               && themeMeta.ThemeJson.staticBackground != null
                && !themeMeta.ThemeJson.staticBackground.imagePath.IsNullOrEmpty();
     }
 
-    public static bool HasDynamicBackground(ThemeMeta themeMeta)
+    public static bool HasDynamicBackground(ThemeMeta themeMeta, Settings settings)
     {
-        return !HasStaticBackground(themeMeta);
+        return !settings.DeveloperSettings.disableDynamicThemes
+                && !HasStaticBackground(themeMeta, settings);
     }
 }

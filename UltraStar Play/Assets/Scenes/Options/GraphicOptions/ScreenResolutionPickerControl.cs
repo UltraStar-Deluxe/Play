@@ -85,6 +85,7 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
     {
         List<ScreenResolution> result = Screen.resolutions
             .Select(it => new ScreenResolution(it))
+            .Distinct()
             .ToList();
         return result;
     }

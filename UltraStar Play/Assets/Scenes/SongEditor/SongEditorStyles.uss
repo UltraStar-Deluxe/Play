@@ -128,6 +128,10 @@ Button.selected:hover {
 }
 
 #leftSideBarMainColumn.small {
+    width: auto;
+}
+
+#leftSideBarMainColumn.small Button {
     width: 30px;
 }
 

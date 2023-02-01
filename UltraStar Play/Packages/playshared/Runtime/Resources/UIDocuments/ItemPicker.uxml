@@ -1,10 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Packages/playshared/Runtime/StyleSheets/CommonStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#CommonStyles" />
     <ui:VisualElement style="justify-content: center; align-items: center; flex-direction: row; width: 100%; height: 100%;">
-        <ui:Button text="&lt;" name="previousItemButton" class="itemPickerButton" />
+        <ui:Button name="previousItemButton" class="itemPickerButton">
+            <MaterialIcon tabindex="-1" name="previousItemIcon" icon="chevron_left" picking-mode="Ignore" />
+        </ui:Button>
         <ui:Label name="itemLabel" text="Sample Text" class="itemPickerItemLabel" style="overflow: hidden; white-space: normal;">
             <ui:Image name="itemImage" style="position: absolute; width: 100%; height: 100%; -unity-background-scale-mode: scale-to-fit;" />
         </ui:Label>
-        <ui:Button text="&gt;" name="nextItemButton" class="itemPickerButton" />
+        <ui:Button name="nextItemButton" class="itemPickerButton">
+            <MaterialIcon tabindex="-1" name="nextItemIcon" icon="chevron_right" picking-mode="Ignore" />
+        </ui:Button>
     </ui:VisualElement>
 </ui:UXML>
