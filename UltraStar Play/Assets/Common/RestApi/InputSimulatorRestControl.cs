@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Net.Http;
 using SimpleHttpServerForUnity;
-using UnityEngine;
 using UniInject;
+using UniRx;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -14,97 +12,187 @@ using UnityEngine.InputSystem.LowLevel;
 
 public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
 {
+    public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InputSimulatorRestControl>();
+    
     [Inject]
     private HttpServer httpServer;
 
-    private Keyboard currentKeyboard;
+    private Keyboard virtualKeyboard;
+    private Mouse virtualMouse;
+    private Mouse systemMouse;
 
-    private ConcurrentBag<KeyControl> keyControlsToBeTriggered = new();
-    private List<KeyControl> triggeredKeyControlsOfLastFrame = new();
-//
 	private void Start()
     {
-        currentKeyboard = Keyboard.current;
+        // Grab the system mouse before the virtual mouse is used.
+        // Mouse.current can later change to the virtual mouse.
+        systemMouse = Mouse.current;
+        
+        virtualKeyboard = InputSystem.AddDevice<Keyboard>();
+        virtualMouse = InputSystem.AddDevice<Mouse>();
 
-        RegisterNavigationEndpoint("left",
+        RegisterNavigationEndpoint("leftArrowKey",
             "Simulate left arrow key press",
-            () => currentKeyboard.leftArrowKey);
+            virtualKeyboard,
+            () => virtualKeyboard.leftArrowKey);
 
-        RegisterNavigationEndpoint("right",
+        RegisterNavigationEndpoint("rightArrowKey",
             "Simulate right arrow key press",
-            () => currentKeyboard.rightArrowKey);
+            virtualKeyboard,
+            () => virtualKeyboard.rightArrowKey);
 
-        RegisterNavigationEndpoint("up",
+        RegisterNavigationEndpoint("upArrowKey",
             "Simulate up arrow key press",
-            () => currentKeyboard.upArrowKey);
+            virtualKeyboard,
+            () => virtualKeyboard.upArrowKey);
 
-        RegisterNavigationEndpoint("down",
+        RegisterNavigationEndpoint("downArrowKey",
             "Simulate down arrow key press",
-            () => currentKeyboard.downArrowKey);
+            virtualKeyboard,
+            () => virtualKeyboard.downArrowKey);
 
-        RegisterNavigationEndpoint("enter",
+        RegisterNavigationEndpoint("enterKey",
             "Simulate enter key press",
-            () => currentKeyboard.enterKey);
+            virtualKeyboard,
+            () => virtualKeyboard.enterKey);
 
-        RegisterNavigationEndpoint("escape",
+        RegisterNavigationEndpoint("escapeKey",
             "Simulate escape key press",
-            () => currentKeyboard.escapeKey);
+            virtualKeyboard,
+            () => virtualKeyboard.escapeKey);
 
-        RegisterNavigationEndpoint("space",
+        RegisterNavigationEndpoint("spaceKey",
             "Simulate space key press",
-            () => currentKeyboard.spaceKey);
-	}
+            virtualKeyboard,
+            () => virtualKeyboard.spaceKey);
+        
+        RegisterNavigationEndpoint("leftMouseButton",
+            "Simulate left mouse button press",
+            virtualMouse,
+            () => virtualMouse.leftButton);
+        
+        RegisterNavigationEndpoint("rightMouseButton",
+            "Simulate left mouse button press",
+            virtualMouse,
+            () => virtualMouse.rightButton);
+        
+        RegisterNavigationEndpoint("middleMouseButton",
+            "Simulate left mouse button press",
+            virtualMouse,
+            () => virtualMouse.middleButton);
 
-    private void Update()
+        RegisterMouseDeltaEndpoint();
+        RegisterScrollWheelEndpoint();
+    }
+
+    private void RegisterMouseDeltaEndpoint()
     {
-        if (keyControlsToBeTriggered.IsEmpty
-            && triggeredKeyControlsOfLastFrame.IsNullOrEmpty())
+        httpServer.On(HttpMethod.Post, "api/rest/input/mouseDelta/{deltaX}/{deltaY}")
+            .WithDescription("Move the current mouse if any by the given X and Y delta values")
+            .UntilDestroy(gameObject)
+            .Do(requestData =>
+            {
+                if (systemMouse == null)
+                {
+                    return;
+                }
+
+                bool hasDeltaX = float.TryParse(requestData.PathParameters["deltaX"], out float deltaX);
+                bool hasDeltaY = float.TryParse(requestData.PathParameters["deltaY"], out float deltaY);
+                if (hasDeltaX && hasDeltaY)
+                {
+                    SimulateCurrentMouseDelta(new Vector2(deltaX, deltaY));
+                }
+            });
+    }
+
+    private void RegisterScrollWheelEndpoint()
+    {
+        httpServer.On(HttpMethod.Post, "api/rest/input/scrollWheel/{deltaX}/{deltaY}")
+            .WithDescription("Simulate scroll wheel events")
+            .UntilDestroy(gameObject)
+            .Do(requestData =>
+            {
+                if (systemMouse == null)
+                {
+                    return;
+                }
+
+                bool hasDeltaX = float.TryParse(requestData.PathParameters["deltaX"], out float deltaX);
+                bool hasDeltaY = float.TryParse(requestData.PathParameters["deltaY"], out float deltaY);
+                if (hasDeltaX && hasDeltaY)
+                {
+                    SimulateVirtualMouseScrollDelta(new Vector2(deltaX, deltaY));
+                }
+            });
+    }
+
+    private void SimulateVirtualMouseScrollDelta(Vector2 scrollDelta)
+    {
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
+        {
+            using (StateEvent.From(virtualMouse, out InputEventPtr eventPtr))
+            {
+                virtualMouse.scroll.WriteValueIntoEvent(scrollDelta, eventPtr);
+                InputSystem.QueueEvent(eventPtr);
+            }
+        }));
+    }
+
+    private void SimulateCurrentMouseDelta(Vector2 delta)
+    {
+        if (delta == Vector2.zero)
         {
             return;
         }
 
-        if (currentKeyboard == null)
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
-            Debug.LogWarning($"Cannot simulate input events because no keyboard was found");
-        }
-        else
-        {
-            using (StateEvent.From(currentKeyboard, out InputEventPtr inputEventPtr))
+            if (systemMouse == null)
             {
-                triggeredKeyControlsOfLastFrame.ForEach(keyControl =>
-                {
-                    SetKeyboardButtonEvent(keyControl, inputEventPtr, 0);
-                });
-                triggeredKeyControlsOfLastFrame = new();
-
-                keyControlsToBeTriggered.ForEach(keyControl =>
-                {
-                    SetKeyboardButtonEvent(keyControl, inputEventPtr, 1);
-                    triggeredKeyControlsOfLastFrame.Add(keyControl);
-                });
+                return;
             }
-        }
-        keyControlsToBeTriggered = new();
+            Vector2 currentMousePosition = systemMouse.position.ReadValue();
+            Vector2 newMousePosition = currentMousePosition + delta;
+            using (StateEvent.From(systemMouse, out InputEventPtr eventPtr))
+            {
+                systemMouse.WarpCursorPosition(newMousePosition);
+                InputSystem.QueueEvent(eventPtr);
+            }
+        }));
     }
 
-    private void RegisterNavigationEndpoint(string keyboardButton, string description, Func<KeyControl> keyControlGetter)
+    private void RegisterNavigationEndpoint(string inputControlName, string description, InputDevice inputDevice, Func<InputControl> inputControlGetter)
     {
-        string path = $"api/rest/input/{keyboardButton}";
+        string path = $"api/rest/input/{inputControlName}";
         httpServer.On(HttpMethod.Post, path)
             .WithDescription(description)
             .UntilDestroy(gameObject)
             .Do(_ =>
             {
+                InputControl inputControl = inputControlGetter();
                 Debug.Log($"Received input simulation request {path}");
-                KeyControl keyControl = keyControlGetter();
-                keyControlsToBeTriggered.Add(keyControl);
+                SimulateButtonClick(inputDevice, inputControl);
             });
     }
 
-    private void SetKeyboardButtonEvent(KeyControl keyControl, InputEventPtr eventPtr, float value)
+    private void SimulateButtonClick(InputDevice inputDevice, InputControl inputControl)
     {
-        Debug.Log($"Simulating keyboard button event {value} for {keyControl}");
-        keyControl.WriteValueIntoEvent(value, eventPtr);
-        InputSystem.QueueEvent(eventPtr);
+        Debug.Log($"Triggering button click on input control {inputControl} by setting its value to 1 and afterwards to 0");
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
+        {
+            using (StateEvent.From(inputDevice, out InputEventPtr eventPtr))
+            {
+                inputControl.WriteValueIntoEvent(1f, eventPtr);
+                InputSystem.QueueEvent(eventPtr);
+            }
+        }));
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
+        {
+            using (StateEvent.From(inputDevice, out InputEventPtr eventPtr))
+            {
+                inputControl.WriteValueIntoEvent(0f, eventPtr);
+                InputSystem.QueueEvent(eventPtr);
+            }
+        }));
     }
 }
