@@ -32,6 +32,9 @@ public static class BuildUtils
 
         if (options.buildAppBundleForGooglePlay)
         {
+            // Build the app bundle for all CPU architectures. Note that this build takes considerably more time.
+            // Must set the scripting backend to IL2CPP to build for all architectures.
+            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.All
                                                          | AndroidArchitecture.ARMv7
                                                          | AndroidArchitecture.ARM64
@@ -40,6 +43,8 @@ public static class BuildUtils
         }
         else
         {
+            // Build the app only for ARMv7 using Mono scripting backend.
+            PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.Mono2x);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7;
         }
 
