@@ -82,6 +82,11 @@ public static class SongMetaUtils
 
     private static string GetAbsoluteFilePath(SongMeta songMeta, string path)
     {
+        if (PathUtils.IsAbsolutePath(path))
+        {
+            return path;
+        }
+
         return songMeta.Directory + Path.DirectorySeparatorChar + path;
     }
 
