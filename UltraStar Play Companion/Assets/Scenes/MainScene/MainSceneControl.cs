@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
+using ProTrans;
 using UniInject;
 using UniRx;
-using ProTrans;
-using UnityEngine.Networking;
-using Button = UnityEngine.UIElements.Button;
+using UnityEngine;
+using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
-using Toggle = UnityEngine.UIElements.Toggle;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -155,6 +152,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.volumeSlider)]
     private SliderInt volumeSlider;
 
+    [Inject(UxmlName = R.UxmlNames.mouseSensitivityFloatField)]
+    private FloatField mouseSensitivityFloatField;
+    
     [Inject]
     private Injector injector;
 
@@ -231,6 +231,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
         mainGameHttpClient.ConnectionEventStream.Subscribe(_ => InitVolumeSlider());
 
+        mouseSensitivityFloatField.value = settings.mousePadSensitivity;
+        mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.mousePadSensitivity = evt.newValue);
+        
         InitTabGroup();
         InitMenu();
     }
