@@ -165,23 +165,18 @@ ItemPicker #nextItemButton {
 /* ACCORDION */
 /**************************************************/
 
-#accordionItemContent {
-    height: 0;
-    overflow: hidden;
-    transition: height 0.5s;
-}
-
 #accordionItemRoot {
     width: 100%;
     border-width: 0;
 }
 
-#toggleAccordionItemContentButton.unity-button {
-    border-radius: 0;
+#accordionItemContent {
+    overflow: hidden;
+    transition: height 0.5s;
 }
 
-#accordionItemRoot.expanded #accordionItemContent {
-    height: auto;
+#toggleAccordionItemContentButton.unity-button {
+    border-radius: 0;
 }
 
 #toggleAccordionItemContentIcon {
