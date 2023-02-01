@@ -48,6 +48,14 @@ public static class BuildUtils
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7;
         }
 
+        if (options.buildTarget == BuildTarget.Android)
+        {
+            // Use the Unix time in minutes as version code.
+            // This ensures that the value is incremented for every new build.
+            // Using minutes (instead of milliseconds) makes the value small enough to fit into an int32.
+            PlayerSettings.Android.bundleVersionCode = (int)(TimeUtils.GetUnixTimeMilliseconds() / 1000 / 60);
+        }
+
         if (options.configureKeystoreForAndroidBuild)
         {
             ConfigureKeystoreForAndroidBuild();
