@@ -1,11 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="accordionItemRoot" class="accordionRoot expanded">
         <ui:Button display-tooltip-when-elided="true" name="toggleAccordionItemContentButton" style="width: 100%; align-items: center; padding-left: 10px; padding-right: 10px; flex-direction: row; justify-content: space-between; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0;">
-            <ui:Label text="Accordion Title Text" display-tooltip-when-elided="true" name="accordionItemTitle" />
+            <ui:Label text="Accordion Item Title" display-tooltip-when-elided="true" name="accordionItemTitle" />
             <MaterialIcon name="toggleAccordionItemContentIcon" icon="expand_more" />
         </ui:Button>
         <ui:VisualElement name="accordionItemContent">
-            <ui:Label text="Label" display-tooltip-when-elided="true" />
+            <ui:Label text="Dummy Content" display-tooltip-when-elided="true" name="dummyContent" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

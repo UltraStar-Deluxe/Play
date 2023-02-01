@@ -3,9 +3,13 @@ public static partial class R
 {
     public static class UxmlNames
     {
+        public const string accordionItemContent = "accordionItemContent";
+        public const string accordionItemRoot = "accordionItemRoot";
+        public const string accordionItemTitle = "accordionItemTitle";
         public const string audioWaveForm = "audioWaveForm";
         public const string background = "background";
         public const string buildTimeStampText = "buildTimeStampText";
+        public const string cancelButton = "cancelButton";
         public const string clientNameTextField = "clientNameTextField";
         public const string closeMenuButton = "closeMenuButton";
         public const string commitHashText = "commitHashText";
@@ -13,11 +17,33 @@ public static partial class R
         public const string connectionStatusText = "connectionStatusText";
         public const string connectionThroubleshootingText = "connectionThroubleshootingText";
         public const string connectionViewContainer = "connectionViewContainer";
+        public const string container = "container";
+        public const string contextMenu = "contextMenu";
+        public const string contextMenuButton = "contextMenuButton";
+        public const string contextMenuItem = "contextMenuItem";
+        public const string ContextMenuItemUi = "ContextMenuItemUi";
+        public const string contextMenuLabel = "contextMenuLabel";
+        public const string contextMenuSeparator = "contextMenuSeparator";
+        public const string ContextMenuSeparatorUi = "ContextMenuSeparatorUi";
         public const string devModeContainer = "devModeContainer";
         public const string devModeLabel = "devModeLabel";
         public const string devModePicker = "devModePicker";
+        public const string dialogButtonContainer = "dialogButtonContainer";
+        public const string dialogContent = "dialogContent";
+        public const string dialogMessage = "dialogMessage";
+        public const string dialogMessageContainer = "dialogMessageContainer";
+        public const string dialogTitle = "dialogTitle";
+        public const string dialogTitleImage = "dialogTitleImage";
+        public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
+        public const string dialogTitleMaterialIcon = "dialogTitleMaterialIcon";
+        public const string dummyButton = "dummyButton";
+        public const string dummyContent = "dummyContent";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
         public const string infoContainer = "infoContainer";
+        public const string invalidValueIcon = "invalidValueIcon";
+        public const string invalidValueLabel = "invalidValueLabel";
+        public const string itemImage = "itemImage";
+        public const string itemLabel = "itemLabel";
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
@@ -28,9 +54,17 @@ public static partial class R
         public const string micIcon = "micIcon";
         public const string micViewContainer = "micViewContainer";
         public const string networkConfigContainer = "networkConfigContainer";
+        public const string nextItemButton = "nextItemButton";
+        public const string nextItemIcon = "nextItemIcon";
+        public const string notificationLabel = "notificationLabel";
+        public const string notificationOverlay = "notificationOverlay";
+        public const string okButton = "okButton";
+        public const string overlay = "overlay";
         public const string ownHostContainer = "ownHostContainer";
         public const string ownHostLabel = "ownHostLabel";
         public const string ownHostTextField = "ownHostTextField";
+        public const string previousItemButton = "previousItemButton";
+        public const string previousItemIcon = "previousItemIcon";
         public const string recordingDeviceColorIndicator = "recordingDeviceColorIndicator";
         public const string recordingDeviceContainer = "recordingDeviceContainer";
         public const string recordingDeviceInfo = "recordingDeviceInfo";
@@ -52,6 +86,8 @@ public static partial class R
         public const string titleAndDescription = "titleAndDescription";
         public const string titleContainer = "titleContainer";
         public const string titleImageAndText = "titleImageAndText";
+        public const string toggleAccordionItemContentButton = "toggleAccordionItemContentButton";
+        public const string toggleAccordionItemContentIcon = "toggleAccordionItemContentIcon";
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleRecordingButtonContainer = "toggleRecordingButtonContainer";
         public const string udpPortOnClientContainer = "udpPortOnClientContainer";
@@ -60,6 +96,8 @@ public static partial class R
         public const string udpPortOnServerContainer = "udpPortOnServerContainer";
         public const string udpPortOnServerLabel = "udpPortOnServerLabel";
         public const string udpPortOnServerTextField = "udpPortOnServerTextField";
+        public const string validationWarningContainer = "validationWarningContainer";
+        public const string valueTextField = "valueTextField";
         public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";

@@ -27,6 +27,27 @@ public static class UIUtils
             return;
         }
 
+        void ApplyFocusStyle()
+        {
+            Color color = elementsBgColorsDict[hoverRoot].focusBackgroundColor;
+            color.a = root.resolvedStyle.backgroundColor.a;
+            root.style.backgroundColor = color;
+        }
+
+        void ApplyHoverStyle()
+        {
+            Color color = elementsBgColorsDict[hoverRoot].hoverBackgroundColor;
+            color.a = root.resolvedStyle.backgroundColor.a;
+            root.style.backgroundColor = color;
+        }
+
+        void RemoveHoverAndFocusStyle()
+        {
+            Color color = elementsBgColorsDict[hoverRoot].backgroundColor;
+            color.a = root.resolvedStyle.backgroundColor.a;
+            root.style.backgroundColor = color;
+        }
+
         root.style.color = fontColor;
         root.style.backgroundColor = backgroundColor;
 
@@ -35,30 +56,38 @@ public static class UIUtils
         {
             elementsBgColorsDict.Add(hoverRoot, new BackgroundColorConfig(backgroundColor, hoverBackgroundColor, focusBackgroundColor));
 
+            bool pointerOver = false;
+            bool hasFocus = hoverRoot.focusController.focusedElement == hoverRoot;
             hoverRoot.RegisterCallback<PointerEnterEvent>(evt =>
             {
-                Color color = elementsBgColorsDict[hoverRoot].hoverBackgroundColor;
-                color.a = root.resolvedStyle.backgroundColor.a;
-                root.style.backgroundColor = color;
+                pointerOver = true;
+                ApplyHoverStyle();
             });
             hoverRoot.RegisterCallback<PointerLeaveEvent>(evt =>
             {
-                Color color = elementsBgColorsDict[hoverRoot].backgroundColor;
-                color.a = root.resolvedStyle.backgroundColor.a;
-                root.style.backgroundColor = color;
+                pointerOver = false;
+                if (!pointerOver && !hasFocus)
+                {
+                    RemoveHoverAndFocusStyle();
+                }
             });
 
+            if (hasFocus)
+            {
+                ApplyFocusStyle();
+            }
             hoverRoot.RegisterCallback<FocusEvent>(evt =>
             {
-                Color color = elementsBgColorsDict[hoverRoot].focusBackgroundColor;
-                color.a = root.resolvedStyle.backgroundColor.a;
-                root.style.backgroundColor = color;
+                hasFocus = true;
+                ApplyFocusStyle();
             });
             hoverRoot.RegisterCallback<BlurEvent>(evt =>
             {
-                Color color = elementsBgColorsDict[hoverRoot].backgroundColor;
-                color.a = root.resolvedStyle.backgroundColor.a;
-                root.style.backgroundColor = color;
+                hasFocus = false;
+                if (!pointerOver && !hasFocus)
+                {
+                    RemoveHoverAndFocusStyle();
+                }
             });
         }
         else

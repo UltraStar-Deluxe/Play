@@ -181,15 +181,15 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
+        string relativePathNormalized = PathUtils.NormalizePath(imagePath);
         string matchingFullPath = GetAbsolutePlayerProfileImagePaths().FirstOrDefault(absolutePath =>
         {
             string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
-            string relativePathNormalized = PathUtils.NormalizePath(imagePath);
             return absolutePathNormalized.EndsWith(relativePathNormalized);
         });
         if (matchingFullPath.IsNullOrEmpty())
         {
-            Debug.LogWarning($"Cannot load player profile image with path '{imagePath}', no corresponding image file found.");
+            Debug.LogWarning($"Cannot load player profile image with path '{imagePath}' (normalized: '{relativePathNormalized}'), no corresponding image file found.");
             onSuccess(fallbackPlayerProfileImage);
             return;
         }

@@ -35,6 +35,15 @@ public static class UltraStarPlayCompanionBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
+    [MenuItem("Tools/Build/Android - Build signed app bundle")]
+    public static void BuildSignedAndroidAppBundle()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
+        customBuildOptions.configureKeystoreForAndroidBuild = true;
+        customBuildOptions.buildAppBundleForGooglePlay = true;
+        BuildUtils.PerformCustomBuild(customBuildOptions);
+    }
+
     [MenuItem("Tools/Build/Android - Build and run signed app bundle")]
     public static void BuildAndRunSignedAndroidAppBundle()
     {

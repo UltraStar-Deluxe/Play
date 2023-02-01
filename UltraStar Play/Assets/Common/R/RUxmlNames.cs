@@ -151,6 +151,7 @@ public static partial class R
         public const string duetLegendIcon = "duetLegendIcon";
         public const string duetLegendLabel = "duetLegendLabel";
         public const string dummyButton = "dummyButton";
+        public const string dummyContent = "dummyContent";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
         public const string editingTitle = "editingTitle";
@@ -433,6 +434,7 @@ public static partial class R
         public const string previewVolumeLabel = "previewVolumeLabel";
         public const string previousCharacterButton = "previousCharacterButton";
         public const string previousItemButton = "previousItemButton";
+        public const string previousItemIcon = "previousItemIcon";
         public const string previousSongButton = "previousSongButton";
         public const string profileList = "profileList";
         public const string profileOptionsButton = "profileOptionsButton";
