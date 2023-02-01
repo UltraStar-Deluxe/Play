@@ -127,7 +127,6 @@ public static class ApplicationUtils
             }
 
             string internalStorageRoot = AndroidUtils.GetStorageRootPath(false);
-            internalStorageRoot = "F:\\";
             string sdCardStorageRoot = AndroidUtils.GetStorageRootPath(true);
             return text
                 .Replace(internalStorageRoot, $"{internalStorageTranslation}/")

@@ -1,4 +1,5 @@
-﻿using UniInject;
+﻿using System.Collections.Generic;
+using UniInject;
 using UnityEngine.UIElements;
 
 public class AccordionItemControl : INeedInjection, IInjectionFinishedListener
@@ -17,6 +18,8 @@ public class AccordionItemControl : INeedInjection, IInjectionFinishedListener
 
     public bool IsContentVisible => accordionItemRootVisualElement.ClassListContains("expanded");
     public VisualElement VisualElement => accordionItemRootVisualElement;
+
+    private float targetContentHeight = -1;
 
     public string Title
     {
@@ -52,15 +55,44 @@ public class AccordionItemControl : INeedInjection, IInjectionFinishedListener
     public virtual void ShowAccordionContent()
     {
         accordionItemRootVisualElement.AddToClassList("expanded");
+        accordionItemContent.style.height = targetContentHeight;
     }
 
     public virtual void HideAccordionContent()
     {
         accordionItemRootVisualElement.RemoveFromClassList("expanded");
+        if (targetContentHeight >= 0)
+        {
+            accordionItemContent.style.height = 0;
+        }
     }
 
-    public void AddVisualElement(VisualElement visualElement)
+    public void AddVisualElement(VisualElement visualElement, bool updateTargetHeight=true)
     {
         accordionItemContent.Add(visualElement);
+
+        if (updateTargetHeight)
+        {
+            accordionItemContent.style.height = new StyleLength(StyleKeyword.Auto);
+            accordionItemContent.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+            {
+                targetContentHeight = evt.newRect.height;
+                if (!IsContentVisible)
+                {
+                    accordionItemContent.style.height = 0;
+                }
+            });
+        }
+    }
+
+    public void AddVisualElements(List<VisualElement> visualElements)
+    {
+        for (int i = 0; i < visualElements.Count; i++)
+        {
+            VisualElement visualElement = visualElements[i];
+            // Update height if the last element is added
+            bool updateTargetHeight = i >= visualElements.Count - 1;
+            AddVisualElement(visualElement, updateTargetHeight);
+        }
     }
 }

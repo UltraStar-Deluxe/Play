@@ -97,6 +97,12 @@ public static class PathUtils
         Uri baseUri = new Uri(dummyBasePath);
         if (Uri.TryCreate(baseUri, path, out Uri normalizedUri))
         {
+            if (normalizedUri.AbsolutePath.StartsWith($"/{dummyBasePath}"))
+            {
+                // On Unix systems, a leading slash is added for the root folder
+                return normalizedUri.AbsolutePath.Substring(dummyBasePath.Length + 1);
+            }
+
             if (normalizedUri.AbsolutePath.StartsWith(dummyBasePath))
             {
                 return normalizedUri.AbsolutePath.Substring(dummyBasePath.Length);

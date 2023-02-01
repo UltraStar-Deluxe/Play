@@ -111,6 +111,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         if (settings.DeveloperSettings.disableDynamicThemes)
         {
+            DisableDynamicBackground();
             return;
         }
 
@@ -153,13 +154,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        if (!ThemeMetaUtils.HasStaticBackground(themeMeta))
+        if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings))
         {
-            backgroundElement.style.backgroundImage = new StyleBackground();
+            DisableStaticBackground();
             return;
         }
 
-        ImageManager.LoadSpriteFromUri(themeMeta.ThemeJson.staticBackground.imagePath, loadedSprite =>
+        string absoluteFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, themeMeta.ThemeJson.staticBackground.imagePath);
+        ImageManager.LoadSpriteFromUri(absoluteFilePath, loadedSprite =>
         {
             backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
             if (!themeMeta.ThemeJson.staticBackground.scaleMode.IsNullOrEmpty()
@@ -172,8 +174,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
-        if (!ThemeMetaUtils.HasDynamicBackground(themeMeta))
+        if (!ThemeMetaUtils.HasDynamicBackground(themeMeta, settings))
         {
+            DisableDynamicBackground();
             return;
         }
 
@@ -391,6 +394,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         if (settings.DeveloperSettings.disableDynamicThemes)
         {
+            DisableDynamicBackground();
             return;
         }
 
@@ -504,5 +508,16 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public static string GetAbsoluteUserDefinedThemesFolder()
     {
         return $"{Application.persistentDataPath}/{ThemeFolderName}";
+    }
+
+    private void DisableDynamicBackground()
+    {
+        backgroundShaderControl.DisableShader();
+        backgroundParticleSystem.gameObject.SetActive(false);
+    }
+
+    private void DisableStaticBackground()
+    {
+        uiDocument.rootVisualElement.style.backgroundImage = new StyleBackground();
     }
 }
