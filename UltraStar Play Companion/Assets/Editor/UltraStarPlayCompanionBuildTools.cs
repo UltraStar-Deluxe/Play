@@ -6,7 +6,7 @@ public static class UltraStarPlayCompanionBuildTools
     private static readonly string appName = "UltraStar Play Companion";
 
     [MenuItem("Tools/Build/Build for release (signed apk, signed app bundle)")]
-    public static void BuildForRelease()
+    public static void BuildAllForRelease()
     {
         BuildSignedAndroidApk();
         BuildSignedAndroidAppBundle();
