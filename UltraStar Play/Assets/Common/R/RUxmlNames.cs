@@ -434,6 +434,7 @@ public static partial class R
         public const string previewVolumeLabel = "previewVolumeLabel";
         public const string previousCharacterButton = "previousCharacterButton";
         public const string previousItemButton = "previousItemButton";
+        public const string previousItemIcon = "previousItemIcon";
         public const string previousSongButton = "previousSongButton";
         public const string profileList = "profileList";
         public const string profileOptionsButton = "profileOptionsButton";
