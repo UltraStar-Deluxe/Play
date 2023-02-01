@@ -48,6 +48,7 @@ public static partial class R
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string dialogTitleMaterialIcon = "dialogTitleMaterialIcon";
         public const string dummyButton = "dummyButton";
+        public const string dummyContent = "dummyContent";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
         public const string icon = "icon";
         public const string infoContainer = "infoContainer";
