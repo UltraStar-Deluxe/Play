@@ -5,15 +5,15 @@ public static class UltraStarPlayBuildTools
 {
     private static readonly string appName = "UltraStar Play";
 
-    [MenuItem("Tools/Build/All")]
+    [MenuItem("Tools/Build/Build for release (Windows, macOS, Linux, signed apk, signed app bundle)")]
     public static void BuildAll()
     {
         BuildWindows64();
+        BuildMacOS();
         BuildLinux64();
-        BuildMacOS();;
-        BuildAndRunAndroidApk();
-        BuildAndRunSignedAndroidAppBundle();
-        BuildIOS();
+        BuildSignedAndroidApk();
+        BuildSignedAndroidAppBundle();
+        // BuildIOS();
     }
 
     [MenuItem("Tools/Build/Windows64")]
@@ -45,6 +45,14 @@ public static class UltraStarPlayBuildTools
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
         customBuildOptions.buildOptions |= BuildOptions.AutoRunPlayer;
+        BuildUtils.PerformCustomBuild(customBuildOptions);
+    }
+
+    [MenuItem("Tools/Build/Android - Build signed apk")]
+    public static void BuildSignedAndroidApk()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
+        customBuildOptions.configureKeystoreForAndroidBuild = true;
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 

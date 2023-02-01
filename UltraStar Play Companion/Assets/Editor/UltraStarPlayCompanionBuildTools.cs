@@ -5,11 +5,11 @@ public static class UltraStarPlayCompanionBuildTools
 {
     private static readonly string appName = "UltraStar Play Companion";
 
-    [MenuItem("Tools/Build/All")]
-    public static void BuildAll()
+    [MenuItem("Tools/Build/Build for release (signed apk, signed app bundle)")]
+    public static void BuildForRelease()
     {
-        BuildAndRunSignedAndroidApk();
-        BuildAndRunSignedAndroidAppBundle();
+        BuildSignedAndroidApk();
+        BuildSignedAndroidAppBundle();
     }
 
     [MenuItem("Tools/Build/Android - Build apk")]
@@ -23,6 +23,14 @@ public static class UltraStarPlayCompanionBuildTools
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
         customBuildOptions.buildOptions = BuildOptions.AutoRunPlayer;
+        BuildUtils.PerformCustomBuild(customBuildOptions);
+    }
+
+    [MenuItem("Tools/Build/Android - Build signed apk")]
+    public static void BuildSignedAndroidApk()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
+        customBuildOptions.configureKeystoreForAndroidBuild = true;
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
