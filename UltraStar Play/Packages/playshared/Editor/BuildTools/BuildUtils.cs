@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
+using UnityEngine;
 
 public static class BuildUtils
 {
@@ -32,14 +32,13 @@ public static class BuildUtils
 
         if (options.buildAppBundleForGooglePlay)
         {
-            // Build the app bundle for all CPU architectures. Note that this build takes considerably more time.
-            // Must set the scripting backend to IL2CPP to build for all architectures.
+            // Build the app bundle also for 64bit CPU architectures.
+            // Otherwise it cannot be uploaded to Google Play.
+            // Note that this build takes considerably more time.
+            // Must set the scripting backend to IL2CPP to build for non-ARMv7 architectures.
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
-            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.All
-                                                         | AndroidArchitecture.ARMv7
-                                                         | AndroidArchitecture.ARM64
-                                                         | AndroidArchitecture.X86
-                                                         | AndroidArchitecture.X86_64;
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7
+                                                         | AndroidArchitecture.ARM64;
         }
         else
         {
