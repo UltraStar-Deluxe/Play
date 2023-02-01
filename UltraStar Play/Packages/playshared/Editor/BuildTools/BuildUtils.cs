@@ -30,6 +30,19 @@ public static class BuildUtils
         // Build Android app bundle (aab file) or apk file
         EditorUserBuildSettings.buildAppBundle = options.buildAppBundleForGooglePlay;
 
+        if (options.buildAppBundleForGooglePlay)
+        {
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.All
+                                                         | AndroidArchitecture.ARMv7
+                                                         | AndroidArchitecture.ARM64
+                                                         | AndroidArchitecture.X86
+                                                         | AndroidArchitecture.X86_64;
+        }
+        else
+        {
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7;
+        }
+
         if (options.configureKeystoreForAndroidBuild)
         {
             ConfigureKeystoreForAndroidBuild();
