@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -150,10 +147,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public double PositionInSongInMillis => songAudioPlayer.PositionInSongInMillis;
     public double CurrentBeat => songAudioPlayer.GetCurrentBeat(false);
 
-    public PartyModeSettings PartyModeSettings => sceneData.partyModeSettings;
-    public bool HasPartyModeSettings => PartyModeSettings != null;
-    public bool IsPassTheMic => HasPartyModeSettings &&
-                                PartyModeSettings.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic);
+    public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
+    public bool HasPartyModeSceneData => PartyModeSceneData != null;
+    public PartyModeSettings PartyModeSettings => sceneData.partyModeSceneData.PartyModeSettings;
+    public bool IsPassTheMic => HasPartyModeSceneData &&
+                                sceneData.partyModeSceneData.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic);
 
     private SingingLyricsControl topSingingLyricsControl;
     private SingingLyricsControl bottomSingingLyricsControl;
@@ -578,7 +576,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void OpenSongInEditor()
     {
-        if (HasPartyModeSettings)
+        if (HasPartyModeSceneData)
         {
             UiManager.CreateNotification("Song editor not available in party mode");
             return;
@@ -618,7 +616,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (continueWithNextMedleySong
             && sceneData.MedleySongIndex >= 0
             && sceneData.MedleySongIndex < sceneData.SongMetas.Count - 1
-            && !HasPartyModeSettings)
+            && !HasPartyModeSceneData)
         {
             StartNextMedleySong();
             return;
@@ -657,7 +655,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Open song select without recording scores
         SongSelectSceneData songSelectSceneData = new();
         songSelectSceneData.SongMeta = SongMeta;
-        songSelectSceneData.PartyModeSettings = PartyModeSettings;
+        songSelectSceneData.partyModeSceneData = sceneData.partyModeSceneData;
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
@@ -669,7 +667,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         singingResultsSceneData.SongMetas = sceneData.SongMetas;
         singingResultsSceneData.IsMedley = sceneData.IsMedley;
         singingResultsSceneData.SongDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
-        singingResultsSceneData.partyModeSettings = sceneData.partyModeSettings;
+        singingResultsSceneData.partyModeSceneData = sceneData.partyModeSceneData;
 
         // Add scores, either for individual players, or as one common score.
         List<SongStatistic> songStatistics = new();
@@ -782,7 +780,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private void UpdateSongFinishedStats(List<SongStatistic> songStatistics)
     {
         if (sceneData.IsMedley
-            || HasPartyModeSettings)
+            || HasPartyModeSceneData)
         {
             // Medleys and party mode are not recorded
             return;
@@ -794,7 +792,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         Voice voice = GetVoice(playerProfile);
 
-        PlayerControl playerControl = GameObject.Instantiate<PlayerControl>(playerControlPrefab);
+        PlayerControl playerControl = Instantiate<PlayerControl>(playerControlPrefab);
 
         Injector playerControlInjector = UniInjectUtils.CreateInjector(injector);
         playerControlInjector.AddBindingForInstance(playerProfile);
@@ -994,7 +992,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             () => SkipToNextSingableNote());
         contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
             () => FinishScene(false, false));
-        if (!HasPartyModeSettings)
+        if (!HasPartyModeSceneData)
         {
             contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
             () => OpenSongInEditor());

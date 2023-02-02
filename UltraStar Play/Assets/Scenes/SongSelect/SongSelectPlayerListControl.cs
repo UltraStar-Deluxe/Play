@@ -54,7 +54,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             .Subscribe(HandleClientConnectedEvent)
             .AddTo(gameObject);
 
-        if (songSelectSceneControl.HasPartyModeSettings)
+        if (songSelectSceneControl.HasPartyModeSceneData)
         {
             SelectMicsForPartyMode();
         }
@@ -112,7 +112,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)
             .WithBindingForInstance(playerProfile)
-            .WithBindingForInstance(PartyModeUtils.GetTeam(songSelectSceneControl.PartyModeSettings, playerProfile))
+            .WithBindingForInstance(PartyModeUtils.GetTeam(songSelectSceneControl.PartyModeSceneData, playerProfile))
             .CreateAndInject<SongSelectPlayerEntryControl>();
 
         listEntryControl.SelectedChangedEventStream.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));

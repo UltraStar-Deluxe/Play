@@ -64,7 +64,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     public void OnInjectionFinished()
     {
         UpdatePartyModeSettingsDescription();
-        if (songSelectSceneControl.HasPartyModeSettings)
+        if (songSelectSceneControl.HasPartyModeSceneData)
         {
             // Medleys and song queue not supported in party mode
             gameRoundsOverlay.HideByDisplay();
@@ -73,13 +73,13 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     private void UpdatePartyModeSettingsDescription()
     {
-        partySettingsContainer.SetVisibleByDisplay(songSelectSceneControl.HasPartyModeSettings);
-        if (!songSelectSceneControl.HasPartyModeSettings)
+        partySettingsContainer.SetVisibleByDisplay(songSelectSceneControl.HasPartyModeSceneData);
+        if (!songSelectSceneControl.HasPartyModeSceneData)
         {
             return;
         }
 
-        GameRoundSettings currentRoundSettings = songSelectSceneControl.PartyModeSettings.CurrentRoundSettings;
+        GameRoundSettings currentRoundSettings = songSelectSceneControl.PartyModeSceneData.CurrentRoundSettings;
         GameRoundFinishConditionSettings finishConditionSettings = currentRoundSettings.finishConditionSettings;
         HashSet<EGameRoundModifier> modifiers = currentRoundSettings.modifiers;
         GameRoundModifierConditionSettings modifierConditionSettings = currentRoundSettings.modifierConditionSettings;
@@ -170,12 +170,12 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     {
         VisualElement jokerList = new();
         jokerList.AddToClassList("jokerList");
-        if (sceneData.PartyModeSettings.songSelectionSettings.jokerCount < 0)
+        if (sceneData.partyModeSceneData.PartyModeSettings.songSelectionSettings.jokerCount < 0)
         {
             return jokerList;
         }
 
-        for (int i = 0; i < sceneData.PartyModeSettings.songSelectionSettings.jokerCount; i++)
+        for (int i = 0; i < sceneData.partyModeSceneData.PartyModeSettings.songSelectionSettings.jokerCount; i++)
         {
             MaterialIcon jokerIcon = new();
             jokerIcon.Icon = "casino";
