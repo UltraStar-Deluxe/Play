@@ -81,6 +81,10 @@ public class AccordionItemControl : INeedInjection, IInjectionFinishedListener
                 {
                     accordionItemContent.style.height = 0;
                 }
+                else
+                {
+                    accordionItemContent.style.height = targetContentHeight;
+                }
             });
         }
     }
