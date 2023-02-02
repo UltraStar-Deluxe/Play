@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using ICSharpCode.SharpZipLib;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -334,6 +333,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             Thread.Sleep(100);
         }
 
+        if (PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random)
+        {
+            partyModeControl.SelectRandomSong();
+        }
+        
         InitSongMetas();
 
         HidePlayerSelectOverlay();
