@@ -23,7 +23,8 @@ jobs:
           - StandaloneWindows64
           - StandaloneLinux64
           - StandaloneOSX
-          - Android
+          # Skip Android build until "JDK not found" issue has been solved (https://github.com/game-ci/unity-builder/issues/489)
+          #- Android
           - iOS
           # - WebGL
     steps:
