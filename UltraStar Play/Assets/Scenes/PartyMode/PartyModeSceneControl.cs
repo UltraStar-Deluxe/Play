@@ -1,13 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UnityEngine.PlayerLoop;
+using UnityEngine;
+using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -114,6 +112,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         }
 
         // Select the "all songs" playlist
+        partyModeSettings.songSelectionSettings.jokerCount = 5;
         partyModeSettings.songSelectionSettings.songPoolPlaylist = UltraStarAllSongsPlaylist.Instance;
     }
 
@@ -150,7 +149,11 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void OnBack()
     {
-        if (configPart.Value == EPartyModeConfigPart.Teams)
+        if (roundsConfigControl.IsSavePresetDialogOpen)
+        {
+            roundsConfigControl.CloseSavePresetDialog();
+        }
+        else if (configPart.Value == EPartyModeConfigPart.Teams)
         {
             sceneNavigator.LoadScene(EScene.MainScene);
         }

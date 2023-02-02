@@ -76,6 +76,9 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.presetItemPicker)]
     private ItemPicker presetItemPicker;
 
+    private TextInputDialogControl savePresetDialogControl;
+    public bool IsSavePresetDialogOpen => savePresetDialogControl != null;
+    
     private bool IsFolded => visualElement.ClassListContains(FoldedClassName);
 
     private LabeledItemPickerControl<PartyModeRoundSettingsPreset> presetPickerControl;
@@ -261,18 +264,34 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
     private void OpenSavePresetDialog()
     {
+        CloseSavePresetDialog();
+        
         VisualElement dialogVisualElement = valueInputDialogUi.CloneTreeAndGetFirstChild();
         dialogContainer.Add(dialogVisualElement);
         dialogVisualElement.AddToClassList("overlay");
 
-        TextInputDialogControl dialogControl = injector
+        savePresetDialogControl = injector
             .WithRootVisualElement(dialogVisualElement)
             .CreateAndInject<TextInputDialogControl>();
-        dialogControl.Title = "Save preset";
-        dialogControl.Message = "Enter preset name";
+        savePresetDialogControl.Title = "Save preset";
+        savePresetDialogControl.Message = "Enter preset name";
 
-        dialogControl.SubmitValueEventStream
+        savePresetDialogControl.SubmitValueEventStream
             .Subscribe(presetName => SavePreset(presetName));
+        savePresetDialogControl.DialogClosedEventStream.Subscribe(_ =>
+        {
+            savePresetDialogControl = null;
+        });
+    }
+
+    public void CloseSavePresetDialog()
+    {
+        if (savePresetDialogControl == null)
+        {
+            return;
+        }
+        savePresetDialogControl.CloseDialog();
+        savePresetDialogControl = null;
     }
 
     private void SavePreset(string presetName)

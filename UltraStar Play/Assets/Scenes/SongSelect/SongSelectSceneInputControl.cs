@@ -162,7 +162,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneControl.HideSongDetailOverlay();
         }
-        else if (songSelectSceneControl.IsPlaylistActive())
+        else if (songSelectSceneControl.IsPlaylistActive()
+                 && (!songSelectSceneControl.HasPartyModeSettings
+                     || songSelectSceneControl.PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Manual))
         {
             songSelectSceneControl.ResetPlaylistSelection();
         }
