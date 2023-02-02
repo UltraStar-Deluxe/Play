@@ -34,6 +34,12 @@ public static class UltraStarPlayBuildTools
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.StandaloneOSX));
     }
 
+    [MenuItem("Tools/Build/Android - Push apk to device")]
+    public static void PushToAndroid()
+    {
+        BuildUtils.PushApkToDevice(appName);
+    }
+
     [MenuItem("Tools/Build/Android - Build apk")]
     public static void BuildAndroidApk()
     {

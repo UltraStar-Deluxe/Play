@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ICSharpCode.SharpZipLib.Zip;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public static class BuildUtils
 {
@@ -223,5 +225,58 @@ public static class BuildUtils
         Debug.Log($"Creating ZIP file {outputFilePath} from {directoryPath}");
         new FastZip().CreateZip(outputFilePath, directoryPath, true, ".*", ".*");
         Debug.Log($"Created ZIP file {outputFilePath} from {directoryPath}");
+    }
+
+    public static void PushApkToDevice(string appName)
+    {
+        string outputFolder = GetBuildOutputFolder(appName, BuildTarget.Android);
+        string apkFileName = GetExecutableName(appName, BuildTarget.Android, false, false);
+        string apkLocation = outputFolder + $"/{apkFileName}";
+        if (apkLocation.IsNullOrEmpty()
+            || !File.Exists(apkLocation))
+        {
+            Debug.LogError($"Did not find apk file '{apkLocation}'. Build the apk first.");
+            return;
+        }
+
+        string androidSdkRoot = EditorPrefs.GetString("AndroidSdkRoot");
+        if (androidSdkRoot.IsNullOrEmpty()
+            || !Directory.Exists(androidSdkRoot))
+        {
+            androidSdkRoot = PlayerPrefs.GetString("AndroidSdkRoot");
+            if (androidSdkRoot.IsNullOrEmpty()
+                || !Directory.Exists(androidSdkRoot))
+            {
+                androidSdkRoot = EditorUtility.OpenFolderPanel("Android SDK location", Environment.CurrentDirectory, "");
+                if (androidSdkRoot.IsNullOrEmpty()
+                    || !Directory.Exists(androidSdkRoot))
+                {
+                    Debug.LogError($"No Android SDK found");
+                    return;         
+                }
+                PlayerPrefs.SetString("AndroidSdkRoot", androidSdkRoot);
+            }
+        }
+        
+        string adbLocation = androidSdkRoot + "/platform-tools/adb";
+#if UNITY_EDITOR_WIN
+        adbLocation += ".exe";
+#endif
+        
+        if (adbLocation.IsNullOrEmpty()
+            || !File.Exists(adbLocation))
+        {
+            Debug.LogError($"Did not find adb in {adbLocation}");
+            return;
+        }
+
+        Debug.Log($"Pushing '{apkLocation}' to device.");
+        ProcessStartInfo info = new ProcessStartInfo
+        {
+            FileName = adbLocation,
+            Arguments = $"install -r -d \"{apkLocation}\"",
+            WorkingDirectory = Path.GetDirectoryName(adbLocation),
+        };
+        Process.Start(info);
     }
 }
