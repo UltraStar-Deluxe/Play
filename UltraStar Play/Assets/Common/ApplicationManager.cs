@@ -86,7 +86,7 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         {
             if (PlatformUtils.IsStandalone)
             {
-                return System.Environment.GetCommandLineArgs();
+                return Environment.GetCommandLineArgs();
             }
             else
             {

@@ -81,6 +81,9 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SongEditorStatusBarControl statusBarControl;
 
+    [Inject]
+    private InputDeviceManager inputDeviceManager;
+    
     private Vector2 pointerDownPosition;
 
     private EditorNoteLyricsInputControl lyricsInputControl;
@@ -193,7 +196,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void SetCursorForGestureOrMusicNoteCursor(ECursor cursor)
     {
-        if (InputUtils.IsKeyboardControlPressed())
+        if (InputUtils.IsKeyboardControlPressed(inputDeviceManager.SystemKeyboard))
         {
             // LeftControl is used to play midi sound, indicate this via a custom cursor.
             cursorManager.SetCursorMusicNote();
@@ -214,11 +217,11 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
         bool isSelected = (selectionControl != null) && selectionControl.IsSelected(Note);
         bool isLeftHandleVisible = IsPointerOverLeftHandle
-            || (isSelected && (InputUtils.IsKeyboardControlPressed() || InputUtils.IsKeyboardShiftPressed()));
+            || (isSelected && (InputUtils.IsKeyboardControlPressed(inputDeviceManager.SystemKeyboard) || InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard)));
         leftHandle.SetVisibleByDisplay(isLeftHandleVisible);
 
         bool isRightHandleVisible = IsPointerOverRightHandle
-            || (isSelected && (InputUtils.IsKeyboardAltPressed() || InputUtils.IsKeyboardShiftPressed()));
+            || (isSelected && (InputUtils.IsKeyboardAltPressed(inputDeviceManager.SystemKeyboard) || InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard)));
         rightHandle.SetVisibleByDisplay(isRightHandleVisible);
     }
 
@@ -266,7 +269,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         }
 
         // Select / deselect notes via Shift.
-        if (InputUtils.IsKeyboardShiftPressed())
+        if (InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard))
         {
             if (selectionControl.IsSelected(Note))
             {
@@ -277,7 +280,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
                 selectionControl.AddToSelection(this);
             }
         }
-        else if (!InputUtils.IsKeyboardControlPressed())
+        else if (!InputUtils.IsKeyboardControlPressed(inputDeviceManager.SystemKeyboard))
         {
             // Move the playback position to the start of the note
             double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
@@ -369,7 +372,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
         pointerDownPosition = eventData.position;
         // Play midi sound via Ctrl
-        if (!isPlayingMidiSound && InputUtils.IsKeyboardControlPressed())
+        if (!isPlayingMidiSound && InputUtils.IsKeyboardControlPressed(inputDeviceManager.SystemKeyboard))
         {
             isPlayingMidiSound = true;
             midiManager.PlayMidiNote(Note.MidiNote);

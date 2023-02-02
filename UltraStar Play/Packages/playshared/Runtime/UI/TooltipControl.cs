@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -21,6 +20,9 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private UIDocument uiDocument;
+    
+    [Inject]
+    private InputDeviceManager inputDeviceManager;
 
     private Label label;
     private PanelHelper panelHelper;
@@ -104,7 +106,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true) + tooltipOffsetInPx;
+        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true) + tooltipOffsetInPx;
 
         label = new Label();
         label.AddToClassList("tooltip");
