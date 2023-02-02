@@ -135,6 +135,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAudioPicker)]
     private ItemPicker pitchDetectionAudioPicker;
 
+    [Inject(UxmlName = R.UxmlNames.importMidiFileTrack)]
+    private IntegerField importMidiFileTrack;
+    
+    [Inject(UxmlName = R.UxmlNames.importMidiFileChannel)]
+    private IntegerField importMidiFileChannel;
+    
     [Inject]
     private SongMeta songMeta;
 
@@ -367,7 +373,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             path =>
             {
                 settings.SongEditorSettings.LastMidiFilePath = path;
-                midiFileImporter.ImportMidiFile(path);
+                midiFileImporter.ImportMidiFile(path, importMidiFileTrack.value, importMidiFileChannel.value);
             });
     }
 

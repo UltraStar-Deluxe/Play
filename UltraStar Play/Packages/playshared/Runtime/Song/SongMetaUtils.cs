@@ -188,6 +188,16 @@ public static class SongMetaUtils
         return voice.Sentences.FirstOrDefault(sentence => sentence.MinBeat <= beat && beat <= sentence.MaxBeat);
     }
 
+    public static Note GetNoteAtBeat(IEnumerable<Note> notes, int beat, bool inclusiveStartBeat = true, bool inclusiveEndBeat = true)
+    {
+        if (notes == null)
+        {
+            return null;
+        }
+
+        return notes.FirstOrDefault(note => IsBeatInNote(note, beat, inclusiveStartBeat, inclusiveEndBeat));
+    }
+
     public static Note GetNoteAtBeat(Sentence sentence, int beat, bool inclusiveStartBeat = true, bool inclusiveEndBeat = true)
     {
         if (sentence == null)
@@ -195,9 +205,13 @@ public static class SongMetaUtils
             return null;
         }
 
-        return sentence.Notes.FirstOrDefault(note =>
-            (note.StartBeat < beat || inclusiveStartBeat && note.StartBeat == beat)
-            && (beat < note.EndBeat || inclusiveEndBeat && note.EndBeat == beat));
+        return GetNoteAtBeat(sentence.Notes, beat, inclusiveStartBeat, inclusiveEndBeat);
+    }
+
+    public static bool IsBeatInNote(Note note, int beat, bool inclusiveStartBeat = true, bool inclusiveEndBeat = true)
+    {
+        return (note.StartBeat < beat || inclusiveStartBeat && note.StartBeat == beat)
+               && (beat < note.EndBeat || inclusiveEndBeat && note.EndBeat == beat);
     }
 
     public static bool IsBeatInSentence(Sentence sentence, int beat)
