@@ -102,12 +102,13 @@ public static class PartyModeUtils
 
     public static int GetTeamScore(PartyModeSettings partyModeSettings, PartyModeTeamSettings teamSettings)
     {
-        if (partyModeSettings.teamToScoreMap.TryGetValue(teamSettings, out int score))
+        if (teamSettings == null
+            || !partyModeSettings.teamToScoreMap.TryGetValue(teamSettings, out int score))
         {
-            return score;
+            return 0;
         }
 
-        return 0;
+        return score;
     }
 
     public static List<PartyModeTeamSettings> GetAllTeams(PartyModeSettings partyModeSettings)

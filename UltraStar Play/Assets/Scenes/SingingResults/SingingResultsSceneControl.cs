@@ -28,6 +28,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [InjectedInInspector]
     public SongPreviewControl songPreviewControl;
 
+    [InjectedInInspector]
+    public AudioSource crowdCheerAudioSource;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -75,7 +78,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
 	[Inject]
     private SingingResultsSceneData sceneData;
-
+    
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
@@ -344,6 +347,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             // Show team result
             playerResultsContainer.HideByDisplay();
             teamResultsUiControl.ShowByDisplay();
+
+            if (HasFinalTeamResults)
+            {
+                // Play audio clip
+                crowdCheerAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
+                crowdCheerAudioSource.Play();
+            }
         }
         else
         {
@@ -403,9 +413,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         // Find corresponding teams of first and second best players
         List<PartyModeTeamSettings> firstTeams = firstPlayers
             .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile))
+            .Where(team => team != null)
             .ToList();
         List<PartyModeTeamSettings> secondTeams = secondPlayers
             .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile))
+            .Where(team => team != null)
             .ToList();
 
         // First teams receive 2 points. Second teams receive 1 point.
