@@ -28,9 +28,16 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
         SongSelectSceneData songSelectSceneData = new();
         if (partyMode)
         {
-            songSelectSceneData.PartyModeSettings = CreatePartyModeSettings();
+            songSelectSceneData.partyModeSceneData = CreatePartyModeSceneData();
         }
         return songSelectSceneData;
+    }
+    
+    private PartyModeSceneData CreatePartyModeSceneData()
+    {
+        PartyModeSceneData partyModeSceneData = new();
+        partyModeSceneData.PartyModeSettings = CreatePartyModeSettings();
+        return partyModeSceneData;
     }
 
     private PartyModeSettings CreatePartyModeSettings()

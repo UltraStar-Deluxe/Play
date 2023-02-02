@@ -27,6 +27,9 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
     [Inject]
     private PartyModeSettings partyModeSettings;
+    
+    [Inject]
+    private PartyModeRoundConfigModifierDialogControl modifierDialogControl;
 
     [Inject]
     public GameRoundSettings GameRoundSettings { get; private set; }
@@ -42,15 +45,6 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
     [Inject(UxmlName = R.UxmlNames.finishConditionPointsPicker)]
     private ItemPicker finishConditionPointsPicker;
-
-    [Inject(UxmlName = R.UxmlNames.modifierConditionPicker)]
-    private ItemPicker modifierConditionPicker;
-
-    [Inject(UxmlName = R.UxmlNames.modifierConditionFromNumberPicker)]
-    private ItemPicker modifierConditionFromNumberPicker;
-
-    [Inject(UxmlName = R.UxmlNames.modifierConditionUntilNumberPicker)]
-    private ItemPicker modifierConditionUntilNumberPicker;
 
     [Inject(UxmlName = R.UxmlNames.modifierChipsCombo)]
     private ChipsCombo modifierChipsCombo;
@@ -76,15 +70,15 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.presetItemPicker)]
     private ItemPicker presetItemPicker;
 
+    private TextInputDialogControl savePresetDialogControl;
+    public bool IsSavePresetDialogOpen => savePresetDialogControl != null;
+    
     private bool IsFolded => visualElement.ClassListContains(FoldedClassName);
 
     private LabeledItemPickerControl<PartyModeRoundSettingsPreset> presetPickerControl;
     private LabeledItemPickerControl<EGameRoundFinishCondition> finishConditionPickerControl;
     private LabeledItemPickerControl<int> finishConditionPointsPickerControl;
-    private HashSetChipsComboControl<EGameRoundModifier> modifierChipsComboControl;
-    private LabeledItemPickerControl<EGameRoundModifierCondition> modifierConditionPickerControl;
-    private LabeledItemPickerControl<int> modifierConditionFromNumberPickerControl;
-    private LabeledItemPickerControl<int> modifierConditionUntilNumberPickerControl;
+    private GameRoundModifierChipsComboControl modifierChipsComboControl;
 
     private readonly Subject<GameRoundSettings> deletedEventStream = new();
     public IObservable<GameRoundSettings> DeletedEventStream => deletedEventStream;
@@ -142,84 +136,26 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
             });
 
         // Modifiers
-        modifierChipsComboControl.Bind(
-            () => GameRoundSettings.modifiers,
-            newValue =>
+        modifierChipsComboControl.GameRoundSettings = GameRoundSettings;
+        modifierChipsComboControl.GameRoundSettingsChangedEventStream.Subscribe(_ => UpdateControls());
+        modifierChipsComboControl.ChipsCombo.ComboButton.RegisterCallbackButtonTriggered(() =>
+        {
+            modifierDialogControl.OpenDialog(GameRoundSettings);
+
+            // Update controls if the dialog is closed
+            IDisposable dialogClosedDisposable = null;
+            dialogClosedDisposable = modifierDialogControl.DialogClosedEventStream.Subscribe(_ =>
             {
-                GameRoundSettings.modifiers = newValue;
                 UpdateControls();
-            });
-
-        // Modifier condition
-        modifierConditionPickerControl.Bind(
-            () => GameRoundSettings.modifierConditionSettings.condition,
-            newValue =>
-            {
-                GameRoundSettings.modifierConditionSettings.condition = newValue;
-                UpdateControls();
-            });
-
-        // Modifier condition from
-        modifierConditionFromNumberPickerControl.Bind(
-            () =>
-            {
-                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.ScoreRange)
+                if (dialogClosedDisposable != null)
                 {
-                    return GameRoundSettings.modifierConditionSettings.scoreFrom;
-                }
-                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
-                {
-                    return GameRoundSettings.modifierConditionSettings.timeFrom;
-                }
-
-                return 0;
-            },
-            newValue =>
-            {
-                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.ScoreRange)
-                {
-                    GameRoundSettings.modifierConditionSettings.scoreFrom = newValue;
-                }
-                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
-                {
-                    GameRoundSettings.modifierConditionSettings.timeFrom = newValue;
-                }
-                UpdateControls();
-            });
-
-        // Modifier condition until
-        modifierConditionUntilNumberPickerControl.Bind(
-            () =>
-            {
-                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.ScoreRange)
-                {
-                    return GameRoundSettings.modifierConditionSettings.scoreUntil;
-                }
-                if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
-                {
-                    return GameRoundSettings.modifierConditionSettings.timeUntil;
-                }
-
-                return 0;
-            },
-            newValue =>
-            {
-                if (GameRoundSettings.modifierConditionSettings.condition
-                    is EGameRoundModifierCondition.ScoreRange
-                    or EGameRoundModifierCondition.PlayerAdvance)
-                {
-                    GameRoundSettings.modifierConditionSettings.scoreUntil = newValue;
-                    UpdateControls();
-                }
-                else if (GameRoundSettings.modifierConditionSettings.condition is EGameRoundModifierCondition.TimeRange)
-                {
-                    GameRoundSettings.modifierConditionSettings.timeUntil = newValue;
-                    UpdateControls();
+                    dialogClosedDisposable.Dispose();
+                    dialogClosedDisposable = null;
                 }
             });
-
+        });
+            
         UpdateControls();
-
         UpdateTargetHeight();
     }
 
@@ -234,10 +170,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         finishConditionPointsPickerControl = new(finishConditionPointsPicker, NumberUtils.CreateIntList(1000, 9000, 1000));
 
         // Modifiers
-        modifierChipsComboControl = new(modifierChipsCombo, EnumUtils.GetValuesAsList<EGameRoundModifier>());
-        modifierConditionPickerControl = new(modifierConditionPicker, EnumUtils.GetValuesAsList<EGameRoundModifierCondition>());
-        modifierConditionFromNumberPickerControl = new(modifierConditionFromNumberPicker, new List<int> { 0 });
-        modifierConditionUntilNumberPickerControl = new(modifierConditionUntilNumberPicker, new List<int> { 0 });
+        modifierChipsComboControl = new(modifierChipsCombo);
     }
 
     public void UpdatePresetPicker()
@@ -261,18 +194,34 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
     private void OpenSavePresetDialog()
     {
+        CloseSavePresetDialog();
+        
         VisualElement dialogVisualElement = valueInputDialogUi.CloneTreeAndGetFirstChild();
         dialogContainer.Add(dialogVisualElement);
         dialogVisualElement.AddToClassList("overlay");
 
-        TextInputDialogControl dialogControl = injector
+        savePresetDialogControl = injector
             .WithRootVisualElement(dialogVisualElement)
             .CreateAndInject<TextInputDialogControl>();
-        dialogControl.Title = "Save preset";
-        dialogControl.Message = "Enter preset name";
+        savePresetDialogControl.Title = "Save preset";
+        savePresetDialogControl.Message = "Enter preset name";
 
-        dialogControl.SubmitValueEventStream
+        savePresetDialogControl.SubmitValueEventStream
             .Subscribe(presetName => SavePreset(presetName));
+        savePresetDialogControl.DialogClosedEventStream.Subscribe(_ =>
+        {
+            savePresetDialogControl = null;
+        });
+    }
+
+    public void CloseSavePresetDialog()
+    {
+        if (savePresetDialogControl == null)
+        {
+            return;
+        }
+        savePresetDialogControl.CloseDialog();
+        savePresetDialogControl = null;
     }
 
     private void SavePreset(string presetName)
@@ -410,57 +359,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         finishConditionPointsPickerControl.ItemPicker.SetVisibleByDisplay(GameRoundSettings.finishConditionSettings.condition != EGameRoundFinishCondition.ReachEndOfSong);
 
         // Modifiers
-        modifierChipsComboControl.SelectItem(GameRoundSettings.modifiers);
-
-        // Modifier condition
-        modifierConditionPickerControl.ItemPicker.SetVisibleByDisplay(!GameRoundSettings.modifiers.IsNullOrEmpty());
-        modifierConditionPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.condition);
-
-        // Modifier condition from/until
-        bool modifierConditionNumberPickersVisible = modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay()
-            && GameRoundSettings.modifierConditionSettings.condition
-                is EGameRoundModifierCondition.ScoreRange
-                or EGameRoundModifierCondition.TimeRange;
-        modifierConditionFromNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionNumberPickersVisible
-            || (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.PlayerAdvance
-                && modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay()));
-        modifierConditionUntilNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionNumberPickersVisible);
-
-        List<int> modifierConditionValues = new();
-        if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
-        {
-            modifierConditionValues = NumberUtils.CreateIntList(0, 100, 10);
-            modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.timeFrom);
-            modifierConditionUntilNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.timeUntil);
-            modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
-            modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
-        }
-        else if (GameRoundSettings.modifierConditionSettings.condition
-            is EGameRoundModifierCondition.ScoreRange
-            or EGameRoundModifierCondition.PlayerAdvance)
-        {
-            modifierConditionValues = NumberUtils.CreateIntList(0, 10000, 1000);
-            modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.scoreFrom);
-            modifierConditionUntilNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.scoreUntil);
-            modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue}";
-            modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue}";
-        }
-
-        if (!modifierConditionValues.IsNullOrEmpty())
-        {
-            modifierConditionFromNumberPickerControl.Items = modifierConditionValues;
-            if (!modifierConditionValues.Contains(modifierConditionFromNumberPickerControl.SelectedItem))
-            {
-                modifierConditionFromNumberPickerControl.SelectItem(modifierConditionValues.FirstOrDefault());
-            }
-
-            modifierConditionUntilNumberPickerControl.Items = modifierConditionValues;
-            if (!modifierConditionValues.Contains(modifierConditionUntilNumberPickerControl.SelectedItem)
-                || modifierConditionUntilNumberPickerControl.SelectedItem == modifierConditionFromNumberPickerControl.SelectedItem)
-            {
-                modifierConditionUntilNumberPickerControl.SelectItem(modifierConditionValues.LastOrDefault());
-            }
-        }
+        modifierChipsComboControl.UpdateChipsComboEntries();
 
         UpdatePresetPicker();
         UpdatePresetPickerSaveDeleteButtons();

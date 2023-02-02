@@ -70,7 +70,7 @@ public class SettingsManager : AbstractSingletonBehaviour
             string loadedSettingsPath = GetSettingsPath();
             if (!File.Exists(loadedSettingsPath))
             {
-                UnityEngine.Debug.LogWarning($"Settings file not found. Creating default settings at {loadedSettingsPath}.");
+                Debug.LogWarning($"Settings file not found. Creating default settings at {loadedSettingsPath}.");
                 settings = CreateDefaultSettings();
                 Save();
                 return;
@@ -89,16 +89,7 @@ public class SettingsManager : AbstractSingletonBehaviour
                 Debug.LogError($"Failed to load settings from JSON. Using new default settings instead. You can find the original settings in {settingsCopyPath}. Original settings JSON: {fileContent}");
                 settings = CreateDefaultSettings();
             }
-            SanitizeSettings();
             OverwriteSettingsWithCommandLineArguments();
-        }
-    }
-
-    private void SanitizeSettings()
-    {
-        if (settings.PartyModeSettings == null)
-        {
-            settings.PartyModeSettings = new();
         }
     }
 
@@ -170,8 +161,8 @@ public class SettingsManager : AbstractSingletonBehaviour
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError("OverwriteSettingsWithCommandLineArguments failed");
-                UnityEngine.Debug.LogException(e);
+                Debug.LogError("OverwriteSettingsWithCommandLineArguments failed");
+                Debug.LogException(e);
             }
         }
     }

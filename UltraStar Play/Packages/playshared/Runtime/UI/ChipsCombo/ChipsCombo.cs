@@ -1,11 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UniInject;
-using UniRx;
 
 public class ChipsCombo : VisualElement
 {
@@ -70,5 +64,12 @@ public class ChipsCombo : VisualElement
             throw new UnityException("Already initialized");
         }
         control = newControl;
+    }
+
+    public void AddSeparator()
+    {
+        VisualElement separator = new();
+        separator.AddToClassList("chipsComboListSeparator");
+        ChipsList.Add(separator);
     }
 }

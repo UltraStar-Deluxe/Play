@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using PrimeInputActions;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -27,7 +24,7 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
 
     [Inject(UxmlName = R.UxmlNames.roundsContainer)]
     private VisualElement roundsContainer;
-
+    
     [Inject(UxmlName = R.UxmlNames.addRoundButton)]
     private Button addRoundButton;
 
@@ -36,6 +33,8 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
 
     private readonly List<PartyModeRoundConfigControl> roundConfigControls = new();
 
+    public bool IsSavePresetDialogOpen => roundConfigControls.AnyMatch(it => it.IsSavePresetDialogOpen);
+    
     private int unfoldedRoundUiIndex;
 
     public void OnInjectionFinished()
@@ -116,5 +115,10 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
 
         PartyModeRoundConfigControl newRoundControl = roundConfigControls.FirstOrDefault(roundControl => ReferenceEquals(roundControl.GameRoundSettings, newRound));
         newRoundControl?.Unfold(true);
+    }
+
+    public void CloseSavePresetDialog()
+    {
+        roundConfigControls.ForEach(it => it.CloseSavePresetDialog());
     }
 }

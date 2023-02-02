@@ -111,18 +111,18 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private string GetTeamName()
     {
-        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, PlayerProfile);
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSceneData, PlayerProfile);
         return teamSettings.name;
     }
 
     private bool ShouldShowTeamName()
     {
-        if (singingResultsSceneControl.HasPartyModeSettings
+        if (singingResultsSceneControl.HasPartyModeSceneData
             && singingResultsSceneControl.PartyModeSettings.teamSettings.isFreeForAll)
         {
             return false;
         }
-        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSettings, PlayerProfile);
+        PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSceneData, PlayerProfile);
         return teamSettings != null;
     }
 
