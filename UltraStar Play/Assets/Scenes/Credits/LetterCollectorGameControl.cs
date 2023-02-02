@@ -1,13 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UniInject;
-using UniRx;
-using Random = UnityEngine.Random;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -64,6 +59,9 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private PanelHelper panelHelper;
+    
+    [Inject]
+    private InputDeviceManager inputDeviceManager;
 
     [Inject]
     private Injector injector;
@@ -216,7 +214,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     private void UpdatePlayerPosition()
     {
         Vector2 screenSize = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
-        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper);
+        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper);
         float pointerPositionXPercent = pointerPosition.x / screenSize.x;
         player.style.left = new StyleLength(new Length(pointerPositionXPercent * 100f, LengthUnit.Percent));
     }

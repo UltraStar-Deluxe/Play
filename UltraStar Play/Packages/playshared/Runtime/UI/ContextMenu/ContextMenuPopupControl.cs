@@ -29,6 +29,9 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private InputDeviceManager inputDeviceManager;
 
     private PanelHelper panelHelper;
 
@@ -42,6 +45,9 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     private Vector2 lastSize;
     private Vector2 lastPosition;
 
+    private Keyboard keyboard;
+    private Mouse mouse;
+    
     public ContextMenuPopupControl(GameObject gameObject, Vector2 position)
     {
         this.gameObject = gameObject;
@@ -50,6 +56,8 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     public void OnInjectionFinished()
     {
+        keyboard = Keyboard.current;
+        mouse = Mouse.current;
         panelHelper = new PanelHelper(uiDocument);
         visualElement = contextMenuPopupManager.contextMenuUi.CloneTree().Children().First();
         visualElement.style.left = position.x;
@@ -91,7 +99,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         }
 
         // Do not close when clicking an item
-        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
+        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true);
         if (visualElement.worldBound.Contains(pointerPosition))
         {
             return;
@@ -102,7 +110,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     public void Update()
     {
-        wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed || !InputUtils.AnyKeyboardOrMouseOrTouchPressed();
+        wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed || !InputUtils.AnyKeyboardOrMouseOrTouchPressed(keyboard, mouse);
     }
     
     public void AddSeparator()
