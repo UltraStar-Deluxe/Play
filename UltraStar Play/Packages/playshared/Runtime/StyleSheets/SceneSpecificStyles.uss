@@ -438,11 +438,8 @@
 }
 
 #roundUiRoot #centerContent {
-    display: flex;
-}
-
-#roundUiRoot.folded #centerContent {
-    display: none;
+    overflow: hidden;
+    transition: height 0.5s;
 }
 
 #presetItemPicker #itemLabel {

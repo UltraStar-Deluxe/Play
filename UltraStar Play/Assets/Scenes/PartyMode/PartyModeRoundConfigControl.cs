@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -54,6 +54,9 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
     [Inject(UxmlName = R.UxmlNames.modifierChipsCombo)]
     private ChipsCombo modifierChipsCombo;
+    
+    [Inject(UxmlName = R.UxmlNames.centerContent)]
+    private VisualElement centerContent;
 
     [Inject(UxmlName = R.UxmlNames.deleteRoundButton)]
     private Button deleteRoundButton;
@@ -95,6 +98,8 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     private readonly Subject<PartyModeRoundSettingsPreset> presetsChangedEventStream = new();
     public IObservable<PartyModeRoundSettingsPreset> PresetsChangedEventStream => presetsChangedEventStream;
 
+    private float targetContentHeight = -1;
+    
     public void OnInjectionFinished()
     {
         CreateControlObjects();
@@ -214,6 +219,8 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
             });
 
         UpdateControls();
+
+        UpdateTargetHeight();
     }
 
     private void CreateControlObjects()
@@ -368,7 +375,11 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         }
 
         visualElement.AddToClassList(FoldedClassName);
-
+        if (targetContentHeight >= 0)
+        {
+            centerContent.style.height = 0;
+        }
+        
         if (notify)
         {
             foldEventStream.OnNext(GameRoundSettings);
@@ -383,6 +394,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         }
 
         visualElement.RemoveFromClassList(FoldedClassName);
+        centerContent.style.height = targetContentHeight;
 
         if (notify)
         {
@@ -452,6 +464,8 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
 
         UpdatePresetPicker();
         UpdatePresetPickerSaveDeleteButtons();
+        
+        UpdateTargetHeight();
     }
 
     private List<PartyModeRoundSettingsPreset> GetSelectablePresets()
@@ -459,5 +473,22 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
         return new List<PartyModeRoundSettingsPreset> { null }
             .Union(settings.PartyModeSettings.roundSettingsPresets)
             .ToList();
+    }
+
+    private void UpdateTargetHeight()
+    {
+        centerContent.style.height = new StyleLength(StyleKeyword.Auto);
+        centerContent.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+        {
+            targetContentHeight = evt.newRect.height;
+            if (IsFolded)
+            {
+                centerContent.style.height = 0;
+            }
+            else
+            {
+                centerContent.style.height = targetContentHeight;
+            }
+        });
     }
 }
