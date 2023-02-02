@@ -67,6 +67,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorSideBarControl songEditorSideBarControl;
 
+    [Inject]
+    private InputDeviceManager inputDeviceManager;
+    
     private bool inputFieldHasFocusOld;
 
     private Vector2[] zoomStartTouchPositions;
@@ -182,14 +185,14 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         // Zoom horizontal with shortcuts
         InputManager.GetInputAction(R.InputActions.songEditor_zoomInHorizontal).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Where(_ => !InputUtils.IsKeyboardShiftPressed())
+            .Where(_ => !InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard))
             .Subscribe(context =>
             {
                 noteAreaControl.ZoomHorizontal(1);
             });
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutHorizontal).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
-            .Where(_ => !InputUtils.IsKeyboardShiftPressed())
+            .Where(_ => !InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard))
             .Subscribe(context =>
             {
                 noteAreaControl.ZoomHorizontal(-1);
@@ -249,7 +252,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
+        EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier(inputDeviceManager.SystemKeyboard);
 
         int scrollDirection = Math.Sign(context.ReadValue<Vector2>().y);
         if (scrollDirection != 0 && noteAreaControl.IsPointerOver())
@@ -285,7 +288,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         if (!songAudioPlayer.IsPlaying)
         {
             Vector2 direction = context.ReadValue<Vector2>();
-            EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
+            EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier(inputDeviceManager.SystemKeyboard);
 
             List<Note> selectedNotes = selectionControl.GetSelectedNotes();
             if (selectedNotes.IsNullOrEmpty())
@@ -380,14 +383,14 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
                 direction = 1;
             }
 
-            if (!InputUtils.IsAnyKeyboardModifierPressed())
+            if (!InputUtils.IsAnyKeyboardModifierPressed(inputDeviceManager.SystemKeyboard))
             {
                 if (timeFactor > 0)
                 {
                     noteAreaControl.ScrollHorizontal(direction);
                 }
             }
-            else if (InputUtils.IsKeyboardControlPressed())
+            else if (InputUtils.IsKeyboardControlPressed(inputDeviceManager.SystemKeyboard))
             {
                 int stepInMillis = (int)(BpmUtils.MillisecondsPerBeat(songMeta) * timeFactor);
                 if (Keyboard.current.leftArrowKey.isPressed)
@@ -474,7 +477,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     // See: https://github.com/UltraStar-Deluxe/Play/issues/111
     private void UpdateInputForYassShortcuts()
     {
-        EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
+        EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier(inputDeviceManager.SystemKeyboard);
         if (modifier != EKeyboardModifier.None
             // Yass shortcuts only work with a keyboard.
             || Keyboard.current == null
