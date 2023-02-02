@@ -7,5 +7,4 @@ public class PartyModeTeamSettings
     public string name = "";
     public List<PlayerProfile> playerProfiles = new();
     public List<PlayerProfile> guestPlayerProfiles = new();
-    public bool isKnockedOut;
 }

@@ -28,6 +28,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [InjectedInInspector]
     public SongPreviewControl songPreviewControl;
 
+    [InjectedInInspector]
+    public AudioSource crowdCheerAudioSource;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -75,13 +78,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
 	[Inject]
     private SingingResultsSceneData sceneData;
-
+    
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
 
     private bool ShowHighScoresNext => !sceneData.IsMedley
-                                       && !HasPartyModeSettings
+                                       && !HasPartyModeSceneData
                                        && statistics.HasHighscore(sceneData.SongMetas.LastOrDefault());
 
     public static SingingResultsSceneControl Instance
@@ -92,13 +95,15 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
     }
 
-    public PartyModeSettings PartyModeSettings => sceneData.partyModeSettings;
-    public bool HasPartyModeSettings => PartyModeSettings != null;
-    public bool HasFinalTeamResults => PartyModeUtils.IsFinalRound(PartyModeSettings);
+    public PartyModeSettings PartyModeSettings => sceneData.partyModeSceneData.PartyModeSettings;
+    public bool HasPartyModeSceneData => PartyModeSceneData != null;
+    public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
+    public bool HasFinalTeamResults => PartyModeUtils.IsFinalRound(PartyModeSceneData);
 
     public void OnInjectionFinished()
     {
         GivePartyModeTeamPoints();
+        KnockOutPartyTeams();
 
         injector.Inject(nextGameRoundUiControl);
         injector.Inject(teamResultsUiControl);
@@ -126,29 +131,20 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         ActivateLayout();
         FillLayout();
-
-        KnockOutPartyTeams();
     }
 
     private void KnockOutPartyTeams()
     {
-        if (!HasPartyModeSettings
+        if (!HasPartyModeSceneData
             || !PartyModeSettings.teamSettings.isKnockOutTournament)
         {
             return;
         }
 
-        PartyModeTeamSettings knockedOutTeam = GetKnockedOutTeam(sceneData.PlayerProfileToMicProfileMap.Keys.ToList());
-
-        // Mark team as knocked out
-        knockedOutTeam.isKnockedOut = true;
-
-        // Show knock out in UI
-        PlayerProfile knockedOutPlayerProfile = GetPlayerProfileOfThisRound(knockedOutTeam);
-        SingingResultsPlayerControl singingResultsPlayerControl = singingResultsPlayerUiControls.FirstOrDefault(playerUiControl => playerUiControl.PlayerProfile == knockedOutPlayerProfile);
-        if (singingResultsPlayerControl != null)
+        PartyModeTeamSettings knockedOutTeam = GetKnockedOutTeam(sceneData.PlayerProfiles.ToList());
+        if (knockedOutTeam != null)
         {
-            singingResultsPlayerControl.ShowKnockedOutLabel();
+            PartyModeSceneData.teamToIsKnockedOutMap[knockedOutTeam] = true;
         }
     }
 
@@ -310,12 +306,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
             sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
         }
-        else if (!HasPartyModeSettings && gameRoundManager.HasGameRounds)
+        else if (!HasPartyModeSceneData && gameRoundManager.HasGameRounds)
         {
             // Start next game round
             gameRoundManager.StartNextGameRound();
         }
-        else if (HasPartyModeSettings && HasFinalTeamResults)
+        else if (HasPartyModeSceneData && HasFinalTeamResults)
         {
             // Go to party mode config
             sceneNavigator.LoadScene(EScene.PartyModeScene);
@@ -323,28 +319,34 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         else
         {
             // Go to song select scene
-            if (HasPartyModeSettings)
+            if (HasPartyModeSceneData)
             {
                 // Increase party round index
-                PartyModeSettings.currentRoundIndex++;
+                PartyModeSceneData.currentRoundIndex++;
             }
 
             SongSelectSceneData songSelectSceneData = new();
             songSelectSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
-            songSelectSceneData.PartyModeSettings = sceneData.partyModeSettings;
+            songSelectSceneData.partyModeSceneData = sceneData.partyModeSceneData;
             sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
         }
     }
 
     public void Continue()
     {
-        if (HasPartyModeSettings
-            && HasFinalTeamResults
+        if (HasPartyModeSceneData
             && !teamResultsUiControl.IsVisibleByDisplay())
         {
             // Show team result
             playerResultsContainer.HideByDisplay();
             teamResultsUiControl.ShowByDisplay();
+
+            if (HasFinalTeamResults)
+            {
+                // Play audio clip
+                crowdCheerAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
+                crowdCheerAudioSource.Play();
+            }
         }
         else
         {
@@ -383,12 +385,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     {
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
+        if (HasPartyModeSceneData)
+        {
+            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundsSettings.gameRoundSettings.Count}";
+        }
+        
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
     }
 
     private void GivePartyModeTeamPoints()
     {
-        if (!HasPartyModeSettings)
+        if (!HasPartyModeSceneData)
         {
             return;
         }
@@ -403,15 +410,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         // Find corresponding teams of first and second best players
         List<PartyModeTeamSettings> firstTeams = firstPlayers
-            .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile))
+            .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSceneData, playerProfile))
+            .Where(team => team != null)
             .ToList();
         List<PartyModeTeamSettings> secondTeams = secondPlayers
-            .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile))
+            .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSceneData, playerProfile))
+            .Where(team => team != null)
             .ToList();
 
         // First teams receive 2 points. Second teams receive 1 point.
-        firstTeams.ForEach(team => PartyModeSettings.teamToScoreMap[team] = PartyModeUtils.GetTeamScore(PartyModeSettings, team) + 2);
-        secondTeams.ForEach(team => PartyModeSettings.teamToScoreMap[team] = PartyModeUtils.GetTeamScore(PartyModeSettings, team) + 1);
+        firstTeams.ForEach(team => PartyModeSceneData.teamToScoreMap[team] = PartyModeUtils.GetTeamScore(PartyModeSceneData, team) + 2);
+        secondTeams.ForEach(team => PartyModeSceneData.teamToScoreMap[team] = PartyModeUtils.GetTeamScore(PartyModeSceneData, team) + 1);
     }
 
     private List<PlayerProfile> GetTopPlayers(List<PlayerProfile> playerProfiles)
@@ -437,17 +446,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
 
         List<PartyModeTeamSettings> teams = playerProfiles
-            .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile))
+            .Select(playerProfile => PartyModeUtils.GetTeam(PartyModeSceneData, playerProfile))
             .ToList();
         if (teams.IsNullOrEmpty())
         {
             return null;
         }
 
-        int lowestTeamScore = teams.Select(team => PartyModeUtils.GetTeamScore(PartyModeSettings, team))
+        int lowestTeamScore = teams.Select(team => PartyModeUtils.GetTeamScore(PartyModeSceneData, team))
             .Min();
         List<PartyModeTeamSettings> lowestTeams = teams
-            .Where(team => PartyModeUtils.GetTeamScore(PartyModeSettings, team) == lowestTeamScore)
+            .Where(team => PartyModeUtils.GetTeamScore(PartyModeSceneData, team) == lowestTeamScore)
             .ToList();
         if (lowestTeams.IsNullOrEmpty())
         {
@@ -461,8 +470,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private PlayerProfile GetPlayerProfileOfThisRound(PartyModeTeamSettings team)
     {
-        List<PlayerProfile> playerProfiles = sceneData.PlayerProfileToMicProfileMap.Keys.ToList();
-        PlayerProfile playerProfileOfTeam = playerProfiles.FirstOrDefault(playerProfile => PartyModeUtils.GetTeam(PartyModeSettings, playerProfile) == team);
+        List<PlayerProfile> playerProfiles = sceneData.PlayerProfiles.ToList();
+        PlayerProfile playerProfileOfTeam = playerProfiles.FirstOrDefault(playerProfile => PartyModeUtils.GetTeam(PartyModeSceneData, playerProfile) == team);
         return playerProfileOfTeam;
     }
 

@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using ICSharpCode.SharpZipLib;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -314,9 +313,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    public PartyModeSettings PartyModeSettings => sceneData.PartyModeSettings;
-    public bool HasPartyModeSettings => PartyModeSettings != null;
-    public bool IsPartyModeRandomSongSelection => PartyModeSettings != null
+    public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
+    public bool HasPartyModeSceneData => PartyModeSceneData != null;
+    public PartyModeSettings PartyModeSettings => PartyModeSceneData.PartyModeSettings;
+    public bool IsPartyModeRandomSongSelection => HasPartyModeSceneData
                                                   && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random;
     public bool UsePartyModePlaylist => IsPartyModeRandomSongSelection
                                         && PartyModeSettings.songSelectionSettings.songPoolPlaylist != null;
@@ -334,15 +334,21 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             Thread.Sleep(100);
         }
 
+        SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
+        
         InitSongMetas();
+
+        if (HasPartyModeSceneData
+            && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random)
+        {
+            partyModeControl.SelectRandomSong();
+        }
 
         HidePlayerSelectOverlay();
         HideMenuOverlay();
         HideSongDetailOverlay();
         HideSearchExpressionInfoOverlay();
-
-        SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
-
+        
         // Register Callbacks
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
         selectRandomSongButton.RegisterCallbackButtonTriggered(() => SelectRandomSong());
@@ -356,7 +362,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         playerSelectStartSongButton.RegisterCallbackButtonTriggered(() => AttemptStartSong());
         playerSelectCreateSongButton.RegisterCallbackButtonTriggered(() => createSingAlongSongControl.CreateSingAlongSong(SelectedSong));
         playerSelectOpenSongEditorButton.RegisterCallbackButtonTriggered(() => StartSongEditorScene());
-        if (HasPartyModeSettings)
+        if (HasPartyModeSceneData)
         {
             playerSelectOpenSongEditorButton.SetEnabled(false);
         }
@@ -494,7 +500,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void QuitSongSelect()
     {
-        if (HasPartyModeSettings)
+        if (HasPartyModeSceneData)
         {
             PartyModeSceneData partyModeSceneData = new();
             partyModeSceneData.PartyModeSettings = PartyModeSettings;
@@ -520,7 +526,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void AddCurrentSongAsMedley()
     {
-        if (HasPartyModeSettings)
+        if (HasPartyModeSceneData)
         {
             // Medleys not supported in party mode
             return;
@@ -537,7 +543,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void AddNewMedleyWithCurrentSettings()
     {
-        if (HasPartyModeSettings)
+        if (HasPartyModeSceneData)
         {
             // Medleys not supported in party mode
             return;
@@ -886,9 +892,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = new List<SongMeta> { SelectedSong };
         singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
-        singSceneData.partyModeSettings = PartyModeSettings;
-        if (HasPartyModeSettings &&
-            PartyModeSettings.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
+        singSceneData.partyModeSceneData = sceneData.partyModeSceneData;
+        if (HasPartyModeSceneData &&
+            PartyModeSceneData.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
         {
             // Set as medley song to play shortened version
             singSceneData.MedleySongIndex = 0;
@@ -915,7 +921,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void StartSingScene()
     {
         if (gameRoundManager.HasGameRounds
-            && !HasPartyModeSettings)
+            && !HasPartyModeSceneData)
         {
             StartSingSceneWithNextGameRound();
         }
@@ -947,7 +953,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSongEditorScene(SongMeta songMeta)
     {
-        if (HasPartyModeSettings)
+        if (HasPartyModeSceneData)
         {
             UiManager.CreateNotification("Song editor not available in party mode");
             return;
@@ -1276,6 +1282,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public void UpdateTranslation()
     {
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
+        if (HasPartyModeSceneData)
+        {
+            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundsSettings.gameRoundSettings.Count}";
+        }
 
         menuButton.text = TranslationManager.GetTranslation(R.Messages.menu);
         closeMenuOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
@@ -1438,7 +1448,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public List<PlayerProfile> GetEnabledPlayerProfiles()
     {
-        if (!HasPartyModeSettings)
+        if (!HasPartyModeSceneData)
         {
             return settings.PlayerProfiles
                 .Where(playerProfile => playerProfile.IsEnabled)
@@ -1450,7 +1460,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             List<PlayerProfile> allPlayerProfiles = PartyModeUtils.GetAllPlayerProfiles(PartyModeSettings);
             return allPlayerProfiles
                 .Where(playerProfile => playerProfile != null
-                                        && !PartyModeUtils.GetTeam(PartyModeSettings, playerProfile).isKnockedOut)
+                                        && !PartyModeUtils.IsKnockedOut(PartyModeSceneData, PartyModeUtils.GetTeam(PartyModeSceneData, playerProfile)))
                 .Distinct()
                 .ToList();
         }
@@ -1459,7 +1469,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             // Select random player of each team
             List<PlayerProfile> result = new();
             PartyModeSettings.teamSettings.teams
-                .Where(team => !team.isKnockedOut)
+                .Where(team => !PartyModeUtils.IsKnockedOut(PartyModeSceneData, team))
                 .ForEach(team =>
                 {
                     List<PlayerProfile> allTeamPlayerProfiles = team.playerProfiles.Union(team.guestPlayerProfiles).ToList();

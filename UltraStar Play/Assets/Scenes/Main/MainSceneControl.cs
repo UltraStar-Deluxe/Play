@@ -130,7 +130,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     private void OpenSongSelectScene()
     {
         SongSelectSceneData songSelectSceneData = SceneNavigator.GetSceneData(new SongSelectSceneData());
-        songSelectSceneData.PartyModeSettings = null;
+        songSelectSceneData.partyModeSceneData = null;
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 

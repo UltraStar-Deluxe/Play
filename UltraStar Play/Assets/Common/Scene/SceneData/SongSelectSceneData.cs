@@ -4,5 +4,5 @@
 public class SongSelectSceneData : SceneData
 {
     public SongMeta SongMeta { get; set; }
-    public PartyModeSettings PartyModeSettings { get; set; }
+    public PartyModeSceneData partyModeSceneData;
 }

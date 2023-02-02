@@ -1,5 +1,4 @@
 using UnityEditor;
-using UnityEngine;
 
 public static class UltraStarPlayCompanionBuildTools
 {
@@ -16,6 +15,12 @@ public static class UltraStarPlayCompanionBuildTools
     public static void BuildAndroidApk()
     {
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.Android));
+    }
+
+    [MenuItem("Tools/Build/Android - Push apk to device")]
+    public static void PushToAndroid()
+    {
+        BuildUtils.PushApkToDevice(appName);
     }
 
     [MenuItem("Tools/Build/Android - Build and run apk")]

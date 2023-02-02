@@ -1,11 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
-using UniRx;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -28,14 +24,14 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
     public void OnInjectionFinished()
     {
         passTheMicProgressBar.SetVisibleByDisplay(singSceneControl.IsPassTheMic);
-        if (!singSceneControl.HasPartyModeSettings)
+        if (!singSceneControl.HasPartyModeSceneData)
         {
             return;
         }
 
         singSceneControl.PlayerControls.ForEach(playerControl =>
         {
-            PartyModeTeamSettings team = PartyModeUtils.GetTeam(singSceneControl.PartyModeSettings, playerControl.PlayerProfile);
+            PartyModeTeamSettings team = PartyModeUtils.GetTeam(singSceneControl.PartyModeSceneData, playerControl.PlayerProfile);
             if (team != null)
             {
                 teamToCurrentPlayerProfile[team] = playerControl.PlayerProfile;
@@ -175,7 +171,7 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
             return null;
         }
         return singSceneControl.PlayerControls.FirstOrDefault(playerControl
-            => PartyModeUtils.GetTeam(singSceneControl.PartyModeSettings, playerControl.PlayerProfile)
-               == PartyModeUtils.GetTeam(singSceneControl.PartyModeSettings, currentPlayerProfile));
+            => PartyModeUtils.GetTeam(singSceneControl.PartyModeSceneData, playerControl.PlayerProfile)
+               == PartyModeUtils.GetTeam(singSceneControl.PartyModeSceneData, currentPlayerProfile));
     }
 }

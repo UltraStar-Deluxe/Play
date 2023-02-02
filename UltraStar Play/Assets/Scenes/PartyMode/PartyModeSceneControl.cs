@@ -1,13 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UnityEngine.PlayerLoop;
+using UnityEngine;
+using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -37,7 +35,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private Settings settings;
 
     [Inject]
-    private PartyModeSettings partyModeSettings;
+    private PartyModeSceneData sceneData;
 
     [Inject]
     private UiManager uiManager;
@@ -66,10 +64,13 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
+    private PartyModeSettings PartyModeSettings => sceneData.PartyModeSettings;
+    
     private readonly ReactiveProperty<EPartyModeConfigPart> configPart = new(EPartyModeConfigPart.Teams);
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
     private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
     private readonly PartyModeRoundsConfigControl roundsConfigControl = new();
+    private readonly PartyModeRoundConfigModifierDialogControl modifierDialogControl = new();
 
     public void OnInjectionFinished()
     {
@@ -87,6 +88,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         UpdateConfigPart();
 
         // Inject child controls
+        injector.Inject(modifierDialogControl);
         injector.Inject(teamConfigControl);
         injector.Inject(songSelectionConfigControl);
         injector.Inject(roundsConfigControl);
@@ -94,12 +96,14 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void InitPartyModeSettings()
     {
+        sceneData.PartyModeSettings = settings.PartyModeSettings;
+
         // Add at least two teams
-        for (int i = partyModeSettings.teamSettings.teams.Count; i < 2; i++)
+        for (int i = PartyModeSettings.teamSettings.teams.Count; i < 2; i++)
         {
             PartyModeTeamSettings newTeam = new();
-            newTeam.name = PartyModeTeamConfigControl.GetDefaultTeamName(newTeam, partyModeSettings);
-            partyModeSettings.teamSettings.teams.Add(newTeam);
+            newTeam.name = PartyModeTeamConfigControl.GetDefaultTeamName(newTeam, PartyModeSettings);
+            PartyModeSettings.teamSettings.teams.Add(newTeam);
         }
 
         // Add all players that are selected for singing to the teams.
@@ -108,13 +112,13 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         AddPlayerProfilesToTeams(true);
 
         // Add at least one round
-        if (partyModeSettings.roundsSettings.gameRoundSettings.IsNullOrEmpty())
+        if (PartyModeSettings.roundsSettings.gameRoundSettings.IsNullOrEmpty())
         {
-            partyModeSettings.roundsSettings.gameRoundSettings.Add(new GameRoundSettings());
+            PartyModeSettings.roundsSettings.gameRoundSettings.Add(new GameRoundSettings());
         }
 
         // Select the "all songs" playlist
-        partyModeSettings.songSelectionSettings.songPoolPlaylist = UltraStarAllSongsPlaylist.Instance;
+        PartyModeSettings.songSelectionSettings.songPoolPlaylist = UltraStarAllSongsPlaylist.Instance;
     }
 
     private void UpdateConfigPart()
@@ -150,7 +154,15 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void OnBack()
     {
-        if (configPart.Value == EPartyModeConfigPart.Teams)
+        if (modifierDialogControl.IsVisible)
+        {
+            modifierDialogControl.CloseDialog();
+        }
+        else if (roundsConfigControl.IsSavePresetDialogOpen)
+        {
+            roundsConfigControl.CloseSavePresetDialog();
+        }
+        else if (configPart.Value == EPartyModeConfigPart.Teams)
         {
             sceneNavigator.LoadScene(EScene.MainScene);
         }
@@ -204,22 +216,23 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void FinishScene()
     {
-        // Reset some fields in party mode settings
-        partyModeSettings.teamSettings.teams.ForEach(team => team.isKnockedOut = false);
-        partyModeSettings.teamSettings.freeForAllPlayerToTeam.Clear();
-        partyModeSettings.teamToScoreMap.Clear();
-        partyModeSettings.currentRoundIndex = 0;
+        // Reset scene data
+        sceneData.teamToIsKnockedOutMap.Clear();
+        sceneData.freeForAllPlayerToTeam.Clear();
+        sceneData.teamToScoreMap.Clear();
+        sceneData.currentRoundIndex = 0;
+        sceneData.remainingJokerCount = PartyModeSettings.songSelectionSettings.jokerCount;
 
         // Start next scene
         SongSelectSceneData songSelectSceneData = new();
-        songSelectSceneData.PartyModeSettings = partyModeSettings;
+        songSelectSceneData.partyModeSceneData = sceneData;
         sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
     private string GetSongSelectionConfigErrorMessage()
     {
-        if (partyModeSettings.songSelectionSettings.songPoolPlaylist == null
-            || partyModeSettings.songSelectionSettings.songPoolPlaylist.IsEmpty)
+        if (PartyModeSettings.songSelectionSettings.songPoolPlaylist == null
+            || PartyModeSettings.songSelectionSettings.songPoolPlaylist.IsEmpty)
         {
             return "Select a playlist that is not empty";
         }
@@ -229,12 +242,12 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private string GetTeamsConfigErrorMessage()
     {
-        if (partyModeSettings.teamSettings.teams.Count < 1)
+        if (PartyModeSettings.teamSettings.teams.Count < 1)
         {
             return "Must use at least one teams";
         }
 
-        if (partyModeSettings.teamSettings.teams
+        if (PartyModeSettings.teamSettings.teams
             .AnyMatch(team => team.playerProfiles.IsNullOrEmpty() && team.guestPlayerProfiles.IsNullOrEmpty()))
         {
             return "Each team must have at least one player";
@@ -245,20 +258,20 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private string GetRoundsConfigErrorMessage()
     {
-        if (partyModeSettings.roundsSettings.gameRoundSettings.Count <= 0)
+        if (PartyModeSettings.roundsSettings.gameRoundSettings.Count <= 0)
         {
             return "Must play at least one round";
         }
 
-        if (partyModeSettings.teamSettings.isKnockOutTournament)
+        if (PartyModeSettings.teamSettings.isKnockOutTournament)
         {
-            if (partyModeSettings.teamSettings.isFreeForAll)
+            if (PartyModeSettings.teamSettings.isFreeForAll)
             {
                 // N players => at most (N - 1) rounds to play, until there is a single winning player.
-                int playerCount = partyModeSettings.teamSettings.teams
+                int playerCount = PartyModeSettings.teamSettings.teams
                     .Select(team => team.playerProfiles.Count + team.guestPlayerProfiles.Count)
                     .Sum();
-                if (partyModeSettings.roundsSettings.gameRoundSettings.Count >= playerCount)
+                if (PartyModeSettings.roundsSettings.gameRoundSettings.Count >= playerCount)
                 {
                     return "Too many rounds for knock-out tournament";
                 }
@@ -266,8 +279,8 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
             else
             {
                 // N teams => at most (N - 1) rounds to play, until there is a single winning team.
-                int teamCount = partyModeSettings.teamSettings.teams.Count;
-                if (partyModeSettings.roundsSettings.gameRoundSettings.Count >= teamCount)
+                int teamCount = PartyModeSettings.teamSettings.teams.Count;
+                if (PartyModeSettings.roundsSettings.gameRoundSettings.Count >= teamCount)
                 {
                     return "Too many rounds for knock-out tournament";
                 }
@@ -279,7 +292,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void AddPlayerProfilesToTeams(bool guests)
     {
-        partyModeSettings.teamSettings.teams.ForEach(teamList =>
+        PartyModeSettings.teamSettings.teams.ForEach(teamList =>
         {
             if (guests)
             {
@@ -293,11 +306,11 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
         List<PlayerProfile> allRelevantPlayerProfiles = settings.PlayerProfiles
             .Where(playerProfile => playerProfile.IsEnabled)
-            .Union(partyModeSettings.guestPlayerProfiles)
+            .Union(PartyModeSettings.guestPlayerProfiles)
             .ToList();
         if (allRelevantPlayerProfiles.IsNullOrEmpty())
         {
-            partyModeSettings.teamSettings.teams.ForEach(team =>
+            PartyModeSettings.teamSettings.teams.ForEach(team =>
             {
                 // No players to assign
                 team.playerProfiles.Clear();
@@ -307,12 +320,12 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         }
 
         List<PlayerProfile> playerProfiles = guests
-            ? partyModeSettings.guestPlayerProfiles
+            ? PartyModeSettings.guestPlayerProfiles
             : settings.PlayerProfiles;
         List<PlayerProfile> relevantPlayerProfiles = playerProfiles
             .Where(playerProfile => playerProfile.IsEnabled)
             .ToList();
-        List<PlayerProfile> assignedPlayerProfiles = partyModeSettings.teamSettings.teams
+        List<PlayerProfile> assignedPlayerProfiles = PartyModeSettings.teamSettings.teams
             .SelectMany(team => team.playerProfiles.Union(team.guestPlayerProfiles))
             .ToList();
         List<PlayerProfile> relevantUnassignedPlayerProfiles = relevantPlayerProfiles
@@ -322,9 +335,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         {
             int playerProfileIndex = allRelevantPlayerProfiles.IndexOf(playerProfile);
             double playerProfilePercent = playerProfileIndex / (double)(allRelevantPlayerProfiles.Count - 1);
-            int teamIndex = (int)Math.Round(playerProfilePercent * (partyModeSettings.teamSettings.teams.Count - 1));
-            teamIndex = NumberUtils.Limit(teamIndex, 0, partyModeSettings.teamSettings.teams.Count - 1);
-            PartyModeTeamSettings team = partyModeSettings.teamSettings.teams[teamIndex];
+            int teamIndex = (int)Math.Round(playerProfilePercent * (PartyModeSettings.teamSettings.teams.Count - 1));
+            teamIndex = NumberUtils.Limit(teamIndex, 0, PartyModeSettings.teamSettings.teams.Count - 1);
+            PartyModeTeamSettings team = PartyModeSettings.teamSettings.teams[teamIndex];
             List<PlayerProfile> targetList = guests ? team.guestPlayerProfiles : team.playerProfiles;
             targetList.Add(playerProfile);
         }
@@ -333,15 +346,24 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();
-        bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(SceneNavigator.GetSceneData(CreateDefaultPartyModeSceneData()));
         bb.BindExistingInstance(teamConfigControl);
         bb.BindExistingInstance(songSelectionConfigControl);
         bb.BindExistingInstance(roundsConfigControl);
+        bb.BindExistingInstance(modifierDialogControl);
         bb.Bind(nameof(valueInputDialogUi)).ToExistingInstance(valueInputDialogUi);
         bb.Bind(nameof(teamColumnUi)).ToExistingInstance(teamColumnUi);
         bb.Bind(nameof(teamColumnPlayerUi)).ToExistingInstance(teamColumnPlayerUi);
         bb.Bind(nameof(roundUi)).ToExistingInstance(roundUi);
         return bb.GetBindings();
+    }
+
+    private PartyModeSceneData CreateDefaultPartyModeSceneData()
+    {
+        PartyModeSceneData newPartyModeSceneData = new();
+        newPartyModeSceneData.PartyModeSettings = SettingsManager.Instance.Settings.PartyModeSettings;
+        return newPartyModeSceneData;
     }
 }

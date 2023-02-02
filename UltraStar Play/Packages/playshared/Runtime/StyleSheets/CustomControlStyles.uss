@@ -108,18 +108,26 @@ ChipsCombo {
 
 .chipsComboEntryLabel {
     padding-left: 15px;
-    padding-right: 5px;
     padding-top: 5px;
     padding-bottom: 5px;
     flex-grow: 0;
 }
 
 .chipsComboEntryButton {
-    margin-left: 5px;
 }
 
 .chipsDialogToggle {
     margin-bottom: 5px;
+}
+
+.chipsComboListSeparator {
+    width: 100%;
+    border-color: var(--text-color);
+    border-bottom-width: 1px;
+    padding-top: 2px;
+    margin-bottom: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 /**************************************************/
