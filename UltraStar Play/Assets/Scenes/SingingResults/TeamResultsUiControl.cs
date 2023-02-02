@@ -30,7 +30,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         HideByDisplay();
-        if (!singingResultsSceneControl.HasPartyModeSettings)
+        if (!singingResultsSceneControl.HasPartyModeSceneData)
         {
             return;
         }
@@ -51,12 +51,12 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         secondTeamUi.HideByDisplay();
         thirdTeamUi.HideByDisplay();
         
-        List<PartyModeTeamSettings> otherTeams = PartyModeUtils.GetAllTeams(singingResultsSceneControl.PartyModeSettings);
+        List<PartyModeTeamSettings> otherTeams = PartyModeUtils.GetAllTeams(singingResultsSceneControl.PartyModeSceneData);
         otherTeams.Sort((a,b) =>
         {
-            int aScore = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSettings, a);
-            int bScore = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSettings, b);
-            return aScore.CompareTo(bScore);
+            int aScore = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSceneData, a);
+            int bScore = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSceneData, b);
+            return -aScore.CompareTo(bScore);
         });
 
         otherTeamsScrollView.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
@@ -72,19 +72,19 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
     private void FillFinalTeamResults()
     {
         // Find top three and remaining teams
-        List<PartyModeTeamSettings> unusedTeams = PartyModeUtils.GetAllTeams(singingResultsSceneControl.PartyModeSettings);
+        List<PartyModeTeamSettings> unusedTeams = PartyModeUtils.GetAllTeams(singingResultsSceneControl.PartyModeSceneData);
 
-        List<PartyModeTeamSettings> firstTeams = PartyModeUtils.GetLeadingTeams(singingResultsSceneControl.PartyModeSettings, unusedTeams);
+        List<PartyModeTeamSettings> firstTeams = PartyModeUtils.GetLeadingTeams(singingResultsSceneControl.PartyModeSceneData, unusedTeams);
         firstTeams.ForEach(usedTeam => unusedTeams.Remove(usedTeam));
 
-        List<PartyModeTeamSettings> secondTeams = PartyModeUtils.GetLeadingTeams(singingResultsSceneControl.PartyModeSettings, unusedTeams);
+        List<PartyModeTeamSettings> secondTeams = PartyModeUtils.GetLeadingTeams(singingResultsSceneControl.PartyModeSceneData, unusedTeams);
         secondTeams.ForEach(usedTeam => unusedTeams.Remove(usedTeam));
 
-        List<PartyModeTeamSettings> thirdTeams = PartyModeUtils.GetLeadingTeams(singingResultsSceneControl.PartyModeSettings, unusedTeams);
+        List<PartyModeTeamSettings> thirdTeams = PartyModeUtils.GetLeadingTeams(singingResultsSceneControl.PartyModeSceneData, unusedTeams);
         thirdTeams.ForEach(usedTeam => unusedTeams.Remove(usedTeam));
 
         List<PartyModeTeamSettings> otherTeams = unusedTeams
-            .OrderBy(otherTeam => PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSettings, otherTeam))
+            .OrderBy(otherTeam => PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSceneData, otherTeam))
             .ToList();
 
         // Fill UI
@@ -116,9 +116,15 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         Label teamScoreLabel = teamUi.Q<Label>(R.UxmlNames.teamScoreLabel);
         VisualElement labelContainer = teamUi.Q<VisualElement>(R.UxmlNames.labelContainer);
 
+        VisualElement knockOutOverlay = teamUi.Q<VisualElement>(R.UxmlNames.knockOutLabelOverlay);
+        bool knockOutOverlayVisible = singingResultsSceneControl.PartyModeSettings.teamSettings.isKnockOutTournament
+                                      && !PartyModeUtils.IsFinalRound(singingResultsSceneControl.PartyModeSceneData)
+                                      && teams.AllMatch(team => PartyModeUtils.IsKnockedOut(singingResultsSceneControl.PartyModeSceneData, team));
+        knockOutOverlay.SetVisibleByDisplay(knockOutOverlayVisible);
+
         teamNameLabel.text = teams.Select(team => team.name).JoinWith(" & ");
 
-        int score = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSettings, teams.FirstOrDefault());
+        int score = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSceneData, teams.FirstOrDefault());
         teamScoreLabel.text = score.ToString();
 
         labelContainer.style.backgroundColor = GetPlaceColor(place);

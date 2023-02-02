@@ -349,7 +349,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         });
 
         openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneControl.StartSongEditorScene());
-        if (songSelectSceneControl.HasPartyModeSettings)
+        if (songSelectSceneControl.HasPartyModeSceneData)
         {
             openSongEditorButton.SetEnabled(false);
         }

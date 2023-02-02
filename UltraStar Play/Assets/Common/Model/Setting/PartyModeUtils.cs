@@ -3,65 +3,79 @@ using System.Linq;
 
 public static class PartyModeUtils
 {
-    public static bool IsFinalRound(PartyModeSettings partyModeSettings)
+    public static bool IsFinalRound(PartyModeSceneData partyModeSceneData)
     {
-        if (partyModeSettings == null)
+        if (partyModeSceneData == null)
         {
             return false;
         }
-        return partyModeSettings.currentRoundIndex >= partyModeSettings.roundsSettings.gameRoundSettings.Count - 1
-               || IsFinalRoundOfKnockOutTournament(partyModeSettings);
+        return partyModeSceneData.currentRoundIndex >= partyModeSceneData.PartyModeSettings.roundsSettings.gameRoundSettings.Count - 1
+               || IsFinalRoundOfKnockOutTournament(partyModeSceneData);
     }
 
-    private static bool IsFinalRoundOfKnockOutTournament(PartyModeSettings partyModeSettings)
+    private static bool IsFinalRoundOfKnockOutTournament(PartyModeSceneData partyModeSceneData)
     {
-        if (!partyModeSettings.teamSettings.isKnockOutTournament)
+        if (!partyModeSceneData.PartyModeSettings.teamSettings.isKnockOutTournament)
         {
             return false;
         }
 
-        if (partyModeSettings.teamSettings.isFreeForAll)
+        if (partyModeSceneData.PartyModeSettings.teamSettings.isFreeForAll)
         {
-            List<PlayerProfile> allFreeForAllPlayerProfiles = GetAllPlayerProfiles(partyModeSettings);
+            List<PlayerProfile> allFreeForAllPlayerProfiles = GetAllPlayerProfiles(partyModeSceneData.PartyModeSettings);
             List<PartyModeTeamSettings> allTeamSettingsOfFreeForAllPlayers = allFreeForAllPlayerProfiles
-                .Select(playerProfile => GetTeam(partyModeSettings, playerProfile))
+                .Select(playerProfile => GetTeam(partyModeSceneData, playerProfile))
                 .ToList();
-            int remainingFreeForAllTeams = allTeamSettingsOfFreeForAllPlayers.Select(team => !team.isKnockedOut).Count();
+            int remainingFreeForAllTeams = allTeamSettingsOfFreeForAllPlayers
+                .Select(team => !IsKnockedOut(partyModeSceneData, team))
+                .Count();
             return remainingFreeForAllTeams <= 2;
         }
         else
         {
-            int remainingTeams = partyModeSettings.teamSettings.teams.Select(team => !team.isKnockedOut).Count();
+            int remainingTeams = partyModeSceneData.PartyModeSettings.teamSettings.teams
+                .Select(team => !IsKnockedOut(partyModeSceneData, team))
+                .Count();
             return remainingTeams <= 2;
         }
     }
 
-    public static PartyModeTeamSettings GetTeam(PartyModeSettings partyModeSettings, PlayerProfile playerProfile)
+    public static bool IsKnockedOut(PartyModeSceneData partyModeSceneData, PartyModeTeamSettings team)
     {
-        if (partyModeSettings == null)
+        if (partyModeSceneData.teamToIsKnockedOutMap.TryGetValue(team, out bool isKnockedOut))
+        {
+            return isKnockedOut;
+        }
+
+        return false;
+    }
+
+    public static PartyModeTeamSettings GetTeam(PartyModeSceneData partyModeSceneData, PlayerProfile playerProfile)
+    {
+        if (partyModeSceneData == null)
         {
             return null;
         }
 
-        if (partyModeSettings.teamSettings.isFreeForAll)
+        if (partyModeSceneData.PartyModeSettings.teamSettings.isFreeForAll)
         {
-            return GetTeamForPlayerInFreeForAll(partyModeSettings, playerProfile);
+            return GetTeamForPlayerInFreeForAll(partyModeSceneData, playerProfile);
         }
 
         // Return of this player
-        return partyModeSettings.teamSettings.teams.FirstOrDefault(team
+        return partyModeSceneData.PartyModeSettings.teamSettings.teams.FirstOrDefault(team
             => team.playerProfiles.Contains(playerProfile) || team.guestPlayerProfiles.Contains(playerProfile));
     }
 
-    private static PartyModeTeamSettings GetTeamForPlayerInFreeForAll(PartyModeSettings partyModeSettings, PlayerProfile playerProfile)
+    private static PartyModeTeamSettings GetTeamForPlayerInFreeForAll(PartyModeSceneData partyModeSceneData, PlayerProfile playerProfile)
     {
-        if (!partyModeSettings.teamSettings.freeForAllPlayerToTeam.TryGetValue(playerProfile, out PartyModeTeamSettings team))
+        if (!partyModeSceneData.freeForAllPlayerToTeam.TryGetValue(playerProfile, out PartyModeTeamSettings team))
         {
             team = new();
             // Team has same name as player
             team.name = playerProfile.Name;
             team.playerProfiles.Add(playerProfile);
-            partyModeSettings.teamSettings.freeForAllPlayerToTeam[playerProfile] = team;
+            partyModeSceneData.freeForAllPlayerToTeam[playerProfile] = team;
         }
 
         return team;
@@ -86,7 +100,7 @@ public static class PartyModeUtils
             .ToList();
     }
 
-    public static List<PartyModeTeamSettings> GetLeadingTeams(PartyModeSettings partyModeSettings, List<PartyModeTeamSettings> teams)
+    public static List<PartyModeTeamSettings> GetLeadingTeams(PartyModeSceneData partyModeSceneData, List<PartyModeTeamSettings> teams)
     {
         if (teams.IsNullOrEmpty())
         {
@@ -94,16 +108,16 @@ public static class PartyModeUtils
         }
 
         // Return teams with highest score
-        int highestTeamScore = teams.Select(team => GetTeamScore(partyModeSettings, team)).Max();
+        int highestTeamScore = teams.Select(team => GetTeamScore(partyModeSceneData, team)).Max();
         return teams
-            .Where(team => GetTeamScore(partyModeSettings, team) == highestTeamScore)
+            .Where(team => GetTeamScore(partyModeSceneData, team) == highestTeamScore)
             .ToList();
     }
 
-    public static int GetTeamScore(PartyModeSettings partyModeSettings, PartyModeTeamSettings teamSettings)
+    public static int GetTeamScore(PartyModeSceneData partyModeSceneData, PartyModeTeamSettings teamSettings)
     {
         if (teamSettings == null
-            || !partyModeSettings.teamToScoreMap.TryGetValue(teamSettings, out int score))
+            || !partyModeSceneData.teamToScoreMap.TryGetValue(teamSettings, out int score))
         {
             return 0;
         }
@@ -111,18 +125,18 @@ public static class PartyModeUtils
         return score;
     }
 
-    public static List<PartyModeTeamSettings> GetAllTeams(PartyModeSettings partyModeSettings)
+    public static List<PartyModeTeamSettings> GetAllTeams(PartyModeSceneData partyModeSceneData)
     {
-        if (partyModeSettings.teamSettings.isFreeForAll)
+        if (partyModeSceneData.PartyModeSettings.teamSettings.isFreeForAll)
         {
-            List<PlayerProfile> playerProfiles = GetAllPlayerProfiles(partyModeSettings);
+            List<PlayerProfile> playerProfiles = GetAllPlayerProfiles(partyModeSceneData.PartyModeSettings);
             return playerProfiles
-                .Select(playerProfile => GetTeamForPlayerInFreeForAll(partyModeSettings, playerProfile))
+                .Select(playerProfile => GetTeamForPlayerInFreeForAll(partyModeSceneData, playerProfile))
                 .ToList();
         }
         else
         {
-            return partyModeSettings.teamSettings.teams.ToList();
+            return partyModeSceneData.PartyModeSettings.teamSettings.teams.ToList();
         }
     }
 }

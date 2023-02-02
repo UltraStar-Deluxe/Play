@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -37,7 +35,7 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
     {
         injector.Inject(passTheMicControl);
 
-        if (!singSceneControl.HasPartyModeSettings)
+        if (!singSceneControl.HasPartyModeSceneData)
         {
             return;
         }
@@ -50,7 +48,7 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     public void Update()
     {
-        if (!singSceneControl.HasPartyModeSettings)
+        if (!singSceneControl.HasPartyModeSceneData)
         {
             return;
         }
@@ -70,8 +68,8 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     private bool IsFinishConditionTriggered()
     {
-        EGameRoundFinishCondition finishCondition = singSceneControl.PartyModeSettings.CurrentRoundSettings.finishConditionSettings.condition;
-        int finishConditionScore = singSceneControl.PartyModeSettings.CurrentRoundSettings.finishConditionSettings.points;
+        EGameRoundFinishCondition finishCondition = singSceneControl.PartyModeSceneData.CurrentRoundSettings.finishConditionSettings.condition;
+        int finishConditionScore = singSceneControl.PartyModeSceneData.CurrentRoundSettings.finishConditionSettings.points;
         if (finishCondition == EGameRoundFinishCondition.ReachPoints)
         {
             return singSceneControl.PlayerControls.AnyMatch(playerControl
@@ -101,7 +99,7 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     private void UpdatePlayerIndependentModifiers()
     {
-        HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSettings.CurrentRoundSettings.modifiers;
+        HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSceneData.CurrentRoundSettings.modifiers;
         bool isModifierConditionTriggered = singSceneControl.PlayerControls
             .AnyMatch(playerControl => IsModifierConditionTriggered(playerControl));
         modifiers.ForEach(modifier =>
@@ -164,7 +162,7 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
             playerControlToActiveModifiers.Add(playerControl, activeModifiers);
         }
 
-        HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSettings.CurrentRoundSettings.modifiers;
+        HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSceneData.CurrentRoundSettings.modifiers;
         bool isModifierConditionTriggered = IsModifierConditionTriggered(playerControl);
         modifiers.ForEach(modifier =>
         {
@@ -221,7 +219,7 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     private bool IsModifierConditionTriggered(PlayerControl playerControl)
     {
-        GameRoundModifierConditionSettings modifierConditionSettings = singSceneControl.PartyModeSettings.CurrentRoundSettings.modifierConditionSettings;
+        GameRoundModifierConditionSettings modifierConditionSettings = singSceneControl.PartyModeSceneData.CurrentRoundSettings.modifierConditionSettings;
         if (modifierConditionSettings.condition == EGameRoundModifierCondition.Always)
         {
             return true;

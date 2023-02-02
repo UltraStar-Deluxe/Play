@@ -50,9 +50,27 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
 
         if (partyModeTeams > 0)
         {
-            data.partyModeSettings = CreatePartyModeSettings();
+            data.partyModeSceneData = CreatePartyModeSceneData();
         }
         return data;
+    }
+
+    private PartyModeSceneData CreatePartyModeSceneData()
+    {
+        PartyModeSceneData partyModeSceneData = new();
+        partyModeSceneData.PartyModeSettings = CreatePartyModeSettings();
+
+        // Set round index to last round
+        partyModeSceneData.currentRoundIndex = partyModeSceneData.PartyModeSettings.roundsSettings.gameRoundSettings.Count - 1;
+
+        // Give team points
+        for (int i = 1; i <= partyModeTeams; i++)
+        {
+            PartyModeTeamSettings teamSettings = partyModeSceneData.PartyModeSettings.teamSettings.teams[i];
+            partyModeSceneData.teamToScoreMap[teamSettings] = i;
+        }
+
+        return partyModeSceneData;
     }
 
     private PartyModeSettings CreatePartyModeSettings()
@@ -69,7 +87,6 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
                 teamSettings.name = $"Team 0{i}";
                 teamSettings.guestPlayerProfiles = new List<PlayerProfile> { guestPlayerProfile };
                 partyModeSettings.teamSettings.teams.Add(teamSettings);
-                partyModeSettings.teamToScoreMap[teamSettings] = i;
             }
         }
 
@@ -77,9 +94,6 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         {
             GameRoundSettings roundSettings = new();
             partyModeSettings.roundsSettings.gameRoundSettings.Add(roundSettings);
-
-            // Set round index to last round
-            partyModeSettings.currentRoundIndex = partyModeSettings.roundsSettings.gameRoundSettings.Count - 1;
         }
 
         AddTeams();
