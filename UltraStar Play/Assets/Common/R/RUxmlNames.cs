@@ -265,6 +265,8 @@ public static partial class R
         public const string image = "image";
         public const string imageAsCursorContainer = "imageAsCursorContainer";
         public const string importMidiFileButton = "importMidiFileButton";
+        public const string importMidiFileChannel = "importMidiFileChannel";
+        public const string importMidiFileTrack = "importMidiFileTrack";
         public const string innerMenuOverlay = "innerMenuOverlay";
         public const string innerSearchExpressionInfoOverlay = "innerSearchExpressionInfoOverlay";
         public const string innerSongDetailOverlay = "innerSongDetailOverlay";
