@@ -35,6 +35,42 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
+        if (singingResultsSceneControl.HasFinalTeamResults)
+        {
+            FillFinalTeamResults();
+        }
+        else
+        {
+            FillIntermediateTeamResults();
+        }
+    }
+
+    private void FillIntermediateTeamResults()
+    {
+        firstTeamUi.HideByDisplay();
+        secondTeamUi.HideByDisplay();
+        thirdTeamUi.HideByDisplay();
+        
+        List<PartyModeTeamSettings> otherTeams = PartyModeUtils.GetAllTeams(singingResultsSceneControl.PartyModeSettings);
+        otherTeams.Sort((a,b) =>
+        {
+            int aScore = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSettings, a);
+            int bScore = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSettings, b);
+            return aScore.CompareTo(bScore);
+        });
+
+        otherTeamsScrollView.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+        otherTeamsScrollView.Clear();
+        otherTeams.ForEach(team =>
+        {
+            VisualElement teamUi = teamResultUi.CloneTreeAndGetFirstChild();
+            otherTeamsScrollView.Add(teamUi);
+            FillTeamResultUi(-1, teamUi, new List<PartyModeTeamSettings> { team });
+        });
+    }
+
+    private void FillFinalTeamResults()
+    {
         // Find top three and remaining teams
         List<PartyModeTeamSettings> unusedTeams = PartyModeUtils.GetAllTeams(singingResultsSceneControl.PartyModeSettings);
 

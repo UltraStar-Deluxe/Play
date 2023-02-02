@@ -339,7 +339,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     public void Continue()
     {
         if (HasPartyModeSettings
-            && HasFinalTeamResults
             && !teamResultsUiControl.IsVisibleByDisplay())
         {
             // Show team result
