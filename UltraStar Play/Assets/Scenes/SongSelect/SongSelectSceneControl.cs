@@ -1276,6 +1276,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public void UpdateTranslation()
     {
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
+        if (HasPartyModeSettings)
+        {
+            sceneTitle.text += $" - {PartyModeSettings.currentRoundIndex + 1} / {PartyModeSettings.roundsSettings.gameRoundSettings.Count}";
+        }
 
         menuButton.text = TranslationManager.GetTranslation(R.Messages.menu);
         closeMenuOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
