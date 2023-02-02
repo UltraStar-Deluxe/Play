@@ -315,8 +315,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
-    public PartyModeSettings PartyModeSettings => sceneData.partyModeSceneData.PartyModeSettings;
-    public bool IsPartyModeRandomSongSelection => PartyModeSettings != null
+    public PartyModeSettings PartyModeSettings => PartyModeSceneData.PartyModeSettings;
+    public bool IsPartyModeRandomSongSelection => HasPartyModeSceneData
                                                   && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random;
     public bool UsePartyModePlaylist => IsPartyModeRandomSongSelection
                                         && PartyModeSettings.songSelectionSettings.songPoolPlaylist != null;
@@ -334,20 +334,21 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             Thread.Sleep(100);
         }
 
-        if (PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random)
+        SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
+        
+        InitSongMetas();
+
+        if (HasPartyModeSceneData
+            && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random)
         {
             partyModeControl.SelectRandomSong();
         }
-        
-        InitSongMetas();
 
         HidePlayerSelectOverlay();
         HideMenuOverlay();
         HideSongDetailOverlay();
         HideSearchExpressionInfoOverlay();
-
-        SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
-
+        
         // Register Callbacks
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
         selectRandomSongButton.RegisterCallbackButtonTriggered(() => SelectRandomSong());
