@@ -41,6 +41,9 @@ public class SongEditorStatusBarControl : INeedInjection, IInjectionFinishedList
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private InputDeviceManager inputDeviceManager;
+    
     private EditorNoteControl editorNoteControlUnderPointer;
     private bool isPointerOverVideoArea;
     private bool IsPointerOverVideoArea
@@ -130,7 +133,7 @@ public class SongEditorStatusBarControl : INeedInjection, IInjectionFinishedList
 
     private string GetKeyboardBasedNoteManipulationControlHint()
     {
-        EKeyboardModifier currentKeyboardModifier = InputUtils.GetCurrentKeyboardModifier();
+        EKeyboardModifier currentKeyboardModifier = InputUtils.GetCurrentKeyboardModifier(inputDeviceManager.SystemKeyboard);
         return currentKeyboardModifier switch
         {
             EKeyboardModifier.Shift => "Arrow keys to move notes",
@@ -150,7 +153,7 @@ public class SongEditorStatusBarControl : INeedInjection, IInjectionFinishedList
         else if (editorNoteControlUnderPointer.IsPointerOverLeftHandle
                  || editorNoteControlUnderPointer.IsPointerOverRightHandle)
         {
-            if (InputUtils.IsKeyboardShiftPressed()
+            if (InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard)
                 || selectedNotes.Count <= 1
                 || !selectedNotes.Contains(editorNoteControlUnderPointer.Note))
             {
