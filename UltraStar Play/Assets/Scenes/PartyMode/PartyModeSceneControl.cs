@@ -70,6 +70,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
     private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
     private readonly PartyModeRoundsConfigControl roundsConfigControl = new();
+    private readonly PartyModeRoundConfigModifierDialogControl modifierDialogControl = new();
 
     public void OnInjectionFinished()
     {
@@ -87,6 +88,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         UpdateConfigPart();
 
         // Inject child controls
+        injector.Inject(modifierDialogControl);
         injector.Inject(teamConfigControl);
         injector.Inject(songSelectionConfigControl);
         injector.Inject(roundsConfigControl);
@@ -152,7 +154,11 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void OnBack()
     {
-        if (roundsConfigControl.IsSavePresetDialogOpen)
+        if (modifierDialogControl.IsVisible)
+        {
+            modifierDialogControl.CloseDialog();
+        }
+        else if (roundsConfigControl.IsSavePresetDialogOpen)
         {
             roundsConfigControl.CloseSavePresetDialog();
         }
@@ -346,6 +352,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         bb.BindExistingInstance(teamConfigControl);
         bb.BindExistingInstance(songSelectionConfigControl);
         bb.BindExistingInstance(roundsConfigControl);
+        bb.BindExistingInstance(modifierDialogControl);
         bb.Bind(nameof(valueInputDialogUi)).ToExistingInstance(valueInputDialogUi);
         bb.Bind(nameof(teamColumnUi)).ToExistingInstance(teamColumnUi);
         bb.Bind(nameof(teamColumnPlayerUi)).ToExistingInstance(teamColumnPlayerUi);

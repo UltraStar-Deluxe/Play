@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 [Serializable]
 public class GameRoundSettings
@@ -8,6 +9,14 @@ public class GameRoundSettings
     public HashSet<EGameRoundModifier> modifiers = new();
     public GameRoundModifierConditionSettings modifierConditionSettings = new();
 
+    public HashSet<EGameRoundModifier> UnconditionalModifiers => modifiers
+        .Where(it => it is EGameRoundModifier.ShortSong or EGameRoundModifier.PassTheMic)
+        .ToHashSet();
+    
+    public HashSet<EGameRoundModifier> ConditionalModifiers => modifiers
+        .Except(UnconditionalModifiers)
+        .ToHashSet();
+    
     public void CopyValues(GameRoundSettings other)
     {
         finishConditionSettings.CopyValues(other.finishConditionSettings);
