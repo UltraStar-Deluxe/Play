@@ -24,7 +24,7 @@ public class PartyModeRoundsConfigControl : INeedInjection, IInjectionFinishedLi
 
     [Inject(UxmlName = R.UxmlNames.roundsContainer)]
     private VisualElement roundsContainer;
-
+    
     [Inject(UxmlName = R.UxmlNames.addRoundButton)]
     private Button addRoundButton;
 

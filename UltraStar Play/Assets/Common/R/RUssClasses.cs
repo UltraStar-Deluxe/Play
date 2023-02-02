@@ -19,6 +19,7 @@ public static partial class R
         public const string chipsComboEntryLabel = "chipsComboEntryLabel";
         public const string chipsComboEntryRoot = "chipsComboEntryRoot";
         public const string chipsComboLabel = "chipsComboLabel";
+        public const string chipsComboListSeparator = "chipsComboListSeparator";
         public const string chipsComponentContainer = "chipsComponentContainer";
         public const string chipsDialogToggle = "chipsDialogToggle";
         public const string comboBoxButton = "comboBoxButton";

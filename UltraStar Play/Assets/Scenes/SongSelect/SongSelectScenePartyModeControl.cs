@@ -47,15 +47,21 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     [Inject(UxmlName = R.UxmlNames.finishConditionContainer)]
     private VisualElement finishConditionContainer;
-
-    [Inject(UxmlName = R.UxmlNames.modifierConditionContainer)]
-    private VisualElement modifierConditionContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.conditionalModifierConditionContainer)]
+    private VisualElement conditionalModifierConditionContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.unconditionalModifierConditionContainer)]
+    private VisualElement unconditionalModifierConditionContainer;
 
     [Inject(UxmlName = R.UxmlNames.finishConditionDescription)]
     private Label finishConditionDescription;
 
-    [Inject(UxmlName = R.UxmlNames.modifierDescription)]
-    private Label modifierDescription;
+    [Inject(UxmlName = R.UxmlNames.conditionalModifierDescription)]
+    private Label conditionalModifierDescription;
+    
+    [Inject(UxmlName = R.UxmlNames.unconditionalModifierDescription)]
+    private Label unconditionalModifierDescription;
 
     public SongMeta RandomlySelectedSong { get; private set; }
 
@@ -81,8 +87,6 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
         GameRoundSettings currentRoundSettings = songSelectSceneControl.PartyModeSceneData.CurrentRoundSettings;
         GameRoundFinishConditionSettings finishConditionSettings = currentRoundSettings.finishConditionSettings;
-        HashSet<EGameRoundModifier> modifiers = currentRoundSettings.modifiers;
-        GameRoundModifierConditionSettings modifierConditionSettings = currentRoundSettings.modifierConditionSettings;
 
         string GetFinishConditionDescription()
         {
@@ -103,59 +107,39 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
             return "";
         }
 
-        string GetModifierConditionDescription()
+        string GetUnconditionalModifierDescription()
         {
-            if (modifiers.IsNullOrEmpty()
-                || modifierConditionSettings == null
-                || modifierConditionSettings.condition == EGameRoundModifierCondition.Always)
+            if (currentRoundSettings.UnconditionalModifiers.IsNullOrEmpty())
             {
                 return "";
             }
-            else if (modifierConditionSettings.condition == EGameRoundModifierCondition.PlayerAdvance)
-            {
-                if (modifierConditionSettings.scoreFrom <= 0)
-                {
-                    return "";
-                }
-                return $"when player has advance of {modifierConditionSettings.scoreFrom} points";
-            }
-            else if (modifierConditionSettings.condition == EGameRoundModifierCondition.ScoreRange)
-            {
-                if (modifierConditionSettings.scoreFrom <= 0 && modifierConditionSettings.scoreUntil >= 10000)
-                {
-                    return "";
-                }
-                return $"when score is between {modifierConditionSettings.scoreFrom} and {modifierConditionSettings.scoreUntil}";
-            }
-            else if (modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
-            {
-                if (modifierConditionSettings.timeFrom <= 0 && modifierConditionSettings.timeUntil >= 100)
-                {
-                    return "";
-                }
-                return $"when time is between {modifierConditionSettings.timeFrom}% and {modifierConditionSettings.timeUntil}%";
-            }
-
-            return "";
-        }
-
-        string GetModifierDescription()
-        {
-            if (modifiers.IsNullOrEmpty())
-            {
-                return "";
-            }
-            string modifierCsv = modifiers.ToList()
+            string modifierCsv = currentRoundSettings.UnconditionalModifiers.ToList()
                 .OrderBy(it => it.ToString())
                 .JoinWith(", ");
-            string modifierConditionDescription = GetModifierConditionDescription();
+            return modifierCsv;
+        }
+
+        string GetConditionalModifierDescription()
+        {
+            if (currentRoundSettings.ConditionalModifiers.IsNullOrEmpty())
+            {
+                return "";
+            }
+            string modifierCsv = currentRoundSettings.ConditionalModifiers.ToList()
+                .OrderBy(it => it.ToString())
+                .JoinWith(", ");
+            string modifierConditionDescription = PartyModeUtils.GetModifierConditionDescription(currentRoundSettings);
             return $"{modifierCsv} {modifierConditionDescription}";
         }
 
         finishConditionDescription.text = GetFinishConditionDescription();
         finishConditionContainer.SetVisibleByDisplay(!finishConditionDescription.text.IsNullOrEmpty());
-        modifierDescription.text = GetModifierDescription();
-        modifierConditionContainer.SetVisibleByDisplay(!modifierDescription.text.IsNullOrEmpty());
+        
+        unconditionalModifierDescription.text = GetUnconditionalModifierDescription();
+        unconditionalModifierConditionContainer.SetVisibleByDisplay(!unconditionalModifierDescription.text.IsNullOrEmpty());
+        
+        conditionalModifierDescription.text = GetConditionalModifierDescription();
+        conditionalModifierConditionContainer.SetVisibleByDisplay(!conditionalModifierDescription.text.IsNullOrEmpty());
     }
 
     public void SelectRandomSong()
