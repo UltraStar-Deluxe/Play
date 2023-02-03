@@ -150,6 +150,14 @@ public static class MoveNotesToOtherVoiceUtils
                 .ToList();
         }
 
+        bool CanSplitNote(Note lastNote, Note note)
+        {
+            // Do not split note if it is part of a word
+            return lastNote != null
+                    && (lastNote.Text.IsNullOrEmpty()
+                        || char.IsWhiteSpace(lastNote.Text.LastOrDefault()));
+        }
+        
         /////////////////// Split Batches
         void SplitOnCondition(List<Note> inputBatch, Func<List<Note>, Note, Note, bool> shouldSplitFunction)
         {
@@ -200,13 +208,16 @@ public static class MoveNotesToOtherVoiceUtils
                     int maxBeat = currentBatch.LastOrDefault().EndBeat;
                     int lengthInBeats = maxBeat - minBeat;
                     double lengthInMillis = lengthInBeats * BpmUtils.MillisecondsPerBeat(songMeta);
-                    if (lengthInMillis > 10000)
+                    if (lengthInMillis > 10000
+                        && CanSplitNote(lastNote, note))
                     {
                         return true;
                     }
 
                     // Split if sentence is long on text.
-                    if (currentBatch.Select(batchNote => batchNote.Text.Length).Sum() > 30)
+                    if (currentBatch.Select(batchNote => batchNote.Text.Length).Sum() > 30
+                        // Do not split words across multiple notes
+                        && CanSplitNote(lastNote, note))
                     {
                         return true;
                     }
