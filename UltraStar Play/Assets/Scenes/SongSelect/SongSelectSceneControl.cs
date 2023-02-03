@@ -449,21 +449,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
 
         // Close overlays by clicking none of its child elements
-        playerSelectOverlayContainer.RegisterCallback<ClickEvent>(evt =>
-        {
-            if (evt.target == playerSelectOverlayContainer)
-            {
-                HidePlayerSelectOverlay();
-            }
-        });
-
-        menuOverlay.RegisterCallback<ClickEvent>(evt =>
-        {
-            if (evt.target == menuOverlay)
-            {
-                HideMenuOverlay();
-            }
-        });
+        VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(playerSelectOverlayContainer, HidePlayerSelectOverlay);
+        VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(menuOverlay, HideMenuOverlay);
 
         gameRoundManager.GameRoundsChangedEventStream.Subscribe(_ => UpdateGameRoundsUi());
 

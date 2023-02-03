@@ -167,12 +167,15 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
                 or NotesSplitEvent
                 or NotesDeletedEvent
                 or SentencesDeletedEvent
-                or NotesPastedEvent)
+                or NotesPastedEvent
+                or NotesAddedEvent)
         {
             UpdateLyrics();
         }
 
-        if (changeEvent is MovedNotesToVoiceEvent)
+        if (changeEvent 
+            is MovedNotesToVoiceEvent
+            or NotesAddedEvent)
         {
             UpdateVoiceButtons();
         }

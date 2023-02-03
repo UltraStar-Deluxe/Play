@@ -22,12 +22,12 @@ public class DeleteSentencesAction : INeedInjection
             return;
         }
 
-        editorNoteDisplayer.RemoveSentences(selectedSentences);
         foreach (Sentence sentence in selectedSentences)
         {
             deleteNotesAction.Execute(new List<Note>(sentence.Notes));
             sentence.SetVoice(null);
         }
+        editorNoteDisplayer.RemoveSentences(selectedSentences);
     }
 
     public void ExecuteAndNotify(List<Sentence> selectedSentences)
