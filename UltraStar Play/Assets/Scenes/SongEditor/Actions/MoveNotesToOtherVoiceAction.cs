@@ -17,13 +17,46 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         return selectedNotes.AnyMatch(note => !HasVoice(note, voiceNames));
     }
 
-    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
+    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName, bool smartSplit = true)
     {
+        if (smartSplit
+            && ShouldSplit(songMeta, selectedNotes))
+        {
+            List<List<Note>> noteGroups = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, selectedNotes);
+            List<MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult> moveNotesToVoiceResults = noteGroups
+                .Select(noteGroup =>
+                {
+                    MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteGroup, voiceName);
+                    return moveNotesToVoiceResult;
+                })
+                .ToList();
+
+            return new MovedNotesToVoiceEvent(
+                moveNotesToVoiceResults.SelectMany(it => it.Notes).ToList(),
+                moveNotesToVoiceResults.SelectMany(it => it.ChangedSentences).ToList(),
+                moveNotesToVoiceResults.SelectMany(it => it.RemovedSentences).ToList());
+        }
+        
         MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, selectedNotes, voiceName);
         return new MovedNotesToVoiceEvent(
             moveNotesToVoiceResult.Notes,
             moveNotesToVoiceResult.ChangedSentences,
             moveNotesToVoiceResult.RemovedSentences);
+    }
+
+    private bool ShouldSplit(SongMeta songMeta, List<Note> selectedNotes)
+    {
+        // Split the notes into multiple sentences if needed
+        bool hasDifferentSentences = selectedNotes.Select(note => note.Sentence).Distinct().Count() > 1;
+        if (hasDifferentSentences)
+        {
+            return false;
+        }
+
+        int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
+        double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
+        bool isVeryLong = lengthInMillis > 10000;
+        return isVeryLong;
     }
 
     public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
