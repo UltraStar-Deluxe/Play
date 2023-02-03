@@ -27,8 +27,10 @@ public static partial class R
         public const string contextMenu = "contextMenu";
         public const string contextMenuSeparator = "contextMenuSeparator";
         public const string controlLabel = "controlLabel";
+        public const string controlLabel40Percent = "controlLabel40Percent";
         public const string controlMinWidth = "controlMinWidth";
         public const string controlWithLabelHorizontal = "controlWithLabelHorizontal";
+        public const string controlWithLabelVertical = "controlWithLabelVertical";
         public const string creditsEntryCharacter = "creditsEntryCharacter";
         public const string creditsGoldBanner = "creditsGoldBanner";
         public const string creditsRegularBanner = "creditsRegularBanner";
@@ -54,6 +56,7 @@ public static partial class R
         public const string gridLine = "gridLine";
         public const string hidden = "hidden";
         public const string horizontalGridLine = "horizontalGridLine";
+        public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string icon = "icon";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
@@ -99,6 +102,7 @@ public static partial class R
         public const string outlineOnFocus = "outlineOnFocus";
         public const string overlay = "overlay";
         public const string overlayBackground = "overlayBackground";
+        public const string overlayDialog = "overlayDialog";
         public const string panel = "panel";
         public const string placeholderVisible = "placeholderVisible";
         public const string playerProfilePlaceholder = "playerProfilePlaceholder";

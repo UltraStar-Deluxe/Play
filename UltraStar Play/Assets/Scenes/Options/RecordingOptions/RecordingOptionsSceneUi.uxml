@@ -22,24 +22,24 @@
                     <ui:Toggle name="enabledToggle" style="-unity-text-align: upper-center;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="colorContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                    <ui:Label text="Color" name="Label" class="controlLabel" />
+                    <ui:Label text="Color" name="Label" class="controlLabel40Percent" />
                     <ItemPicker wrap-around="false" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="delayContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                    <ui:Label text="Delay" name="Label" class="controlLabel" style="width: 100px;" />
+                    <ui:Label text="Delay" name="Label" class="controlLabel40Percent" style="width: 100px;" />
                     <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis" style="width: 200px; flex-shrink: 1;" />
                     <ItemPicker wrap-around="true" min-value="0" max-value="1000" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="amplificationContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                    <ui:Label text="Amplification" name="Label" class="controlLabel" />
+                    <ui:Label text="Amplification" name="Label" class="controlLabel40Percent" />
                     <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="noiseSuppressionContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                    <ui:Label text="Noise Suppression" name="Label" class="controlLabel" />
+                    <ui:Label text="Noise Suppression" name="Label" class="controlLabel40Percent" />
                     <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:VisualElement name="sampleRateContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                    <ui:Label text="Sample Rate" name="Label" class="controlLabel" />
+                    <ui:Label text="Sample Rate" name="Label" class="controlLabel40Percent" />
                     <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
                 </ui:VisualElement>
                 <ui:Label tabindex="-1" text="Global Settings" display-tooltip-when-elided="true" name="globalSettingsLabel" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />

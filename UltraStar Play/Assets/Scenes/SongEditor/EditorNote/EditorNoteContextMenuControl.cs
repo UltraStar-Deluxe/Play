@@ -170,7 +170,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         if (canMoveToVoice1)
         {
             contextMenu.AddSeparator();
-            contextMenu.AddButton("Move to player 1",
+            contextMenu.AddButton("Assign to player 1",
                 () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.firstVoiceName));
         }
         if (!canMoveToVoice1 && canMoveToVoice2)
@@ -179,13 +179,13 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
         if (canMoveToVoice2)
         {
-            contextMenu.AddButton("Move to player 2",
+            contextMenu.AddButton("Assign to player 2",
                 () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.secondVoiceName));
         }
 
         if (moveNoteToOwnSentenceAction.CanMoveToOwnSentence(selectedNotes))
         {
-            contextMenu.AddButton("Move to own sentence", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
+            contextMenu.AddButton("Assign to own sentence", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
         }
     }
 

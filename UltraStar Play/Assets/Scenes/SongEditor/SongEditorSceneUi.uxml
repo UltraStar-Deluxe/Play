@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SongEditorSideBarSettingsUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarSettingsUi.uxml?fileID=9197481963319205126&amp;guid=389904d283862964a80d9858eb82f88c&amp;type=3#SongEditorSideBarSettingsUi" />
+    <ui:Template name="ImportMidiFileDialogUi" src="project://database/Assets/Scenes/SongEditor/ImportMidiFileDialogUi.uxml?fileID=9197481963319205126&amp;guid=12c6b8c6d3c252947b7e6253befb9789&amp;type=3#ImportMidiFileDialogUi" />
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
     <ui:VisualElement name="songEditorRoot" style="width: 100%; height: 100%; flex-direction: column; align-items: flex-start;">
         <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
@@ -155,6 +156,9 @@
         </ui:VisualElement>
         <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
             <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="importMidiFileDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+            <ui:Instance template="ImportMidiFileDialogUi" name="ImportMidiFileDialogUi" class="overlayDialog" style="min-width: 50%;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

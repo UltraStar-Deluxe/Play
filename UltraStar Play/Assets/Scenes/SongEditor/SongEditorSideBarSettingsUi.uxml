@@ -133,8 +133,6 @@
                 <ui:Label text="Playback offset (ms)" display-tooltip-when-elided="true" name="label" />
                 <ui:TextField picking-mode="Ignore" value="400" text="400" name="midiDelayTextField" class="smallControl" style="flex-grow: 1;" />
             </ui:VisualElement>
-            <ui:IntegerField label="MIDI  File Track" value="0" name="importMidiFileTrack" />
-            <ui:IntegerField label="MIDI File Channel" value="0" name="importMidiFileChannel" />
             <ui:Button text="Import MIDI File" display-tooltip-when-elided="true" name="importMidiFileButton" style="width: 100%;" />
         </ui:VisualElement>
         <ui:Label text="Layout" display-tooltip-when-elided="true" name="layoutTitle" class="songEditorSettingsGroupTitle" />
