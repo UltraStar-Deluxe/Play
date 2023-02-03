@@ -26,7 +26,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     public float midiGain = 1f;
 
     // The txt file describing the instruments of the sound bank. Must be in a Resources folder.
-    private readonly string bankFilePath = "GM Bank - Piano/GM Bank - Piano";
+    private readonly string bankFilePath = "GM Bank/gm";
     private readonly int bufferSize = 1024;
     // "volume" for the midi events.
     [Range(0, 127)]
