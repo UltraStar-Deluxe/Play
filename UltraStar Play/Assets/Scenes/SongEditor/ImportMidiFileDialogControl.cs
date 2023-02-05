@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CSharpSynth.Midi;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,6 +15,9 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private SongMeta songMeta;
     
     [Inject(UxmlName = R.UxmlNames.importMidiFileDialogOverlay)]
     private VisualElement importMidiFileDialogOverlay;
@@ -49,6 +54,9 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     
     [Inject(UxmlName = R.UxmlNames.importMidiFileDialogButton)]
     private Button importMidiFileDialogButton;
+    
+    [Inject]
+    private MidiManager midiManager;
 
     private readonly SongEditorMidiFileImporter midiFileImporter = new();
 
@@ -94,6 +102,17 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         injector.Inject(midiFileImporter);
         
         closeImportMidiDialogButton.RegisterCallbackButtonTriggered(() => CloseDialog());
+        previewMidiTrackAndChannelButton.RegisterCallbackButtonTriggered(() =>
+        {
+            if (midiManager.IsPlayingMidiFile)
+            {
+                StopPreview();
+            }
+            else
+            {
+                StartPreview();
+            }
+        });
         importMidiFileDialogButton.RegisterCallbackButtonTriggered(() =>
         {
             ImportMidiFile();
@@ -102,7 +121,9 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(importMidiFileDialogOverlay, CloseDialog);
 
         midiTrackIndexPickerControl = new(midiTrackIndexPicker, new List<int>());
+        midiTrackIndexPickerControl.Selection.Subscribe(_ => StopPreview());
         midiChannelIndexPickerControl = new(midiChannelIndexPicker, new List<int>());
+        midiChannelIndexPickerControl.Selection.Subscribe(_ => StopPreview());
         
         midiAssignToPlayerPickerControl = new(assignToPlayerPicker, new List<int> { -1, 0, 1 });
         midiAssignToPlayerPickerControl.GetLabelTextFunction = newValue =>
@@ -114,10 +135,104 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
                 _ => "None"
             };
         };
+        midiAssignToPlayerPickerControl.SelectItem(-1);
 
         midiFilePathTextField.RegisterValueChangedCallback(evt => UpdateControls());
         
         CloseDialog();
+    }
+
+    private void StopPreview()
+    {
+        if (!midiManager.IsPlayingMidiFile)
+        {
+            return;
+        }
+        
+        previewMidiTrackAndChannelButton.text = "Start Preview";
+        Debug.Log("Stopping preview of midi file");
+        
+        midiManager.StopMidiFile();
+    }
+
+    private void StartPreview()
+    {
+        if (SelectedTrack == null
+            || midiManager.IsPlayingMidiFile)
+        {
+            return;
+        }
+
+        previewMidiTrackAndChannelButton.text = "Stop Preview";
+        Debug.Log("Starting preview of midi file");
+        
+        try
+        {
+            int trackIndex = midiTrackIndexPickerControl.SelectedItem;
+            int channelIndex = midiChannelIndexPickerControl.SelectedItem;
+            MidiFile midiFileCopy = midiManager.LoadMidiFile(MidiFilePath);
+            List<Note> loadNotesFromMidiFile = midiFileImporter.LoadNotesFromMidiFile(midiFileCopy, trackIndex, channelIndex, true);
+            MidiFile previewMidiFile = CreateMidiFile(loadNotesFromMidiFile);
+            SetDeltaTimeToStartAtZero(previewMidiFile);
+            midiManager.PlayMidiFile(previewMidiFile);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            UiManager.CreateNotification($"Preview failed: {e.Message}");
+            throw;
+        }
+    }
+
+    private void SetDeltaTimeToStartAtZero(MidiFile midiFile)
+    {
+        midiFile.Tracks.ForEach(track =>
+        {
+            MidiEvent firstNoteOnEvent = track.MidiEvents.FirstOrDefault(midiEvent => midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On);
+            if (firstNoteOnEvent != null)
+            {
+                firstNoteOnEvent.deltaTime = 0;
+            }
+        });
+    }
+    
+    private MidiFile CreateMidiFile(List<Note> loadNotesFromMidiFile)
+    {
+        List<MidiEvent> midiEvents = new();
+        uint lastNoteEndInMillis = 0;
+        loadNotesFromMidiFile.ForEach(note =>
+        {
+            uint startInMillis = (uint)BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.StartBeat);
+            if (startInMillis < lastNoteEndInMillis)
+            {
+                return;
+            }
+            uint endInMillis = (uint)BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.EndBeat);
+            
+            MidiEvent noteOnEvent = new MidiEvent();
+            noteOnEvent.midiChannelEvent = MidiHelper.MidiChannelEvent.Note_On;
+            noteOnEvent.deltaTime = (uint)startInMillis - lastNoteEndInMillis;
+            noteOnEvent.parameter1 = (byte)note.MidiNote;
+            noteOnEvent.parameter2 = (byte)90;
+            midiEvents.Add(noteOnEvent);
+            
+            MidiEvent noteOffEvent = new MidiEvent();
+            noteOffEvent.midiChannelEvent = MidiHelper.MidiChannelEvent.Note_Off;
+            noteOffEvent.deltaTime = endInMillis - (lastNoteEndInMillis + noteOnEvent.deltaTime);
+            noteOffEvent.parameter1 = (byte)note.MidiNote;
+            noteOffEvent.parameter2 = (byte)90;
+            midiEvents.Add(noteOffEvent);
+            
+            lastNoteEndInMillis = endInMillis;
+        });
+
+        MidiFile midiFile = new();
+        midiFile.MidiHeader.DeltaTiming = 960;
+        midiFile.Tracks[0].Programs = new byte[] { 0 };
+        midiFile.Tracks[0].DrumPrograms = new byte[] { 0 };
+        midiFile.Tracks[0].MidiEvents = midiEvents.ToArray();
+        midiFile.Tracks[0].TotalTime = (ulong)midiEvents.Select(midiEvent => (double)midiEvent.deltaTime).Sum();
+        return midiFile;
     }
 
     private void ImportMidiFile()
@@ -128,6 +243,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
+        StopPreview();
+        
         string voiceName = null;
         if (midiAssignToPlayerPickerControl.SelectedItem == 0)
         {
@@ -154,6 +271,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
     public void CloseDialog()
     {
+        StopPreview();
         importMidiFileDialogOverlay.HideByDisplay();
     }
     

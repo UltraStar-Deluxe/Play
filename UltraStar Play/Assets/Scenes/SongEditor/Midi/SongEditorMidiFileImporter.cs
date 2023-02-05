@@ -172,19 +172,17 @@ public class SongEditorMidiFileImporter : INeedInjection
         });
     }
 
-    private List<Note> LoadNotesFromMidiFile(
+    public List<Note> LoadNotesFromMidiFile(
         MidiFile midiFile,
         int trackIndex,
         int channelIndex,
         bool importWithoutLyrics)
     {
         List<Note> loadedNotes = new();
+        Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
         
         void LoadNotesFromTrack(MidiTrack track)
         {
-            Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
-            midiPitchToNoteUnderConstruction.Clear();
-            
             List<MidiEvent> midiEventsOfChannel = track.MidiEvents
                 .Where(midiEvent => midiEvent.channel == channelIndex)
                 .ToList();
