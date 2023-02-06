@@ -149,17 +149,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
     private VisualElement recordingDeviceColorIndicator;
 
-    [Inject(UxmlName = R.UxmlNames.volumeSlider)]
-    private SliderInt volumeSlider;
-
     [Inject(UxmlName = R.UxmlNames.mouseSensitivityFloatField)]
     private FloatField mouseSensitivityFloatField;
     
     [Inject]
     private Injector injector;
-
-    [Inject]
-    private MainGameHttpClient mainGameHttpClient;
 
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
@@ -170,12 +164,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private int frameCount;
 
     private readonly InputSimulationControl inputSimulationControl = new();
-
-    private bool isVolumeSliderInitialized;
-
+    private readonly EditMainGameConfigControl editMainGameConfigControl = new();
+    
     public void OnInjectionFinished()
     {
         injector.Inject(inputSimulationControl);
+        injector.Inject(editMainGameConfigControl);
 
         // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
@@ -228,35 +222,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             songSearchHint.SetVisibleByDisplay(songSearchTextField.value.IsNullOrEmpty());
             UpdateSongList();
         });
-
-        mainGameHttpClient.ConnectionEventStream.Subscribe(_ => InitVolumeSlider());
-
+        
         mouseSensitivityFloatField.value = settings.mousePadSensitivity;
         mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.mousePadSensitivity = evt.newValue);
         
         InitTabGroup();
         InitMenu();
-    }
-
-    private void InitVolumeSlider()
-    {
-        mainGameHttpClient.GetRequest("api/rest/config/volume",
-            response =>
-            {
-                if (isVolumeSliderInitialized)
-                {
-                    return;
-                }
-
-                isVolumeSliderInitialized = true;
-                PropertyUtils.TrySetIntFromString(response, newIntValue => volumeSlider.value = newIntValue);
-
-                Subject<int> volumeSliderValueChangedEventStream = new();
-                volumeSlider.RegisterValueChangedCallback(evt => volumeSliderValueChangedEventStream.OnNext(evt.newValue));
-                volumeSliderValueChangedEventStream
-                    .Throttle(TimeSpan.FromMilliseconds(200))
-                    .Subscribe(newValue => mainGameHttpClient.PostRequest($"api/rest/config/volume/{newValue}"));
-            });
     }
 
     private void InitTabGroup()

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using UniInject;
 using UniRx;
@@ -62,19 +61,15 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
 
     public IObservable<UnityWebRequestAsyncOperation> PostRequest(
         string path,
-        Dictionary<string, string> formFields = null,
+        string postData = "{}",
+        string contentType = "application/json",
         Action<string> onSuccess = null)
     {
         ThrowIfNotConnected();
 
-        if (formFields == null)
-        {
-            formFields = new Dictionary<string, string>();
-        }
-
         string uri = GetUri(path);
         Debug.Log($"Sending POST request to {uri}");
-        UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, formFields);
+        UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, postData, contentType);
         IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
             .SendWebRequest()
             .AsAsyncOperationObservable();
