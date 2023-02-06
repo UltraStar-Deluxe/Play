@@ -28,6 +28,8 @@ public class StatsManager : AbstractSingletonBehaviour
 
     public static StatsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatsManager>();
 
+    private float lastSaveTimeInSeconds;
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -36,14 +38,23 @@ public class StatsManager : AbstractSingletonBehaviour
     public void Save()
     {
         Debug.Log("Writing database");
+        
         // Update the total play time before saving
-        Statistics.UpdateTotalPlayTime();
-
+        UpdateTotalPlayTime();
+        
         // Do not pretty print json. The database is relatively big compared to the settings.
         // To view the JSON file, use an external viewer/formatter, for example a web browser or JSON Viewer plugin of Notepad++.
         string json = JsonConverter.ToJson(Statistics, false);
         File.WriteAllText(DatabasePath(), json);
         Statistics.IsDirty = false;
+    }
+
+    private void UpdateTotalPlayTime()
+    {
+        float currentTimeInSeconds = Time.time;
+        float timeSinceLastSaveInSeconds = currentTimeInSeconds - lastSaveTimeInSeconds;
+        Statistics.TotalPlayTimeSeconds += timeSinceLastSaveInSeconds;
+        lastSaveTimeInSeconds = currentTimeInSeconds;
     }
 
     public void Reload()

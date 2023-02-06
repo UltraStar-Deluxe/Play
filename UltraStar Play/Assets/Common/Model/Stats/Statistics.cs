@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using FullSerializer;
 using UnityEngine;
 
-// Holds all in-memory stats data
+/**
+ * Data structure for song scores.
+ */
 [Serializable]
 public class Statistics
 {
-    public float TotalPlayTimeSeconds { get; private set; }
+    public float TotalPlayTimeSeconds { get; set; }
     public Dictionary<string, LocalStatistic> LocalStatistics { get; private set; } = new();
     public Dictionary<string, WebStatistic> WebStatistics { get; private set; } = new();
-    public List<TopEntry> TopTenList { get; private set; } = new();
-    public TopEntry TopScore { get; private set; }
 
     // Indicates whether the Statistics have non-persisted changes.
     // The flag is checked by the StatsManager, e.g., on scene change.
@@ -32,73 +31,35 @@ public class Statistics
         return result;
     }
 
-    public void UpdateTotalPlayTime()
-    {
-        TotalPlayTimeSeconds += Time.realtimeSinceStartup;
-    }
-
     public void RecordSongStarted(SongMeta songMeta)
     {
-        LocalStatistics.GetOrInitialize(songMeta.SongHash).IncrementSongStarted();
+        LocalStatistic localStatistic = CreateLocalStatistics(songMeta);
+        localStatistic.IncrementSongStarted();
+
         IsDirty = true;
     }
 
     public void RecordSongFinished(SongMeta songMeta, List<SongStatistic> songStatistics)
     {
         Debug.Log("Recording song finished stats for: " + songMeta.Title);
-        LocalStatistic localStatistic = LocalStatistics.GetOrInitialize(songMeta.SongHash);
+        LocalStatistic localStatistic = CreateLocalStatistics(songMeta);
         localStatistic.IncrementSongFinished();
         foreach (SongStatistic songStatistic in songStatistics)
         {
             localStatistic.AddSongStatistics(songStatistic);
-            UpdateTopScores(songMeta, songStatistic);
         }
 
         IsDirty = true;
     }
 
-    private void UpdateTopScores(SongMeta songMeta, SongStatistic songStatistic)
+    private LocalStatistic CreateLocalStatistics(SongMeta songMeta)
     {
-        Debug.Log("Updating top scores");
-        TopEntry topEntry = new(songMeta.Title, songMeta.Artist, songStatistic);
-
-        //Update the top score
-        if (TopScore == null || songStatistic.Score > TopScore.SongStatistic.Score)
-        {
-            TopScore = topEntry;
-        }
-
-        //Update the top ten
-        //Find where in the current top ten to place the current score
-        int topTenIndex = -1;
-        for (int i = 0; i < TopTenList.Count; ++i)
-        {
-            if (songStatistic.Score > TopTenList[i].SongStatistic.Score)
-            {
-                topTenIndex = i + 1;
-                break;
-            }
-        }
-
-        //List isn't full yet, just add the score to the end
-        if (topTenIndex == -1 || TopTenList.Count < 10)
-        {
-            TopTenList.Add(topEntry);
-        }
-        else
-        {
-            //should be fine. an oversight
-            //Otherwise just insert the top score into its respective place
-            TopTenList.Insert(topTenIndex, topEntry);
-        }
-
-        //Remove any scores beyond the top ten in the list
-        if (TopTenList.Count > 10)
-        {
-            TopTenList = TopTenList.Take(10).ToList();
-        }
+        LocalStatistic localStatistic = LocalStatistics.GetOrInitialize(songMeta.SongHash);
+        localStatistic.SongArtist = songMeta.Artist;
+        localStatistic.SongTitle = songMeta.Title;
+        return localStatistic;
     }
-
+    
     public bool HasHighscore(SongMeta songMeta)
     {
         if (GetLocalStats(songMeta) != null)
