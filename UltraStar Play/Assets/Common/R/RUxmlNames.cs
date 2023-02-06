@@ -385,7 +385,6 @@ public static partial class R
         public const string micRecordingContainer = "micRecordingContainer";
         public const string micScrollView = "micScrollView";
         public const string micVisualizationContainer = "micVisualizationContainer";
-        public const string midiChannelIndexPicker = "midiChannelIndexPicker";
         public const string midiDelayContainer = "midiDelayContainer";
         public const string midiDelayTextField = "midiDelayTextField";
         public const string midiFileIssueContainer = "midiFileIssueContainer";

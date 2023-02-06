@@ -14,14 +14,21 @@ public static class MidiFileUtils
         return NumberUtils.CreateIntList(0, midiFile.Tracks.Length - 1);
     }
     
-    public static List<int> GetChannelIndexes(MidiTrack track)
+    public static List<int> GetChannelIndexes(MidiTrack track, bool onlyWithNotes)
     {
         if (track == null)
         {
             return new();
         }
-        return track.MidiEvents
-            .Select(midiEvent => (int)midiEvent.channel)
+
+        List<MidiEvent> midiEvents = track.MidiEvents.ToList();
+        if (onlyWithNotes)
+        {
+            midiEvents = midiEvents
+                .Where(midiEvent => midiEvent.midiChannelEvent is MidiHelper.MidiChannelEvent.Note_On)
+                .ToList();
+        }
+        return midiEvents.Select(midiEvent => (int)midiEvent.channel)
             .Distinct()
             .OrderBy(channelIndex => channelIndex)
             .ToList();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CSharpSynth.Midi;
 using UniInject;
 using UniRx;
@@ -33,9 +34,6 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.midiTrackIndexPicker)]
     private ItemPicker midiTrackIndexPicker;
     
-    [Inject(UxmlName = R.UxmlNames.midiChannelIndexPicker)]
-    private ItemPicker midiChannelIndexPicker;
-    
     [Inject(UxmlName = R.UxmlNames.previewMidiTrackAndChannelButton)]
     private Button previewMidiTrackAndChannelButton;
     
@@ -59,8 +57,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
     private readonly SongEditorMidiFileImporter midiFileImporter = new();
 
-    private LabeledItemPickerControl<int> midiTrackIndexPickerControl;
-    private LabeledItemPickerControl<int> midiChannelIndexPickerControl;
+    private LabeledItemPickerControl<TrackAndChannel> midiTrackIndexPickerControl;
     private LabeledItemPickerControl<int> midiAssignToPlayerPickerControl;
 
     private MidiFile midiFile;
@@ -68,12 +65,13 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         get
         {
-            if (midiFile == null)
+            if (midiFile == null
+                || midiTrackIndexPickerControl.SelectedItem == null)
             {
                 return null;
             }
 
-            int selectedTrackIndex = midiTrackIndexPickerControl.SelectedItem;
+            int selectedTrackIndex = midiTrackIndexPickerControl.SelectedItem.trackIndex;
             if (selectedTrackIndex >= 0 && selectedTrackIndex < midiFile.Tracks.Length)
             {
                 return midiFile.Tracks[selectedTrackIndex];
@@ -119,10 +117,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         });
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(importMidiFileDialogOverlay, CloseDialog);
 
-        midiTrackIndexPickerControl = new(midiTrackIndexPicker, new List<int>());
-        midiTrackIndexPickerControl.Selection.Subscribe(_ => StopPreview());
-        midiChannelIndexPickerControl = new(midiChannelIndexPicker, new List<int>());
-        midiChannelIndexPickerControl.Selection.Subscribe(_ => StopPreview());
+        midiTrackIndexPickerControl = new(midiTrackIndexPicker, new List<TrackAndChannel>());
+        midiTrackIndexPickerControl.Selection.Subscribe(_ =>
+        {
+            StopPreview();
+            UpdateMidiLyrics();
+        });
         
         midiAssignToPlayerPickerControl = new(assignToPlayerPicker, new List<int> { -1, 0, 1 });
         midiAssignToPlayerPickerControl.GetLabelTextFunction = newValue =>
@@ -167,8 +167,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         
         try
         {
-            int trackIndex = midiTrackIndexPickerControl.SelectedItem;
-            int channelIndex = midiChannelIndexPickerControl.SelectedItem;
+            int trackIndex = midiTrackIndexPickerControl.SelectedItem.trackIndex;
+            int channelIndex = midiTrackIndexPickerControl.SelectedItem.channelIndex;
             MidiFile midiFileCopy = midiManager.LoadMidiFile(MidiFilePath);
             List<Note> loadNotesFromMidiFile = midiFileImporter.LoadNotesFromMidiFile(midiFileCopy, trackIndex, channelIndex, true);
             MidiFile previewMidiFile = MidiFileUtils.CreateMidiFile(songMeta, loadNotesFromMidiFile, (byte)settings.SongEditorSettings.MidiVelocity);
@@ -205,8 +205,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         
         midiFileImporter.ImportMidiFile(
             midiFilePathTextField.value,
-            midiTrackIndexPickerControl.SelectedItem,
-            midiChannelIndexPickerControl.SelectedItem,
+            midiTrackIndexPickerControl.SelectedItem.trackIndex,
+            midiTrackIndexPickerControl.SelectedItem.channelIndex,
             importWithoutLyricsToggle.value,
             voiceName);
     }
@@ -244,7 +244,6 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         }
         
         UpdateTrackIndexPicker();
-        UpdateChannelIndexPicker();
         UpdateMidiLyrics();
     }
 
@@ -270,20 +269,20 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
     private void UpdateTrackIndexPicker()
     {
+        List<TrackAndChannel> trackAndChannels = new();
         List<int> trackIndexes = MidiFileUtils.GetTrackIndexes(midiFile);
-        midiTrackIndexPickerControl.Items = trackIndexes;
-    }
-
-    private void UpdateChannelIndexPicker()
-    {
-        if (SelectedTrack == null)
+        trackIndexes.ForEach(trackIndex =>
         {
-            midiChannelIndexPickerControl.Items = new List<int>();
-            return;
-        }
+            MidiTrack track = midiFile.Tracks[trackIndex];
+            List<int> channelIndexes = MidiFileUtils.GetChannelIndexes(track, true);
+            channelIndexes.ForEach(channelIndex =>
+            {
+                trackAndChannels.Add(new (trackIndex, channelIndex));
+            });
+        });
 
-        List<int> channelIndexes = MidiFileUtils.GetChannelIndexes(SelectedTrack);
-        midiChannelIndexPickerControl.Items = channelIndexes;
+        midiTrackIndexPickerControl.Items = trackAndChannels;
+        midiTrackIndexPickerControl.SelectItem(trackAndChannels.FirstOrDefault());
     }
     
     private string GetMidiFileErrorMessage()
@@ -306,5 +305,22 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         }
         
         return "";
+    }
+
+    public class TrackAndChannel
+    {
+        public int trackIndex;
+        public int channelIndex;
+        
+        public TrackAndChannel(int trackIndex, int channelIndex)
+        {
+            this.trackIndex = trackIndex;
+            this.channelIndex = channelIndex;
+        }
+
+        public override string ToString()
+        {
+            return $"track {trackIndex}, channel {channelIndex}";
+        }
     }
 }
