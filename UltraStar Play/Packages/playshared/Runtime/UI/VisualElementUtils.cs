@@ -80,4 +80,22 @@ public static class VisualElementUtils
         }
         return visualTreeAsset.CloneTree().Children().FirstOrDefault();
     }
+    
+    public static void RegisterCallbackToHideByDisplayOnDirectClick(VisualElement visualElement, Action onHide=null)
+    {
+        visualElement.RegisterCallback<PointerDownEvent>(evt =>
+        {
+            if (evt.target == visualElement)
+            {
+                if (onHide != null)
+                {
+                    onHide();
+                }
+                else
+                {
+                    visualElement.HideByDisplay();
+                }
+            }
+        });
+    }
 }

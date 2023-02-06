@@ -1,4 +1,17 @@
 /**************************************************/
+/* SEPARATOR */
+/**************************************************/
+.horizontalSeparatorLine {
+    width: 100%;
+    border-color: var(--text-color);
+    border-bottom-width: 1px;
+    border-radius: 5px;
+    height: 10px;
+    margin-bottom: 5px;
+}
+
+
+/**************************************************/
 /* ITEM PICKER */
 /**************************************************/
 
@@ -17,7 +30,15 @@ ItemPicker {
 
 .controlWithLabelHorizontal .controlLabel {
     margin-right: auto;
-    width: 50%;
+    width: 40%;
+}
+
+.controlWithLabelVertical {
+    height: auto;
+}
+
+.controlWithLabelVertical .unity-text-field__input {
+    height: var(--control-height);
 }
 
 .itemPickerItemLabel {

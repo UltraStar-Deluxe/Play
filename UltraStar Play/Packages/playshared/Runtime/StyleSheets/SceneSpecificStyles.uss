@@ -445,13 +445,3 @@
 #presetItemPicker #itemLabel {
     min-width: var(--control-width);
 }
-
-#roundUiRoot #finishConditionPicker.controlWithLabelHorizontal .controlLabel {
-    margin-right: auto;
-    width: 30%;
-}
-
-#roundUiRoot #modifierChipsCombo.controlWithLabelHorizontal .controlLabel {
-    margin-right: auto;
-    width: 30%;
-}

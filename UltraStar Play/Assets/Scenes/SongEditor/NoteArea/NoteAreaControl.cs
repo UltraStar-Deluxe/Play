@@ -549,8 +549,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         List<Note> allNotes = SongMetaUtils.GetAllNotes(songMeta);
         if (allNotes.IsNullOrEmpty())
         {
-            minMidiNote = MidiUtils.MidiNoteConcertPitch;
-            maxMidiNote = minMidiNote + 18;
+            maxMidiNote = MidiUtils.MidiNoteConcertPitch + 9;
+            minMidiNote = MidiUtils.MidiNoteConcertPitch - 9;
         }
         else
         {
