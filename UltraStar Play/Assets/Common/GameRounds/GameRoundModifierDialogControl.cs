@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PartyModeRoundConfigModifierDialogControl : INeedInjection, IInjectionFinishedListener
+public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
     private VisualElement modifierDialogOverlay;
@@ -24,9 +24,6 @@ public class PartyModeRoundConfigModifierDialogControl : INeedInjection, IInject
     
     [Inject(UxmlName = R.UxmlNames.hideNotesToggle)]
     private Toggle hideNotesToggle;
-    
-    [Inject(UxmlName = R.UxmlNames.hideScoreToggle)]
-    private Toggle hideScoreToggle;
     
     [Inject(UxmlName = R.UxmlNames.reduceAudioToggle)]
     private Toggle reduceAudioToggle;
@@ -62,6 +59,8 @@ public class PartyModeRoundConfigModifierDialogControl : INeedInjection, IInject
     
     public void OnInjectionFinished()
     {
+        modifierDialogOverlay.HideByDisplay();
+        
         UpdateGameRoundModifierToToggle();
         
         closeModifierDialogButton.RegisterCallbackButtonTriggered(() => CloseDialog());

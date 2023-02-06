@@ -222,6 +222,7 @@ public static partial class R
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameLogo = "gameLogo";
         public const string gameOptionsButton = "gameOptionsButton";
+        public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
         public const string gameRoundPlayerEntryUiRoot = "gameRoundPlayerEntryUiRoot";
         public const string gameRoundsOverlay = "gameRoundsOverlay";
         public const string gameRoundsScrollView = "gameRoundsScrollView";
@@ -251,7 +252,6 @@ public static partial class R
         public const string hiddenContinueButton = "hiddenContinueButton";
         public const string hideLyricsToggle = "hideLyricsToggle";
         public const string hideNotesToggle = "hideNotesToggle";
-        public const string hideScoreToggle = "hideScoreToggle";
         public const string highScoreContainer = "highScoreContainer";
         public const string highscoreEntry = "highscoreEntry";
         public const string HighscoreEntry = "HighscoreEntry";

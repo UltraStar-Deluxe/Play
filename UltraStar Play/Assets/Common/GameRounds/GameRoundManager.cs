@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -93,6 +93,7 @@ public class GameRoundManager : MonoBehaviour, INeedInjection
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = nextGameRound.SongMetas;
         singSceneData.SingScenePlayerData = nextGameRound.SingScenePlayerData;
+        singSceneData.gameRoundSettings = nextGameRound.GameRoundSettings;
         if (nextGameRound.IsMedley)
         {
             singSceneData.MedleySongIndex = 0;

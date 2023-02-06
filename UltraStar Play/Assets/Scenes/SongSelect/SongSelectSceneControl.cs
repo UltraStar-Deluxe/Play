@@ -185,6 +185,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
     private ItemPicker scoreModePicker;
 
+    [Inject(UxmlName = R.UxmlNames.modifierChipsCombo)]
+    private ChipsCombo modifierChipsCombo;
+    
     [Inject(UxmlName = R.UxmlNames.noteDisplayModeLabel)]
     private Label noteDisplayModeLabel;
 
@@ -324,6 +327,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
+    
+    private readonly GameRoundModifierDialogControl modifierDialogControl = new();
+    private GameRoundModifierChipsComboControl modifierChipsComboControl;
 
     private void Start()
     {
@@ -343,6 +349,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             partyModeControl.SelectRandomSong();
         }
+
+        InitModifiersChipsComboControl();
 
         HidePlayerSelectOverlay();
         HideMenuOverlay();
@@ -485,6 +493,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
     }
 
+    private void InitModifiersChipsComboControl()
+    {
+        GameRoundSettings gameRoundSettings = HasPartyModeSceneData
+            ? PartyModeSceneData.CurrentRoundSettings
+            : settings.GameRoundSettings;
+
+        injector.Inject(modifierDialogControl);
+        modifierChipsComboControl = new(modifierChipsCombo);
+        modifierChipsComboControl.GameRoundSettings = gameRoundSettings;
+        modifierDialogControl.DialogClosedEventStream.Subscribe(_ => modifierChipsComboControl.UpdateChipsComboEntries());
+        modifierChipsComboControl.ChipsCombo.ComboButton.RegisterCallbackButtonTriggered(() =>
+        {
+            modifierDialogControl.OpenDialog(gameRoundSettings);
+        });
+    }
+
     public void QuitSongSelect()
     {
         if (HasPartyModeSceneData)
@@ -539,6 +563,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         GameRoundData gameRoundData = new();
         gameRoundData.SongMetas = new List<SongMeta> { SelectedSong };
         gameRoundData.SingScenePlayerData = CreateSingScenePlayerData();
+        gameRoundData.GameRoundSettings = new(settings.GameRoundSettings);
         gameRoundData.IsMedley = true;
 
         gameRoundManager.AddGameRound(gameRoundData);
@@ -760,11 +785,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         UpdateSongStatistics(selectedSong);
 
         UpdatePlayerSelectOverlayButtons();
+        UpdateModifiersChipsCombo();
 
         if (IsSongDetailOverlayVisible)
         {
             UpdateSongDetailsInOverlay();
         }
+    }
+
+    private void UpdateModifiersChipsCombo()
+    {
+        
     }
 
     private void UpdatePlayerSelectOverlayButtons()
@@ -880,8 +911,18 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         singSceneData.SongMetas = new List<SongMeta> { SelectedSong };
         singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
         singSceneData.partyModeSceneData = sceneData.partyModeSceneData;
-        if (HasPartyModeSceneData &&
-            PartyModeSceneData.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
+
+        if (HasPartyModeSceneData)
+        {
+            singSceneData.gameRoundSettings = new(PartyModeSceneData.CurrentRoundSettings);
+        }
+        else
+        {
+            singSceneData.gameRoundSettings = new(settings.GameRoundSettings);
+        }
+        
+        if (singSceneData.gameRoundSettings != null
+            && singSceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
         {
             // Set as medley song to play shortened version
             singSceneData.MedleySongIndex = 0;
