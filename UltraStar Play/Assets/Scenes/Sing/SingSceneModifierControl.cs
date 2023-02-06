@@ -8,7 +8,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListener
+public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListener
 {
     private const float AnimTimeInSeconds = 1.5f;
 
@@ -20,6 +20,9 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     [Inject]
     private SongAudioPlayer songAudioPlayer;
+    
+    [Inject]
+    private SingSceneData sceneData;
 
     [Inject]
     private Injector injector;
@@ -35,24 +38,18 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
     {
         injector.Inject(passTheMicControl);
 
-        if (!singSceneControl.HasPartyModeSceneData)
+        if (singSceneControl.HasPartyModeSceneData)
         {
-            return;
+            // Check for finish when any score changes after a sentence is complete
+            singSceneControl.PlayerControls
+                .Select(playerControl => playerControl.PlayerScoreControl.SentenceScoreEventStream)
+                .Merge()
+                .Subscribe(_ => UpdateFinishCondition());
         }
-        // Check for finish when any score changes after a sentence is complete
-        singSceneControl.PlayerControls
-            .Select(playerControl => playerControl.PlayerScoreControl.SentenceScoreEventStream)
-            .Merge()
-            .Subscribe(_ => UpdateFinishCondition());
     }
 
     public void Update()
     {
-        if (!singSceneControl.HasPartyModeSceneData)
-        {
-            return;
-        }
-
         UpdateModifiers();
     }
 
@@ -68,8 +65,8 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     private bool IsFinishConditionTriggered()
     {
-        EGameRoundFinishCondition finishCondition = singSceneControl.PartyModeSceneData.CurrentRoundSettings.finishConditionSettings.condition;
-        int finishConditionScore = singSceneControl.PartyModeSceneData.CurrentRoundSettings.finishConditionSettings.points;
+        EGameRoundFinishCondition finishCondition = sceneData.gameRoundSettings.finishConditionSettings.condition;
+        int finishConditionScore = sceneData.gameRoundSettings.finishConditionSettings.points;
         if (finishCondition == EGameRoundFinishCondition.ReachPoints)
         {
             return singSceneControl.PlayerControls.AnyMatch(playerControl
@@ -99,7 +96,7 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     private void UpdatePlayerIndependentModifiers()
     {
-        HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSceneData.CurrentRoundSettings.modifiers;
+        HashSet<EGameRoundModifier> modifiers = sceneData.gameRoundSettings.modifiers;
         bool isModifierConditionTriggered = singSceneControl.PlayerControls
             .AnyMatch(playerControl => IsModifierConditionTriggered(playerControl));
         modifiers.ForEach(modifier =>
@@ -162,7 +159,7 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
             playerControlToActiveModifiers.Add(playerControl, activeModifiers);
         }
 
-        HashSet<EGameRoundModifier> modifiers = singSceneControl.PartyModeSceneData.CurrentRoundSettings.modifiers;
+        HashSet<EGameRoundModifier> modifiers = sceneData.gameRoundSettings.modifiers;
         bool isModifierConditionTriggered = IsModifierConditionTriggered(playerControl);
         modifiers.ForEach(modifier =>
         {
@@ -211,7 +208,7 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
 
     private bool IsModifierConditionTriggered(PlayerControl playerControl)
     {
-        GameRoundModifierConditionSettings modifierConditionSettings = singSceneControl.PartyModeSceneData.CurrentRoundSettings.modifierConditionSettings;
+        GameRoundModifierConditionSettings modifierConditionSettings = sceneData.gameRoundSettings.modifierConditionSettings;
         if (modifierConditionSettings.condition == EGameRoundModifierCondition.Always)
         {
             return true;

@@ -151,7 +151,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
     public PartyModeSettings PartyModeSettings => sceneData.partyModeSceneData.PartyModeSettings;
     public bool IsPassTheMic => HasPartyModeSceneData &&
-                                sceneData.partyModeSceneData.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic);
+                                sceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic);
 
     private SingingLyricsControl topSingingLyricsControl;
     private SingingLyricsControl bottomSingingLyricsControl;
@@ -166,7 +166,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private readonly SingSceneCountdownControl countdownControl = new();
     private readonly SingSceneAudioFadeInControl audioFadeInControl = new();
     private readonly SingSceneMedleyControl medleyControl = new();
-    private readonly SingScenePartyModeControl partyModeControl = new();
+    private readonly SingSceneModifierControl modifierControl = new();
 
     public bool IsCommonScore => settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
                                  && sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 2;
@@ -296,7 +296,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         // Handle party mode
-        injector.Inject(partyModeControl);
+        injector.Inject(modifierControl);
     }
 
     private void CreateWarningAboutMissingMicrophonesIfNeeded(List<PlayerProfile> playerProfilesWithoutMic)
@@ -521,7 +521,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             medleyControl.Update();
         }
 
-        partyModeControl.Update();
+        modifierControl.Update();
 
         if (!IsPaused)
         {
@@ -908,7 +908,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         bb.BindExistingInstance(countdownControl);
         bb.BindExistingInstance(medleyControl);
         bb.BindExistingInstance(audioFadeInControl);
-        bb.BindExistingInstance(partyModeControl);
+        bb.BindExistingInstance(modifierControl);
         bb.BindExistingInstance(alternativeAudioPlayer);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);

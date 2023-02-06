@@ -8,7 +8,6 @@
             <ui:VisualElement name="conditionalModifierContainer" style="background-color: rgba(0, 0, 0, 0);">
                 <ui:Toggle label="Hide lyrics" name="hideLyricsToggle" style="margin-bottom: 5px;" />
                 <ui:Toggle label="Hide notes" name="hideNotesToggle" style="margin-bottom: 5px;" />
-                <ui:Toggle label="Hide score" name="hideScoreToggle" style="margin-bottom: 5px;" />
                 <ui:Toggle label="Reduce audio" name="reduceAudioToggle" style="margin-bottom: 5px;" />
                 <ui:VisualElement name="conditionContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                     <ui:Label tabindex="-1" text="When" display-tooltip-when-elided="true" name="conditionTitleLabel" style="margin-bottom: 5px;" />

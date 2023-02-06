@@ -29,7 +29,7 @@ public class PartyModeRoundConfigControl : INeedInjection, IInjectionFinishedLis
     private PartyModeSettings partyModeSettings;
     
     [Inject]
-    private PartyModeRoundConfigModifierDialogControl modifierDialogControl;
+    private GameRoundModifierDialogControl modifierDialogControl;
 
     [Inject]
     public GameRoundSettings GameRoundSettings { get; private set; }

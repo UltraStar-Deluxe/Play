@@ -16,6 +16,15 @@ public class GameRoundSettings
     public HashSet<EGameRoundModifier> ConditionalModifiers => modifiers
         .Except(UnconditionalModifiers)
         .ToHashSet();
+
+    public GameRoundSettings()
+    {
+    }
+    
+    public GameRoundSettings(GameRoundSettings other)
+    {
+        CopyValues(other);
+    }
     
     public void CopyValues(GameRoundSettings other)
     {
