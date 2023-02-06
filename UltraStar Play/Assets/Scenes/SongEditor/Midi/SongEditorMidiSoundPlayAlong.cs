@@ -1,4 +1,7 @@
-﻿using UniInject;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CSharpSynth.Midi;
+using UniInject;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -19,60 +22,108 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
-    private Injector injector;
+    private SongEditorSceneControl songEditorSceneControl;
 
-    private SongEditorMidiSoundPlayAlongThread thread;
-    private double positionInSongInMillisOld;
-
+    private bool isPlaying;
+    private float startTimeInSeconds;
+    
     void Update()
     {
         if (!settings.SongEditorSettings.MidiSoundPlayAlongEnabled)
         {
-            // Do not play midi sounds.
-            // Furthermore, stop currently playing sounds if this setting changed during playback.
-            if (thread != null)
+            if (isPlaying)
             {
-                StopThread();
+                StopMidiPlayAlong();
             }
             return;
         }
 
-        if (songAudioPlayer.IsPlaying && thread == null)
+        if (songAudioPlayer.IsPlaying
+            && !isPlaying)
         {
-            // Start thread for playing Midi note at correct time
-            StartThread();
+            StartMidiPlayAlong();
         }
-        else if (!songAudioPlayer.IsPlaying && thread != null)
+        else if (!songAudioPlayer.IsPlaying
+                 && isPlaying)
         {
-            StopThread();
+            StopMidiPlayAlong();
         }
-
-        if (thread != null)
+        
+        // There is an increasing inaccuracy of the midi playback.
+        // Thus, we start over after a short time.
+        if (isPlaying
+            && Time.time - startTimeInSeconds > 2)
         {
-            if (songAudioPlayer.PositionInSongInMillis < positionInSongInMillisOld)
+            if (!InsideAnyVisibleNote())
             {
-                // Jumped back, thus recalculate upcomingSortedNotes and stop any currently playing notes.
-                thread.CalculateUpcomingSortedNotes((int)songAudioPlayer.PositionInSongInMillis);
-                midiManager.StopAllMidiNotes();
+                Debug.Log("Updating MIDI play along");
+                StartMidiPlayAlong();
             }
-
-            thread.SynchronizeWithPlaybackPosition((int)songAudioPlayer.PositionInSongInMillis);
+            else
+            {
+                Debug.Log("Waiting for MIDI play along");
+            }
         }
-        positionInSongInMillisOld = songAudioPlayer.PositionInSongInMillis;
     }
 
-    private void StopThread()
+    private bool InsideAnyVisibleNote()
     {
-        thread.Stop();
-        thread = null;
+        int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
+        foreach (Note note in songEditorSceneControl.GetAllVisibleNotes())
+        {
+            for (int offset = -1; offset <= 1; offset++)
+            {
+                if (SongMetaUtils.IsBeatInNote(note, currentBeat + offset))
+                {
+                    return true;
+                }
+            }
+        }
 
-        midiManager.StopAllMidiNotes();
+        return false;
     }
 
-    private void StartThread()
+    private void StopMidiPlayAlong()
     {
-        midiManager.InitIfNotDoneYet();
-        thread = injector.CreateAndInject<SongEditorMidiSoundPlayAlongThread>();
-        thread.Start((int)songAudioPlayer.PositionInSongInMillis);
+        midiManager.StopMidiFile();
+        isPlaying = false;
+    }
+
+    private void StartMidiPlayAlong()
+    {
+        StopMidiPlayAlong();
+
+        double currentPositionInBeats = songAudioPlayer.GetCurrentBeat(true);
+        List<Note> allVisibleNotes = songEditorSceneControl.GetAllVisibleNotes();
+        List<Note> followingNotes = allVisibleNotes
+            .Where(note => note.StartBeat > currentPositionInBeats)
+            .ToList();
+        if (followingNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        followingNotes.Sort(Note.comparerByStartBeat);
+        Note firstNote = followingNotes.FirstOrDefault();
+        double firstNoteStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, firstNote.StartBeat);
+        double distanceToFirstNoteStartInMillis = firstNoteStartInMillis - songAudioPlayer.PositionInSongInMillis;
+        distanceToFirstNoteStartInMillis += settings.SongEditorSettings.MidiPlaybackOffsetInMillis;
+        
+        Debug.Log($"distanceToFirstNoteStartInMillis before {distanceToFirstNoteStartInMillis}");
+        if (distanceToFirstNoteStartInMillis < 0)
+        {
+            distanceToFirstNoteStartInMillis = 0;
+        }
+        Debug.Log($"distanceToFirstNoteStartInMillis after {distanceToFirstNoteStartInMillis}");
+        
+        MidiFile midiFile = MidiFileUtils.CreateMidiFile(
+            songMeta,
+            followingNotes,
+            (byte)settings.SongEditorSettings.MidiVelocity);
+        MidiFileUtils.SetFirstDeltaTimeTo(midiFile, (uint)distanceToFirstNoteStartInMillis);
+        midiManager.PlayMidiFile(midiFile);
+        
+        isPlaying = true;
+        startTimeInSeconds = Time.time;
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CSharpSynth.Midi;
 using UniInject;
 using UniRx;
@@ -172,8 +171,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             int channelIndex = midiChannelIndexPickerControl.SelectedItem;
             MidiFile midiFileCopy = midiManager.LoadMidiFile(MidiFilePath);
             List<Note> loadNotesFromMidiFile = midiFileImporter.LoadNotesFromMidiFile(midiFileCopy, trackIndex, channelIndex, true);
-            MidiFile previewMidiFile = CreateMidiFile(loadNotesFromMidiFile);
-            SetDeltaTimeToStartAtZero(previewMidiFile);
+            MidiFile previewMidiFile = MidiFileUtils.CreateMidiFile(songMeta, loadNotesFromMidiFile, (byte)settings.SongEditorSettings.MidiVelocity);
+            MidiFileUtils.SetFirstDeltaTimeTo(previewMidiFile, 0);
             midiManager.PlayMidiFile(previewMidiFile);
         }
         catch (Exception e)
@@ -182,57 +181,6 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             UiManager.CreateNotification($"Preview failed: {e.Message}");
             throw;
         }
-    }
-
-    private void SetDeltaTimeToStartAtZero(MidiFile midiFile)
-    {
-        midiFile.Tracks.ForEach(track =>
-        {
-            MidiEvent firstNoteOnEvent = track.MidiEvents.FirstOrDefault(midiEvent => midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On);
-            if (firstNoteOnEvent != null)
-            {
-                firstNoteOnEvent.deltaTime = 0;
-            }
-        });
-    }
-    
-    private MidiFile CreateMidiFile(List<Note> loadNotesFromMidiFile)
-    {
-        List<MidiEvent> midiEvents = new();
-        uint lastNoteEndInMillis = 0;
-        loadNotesFromMidiFile.ForEach(note =>
-        {
-            uint startInMillis = (uint)BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.StartBeat);
-            if (startInMillis < lastNoteEndInMillis)
-            {
-                return;
-            }
-            uint endInMillis = (uint)BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.EndBeat);
-            
-            MidiEvent noteOnEvent = new MidiEvent();
-            noteOnEvent.midiChannelEvent = MidiHelper.MidiChannelEvent.Note_On;
-            noteOnEvent.deltaTime = (uint)startInMillis - lastNoteEndInMillis;
-            noteOnEvent.parameter1 = (byte)note.MidiNote;
-            noteOnEvent.parameter2 = (byte)90;
-            midiEvents.Add(noteOnEvent);
-            
-            MidiEvent noteOffEvent = new MidiEvent();
-            noteOffEvent.midiChannelEvent = MidiHelper.MidiChannelEvent.Note_Off;
-            noteOffEvent.deltaTime = endInMillis - (lastNoteEndInMillis + noteOnEvent.deltaTime);
-            noteOffEvent.parameter1 = (byte)note.MidiNote;
-            noteOffEvent.parameter2 = (byte)90;
-            midiEvents.Add(noteOffEvent);
-            
-            lastNoteEndInMillis = endInMillis;
-        });
-
-        MidiFile midiFile = MidiFile.CreateEmpty();
-        midiFile.MidiHeader.DeltaTiming = 480;
-        midiFile.Tracks[0].Programs = new byte[] { 0 };
-        midiFile.Tracks[0].DrumPrograms = new byte[] { 0 };
-        midiFile.Tracks[0].MidiEvents = midiEvents.ToArray();
-        midiFile.Tracks[0].TotalTime = (ulong)midiEvents.Select(midiEvent => (double)midiEvent.deltaTime).Sum();
-        return midiFile;
     }
 
     private void ImportMidiFile()
