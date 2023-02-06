@@ -61,9 +61,6 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     private PanelHelper panelHelper;
     
     [Inject]
-    private InputDeviceManager inputDeviceManager;
-
-    [Inject]
     private Injector injector;
 
     private int categoryIndex;
@@ -214,7 +211,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     private void UpdatePlayerPosition()
     {
         Vector2 screenSize = ApplicationUtils.GetScreenSizeInPanelCoordinates(panelHelper);
-        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper);
+        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper);
         float pointerPositionXPercent = pointerPosition.x / screenSize.x;
         player.style.left = new StyleLength(new Length(pointerPositionXPercent * 100f, LengthUnit.Percent));
     }
