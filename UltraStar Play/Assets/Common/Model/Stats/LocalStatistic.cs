@@ -1,6 +1,8 @@
 ﻿using System;
 
-//Stores offline statistics for a single song
+/**
+ * Stores offline statistics for a single song
+ */
 [Serializable]
 public class LocalStatistic
 {
@@ -9,6 +11,8 @@ public class LocalStatistic
     public int TimesCanceled => TimesStarted - TimesFinished;
     public DateTime LastPlayed { get; private set; } = DateTime.MinValue;
     public StatisticEntries StatsEntries { get; private set; } = new();
+    public string SongArtist { get; set; }
+    public string SongTitle { get; set; }
 
     // Called once when a song is started
     public void IncrementSongStarted()
