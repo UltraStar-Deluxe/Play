@@ -59,4 +59,29 @@ public class SongIssue
             Debug.LogError(logMessage);
         }
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is not SongIssue y)
+        {
+            return false;
+        }
+
+        SongIssue x = this;
+        if (ReferenceEquals(x, y))
+        {
+            return true;
+        }
+
+        return Equals(x.SongMeta, y.SongMeta)
+               && x.Severity == y.Severity
+               && x.Message == y.Message
+               && x.StartBeat == y.StartBeat
+               && x.EndBeat == y.EndBeat;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(SongMeta, (int)Severity, Message, StartBeat, EndBeat);
+    }
 }

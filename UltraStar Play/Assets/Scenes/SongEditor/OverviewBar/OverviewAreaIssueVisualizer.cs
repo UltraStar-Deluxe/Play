@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -21,20 +20,17 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
+    [Inject]
+    private SongEditorIssueAnalyzerControl issueAnalyzerControl;
+    
     [Inject(UxmlName = R.UxmlNames.overviewAreaIssues)]
     private VisualElement overviewAreaIssues;
-
-    private IReadOnlyCollection<SongIssue> issues = new List<SongIssue>();
 
     private DynamicTexture dynamicTexture;
 
     public void OnInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(_ =>
-        {
-            issues = SongMetaAnalyzer.AnalyzeIssues(songMeta, SongEditorIssueAnalyzerControl.MaxSongIssueCountPerMessage);
-            UpdateIssueOverviewImage();
-        });
+        issueAnalyzerControl.IssuesEventStream.Subscribe(_ => UpdateIssueOverviewImage());
 
         overviewAreaIssues.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
@@ -51,7 +47,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
         }
 
         dynamicTexture.ClearTexture();
-        foreach (SongIssue issue in issues)
+        foreach (SongIssue issue in issueAnalyzerControl.Issues)
         {
             DrawIssue(issue);
         }
@@ -64,9 +60,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
         {
             return;
         }
-
-        Color color = SongIssueUtils.GetColorForIssue(issue);
-
+        
         int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
 
         int startMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
@@ -88,6 +82,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
             ObjectUtils.Swap(ref xStart, ref xEnd);
         }
 
-        dynamicTexture.DrawRectByCorners(xStart, 0, xEnd, (int)(dynamicTexture.TextureHeight * 0.5f), color);
+        Color color = issue.Severity == ESongIssueSeverity.Error ? Colors.red : Colors.yellow;
+        dynamicTexture.DrawRectByCorners(xStart, 0, xEnd, (int)(dynamicTexture.TextureHeight * 0.25f), color);
     }
 }

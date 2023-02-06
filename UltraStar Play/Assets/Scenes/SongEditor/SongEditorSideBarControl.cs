@@ -237,7 +237,16 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(() => GoToIssue(issue));
         visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).text = issue.Message;
         visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).text = $"({issueStartPositionInSeconds}s)";
-        visualElement.Q<VisualElement>(R.UxmlNames.issueImage).style.unityBackgroundImageTintColor = SongIssueUtils.GetColorForIssue(issue);
+        
+        VisualElement issueImage = visualElement.Q<VisualElement>(R.UxmlNames.issueImage);
+        if (issue.Severity == ESongIssueSeverity.Error)
+        {
+            issueImage.AddToClassList("error");
+        }
+        else if (issue.Severity == ESongIssueSeverity.Warning)
+        {
+            issueImage.AddToClassList("warning");
+        }
     }
 
     private void GoToIssue(SongIssue issue)

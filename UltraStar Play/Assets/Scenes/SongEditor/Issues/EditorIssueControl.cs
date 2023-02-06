@@ -22,7 +22,14 @@ public class EditorIssueControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        issueImage.style.unityBackgroundImageTintColor = SongIssueUtils.GetColorForIssue(SongIssue);
+        if (SongIssue.Severity == ESongIssueSeverity.Warning)
+        {
+            issueImage.AddToClassList("warning");
+        }
+        else if (SongIssue.Severity == ESongIssueSeverity.Error)
+        {
+            issueImage.AddToClassList("error");
+        }
 
         tooltipControl = injector
             .WithRootVisualElement(VisualElement)
