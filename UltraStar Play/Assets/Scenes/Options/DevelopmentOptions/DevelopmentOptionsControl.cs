@@ -1,10 +1,7 @@
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using Serilog.Events;
-using Serilog.Formatting.Display;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
@@ -58,6 +55,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     [Inject(UxmlName = R.UxmlNames.copyLogButton)]
     private Button copyLogButton;
+
+    [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
+    private Button openPersistentDataPathButton;
 
     [Inject]
     private Settings settings;
@@ -147,6 +147,16 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
             UiManager.CreateNotification("Copied log to clipboard");
         });
 
+        // Open persistent data path
+        if (PlatformUtils.IsStandalone)
+        {
+            openPersistentDataPathButton.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(Application.persistentDataPath));
+        }
+        else
+        {
+            openPersistentDataPathButton.HideByDisplay();
+        }
+        
         // Back button
         backButton.RegisterCallbackButtonTriggered(() => OnBack());
         backButton.Focus();
