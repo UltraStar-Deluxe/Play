@@ -30,9 +30,6 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     [Inject]
     private Injector injector;
     
-    [Inject]
-    private InputDeviceManager inputDeviceManager;
-
     private PanelHelper panelHelper;
 
     private VisualElement visualElement;
@@ -99,7 +96,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         }
 
         // Do not close when clicking an item
-        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true);
+        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         if (visualElement.worldBound.Contains(pointerPosition))
         {
             return;
@@ -110,7 +107,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     public void Update()
     {
-        wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed || !InputUtils.AnyKeyboardOrMouseOrTouchPressed(keyboard, mouse);
+        wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed || !InputUtils.AnyKeyboardOrMouseOrTouchPressed();
     }
     
     public void AddSeparator()

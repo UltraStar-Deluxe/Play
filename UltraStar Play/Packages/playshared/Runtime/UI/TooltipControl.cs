@@ -21,9 +21,6 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private UIDocument uiDocument;
     
-    [Inject]
-    private InputDeviceManager inputDeviceManager;
-
     private Label label;
     private PanelHelper panelHelper;
     private IEnumerator showTooltipCoroutine;
@@ -106,7 +103,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true) + tooltipOffsetInPx;
+        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true) + tooltipOffsetInPx;
 
         label = new Label();
         label.AddToClassList("tooltip");
