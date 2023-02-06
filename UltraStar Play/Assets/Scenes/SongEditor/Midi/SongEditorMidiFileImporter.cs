@@ -72,18 +72,7 @@ public class SongEditorMidiFileImporter : INeedInjection
             // Shift notes such that the first note starts at the current playback position
             ShiftNotesToPlaybackPosition(loadedNotes);
 
-            if (voiceName != null)
-            {
-                List<Sentence> changedSentences = SongMetaUtils.GetAllSentences(songMeta);
-                List<Sentence> removedSentences = new();
-                songMetaChangeEventStream.OnNext(new MovedNotesToVoiceEvent(loadedNotes,
-                    changedSentences,
-                    removedSentences));
-            }
-            else
-            {
-                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-            }
+            songMetaChangeEventStream.OnNext(new ImportedMidiFileEvent());
             
             UiManager.CreateNotification("Loaded MIDI file successfully");
         }
