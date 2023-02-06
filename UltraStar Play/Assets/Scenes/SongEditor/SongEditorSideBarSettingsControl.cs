@@ -107,7 +107,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
     private Button importMidiFileButton;
-
+    
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
@@ -166,11 +166,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private LabeledItemPickerControl<ESongEditorSamplesSource> pitchDetectionAudioItemPickerControl;
     private LabeledItemPickerControl<ERecordNotesOrAudio> recordNotesOrAudioItemPickerControl;
 
-    private readonly SongEditorMidiFileImporter midiFileImporter = new();
-
+    private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
+    
     public void OnInjectionFinished()
     {
-        injector.Inject(midiFileImporter);
+        injector.Inject(importMidiFileDialogControl);
 
         // Editing settings
         Bind(adjustFollowingNotesToggle,
@@ -277,7 +277,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MidiPlaybackOffsetInMillis.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MidiPlaybackOffsetInMillis = newIntValue));
 
-        importMidiFileButton.RegisterCallbackButtonTriggered(() => CreateImportMidiFileDialog());
+        importMidiFileButton.RegisterCallbackButtonTriggered(() => importMidiFileDialogControl.OpenDialog());
 
         // Speech recognition
         Bind(speechRecognitionModelPathTextField,
@@ -357,18 +357,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(sentenceLineSizeTextField,
             () => settings.SongEditorSettings.SentenceLineSizeInPx.ToString(CultureInfo.InvariantCulture),
             newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.SentenceLineSizeInPx = newFloatValue));
-    }
-
-    private void CreateImportMidiFileDialog()
-    {
-        songEditorSceneControl.CreatePathInputDialog("Import MIDI File",
-            "Enter the absolute path to the MIDI file.",
-            settings.SongEditorSettings.LastMidiFilePath,
-            path =>
-            {
-                settings.SongEditorSettings.LastMidiFilePath = path;
-                midiFileImporter.ImportMidiFile(path);
-            });
     }
 
     private void UpdateRecordingSettingsVisibility()

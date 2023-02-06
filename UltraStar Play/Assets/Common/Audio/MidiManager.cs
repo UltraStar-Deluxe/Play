@@ -16,8 +16,10 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static MidiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MidiManager>();
 
-    // It seems, the sound bank has been created with a specific sample rate of 44100 Hz.
+    // The sound bank (or CSharpSynth) can only handle a specific sample rate of 44100 Hz. With 44800 Hz, the sound is distorted.
     public static readonly int midiStreamSampleRateHz = 44100;
+    // MIDI sound is generated for 1 channel (mono).
+    public static readonly int midiStreamChannelCount = 1;
 
     [Range(0, 2)] // Piano 0, 1 or 2
     public int midiInstrument;
@@ -42,8 +44,8 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     // A larger amount is buffered in availableSamplesSynthesizerSampleRate. The values are unchanged, using the sample rate of the midi synthesizer.
     // This buffer is then resampled to the output device sample rate. These resampled values are buffered in availableSamplesOutputSampleRate.
     private float[] newSampleBuffer;
-    private CircularBuffer<float> availableSamplesSynthesizerSampleRate;
-    private CircularBuffer<float> availableSamplesOutputSampleRate;
+    private CircularBuffer<float> availableSynthesizerSamples;
+    private CircularBuffer<float> availableOutputSamples;
     private MidiSequencer midiSequencer;
     private StreamSynthesizer midiStreamSynthesizer;
 
@@ -54,6 +56,8 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     private float audioFilterReadSecondsCounter;
 
     private bool isInitialized;
+    
+    public bool IsPlayingMidiFile { get; private set; }
 
     protected override object GetInstance()
     {
@@ -97,10 +101,10 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        midiStreamSynthesizer = new StreamSynthesizer(midiStreamSampleRateHz, 1, bufferSize, 16, 1);
-        newSampleBuffer = new float[midiStreamSynthesizer.BufferSize];
-        availableSamplesSynthesizerSampleRate = new CircularBuffer<float>(midiStreamSampleRateHz / 10);
-        availableSamplesOutputSampleRate = new CircularBuffer<float>(outputSampleRateHz / 10);
+        midiStreamSynthesizer = new StreamSynthesizer(midiStreamSampleRateHz, midiStreamChannelCount, bufferSize, 16);
+        newSampleBuffer = new float[bufferSize * midiStreamChannelCount];
+        availableSynthesizerSamples = new CircularBuffer<float>(midiStreamSampleRateHz / 10);
+        availableOutputSamples = new CircularBuffer<float>(outputSampleRateHz / 10);
 
         midiStreamSynthesizer.LoadBank(bankFilePath);
         midiSequencer = new MidiSequencer(midiStreamSynthesizer);
@@ -108,6 +112,27 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         isInitialized = true;
     }
 
+    public void PlayMidiFile(MidiFile midiFile)
+    {
+        InitIfNotDoneYet();
+        
+        StopAllMidiNotes();
+        midiSequencer.LoadMidi(midiFile, false);
+        midiSequencer.Play();
+        IsPlayingMidiFile = true;
+    }
+
+    public void StopMidiFile()
+    {
+        if (!isInitialized)
+        {
+            return;
+        }
+        
+        midiSequencer.Stop(true);
+        IsPlayingMidiFile = false;
+    }
+    
     public void PlayMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
@@ -154,7 +179,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     //	(it turns red if the filter is taking up too much time, so the mixer will starv audio data). 
     //	Also note, that OnAudioFilterRead is called on a different thread from the main thread (namely the audio thread) 
     //	so calling into many Unity functions from this function is not allowed ( a warning will show up ). 	
-    void OnAudioFilterRead(float[] data, int channels)
+    void OnAudioFilterRead(float[] data, int outputChannelCount)
     {
         if (!isInitialized)
         {
@@ -162,25 +187,25 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Statistics to find the actually used sample rate
-        audioFilterReadSampleCounter += (data.Length / channels);
+        audioFilterReadSampleCounter += (data.Length / outputChannelCount);
 
         // Synthesize new samples from the Midi instrument until there is enough to fill the data array.
-        int neededSingleChannelSamples = data.Length / channels;
-        if (availableSamplesOutputSampleRate.Count < neededSingleChannelSamples)
+        int neededSingleChannelSamples = data.Length / outputChannelCount;
+        if (availableOutputSamples.Count < neededSingleChannelSamples)
         {
             FillAvailableSampleBuffers();
         }
 
         // The Midi stream is generated in mono (1 channel).
         // These samples are written to every channel of the output data array.
-        for (int i = 0; i < data.Length; i += channels)
+        for (int sampleIndex = 0; sampleIndex < data.Length; sampleIndex += outputChannelCount)
         {
-            float sampleValue = availableSamplesOutputSampleRate.Front() * midiGain;
-            availableSamplesOutputSampleRate.PopFront();
+            float sampleValue = availableOutputSamples.Front() * midiGain;
+            availableOutputSamples.PopFront();
 
-            for (int channelIndex = 0; channelIndex < channels; channelIndex++)
+            for (int outputChannelIndex = 0; outputChannelIndex < outputChannelCount; outputChannelIndex++)
             {
-                data[i + channelIndex] = sampleValue;
+                data[sampleIndex + outputChannelIndex] = sampleValue;
             }
         }
     }
@@ -190,21 +215,21 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         // Synthesize midi samples (in midi synthesizer's sample rate).
         SynthesizeMidiSamples();
         // Resample the data for the output device sample rate.
-        ReSampleAndFill(availableSamplesSynthesizerSampleRate,
-            availableSamplesOutputSampleRate,
+        ReSampleAndFill(availableSynthesizerSamples,
+            availableOutputSamples,
             midiStreamSampleRateHz,
             outputSampleRateHz,
-            availableSamplesOutputSampleRate.Capacity / 2);
+            availableOutputSamples.Capacity / 2);
     }
 
     private void SynthesizeMidiSamples()
     {
-        while (availableSamplesSynthesizerSampleRate.Count < availableSamplesSynthesizerSampleRate.Capacity / 2)
+        while (availableSynthesizerSamples.Count < availableSynthesizerSamples.Capacity / 2)
         {
             midiStreamSynthesizer.GetNext(newSampleBuffer);
             for (int i = 0; i < newSampleBuffer.Length; i++)
             {
-                availableSamplesSynthesizerSampleRate.PushBack(newSampleBuffer[i]);
+                availableSynthesizerSamples.PushBack(newSampleBuffer[i]);
             }
         }
     }

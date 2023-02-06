@@ -173,7 +173,7 @@ public static class CollectionExtensions
         int index = 0;
         foreach (T elem in enumerable)
         {
-            if (object.Equals(elem, element))
+            if (Equals(elem, element))
             {
                 return index;
             }
@@ -240,5 +240,10 @@ public static class CollectionExtensions
         }
 
         list[index] = replacement;
+    }
+
+    public static void RemoveAll<T>(this List<T> list, IEnumerable<T> enumerable)
+    {
+        enumerable.ForEach(item => list.Remove(item));
     }
 }

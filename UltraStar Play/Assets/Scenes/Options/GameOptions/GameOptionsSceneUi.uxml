@@ -12,7 +12,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="scoreModeContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Score" name="Label" class="controlLabel" />
+                <ui:Label text="Score" name="Label" class="controlLabel40Percent" />
                 <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
