@@ -16,8 +16,10 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static MidiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MidiManager>();
 
-    // It seems, the sound bank has been created with a specific sample rate of 44100 Hz.
+    // The sound bank (or CSharpSynth) can only handle a specific sample rate of 44100 Hz. With 44800 Hz, the sound is distorted.
     public static readonly int midiStreamSampleRateHz = 44100;
+    // MIDI sound is generated for 1 channel (mono).
+    public static readonly int midiStreamChannelCount = 1;
 
     [Range(0, 2)] // Piano 0, 1 or 2
     public int midiInstrument;
@@ -99,8 +101,8 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        midiStreamSynthesizer = new StreamSynthesizer(midiStreamSampleRateHz, 1, bufferSize, 16, 1);
-        newSampleBuffer = new float[midiStreamSynthesizer.BufferSize];
+        midiStreamSynthesizer = new StreamSynthesizer(midiStreamSampleRateHz, midiStreamChannelCount, bufferSize, 16);
+        newSampleBuffer = new float[bufferSize * midiStreamChannelCount];
         availableSynthesizerSamples = new CircularBuffer<float>(midiStreamSampleRateHz / 10);
         availableOutputSamples = new CircularBuffer<float>(outputSampleRateHz / 10);
 
