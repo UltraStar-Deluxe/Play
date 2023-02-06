@@ -465,6 +465,7 @@ public static partial class R
         public const string removeWebCamImageIcon = "removeWebCamImageIcon";
         public const string resetMusicPlaybackSpeedButton = "resetMusicPlaybackSpeedButton";
         public const string resolutionContainer = "resolutionContainer";
+        public const string restartButton = "restartButton";
         public const string rightHandle = "rightHandle";
         public const string rightLyricsOverlay = "rightLyricsOverlay";
         public const string rightSide = "rightSide";

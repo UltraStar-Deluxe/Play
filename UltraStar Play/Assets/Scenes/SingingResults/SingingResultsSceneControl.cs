@@ -32,20 +32,23 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     private Label songLabel;
 
     [Inject(UxmlName = R.UxmlNames.onePlayerLayout)]
-    public VisualElement onePlayerLayout;
+    private VisualElement onePlayerLayout;
 
     [Inject(UxmlName = R.UxmlNames.twoPlayerLayout)]
-    public VisualElement twoPlayerLayout;
+    private VisualElement twoPlayerLayout;
 
     [Inject(UxmlName = R.UxmlNames.nPlayerLayout)]
-    public VisualElement nPlayerLayout;
+    private VisualElement nPlayerLayout;
 
     [Inject(UxmlName = R.UxmlNames.continueButton)]
-    public Button continueButton;
+    private Button continueButton;
 
     [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
-    public Button hiddenContinueButton;
+    private Button hiddenContinueButton;
 
+    [Inject(UxmlName = R.UxmlNames.restartButton)]
+    public Button restartButton;
+    
     [Inject]
     private Statistics statistics;
 
@@ -82,6 +85,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         continueButton.Focus();
+        
+        restartButton.RegisterCallbackButtonTriggered(() => RestartSingScene());
 
         // Click through to hiddenContinueButton
         uiDocument.rootVisualElement.Query<VisualElement>()
@@ -99,6 +104,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         ActivateLayout();
         FillLayout();
+    }
+
+    private void RestartSingScene()
+    {
+        SingSceneData singSceneData = SceneNavigator.GetSceneData(new SingSceneData());
+        singSceneData.SelectedSongMeta = sceneData.SongMeta;
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
     private void FillLayout()
