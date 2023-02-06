@@ -377,6 +377,9 @@ public static partial class R
         public const string onlineHighScoreContainer = "onlineHighScoreContainer";
         public const string openFolderButton = "openFolderButton";
         public const string openFolderIcon = "openFolderIcon";
+        public const string openPersistentDataPathButton = "openPersistentDataPathButton";
+        public const string openPersistentDataPathIcon = "openPersistentDataPathIcon";
+        public const string openPersistentDataPathLabel = "openPersistentDataPathLabel";
         public const string openSongEditorButton = "openSongEditorButton";
         public const string openSongFolderButton = "openSongFolderButton";
         public const string outputTextField = "outputTextField";
