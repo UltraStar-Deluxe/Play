@@ -27,8 +27,8 @@ public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
         // Mouse.current can later change to the virtual mouse.
         systemMouse = Mouse.current;
         
-        virtualKeyboard = InputSystem.AddDevice<Keyboard>();
-        virtualMouse = InputSystem.AddDevice<Mouse>();
+        virtualKeyboard = InputSystem.AddDevice<Keyboard>("Virtual Keyboard");
+        virtualMouse = InputSystem.AddDevice<Mouse>("Virtual Mouse");
 
         RegisterNavigationEndpoint("leftArrowKey",
             "Simulate left arrow key press",

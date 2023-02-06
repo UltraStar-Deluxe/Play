@@ -25,9 +25,6 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
 
     [Inject]
     protected Injector injector;
-    
-    [Inject]
-    protected InputDeviceManager inputDeviceManager;
 
     protected PanelHelper panelHelper;
 
@@ -86,7 +83,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
             return;
         }
 
-        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true);
+        Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         if (!targetVisualElement.worldBound.Contains(pointerPosition))
         {
             return;

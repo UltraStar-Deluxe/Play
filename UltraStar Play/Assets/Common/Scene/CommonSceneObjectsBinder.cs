@@ -5,8 +5,6 @@ using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
-using IBinding = UniInject.IBinding;
 
 public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 {
@@ -29,7 +27,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
-        bb.BindExistingInstance(InputDeviceManager.Instance);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);

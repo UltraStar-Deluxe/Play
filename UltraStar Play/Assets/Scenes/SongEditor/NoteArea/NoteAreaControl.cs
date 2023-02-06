@@ -82,9 +82,6 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
-    [Inject]
-    private InputDeviceManager inputDeviceManager;
-
     [Inject(UxmlName = R.UxmlNames.noteArea)]
     public VisualElement VisualElement { get; private set; }
 
@@ -300,7 +297,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public int GetHorizontalMousePositionInMillis()
     {
-        Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true);
+        Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         float width = VisualElement.contentRect.width;
         double xPercent = (mousePositionInPanelCoordinates.x - VisualElement.worldBound.x) / width;
         return ViewportX + (int)(xPercent * ViewportWidth);
@@ -315,7 +312,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public int GetVerticalMousePositionInMidiNote()
     {
-        Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true);
+        Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         return ScreenPixelPositionToMidiNote(mousePositionInPanelCoordinates.y);
     }
 
@@ -323,7 +320,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     {
         double viewportChangeInPercent = 0.25;
 
-        Vector2 zoomPositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true);
+        Vector2 zoomPositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         float width = VisualElement.worldBound.width;
         double xPercent = (zoomPositionInPanelCoordinates.x - VisualElement.worldBound.x) / width;
 
@@ -365,7 +362,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
         double viewportChangeInPercent = 0.25;
 
-        Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(inputDeviceManager.SystemPointer, panelHelper, true);
+        Vector2 mousePositionInPanelCoordinates = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         float height = VisualElement.contentRect.height;
         double yPercent = (mousePositionInPanelCoordinates.y - VisualElement.worldBound.y) / height;
 
@@ -634,6 +631,6 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public bool IsPointerOver()
     {
-        return InputUtils.IsPointerOverVisualElement(inputDeviceManager.SystemPointer, VisualElement, panelHelper);
+        return InputUtils.IsPointerOverVisualElement(VisualElement, panelHelper);
     }
 }

@@ -32,9 +32,6 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
     [Inject]
     private SongMeta songMeta;
     
-    [Inject]
-    private InputDeviceManager inputDeviceManager;
-
     [Inject(UxmlName = R.UxmlNames.noteAreaSentences)]
     private VisualElement noteAreaSentences;
 
@@ -132,9 +129,9 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             .ToList();
 
         // Add to selection via Shift. Remove from selection via Ctrl+Shift. Without modifier, set selection.
-        if (InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard))
+        if (InputUtils.IsKeyboardShiftPressed())
         {
-            if (InputUtils.IsKeyboardControlPressed(inputDeviceManager.SystemKeyboard))
+            if (InputUtils.IsKeyboardControlPressed())
             {
                 selectionControl.RemoveFromSelection(selectedNotes);
             }

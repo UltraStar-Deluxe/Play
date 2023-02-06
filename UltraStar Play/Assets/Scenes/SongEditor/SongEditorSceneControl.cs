@@ -83,9 +83,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [Inject]
     private ApplicationManager applicationManager;
     
-    [Inject]
-    private InputDeviceManager inputDeviceManager;
-
     private IDisposable autoSaveDisposable;
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new();
@@ -224,7 +221,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private void OnAudioPlaybackStopped()
     {
         // Go to last position in song when playback stopped
-        bool invertedGoToLastPlaybackPositionBehavior = InputUtils.IsKeyboardControlPressed(inputDeviceManager.SystemKeyboard);
+        bool invertedGoToLastPlaybackPositionBehavior = InputUtils.IsKeyboardControlPressed();
         bool goToLastPlaybackPosition = (settings.SongEditorSettings.GoToLastPlaybackPosition &&
                                          !invertedGoToLastPlaybackPositionBehavior)
                                         || (!settings.SongEditorSettings.GoToLastPlaybackPosition &&
