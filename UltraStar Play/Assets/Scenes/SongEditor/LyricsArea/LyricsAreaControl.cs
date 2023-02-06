@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -79,6 +78,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         textField.tripleClickSelectsLine = true;
 
         // Check when a newline has been added. This requires adding an additional character to show white space.
+        bool pasted = false;
         bool addedNewline = false;
         bool removeCharacter = false;
         textField.RegisterCallback<KeyDownEvent>(evt =>
@@ -92,6 +92,13 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             {
                 removeCharacter = true;
             }
+            else if (evt.keyCode == KeyCode.V
+                     && evt.ctrlKey
+                     && !evt.shiftKey
+                     && !evt.altKey)
+            {
+                pasted = true;
+            }
         });
 
         // Replace white space with visible characters when in edit mode
@@ -103,9 +110,11 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             }
 
             string newText = evt.newValue;
-            if (addedNewline)
+            if (addedNewline
+                || pasted)
             {
                 addedNewline = false;
+                pasted = false;
                 // Add whitespace character for newly added newline character
                 newText = newText.Replace(ShowWhiteSpaceText.newlineReplacement, "⌇")
                     .Replace("\n", "⌇")
@@ -168,7 +177,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
                 or NotesDeletedEvent
                 or SentencesDeletedEvent
                 or NotesPastedEvent
-                or NotesAddedEvent)
+                or NotesAddedEvent
+                or ImportedMidiFileEvent)
         {
             UpdateLyrics();
         }
