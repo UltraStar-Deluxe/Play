@@ -89,7 +89,6 @@ public class GameRoundModifierChipsComboControl
         {
             CreateBoolChipsEntry(EGameRoundModifier.HideLyrics, "Hide lyrics");
             CreateBoolChipsEntry(EGameRoundModifier.HideNotes, "Hide notes");
-            CreateBoolChipsEntry(EGameRoundModifier.HideScore, "Hide score");
             CreateBoolChipsEntry(EGameRoundModifier.ReduceAudio, "Reduce audio");
 
             if (GameRoundSettings.modifierConditionSettings.condition is not EGameRoundModifierCondition.Always)

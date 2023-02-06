@@ -195,10 +195,6 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
         {
             playerControl.PlayerUiControl.FadeOutNotes(AnimTimeInSeconds);
         }
-        else if (modifier == EGameRoundModifier.HideScore)
-        {
-            playerControl.PlayerUiControl.FadeOut(AnimTimeInSeconds);
-        }
     }
 
     private void DeactivateModifier(PlayerControl playerControl, EGameRoundModifier modifier)
@@ -210,10 +206,6 @@ public class SingScenePartyModeControl : INeedInjection, IInjectionFinishedListe
         else if (modifier == EGameRoundModifier.HideNotes)
         {
             playerControl.PlayerUiControl.FadeInNotes(AnimTimeInSeconds);
-        }
-        else if (modifier == EGameRoundModifier.HideScore)
-        {
-            playerControl.PlayerUiControl.FadeIn(AnimTimeInSeconds);
         }
     }
 
