@@ -1,12 +1,13 @@
 ﻿public enum EGameRoundModifier
 {
-    // Modifiers per player
+    // Conditional modifiers per player
     HideNotes,
     HideLyrics,
-    HideScore,
 
-    // Modifiers for all players
+    // Conditional modifiers for all players
     ReduceAudio,
+    
+    // Unconditional modifiers
     ShortSong,
     PassTheMic,
 }

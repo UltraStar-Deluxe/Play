@@ -157,7 +157,6 @@ public class PartyModeRoundConfigModifierDialogControl : INeedInjection, IInject
         gameRoundModifierToToggle[EGameRoundModifier.PassTheMic] = passTheMicToggle;
         gameRoundModifierToToggle[EGameRoundModifier.HideLyrics] = hideLyricsToggle;
         gameRoundModifierToToggle[EGameRoundModifier.HideNotes] = hideNotesToggle;
-        gameRoundModifierToToggle[EGameRoundModifier.HideScore] = hideScoreToggle;
         gameRoundModifierToToggle[EGameRoundModifier.ReduceAudio] = reduceAudioToggle;
     }
 
