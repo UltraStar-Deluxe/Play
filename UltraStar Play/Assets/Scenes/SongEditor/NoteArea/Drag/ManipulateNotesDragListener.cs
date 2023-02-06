@@ -34,9 +34,6 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SongEditorLayerManager layerManager;
 
-    [Inject]
-    private InputDeviceManager inputDeviceManager;
-    
     private List<Note> selectedNotes = new();
     private List<Note> followingNotes = new();
 
@@ -137,7 +134,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
                 break;
 
             case DragAction.StretchLeft:
-                if (InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard)
+                if (InputUtils.IsKeyboardShiftPressed()
                     || selectedNotes.Count == 1)
                 {
                     ExtendNotesLeft(dragEvent, selectedNotes);
@@ -149,7 +146,7 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
                 break;
 
             case DragAction.StretchRight:
-                if (InputUtils.IsKeyboardShiftPressed(inputDeviceManager.SystemKeyboard)
+                if (InputUtils.IsKeyboardShiftPressed()
                     || selectedNotes.Count == 1)
                 {
                     ExtendNotesRight(dragEvent, selectedNotes, true);

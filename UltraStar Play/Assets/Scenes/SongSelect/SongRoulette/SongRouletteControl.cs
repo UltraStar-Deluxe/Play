@@ -35,9 +35,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private ThemeManager themeManager;
 
-    [Inject]
-    private InputDeviceManager inputDeviceManager;
-    
     [Inject(UxmlName = R.UxmlNames.songEntryContainer)]
     private VisualElement songEntryContainer;
 
@@ -512,7 +509,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
         dragVelocity *= 1 - (1 - FlickAccelerationPerSecond) * Time.deltaTime;
         if (dragVelocity.magnitude < FlickGestureStopThresholdInPixels
             || songEntryControls.IsNullOrEmpty()
-            || InputUtils.AnyMouseButtonPressed(inputDeviceManager.SystemMouse)
+            || InputUtils.AnyMouseButtonPressed()
             || (flickGestureWasNoTouchscreenPressed && InputUtils.AnyTouchscreenPressed()))
         {
             // End flick-gesture

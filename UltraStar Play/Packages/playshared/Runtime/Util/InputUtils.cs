@@ -10,8 +10,43 @@ public static class InputUtils
     public const float DoubleClickThresholdInSeconds = 0.3f;
     public const float DragDistanceThresholdInPx = 5f;
 
-    public static EKeyboardModifier GetCurrentKeyboardModifier(Keyboard keyboard)
+    private static Keyboard lastNonVirtualKeyboard;
+    private static Mouse lastNonVirtualMouse;
+    private static Pointer lastNonVirtualPointer;
+    
+    public static Keyboard GetNonVirtualKeyboard()
     {
+        Keyboard current = Keyboard.current;
+        if (!current.name.ToLowerInvariant().Contains("virtual"))
+        {
+            lastNonVirtualKeyboard = current;
+        }
+        return lastNonVirtualKeyboard;
+    }
+
+    public static Mouse GetNonVirtualMouse()
+    {
+        Mouse current = Mouse.current;
+        if (!current.name.ToLowerInvariant().Contains("virtual"))
+        {
+            lastNonVirtualMouse = current;
+        }
+        return lastNonVirtualMouse;
+    }
+    
+    public static Pointer GetNonVirtualPointer()
+    {
+        Pointer current = Pointer.current;
+        if (!current.name.ToLowerInvariant().Contains("virtual"))
+        {
+            lastNonVirtualPointer = current;
+        }
+        return lastNonVirtualPointer;
+    }
+    
+    public static EKeyboardModifier GetCurrentKeyboardModifier()
+    {
+        Keyboard keyboard = GetNonVirtualKeyboard();
         if (keyboard == null)
         {
             return EKeyboardModifier.None;
@@ -57,21 +92,23 @@ public static class InputUtils
         return InputManager.GetInputAction("usplay/anyKeyboardModifier").ReadValue<float>() > 0;
     }
 
-    public static bool AnyKeyboardOrMouseOrTouchPressed(Keyboard keyboard, Mouse mouse)
+    public static bool AnyKeyboardOrMouseOrTouchPressed()
     {
-        return AnyKeyboardButtonPressed(keyboard)
-               || AnyMouseButtonPressed(mouse)
+        return AnyKeyboardButtonPressed()
+               || AnyMouseButtonPressed()
                || AnyTouchscreenPressed();
     }
     
-    public static bool AnyKeyboardButtonPressed(Keyboard keyboard)
+    public static bool AnyKeyboardButtonPressed()
     {
+        Keyboard keyboard = GetNonVirtualKeyboard();
         return keyboard != null
                && keyboard.anyKey.ReadValue() > 0;
     }
 
-    public static bool AnyMouseButtonPressed(Mouse mouse)
+    public static bool AnyMouseButtonPressed()
     {
+        Mouse mouse = GetNonVirtualMouse();
         return mouse != null
                && (mouse.leftButton.isPressed
                    || mouse.rightButton.isPressed
@@ -83,30 +120,32 @@ public static class InputUtils
         return Touch.activeTouches.Count > 0;
     }
 
-    public static bool IsKeyboardShiftPressed(Keyboard keyboard)
+    public static bool IsKeyboardShiftPressed()
     {
+        Keyboard keyboard = GetNonVirtualKeyboard();
         return keyboard != null
                && (keyboard.leftShiftKey.isPressed
                    || keyboard.rightShiftKey.isPressed);
     }
     
-    public static bool IsKeyboardControlPressed(Keyboard keyboard)
+    public static bool IsKeyboardControlPressed()
     {
+        Keyboard keyboard = GetNonVirtualKeyboard();
         return keyboard != null
                && (keyboard.leftCtrlKey.isPressed
                    || keyboard.rightCtrlKey.isPressed);
     }
 
-    public static bool IsAnyKeyboardModifierPressed(Keyboard keyboard)
+    public static bool IsAnyKeyboardModifierPressed()
     {
-        return IsKeyboardShiftPressed(keyboard)
-               || IsKeyboardControlPressed(keyboard)
-               || IsKeyboardAltPressed(keyboard);
+        return IsKeyboardShiftPressed()
+               || IsKeyboardControlPressed()
+               || IsKeyboardAltPressed();
     }
 
-    
-    public static bool IsKeyboardAltPressed(Keyboard keyboard)
+    public static bool IsKeyboardAltPressed()
     {
+        Keyboard keyboard = GetNonVirtualKeyboard();
         return keyboard != null
                && (keyboard.leftAltKey.isPressed
                    || keyboard.rightAltKey.isPressed);
@@ -122,8 +161,9 @@ public static class InputUtils
         return mouse != null ? mouse.position.ReadValue() : Vector2.zero;
     }
 
-    public static Vector2 GetPointerPositionInPanelCoordinates(Pointer pointer, PanelHelper panelHelper, bool invertY = false)
+    public static Vector2 GetPointerPositionInPanelCoordinates(PanelHelper panelHelper, bool invertY = false)
     {
+        Pointer pointer = GetNonVirtualPointer();
         if (pointer == null)
         {
             return Vector2.zero;
@@ -140,14 +180,15 @@ public static class InputUtils
         return pointerPanelCoordinates;
     }
 
-    public static bool IsPointerOverVisualElement(Pointer pointer, VisualElement visualElement, PanelHelper panelHelper)
+    public static bool IsPointerOverVisualElement(VisualElement visualElement, PanelHelper panelHelper)
     {
+        Pointer pointer = GetNonVirtualPointer();
         if (pointer == null)
         {
             return false;
         }
 
-        Vector2 pointerPositionInPanelCoordinates = GetPointerPositionInPanelCoordinates(pointer, panelHelper, true);
+        Vector2 pointerPositionInPanelCoordinates = GetPointerPositionInPanelCoordinates(panelHelper, true);
         pointerPositionInPanelCoordinates = new Vector2(pointerPositionInPanelCoordinates.x,
             pointerPositionInPanelCoordinates.y);
         Rect rect = visualElement.worldBound;
