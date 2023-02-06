@@ -226,8 +226,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             lastNoteEndInMillis = endInMillis;
         });
 
-        MidiFile midiFile = new();
-        midiFile.MidiHeader.DeltaTiming = 960;
+        MidiFile midiFile = MidiFile.CreateEmpty();
+        midiFile.MidiHeader.DeltaTiming = 480;
         midiFile.Tracks[0].Programs = new byte[] { 0 };
         midiFile.Tracks[0].DrumPrograms = new byte[] { 0 };
         midiFile.Tracks[0].MidiEvents = midiEvents.ToArray();
