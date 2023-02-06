@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using ProTrans;
 using UniInject;
 using UnityEngine;
 
 public class UltraStarPlayTranslationManager : TranslationManager, INeedInjection
 {
+    public static UltraStarPlayTranslationManager Instance => TranslationManager.Instance as UltraStarPlayTranslationManager;
+    
     [Inject]
     private Injector injector;
 
@@ -21,5 +24,16 @@ public class UltraStarPlayTranslationManager : TranslationManager, INeedInjectio
             sceneInjectionManager.DoSceneInjection();
         }
         base.UpdateTranslatorsInScene();
+    }
+
+    public Dictionary<string, string> GetAllTranslations(bool includeFallbackTranslations)
+    {
+        Dictionary<string, string> allTranslations = new();
+        if (includeFallbackTranslations)
+        {
+            fallbackMessages.ForEach(entry => allTranslations[entry.Key] = entry.Value);
+        }
+        currentLanguageMessages.ForEach(entry => allTranslations[entry.Key] = entry.Value);
+        return allTranslations;
     }
 }
