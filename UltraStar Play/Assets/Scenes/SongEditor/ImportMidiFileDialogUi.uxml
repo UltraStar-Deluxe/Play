@@ -9,13 +9,12 @@
             <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
             <ui:VisualElement name="midiImportSettingsContainer" style="background-color: rgba(0, 0, 0, 0); align-items: stretch;">
                 <ui:VisualElement name="midiTrackAndChannelContainer" style="background-color: rgba(0, 0, 0, 0);">
-                    <ItemPicker label="Track" name="midiTrackIndexPicker" class="controlWithLabelHorizontal" style="margin-bottom: 5px;" />
-                    <ItemPicker label="Channel" name="midiChannelIndexPicker" class="controlWithLabelHorizontal" style="margin-bottom: 5px;" />
+                    <ItemPicker label="Track" name="midiTrackIndexPicker" wrap-around="true" class="controlWithLabelHorizontal" style="margin-bottom: 5px; height: auto;" />
                     <ui:Button text="Preview" display-tooltip-when-elided="true" name="previewMidiTrackAndChannelButton" style="width: 60%; align-self: flex-end;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="midiImportLyricsContainer" style="background-color: rgba(0, 0, 0, 0);">
-                    <ui:TextField picking-mode="Ignore" label="Found Lyrics" value="La li lu" name="midiLyricsTextField" readonly="true" is-delayed="true" multiline="true" class="controlWithLabelVertical" style="flex-direction: column; margin-bottom: 5px; height: 80px;" />
+                    <ui:TextField picking-mode="Ignore" label="Lyrics of track" value="La li lu" name="midiLyricsTextField" readonly="true" is-delayed="true" multiline="true" class="controlWithLabelVertical" style="flex-direction: column; margin-bottom: 5px; height: 80px;" />
                     <ui:Toggle label="Import without lyrics" name="importWithoutLyricsToggle" />
                 </ui:VisualElement>
                 <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
