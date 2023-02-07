@@ -367,7 +367,7 @@ public static class SongMetaUtils
         ApplicationUtils.OpenDirectory(songMeta.Directory);
     }
 
-    public static string GetLyrics(SongMeta songMeta, string voiceName)
+    public static string GetLyrics(SongMeta songMeta, string voiceName, bool removeTilde = false)
     {
         Voice voice = songMeta.GetVoices().FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
         if (voice == null)
@@ -375,10 +375,10 @@ public static class SongMetaUtils
             return "";
         }
 
-        return GetLyrics(voice);
+        return GetLyrics(voice, removeTilde);
     }
 
-    public static string GetLyrics(Voice voice)
+    public static string GetLyrics(Voice voice, bool removeTilde = false)
     {
         StringBuilder sb = new();
         voice.Sentences.ForEach(sentence =>
@@ -386,7 +386,13 @@ public static class SongMetaUtils
             sb.Append(GetLyrics(sentence));
             sb.Append("\n");
         });
-        return sb.ToString();
+        string lyrics = sb.ToString();
+        if (removeTilde)
+        {
+            lyrics = lyrics.Replace("~", "");
+        }
+
+        return lyrics;
     }
 
     public static string GetLyrics(Sentence sentence)
