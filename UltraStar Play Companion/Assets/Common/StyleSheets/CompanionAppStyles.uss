@@ -14,3 +14,15 @@
 .stopRecordingButton:focus {
     background-color: rgb(255, 0, 0);
 }
+
+#songListEntryButton {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#songListEntryLabel {
+    white-space: normal;
+    -unity-text-align: middle-left;
+}

@@ -7,8 +7,10 @@ public static partial class R
         public const string accordionItemRoot = "accordionItemRoot";
         public const string accordionItemTitle = "accordionItemTitle";
         public const string audioWaveForm = "audioWaveForm";
+        public const string backButton = "backButton";
         public const string background = "background";
         public const string buildTimeStampText = "buildTimeStampText";
+        public const string buttonRow = "buttonRow";
         public const string cancelButton = "cancelButton";
         public const string chipsComboButton = "chipsComboButton";
         public const string chipsComboButtonIcon = "chipsComboButtonIcon";
@@ -48,6 +50,11 @@ public static partial class R
         public const string dialogTitleMaterialIcon = "dialogTitleMaterialIcon";
         public const string dummyButton = "dummyButton";
         public const string dummyContent = "dummyContent";
+        public const string enabledToggle = "enabledToggle";
+        public const string enqueueButton = "enqueueButton";
+        public const string EnqueueSongUi = "EnqueueSongUi";
+        public const string favoriteButton = "favoriteButton";
+        public const string gameRoundConfigContainer = "gameRoundConfigContainer";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
         public const string icon = "icon";
         public const string infoContainer = "infoContainer";
@@ -61,6 +68,7 @@ public static partial class R
         public const string itemPickerLabel = "itemPickerLabel";
         public const string keyboardIcon = "keyboardIcon";
         public const string keyboardSimulationContainer = "keyboardSimulationContainer";
+        public const string labelContainer = "labelContainer";
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
@@ -74,10 +82,12 @@ public static partial class R
         public const string MicrophoneUi = "MicrophoneUi";
         public const string microphoneUiRoot = "microphoneUiRoot";
         public const string micViewContainer = "micViewContainer";
+        public const string modifierContainer = "modifierContainer";
         public const string mouseIcon = "mouseIcon";
         public const string mousePadArea = "mousePadArea";
         public const string mouseSensitivityFloatField = "mouseSensitivityFloatField";
         public const string mouseSimulationContainer = "mouseSimulationContainer";
+        public const string nameLabel = "nameLabel";
         public const string networkConfigContainer = "networkConfigContainer";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
@@ -88,6 +98,10 @@ public static partial class R
         public const string ownHostContainer = "ownHostContainer";
         public const string ownHostLabel = "ownHostLabel";
         public const string ownHostTextField = "ownHostTextField";
+        public const string playerEntry = "playerEntry";
+        public const string playersContainer = "playersContainer";
+        public const string playersContainerTitle = "playersContainerTitle";
+        public const string PlayerSelectPlayerEntryUi = "PlayerSelectPlayerEntryUi";
         public const string previousItemButton = "previousItemButton";
         public const string previousItemIcon = "previousItemIcon";
         public const string recordingDeviceColorIndicator = "recordingDeviceColorIndicator";
@@ -122,16 +136,29 @@ public static partial class R
         public const string simulateSpaceButton = "simulateSpaceButton";
         public const string simulateSpaceButtonContainer = "simulateSpaceButtonContainer";
         public const string simulateUpButton = "simulateUpButton";
+        public const string songArtistLabel = "songArtistLabel";
+        public const string songDetailsContainer = "songDetailsContainer";
+        public const string SongDetailsUi = "SongDetailsUi";
+        public const string songDetailsUiRoot = "songDetailsUiRoot";
+        public const string songImage = "songImage";
+        public const string songInfoContainer = "songInfoContainer";
+        public const string songInfoLabelContainer = "songInfoLabelContainer";
+        public const string songListContainer = "songListContainer";
+        public const string songListEntryButton = "songListEntryButton";
+        public const string songListEntryLabel = "songListEntryLabel";
+        public const string songListEntryUiRoot = "songListEntryUiRoot";
         public const string songListIcon = "songListIcon";
         public const string SongListUi = "SongListUi";
         public const string songListUiRoot = "songListUiRoot";
         public const string songListView = "songListView";
         public const string songSearchHint = "songSearchHint";
         public const string songSearchTextField = "songSearchTextField";
+        public const string songTitleLabel = "songTitleLabel";
         public const string songViewContainer = "songViewContainer";
         public const string spacer = "spacer";
         public const string tabContentContainer = "tabContentContainer";
         public const string tabGroup = "tabGroup";
+        public const string teamLabel = "teamLabel";
         public const string titleAndDescription = "titleAndDescription";
         public const string titleContainer = "titleContainer";
         public const string titleImageAndText = "titleImageAndText";
@@ -150,6 +177,7 @@ public static partial class R
         public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";
+        public const string voiceChooser = "voiceChooser";
         public const string volumeSlider = "volumeSlider";
     }
 }

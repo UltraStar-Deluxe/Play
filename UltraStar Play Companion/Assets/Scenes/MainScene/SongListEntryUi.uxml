@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="songListEntryUiRoot" style="flex-grow: 1;">
+        <ui:Button display-tooltip-when-elided="true" name="songListEntryButton" class="transparentBackgroundColor" style="align-items: flex-start; height: auto;">
+            <ui:Label tabindex="-1" text="Some Artist - Some Title" display-tooltip-when-elided="true" name="songListEntryLabel" picking-mode="Ignore" style="-unity-font-style: normal;" />
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

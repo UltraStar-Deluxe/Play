@@ -31,6 +31,11 @@ public static class JsonConverter
 
     public static T FromJson<T>(string json) where T : new()
     {
+        if (json.IsNullOrEmpty())
+        {
+            return default(T);
+        }
+
         fsData data = fsJsonParser.Parse(json);
         T deserialized = new();
         CreateSerializer()
