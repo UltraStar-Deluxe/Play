@@ -116,7 +116,8 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
 
     private void RequestOnError(UnityWebRequest unityWebRequest, Exception ex)
     {
-        Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}");
+        string responseBody = unityWebRequest.downloadHandler.text;
+        Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}, response body: {responseBody}");
         Debug.LogException(ex);
     }
 
