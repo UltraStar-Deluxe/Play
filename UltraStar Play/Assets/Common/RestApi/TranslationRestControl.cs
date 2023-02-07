@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using ProTrans;
 using SimpleHttpServerForUnity;
 using UniInject;
@@ -23,9 +23,8 @@ public class TranslationRestControl : MonoBehaviour, INeedInjection
             .UntilDestroy(gameObject)
             .Do(requestData =>
             {
-                string parameterValue = LanguageHelper.Get2LetterIsoCodeFromSystemLanguage(translationManager.currentLanguage);
-                byte[] responseBytes = Encoding.UTF8.GetBytes(parameterValue);
-                requestData.Context.Response.OutputStream.Write(responseBytes);
+                string language = LanguageHelper.Get2LetterIsoCodeFromSystemLanguage(translationManager.currentLanguage);
+                requestData.Context.Response.WriteJson(new Dictionary<string, string> { { "language", language } });
             });
 
         httpServer.On(HttpMethod.Get, "api/rest/translations")
@@ -33,9 +32,7 @@ public class TranslationRestControl : MonoBehaviour, INeedInjection
             .UntilDestroy(gameObject)
             .Do(requestData =>
             {
-                string parameterValue = JsonConverter.ToJson(translationManager.GetAllTranslations(true));
-                byte[] responseBytes = Encoding.UTF8.GetBytes(parameterValue);
-                requestData.Context.Response.OutputStream.Write(responseBytes);
+                requestData.Context.Response.WriteJson(translationManager.GetAllTranslations(true));
             });
 	}
 }

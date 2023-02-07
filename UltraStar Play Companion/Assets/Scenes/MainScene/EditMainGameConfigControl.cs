@@ -1,6 +1,7 @@
 ﻿using System;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -36,11 +37,12 @@ public class EditMainGameConfigControl : INeedInjection, IInjectionFinishedListe
                     return;
                 }
 
-                MainGameSettingsDto mainGameSettingsDto = JsonConverter.FromJson<MainGameSettingsDto>(response);
+                MainGameSettingsDto mainGameSettingsDto = JsonConverter.FromJson<MainGameSettingsDto>(response, false);
 
                 if (mainGameSettingsDto == null
                     || mainGameSettingsDto.AudioSettings == null)
                 {
+                    Debug.LogError($"Failed to get main game settings. Response: {response}");
                     return;
                 }
                 

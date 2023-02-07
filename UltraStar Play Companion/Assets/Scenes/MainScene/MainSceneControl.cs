@@ -139,13 +139,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.songViewContainer)]
     private VisualElement songViewContainer;
-    
-    [Inject(UxmlName = R.UxmlNames.songListContainer)]
-    private VisualElement songListContainer;
-    
-    [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
-    private VisualElement songDetailsContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.inputSimulationContainer)]
     private VisualElement inputSimulationContainer;
 
@@ -161,6 +155,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.mouseSensitivityFloatField)]
     private FloatField mouseSensitivityFloatField;
     
+    [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
+    private VisualElement songDetailsContainer;
+    
     [Inject]
     private Injector injector;
 
@@ -174,11 +171,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private readonly InputSimulationControl inputSimulationControl = new();
     private readonly EditMainGameConfigControl editMainGameConfigControl = new();
+    private readonly SongDetailsControl songDetailsControl = new();
     
     public void OnInjectionFinished()
     {
         injector.Inject(inputSimulationControl);
         injector.Inject(editMainGameConfigControl);
+        injector.WithRootVisualElement(songDetailsContainer)
+            .Inject(songDetailsControl);
 
         // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
@@ -234,10 +234,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         
         mouseSensitivityFloatField.value = settings.mousePadSensitivity;
         mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.mousePadSensitivity = evt.newValue);
-        
-        songDetailsContainer.HideByDisplay();
-        songListContainer.ShowByDisplay();
-        songDetailsContainer.Q<Button>(R.UxmlNames.backButton).RegisterCallbackButtonTriggered(() => HideSongDetails());
         
         InitTabGroup();
         InitMenu();
@@ -528,25 +524,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     {
         VisualElement songListEntry = songListEntryUi.CloneTreeAndGetFirstChild();
         songListEntry.Q<Label>(R.UxmlNames.songListEntryLabel).text = $"{songDto.Artist} - {songDto.Title}";
-        songListEntry.Q<Button>(R.UxmlNames.songListEntryButton).RegisterCallbackButtonTriggered(() => ShowSongDetails(songDto));
+        songListEntry.Q<Button>(R.UxmlNames.songListEntryButton).RegisterCallbackButtonTriggered(() => songDetailsControl.ShowSongDetails(songDto));
         return songListEntry;
     }
 
-    private void ShowSongDetails(SongDto songDto)
-    {
-        songDetailsContainer.ShowByDisplay();
-        songListContainer.HideByDisplay();
-
-        songDetailsContainer.Q<Label>(R.UxmlNames.songArtistLabel).text = songDto.Artist;
-        songDetailsContainer.Q<Label>(R.UxmlNames.songTitleLabel).text = songDto.Title;
-    }
-
-    private void HideSongDetails()
-    {
-        songDetailsContainer.HideByDisplay();
-        songListContainer.ShowByDisplay();
-    }
-    
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();
@@ -556,5 +537,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         bb.BindExistingInstance(clientSideMicDataSender);
         bb.BindExistingInstance(inputSimulationControl);
         return bb.GetBindings();
+    }
+
+    public void OnDestroy()
+    {
+        songDetailsControl.Dispose();
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using UniInject;
 using UniRx;
@@ -20,6 +22,9 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
     [Inject]
     private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
+    [Inject]
+    private UnityWebRequestManager webRequestManager;
+    
     private readonly Subject<bool> connectionEventStream = new();
     public IObservable<bool> ConnectionEventStream => connectionEventStream;
 
@@ -45,7 +50,10 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         return $"http://{serverIPEndPoint.Address}:{httpServerPort}{path}";
     }
 
-    public IObservable<UnityWebRequestAsyncOperation> GetRequest(string path, Action<string> onSuccess = null)
+    public IObservable<UnityWebRequestAsyncOperation> GetRequest(
+        string path,
+        Action<string> onSuccess = null,
+        Action<Exception> onError = null)
     {
         ThrowIfNotConnected();
 
@@ -55,52 +63,67 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
             .SendWebRequest()
             .AsAsyncOperationObservable();
-        HandleRequest(unityWebRequest, asyncOperation, onSuccess);
+        HandleRequest(unityWebRequest, asyncOperation, onSuccess, onError);
         return asyncOperation;
     }
 
     public IObservable<UnityWebRequestAsyncOperation> PostRequest(
         string path,
-        string postData = "{}",
+        string body = "{}",
         string contentType = "application/json",
-        Action<string> onSuccess = null)
+        Action<string> onSuccess = null,
+        Action<Exception> onError = null)
     {
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
         Debug.Log($"Sending POST request to {uri}");
-        UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, postData, contentType);
+        UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, body, contentType);
         IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
             .SendWebRequest()
             .AsAsyncOperationObservable();
-        HandleRequest(unityWebRequest, asyncOperation, onSuccess);
+        HandleRequest(unityWebRequest, asyncOperation, onSuccess, onError);
         return asyncOperation;
     }
 
-    private void HandleRequest(UnityWebRequest unityWebRequest,
-        IObservable<UnityWebRequestAsyncOperation> asyncOperationObservable, Action<string> onSuccess)
+    private void HandleRequest(
+        UnityWebRequest unityWebRequest,
+        IObservable<UnityWebRequestAsyncOperation> asyncOperationObservable,
+        Action<string> onSuccess,
+        Action<Exception> onError)
     {
-        asyncOperationObservable.Subscribe(
-            _ => RequestOnNext(unityWebRequest),
-            ex => RequestOnError(unityWebRequest, ex),
-            () => RequestOnCompleted(unityWebRequest, onSuccess));
+        void WrappedOnError(Exception ex)
+        {
+            RequestOnError(unityWebRequest, ex);
+            onError?.Invoke(ex);
+        }
+
+        webRequestManager.AddUnityWebRequest(unityWebRequest,
+            onSuccess,
+            ex => WrappedOnError(ex));
+
+        // TODO: onComplete is called prematurely when using Observable (see https://github.com/neuecc/UniRx/issues/530)
+        // asyncOperationObservable.Subscribe(
+        //     _ => RequestOnNext(unityWebRequest),
+        //     ex => RequestOnError(unityWebRequest, ex),
+        //     () => RequestOnCompleted(unityWebRequest, onSuccess));
     }
 
     private void RequestOnNext(UnityWebRequest unityWebRequest)
     {
-        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has updated. Result: {unityWebRequest.result}");
+        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has updated. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}");
     }
 
     private void RequestOnError(UnityWebRequest unityWebRequest, Exception ex)
     {
-        Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' failed. Error message: {ex.Message}");
+        Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}");
         Debug.LogException(ex);
     }
 
     private void RequestOnCompleted(UnityWebRequest unityWebRequest, Action<string> onSuccess)
     {
         string responseBody = unityWebRequest.downloadHandler.text;
-        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Result: {unityWebRequest.result}, response body: {responseBody}");
+        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
         if (onSuccess != null)
         {
             MainThreadDispatcher.Send(_ => onSuccess(responseBody), null);
