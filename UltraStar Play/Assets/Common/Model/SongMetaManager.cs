@@ -418,7 +418,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
-    public SongMeta GetSongById(string songId)
+    public SongMeta GetSongMetaById(string songId)
     {
         SongMeta matchingSongMeta = allSongMetas.FirstOrDefault(songMeta => songMeta.SongHash == songId);
         return matchingSongMeta;

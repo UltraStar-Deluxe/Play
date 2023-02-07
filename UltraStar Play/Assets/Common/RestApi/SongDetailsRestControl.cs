@@ -28,7 +28,7 @@ public class SongDetailsRestControl : MonoBehaviour, INeedInjection
             {
                 string songId = requestData.PathParameters["songId"];
 
-                SongMeta songMeta = songMetaManager.GetSongById(songId);
+                SongMeta songMeta = songMetaManager.GetSongMetaById(songId);
                 if (songMeta == null)
                 {
                     Debug.Log($"Cannot return song details. No song found with id {songId}.");
@@ -53,7 +53,7 @@ public class SongDetailsRestControl : MonoBehaviour, INeedInjection
             {
                 string songId = requestData.PathParameters["songId"];
 
-                SongMeta songMeta = songMetaManager.GetSongById(songId);
+                SongMeta songMeta = songMetaManager.GetSongMetaById(songId);
                 if (songMeta == null)
                 {
                     Debug.Log($"Cannot return song image. No song found with id {songId}.");
