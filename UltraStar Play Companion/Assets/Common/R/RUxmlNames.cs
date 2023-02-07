@@ -71,6 +71,8 @@ public static partial class R
         public const string menuOverlayScrollView = "menuOverlayScrollView";
         public const string menuUiRoot = "menuUiRoot";
         public const string micIcon = "micIcon";
+        public const string MicrophoneUi = "MicrophoneUi";
+        public const string microphoneUiRoot = "microphoneUiRoot";
         public const string micViewContainer = "micViewContainer";
         public const string mouseIcon = "mouseIcon";
         public const string mousePadArea = "mousePadArea";
@@ -121,6 +123,8 @@ public static partial class R
         public const string simulateSpaceButtonContainer = "simulateSpaceButtonContainer";
         public const string simulateUpButton = "simulateUpButton";
         public const string songListIcon = "songListIcon";
+        public const string SongListUi = "SongListUi";
+        public const string songListUiRoot = "songListUiRoot";
         public const string songListView = "songListView";
         public const string songSearchHint = "songSearchHint";
         public const string songSearchTextField = "songSearchTextField";
