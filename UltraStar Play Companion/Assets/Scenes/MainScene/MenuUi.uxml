@@ -1,5 +1,4 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Scenes/MainScene/CompanionStyles.uss?fileID=7433441132597879392&amp;guid=10474d1b67f8481fbb7ed771cc866f3e&amp;type=3#CompanionStyles" />
     <ui:VisualElement name="menuUiRoot" style="background-color: rgba(0, 0, 0, 0); width: 100%;">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="menuOverlayScrollView" style="flex-grow: 1; width: 100%;">
             <ui:VisualElement name="languageContainer" style="margin-bottom: 20px;">
