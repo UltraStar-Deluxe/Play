@@ -16,6 +16,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private const int ConnectRequestCountShowTroubleshootingHintThreshold = 3;
 
     [InjectedInInspector]
+    public VisualTreeAsset songListEntryUi;
+
+    [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
     [InjectedInInspector]
@@ -136,7 +139,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.songViewContainer)]
     private VisualElement songViewContainer;
-
+    
+    [Inject(UxmlName = R.UxmlNames.songListContainer)]
+    private VisualElement songListContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
+    private VisualElement songDetailsContainer;
+    
     [Inject(UxmlName = R.UxmlNames.inputSimulationContainer)]
     private VisualElement inputSimulationContainer;
 
@@ -225,6 +234,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         
         mouseSensitivityFloatField.value = settings.mousePadSensitivity;
         mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.mousePadSensitivity = evt.newValue);
+        
+        songDetailsContainer.HideByDisplay();
+        songListContainer.ShowByDisplay();
+        songDetailsContainer.Q<Button>(R.UxmlNames.backButton).RegisterCallbackButtonTriggered(() => HideSongDetails());
         
         InitTabGroup();
         InitMenu();
@@ -329,7 +342,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         if (songListRequestor.LoadedSongsDto == null
             || songListRequestor.LoadedSongsDto.SongList.IsNullOrEmpty())
         {
-            AddSongListLabel("No songs found");
+            songListView.Add(new Label("No songs found"));
             return;
         }
 
@@ -340,12 +353,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
         foreach (SongDto songDto in songDtos)
         {
-            AddSongListLabel(songDto.Artist + " - " + songDto.Title);
+            VisualElement songListEntry = CreateSongListEntry(songDto);
+            songListView.Add(songListEntry);
         }
 
         if (!songListRequestor.LoadedSongsDto.IsSongScanFinished)
         {
-            AddSongListLabel("...");
+            songListView.Add(new Label("..."));
         }
     }
 
@@ -362,7 +376,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         if (!evt.ErrorMessage.IsNullOrEmpty())
         {
             songListView.Clear();
-            AddSongListLabel(evt.ErrorMessage);
+            songListView.Add(new Label(evt.ErrorMessage));
             return;
         }
 
@@ -374,7 +388,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         if (!songListRequestor.SuccessfullyLoadedAllSongs)
         {
             songListView.Clear();
-            AddSongListLabel("Loading song list...");
+            songListView.Add(new Label("Loading song list..."));
             songListRequestor.RequestSongList();
         }
     }
@@ -509,16 +523,30 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             buildTimeStampText.text = "";
         }
     }
-
-    private void AddSongListLabel(string text)
+    
+    private VisualElement CreateSongListEntry(SongDto songDto)
     {
-        Label label = new Label(text);
-        label.AddToClassList("songListElement");
-        label.style.whiteSpace = WhiteSpace.Normal;
-        label.style.marginBottom = 20;
-        songListView.Add(label);
+        VisualElement songListEntry = songListEntryUi.CloneTreeAndGetFirstChild();
+        songListEntry.Q<Label>(R.UxmlNames.songListEntryLabel).text = $"{songDto.Artist} - {songDto.Title}";
+        songListEntry.Q<Button>(R.UxmlNames.songListEntryButton).RegisterCallbackButtonTriggered(() => ShowSongDetails(songDto));
+        return songListEntry;
     }
 
+    private void ShowSongDetails(SongDto songDto)
+    {
+        songDetailsContainer.ShowByDisplay();
+        songListContainer.HideByDisplay();
+
+        songDetailsContainer.Q<Label>(R.UxmlNames.songArtistLabel).text = songDto.Artist;
+        songDetailsContainer.Q<Label>(R.UxmlNames.songTitleLabel).text = songDto.Title;
+    }
+
+    private void HideSongDetails()
+    {
+        songDetailsContainer.HideByDisplay();
+        songListContainer.ShowByDisplay();
+    }
+    
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();
