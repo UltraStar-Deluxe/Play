@@ -44,4 +44,9 @@ public class CoroutineUtils
             yield return new WaitForSeconds(delayInSeconds);
         }
     }
+
+    public static IEnumerator NoOperation()
+    {
+        yield return null;
+    }
 }
