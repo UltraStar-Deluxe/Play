@@ -1,5 +1,4 @@
 using System.Net.Http;
-using System.Text;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
@@ -22,9 +21,7 @@ public class EditSettingsRestControl : MonoBehaviour, INeedInjection
             .UntilDestroy(gameObject)
             .Do(requestData =>
             {
-                string parameterValue = JsonConverter.ToJson(settings);
-                byte[] responseBytes = Encoding.UTF8.GetBytes(parameterValue);
-                requestData.Context.Response.OutputStream.Write(responseBytes);
+                requestData.Context.Response.WriteJson(settings);
             });
         
         httpServer.On(HttpMethod.Post, "api/rest/config")
@@ -33,7 +30,7 @@ public class EditSettingsRestControl : MonoBehaviour, INeedInjection
             .Do(requestData =>
             {
                 string jsonBody = requestData.Context.Request.GetBodyAsString();
-                JsonConverter.FillFromJson(jsonBody, settings);
+                JsonConverter.FillFromJson(jsonBody, settings, false);
             });
 	}
 }

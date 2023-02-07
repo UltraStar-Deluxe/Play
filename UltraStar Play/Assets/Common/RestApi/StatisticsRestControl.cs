@@ -22,9 +22,7 @@ public class StatisticsRestControl : MonoBehaviour, INeedInjection
             .UntilDestroy(gameObject)
             .Do(requestData =>
             {
-                string parameterValue = JsonConverter.ToJson(statistics);
-                byte[] responseBytes = Encoding.UTF8.GetBytes(parameterValue);
-                requestData.Context.Response.OutputStream.Write(responseBytes);
+                requestData.Context.Response.WriteJson(statistics);
             });
 	}
 }

@@ -417,4 +417,10 @@ public class SongMetaManager : AbstractSingletonBehaviour
             Debug.LogException(e);
         }
     }
+
+    public SongMeta GetSongById(string songId)
+    {
+        SongMeta matchingSongMeta = allSongMetas.FirstOrDefault(songMeta => songMeta.SongHash == songId);
+        return matchingSongMeta;
+    }
 }

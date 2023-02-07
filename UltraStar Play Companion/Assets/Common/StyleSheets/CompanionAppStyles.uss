@@ -26,3 +26,11 @@
     white-space: normal;
     -unity-text-align: middle-left;
 }
+
+#lyricsLabel {
+    max-height: 50px;
+}
+
+#lyricsLabel.showLyrics {
+    max-height: none;
+}

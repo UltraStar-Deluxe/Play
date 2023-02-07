@@ -9,6 +9,7 @@ public static partial class R
         public const string audioWaveForm = "audioWaveForm";
         public const string backButton = "backButton";
         public const string background = "background";
+        public const string backIcon = "backIcon";
         public const string buildTimeStampText = "buildTimeStampText";
         public const string buttonRow = "buttonRow";
         public const string cancelButton = "cancelButton";
@@ -52,10 +53,15 @@ public static partial class R
         public const string dummyContent = "dummyContent";
         public const string enabledToggle = "enabledToggle";
         public const string enqueueButton = "enqueueButton";
+        public const string enqueueButtonLabel = "enqueueButtonLabel";
+        public const string enqueueIcon = "enqueueIcon";
+        public const string enqueueSettingsTitle = "enqueueSettingsTitle";
         public const string EnqueueSongUi = "EnqueueSongUi";
         public const string favoriteButton = "favoriteButton";
+        public const string favoriteIcon = "favoriteIcon";
         public const string gameRoundConfigContainer = "gameRoundConfigContainer";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
+        public const string hiddenFavoriteIcon = "hiddenFavoriteIcon";
         public const string icon = "icon";
         public const string infoContainer = "infoContainer";
         public const string inputSimulationContainer = "inputSimulationContainer";
@@ -72,6 +78,8 @@ public static partial class R
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
+        public const string lyricsLabel = "lyricsLabel";
+        public const string lyricsTitle = "lyricsTitle";
         public const string MainSceneMenuUi = "MainSceneMenuUi";
         public const string menuIcon = "menuIcon";
         public const string menuOverlay = "menuOverlay";
@@ -91,6 +99,7 @@ public static partial class R
         public const string networkConfigContainer = "networkConfigContainer";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
+        public const string noFavoriteIcon = "noFavoriteIcon";
         public const string notificationLabel = "notificationLabel";
         public const string notificationOverlay = "notificationOverlay";
         public const string okButton = "okButton";
@@ -137,6 +146,7 @@ public static partial class R
         public const string simulateSpaceButtonContainer = "simulateSpaceButtonContainer";
         public const string simulateUpButton = "simulateUpButton";
         public const string songArtistLabel = "songArtistLabel";
+        public const string songCoverAndTitleContainer = "songCoverAndTitleContainer";
         public const string songDetailsContainer = "songDetailsContainer";
         public const string SongDetailsUi = "SongDetailsUi";
         public const string songDetailsUiRoot = "songDetailsUiRoot";
@@ -164,6 +174,7 @@ public static partial class R
         public const string titleImageAndText = "titleImageAndText";
         public const string toggleAccordionItemContentButton = "toggleAccordionItemContentButton";
         public const string toggleAccordionItemContentIcon = "toggleAccordionItemContentIcon";
+        public const string toggleLyricsButton = "toggleLyricsButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleRecordingButtonContainer = "toggleRecordingButtonContainer";
         public const string udpPortOnClientContainer = "udpPortOnClientContainer";

@@ -104,6 +104,7 @@ public static partial class R
         public const string scrollingNoteStreamSentenceSeparator = "scrollingNoteStreamSentenceSeparator";
         public const string searchPropertyContainer = "searchPropertyContainer";
         public const string settingsProblemHintIcon = "settingsProblemHintIcon";
+        public const string showLyrics = "showLyrics";
         public const string singingLyrics = "singingLyrics";
         public const string singingResultUiSmall = "singingResultUiSmall";
         public const string singingResultUiSmaller = "singingResultUiSmaller";
