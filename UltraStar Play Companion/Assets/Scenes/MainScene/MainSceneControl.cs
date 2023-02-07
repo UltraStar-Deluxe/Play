@@ -17,6 +17,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [InjectedInInspector]
     public VisualTreeAsset songListEntryUi;
+    
+    [InjectedInInspector]
+    public VisualTreeAsset playerSelectPlayerEntryUi;
 
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
@@ -536,6 +539,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         bb.BindExistingInstance(micSampleRecorder);
         bb.BindExistingInstance(clientSideMicDataSender);
         bb.BindExistingInstance(inputSimulationControl);
+        bb.Bind(nameof(playerSelectPlayerEntryUi)).ToExistingInstance(playerSelectPlayerEntryUi);
         return bb.GetBindings();
     }
 

@@ -430,6 +430,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   songListEntryUi: {fileID: 9197481963319205126, guid: 2d49ee40abf3e004ab100df248a731db, type: 3}
+  playerSelectPlayerEntryUi: {fileID: 9197481963319205126, guid: ae611919e3b6a9e439070651ea79c54e, type: 3}
   versionPropertiesTextAsset: {fileID: 4900000, guid: d2f6d8e833e31724796bca2ae8f0d566, type: 3}
   songListRequestor: {fileID: 1757853345}
   clientSideMicDataSender: {fileID: 781607867}
