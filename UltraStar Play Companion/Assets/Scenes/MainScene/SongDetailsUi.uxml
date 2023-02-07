@@ -17,7 +17,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="gameRoundConfigContainer" style="background-color: rgba(0, 0, 0, 0); display: flex;">
                 <ui:Label tabindex="-1" text="Enqueue Settings" display-tooltip-when-elided="true" enable-rich-text="true" name="enqueueSettingsTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
-                <ui:Instance template="EnqueueSongUi" name="EnqueueSongUi" />
+                <ui:Instance template="EnqueueSongUi" name="GameRoundConfigUi" />
             </ui:VisualElement>
         </ui:ScrollView>
         <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); flex-shrink: 0; width: 100%; flex-direction: row; justify-content: space-between;">

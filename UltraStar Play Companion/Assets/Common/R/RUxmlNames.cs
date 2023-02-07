@@ -60,6 +60,8 @@ public static partial class R
         public const string favoriteButton = "favoriteButton";
         public const string favoriteIcon = "favoriteIcon";
         public const string gameRoundConfigContainer = "gameRoundConfigContainer";
+        public const string GameRoundConfigUi = "GameRoundConfigUi";
+        public const string gameRoundConfigUiRoot = "gameRoundConfigUiRoot";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
         public const string hiddenFavoriteIcon = "hiddenFavoriteIcon";
         public const string icon = "icon";
