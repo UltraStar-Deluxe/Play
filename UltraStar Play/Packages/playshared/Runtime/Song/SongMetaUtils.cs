@@ -139,7 +139,7 @@ public static class SongMetaUtils
     public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceName)
     {
         Voice matchingVoice = songMeta.GetVoices()
-            .FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
+            .FirstOrDefault(voice => Voice.VoiceNameEquals(voice.Name, voiceName));
         if (matchingVoice != null)
         {
             return matchingVoice;
@@ -281,7 +281,7 @@ public static class SongMetaUtils
 
     public static string GetLyrics(SongMeta songMeta, string voiceName)
     {
-        Voice voice = songMeta.GetVoices().FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
+        Voice voice = songMeta.GetVoices().FirstOrDefault(voice => Voice.VoiceNameEquals(voice.Name, voiceName));
         if (voice == null)
         {
             return "";
