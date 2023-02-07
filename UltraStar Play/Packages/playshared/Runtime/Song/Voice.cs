@@ -130,11 +130,11 @@ public class Voice : ISerializationCallbackReceiver
         }
     }
 
-    public bool VoiceNameEquals(string otherVoiceName)
+    public static bool VoiceNameEquals(string a, string b)
     {
-        return otherVoiceName == Name
-               || (otherVoiceName.IsNullOrEmpty() && Name.IsNullOrEmpty())
-               || (otherVoiceName == firstVoiceName && Name == soloVoiceName);
+        return a == b
+               || (a.IsNullOrEmpty() && b.IsNullOrEmpty())
+               || (a == firstVoiceName && b == soloVoiceName);
     }
 
     public static string NormalizeVoiceName(string voiceName)
