@@ -3,7 +3,6 @@
     <ui:Template name="SongListUi" src="project://database/Assets/Scenes/MainScene/SongListUi.uxml?fileID=9197481963319205126&amp;guid=0485cb8517dc0464996e2aa2f6ea1e37&amp;type=3#SongListUi" />
     <ui:Template name="InputSimulationUi" src="project://database/Assets/Scenes/MainScene/InputSimulationUi.uxml?fileID=9197481963319205126&amp;guid=8207c240e20c0e546b018010579d8422&amp;type=3#InputSimulationUi" />
     <ui:Template name="MainSceneMenuUi" src="project://database/Assets/Scenes/MainScene/MenuUi.uxml?fileID=9197481963319205126&amp;guid=ada12ffedb0785e43aa19245961c4d1f&amp;type=3#MenuUi" />
-    <Style src="project://database/Assets/Scenes/MainScene/CompanionStyles.uss?fileID=7433441132597879392&amp;guid=10474d1b67f8481fbb7ed771cc866f3e&amp;type=3#CompanionStyles" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;); padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px;">
         <ui:VisualElement name="titleContainer" style="align-items: center; width: 100%; justify-content: flex-start; top: auto; flex-direction: row; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center; flex-grow: 1; justify-content: center;">
