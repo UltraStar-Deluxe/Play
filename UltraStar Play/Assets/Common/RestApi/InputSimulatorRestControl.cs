@@ -10,7 +10,7 @@ using UnityEngine.InputSystem.LowLevel;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
+public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInjection
 {
     public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InputSimulatorRestControl>();
     
@@ -21,7 +21,12 @@ public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
     private Mouse virtualMouse;
     private Mouse systemMouse;
 
-	private void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         // Grab the system mouse before the virtual mouse is used.
         // Mouse.current can later change to the virtual mouse.

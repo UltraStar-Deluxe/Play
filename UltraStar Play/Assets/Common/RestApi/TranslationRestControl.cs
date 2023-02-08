@@ -3,20 +3,26 @@ using System.Net.Http;
 using ProTrans;
 using SimpleHttpServerForUnity;
 using UniInject;
-using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class TranslationRestControl : MonoBehaviour, INeedInjection
+public class TranslationRestControl : AbstractSingletonBehaviour, INeedInjection
 {
+    public static TranslationRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<TranslationRestControl>();
+    
     [Inject]
     private HttpServer httpServer;
 
     [Inject]
     private UltraStarPlayTranslationManager translationManager;
 
-    private void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+    
+    protected override void StartSingleton()
     {
         httpServer.On(HttpMethod.Get, "api/rest/language")
             .WithDescription($"Get current language as 2 letter country code")

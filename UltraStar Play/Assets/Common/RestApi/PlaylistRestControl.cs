@@ -8,8 +8,10 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlaylistRestControl : MonoBehaviour, INeedInjection
+public class PlaylistRestControl : AbstractSingletonBehaviour, INeedInjection
 {
+    public static PlaylistRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistRestControl>();
+    
     [Inject]
     private HttpServer httpServer;
 
@@ -19,7 +21,12 @@ public class PlaylistRestControl : MonoBehaviour, INeedInjection
     [Inject]
     private PlaylistManager playlistManager;
 
-    private void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+    
+    protected override void StartSingleton()
     {
         httpServer.On(HttpMethod.Get, "api/rest/playlist/favorites")
             .WithDescription($"Get songs of the 'favorites' playlist")
