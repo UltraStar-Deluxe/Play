@@ -121,7 +121,6 @@
 .controlLabel40Percent {
     -unity-text-align: middle-left;
     width: 40%;
-    -unity-font-style: bold;
     font-size: var(--font-size);
 }
 
