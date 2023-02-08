@@ -188,6 +188,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         songArtistLabel.text = songDto.Artist;
         songTitleLabel.text = songDto.Title;
 
+        enqueueButton.SetEnabled(false);
+        
         LoadSongDetails();
         LoadSongImage();
         UpdateEnqueueSettings();
@@ -196,7 +198,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     private void UpdateEnqueueSettings()
     {
         UpdatePlayersAndMics();
-        UpdateGameRoundModifiers();
+        UpdateEnqueueButton();
     }
 
     private void UpdatePlayersAndMics()
@@ -317,16 +319,20 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
                     playerEntryControl.MicProfile = null;
                 }
+
+                UpdateEnqueueButton();
             });
 
             playerProfileEntryControls.Add(playerEntryControl);
             playerProfileIndex++;
         });
+
+        UpdateEnqueueButton();
     }
 
-    private void UpdateGameRoundModifiers()
+    private void UpdateEnqueueButton()
     {
-        // TODO: Implement
+        enqueueButton.SetEnabled(!GetSelectedPlayerControls().IsNullOrEmpty());
     }
 
     private void LoadSongImage()
