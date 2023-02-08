@@ -93,7 +93,7 @@ public class GameRoundModifierChipsComboControl
 
             if (GameRoundSettings.modifierConditionSettings.condition is not EGameRoundModifierCondition.Always)
             {
-                CreateChipsComboEntry(PartyModeUtils.GetModifierConditionDescription(GameRoundSettings),
+                CreateChipsComboEntry(GameRoundSettingsUtils.GetModifierConditionDescription(GameRoundSettings),
                     () => GameRoundSettings.modifierConditionSettings.condition = EGameRoundModifierCondition.Always);
             }
         }

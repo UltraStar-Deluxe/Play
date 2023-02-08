@@ -185,9 +185,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
     private ItemPicker scoreModePicker;
 
-    [Inject(UxmlName = R.UxmlNames.modifierChipsCombo)]
-    private ChipsCombo modifierChipsCombo;
-    
     [Inject(UxmlName = R.UxmlNames.noteDisplayModeLabel)]
     private Label noteDisplayModeLabel;
 
@@ -278,7 +275,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.selectRandomSongButton)]
     private Button selectRandomSongButton;
-
+    
     public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
@@ -327,9 +324,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
-    
-    private readonly GameRoundModifierDialogControl modifierDialogControl = new();
-    private GameRoundModifierChipsComboControl modifierChipsComboControl;
+    private readonly GameRoundSettingsUiControl gameRoundSettingsUiControl = new();
 
     private void Start()
     {
@@ -499,14 +494,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             ? PartyModeSceneData.CurrentRoundSettings
             : settings.GameRoundSettings;
 
-        injector.Inject(modifierDialogControl);
-        modifierChipsComboControl = new(modifierChipsCombo);
-        modifierChipsComboControl.GameRoundSettings = gameRoundSettings;
-        modifierDialogControl.DialogClosedEventStream.Subscribe(_ => modifierChipsComboControl.UpdateChipsComboEntries());
-        modifierChipsComboControl.ChipsCombo.ComboButton.RegisterCallbackButtonTriggered(() =>
-        {
-            modifierDialogControl.OpenDialog(gameRoundSettings);
-        });
+        injector.Inject(gameRoundSettingsUiControl);
+        gameRoundSettingsUiControl.GameRoundSettings = gameRoundSettings;
     }
 
     public void QuitSongSelect()

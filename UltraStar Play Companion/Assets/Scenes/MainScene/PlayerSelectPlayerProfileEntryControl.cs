@@ -10,19 +10,19 @@ public class PlayerSelectPlayerProfileEntryControl : INeedInjection, IInjectionF
     [Inject]
     public string PlayerProfileName { get; private set; }
     
-    [Inject(UxmlName = R.UxmlNames.micIcon)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.micIcon)]
     private VisualElement micIcon;
     
-    [Inject(UxmlName = R.UxmlNames.nameLabel)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.nameLabel)]
     private Label nameLabel;
     
-    [Inject(UxmlName = R.UxmlNames.teamLabel)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.teamLabel)]
     private Label teamLabel;
 
-    [Inject(UxmlName = R.UxmlNames.voiceChooser)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.voiceChooser)]
     private ItemPicker voiceChooser;
 
-    [Inject(UxmlName = R.UxmlNames.enabledToggle)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.enabledToggle)]
     public Toggle EnabledToggle { get; private set; }
     
     private MicProfile micProfile;

@@ -6,6 +6,7 @@ public static partial class R_PlayShared
         public const string accordionItemContent = "accordionItemContent";
         public const string accordionItemRoot = "accordionItemRoot";
         public const string accordionItemTitle = "accordionItemTitle";
+        public const string buttonRow = "buttonRow";
         public const string cancelButton = "cancelButton";
         public const string chipsComboButton = "chipsComboButton";
         public const string chipsComboButtonIcon = "chipsComboButtonIcon";
@@ -16,6 +17,10 @@ public static partial class R_PlayShared
         public const string chipsComboEntryLabel = "chipsComboEntryLabel";
         public const string chipsComboEntryRoot = "chipsComboEntryRoot";
         public const string chipsComboLabel = "chipsComboLabel";
+        public const string closeModifierDialogButton = "closeModifierDialogButton";
+        public const string conditionalModifierContainer = "conditionalModifierContainer";
+        public const string conditionContainer = "conditionContainer";
+        public const string conditionTitleLabel = "conditionTitleLabel";
         public const string container = "container";
         public const string contextMenu = "contextMenu";
         public const string contextMenuButton = "contextMenuButton";
@@ -36,6 +41,8 @@ public static partial class R_PlayShared
         public const string dummyButton = "dummyButton";
         public const string dummyContent = "dummyContent";
         public const string enabledToggle = "enabledToggle";
+        public const string hideLyricsToggle = "hideLyricsToggle";
+        public const string hideNotesToggle = "hideNotesToggle";
         public const string invalidValueIcon = "invalidValueIcon";
         public const string invalidValueLabel = "invalidValueLabel";
         public const string itemImage = "itemImage";
@@ -43,6 +50,9 @@ public static partial class R_PlayShared
         public const string itemPickerLabel = "itemPickerLabel";
         public const string labelContainer = "labelContainer";
         public const string micIcon = "micIcon";
+        public const string modifierConditionFromNumberPicker = "modifierConditionFromNumberPicker";
+        public const string modifierConditionPicker = "modifierConditionPicker";
+        public const string modifierConditionUntilNumberPicker = "modifierConditionUntilNumberPicker";
         public const string nameLabel = "nameLabel";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
@@ -50,13 +60,18 @@ public static partial class R_PlayShared
         public const string notificationOverlay = "notificationOverlay";
         public const string okButton = "okButton";
         public const string overlay = "overlay";
+        public const string passTheMicToggle = "passTheMicToggle";
         public const string playerEntry = "playerEntry";
         public const string previousItemButton = "previousItemButton";
         public const string previousItemIcon = "previousItemIcon";
+        public const string reduceAudioToggle = "reduceAudioToggle";
+        public const string roundModifierDialogUiRoot = "roundModifierDialogUiRoot";
         public const string row = "row";
+        public const string shortSongToggle = "shortSongToggle";
         public const string teamLabel = "teamLabel";
         public const string toggleAccordionItemContentButton = "toggleAccordionItemContentButton";
         public const string toggleAccordionItemContentIcon = "toggleAccordionItemContentIcon";
+        public const string unconditionalModifierContainer = "unconditionalModifierContainer";
         public const string validationWarningContainer = "validationWarningContainer";
         public const string valueTextField = "valueTextField";
         public const string voiceChooser = "voiceChooser";

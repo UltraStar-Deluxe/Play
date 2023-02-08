@@ -128,7 +128,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
             string modifierCsv = currentRoundSettings.ConditionalModifiers.ToList()
                 .OrderBy(it => it.ToString())
                 .JoinWith(", ");
-            string modifierConditionDescription = PartyModeUtils.GetModifierConditionDescription(currentRoundSettings);
+            string modifierConditionDescription = GameRoundSettingsUtils.GetModifierConditionDescription(currentRoundSettings);
             return $"{modifierCsv} {modifierConditionDescription}";
         }
 

@@ -83,8 +83,13 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
     private readonly List<PlayerSelectPlayerProfileEntryControl> playerProfileEntryControls = new();
 
+    private readonly GameRoundSettingsUiControl gameRoundSettingsUiControl = new();
+    
     public void OnInjectionFinished()
     {
+        injector.Inject(gameRoundSettingsUiControl);
+        gameRoundSettingsUiControl.GameRoundSettings = settings.GameRoundSettings;
+
         HideSongDetails();
         backButton.RegisterCallbackButtonTriggered(() => HideSongDetails());
         favoriteButton.RegisterCallbackButtonTriggered(() => ToggleFavorite());
@@ -154,6 +159,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 dto.SingScenePlayerDataDto.PlayerProfileToVoiceNameMap[control.PlayerProfileName] = control.VoiceChooserControl.SelectedItem;
             }
         });
+
+        dto.GameRoundSettings = settings.GameRoundSettings;
         return dto;
     }
 

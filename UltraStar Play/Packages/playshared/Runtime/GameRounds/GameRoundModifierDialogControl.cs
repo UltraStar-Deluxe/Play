@@ -10,37 +10,37 @@ using UnityEngine.UIElements;
 
 public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinishedListener
 {
-    [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
-    private VisualElement modifierDialogOverlay;
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    private VisualElement visualElement;
 
-    [Inject(UxmlName = R.UxmlNames.shortSongToggle)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.shortSongToggle)]
     private Toggle shortSongToggle;
     
-    [Inject(UxmlName = R.UxmlNames.passTheMicToggle)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.passTheMicToggle)]
     private Toggle passTheMicToggle;
     
-    [Inject(UxmlName = R.UxmlNames.hideLyricsToggle)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.hideLyricsToggle)]
     private Toggle hideLyricsToggle;
     
-    [Inject(UxmlName = R.UxmlNames.hideNotesToggle)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.hideNotesToggle)]
     private Toggle hideNotesToggle;
     
-    [Inject(UxmlName = R.UxmlNames.reduceAudioToggle)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.reduceAudioToggle)]
     private Toggle reduceAudioToggle;
     
-    [Inject(UxmlName = R.UxmlNames.modifierConditionPicker)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionPicker)]
     private ItemPicker modifierConditionPicker;
 
-    [Inject(UxmlName = R.UxmlNames.modifierConditionFromNumberPicker)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionFromNumberPicker)]
     private ItemPicker modifierConditionFromNumberPicker;
 
-    [Inject(UxmlName = R.UxmlNames.modifierConditionUntilNumberPicker)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionUntilNumberPicker)]
     private ItemPicker modifierConditionUntilNumberPicker;
     
-    [Inject(UxmlName = R.UxmlNames.closeModifierDialogButton)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.closeModifierDialogButton)]
     private Button closeModifierDialogButton;
     
-    [Inject(UxmlName = R.UxmlNames.conditionTitleLabel)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.conditionTitleLabel)]
     private Label conditionTitleLabel;
     
     private GameRoundSettings gameRoundSettings;
@@ -55,11 +55,11 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
 
     private readonly Dictionary<EGameRoundModifier, Toggle> gameRoundModifierToToggle = new();
 
-    public bool IsVisible => modifierDialogOverlay.IsVisibleByDisplay();
+    public bool IsVisible => visualElement.IsVisibleByDisplay();
     
     public void OnInjectionFinished()
     {
-        modifierDialogOverlay.HideByDisplay();
+        visualElement.HideByDisplay();
         
         UpdateGameRoundModifierToToggle();
         
@@ -224,14 +224,14 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
 
     public void CloseDialog()
     {
-        modifierDialogOverlay.HideByDisplay();
+        visualElement.HideByDisplay();
         gameRoundSettings = null;
         dialogClosedEventStream.OnNext(true);
     }
 
     public void OpenDialog(GameRoundSettings newGameRoundSettings)
     {
-        modifierDialogOverlay.ShowByDisplay();
+        visualElement.ShowByDisplay();
         gameRoundSettings = newGameRoundSettings;
         UpdateControls();
     }
