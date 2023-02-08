@@ -118,11 +118,13 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(importMidiFileDialogOverlay, CloseDialog);
 
         midiTrackIndexPickerControl = new(midiTrackIndexPicker, new List<TrackAndChannel>());
+        midiTrackIndexPickerControl.AutoSmallFont = false;
         midiTrackIndexPickerControl.Selection.Subscribe(_ =>
         {
             StopPreview();
             UpdateMidiLyrics();
         });
+        new AutoFitLabelControl(midiTrackIndexPicker.ItemLabel);
         
         midiAssignToPlayerPickerControl = new(assignToPlayerPicker, new List<int> { -1, 0, 1 });
         midiAssignToPlayerPickerControl.GetLabelTextFunction = newValue =>
