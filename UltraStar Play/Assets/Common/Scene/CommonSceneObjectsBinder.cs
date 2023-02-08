@@ -33,6 +33,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(ThemeManager.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
+        bb.BindExistingInstance(HttpServer.Instance as UltraStarPlayHttpServer);
         bb.Bind(typeof(IServerSideConnectRequestManager)).ToExistingInstance(ServerSideConnectRequestManager.Instance);
         bb.BindExistingInstance(ServerSideConnectRequestManager.Instance);
 
