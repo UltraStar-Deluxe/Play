@@ -3,14 +3,12 @@ public static partial class R
 {
     public static class UssClasses
     {
-        public const string ellipsis = "ellipsis";
         public const string onlyVisibleWhenConnected = "onlyVisibleWhenConnected";
         public const string onlyVisibleWhenNotConnected = "onlyVisibleWhenNotConnected";
         public const string outline = "outline";
         public const string overlay = "overlay";
         public const string overlayBackground = "overlayBackground";
         public const string roundCorners = "roundCorners";
-        public const string showLyrics = "showLyrics";
         public const string smallerFont = "smallerFont";
         public const string smallFont = "smallFont";
         public const string startButtonClass = "startButtonClass";

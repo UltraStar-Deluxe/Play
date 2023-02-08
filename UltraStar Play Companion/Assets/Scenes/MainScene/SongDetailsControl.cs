@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -46,12 +47,6 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     [Inject(UxmlName = R.UxmlNames.enqueueButton)]
     private Button enqueueButton;
     
-    [Inject(UxmlName = R.UxmlNames.toggleLyricsButton)]
-    private Button toggleLyricsButton;
-    
-    [Inject(UxmlName = R.UxmlNames.lyricsLabel)]
-    private Label lyricsLabel;
-    
     [Inject(UxmlName = R.UxmlNames.playersContainer)]
     private VisualElement playersContainer;
     
@@ -60,6 +55,12 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     
     [Inject(UxmlName = R.UxmlNames.noFavoriteIcon)]
     private VisualElement noFavoriteIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.lyricsAccordionItem)]
+    private AccordionItem lyricsAccordionItem;
+    
+    [Inject(UxmlName = R.UxmlNames.enqueueSettingsAccordionItem)]
+    private AccordionItem enqueueSettingsAccordionItem;
     
     private SongDto songDto;
     public SongDto SongDto
@@ -75,7 +76,6 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         }
     }
 
-    private bool isShowLyrics;
     private bool isFavorite;
     
     private Texture2D texture2D;
@@ -90,24 +90,17 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         injector.Inject(gameRoundSettingsUiControl);
         gameRoundSettingsUiControl.GameRoundSettings = settings.GameRoundSettings;
 
+        gameRoundSettingsUiControl
+            .DialogClosedEventStream
+            .Subscribe(_ => enqueueSettingsAccordionItem.UpdateTargetHeight());
+        
         HideSongDetails();
         backButton.RegisterCallbackButtonTriggered(() => HideSongDetails());
         favoriteButton.RegisterCallbackButtonTriggered(() => ToggleFavorite());
         enqueueButton.RegisterCallbackButtonTriggered(() => EnqueueSong());
-        toggleLyricsButton.RegisterCallbackButtonTriggered(() => ToggleLyrics());
-    }
 
-    private void ToggleLyrics()
-    {
-        isShowLyrics = !isShowLyrics;
-        if (isShowLyrics)
-        {
-            lyricsLabel.AddToClassList("showLyrics");
-        }
-        else
-        {
-            lyricsLabel.RemoveFromClassList("showLyrics");
-        }
+        lyricsAccordionItem.ContentVisible = false;
+        enqueueSettingsAccordionItem.ContentVisible = false;
     }
 
     private void EnqueueSong()
@@ -210,6 +203,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         playersContainer.Clear();
         playersContainer.Add(new Label("Loading players..."));
+        enqueueSettingsAccordionItem.UpdateTargetHeight();
         
         playerProfileEntryControls.Clear();
 
@@ -300,7 +294,10 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                     .Select(voiceName => Voice.NormalizeVoiceName(voiceName))
                     .ToList();
                 playerEntryControl.SetAvailableVoiceNames(voiceNames);
-                playerEntryControl.VoiceChooserControl.SelectItem(voiceNames[playerProfileIndex % voiceNames.Count]);
+                if (!voiceNames.IsNullOrEmpty())
+                {
+                    playerEntryControl.VoiceChooserControl.SelectItem(voiceNames[playerProfileIndex % voiceNames.Count]);
+                }
             }
 
             playerEntryControl.EnabledToggle.RegisterValueChangedCallback(evt =>
@@ -328,6 +325,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         });
 
         UpdateEnqueueButton();
+        enqueueSettingsAccordionItem.UpdateTargetHeight();
     }
 
     private void UpdateEnqueueButton()
@@ -366,8 +364,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
     private void LoadSongDetails()
     {
-        lyricsLabel.text = "Loading lyrics...";
-        
+        SetLyrics("Loading lyrics...");
+
         mainGameHttpClient.GetRequest($"api/rest/song/{songDto.Hash}",
             response =>
             {
@@ -397,7 +395,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         
         if (newVoiceNameToLyricsMap.Count <= 1)
         {
-            lyricsLabel.text = newVoiceNameToLyricsMap.Values.FirstOrDefault();
+            SetLyrics(newVoiceNameToLyricsMap.Values.FirstOrDefault());
             return;
         }
 
@@ -419,7 +417,14 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         string lyricsWithVoiceNames = newVoiceNameToLyricsMap
             .Select(entry => GetVoiceDisplayName(entry.Key) + ": " + entry.Value)
             .JoinWith("\n\n");
-        lyricsLabel.text = lyricsWithVoiceNames;
+        SetLyrics(lyricsWithVoiceNames);
+    }
+
+    private void SetLyrics(string text)
+    {
+        lyricsAccordionItem.Clear();
+        lyricsAccordionItem.Add(new Label(text));
+        lyricsAccordionItem.UpdateTargetHeight();
     }
 
     public void ShowSongDetails(SongDto newSongDto)

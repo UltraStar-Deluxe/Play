@@ -22,11 +22,10 @@ public static partial class R
         public const string enqueueButton = "enqueueButton";
         public const string enqueueButtonLabel = "enqueueButtonLabel";
         public const string enqueueIcon = "enqueueIcon";
-        public const string enqueueSettingsTitle = "enqueueSettingsTitle";
+        public const string enqueueSettingsAccordionItem = "enqueueSettingsAccordionItem";
         public const string EnqueueSongUi = "EnqueueSongUi";
         public const string favoriteButton = "favoriteButton";
         public const string favoriteIcon = "favoriteIcon";
-        public const string gameRoundConfigContainer = "gameRoundConfigContainer";
         public const string GameRoundConfigUi = "GameRoundConfigUi";
         public const string gameRoundConfigUiRoot = "gameRoundConfigUiRoot";
         public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
@@ -42,8 +41,8 @@ public static partial class R
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
+        public const string lyricsAccordionItem = "lyricsAccordionItem";
         public const string lyricsLabel = "lyricsLabel";
-        public const string lyricsTitle = "lyricsTitle";
         public const string MainSceneMenuUi = "MainSceneMenuUi";
         public const string menuIcon = "menuIcon";
         public const string menuOverlay = "menuOverlay";
@@ -127,7 +126,6 @@ public static partial class R
         public const string titleAndDescription = "titleAndDescription";
         public const string titleContainer = "titleContainer";
         public const string titleImageAndText = "titleImageAndText";
-        public const string toggleLyricsButton = "toggleLyricsButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleRecordingButtonContainer = "toggleRecordingButtonContainer";
         public const string udpPortOnClientContainer = "udpPortOnClientContainer";
