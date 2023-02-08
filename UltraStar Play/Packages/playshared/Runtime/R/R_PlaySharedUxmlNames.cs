@@ -39,7 +39,6 @@ public static partial class R_PlayShared
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string dialogTitleMaterialIcon = "dialogTitleMaterialIcon";
         public const string dummyButton = "dummyButton";
-        public const string dummyContent = "dummyContent";
         public const string enabledToggle = "enabledToggle";
         public const string hideLyricsToggle = "hideLyricsToggle";
         public const string hideNotesToggle = "hideNotesToggle";

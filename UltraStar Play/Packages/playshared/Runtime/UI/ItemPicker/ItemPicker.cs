@@ -84,11 +84,11 @@ public class ItemPicker : VisualElement
         }
         visualTreeAsset.CloneTree(this);
 
-        LabelElement = this.Q<Label>("itemPickerLabel");
-        ItemLabel = this.Q<Label>("itemLabel");
-        ItemImage = this.Q<Image>("itemImage");
-        PreviousItemButton = this.Q<Button>("previousItemButton");
-        NextItemButton = this.Q<Button>("nextItemButton");
+        LabelElement = this.Q<Label>(R_PlayShared.UxmlNames.itemPickerLabel);
+        ItemLabel = this.Q<Label>(R_PlayShared.UxmlNames.itemLabel);
+        ItemImage = this.Q<Image>(R_PlayShared.UxmlNames.itemImage);
+        PreviousItemButton = this.Q<Button>(R_PlayShared.UxmlNames.previousItemButton);
+        NextItemButton = this.Q<Button>(R_PlayShared.UxmlNames.nextItemButton);
     }
 
     public virtual void InitControl(object itemPickerControl)
