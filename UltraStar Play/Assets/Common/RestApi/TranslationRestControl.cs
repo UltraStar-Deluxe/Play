@@ -24,19 +24,19 @@ public class TranslationRestControl : AbstractSingletonBehaviour, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.On(HttpMethod.Get, "api/rest/language")
-            .WithDescription($"Get current language as 2 letter country code")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/language")
+            .SetDescription($"Get current language as 2 letter country code")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 string language = LanguageHelper.Get2LetterIsoCodeFromSystemLanguage(translationManager.currentLanguage);
                 requestData.Context.Response.WriteJson(new Dictionary<string, string> { { "language", language } });
             });
 
-        httpServer.On(HttpMethod.Get, "api/rest/translations")
-            .WithDescription($"Get all translations for the current language.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/translations")
+            .SetDescription($"Get all translations for the current language.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 requestData.Context.Response.WriteJson(translationManager.GetAllTranslations(true));
             });

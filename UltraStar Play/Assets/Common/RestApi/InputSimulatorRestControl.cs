@@ -91,10 +91,10 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
 
     private void RegisterMouseDeltaEndpoint()
     {
-        httpServer.On(HttpMethod.Post, "api/rest/input/mouseDelta/{deltaX}/{deltaY}")
-            .WithDescription("Move the current mouse if any by the given X and Y delta values")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/input/mouseDelta/{deltaX}/{deltaY}")
+            .SetDescription("Move the current mouse if any by the given X and Y delta values")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 if (systemMouse == null)
                 {
@@ -112,10 +112,10 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
 
     private void RegisterScrollWheelEndpoint()
     {
-        httpServer.On(HttpMethod.Post, "api/rest/input/scrollWheel/{deltaX}/{deltaY}")
-            .WithDescription("Simulate scroll wheel events")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/input/scrollWheel/{deltaX}/{deltaY}")
+            .SetDescription("Simulate scroll wheel events")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 if (systemMouse == null)
                 {
@@ -169,10 +169,10 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
     private void RegisterNavigationEndpoint(string inputControlName, string description, InputDevice inputDevice, Func<InputControl> inputControlGetter)
     {
         string path = $"api/rest/input/{inputControlName}";
-        httpServer.On(HttpMethod.Post, path)
-            .WithDescription(description)
-            .UntilDestroy(gameObject)
-            .Do(_ =>
+        httpServer.CreateEndpoint(HttpMethod.Post, path)
+            .SetDescription(description)
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(_ =>
             {
                 InputControl inputControl = inputControlGetter();
                 Debug.Log($"Received input simulation request {path}");

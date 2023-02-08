@@ -28,10 +28,10 @@ public class PlaylistRestControl : AbstractSingletonBehaviour, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.On(HttpMethod.Get, "api/rest/playlist/favorites")
-            .WithDescription($"Get songs of the 'favorites' playlist")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/playlist/favorites")
+            .SetDescription($"Get songs of the 'favorites' playlist")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 List<SongMeta> songMetas = playlistManager.GetSongMetas(playlistManager.FavoritesPlaylist);
                 SongListDto songListDto = new SongListDto();
@@ -46,20 +46,20 @@ public class PlaylistRestControl : AbstractSingletonBehaviour, INeedInjection
                 requestData.Context.Response.WriteJson(songListDto);
             });
 
-        httpServer.On(HttpMethod.Post, "api/rest/playlist/favorites/entry/{songId}")
-            .WithDescription($"Add song to the favorites playlist")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/playlist/favorites/entry/{songId}")
+            .SetDescription($"Add song to the favorites playlist")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 string songId = requestData.PathParameters["songId"];
                 SongMeta songMeta = songMetaManager.GetSongMetaById(songId);
                 playlistManager.AddSongToPlaylist(playlistManager.FavoritesPlaylist, songMeta);
             });
 
-        httpServer.On(HttpMethod.Delete, "api/rest/playlist/favorites/entry/{songId}")
-            .WithDescription($"Remove song from the favorites playlist")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Delete, "api/rest/playlist/favorites/entry/{songId}")
+            .SetDescription($"Remove song from the favorites playlist")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 string songId = requestData.PathParameters["songId"];
                 SongMeta songMeta = songMetaManager.GetSongMetaById(songId);

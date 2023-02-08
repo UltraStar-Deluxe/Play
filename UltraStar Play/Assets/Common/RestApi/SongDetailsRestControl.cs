@@ -30,10 +30,10 @@ public class SongDetailsRestControl : AbstractSingletonBehaviour, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.On(HttpMethod.Get, "api/rest/song/{songId}")
-            .WithDescription($"Get song details.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/song/{songId}")
+            .SetDescription($"Get song details.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 string songId = requestData.PathParameters["songId"];
 
@@ -57,11 +57,11 @@ public class SongDetailsRestControl : AbstractSingletonBehaviour, INeedInjection
                 requestData.Context.Response.WriteJson(songDetailsDto);
             });
         
-        httpServer.On(HttpMethod.Get, "api/rest/songImage/{songId}")
-            .WithDescription($"Get song cover image. Returns the background image if no cover image was found.")
-            .UntilDestroy(gameObject)
-            .OnThread(ResponseThread.NewThread)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/songImage/{songId}")
+            .SetDescription($"Get song cover image. Returns the background image if no cover image was found.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetThread(ResponseThread.NewThread)
+            .SetCallbackAndAdd(requestData =>
             {
                 string songId = requestData.PathParameters["songId"];
 
