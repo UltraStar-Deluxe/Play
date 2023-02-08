@@ -121,7 +121,7 @@ public static class MidiFileUtils
         });
 
         MidiFile midiFile = MidiFile.CreateEmpty();
-        midiFile.MidiHeader.DeltaTiming = 480;
+        midiFile.MidiHeader.DeltaTiming = 500;
         midiFile.Tracks[0].Programs = new byte[] { 0 };
         midiFile.Tracks[0].DrumPrograms = new byte[] { 0 };
         midiFile.Tracks[0].MidiEvents = midiEvents.ToArray();
