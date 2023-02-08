@@ -1,11 +1,13 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using SimpleHttpServerForUnity;
+using UniInject;
 using UnityEngine;
 
-public class UltraStarPlayHttpServer : HttpServer
+public class UltraStarPlayHttpServer : HttpServer, INeedInjection
 {
     protected override void Awake()
     {
@@ -96,5 +98,22 @@ public class UltraStarPlayHttpServer : HttpServer
             ErrorMessage = $"No endpoint found for '{requestData.Context.Request.HttpMethod}' on '{requestData.Context.Request.RawUrl}'. "
                 + "Try 'GET' on 'api/rest/endpoints' to get the available endpoints."
         }.ToJson(), HttpStatusCode.NotFound);
+    }
+
+    public List<HttpApiPermission> GetPermissions(EndpointRequestData requestData)
+    {
+        string clientId = requestData.Context.Request.Headers["client-id"];
+        if (clientId.IsNullOrEmpty())
+        {
+            return new();
+        }
+        
+        Settings settings = SettingsManager.Instance.Settings;
+        if (settings.HttpApiPermissions.TryGetValue(clientId, out List<HttpApiPermission> permissions))
+        {
+            return permissions;
+        }
+
+        return new();
     }
 }
