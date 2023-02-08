@@ -22,6 +22,9 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
 
     [Inject]
     private UnityWebRequestManager webRequestManager;
+ 
+    [Inject]
+    private Settings settings;
     
     private readonly Subject<bool> connectionEventStream = new();
     public IObservable<bool> ConnectionEventStream => connectionEventStream;
@@ -58,8 +61,7 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         string uri = GetUri(path);
         Debug.Log($"Sending GET request to {uri}");
         UnityWebRequest unityWebRequest = UnityWebRequest.Get(uri);
-        unityWebRequest.SendWebRequest();
-        HandleRequest(unityWebRequest, onSuccess, onError);
+        SendRequest(unityWebRequest, onSuccess, onError);
     }
 
     public void PostRequest(
@@ -74,8 +76,7 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         string uri = GetUri(path);
         Debug.Log($"Sending POST request to {uri}");
         UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, body, contentType);
-        unityWebRequest.SendWebRequest();
-        HandleRequest(unityWebRequest, onSuccess, onError);
+        SendRequest(unityWebRequest, onSuccess, onError);
     }
 
     public void DeleteRequest(
@@ -88,15 +89,17 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         string uri = GetUri(path);
         Debug.Log($"Sending DELETE request to {uri}");
         UnityWebRequest unityWebRequest = UnityWebRequest.Delete(uri);
-        unityWebRequest.SendWebRequest();
-        HandleRequest(unityWebRequest, onSuccess, onError);
+        SendRequest(unityWebRequest, onSuccess, onError);
     }
     
-    private void HandleRequest(
+    private void SendRequest(
         UnityWebRequest unityWebRequest,
         Action<string> onSuccess,
         Action<Exception> onError)
     {
+        AddHeaders(unityWebRequest);
+        unityWebRequest.SendWebRequest();
+
         void WrappedOnError(Exception ex)
         {
             RequestOnError(unityWebRequest, ex);
@@ -106,12 +109,12 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         webRequestManager.AddUnityWebRequest(unityWebRequest,
             onSuccess,
             ex => WrappedOnError(ex));
+    }
 
-        // TODO: onComplete is called prematurely when using Observable (see https://github.com/neuecc/UniRx/issues/530)
-        // asyncOperationObservable.Subscribe(
-        //     _ => RequestOnNext(unityWebRequest),
-        //     ex => RequestOnError(unityWebRequest, ex),
-        //     () => RequestOnCompleted(unityWebRequest, onSuccess));
+    private void AddHeaders(UnityWebRequest unityWebRequest)
+    {
+        unityWebRequest.SetRequestHeader("client-id", settings.ClientId);
+        unityWebRequest.SetRequestHeader("client-name", settings.ClientName);
     }
 
     private void RequestOnNext(UnityWebRequest unityWebRequest)
