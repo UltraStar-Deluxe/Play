@@ -94,6 +94,7 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
         httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/input/mouseDelta/{deltaX}/{deltaY}")
             .SetDescription("Move the current mouse if any by the given X and Y delta values")
             .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
             .SetCallbackAndAdd(requestData =>
             {
                 if (systemMouse == null)
@@ -115,6 +116,7 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
         httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/input/scrollWheel/{deltaX}/{deltaY}")
             .SetDescription("Simulate scroll wheel events")
             .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
             .SetCallbackAndAdd(requestData =>
             {
                 if (systemMouse == null)
@@ -172,6 +174,7 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
         httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription(description)
             .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
             .SetCallbackAndAdd(_ =>
             {
                 InputControl inputControl = inputControlGetter();

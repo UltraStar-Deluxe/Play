@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -59,8 +60,20 @@ public class SettingsManager : AbstractSingletonBehaviour
 
     public void Save()
     {
+        SimplifySettings();
+
         string json = JsonConverter.ToJson(Settings, true);
         File.WriteAllText(GetSettingsPath(), json);
+    }
+
+    private void SimplifySettings()
+    {
+        // Remove permission list if empty
+        List<string> clientIdsWithoutPermission = Settings.HttpApiPermissions
+            .Where(entry => entry.Value.IsNullOrEmpty())
+            .Select(entry => entry.Key)
+            .ToList();
+        clientIdsWithoutPermission.ForEach(clientId => Settings.HttpApiPermissions.Remove(clientId));
     }
 
     private void Reload()

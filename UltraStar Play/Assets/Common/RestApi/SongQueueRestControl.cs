@@ -64,10 +64,11 @@ public class SongQueueRestControl : AbstractSingletonBehaviour, INeedInjection
                 };
                 requestData.Context.Response.WriteJson(dto);
             });
-        
+
         httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/songQueue/entry")
             .SetDescription($"Add entry song queue to the song queue.")
             .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteSongQueue)
             .SetCallbackAndAdd(requestData =>
             {
                 string json = requestData.Context.Request.GetBodyAsString();

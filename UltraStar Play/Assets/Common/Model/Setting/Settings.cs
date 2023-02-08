@@ -31,6 +31,8 @@ public class Settings : ISettings
     public int UdpPortOnClient { get; set; } = 34568;
     public string OwnHost { get; set; }
 
+    public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
+    
     private static List<PlayerProfile> CreateDefaultPlayerProfiles()
     {
         List<PlayerProfile> result = new();
