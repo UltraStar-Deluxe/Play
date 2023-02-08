@@ -24,7 +24,6 @@ public static partial class R_PlayShared
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string dialogTitleMaterialIcon = "dialogTitleMaterialIcon";
         public const string dummyButton = "dummyButton";
-        public const string dummyContent = "dummyContent";
         public const string invalidValueIcon = "invalidValueIcon";
         public const string invalidValueLabel = "invalidValueLabel";
         public const string itemImage = "itemImage";

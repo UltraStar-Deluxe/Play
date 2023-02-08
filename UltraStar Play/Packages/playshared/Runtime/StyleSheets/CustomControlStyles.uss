@@ -247,7 +247,7 @@ AccordionGroup > AccordionItem.lastChild {
     transition: rotate 0.3s;
 }
 
-#accordionItemRoot.expanded #toggleAccordionItemContentIcon {
+AccordionItem.expanded #toggleAccordionItemContentIcon {
     transform-origin: 50% 50%;
     rotate: -180deg;
 }
