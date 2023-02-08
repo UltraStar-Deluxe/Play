@@ -15,7 +15,6 @@ public static partial class R
         public const string addSongFolderButton = "addSongFolderButton";
         public const string addTeamButton = "addTeamButton";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
-        public const string adminRightsContainer = "adminRightsContainer";
         public const string allCharactersContainer = "allCharactersContainer";
         public const string amplificationContainer = "amplificationContainer";
         public const string analyzeBeatsWithoutTargetNoteContainer = "analyzeBeatsWithoutTargetNoteContainer";
@@ -76,6 +75,8 @@ public static partial class R
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string characterQuickJumpContainer = "characterQuickJumpContainer";
+        public const string clientIcon = "clientIcon";
+        public const string clientNameLabel = "clientNameLabel";
         public const string closeImportMidiDialogButton = "closeImportMidiDialogButton";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closePlayerSelectOverlayButton = "closePlayerSelectOverlayButton";
@@ -98,6 +99,7 @@ public static partial class R
         public const string confirmDeletePlaylistButton = "confirmDeletePlaylistButton";
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
+        public const string connectedClientListEntryUiRoot = "connectedClientListEntryUiRoot";
         public const string container = "container";
         public const string continueButton = "continueButton";
         public const string copyLogButton = "copyLogButton";
@@ -164,6 +166,7 @@ public static partial class R
         public const string duetLegend = "duetLegend";
         public const string duetLegendIcon = "duetLegendIcon";
         public const string duetLegendLabel = "duetLegendLabel";
+        public const string dummyPermissionToggle = "dummyPermissionToggle";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
         public const string editionPropertyContainer = "editionPropertyContainer";
@@ -481,6 +484,7 @@ public static partial class R
         public const string pauseIcon = "pauseIcon";
         public const string pauseOverlay = "pauseOverlay";
         public const string pauseOverlayTitle = "pauseOverlayTitle";
+        public const string permissionsContainer = "permissionsContainer";
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmContainer = "pitchDetectionAlgorithmContainer";
         public const string pitchDetectionAlgorithmItemPicker = "pitchDetectionAlgorithmItemPicker";
@@ -709,7 +713,6 @@ public static partial class R
         public const string songPropertiesSideBarContainer = "songPropertiesSideBarContainer";
         public const string songPropertiesTitle = "songPropertiesTitle";
         public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
-        public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
         public const string songSelectGameRoundOverlayUi = "songSelectGameRoundOverlayUi";
         public const string SongSelectGameRoundOverlayUi = "SongSelectGameRoundOverlayUi";
@@ -796,7 +799,6 @@ public static partial class R
         public const string titlePropertyContainer = "titlePropertyContainer";
         public const string titleRow = "titleRow";
         public const string titleTextField = "titleTextField";
-        public const string toggle = "toggle";
         public const string toggleFavoriteButton = "toggleFavoriteButton";
         public const string toggleGameRoundsOverlayButton = "toggleGameRoundsOverlayButton";
         public const string toggleGameRoundsOverlayIcon = "toggleGameRoundsOverlayIcon";

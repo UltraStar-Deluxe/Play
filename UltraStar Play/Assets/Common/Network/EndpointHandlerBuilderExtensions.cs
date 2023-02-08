@@ -15,7 +15,10 @@ public static class EndpointHandlerBuilderExtensions
     {
         endpointHandlerBuilder.SetCondition(requestData =>
         {
-            List<HttpApiPermission> permissions = (endpointHandlerBuilder.HttpServer as UltraStarPlayHttpServer).GetPermissions(requestData);
+            string clientId = requestData.Context.Request.Headers["client-id"];
+            Settings settings = SettingsManager.Instance.Settings;
+            
+            List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, clientId);
             if (permissions.Contains(requiredPermission))
             {
                 return true;
