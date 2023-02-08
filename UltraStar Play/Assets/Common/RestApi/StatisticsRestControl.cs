@@ -24,10 +24,10 @@ public class StatisticsRestControl : AbstractSingletonBehaviour, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.On(HttpMethod.Get, "api/rest/stats")
-            .WithDescription($"Get statistics. This includes song scores, play count, etc.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/stats")
+            .SetDescription($"Get statistics. This includes song scores, play count, etc.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 requestData.Context.Response.WriteJson(statistics);
             });

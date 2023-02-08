@@ -23,18 +23,18 @@ public class EditSettingsRestControl : AbstractSingletonBehaviour, INeedInjectio
 
     protected override void StartSingleton()
     {
-        httpServer.On(HttpMethod.Get, "api/rest/config")
-            .WithDescription($"Get config.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/config")
+            .SetDescription($"Get config.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 requestData.Context.Response.WriteJson(settings);
             });
         
-        httpServer.On(HttpMethod.Post, "api/rest/config")
-            .WithDescription($"Set config. Only present fields in the request body are set.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/config")
+            .SetDescription($"Set config. Only present fields in the request body are set.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 string jsonBody = requestData.Context.Request.GetBodyAsString();
                 JsonConverter.FillFromJson(jsonBody, settings, false);

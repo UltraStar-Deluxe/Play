@@ -34,10 +34,10 @@ public class SongQueueRestControl : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
-        httpServer.On(HttpMethod.Get, "api/rest/availablePlayers")
-            .WithDescription($"Get player profiles that can be used for singing")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/availablePlayers")
+            .SetDescription($"Get player profiles that can be used for singing")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 List<string> playerProfileNames = settings.PlayerProfiles
                     .Where(playerProfile => playerProfile.IsSelected)
@@ -50,10 +50,10 @@ public class SongQueueRestControl : AbstractSingletonBehaviour, INeedInjection
                 requestData.Context.Response.WriteJson(dto);
             });
 
-        httpServer.On(HttpMethod.Get, "api/rest/availableMicrophones")
-            .WithDescription($"Get microphone profiles that can be used for singing")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/availableMicrophones")
+            .SetDescription($"Get microphone profiles that can be used for singing")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 List<MicProfile> enabledMicrophoneProfiles = settings.MicProfiles
                     .Where(microphoneProfile => microphoneProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
@@ -65,10 +65,10 @@ public class SongQueueRestControl : AbstractSingletonBehaviour, INeedInjection
                 requestData.Context.Response.WriteJson(dto);
             });
         
-        httpServer.On(HttpMethod.Post, "api/rest/songQueue/entry")
-            .WithDescription($"Add entry song queue to the song queue.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/songQueue/entry")
+            .SetDescription($"Add entry song queue to the song queue.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
                 string json = requestData.Context.Request.GetBodyAsString();
                 GameRoundDataDto gameRoundDataDto = JsonConverter.FromJson<GameRoundDataDto>(json, false);

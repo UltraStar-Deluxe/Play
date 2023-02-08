@@ -37,20 +37,15 @@ public class UltraStarPlayHttpServer : HttpServer
         NoEndpointFoundCallback = SendNoEndpointFound;
         StartHttpListener();
 
-        this.On(HttpMethod.Get, "api/rest/endpoints")
-            .WithDescription("Get currently registered endpoints")
-            .UntilDestroy(gameObject)
-            .Do(SendRegisteredEndpoints);
+        this.CreateEndpoint(HttpMethod.Get, "api/rest/songs")
+            .SetDescription("Get loaded songs")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(SendLoadedSongs);
 
-        this.On(HttpMethod.Get, "api/rest/songs")
-            .WithDescription("Get loaded songs")
-            .UntilDestroy(gameObject)
-            .Do(SendLoadedSongs);
-
-        this.On(HttpMethod.Get, "/api/rest/hello/{name}")
-            .WithDescription("Say hello (path-parameter example)")
-            .UntilDestroy(gameObject)
-            .Do(SendHello);
+        this.CreateEndpoint(HttpMethod.Get, "/api/rest/hello/{name}")
+            .SetDescription("Say hello (path-parameter example)")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(SendHello);
     }
 
     private void SendHello(EndpointRequestData requestData)
