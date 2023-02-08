@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using ProTrans;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -26,10 +23,10 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
     [InjectedInInspector]
-    public VisualTreeAsset notificationOverlayVisualTreeAsset;
+    public VisualTreeAsset notificationOverlayUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset notificationVisualTreeAsset;
+    public VisualTreeAsset notificationUi;
 
     [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;
@@ -82,18 +79,18 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
-            notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree().Children().First();
+            notificationOverlay = notificationOverlayUi.CloneTree().Children().First();
             uiDocument.rootVisualElement.Add(notificationOverlay);
         }
 
-        TemplateContainer templateContainer = notificationVisualTreeAsset.CloneTree();
+        TemplateContainer templateContainer = notificationUi.CloneTree();
         VisualElement notification = templateContainer.Children().First();
         Label notificationLabel = notification.Q<Label>("notificationLabel");
         notificationLabel.text = text;
         notificationOverlay.Add(notification);
 
         // Fade out then remove
-        StartCoroutine(FadeOutVisualElement(notification, 2, 1));
+        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, 2, 1));
 
         return notificationLabel;
     }
@@ -108,33 +105,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         params string[] additionalTextClasses)
     {
         return Instance.DoCreateNotification(text, additionalTextClasses);
-    }
-
-    public static IEnumerator FadeOutVisualElement(
-        VisualElement visualElement,
-        float solidTimeInSeconds,
-        float fadeOutTimeInSeconds)
-    {
-        yield return new WaitForSeconds(solidTimeInSeconds);
-        float startOpacity = visualElement.resolvedStyle.opacity;
-        float startTime = Time.time;
-        while (visualElement.resolvedStyle.opacity > 0)
-        {
-            float newOpacity = Mathf.Lerp(startOpacity, 0, (Time.time - startTime) / fadeOutTimeInSeconds);
-            if (newOpacity < 0)
-            {
-                newOpacity = 0;
-            }
-
-            visualElement.style.opacity = newOpacity;
-            yield return null;
-        }
-
-        // Remove VisualElement
-        if (visualElement.parent != null)
-        {
-            visualElement.parent.Remove(visualElement);
-        }
     }
 
     public MessageDialogControl CreateMessageDialog(string dialogTitle)
