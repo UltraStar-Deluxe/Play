@@ -33,14 +33,6 @@ public class Settings : ISettings
 
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
     
-    private static List<PlayerProfile> CreateDefaultPlayerProfiles()
-    {
-        List<PlayerProfile> result = new();
-        result.Add(new PlayerProfile("Player01", EDifficulty.Medium, "Silhouette01.png"));
-        result.Add(new PlayerProfile("Player02", EDifficulty.Easy, "Silhouette02.png"));
-        return result;
-    }
-
     // TODO: flatten settings?
     public SystemLanguage Language
     {
@@ -58,5 +50,13 @@ public class Settings : ISettings
     {
         get { return DeveloperSettings.showFps; }
         set { DeveloperSettings.showFps = value; }
+    }
+    
+    private static List<PlayerProfile> CreateDefaultPlayerProfiles()
+    {
+        List<PlayerProfile> result = new();
+        result.Add(new PlayerProfile("Player01", EDifficulty.Medium, "Silhouette01.png"));
+        result.Add(new PlayerProfile("Player02", EDifficulty.Easy, "Silhouette02.png"));
+        return result;
     }
 }
