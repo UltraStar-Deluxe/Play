@@ -54,7 +54,13 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     
     [Inject(UxmlName = R.UxmlNames.playersContainer)]
     private VisualElement playersContainer;
-
+    
+    [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
+    private VisualElement favoriteIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.noFavoriteIcon)]
+    private VisualElement noFavoriteIcon;
+    
     private SongDto songDto;
     public SongDto SongDto
     {
@@ -70,6 +76,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     }
 
     private bool isShowLyrics;
+    private bool isFavorite;
     
     private Texture2D texture2D;
     private Dictionary<string, string> voiceNameToLyricsMap = new();
@@ -152,6 +159,16 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
     private void ToggleFavorite()
     {
+        isFavorite = !isFavorite;
+        if (isFavorite)
+        {
+            mainGameHttpClient.PostRequest($"api/rest/playlist/favorites/entry/{songDto.Hash}");
+        }
+        else
+        {
+            mainGameHttpClient.DeleteRequest($"api/rest/playlist/favorites/entry/{songDto.Hash}");
+        }
+        UpdateFavoriteButton();
     }
 
     private void UpdateControls()
@@ -330,8 +347,17 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                     Debug.LogError($"Failed to load details for song {songDto.Artist} - {songDto.Title}. Response: {response}");
                     return;
                 }
+
+                isFavorite = songDetailsDto.IsFavorite;
                 UpdateLyrics(songDetailsDto.VoiceNameToLyricsMap);
+                UpdateFavoriteButton();
             });
+    }
+
+    private void UpdateFavoriteButton()
+    {
+        favoriteIcon.SetVisibleByDisplay(isFavorite);
+        noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
     }
 
     private void UpdateLyrics(Dictionary<string,string> newVoiceNameToLyricsMap)

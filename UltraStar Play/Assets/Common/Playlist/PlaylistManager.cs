@@ -135,6 +135,10 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     public void RemoveSongFromPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)
     {
+        if (songMeta == null)
+        {
+            return;
+        }
         playlist.RemoveSongEntry(songMeta.Artist, songMeta.Title);
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, songMeta));
         SavePlaylist(playlist);
@@ -142,7 +146,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     public void AddSongToPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)
     {
-        if (HasSongEntry(playlist, songMeta))
+        if (songMeta == null
+            || HasSongEntry(playlist, songMeta))
         {
             return;
         }
