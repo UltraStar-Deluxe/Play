@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using PrimeInputActions;
+using ProTrans;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,8 +22,6 @@ public static class CreateConstantsMenuItems
         "null", "true", "false", "out", "ref",
         "get", "set", "if", "else", "while", "return", "do", "for", "foreach", "in", "continue" };
 
-    public static readonly string className = "R";
-
     private static readonly string indentation = "    ";
 
     [MenuItem("Generate/Create all C# constants")]
@@ -30,8 +30,8 @@ public static class CreateConstantsMenuItems
         EditorUtils.RefreshAssetsInStreamingAssetsFolder();
 
         CreateConstantsForUxmlNamesAndUssClasses();
-        ProTrans.CreateTranslationConstantsMenuItems.CreateTranslationConstants();
-        PrimeInputActions.CreateInputActionConstantsMenuItems.CreateInputActionConstants();
+        CreateTranslationConstantsMenuItems.CreateTranslationConstants();
+        CreateInputActionConstantsMenuItems.CreateInputActionConstants();
     }
 
     [MenuItem("Generate/Create C# constants for UXML names and classes")]
@@ -43,11 +43,16 @@ public static class CreateConstantsMenuItems
 
     public static void CreateConstantsForUxmlNames()
     {
+        CreateConstantsForUxmlNamesInPlayShared();
+        CreateConstantsForUxmlNamesInAssets();
+    }
+
+    public static void CreateConstantsForUxmlNamesInAssets()
+    {
+        string className = "R";
         string subClassName = "UxmlNames";
         string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
-
         List<string> uxmlFiles = GetFilesInFolder("Assets", "*.uxml")
-            .Union(GetFilesInFolder("Packages/playshared/Runtime", "*.uxml"))
             .ToList();
 
         HashSet<string> uxmlNames = new();
@@ -55,21 +60,50 @@ public static class CreateConstantsMenuItems
         List<string> uxmlNamesList = uxmlNames.ToList();
         uxmlNamesList.Sort();
 
-        string classCode = CreateClassCode(subClassName, uxmlNamesList, null, true);
+        string classCode = CreateClassCode(className, subClassName, uxmlNamesList, null, true);
         File.WriteAllText(targetPath, classCode, Encoding.UTF8);
         Debug.Log("Generated file " + targetPath);
     }
+    
+    public static void CreateConstantsForUxmlNamesInPlayShared()
+    {
+        string className = "R_PlayShared";
+        string subClassName = "UxmlNames";
+        string targetPath = $"Packages/playshared/Runtime/R/{className + subClassName}.cs";
+        if (!Directory.Exists(Path.GetDirectoryName(targetPath)))
+        {
+            // The PlayShared folder only exists in the main game project.
+            return;
+        }
 
+        List<string> uxmlFiles = GetFilesInFolder("Packages/playshared/Runtime", "*.uxml")
+            .ToList();
+
+        HashSet<string> uxmlNames = new();
+        uxmlFiles.ForEach(file => FindUxmlNames(file).ForEach(uxmlName => uxmlNames.Add(uxmlName)));
+        List<string> uxmlNamesList = uxmlNames.ToList();
+        uxmlNamesList.Sort();
+
+        string classCode = CreateClassCode(className, subClassName, uxmlNamesList, null, true);
+        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
+        Debug.Log("Generated file " + targetPath);
+    }
+    
     public static void CreateConstantsForUssClasses()
     {
+        CreateConstantsForUssClassesInPlayShared();
+        CreateConstantsForUssClassesInAssets();
+    }
+
+    public static void CreateConstantsForUssClassesInAssets()
+    {
+        string className = "R";
         string subClassName = "UssClasses";
         string targetPath = $"Assets/Common/R/{className + subClassName}.cs";
 
         List<string> uxmlFiles = GetFilesInFolder("Assets", "*.uxml")
-            .Union(GetFilesInFolder("Packages/playshared/Runtime", "*.uxml"))
             .ToList();
         List<string> ussFiles = GetFilesInFolder("Assets", "*.uss")
-            .Union(GetFilesInFolder("Packages/playshared/Runtime", "*.uss"))
             .ToList();
 
         HashSet<string> ussClassesHashSet = new();
@@ -78,11 +112,38 @@ public static class CreateConstantsMenuItems
         List<string> ussClassesList = ussClassesHashSet.ToList();
         ussClassesList.Sort();
 
-        string classCode = CreateClassCode(subClassName, ussClassesList, null, true);
+        string classCode = CreateClassCode(className, subClassName, ussClassesList, null, true);
         File.WriteAllText(targetPath, classCode, Encoding.UTF8);
         Debug.Log("Generated file " + targetPath);
     }
+    
+    public static void CreateConstantsForUssClassesInPlayShared()
+    {
+        string className = "R_PlayShared";
+        string subClassName = "UssClasses";
+        string targetPath = $"Packages/playshared/Runtime/R/{className + subClassName}.cs";
+        if (!Directory.Exists(Path.GetDirectoryName(targetPath)))
+        {
+            // The PlayShared folder only exists in the main game project.
+            return;
+        }
 
+        List<string> uxmlFiles = GetFilesInFolder("Packages/playshared/Runtime", "*.uxml")
+            .ToList();
+        List<string> ussFiles = GetFilesInFolder("Packages/playshared/Runtime", "*.uss")
+            .ToList();
+
+        HashSet<string> ussClassesHashSet = new();
+        uxmlFiles.ForEach(file => FindUssClassesInUxmlFile(file).ForEach(ussClassName => ussClassesHashSet.Add(ussClassName)));
+        ussFiles.ForEach(file => FindUssClassesInUssFile(file).ForEach(ussClassName => ussClassesHashSet.Add(ussClassName)));
+        List<string> ussClassesList = ussClassesHashSet.ToList();
+        ussClassesList.Sort();
+
+        string classCode = CreateClassCode(className, subClassName, ussClassesList, null, true);
+        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
+        Debug.Log("Generated file " + targetPath);
+    }
+    
     private static IEnumerable<string> FindUxmlNames(string uxmlFile)
     {
         HashSet<string> result = new();
@@ -145,9 +206,9 @@ public static class CreateConstantsMenuItems
         return result.Distinct().ToList();
     }
 
-    private static string CreateClassCode(string subClassName, List<string> constantValues, List<string> fieldNames = null, bool useConst = false)
+    private static string CreateClassCode(string className, string subClassName, List<string> constantValues, List<string> fieldNames = null, bool useConst = false)
     {
-        string newline = System.Environment.NewLine;
+        string newline = Environment.NewLine;
 
         StringBuilder sb = new();
         sb.AppendLine("// GENERATED CODE. To update this file use the corresponding menu item in the Unity Editor.");

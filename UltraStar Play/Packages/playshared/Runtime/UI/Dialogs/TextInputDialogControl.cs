@@ -5,25 +5,25 @@ using UnityEngine.UIElements;
 
 public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedListener
 {
-    [Inject(UxmlName = "dialogTitle")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.dialogTitle)]
     protected Label dialogTitle;
 
-    [Inject(UxmlName = "dialogMessage")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.dialogMessage)]
     protected Label dialogMessage;
 
-    [Inject(UxmlName = "invalidValueIcon")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.invalidValueIcon)]
     protected VisualElement invalidValueIcon;
 
-    [Inject(UxmlName = "invalidValueLabel")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.invalidValueLabel)]
     protected Label invalidValueLabel;
 
-    [Inject(UxmlName = "valueTextField")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.valueTextField)]
     protected TextField textField;
 
-    [Inject(UxmlName = "okButton")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.okButton)]
     protected Button okButton;
 
-    [Inject(UxmlName = "cancelButton")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.cancelButton)]
     protected Button cancelButton;
 
     private readonly Subject<string> submitValueEventStream = new();
