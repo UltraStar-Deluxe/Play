@@ -5,19 +5,19 @@ using UnityEngine.UIElements;
 
 public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedListener
 {
-    [Inject(UxmlName = "dialogTitleImage")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.dialogTitleImage)]
     public VisualElement DialogTitleImage { get; private set; }
 
-    [Inject(UxmlName = "dialogTitle")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.dialogTitle)]
     private Label dialogTitle;
 
-    [Inject(UxmlName = "dialogMessageContainer")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.dialogMessageContainer)]
     private VisualElement dialogMessageContainer;
 
-    [Inject(UxmlName = "dialogMessage")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.dialogMessage)]
     private Label dialogMessage;
 
-    [Inject(UxmlName = "dialogButtonContainer")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.dialogButtonContainer)]
     private VisualElement dialogButtonContainer;
 
     [Inject]

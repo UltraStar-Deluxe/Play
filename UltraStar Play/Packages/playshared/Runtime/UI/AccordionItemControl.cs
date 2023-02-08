@@ -7,13 +7,13 @@ public class AccordionItemControl : INeedInjection, IInjectionFinishedListener
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     protected VisualElement accordionItemRootVisualElement;
 
-    [Inject(UxmlName = "accordionItemTitle")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.accordionItemTitle)]
     protected Label accordionItemTitle;
 
-    [Inject(UxmlName = "toggleAccordionItemContentButton")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.toggleAccordionItemContentButton)]
     protected Button toggleAccordionItemContentButton;
 
-    [Inject(UxmlName = "accordionItemContent")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.accordionItemContent)]
     protected VisualElement accordionItemContent;
 
     public bool IsContentVisible => accordionItemRootVisualElement.ClassListContains("expanded");
