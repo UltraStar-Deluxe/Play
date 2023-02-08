@@ -43,7 +43,11 @@ public class SongQueueRestControl : AbstractSingletonBehaviour, INeedInjection
                     .Where(playerProfile => playerProfile.IsSelected)
                     .Select(playerProfile => playerProfile.Name)
                     .ToList();
-                requestData.Context.Response.WriteJson(playerProfileNames);
+                ListDto<string> dto = new()
+                {
+                    Items = playerProfileNames,
+                };
+                requestData.Context.Response.WriteJson(dto);
             });
 
         httpServer.On(HttpMethod.Get, "api/rest/availableMicrophones")
@@ -54,7 +58,11 @@ public class SongQueueRestControl : AbstractSingletonBehaviour, INeedInjection
                 List<MicProfile> enabledMicrophoneProfiles = settings.MicProfiles
                     .Where(microphoneProfile => microphoneProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
                     .ToList();
-                requestData.Context.Response.WriteJson(enabledMicrophoneProfiles);
+                ListDto<MicProfile> dto = new()
+                {
+                    Items = enabledMicrophoneProfiles,
+                };
+                requestData.Context.Response.WriteJson(dto);
             });
         
         httpServer.On(HttpMethod.Post, "api/rest/songQueue/entry")
