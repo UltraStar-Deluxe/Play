@@ -126,7 +126,10 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     private void Start()
     {
+        new AutoFitLabelControl(deviceItemPicker.ItemLabel, 10, 15);
+        
         devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceItemPicker, CreateMicProfiles());
+        devicePickerControl.AutoSmallFont = false;
         devicePickerControl.GetLabelTextFunction = micProfile => micProfile.GetDisplayNameWithChannel();
         if (!TryReSelectLastMicProfile())
         {
