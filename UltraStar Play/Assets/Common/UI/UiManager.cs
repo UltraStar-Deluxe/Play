@@ -133,10 +133,10 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         void AddChapter(string title, string content)
         {
-            AccordionItemControl accordionItemControl = CreateAccordionItemControl();
-            accordionItemControl.Title = title;
-            accordionItemControl.AddVisualElement(new Label(content));
-            helpDialogControl.AddVisualElement(accordionItemControl.VisualElement);
+            AccordionItem accordionItem = new(title);
+            accordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+            accordionItem.Add(new Label(content));
+            helpDialogControl.AddVisualElement(accordionItem);
         }
 
         titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
@@ -146,15 +146,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         closeDialogButton.Focus();
 
         return helpDialogControl;
-    }
-
-    public AccordionItemControl CreateAccordionItemControl()
-    {
-        VisualElement accordionItem = accordionUi.CloneTree().Children().FirstOrDefault();
-        AccordionItemControl accordionItemControl = injector
-            .WithRootVisualElement(accordionItem)
-            .CreateAndInject<AccordionItemControl>();
-        return accordionItemControl;
     }
 
     public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)

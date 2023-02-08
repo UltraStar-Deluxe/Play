@@ -4,7 +4,7 @@
         <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
             <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 100%;">
                 <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ultrastardx-icon-contour.svg?fileID=7388822144124034973&amp;guid=2784df2e61772dc448202fc152a4fcfc&amp;type=3#ultrastardx-icon-contour&apos;);" />
+                    <ui:VisualElement name="titleImage" class="titleImage" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Icons/ultrastardx-icon-contour.svg?fileID=7388822144124034973&amp;guid=2784df2e61772dc448202fc152a4fcfc&amp;type=3#ultrastardx-icon-contour&apos;);" />
                     <ui:VisualElement name="titleAndDescription">
                         <ui:Label text="Main Menu" name="sceneTitle" class="titleText" />
                         <ui:Label text="Button description" name="sceneSubtitle" class="titleSubText" style="width: auto;" />

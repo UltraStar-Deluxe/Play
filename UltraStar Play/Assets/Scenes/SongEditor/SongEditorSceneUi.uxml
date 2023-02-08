@@ -157,7 +157,7 @@
         <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
             <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="importMidiFileDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+        <ui:VisualElement name="importMidiFileDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
             <ui:Instance template="ImportMidiFileDialogUi" name="ImportMidiFileDialogUi" class="overlayDialog" style="min-width: 50%;" />
         </ui:VisualElement>
     </ui:VisualElement>
