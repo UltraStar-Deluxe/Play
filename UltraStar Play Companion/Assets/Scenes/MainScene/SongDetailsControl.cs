@@ -116,6 +116,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         if (selectedPlayerControls.IsNullOrEmpty())
         {
             Debug.LogError("Cannot enqueue song. No player profiles selected.");
+            UiManager.CreateNotification("Select a player first");
             return;
         }
         
@@ -206,18 +207,25 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         List<MicProfile> micProfiles = null;
 
         playersContainer.Clear();
+        playersContainer.Add(new Label("Loading players..."));
+        
         playerProfileEntryControls.Clear();
 
         mainGameHttpClient.GetRequest($"api/rest/availablePlayers",
             response =>
             {
-                playerProfileNames = JsonConverter.FromJson<List<string>>(response, false);
-                if (playerProfileNames.IsNullOrEmpty())
+                ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response, false); 
+                if (listDto == null
+                    || listDto.Items == null)
                 {
                     Debug.LogError($"Failed to get players. Response: {response}");
+                    playersContainer.Clear();
+                    playersContainer.Add(new Label("Failed to load players"));
                     return;
                 }
 
+                playerProfileNames = listDto.Items;
+                
                 receivedPlayers = true;
                 if (receivedPlayers && receivedMicrophones)
                 {
@@ -228,13 +236,21 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.GetRequest($"api/rest/availableMicrophones",
             response =>
             {
-                micProfiles = JsonConverter.FromJson<List<MicProfile>>(response, false);
-                if (micProfiles.IsNullOrEmpty())
+                ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response, false); 
+                if (listDto == null
+                    || listDto.Items == null)
                 {
                     Debug.LogError($"Failed to get available microphones. Response: {response}");
                     return;
                 }
 
+                if (listDto.Items.IsNullOrEmpty())
+                {
+                    Debug.LogWarning($"No available microphones found. Response: {response}");
+                }
+
+                micProfiles = listDto.Items;
+                
                 receivedMicrophones = true;
                 if (receivedPlayers && receivedMicrophones)
                 {
@@ -245,13 +261,15 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
     private void DoUpdatePlayersAndMics(List<string> playerProfileNames, List<MicProfile> micProfiles)
     {
-        if (playerProfileNames.IsNullOrEmpty()
-            || micProfiles.IsNullOrEmpty())
+        if (playerProfileNames.IsNullOrEmpty())
         {
-            Debug.LogError("Cannot update players and mics. PlayerProfiles or MicProfiles are null or empty.");
+            Debug.LogError("Cannot update players and mics. PlayerProfiles are null or empty.");
+            playersContainer.Clear();
+            playersContainer.Add(new Label("No active players found.\nEdit players in the settings first."));
             return;
         }
         
+        playersContainer.Clear();
         List<MicProfile> unusedMicProfiles = micProfiles.ToList();
 
         void AssignUnusedMicProfile(PlayerSelectPlayerProfileEntryControl playerEntryControl)
