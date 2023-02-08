@@ -139,42 +139,4 @@ public static class PartyModeUtils
             return partyModeSceneData.PartyModeSettings.teamSettings.teams.ToList();
         }
     }
-    
-    public static string GetModifierConditionDescription(GameRoundSettings gameRoundSettings)
-    {
-        HashSet<EGameRoundModifier> modifiers = gameRoundSettings.modifiers;
-        GameRoundModifierConditionSettings modifierConditionSettings = gameRoundSettings.modifierConditionSettings;
-        if (modifiers.IsNullOrEmpty()
-            || modifierConditionSettings == null
-            || modifierConditionSettings.condition == EGameRoundModifierCondition.Always)
-        {
-            return "";
-        }
-        else if (modifierConditionSettings.condition == EGameRoundModifierCondition.PlayerAdvance)
-        {
-            if (modifierConditionSettings.scoreFrom <= 0)
-            {
-                return "";
-            }
-            return $"when player has advance of {modifierConditionSettings.scoreFrom} points";
-        }
-        else if (modifierConditionSettings.condition == EGameRoundModifierCondition.ScoreRange)
-        {
-            if (modifierConditionSettings.scoreFrom <= 0 && modifierConditionSettings.scoreUntil >= 10000)
-            {
-                return "";
-            }
-            return $"when score is between {modifierConditionSettings.scoreFrom} and {modifierConditionSettings.scoreUntil}";
-        }
-        else if (modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
-        {
-            if (modifierConditionSettings.timeFrom <= 0 && modifierConditionSettings.timeUntil >= 100)
-            {
-                return "";
-            }
-            return $"when time is between {modifierConditionSettings.timeFrom}% and {modifierConditionSettings.timeUntil}%";
-        }
-
-        return "";
-    }
 }
