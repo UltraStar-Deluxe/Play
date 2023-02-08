@@ -17,7 +17,10 @@ public class SongDetailsRestControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private SongMetaManager songMetaManager;
-
+    
+    [Inject]
+    private PlaylistManager playlistManager;
+    
     private void Start()
     {
         httpServer.On(HttpMethod.Get, "api/rest/song/{songId}")
@@ -35,9 +38,12 @@ public class SongDetailsRestControl : MonoBehaviour, INeedInjection
                     requestData.Context.Response.WriteJson(new ErrorMessageDto("Song not found"));
                 }
 
+                bool isFavorite = playlistManager.HasSongEntry(playlistManager.FavoritesPlaylist, songMeta);
+                
                 SongDetailsDto songDetailsDto = new()
                 {
                     SongId = songId,
+                    IsFavorite = isFavorite,
                     VoiceNameToLyricsMap = CreateVoiceNameToLyricsMap(songMeta),
                 };
 

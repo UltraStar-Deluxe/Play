@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using UniInject;
 using UniRx;
@@ -50,7 +48,7 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         return $"http://{serverIPEndPoint.Address}:{httpServerPort}{path}";
     }
 
-    public IObservable<UnityWebRequestAsyncOperation> GetRequest(
+    public void GetRequest(
         string path,
         Action<string> onSuccess = null,
         Action<Exception> onError = null)
@@ -60,14 +58,11 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         string uri = GetUri(path);
         Debug.Log($"Sending GET request to {uri}");
         UnityWebRequest unityWebRequest = UnityWebRequest.Get(uri);
-        IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
-            .SendWebRequest()
-            .AsAsyncOperationObservable();
-        HandleRequest(unityWebRequest, asyncOperation, onSuccess, onError);
-        return asyncOperation;
+        unityWebRequest.SendWebRequest();
+        HandleRequest(unityWebRequest, onSuccess, onError);
     }
 
-    public IObservable<UnityWebRequestAsyncOperation> PostRequest(
+    public void PostRequest(
         string path,
         string body = "{}",
         string contentType = "application/json",
@@ -79,16 +74,26 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         string uri = GetUri(path);
         Debug.Log($"Sending POST request to {uri}");
         UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, body, contentType);
-        IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
-            .SendWebRequest()
-            .AsAsyncOperationObservable();
-        HandleRequest(unityWebRequest, asyncOperation, onSuccess, onError);
-        return asyncOperation;
+        unityWebRequest.SendWebRequest();
+        HandleRequest(unityWebRequest, onSuccess, onError);
     }
 
+    public void DeleteRequest(
+        string path,
+        Action<string> onSuccess = null,
+        Action<Exception> onError = null)
+    {
+        ThrowIfNotConnected();
+
+        string uri = GetUri(path);
+        Debug.Log($"Sending DELETE request to {uri}");
+        UnityWebRequest unityWebRequest = UnityWebRequest.Delete(uri);
+        unityWebRequest.SendWebRequest();
+        HandleRequest(unityWebRequest, onSuccess, onError);
+    }
+    
     private void HandleRequest(
         UnityWebRequest unityWebRequest,
-        IObservable<UnityWebRequestAsyncOperation> asyncOperationObservable,
         Action<string> onSuccess,
         Action<Exception> onError)
     {
