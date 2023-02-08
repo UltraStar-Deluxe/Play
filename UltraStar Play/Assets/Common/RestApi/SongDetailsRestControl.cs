@@ -33,7 +33,6 @@ public class SongDetailsRestControl : AbstractSingletonBehaviour, INeedInjection
         httpServer.On(HttpMethod.Get, "api/rest/song/{songId}")
             .WithDescription($"Get song details.")
             .UntilDestroy(gameObject)
-            .OnThread(ResponseThread.NewThread)
             .Do(requestData =>
             {
                 string songId = requestData.PathParameters["songId"];
