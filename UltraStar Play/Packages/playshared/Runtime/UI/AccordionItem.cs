@@ -127,19 +127,39 @@ public class AccordionItem : VisualElement
 
     public virtual void ShowAccordionContent()
     {
+        if (ContentVisible)
+        {
+            return;
+        }
+        
         this.AddToClassList("expanded");
         if (targetContentHeight >= 0)
         {
             ContentElement.style.height = targetContentHeight;
         }
+
+        if (parent is AccordionGroup accordionGroup)
+        {
+            accordionGroup.OnAccordionItemContentVisibleChanged(this);
+        }
     }
 
     public virtual void HideAccordionContent()
     {
+        if (!ContentVisible)
+        {
+            return;
+        }
+
         this.RemoveFromClassList("expanded");
         if (targetContentHeight >= 0)
         {
             ContentElement.style.height = 0;
+        }
+        
+        if (parent is AccordionGroup accordionGroup)
+        {
+            accordionGroup.OnAccordionItemContentVisibleChanged(this);
         }
     }
 
