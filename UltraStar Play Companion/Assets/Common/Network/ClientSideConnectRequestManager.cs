@@ -80,6 +80,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                     MessagingPort = connectResponseDto.MessagingPort,
                     HttpServerPort = connectResponseDto.HttpServerPort,
                     ServerIpEndPoint = connectResponseDto.ServerIpEndPoint,
+                    Permissions = connectResponseDto.Permissions,
                 });
                 connectRequestCount = 0;
             }
