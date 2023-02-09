@@ -100,10 +100,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.menuOverlay)]
     private VisualElement menuOverlay;
 
-    [Inject(UxmlClass = R.UxmlClasses.onlyVisibleWhenConnected)]
+    [Inject(UxmlClass = R.UssClasses.onlyVisibleWhenConnected)]
     private List<VisualElement> onlyVisibleWhenConnected;
 
-    [Inject(UxmlClass = R.UxmlClasses.onlyVisibleWhenNotConnected)]
+    [Inject(UxmlClass = R.UssClasses.onlyVisibleWhenNotConnected)]
     private List<VisualElement> onlyVisibleWhenNotConnected;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
