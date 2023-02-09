@@ -10,7 +10,8 @@
         "com.achimmihca.protrans",
         "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
-        "com.achimmihca.utfunknownunity"
+        "com.achimmihca.utfunknownunity",
+        "IngameDebugConsole.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

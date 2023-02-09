@@ -190,6 +190,13 @@
       "dependencies": {},
       "hash": "6778d20ec4133dbac43cd526113426a608558249"
     },
+    "com.yasirkula.ingamedebugconsole": {
+      "version": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.5.8",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "2ee62e21eded65257454d14d545f5db7484743b0"
+    },
     "playshared": {
       "version": "file:../../UltraStar Play/Packages/playshared",
       "depth": 0,
