@@ -233,7 +233,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private void InitMenu()
     {
         // Recording device
+        new AutoFitLabelControl(recordingDevicePicker.ItemLabel);
         recordingDevicePickerControl = new(recordingDevicePicker, Microphone.devices.ToList());
+        recordingDevicePickerControl.AutoSmallFont = false;
         recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
         recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
 
