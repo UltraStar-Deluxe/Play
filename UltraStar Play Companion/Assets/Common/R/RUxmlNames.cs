@@ -3,6 +3,8 @@ public static partial class R
 {
     public static class UxmlNames
     {
+        public const string arrowBar = "arrowBar";
+        public const string arrowIcon = "arrowIcon";
         public const string audioWaveForm = "audioWaveForm";
         public const string backButton = "backButton";
         public const string background = "background";
@@ -100,6 +102,9 @@ public static partial class R
         public const string simulateSpaceButton = "simulateSpaceButton";
         public const string simulateSpaceButtonContainer = "simulateSpaceButtonContainer";
         public const string simulateUpButton = "simulateUpButton";
+        public const string simulateVolumeButtonContainer = "simulateVolumeButtonContainer";
+        public const string simulateVolumeDownButton = "simulateVolumeDownButton";
+        public const string simulateVolumeUpButton = "simulateVolumeUpButton";
         public const string songArtistLabel = "songArtistLabel";
         public const string songCoverAndTitleContainer = "songCoverAndTitleContainer";
         public const string songDetailsContainer = "songDetailsContainer";
@@ -128,6 +133,8 @@ public static partial class R
         public const string titleImageAndText = "titleImageAndText";
         public const string toggleRecordingButton = "toggleRecordingButton";
         public const string toggleRecordingButtonContainer = "toggleRecordingButtonContainer";
+        public const string triangleDown = "triangleDown";
+        public const string triangleUp = "triangleUp";
         public const string udpPortOnClientContainer = "udpPortOnClientContainer";
         public const string udpPortOnClientLabel = "udpPortOnClientLabel";
         public const string udpPortOnClientTextField = "udpPortOnClientTextField";
@@ -137,6 +144,5 @@ public static partial class R
         public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";
-        public const string volumeSlider = "volumeSlider";
     }
 }
