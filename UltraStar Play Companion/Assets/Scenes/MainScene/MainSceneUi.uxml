@@ -51,7 +51,7 @@
         <ui:VisualElement name="menuOverlay" style="width: 100%; height: 100%; flex-direction: row; position: absolute; display: none;">
             <ui:Button display-tooltip-when-elided="true" name="hiddenCloseMenuButton" class="transparentBackgroundColor" style="flex-grow: 1; height: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
             <ui:VisualElement name="menuOverlayContent" style="background-color: rgba(0, 0, 0, 0.75); width: 80%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
-                <ui:Instance template="MainSceneMenuUi" name="MainSceneMenuUi" />
+                <ui:Instance template="MainSceneMenuUi" name="MainSceneMenuUi" style="flex-grow: 1;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="modifierDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">

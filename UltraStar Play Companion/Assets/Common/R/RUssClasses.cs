@@ -4,6 +4,7 @@ public static partial class R
     public static class UssClasses
     {
         public const string onlyVisibleWhenConnected = "onlyVisibleWhenConnected";
+        public const string onlyVisibleWhenDevModeEnabled = "onlyVisibleWhenDevModeEnabled";
         public const string onlyVisibleWhenNotConnected = "onlyVisibleWhenNotConnected";
         public const string outline = "outline";
         public const string overlay = "overlay";

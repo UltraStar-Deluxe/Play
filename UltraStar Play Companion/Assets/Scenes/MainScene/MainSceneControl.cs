@@ -106,6 +106,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlClass = R.UssClasses.onlyVisibleWhenNotConnected)]
     private List<VisualElement> onlyVisibleWhenNotConnected;
 
+    [Inject(UxmlClass = R.UssClasses.onlyVisibleWhenDevModeEnabled)]
+    private List<VisualElement> onlyVisibleWhenDevModeEnabled;
+
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
     [Inject(UxmlName = R.UxmlNames.recordingDeviceLabel)]
@@ -255,8 +258,19 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         mouseSensitivityFloatField.value = settings.mousePadSensitivity;
         mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.mousePadSensitivity = evt.newValue);
         
+        // Only show some controls when dev mode is enabled.
+        UpdateDevModeControlsVisibility();
+        settings.ObserveEveryValueChanged(it => it.IsDevModeEnabled)
+            .Subscribe(_ => UpdateDevModeControlsVisibility())
+            .AddTo(gameObject);
+
         InitTabGroup();
         InitMenu();
+    }
+
+    private void UpdateDevModeControlsVisibility()
+    {
+        onlyVisibleWhenDevModeEnabled.ForEach(it => it.SetVisibleByDisplay(settings.IsDevModeEnabled));
     }
 
     private void OnPermissionsChanged(List<HttpApiPermission> permissions)
