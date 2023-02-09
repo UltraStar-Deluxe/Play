@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using UniInject;
 using UniRx;
@@ -8,7 +9,7 @@ using UnityEngine.Networking;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainGameHttpClient : MonoBehaviour, INeedInjection
+public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 {
     public static MainGameHttpClient Instance => GameObjectUtils.FindComponentWithTag<MainGameHttpClient>("MainGameHttpClient");
 
@@ -29,7 +30,14 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
     private readonly Subject<bool> connectionEventStream = new();
     public IObservable<bool> ConnectionEventStream => connectionEventStream;
 
-    private void Start()
+    public ReactiveProperty<List<HttpApiPermission>> Permissions { get; private set; } = new(new List<HttpApiPermission>());
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         clientSideConnectRequestManager.ConnectEventStream
             .Where(connectEvent => connectEvent.IsSuccess)
@@ -37,9 +45,21 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
             {
                 serverIPEndPoint = connectEvent.ServerIpEndPoint;
                 httpServerPort = connectEvent.HttpServerPort;
-
+                Permissions.Value = connectEvent.Permissions ?? new();
                 connectionEventStream.OnNext(true);
             });
+
+        clientSideConnectRequestManager.ReceivedMessageStream
+            .ObserveOnMainThread()
+            .Subscribe(dto =>
+            {
+                if (dto is PermissionsMessageDto permissionsMessageDto)
+                {
+                    Permissions.Value = permissionsMessageDto.Permissions;
+                }
+            });
+
+        Permissions.Subscribe(newPermissions => Debug.Log($"Permissions changed: {newPermissions.ToCsv()}"));
     }
 
     public string GetUri(string path)
