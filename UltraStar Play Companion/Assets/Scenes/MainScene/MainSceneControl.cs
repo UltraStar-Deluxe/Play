@@ -179,13 +179,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private int frameCount;
 
     private readonly InputSimulationControl inputSimulationControl = new();
-    private readonly EditMainGameConfigControl editMainGameConfigControl = new();
     private readonly SongDetailsControl songDetailsControl = new();
     
     public void OnInjectionFinished()
     {
         injector.Inject(inputSimulationControl);
-        injector.Inject(editMainGameConfigControl);
         injector.WithRootVisualElement(songDetailsContainer)
             .Inject(songDetailsControl);
 
