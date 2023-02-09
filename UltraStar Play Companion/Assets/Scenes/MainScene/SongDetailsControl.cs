@@ -93,6 +93,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         gameRoundSettingsUiControl
             .DialogClosedEventStream
             .Subscribe(_ => enqueueSettingsAccordionItem.UpdateTargetHeight());
+
+        mainGameHttpClient.Permissions.Subscribe(permissions => OnPermissionsChanged(permissions));
         
         HideSongDetails();
         backButton.RegisterCallbackButtonTriggered(() => HideSongDetails());
@@ -103,6 +105,12 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         enqueueSettingsAccordionItem.ContentVisible = false;
     }
 
+    private void OnPermissionsChanged(List<HttpApiPermission> permissions)
+    {
+        enqueueButton.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteSongQueue));
+        enqueueSettingsAccordionItem.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteSongQueue));
+    }
+    
     private void EnqueueSong()
     {
         List<PlayerSelectPlayerProfileEntryControl> selectedPlayerControls = GetSelectedPlayerControls();

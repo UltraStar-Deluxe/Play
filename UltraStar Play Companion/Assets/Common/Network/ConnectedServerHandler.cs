@@ -3,8 +3,8 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -114,7 +114,7 @@ public class ConnectedServerHandler : IConnectedServerHandler, IDisposable
         catch (Exception e)
         {
             Debug.LogException(e);
-            Debug.LogError($"Failed to send pitch to server");
+            Debug.LogError($"Failed to send message to server. Message: {jsonSerializable.ToJson()}");
             clientSideConnectRequestManager.RemoveConnectedServerHandler(this);
         }
     }
@@ -161,6 +161,9 @@ public class ConnectedServerHandler : IConnectedServerHandler, IDisposable
                 return;
             case CompanionAppMessageType.StartRecording:
                 receivedMessageStream.OnNext(JsonConverter.FromJson<StartRecordingMessageDto>(json));
+                return;
+            case CompanionAppMessageType.Permissions:
+                receivedMessageStream.OnNext(JsonConverter.FromJson<PermissionsMessageDto>(json));
                 return;
             default:
                 Debug.Log($"Unknown MessageType {messageType} in JSON from server: {json}");

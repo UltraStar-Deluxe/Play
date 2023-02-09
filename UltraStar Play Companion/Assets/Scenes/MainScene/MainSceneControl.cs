@@ -161,8 +161,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
     private VisualElement songDetailsContainer;
     
+    [Inject(UxmlName = R.UxmlNames.tabGroup)]
+    private VisualElement tabGroup;
+    
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private MainGameHttpClient mainGameHttpClient;
 
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
@@ -183,6 +189,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         injector.WithRootVisualElement(songDetailsContainer)
             .Inject(songDetailsControl);
 
+        mainGameHttpClient.Permissions
+            .Subscribe(permissions => OnPermissionsChanged(permissions));
+        
         // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
             || !Microphone.devices.Contains(settings.MicProfile.Name))
@@ -240,6 +249,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         
         InitTabGroup();
         InitMenu();
+    }
+
+    private void OnPermissionsChanged(List<HttpApiPermission> permissions)
+    {
+        showInputSimulationButton.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteInputSimulation));
+        inputSimulationContainer.HideByDisplay();
     }
 
     private void InitTabGroup()
