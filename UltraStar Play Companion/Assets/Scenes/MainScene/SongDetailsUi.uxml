@@ -11,12 +11,14 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <AccordionItem label="Lyrics" name="lyricsAccordionItem" style="flex-grow: 1;">
-                <ui:Label tabindex="-1" text="Lorem ipsum dolor sit&#10;amet, ex eum mandamus volutpat, eos at dicunt antiopam, at tibique molestie forensibus nam. Duo atqui oblique et, vim et mucius detracto dignissim, eros impetus sadipscing has no. Populo labore utroque mei ne, ne elitr suscipit vituperata mel. Omnium eleifend id duo, in numquam apeirian mea, te duo novum&#10;singulis disputationi.&#10;" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; white-space: normal; -unity-text-align: upper-left;" />
-            </AccordionItem>
-            <AccordionItem label="Enqueue Settings" name="enqueueSettingsAccordionItem" style="flex-grow: 1;">
-                <ui:Instance template="EnqueueSongUi" name="GameRoundConfigUi" />
-            </AccordionItem>
+            <AccordionGroup>
+                <AccordionItem label="Lyrics" name="lyricsAccordionItem" style="flex-grow: 1;">
+                    <ui:Label tabindex="-1" text="Lorem ipsum dolor sit&#10;amet, ex eum mandamus volutpat, eos at dicunt antiopam, at tibique molestie forensibus nam. Duo atqui oblique et, vim et mucius detracto dignissim, eros impetus sadipscing has no. Populo labore utroque mei ne, ne elitr suscipit vituperata mel. Omnium eleifend id duo, in numquam apeirian mea, te duo novum&#10;singulis disputationi.&#10;" display-tooltip-when-elided="true" name="lyricsLabel" class="smallFont" style="-unity-font-style: normal; white-space: normal; -unity-text-align: upper-left;" />
+                </AccordionItem>
+                <AccordionItem label="Enqueue Settings" name="enqueueSettingsAccordionItem" style="flex-grow: 1;">
+                    <ui:Instance template="EnqueueSongUi" name="GameRoundConfigUi" />
+                </AccordionItem>
+            </AccordionGroup>
         </ui:ScrollView>
         <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); flex-shrink: 0; width: 100%; flex-direction: row; justify-content: space-between;">
             <ui:Button display-tooltip-when-elided="true" name="backButton" style="height: auto;">
