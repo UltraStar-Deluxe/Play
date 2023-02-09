@@ -53,6 +53,7 @@ public static partial class R_PlayShared
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
         public const string goldenNote = "goldenNote";
         public const string hidden = "hidden";
+        public const string horizontal = "horizontal";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
@@ -160,6 +161,7 @@ public static partial class R_PlayShared
         public const string unity_toggle__checkmark = "unity-toggle__checkmark";
         public const string unity_toggle__input = "unity-toggle__input";
         public const string unity_toggle__label = "unity-toggle__label";
+        public const string vertical = "vertical";
         public const string warning = "warning";
         public const string wordWrap = "wordWrap";
         public const string xxlFont = "xxlFont";
