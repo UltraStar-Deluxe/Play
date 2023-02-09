@@ -212,7 +212,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             return;
         }
         
-        mainGameHttpClient.PostRequest($"api/rest/input/scrollWheel/{scrollDelta.x}/{scrollDelta.y}");
+        mainGameHttpClient.PostRequest($"api/rest/input/scrollWheel/{scrollDelta.x.ToString(CultureInfo.InvariantCulture)}/{scrollDelta.y.ToString(CultureInfo.InvariantCulture)}");
     }
     
     private void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
@@ -222,7 +222,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             return;
         }
         
-        mainGameHttpClient.PostRequest($"api/rest/input/mouseDelta/{mouseDelta.x}/{mouseDelta.y}");
+        mainGameHttpClient.PostRequest($"api/rest/input/mouseDelta/{mouseDelta.x.ToString(CultureInfo.InvariantCulture)}/{mouseDelta.y.ToString(CultureInfo.InvariantCulture)}");
     }
 
     private void RegisterCallbackToSendSimulationInputRequest(Button uiButton, string keyboardButton)
