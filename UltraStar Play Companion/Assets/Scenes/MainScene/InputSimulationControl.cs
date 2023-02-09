@@ -211,7 +211,8 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     private void SendSimulateInputRequest(string inputControl)
     {
-        mainGameHttpClient.PostRequest($"api/rest/input/{inputControl}");
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.Input
+            .ReplaceOrThrow("{inputControl}", inputControl));
     }
 
     private void SendSimulateScrollWheelRequest(Vector2 scrollDelta)
@@ -220,18 +221,22 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-        
-        mainGameHttpClient.PostRequest($"api/rest/input/scrollWheel/{scrollDelta.x.ToString(CultureInfo.InvariantCulture)}/{scrollDelta.y.ToString(CultureInfo.InvariantCulture)}");
+
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputScrollWheel
+            .ReplaceOrThrow("{deltaX}", scrollDelta.x.ToString(CultureInfo.InvariantCulture))
+            .ReplaceOrThrow("{deltaY}", scrollDelta.y.ToString(CultureInfo.InvariantCulture)));
     }
-    
+
     private void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
     {
         if (mouseDelta == Vector2.zero)
         {
             return;
         }
-        
-        mainGameHttpClient.PostRequest($"api/rest/input/mouseDelta/{mouseDelta.x.ToString(CultureInfo.InvariantCulture)}/{mouseDelta.y.ToString(CultureInfo.InvariantCulture)}");
+
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputMouseDelta
+            .ReplaceOrThrow("{deltaX}", mouseDelta.x.ToStringInvariantCulture())
+            .ReplaceOrThrow("{deltaY}", mouseDelta.y.ToStringInvariantCulture()));
     }
 
     private void RegisterCallbackToSendSimulationInputRequest(Button uiButton, string keyboardButton)

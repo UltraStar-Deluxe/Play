@@ -17,7 +17,7 @@ public class EditSettingsRestControl : AbstractRestControl, INeedInjection
 
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/config")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Config)
             .SetDescription($"Get config.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -25,7 +25,7 @@ public class EditSettingsRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(settings);
             });
         
-        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/config")
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.Config)
             .SetDescription($"Set config. Only present fields in the request body are set.")
             .SetRemoveOnDestroy(gameObject)
             .SetRequiredPermission(HttpApiPermission.WriteConfig)

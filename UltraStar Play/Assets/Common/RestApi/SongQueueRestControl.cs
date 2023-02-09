@@ -28,7 +28,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
 
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/availablePlayers")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.AvailablePlayers)
             .SetDescription($"Get player profiles that can be used for singing")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -44,7 +44,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(dto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/availableMicrophones")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.AvailableMicrophones)
             .SetDescription($"Get microphone profiles that can be used for singing")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -59,7 +59,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(dto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/songQueue/entry")
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.SongQueueEntry)
             .SetDescription($"Add entry song queue to the song queue.")
             .SetRemoveOnDestroy(gameObject)
             .SetRequiredPermission(HttpApiPermission.WriteSongQueue)

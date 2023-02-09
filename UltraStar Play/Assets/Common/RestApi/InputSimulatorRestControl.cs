@@ -130,7 +130,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 
     private void RegisterMouseDeltaEndpoint()
     {
-        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/input/mouseDelta/{deltaX}/{deltaY}")
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.InputMouseDelta)
             .SetDescription("Move the current mouse if any by the given X and Y delta values")
             .SetRemoveOnDestroy(gameObject)
             .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
@@ -152,7 +152,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 
     private void RegisterScrollWheelEndpoint()
     {
-        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/input/scrollWheel/{deltaX}/{deltaY}")
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.InputScrollWheel)
             .SetDescription("Simulate scroll wheel events")
             .SetRemoveOnDestroy(gameObject)
             .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
