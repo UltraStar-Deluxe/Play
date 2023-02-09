@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
+using Serilog.Events;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -164,8 +165,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.tabGroup)]
     private VisualElement tabGroup;
     
+    [Inject(UxmlName = R.UxmlNames.viewLogButton)]
+    private Button viewLogButton;
+    
+    [Inject(UxmlName = R.UxmlNames.copyLogButton)]
+    private Button copyLogButton;
+    
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private InGameDebugConsoleManager inGameDebugConsoleManager;
     
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
@@ -308,6 +318,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         showMenuButton.RegisterCallbackButtonTriggered(() => ShowMenu());
         hiddenCloseMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
         closeMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
+        
+        // View and copy log
+        viewLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
+        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        {
+            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
+            UiManager.CreateNotification("Copied log to clipboard");
+        });
     }
 
     private void OnDevModeEnabledChanged(bool isEnabled)

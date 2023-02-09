@@ -19,6 +19,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(MainGameHttpClient.Instance);
         bb.BindExistingInstance(UnityWebRequestManager.Instance);
         bb.BindExistingInstance(UiManager.Instance);
+        bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(GetUiDocument());
 
         bb.BindExistingInstance(SettingsManager.Instance.Settings);

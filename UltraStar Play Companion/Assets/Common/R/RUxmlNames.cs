@@ -18,6 +18,7 @@ public static partial class R
         public const string connectionStatusText = "connectionStatusText";
         public const string connectionThroubleshootingText = "connectionThroubleshootingText";
         public const string connectionViewContainer = "connectionViewContainer";
+        public const string copyLogButton = "copyLogButton";
         public const string devModeContainer = "devModeContainer";
         public const string devModeLabel = "devModeLabel";
         public const string devModePicker = "devModePicker";
@@ -141,6 +142,7 @@ public static partial class R
         public const string udpPortOnServerContainer = "udpPortOnServerContainer";
         public const string udpPortOnServerLabel = "udpPortOnServerLabel";
         public const string udpPortOnServerTextField = "udpPortOnServerTextField";
+        public const string viewLogButton = "viewLogButton";
         public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";
