@@ -30,11 +30,13 @@ public static partial class R_PlayShared
         public const string ellipsis = "ellipsis";
         public const string error = "error";
         public const string expanded = "expanded";
+        public const string firstChild = "firstChild";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fontIcon = "fontIcon";
         public const string fpsLabel = "fpsLabel";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
         public const string goldenNote = "goldenNote";
+        public const string horizontal = "horizontal";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
@@ -44,6 +46,7 @@ public static partial class R_PlayShared
         public const string itemPickerItemLabel = "itemPickerItemLabel";
         public const string largeFont = "largeFont";
         public const string largerFont = "largerFont";
+        public const string lastChild = "lastChild";
         public const string lyricsContainer = "lyricsContainer";
         public const string mainSceneButton = "mainSceneButton";
         public const string mainSceneButtonSpacer = "mainSceneButtonSpacer";
@@ -124,6 +127,7 @@ public static partial class R_PlayShared
         public const string unity_text_input = "unity-text-input";
         public const string unity_toggle = "unity-toggle";
         public const string unity_toggle__checkmark = "unity-toggle__checkmark";
+        public const string vertical = "vertical";
         public const string warning = "warning";
         public const string wideControl = "wideControl";
         public const string wordWrap = "wordWrap";

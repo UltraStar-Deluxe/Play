@@ -207,6 +207,25 @@ ButtonGroup.horizontal > .unity-button.lastChild {
 /**************************************************/
 /* ACCORDION */
 /**************************************************/
+AccordionGroup {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+AccordionGroup > AccordionItem {
+    margin-bottom: 1px;
+}
+
+AccordionGroup > AccordionItem.firstChild {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+AccordionGroup > AccordionItem.lastChild {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-bottom: 0;
+}
 
 #accordionItemRoot {
     width: 100%;
@@ -214,8 +233,10 @@ ButtonGroup.horizontal > .unity-button.lastChild {
 }
 
 #accordionItemContent {
+    padding-left: 10px;
+    padding-right: 10px;
     overflow: hidden;
-    transition: height 0.5s;
+    transition: height 0.3s;
 }
 
 #toggleAccordionItemContentButton.unity-button {
