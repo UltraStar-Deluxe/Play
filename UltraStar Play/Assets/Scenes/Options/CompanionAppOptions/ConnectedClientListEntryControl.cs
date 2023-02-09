@@ -10,6 +10,9 @@ public class ConnectedClientListEntryControl : INeedInjection, IInjectionFinishe
     [Inject]
     private Settings settings;
     
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    
     [Inject(UxmlName = R.UxmlNames.clientNameLabel)]
     private Label clientNameLabel;
     
@@ -41,6 +44,12 @@ public class ConnectedClientListEntryControl : INeedInjection, IInjectionFinishe
                 {
                     SettingsUtils.RemovePermission(settings, clientHandler.ClientId, permission);
                 }
+
+                List <HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
+                clientHandler.SendMessageToClient(new PermissionsMessageDto()
+                {
+                    Permissions = permissions,
+                });
             });
             
             permissionsContainer.Add(permissionToggle);
