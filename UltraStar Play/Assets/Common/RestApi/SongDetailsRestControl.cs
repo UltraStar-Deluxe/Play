@@ -10,12 +10,9 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongDetailsRestControl : AbstractSingletonBehaviour, INeedInjection
+public class SongDetailsRestControl : AbstractRestControl, INeedInjection
 {
     public static SongDetailsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongDetailsRestControl>();
-
-    [Inject]
-    private HttpServer httpServer;
 
     [Inject]
     private SongMetaManager songMetaManager;

@@ -1,18 +1,12 @@
 using System.Net.Http;
-using System.Text;
-using SimpleHttpServerForUnity;
 using UniInject;
-using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class StatisticsRestControl : AbstractSingletonBehaviour, INeedInjection
+public class StatisticsRestControl : AbstractRestControl, INeedInjection
 {
     public static StatisticsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatisticsRestControl>();
-
-    [Inject]
-    private HttpServer httpServer;
 
     [Inject]
     private Statistics statistics;

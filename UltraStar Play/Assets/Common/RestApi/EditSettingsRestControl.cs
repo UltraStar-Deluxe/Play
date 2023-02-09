@@ -6,16 +6,10 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditSettingsRestControl : AbstractSingletonBehaviour, INeedInjection
+public class EditSettingsRestControl : AbstractRestControl, INeedInjection
 {
     public static EditSettingsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<EditSettingsRestControl>();
-
-    [Inject]
-    private HttpServer httpServer;
-
-    [Inject]
-    private Settings settings;
-
+    
     protected override object GetInstance()
     {
         return Instance;
