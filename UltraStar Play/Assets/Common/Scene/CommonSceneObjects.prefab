@@ -584,7 +584,7 @@ GameObject:
   - component: {fileID: 1167584606245705781}
   - component: {fileID: 1837713144552438351}
   m_Layer: 0
-  m_Name: SongDetailsRestControl
+  m_Name: SongsRestControl
   m_TagString: GameRoundManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

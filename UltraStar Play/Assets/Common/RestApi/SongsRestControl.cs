@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using SimpleHttpServerForUnity;
@@ -27,7 +28,12 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/song/{songId}")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Songs)
+            .SetDescription("Get loaded songs")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(SendLoadedSongs);
+        
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Song)
             .SetDescription($"Get song details.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -54,7 +60,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(songDetailsDto);
             });
         
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/songImage/{songId}")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.SongImage)
             .SetDescription($"Get song cover image. Returns the background image if no cover image was found.")
             .SetRemoveOnDestroy(gameObject)
             .SetThread(ResponseThread.NewThread)
@@ -138,5 +144,23 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
             voiceNameToLyricsMap.Add(voiceDisplayName, SongMetaUtils.GetLyrics(voice, true));
         }
         return voiceNameToLyricsMap;
+    }
+    
+    private void SendLoadedSongs(EndpointRequestData requestData)
+    {
+        SongMetaManager songMetaManager = SongMetaManager.Instance;
+        requestData.Context.Response.SendResponse(new LoadedSongsDto
+        {
+            IsSongScanFinished = SongMetaManager.IsSongScanFinished,
+            SongCount = songMetaManager.GetSongMetas().Count,
+            SongList = songMetaManager.GetSongMetas()
+                .Select(songMeta => new SongDto
+                {
+                    Artist = songMeta.Artist,
+                    Title = songMeta.Title,
+                    Hash = songMeta.SongHash,
+                })
+                .ToList()
+        }.ToJson());
     }
 }
