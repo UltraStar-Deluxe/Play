@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 using ProTrans;
+using Serilog.Events;
 using Button = UnityEngine.UIElements.Button;
 using IBinding = UniInject.IBinding;
 using Toggle = UnityEngine.UIElements.Toggle;
@@ -37,6 +38,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private InGameDebugConsoleManager inGameDebugConsoleManager;
     
     [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
@@ -147,7 +151,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject]
     private Injector injector;
+    
+    [Inject(UxmlName = R.UxmlNames.viewLogButton)]
+    private Button viewLogButton;
 
+    [Inject(UxmlName = R.UxmlNames.copyLogButton)]
+    private Button copyLogButton;
+    
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
     private BoolPickerControl devModePickerControl;
@@ -266,6 +276,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         showMenuButton.RegisterCallbackButtonTriggered(() => ShowMenu());
         hiddenCloseMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
         closeMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
+        
+        // View and copy log
+        viewLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
+        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        {
+            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
+            UiManager.CreateNotification("Copied log to clipboard");
+        });
     }
 
     private void OnDevModeEnabledChanged(bool isEnabled)

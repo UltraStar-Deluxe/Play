@@ -63,6 +63,8 @@
                         <ui:Label text="Developer Mode" display-tooltip-when-elided="true" name="devModeLabel" />
                         <ItemPicker name="devModePicker" noPreviousButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
                     </ui:VisualElement>
+                    <ui:Button text="View Log" display-tooltip-when-elided="true" name="viewLogButton" />
+                    <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" />
                     <ui:VisualElement name="networkConfigContainer">
                         <ui:VisualElement name="udpPortOnClientContainer" style="margin-bottom: 20px;">
                             <ui:Label text="UDP Port of Companion App&#10;(default 34568)" display-tooltip-when-elided="true" name="udpPortOnClientLabel" />
