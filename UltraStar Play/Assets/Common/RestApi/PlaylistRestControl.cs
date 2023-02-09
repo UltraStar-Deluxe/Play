@@ -25,7 +25,7 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/playlist/favorites")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.PlaylistFavorites)
             .SetDescription($"Get songs of the 'favorites' playlist")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -43,7 +43,7 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(songListDto);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Post, "api/rest/playlist/favorites/entry/{songId}")
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.PlaylistFavoritesEntry)
             .SetDescription($"Add song to the favorites playlist")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -53,7 +53,7 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
                 playlistManager.AddSongToPlaylist(playlistManager.FavoritesPlaylist, songMeta);
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Delete, "api/rest/playlist/favorites/entry/{songId}")
+        httpServer.CreateEndpoint(HttpMethod.Delete, HttpApiEndpointPaths.PlaylistFavoritesEntry)
             .SetDescription($"Remove song from the favorites playlist")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>

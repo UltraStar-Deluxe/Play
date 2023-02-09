@@ -18,7 +18,7 @@ public class StatisticsRestControl : AbstractRestControl, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/stats")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Statistics)
             .SetDescription($"Get statistics. This includes song scores, play count, etc.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>

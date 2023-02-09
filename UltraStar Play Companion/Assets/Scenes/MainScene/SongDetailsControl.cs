@@ -123,7 +123,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         
         GameRoundDataDto dto = CreateGameRoundDataDto(selectedPlayerControls);
         string json = JsonConverter.ToJson(dto);
-        mainGameHttpClient.PostRequest("api/rest/songQueue/entry", json);
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
         
         HideSongDetails();
     }
@@ -171,11 +171,13 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         isFavorite = !isFavorite;
         if (isFavorite)
         {
-            mainGameHttpClient.PostRequest($"api/rest/playlist/favorites/entry/{songDto.Hash}");
+            mainGameHttpClient.PostRequest(HttpApiEndpointPaths.PlaylistFavoritesEntry
+                .ReplaceOrThrow("{songId}", songDto.Hash));
         }
         else
         {
-            mainGameHttpClient.DeleteRequest($"api/rest/playlist/favorites/entry/{songDto.Hash}");
+            mainGameHttpClient.DeleteRequest(HttpApiEndpointPaths.PlaylistFavoritesEntry
+                    .ReplaceOrThrow("{songId}", songDto.Hash));
         }
         UpdateFavoriteButton();
     }
@@ -215,7 +217,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         
         playerProfileEntryControls.Clear();
 
-        mainGameHttpClient.GetRequest($"api/rest/availablePlayers",
+        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailablePlayers,
             response =>
             {
                 ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response, false); 
@@ -237,7 +239,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
             });
         
-        mainGameHttpClient.GetRequest($"api/rest/availableMicrophones",
+        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailableMicrophones,
             response =>
             {
                 ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response, false); 
@@ -344,8 +346,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     private void LoadSongImage()
     {
         songImage.HideByVisibility();
-        
-        mainGameHttpClient.GetRequest($"api/rest/songImage/{songDto.Hash}",
+
+        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.SongImage.ReplaceOrThrow("{songId}", songDto.Hash),
             response =>
             {
                 ImageDto imageDto = JsonConverter.FromJson<ImageDto>(response, false);
@@ -374,7 +376,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         SetLyrics("Loading lyrics...");
 
-        mainGameHttpClient.GetRequest($"api/rest/song/{songDto.Hash}",
+        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Song.ReplaceOrThrow("{songId}", songDto.Hash),
             response =>
             {
                 SongDetailsDto songDetailsDto = JsonConverter.FromJson<SongDetailsDto>(response, false);

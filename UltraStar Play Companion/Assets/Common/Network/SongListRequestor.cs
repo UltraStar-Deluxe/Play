@@ -31,7 +31,7 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
             return;
         }
 
-        mainGameHttpClient.GetRequest("/api/rest/songs",
+        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Songs,
             HandleSongListResponse,
             HandleSongListErrorResponse);
     }

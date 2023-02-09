@@ -21,7 +21,7 @@ public class TranslationRestControl : AbstractRestControl, INeedInjection
     
     protected override void StartSingleton()
     {
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/language")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Language)
             .SetDescription($"Get current language as 2 letter country code")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
@@ -30,7 +30,7 @@ public class TranslationRestControl : AbstractRestControl, INeedInjection
                 requestData.Context.Response.WriteJson(new Dictionary<string, string> { { "language", language } });
             });
 
-        httpServer.CreateEndpoint(HttpMethod.Get, "api/rest/translations")
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Translations)
             .SetDescription($"Get all translations for the current language.")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>

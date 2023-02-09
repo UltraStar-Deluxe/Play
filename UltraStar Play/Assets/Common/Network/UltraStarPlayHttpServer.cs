@@ -39,12 +39,12 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
         NoEndpointFoundCallback = SendNoEndpointFound;
         StartHttpListener();
 
-        this.CreateEndpoint(HttpMethod.Get, "api/rest/songs")
-            .SetDescription("Get loaded songs")
+        this.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Endpoints)
+            .SetDescription("Get currently registered endpoints")
             .SetRemoveOnDestroy(gameObject)
-            .SetCallbackAndAdd(SendLoadedSongs);
+            .SetCallbackAndAdd(SendRegisteredEndpoints);
 
-        this.CreateEndpoint(HttpMethod.Get, "/api/rest/hello/{name}")
+        this.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Hello)
             .SetDescription("Say hello (path-parameter example)")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(SendHello);
@@ -68,24 +68,6 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
                     HttpMethod = endpoint.HttpMethod.Method,
                     UrlPattern = endpoint.PathPattern,
                     Description = endpoint.Description
-                })
-                .ToList()
-        }.ToJson());
-    }
-    
-    private void SendLoadedSongs(EndpointRequestData requestData)
-    {
-        SongMetaManager songMetaManager = SongMetaManager.Instance;
-        requestData.Context.Response.SendResponse(new LoadedSongsDto
-        {
-            IsSongScanFinished = SongMetaManager.IsSongScanFinished,
-            SongCount = songMetaManager.GetSongMetas().Count,
-            SongList = songMetaManager.GetSongMetas()
-                .Select(songMeta => new SongDto
-                {
-                    Artist = songMeta.Artist,
-                    Title = songMeta.Title,
-                    Hash = songMeta.SongHash,
                 })
                 .ToList()
         }.ToJson());
