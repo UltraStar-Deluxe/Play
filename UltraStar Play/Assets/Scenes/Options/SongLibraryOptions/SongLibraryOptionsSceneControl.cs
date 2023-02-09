@@ -283,14 +283,17 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             .CreateAndInject<MessageDialogControl>();
         songIssueDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
 
+        AccordionGroup accordionGroup = new();
+        songIssueDialogControl.AddVisualElement(accordionGroup);
+        
         AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
         errorsAccordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
-        songIssueDialogControl.AddVisualElement(errorsAccordionItem);
+        accordionGroup.Add(errorsAccordionItem);
         FillWithSongIssues(errorsAccordionItem, songMetaManager.GetSongErrors());
 
         AccordionItem warningsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings));
         warningsAccordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
-        songIssueDialogControl.AddVisualElement(warningsAccordionItem);
+        accordionGroup.Add(warningsAccordionItem);
         FillWithSongIssues(warningsAccordionItem, songMetaManager.GetSongWarnings());
 
         if (songMetaManager.GetSongErrors().Count > 0)
