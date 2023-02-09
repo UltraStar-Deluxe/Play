@@ -24,9 +24,7 @@ public class EditorIssueControl : INeedInjection, IInjectionFinishedListener
     {
         issueImage.style.unityBackgroundImageTintColor = SongIssueUtils.GetColorForIssue(SongIssue);
 
-        tooltipControl = injector
-            .WithRootVisualElement(VisualElement)
-            .CreateAndInject<TooltipControl>();
+        tooltipControl = new(VisualElement);
         tooltipControl.TooltipText = SongIssue.Message;
     }
 }

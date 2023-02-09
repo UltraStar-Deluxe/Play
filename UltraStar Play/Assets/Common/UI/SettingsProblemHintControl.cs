@@ -17,9 +17,7 @@ public class SettingsProblemHintControl
     public SettingsProblemHintControl(VisualElement visualElement, List<string> settingsProblems, Injector injector)
     {
         visualElement.SetVisibleByDisplay(!settingsProblems.IsNullOrEmpty());
-        TooltipControl settingsProblemTooltipControl = injector
-            .WithRootVisualElement(visualElement)
-            .CreateAndInject<TooltipControl>();
+        TooltipControl settingsProblemTooltipControl = new(visualElement);
         settingsProblemTooltipControl.TooltipText = settingsProblems.JoinWith("\n\n");
     }
 

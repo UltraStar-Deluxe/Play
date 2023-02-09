@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Linq;
-using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class TooltipControl : INeedInjection, IInjectionFinishedListener
+public class TooltipControl
 {
     private static readonly float defaultShowDelayInSeconds = 1f;
     private static readonly float defaultCloseDelayInSeconds = 0.2f;
@@ -16,35 +14,41 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
     public float CloseDelayInSeconds { get; set; } = defaultCloseDelayInSeconds;
     public string TooltipText { get; set; }
 
-    [Inject(Key = Injector.RootVisualElementInjectionKey)]
-    private VisualElement target;
-
-    [Inject]
-    private UIDocument uiDocument;
-
+    private readonly VisualElement visualElement;
+    
     private Label label;
-    private PanelHelper panelHelper;
     private IEnumerator showTooltipCoroutine;
     private IEnumerator closeTooltipCoroutine;
     private bool showTooltipByPointerDown;
 
-    public void OnInjectionFinished()
+    public TooltipControl(VisualElement visualElement)
     {
-        this.panelHelper = new PanelHelper(uiDocument);
-        target.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter());
-        target.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit());
-        target.RegisterCallback<PointerDownEvent>(evt => OnPointerDown());
+        this.visualElement = visualElement;
+        
+        this.visualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter());
+        this.visualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit());
+        this.visualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown());
     }
 
     private void OnPointerDown()
     {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+        
         showTooltipByPointerDown = true;
         ShowTooltip();
-        uiDocument.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showTooltipOnPointerDownTimeInSeconds, () =>
+        GetUiDocument().StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(showTooltipOnPointerDownTimeInSeconds, () =>
         {
             showTooltipByPointerDown = false;
             CloseTooltip();
         }));
+    }
+
+    private UIDocument GetUiDocument()
+    {
+        return UIDocumentUtils.FindUIDocumentOrThrow();
     }
 
     private void OnPointerEnter()
@@ -56,7 +60,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
 
         if (closeTooltipCoroutine != null)
         {
-            uiDocument.StopCoroutine(closeTooltipCoroutine);
+            GetUiDocument().StopCoroutine(closeTooltipCoroutine);
         }
 
         showTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(ShowDelayInSeconds, () =>
@@ -67,7 +71,7 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
             }
             ShowTooltip();
         });
-        uiDocument.StartCoroutine(showTooltipCoroutine);
+        GetUiDocument().StartCoroutine(showTooltipCoroutine);
     }
 
     private void OnPointerExit()
@@ -79,11 +83,11 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
 
         if (showTooltipCoroutine != null)
         {
-            uiDocument.StopCoroutine(showTooltipCoroutine);
+            GetUiDocument().StopCoroutine(showTooltipCoroutine);
         }
 
         closeTooltipCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(CloseDelayInSeconds, () => CloseTooltip());
-        uiDocument.StartCoroutine(closeTooltipCoroutine);
+        GetUiDocument().StartCoroutine(closeTooltipCoroutine);
     }
 
     public void CloseTooltip()
@@ -103,8 +107,8 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-
-        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true) + tooltipOffsetInPx;
+        
+        Vector2 pos = InputUtils.GetPointerPositionInPanelCoordinates(GetPanelHelper(), true) + tooltipOffsetInPx;
 
         label = new Label();
         label.AddToClassList("tooltip");
@@ -114,8 +118,13 @@ public class TooltipControl : INeedInjection, IInjectionFinishedListener
         label.style.left = pos.x;
         label.style.top = pos.y;
 
-        uiDocument.rootVisualElement.Children().First().Add(label);
+        GetUiDocument().rootVisualElement.Children().First().Add(label);
 
-        label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => VisualElementUtils.MoveVisualElementFullyInsideScreen(label, panelHelper));
+        label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => VisualElementUtils.MoveVisualElementFullyInsideScreen(label, GetPanelHelper()));
+    }
+
+    private PanelHelper GetPanelHelper()
+    {
+        return new PanelHelper(GetUiDocument());
     }
 }

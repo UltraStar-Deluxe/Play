@@ -83,9 +83,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         UpdateSearchTextFieldHint();
 
         searchErrorIcon.HideByDisplay();
-        searchErrorIconTooltipControl = injector
-            .WithRootVisualElement(searchErrorIcon)
-            .CreateAndInject<TooltipControl>();
+        searchErrorIconTooltipControl = new(searchErrorIcon);
 
         HideSearchPropertyDropdownOverlay();
         searchPropertyButton.RegisterCallbackButtonTriggered(() =>
