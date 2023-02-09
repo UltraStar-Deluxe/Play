@@ -16,7 +16,7 @@
                 <MaterialIcon icon="settings" name="menuIcon" />
             </ui:Button>
         </ui:VisualElement>
-        <ButtonGroup name="tabGroup" direction="Horizontal" style="flex-direction: row;">
+        <ButtonGroup name="tabGroup" direction="Horizontal" class="onlyVisibleWhenConnected" style="flex-direction: row;">
             <ui:Button display-tooltip-when-elided="true" name="showMicViewButton">
                 <MaterialIcon tabindex="-1" icon="mic" name="micIcon" />
             </ui:Button>
