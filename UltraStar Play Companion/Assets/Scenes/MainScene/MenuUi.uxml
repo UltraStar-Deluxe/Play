@@ -28,6 +28,8 @@
                     <ui:TextField picking-mode="Ignore" name="ownHostTextField" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:Button text="View Log" display-tooltip-when-elided="true" name="viewLogButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 10px;" />
+            <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 10px;" />
         </ui:ScrollView>
         <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 10px;" />
         <ui:VisualElement name="infoContainer" class="smallerFont" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; width: 100%;">
