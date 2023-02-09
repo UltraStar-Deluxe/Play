@@ -162,6 +162,49 @@ ItemPicker #nextItemButton {
 }
 
 /**************************************************/
+/* BUTTON GROUP */
+/**************************************************/
+ButtonGroup {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+ButtonGroup > .unity-button {
+    border-radius: 0;
+    flex-grow: 1;
+}
+
+ButtonGroup.vertical > .unity-button {
+    margin-bottom: 1px;
+}
+
+ButtonGroup.vertical > .unity-button.firstChild {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+ButtonGroup.vertical > .unity-button.lastChild {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-bottom: 0;
+}
+
+ButtonGroup.horizontal > .unity-button {
+    margin-right: 1px;
+}
+
+ButtonGroup.horizontal > .unity-button.firstChild {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+ButtonGroup.horizontal > .unity-button.lastChild {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-right: 0;
+}
+
+/**************************************************/
 /* ACCORDION */
 /**************************************************/
 
