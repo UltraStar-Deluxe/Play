@@ -46,6 +46,7 @@ public static partial class R_PlayShared
         public const string ellipsis = "ellipsis";
         public const string error = "error";
         public const string expanded = "expanded";
+        public const string firstChild = "firstChild";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string folded = "folded";
         public const string fontIcon = "fontIcon";
@@ -71,6 +72,7 @@ public static partial class R_PlayShared
         public const string largeControlMinWidth = "largeControlMinWidth";
         public const string largeFont = "largeFont";
         public const string largerFont = "largerFont";
+        public const string lastChild = "lastChild";
         public const string lyricsContainer = "lyricsContainer";
         public const string mainSceneButton = "mainSceneButton";
         public const string mainSceneButtonSpacer = "mainSceneButtonSpacer";
