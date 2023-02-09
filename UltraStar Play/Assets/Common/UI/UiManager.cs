@@ -147,12 +147,15 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
             .CreateAndInject<MessageDialogControl>();
         helpDialogControl.Title = dialogTitle;
 
+        AccordionGroup accordionGroup = new();
+        helpDialogControl.AddVisualElement(accordionGroup);
+            
         void AddChapter(string title, string content)
         {
             AccordionItem accordionItem = new(title);
             accordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
             accordionItem.Add(new Label(content));
-            helpDialogControl.AddVisualElement(accordionItem);
+            accordionGroup.Add(accordionItem);
         }
 
         titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
