@@ -16,6 +16,9 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
     
     [Inject]
     private HttpServer httpServer;
+    
+    [Inject]
+    private Settings settings;
 
     private Keyboard virtualKeyboard;
     private Mouse virtualMouse;
@@ -70,6 +73,14 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
             virtualKeyboard,
             () => virtualKeyboard.spaceKey);
         
+        RegisterPseudoNavigationEndpoint("volumeUpKey",
+            "Increase volume",
+            () => IncreaseVolume());
+        
+        RegisterPseudoNavigationEndpoint("volumeDownKey",
+            "Decrease volume",
+            () => DecreaseVolume());
+        
         RegisterNavigationEndpoint("leftMouseButton",
             "Simulate left mouse button press",
             virtualMouse,
@@ -87,6 +98,41 @@ public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInject
 
         RegisterMouseDeltaEndpoint();
         RegisterScrollWheelEndpoint();
+    }
+
+    private void IncreaseVolume()
+    {
+        settings.AudioSettings.VolumePercent += 10;
+        settings.AudioSettings.VolumePercent = NumberUtils.Limit(settings.AudioSettings.VolumePercent, 0, 100);
+    }
+
+    private void DecreaseVolume()
+    {
+        settings.AudioSettings.VolumePercent -= 10;
+        settings.AudioSettings.VolumePercent = NumberUtils.Limit(settings.AudioSettings.VolumePercent, 0, 100);
+    }
+    
+    /**
+     * Method that uses an endpoint similar to other input simulation,
+     * but for a key that Unity does not really support.
+     */
+    private void RegisterPseudoNavigationEndpoint(string inputControlName, string description, Action callback)
+    {
+        string path = $"api/rest/input/{inputControlName}";
+        httpServer.CreateEndpoint(HttpMethod.Post, path)
+            .SetDescription(description)
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetCallbackAndAdd(requestData =>
+            {
+                if (virtualKeyboard == null)
+                {
+                    return;
+                }
+
+                Debug.Log($"Received input simulation request {path}");
+                callback?.Invoke();
+            });
     }
 
     private void RegisterMouseDeltaEndpoint()

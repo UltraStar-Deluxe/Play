@@ -74,7 +74,7 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
-        Debug.Log($"Sending POST request to {uri}");
+        Debug.Log($"Sending POST request to '{uri}'");
         UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, body, contentType);
         SendRequest(unityWebRequest, onSuccess, onError);
     }
@@ -100,14 +100,20 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         AddHeaders(unityWebRequest);
         unityWebRequest.SendWebRequest();
 
+        void WrappedOnSuccess(string response)
+        {
+            LogRequestSuccess(unityWebRequest);
+            onSuccess?.Invoke(response);
+        }
+
         void WrappedOnError(Exception ex)
         {
-            RequestOnError(unityWebRequest, ex);
+            LogRequestError(unityWebRequest, ex);
             onError?.Invoke(ex);
         }
 
         webRequestManager.AddUnityWebRequest(unityWebRequest,
-            onSuccess,
+            WrappedOnSuccess,
             ex => WrappedOnError(ex));
     }
 
@@ -117,26 +123,17 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         unityWebRequest.SetRequestHeader("client-name", settings.ClientName);
     }
 
-    private void RequestOnNext(UnityWebRequest unityWebRequest)
-    {
-        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has updated. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}");
-    }
-
-    private void RequestOnError(UnityWebRequest unityWebRequest, Exception ex)
+    private void LogRequestError(UnityWebRequest unityWebRequest, Exception ex)
     {
         string responseBody = unityWebRequest.downloadHandler.text;
         Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}, response body: {responseBody}");
         Debug.LogException(ex);
     }
 
-    private void RequestOnCompleted(UnityWebRequest unityWebRequest, Action<string> onSuccess)
+    private void LogRequestSuccess(UnityWebRequest unityWebRequest)
     {
         string responseBody = unityWebRequest.downloadHandler.text;
         Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
-        if (onSuccess != null)
-        {
-            MainThreadDispatcher.Send(_ => onSuccess(responseBody), null);
-        }
     }
 
     private void ThrowIfNotConnected()

@@ -1,38 +1,31 @@
-﻿using System;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class EditMainGameConfigControl : INeedInjection, IInjectionFinishedListener
 {
-    private const float ClickTimeThresholdInSeconds = 0.3f;
-    
     [Inject]
     private Settings settings;
     
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
 
-    [Inject(UxmlName = R.UxmlNames.volumeSlider)]
-    private SliderInt volumeSlider;
-
-    private bool isVolumeSliderInitialized;
+    private bool isControlsInitialized;
     
     public void OnInjectionFinished()
     {
-        mainGameHttpClient.ConnectionEventStream.Subscribe(_ => InitVolumeSlider());
+        mainGameHttpClient.ConnectionEventStream.Subscribe(_ => InitControls());
     }
     
-    private void InitVolumeSlider()
+    private void InitControls()
     {
         mainGameHttpClient.GetRequest("api/rest/config",
             response =>
             {
-                if (isVolumeSliderInitialized)
+                if (isControlsInitialized)
                 {
                     return;
                 }
@@ -46,15 +39,7 @@ public class EditMainGameConfigControl : INeedInjection, IInjectionFinishedListe
                     return;
                 }
                 
-                isVolumeSliderInitialized = true;
-                volumeSlider.value = mainGameSettingsDto.AudioSettings.VolumePercent;
-
-                // Only send a request when the new volume is stable. Therefor, use throttle of observable.
-                Subject<int> volumeSliderValueChangedEventStream = new();
-                volumeSlider.RegisterValueChangedCallback(evt => volumeSliderValueChangedEventStream.OnNext(evt.newValue));
-                volumeSliderValueChangedEventStream
-                    .Throttle(TimeSpan.FromMilliseconds(200))
-                    .Subscribe(newValue => SetMainGameVolume(newValue));
+                isControlsInitialized = true;
             });
     }
 

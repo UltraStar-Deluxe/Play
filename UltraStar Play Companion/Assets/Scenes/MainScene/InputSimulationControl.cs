@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -41,6 +42,12 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.simulateSpaceButton)]
     private Button simulateSpaceButton;
+    
+    [Inject(UxmlName = R.UxmlNames.simulateVolumeUpButton)]
+    private Button simulateVolumeUpButton;
+    
+    [Inject(UxmlName = R.UxmlNames.simulateVolumeDownButton)]
+    private Button simulateVolumeDownButton;
     
     [Inject(UxmlName = R.UxmlNames.simulateLeftMouseButton)]
     private Button simulateLeftMouseButton;
@@ -93,6 +100,8 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         RegisterCallbackToSendSimulationInputRequest(simulateEnterButton, "enterKey");
         RegisterCallbackToSendSimulationInputRequest(simulateEscapeButton, "escapeKey");
         RegisterCallbackToSendSimulationInputRequest(simulateSpaceButton, "spaceKey");
+        RegisterCallbackToSendSimulationInputRequest(simulateVolumeUpButton, "volumeUpKey");
+        RegisterCallbackToSendSimulationInputRequest(simulateVolumeDownButton, "volumeDownKey");
         RegisterCallbackToSendSimulationInputRequest(simulateLeftMouseButton, "leftMouseButton");
         RegisterCallbackToSendSimulationInputRequest(simulateRightMouseButton, "rightMouseButton");
         RegisterCallbackToSendSimulationInputRequest(simulateMiddleMouseButton, "middleMouseButton");
