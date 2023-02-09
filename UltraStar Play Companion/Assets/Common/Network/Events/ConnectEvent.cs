@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 public class ConnectEvent
 {
@@ -8,4 +9,5 @@ public class ConnectEvent
     public int HttpServerPort { get; set; }
     public string ErrorMessage { get; set; }
     public IPEndPoint ServerIpEndPoint { get; set; }
+    public List<HttpApiPermission> Permissions { get; set; }
 }

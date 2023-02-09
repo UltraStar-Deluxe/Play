@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 public class ConnectResponseDto : JsonSerializable
 {
@@ -8,4 +9,5 @@ public class ConnectResponseDto : JsonSerializable
     public int MessagingPort { get; set; }
     public int HttpServerPort { get; set; }
     public IPEndPoint ServerIpEndPoint { get; set; }
+    public List<HttpApiPermission> Permissions { get; set; }
 }
