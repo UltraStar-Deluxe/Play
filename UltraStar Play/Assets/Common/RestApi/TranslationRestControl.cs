@@ -7,13 +7,10 @@ using UniInject;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class TranslationRestControl : AbstractSingletonBehaviour, INeedInjection
+public class TranslationRestControl : AbstractRestControl, INeedInjection
 {
     public static TranslationRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<TranslationRestControl>();
     
-    [Inject]
-    private HttpServer httpServer;
-
     [Inject]
     private UltraStarPlayTranslationManager translationManager;
 

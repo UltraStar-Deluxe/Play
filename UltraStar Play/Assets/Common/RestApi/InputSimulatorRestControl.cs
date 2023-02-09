@@ -1,6 +1,5 @@
 using System;
 using System.Net.Http;
-using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -10,16 +9,10 @@ using UnityEngine.InputSystem.LowLevel;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class InputSimulatorRestControl : AbstractSingletonBehaviour, INeedInjection
+public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 {
     public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InputSimulatorRestControl>();
     
-    [Inject]
-    private HttpServer httpServer;
-    
-    [Inject]
-    private Settings settings;
-
     private Keyboard virtualKeyboard;
     private Mouse virtualMouse;
     private Mouse systemMouse;
