@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine.UIElements;
 
 public class ButtonGroup : VisualElement
@@ -42,31 +41,11 @@ public class ButtonGroup : VisualElement
         }
     }
     
-    private VisualElement firstChild;
-    private VisualElement lastChild;
+    private SetFirstAndLastChildClassControl setFirstAndLastChildClassControl;
     
     public ButtonGroup()
     {
-        this.RegisterCallback<GeometryChangedEvent>(UpdateChildClasses);
         Direction = ButtonGroupDirection.Vertical;
-    }
-
-    private void UpdateChildClasses(GeometryChangedEvent evt)
-    {
-        VisualElement newFirstChild = this.Children().FirstOrDefault();
-        if (newFirstChild != firstChild)
-        {
-            newFirstChild?.AddToClassList("firstChild");
-            firstChild?.RemoveFromClassList("firstChild");
-            firstChild = newFirstChild;
-        }
-        
-        VisualElement newLastChild = this.Children().LastOrDefault();
-        if (newLastChild != lastChild)
-        {
-            newLastChild?.AddToClassList("lastChild");
-            lastChild?.RemoveFromClassList("lastChild");
-            lastChild = newLastChild;
-        }
+        setFirstAndLastChildClassControl = new(this);
     }
 }
