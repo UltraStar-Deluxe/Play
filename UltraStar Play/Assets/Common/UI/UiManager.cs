@@ -43,6 +43,12 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public VisualTreeAsset nextGameRoundInfoPlayerEntryUi;
 
+    [InjectedInInspector]
+    public VisualTreeAsset songQueueEntryUi;
+    
+    [InjectedInInspector]
+    public VisualTreeAsset songQueuePlayerEntryUi;
+    
     [Inject]
     private Injector injector;
 
@@ -202,6 +208,8 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         bb.Bind(nameof(nextGameRoundInfoUi)).ToExistingInstance(nextGameRoundInfoUi);
         bb.Bind(nameof(nextGameRoundInfoPlayerEntryUi)).ToExistingInstance(nextGameRoundInfoPlayerEntryUi);
         bb.Bind(nameof(micWithNameUi)).ToExistingInstance(micWithNameUi);
+        bb.Bind(nameof(songQueueEntryUi)).ToExistingInstance(songQueueEntryUi);
+        bb.Bind(nameof(songQueuePlayerEntryUi)).ToExistingInstance(songQueuePlayerEntryUi);
         return bb.GetBindings();
     }
 }

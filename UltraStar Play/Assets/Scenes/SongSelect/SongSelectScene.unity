@@ -320,12 +320,6 @@ MonoBehaviour:
   songPreviewControl: {fileID: 974432512}
   playerListControl: {fileID: 922159446}
   micListControl: {fileID: 1127310616}
-  gameRoundUi: {fileID: 9197481963319205126, guid: 82a6470c46626074998301d3d1e10698,
-    type: 3}
-  gameRoundPlayerEntryUi: {fileID: 9197481963319205126, guid: ccb6fef294a278444a611bf2cff48729,
-    type: 3}
-  gameRoundSongEntryUi: {fileID: 9197481963319205126, guid: fb881350f700eba4b80febd82795eb70,
-    type: 3}
 --- !u!4 &620408750
 Transform:
   m_ObjectHideFlags: 0

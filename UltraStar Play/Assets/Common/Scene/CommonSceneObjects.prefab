@@ -344,6 +344,10 @@ MonoBehaviour:
     type: 3}
   nextGameRoundInfoPlayerEntryUi: {fileID: 9197481963319205126, guid: 1c1764560ee144247ab75c166154b2a3,
     type: 3}
+  songQueueEntryUi: {fileID: 9197481963319205126, guid: 82a6470c46626074998301d3d1e10698,
+    type: 3}
+  songQueuePlayerEntryUi: {fileID: 9197481963319205126, guid: ccb6fef294a278444a611bf2cff48729,
+    type: 3}
 --- !u!1 &85355051779227372
 GameObject:
   m_ObjectHideFlags: 0

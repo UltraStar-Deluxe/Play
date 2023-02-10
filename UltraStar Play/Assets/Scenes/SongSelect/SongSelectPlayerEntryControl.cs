@@ -101,6 +101,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             ? voice.Name
             : "";
 
+        enabledToggle.RegisterValueChangedCallback(evt => PlayerProfile.IsSelected = evt.newValue);
+        
         micButton.RegisterCallbackButtonTriggered(() => OpenMicSelectionDialog());
         
         UpdateEnabledToggle();

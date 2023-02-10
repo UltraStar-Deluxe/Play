@@ -79,6 +79,8 @@ public static partial class R_PlayShared
         public const string marginBottomSmall = "marginBottomSmall";
         public const string marginBottomSmaller = "marginBottomSmaller";
         public const string materialIcon = "materialIcon";
+        public const string medleyWithNext = "medleyWithNext";
+        public const string medleyWithPrevious = "medleyWithPrevious";
         public const string middleCenterText = "middleCenterText";
         public const string minimized = "minimized";
         public const string modalDialogContainer = "modalDialogContainer";
@@ -101,6 +103,7 @@ public static partial class R_PlayShared
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string roundButton = "roundButton";
         public const string roundCorners = "roundCorners";
+        public const string roundedCorners = "roundedCorners";
         public const string scoreRow = "scoreRow";
         public const string scrollingNoteStreamSentenceSeparator = "scrollingNoteStreamSentenceSeparator";
         public const string searchPropertyContainer = "searchPropertyContainer";

@@ -329,3 +329,15 @@ Toggle.smallControl {
 .wordWrap Label {
     white-space: normal;
 }
+
+.medleyWithNext {
+    border-bottom-width: 0;
+}
+
+.medleyWithPrevious {
+    border-top-width: 0;
+}
+
+.medleyWithPrevious #playerEntryList {
+    display: none;
+}

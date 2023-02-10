@@ -121,7 +121,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             return;
         }
         
-        GameRoundDataDto dto = CreateGameRoundDataDto(selectedPlayerControls);
+        SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls);
         string json = JsonConverter.ToJson(dto);
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
         
@@ -135,21 +135,33 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             .ToList();
     }
     
-    private GameRoundDataDto CreateGameRoundDataDto(List<PlayerSelectPlayerEntryControl> selectedPlayerControls)
+    private SongQueueEntryDto CreateSongQueueEntryDto(List<PlayerSelectPlayerEntryControl> selectedPlayerControls)
     {
-        GameRoundDataDto dto = new();
-        dto.SongIds = new List<string>() { songDto.Hash };
+        SongQueueEntryDto dto = new();
+        dto.SongDto = songDto;
         dto.SingScenePlayerDataDto = new SingScenePlayerDataDto();
         dto.SingScenePlayerDataDto.PlayerProfileNames = selectedPlayerControls
             .Select(control => control.PlayerProfileName)
             .ToList();
 
-        dto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap = new Dictionary<string, string>();
+        dto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap = new Dictionary<string, MicProfileDto>();
         selectedPlayerControls.ForEach(control =>
         {
             if (control.MicProfile != null)
             {
-                dto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap[control.PlayerProfileName] = control.MicProfile.Name;
+                MicProfileDto micProfileDto = new()
+                {
+                    Name = control.MicProfile.Name,
+                    ChannelIndex = control.MicProfile.ChannelIndex,
+                    Color = control.MicProfile.Color,
+                    Amplification = control.MicProfile.Amplification,
+                    NoiseSuppression = control.MicProfile.NoiseSuppression,
+                    SampleRate = control.MicProfile.SampleRate,
+                    DelayInMillis = control.MicProfile.DelayInMillis,
+                    IsEnabled = control.MicProfile.IsEnabled,
+                    ConnectedClientId = control.MicProfile.ConnectedClientId,
+                };
+                dto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap[control.PlayerProfileName] = micProfileDto;
             }
         });
         

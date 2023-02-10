@@ -25,29 +25,36 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
     private VisualElement nextGameRoundPlayerEntryList;
 
     [Inject]
-    private GameRoundManager gameRoundManager;
+    private SongQueueManager songQueueManager;
+    
+    [Inject]
+    private SongMetaManager songMetaManager;
 
     public void OnInjectionFinished()
     {
-        if (!gameRoundManager.HasGameRounds)
+        if (songQueueManager.IsSongQueueEmpty)
         {
             HideNextGameRoundUi();
             return;
         }
 
-        GameRoundData gameRound = gameRoundManager.GetNextGameRound();
-        nextGameRoundSongInfoLabel.text = SongMetaUtils.GetMedleyName(gameRound.SongMetas);
+        List<SongQueueEntryDto> songQueueEntryDtos = songQueueManager.PeekNextSongQueueEntries();
+        List<SongMeta> songMetas = songQueueEntryDtos
+            .Select(it => DtoConverter.FromDto(it.SongDto, songMetaManager))
+            .ToList();
+        nextGameRoundSongInfoLabel.text = SongMetaUtils.GetMedleyName(songMetas);
 
         nextGameRoundPlayerEntryList.RemoveTemplateContainers();
-        gameRound.SingScenePlayerData.SelectedPlayerProfiles.ForEach(playerProfile =>
+        SongQueueEntryDto songQueueEntryDto = songQueueEntryDtos.FirstOrDefault();
+        songQueueEntryDto.SingScenePlayerDataDto.PlayerProfileNames.ForEach(playerProfileName =>
         {
             VisualElement playerEntryVisualElement = nextGameRoundInfoPlayerEntryUi.CloneTree().Children().FirstOrDefault();
             nextGameRoundPlayerEntryList.Add(playerEntryVisualElement);
-            playerEntryVisualElement.Q<Label>().text = playerProfile.Name;
+            playerEntryVisualElement.Q<Label>().text = playerProfileName;
             VisualElement micVisualElement = playerEntryVisualElement.Q<VisualElement>(R.UxmlNames.nextGameRoundPlayerEntryMicImage);
-            if (gameRound.SingScenePlayerData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile))
+            if (songQueueEntryDto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap.TryGetValue(playerProfileName, out MicProfileDto micProfileDto))
             {
-                micVisualElement.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+                micVisualElement.style.unityBackgroundImageTintColor = new StyleColor(micProfileDto.Color);
             }
             else
             {

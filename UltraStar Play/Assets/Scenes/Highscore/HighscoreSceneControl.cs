@@ -37,7 +37,7 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private GameRoundManager gameRoundManager;
+    private SongQueueManager songQueueManager;
 
     [Inject]
     private Statistics statistics;
@@ -79,17 +79,17 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
 
     public void FinishScene()
     {
-        if (gameRoundManager.HasGameRounds)
-        {
-            // Start next game round
-            gameRoundManager.StartNextGameRound();
-        }
-        else
+        if (songQueueManager.IsSongQueueEmpty)
         {
             // Go to song select
             SongSelectSceneData songSelectSceneData = new();
             songSelectSceneData.SongMeta = sceneData.SongMeta;
             sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+        }
+        else
+        {
+            // Start next game round
+            songQueueManager.StartNextEntry();
         }
     }
 
