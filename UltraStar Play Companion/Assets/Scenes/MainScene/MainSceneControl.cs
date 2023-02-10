@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
@@ -15,9 +14,6 @@ using IBinding = UniInject.IBinding;
 public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInjectionFinishedListener, IBinder
 {
     private const int ConnectRequestCountShowTroubleshootingHintThreshold = 3;
-
-    [InjectedInInspector]
-    public VisualTreeAsset songListEntryUi;
     
     [InjectedInInspector]
     public VisualTreeAsset playerSelectPlayerEntryUi;
@@ -81,9 +77,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     
     [Inject(UxmlName = R.UxmlNames.serverErrorResponseText)]
     private Label serverErrorResponseText;
-
-    [Inject(UxmlName = R.UxmlNames.songListView)]
-    private ScrollView songListView;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -150,21 +143,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.inputSimulationContainer)]
     private VisualElement inputSimulationContainer;
 
-    [Inject(UxmlName = R.UxmlNames.songSearchTextField)]
-    private TextField songSearchTextField;
-
-    [Inject(UxmlName = R.UxmlNames.songSearchHint)]
-    private Label songSearchHint;
-
     [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
     private VisualElement recordingDeviceColorIndicator;
 
     [Inject(UxmlName = R.UxmlNames.mouseSensitivityFloatField)]
     private FloatField mouseSensitivityFloatField;
-    
-    [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
-    private VisualElement songDetailsContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.tabGroup)]
     private VisualElement tabGroup;
     
@@ -192,13 +176,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private int frameCount;
 
     private readonly InputSimulationControl inputSimulationControl = new();
-    private readonly SongDetailsControl songDetailsControl = new();
+    private readonly SongListControl songListControl = new();
     
     public void OnInjectionFinished()
     {
+        injector.Inject(songListControl);
         injector.Inject(inputSimulationControl);
-        injector.WithRootVisualElement(songDetailsContainer)
-            .Inject(songDetailsControl);
 
         mainGameHttpClient.Permissions
             .Subscribe(permissions => OnPermissionsChanged(permissions));
@@ -239,20 +222,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         
         clientSideConnectRequestManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus);
-
-        songListRequestor.SongListEventStream.Subscribe(evt => HandleSongListEvent(evt));
         
         UpdateVersionInfoText();
 
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             audioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, audioWaveForm);
-        });
-
-        songSearchTextField.RegisterValueChangedCallback(evt =>
-        {
-            songSearchHint.SetVisibleByDisplay(songSearchTextField.value.IsNullOrEmpty());
-            UpdateSongList();
         });
         
         mouseSensitivityFloatField.value = settings.mousePadSensitivity;
@@ -291,8 +266,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         showSongViewButton.RegisterCallbackButtonTriggered(() =>
         {
             micSampleRecorder.StopRecording();
-            songSearchTextField.value = "";
-            ShowSongList();
+            songListControl.ShowSongList();
         });
     }
 
@@ -372,71 +346,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         languagePickerControl.UpdateLabelText();
         TranslationManager.GetTranslation("yes");
         devModePickerControl.UpdateLabelText();
-
-        // Search text field hint
-        string searchPropertiesText = new List<string>
-        {
-            TranslationManager.GetTranslation(R.Messages.songProperty_artist),
-            TranslationManager.GetTranslation(R.Messages.songProperty_title),
-        }.ToCsv(", ", "", "");
-        songSearchHint.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint, "properties", searchPropertiesText);
-    }
-
-    private void UpdateSongList()
-    {
-        songListView.Clear();
-        if (songListRequestor.LoadedSongsDto == null
-            || songListRequestor.LoadedSongsDto.SongList.IsNullOrEmpty())
-        {
-            songListView.Add(new Label("No songs found"));
-            return;
-        }
-
-        List<SongDto> songDtos = new List<SongDto>(songListRequestor.LoadedSongsDto.SongList)
-            .Where(songDto => SongSearchMatches(songDto))
-            .ToList();
-        songDtos.Sort((a,b) => string.Compare(a.Artist, b.Artist, StringComparison.InvariantCulture));
-
-        foreach (SongDto songDto in songDtos)
-        {
-            VisualElement songListEntry = CreateSongListEntry(songDto);
-            songListView.Add(songListEntry);
-        }
-
-        if (!songListRequestor.LoadedSongsDto.IsSongScanFinished)
-        {
-            songListView.Add(new Label("..."));
-        }
-    }
-
-    private bool SongSearchMatches(SongDto songDto)
-    {
-        string searchText = songSearchTextField.value.ToLowerInvariant();
-        return searchText.IsNullOrEmpty()
-               || songDto.Title.ToLowerInvariant().Contains(searchText)
-               || songDto.Artist.ToLowerInvariant().Contains(searchText);
-    }
-
-    private void HandleSongListEvent(SongListEvent evt)
-    {
-        if (!evt.ErrorMessage.IsNullOrEmpty())
-        {
-            songListView.Clear();
-            songListView.Add(new Label(evt.ErrorMessage));
-            return;
-        }
-
-        UpdateSongList();
-    }
-
-    private void ShowSongList()
-    {
-        if (!songListRequestor.SuccessfullyLoadedAllSongs)
-        {
-            songListView.Clear();
-            songListView.Add(new Label("Loading song list..."));
-            songListRequestor.RequestSongList();
-        }
     }
 
     private void Update()
@@ -569,14 +478,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             buildTimeStampText.text = "";
         }
     }
-    
-    private VisualElement CreateSongListEntry(SongDto songDto)
-    {
-        VisualElement songListEntry = songListEntryUi.CloneTreeAndGetFirstChild();
-        songListEntry.Q<Label>(R.UxmlNames.songListEntryLabel).text = $"{songDto.Artist} - {songDto.Title}";
-        songListEntry.Q<Button>(R.UxmlNames.songListEntryButton).RegisterCallbackButtonTriggered(() => songDetailsControl.ShowSongDetails(songDto));
-        return songListEntry;
-    }
 
     public List<IBinding> GetBindings()
     {
@@ -586,12 +487,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         bb.BindExistingInstance(micSampleRecorder);
         bb.BindExistingInstance(clientSideMicDataSender);
         bb.BindExistingInstance(inputSimulationControl);
+        bb.BindExistingInstance(songListRequestor);
         bb.Bind(nameof(playerSelectPlayerEntryUi)).ToExistingInstance(playerSelectPlayerEntryUi);
         return bb.GetBindings();
     }
 
     public void OnDestroy()
     {
-        songDetailsControl.Dispose();
+        songListControl.Dispose();
     }
 }

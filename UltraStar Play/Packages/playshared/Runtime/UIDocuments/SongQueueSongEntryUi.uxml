@@ -1,8 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="songQueueSongEntryUiRoot" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; width: 100%; flex-grow: 1;">
-        <ui:VisualElement name="songInfo" picking-mode="Ignore" style="justify-content: flex-start; flex-direction: column; align-items: flex-start;">
-            <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="ellipsis smallerFont" style="flex-shrink: 1; white-space: normal; min-width: 33%; -unity-font-style: bold;" />
-            <ui:Label text="Some very very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" class="ellipsis smallerFont" style="flex-shrink: 1; white-space: normal; min-width: 33%;" />
-        </ui:VisualElement>
-    </ui:VisualElement>
-</ui:UXML>

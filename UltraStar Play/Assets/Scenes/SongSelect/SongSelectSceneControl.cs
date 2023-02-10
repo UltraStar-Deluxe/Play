@@ -188,6 +188,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.toggleSingingOptionsButton)]
     private Button toggleSingingOptionsButton;
 
+    [Inject(UxmlName = R.UxmlNames.addToSongQueueAsNewButton)]
+    private Button addToSongQueueAsNewButton;
+    
+    [Inject(UxmlName = R.UxmlNames.addToSongQueueAsMedleyButton)]
+    private Button addToSongQueueAsMedleyButton;
+    
     [Inject(UxmlName = R.UxmlNames.playerScrollView)]
     private VisualElement playerScrollView;
 
@@ -453,8 +459,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             songQueueOverlay.ToggleVisibleByDisplay();
         });
-        songQueueUiControl.OnAdd = () => AddCurrentSongToSongQueue();
-        songQueueUiControl.OnAddAsMedley = () => AddCurrentSongToSongQueueAsMedley();
+        addToSongQueueAsNewButton.RegisterCallbackButtonTriggered(() => AddCurrentSongToSongQueue());
+        addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(() => AddCurrentSongToSongQueueAsMedley());
         songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
         songQueueUiControl.OnDelete = songQueueEntryDto => songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
     }

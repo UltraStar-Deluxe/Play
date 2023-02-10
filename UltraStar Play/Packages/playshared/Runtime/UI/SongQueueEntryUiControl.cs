@@ -76,4 +76,10 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
     {
         toggleMedleyButton.HideByDisplay();
     }
+
+    public void HideControls()
+    {
+        deleteButton.HideByDisplay();
+        toggleMedleyButton.HideByDisplay();
+    }
 }

@@ -80,6 +80,7 @@ public static partial class R
         public const string row = "row";
         public const string sceneTitle = "sceneTitle";
         public const string scrollWheelArea = "scrollWheelArea";
+        public const string searchIcon = "searchIcon";
         public const string semanticVersionText = "semanticVersionText";
         public const string serverErrorResponseText = "serverErrorResponseText";
         public const string showInputSimulationButton = "showInputSimulationButton";
@@ -87,6 +88,8 @@ public static partial class R
         public const string showMenuButton = "showMenuButton";
         public const string showMicViewButton = "showMicViewButton";
         public const string showMouseSimulationButton = "showMouseSimulationButton";
+        public const string showSongQueueButton = "showSongQueueButton";
+        public const string showSongSearchButton = "showSongSearchButton";
         public const string showSongViewButton = "showSongViewButton";
         public const string simulateArrowKeyButtonContainer = "simulateArrowKeyButtonContainer";
         public const string simulateButtonInputContainer = "simulateButtonInputContainer";
@@ -120,11 +123,17 @@ public static partial class R
         public const string songListEntryLabel = "songListEntryLabel";
         public const string songListEntryUiRoot = "songListEntryUiRoot";
         public const string songListIcon = "songListIcon";
+        public const string songListTabGroup = "songListTabGroup";
         public const string SongListUi = "SongListUi";
         public const string songListUiRoot = "songListUiRoot";
-        public const string songListView = "songListView";
+        public const string songQueueContainer = "songQueueContainer";
+        public const string songQueueIcon = "songQueueIcon";
+        public const string SongQueueOverlayUi = "SongQueueOverlayUi";
+        public const string SongQueueUi = "SongQueueUi";
+        public const string songSearchContainer = "songSearchContainer";
         public const string songSearchHint = "songSearchHint";
         public const string songSearchTextField = "songSearchTextField";
+        public const string songsScrollView = "songsScrollView";
         public const string songTitleLabel = "songTitleLabel";
         public const string songViewContainer = "songViewContainer";
         public const string spacer = "spacer";
