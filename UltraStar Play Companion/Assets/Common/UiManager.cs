@@ -1,11 +1,14 @@
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UiManager : AbstractSingletonBehaviour, INeedInjection
+public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 {
     public static UiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UiManager>();
 
@@ -15,6 +18,12 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     [InjectedInInspector]
     public VisualTreeAsset notificationUi;
 
+     [InjectedInInspector]
+    public VisualTreeAsset messageDialogUi;
+    
+    [InjectedInInspector]
+    public VisualTreeAsset micWithNameUi;
+    
     [Inject]
     private UIDocument uiDocument;
     
@@ -51,5 +60,13 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         params string[] additionalTextClasses)
     {
         return Instance.DoCreateNotification(text, additionalTextClasses);
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new();
+        bb.Bind(nameof(messageDialogUi)).ToExistingInstance(messageDialogUi);
+        bb.Bind(nameof(micWithNameUi)).ToExistingInstance(micWithNameUi);
+        return bb.GetBindings();
     }
 }

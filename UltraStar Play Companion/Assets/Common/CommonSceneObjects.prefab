@@ -338,6 +338,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   notificationOverlayUi: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0, type: 3}
   notificationUi: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59, type: 3}
+  messageDialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb, type: 3}
+  micWithNameUi: {fileID: 9197481963319205126, guid: 633a1b5f196ee2f45beba597ffda0b45, type: 3}
 --- !u!1 &7533492218452213851
 GameObject:
   m_ObjectHideFlags: 0

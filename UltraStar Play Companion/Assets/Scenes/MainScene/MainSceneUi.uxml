@@ -57,5 +57,6 @@
         <ui:VisualElement name="modifierDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
             <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" class="overlayBackground roundCorners" style="width: 100%; height: 100%; max-width: 90%; max-height: 90%;" />
         </ui:VisualElement>
+        <ui:VisualElement name="dialogContainer" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -81,7 +81,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     private Texture2D texture2D;
     private Dictionary<string, string> voiceNameToLyricsMap = new();
 
-    private readonly List<PlayerSelectPlayerProfileEntryControl> playerProfileEntryControls = new();
+    private readonly List<PlayerSelectPlayerEntryControl> playerEntryControls = new();
 
     private readonly GameRoundSettingsUiControl gameRoundSettingsUiControl = new();
     
@@ -113,7 +113,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     
     private void EnqueueSong()
     {
-        List<PlayerSelectPlayerProfileEntryControl> selectedPlayerControls = GetSelectedPlayerControls();
+        List<PlayerSelectPlayerEntryControl> selectedPlayerControls = GetSelectedPlayerControls();
         if (selectedPlayerControls.IsNullOrEmpty())
         {
             Debug.LogError("Cannot enqueue song. No player profiles selected.");
@@ -128,14 +128,14 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         HideSongDetails();
     }
 
-    public List<PlayerSelectPlayerProfileEntryControl> GetSelectedPlayerControls()
+    public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()
     {
-        return playerProfileEntryControls
+        return playerEntryControls
             .Where(control => control.IsSelected)
             .ToList();
     }
     
-    private GameRoundDataDto CreateGameRoundDataDto(List<PlayerSelectPlayerProfileEntryControl> selectedPlayerControls)
+    private GameRoundDataDto CreateGameRoundDataDto(List<PlayerSelectPlayerEntryControl> selectedPlayerControls)
     {
         GameRoundDataDto dto = new();
         dto.SongIds = new List<string>() { songDto.Hash };
@@ -215,7 +215,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         playersContainer.Add(new Label("Loading players..."));
         enqueueSettingsAccordionItem.UpdateTargetHeight();
         
-        playerProfileEntryControls.Clear();
+        playerEntryControls.Clear();
 
         mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailablePlayers,
             response =>
@@ -278,7 +278,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         playersContainer.Clear();
         List<MicProfile> unusedMicProfiles = micProfiles.ToList();
 
-        void AssignUnusedMicProfile(PlayerSelectPlayerProfileEntryControl playerEntryControl)
+        void AssignUnusedMicProfile(PlayerSelectPlayerEntryControl playerEntryControl)
         {
             playerEntryControl.MicProfile = unusedMicProfiles.FirstOrDefault();
             if (playerEntryControl.MicProfile != null)
@@ -293,10 +293,19 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             VisualElement playerEntry = playerSelectPlayerEntryUi.CloneTreeAndGetFirstChild();
             playersContainer.Add(playerEntry);
 
-            PlayerSelectPlayerProfileEntryControl playerEntryControl = injector
+            PlayerSelectPlayerEntryControl playerEntryControl = injector
                 .WithRootVisualElement(playerEntry)
                 .WithBindingForInstance(playerProfile)
-                .CreateAndInject<PlayerSelectPlayerProfileEntryControl>();
+                .WithBinding(new Binding(nameof(micProfiles), new ExistingInstanceProvider<List<MicProfile>>(micProfiles)))
+                .CreateAndInject<PlayerSelectPlayerEntryControl>();
+            playerEntryControl.MicProfileChangedEventStream
+                .Subscribe(evt =>
+                {
+                    // Deselect mic from other players.
+                    playerEntryControls
+                        .Where(it => it != evt.playerEntryControl && it.MicProfile == evt.newMicProfile)
+                        .ForEach(it => it.MicProfile = null);
+                });
             
             if (voiceNameToLyricsMap != null)
             {
@@ -330,7 +339,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 UpdateEnqueueButton();
             });
 
-            playerProfileEntryControls.Add(playerEntryControl);
+            playerEntryControls.Add(playerEntryControl);
             playerProfileIndex++;
         });
 

@@ -22,6 +22,7 @@ public static partial class R
         public const string devModeContainer = "devModeContainer";
         public const string devModeLabel = "devModeLabel";
         public const string devModePicker = "devModePicker";
+        public const string dialogContainer = "dialogContainer";
         public const string enqueueButton = "enqueueButton";
         public const string enqueueButtonLabel = "enqueueButtonLabel";
         public const string enqueueIcon = "enqueueIcon";
