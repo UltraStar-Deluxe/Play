@@ -534,8 +534,9 @@ public static class SongMetaUtils
     {
         // Search for lyrics about the middle of the song, approx. 20 seconds afterwards.
         int middleBeat = GetMiddleBeat(songMeta);
-        List<Sentence> sentencesBeforeMiddleBeat = songMeta.GetVoice(Voice.firstVoiceName)
-            .Sentences
+        Voice voice = songMeta.GetVoice(Voice.firstVoiceName);
+        List<Sentence> sentences = voice.Sentences.ToList();
+        List<Sentence> sentencesBeforeMiddleBeat = sentences
             .Where(sentence => sentence.ExtendedMaxBeat < middleBeat)
             .ToList();
         if (sentencesBeforeMiddleBeat.IsNullOrEmpty())

@@ -16,7 +16,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
     
     [Inject]
-    private GameRoundManager gameRoundManager;
+    private SongQueueManager songQueueManager;
     
     [Inject]
     private SongMetaManager songMetaManager;
@@ -34,7 +34,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
             .SetCallbackAndAdd(requestData =>
             {
                 List<string> playerProfileNames = settings.PlayerProfiles
-                    .Where(playerProfile => playerProfile.IsSelected)
+                    .Where(playerProfile => playerProfile.IsEnabled)
                     .Select(playerProfile => playerProfile.Name)
                     .ToList();
                 ListDto<string> dto = new()
@@ -66,104 +66,16 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
             .SetCallbackAndAdd(requestData =>
             {
                 string json = requestData.Context.Request.GetBodyAsString();
-                GameRoundDataDto gameRoundDataDto = JsonConverter.FromJson<GameRoundDataDto>(json, false);
-                GameRoundData gameRoundData = CreateGameRoundData(gameRoundDataDto);
-                
-                string errorMessage = GetGameRoundDataErrorMessage(gameRoundData);
+                SongQueueEntryDto songQueueEntryDto = JsonConverter.FromJson<SongQueueEntryDto>(json, false);
+
+                string errorMessage = songQueueManager.GetSongQueueEntryErrorMessage(songQueueEntryDto);
                 if (!errorMessage.IsNullOrEmpty())
                 {
-                    Debug.LogError($"Invalid game round data: {errorMessage}");
+                    Debug.LogError($"Invalid song queue entry: {errorMessage}");
                     return;
                 }
                 
-                gameRoundManager.AddGameRound(gameRoundData);
+                songQueueManager.AddSongQueueEntry(songQueueEntryDto);
             });
-    }
-
-    private GameRoundData CreateGameRoundData(GameRoundDataDto dto)
-    {
-        if (dto == null)
-        {
-            return null;
-        }
-        
-        GameRoundData gameRoundData = new GameRoundData();
-        gameRoundData.IsMedley = dto.IsMedley;
-        gameRoundData.SongMetas = dto.SongIds
-            .Select(songId => songMetaManager.GetSongMetaById(songId))
-            .ToList();
-        gameRoundData.GameRoundSettings = new(dto.GameRoundSettings);
-        gameRoundData.SingScenePlayerData = CreateSingScenePlayerData(dto.SingScenePlayerDataDto);
-        return gameRoundData;
-    }
-
-    private SingScenePlayerData CreateSingScenePlayerData(SingScenePlayerDataDto dto)
-    {
-        if (dto == null)
-        {
-            return null;
-        }
-        
-        SingScenePlayerData singScenePlayerData = new();
-        singScenePlayerData.SelectedPlayerProfiles = dto.PlayerProfileNames
-            .Select(playerProfileName => GetPlayerProfile(playerProfileName))
-            .Where(it => it != null)
-            .ToList();
-        singScenePlayerData.PlayerProfileToMicProfileMap = new();
-        dto.PlayerProfileToMicProfileMap.ForEach(entry =>
-        {
-            PlayerProfile playerProfile = GetPlayerProfile(entry.Key);
-            MicProfile micProfile = GetMicProfile(entry.Value);
-            if (playerProfile != null
-                && micProfile != null)
-            {
-                singScenePlayerData.PlayerProfileToMicProfileMap[playerProfile] = micProfile;
-            }
-        });
-        singScenePlayerData.PlayerProfileToVoiceNameMap = new();
-        dto.PlayerProfileToVoiceNameMap.ForEach(entry =>
-        {
-            PlayerProfile playerProfile = GetPlayerProfile(entry.Key);
-            if (playerProfile != null)
-            {
-                singScenePlayerData.PlayerProfileToVoiceNameMap[playerProfile] = entry.Value;
-            }
-        });
-        return singScenePlayerData;
-    }
-
-    private PlayerProfile GetPlayerProfile(string profileName)
-    {
-        return settings.PlayerProfiles.FirstOrDefault(playerProfile => playerProfile.Name == profileName);
-    }
-
-    private MicProfile GetMicProfile(string profileName)
-    {
-        return settings.MicProfiles.FirstOrDefault(micProfile => micProfile.Name == profileName);
-    }
-    
-    private string GetGameRoundDataErrorMessage(GameRoundData gameRoundData)
-    {
-        if (gameRoundData == null)
-        {
-            return "Missing game round data";
-        }
-        
-        if (gameRoundData.SingScenePlayerData == null)
-        {
-            return "Missing player data";
-        }
-
-        if (gameRoundData.SingScenePlayerData.SelectedPlayerProfiles.IsNullOrEmpty())
-        {
-            return "Missing player profiles";
-        }
-        
-        if (gameRoundData.SongMetas.IsNullOrEmpty())
-        {
-            return "Missing song metas";
-        }
-        
-        return "";
     }
 }

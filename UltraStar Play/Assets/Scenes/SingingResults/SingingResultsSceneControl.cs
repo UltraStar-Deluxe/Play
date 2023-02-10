@@ -74,7 +74,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private SceneNavigator sceneNavigator;
 
     [Inject]
-    private GameRoundManager gameRoundManager;
+    private SongQueueManager songQueueManager;
 
 	[Inject]
     private SingingResultsSceneData sceneData;
@@ -306,10 +306,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
             sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
         }
-        else if (!HasPartyModeSceneData && gameRoundManager.HasGameRounds)
+        else if (!HasPartyModeSceneData && !songQueueManager.IsSongQueueEmpty)
         {
             // Start next game round
-            gameRoundManager.StartNextGameRound();
+            songQueueManager.StartNextEntry();
         }
         else if (HasPartyModeSceneData && HasFinalTeamResults)
         {
