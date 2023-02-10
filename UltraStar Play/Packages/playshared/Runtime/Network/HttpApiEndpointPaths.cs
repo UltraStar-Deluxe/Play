@@ -15,6 +15,7 @@
     public const string SongImage = "api/rest/song/{songId}/image";
     public const string SongQueue = "api/rest/songQueue";
     public const string SongQueueEntry = "api/rest/songQueue/entry";
+    public const string SongQueueEntryIndex = "api/rest/songQueue/entry/{index}";
     public const string Songs = "api/rest/songs";
     public const string Statistics = "api/rest/stats";
     public const string Translations = "api/rest/translations";

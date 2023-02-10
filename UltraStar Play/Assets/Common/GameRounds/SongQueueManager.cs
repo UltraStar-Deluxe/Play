@@ -145,4 +145,19 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         
         return "";
     }
+
+    public void UpdateSongQueueEntry(SongQueueEntryDto oldSongQueueEntryDto, SongQueueEntryDto newSongQueueEntryDto)
+    {
+        if (oldSongQueueEntryDto == newSongQueueEntryDto)
+        {
+            return;
+        }
+        
+        oldSongQueueEntryDto.SongDto = newSongQueueEntryDto.SongDto;
+        oldSongQueueEntryDto.SingScenePlayerDataDto = newSongQueueEntryDto.SingScenePlayerDataDto;
+        oldSongQueueEntryDto.GameRoundSettings = newSongQueueEntryDto.GameRoundSettings;
+        oldSongQueueEntryDto.IsMedleyWithPreviousEntry = newSongQueueEntryDto.IsMedleyWithPreviousEntry;
+        
+        songQueueChangedEventStream.OnNext(new (oldSongQueueEntryDto));
+    }
 }

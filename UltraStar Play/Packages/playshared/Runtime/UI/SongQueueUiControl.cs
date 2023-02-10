@@ -18,7 +18,7 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private Injector injector;
     
-    private readonly List<SongQueueEntryUiControl> songQueueEntryControls = new();
+    public List<SongQueueEntryUiControl> SongQueueEntryControls { get; private set; } = new();
 
     public Action<SongQueueEntryDto> OnDelete { get; set; }
     public Action<SongQueueEntryDto> OnToggleMedley { get; set; }
@@ -31,21 +31,21 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
     public void SetSongQueueEntryDtos(IReadOnlyList<SongQueueEntryDto> songQueueEntryDtos)
     {
         songQueueEntriesScrollView.Clear();
-        songQueueEntryControls.Clear();
+        SongQueueEntryControls.Clear();
         
         songQueueEntryDtos.ForEach(songQueueEntryDto => CreateSongQueueEntryControl(songQueueEntryDto));
 
-        if (songQueueEntryControls.IsNullOrEmpty())
+        if (SongQueueEntryControls.IsNullOrEmpty())
         {
             return;
         }
         
         // Hide medley button of first entry.
-        songQueueEntryControls.FirstOrDefault().HideToggleMedleyButton();
+        SongQueueEntryControls.FirstOrDefault().HideToggleMedleyButton();
         
         // Remove borders of medley entries.
         SongQueueEntryUiControl lastSongQueueEntryControl = null;
-        foreach (SongQueueEntryUiControl currentSongQueueEntryControl in songQueueEntryControls)
+        foreach (SongQueueEntryUiControl currentSongQueueEntryControl in SongQueueEntryControls)
         {
             if (lastSongQueueEntryControl != null
                 && currentSongQueueEntryControl.SongQueueEntryDto.IsMedleyWithPreviousEntry)
@@ -69,12 +69,12 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
         songQueueEntryControl.OnDelete = () => OnDelete?.Invoke(songQueueEntryDto);
         songQueueEntryControl.OnToggleMedley = () => OnToggleMedley?.Invoke(songQueueEntryDto);
         
-        songQueueEntryControls.Add(songQueueEntryControl);
+        SongQueueEntryControls.Add(songQueueEntryControl);
     }
 
     public void HideControls()
     {
-        songQueueEntryControls.ForEach(it => it.HideControls());
+        SongQueueEntryControls.ForEach(it => it.HideControls());
     }
 
     public void Clear()

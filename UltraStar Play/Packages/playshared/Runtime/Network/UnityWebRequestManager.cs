@@ -32,7 +32,7 @@ public class UnityWebRequestManager : AbstractSingletonBehaviour
             }
             else if (request.unityWebRequest.result is UnityWebRequest.Result.Success)
             {
-                request.onSuccess?.Invoke(request.unityWebRequest.downloadHandler.text);
+                request.onSuccess?.Invoke(request.unityWebRequest.downloadHandler?.text);
             }
         });
     }

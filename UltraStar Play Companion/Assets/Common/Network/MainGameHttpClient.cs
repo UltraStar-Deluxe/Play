@@ -145,14 +145,14 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 
     private void LogRequestError(UnityWebRequest unityWebRequest, Exception ex)
     {
-        string responseBody = unityWebRequest.downloadHandler.text;
+        string responseBody = unityWebRequest.downloadHandler?.text;
         Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}, response body: {responseBody}");
         Debug.LogException(ex);
     }
 
     private void LogRequestSuccess(UnityWebRequest unityWebRequest)
     {
-        string responseBody = unityWebRequest.downloadHandler.text;
+        string responseBody = unityWebRequest.downloadHandler?.text;
         Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
     }
 
