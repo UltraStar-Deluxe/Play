@@ -14,15 +14,12 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
     
     [Inject]
     private Injector injector;
-    
+
     [Inject(Key = nameof(micProfiles))]
     private List<MicProfile> micProfiles;
         
     [Inject(Key = nameof(messageDialogUi))]
     private VisualTreeAsset messageDialogUi;
-    
-    [Inject(Key = nameof(micWithNameUi))]
-    private VisualTreeAsset micWithNameUi;
     
     [Inject(UxmlName = R.UxmlNames.dialogContainer)]
     private VisualElement dialogContainer;
@@ -63,10 +60,9 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
     
     public LabeledItemPickerControl<string> VoiceChooserControl { get; private set; }
 
-    private MessageDialogControl micSelectionDialogControl;
+    private MicSelectionDialogControl micSelectionDialogControl;
     
-    private readonly Subject<MicProfileChangedEvent> micProfileChangedEventStream = new();
-    public IObservable<MicProfileChangedEvent> MicProfileChangedEventStream => micProfileChangedEventStream;
+    public Action<MicProfile> OnMicProfileSelected { get; set; }
 
     public void OnInjectionFinished()
     {
@@ -93,14 +89,9 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
 
         void OnMicSelected(MicProfile newMicProfile)
         {
-            micProfileChangedEventStream.OnNext(new()
-            {
-                oldMicProfile = micProfile,
-                newMicProfile = newMicProfile,
-                playerEntryControl = this,
-            });
             MicProfile = newMicProfile;
             micSelectionDialogControl.CloseDialog();
+            OnMicProfileSelected?.Invoke(newMicProfile);
         }
 
         VisualElement dialog = messageDialogUi.CloneTreeAndGetFirstChild();
@@ -109,21 +100,12 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         
         micSelectionDialogControl = injector
             .WithRootVisualElement(dialog)
-            .CreateAndInject<MessageDialogControl>();
+            .CreateAndInject<MicSelectionDialogControl>();
         micSelectionDialogControl.Title = $"Select Microphone for {PlayerProfileName}";
         micSelectionDialogControl.AddButton("OK", () => micSelectionDialogControl.CloseDialog());
         micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ => OnMicSelectionDialogClosed());
-        
-        micProfiles.ForEach(otherMicProfile =>
-        {
-            VisualElement micWithName = micWithNameUi.CloneTreeAndGetFirstChild();
-            micWithName.Q<Button>(R_PlayShared.UxmlNames.micButton).RegisterCallbackButtonTriggered(() => OnMicSelected(otherMicProfile));
-            micWithName.Q<Label>(R_PlayShared.UxmlNames.nameLabel).text = otherMicProfile.Name;
-            micWithName.Q<Label>(R_PlayShared.UxmlNames.nameLabel).RegisterCallback<ClickEvent>(evt => OnMicSelected(otherMicProfile));
-            micWithName.Q<VisualElement>(R_PlayShared.UxmlNames.micIcon).style.unityBackgroundImageTintColor = new StyleColor(otherMicProfile.Color);
-            
-            micSelectionDialogControl.AddVisualElement(micWithName);
-        });
+        micSelectionDialogControl.MicProfiles = micProfiles;
+        micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;
     }
 
     private void OnMicSelectionDialogClosed()
@@ -156,12 +138,5 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         {
             VoiceChooserControl.ItemPicker.HideByDisplay();
         }
-    }
-
-    public class MicProfileChangedEvent
-    {
-        public PlayerSelectPlayerEntryControl playerEntryControl;
-        public MicProfile oldMicProfile;
-        public MicProfile newMicProfile;
     }
 }

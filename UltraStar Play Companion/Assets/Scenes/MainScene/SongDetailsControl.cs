@@ -298,14 +298,13 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 .WithBindingForInstance(playerProfile)
                 .WithBinding(new Binding(nameof(micProfiles), new ExistingInstanceProvider<List<MicProfile>>(micProfiles)))
                 .CreateAndInject<PlayerSelectPlayerEntryControl>();
-            playerEntryControl.MicProfileChangedEventStream
-                .Subscribe(evt =>
-                {
-                    // Deselect mic from other players.
-                    playerEntryControls
-                        .Where(it => it != evt.playerEntryControl && it.MicProfile == evt.newMicProfile)
-                        .ForEach(it => it.MicProfile = null);
-                });
+            playerEntryControl.OnMicProfileSelected = newMicProfile =>
+            {
+                // Deselect mic from other players.
+                playerEntryControls
+                    .Where(it => it.MicProfile == newMicProfile && it != playerEntryControl)
+                    .ForEach(it => it.MicProfile = null);
+            };
             
             if (voiceNameToLyricsMap != null)
             {

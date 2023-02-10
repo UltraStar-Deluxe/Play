@@ -3,7 +3,7 @@
     <ui:Template name="SongSelectScenePlayerSelectUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerSelectUi.uxml?fileID=9197481963319205126&amp;guid=203783e05a7f81543812dd249b0e1372&amp;type=3#SongSelectScenePlayerSelectUi" />
     <ui:Template name="SongSelectGameRoundOverlayUi" src="project://database/Assets/Scenes/SongSelect/SongSelectGameRoundOverlayUi.uxml?fileID=9197481963319205126&amp;guid=7e90fb1f4cdd0044a978248fba705341&amp;type=3#SongSelectGameRoundOverlayUi" />
     <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/Input/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
-    <ui:Template name="GameRoundModifierDialogUi" src="project://database/Assets/Common/GameRounds/GameRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#GameRoundModifierDialogUi" />
+    <ui:Template name="GameRoundModifierDialogUi" src="project://database/Packages/playshared/Runtime/GameRounds/GameRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#GameRoundModifierDialogUi" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%;">
         <ui:VisualElement name="topContent" class="focusableNavigatorRoot">
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
@@ -229,5 +229,6 @@
         <ui:VisualElement name="modifierDialogOverlay" class="overlay" style="background-color: rgba(0, 0, 0, 0); display: none;">
             <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" class="overlayBackground roundCorners" style="max-height: 90%; max-width: 90%; min-width: 50%;" />
         </ui:VisualElement>
+        <ui:VisualElement name="dialogContainer" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;" />
     </ui:VisualElement>
 </ui:UXML>

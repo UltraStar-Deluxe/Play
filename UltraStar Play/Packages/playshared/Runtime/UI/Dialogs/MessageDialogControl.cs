@@ -1,27 +1,26 @@
 ﻿using System;
-using System.Linq;
 using UniInject;
 using UnityEngine.UIElements;
 
 public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedListener
 {
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogTitleImage)]
-    public VisualElement DialogTitleImage { get; private set; }
+    public VisualElement DialogTitleImage { get; protected set; }
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogTitle)]
-    private Label dialogTitle;
+    protected Label dialogTitle;
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogMessageContainer)]
-    private VisualElement dialogMessageContainer;
+    protected VisualElement dialogMessageContainer;
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogMessage)]
-    private Label dialogMessage;
+    protected Label dialogMessage;
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogButtonContainer)]
-    private VisualElement dialogButtonContainer;
+    protected VisualElement dialogButtonContainer;
 
     [Inject]
-    private Injector injector;
+    protected Injector injector;
 
     public string Title
     {
@@ -49,7 +48,7 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
         }
     }
 
-    public void OnInjectionFinished()
+    public virtual void OnInjectionFinished()
     {
         dialogTitle.text = "";
         dialogMessage.text = "";
