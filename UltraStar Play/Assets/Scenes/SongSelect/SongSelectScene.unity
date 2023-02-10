@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88c66271ab435874bb9f1209ab84f82a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerEntryUi: {fileID: 9197481963319205126, guid: 810593cc2dd7a764f9a6be22b3ec53a5,
+  playerEntryUi: {fileID: 9197481963319205126, guid: ae611919e3b6a9e439070651ea79c54e,
     type: 3}
 --- !u!4 &922159447
 Transform:

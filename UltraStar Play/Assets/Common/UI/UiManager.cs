@@ -32,8 +32,8 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     public VisualTreeAsset messageDialogUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset accordionUi;
-
+    public VisualTreeAsset micWithNameUi;
+    
     [InjectedInInspector]
     public Sprite fallbackPlayerProfileImage;
 
@@ -201,6 +201,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         bb.Bind(nameof(messageDialogUi)).ToExistingInstance(messageDialogUi);
         bb.Bind(nameof(nextGameRoundInfoUi)).ToExistingInstance(nextGameRoundInfoUi);
         bb.Bind(nameof(nextGameRoundInfoPlayerEntryUi)).ToExistingInstance(nextGameRoundInfoPlayerEntryUi);
+        bb.Bind(nameof(micWithNameUi)).ToExistingInstance(micWithNameUi);
         return bb.GetBindings();
     }
 }

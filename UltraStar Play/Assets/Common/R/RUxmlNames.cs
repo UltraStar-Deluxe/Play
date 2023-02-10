@@ -388,7 +388,6 @@ public static partial class R
         public const string musicVolumeLabel = "musicVolumeLabel";
         public const string musicVolumeSlider = "musicVolumeSlider";
         public const string nameCharacterContainer = "nameCharacterContainer";
-        public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
         public const string networkConfigContainer = "networkConfigContainer";
         public const string nextCharacterButton = "nextCharacterButton";
@@ -514,6 +513,7 @@ public static partial class R
         public const string playerSelectOpenSongEditorButton = "playerSelectOpenSongEditorButton";
         public const string playerSelectOverlay = "playerSelectOverlay";
         public const string playerSelectOverlayContainer = "playerSelectOverlayContainer";
+        public const string PlayerSelectPlayerEntryUi = "PlayerSelectPlayerEntryUi";
         public const string playerSelectStartSongButton = "playerSelectStartSongButton";
         public const string playersIcon = "playersIcon";
         public const string playerUi = "playerUi";
@@ -725,7 +725,6 @@ public static partial class R
         public const string songSelectionUi = "songSelectionUi";
         public const string songSelectPlayerSelectUi = "songSelectPlayerSelectUi";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
-        public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
         public const string SongSelectScenePlayerSelectUi = "SongSelectScenePlayerSelectUi";
         public const string SongSelectSongEntryUi = "SongSelectSongEntryUi";
         public const string songSettingsProblemHintIcon = "songSettingsProblemHintIcon";
@@ -767,7 +766,6 @@ public static partial class R
         public const string teamColumnsContainer = "teamColumnsContainer";
         public const string teamColumnUiRoot = "teamColumnUiRoot";
         public const string teamConfigUiRoot = "teamConfigUiRoot";
-        public const string teamLabel = "teamLabel";
         public const string teamNameLabel = "teamNameLabel";
         public const string teamNameTextField = "teamNameTextField";
         public const string TeamResultsTeamUi = "TeamResultsTeamUi";
@@ -864,7 +862,6 @@ public static partial class R
         public const string vocalsAudioVolumeContainer = "vocalsAudioVolumeContainer";
         public const string vocalsAudioVolumeLabel = "vocalsAudioVolumeLabel";
         public const string voiceButtonRow = "voiceButtonRow";
-        public const string voiceChooser = "voiceChooser";
         public const string voiceNameLabel = "voiceNameLabel";
         public const string volumeChooser = "volumeChooser";
         public const string volumeContainer = "volumeContainer";
