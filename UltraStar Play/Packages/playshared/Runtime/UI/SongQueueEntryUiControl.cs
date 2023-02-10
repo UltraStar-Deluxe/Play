@@ -35,7 +35,7 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
     private Button deleteButton;
     
     [Inject]
-    public SongQueueEntryDto SongQueueEntryDto { get;private set; }
+    public SongQueueEntryDto SongQueueEntryDto { get; private set; }
 
     public Action OnDelete { get; set; }
     public Action OnToggleMedley { get; set; }

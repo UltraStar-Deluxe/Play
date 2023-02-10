@@ -49,6 +49,10 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     private readonly SongDetailsControl songDetailsControl = new();
     private readonly SongQueueUiControl songQueueUiControl = new();
 
+    private List<SongQueueEntryDto> SongQueueEntryDtos => songQueueUiControl.SongQueueEntryControls
+        .Select(control => control.SongQueueEntryDto)
+        .ToList();
+    
     public void OnInjectionFinished()
     {
         injector
@@ -72,8 +76,42 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
         });
 
         mainGameHttpClient.Permissions.Subscribe(_ => UpdateSongQueue());
+        
+        songQueueUiControl.OnDelete = entry => DeleteSongQueueEntry(entry);
+        songQueueUiControl.OnToggleMedley = entry => ToggleMedley(entry);
     }
 
+    private void DeleteSongQueueEntry(SongQueueEntryDto entry)
+    {
+        mainGameHttpClient.DeleteRequest(HttpApiEndpointPaths.SongQueueEntryIndex
+                .ReplaceOrThrow("{index}", SongQueueEntryDtos.IndexOf(entry).ToString()),
+            response =>
+            {
+                UpdateSongQueue();
+            },
+            ex =>
+            {
+                UpdateSongQueue();
+            });
+    }
+
+    private void ToggleMedley(SongQueueEntryDto entry)
+    {
+        entry.IsMedleyWithPreviousEntry = !entry.IsMedleyWithPreviousEntry;
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntryIndex
+                .ReplaceOrThrow("{index}", SongQueueEntryDtos.IndexOf(entry).ToString()),
+            entry.ToJson(),
+            MimeTypeUtils.ApplicationJson,
+            response =>
+            {
+                UpdateSongQueue();
+            },
+            ex =>
+            {
+                UpdateSongQueue();
+            });
+    }
+    
     private void UpdateSongQueue()
     {
         songQueueUiControl.Clear();

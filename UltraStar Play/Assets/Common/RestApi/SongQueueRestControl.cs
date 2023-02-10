@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
 
@@ -89,6 +88,43 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 }
                 
                 songQueueManager.AddSongQueueEntry(songQueueEntryDto);
+            });
+        
+        httpServer.CreateEndpoint(HttpMethod.Delete, HttpApiEndpointPaths.SongQueueEntryIndex)
+            .SetDescription($"Remove song queue entry at given index.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteSongQueue)
+            .SetCallbackAndAdd(requestData =>
+            {
+                if (!int.TryParse(requestData.PathParameters["index"], out int index)
+                    || index < 0 || index >= songQueueManager.GetSongQueueEntries().Count)
+                {
+                    Debug.LogError("Cannot delete song queue entry. Invalid index");
+                    return;
+                }
+                
+                SongQueueEntryDto songQueueEntryDto = songQueueManager.GetSongQueueEntries()[index];
+                songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
+            });
+        
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.SongQueueEntryIndex)
+            .SetDescription($"Update song queue entry at given index.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteSongQueue)
+            .SetCallbackAndAdd(requestData =>
+            {
+                if (!int.TryParse(requestData.PathParameters["index"], out int index)
+                    || index < 0 || index >= songQueueManager.GetSongQueueEntries().Count)
+                {
+                    Debug.LogError("Cannot update song queue entry. Invalid index");
+                    return;
+                }
+                
+                string json = requestData.Context.Request.GetBodyAsString();
+                SongQueueEntryDto newSongQueueEntryDto = JsonConverter.FromJson<SongQueueEntryDto>(json, false);
+                
+                SongQueueEntryDto oldSongQueueEntryDto = songQueueManager.GetSongQueueEntries()[index];
+                songQueueManager.UpdateSongQueueEntry(oldSongQueueEntryDto, newSongQueueEntryDto);
             });
     }
 }
