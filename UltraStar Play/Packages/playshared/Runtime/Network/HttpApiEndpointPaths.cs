@@ -13,6 +13,7 @@
     public const string PlaylistFavoritesEntry = "api/rest/playlist/favorites/entry/{songId}";
     public const string Song = "api/rest/song/{songId}";
     public const string SongImage = "api/rest/song/{songId}/image";
+    public const string SongQueue = "api/rest/songQueue";
     public const string SongQueueEntry = "api/rest/songQueue/entry";
     public const string Songs = "api/rest/songs";
     public const string Statistics = "api/rest/stats";

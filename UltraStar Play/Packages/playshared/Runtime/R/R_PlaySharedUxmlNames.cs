@@ -6,8 +6,6 @@ public static partial class R_PlayShared
         public const string accordionItemContent = "accordionItemContent";
         public const string accordionItemRoot = "accordionItemRoot";
         public const string accordionItemTitle = "accordionItemTitle";
-        public const string addAsMedleyButton = "addAsMedleyButton";
-        public const string addButton = "addButton";
         public const string buttonRow = "buttonRow";
         public const string cancelButton = "cancelButton";
         public const string chipsComboButton = "chipsComboButton";
@@ -45,8 +43,6 @@ public static partial class R_PlayShared
         public const string dummyButton = "dummyButton";
         public const string enabledToggle = "enabledToggle";
         public const string gameRoundPlayerEntryUiRoot = "gameRoundPlayerEntryUiRoot";
-        public const string gameRoundsOverlay = "gameRoundsOverlay";
-        public const string gameRoundsTitle = "gameRoundsTitle";
         public const string hideLyricsToggle = "hideLyricsToggle";
         public const string hideNotesToggle = "hideNotesToggle";
         public const string invalidValueIcon = "invalidValueIcon";
@@ -85,17 +81,14 @@ public static partial class R_PlayShared
         public const string SongQueueEntryUi = "SongQueueEntryUi";
         public const string songQueueEntryUiRoot = "songQueueEntryUiRoot";
         public const string SongQueuePlayerEntryUi = "SongQueuePlayerEntryUi";
-        public const string SongQueueSongEntryUi = "SongQueueSongEntryUi";
-        public const string songQueueSongEntryUiRoot = "songQueueSongEntryUiRoot";
+        public const string songQueueUiRoot = "songQueueUiRoot";
         public const string SongSelectGameRoundPlayerEntryUi = "SongSelectGameRoundPlayerEntryUi";
-        public const string SongSelectGameRoundSongEntryUi = "SongSelectGameRoundSongEntryUi";
         public const string SongSelectGameRoundUi = "SongSelectGameRoundUi";
         public const string songTitle = "songTitle";
         public const string teamLabel = "teamLabel";
         public const string toggleAccordionItemContentButton = "toggleAccordionItemContentButton";
         public const string toggleAccordionItemContentIcon = "toggleAccordionItemContentIcon";
         public const string toggleMedleyButton = "toggleMedleyButton";
-        public const string topRow = "topRow";
         public const string unconditionalModifierContainer = "unconditionalModifierContainer";
         public const string validationWarningContainer = "validationWarningContainer";
         public const string valueTextField = "valueTextField";

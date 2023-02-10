@@ -13,6 +13,8 @@ public static partial class R
         public const string addRoundButton = "addRoundButton";
         public const string addSongFolderButton = "addSongFolderButton";
         public const string addTeamButton = "addTeamButton";
+        public const string addToSongQueueAsMedleyButton = "addToSongQueueAsMedleyButton";
+        public const string addToSongQueueAsNewButton = "addToSongQueueAsNewButton";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
         public const string allCharactersContainer = "allCharactersContainer";
         public const string amplificationContainer = "amplificationContainer";
@@ -702,6 +704,8 @@ public static partial class R
         public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
         public const string songQueueIcon = "songQueueIcon";
         public const string songQueueOverlay = "songQueueOverlay";
+        public const string songQueueTitle = "songQueueTitle";
+        public const string songQueueUi = "songQueueUi";
         public const string songRouletteContainer = "songRouletteContainer";
         public const string SongSelectGameRoundOverlayUi = "SongSelectGameRoundOverlayUi";
         public const string songSelectionItemPicker = "songSelectionItemPicker";

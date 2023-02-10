@@ -24,6 +24,15 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public VisualTreeAsset micWithNameUi;
     
+    [InjectedInInspector]
+    public VisualTreeAsset songListEntryUi;
+    
+    [InjectedInInspector]
+    public VisualTreeAsset songQueueEntryUi;
+    
+    [InjectedInInspector]
+    public VisualTreeAsset songQueuePlayerEntryUi;
+    
     [Inject]
     private UIDocument uiDocument;
     
@@ -67,6 +76,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         BindingBuilder bb = new();
         bb.Bind(nameof(messageDialogUi)).ToExistingInstance(messageDialogUi);
         bb.Bind(nameof(micWithNameUi)).ToExistingInstance(micWithNameUi);
+        bb.Bind(nameof(songListEntryUi)).ToExistingInstance(songListEntryUi);
+        bb.Bind(nameof(songQueueEntryUi)).ToExistingInstance(songQueueEntryUi);
+        bb.Bind(nameof(songQueuePlayerEntryUi)).ToExistingInstance(songQueuePlayerEntryUi);
         return bb.GetBindings();
     }
 }
