@@ -77,10 +77,22 @@ public static class BuildUtils
                 or BuildTarget.StandaloneWindows64
                 or BuildTarget.StandaloneWindows)
         {
-            string generatedFolderPath = options.buildTarget == BuildTarget.StandaloneOSX
-                ? $"{outputFolderPath}.app"
-                : outputFolderPath;
-            CompressDirectoryToZipFile(generatedFolderPath, outputFolderPath + ".zip");
+            if (options.buildTarget is BuildTarget.StandaloneOSX)
+            {
+                // A folder that ends with ".app" was created. This folder is the app for macOS.
+                // To include this ".app" folder in the ZIP file, we need to move it to a subfolder.
+                // Example: generated folder is "MyApp-macOS.app". This will be moved to "MyApp-macOS/MyApp-macOS.app".
+                string generatedFolderPath = $"{outputFolderPath}.app";
+                string generatedFolderName = Path.GetFileName(generatedFolderPath);
+                string subfolderPath = outputFolderPath + $"/{generatedFolderName}";
+                if (!Directory.Exists(outputFolderPath))
+                {
+                    Directory.CreateDirectory(outputFolderPath);
+                }
+                Directory.Move(generatedFolderPath, subfolderPath);
+                Debug.Log($"Moved folder {generatedFolderPath} to {subfolderPath}");
+            }
+            CompressDirectoryToZipFile(outputFolderPath, outputFolderPath + ".zip");
         }
     }
 
@@ -97,7 +109,7 @@ public static class BuildUtils
 
     private static string GetBuildOutputFolder(string appName, BuildTarget buildTarget)
     {
-        string buildFolderPath = $"{Application.dataPath}../../../Build/";
+        string buildFolderPath = $"{Application.dataPath}/../../Build/";
         if (buildTarget == BuildTarget.Android)
         {
             return buildFolderPath;
@@ -105,7 +117,7 @@ public static class BuildUtils
 
         string versionName = $"v{GetPlayerSettingsFileBundleVersion()}";
         string outputFolderName = $"{ReplaceSpaces(appName)}-{versionName}-{GetTargetPlatformName(buildTarget)}";
-        return $"{buildFolderPath}/{outputFolderName}";
+        return $"{buildFolderPath}{outputFolderName}";
     }
 
     private static string ReplaceSpaces(string text)
