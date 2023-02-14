@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UniInject;
 using UnityEngine;
@@ -11,7 +12,7 @@ public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
         CompilerWrapper compilerWrapper = CreateCompilerWrapper();
         
         // load text files and run them
-        string[] csFiles = Directory.GetFiles(Application.streamingAssetsPath + "/Mods", "*.cs");
+        string[] csFiles = Directory.GetFiles(ApplicationUtils.GetStreamingAssetsPath("Mods"), "*.cs");
         foreach (var file in csFiles)
         {
             compilerWrapper.Execute(file);
@@ -39,7 +40,8 @@ public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
             return;
         }
         
-        IEnumerable<IHighscoreProvider> highscoreProviders = compilerWrapper.CreateInstancesOf<IHighscoreProvider>();
+        List<IHighscoreProvider> highscoreProviders = compilerWrapper.CreateInstancesOf<IHighscoreProvider>().ToList();
+        highscoreProviders = GetNewestImplementation(highscoreProviders);
 
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         SongMetaManager.Instance.WaitUntilSongScanFinished();
@@ -58,5 +60,15 @@ public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
         result.ReferenceAssembly(commonAssembly);
         
         return result;
+    }
+
+    public static List<T> GetNewestImplementation<T>(List<T> instances)
+    {
+        // Multiple implementations of the same class can be loaded, e.g. during development.
+        // These implementations cannot be unloaded without unloading the whole AppDomain.
+        // Thus, if there are multiple instances with the same class name then we only take the last implementation, which is the most up-to-date version.
+        return instances.GroupBy(highscoreProvider => highscoreProvider.GetType().Name)
+            .Select(group => group.Last())
+            .ToList();
     }
 }
