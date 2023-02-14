@@ -19,7 +19,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        ""
+        "Esprima.dll",
+        "Jint.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

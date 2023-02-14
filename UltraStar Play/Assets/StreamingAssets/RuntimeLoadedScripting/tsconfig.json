@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+      "lib": ["ES2021"],
+      "target": "ES2021",
+      "noImplicitAny": true,
+      "removeComments": false,
+      "preserveConstEnums": true,
+      "sourceMap": true,
+      "rootDir": "src/ts/",
+      "outDir": "out/js",
+      "tsBuildInfoFile": "out/tsBuildInfoFile.txt",
+      "incremental": true
+    },
+    "typeAcquisition": {
+        "include": ["jquery"]
+    },
+    "include": [
+        "typings/**/*.d.ts",
+        "out/typings/**/*.d.ts",
+        "src/**/*.ts"
+    ]
+  }
