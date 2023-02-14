@@ -14,7 +14,7 @@ using Debug = UnityEngine.Debug;
 
 public class JintDemo : MonoBehaviour, INeedInjection
 {
-    private string ModsPath => $"{Application.persistentDataPath}/Mods";
+    private string ModsPath => $"{Application.streamingAssetsPath}/Mods";
     private string RuntimeScriptPath => $"{ModsPath}/out/js/index.js";
 
     private string[] jsCodeLines;
@@ -25,17 +25,17 @@ public class JintDemo : MonoBehaviour, INeedInjection
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         SongMetaManager.Instance.WaitUntilSongScanFinished();
         
-        if (!File.Exists(RuntimeScriptPath))
-        {
-            Debug.LogWarning("Cannot run script. File not found: " + RuntimeScriptPath);
-            return;
-        }
-
         GenerateTypeScriptDeclarations();
         
 #if UNITY_EDITOR
         RunTypeScriptCompiler();
 #endif
+        
+        if (!File.Exists(RuntimeScriptPath))
+        {
+            Debug.LogError("Cannot run script. File not found: " + RuntimeScriptPath);
+            return;
+        }
         
         RuntimeScriptRegistry runtimeScriptRegistry = new();
 

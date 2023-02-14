@@ -52,6 +52,8 @@ public class TypeScriptDeclarationGenerator
                 return infoCode;
             })
             .JoinWith("\n\n");
+        
+        Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
         File.WriteAllText(targetPath, declarationCode);
     }
 
