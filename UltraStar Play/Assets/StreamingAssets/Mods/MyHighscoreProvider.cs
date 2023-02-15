@@ -1,10 +1,15 @@
 using System.Collections.Generic;
+using UniInject;
+using UnityEngine;
 
 public class MyHighscoreProvider : IHighscoreProvider
 {
+    [Inject]
+    private Settings settings;
+    
     public int GetScore()
     {
-        return 2000;
+        return 2002;
     }
 
     public int GetNoteCount(SongMeta songMeta)
@@ -20,6 +25,9 @@ public class MyHighscoreProvider : IHighscoreProvider
         // }
         // return count;
 
+        int micProfileCount = settings.MicProfiles.Count;
+        Debug.Log("MyHighscoreProvider - MicProfile count: " + micProfileCount);
+        
         List<Note> notes = SongMetaUtils.GetAllNotes(songMeta);
         return notes.Count;
     }

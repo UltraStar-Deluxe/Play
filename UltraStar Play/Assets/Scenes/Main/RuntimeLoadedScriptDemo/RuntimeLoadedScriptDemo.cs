@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
 {
+    [Inject]
+    private Injector injector;
+    
     private void Start()
     {
         CompilerWrapper compilerWrapper = CreateCompilerWrapper();
@@ -42,13 +45,12 @@ public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
         
         List<IHighscoreProvider> highscoreProviders = compilerWrapper.CreateInstancesOf<IHighscoreProvider>().ToList();
         highscoreProviders = GetNewestImplementation(highscoreProviders);
-
+        IHighscoreProvider highscoreProvider = highscoreProviders.LastOrDefault();
+        injector.Inject(highscoreProvider);
+        
         SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         SongMetaManager.Instance.WaitUntilSongScanFinished();
-        foreach (IHighscoreProvider highscoreProvider in highscoreProviders)
-        {
-            Debug.Log($"HighscoreProvider {highscoreProvider.GetType()}, score: {highscoreProvider.GetScore()}, note count: {highscoreProvider.GetNoteCount(SongMetaManager.Instance.GetFirstSongMeta())}");
-        }
+        Debug.Log($"HighscoreProvider {highscoreProvider.GetType()}, score: {highscoreProvider.GetScore()}, note count: {highscoreProvider.GetNoteCount(SongMetaManager.Instance.GetFirstSongMeta())}");
     }
 
     private CompilerWrapper CreateCompilerWrapper()
@@ -56,8 +58,9 @@ public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
         CompilerWrapper result = new();
         result.ReferenceCurrentAssembly();
 
-        Assembly commonAssembly = Assembly.GetAssembly(typeof(SongMeta));
-        result.ReferenceAssembly(commonAssembly);
+        result.ReferenceAssembly(Assembly.GetAssembly(typeof(SongMeta)));
+        result.ReferenceAssembly(Assembly.GetAssembly(typeof(Settings)));
+        result.ReferenceAssembly(Assembly.GetAssembly(typeof(InjectAttribute)));
         
         return result;
     }
