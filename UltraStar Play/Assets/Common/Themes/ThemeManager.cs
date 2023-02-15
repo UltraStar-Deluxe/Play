@@ -428,6 +428,24 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         Color fontColorButtons = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeJson.fontColorButtons;
         Color fontColorLabels = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeJson.fontColorLabels;
 
+        ControlColorConfig buttonColorConfig = new()
+        {
+            fontColor = fontColorButtons,
+            backgroundColor = backgroundButtonColor,
+            hoverBackgroundColor = backgroundButtonColorHover,
+            focusBackgroundColor = backgroundButtonColorFocus,
+            activeToggleButtonColor = backgroundButtonColorFocus,
+        };
+        
+        ControlColorConfig toggleButtonColorConfig = new()
+        {
+            fontColor = fontColorButtons,
+            backgroundColor = Colors.clear,
+            hoverBackgroundColor = backgroundButtonColorHover.WithAlpha(0.5f),
+            focusBackgroundColor = backgroundButtonColorFocus.WithAlpha(0.5f),
+            activeToggleButtonColor = backgroundButtonColorFocus,
+        };
+
         // Change color of UXML elements:
         root.Query(null, "currentNoteLyrics", "previousNoteLyrics")
             .ForEach(el => el.style.color = backgroundButtonColor);
@@ -448,7 +466,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             }
             alreadyProcessedVisualElements.Add(button);
 
-            UIUtils.SetBackgroundStyleWithHoverAndFocus(button, backgroundButtonColor, backgroundButtonColorHover, backgroundButtonColorFocus, fontColorButtons);
+            if (button is ToggleButton)
+            {
+                UIUtils.SetBackgroundStyleWithHoverAndFocus(button, toggleButtonColorConfig);
+            }
+            else
+            {
+                UIUtils.SetBackgroundStyleWithHoverAndFocus(button, buttonColorConfig);
+            }
 
             VisualElement image = button.Q("image");
             if (image != null)
@@ -469,7 +494,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 return;
             }
             alreadyProcessedVisualElements.Add(entry);
-            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, entry.parent, backgroundButtonColor, backgroundButtonColorHover, backgroundButtonColorFocus, fontColorButtons);
+            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, entry.parent, buttonColorConfig);
         });
         root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
         {
@@ -478,7 +503,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 return;
             }
             alreadyProcessedVisualElements.Add(entry);
-            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, backgroundButtonColor, backgroundButtonColorHover, backgroundButtonColorFocus, fontColorButtons);
+            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
         });
 
         UIUtils.ApplyFontColorForElements(root, new []{"Label", "titleImage", "sceneTitle", "sceneSubtitle"}, null, fontColorLabels);

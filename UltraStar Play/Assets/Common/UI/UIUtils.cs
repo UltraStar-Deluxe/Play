@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,87 +14,108 @@ public static class UIUtils
         }
     }
 
-    private static readonly Dictionary<VisualElement, BackgroundColorConfig> elementsBgColorsDict = new();
+    private static readonly HashSet<VisualElement> visualElementsWithCustomCallbacks = new();
 
-    public static void SetBackgroundStyleWithHoverAndFocus(VisualElement root, Color backgroundColor, Color hoverBackgroundColor, Color focusBackgroundColor, Color fontColor)
+    public static void SetBackgroundStyleWithHoverAndFocus(VisualElement root, ControlColorConfig controlColorConfig)
     {
-        SetBackgroundStyleWithHoverAndFocus(root, root, backgroundColor, hoverBackgroundColor, focusBackgroundColor, fontColor);
+        SetBackgroundStyleWithHoverAndFocus(root, root, controlColorConfig);
     }
 
-    public static void SetBackgroundStyleWithHoverAndFocus(VisualElement root, VisualElement hoverRoot, Color backgroundColor, Color hoverBackgroundColor, Color focusBackgroundColor, Color fontColor)
+    public static void SetBackgroundStyleWithHoverAndFocus(VisualElement root, VisualElement hoverRoot, ControlColorConfig controlColorConfig)
     {
         if (root == null)
         {
             return;
         }
+        bool isPointerOver = false;
 
+        bool HasFocus()
+        {
+            return hoverRoot.focusController.focusedElement == hoverRoot;
+        }
+
+        bool IsToggleButtonActive()
+        {
+            return hoverRoot is ToggleButton toggleButton
+                   && toggleButton.IsActive;
+        }
+
+        void ApplyActiveToggleButtonStyle()
+        {
+            root.style.backgroundColor = controlColorConfig.activeToggleButtonColor;
+        }
+        
         void ApplyFocusStyle()
         {
-            Color color = elementsBgColorsDict[hoverRoot].focusBackgroundColor;
-            color.a = root.resolvedStyle.backgroundColor.a;
-            root.style.backgroundColor = color;
+            root.style.backgroundColor = controlColorConfig.focusBackgroundColor;
         }
 
         void ApplyHoverStyle()
         {
-            Color color = elementsBgColorsDict[hoverRoot].hoverBackgroundColor;
-            color.a = root.resolvedStyle.backgroundColor.a;
-            root.style.backgroundColor = color;
+            root.style.backgroundColor = controlColorConfig.hoverBackgroundColor;
         }
 
-        void RemoveHoverAndFocusStyle()
+        void ApplyDefaultStyle()
         {
-            Color color = elementsBgColorsDict[hoverRoot].backgroundColor;
-            color.a = root.resolvedStyle.backgroundColor.a;
-            root.style.backgroundColor = color;
+            root.style.color = controlColorConfig.fontColor;
+            root.style.backgroundColor = controlColorConfig.backgroundColor;
         }
 
-        root.style.color = fontColor;
-        root.style.backgroundColor = backgroundColor;
+        ApplyDefaultStyle();
 
-        // We can't access pseudo states through the API (e.g. :hover), so we have to manually mimic them
-        if (!elementsBgColorsDict.ContainsKey(hoverRoot))
+        void UpdateStyles()
         {
-            elementsBgColorsDict.Add(hoverRoot, new BackgroundColorConfig(backgroundColor, hoverBackgroundColor, focusBackgroundColor));
-
-            bool pointerOver = false;
-            bool hasFocus = hoverRoot.focusController.focusedElement == hoverRoot;
-            hoverRoot.RegisterCallback<PointerEnterEvent>(evt =>
+            bool shouldApplyHoverStyle = isPointerOver;
+            bool shouldApplyFocusStyle = HasFocus();
+            bool shouldApplyActiveToggleButtonStyle = IsToggleButtonActive();
+            if (!shouldApplyHoverStyle && !shouldApplyFocusStyle && !shouldApplyActiveToggleButtonStyle)
             {
-                pointerOver = true;
+                ApplyDefaultStyle();
+            }
+            else if (shouldApplyHoverStyle)
+            {
                 ApplyHoverStyle();
-            });
-            hoverRoot.RegisterCallback<PointerLeaveEvent>(evt =>
-            {
-                pointerOver = false;
-                if (!pointerOver && !hasFocus)
-                {
-                    RemoveHoverAndFocusStyle();
-                }
-            });
-
-            if (hasFocus)
+            }
+            else if (shouldApplyFocusStyle)
             {
                 ApplyFocusStyle();
             }
-            hoverRoot.RegisterCallback<FocusEvent>(evt =>
+            else if (shouldApplyActiveToggleButtonStyle)
             {
-                hasFocus = true;
-                ApplyFocusStyle();
-            });
-            hoverRoot.RegisterCallback<BlurEvent>(evt =>
-            {
-                hasFocus = false;
-                if (!pointerOver && !hasFocus)
-                {
-                    RemoveHoverAndFocusStyle();
-                }
-            });
+                ApplyActiveToggleButtonStyle();
+            }
         }
-        else
+
+        // We can't access pseudo states through the API (e.g. :hover), so we have to manually mimic them
+        if (!visualElementsWithCustomCallbacks.Contains(hoverRoot))
         {
-            elementsBgColorsDict[hoverRoot] = new BackgroundColorConfig(backgroundColor, hoverBackgroundColor, focusBackgroundColor);
+            visualElementsWithCustomCallbacks.Add(hoverRoot);
+
+            hoverRoot.RegisterCallback<PointerEnterEvent>(evt =>
+            {
+                isPointerOver = true;
+                UpdateStyles();
+            });
+            hoverRoot.RegisterCallback<PointerLeaveEvent>(evt =>
+            {
+                isPointerOver = false;
+                UpdateStyles();
+            });
+
+            hoverRoot.RegisterCallback<FocusEvent>(evt => UpdateStyles());
+            hoverRoot.RegisterCallback<BlurEvent>(evt => UpdateStyles());
+            if (hoverRoot is ToggleButton toggleButton)
+            {
+                toggleButton.IsActiveChangedEventStream.Subscribe(_ => UpdateStyles());
+            }
+
+            UpdateStyles();
         }
+    }
+
+    private static bool IgnoreNonFocusNonHoverBackgroundColor(VisualElement root)
+    {
+        return root.ClassListContains("toggleButton");
     }
 
     public static void ApplyFontColorForElements(VisualElement root, string[] names, string[] classes, Color fontColor)
@@ -118,19 +140,5 @@ public static class UIUtils
         s += saturationOffset;
         v += valueOffset;
         return Color.HSVToRGB(h, s, v);
-    }
-
-    public class BackgroundColorConfig
-    {
-        public Color backgroundColor;
-        public Color hoverBackgroundColor;
-        public Color focusBackgroundColor;
-
-        public BackgroundColorConfig(Color backgroundColor, Color hoverBackgroundColor, Color focusBackgroundColor)
-        {
-            this.backgroundColor = backgroundColor;
-            this.hoverBackgroundColor = hoverBackgroundColor;
-            this.focusBackgroundColor = focusBackgroundColor;
-        }
     }
 }

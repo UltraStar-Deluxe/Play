@@ -5,6 +5,8 @@ using UnityEngine;
 // List of CSS colors at W3Schools: https://www.w3schools.com/cssref/css_colors.asp
 public static class Colors
 {
+    public static readonly Color32 clear = CreateColor("#00000000");
+
     public static readonly Color32 aliceBlue = CreateColor("#F0F8FF");
     public static readonly Color32 antiqueWhite = CreateColor("#FAEBD7");
     public static readonly Color32 aqua = CreateColor("#00FFFF");
