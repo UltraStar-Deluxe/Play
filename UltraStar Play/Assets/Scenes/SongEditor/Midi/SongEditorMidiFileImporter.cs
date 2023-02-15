@@ -36,7 +36,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         string midiFilePath,
         int trackIndex,
         int channelIndex,
-        bool importWithoutLyrics,
+        bool importWithLyrics,
         string voiceName)
     {
         if (!File.Exists(midiFilePath))
@@ -54,7 +54,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         
         try
         {
-            List<Note> loadedNotes = LoadNotesFromMidiFile(midiFile, trackIndex, channelIndex, importWithoutLyrics);
+            List<Note> loadedNotes = LoadNotesFromMidiFile(midiFile, trackIndex, channelIndex, importWithLyrics);
             
             if (voiceName == null)
             {
@@ -165,7 +165,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         MidiFile midiFile,
         int trackIndex,
         int channelIndex,
-        bool importWithoutLyrics)
+        bool importWithLyrics)
     {
         List<Note> loadedNotes = new();
         Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
@@ -234,7 +234,7 @@ public class SongEditorMidiFileImporter : INeedInjection
                 throw new UltraStarPlayException($"No notes found in channel {channelIndex} of track {trackIndex}");
             }
 
-            if (!importWithoutLyrics)
+            if (importWithLyrics)
             {
                 LoadLyricsFromTrack(track);
             }
