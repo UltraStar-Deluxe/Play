@@ -240,7 +240,7 @@ public static partial class R
         public const string importMidiFileDialogOverlay = "importMidiFileDialogOverlay";
         public const string importMidiFileDialogRoot = "importMidiFileDialogRoot";
         public const string ImportMidiFileDialogUi = "ImportMidiFileDialogUi";
-        public const string importWithoutLyricsToggle = "importWithoutLyricsToggle";
+        public const string importWithLyricsToggle = "importWithLyricsToggle";
         public const string innerMenuOverlay = "innerMenuOverlay";
         public const string innerSearchExpressionInfoOverlay = "innerSearchExpressionInfoOverlay";
         public const string innerSongDetailOverlay = "innerSongDetailOverlay";
