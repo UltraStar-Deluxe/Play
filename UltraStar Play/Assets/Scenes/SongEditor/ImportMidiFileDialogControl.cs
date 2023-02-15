@@ -85,12 +85,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         get
         {
-            return midiFilePathTextField.value;
+            return midiFilePathTextField.value.Trim();
         }
         set
         {
-            midiFilePathTextField.value = value;
-            settings.SongEditorSettings.LastMidiFilePath = value;
+            midiFilePathTextField.value = value.Trim();
+            settings.SongEditorSettings.LastMidiFilePath = value.Trim();
             UpdateControls();
         }
     }
