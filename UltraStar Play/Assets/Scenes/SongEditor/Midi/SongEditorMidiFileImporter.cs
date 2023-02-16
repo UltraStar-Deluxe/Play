@@ -226,16 +226,19 @@ public class SongEditorMidiFileImporter : INeedInjection
                 {
                     // Find best matching note within a tolerance.
                     Note bestMatch = notesWithoutText.FindMinElement(note => Math.Abs(note.StartBeat - beat));
-                    double distanceInMillis = Math.Abs(bestMatch.StartBeat - beat) * BpmUtils.MillisecondsPerBeat(songMeta);
-                    if (distanceInMillis < 1000)
+                    if (bestMatch != null)
                     {
-                        notesWithoutText.Remove(bestMatch);
-                        bestMatch.SetText(midiEventLyrics);
+                        double distanceInMillis = Math.Abs(bestMatch.StartBeat - beat) * BpmUtils.MillisecondsPerBeat(songMeta);
+                        if (distanceInMillis < 1000)
+                        {
+                            notesWithoutText.Remove(bestMatch);
+                            bestMatch.SetText(midiEventLyrics);
+                        }
                     }
                 }
             });
 
-            // Normalize spaces.
+            // Normalize text on notes.
             Note lastNote = null;
             foreach (Note note in loadedNotes)
             {
