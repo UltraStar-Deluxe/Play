@@ -8,7 +8,7 @@
                 <ui:Label text="Player01" display-tooltip-when-elided="true" name="nameLabel" style="flex-grow: 1; white-space: normal;" />
                 <ui:Label text="Team01" display-tooltip-when-elided="true" name="teamLabel" class="smallFont" style="flex-grow: 1; white-space: normal; margin-top: 2px;" />
             </ui:VisualElement>
-            <ui:Toggle name="enabledToggle" style="margin-top: 5px; margin-right: 5px;" />
+            <ui:Toggle name="selectedToggle" style="margin-top: 5px; margin-right: 5px;" />
         </ui:VisualElement>
         <ItemPicker name="voiceChooser" no-previous-button="true" wrap-around="true" class="smallControl smallFont" style="width: 100%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" />
     </ui:VisualElement>

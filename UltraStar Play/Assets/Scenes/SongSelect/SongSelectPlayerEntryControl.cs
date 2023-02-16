@@ -32,8 +32,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R_PlayShared.UxmlNames.teamLabel)]
     private Label teamLabel;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.enabledToggle)]
-    private Toggle enabledToggle;
+    [Inject(UxmlName = R_PlayShared.UxmlNames.selectedToggle)]
+    private Toggle selectedToggle;
 
     [Inject]
     public PlayerProfile PlayerProfile { get; private set; }
@@ -101,7 +101,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             ? voice.Name
             : "";
 
-        enabledToggle.RegisterValueChangedCallback(evt => PlayerProfile.IsSelected = evt.newValue);
+        selectedToggle.RegisterValueChangedCallback(evt => SetSelected(evt.newValue, false));
         
         micButton.RegisterCallbackButtonTriggered(() => OpenMicSelectionDialog());
         
@@ -121,7 +121,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
                 teamLabel.text = partyModeTeamSettings.name;
             }
 
-            enabledToggle.HideByDisplay();
+            selectedToggle.HideByDisplay();
         }
         else
         {
@@ -139,7 +139,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         void OnMicSelected(MicProfile newMicProfile)
         {
             MicProfile = newMicProfile;
-            micSelectionDialogControl.CloseDialog();
+            micSelectionDialogControl?.CloseDialog();
             OnMicProfileSelected?.Invoke(newMicProfile);
         }
 
@@ -183,7 +183,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private void UpdateEnabledToggle()
     {
-        enabledToggle.value = PlayerProfile.IsSelected;
+        selectedToggle.value = PlayerProfile.IsSelected;
     }
 
     public void HideVoiceSelection()
