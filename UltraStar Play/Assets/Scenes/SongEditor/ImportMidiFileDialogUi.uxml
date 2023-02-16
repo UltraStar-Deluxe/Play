@@ -14,8 +14,8 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="midiImportLyricsContainer" style="background-color: rgba(0, 0, 0, 0);">
-                    <ui:TextField picking-mode="Ignore" label="Lyrics of track" value="La li lu" name="midiLyricsTextField" readonly="true" is-delayed="true" multiline="true" class="controlWithLabelVertical" style="flex-direction: column; margin-bottom: 5px; height: 80px;" />
-                    <ui:Toggle label="Import without lyrics" name="importWithoutLyricsToggle" />
+                    <ui:Toggle label="Import with lyrics" name="importWithLyricsToggle" />
+                    <ui:TextField picking-mode="Ignore" value="La li lu" name="midiLyricsTextField" readonly="true" is-delayed="true" multiline="true" class="controlWithLabelVertical" style="flex-direction: column; margin-bottom: 5px; height: 80px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="midiImportAssignToPlayerContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">

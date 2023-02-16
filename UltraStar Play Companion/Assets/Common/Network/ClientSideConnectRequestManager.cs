@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -41,6 +41,10 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     private ConnectedServerHandler connectedServerHandler;
     public bool IsConnected => connectedServerHandler != null;
 
+    private IDisposable receivedMessageStreamDisposable;
+    private readonly Subject<JsonSerializable> receivedMessageStream = new();
+    public IObservable<JsonSerializable> ReceivedMessageStream => receivedMessageStream;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -73,6 +77,10 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                 IPEndPoint messagingIpEndPoint = new(connectResponseDto.ServerIpEndPoint.Address, connectResponseDto.MessagingPort);
                 connectedServerHandler = new(this, messagingIpEndPoint);
 
+                // Forward received messages also to this event stream.
+                receivedMessageStreamDisposable = connectedServerHandler.ReceivedMessageStream
+                    .Subscribe(dto => receivedMessageStream.OnNext(dto));
+
                 connectEventStream.OnNext(new ConnectEvent
                 {
                     IsSuccess = true,
@@ -80,6 +88,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                     MessagingPort = connectResponseDto.MessagingPort,
                     HttpServerPort = connectResponseDto.HttpServerPort,
                     ServerIpEndPoint = connectResponseDto.ServerIpEndPoint,
+                    Permissions = connectResponseDto.Permissions,
                 });
                 connectRequestCount = 0;
             }
@@ -109,6 +118,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         {
             connectedServerHandler.Dispose();
             connectedServerHandler = null;
+            receivedMessageStreamDisposable?.Dispose();
         }
     }
 

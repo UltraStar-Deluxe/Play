@@ -151,7 +151,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
     public PartyModeSettings PartyModeSettings => sceneData.partyModeSceneData.PartyModeSettings;
     public bool IsPassTheMic => HasPartyModeSceneData &&
-                                sceneData.partyModeSceneData.CurrentRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic);
+                                sceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic);
 
     private SingingLyricsControl topSingingLyricsControl;
     private SingingLyricsControl bottomSingingLyricsControl;
@@ -166,7 +166,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private readonly SingSceneCountdownControl countdownControl = new();
     private readonly SingSceneAudioFadeInControl audioFadeInControl = new();
     private readonly SingSceneMedleyControl medleyControl = new();
-    private readonly SingScenePartyModeControl partyModeControl = new();
+    private readonly SingSceneModifierControl modifierControl = new();
 
     public bool IsCommonScore => settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
                                  && sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 2;
@@ -296,7 +296,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         // Handle party mode
-        injector.Inject(partyModeControl);
+        injector.Inject(modifierControl);
     }
 
     private void CreateWarningAboutMissingMicrophonesIfNeeded(List<PlayerProfile> playerProfilesWithoutMic)
@@ -521,7 +521,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             medleyControl.Update();
         }
 
-        partyModeControl.Update();
+        modifierControl.Update();
 
         if (!IsPaused)
         {
@@ -831,9 +831,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return Voice.soloVoiceName;
         }
 
-        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceName))
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceNameOrPerformerName))
         {
-            return voiceName;
+            // The given value could be "P1" / "P2" (i.e. a voiceName) or the performer's name (e.g. "Elvis").
+            string matchingVoiceName = SongMeta.VoiceNames
+                .Where(entry => entry.Key == voiceNameOrPerformerName
+                    || entry.Value == voiceNameOrPerformerName)
+                .Select(entry => entry.Key)
+                .FirstOrDefault();
+            return matchingVoiceName;
         }
 
         if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count == 1)
@@ -908,7 +914,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         bb.BindExistingInstance(countdownControl);
         bb.BindExistingInstance(medleyControl);
         bb.BindExistingInstance(audioFadeInControl);
-        bb.BindExistingInstance(partyModeControl);
+        bb.BindExistingInstance(modifierControl);
         bb.BindExistingInstance(alternativeAudioPlayer);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
@@ -923,7 +929,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         string voiceName = GetVoiceName(playerProfile);
         IReadOnlyCollection<Voice> voices = SongMeta.GetVoices();
-        Voice matchingVoice = voices.FirstOrDefault(it => it.VoiceNameEquals(voiceName));
+        Voice matchingVoice = voices.FirstOrDefault(it => Voice.VoiceNameEquals(it.Name, voiceName));
         if (matchingVoice != null)
         {
             return matchingVoice;

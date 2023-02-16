@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using UniInject;
 using UniRx;
@@ -8,7 +9,7 @@ using UnityEngine.Networking;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainGameHttpClient : MonoBehaviour, INeedInjection
+public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 {
     public static MainGameHttpClient Instance => GameObjectUtils.FindComponentWithTag<MainGameHttpClient>("MainGameHttpClient");
 
@@ -20,10 +21,23 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
     [Inject]
     private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
+    [Inject]
+    private UnityWebRequestManager webRequestManager;
+ 
+    [Inject]
+    private Settings settings;
+    
     private readonly Subject<bool> connectionEventStream = new();
     public IObservable<bool> ConnectionEventStream => connectionEventStream;
 
-    private void Start()
+    public ReactiveProperty<List<HttpApiPermission>> Permissions { get; private set; } = new(new List<HttpApiPermission>());
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         clientSideConnectRequestManager.ConnectEventStream
             .Where(connectEvent => connectEvent.IsSuccess)
@@ -31,9 +45,21 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
             {
                 serverIPEndPoint = connectEvent.ServerIpEndPoint;
                 httpServerPort = connectEvent.HttpServerPort;
-
+                Permissions.Value = connectEvent.Permissions ?? new();
                 connectionEventStream.OnNext(true);
             });
+
+        clientSideConnectRequestManager.ReceivedMessageStream
+            .ObserveOnMainThread()
+            .Subscribe(dto =>
+            {
+                if (dto is PermissionsMessageDto permissionsMessageDto)
+                {
+                    Permissions.Value = permissionsMessageDto.Permissions;
+                }
+            });
+
+        Permissions.Subscribe(newPermissions => Debug.Log($"Permissions changed: {newPermissions.ToCsv()}"));
     }
 
     public string GetUri(string path)
@@ -45,66 +71,89 @@ public class MainGameHttpClient : MonoBehaviour, INeedInjection
         return $"http://{serverIPEndPoint.Address}:{httpServerPort}{path}";
     }
 
-    public IObservable<UnityWebRequestAsyncOperation> GetRequest(string path, Action<string> onSuccess = null)
+    public void GetRequest(
+        string path,
+        Action<string> onSuccess = null,
+        Action<Exception> onError = null)
     {
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
         Debug.Log($"Sending GET request to {uri}");
         UnityWebRequest unityWebRequest = UnityWebRequest.Get(uri);
-        IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
-            .SendWebRequest()
-            .AsAsyncOperationObservable();
-        HandleRequest(unityWebRequest, asyncOperation, onSuccess);
-        return asyncOperation;
+        SendRequest(unityWebRequest, onSuccess, onError);
     }
 
-    public IObservable<UnityWebRequestAsyncOperation> PostRequest(
+    public void PostRequest(
         string path,
-        string postData = "{}",
+        string body = "{}",
         string contentType = "application/json",
-        Action<string> onSuccess = null)
+        Action<string> onSuccess = null,
+        Action<Exception> onError = null)
     {
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
-        Debug.Log($"Sending POST request to {uri}");
-        UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, postData, contentType);
-        IObservable<UnityWebRequestAsyncOperation> asyncOperation = unityWebRequest
-            .SendWebRequest()
-            .AsAsyncOperationObservable();
-        HandleRequest(unityWebRequest, asyncOperation, onSuccess);
-        return asyncOperation;
+        Debug.Log($"Sending POST request to '{uri}'");
+        UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, body, contentType);
+        SendRequest(unityWebRequest, onSuccess, onError);
     }
 
-    private void HandleRequest(UnityWebRequest unityWebRequest,
-        IObservable<UnityWebRequestAsyncOperation> asyncOperationObservable, Action<string> onSuccess)
+    public void DeleteRequest(
+        string path,
+        Action<string> onSuccess = null,
+        Action<Exception> onError = null)
     {
-        asyncOperationObservable.Subscribe(
-            _ => RequestOnNext(unityWebRequest),
-            ex => RequestOnError(unityWebRequest, ex),
-            () => RequestOnCompleted(unityWebRequest, onSuccess));
+        ThrowIfNotConnected();
+
+        string uri = GetUri(path);
+        Debug.Log($"Sending DELETE request to {uri}");
+        UnityWebRequest unityWebRequest = UnityWebRequest.Delete(uri);
+        SendRequest(unityWebRequest, onSuccess, onError);
+    }
+    
+    private void SendRequest(
+        UnityWebRequest unityWebRequest,
+        Action<string> onSuccess,
+        Action<Exception> onError)
+    {
+        AddHeaders(unityWebRequest);
+        unityWebRequest.SendWebRequest();
+
+        void WrappedOnSuccess(string response)
+        {
+            LogRequestSuccess(unityWebRequest);
+            onSuccess?.Invoke(response);
+        }
+
+        void WrappedOnError(Exception ex)
+        {
+            LogRequestError(unityWebRequest, ex);
+            onError?.Invoke(ex);
+        }
+
+        webRequestManager.AddUnityWebRequest(unityWebRequest,
+            WrappedOnSuccess,
+            ex => WrappedOnError(ex));
     }
 
-    private void RequestOnNext(UnityWebRequest unityWebRequest)
+    private void AddHeaders(UnityWebRequest unityWebRequest)
     {
-        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has updated. Result: {unityWebRequest.result}");
+        unityWebRequest.SetRequestHeader("client-id", settings.ClientId);
+        unityWebRequest.SetRequestHeader("client-name", settings.ClientName);
     }
 
-    private void RequestOnError(UnityWebRequest unityWebRequest, Exception ex)
+    private void LogRequestError(UnityWebRequest unityWebRequest, Exception ex)
     {
-        Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' failed. Error message: {ex.Message}");
+        string responseBody = unityWebRequest.downloadHandler?.text;
+        Debug.LogError($"{unityWebRequest.method} '{unityWebRequest.uri}' has failed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, error message: {ex.Message}, response body: {responseBody}");
         Debug.LogException(ex);
     }
 
-    private void RequestOnCompleted(UnityWebRequest unityWebRequest, Action<string> onSuccess)
+    private void LogRequestSuccess(UnityWebRequest unityWebRequest)
     {
-        string responseBody = unityWebRequest.downloadHandler.text;
-        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Result: {unityWebRequest.result}, response body: {responseBody}");
-        if (onSuccess != null)
-        {
-            MainThreadDispatcher.Send(_ => onSuccess(responseBody), null);
-        }
+        string responseBody = unityWebRequest.downloadHandler?.text;
+        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
     }
 
     private void ThrowIfNotConnected()

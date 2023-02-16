@@ -9,6 +9,7 @@ public class SingSceneData : SceneData
 
     public int MedleySongIndex { get; set; } = -1;
     public bool IsMedley => MedleySongIndex >= 0;
+    public GameRoundSettings gameRoundSettings = new();
 
     public PartyModeSceneData partyModeSceneData;
 

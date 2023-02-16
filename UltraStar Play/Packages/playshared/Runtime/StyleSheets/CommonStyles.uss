@@ -121,7 +121,6 @@
 .controlLabel40Percent {
     -unity-text-align: middle-left;
     width: 40%;
-    -unity-font-style: bold;
     font-size: var(--font-size);
 }
 
@@ -329,4 +328,16 @@ Toggle.smallControl {
 
 .wordWrap Label {
     white-space: normal;
+}
+
+.medleyWithNext {
+    border-bottom-width: 0;
+}
+
+.medleyWithPrevious {
+    border-top-width: 0;
+}
+
+.medleyWithPrevious #playerEntryList {
+    display: none;
 }

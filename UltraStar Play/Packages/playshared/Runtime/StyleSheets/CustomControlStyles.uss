@@ -271,8 +271,70 @@ ChipsCombo {
 }
 
 /**************************************************/
+/* BUTTON GROUP */
+/**************************************************/
+ButtonGroup {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+ButtonGroup > .unity-button {
+    border-radius: 0;
+    flex-grow: 1;
+}
+
+ButtonGroup.vertical > .unity-button {
+    margin-bottom: 1px;
+}
+
+ButtonGroup.vertical > .unity-button.firstChild {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+ButtonGroup.vertical > .unity-button.lastChild {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-bottom: 0;
+}
+
+ButtonGroup.horizontal > .unity-button {
+    margin-right: 1px;
+}
+
+ButtonGroup.horizontal > .unity-button.firstChild {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+ButtonGroup.horizontal > .unity-button.lastChild {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-right: 0;
+}
+
+/**************************************************/
 /* ACCORDION */
 /**************************************************/
+AccordionGroup {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+AccordionGroup > AccordionItem {
+    margin-bottom: 1px;
+}
+
+AccordionGroup > AccordionItem.firstChild {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+AccordionGroup > AccordionItem.lastChild {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-bottom: 0;
+}
 
 #accordionItemRoot {
     width: 100%;
@@ -280,8 +342,10 @@ ChipsCombo {
 }
 
 #accordionItemContent {
+    padding-left: 10px;
+    padding-right: 10px;
     overflow: hidden;
-    transition: height 0.5s;
+    transition: height 0.3s;
 }
 
 #toggleAccordionItemContentButton.unity-button {
@@ -292,7 +356,7 @@ ChipsCombo {
     transition: rotate 0.3s;
 }
 
-#accordionItemRoot.expanded #toggleAccordionItemContentIcon {
+AccordionItem.expanded #toggleAccordionItemContentIcon {
     transform-origin: 50% 50%;
     rotate: -180deg;
 }

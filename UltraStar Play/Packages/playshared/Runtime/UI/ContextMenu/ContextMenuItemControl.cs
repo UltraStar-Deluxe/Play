@@ -5,10 +5,10 @@ using UnityEngine.UIElements;
 
 public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
 {
-    [Inject(UxmlName = "contextMenuLabel")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.contextMenuLabel)]
     private Label label;
 
-    [Inject(UxmlName = "contextMenuButton")]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.contextMenuButton)]
     private Button button;
 
     private readonly string text;

@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -10,8 +12,8 @@ using UnityEngine.UIElements;
 
 public class CompanionAppOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 {
-    [InjectedInInspector]
-    public VisualTreeAsset connectedClientListEntryAsset;
+    [FormerlySerializedAs("connectedClientListEntryAsset")] [InjectedInInspector]
+    public VisualTreeAsset connectedClientListEntryUi;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -35,8 +37,13 @@ public class CompanionAppOptionsControl : MonoBehaviour, INeedInjection, ITransl
     private Settings settings;
 
     [Inject]
+    private Injector injector;
+    
+    [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
+    private readonly List<ConnectedClientListEntryControl> connectedClientListEntryControls = new();
+    
     private void Start()
     {
         UpdateConnectedClients();
@@ -72,8 +79,12 @@ public class CompanionAppOptionsControl : MonoBehaviour, INeedInjection, ITransl
 
     private VisualElement CreateClientEntry(IConnectedClientHandler clientHandler)
     {
-        VisualElement result = connectedClientListEntryAsset.CloneTree();
-        result.Q<Label>(R.UxmlNames.nameLabel).text = clientHandler.ClientName;
-        return result;
+        VisualElement visualElement = connectedClientListEntryUi.CloneTreeAndGetFirstChild();
+        ConnectedClientListEntryControl control = injector
+            .WithRootVisualElement(visualElement)
+            .WithBindingForInstance(clientHandler)
+            .CreateAndInject<ConnectedClientListEntryControl>();
+        connectedClientListEntryControls.Add(control);
+        return visualElement;
     }
 }

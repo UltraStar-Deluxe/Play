@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using ProTrans;
 using UniInject;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 using UnityEngine.Networking;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -22,6 +20,9 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
 
+    [Inject]
+    private UnityWebRequestManager webRequestManager;
+    
     public void RequestSongList()
     {
         if (!mainGameHttpClient.IsConnected)
@@ -30,34 +31,16 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
             return;
         }
 
-        string uri = mainGameHttpClient.GetUri("/api/rest/songs");
-        Debug.Log("GET song list from URI: " + uri);
-
-        UnityWebRequest getSongListWebRequest = UnityWebRequest.Get(uri);
-        UnityWebRequestAsyncOperation unityWebRequestAsyncOperation = getSongListWebRequest.SendWebRequest();
-        unityWebRequestAsyncOperation.AsObservable()
-            .Subscribe(_ => HandleSongListResponse(getSongListWebRequest, false),
-                exception => FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_general)),
-                () => HandleSongListResponse(getSongListWebRequest, true));
-        // BUG: When using only the observable, then completed is sometimes called before isDone is true.
-        unityWebRequestAsyncOperation.completed += (AsyncOperation op) => HandleSongListResponse(getSongListWebRequest, true);
+        mainGameHttpClient.GetRequest(HttpApiEndpointPaths.Songs,
+            HandleSongListResponse,
+            HandleSongListErrorResponse);
     }
 
-    private void HandleSongListResponse(UnityWebRequest webRequest, bool isCompleted)
+    private void HandleSongListResponse(string response)
     {
-        if (!webRequest.isDone)
-        {
-            if (isCompleted)
-            {
-                Debug.LogWarning("WebRequest not done but already completed?!");
-            }
-            return;
-        }
-
-        string downloadHandlerText = webRequest.downloadHandler.text;
         try
         {
-            LoadedSongsDto = JsonConverter.FromJson<LoadedSongsDto>(downloadHandlerText);
+            LoadedSongsDto = JsonConverter.FromJson<LoadedSongsDto>(response);
             if (!LoadedSongsDto.IsSongScanFinished
                 && LoadedSongsDto.SongCount == 0)
             {
@@ -82,6 +65,11 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
             SuccessfullyLoadedAllSongs = false;
             FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_general));
         }
+    }
+
+    private void HandleSongListErrorResponse(Exception ex)
+    {
+        FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_general));
     }
     
     private void FireErrorMessageEvent(string errorMessage)

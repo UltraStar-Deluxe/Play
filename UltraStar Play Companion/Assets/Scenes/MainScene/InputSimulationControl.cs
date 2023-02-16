@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -41,6 +42,12 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.simulateSpaceButton)]
     private Button simulateSpaceButton;
+    
+    [Inject(UxmlName = R.UxmlNames.simulateVolumeUpButton)]
+    private Button simulateVolumeUpButton;
+    
+    [Inject(UxmlName = R.UxmlNames.simulateVolumeDownButton)]
+    private Button simulateVolumeDownButton;
     
     [Inject(UxmlName = R.UxmlNames.simulateLeftMouseButton)]
     private Button simulateLeftMouseButton;
@@ -93,6 +100,8 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         RegisterCallbackToSendSimulationInputRequest(simulateEnterButton, "enterKey");
         RegisterCallbackToSendSimulationInputRequest(simulateEscapeButton, "escapeKey");
         RegisterCallbackToSendSimulationInputRequest(simulateSpaceButton, "spaceKey");
+        RegisterCallbackToSendSimulationInputRequest(simulateVolumeUpButton, "volumeUpKey");
+        RegisterCallbackToSendSimulationInputRequest(simulateVolumeDownButton, "volumeDownKey");
         RegisterCallbackToSendSimulationInputRequest(simulateLeftMouseButton, "leftMouseButton");
         RegisterCallbackToSendSimulationInputRequest(simulateRightMouseButton, "rightMouseButton");
         RegisterCallbackToSendSimulationInputRequest(simulateMiddleMouseButton, "middleMouseButton");
@@ -202,7 +211,8 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     private void SendSimulateInputRequest(string inputControl)
     {
-        mainGameHttpClient.PostRequest($"api/rest/input/{inputControl}");
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.Input
+            .ReplaceOrThrow("{inputControl}", inputControl));
     }
 
     private void SendSimulateScrollWheelRequest(Vector2 scrollDelta)
@@ -211,18 +221,22 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-        
-        mainGameHttpClient.PostRequest($"api/rest/input/scrollWheel/{scrollDelta.x}/{scrollDelta.y}");
+
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputScrollWheel
+            .ReplaceOrThrow("{deltaX}", scrollDelta.x.ToString(CultureInfo.InvariantCulture))
+            .ReplaceOrThrow("{deltaY}", scrollDelta.y.ToString(CultureInfo.InvariantCulture)));
     }
-    
+
     private void SendSimulateMouseDeltaRequest(Vector2 mouseDelta)
     {
         if (mouseDelta == Vector2.zero)
         {
             return;
         }
-        
-        mainGameHttpClient.PostRequest($"api/rest/input/mouseDelta/{mouseDelta.x}/{mouseDelta.y}");
+
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.InputMouseDelta
+            .ReplaceOrThrow("{deltaX}", mouseDelta.x.ToStringInvariantCulture())
+            .ReplaceOrThrow("{deltaY}", mouseDelta.y.ToStringInvariantCulture()));
     }
 
     private void RegisterCallbackToSendSimulationInputRequest(Button uiButton, string keyboardButton)

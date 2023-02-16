@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using CSharpSynth.Midi;
@@ -40,8 +41,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.midiLyricsTextField)]
     private TextField midiLyricsTextField;
     
-    [Inject(UxmlName = R.UxmlNames.importWithoutLyricsToggle)]
-    private Toggle importWithoutLyricsToggle;
+    [Inject(UxmlName = R.UxmlNames.importWithLyricsToggle)]
+    private Toggle importWithLyricsToggle;
     
     [Inject(UxmlName = R.UxmlNames.assignToPlayerPicker)]
     private ItemPicker assignToPlayerPicker;
@@ -84,12 +85,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         get
         {
-            return midiFilePathTextField.value;
+            return midiFilePathTextField.value.Trim();
         }
         set
         {
-            midiFilePathTextField.value = value;
-            settings.SongEditorSettings.LastMidiFilePath = value;
+            midiFilePathTextField.value = value.Trim();
+            settings.SongEditorSettings.LastMidiFilePath = value.Trim();
             UpdateControls();
         }
     }
@@ -118,11 +119,13 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(importMidiFileDialogOverlay, CloseDialog);
 
         midiTrackIndexPickerControl = new(midiTrackIndexPicker, new List<TrackAndChannel>());
+        midiTrackIndexPickerControl.AutoSmallFont = false;
         midiTrackIndexPickerControl.Selection.Subscribe(_ =>
         {
             StopPreview();
             UpdateMidiLyrics();
         });
+        new AutoFitLabelControl(midiTrackIndexPicker.ItemLabel);
         
         midiAssignToPlayerPickerControl = new(assignToPlayerPicker, new List<int> { -1, 0, 1 });
         midiAssignToPlayerPickerControl.GetLabelTextFunction = newValue =>
@@ -207,7 +210,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             midiFilePathTextField.value,
             midiTrackIndexPickerControl.SelectedItem.trackIndex,
             midiTrackIndexPickerControl.SelectedItem.channelIndex,
-            importWithoutLyricsToggle.value,
+            importWithLyricsToggle.value,
             voiceName);
     }
     
@@ -252,11 +255,16 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         if (SelectedTrack == null)
         {
             midiLyricsTextField.value = "";
+            importWithLyricsToggle.SetEnabled(false);
             return;
         }
 
         string lyrics = MidiFileUtils.GetLyrics(SelectedTrack);
-        midiLyricsTextField.value = lyrics;
+        midiLyricsTextField.value = lyrics.IsNullOrEmpty()
+            ? "No lyrics found"
+            : lyrics;
+        importWithLyricsToggle.SetEnabled(!lyrics.IsNullOrEmpty());
+        importWithLyricsToggle.value = !lyrics.IsNullOrEmpty();
     }
 
     private void SetErrorMessage(string errorMessage)
@@ -282,9 +290,144 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         });
 
         midiTrackIndexPickerControl.Items = trackAndChannels;
-        midiTrackIndexPickerControl.SelectItem(trackAndChannels.FirstOrDefault());
+        
+        TrackAndChannel bestMatchingTrackAndChannel = FindBestMatchingTrackAndChannel(trackAndChannels);
+        if (bestMatchingTrackAndChannel != null)
+        {
+            midiTrackIndexPickerControl.SelectItem(bestMatchingTrackAndChannel);
+        }
+        else
+        {
+            midiTrackIndexPickerControl.SelectItem(trackAndChannels.FirstOrDefault());
+        }
     }
-    
+
+    private TrackAndChannel FindBestMatchingTrackAndChannel(List<TrackAndChannel> trackAndChannels)
+    {
+        if (trackAndChannels.IsNullOrEmpty())
+        {
+            return null;
+        }
+        
+        int FindTrackIndexWithLongestLyrics()
+        {
+            if (trackAndChannels.IsNullOrEmpty())
+            {
+                return -1;
+            }
+            if (trackAndChannels.Count == 1)
+            {
+                return 0;
+            }
+            
+            int trackIndexWithLongestLyrics = trackAndChannels.FirstOrDefault().trackIndex;
+            int longestLyricsLength = 0;
+            foreach (TrackAndChannel trackAndChannel in trackAndChannels)
+            {
+                MidiTrack midiTrack = midiFile.Tracks[trackAndChannel.trackIndex];
+                string lyrics = MidiFileUtils.GetLyrics(midiTrack);
+                if (!lyrics.IsNullOrEmpty()
+                    && lyrics.Length > longestLyricsLength)
+                {
+                    trackIndexWithLongestLyrics = trackAndChannel.trackIndex;
+                    longestLyricsLength = lyrics.Length;
+                }
+            }
+
+            return trackIndexWithLongestLyrics;
+        }
+
+        int bestTrackIndex = FindTrackIndexWithLongestLyrics();
+        if (bestTrackIndex < 0)
+        {
+            return trackAndChannels.FirstOrDefault();
+        }
+
+        double GetMidiEventAbsoluteTimeDistance(MidiEvent a, MidiEvent b, Dictionary<MidiEvent, uint> midiEventToAbsoluteTime)
+        {
+            if (a == null
+                && b == null)
+            {
+                return 0;
+            }
+
+            if (a == null)
+            {
+                return midiEventToAbsoluteTime[b];
+            }
+
+            if (b == null)
+            {
+                return midiEventToAbsoluteTime[a];
+            }
+            
+            return Mathf.Abs((int)midiEventToAbsoluteTime[a] - midiEventToAbsoluteTime[b]);
+        }
+        
+        int FindChannelIndexWithBestMatchingNotes()
+        {
+            List<int> channelIndexes = trackAndChannels
+                .Where(it => it.trackIndex == bestTrackIndex)
+                .Select(it => it.channelIndex)
+                .Distinct()
+                .ToList();
+            if (channelIndexes.IsNullOrEmpty())
+            {
+                return -1;
+            }
+            if (channelIndexes.Count == 1)
+            {
+                return channelIndexes[0];
+            }
+            
+            // For each channel, calculate difference to lyrics events. Return the channel with smallest difference.
+            MidiTrack bestTrack = midiFile.Tracks[bestTrackIndex];
+            List<MidiEvent> lyricsEvents = MidiFileUtils.GetLyricsEvents(bestTrack);
+            Dictionary<MidiEvent, uint> midiEventToAbsoluteTime = MidiFileUtils.GetMidiEventToAbsoluteTime(bestTrack);
+            
+            Dictionary<int, double> channelIndexToDistance = new();
+            foreach (int channelIndex in channelIndexes)
+            {
+                List<MidiEvent> noteEventsOfChannel = bestTrack.MidiEvents
+                    .Where(midiEvent => midiEvent.channel == (byte)channelIndex
+                                        && midiEvent.midiChannelEvent
+                                            is MidiHelper.MidiChannelEvent.Note_On)
+                    .ToList();
+
+                double distanceOfChannel = 0;
+                foreach (MidiEvent lyricsEvent in lyricsEvents)
+                {
+                    MidiEvent closestNoteOfLyricsEvent = noteEventsOfChannel.FindMinElement(noteEvent =>
+                        GetMidiEventAbsoluteTimeDistance(lyricsEvent, noteEvent, midiEventToAbsoluteTime));
+                    if (closestNoteOfLyricsEvent == null)
+                    {
+                        // Add unmatched lyrics event to distance.
+                        distanceOfChannel += midiEventToAbsoluteTime[lyricsEvent];
+                    }
+
+                    noteEventsOfChannel.Remove(closestNoteOfLyricsEvent);
+                    double distanceOfNote = GetMidiEventAbsoluteTimeDistance(lyricsEvent, closestNoteOfLyricsEvent, midiEventToAbsoluteTime);
+                    distanceOfChannel += distanceOfNote;
+                }
+
+                // Add unmatched notes to distance
+                distanceOfChannel += noteEventsOfChannel.Sum(noteEvent => midiEventToAbsoluteTime[noteEvent]);
+                
+                channelIndexToDistance[channelIndex] = distanceOfChannel;
+            }
+
+            int channelIndexWithSmallestDistance = channelIndexToDistance.FindMinElement(entry => entry.Value).Key;
+            return channelIndexWithSmallestDistance;
+        }
+
+        int bestChannelIndex = FindChannelIndexWithBestMatchingNotes();
+        if (bestChannelIndex < 0)
+        {
+            return null;
+        }
+        return new TrackAndChannel(bestTrackIndex, bestChannelIndex);
+    }
+
     private string GetMidiFileErrorMessage()
     {
         if (MidiFilePath.IsNullOrEmpty())

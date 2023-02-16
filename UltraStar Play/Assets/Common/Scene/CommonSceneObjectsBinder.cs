@@ -28,14 +28,16 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
+        bb.BindExistingInstance(UnityWebRequestManager.Instance);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
-        bb.BindExistingInstance(GameRoundManager.Instance);
+        bb.BindExistingInstance(SongQueueManager.Instance);
         bb.BindExistingInstance(JobManager.Instance);   bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
+        bb.BindExistingInstance(HttpServer.Instance as UltraStarPlayHttpServer);
         bb.Bind(typeof(IServerSideConnectRequestManager)).ToExistingInstance(ServerSideConnectRequestManager.Instance);
         bb.BindExistingInstance(ServerSideConnectRequestManager.Instance);
 

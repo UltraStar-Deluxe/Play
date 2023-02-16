@@ -183,39 +183,69 @@ public static class CollectionExtensions
     }
 
     public static T FindMinElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
-        where T : class
     {
-        T minElement = null;
-        float minDistance = 0;
+        T minElement = default(T);
+        float minDistance = -1;
         foreach (T element in enumerable)
         {
-            float currentValue = valueFunction(element);
-            if (minElement == null || currentValue < minDistance)
+            float currentDistance = valueFunction(element);
+            if (minDistance < 0 || currentDistance < minDistance)
             {
-                minDistance = currentValue;
+                minDistance = currentDistance;
                 minElement = element;
             }
         }
         return minElement;
     }
 
-    public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
-        where T : class
+    public static T FindMinElement<T>(this IEnumerable<T> enumerable, Func<T, double> valueFunction)
     {
-        T maxElement = null;
-        float maxDistance = 0;
+        T minElement = default(T);
+        double minDistance = -1;
         foreach (T element in enumerable)
         {
-            float currentValue = valueFunction(element);
-            if (maxElement == null || currentValue > maxDistance)
+            double currentDistance = valueFunction(element);
+            if (minDistance < 0 || currentDistance < minDistance)
             {
-                maxDistance = currentValue;
+                minDistance = currentDistance;
+                minElement = element;
+            }
+        }
+        return minElement;
+    }
+    
+    public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
+    {
+        T maxElement = default(T);
+        float maxDistance = -1;
+        foreach (T element in enumerable)
+        {
+            float currentDistance = valueFunction(element);
+            if (maxDistance < 0 || currentDistance > maxDistance)
+            {
+                maxDistance = currentDistance;
                 maxElement = element;
             }
         }
         return maxElement;
     }
 
+    public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, double> valueFunction)
+    {
+        T maxElement = default(T);
+        double maxDistance = -1;
+        foreach (T element in enumerable)
+        {
+            double currentDistance = valueFunction(element);
+            if (maxDistance < 0 || currentDistance > maxDistance)
+            {
+                maxDistance = currentDistance;
+                maxElement = element;
+            }
+        }
+        return maxElement;
+    }
+    
     public static Dictionary<TValue, TKey> ToInvertedDictionary<TKey, TValue>(this IDictionary<TKey, TValue> source)
     {
         Dictionary<TValue, TKey> result = new();

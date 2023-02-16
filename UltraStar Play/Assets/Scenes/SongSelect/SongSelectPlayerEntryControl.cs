@@ -11,20 +11,35 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     private VisualElement visualElement;
 
-    [Inject(UxmlName = R.UxmlNames.micIcon)]
+    [Inject(Key = nameof(micProfiles))]
+    private List<MicProfile> micProfiles;
+        
+    [Inject(Key = nameof(messageDialogUi))]
+    private VisualTreeAsset messageDialogUi;
+    
+    [Inject(UxmlName = R.UxmlNames.dialogContainer)]
+    private VisualElement dialogContainer;
+    
+    [Inject(UxmlName = R_PlayShared.UxmlNames.micButton)]
+    private Button micButton;
+    
+    [Inject(UxmlName = R_PlayShared.UxmlNames.micIcon)]
     private VisualElement micIcon;
 
-    [Inject(UxmlName = R.UxmlNames.nameLabel)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.nameLabel)]
     private Label nameLabel;
 
-    [Inject(UxmlName = R.UxmlNames.teamLabel)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.teamLabel)]
     private Label teamLabel;
 
-    [Inject(UxmlName = R.UxmlNames.enabledToggle)]
+    [Inject(UxmlName = R_PlayShared.UxmlNames.enabledToggle)]
     private Toggle enabledToggle;
 
     [Inject]
     public PlayerProfile PlayerProfile { get; private set; }
+
+    [Inject]
+    private Injector injector;
 
     [Inject(Optional = true)]
     private PartyModeTeamSettings partyModeTeamSettings;
@@ -69,16 +84,27 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
+    private MicSelectionDialogControl micSelectionDialogControl;
+    
     private readonly Subject<bool> selectedChangedEventStream = new();
     public IObservable<bool> SelectedChangedEventStream => selectedChangedEventStream;
 
+    private readonly Subject<MicSelectionDialogControl.MicProfileChangedEvent> micProfileChangedEventStream = new();
+    public IObservable<MicSelectionDialogControl.MicProfileChangedEvent> MicProfileChangedEventStream => micProfileChangedEventStream;
+
+    public Action<MicProfile> OnMicProfileSelected { get; set; }
+    
     public void OnInjectionFinished()
     {
-        voiceChooserControl = new LabeledItemPickerControl<Voice>(visualElement.Q<ItemPicker>(R.UxmlNames.voiceChooser), new List<Voice>());
+        voiceChooserControl = new LabeledItemPickerControl<Voice>(visualElement.Q<ItemPicker>(R_PlayShared.UxmlNames.voiceChooser), new List<Voice>());
         voiceChooserControl.GetLabelTextFunction = voice => voice != null
             ? voice.Name
             : "";
 
+        enabledToggle.RegisterValueChangedCallback(evt => PlayerProfile.IsSelected = evt.newValue);
+        
+        micButton.RegisterCallbackButtonTriggered(() => OpenMicSelectionDialog());
+        
         UpdateEnabledToggle();
         MicProfile = null;
 
@@ -103,6 +129,43 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
+    private void OpenMicSelectionDialog()
+    {
+        if (micSelectionDialogControl != null)
+        {
+            return;
+        }
+
+        void OnMicSelected(MicProfile newMicProfile)
+        {
+            MicProfile = newMicProfile;
+            micSelectionDialogControl.CloseDialog();
+            OnMicProfileSelected?.Invoke(newMicProfile);
+        }
+
+        VisualElement dialog = messageDialogUi.CloneTreeAndGetFirstChild();
+        dialogContainer.Add(dialog);
+        dialogContainer.ShowByDisplay();
+        
+        micSelectionDialogControl = injector
+            .WithRootVisualElement(dialog)
+            .CreateAndInject<MicSelectionDialogControl>();
+        micSelectionDialogControl.Title = $"Select Microphone for {PlayerProfile.Name}";
+        micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ => OnMicSelectionDialogClosed());
+        micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;
+        micSelectionDialogControl.MicProfiles = micProfiles;
+    }
+
+    private void OnMicSelectionDialogClosed()
+    {
+        if (micSelectionDialogControl == null)
+        {
+            return;
+        }
+        micSelectionDialogControl = null;
+        dialogContainer.HideByDisplay();
+    }
+    
     public void SetSelected(bool newValue, bool force)
     {
         if (partyModeTeamSettings != null

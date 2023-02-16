@@ -63,6 +63,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
+    
+    [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
+    private VisualElement modifierDialogOverlay;
 
     private PartyModeSettings PartyModeSettings => sceneData.PartyModeSettings;
     
@@ -70,7 +73,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
     private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
     private readonly PartyModeRoundsConfigControl roundsConfigControl = new();
-    private readonly PartyModeRoundConfigModifierDialogControl modifierDialogControl = new();
+    private readonly GameRoundModifierDialogControl modifierDialogControl = new();
 
     public void OnInjectionFinished()
     {
@@ -88,7 +91,8 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         UpdateConfigPart();
 
         // Inject child controls
-        injector.Inject(modifierDialogControl);
+        injector.WithRootVisualElement(modifierDialogOverlay)
+            .Inject(modifierDialogControl);
         injector.Inject(teamConfigControl);
         injector.Inject(songSelectionConfigControl);
         injector.Inject(roundsConfigControl);

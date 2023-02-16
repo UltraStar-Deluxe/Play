@@ -1,41 +1,41 @@
+using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using ProTrans;
 using SimpleHttpServerForUnity;
 using UniInject;
-using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class TranslationRestControl : MonoBehaviour, INeedInjection
+public class TranslationRestControl : AbstractRestControl, INeedInjection
 {
-    [Inject]
-    private HttpServer httpServer;
-
+    public static TranslationRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<TranslationRestControl>();
+    
     [Inject]
     private UltraStarPlayTranslationManager translationManager;
 
-    private void Start()
+    protected override object GetInstance()
     {
-        httpServer.On(HttpMethod.Get, "api/rest/language")
-            .WithDescription($"Get current language as 2 letter country code")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        return Instance;
+    }
+    
+    protected override void StartSingleton()
+    {
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Language)
+            .SetDescription($"Get current language as 2 letter country code")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
-                string parameterValue = LanguageHelper.Get2LetterIsoCodeFromSystemLanguage(translationManager.currentLanguage);
-                byte[] responseBytes = Encoding.UTF8.GetBytes(parameterValue);
-                requestData.Context.Response.OutputStream.Write(responseBytes);
+                string language = LanguageHelper.Get2LetterIsoCodeFromSystemLanguage(translationManager.currentLanguage);
+                requestData.Context.Response.WriteJson(new Dictionary<string, string> { { "language", language } });
             });
 
-        httpServer.On(HttpMethod.Get, "api/rest/translations")
-            .WithDescription($"Get all translations for the current language.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Translations)
+            .SetDescription($"Get all translations for the current language.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
-                string parameterValue = JsonConverter.ToJson(translationManager.GetAllTranslations(true));
-                byte[] responseBytes = Encoding.UTF8.GetBytes(parameterValue);
-                requestData.Context.Response.OutputStream.Write(responseBytes);
+                requestData.Context.Response.WriteJson(translationManager.GetAllTranslations(true));
             });
 	}
 }
