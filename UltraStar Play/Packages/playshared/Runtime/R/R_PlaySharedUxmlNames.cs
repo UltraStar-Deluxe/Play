@@ -54,6 +54,7 @@ public static partial class R_PlayShared
         public const string labelContainer = "labelContainer";
         public const string micButton = "micButton";
         public const string micIcon = "micIcon";
+        public const string micProgressBar = "micProgressBar";
         public const string micWithNameUiRoot = "micWithNameUiRoot";
         public const string modifierConditionFromNumberPicker = "modifierConditionFromNumberPicker";
         public const string modifierConditionPicker = "modifierConditionPicker";
