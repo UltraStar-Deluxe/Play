@@ -39,8 +39,8 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R_PlayShared.UxmlNames.voiceChooser)]
     private ItemPicker voiceChooser;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.enabledToggle)]
-    public Toggle EnabledToggle { get; private set; }
+    [Inject(UxmlName = R_PlayShared.UxmlNames.selectedToggle)]
+    public Toggle SelectedToggle { get; private set; }
     
     private MicProfile micProfile;
     public MicProfile MicProfile
@@ -56,7 +56,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         }
     }
 
-    public bool IsSelected => EnabledToggle.value;
+    public bool IsSelected => SelectedToggle.value;
     
     public LabeledItemPickerControl<string> VoiceChooserControl { get; private set; }
 
