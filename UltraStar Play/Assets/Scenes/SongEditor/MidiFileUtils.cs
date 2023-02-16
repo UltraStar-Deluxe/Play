@@ -53,14 +53,24 @@ public static class MidiFileUtils
 
     public static string GetLyrics(MidiEvent midiEvent)
     {
-        if (midiEvent.Parameters.IsNullOrEmpty()
-            || midiEvent.Parameters[0] is not string)
+        if (midiEvent.Parameters.IsNullOrEmpty())
         {
             return null;
         }
 
-        string rawLyrics = midiEvent.Parameters[0] as string;
-        return rawLyrics.Replace("\r", "\n");   
+        foreach (object parameter in midiEvent.Parameters)
+        {
+            if (parameter is string)
+            {
+                string rawLyrics = parameter as string;
+                return rawLyrics
+                    .Replace("\r", "\n")   
+                    .Replace("/", "\n")
+                    .Replace("\\", "\n");
+            }
+        }
+
+        return null;
     }
     
     public static string GetLyrics(MidiTrack track)
@@ -71,8 +81,28 @@ public static class MidiFileUtils
             .JoinWith("");
     }
     
+    public static Dictionary<MidiEvent, uint> GetMidiEventToAbsoluteTime(MidiTrack track)
+    {
+        Dictionary<byte, uint> channelIndexToTime = new();
+        Dictionary<MidiEvent, uint> midiEventToTime = new();
+        foreach (MidiEvent midiEvent in track.MidiEvents)
+        {
+            if (!channelIndexToTime.ContainsKey(midiEvent.channel))
+            {
+                channelIndexToTime[midiEvent.channel] = 0;
+            }
+
+            channelIndexToTime[midiEvent.channel] += midiEvent.deltaTime;
+            
+            midiEventToTime[midiEvent] = channelIndexToTime[midiEvent.channel];
+        }
+
+        return midiEventToTime;
+    }
+    
     public static int GetDeltaTimeInMillis(MidiEvent midiEvent)
     {
+        // TODO: This is just wrong. MidiFile has a deltaTiming property.
         uint deltaTimeInSamples = midiEvent.deltaTime;
         int deltaTimeInMillis = (int)Math.Round(deltaTimeInSamples / (MidiManager.midiStreamSampleRateHz / 1000.0));
         return deltaTimeInMillis;
@@ -121,7 +151,7 @@ public static class MidiFileUtils
         });
 
         MidiFile midiFile = MidiFile.CreateEmpty();
-        midiFile.MidiHeader.DeltaTiming = 480;
+        midiFile.MidiHeader.DeltaTiming = 500;
         midiFile.Tracks[0].Programs = new byte[] { 0 };
         midiFile.Tracks[0].DrumPrograms = new byte[] { 0 };
         midiFile.Tracks[0].MidiEvents = midiEvents.ToArray();

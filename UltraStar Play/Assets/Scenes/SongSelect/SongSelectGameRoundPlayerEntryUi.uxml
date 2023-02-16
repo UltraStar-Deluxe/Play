@@ -1,6 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="gameRoundPlayerEntryUiRoot" style="flex-direction: row; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px; align-items: center;">
-        <ui:VisualElement name="micImage" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ultrastardx-icon-contour.svg?fileID=7388822144124034973&amp;guid=2784df2e61772dc448202fc152a4fcfc&amp;type=3#ultrastardx-icon-contour&apos;); min-height: 16px; min-width: 16px; margin-right: 5px;" />
-        <ui:Label tabindex="-1" text="Player 01" name="playerNameLabel" class="smallerFont" />
-    </ui:VisualElement>
-</ui:UXML>

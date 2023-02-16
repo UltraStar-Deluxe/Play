@@ -1,11 +1,13 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using SimpleHttpServerForUnity;
+using UniInject;
 using UnityEngine;
 
-public class UltraStarPlayHttpServer : HttpServer
+public class UltraStarPlayHttpServer : HttpServer, INeedInjection
 {
     protected override void Awake()
     {
@@ -37,20 +39,15 @@ public class UltraStarPlayHttpServer : HttpServer
         NoEndpointFoundCallback = SendNoEndpointFound;
         StartHttpListener();
 
-        this.On(HttpMethod.Get, "api/rest/endpoints")
-            .WithDescription("Get currently registered endpoints")
-            .UntilDestroy(gameObject)
-            .Do(SendRegisteredEndpoints);
+        this.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Endpoints)
+            .SetDescription("Get currently registered endpoints")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(SendRegisteredEndpoints);
 
-        this.On(HttpMethod.Get, "api/rest/songs")
-            .WithDescription("Get loaded songs")
-            .UntilDestroy(gameObject)
-            .Do(SendLoadedSongs);
-
-        this.On(HttpMethod.Get, "/api/rest/hello/{name}")
-            .WithDescription("Say hello (path-parameter example)")
-            .UntilDestroy(gameObject)
-            .Do(SendHello);
+        this.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Hello)
+            .SetDescription("Say hello (path-parameter example)")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(SendHello);
     }
 
     private void SendHello(EndpointRequestData requestData)
@@ -71,24 +68,6 @@ public class UltraStarPlayHttpServer : HttpServer
                     HttpMethod = endpoint.HttpMethod.Method,
                     UrlPattern = endpoint.PathPattern,
                     Description = endpoint.Description
-                })
-                .ToList()
-        }.ToJson());
-    }
-    
-    private void SendLoadedSongs(EndpointRequestData requestData)
-    {
-        SongMetaManager songMetaManager = SongMetaManager.Instance;
-        requestData.Context.Response.SendResponse(new LoadedSongsDto
-        {
-            IsSongScanFinished = SongMetaManager.IsSongScanFinished,
-            SongCount = songMetaManager.GetSongMetas().Count,
-            SongList = songMetaManager.GetSongMetas()
-                .Select(songMeta => new SongDto
-                {
-                    Artist = songMeta.Artist,
-                    Title = songMeta.Title,
-                    Hash = songMeta.SongHash,
                 })
                 .ToList()
         }.ToJson());

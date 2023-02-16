@@ -1,8 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SongSelectSongEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneSongEntryUi.uxml?fileID=9197481963319205126&amp;guid=e1997eb384bb6554d805a53cd309ec16&amp;type=3#SongSelectSceneSongEntryUi" />
     <ui:Template name="SongSelectScenePlayerSelectUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerSelectUi.uxml?fileID=9197481963319205126&amp;guid=203783e05a7f81543812dd249b0e1372&amp;type=3#SongSelectScenePlayerSelectUi" />
-    <ui:Template name="SongSelectGameRoundOverlayUi" src="project://database/Assets/Scenes/SongSelect/SongSelectGameRoundOverlayUi.uxml?fileID=9197481963319205126&amp;guid=7e90fb1f4cdd0044a978248fba705341&amp;type=3#SongSelectGameRoundOverlayUi" />
     <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/Input/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
+    <ui:Template name="SongSelectGameRoundOverlayUi" src="project://database/Packages/playshared/Runtime/UIDocuments/SongQueueUi.uxml?fileID=9197481963319205126&amp;guid=7e90fb1f4cdd0044a978248fba705341&amp;type=3#SongQueueUi" />
+    <ui:Template name="GameRoundModifierDialogUi" src="project://database/Packages/playshared/Runtime/GameRounds/GameRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#GameRoundModifierDialogUi" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%;">
         <ui:VisualElement name="topContent" class="focusableNavigatorRoot">
             <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: auto; margin-top: 5px; margin-left: 5px; margin-right: 5px;">
@@ -16,6 +17,9 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="topRightContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                    <ui:Button display-tooltip-when-elided="true" name="toggleSongQueueOverlayButton" class="squareButton" style="margin-right: 5px;">
+                        <MaterialIcon tabindex="-1" name="songQueueIcon" icon="list" />
+                    </ui:Button>
                     <ui:Button text="Menu" display-tooltip-when-elided="true" name="menuButton" class="controlMinWidth" />
                 </ui:VisualElement>
             </ui:VisualElement>
@@ -107,12 +111,19 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Instance template="SongSelectScenePlayerSelectUi" name="songSelectPlayerSelectUi" style="position: absolute; width: 100%; height: 100%; display: none;" />
-        <ui:Instance template="SongSelectGameRoundOverlayUi" name="songSelectGameRoundOverlayUi" picking-mode="Ignore" style="width: auto; height: 100%; position: absolute; max-width: 30%;" />
         <ui:VisualElement name="inputLegend" picking-mode="Ignore" text="Search title, artist, ..." class="smallerFont inputLegendBar" style="flex-grow: 0; justify-content: space-around; align-items: center; flex-direction: row; background-color: rgba(32, 32, 32, 0.88); display: flex; flex-wrap: wrap;">
             <ui:Instance template="InputDeviceIconContainer" name="inputDeviceIconTemplate" style="position: absolute; left: 10px; height: 100%;" />
             <ui:Label text="B: Back" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="A: Select song" display-tooltip-when-elided="true" name="buttonDescription" />
             <ui:Label text="X: Song details" display-tooltip-when-elided="true" name="buttonDescription" />
+        </ui:VisualElement>
+        <ui:VisualElement name="songQueueOverlay" class="overlay overlayBackground" style="max-width: 40%; justify-content: flex-start; align-items: stretch; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; width: auto;">
+            <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center;" />
+            <ui:Instance template="SongSelectGameRoundOverlayUi" name="songQueueUi" picking-mode="Ignore" style="flex-grow: 1;" />
+            <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: space-between;">
+                <ui:Button text="Add" display-tooltip-when-elided="true" name="addToSongQueueAsNewButton" enable-rich-text="false" style="margin-right: 5px;" />
+                <ui:Button text="Add as Medley" display-tooltip-when-elided="true" name="addToSongQueueAsMedleyButton" enable-rich-text="false" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="menuOverlay" style="position: absolute; width: 100%; height: 100%; min-width: auto; min-height: auto; background-color: rgba(32, 32, 32, 0.5); display: none;">
             <ui:VisualElement name="innerMenuOverlay" class="focusableNavigatorRoot" style="position: absolute; right: 0; height: 100%; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: flex-start; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
@@ -225,5 +236,9 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" style="position: absolute; top: 16px; -unity-text-align: upper-center; width: 100%; display: none; min-width: 10%;" />
+        <ui:VisualElement name="modifierDialogOverlay" class="overlay" style="background-color: rgba(0, 0, 0, 0); display: none;">
+            <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" class="overlayBackground roundCorners" style="max-height: 90%; max-width: 90%; min-width: 50%;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="dialogContainer" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;" />
     </ui:VisualElement>
 </ui:UXML>

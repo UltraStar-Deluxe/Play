@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CSharpSynth.Midi;
+using PrimeInputActions;
 using UniInject;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         string midiFilePath,
         int trackIndex,
         int channelIndex,
-        bool importWithoutLyrics,
+        bool importWithLyrics,
         string voiceName)
     {
         if (!File.Exists(midiFilePath))
@@ -54,7 +55,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         
         try
         {
-            List<Note> loadedNotes = LoadNotesFromMidiFile(midiFile, trackIndex, channelIndex, importWithoutLyrics);
+            List<Note> loadedNotes = LoadNotesFromMidiFile(midiFile, trackIndex, channelIndex, importWithLyrics);
             
             if (voiceName == null)
             {
@@ -102,8 +103,7 @@ public class SongEditorMidiFileImporter : INeedInjection
             lyricsEvents.ForEach(midiEvent =>
             {
                 string midiEventLyrics = MidiFileUtils.GetLyrics(midiEvent);
-                if (!midiEventLyrics.EndsWith("\n")
-                    && !midiEventLyrics.EndsWith("\r"))
+                if (!midiEventLyrics.EndsWith("\n"))
                 {
                     // This is not a line break.
                     return;
@@ -165,7 +165,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         MidiFile midiFile,
         int trackIndex,
         int channelIndex,
-        bool importWithoutLyrics)
+        bool importWithLyrics)
     {
         List<Note> loadedNotes = new();
         Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
@@ -222,7 +222,38 @@ public class SongEditorMidiFileImporter : INeedInjection
                     notesWithoutText.Remove(correspondingNote);
                     correspondingNote.SetText(midiEventLyrics);
                 }
+                else
+                {
+                    // Find best matching note within a tolerance.
+                    Note bestMatch = notesWithoutText.FindMinElement(note => Math.Abs(note.StartBeat - beat));
+                    double distanceInMillis = Math.Abs(bestMatch.StartBeat - beat) * BpmUtils.MillisecondsPerBeat(songMeta);
+                    if (distanceInMillis < 1000)
+                    {
+                        notesWithoutText.Remove(bestMatch);
+                        bestMatch.SetText(midiEventLyrics);
+                    }
+                }
             });
+
+            // Normalize spaces.
+            Note lastNote = null;
+            foreach (Note note in loadedNotes)
+            {
+                if (note.Text.Contains("\n"))
+                {
+                    note.SetText(note.Text.Replace("\n", ""));
+                }
+                
+                if (lastNote != null
+                    && note.Text.StartsWith(" ")
+                    && !lastNote.Text.EndsWith(" "))
+                {
+                    lastNote.SetText(lastNote.Text + " ");
+                    note.SetText(note.Text.Substring(1));
+                }
+                
+                lastNote = note;
+            }
         }
         
         if (trackIndex < midiFile.Tracks.Length)
@@ -234,7 +265,7 @@ public class SongEditorMidiFileImporter : INeedInjection
                 throw new UltraStarPlayException($"No notes found in channel {channelIndex} of track {trackIndex}");
             }
 
-            if (!importWithoutLyrics)
+            if (importWithLyrics)
             {
                 LoadLyricsFromTrack(track);
             }

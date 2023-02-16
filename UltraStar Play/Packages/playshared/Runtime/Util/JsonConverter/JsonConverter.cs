@@ -29,20 +29,28 @@ public static class JsonConverter
         return json;
     }
 
-    public static T FromJson<T>(string json) where T : new()
+    public static T FromJson<T>(string json, bool assertSuccessWithoutWarnings = true) where T : new()
     {
-        fsData data = fsJsonParser.Parse(json);
-        T deserialized = new();
-        CreateSerializer()
-            .TryDeserialize<T>(data, ref deserialized)
-            .AssertSuccessWithoutWarnings();
-        return deserialized;
+        if (json.IsNullOrEmpty())
+        {
+            return default(T);
+        }
+
+        T newInstance = new();
+        FillFromJson(json, newInstance, assertSuccessWithoutWarnings);
+        return newInstance;
     }
 
-    public static void FillFromJson<T>(string json, T existingInstance)
+    public static void FillFromJson<T>(string json, T existingInstance, bool assertSuccessWithoutWarnings = true)
     {
         fsData data = fsJsonParser.Parse(json);
-        CreateSerializer().TryDeserialize<T>(data, ref existingInstance).AssertSuccessWithoutWarnings();
+        fsResult fsResult = CreateSerializer()
+            .TryDeserialize<T>(data, ref existingInstance);
+
+        if (assertSuccessWithoutWarnings)
+        {
+            fsResult.AssertSuccessWithoutWarnings();
+        }
     }
 
     // https://stackoverflow.com/questions/4580397/json-formatter-in-c

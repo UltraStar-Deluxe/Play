@@ -1,6 +1,5 @@
 using System;
 using System.Net.Http;
-using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -10,18 +9,20 @@ using UnityEngine.InputSystem.LowLevel;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
+public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 {
     public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InputSimulatorRestControl>();
     
-    [Inject]
-    private HttpServer httpServer;
-
     private Keyboard virtualKeyboard;
     private Mouse virtualMouse;
     private Mouse systemMouse;
 
-	private void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         // Grab the system mouse before the virtual mouse is used.
         // Mouse.current can later change to the virtual mouse.
@@ -65,6 +66,14 @@ public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
             virtualKeyboard,
             () => virtualKeyboard.spaceKey);
         
+        RegisterPseudoNavigationEndpoint("volumeUpKey",
+            "Increase volume",
+            () => IncreaseVolume());
+        
+        RegisterPseudoNavigationEndpoint("volumeDownKey",
+            "Decrease volume",
+            () => DecreaseVolume());
+        
         RegisterNavigationEndpoint("leftMouseButton",
             "Simulate left mouse button press",
             virtualMouse,
@@ -84,12 +93,48 @@ public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
         RegisterScrollWheelEndpoint();
     }
 
+    private void IncreaseVolume()
+    {
+        settings.AudioSettings.VolumePercent += 10;
+        settings.AudioSettings.VolumePercent = NumberUtils.Limit(settings.AudioSettings.VolumePercent, 0, 100);
+    }
+
+    private void DecreaseVolume()
+    {
+        settings.AudioSettings.VolumePercent -= 10;
+        settings.AudioSettings.VolumePercent = NumberUtils.Limit(settings.AudioSettings.VolumePercent, 0, 100);
+    }
+    
+    /**
+     * Method that uses an endpoint similar to other input simulation,
+     * but for a key that Unity does not really support.
+     */
+    private void RegisterPseudoNavigationEndpoint(string inputControlName, string description, Action callback)
+    {
+        string path = $"api/rest/input/{inputControlName}";
+        httpServer.CreateEndpoint(HttpMethod.Post, path)
+            .SetDescription(description)
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetCallbackAndAdd(requestData =>
+            {
+                if (virtualKeyboard == null)
+                {
+                    return;
+                }
+
+                Debug.Log($"Received input simulation request {path}");
+                callback?.Invoke();
+            });
+    }
+
     private void RegisterMouseDeltaEndpoint()
     {
-        httpServer.On(HttpMethod.Post, "api/rest/input/mouseDelta/{deltaX}/{deltaY}")
-            .WithDescription("Move the current mouse if any by the given X and Y delta values")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.InputMouseDelta)
+            .SetDescription("Move the current mouse if any by the given X and Y delta values")
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetCallbackAndAdd(requestData =>
             {
                 if (systemMouse == null)
                 {
@@ -107,10 +152,11 @@ public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
 
     private void RegisterScrollWheelEndpoint()
     {
-        httpServer.On(HttpMethod.Post, "api/rest/input/scrollWheel/{deltaX}/{deltaY}")
-            .WithDescription("Simulate scroll wheel events")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.InputScrollWheel)
+            .SetDescription("Simulate scroll wheel events")
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetCallbackAndAdd(requestData =>
             {
                 if (systemMouse == null)
                 {
@@ -164,10 +210,11 @@ public class InputSimulatorRestControl : MonoBehaviour, INeedInjection
     private void RegisterNavigationEndpoint(string inputControlName, string description, InputDevice inputDevice, Func<InputControl> inputControlGetter)
     {
         string path = $"api/rest/input/{inputControlName}";
-        httpServer.On(HttpMethod.Post, path)
-            .WithDescription(description)
-            .UntilDestroy(gameObject)
-            .Do(_ =>
+        httpServer.CreateEndpoint(HttpMethod.Post, path)
+            .SetDescription(description)
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetCallbackAndAdd(_ =>
             {
                 InputControl inputControl = inputControlGetter();
                 Debug.Log($"Received input simulation request {path}");

@@ -20,6 +20,8 @@ public class Settings : ISettings
     public DeveloperSettings DeveloperSettings { get; set; } = new();
 
     public PartyModeSettings PartyModeSettings { get; set; } = new();
+    
+    public GameRoundSettings GameRoundSettings { get; set; } = new();
 
     // The releases to be ignored when checking for updates.
     // When containing the string "all", then all releases will be ignored.
@@ -29,14 +31,8 @@ public class Settings : ISettings
     public int UdpPortOnClient { get; set; } = 34568;
     public string OwnHost { get; set; }
 
-    private static List<PlayerProfile> CreateDefaultPlayerProfiles()
-    {
-        List<PlayerProfile> result = new();
-        result.Add(new PlayerProfile("Player01", EDifficulty.Medium, "Silhouette01.png"));
-        result.Add(new PlayerProfile("Player02", EDifficulty.Easy, "Silhouette02.png"));
-        return result;
-    }
-
+    public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
+    
     // TODO: flatten settings?
     public SystemLanguage Language
     {
@@ -54,5 +50,13 @@ public class Settings : ISettings
     {
         get { return DeveloperSettings.showFps; }
         set { DeveloperSettings.showFps = value; }
+    }
+    
+    private static List<PlayerProfile> CreateDefaultPlayerProfiles()
+    {
+        List<PlayerProfile> result = new();
+        result.Add(new PlayerProfile("Player01", EDifficulty.Medium, "Silhouette01.png"));
+        result.Add(new PlayerProfile("Player02", EDifficulty.Easy, "Silhouette02.png"));
+        return result;
     }
 }

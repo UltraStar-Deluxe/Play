@@ -25,6 +25,8 @@ public class Settings : ISettings
     public int UdpPortOnClient { get; set; } = 34568;
     public string OwnHost { get; set; }
 
+    public GameRoundSettings GameRoundSettings { get; set; } = new();
+    
     public float mousePadSensitivity = 1;
     
     public void CreateAndSetClientId()

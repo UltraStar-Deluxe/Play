@@ -48,22 +48,6 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         {
             StopMidiPlayAlong();
         }
-        
-        // There is an increasing inaccuracy of the midi playback.
-        // Thus, we start over after a short time.
-        if (isPlaying
-            && Time.time - startTimeInSeconds > 2)
-        {
-            if (!InsideAnyVisibleNote())
-            {
-                Debug.Log("Updating MIDI play along");
-                StartMidiPlayAlong();
-            }
-            else
-            {
-                Debug.Log("Waiting for MIDI play along");
-            }
-        }
     }
 
     private bool InsideAnyVisibleNote()

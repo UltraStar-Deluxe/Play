@@ -3,8 +3,8 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -114,7 +114,7 @@ public class ConnectedServerHandler : IConnectedServerHandler, IDisposable
         catch (Exception e)
         {
             Debug.LogException(e);
-            Debug.LogError($"Failed to send pitch to server");
+            Debug.LogError($"Failed to send message to server. Message: {jsonSerializable.ToJson()}");
             clientSideConnectRequestManager.RemoveConnectedServerHandler(this);
         }
     }
@@ -140,19 +140,12 @@ public class ConnectedServerHandler : IConnectedServerHandler, IDisposable
 
     private void HandleJsonMessageFromServer(string json)
     {
-        CompanionAppMessageDto companionAppMessageDto = null;
-        try
+        if (!CompanionAppMessageUtils.TryGetMessageType(json, out CompanionAppMessageType messageType))
         {
-            companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
-        }
-        catch (Exception e)
-        {
-            Debug.Log($"Exception while parsing message from server: {json}");
-            Debug.LogException(e);
             return;
         }
 
-        switch (companionAppMessageDto.MessageType)
+        switch (messageType)
         {
             case CompanionAppMessageType.StillAliveCheck:
                 // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
@@ -169,8 +162,11 @@ public class ConnectedServerHandler : IConnectedServerHandler, IDisposable
             case CompanionAppMessageType.StartRecording:
                 receivedMessageStream.OnNext(JsonConverter.FromJson<StartRecordingMessageDto>(json));
                 return;
+            case CompanionAppMessageType.Permissions:
+                receivedMessageStream.OnNext(JsonConverter.FromJson<PermissionsMessageDto>(json));
+                return;
             default:
-                Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
+                Debug.Log($"Unknown MessageType {messageType} in JSON from server: {json}");
                 return;
         }
     }

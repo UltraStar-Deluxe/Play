@@ -1,5 +1,4 @@
 using System.Net.Http;
-using System.Text;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
@@ -7,33 +6,33 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditSettingsRestControl : MonoBehaviour, INeedInjection
+public class EditSettingsRestControl : AbstractRestControl, INeedInjection
 {
-    [Inject]
-    private HttpServer httpServer;
-
-    [Inject]
-    private Settings settings;
-
-    private void Start()
+    public static EditSettingsRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<EditSettingsRestControl>();
+    
+    protected override object GetInstance()
     {
-        httpServer.On(HttpMethod.Get, "api/rest/config")
-            .WithDescription($"Get config.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Config)
+            .SetDescription($"Get config.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetCallbackAndAdd(requestData =>
             {
-                string parameterValue = JsonConverter.ToJson(settings);
-                byte[] responseBytes = Encoding.UTF8.GetBytes(parameterValue);
-                requestData.Context.Response.OutputStream.Write(responseBytes);
+                requestData.Context.Response.WriteJson(settings);
             });
         
-        httpServer.On(HttpMethod.Post, "api/rest/config")
-            .WithDescription($"Set config. Only present fields in the request body are set.")
-            .UntilDestroy(gameObject)
-            .Do(requestData =>
+        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.Config)
+            .SetDescription($"Set config. Only present fields in the request body are set.")
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteConfig)
+            .SetCallbackAndAdd(requestData =>
             {
                 string jsonBody = requestData.Context.Request.GetBodyAsString();
-                JsonConverter.FillFromJson(jsonBody, settings);
+                JsonConverter.FillFromJson(jsonBody, settings, false);
             });
 	}
 }

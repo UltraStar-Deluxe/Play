@@ -1,6 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="SongSelectScenePlayerEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=810593cc2dd7a764f9a6be22b3ec53a5&amp;type=3#SongSelectScenePlayerEntryUi" />
-    <ui:Template name="SongSelectSceneMicEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneMicEntryUi.uxml?fileID=9197481963319205126&amp;guid=95374f2e3150a184db1ca8e5b5bca617&amp;type=3#SongSelectSceneMicEntryUi" />
+    <ui:Template name="PlayerSelectPlayerEntryUi" src="project://database/Packages/playshared/Runtime/UIDocuments/PlayerSelectPlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=ae611919e3b6a9e439070651ea79c54e&amp;type=3#PlayerSelectPlayerEntryUi" />    <ui:Template name="SongSelectSceneMicEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSceneMicEntryUi.uxml?fileID=9197481963319205126&amp;guid=95374f2e3150a184db1ca8e5b5bca617&amp;type=3#SongSelectSceneMicEntryUi" />
     <ui:VisualElement name="playerSelectOverlayContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: flex; background-color: rgba(32, 32, 32, 0.5);">
         <ui:VisualElement name="lyricsContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; align-items: flex-end; flex-direction: row;">
             <ui:VisualElement name="leftLyricsOverlay" class="roundCorners" style="position: absolute; left: 0; height: 90%; width: 30%; background-color: rgba(32, 32, 32, 0.88); padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 30px; display: flex;">
@@ -31,8 +30,8 @@
                     <MaterialIcon name="openSongEditorIcon" icon="edit" style="position: absolute;" />
                 </ui:Button>
             </ui:VisualElement>
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" style="width: 100%; flex-grow: 1;">
-                <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" style="width: 100%; flex-grow: 1; display: none;">
+                <ui:Instance template="PlayerSelectPlayerEntryUi" name="playerEntry" />
                 <ui:VisualElement name="partySettingsContainer" class="smallerFont" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; margin-bottom: 5px; margin-top: 5px;">
                     <ui:Label tabindex="-1" text="Party Settings" display-tooltip-when-elided="true" name="partySettingsTitleLabel" style="margin-left: auto; margin-right: auto;" />
                     <ui:VisualElement name="finishConditionContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-left: 15px;">
@@ -49,7 +48,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:ScrollView>
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="singingOptionsScrollView" style="width: 100%; flex-grow: 1; display: none;">
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="singingOptionsScrollView" style="width: 100%; flex-grow: 1; display: flex;">
                 <ui:VisualElement name="scoreModeContainer">
                     <ui:Label text="Score" display-tooltip-when-elided="true" name="scoreModeLabel" class="smallFont" />
                     <ItemPicker noPreviousButton="true" name="scoreModePicker" wrapAround="true" class="smallControl" style="width: auto;" />
@@ -58,6 +57,7 @@
                     <ui:Label text="Note Display Mode" display-tooltip-when-elided="true" name="noteDisplayModeLabel" class="smallFont" />
                     <ItemPicker noPreviousButton="true" name="noteDisplayModePicker" wrapAround="true" class="smallControl" style="width: auto;" />
                 </ui:VisualElement>
+                <ChipsCombo name="modifierChipsCombo" label="Modifiers" style="flex-direction: column; align-items: stretch;" />
             </ui:ScrollView>
         </ui:VisualElement>
         <ui:VisualElement name="micListOverlay" class="roundCorners" style="height: auto; width: 33%; background-color: rgba(32, 32, 32, 0.88); align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 30px; display: flex; bottom: 0; margin-top: 5px; flex-grow: 1; min-height: 30%;">

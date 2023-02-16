@@ -227,7 +227,7 @@ public static class SongMetaUtils
     public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceName)
     {
         Voice matchingVoice = songMeta.GetVoices()
-            .FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
+            .FirstOrDefault(voice => Voice.VoiceNameEquals(voice.Name, voiceName));
         if (matchingVoice != null)
         {
             return matchingVoice;
@@ -367,18 +367,18 @@ public static class SongMetaUtils
         ApplicationUtils.OpenDirectory(songMeta.Directory);
     }
 
-    public static string GetLyrics(SongMeta songMeta, string voiceName)
+    public static string GetLyrics(SongMeta songMeta, string voiceName, bool removeTilde = false)
     {
-        Voice voice = songMeta.GetVoices().FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
+        Voice voice = songMeta.GetVoices().FirstOrDefault(voice => Voice.VoiceNameEquals(voice.Name, voiceName));
         if (voice == null)
         {
             return "";
         }
 
-        return GetLyrics(voice);
+        return GetLyrics(voice, removeTilde);
     }
 
-    public static string GetLyrics(Voice voice)
+    public static string GetLyrics(Voice voice, bool removeTilde = false)
     {
         StringBuilder sb = new();
         voice.Sentences.ForEach(sentence =>
@@ -386,7 +386,13 @@ public static class SongMetaUtils
             sb.Append(GetLyrics(sentence));
             sb.Append("\n");
         });
-        return sb.ToString();
+        string lyrics = sb.ToString();
+        if (removeTilde)
+        {
+            lyrics = lyrics.Replace("~", "");
+        }
+
+        return lyrics;
     }
 
     public static string GetLyrics(Sentence sentence)
@@ -528,8 +534,9 @@ public static class SongMetaUtils
     {
         // Search for lyrics about the middle of the song, approx. 20 seconds afterwards.
         int middleBeat = GetMiddleBeat(songMeta);
-        List<Sentence> sentencesBeforeMiddleBeat = songMeta.GetVoice(Voice.firstVoiceName)
-            .Sentences
+        Voice voice = songMeta.GetVoice(Voice.firstVoiceName);
+        List<Sentence> sentences = voice.Sentences.ToList();
+        List<Sentence> sentencesBeforeMiddleBeat = sentences
             .Where(sentence => sentence.ExtendedMaxBeat < middleBeat)
             .ToList();
         if (sentencesBeforeMiddleBeat.IsNullOrEmpty())

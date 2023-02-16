@@ -176,8 +176,11 @@ public class ConnectedClientHandler : IConnectedClientHandler
 
     private void HandleJsonMessageFromClient(string json)
     {
-        CompanionAppMessageDto companionAppMessageDto = JsonConverter.FromJson<CompanionAppMessageDto>(json);
-        switch (companionAppMessageDto.MessageType)
+        if (!CompanionAppMessageUtils.TryGetMessageType(json, out CompanionAppMessageType messageType))
+        {
+            return;
+        }
+        switch (messageType)
         {
             case CompanionAppMessageType.StillAliveCheck:
                 // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
@@ -188,7 +191,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
                     .ForEach(beatPitchEventDto => receivedMessageStream.OnNext(beatPitchEventDto));
                 return;
             default:
-                Debug.Log($"Unknown MessageType {companionAppMessageDto.MessageType} in JSON from server: {json}");
+                Debug.Log($"Unknown MessageType {messageType} in JSON from server: {json}");
                 return;
         }
     }

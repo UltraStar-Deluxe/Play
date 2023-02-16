@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -124,11 +123,14 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
     private void HandleClientMessageWithNoMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
     {
+        List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
+
         ConnectResponseDto connectResponseDto = new()
         {
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
+            Permissions = permissions,
         };
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
     }
@@ -138,12 +140,15 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.ClientId);
         clientConnectedEventStream.OnNext(new ClientConnectionEvent(newConnectedClientHandler, true));
 
+        List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
+        
         ConnectResponseDto connectResponseDto = new()
         {
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
             MessagingPort = newConnectedClientHandler.ClientTcpListener.GetPort(),
+            Permissions = permissions,
         };
         Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
         serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);

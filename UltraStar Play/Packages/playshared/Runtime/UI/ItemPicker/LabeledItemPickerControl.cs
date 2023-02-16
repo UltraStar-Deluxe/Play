@@ -21,6 +21,8 @@ public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
         }
     }
 
+    public bool AutoSmallFont { get; set; } = true;
+    
     public LabeledItemPickerControl(ItemPicker itemPicker, List<T> items)
         : base(itemPicker)
     {
@@ -36,14 +38,18 @@ public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
     private void UpdateLabelText(T item)
     {
         ItemPicker.ItemLabel.text = GetLabelTextFunction(item);
-        if (ItemPicker.ItemLabel.text.Length > 28
-            || ItemPicker.ItemLabel.text.Contains("\n"))
+
+        if (AutoSmallFont)
         {
-            ItemPicker.AddToClassListIfNew(smallFontUssClass);
-        }
-        else
-        {
-            ItemPicker.RemoveFromClassList(smallFontUssClass);
+            if (ItemPicker.ItemLabel.text.Length > 28
+                || ItemPicker.ItemLabel.text.Contains("\n"))
+            {
+                ItemPicker.AddToClassListIfNew(smallFontUssClass);
+            }
+            else
+            {
+                ItemPicker.RemoveFromClassList(smallFontUssClass);
+            }
         }
     }
 }

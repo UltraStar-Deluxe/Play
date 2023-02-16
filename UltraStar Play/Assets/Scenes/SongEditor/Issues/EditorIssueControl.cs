@@ -31,9 +31,7 @@ public class EditorIssueControl : INeedInjection, IInjectionFinishedListener
             issueImage.AddToClassList("error");
         }
 
-        tooltipControl = injector
-            .WithRootVisualElement(VisualElement)
-            .CreateAndInject<TooltipControl>();
+        tooltipControl = new TooltipControl(VisualElement);
         tooltipControl.TooltipText = SongIssue.Message;
     }
 }

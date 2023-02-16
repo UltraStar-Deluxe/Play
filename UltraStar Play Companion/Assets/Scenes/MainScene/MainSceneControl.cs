@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
+using Serilog.Events;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -14,6 +14,9 @@ using IBinding = UniInject.IBinding;
 public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInjectionFinishedListener, IBinder
 {
     private const int ConnectRequestCountShowTroubleshootingHintThreshold = 3;
+    
+    [InjectedInInspector]
+    public VisualTreeAsset playerSelectPlayerEntryUi;
 
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
@@ -75,9 +78,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.serverErrorResponseText)]
     private Label serverErrorResponseText;
 
-    [Inject(UxmlName = R.UxmlNames.songListView)]
-    private ScrollView songListView;
-
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -93,11 +93,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.menuOverlay)]
     private VisualElement menuOverlay;
 
-    [Inject(UxmlClass = R.UxmlClasses.onlyVisibleWhenConnected)]
+    [Inject(UxmlClass = R.UssClasses.onlyVisibleWhenConnected)]
     private List<VisualElement> onlyVisibleWhenConnected;
 
-    [Inject(UxmlClass = R.UxmlClasses.onlyVisibleWhenNotConnected)]
+    [Inject(UxmlClass = R.UssClasses.onlyVisibleWhenNotConnected)]
     private List<VisualElement> onlyVisibleWhenNotConnected;
+
+    [Inject(UxmlClass = R.UssClasses.onlyVisibleWhenDevModeEnabled)]
+    private List<VisualElement> onlyVisibleWhenDevModeEnabled;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
@@ -140,20 +143,29 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.inputSimulationContainer)]
     private VisualElement inputSimulationContainer;
 
-    [Inject(UxmlName = R.UxmlNames.songSearchTextField)]
-    private TextField songSearchTextField;
-
-    [Inject(UxmlName = R.UxmlNames.songSearchHint)]
-    private Label songSearchHint;
-
     [Inject(UxmlName = R.UxmlNames.recordingDeviceColorIndicator)]
     private VisualElement recordingDeviceColorIndicator;
 
     [Inject(UxmlName = R.UxmlNames.mouseSensitivityFloatField)]
     private FloatField mouseSensitivityFloatField;
+
+    [Inject(UxmlName = R.UxmlNames.tabGroup)]
+    private VisualElement tabGroup;
+    
+    [Inject(UxmlName = R.UxmlNames.viewLogButton)]
+    private Button viewLogButton;
+    
+    [Inject(UxmlName = R.UxmlNames.copyLogButton)]
+    private Button copyLogButton;
     
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private InGameDebugConsoleManager inGameDebugConsoleManager;
+    
+    [Inject]
+    private MainGameHttpClient mainGameHttpClient;
 
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
@@ -164,13 +176,16 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private int frameCount;
 
     private readonly InputSimulationControl inputSimulationControl = new();
-    private readonly EditMainGameConfigControl editMainGameConfigControl = new();
+    private readonly SongListControl songListControl = new();
     
     public void OnInjectionFinished()
     {
+        injector.Inject(songListControl);
         injector.Inject(inputSimulationControl);
-        injector.Inject(editMainGameConfigControl);
 
+        mainGameHttpClient.Permissions
+            .Subscribe(permissions => OnPermissionsChanged(permissions));
+        
         // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
             || !Microphone.devices.Contains(settings.MicProfile.Name))
@@ -207,8 +222,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         
         clientSideConnectRequestManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus);
-
-        songListRequestor.SongListEventStream.Subscribe(evt => HandleSongListEvent(evt));
         
         UpdateVersionInfoText();
 
@@ -216,18 +229,29 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         {
             audioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, audioWaveForm);
         });
-
-        songSearchTextField.RegisterValueChangedCallback(evt =>
-        {
-            songSearchHint.SetVisibleByDisplay(songSearchTextField.value.IsNullOrEmpty());
-            UpdateSongList();
-        });
         
         mouseSensitivityFloatField.value = settings.mousePadSensitivity;
         mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.mousePadSensitivity = evt.newValue);
         
+        // Only show some controls when dev mode is enabled.
+        UpdateDevModeControlsVisibility();
+        settings.ObserveEveryValueChanged(it => it.IsDevModeEnabled)
+            .Subscribe(_ => UpdateDevModeControlsVisibility())
+            .AddTo(gameObject);
+
         InitTabGroup();
         InitMenu();
+    }
+
+    private void UpdateDevModeControlsVisibility()
+    {
+        onlyVisibleWhenDevModeEnabled.ForEach(it => it.SetVisibleByDisplay(settings.IsDevModeEnabled));
+    }
+
+    private void OnPermissionsChanged(List<HttpApiPermission> permissions)
+    {
+        showInputSimulationButton.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteInputSimulation));
+        inputSimulationContainer.HideByDisplay();
     }
 
     private void InitTabGroup()
@@ -242,15 +266,16 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         showSongViewButton.RegisterCallbackButtonTriggered(() =>
         {
             micSampleRecorder.StopRecording();
-            songSearchTextField.value = "";
-            ShowSongList();
+            songListControl.ShowSongList();
         });
     }
 
     private void InitMenu()
     {
         // Recording device
+        new AutoFitLabelControl(recordingDevicePicker.ItemLabel);
         recordingDevicePickerControl = new(recordingDevicePicker, Microphone.devices.ToList());
+        recordingDevicePickerControl.AutoSmallFont = false;
         recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
         recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
 
@@ -281,6 +306,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         showMenuButton.RegisterCallbackButtonTriggered(() => ShowMenu());
         hiddenCloseMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
         closeMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
+        
+        // View and copy log
+        viewLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
+        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        {
+            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
+            UiManager.CreateNotification("Copied log to clipboard");
+        });
     }
 
     private void OnDevModeEnabledChanged(bool isEnabled)
@@ -313,70 +346,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         languagePickerControl.UpdateLabelText();
         TranslationManager.GetTranslation("yes");
         devModePickerControl.UpdateLabelText();
-
-        // Search text field hint
-        string searchPropertiesText = new List<string>
-        {
-            TranslationManager.GetTranslation(R.Messages.songProperty_artist),
-            TranslationManager.GetTranslation(R.Messages.songProperty_title),
-        }.ToCsv(", ", "", "");
-        songSearchHint.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint, "properties", searchPropertiesText);
-    }
-
-    private void UpdateSongList()
-    {
-        songListView.Clear();
-        if (songListRequestor.LoadedSongsDto == null
-            || songListRequestor.LoadedSongsDto.SongList.IsNullOrEmpty())
-        {
-            AddSongListLabel("No songs found");
-            return;
-        }
-
-        List<SongDto> songDtos = new List<SongDto>(songListRequestor.LoadedSongsDto.SongList)
-            .Where(songDto => SongSearchMatches(songDto))
-            .ToList();
-        songDtos.Sort((a,b) => string.Compare(a.Artist, b.Artist, StringComparison.InvariantCulture));
-
-        foreach (SongDto songDto in songDtos)
-        {
-            AddSongListLabel(songDto.Artist + " - " + songDto.Title);
-        }
-
-        if (!songListRequestor.LoadedSongsDto.IsSongScanFinished)
-        {
-            AddSongListLabel("...");
-        }
-    }
-
-    private bool SongSearchMatches(SongDto songDto)
-    {
-        string searchText = songSearchTextField.value.ToLowerInvariant();
-        return searchText.IsNullOrEmpty()
-               || songDto.Title.ToLowerInvariant().Contains(searchText)
-               || songDto.Artist.ToLowerInvariant().Contains(searchText);
-    }
-
-    private void HandleSongListEvent(SongListEvent evt)
-    {
-        if (!evt.ErrorMessage.IsNullOrEmpty())
-        {
-            songListView.Clear();
-            AddSongListLabel(evt.ErrorMessage);
-            return;
-        }
-
-        UpdateSongList();
-    }
-
-    private void ShowSongList()
-    {
-        if (!songListRequestor.SuccessfullyLoadedAllSongs)
-        {
-            songListView.Clear();
-            AddSongListLabel("Loading song list...");
-            songListRequestor.RequestSongList();
-        }
     }
 
     private void Update()
@@ -510,15 +479,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         }
     }
 
-    private void AddSongListLabel(string text)
-    {
-        Label label = new Label(text);
-        label.AddToClassList("songListElement");
-        label.style.whiteSpace = WhiteSpace.Normal;
-        label.style.marginBottom = 20;
-        songListView.Add(label);
-    }
-
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();
@@ -527,6 +487,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         bb.BindExistingInstance(micSampleRecorder);
         bb.BindExistingInstance(clientSideMicDataSender);
         bb.BindExistingInstance(inputSimulationControl);
+        bb.BindExistingInstance(songListRequestor);
+        bb.Bind(nameof(playerSelectPlayerEntryUi)).ToExistingInstance(playerSelectPlayerEntryUi);
         return bb.GetBindings();
+    }
+
+    public void OnDestroy()
+    {
+        songListControl.Dispose();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using UnityEngine;
 
 public static class NumberExtensions
@@ -11,5 +12,15 @@ public static class NumberExtensions
     public static bool NearlyEquals(this double value, double targetValue, double tolerance)
     {
         return Math.Abs(value - targetValue) <= tolerance;
+    }
+    
+    public static string ToStringInvariantCulture(this float value)
+    {
+        return value.ToString(CultureInfo.InvariantCulture);
+    }
+    
+    public static string ToStringInvariantCulture(this double value)
+    {
+        return value.ToString(CultureInfo.InvariantCulture);
     }
 }

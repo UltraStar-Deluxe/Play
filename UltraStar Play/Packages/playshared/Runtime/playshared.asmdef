@@ -11,7 +11,8 @@
         "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
         "com.achimmihca.utfunknownunity",
-        "com.achimmihca.portaudioforunity"
+        "com.achimmihca.portaudioforunity",
+        "IngameDebugConsole.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

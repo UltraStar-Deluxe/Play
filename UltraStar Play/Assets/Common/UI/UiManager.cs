@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using ProTrans;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -26,17 +23,17 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
     [InjectedInInspector]
-    public VisualTreeAsset notificationOverlayVisualTreeAsset;
+    public VisualTreeAsset notificationOverlayUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset notificationVisualTreeAsset;
+    public VisualTreeAsset notificationUi;
 
     [InjectedInInspector]
     public VisualTreeAsset messageDialogUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset accordionUi;
-
+    public VisualTreeAsset micWithNameUi;
+    
     [InjectedInInspector]
     public Sprite fallbackPlayerProfileImage;
 
@@ -46,6 +43,12 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public VisualTreeAsset nextGameRoundInfoPlayerEntryUi;
 
+    [InjectedInInspector]
+    public VisualTreeAsset songQueueEntryUi;
+    
+    [InjectedInInspector]
+    public VisualTreeAsset songQueuePlayerEntryUi;
+    
     [Inject]
     private Injector injector;
 
@@ -82,18 +85,18 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
-            notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree().Children().First();
+            notificationOverlay = notificationOverlayUi.CloneTree().Children().First();
             uiDocument.rootVisualElement.Add(notificationOverlay);
         }
 
-        TemplateContainer templateContainer = notificationVisualTreeAsset.CloneTree();
+        TemplateContainer templateContainer = notificationUi.CloneTree();
         VisualElement notification = templateContainer.Children().First();
         Label notificationLabel = notification.Q<Label>("notificationLabel");
         notificationLabel.text = text;
         notificationOverlay.Add(notification);
 
         // Fade out then remove
-        StartCoroutine(FadeOutVisualElement(notification, 2, 1));
+        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, 2, 1));
 
         return notificationLabel;
     }
@@ -108,33 +111,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         params string[] additionalTextClasses)
     {
         return Instance.DoCreateNotification(text, additionalTextClasses);
-    }
-
-    public static IEnumerator FadeOutVisualElement(
-        VisualElement visualElement,
-        float solidTimeInSeconds,
-        float fadeOutTimeInSeconds)
-    {
-        yield return new WaitForSeconds(solidTimeInSeconds);
-        float startOpacity = visualElement.resolvedStyle.opacity;
-        float startTime = Time.time;
-        while (visualElement.resolvedStyle.opacity > 0)
-        {
-            float newOpacity = Mathf.Lerp(startOpacity, 0, (Time.time - startTime) / fadeOutTimeInSeconds);
-            if (newOpacity < 0)
-            {
-                newOpacity = 0;
-            }
-
-            visualElement.style.opacity = newOpacity;
-            yield return null;
-        }
-
-        // Remove VisualElement
-        if (visualElement.parent != null)
-        {
-            visualElement.parent.Remove(visualElement);
-        }
     }
 
     public MessageDialogControl CreateMessageDialog(string dialogTitle)
@@ -161,12 +137,15 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             .CreateAndInject<MessageDialogControl>();
         helpDialogControl.Title = dialogTitle;
 
+        AccordionGroup accordionGroup = new();
+        helpDialogControl.AddVisualElement(accordionGroup);
+            
         void AddChapter(string title, string content)
         {
-            AccordionItemControl accordionItemControl = CreateAccordionItemControl();
-            accordionItemControl.Title = title;
-            accordionItemControl.AddVisualElement(new Label(content));
-            helpDialogControl.AddVisualElement(accordionItemControl.VisualElement);
+            AccordionItem accordionItem = new(title);
+            accordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+            accordionItem.Add(new Label(content));
+            accordionGroup.Add(accordionItem);
         }
 
         titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
@@ -176,15 +155,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         closeDialogButton.Focus();
 
         return helpDialogControl;
-    }
-
-    public AccordionItemControl CreateAccordionItemControl()
-    {
-        VisualElement accordionItem = accordionUi.CloneTree().Children().FirstOrDefault();
-        AccordionItemControl accordionItemControl = injector
-            .WithRootVisualElement(accordionItem)
-            .CreateAndInject<AccordionItemControl>();
-        return accordionItemControl;
     }
 
     public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
@@ -237,6 +207,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         bb.Bind(nameof(messageDialogUi)).ToExistingInstance(messageDialogUi);
         bb.Bind(nameof(nextGameRoundInfoUi)).ToExistingInstance(nextGameRoundInfoUi);
         bb.Bind(nameof(nextGameRoundInfoPlayerEntryUi)).ToExistingInstance(nextGameRoundInfoPlayerEntryUi);
+        bb.Bind(nameof(micWithNameUi)).ToExistingInstance(micWithNameUi);
+        bb.Bind(nameof(songQueueEntryUi)).ToExistingInstance(songQueueEntryUi);
+        bb.Bind(nameof(songQueuePlayerEntryUi)).ToExistingInstance(songQueuePlayerEntryUi);
         return bb.GetBindings();
     }
 }

@@ -108,19 +108,34 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         VisualElement playerEntryVisualElement = playerEntryUi.CloneTree().Children().FirstOrDefault();
         playerScrollView.Add(playerEntryVisualElement);
-
+        
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)
             .WithBindingForInstance(playerProfile)
+            .WithBinding(new Binding("micProfiles", new ExistingInstanceProvider<List<MicProfile>>(GetAvailableMicProfiles())))
             .WithBindingForInstance(PartyModeUtils.GetTeam(songSelectSceneControl.PartyModeSceneData, playerProfile))
             .CreateAndInject<SongSelectPlayerEntryControl>();
 
         listEntryControl.SelectedChangedEventStream.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));
         listEntryControl.SetSelected(playerProfile.IsSelected, false);
-
+        listEntryControl.OnMicProfileSelected = newMicProfile =>
+        {
+            // Remove this mic profile from other players
+            playerEntryControls
+                .Where(it => it != listEntryControl && it.MicProfile == newMicProfile)
+                .ForEach(it => it.MicProfile = null);
+        };
+        
         playerEntryControls.Add(listEntryControl);
     }
 
+    private List<MicProfile> GetAvailableMicProfiles()
+    {
+        return settings.MicProfiles
+            .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
+            .ToList();
+    }
+    
     private void UseMicProfileWhereNeeded(MicProfile micProfile)
     {
         if (micProfile == null
