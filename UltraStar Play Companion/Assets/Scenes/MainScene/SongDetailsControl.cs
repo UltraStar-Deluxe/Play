@@ -330,7 +330,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
             }
 
-            playerEntryControl.EnabledToggle.RegisterValueChangedCallback(evt =>
+            playerEntryControl.SelectedToggle.RegisterValueChangedCallback(evt =>
             {
                 // Update mic profile.
                 if (evt.newValue)
