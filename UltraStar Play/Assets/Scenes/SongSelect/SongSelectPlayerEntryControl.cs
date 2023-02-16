@@ -139,7 +139,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         void OnMicSelected(MicProfile newMicProfile)
         {
             MicProfile = newMicProfile;
-            micSelectionDialogControl.CloseDialog();
+            micSelectionDialogControl?.CloseDialog();
             OnMicProfileSelected?.Invoke(newMicProfile);
         }
 
