@@ -61,6 +61,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongSelectFilterControl songSelectFilterControl;
+
     private TooltipControl searchErrorIconTooltipControl;
 
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
@@ -159,6 +162,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     {
         searchPropertyDropdownOverlay.ShowByDisplay();
         artistPropertyContainer.Q<Toggle>().Focus();
+
+        songSelectFilterControl.ShowFilters();
     }
 
     public void HideSearchPropertyDropdownOverlay()
