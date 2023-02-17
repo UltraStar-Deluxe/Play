@@ -102,6 +102,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         });
         songSelectFilterControl.FiltersChangedEventStream.Subscribe(_ =>
             searchPropertyButton.SetInClassList("filtersAreActive", songSelectFilterControl.IsAnyFilterActive));
+
+        if (!settings.activeSearchPropertyFilters.IsNullOrEmpty())
+        {
+            songSelectFilterControl.InitFilters();
+        }
         
         closeSearchPropertyDropdownButton.RegisterCallbackButtonTriggered(() => searchPropertyDropdownOverlay.HideByDisplay());
 
@@ -166,7 +171,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         searchPropertyDropdownOverlay.ShowByDisplay();
         artistPropertyContainer.Q<Toggle>().Focus();
 
-        songSelectFilterControl.ShowFilters();
+        songSelectFilterControl.InitFilters();
     }
 
     public void HideSearchPropertyDropdownOverlay()

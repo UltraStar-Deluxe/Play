@@ -32,7 +32,9 @@ public class Settings : ISettings
     public string OwnHost { get; set; }
 
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
-    
+
+    public HashSet<SearchPropertyFilter> activeSearchPropertyFilters = new();
+
     // TODO: flatten settings?
     public SystemLanguage Language
     {

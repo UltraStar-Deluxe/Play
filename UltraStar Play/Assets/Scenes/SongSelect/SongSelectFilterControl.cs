@@ -5,10 +5,13 @@ using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
 
-public class SongSelectFilterControl : INeedInjection
+public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private SongMetaManager songMetaManager;
+
+    [Inject]
+    private Settings settings;
     
     [Inject(UxmlName = R.UxmlNames.filterListContainer)]
     private VisualElement filterListContainer;
@@ -21,7 +24,22 @@ public class SongSelectFilterControl : INeedInjection
     private readonly Subject<bool> filtersChangedEventStream = new();
     public IObservable<bool> FiltersChangedEventStream => filtersChangedEventStream;
     
-    public void ShowFilters()
+    public void OnInjectionFinished()
+    {
+        filtersChangedEventStream.Subscribe(_ =>
+        {
+            if (!isInitialized)
+            {
+                return;
+            }
+            
+            settings.activeSearchPropertyFilters = activeFilters
+                .SelectMany(entry => entry.Value)
+                .ToHashSet();
+        });
+    }
+
+    public void InitFilters()
     {
         if (isInitialized)
         {
@@ -98,6 +116,8 @@ public class SongSelectFilterControl : INeedInjection
         };
         
         searchProperties.ForEach(searchProperty => FillFilterList(searchProperty));
+        
+        filtersChangedEventStream.OnNext(true);
     }
 
     private void FillFilterList(ESearchProperty searchProperty)
@@ -121,31 +141,53 @@ public class SongSelectFilterControl : INeedInjection
                 searchProperty = searchProperty,
                 value = value,
             };
-            filterToggle.RegisterValueChangedCallback(evt => ToggleFilter(searchPropertyFilter, evt.newValue));
+            
+            if (settings.activeSearchPropertyFilters.Contains(searchPropertyFilter))
+            {
+                filterToggle.value = true;
+                EnableFilter(searchPropertyFilter);
+            }
+            
+            filterToggle.RegisterValueChangedCallback(evt => SetFilterActive(searchPropertyFilter, evt.newValue));
+        }
+    }
+    
+    private void DisableFilter(SearchPropertyFilter searchPropertyFilter)
+    {
+        if (activeFilters.ContainsKey(searchPropertyFilter.searchProperty))
+        {
+            // Remove from HashSet
+            activeFilters[searchPropertyFilter.searchProperty].Remove(searchPropertyFilter);
+            
+            // Remove HashSet from Dictionary if empty
+            if (activeFilters[searchPropertyFilter.searchProperty].IsNullOrEmpty())
+            {
+                activeFilters.Remove(searchPropertyFilter.searchProperty);
+            }
         }
     }
 
-    private void ToggleFilter(SearchPropertyFilter searchPropertyFilter, bool isActive)
+    private void EnableFilter(SearchPropertyFilter searchPropertyFilter)
+    {
+        if (!activeFilters.ContainsKey(searchPropertyFilter.searchProperty))
+        {
+            // Create HashSet if none yet
+            activeFilters.Add(searchPropertyFilter.searchProperty, new HashSet<SearchPropertyFilter>());
+        }
+
+        // Add to HashSet
+        activeFilters[searchPropertyFilter.searchProperty].Add(searchPropertyFilter);
+    }
+    
+    private void SetFilterActive(SearchPropertyFilter searchPropertyFilter, bool isActive)
     {
         if (isActive)
         {
-            if (!activeFilters.ContainsKey(searchPropertyFilter.searchProperty))
-            {
-                activeFilters.Add(searchPropertyFilter.searchProperty, new HashSet<SearchPropertyFilter>());
-            }
-
-            activeFilters[searchPropertyFilter.searchProperty].Add(searchPropertyFilter);
+            EnableFilter(searchPropertyFilter);
         }
         else
         {
-            if (activeFilters.ContainsKey(searchPropertyFilter.searchProperty))
-            {
-                activeFilters[searchPropertyFilter.searchProperty].Remove(searchPropertyFilter);
-                if (activeFilters[searchPropertyFilter.searchProperty].IsNullOrEmpty())
-                {
-                    activeFilters.Remove(searchPropertyFilter.searchProperty);
-                }
-            }
+            DisableFilter(searchPropertyFilter);
         }
         filtersChangedEventStream.OnNext(true);
     }
@@ -171,11 +213,5 @@ public class SongSelectFilterControl : INeedInjection
             default:
                 return null;
         }
-    }
-    
-    private struct SearchPropertyFilter
-    {
-        public ESearchProperty searchProperty;
-        public string value;
     }
 }
