@@ -134,10 +134,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneControl.SongSelectionPlaylistChooserControl.HidePlaylistChooserDropdownOverlay();
         }
-        else if (songSelectSceneControl.IsSearchExpressionInfoOverlayVisible)
-        {
-            songSelectSceneControl.HideSearchExpressionInfoOverlay();
-        }
         else if (songSelectSceneControl.SongSearchControl.IsSearchPropertyDropdownVisible)
         {
             songSelectSceneControl.SongSearchControl.HideSearchPropertyDropdownOverlay();
