@@ -612,6 +612,8 @@ public static partial class R
         public const string secondTeamUi = "secondTeamUi";
         public const string selectAllNotesIcon = "selectAllNotesIcon";
         public const string selectAllNotesOfLayerButton = "selectAllNotesOfLayerButton";
+        public const string selectFolderButton = "selectFolderButton";
+        public const string selectFolderIcon = "selectFolderIcon";
         public const string selectionIndicator = "selectionIndicator";
         public const string selectRandomSongButton = "selectRandomSongButton";
         public const string semanticVersionText = "semanticVersionText";
