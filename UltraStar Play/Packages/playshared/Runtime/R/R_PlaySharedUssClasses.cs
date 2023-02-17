@@ -46,6 +46,7 @@ public static partial class R_PlayShared
         public const string ellipsis = "ellipsis";
         public const string error = "error";
         public const string expanded = "expanded";
+        public const string filtersAreActive = "filtersAreActive";
         public const string firstChild = "firstChild";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string folded = "folded";

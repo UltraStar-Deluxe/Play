@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
-using UnityEditor;
 using UnityEngine.UIElements;
 
 public class SongSelectFilterControl : INeedInjection
@@ -17,7 +16,8 @@ public class SongSelectFilterControl : INeedInjection
     private bool isInitialized;
 
     private readonly Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> activeFilters = new();
-
+    public bool IsAnyFilterActive => !activeFilters.IsNullOrEmpty();
+    
     private readonly Subject<bool> filtersChangedEventStream = new();
     public IObservable<bool> FiltersChangedEventStream => filtersChangedEventStream;
     
@@ -42,7 +42,7 @@ public class SongSelectFilterControl : INeedInjection
 
     public bool SongMetaPassesActiveFilters(SongMeta songMeta)
     {
-        if (activeFilters.IsNullOrEmpty())
+        if (!IsAnyFilterActive)
         {
             return true;
         }
@@ -82,7 +82,7 @@ public class SongSelectFilterControl : INeedInjection
     private bool SongMetaPassesFilter(SongMeta songMeta, SearchPropertyFilter searchPropertyFilter)
     {
         string songMetaValue = GetSongMetaSearchProperty(songMeta, searchPropertyFilter.searchProperty);
-        return songMetaValue.Equals(searchPropertyFilter.value, System.StringComparison.InvariantCultureIgnoreCase);
+        return songMetaValue.Equals(searchPropertyFilter.value, StringComparison.InvariantCultureIgnoreCase);
     }
 
     private void UpdateFilterList()
