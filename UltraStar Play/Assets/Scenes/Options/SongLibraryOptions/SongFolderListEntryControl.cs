@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using ProTrans;
+using SFB;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -28,6 +29,9 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
     [Inject(UxmlName = R.UxmlNames.deleteButton)]
     private Button deleteButton;
+
+    [Inject(UxmlName = R.UxmlNames.selectFolderButton)]
+    private Button selectFolderButton;
 
     [Inject(UxmlName = R.UxmlNames.openFolderButton)]
     private Button openSongFolderButton;
@@ -92,10 +96,12 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
         if (PlatformUtils.IsStandalone)
         {
+            selectFolderButton.RegisterCallbackButtonTriggered(() => OpenSelectFolderDialog());
             openSongFolderButton.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(FullPath));
         }
         else
         {
+            selectFolderButton.HideByDisplay();
             openSongFolderButton.HideByDisplay();
         }
 
@@ -107,6 +113,21 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         });
         androidDrivePath.Subscribe(_ => valueChangedEventStream.OnNext(FullPath));
         CheckPathIsValid();
+    }
+
+    private void OpenSelectFolderDialog()
+    {
+#if UNITY_STANDALONE
+        string[] selectedFolders = StandaloneFileBrowser.OpenFolderPanel("Open song folder", FullPath, false);
+        if (selectedFolders.IsNullOrEmpty()
+            || !Directory.Exists(selectedFolders.FirstOrDefault()))
+        {
+            return;
+        }
+
+        textField.value = selectedFolders.FirstOrDefault()
+            .Replace("\\", "/");
+#endif
     }
 
     private void UpdateDriveButton()

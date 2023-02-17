@@ -5,6 +5,9 @@
                 <ui:Button text="Internal Storage" display-tooltip-when-elided="true" name="driveButton" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" />
                 <ui:TextField picking-mode="Ignore" text="C:\Songs" name="pathTextField" mask-character="*" password="false" style="flex-grow: 1;" />
             </ui:VisualElement>
+            <ui:Button name="selectFolderButton" class="squareButton" style="margin-right: 5px;">
+                <MaterialIcon name="selectFolderIcon" icon="folder_open" />
+            </ui:Button>
             <ui:Button name="openFolderButton" class="squareButton" style="margin-right: 5px;">
                 <MaterialIcon name="openFolderIcon" icon="open_in_new" />
             </ui:Button>
