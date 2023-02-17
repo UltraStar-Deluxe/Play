@@ -116,6 +116,10 @@
     bottom: 100%;
 }
 
+#searchPropertyButton.filtersAreActive MaterialIcon {
+    color: var(--control-danger);
+}
+
 #toggleFavoriteButton MaterialIcon {
     position: absolute;
     width: 100%;

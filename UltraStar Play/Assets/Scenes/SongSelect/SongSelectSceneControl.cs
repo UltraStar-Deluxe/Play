@@ -240,21 +240,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.addSongFolderButton)]
     private Button addSongFolderButton;
 
-    [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
-    private Button showSearchExpressionInfoButton;
-
-    [Inject(UxmlName = R.UxmlNames.closeSearchExpressionInfoButton)]
-    private Button closeSearchExpressionInfoButton;
-
-    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoOverlay)]
-    private VisualElement searchExpressionInfoOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoLabel)]
-    private Label searchExpressionInfoLabel;
-
-    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoSyntaxTipsLabel)]
-    private Label searchExpressionInfoSyntaxTipsLabel;
-
     [Inject(UxmlName = R.UxmlNames.selectRandomSongButton)]
     private Button selectRandomSongButton;
 
@@ -263,13 +248,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
-    
+
     public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
 
     public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
     public bool IsSongDetailOverlayVisible => songDetailOverlay.IsVisibleByDisplay();
-    public bool IsSearchExpressionInfoOverlayVisible => searchExpressionInfoOverlay.IsVisibleByDisplay();
 
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
@@ -314,6 +298,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
     private readonly GameRoundSettingsUiControl gameRoundSettingsUiControl = new();
     private readonly SongQueueUiControl songQueueUiControl = new();
+    private readonly SongSelectFilterControl songSelectFilterControl = new();
 
     public void OnInjectionFinished()
     {
@@ -321,6 +306,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         injector.Inject(createSingAlongSongControl);
         injector.Inject(partyModeControl);
         injector.Inject(songQueueUiControl);
+        injector.Inject(songSelectFilterControl);
     }
     
     private void Start()
@@ -347,7 +333,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         HidePlayerSelectOverlay();
         HideMenuOverlay();
         HideSongDetailOverlay();
-        HideSearchExpressionInfoOverlay();
         
         // Register Callbacks
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
@@ -383,8 +368,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             }
         });
 
-        InitSearchExpressionInfo();
-
         nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
         previousSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectPreviousSong());
         UpdateNextAndPreviousSongButtonLabels();
@@ -397,6 +380,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Subscribe(_ => OnSearchTextChanged());
 
         SongSelectionPlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
+        songSelectFilterControl.FiltersChangedEventStream.Subscribe(_ => UpdateFilteredSongs());
 
         SongOrderPickerControl.Selection.Subscribe(newValue =>
         {
@@ -524,17 +508,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songQueueEntryDto.SingScenePlayerDataDto = DtoConverter.ToDto(CreateSingScenePlayerData());
         songQueueEntryDto.GameRoundSettings = new(settings.GameRoundSettings);
         return songQueueEntryDto;
-    }
-
-    public void HideSearchExpressionInfoOverlay()
-    {
-        searchExpressionInfoOverlay.HideByDisplay();
-    }
-
-    private void InitSearchExpressionInfo()
-    {
-        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => searchExpressionInfoOverlay.ShowByDisplay());
-        closeSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => HideSearchExpressionInfoOverlay());
     }
 
     private void ShowPlayerSelectContainer()
@@ -1079,6 +1052,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetas)
             .Where(songMeta => playlist == null
                             || playlist.HasSongEntry(songMeta.Artist, songMeta.Title))
+            .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta))
             .ToList();
         return filteredSongs;
@@ -1132,6 +1106,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         bb.BindExistingInstance(SongSelectionPlaylistChooserControl);
         bb.BindExistingInstance(createSingAlongSongControl);
         bb.BindExistingInstance(partyModeControl);
+        bb.BindExistingInstance(songSelectFilterControl);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(focusableNavigator);
         bb.BindExistingInstance(songPreviewControl);
         return bb.GetBindings();
@@ -1218,8 +1193,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         noteDisplayModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
         noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);
-        searchExpressionInfoLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo);
-        searchExpressionInfoSyntaxTipsLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips);
         downloadSongsButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_downloadSongsButton);
         addSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_addSongFolderButton);
 

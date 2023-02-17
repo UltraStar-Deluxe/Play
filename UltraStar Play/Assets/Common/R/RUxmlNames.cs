@@ -186,6 +186,9 @@ public static partial class R
         public const string exitSceneButton = "exitSceneButton";
         public const string favoriteIcon = "favoriteIcon";
         public const string filledScoreBar = "filledScoreBar";
+        public const string filterContainer = "filterContainer";
+        public const string filterLabel = "filterLabel";
+        public const string filterListContainer = "filterListContainer";
         public const string finishConditionContainer = "finishConditionContainer";
         public const string finishConditionDescription = "finishConditionDescription";
         public const string finishConditionPicker = "finishConditionPicker";
@@ -595,6 +598,7 @@ public static partial class R
         public const string scrollView = "scrollView";
         public const string ScrollView = "ScrollView";
         public const string searchBarContainer = "searchBarContainer";
+        public const string searchByPropertyContainer = "searchByPropertyContainer";
         public const string searchErrorIcon = "searchErrorIcon";
         public const string searchExpressionInfoLabel = "searchExpressionInfoLabel";
         public const string searchExpressionInfoOverlay = "searchExpressionInfoOverlay";
@@ -647,9 +651,6 @@ public static partial class R
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
         public const string showNotePitchLabelContainer = "showNotePitchLabelContainer";
         public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
-        public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
-        public const string showSearchExpressionInfoContainer = "showSearchExpressionInfoContainer";
-        public const string showSearchExpressionInfoTitle = "showSearchExpressionInfoTitle";
         public const string showStatusBarContainer = "showStatusBarContainer";
         public const string showStatusBarToggle = "showStatusBarToggle";
         public const string showVideoAreaContainer = "showVideoAreaContainer";

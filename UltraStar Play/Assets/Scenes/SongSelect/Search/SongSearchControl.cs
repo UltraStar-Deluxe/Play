@@ -61,6 +61,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongSelectFilterControl songSelectFilterControl;
+
     private TooltipControl searchErrorIconTooltipControl;
 
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
@@ -97,6 +100,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
                 ShowSearchPropertyDropdownOverlay();
             }
         });
+        songSelectFilterControl.FiltersChangedEventStream.Subscribe(_ =>
+            searchPropertyButton.SetInClassList("filtersAreActive", songSelectFilterControl.IsAnyFilterActive));
+
+        if (!settings.activeSearchPropertyFilters.IsNullOrEmpty())
+        {
+            songSelectFilterControl.InitFilters();
+        }
+        
         closeSearchPropertyDropdownButton.RegisterCallbackButtonTriggered(() => searchPropertyDropdownOverlay.HideByDisplay());
 
         RegisterToggleSearchPropertyCallback(artistPropertyContainer.Q<Toggle>(), ESearchProperty.Artist);
@@ -159,6 +170,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     {
         searchPropertyDropdownOverlay.ShowByDisplay();
         artistPropertyContainer.Q<Toggle>().Focus();
+
+        songSelectFilterControl.InitFilters();
     }
 
     public void HideSearchPropertyDropdownOverlay()
