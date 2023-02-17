@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class Settings : ISettings
@@ -33,7 +34,8 @@ public class Settings : ISettings
 
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
 
-    public HashSet<SearchPropertyFilter> activeSearchPropertyFilters = new();
+    public Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> activeSearchPropertyFilters = new();
+    [FormerlySerializedAs("showOnlyDuetsFilter")] public bool isShowOnlyDuetsFilterActive;
 
     // TODO: flatten settings?
     public SystemLanguage Language

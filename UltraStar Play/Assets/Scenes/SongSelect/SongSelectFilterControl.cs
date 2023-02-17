@@ -16,29 +16,28 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     [Inject(UxmlName = R.UxmlNames.filterListContainer)]
     private VisualElement filterListContainer;
 
+    [Inject(UxmlName = R.UxmlNames.showOnlyDuetsToggle)]
+    private Toggle showOnlyDuetsToggle;
+    
     private bool isInitialized;
 
-    private readonly Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> activeFilters = new();
-    public bool IsAnyFilterActive => !activeFilters.IsNullOrEmpty();
+    private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => settings.activeSearchPropertyFilters;
+    public bool IsAnyFilterActive => !settings.activeSearchPropertyFilters.IsNullOrEmpty()
+        || settings.isShowOnlyDuetsFilterActive;
     
     private readonly Subject<bool> filtersChangedEventStream = new();
     public IObservable<bool> FiltersChangedEventStream => filtersChangedEventStream;
     
     public void OnInjectionFinished()
     {
-        filtersChangedEventStream.Subscribe(_ =>
+        showOnlyDuetsToggle.value = settings.isShowOnlyDuetsFilterActive;
+        showOnlyDuetsToggle.RegisterValueChangedCallback(evt =>
         {
-            if (!isInitialized)
-            {
-                return;
-            }
-            
-            settings.activeSearchPropertyFilters = activeFilters
-                .SelectMany(entry => entry.Value)
-                .ToHashSet();
+            settings.isShowOnlyDuetsFilterActive = evt.newValue;
+            filtersChangedEventStream.OnNext(true);
         });
     }
-
+    
     public void InitFilters()
     {
         if (isInitialized)
@@ -65,8 +64,14 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             return true;
         }
 
+        if (settings.isShowOnlyDuetsFilterActive
+            && songMeta.GetVoices().Count < 2)
+        {
+            return false;
+        }
+
         // EVERY category must match at least one value (i.e. return false if ANY does not match).
-        foreach (ESearchProperty searchProperty in activeFilters.Keys)
+        foreach (ESearchProperty searchProperty in ActiveFilters.Keys)
         {
             if (!SongMetaPassesFilters(songMeta, searchProperty))
             {
@@ -79,13 +84,13 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
     private bool SongMetaPassesFilters(SongMeta songMeta, ESearchProperty searchProperty)
     {
-        if (!activeFilters.ContainsKey(searchProperty))
+        if (!ActiveFilters.ContainsKey(searchProperty))
         {
             return true;
         }
         
         // ANY value in the category must match (i.e. return true if ANY does match).
-        HashSet<SearchPropertyFilter> searchPropertyFilters = activeFilters[searchProperty];
+        HashSet<SearchPropertyFilter> searchPropertyFilters = ActiveFilters[searchProperty];
         foreach (SearchPropertyFilter searchPropertyFilter in searchPropertyFilters)
         {
             if (SongMetaPassesFilter(songMeta, searchPropertyFilter))
@@ -141,8 +146,9 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
                 searchProperty = searchProperty,
                 value = value,
             };
-            
-            if (settings.activeSearchPropertyFilters.Contains(searchPropertyFilter))
+
+            if (settings.activeSearchPropertyFilters.ContainsKey(searchPropertyFilter.searchProperty)
+                && settings.activeSearchPropertyFilters[searchPropertyFilter.searchProperty].Contains(searchPropertyFilter))
             {
                 filterToggle.value = true;
                 EnableFilter(searchPropertyFilter);
@@ -154,29 +160,29 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     
     private void DisableFilter(SearchPropertyFilter searchPropertyFilter)
     {
-        if (activeFilters.ContainsKey(searchPropertyFilter.searchProperty))
+        if (ActiveFilters.ContainsKey(searchPropertyFilter.searchProperty))
         {
             // Remove from HashSet
-            activeFilters[searchPropertyFilter.searchProperty].Remove(searchPropertyFilter);
+            ActiveFilters[searchPropertyFilter.searchProperty].Remove(searchPropertyFilter);
             
             // Remove HashSet from Dictionary if empty
-            if (activeFilters[searchPropertyFilter.searchProperty].IsNullOrEmpty())
+            if (ActiveFilters[searchPropertyFilter.searchProperty].IsNullOrEmpty())
             {
-                activeFilters.Remove(searchPropertyFilter.searchProperty);
+                ActiveFilters.Remove(searchPropertyFilter.searchProperty);
             }
         }
     }
 
     private void EnableFilter(SearchPropertyFilter searchPropertyFilter)
     {
-        if (!activeFilters.ContainsKey(searchPropertyFilter.searchProperty))
+        if (!ActiveFilters.ContainsKey(searchPropertyFilter.searchProperty))
         {
             // Create HashSet if none yet
-            activeFilters.Add(searchPropertyFilter.searchProperty, new HashSet<SearchPropertyFilter>());
+            ActiveFilters.Add(searchPropertyFilter.searchProperty, new HashSet<SearchPropertyFilter>());
         }
 
         // Add to HashSet
-        activeFilters[searchPropertyFilter.searchProperty].Add(searchPropertyFilter);
+        ActiveFilters[searchPropertyFilter.searchProperty].Add(searchPropertyFilter);
     }
     
     private void SetFilterActive(SearchPropertyFilter searchPropertyFilter, bool isActive)

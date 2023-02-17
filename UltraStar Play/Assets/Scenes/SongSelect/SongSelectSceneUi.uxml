@@ -205,9 +205,10 @@
                             <ui:Label text="Lyrics" display-tooltip-when-elided="true" style="margin-right: 5px;" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="filterContainer" style="align-items: flex-start;">
-                        <ui:Label text="Filter by" display-tooltip-when-elided="true" name="filterLabel" class="smallFont" style="margin-bottom: 5px;" />
-                        <ui:VisualElement name="filterListContainer" style="align-items: auto; width: 100%;" />
+                    <ui:VisualElement name="filterContainer" style="align-items: flex-end;">
+                        <ui:Label text="Filter by" display-tooltip-when-elided="true" name="filterLabel" class="smallFont" style="margin-bottom: 5px; margin-right: auto;" />
+                        <ui:Toggle label="Duet" name="showOnlyDuetsToggle" />
+                        <ui:VisualElement name="filterListContainer" style="width: 100%; align-items: flex-end;" />
                     </ui:VisualElement>
                 </ui:ScrollView>
             </ui:VisualElement>
