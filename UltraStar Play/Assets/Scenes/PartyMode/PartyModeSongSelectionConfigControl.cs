@@ -48,8 +48,8 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
             });
 
         // Playlist
-        List<UltraStarPlaylist> playlists = playlistManager.GetPlaylists(true, true);
-        LabeledItemPickerControl<UltraStarPlaylist> playlistItemPickerControl = new(songSelectionPlaylistItemPicker, playlists);
+        List<IPlaylist> playlists = playlistManager.GetPlaylists(true, true);
+        LabeledItemPickerControl<IPlaylist> playlistItemPickerControl = new(songSelectionPlaylistItemPicker, playlists);
         playlistItemPickerControl.GetLabelTextFunction = newValue => playlistManager.GetPlaylistName(newValue);
         playlistItemPickerControl.Bind(
             () => partyModeSettings.songSelectionSettings.songPoolPlaylist,
