@@ -29,7 +29,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             if (playlists.IsNullOrEmpty())
             {
                 CreateFavoritePlaylistIfNotExist();
-                ScanPlaylistFolder();
+                ScanPlaylists();
             }
             return playlists;
         }
@@ -44,7 +44,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
                 || playlists.IsNullOrEmpty())
             {
                 CreateFavoritePlaylistIfNotExist();
-                ScanPlaylistFolder();
+                ScanPlaylists();
             }
             return favoritesPlaylist;
         }
@@ -100,12 +100,39 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         File.WriteAllLines(playlist.FilePath, lines);
     }
 
-    private void ScanPlaylistFolder()
+    private void ScanPlaylists()
+    {
+        ScanPlaylists(PlaylistFolder);
+        
+        foreach (string songDir in SettingsManager.Instance.Settings.GameSettings.songDirs)
+        {
+            ScanPlaylists(songDir);
+        }
+    }
+
+    private void ScanPlaylists(string folder)
     {
         playlists = new List<IPlaylist>();
 
+        ScanUltraStarPlaylists(folder);
+        ScanM3UPlaylists(folder);
+    }
+
+    private void ScanM3UPlaylists(string folder)
+    {
+        FolderScanner scanner = new("*.m3u");
+        List<string> playlistFilePaths = scanner.GetFiles(folder);
+        foreach (string filePath in playlistFilePaths)
+        {
+            M3UPlaylist playlist = M3UPlaylistParser.ParseFile(filePath);
+            AddPlaylist(playlist, filePath);
+        }
+    }
+    
+    private void ScanUltraStarPlaylists(string folder)
+    {
         FolderScanner scanner = new("*" + ultraStarPlaylistFileExtension);
-        List<string> playlistFilePaths = scanner.GetFiles(PlaylistFolder);
+        List<string> playlistFilePaths = scanner.GetFiles(folder);
         foreach (string filePath in playlistFilePaths)
         {
             UltraStarPlaylist playlist = UltraStarPlaylistParser.ParseFile(filePath);
