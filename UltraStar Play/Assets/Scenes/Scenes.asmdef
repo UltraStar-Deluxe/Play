@@ -14,7 +14,8 @@
         "Unity.TextMeshPro",
         "Unity.InputSystem",
         "playshared",
-        "AndroidRuntimePermissions.Runtime"
+        "AndroidRuntimePermissions.Runtime",
+        "UnityStandaloneFileBrowser"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
