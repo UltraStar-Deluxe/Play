@@ -651,6 +651,7 @@ public static partial class R
         public const string showLyricsAreaToggle = "showLyricsAreaToggle";
         public const string showNotePitchLabelContainer = "showNotePitchLabelContainer";
         public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
+        public const string showOnlyDuetsToggle = "showOnlyDuetsToggle";
         public const string showStatusBarContainer = "showStatusBarContainer";
         public const string showStatusBarToggle = "showStatusBarToggle";
         public const string showVideoAreaContainer = "showVideoAreaContainer";
