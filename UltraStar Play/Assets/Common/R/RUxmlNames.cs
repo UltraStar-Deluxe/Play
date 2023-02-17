@@ -598,6 +598,7 @@ public static partial class R
         public const string scrollView = "scrollView";
         public const string ScrollView = "ScrollView";
         public const string searchBarContainer = "searchBarContainer";
+        public const string searchByPropertyContainer = "searchByPropertyContainer";
         public const string searchErrorIcon = "searchErrorIcon";
         public const string searchExpressionInfoLabel = "searchExpressionInfoLabel";
         public const string searchExpressionInfoOverlay = "searchExpressionInfoOverlay";

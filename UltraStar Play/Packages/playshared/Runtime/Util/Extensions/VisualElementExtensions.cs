@@ -31,15 +31,21 @@ public static class VisualElementExtensions
         });
     }
 
-    public static void SetInClassList(this VisualElement visualElement, string newClass, bool shouldBePresent)
+    public static void SetInClassList(this VisualElement visualElement, string className, bool shouldBePresent)
     {
         if (shouldBePresent)
         {
-            visualElement.AddToClassList(newClass);
+            if (!visualElement.ClassListContains(className))
+            {
+                visualElement.AddToClassList(className);
+            }
         }
         else
         {
-            visualElement.RemoveFromClassList(newClass);
+            if (visualElement.ClassListContains(className))
+            {
+                visualElement.RemoveFromClassList(className);
+            }
         }
     }
 

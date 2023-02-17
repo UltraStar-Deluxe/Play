@@ -100,6 +100,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
                 ShowSearchPropertyDropdownOverlay();
             }
         });
+        songSelectFilterControl.FiltersChangedEventStream.Subscribe(_ =>
+            searchPropertyButton.SetInClassList("filtersAreActive", songSelectFilterControl.IsAnyFilterActive));
+        
         closeSearchPropertyDropdownButton.RegisterCallbackButtonTriggered(() => searchPropertyDropdownOverlay.HideByDisplay());
 
         RegisterToggleSearchPropertyCallback(artistPropertyContainer.Q<Toggle>(), ESearchProperty.Artist);
