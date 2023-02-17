@@ -507,7 +507,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     {
         modifyPlaylistButtonContainer.Clear();
         playlistManager.Playlists
-            .Where(playlist => !(playlist is UltraStarAllSongsPlaylist))
+            .Where(playlist => playlist is UltraStarPlaylist
+                               && playlist is not UltraStarAllSongsPlaylist)
             .ForEach(playlist =>
         {
             string playlistName = playlist.Name;
@@ -518,12 +519,12 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             if (playlistManager.HasSongEntry(playlist, songMeta))
             {
                 button.text = $"Remove from\n'{playlistName}'";
-                button.RegisterCallbackButtonTriggered(() => playlistManager.RemoveSongFromPlaylist(playlist, songMeta));
+                button.RegisterCallbackButtonTriggered(() => playlistManager.RemoveSongFromPlaylist(playlist as UltraStarPlaylist, songMeta));
             }
             else
             {
                 button.text = $"Add to\n'{playlistName}'";
-                button.RegisterCallbackButtonTriggered(() => playlistManager.AddSongToPlaylist(playlist, songMeta));
+                button.RegisterCallbackButtonTriggered(() => playlistManager.AddSongToPlaylist(playlist as UltraStarPlaylist, songMeta));
             }
         });
     }
@@ -535,7 +536,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
 
     private void UpdateIcons()
     {
-        favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
+        favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta));
         duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
         notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta));
     }
