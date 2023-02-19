@@ -1048,10 +1048,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public List<SongMeta> GetFilteredSongMetas()
     {
         // Ignore prefix for special search syntax
-        UltraStarPlaylist playlist = SongSelectionPlaylistChooserControl.Selection.Value;
+        IPlaylist playlist = SongSelectionPlaylistChooserControl.Selection.Value;
         List<SongMeta> filteredSongs = songSearchControl.GetFilteredSongMetas(songMetas)
             .Where(songMeta => playlist == null
-                            || playlist.HasSongEntry(songMeta.Artist, songMeta.Title))
+                            || playlist.HasSongEntry(songMeta))
             .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta))
             .ToList();
@@ -1129,7 +1129,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        if (playlistManager.FavoritesPlaylist.HasSongEntry(SelectedSong.Artist, SelectedSong.Title))
+        if (playlistManager.FavoritesPlaylist.HasSongEntry(SelectedSong))
         {
             playlistManager.RemoveSongFromPlaylist(playlistManager.FavoritesPlaylist, SelectedSong);
         }
@@ -1208,7 +1208,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private bool IsFavorite(SongMeta songMeta)
     {
         return songMeta != null
-               && playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title);
+               && playlistManager.FavoritesPlaylist.HasSongEntry(songMeta);
     }
 
     public void SubmitSearch()

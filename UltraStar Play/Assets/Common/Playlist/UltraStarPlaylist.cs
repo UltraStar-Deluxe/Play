@@ -2,9 +2,10 @@
 using System.IO;
 using System.Linq;
 
-public class UltraStarPlaylist
+public class UltraStarPlaylist : IPlaylist
 {
     public string FilePath { get; private set; }
+
     public string FileName => Path.GetFileNameWithoutExtension(FilePath);
     public string Name
     {
@@ -87,6 +88,11 @@ public class UltraStarPlaylist
     public virtual bool HasSongEntry(string artist, string title)
     {
         return songHashes.Contains(GetHash(artist, title));
+    }
+    
+    public bool HasSongEntry(SongMeta songMeta)
+    {
+        return HasSongEntry(songMeta.Artist, songMeta.Title);
     }
 
     private string GetHash(string artist, string title)
