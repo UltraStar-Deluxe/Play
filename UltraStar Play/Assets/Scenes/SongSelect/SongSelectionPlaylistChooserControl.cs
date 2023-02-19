@@ -31,9 +31,9 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
 
-    private List<UltraStarPlaylist> items = new();
+    private List<IPlaylist> items = new();
 
-    public ReactiveProperty<UltraStarPlaylist> Selection { get; private set; } = new();
+    public ReactiveProperty<IPlaylist> Selection { get; private set; } = new();
 
     public bool IsPlaylistChooserDropdownOverlayVisible => playlistChooserDropdownOverlay.IsVisibleByDisplay();
 
@@ -67,13 +67,13 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
 
     private void InitItems()
     {
-        items = new List<UltraStarPlaylist>();
+        items = new List<IPlaylist>();
         items.Add(UltraStarAllSongsPlaylist.Instance);
         items.Add(playlistManager.FavoritesPlaylist);
         items.AddRange(playlistManager.Playlists.Where(playlist => playlist != playlistManager.FavoritesPlaylist));
 
         // Initial selection
-        UltraStarPlaylist newSelection;
+        IPlaylist newSelection;
         if (songSelectSceneControl.UsePartyModePlaylist)
         {
             newSelection = songSelectSceneControl.PartyModeSettings.songSelectionSettings.songPoolPlaylist;
@@ -146,7 +146,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
             .IfNotNull(child => child.Focus());
     }
 
-    private Button CreatePlaylistButton(UltraStarPlaylist item)
+    private Button CreatePlaylistButton(IPlaylist item)
     {
         Button button = new();
         button.text = playlistManager.GetPlaylistName(item);

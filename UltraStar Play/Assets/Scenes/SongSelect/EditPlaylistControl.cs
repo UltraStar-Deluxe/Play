@@ -48,7 +48,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private UiManager uiManager;
 
-    private UltraStarPlaylist currentPlaylist;
+    private IPlaylist currentPlaylist;
 
     private string titleText;
 

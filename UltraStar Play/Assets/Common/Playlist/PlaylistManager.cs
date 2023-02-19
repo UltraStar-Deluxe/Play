@@ -20,16 +20,16 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     public static readonly string favoritesPlaylistName = "Favorites";
 
     // static references to be persisted across scenes
-    private static List<UltraStarPlaylist> playlists = new();
+    private static List<IPlaylist> playlists = new();
 
-    public IReadOnlyList<UltraStarPlaylist> Playlists
+    public IReadOnlyList<IPlaylist> Playlists
     {
         get
         {
             if (playlists.IsNullOrEmpty())
             {
                 CreateFavoritePlaylistIfNotExist();
-                ScanPlaylistFolder();
+                ScanPlaylists();
             }
             return playlists;
         }
@@ -44,7 +44,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
                 || playlists.IsNullOrEmpty())
             {
                 CreateFavoritePlaylistIfNotExist();
-                ScanPlaylistFolder();
+                ScanPlaylists();
             }
             return favoritesPlaylist;
         }
@@ -57,6 +57,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
 
     public static readonly string ultraStarPlaylistFileExtension = ".upl";
+    private static readonly string m3uPlaylistFileExtension = ".m3u";
     private string FavoritesPlaylistFilePath => $"{PlaylistFolder}/{favoritesPlaylistName}{ultraStarPlaylistFileExtension}";
     private string PlaylistFolder => $"{Application.persistentDataPath}/Playlists";
 
@@ -85,7 +86,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public bool IsFavoritesPlaylist(UltraStarPlaylist playlist)
+    public bool IsFavoritesPlaylist(IPlaylist playlist)
     {
         return playlist.Name == favoritesPlaylistName;
     }
@@ -100,12 +101,39 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         File.WriteAllLines(playlist.FilePath, lines);
     }
 
-    private void ScanPlaylistFolder()
+    private void ScanPlaylists()
     {
-        playlists = new List<UltraStarPlaylist>();
+        playlists = new List<IPlaylist>();
+        
+        ScanPlaylistsInFolder(PlaylistFolder);
+        
+        foreach (string songDir in SettingsManager.Instance.Settings.GameSettings.songDirs)
+        {
+            ScanPlaylistsInFolder(songDir);
+        }
+    }
 
+    private void ScanPlaylistsInFolder(string folder)
+    {
+        ScanUltraStarPlaylistsInFolder(folder);
+        ScanM3UPlaylistsInFolder(folder);
+    }
+
+    private void ScanM3UPlaylistsInFolder(string folder)
+    {
+        FolderScanner scanner = new("*" + m3uPlaylistFileExtension);
+        List<string> playlistFilePaths = scanner.GetFiles(folder);
+        foreach (string filePath in playlistFilePaths)
+        {
+            M3UPlaylist playlist = M3UPlaylistParser.ParseFile(filePath);
+            AddPlaylist(playlist, filePath);
+        }
+    }
+    
+    private void ScanUltraStarPlaylistsInFolder(string folder)
+    {
         FolderScanner scanner = new("*" + ultraStarPlaylistFileExtension);
-        List<string> playlistFilePaths = scanner.GetFiles(PlaylistFolder);
+        List<string> playlistFilePaths = scanner.GetFiles(folder);
         foreach (string filePath in playlistFilePaths)
         {
             UltraStarPlaylist playlist = UltraStarPlaylistParser.ParseFile(filePath);
@@ -113,14 +141,21 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void AddPlaylist(UltraStarPlaylist playlist, string filePath)
+    private void AddPlaylist(IPlaylist playlist, string filePath)
     {
         if (!File.Exists(filePath))
         {
-            // Create empty file
-            using (FileStream fileStream = File.Create(filePath))
+            if (filePath.ToLowerInvariant().EndsWith(ultraStarPlaylistFileExtension))
             {
-                // Automatically closed by using-statement.
+                // Create empty file
+                using (FileStream fileStream = File.Create(filePath))
+                {
+                    // Automatically closed by using-statement.
+                }
+            }
+            else
+            {
+                throw new UltraStarPlayException("Cannot add to playlist, because the file does not exist: " + filePath);
             }
         }
 
@@ -129,13 +164,14 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         if (Path.GetFullPath(FavoritesPlaylistFilePath) == Path.GetFullPath(filePath))
         {
             // This is the special playlist for the favorite songs.
-            favoritesPlaylist = playlist;
+            favoritesPlaylist = playlist as UltraStarPlaylist;
         }
     }
 
     public void RemoveSongFromPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)
     {
-        if (songMeta == null)
+        if (playlist == null
+            || songMeta == null)
         {
             return;
         }
@@ -146,7 +182,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     public void AddSongToPlaylist(UltraStarPlaylist playlist, SongMeta songMeta)
     {
-        if (songMeta == null
+        if (playlist == null
+            || songMeta == null
             || HasSongEntry(playlist, songMeta))
         {
             return;
@@ -158,17 +195,17 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     public class PlaylistChangeEvent
     {
-        public UltraStarPlaylist Playlist { get; set; }
+        public IPlaylist Playlist { get; set; }
         public SongMeta SongMeta { get; set; }
 
-        public PlaylistChangeEvent(UltraStarPlaylist playlist, SongMeta songMeta)
+        public PlaylistChangeEvent(IPlaylist playlist, SongMeta songMeta)
         {
             Playlist = playlist;
             SongMeta = songMeta;
         }
     }
 
-    public EPlaylistNameIssue GetPlaylistNameIssue(UltraStarPlaylist playlist, string newName)
+    public EPlaylistNameIssue GetPlaylistNameIssue(IPlaylist playlist, string newName)
     {
         if (newName.IsNullOrEmpty())
         {
@@ -197,7 +234,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         return EPlaylistNameIssue.None;
     }
 
-    public bool TrySetPlaylistName(UltraStarPlaylist playlist, string newName, out string errorMessage)
+    public bool TrySetPlaylistName(IPlaylist playlist, string newName, out string errorMessage)
     {
         if (playlist == null
             || playlist.Name == newName)
@@ -206,9 +243,11 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
             return true;
         }
 
+        UltraStarPlaylist ultraStarPlaylist = playlist as UltraStarPlaylist;
         if (playlist is UltraStarAllSongsPlaylist
             || playlist.Name == favoritesPlaylistName
-            || playlist.FilePath.IsNullOrEmpty())
+            || playlist.FilePath.IsNullOrEmpty()
+            || ultraStarPlaylist == null)
         {
             errorMessage = "Cannot rename this playlist";
             return false;
@@ -229,8 +268,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         {
             Debug.Log($"Moving playlist from '{oldPath}' to '{newPath}'");
             File.Move(oldPath, newPath);
-            playlist.SetFileName(newName);
-            playlist.RemoveHeaderField("name");
+            ultraStarPlaylist.SetFileName(newName);
+            ultraStarPlaylist.RemoveHeaderField("name");
         }
         catch (Exception e)
         {
@@ -251,7 +290,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         return true;
     }
 
-    public string TryRemovePlaylist(UltraStarPlaylist playlist)
+    public string TryRemovePlaylist(IPlaylist playlist)
     {
         if (playlist == null
             || playlist is UltraStarAllSongsPlaylist
@@ -317,20 +356,20 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         return newPlaylistName;
     }
 
-    public bool HasSongEntry(UltraStarPlaylist playlist, SongMeta songMeta)
+    public bool HasSongEntry(IPlaylist playlist, SongMeta songMeta)
     {
-        return playlist.HasSongEntry(songMeta.Artist, songMeta.Title);
+        return playlist.HasSongEntry(songMeta);
     }
 
-    public List<SongMeta> GetSongMetas(UltraStarPlaylist playlist)
+    public List<SongMeta> GetSongMetas(IPlaylist playlist)
     {
         IReadOnlyCollection<SongMeta> allSongMetas = songMetaManager.GetSongMetas();
         return allSongMetas.Where(songMeta => HasSongEntry(playlist, songMeta)).ToList();
     }
 
-    public List<UltraStarPlaylist> GetPlaylists(bool includeAllSongPlaylist, bool includeFavoritesPlaylist)
+    public List<IPlaylist> GetPlaylists(bool includeAllSongPlaylist, bool includeFavoritesPlaylist)
     {
-        List<UltraStarPlaylist> result = new();
+        List<IPlaylist> result = new();
         if (includeFavoritesPlaylist)
         {
             result.Add(UltraStarAllSongsPlaylist.Instance);
@@ -345,7 +384,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         return result;
     }
 
-    public string GetPlaylistName(UltraStarPlaylist playlist)
+    public string GetPlaylistName(IPlaylist playlist)
     {
         if (playlist == null)
         {
