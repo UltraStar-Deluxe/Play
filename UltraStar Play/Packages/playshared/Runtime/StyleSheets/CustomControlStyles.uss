@@ -334,6 +334,22 @@ TextField.placeholderVisible #unity-text-input {
 }
 
 /**************************************************/
+/* RADIAL PROGRESS BAR */
+/**************************************************/
+.radial-progress-bar {
+    min-width: 18px;
+    min-height: 18px;
+    --track-color: rgb(130, 130, 130);
+    --progress-color: rgb(46, 132, 24);
+    --percentage-color: white;
+}
+
+.radial-progress-bar__label {
+    -unity-text-align: middle-left;
+    color: var(--percentage-color);
+}
+
+/**************************************************/
 /* FPS LABEL */
 /**************************************************/
 
