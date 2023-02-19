@@ -24,13 +24,13 @@ public class M3UPlaylist : IPlaylist
             return false;
         }
 
-        string songMetaAbsoluteAudioFilePath = new FileInfo(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3)).FullName;
+        string normalizedSongMetaAbsoluteAudioFilePath = new FileInfo(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3)).FullName;
         
         return audioFilePaths.AnyMatch(audioFilePath =>
         {
             string audioFileAbsolutePath = GetAbsoluteAudioFilePath(audioFilePath);
             string normalizedAudioFileAbsolutePath = new FileInfo(audioFileAbsolutePath).FullName;
-            return Equals(songMetaAbsoluteAudioFilePath, normalizedAudioFileAbsolutePath);
+            return Equals(normalizedSongMetaAbsoluteAudioFilePath, normalizedAudioFileAbsolutePath);
         });
     }
 
@@ -41,7 +41,7 @@ public class M3UPlaylist : IPlaylist
             return audioFilePath;
         }
 
-        return FilePath + $"/{audioFilePath}";
+        return Path.GetDirectoryName(FilePath) + $"/{audioFilePath}";
     }
 
     public void AddAudioFilePath(string audioFilePath)
