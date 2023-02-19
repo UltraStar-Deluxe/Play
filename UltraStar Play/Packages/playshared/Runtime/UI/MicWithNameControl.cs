@@ -1,5 +1,6 @@
 ﻿using System;
 using UniInject;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class MicWithNameControl : INeedInjection, IInjectionFinishedListener
@@ -14,7 +15,7 @@ public class MicWithNameControl : INeedInjection, IInjectionFinishedListener
     private VisualElement micIcon;
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.micProgressBar)]
-    private ProgressBar micProgressBar;
+    private RadialProgressBar micProgressBar;
     
     [Inject]
     public MicProfile MicProfile { get; set; }
@@ -44,5 +45,6 @@ public class MicWithNameControl : INeedInjection, IInjectionFinishedListener
         micIcon.style.unityBackgroundImageTintColor = new StyleColor(MicProfile.Color);
         micIcon.style.unityBackgroundImageTintColor = new StyleColor(MicProfile.Color);
         micProgressBar.HideByDisplay();
+        micProgressBar.progressColor = MicProfile.Color;
     }
 }
