@@ -75,20 +75,13 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
 
         void FillRounds()
         {
-            GameRoundSettings CreateGameRoundSettings()
-            {
-                GameRoundSettings round = new();
-                round.modifiers = modifiers.ToHashSet();
-                round.finishConditionSettings = finishConditionSettings;
-                round.modifierConditionSettings = modifierConditionSettings;
-                return round;
-            }
+            GameRoundSettings roundSettings = new();
+            roundSettings.modifiers = modifiers.ToHashSet();
+            roundSettings.finishConditionSettings = finishConditionSettings;
+            roundSettings.modifierConditionSettings = modifierConditionSettings;
+            settings.GameRoundSettings = roundSettings;
 
-            partyModeSettings.roundsSettings.gameRoundSettings = new List<GameRoundSettings>
-            {
-                CreateGameRoundSettings(),
-                CreateGameRoundSettings(),
-            };
+            partyModeSettings.roundCount = 2;
         }
 
         FillTeams();

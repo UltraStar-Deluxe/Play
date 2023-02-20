@@ -5,8 +5,6 @@ public class PartyModeSceneData : SceneData
     public PartyModeSettings PartyModeSettings { get; set; }
 
     public int currentRoundIndex;
-    public GameRoundSettings CurrentRoundSettings => PartyModeSettings.roundsSettings.gameRoundSettings[currentRoundIndex];
-    
     public int remainingJokerCount;
     public Dictionary<PlayerProfile, PartyModeTeamSettings> freeForAllPlayerToTeam = new();
     public Dictionary<PartyModeTeamSettings, int> teamToScoreMap = new();

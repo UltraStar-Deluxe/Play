@@ -10,7 +10,6 @@ public static partial class R
         public const string addButton = "addButton";
         public const string addGuestButton = "addGuestButton";
         public const string addIcon = "addIcon";
-        public const string addRoundButton = "addRoundButton";
         public const string addSongFolderButton = "addSongFolderButton";
         public const string addTeamButton = "addTeamButton";
         public const string addToSongQueueAsMedleyButton = "addToSongQueueAsMedleyButton";
@@ -466,7 +465,6 @@ public static partial class R
         public const string partyModeRoundConfigUi = "partyModeRoundConfigUi";
         public const string PartyModeRoundConfigUi = "PartyModeRoundConfigUi";
         public const string PartyModeRoundModifierDialogUi = "PartyModeRoundModifierDialogUi";
-        public const string PartyModeRoundUi = "PartyModeRoundUi";
         public const string partyModeSongSelectionConfigUi = "partyModeSongSelectionConfigUi";
         public const string PartyModeSongSelectionRoundUi = "PartyModeSongSelectionRoundUi";
         public const string PartyModeTeamColumnUi = "PartyModeTeamColumnUi";
@@ -574,8 +572,7 @@ public static partial class R
         public const string rightSide = "rightSide";
         public const string rightSideBar = "rightSideBar";
         public const string root = "root";
-        public const string roundConfigUiRoot = "roundConfigUiRoot";
-        public const string roundsContainer = "roundsContainer";
+        public const string roundCountItemPicker = "roundCountItemPicker";
         public const string roundTitleLabel = "roundTitleLabel";
         public const string roundUiRoot = "roundUiRoot";
         public const string row = "row";
