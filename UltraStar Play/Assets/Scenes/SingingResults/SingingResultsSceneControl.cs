@@ -304,17 +304,25 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             HighscoreSceneData highscoreSceneData = new();
             highscoreSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
             highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
+            highscoreSceneData.partyModeSceneData = PartyModeSceneData;
             sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
-        }
-        else if (!HasPartyModeSceneData && !songQueueManager.IsSongQueueEmpty)
-        {
-            // Start next game round
-            songQueueManager.StartNextEntry();
         }
         else if (HasPartyModeSceneData && HasFinalTeamResults)
         {
             // Go to party mode config
             sceneNavigator.LoadScene(EScene.PartyModeScene);
+        }
+        else if (!songQueueManager.IsSongQueueEmpty)
+        {
+            // Start next game round
+            if (HasPartyModeSceneData)
+            {
+                // Increase party round index
+                PartyModeSceneData.currentRoundIndex++;
+            }
+
+            SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
+            sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
         }
         else
         {

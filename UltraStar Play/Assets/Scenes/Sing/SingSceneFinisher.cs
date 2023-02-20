@@ -30,6 +30,8 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
 
     private double positionInSongInMillisOld;
 
+    private bool hasFinishedScene;
+
     private void Update()
     {
         double durationOfSongInMillis = singSceneControl.DurationOfSongInMillis;
@@ -41,8 +43,10 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
         if (IsSongFinished)
         {
             durationAfterSongFinishedInSeconds += Time.deltaTime;
-            if (durationAfterSongFinishedInSeconds >= 1.5f)
+            if (durationAfterSongFinishedInSeconds >= 1.5f
+                && !hasFinishedScene)
             {
+                hasFinishedScene = true;
                 singSceneControl.FinishScene(!isEarlyFinish, true);
             }
         }

@@ -797,8 +797,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingScene()
     {
-        if (!songQueueManager.IsSongQueueEmpty
-            && !HasPartyModeSceneData)
+        if (!songQueueManager.IsSongQueueEmpty)
         {
             StartSingSceneWithNextSongQueueEntry();
         }
@@ -810,7 +809,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingSceneWithNextSongQueueEntry()
     {
-        songQueueManager.StartNextEntry();
+        SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
     private void StartSingSceneWithSelectedSongAndSettings()
