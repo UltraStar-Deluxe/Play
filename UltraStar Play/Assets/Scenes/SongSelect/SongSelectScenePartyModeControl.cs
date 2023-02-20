@@ -154,12 +154,12 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     {
         VisualElement jokerList = new();
         jokerList.AddToClassList("jokerList");
-        if (sceneData.partyModeSceneData.PartyModeSettings.songSelectionSettings.jokerCount < 0)
+        if (sceneData.partyModeSceneData.remainingJokerCount < 0)
         {
             return jokerList;
         }
 
-        for (int i = 0; i < sceneData.partyModeSceneData.PartyModeSettings.songSelectionSettings.jokerCount; i++)
+        for (int i = 0; i < sceneData.partyModeSceneData.remainingJokerCount; i++)
         {
             MaterialIcon jokerIcon = new();
             jokerIcon.Icon = "casino";
@@ -193,9 +193,9 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     public void ReduceJokerCount()
     {
-        if (songSelectSceneControl.PartyModeSettings.songSelectionSettings.jokerCount > 0)
+        if (songSelectSceneControl.PartyModeSceneData.remainingJokerCount > 0)
         {
-            songSelectSceneControl.PartyModeSettings.songSelectionSettings.jokerCount--;
+            songSelectSceneControl.PartyModeSceneData.remainingJokerCount--;
         }
     }
 
@@ -223,7 +223,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     private string GetJokerCountTranslation()
     {
-        int jokerCount = songSelectSceneControl.PartyModeSettings.songSelectionSettings.jokerCount;
+        int jokerCount = songSelectSceneControl.PartyModeSceneData.remainingJokerCount;
         if (jokerCount >= 0)
         {
             return jokerCount.ToString();
