@@ -178,6 +178,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private float startTimeInSeconds;
     private bool hasRecordedSongStartedStatistics;
 
+    private bool hasFinishedScene;
+
     public void OnInjectionFinished()
     {
         injector.Inject(commonScoreControl);
@@ -613,16 +615,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void FinishScene(bool isAfterEndOfSong, bool continueWithNextMedleySong)
     {
+        if (hasFinishedScene)
+        {
+            return;
+        }
+        hasFinishedScene = true;
+
         if (continueWithNextMedleySong
             && sceneData.MedleySongIndex >= 0
-            && sceneData.MedleySongIndex < sceneData.SongMetas.Count - 1
-            && !HasPartyModeSceneData)
+            && sceneData.MedleySongIndex < sceneData.SongMetas.Count - 1)
         {
             StartNextMedleySong();
             return;
         }
 
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.GameSettings.ScoreMode == EScoreMode.None
+            && !HasPartyModeSceneData)
         {
             FinishSceneToSongSelect();
         }

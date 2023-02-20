@@ -9,6 +9,8 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
 
     public int partyModeTeams = 5;
 
+    public bool isLastPartyModeRound;
+    
     public SceneData GetDefaultSceneData()
     {
         SingingResultsSceneData data = new();
@@ -61,7 +63,10 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         partyModeSceneData.PartyModeSettings = CreatePartyModeSettings();
 
         // Set round index to last round
-        partyModeSceneData.currentRoundIndex = partyModeSceneData.PartyModeSettings.roundsSettings.gameRoundSettings.Count - 1;
+        if (isLastPartyModeRound)
+        {
+            partyModeSceneData.currentRoundIndex = partyModeSceneData.PartyModeSettings.roundCount - 1;
+        }
 
         // Give team points
         for (int i = 1; i <= partyModeTeams; i++)
@@ -76,7 +81,8 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     private PartyModeSettings CreatePartyModeSettings()
     {
         PartyModeSettings partyModeSettings = new();
-
+        partyModeSettings.roundCount = 2;
+        
         void AddTeams()
         {
             for (int i = 1; i <= partyModeTeams; i++)
@@ -90,14 +96,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
             }
         }
 
-        void AddRounds()
-        {
-            GameRoundSettings roundSettings = new();
-            partyModeSettings.roundsSettings.gameRoundSettings.Add(roundSettings);
-        }
-
         AddTeams();
-        AddRounds();
         return partyModeSettings;
     }
 

@@ -10,7 +10,6 @@ public static partial class R
         public const string addButton = "addButton";
         public const string addGuestButton = "addGuestButton";
         public const string addIcon = "addIcon";
-        public const string addRoundButton = "addRoundButton";
         public const string addSongFolderButton = "addSongFolderButton";
         public const string addTeamButton = "addTeamButton";
         public const string addToSongQueueAsMedleyButton = "addToSongQueueAsMedleyButton";
@@ -128,9 +127,6 @@ public static partial class R
         public const string deleteGuestButton = "deleteGuestButton";
         public const string deleteIcon = "deleteIcon";
         public const string deletePlaylistButton = "deletePlaylistButton";
-        public const string deletePresetButton = "deletePresetButton";
-        public const string deletePresetIcon = "deletePresetIcon";
-        public const string deleteRoundButton = "deleteRoundButton";
         public const string deleteTeamButton = "deleteTeamButton";
         public const string designOptionsButton = "designOptionsButton";
         public const string detectBpmButton = "detectBpmButton";
@@ -191,8 +187,6 @@ public static partial class R
         public const string filterListContainer = "filterListContainer";
         public const string finishConditionContainer = "finishConditionContainer";
         public const string finishConditionDescription = "finishConditionDescription";
-        public const string finishConditionPicker = "finishConditionPicker";
-        public const string finishConditionPointsPicker = "finishConditionPointsPicker";
         public const string first = "first";
         public const string firstTeamUi = "firstTeamUi";
         public const string fpsContainer = "fpsContainer";
@@ -466,7 +460,6 @@ public static partial class R
         public const string partyModeRoundConfigUi = "partyModeRoundConfigUi";
         public const string PartyModeRoundConfigUi = "PartyModeRoundConfigUi";
         public const string PartyModeRoundModifierDialogUi = "PartyModeRoundModifierDialogUi";
-        public const string PartyModeRoundUi = "PartyModeRoundUi";
         public const string partyModeSongSelectionConfigUi = "partyModeSongSelectionConfigUi";
         public const string PartyModeSongSelectionRoundUi = "PartyModeSongSelectionRoundUi";
         public const string PartyModeTeamColumnUi = "PartyModeTeamColumnUi";
@@ -475,6 +468,7 @@ public static partial class R
         public const string partySettingsContainer = "partySettingsContainer";
         public const string partySettingsTitleLabel = "partySettingsTitleLabel";
         public const string passTheMicProgressBar = "passTheMicProgressBar";
+        public const string passTheMicTimeItemPicker = "passTheMicTimeItemPicker";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
         public const string pauseOverlay = "pauseOverlay";
@@ -527,7 +521,6 @@ public static partial class R
         public const string playRecordedAudioToggle = "playRecordedAudioToggle";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
-        public const string presetItemPicker = "presetItemPicker";
         public const string previewMidiTrackAndChannelButton = "previewMidiTrackAndChannelButton";
         public const string previewVolumeChooser = "previewVolumeChooser";
         public const string previewVolumeContainer = "previewVolumeContainer";
@@ -542,8 +535,6 @@ public static partial class R
         public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
         public const string quitSongSelectButton = "quitSongSelectButton";
-        public const string randomizeButton = "randomizeButton";
-        public const string randomizeIcon = "randomizeIcon";
         public const string ratingImage = "ratingImage";
         public const string ratingLabel = "ratingLabel";
         public const string recordedNote = "recordedNote";
@@ -561,6 +552,7 @@ public static partial class R
         public const string recordSamplesInsteadOfNotesToggle = "recordSamplesInsteadOfNotesToggle";
         public const string recreateSingAlongVersionButton = "recreateSingAlongVersionButton";
         public const string redoButton = "redoButton";
+        public const string reduceAudioVolumeItemPicker = "reduceAudioVolumeItemPicker";
         public const string reloadSongButton = "reloadSongButton";
         public const string rem = "rem";
         public const string removeWebCamImageButton = "removeWebCamImageButton";
@@ -574,15 +566,10 @@ public static partial class R
         public const string rightSide = "rightSide";
         public const string rightSideBar = "rightSideBar";
         public const string root = "root";
-        public const string roundConfigUiRoot = "roundConfigUiRoot";
-        public const string roundsContainer = "roundsContainer";
-        public const string roundTitleLabel = "roundTitleLabel";
-        public const string roundUiRoot = "roundUiRoot";
+        public const string roundCountItemPicker = "roundCountItemPicker";
         public const string row = "row";
         public const string sampleRateContainer = "sampleRateContainer";
         public const string saveButton = "saveButton";
-        public const string savePresetButton = "savePresetButton";
-        public const string savePresetIcon = "savePresetIcon";
         public const string sceneSubtitle = "sceneSubtitle";
         public const string sceneTitle = "sceneTitle";
         public const string scoreBar = "scoreBar";
@@ -798,8 +785,6 @@ public static partial class R
         public const string toggleLayersButton = "toggleLayersButton";
         public const string togglePlaybackButton = "togglePlaybackButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
-        public const string toggleRoundExpandedButton = "toggleRoundExpandedButton";
-        public const string toggleRoundFoldedIcon = "toggleRoundFoldedIcon";
         public const string toggleSettingsButton = "toggleSettingsButton";
         public const string toggleSideBarSizeButton = "toggleSideBarSizeButton";
         public const string toggleSingingOptionsButton = "toggleSingingOptionsButton";

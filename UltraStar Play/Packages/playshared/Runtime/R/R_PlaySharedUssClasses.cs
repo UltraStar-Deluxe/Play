@@ -6,6 +6,7 @@ public static partial class R_PlayShared
         public const string accordionRoot = "accordionRoot";
         public const string asset = "asset";
         public const string bootstrapIcon = "bootstrapIcon";
+        public const string bottomLineSeparator = "bottomLineSeparator";
         public const string centerHorizontalByMargin = "centerHorizontalByMargin";
         public const string centerVerticalByMargin = "centerVerticalByMargin";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
