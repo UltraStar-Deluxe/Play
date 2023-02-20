@@ -198,6 +198,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             // Positive VideoGap, thus skip the start of the video
             videoPlayer.time = SongMeta.VideoGap;
         }
+        
+        videoImageVisualElement?.ShowByDisplay();
     }
 
     private void SyncVideoPlayPause(double positionInSongInMillis)

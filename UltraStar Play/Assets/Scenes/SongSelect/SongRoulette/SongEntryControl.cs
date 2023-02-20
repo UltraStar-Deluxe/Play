@@ -118,7 +118,8 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             songTitle.text = songMeta.Title;
             UpdateFontSize();
             UpdateIcons();
-            UpdateCover(songMeta);
+            UpdateCover();
+            UpdateBackgroundImage();
         }
     }
 
@@ -238,13 +239,13 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         SetSize(Vector2.Lerp(animStartSize, targetSize, animPercent));
     }
 
-    private void UpdateCover(SongMeta coverSongMeta)
+    private void UpdateCover()
     {
-        string coverUri = SongMetaUtils.GetCoverUri(coverSongMeta);
+        string coverUri = SongMetaUtils.GetCoverUri(songMeta);
         if (coverUri.IsNullOrEmpty())
         {
             // Try the background image as fallback
-            coverUri = SongMetaUtils.GetBackgroundUri(coverSongMeta);
+            coverUri = SongMetaUtils.GetBackgroundUri(songMeta);
             if (coverUri.IsNullOrEmpty())
             {
                 return;
@@ -255,6 +256,26 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         {
             songImageOuter.style.backgroundImage = new StyleBackground(loadedSprite);
             songImageInner.style.backgroundImage = new StyleBackground(loadedSprite);
+        });
+    }
+    
+    private void UpdateBackgroundImage()
+    {
+        string backgroundUri = SongMetaUtils.GetBackgroundUri(songMeta);
+        if (backgroundUri.IsNullOrEmpty())
+        {
+            // Try the cover image as fallback
+            backgroundUri = SongMetaUtils.GetCoverUri(songMeta);
+            if (backgroundUri.IsNullOrEmpty())
+            {
+                return;
+            }
+        }
+
+        ImageManager.LoadSpriteFromUri(backgroundUri, loadedSprite =>
+        {
+            SongPreviewBackgroundImage.style.backgroundImage = new StyleBackground(loadedSprite);
+            SongPreviewBackgroundImage.style.backgroundImage = new StyleBackground(loadedSprite);
         });
     }
 

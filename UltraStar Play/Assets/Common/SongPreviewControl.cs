@@ -56,11 +56,11 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         // Update fade-in of music volume and video transparency
         if (isFadeInStarted)
         {
-            float audioFadeInPercent = UpdateAudioFadeIn();
-            float videoFadeInPercent = UpdateVideoFadeIn();
+            float audioFadeInFactor = UpdateAudioFadeIn();
+            float videoFadeInFactor = UpdateVideoFadeIn();
 
-            if ((audioFadeInPercent < 0 || audioFadeInPercent >= 1)
-                && (videoFadeInPercent < 0 || videoFadeInPercent >= 1))
+            if ((audioFadeInFactor < 0 || audioFadeInFactor >= 1)
+                && (videoFadeInFactor < 0 || videoFadeInFactor >= 1))
             {
                 // Fade-in is complete
                 isFadeInStarted = false;
@@ -98,12 +98,12 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual float UpdateAudioFadeIn()
     {
-        float audioFadeInPercent = (Time.time - fadeInStartTimeInSeconds) / AudioFadeInDurationInSeconds;
-        audioFadeInPercent = NumberUtils.Limit(audioFadeInPercent, 0, 1);
+        float audioFadeInFactor = (Time.time - fadeInStartTimeInSeconds) / AudioFadeInDurationInSeconds;
+        audioFadeInFactor = NumberUtils.Limit(audioFadeInFactor, 0, 1);
         float maxVolume = GetFinalPreviewVolume();
-        songAudioPlayer.audioPlayer.volume = audioFadeInPercent * maxVolume;
+        songAudioPlayer.VolumeFactor = audioFadeInFactor * maxVolume;
 
-        return audioFadeInPercent;
+        return audioFadeInFactor;
     }
 
     public virtual void StartSongPreview(SongMeta songMeta)
@@ -183,6 +183,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     protected virtual void StartVideoPreview(SongMeta songMeta)
     {
         if (songMeta.Video.IsNullOrEmpty()
+            || !SongMetaUtils.VideoResourceExists(songMeta)
             || songVideoPlayer == null)
         {
             return;
@@ -210,8 +211,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
         
         songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
-        songAudioPlayer.audioPlayer.volume = 0;
-        if (songAudioPlayer.HasAudioClip)
+        songAudioPlayer.VolumeFactor = 0;
+        if (songAudioPlayer.IsPartiallyLoaded)
         {
             songAudioPlayer.PlayAudio();
         }
