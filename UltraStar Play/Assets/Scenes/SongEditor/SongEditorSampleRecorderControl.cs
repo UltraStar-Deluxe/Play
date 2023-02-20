@@ -143,7 +143,7 @@ public class SongEditorSampleRecorderControl : INeedInjection, IInjectionFinishe
 
     private void UpdateRecordingStartIndex()
     {
-        recordingStartIndex = (int)Math.Floor(songAudioPlayer.audioPlayer.time * SampleRate);
+        recordingStartIndex = (int)Math.Floor(songAudioPlayer.PositionInSongInSeconds * SampleRate);
     }
 
     private void UpdateSpeechRecognitionStartBeat()

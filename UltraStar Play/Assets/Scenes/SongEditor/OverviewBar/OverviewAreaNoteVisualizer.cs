@@ -80,7 +80,7 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
             return;
         }
 
-        int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
+        int songDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
 
         // constant offset to
         // (a) ensure that midiNoteRange > 0,

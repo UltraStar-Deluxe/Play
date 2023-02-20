@@ -67,12 +67,12 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.OriginalMusic)
         {
             AudioSource.volume = 0;
-            songAudioPlayer.audioPlayer.volume = settings.AudioSettings.VolumePercent / 100f;
+            songAudioPlayer.VolumeFactor = settings.AudioSettings.VolumePercent / 100f;
         }
         else
         {
             AudioSource.volume = settings.AudioSettings.VolumePercent / 100f;
-            songAudioPlayer.audioPlayer.volume = 0;
+            songAudioPlayer.VolumeFactor = 0;
         }
     }
 
@@ -95,7 +95,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         {
             AudioSource.Stop();
             AudioSource.clip = targetAudioClip;
-            AudioSource.time = songAudioPlayer.audioPlayer.time;
+            AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds;
 
             if (songAudioPlayer.IsPlaying)
             {

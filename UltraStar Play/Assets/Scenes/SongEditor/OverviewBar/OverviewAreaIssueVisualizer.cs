@@ -60,8 +60,8 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
         {
             return;
         }
-        
-        int songDurationInMillis = (int)Math.Ceiling(songAudioPlayer.AudioClip.length * 1000);
+
+        int songDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
 
         int startMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
         int endMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.EndBeat);

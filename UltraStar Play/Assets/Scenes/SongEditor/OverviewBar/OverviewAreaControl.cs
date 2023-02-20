@@ -68,8 +68,7 @@ public class OverviewAreaControl : IInjectionFinishedListener
 
     public void UpdateAudioWaveForm()
     {
-        if (!songAudioPlayer.HasAudioClip
-            || songAudioPlayer.AudioClip.samples <= 0)
+        if (!songAudioPlayer.IsFullyLoaded)
         {
             return;
         }
