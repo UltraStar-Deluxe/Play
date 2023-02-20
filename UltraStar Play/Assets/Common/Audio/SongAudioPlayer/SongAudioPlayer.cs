@@ -1,16 +1,24 @@
 ﻿using System;
-using UniInject;
+using System.IO;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Experimental.Video;
+using UnityEngine.Video;
 
-public class SongAudioPlayer : MonoBehaviour, INeedInjection
+public class SongAudioPlayer : MonoBehaviour
 {
     // The playback position increase in milliseconds from one frame to the next to be counted as "jump".
     // An event is fired when jumping forward in the song.
     private const int MinForwardJumpOffsetInMillis = 500;
 
-    [InjectedInInspector]
-    public AudioSource audioPlayer;
+    private readonly Lazy<AudioManager> audioManagerLazy = new(() => GameObjectUtils.FindComponentWithTag<AudioManager>("AudioManager"));
+    private AudioManager AudioManager => audioManagerLazy.Value;
+
+    private readonly LazyFromComponent<AudioSource> audioPlayerLazy = new(ctx => ctx.GetComponentInChildren<AudioSource>());
+    private AudioSource AudioPlayer => audioPlayerLazy.GetValue(this);
+    
+    private readonly LazyFromComponent<VideoPlayer> videoPlayerLazy = new(ctx => ctx.GetComponentInChildren<VideoPlayer>());
+    private VideoPlayer VideoPlayer => videoPlayerLazy.GetValue(this);
 
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
@@ -24,8 +32,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private readonly Subject<double> positionInSongEventStream = new();
     public IObservable<double> PositionInSongEventStream => positionInSongEventStream;
 
-    private readonly Subject<AudioClip> audioClipLoadedEventStream = new();
-    public IObservable<AudioClip> AudioClipLoadedEventStream => audioClipLoadedEventStream;
+    private readonly Subject<bool> loadedEventStream = new();
+    public IObservable<bool> LoadedEventStream => loadedEventStream;
 
     public IObservable<Pair<double>> JumpBackInSongEventStream
     {
@@ -55,10 +63,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         get
         {
-            if (audioPlayer == null || audioPlayer.clip == null)
+            if (AudioPlayer == null
+                || VideoPlayer == null
+                || !IsFullyLoaded)
             {
                 return 0;
             }
+
             // The samples of an AudioClip change concurrently,
             // even when they are queried in the same frame (e.g. Update() of different scripts).
             // For a given frame, the position in the song should be the same for all scripts,
@@ -89,8 +100,17 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             }
 
             positionInSongInMillis = newPositionInSongInMillis;
-            int newTimeSamples = (int)(audioPlayer.clip.frequency * positionInSongInMillis / 1000.0);
-            audioPlayer.timeSamples = newTimeSamples;
+
+            float newTimeInSeconds = (float)(value / 1000.0);
+            
+            if (HasAudio)
+            {
+                AudioPlayer.time = newTimeInSeconds;
+            }
+            else if (HasVideo)
+            {
+                 VideoPlayer.time = newTimeInSeconds;
+            }
 
             positionInSongEventStream.OnNext(positionInSongInMillis);
         }
@@ -103,9 +123,25 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
      * Note that this changes concurrently,
      * such that it can return different values when called multiple times in the same frame.
      */
-    public double PositionInSongInMillisExact => 1000.0f * (double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency;
+    public double PositionInSongInMillisExact
+    {
+        get
+        {
+            if (HasAudio)
+            {
+                return ((double)AudioPlayer.timeSamples / (double)AudioPlayer.clip.frequency) * 1000.0;
+            }
+            else if (HasVideo)
+            {
+                return VideoPlayer.time * 1000.0;
+            }
+
+            return 0;
+        }
+    }
 
     public double DurationOfSongInMillis { get; private set; }
+    public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
 
     /**
      * Position in the song from 0 (start of song) to 1 (end of song).
@@ -127,33 +163,34 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         get
         {
-            return audioPlayer.isPlaying;
+            return !isPaused
+                   && (AudioPlayer.isPlaying || VideoPlayer.isPlaying);
         }
     }
 
-    public AudioClip AudioClip
-    {
-        get
-        {
-            return audioPlayer.clip;
-        }
-    }
-
-    public bool HasAudioClip
-    {
-        get
-        {
-            return audioPlayer.clip != null;
-        }
-    }
-
+    public bool IsPartiallyLoaded => HasAudio || HasVideo;
+    public bool IsFullyLoaded => (HasAudio && AudioPlayer.clip.length > 0) 
+                                 || (HasVideo && VideoPlayer.length > 0);
+    
     private SongMeta SongMeta { get; set; }
+
+    public float VolumeFactor
+    {
+        get => AudioPlayer.volume;
+        set => AudioPlayer.volume = value;
+    }
+
+    public float Pitch
+    {
+        get => AudioPlayer.pitch;
+        set => AudioPlayer.pitch = value;
+    }
 
     public float PlaybackSpeed
     {
         get
         {
-            return audioPlayer.pitch;
+            return AudioPlayer.pitch;
         }
         set
         {
@@ -169,19 +206,21 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             }
 
             // Setting the pitch of an AudioPlayer will change tempo and pitch.
-            audioPlayer.pitch = newPlaybackSpeed;
+            AudioPlayer.pitch = newPlaybackSpeed;
 
             // A Pitch Shifter effect on an AudioMixerGroup can be used to compensate the pitch change of the AudioPlayer,
             // such that only the change of the tempo remains.
             // See here for details: https://answers.unity.com/questions/25139/how-i-can-change-the-speed-of-a-song-or-sound.html
             // See here for how the pitch value of the Pitch Shifter effect is made available for scripting: https://learn.unity.com/tutorial/audio-mixing#5c7f8528edbc2a002053b506
-            audioPlayer.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - newPlaybackSpeed));
+            AudioPlayer.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - newPlaybackSpeed));
         }
     }
 
-    [Inject]
-    private AudioManager audioManager;
+    private bool HasAudio => AudioPlayer.clip != null;
+    private bool HasVideo => !VideoPlayer.url.IsNullOrEmpty();
 
+    private bool isPaused;
+    
     private void Update()
     {
         if (IsPlaying)
@@ -204,19 +243,77 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return;
         }
 
-        this.SongMeta = songMeta;
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri);
-        if (audioClip != null)
+        SongMeta = songMeta;
+        
+        ResetAudioAndVideo();
+        
+        string fileExtension = Path.GetExtension(audioUri);
+        if (ApplicationUtils.IsSupportedVideoFormat(fileExtension))
         {
-            audioPlayer.clip = audioClip;
-            DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
-            audioClipLoadedEventStream.OnNext(audioClip);
+            // Load video file
+            LoadAsVideo(audioUri);
         }
         else
         {
-            audioPlayer.clip = null;
-            DurationOfSongInMillis = 0;
+            // Load audio file
+            LoadAsAudio(audioUri);
         }
+    }
+
+    private void ResetAudioAndVideo()
+    {
+        VideoPlayer.Stop();
+        VideoPlayer.url = "";
+
+        AudioPlayer.Stop();
+        AudioPlayer.clip = null;
+        
+        DurationOfSongInMillis = 0;
+    }
+    
+    private void LoadAsAudio(string audioUri)
+    {
+        AudioClip audioClip = AudioManager.LoadAudioClipFromUri(audioUri);
+        if (audioClip == null)
+        {
+            Debug.LogError($"Failed to load audio clip from {audioUri}");
+            AudioPlayer.Stop();
+            return;
+        }
+
+        AudioPlayer.clip = audioClip;
+        DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
+        loadedEventStream.OnNext(true);
+    }
+
+    private void LoadAsVideo(string audioUri)
+    {
+        VideoPlayer.url = audioUri;
+        if (VideoPlayer.url.IsNullOrEmpty())
+        {
+            Debug.LogError($"Failed to load video from {audioUri}");
+            VideoPlayer.Stop();
+            return;
+        }
+        
+        // Play the audio of the video player through the AudioSource.
+        VideoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+        for (int trackIndex = 0; trackIndex < VideoPlayer.audioTrackCount; trackIndex++)
+        {
+            VideoPlayer.SetTargetAudioSource(0, AudioPlayer);
+        }
+
+        // Must play the video to trigger loading.
+        VideoPlayer.Play();
+
+        // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
+        StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
+            () => VideoPlayer.length > 0, () =>
+            {
+                DurationOfSongInMillis = 1000.0 * VideoPlayer.length;
+                PauseAudio();
+                loadedEventStream.OnNext(true);
+            }));
     }
 
     public void ReloadAudio()
@@ -226,25 +323,40 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public void PauseAudio()
     {
-        if (audioPlayer.isPlaying)
+        if (!IsPlaying)
         {
-            audioPlayer.Pause();
-            playbackStoppedEventStream.OnNext(PositionInSongInMillis);
+            return;
         }
+
+        AudioPlayer.Pause();
+        VideoPlayer.Pause();
+        isPaused = true;
+        playbackStoppedEventStream.OnNext(PositionInSongInMillis);
     }
 
     public void PlayAudio()
     {
-        if (HasAudioClip && !audioPlayer.isPlaying)
+        if (IsPlaying
+            || !IsPartiallyLoaded)
         {
-            audioPlayer.Play();
-            playbackStartedEventStream.OnNext(PositionInSongInMillis);
+            return;
         }
+
+        if (HasAudio)
+        {
+            AudioPlayer.Play();
+        }
+        else if (HasVideo)
+        {
+            VideoPlayer.Play();
+        }
+        isPaused = false;
+        playbackStartedEventStream.OnNext(PositionInSongInMillis);
     }
 
     public double GetCurrentBeat(bool allowNegativeResult)
     {
-        if (audioPlayer.clip == null)
+        if (!IsFullyLoaded)
         {
             return 0;
         }

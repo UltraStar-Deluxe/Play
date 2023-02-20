@@ -156,7 +156,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private SingingLyricsControl topSingingLyricsControl;
     private SingingLyricsControl bottomSingingLyricsControl;
 
-    private TimeBarControl timeBarControl;
+    private readonly TimeBarControl timeBarControl = new();
 
     private MessageDialogControl dialogControl;
     public bool IsDialogOpen => dialogControl != null;
@@ -182,6 +182,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void OnInjectionFinished()
     {
+        injector.Inject(timeBarControl);
         injector.Inject(commonScoreControl);
         injector.Inject(countdownControl);
         injector.Inject(medleyControl);
@@ -455,13 +456,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         lastLeadingPlayerControl = leadingPlayerControl;
-    }
-
-    private void InitTimeBar()
-    {
-        timeBarControl = new TimeBarControl();
-        injector.Inject(timeBarControl);
-        timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
     }
 
     private void StartVideoOrShowBackgroundImage()
@@ -888,7 +882,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         songAudioPlayer.Init(SongMeta);
 
-        if (!songAudioPlayer.HasAudioClip)
+        if (!songAudioPlayer.IsPartiallyLoaded)
         {
             // Loading the audio failed.
             PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
@@ -897,7 +891,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         // The time bar needs the duration of the song to calculate positions.
         // The duration of the song should be available now.
-        InitTimeBar();
+        timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
+        songAudioPlayer.LoadedEventStream.Subscribe(_ => timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis));
 
         songAudioPlayer.PlayAudio();
         if (sceneData.PositionInSongInMillis > 0)

@@ -78,7 +78,8 @@ public static class SongMetaUtils
      */
     private static bool ResourceExists(SongMeta songMeta, string pathOrUri)
     {
-        if (pathOrUri.IsNullOrEmpty())
+        if (songMeta == null
+            || pathOrUri.IsNullOrEmpty())
         {
             return false;
         }
@@ -431,7 +432,9 @@ public static class SongMetaUtils
 
         // Check audio format.
         // Audio is mandatory. Without working audio file, the song cannot be played.
-        if (!ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3)))
+        if (!ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3))
+            // Also accept a video file as audio file.
+            && !ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(songMeta.Mp3)))
         {
             songIssues.Add(SongIssue.CreateError(songMeta, $"Unsupported audio format {Path.GetExtension(songMeta.Mp3)}"));
         }

@@ -57,6 +57,12 @@ public class TimeBarControl : INeedInjection
     public void UpdateTimeBarRectangles(SongMeta songMeta, List<PlayerControl> playerControls, double durationOfSongInMillis)
     {
         innerTimeBarSentenceEntryContainer.Clear();
+        
+        if (durationOfSongInMillis <= 0)
+        {
+            return;
+        }
+        
         int playerControlIndex = 0;
         foreach (PlayerControl playerControl in playerControls)
         {

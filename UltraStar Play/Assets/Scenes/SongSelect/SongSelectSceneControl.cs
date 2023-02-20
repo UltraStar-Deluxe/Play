@@ -408,7 +408,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         focusableNavigator.FocusSongRoulette();
 
-        songAudioPlayer.AudioClipLoadedEventStream
+        songAudioPlayer.LoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
 
         downloadSongsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
@@ -893,7 +893,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Check that the used audio format can be loaded.
         songAudioPlayer.Init(SelectedSong);
-        if (!songAudioPlayer.HasAudioClip)
+        if (!songAudioPlayer.IsPartiallyLoaded)
         {
             string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
             Debug.Log(message);
