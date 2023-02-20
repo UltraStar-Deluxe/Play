@@ -130,6 +130,15 @@
     font-size: var(--font-size);
 }
 
+ItemPicker.controlLabel40Percent
+{
+    width: auto;
+}
+
+ItemPicker.controlLabel40Percent .itemPickerLabel {
+    width: 40%;
+}
+
 .titleImage {
     -unity-background-scale-mode: scale-to-fit;
     width: var(--font-size-xl);
