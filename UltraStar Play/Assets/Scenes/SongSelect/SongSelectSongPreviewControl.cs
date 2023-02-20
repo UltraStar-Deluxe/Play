@@ -32,8 +32,13 @@ public class SongSelectSongPreviewControl : SongPreviewControl
             {
                 return;
             }
-            currentSongEntryControl.SongPreviewVideoImage.ShowByDisplay();
-            currentSongEntryControl.SongPreviewVideoImage.SetBackgroundImageAlpha(0);
+
+            if (SongMetaUtils.VideoResourceExists(currentSongEntryControl.SongMeta))
+            {
+                currentSongEntryControl.SongPreviewVideoImage.ShowByDisplay();
+                currentSongEntryControl.SongPreviewVideoImage.SetBackgroundImageAlpha(0);
+            }
+
             currentSongEntryControl.SongPreviewBackgroundImage.ShowByDisplay();
             currentSongEntryControl.SongPreviewBackgroundImage.SetBackgroundImageAlpha(0);
         });
