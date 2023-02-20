@@ -209,8 +209,16 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             UiManager.CreateNotification(errorMessage);
             return;
         }
-        
-        songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
+
+        IDisposable audioLoadedDisposable = null;
+        audioLoadedDisposable = songAudioPlayer.LoadedEventStream
+            .Subscribe(_ =>
+            {
+                Debug.Log($"Skipping to song preview at {previewStartInMillis} ms");
+                songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
+                audioLoadedDisposable?.Dispose();
+            });
+
         songAudioPlayer.VolumeFactor = 0;
         if (songAudioPlayer.IsPartiallyLoaded)
         {
