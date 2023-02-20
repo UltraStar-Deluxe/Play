@@ -387,7 +387,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundsSettings.gameRoundSettings.Count}";
+            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
         }
         
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());

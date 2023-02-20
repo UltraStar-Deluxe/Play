@@ -38,6 +38,9 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     [Inject]
     private SongSelectSceneData sceneData;
+    
+    [Inject]
+    private Settings settings;
 
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
@@ -70,11 +73,6 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     public void OnInjectionFinished()
     {
         UpdatePartyModeSettingsDescription();
-        if (songSelectSceneControl.HasPartyModeSceneData)
-        {
-            // Medleys and song queue not supported in party mode
-            songQueueOverlay.HideByDisplay();
-        }
     }
 
     private void UpdatePartyModeSettingsDescription()
@@ -85,7 +83,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
             return;
         }
 
-        GameRoundSettings currentRoundSettings = songSelectSceneControl.PartyModeSceneData.CurrentRoundSettings;
+        GameRoundSettings currentRoundSettings = settings.GameRoundSettings;
         GameRoundFinishConditionSettings finishConditionSettings = currentRoundSettings.finishConditionSettings;
 
         string GetFinishConditionDescription()
