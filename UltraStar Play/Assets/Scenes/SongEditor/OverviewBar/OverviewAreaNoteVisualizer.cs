@@ -34,6 +34,11 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
     {
         songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
 
+        songAudioPlayer.LoadedEventStream.Subscribe(_ =>
+        {
+            UpdateNoteOverviewImage();
+        });
+        
         overviewAreaNotes.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             dynamicTexture = new DynamicTexture(songEditorSceneControl.gameObject, overviewAreaNotes);

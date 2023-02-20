@@ -1,4 +1,6 @@
-﻿using UniInject;
+﻿using System.IO;
+using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -60,6 +62,11 @@ public class OverviewAreaControl : IInjectionFinishedListener
             .CreateAndInject<OverviewAreaIssueVisualizer>();
 
         // Create the audio waveform image.
+        songAudioPlayer.LoadedEventStream.Subscribe(_ =>
+        {
+            UpdateAudioWaveForm();
+        });
+        
         overviewArea.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             UpdateAudioWaveForm();
@@ -68,7 +75,9 @@ public class OverviewAreaControl : IInjectionFinishedListener
 
     public void UpdateAudioWaveForm()
     {
-        if (!songAudioPlayer.IsFullyLoaded)
+        if (!songAudioPlayer.IsFullyLoaded
+            // Must be an audio format. Getting all the samples does not work with video files.
+            || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3)))
         {
             return;
         }

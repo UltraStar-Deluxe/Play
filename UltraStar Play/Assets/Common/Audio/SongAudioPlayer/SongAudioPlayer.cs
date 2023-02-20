@@ -1,25 +1,25 @@
 ﻿using System;
 using System.IO;
-using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Experimental.Video;
 using UnityEngine.Video;
 
-public class SongAudioPlayer : MonoBehaviour, INeedInjection
+public class SongAudioPlayer : MonoBehaviour
 {
     // The playback position increase in milliseconds from one frame to the next to be counted as "jump".
     // An event is fired when jumping forward in the song.
     private const int MinForwardJumpOffsetInMillis = 500;
-    
-    [Inject]
-    private AudioManager audioManager;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    private AudioSource audioPlayer;
+    private readonly Lazy<AudioManager> audioManagerLazy = new(() => GameObjectUtils.FindComponentWithTag<AudioManager>("AudioManager"));
+    private AudioManager AudioManager => audioManagerLazy.Value;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    private VideoPlayer videoPlayer;
+    private readonly LazyFromComponent<AudioSource> audioPlayerLazy = new(ctx => ctx.GetComponentInChildren<AudioSource>());
+    private AudioSource AudioPlayer => audioPlayerLazy.GetValue(this);
     
+    private readonly LazyFromComponent<VideoPlayer> videoPlayerLazy = new(ctx => ctx.GetComponentInChildren<VideoPlayer>());
+    private VideoPlayer VideoPlayer => videoPlayerLazy.GetValue(this);
+
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
 
@@ -63,8 +63,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         get
         {
-            if (audioPlayer == null
-                || videoPlayer == null
+            if (AudioPlayer == null
+                || VideoPlayer == null
                 || !IsFullyLoaded)
             {
                 return 0;
@@ -105,11 +105,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             
             if (HasAudio)
             {
-                audioPlayer.time = newTimeInSeconds;
+                AudioPlayer.time = newTimeInSeconds;
             }
             else if (HasVideo)
             {
-                videoPlayer.time = newTimeInSeconds;
+                 VideoPlayer.time = newTimeInSeconds;
             }
 
             positionInSongEventStream.OnNext(positionInSongInMillis);
@@ -129,11 +129,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         {
             if (HasAudio)
             {
-                return ((double)audioPlayer.timeSamples / (double)audioPlayer.clip.frequency) * 1000.0;
+                return ((double)AudioPlayer.timeSamples / (double)AudioPlayer.clip.frequency) * 1000.0;
             }
             else if (HasVideo)
             {
-                return videoPlayer.time * 1000.0;
+                return VideoPlayer.time * 1000.0;
             }
 
             return 0;
@@ -164,33 +164,33 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         get
         {
             return !isPaused
-                   && (audioPlayer.isPlaying || videoPlayer.isPlaying);
+                   && (AudioPlayer.isPlaying || VideoPlayer.isPlaying);
         }
     }
 
     public bool IsPartiallyLoaded => HasAudio || HasVideo;
-    public bool IsFullyLoaded => (HasAudio && audioPlayer.clip.length > 0) 
-                                 || (HasVideo && videoPlayer.length > 0);
+    public bool IsFullyLoaded => (HasAudio && AudioPlayer.clip.length > 0) 
+                                 || (HasVideo && VideoPlayer.length > 0);
     
     private SongMeta SongMeta { get; set; }
 
     public float VolumeFactor
     {
-        get => audioPlayer.volume;
-        set => audioPlayer.volume = value;
+        get => AudioPlayer.volume;
+        set => AudioPlayer.volume = value;
     }
 
     public float Pitch
     {
-        get => audioPlayer.pitch;
-        set => audioPlayer.pitch = value;
+        get => AudioPlayer.pitch;
+        set => AudioPlayer.pitch = value;
     }
 
     public float PlaybackSpeed
     {
         get
         {
-            return audioPlayer.pitch;
+            return AudioPlayer.pitch;
         }
         set
         {
@@ -206,18 +206,18 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             }
 
             // Setting the pitch of an AudioPlayer will change tempo and pitch.
-            audioPlayer.pitch = newPlaybackSpeed;
+            AudioPlayer.pitch = newPlaybackSpeed;
 
             // A Pitch Shifter effect on an AudioMixerGroup can be used to compensate the pitch change of the AudioPlayer,
             // such that only the change of the tempo remains.
             // See here for details: https://answers.unity.com/questions/25139/how-i-can-change-the-speed-of-a-song-or-sound.html
             // See here for how the pitch value of the Pitch Shifter effect is made available for scripting: https://learn.unity.com/tutorial/audio-mixing#5c7f8528edbc2a002053b506
-            audioPlayer.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - newPlaybackSpeed));
+            AudioPlayer.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - newPlaybackSpeed));
         }
     }
 
-    private bool HasAudio => audioPlayer.clip != null;
-    private bool HasVideo => !videoPlayer.url.IsNullOrEmpty();
+    private bool HasAudio => AudioPlayer.clip != null;
+    private bool HasVideo => !VideoPlayer.url.IsNullOrEmpty();
 
     private bool isPaused;
     
@@ -262,52 +262,56 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     private void ResetAudioAndVideo()
     {
-        videoPlayer.Stop();
-        videoPlayer.url = "";
+        VideoPlayer.Stop();
+        VideoPlayer.url = "";
 
-        audioPlayer.Stop();
-        audioPlayer.clip = null;
+        AudioPlayer.Stop();
+        AudioPlayer.clip = null;
         
         DurationOfSongInMillis = 0;
     }
     
     private void LoadAsAudio(string audioUri)
     {
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri);
+        AudioClip audioClip = AudioManager.LoadAudioClipFromUri(audioUri);
         if (audioClip == null)
         {
             Debug.LogError($"Failed to load audio clip from {audioUri}");
-            audioPlayer.Stop();
+            AudioPlayer.Stop();
             return;
         }
 
-        audioPlayer.clip = audioClip;
+        AudioPlayer.clip = audioClip;
         DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
         loadedEventStream.OnNext(true);
     }
 
     private void LoadAsVideo(string audioUri)
     {
-        videoPlayer.url = audioUri;
-        if (videoPlayer.url.IsNullOrEmpty())
+        VideoPlayer.url = audioUri;
+        if (VideoPlayer.url.IsNullOrEmpty())
         {
             Debug.LogError($"Failed to load video from {audioUri}");
-            videoPlayer.Stop();
+            VideoPlayer.Stop();
             return;
         }
         
         // Play the audio of the video player through the AudioSource.
-        videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
-        for (int trackIndex = 0; trackIndex < videoPlayer.audioTrackCount; trackIndex++)
+        VideoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+        for (int trackIndex = 0; trackIndex < VideoPlayer.audioTrackCount; trackIndex++)
         {
-            videoPlayer.SetTargetAudioSource(0, audioPlayer);
+            VideoPlayer.SetTargetAudioSource(0, AudioPlayer);
         }
+
+        // Must play the video to trigger loading.
+        VideoPlayer.Play();
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
         StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-            () => videoPlayer.length > 0, () =>
+            () => VideoPlayer.length > 0, () =>
             {
-                DurationOfSongInMillis = 1000.0 * videoPlayer.length;
+                DurationOfSongInMillis = 1000.0 * VideoPlayer.length;
+                PauseAudio();
                 loadedEventStream.OnNext(true);
             }));
     }
@@ -324,8 +328,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return;
         }
 
-        audioPlayer.Pause();
-        videoPlayer.Pause();
+        AudioPlayer.Pause();
+        VideoPlayer.Pause();
         isPaused = true;
         playbackStoppedEventStream.OnNext(PositionInSongInMillis);
     }
@@ -340,11 +344,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         if (HasAudio)
         {
-            audioPlayer.Play();
+            AudioPlayer.Play();
         }
         else if (HasVideo)
         {
-            videoPlayer.Play();
+            VideoPlayer.Play();
         }
         isPaused = false;
         playbackStartedEventStream.OnNext(PositionInSongInMillis);
