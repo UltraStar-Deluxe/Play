@@ -69,7 +69,6 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     private readonly ReactiveProperty<EPartyModeConfigPart> configPart = new(EPartyModeConfigPart.Teams);
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
     private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
-    // private readonly PartyModeRoundsConfigControl roundsConfigControl = new();
     private readonly GameRoundModifierDialogControl modifierDialogControl = new();
 
     public void OnInjectionFinished()
