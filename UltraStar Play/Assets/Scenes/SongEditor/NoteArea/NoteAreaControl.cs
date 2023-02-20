@@ -112,6 +112,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         {
             songAudioPlayer.PositionInSongInMillis = songMeta.Gap - DefaultViewportWidthInMillis * 0.25f;
         }
+
+        songAudioPlayer.LoadedEventStream.Subscribe(_ => InitializeViewport());
         VisualElement.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             InitializeViewport();
