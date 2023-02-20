@@ -468,6 +468,7 @@ public static partial class R
         public const string partySettingsContainer = "partySettingsContainer";
         public const string partySettingsTitleLabel = "partySettingsTitleLabel";
         public const string passTheMicProgressBar = "passTheMicProgressBar";
+        public const string passTheMicTimeItemPicker = "passTheMicTimeItemPicker";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
         public const string pauseOverlay = "pauseOverlay";
@@ -551,6 +552,7 @@ public static partial class R
         public const string recordSamplesInsteadOfNotesToggle = "recordSamplesInsteadOfNotesToggle";
         public const string recreateSingAlongVersionButton = "recreateSingAlongVersionButton";
         public const string redoButton = "redoButton";
+        public const string reduceAudioVolumeItemPicker = "reduceAudioVolumeItemPicker";
         public const string reloadSongButton = "reloadSongButton";
         public const string rem = "rem";
         public const string removeWebCamImageButton = "removeWebCamImageButton";

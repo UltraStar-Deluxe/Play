@@ -37,6 +37,9 @@ public class Settings : ISettings
     public Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> activeSearchPropertyFilters = new();
     [FormerlySerializedAs("showOnlyDuetsFilter")] public bool isShowOnlyDuetsFilterActive;
 
+    public int reducedAudioVolumePercent = 1;
+    public float passTheMicTimeInSeconds = 20;
+
     // TODO: flatten settings?
     public SystemLanguage Language
     {

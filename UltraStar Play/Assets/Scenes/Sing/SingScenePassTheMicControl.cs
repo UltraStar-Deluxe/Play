@@ -11,10 +11,12 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
     [Inject]
     private SingSceneControl singSceneControl;
 
+    [Inject]
+    private Settings settings;
+    
     [Inject(UxmlName = R.UxmlNames.passTheMicProgressBar)]
     private ProgressBar passTheMicProgressBar;
 
-    private readonly float passTheMicTargetTimeInSeconds = 20;
     private float passTheMicTimeInSeconds;
 
     private readonly Dictionary<PartyModeTeamSettings, PlayerProfile> teamToCurrentPlayerProfile = new();
@@ -50,9 +52,9 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
         }
 
         passTheMicTimeInSeconds += deltaTimeInSeconds;
-        if (passTheMicTimeInSeconds >= passTheMicTargetTimeInSeconds)
+        if (passTheMicTimeInSeconds >= settings.passTheMicTimeInSeconds)
         {
-            passTheMicTimeInSeconds -= passTheMicTargetTimeInSeconds;
+            passTheMicTimeInSeconds -= settings.passTheMicTimeInSeconds;
             singSceneControl.PartyModeSettings.teamSettings.teams.ForEach(team => PassTheMicToNextPlayerInTeam(team));
         }
 
@@ -61,7 +63,7 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
 
     private void UpdateProgressBar()
     {
-        passTheMicProgressBar.value = 100 * passTheMicTimeInSeconds / passTheMicTargetTimeInSeconds;
+        passTheMicProgressBar.value = 100 * passTheMicTimeInSeconds / settings.passTheMicTimeInSeconds;
     }
 
     private void PassTheMicToNextPlayerInTeam(PartyModeTeamSettings team)
