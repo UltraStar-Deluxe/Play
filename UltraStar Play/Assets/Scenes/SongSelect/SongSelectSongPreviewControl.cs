@@ -13,6 +13,9 @@ public class SongSelectSongPreviewControl : SongPreviewControl
 
     [Inject]
     private SongSelectSceneData sceneData;
+    
+    [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
 
     private SongEntryControl currentSongEntryControl;
 
@@ -91,7 +94,8 @@ public class SongSelectSongPreviewControl : SongPreviewControl
             isFirstSelectedSong = false;
         }
 
-        if (isFirstSelectedSong)
+        if (isFirstSelectedSong
+            && !songSelectSceneControl.HasPartyModeSceneData)
         {
             return;
         }
