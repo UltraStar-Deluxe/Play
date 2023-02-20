@@ -309,7 +309,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             {
                 DurationOfSongInMillis = 1000.0 * videoPlayer.length;
                 loadedEventStream.OnNext(true);
-                Debug.Log($"Loaded as video: duration: {DurationOfSongInMillis}, position: {PositionInSongInMillis}");
             }));
     }
 
