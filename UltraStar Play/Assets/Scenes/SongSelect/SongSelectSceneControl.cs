@@ -292,7 +292,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                                                   && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random;
     public bool UsePartyModePlaylist => IsPartyModeRandomSongSelection
                                         && PartyModeSettings.songSelectionSettings.songPoolPlaylist != null;
-    public bool CanUseSongSelectionJoker => PartyModeSettings.songSelectionSettings.jokerCount != 0;
+    public bool CanUseSongSelectionJoker => PartyModeSceneData.remainingJokerCount != 0;
 
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
