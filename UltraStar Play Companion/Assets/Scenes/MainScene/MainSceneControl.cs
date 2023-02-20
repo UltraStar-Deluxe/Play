@@ -266,7 +266,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         showSongViewButton.RegisterCallbackButtonTriggered(() =>
         {
             micSampleRecorder.StopRecording();
-            songListControl.ShowSongList();
+            songListControl.Show();
         });
     }
 

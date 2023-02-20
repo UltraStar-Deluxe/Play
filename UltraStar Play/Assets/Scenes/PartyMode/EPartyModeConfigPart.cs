@@ -2,5 +2,4 @@
 {
     Teams,
     SongSelection,
-    Rounds,
 }

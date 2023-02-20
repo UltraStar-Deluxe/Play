@@ -29,6 +29,12 @@
     border-width: 1px;
 }
 
+.bottomLineSeparator {
+    border-color: var(--text-color);
+    border-bottom-width: 1px;
+    border-radius: 5px;
+}
+
 .overlay {
     width: 100%;
     height: 100%;
@@ -122,6 +128,15 @@
     -unity-text-align: middle-left;
     width: 40%;
     font-size: var(--font-size);
+}
+
+ItemPicker.controlLabel40Percent
+{
+    width: auto;
+}
+
+ItemPicker.controlLabel40Percent .itemPickerLabel {
+    width: 40%;
 }
 
 .titleImage {

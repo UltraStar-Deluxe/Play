@@ -204,7 +204,19 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
         songSearchHint.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint, "properties", searchPropertiesText);
     }
 
-    public void ShowSongList()
+    public void Show()
+    {
+        if (songQueueContainer.IsVisibleByDisplay())
+        {
+            UpdateSongQueue();
+        }
+        else
+        {
+            ShowSongList();
+        }
+    }
+    
+    private void ShowSongList()
     {
         songSearchTextField.value = "";
                 

@@ -292,7 +292,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                                                   && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random;
     public bool UsePartyModePlaylist => IsPartyModeRandomSongSelection
                                         && PartyModeSettings.songSelectionSettings.songPoolPlaylist != null;
-    public bool CanUseSongSelectionJoker => PartyModeSettings.songSelectionSettings.jokerCount != 0;
+    public bool CanUseSongSelectionJoker => PartyModeSceneData.remainingJokerCount != 0;
 
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
@@ -451,12 +451,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void InitModifiersChipsComboControl()
     {
-        GameRoundSettings gameRoundSettings = HasPartyModeSceneData
-            ? PartyModeSceneData.CurrentRoundSettings
-            : settings.GameRoundSettings;
-
         injector.Inject(gameRoundSettingsUiControl);
-        gameRoundSettingsUiControl.GameRoundSettings = gameRoundSettings;
+        gameRoundSettingsUiControl.GameRoundSettings = settings.GameRoundSettings;
     }
 
     public void QuitSongSelect()
@@ -481,12 +477,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void AddCurrentSongToSongQueueAsMedley()
     {
-        if (HasPartyModeSceneData)
-        {
-            // Medleys not supported in party mode
-            return;
-        }
-        
         if (songQueueManager.IsSongQueueEmpty)
         {
             // Cannot create medley with previous song when song queue is empty.
@@ -778,16 +768,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         singSceneData.SongMetas = new List<SongMeta> { SelectedSong };
         singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
         singSceneData.partyModeSceneData = sceneData.partyModeSceneData;
+        singSceneData.gameRoundSettings = new(settings.GameRoundSettings);
 
-        if (HasPartyModeSceneData)
-        {
-            singSceneData.gameRoundSettings = new(PartyModeSceneData.CurrentRoundSettings);
-        }
-        else
-        {
-            singSceneData.gameRoundSettings = new(settings.GameRoundSettings);
-        }
-        
         if (singSceneData.gameRoundSettings != null
             && singSceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
         {
@@ -815,8 +797,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingScene()
     {
-        if (!songQueueManager.IsSongQueueEmpty
-            && !HasPartyModeSceneData)
+        if (!songQueueManager.IsSongQueueEmpty)
         {
             StartSingSceneWithNextSongQueueEntry();
         }
@@ -828,7 +809,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingSceneWithNextSongQueueEntry()
     {
-        songQueueManager.StartNextEntry();
+        SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
     private void StartSingSceneWithSelectedSongAndSettings()
@@ -1181,7 +1163,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundsSettings.gameRoundSettings.Count}";
+            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
         }
 
         menuButton.text = TranslationManager.GetTranslation(R.Messages.menu);

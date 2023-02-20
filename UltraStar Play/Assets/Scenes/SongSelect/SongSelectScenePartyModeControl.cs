@@ -38,6 +38,9 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     [Inject]
     private SongSelectSceneData sceneData;
+    
+    [Inject]
+    private Settings settings;
 
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
@@ -70,11 +73,6 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     public void OnInjectionFinished()
     {
         UpdatePartyModeSettingsDescription();
-        if (songSelectSceneControl.HasPartyModeSceneData)
-        {
-            // Medleys and song queue not supported in party mode
-            songQueueOverlay.HideByDisplay();
-        }
     }
 
     private void UpdatePartyModeSettingsDescription()
@@ -85,7 +83,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
             return;
         }
 
-        GameRoundSettings currentRoundSettings = songSelectSceneControl.PartyModeSceneData.CurrentRoundSettings;
+        GameRoundSettings currentRoundSettings = settings.GameRoundSettings;
         GameRoundFinishConditionSettings finishConditionSettings = currentRoundSettings.finishConditionSettings;
 
         string GetFinishConditionDescription()
@@ -154,12 +152,12 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     {
         VisualElement jokerList = new();
         jokerList.AddToClassList("jokerList");
-        if (sceneData.partyModeSceneData.PartyModeSettings.songSelectionSettings.jokerCount < 0)
+        if (sceneData.partyModeSceneData.remainingJokerCount < 0)
         {
             return jokerList;
         }
 
-        for (int i = 0; i < sceneData.partyModeSceneData.PartyModeSettings.songSelectionSettings.jokerCount; i++)
+        for (int i = 0; i < sceneData.partyModeSceneData.remainingJokerCount; i++)
         {
             MaterialIcon jokerIcon = new();
             jokerIcon.Icon = "casino";
@@ -193,9 +191,9 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     public void ReduceJokerCount()
     {
-        if (songSelectSceneControl.PartyModeSettings.songSelectionSettings.jokerCount > 0)
+        if (songSelectSceneControl.PartyModeSceneData.remainingJokerCount > 0)
         {
-            songSelectSceneControl.PartyModeSettings.songSelectionSettings.jokerCount--;
+            songSelectSceneControl.PartyModeSceneData.remainingJokerCount--;
         }
     }
 
@@ -223,7 +221,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     private string GetJokerCountTranslation()
     {
-        int jokerCount = songSelectSceneControl.PartyModeSettings.songSelectionSettings.jokerCount;
+        int jokerCount = songSelectSceneControl.PartyModeSceneData.remainingJokerCount;
         if (jokerCount >= 0)
         {
             return jokerCount.ToString();

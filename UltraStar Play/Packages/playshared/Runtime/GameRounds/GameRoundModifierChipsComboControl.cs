@@ -39,45 +39,25 @@ public class GameRoundModifierChipsComboControl
         {
             return;
         }
-        
-        void CreateChipsComboEntry(
-            string labelText,
-            Action onRemove = null)
+
+        // Add chips for finish condition
+        if (GameRoundSettings.finishConditionSettings.condition is not EGameRoundFinishCondition.ReachEndOfSong)
         {
-            VisualElement chipsComboEntryVisualElement = VisualElementUtils.LoadVisualElementFromResources("UIDocuments/ChipsComboEntry");
-            ChipsCombo.ChipsList.Add(chipsComboEntryVisualElement);
+            CreateChipsComboEntry(GameRoundSettingsUtils.GetFinishConditionDescription(GameRoundSettings),
+                () => GameRoundSettings.finishConditionSettings.condition = EGameRoundFinishCondition.ReachEndOfSong);
 
-            Label label = chipsComboEntryVisualElement.Q<Label>("chipsComboEntryLabel");
-            label.text = labelText;
-
-            Button button = chipsComboEntryVisualElement.Q<Button>("chipsComboEntryButton");
-            if (onRemove != null)
+            if (!GameRoundSettings.UnconditionalModifiers.IsNullOrEmpty()
+                || !GameRoundSettings.ConditionalModifiers.IsNullOrEmpty())
             {
-                button.RegisterCallbackButtonTriggered(() =>
-                {
-                    onRemove();
-                    gameRoundSettingsChangedEventStream.OnNext(gameRoundSettings);
-                });
-            }
-            else
-            {
-                button.HideByDisplay();
+                ChipsCombo.AddSeparator();
             }
         }
 
-        void CreateBoolChipsEntry(EGameRoundModifier gameRoundModifier, string labelText)
-        {
-            if (GameRoundSettings.modifiers.Contains(gameRoundModifier))
-            {
-                CreateChipsComboEntry(labelText, () => GameRoundSettings.modifiers.Remove(gameRoundModifier));
-            }
-        }
-
-        // Add chips
+        // Add chips for unconditional modifiers
         if (!GameRoundSettings.UnconditionalModifiers.IsNullOrEmpty())
         {
-            CreateBoolChipsEntry(EGameRoundModifier.ShortSong, "Short song");
-            CreateBoolChipsEntry(EGameRoundModifier.PassTheMic, "Pass the mic");
+            CreateGameRoundModifierChipsEntry(EGameRoundModifier.ShortSong, "Short song");
+            CreateGameRoundModifierChipsEntry(EGameRoundModifier.PassTheMic, "Pass the mic");
 
             if (!GameRoundSettings.ConditionalModifiers.IsNullOrEmpty())
             {
@@ -85,17 +65,49 @@ public class GameRoundModifierChipsComboControl
             }
         }
 
+        // Add chips for conditional modifiers
         if (!GameRoundSettings.ConditionalModifiers.IsNullOrEmpty())
         {
-            CreateBoolChipsEntry(EGameRoundModifier.HideLyrics, "Hide lyrics");
-            CreateBoolChipsEntry(EGameRoundModifier.HideNotes, "Hide notes");
-            CreateBoolChipsEntry(EGameRoundModifier.ReduceAudio, "Reduce audio");
+            CreateGameRoundModifierChipsEntry(EGameRoundModifier.HideLyrics, "Hide lyrics");
+            CreateGameRoundModifierChipsEntry(EGameRoundModifier.HideNotes, "Hide notes");
+            CreateGameRoundModifierChipsEntry(EGameRoundModifier.ReduceAudio, "Reduce audio");
 
             if (GameRoundSettings.modifierConditionSettings.condition is not EGameRoundModifierCondition.Always)
             {
                 CreateChipsComboEntry(GameRoundSettingsUtils.GetModifierConditionDescription(GameRoundSettings),
                     () => GameRoundSettings.modifierConditionSettings.condition = EGameRoundModifierCondition.Always);
             }
+        }
+    }
+    
+    private void CreateChipsComboEntry(string labelText, Action onRemove = null)
+    {
+        VisualElement chipsComboEntryVisualElement = VisualElementUtils.LoadVisualElementFromResources("UIDocuments/ChipsComboEntry");
+        ChipsCombo.ChipsList.Add(chipsComboEntryVisualElement);
+
+        Label label = chipsComboEntryVisualElement.Q<Label>("chipsComboEntryLabel");
+        label.text = labelText;
+
+        Button button = chipsComboEntryVisualElement.Q<Button>("chipsComboEntryButton");
+        if (onRemove != null)
+        {
+            button.RegisterCallbackButtonTriggered(() =>
+            {
+                onRemove();
+                gameRoundSettingsChangedEventStream.OnNext(gameRoundSettings);
+            });
+        }
+        else
+        {
+            button.HideByDisplay();
+        }
+    }
+
+    private void CreateGameRoundModifierChipsEntry(EGameRoundModifier gameRoundModifier, string labelText)
+    {
+        if (GameRoundSettings.modifiers.Contains(gameRoundModifier))
+        {
+            CreateChipsComboEntry(labelText, () => GameRoundSettings.modifiers.Remove(gameRoundModifier));
         }
     }
 }

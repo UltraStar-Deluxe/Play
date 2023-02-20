@@ -2,7 +2,7 @@
     <ui:Template name="PartyModeTeamConfigUi" src="project://database/Assets/Scenes/PartyMode/PartyModeTeamsConfigUi.uxml?fileID=9197481963319205126&amp;guid=4248ab757501d664bb769d0ad950cb4d&amp;type=3#PartyModeTeamsConfigUi" />
     <ui:Template name="PartyModeSongSelectionRoundUi" src="project://database/Assets/Scenes/PartyMode/PartyModeSongSelectionUi.uxml?fileID=9197481963319205126&amp;guid=e8930bfcc4de4f945b1e608a085ecf2f&amp;type=3#PartyModeSongSelectionUi" />
     <ui:Template name="PartyModeRoundConfigUi" src="project://database/Assets/Scenes/PartyMode/PartyModeRoundsConfigUi.uxml?fileID=9197481963319205126&amp;guid=8bf7a1b118fe0634f9b4ad1d8a1e64cd&amp;type=3#PartyModeRoundsConfigUi" />
-    <ui:Template name="PartyModeRoundModifierDialogUi" src="project://database/Assets/Scenes/PartyMode/PartyModeRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#PartyModeRoundModifierDialogUi" />
+    <ui:Template name="PartyModeRoundModifierDialogUi" src="project://database/Packages/playshared/Runtime/GameRounds/GameRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#GameRoundModifierDialogUi" />
     <ui:VisualElement name="background" class="optionsSceneMainContainer">
         <ui:VisualElement name="topRow" class="optionsSceneTopRow" style="align-items: flex-start;">
             <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
@@ -17,9 +17,9 @@
             <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" class="controlMinWidth" style="margin-right: 5px;" />
             <ui:Button text="Continue" display-tooltip-when-elided="true" name="continueButton" class="controlMinWidth" />
         </ui:VisualElement>
-        <ui:Instance template="PartyModeTeamConfigUi" name="partyModeTeamConfigUi" style="flex-grow: 1; width: 100%; display: none;" />
+        <ui:Instance template="PartyModeTeamConfigUi" name="partyModeTeamConfigUi" style="flex-grow: 1; width: 100%; display: flex;" />
         <ui:Instance template="PartyModeSongSelectionRoundUi" name="partyModeSongSelectionConfigUi" style="width: 100%; display: none;" />
-        <ui:Instance template="PartyModeRoundConfigUi" name="partyModeRoundConfigUi" style="flex-grow: 1; width: 100%; display: flex;" />
+        <ui:Instance template="PartyModeRoundConfigUi" name="partyModeRoundConfigUi" style="flex-grow: 1; width: 100%; display: none;" />
         <ui:VisualElement name="bottomRow" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-end; width: 100%; margin-top: auto; align-items: center;" />
     </ui:VisualElement>
     <ui:VisualElement name="dialogContainer" picking-mode="Ignore" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />

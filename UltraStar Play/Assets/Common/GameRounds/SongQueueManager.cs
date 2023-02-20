@@ -71,12 +71,12 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         return songQueueEntryDtos;
     }
 
-    public void StartNextEntry()
+    public SingSceneData CreateNextSingSceneData(PartyModeSceneData partyModeSceneData)
     {
         List<SongQueueEntryDto> nextEntries = PeekNextSongQueueEntries();
         if (nextEntries.IsNullOrEmpty())
         {
-            return;
+            return null;
         }
         
         RemoveSongQueueEntries(nextEntries);
@@ -91,13 +91,14 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         singSceneData.SongMetas = songMetas;
         singSceneData.SingScenePlayerData = DtoConverter.FromDto(firstEntry.SingScenePlayerDataDto, settings);
         singSceneData.gameRoundSettings = firstEntry.GameRoundSettings;
+        singSceneData.partyModeSceneData = partyModeSceneData;
         if (nextEntries.Count > 1)
         {
             // This is a medley
             singSceneData.MedleySongIndex = 0;
         }
 
-        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
+        return singSceneData;
     }
 
     public List<SongQueueEntryDto> PeekNextSongQueueEntries()

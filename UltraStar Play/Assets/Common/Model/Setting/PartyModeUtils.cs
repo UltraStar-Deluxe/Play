@@ -9,7 +9,7 @@ public static class PartyModeUtils
         {
             return false;
         }
-        return partyModeSceneData.currentRoundIndex >= partyModeSceneData.PartyModeSettings.roundsSettings.gameRoundSettings.Count - 1
+        return partyModeSceneData.currentRoundIndex >= partyModeSceneData.PartyModeSettings.roundCount - 1
                || IsFinalRoundOfKnockOutTournament(partyModeSceneData);
     }
 

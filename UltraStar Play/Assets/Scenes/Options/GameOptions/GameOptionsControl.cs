@@ -24,7 +24,13 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
-
+    
+    [Inject(UxmlName = R.UxmlNames.reduceAudioVolumeItemPicker)]
+    private ItemPicker reduceAudioVolumeItemPicker;
+    
+    [Inject(UxmlName = R.UxmlNames.passTheMicTimeItemPicker)]
+    private ItemPicker passTheMicTimeItemPicker;
+    
     [Inject]
     private Settings settings;
 
@@ -33,6 +39,17 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         new ScoreModeItemPickerControl(scoreModeContainer.Q<ItemPicker>())
             .Bind(() => settings.GameSettings.ScoreMode,
                   newValue => settings.GameSettings.ScoreMode = newValue);
+
+        NumberPickerControl passTheMicTimeItemPickerControl = new NumberPickerControl(passTheMicTimeItemPicker, 20);
+        passTheMicTimeItemPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
+        passTheMicTimeItemPickerControl.Bind(
+            () => settings.passTheMicTimeInSeconds,
+            newValue => settings.passTheMicTimeInSeconds = (int)newValue);
+
+        NumberPickerControl reduceAudioVolumeItemPickerControl = new PercentNumberPickerControl(reduceAudioVolumeItemPicker, 2);
+        reduceAudioVolumeItemPickerControl.Bind(
+            () => settings.reducedAudioVolumePercent,
+            newValue => settings.reducedAudioVolumePercent = (int)newValue);
 
         backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();

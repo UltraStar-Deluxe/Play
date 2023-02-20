@@ -26,6 +26,9 @@ public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListen
 
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private Settings settings;
 
     private readonly SingScenePassTheMicControl passTheMicControl = new();
 
@@ -148,7 +151,7 @@ public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListen
 
     private void ReduceAudio()
     {
-        ModifiedVolumePercent.Value = 3;
+        ModifiedVolumePercent.Value = settings.reducedAudioVolumePercent;
     }
 
     private void UpdatePlayerSpecificModifiers(PlayerControl playerControl)

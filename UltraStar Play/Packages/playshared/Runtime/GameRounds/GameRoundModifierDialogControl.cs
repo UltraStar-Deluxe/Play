@@ -43,13 +43,27 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R_PlayShared.UxmlNames.conditionTitleLabel)]
     private Label conditionTitleLabel;
     
+    [Inject(UxmlName = R_PlayShared.UxmlNames.finishConditionPicker)]
+    private ItemPicker finishConditionPicker;
+
+    [Inject(UxmlName = R_PlayShared.UxmlNames.finishConditionPointsPicker)]
+    private ItemPicker finishConditionPointsPicker;
+    
+    [Inject(UxmlName = R_PlayShared.UxmlNames.resetModifiersButton)]
+    private Button resetModifiersButton;
+    
+    [Inject(UxmlName = R_PlayShared.UxmlNames.randomizeModifiersButton)]
+    private Button randomizeModifiersButton;
+    
     private GameRoundSettings gameRoundSettings;
     private GameRoundSettings GameRoundSettings => gameRoundSettings;
 
     private LabeledItemPickerControl<EGameRoundModifierCondition> modifierConditionPickerControl;
     private LabeledItemPickerControl<int> modifierConditionFromNumberPickerControl;
     private LabeledItemPickerControl<int> modifierConditionUntilNumberPickerControl;
-
+    private LabeledItemPickerControl<EGameRoundFinishCondition> finishConditionPickerControl;
+    private LabeledItemPickerControl<int> finishConditionPointsPickerControl;
+    
     private readonly Subject<bool> dialogClosedEventStream = new();
     public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
 
@@ -57,10 +71,35 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
 
     public bool IsVisible => visualElement.IsVisibleByDisplay();
     
+    private bool isInitialized;
+    
     public void OnInjectionFinished()
     {
         visualElement.HideByDisplay();
+    }
+
+    private void Init()
+    {
+        if (isInitialized)
+        {
+            return;
+        }
+        isInitialized = true;
+
+        randomizeModifiersButton.RegisterCallbackButtonTriggered(() => Randomize());
+        resetModifiersButton.RegisterCallbackButtonTriggered(() => Reset());
         
+        CreateControls();
+        BindControls();
+    }
+
+    private void CreateControls()
+    {
+        // Finish condition
+        finishConditionPickerControl = new(finishConditionPicker, EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
+        finishConditionPointsPickerControl = new(finishConditionPointsPicker, NumberUtils.CreateIntList(1000, 9000, 1000));
+        
+        // Modifiers
         UpdateGameRoundModifierToToggle();
         
         closeModifierDialogButton.RegisterCallbackButtonTriggered(() => CloseDialog());
@@ -76,11 +115,6 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
             Toggle toggle = entry.Value;
             toggle.RegisterValueChangedCallback(evt =>
             {
-                if (gameRoundSettings == null)
-                {
-                    return;
-                }
-
                 if (evt.newValue)
                 {
                     gameRoundSettings.modifiers.Add(gameRoundModifier);
@@ -92,14 +126,30 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
                 UpdateControls();
             });
         });
+    }
+
+    private void BindControls()
+    {
+        // Finish condition
+        finishConditionPickerControl.Bind(
+            () => GameRoundSettings.finishConditionSettings.condition,
+            newValue =>
+            {
+                GameRoundSettings.finishConditionSettings.condition = newValue;
+                UpdateControls();
+            });
+
+        finishConditionPointsPickerControl.Bind(
+            () => GameRoundSettings.finishConditionSettings.points,
+            newValue =>
+            {
+                GameRoundSettings.finishConditionSettings.points = newValue;
+                UpdateControls();
+            });
         
         // Modifier condition
         modifierConditionPickerControl.Selection.Subscribe(newValue =>
         {
-            if (GameRoundSettings == null)
-            {
-                return;
-            }
             GameRoundSettings.modifierConditionSettings.condition = newValue;
             UpdateControls();
         });
@@ -107,11 +157,6 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         // Modifier condition from
         modifierConditionFromNumberPickerControl.Selection.Subscribe(newValue =>
         {
-            if (GameRoundSettings == null)
-            {
-                return;
-            }
-            
             if (GameRoundSettings.modifierConditionSettings.condition
                 is EGameRoundModifierCondition.ScoreRange
                 or EGameRoundModifierCondition.PlayerAdvance)
@@ -129,11 +174,6 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         // Modifier condition until
         modifierConditionUntilNumberPickerControl.Selection.Subscribe(newValue =>
         {
-            if (GameRoundSettings == null)
-            {
-                return;
-            }
-
             if (GameRoundSettings.modifierConditionSettings.condition
                 is EGameRoundModifierCondition.ScoreRange
                 or EGameRoundModifierCondition.PlayerAdvance)
@@ -149,6 +189,43 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         });
     }
 
+    private void Randomize()
+    {
+        GameRoundSettings.finishConditionSettings.condition = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
+        GameRoundSettings.finishConditionSettings.points = RandomUtils.RandomOf(NumberUtils.CreateIntList(1000, 9000, 1000));
+
+        GameRoundSettings.modifiers = RandomUtils.RandomHashSetOf(EnumUtils.GetValuesAsList<EGameRoundModifier>());
+        GameRoundSettings.modifierConditionSettings.condition = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<EGameRoundModifierCondition>());
+
+        GameRoundSettings.modifierConditionSettings.scoreFrom = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 10000, 1000));
+        GameRoundSettings.modifierConditionSettings.scoreUntil = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 10000, 1000));
+        if (GameRoundSettings.modifierConditionSettings.scoreFrom > GameRoundSettings.modifierConditionSettings.scoreUntil)
+        {
+            // Swap values via deconstruction
+            (GameRoundSettings.modifierConditionSettings.scoreFrom, GameRoundSettings.modifierConditionSettings.scoreUntil) = (GameRoundSettings.modifierConditionSettings.scoreUntil, GameRoundSettings.modifierConditionSettings.scoreFrom);
+        }
+
+        GameRoundSettings.modifierConditionSettings.timeFrom = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 100, 10));
+        GameRoundSettings.modifierConditionSettings.timeUntil = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 100, 10));
+        if (GameRoundSettings.modifierConditionSettings.timeFrom > GameRoundSettings.modifierConditionSettings.timeUntil)
+        {
+            // Swap values via deconstruction
+            (GameRoundSettings.modifierConditionSettings.timeFrom, GameRoundSettings.modifierConditionSettings.timeUntil) = (GameRoundSettings.modifierConditionSettings.timeUntil, GameRoundSettings.modifierConditionSettings.timeFrom);
+        }
+
+        UpdateControls();
+    }
+    
+    private void Reset()
+    {
+        GameRoundSettings.finishConditionSettings = new();
+
+        GameRoundSettings.modifiers = new();
+        GameRoundSettings.modifierConditionSettings.condition = new();
+
+        UpdateControls();
+    }
+    
     private void UpdateGameRoundModifierToToggle()
     {
         gameRoundModifierToToggle.Clear();
@@ -160,6 +237,20 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     }
 
     private void UpdateControls()
+    {
+        UpdateFinishConditionControls();
+        UpdateModifierControls();
+    }
+
+    private void UpdateFinishConditionControls()
+    {
+        // Finish condition
+        finishConditionPickerControl.SelectItem(GameRoundSettings.finishConditionSettings.condition);
+        finishConditionPointsPickerControl.SelectItem(GameRoundSettings.finishConditionSettings.points);
+        finishConditionPointsPickerControl.ItemPicker.SetVisibleByDisplay(GameRoundSettings.finishConditionSettings.condition != EGameRoundFinishCondition.ReachEndOfSong);
+    }
+
+    private void UpdateModifierControls()
     {
         // Modifier enum toggles
         gameRoundModifierToToggle.ForEach(entry =>
@@ -221,7 +312,7 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
             }
         }
     }
-
+    
     public void CloseDialog()
     {
         visualElement.HideByDisplay();
@@ -233,6 +324,7 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     {
         visualElement.ShowByDisplay();
         gameRoundSettings = newGameRoundSettings;
+        Init();
         UpdateControls();
     }
 }
