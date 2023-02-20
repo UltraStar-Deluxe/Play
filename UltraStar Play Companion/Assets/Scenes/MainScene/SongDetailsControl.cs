@@ -288,15 +288,17 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         }
         
         playersContainer.Clear();
-        List<MicProfile> unusedMicProfiles = micProfiles.ToList();
 
+        List<MicProfile> GetUnusedMicProfiles()
+        {
+            return micProfiles
+                .Except(playerEntryControls.Select(playerEntryControl => playerEntryControl.MicProfile))
+                .ToList();
+        }
+        
         void AssignUnusedMicProfile(PlayerSelectPlayerEntryControl playerEntryControl)
         {
-            playerEntryControl.MicProfile = unusedMicProfiles.FirstOrDefault();
-            if (playerEntryControl.MicProfile != null)
-            {
-                unusedMicProfiles.Remove(playerEntryControl.MicProfile);
-            }
+            playerEntryControl.MicProfile = GetUnusedMicProfiles().FirstOrDefault();
         }
         
         int playerProfileIndex = 0;
@@ -333,17 +335,14 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             playerEntryControl.SelectedToggle.RegisterValueChangedCallback(evt =>
             {
                 // Update mic profile.
-                if (evt.newValue)
+                if (evt.newValue
+                    && playerEntryControl.MicProfile == null)
                 {
                     AssignUnusedMicProfile(playerEntryControl);
                 }
-                else
+                else if (!evt.newValue
+                         && playerEntryControl.MicProfile != null)
                 {
-                    if (playerEntryControl.MicProfile != null)
-                    {
-                        unusedMicProfiles.Add(playerEntryControl.MicProfile);
-                    }
-
                     playerEntryControl.MicProfile = null;
                 }
 
