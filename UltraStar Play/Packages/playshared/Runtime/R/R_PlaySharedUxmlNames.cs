@@ -41,6 +41,9 @@ public static partial class R_PlayShared
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string dialogTitleMaterialIcon = "dialogTitleMaterialIcon";
         public const string dummyButton = "dummyButton";
+        public const string finishConditionContainer = "finishConditionContainer";
+        public const string finishConditionPicker = "finishConditionPicker";
+        public const string finishConditionPointsPicker = "finishConditionPointsPicker";
         public const string gameRoundPlayerEntryUiRoot = "gameRoundPlayerEntryUiRoot";
         public const string hideLyricsToggle = "hideLyricsToggle";
         public const string hideNotesToggle = "hideNotesToggle";
@@ -71,7 +74,10 @@ public static partial class R_PlayShared
         public const string playerEntryList = "playerEntryList";
         public const string previousItemButton = "previousItemButton";
         public const string previousItemIcon = "previousItemIcon";
+        public const string randomizeIcon = "randomizeIcon";
+        public const string randomizeModifiersButton = "randomizeModifiersButton";
         public const string reduceAudioToggle = "reduceAudioToggle";
+        public const string resetModifiersButton = "resetModifiersButton";
         public const string roundModifierDialogUiRoot = "roundModifierDialogUiRoot";
         public const string row = "row";
         public const string selectedToggle = "selectedToggle";

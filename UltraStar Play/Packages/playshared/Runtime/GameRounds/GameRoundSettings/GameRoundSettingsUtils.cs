@@ -2,6 +2,20 @@
 
 public static class GameRoundSettingsUtils
 {
+    public static string GetFinishConditionDescription(GameRoundSettings gameRoundSettings)
+    {
+        if (gameRoundSettings.finishConditionSettings.condition == EGameRoundFinishCondition.ReachPoints)
+        {
+            return $"Reach {gameRoundSettings.finishConditionSettings.points} points";
+        }
+        else if (gameRoundSettings.finishConditionSettings.condition == EGameRoundFinishCondition.ReachAdvanceOfPoints)
+        {
+            return $"Reach advance of {gameRoundSettings.finishConditionSettings.points} points";
+        }
+        
+        return "";
+    }
+
     public static string GetModifierConditionDescription(GameRoundSettings gameRoundSettings)
     {
         HashSet<EGameRoundModifier> modifiers = gameRoundSettings.modifiers;
