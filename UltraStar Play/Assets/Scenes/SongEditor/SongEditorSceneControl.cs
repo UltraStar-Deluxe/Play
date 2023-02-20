@@ -128,13 +128,13 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     {
         Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInSongInMillis} ms.");
         songAudioPlayer.Init(SongMeta);
-        songVideoPlayer.SongMeta = SongMeta;
-        songAudioPlayer.PositionInSongInMillis = sceneData.PositionInSongInMillis;
 
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(positionInSongInMillis => OnAudioPlaybackStarted(positionInSongInMillis));
         songAudioPlayer.PlaybackStoppedEventStream
             .Subscribe(_ => OnAudioPlaybackStopped());
+
+        songVideoPlayer.SongMeta = SongMeta;
 
         HideEditLyricsPopup();
 

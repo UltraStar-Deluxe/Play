@@ -113,7 +113,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void SyncAudioPosition()
     {
-        float songAudioPlayerTimeInSeconds = songAudioPlayer.audioPlayer.time;
+        float songAudioPlayerTimeInSeconds = (float)songAudioPlayer.PositionInSongInSeconds;
         instrumentalAudioSource.time = songAudioPlayerTimeInSeconds;
         vocalsAudioSource.time = songAudioPlayerTimeInSeconds;
     }
@@ -133,7 +133,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void UseOriginalSongAudio()
     {
-        songAudioPlayer.audioPlayer.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent)
+        songAudioPlayer.VolumeFactor = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent)
                                              * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
                                              * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
         vocalsAudioSource.volume = 0;
@@ -151,7 +151,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             vocalsAudioSource.clip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta));
         }
 
-        songAudioPlayer.audioPlayer.volume = 0;
+        songAudioPlayer.VolumeFactor = 0;
         instrumentalAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent)
                                          * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
                                          * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
