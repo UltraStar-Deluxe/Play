@@ -89,7 +89,8 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
         else
         {
             // Start next game round
-            songQueueManager.StartNextEntry();
+            SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
+            sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
         }
     }
 

@@ -31,5 +31,6 @@ public class SingSceneData : SceneData
         IsRestart = other.IsRestart;
         NextBeatToScore = other.NextBeatToScore;
         PlayerProfileToScoreDataMap = new(other.PlayerProfileToScoreDataMap);
+        partyModeSceneData = other.partyModeSceneData;
     }
 }
