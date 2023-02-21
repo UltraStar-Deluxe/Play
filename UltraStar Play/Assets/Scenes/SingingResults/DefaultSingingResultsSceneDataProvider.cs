@@ -42,12 +42,13 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence2, CreateSentenceScore(sentence2, 5000));
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence3, CreateSentenceScore(sentence3, 6500));
 
-        PlayerProfile playerProfile = SettingsManager.Instance.Settings.PlayerProfiles[0];
+        List<PlayerProfile> settingsPlayerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
+        PlayerProfile playerProfile = settingsPlayerProfiles[0];
         data.PlayerProfileToMicProfileMap[playerProfile] = SettingsManager.Instance.Settings.MicProfiles.FirstOrDefault();
         data.AddPlayerScores(playerProfile, playerScoreData);
-        for (int i = 1; i < playerCount; i++)
+        for (int i = 1; i < playerCount && i < settingsPlayerProfiles.Count; i++)
         {
-            data.AddPlayerScores(SettingsManager.Instance.Settings.PlayerProfiles[i], playerScoreData);
+            data.AddPlayerScores(settingsPlayerProfiles[i], playerScoreData);
         }
 
         if (partyModeTeams > 0)
@@ -69,7 +70,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         }
 
         // Give team points
-        for (int i = 1; i <= partyModeTeams; i++)
+        for (int i = 1; i <= partyModeTeams && i < partyModeSceneData.PartyModeSettings.teamSettings.teams.Count; i++)
         {
             PartyModeTeamSettings teamSettings = partyModeSceneData.PartyModeSettings.teamSettings.teams[i];
             partyModeSceneData.teamToScoreMap[teamSettings] = i;
