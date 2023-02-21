@@ -112,8 +112,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.fuzzySearchTextLabel)]
     private Label fuzzySearchTextLabel;
 
-    [Inject(UxmlName = R.UxmlNames.playerSelectOverlayContainer)]
-    private VisualElement playerSelectOverlayContainer;
+    [Inject(UxmlName = R.UxmlNames.songSelectPlayerSelectUi)]
+    private VisualElement songSelectPlayerSelectUi;
 
     [Inject(UxmlName = R.UxmlNames.closePlayerSelectOverlayButton)]
     private Button closePlayerSelectOverlayButton;
@@ -244,7 +244,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
-    public bool IsPlayerSelectOverlayVisible => playerSelectOverlayContainer.IsVisibleByDisplay();
+    public bool IsPlayerSelectOverlayVisible => songSelectPlayerSelectUi.IsVisibleByDisplay();
     public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
     public bool IsSongDetailOverlayVisible => songDetailOverlay.IsVisibleByDisplay();
     public bool IsSearchExpressionInfoOverlayVisible => searchExpressionInfoOverlay.IsVisibleByDisplay();
@@ -722,7 +722,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void CheckAudioAndStartSingScene()
     {
-        if (playerSelectOverlayContainer.IsVisibleByDisplay())
+        if (songSelectPlayerSelectUi.IsVisibleByDisplay())
         {
             StartSingScene(SelectedSong);
         }
@@ -772,7 +772,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void ShowPlayerSelectOverlay()
     {
-        playerSelectOverlayContainer.ShowByDisplay();
+        songSelectPlayerSelectUi.ShowByDisplay();
         UpdateInputLegend();
 
         // Show lyrics for duet song
@@ -797,12 +797,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Focus start button, such that it can be triggered by keyboard
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
-            playerSelectOverlayContainer.Q<Button>(R.UxmlNames.startButton).Focus()));
+            songSelectPlayerSelectUi.Q<Button>(R.UxmlNames.startButton).Focus()));
     }
 
     public void HidePlayerSelectOverlay()
     {
-        playerSelectOverlayContainer.HideByDisplay();
+        songSelectPlayerSelectUi.HideByDisplay();
         UpdateInputLegend();
     }
 
