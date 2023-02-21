@@ -26,7 +26,11 @@ public static partial class R
         public const string menuOverlay = "menuOverlay";
         public const string menuOverlayContent = "menuOverlayContent";
         public const string menuOverlayScrollView = "menuOverlayScrollView";
+        public const string MenuUi = "MenuUi";
+        public const string menuUiRoot = "menuUiRoot";
         public const string micIcon = "micIcon";
+        public const string MicrophoneUi = "MicrophoneUi";
+        public const string microphoneUiRoot = "microphoneUiRoot";
         public const string micViewContainer = "micViewContainer";
         public const string networkConfigContainer = "networkConfigContainer";
         public const string ownHostContainer = "ownHostContainer";
@@ -44,6 +48,9 @@ public static partial class R
         public const string showMenuButton = "showMenuButton";
         public const string showMicViewButton = "showMicViewButton";
         public const string showSongViewButton = "showSongViewButton";
+        public const string songListContainer = "songListContainer";
+        public const string SongListUi = "SongListUi";
+        public const string songListUiRoot = "songListUiRoot";
         public const string songListView = "songListView";
         public const string songSearchHint = "songSearchHint";
         public const string songSearchTextField = "songSearchTextField";

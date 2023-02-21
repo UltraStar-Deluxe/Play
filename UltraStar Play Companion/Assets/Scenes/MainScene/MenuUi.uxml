@@ -1,0 +1,42 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/MainScene/CompanionStyles.uss?fileID=7433441132597879392&amp;guid=10474d1b67f8481fbb7ed771cc866f3e&amp;type=3#CompanionStyles" />
+    <ui:VisualElement name="menuUiRoot" style="width: 100%; height: 100%; flex-direction: column;">
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="menuOverlayScrollView" style="flex-grow: 1; width: 100%;">
+            <ui:VisualElement name="languageContainer" style="margin-bottom: 20px;">
+                <ui:Label text="Language" display-tooltip-when-elided="true" name="languageLabel" />
+                <ItemPicker name="languagePicker" noPreviousButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="recordingDeviceContainer" style="margin-bottom: 20px;">
+                <ui:Label text="Recording device" display-tooltip-when-elided="true" name="recordingDeviceLabel" />
+                <ItemPicker name="recordingDevicePicker" noPreviousButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="devModeContainer" style="margin-bottom: 20px;">
+                <ui:Label text="Developer Mode" display-tooltip-when-elided="true" name="devModeLabel" />
+                <ItemPicker name="devModePicker" noPreviousButton="true" wrapAround="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
+            </ui:VisualElement>
+            <ui:Button text="View Log" display-tooltip-when-elided="true" name="viewLogButton" style="margin-bottom: 20px;" />
+            <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" style="margin-bottom: 20px;" />
+            <ui:VisualElement name="networkConfigContainer">
+                <ui:VisualElement name="udpPortOnClientContainer" style="margin-bottom: 20px;">
+                    <ui:Label text="UDP Port of Companion App&#10;(default 34568)" display-tooltip-when-elided="true" name="udpPortOnClientLabel" />
+                    <ui:TextField picking-mode="Ignore" name="udpPortOnClientTextField" />
+                </ui:VisualElement>
+                <ui:VisualElement name="udpPortOnServerContainer" style="margin-bottom: 20px;">
+                    <ui:Label text="UDP Port of Main Game&#10;(default 34567)" display-tooltip-when-elided="true" name="udpPortOnServerLabel" />
+                    <ui:TextField picking-mode="Ignore" name="udpPortOnServerTextField" />
+                </ui:VisualElement>
+                <ui:VisualElement name="ownHostContainer" style="margin-bottom: 20px;">
+                    <ui:Label text="IP Address of Companion App&#10;(leave empty for automatic value)" display-tooltip-when-elided="true" name="ownHostLabel" />
+                    <ui:TextField picking-mode="Ignore" name="ownHostTextField" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:ScrollView>
+        <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-top: auto; margin-bottom: 10px;" />
+        <ui:VisualElement name="infoContainer" class="smallerFont" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; width: 100%;">
+            <ui:Label text="Connected to aaa.bbb.ccc.ddd" display-tooltip-when-elided="true" name="connectionInfoText" />
+            <ui:Label text="Version: yyyy-MM-dd" display-tooltip-when-elided="true" name="semanticVersionText" />
+            <ui:Label text="Commit: xxxxxxx" display-tooltip-when-elided="true" name="commitHashText" />
+            <ui:Label text="Build time: yyMMddHHmm" display-tooltip-when-elided="true" name="buildTimeStampText" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
