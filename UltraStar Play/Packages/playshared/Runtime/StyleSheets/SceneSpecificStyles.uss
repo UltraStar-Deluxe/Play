@@ -289,6 +289,10 @@
     margin-bottom: 20px;
 }
 
+.optionsLabelAndItemPicker ItemPicker {
+    flex-grow: 1;
+}
+
 .optionsSceneMainContainer {
     flex-grow: 1;
     align-items: center;

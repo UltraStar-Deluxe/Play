@@ -28,6 +28,7 @@ public static partial class R_PlayShared
         public const string invalidValueLabel = "invalidValueLabel";
         public const string itemImage = "itemImage";
         public const string itemLabel = "itemLabel";
+        public const string itemPickerLabel = "itemPickerLabel";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
         public const string notificationLabel = "notificationLabel";

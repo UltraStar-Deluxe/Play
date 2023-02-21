@@ -15,6 +15,8 @@ public static partial class R_PlayShared
         public const string contextMenu = "contextMenu";
         public const string contextMenuSeparator = "contextMenuSeparator";
         public const string controlLabel = "controlLabel";
+        public const string controlWithLabelHorizontal = "controlWithLabelHorizontal";
+        public const string controlWithLabelVertical = "controlWithLabelVertical";
         public const string creditsEntryCharacter = "creditsEntryCharacter";
         public const string creditsGoldBanner = "creditsGoldBanner";
         public const string creditsRegularBanner = "creditsRegularBanner";
@@ -43,7 +45,11 @@ public static partial class R_PlayShared
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string itemPickerButton = "itemPickerButton";
+        public const string itemPickerContent = "itemPickerContent";
         public const string itemPickerItemLabel = "itemPickerItemLabel";
+        public const string itemPickerLabel = "itemPickerLabel";
+        public const string itemPickerNextItemButton = "itemPickerNextItemButton";
+        public const string itemPickerPreviousItemButton = "itemPickerPreviousItemButton";
         public const string largeFont = "largeFont";
         public const string largerFont = "largerFont";
         public const string lastChild = "lastChild";
