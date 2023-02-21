@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using ProTrans;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -25,10 +23,10 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     private static Dictionary<string, string> relativePlayerProfileImagePathToAbsolutePath = new();
 
     [InjectedInInspector]
-    public VisualTreeAsset notificationOverlayVisualTreeAsset;
+    public VisualTreeAsset notificationOverlayUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset notificationVisualTreeAsset;
+    public VisualTreeAsset notificationUi;
 
     [InjectedInInspector]
     public VisualTreeAsset dialogUi;
@@ -75,13 +73,13 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
-            notificationOverlay = notificationOverlayVisualTreeAsset.CloneTree()
+            notificationOverlay = notificationOverlayUi.CloneTree()
                 .Children()
                 .First();
             uiDocument.rootVisualElement.Children().First().Add(notificationOverlay);
         }
 
-        TemplateContainer templateContainer = notificationVisualTreeAsset.CloneTree();
+        TemplateContainer templateContainer = notificationUi.CloneTree();
         VisualElement notification = templateContainer.Children().First();
         Label notificationLabel = notification.Q<Label>("notificationLabel");
         notificationLabel.text = text;
@@ -92,7 +90,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         notificationOverlay.Add(notification);
 
         // Fade out then remove
-        StartCoroutine(FadeOutVisualElement(notification, 2, 1));
+        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, 2, 1));
 
         return notificationLabel;
     }
