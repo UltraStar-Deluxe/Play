@@ -626,7 +626,6 @@ public static partial class R
         public const string settingsIcon = "settingsIcon";
         public const string settingsProblemHintIcon = "settingsProblemHintIcon";
         public const string settingsSideBarContainer = "settingsSideBarContainer";
-        public const string settingsSideBarUi = "settingsSideBarUi";
         public const string settingsTitle = "settingsTitle";
         public const string showBackgroundButton = "showBackgroundButton";
         public const string showControlHintContainer = "showControlHintContainer";
@@ -646,6 +645,7 @@ public static partial class R
         public const string showVideoButton = "showVideoButton";
         public const string showVirtualPianoContainer = "showVirtualPianoContainer";
         public const string showVirtualPianoToggle = "showVirtualPianoToggle";
+        public const string sideBarSettingsUi = "sideBarSettingsUi";
         public const string SingingLyricsUi = "SingingLyricsUi";
         public const string singingOptionsScrollView = "singingOptionsScrollView";
         public const string singingResultsPlayerUi = "singingResultsPlayerUi";
