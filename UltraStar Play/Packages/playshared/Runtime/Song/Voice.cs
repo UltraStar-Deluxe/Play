@@ -134,7 +134,8 @@ public class Voice : ISerializationCallbackReceiver
     {
         return a == b
                || (a.IsNullOrEmpty() && b.IsNullOrEmpty())
-               || (a == firstVoiceName && b == soloVoiceName);
+               || (a == firstVoiceName && b == soloVoiceName)
+                || (a == soloVoiceName && b == firstVoiceName);
     }
 
     public static string NormalizeVoiceName(string voiceName)
