@@ -3,7 +3,7 @@
 [Serializable]
 public class PlayerProfile
 {
-    public const string DefaultImagePath = "Silhouette01.png";
+    public const string DefaultImagePath = "DefaultPlayerProfileImage.png";
     public const string WebcamImagePath = "WEBCAM";
 
     public string Name { get; set; } = "New Player";
