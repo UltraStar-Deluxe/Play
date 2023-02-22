@@ -41,7 +41,7 @@ public class ButtonGroup : VisualElement
         }
     }
     
-    private SetFirstAndLastChildClassControl setFirstAndLastChildClassControl;
+    private readonly SetFirstAndLastChildClassControl setFirstAndLastChildClassControl;
     
     public ButtonGroup()
     {

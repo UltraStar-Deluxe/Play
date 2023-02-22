@@ -9,7 +9,7 @@ public class AccordionGroup : VisualElement
     {
     }
 
-    private SetFirstAndLastChildClassControl setFirstAndLastChildClassControl;
+    private readonly SetFirstAndLastChildClassControl setFirstAndLastChildClassControl;
 
     public AccordionGroup()
     {
