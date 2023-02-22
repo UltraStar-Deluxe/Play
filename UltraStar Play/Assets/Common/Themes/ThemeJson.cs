@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /**
@@ -15,6 +16,7 @@ public class ThemeJson
     public Color32 fontColorButtons;
     public Color32 fontColorLabels;
     public Color32 fontColor;
+    public List<Color32> microphoneColors;
 
     /**
      * Time with unit for scene transition, e.g. "0.5s" or "200 ms".

@@ -47,6 +47,9 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private ThemeManager themeManager;
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
@@ -134,7 +137,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         noiseSuppressionPickerControl.GetLabelTextFunction = item => item + " %";
         delayPickerControl = new NumberPickerControl(delayContainer.Q<ItemPicker>());
         delayPickerControl.GetLabelTextFunction = item => item + " ms";
-        colorPickerControl = new ColorPickerControl(colorContainer.Q<ItemPicker>(), GetColorItems());
+        colorPickerControl = new ColorPickerControl(colorContainer.Q<ItemPicker>(), themeManager.GetMicrophoneColors());
         sampleRatePickerControl = new SampleRatePickerControl(sampleRateContainer.Q<ItemPicker>());
         sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
@@ -459,23 +462,6 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         helpDialogControl.CloseDialog();
         helpDialogControl = null;
         helpButton.Focus();
-    }
-
-    private List<Color32> GetColorItems()
-    {
-        return new List<Color32>
-        {
-            Colors.CreateColor("#0AFF99"),
-            Colors.CreateColor("#FFD300"),
-            Colors.CreateColor("#FF8700"),
-            Colors.CreateColor("#FF0000"),
-            Colors.CreateColor("#FDFCDC"),
-            Colors.CreateColor("#B392AC"),
-            Colors.CreateColor("#BE0AFF"),
-            Colors.CreateColor("#580AFF"),
-            Colors.CreateColor("#147DF5"),
-            Colors.CreateColor("#0AEFFF"),
-        };
     }
 
     private void InitPitchDetectionFromConnectionClient()

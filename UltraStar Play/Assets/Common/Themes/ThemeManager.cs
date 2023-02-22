@@ -520,4 +520,27 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         uiDocument.rootVisualElement.style.backgroundImage = new StyleBackground();
     }
+
+    public List<Color32> GetMicrophoneColors()
+    {
+        List<Color32> themeMicrophoneColors = GetCurrentTheme()?.ThemeJson?.microphoneColors;
+        if (!themeMicrophoneColors.IsNullOrEmpty())
+        {
+            return themeMicrophoneColors;
+        }
+
+        return new List<Color32>
+        {
+            Colors.CreateColor("#CDF564"),
+            Colors.CreateColor("#FF4633"),
+            Colors.CreateColor("#519BF6"),
+            Colors.CreateColor("#FFC665"),
+            Colors.CreateColor("#F673A2"),
+            Colors.CreateColor("#3C04F2"),
+            Colors.CreateColor("#9FC4D0"),
+            Colors.CreateColor("#FFCDD3"),
+            Colors.CreateColor("#F7E32C"),
+            Colors.CreateColor("#0AEFFF"),
+        };
+    }
 }
