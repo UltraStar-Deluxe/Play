@@ -82,6 +82,9 @@
         "superstar": "icons/theme name/rating_6.png",
         "ultrastar": "icons/theme name/rating_7.png"
     },
+
+    // Custom background music.
+    "backgroundMusic": "music/my-background-music.mp3",
     
     // Defines the colors for the rating after each phrase.
     "phraseRatingColors": {

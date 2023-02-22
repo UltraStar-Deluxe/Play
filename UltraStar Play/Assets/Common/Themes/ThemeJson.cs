@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /**
  * Data structure for theme files.
@@ -19,6 +20,7 @@ public class ThemeJson
     public List<Color32> microphoneColors;
     public Dictionary<string, Color32> phraseRatingColors;
     public Dictionary<string, Color32> songEditorLayerColors;
+    public string backgroundMusic;
 
     /**
      * Time with unit for scene transition, e.g. "0.5s" or "200 ms".

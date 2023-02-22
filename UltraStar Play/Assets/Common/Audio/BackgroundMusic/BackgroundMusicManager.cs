@@ -47,9 +47,17 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
+    private ThemeManager themeManager;
+
+    [Inject]
+    private AudioManager audioManager;
+    
+    [Inject]
     private SceneNavigator sceneNavigator;
 
     private float lastPauseTimeInSeconds;
+    
+    private AudioClip defaultBackgroundMusicAudioClip;
 
     protected override object GetInstance()
     {
@@ -58,7 +66,11 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
+        defaultBackgroundMusicAudioClip = backgroundMusicAudioSource.clip;
         settings.ObserveEveryValueChanged(it => it.AudioSettings.BackgroundMusicVolumePercent)
+            .Subscribe(_ => UpdateBackgroundMusic())
+            .AddTo(gameObject);
+        settings.ObserveEveryValueChanged(it => it.GraphicSettings.themeName)
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => UpdateBackgroundMusic());
@@ -66,6 +78,8 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 
     private void UpdateBackgroundMusic()
     {
+        UpdateAudioClip();
+
         // Update volume
         backgroundMusicAudioSource.volume = settings.AudioSettings.BackgroundMusicVolumePercent / 100f;
 
@@ -88,6 +102,29 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
         {
             backgroundMusicAudioSource.Pause();
             lastPauseTimeInSeconds = Time.time;
+        }
+    }
+
+    private void UpdateAudioClip()
+    {
+        AudioClip loadedAudioClip = null;
+        ThemeMeta currentTheme = themeManager.GetCurrentTheme();
+        string backgroundMusicPath = currentTheme?.ThemeJson?.backgroundMusic;
+        if (!backgroundMusicPath.IsNullOrEmpty())
+        {
+            string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(currentTheme, backgroundMusicPath);
+            loadedAudioClip = audioManager.LoadAudioClipFromUri(absolutePath);
+        }
+
+        if (loadedAudioClip != null
+            && backgroundMusicAudioSource.clip != loadedAudioClip)
+        {
+            backgroundMusicAudioSource.clip = loadedAudioClip;
+        }
+        else if (loadedAudioClip == null
+                 && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
+        {
+            backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
         }
     }
 }

@@ -14,7 +14,9 @@ public static class ThemeMetaUtils
 
     public static string GetAbsoluteFilePath(ThemeMeta themeMeta, string path)
     {
-        if (PathUtils.IsAbsolutePath(path))
+        if (WebRequestUtils.IsHttpOrHttpsUri(path)
+            || WebRequestUtils.IsNetworkPath(path)
+            || PathUtils.IsAbsolutePath(path))
         {
             return path;
         }
