@@ -4,6 +4,6 @@ using UnityEngine;
 [Serializable]
 public class SongRatingImageReference
 {
-    public SongRating.ESongRating songRating;
+    public ESongRating songRating;
     public Sprite sprite;
 }

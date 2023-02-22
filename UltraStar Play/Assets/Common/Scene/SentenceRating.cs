@@ -4,20 +4,14 @@ using UnityEngine;
 
 public class SentenceRating
 {
-    // TODO: Add style sheet classes and define in style sheet
-    private const string SentenceRatingColorPerfect = "#3AFF4EAF";
-    private const string SentenceRatingColorGreat = "#20CF327F";
-    private const string SentenceRatingColorGood = "#E7B41C7F";
-    private const string SentenceRatingColorNotBad = "#44ABDC7F";
-    private const string SentenceRatingColorBad = "#961CE77F";
-
-    public static readonly SentenceRating perfect = new(0.95, R.Messages.rating_sentence_perfect, SentenceRatingColorPerfect);
-    public static readonly SentenceRating great = new(0.75, R.Messages.rating_sentence_great, SentenceRatingColorGreat);
-    public static readonly SentenceRating good = new(0.50, R.Messages.rating_sentence_good, SentenceRatingColorGood);
-    public static readonly SentenceRating notBad = new(0.25, R.Messages.rating_sentence_notBad, SentenceRatingColorNotBad);
-    public static readonly SentenceRating bad = new(0, R.Messages.rating_sentence_bad, SentenceRatingColorBad);
+    public static readonly SentenceRating perfect = new(ESentenceRating.Perfect, 0.95, R.Messages.rating_sentence_perfect);
+    public static readonly SentenceRating great = new(ESentenceRating.Great, 0.75, R.Messages.rating_sentence_great);
+    public static readonly SentenceRating good = new(ESentenceRating.Good, 0.50, R.Messages.rating_sentence_good);
+    public static readonly SentenceRating notBad = new(ESentenceRating.NotBad, 0.25, R.Messages.rating_sentence_notBad);
+    public static readonly SentenceRating bad = new(ESentenceRating.Bad, 0, R.Messages.rating_sentence_bad);
 
     private readonly string i18nCode;
+    public ESentenceRating EnumValue { get; private set; }
     public double PercentageThreshold { get; private set; }
 
     public string Text
@@ -27,8 +21,6 @@ public class SentenceRating
             return TranslationManager.GetTranslation(i18nCode);
         }
     }
-
-    public Color BackgroundColor { get; private set; }
 
     private static List<SentenceRating> values;
     public static List<SentenceRating> Values
@@ -48,11 +40,11 @@ public class SentenceRating
         }
     }
 
-    private SentenceRating(double percentThreshold, string i18nCode, string hexBackgroundColor)
+    private SentenceRating(ESentenceRating enumValue, double percentThreshold, string i18nCode)
     {
+        this.EnumValue = enumValue;
         this.PercentageThreshold = percentThreshold;
         this.i18nCode = i18nCode;
-        BackgroundColor = Colors.CreateColor(hexBackgroundColor);
     }
 
     public static SentenceRating GetSentenceRating(double correctNotesPercentage)

@@ -105,7 +105,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         UpdateTranslation();
     }
 
-    private void LoadSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
         if (settings.DeveloperSettings.disableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
@@ -116,7 +116,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         LoadSongRatingSpriteFromTheme(songRatingEnumValue, onSuccess);
     }
 
-    private void LoadSongRatingSpriteFromTheme(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private void LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
         try
         {
@@ -138,7 +138,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
     }
 
-    private void LoadDefaultSongRatingSprite(SongRating.ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private void LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
         SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
             .FirstOrDefault(it => it.songRating == songRatingEnumValue);

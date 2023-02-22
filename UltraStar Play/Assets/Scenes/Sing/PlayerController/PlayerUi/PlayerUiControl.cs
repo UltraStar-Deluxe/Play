@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -11,11 +12,14 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 {
     private const int LineCount = 10;
 
-    [Inject(Key = Injector.RootVisualElementInjectionKey)]
-    public VisualElement RootVisualElement { get; private set; }
-
     [Inject]
     private PlayerScoreControl playerScoreControl;
+    
+    [Inject]
+    private ThemeManager themeManager;
+    
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    public VisualElement RootVisualElement { get; private set; }
 
     [Inject(Optional = true)]
     private MicProfile micProfile;
@@ -67,7 +71,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private int totalScoreAnimationId;
     private int micDisconnectedAnimationId;
     private int leadingPlayerIconAnimationId;
-
+    private Dictionary<ESentenceRating, Color32> sentenceRatingColors;
+    
     public void OnInjectionFinished()
     {
         InitPlayerNameAndImage();
@@ -117,6 +122,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .Subscribe(xs => CreatePerfectSentenceEffect());
 
         ChangeLayoutByPlayerCount();
+
+        sentenceRatingColors = themeManager.GetSentenceRatingColors();
     }
 
     private void InitPlayerNameAndImage()
@@ -208,7 +215,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
         visualElement.Q<Label>().text = sentenceRating.Text;
-        visualElement.style.unityBackgroundImageTintColor = sentenceRating.BackgroundColor;
+        visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         visualElement.style.right = 0;
         parentContainer.Add(visualElement);
 

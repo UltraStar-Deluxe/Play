@@ -543,4 +543,31 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             Colors.CreateColor("#0AEFFF"),
         };
     }
+    
+    public Dictionary<ESentenceRating, Color32> GetSentenceRatingColors()
+    {
+        Dictionary<ESentenceRating, Color32> result = new()
+        {
+            { ESentenceRating.Perfect, Colors.CreateColor("#3AFF4EAF")},
+            { ESentenceRating.Great, Colors.CreateColor("#20CF327F")},
+            { ESentenceRating.Good, Colors.CreateColor("#E7B41C7F")},
+            { ESentenceRating.NotBad, Colors.CreateColor("#44ABDC7F")},
+            { ESentenceRating.Bad, Colors.CreateColor("#961CE77F")},
+        };
+    
+        Dictionary<string, Color32> ratingNameToColor = GetCurrentTheme()?.ThemeJson?.phraseRatingColors;
+        if (ratingNameToColor.IsNullOrEmpty())
+        {
+            return result;
+        }
+
+        ratingNameToColor.ForEach(entry =>
+        {
+            if (Enum.TryParse(entry.Key, true, out ESentenceRating rating))
+            {
+                result[rating] = entry.Value;
+            }
+        });
+        return result;
+    }
 }

@@ -17,6 +17,8 @@ public class ThemeJson
     public Color32 fontColorLabels;
     public Color32 fontColor;
     public List<Color32> microphoneColors;
+    public Dictionary<string, Color32> phraseRatingColors;
+    public Dictionary<string, Color32> songEditorLayerColors;
 
     /**
      * Time with unit for scene transition, e.g. "0.5s" or "200 ms".
