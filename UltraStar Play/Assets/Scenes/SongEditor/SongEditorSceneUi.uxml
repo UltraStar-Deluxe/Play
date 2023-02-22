@@ -1,87 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="SongEditorSideBarSettingsUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarSettingsUi.uxml?fileID=9197481963319205126&amp;guid=d33b795ed5b4e2a47a0d308599bc2650&amp;type=3#SongEditorSideBarSettingsUi" />
+    <ui:Template name="SongEditorSideBarSecondaryColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarSecondaryColumnUi.uxml?fileID=9197481963319205126&amp;guid=91ce971b984f18c4fa80c614d2dc32d8&amp;type=3#SongEditorSideBarSecondaryColumnUi" />
+    <ui:Template name="SongEditorSideBarMainColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarMainColumnUi.uxml?fileID=9197481963319205126&amp;guid=9015a7e9aa0de9248bb4893d185955a1&amp;type=3#SongEditorSideBarMainColumnUi" />
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
     <ui:VisualElement name="songEditorRoot" style="width: 100%; height: 100%; flex-direction: column; align-items: flex-start;">
         <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
             <ui:VisualElement name="leftSideBar" style="flex-direction: row;">
-                <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont leftSideBar" style="border-left-width: 0; border-top-width: 0; border-bottom-width: 0; justify-content: space-between;">
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" horizontal-scroller-visibility="Hidden" style="height: 100%;">
-                        <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" style="justify-content: center;">
-                            <ui:Label text="Play/Pause" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="playIcon" icon="play_arrow" />
-                            <MaterialIcon name="pauseIcon" icon="pause" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton">
-                            <ui:Label text="Record" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="fiber_manual_record" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="toggleIssuesButton">
-                            <ui:Label text="Issues" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="warning" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="toggleSongPropertiesButton">
-                            <ui:Label text="Properties" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="queue_music" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="toggleLayersButton">
-                            <ui:Label text="Layers" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="layers" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="toggleSettingsButton">
-                            <ui:Label text="Settings" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="settings" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="toggleHelpButton">
-                            <ui:Label text="Help" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="help_outline" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="openSongFolderButton">
-                            <ui:Label text="Folder" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="folder" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="undoButton">
-                            <ui:Label text="Undo" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="undo" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="redoButton">
-                            <ui:Label text="Redo" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="redo" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="saveButton">
-                            <ui:Label text="Save" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="save" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="exitSceneButton">
-                            <ui:Label text="Back" display-tooltip-when-elided="true" name="label" />
-                            <MaterialIcon name="icon" icon="arrow_back" class="rounded" />
-                        </ui:Button>
-                        <ui:Button display-tooltip-when-elided="true" name="toggleSideBarSizeButton">
-                            <MaterialIcon name="wideIcon" icon="unfold_less" class="rounded invertedVisibility" style="rotate: 90deg;" />
-                            <MaterialIcon name="smallIcon" icon="unfold_more" class="rounded" style="rotate: 90deg;" />
-                        </ui:Button>
-                    </ui:ScrollView>
-                </ui:VisualElement>
-                <ui:VisualElement name="leftSideBarSecondaryColumn" class="panel" style="border-top-width: 0; border-bottom-width: 0; display: flex; height: 100%; flex-direction: row;">
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="issuesSideBarContainer" class="secondarySideBarPanel">
-                        <ui:Label text="Issues" display-tooltip-when-elided="true" name="issuesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
-                    </ui:ScrollView>
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="layersSideBarContainer" class="secondarySideBarPanel">
-                        <ui:Label text="Note Layers" display-tooltip-when-elided="true" name="layersTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
-                    </ui:ScrollView>
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songPropertiesSideBarContainer" class="secondarySideBarPanel" style="display: none;">
-                        <ui:Label text="Song Properties" display-tooltip-when-elided="true" name="songPropertiesTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
-                        <ui:Label text="BPM" display-tooltip-when-elided="true" name="bpmLabel" style="margin-bottom: 5px;" />
-                        <ui:TextField picking-mode="Ignore" value="999" text="999" name="bpmTextField" style="margin-bottom: 5px;" />
-                        <ui:Button text="Click to find BPM" display-tooltip-when-elided="true" name="detectBpmButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 1px;" />
-                        <ui:Label text="No clicks yet" display-tooltip-when-elided="true" name="detectBpmLabel" style="-unity-text-align: upper-center; margin-bottom: 5px;" />
-                        <ui:Button text="Set BPM&#10;keep note duration" display-tooltip-when-elided="true" name="setBpmKeepNoteDurationButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-bottom: 5px; height: 40px; margin-top: 0;" />
-                        <ui:Button text="Set BPM&#10;change note duration" display-tooltip-when-elided="true" name="setBpmChangeNoteDurationButton" style="width: 100%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 5px; height: 40px;" />
-                    </ui:ScrollView>
-                    <ui:Instance template="SongEditorSideBarSettingsUi" name="sideBarSettingsUi" />
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="helpSideBarContainer" class="secondarySideBarPanel" style="flex-grow: 1; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
-                        <ui:Label text="Song Editor Controls" display-tooltip-when-elided="true" name="helpTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
-                    </ui:ScrollView>
-                </ui:VisualElement>
+                <ui:Instance template="SongEditorSideBarMainColumnUi" name="sideBarMainColumnUi" />
+                <ui:Instance template="SongEditorSideBarSecondaryColumnUi" name="sideBarSecondaryColumnUi" style="display: none;" />
             </ui:VisualElement>
             <ui:VisualElement name="virtualPiano" style="height: 100%; width: 28px;" />
             <ui:VisualElement name="noteArea" style="flex-grow: 1; overflow: hidden;">

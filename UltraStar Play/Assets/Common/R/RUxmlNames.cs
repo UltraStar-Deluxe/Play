@@ -526,7 +526,10 @@ public static partial class R
         public const string showVideoButton = "showVideoButton";
         public const string showVirtualPianoContainer = "showVirtualPianoContainer";
         public const string showVirtualPianoToggle = "showVirtualPianoToggle";
+        public const string sideBarMainColumnUi = "sideBarMainColumnUi";
+        public const string sideBarSecondaryColumnUi = "sideBarSecondaryColumnUi";
         public const string sideBarSettingsUi = "sideBarSettingsUi";
+        public const string sideBarSongPropertiesUi = "sideBarSongPropertiesUi";
         public const string SingingLyricsUi = "SingingLyricsUi";
         public const string singingOptionsScrollView = "singingOptionsScrollView";
         public const string singingResultsPlayerUi = "singingResultsPlayerUi";
@@ -545,7 +548,10 @@ public static partial class R
         public const string songDetailOverlay = "songDetailOverlay";
         public const string songDetailOverlayScrollView = "songDetailOverlayScrollView";
         public const string songEditorRoot = "songEditorRoot";
+        public const string SongEditorSideBarMainColumnUi = "SongEditorSideBarMainColumnUi";
+        public const string SongEditorSideBarSecondaryColumnUi = "SongEditorSideBarSecondaryColumnUi";
         public const string SongEditorSideBarSettingsUi = "SongEditorSideBarSettingsUi";
+        public const string SongEditorSideBarSongPropertiesUi = "SongEditorSideBarSongPropertiesUi";
         public const string songEntryContainer = "songEntryContainer";
         public const string songEntryDuetIcon = "songEntryDuetIcon";
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
