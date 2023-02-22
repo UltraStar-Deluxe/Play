@@ -94,6 +94,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     private float dragDuration;
     private Vector2 dragStartPosition;
 
+    private bool themeNeedsUpdate;
+
     private void Start()
     {
         songEntryPlaceholderControls = songEntryPlaceholders
@@ -206,11 +208,16 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
                 songRouletteItem.VisualElement.style.scale = new StyleScale(new Scale(Vector3.one));
             }
         }
+
+        if (themeNeedsUpdate)
+        {
+            themeNeedsUpdate = false;
+            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        }
     }
 
     private void SpawnAndRemoveSongRouletteItems()
     {
-        bool uiModified = false;
         List<SongEntryControl> usedSongRouletteItems = new();
 
         // Spawn roulette items for songs to be displayed (i.e. selected song and its surrounding songs)
@@ -224,7 +231,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
             if (songRouletteItem == null)
             {
                 songRouletteItem = CreateSongRouletteItem(songMeta, placeholderControl);
-                uiModified = true;
             }
 
             // Update target
@@ -238,14 +244,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
             if (!usedSongRouletteItems.Contains(songRouletteItem))
             {
                 RemoveSongRouletteItem(songRouletteItem);
-                uiModified = true;
             }
-        }
-
-        // Update style sheet
-        if (uiModified)
-        {
-            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
     }
 
@@ -289,6 +288,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
 
         songEntryContainer.Add(item.VisualElement);
 
+        themeNeedsUpdate = true;
+        
         return item;
     }
 
