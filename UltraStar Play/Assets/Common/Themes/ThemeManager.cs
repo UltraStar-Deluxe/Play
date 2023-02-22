@@ -13,7 +13,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     /**
      * Filename without extension of the theme that should be loaded by default
      */
-    public const string DefaultThemeName = "default_blue";
+    public const string DefaultThemeName = "default_dark";
     private const string ThemeFolderName = "Themes";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
 

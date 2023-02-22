@@ -1,0 +1,8 @@
+{
+    "fontColor": "#D0D5DD",
+    "buttonMainColor": "#475467",
+    "staticBackground": {
+        "imagePath": "backgrounds/dot-grid.jpg",
+        "scaleMode": "ScaleAndCrop",
+    }
+}
