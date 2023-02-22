@@ -67,8 +67,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     }
 
     private Label DoCreateNotification(
-        string text,
-        params string[] additionalTextClasses)
+        string text)
     {
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
@@ -83,10 +82,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         VisualElement notification = templateContainer.Children().First();
         Label notificationLabel = notification.Q<Label>("notificationLabel");
         notificationLabel.text = text;
-        if (additionalTextClasses != null)
-        {
-            additionalTextClasses.ForEach(className => notificationLabel.AddToClassList(className));
-        }
         notificationOverlay.Add(notification);
 
         // Fade out then remove
@@ -101,10 +96,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     }
 
     public static Label CreateNotification(
-        string text,
-        params string[] additionalTextClasses)
+        string text)
     {
-        return Instance.DoCreateNotification(text, additionalTextClasses);
+        return Instance.DoCreateNotification(text);
     }
 
     public static IEnumerator FadeOutVisualElement(

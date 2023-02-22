@@ -24,8 +24,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     }
 
     private Label DoCreateNotification(
-        string text,
-        params string[] additionalTextClasses)
+        string text)
     {
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
@@ -47,9 +46,8 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
     }
 
     public static Label CreateNotification(
-        string text,
-        params string[] additionalTextClasses)
+        string text)
     {
-        return Instance.DoCreateNotification(text, additionalTextClasses);
+        return Instance.DoCreateNotification(text);
     }
 }
