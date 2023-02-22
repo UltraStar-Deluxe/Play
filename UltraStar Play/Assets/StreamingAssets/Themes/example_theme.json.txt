@@ -81,5 +81,31 @@
         "leadSinger": "icons/theme name/rating_5.png",
         "superstar": "icons/theme name/rating_6.png",
         "ultrastar": "icons/theme name/rating_7.png"
+    },
+    
+    // Defines the colors for the rating after each phrase.
+    "phraseRatingColors": {
+      "perfect": "#00FF00",
+      "great": "#006600",
+      "good": "#FF00FF",
+      "notBad": "#0000FF",
+      "bad": "#FF0000",
+    },
+
+    // Defines available colors for recording devices
+    "microphoneColors": [
+        "#FF0000",
+        "#00FF00",
+        "#0000FF",
+    ],
+    
+    // Defines colors for the song editor
+    "songEditorLayerColors": {
+      "P1": "#ccbbaa",
+      "P2": "#aabbff",
+      "MicRecording": "#FF0000",
+      "ButtonRecording": "#00FF00",
+      "CopyPaste": "#FF00FF",
+      "MidiFile": "#FFFF00",
     }
 }
