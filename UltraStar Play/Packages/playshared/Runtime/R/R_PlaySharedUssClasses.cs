@@ -32,6 +32,7 @@ public static partial class R_PlayShared
         public const string ellipsis = "ellipsis";
         public const string error = "error";
         public const string expanded = "expanded";
+        public const string featherIcon = "featherIcon";
         public const string firstChild = "firstChild";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fontIcon = "fontIcon";

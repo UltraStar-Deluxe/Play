@@ -307,6 +307,10 @@ AccordionItem.expanded #toggleAccordionItemContentIcon {
     -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/BootstrapIcons%20SDF.asset?fileID=11400000&guid=2273cbbf74fd5304da72d333c483c39a&type=2#BootstrapIcons SDF');
 }
 
+.featherIcon {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/Feather/Feather SDF.asset');
+}
+
 /**************************************************/
 /* TEXT FIELD PLACEHOLDER */
 /**************************************************/
