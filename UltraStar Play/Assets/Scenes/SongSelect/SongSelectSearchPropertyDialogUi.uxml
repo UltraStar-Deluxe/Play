@@ -1,0 +1,40 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="searchPropertyScrollView" style="flex-grow: 1;">
+        <ui:VisualElement name="artistPropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+            <ui:Toggle />
+            <ui:Label text="Artist" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="titlePropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+            <ui:Toggle />
+            <ui:Label text="Title" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="genrePropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+            <ui:Toggle />
+            <ui:Label text="Genre" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="yearPropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+            <ui:Toggle />
+            <ui:Label text="Year" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="languagePropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+            <ui:Toggle />
+            <ui:Label text="Language" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="editionPropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+            <ui:Toggle />
+            <ui:Label text="Edition" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="lyricsPropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
+            <ui:Toggle />
+            <ui:Label text="Lyrics" display-tooltip-when-elided="true" style="margin-right: 5px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="showSearchExpressionInfoContainer" style="align-items: flex-start;">
+            <ui:Label text="Advanced search available" display-tooltip-when-elided="true" name="showSearchExpressionInfoTitle" class="smallFont" style="margin-bottom: 5px;" />
+            <ui:VisualElement style="align-items: auto; width: 100%;">
+                <ui:Button display-tooltip-when-elided="true" name="showSearchExpressionInfoButton" class="squareButton" style="width: auto; height: auto;">
+                    <MaterialIcon name="helpIcon" icon="help_outline" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:ScrollView>
+</ui:UXML>

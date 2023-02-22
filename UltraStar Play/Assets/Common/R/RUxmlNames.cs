@@ -575,10 +575,13 @@ public static partial class R
         public const string songPropertyEntryUiRoot = "songPropertyEntryUiRoot";
         public const string songQueueRights = "songQueueRights";
         public const string songRouletteContainer = "songRouletteContainer";
+        public const string SongSelectEditPlaylistDialogUi = "SongSelectEditPlaylistDialogUi";
+        public const string SongSelectMenuUi = "SongSelectMenuUi";
         public const string songSelectPlayerSelectUi = "songSelectPlayerSelectUi";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
         public const string SongSelectScenePlayerEntryUi = "SongSelectScenePlayerEntryUi";
         public const string SongSelectScenePlayerSelectUi = "SongSelectScenePlayerSelectUi";
+        public const string SongSelectSearchPropertyDialogUi = "SongSelectSearchPropertyDialogUi";
         public const string SongSelectSongEntryUi = "SongSelectSongEntryUi";
         public const string songSettingsProblemHintIcon = "songSettingsProblemHintIcon";
         public const string songsOptionsButton = "songsOptionsButton";
