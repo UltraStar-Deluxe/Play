@@ -570,4 +570,29 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         });
         return result;
     }
+    
+    public Dictionary<string, Color32> GetSongEditorLayerColors()
+    {
+        Dictionary<string, Color32> result = new()
+        {
+            { "P1", Colors.CreateColor("#2ecc71")},
+            { "P2", Colors.CreateColor("#9b59b6")},
+            { "MicRecording", Colors.CreateColor("#1D67C2")},
+            { "ButtonRecording", Colors.CreateColor("#138BBA")},
+            { "CopyPaste", Colors.CreateColor("#F08080")},
+            { "MidiFile", Colors.CreateColor("#0F9799")},
+        };
+
+        Dictionary<string, Color32> layerNameToColor = GetCurrentTheme()?.ThemeJson?.songEditorLayerColors;
+        if (layerNameToColor.IsNullOrEmpty())
+        {
+            return result;
+        }
+
+        layerNameToColor.ForEach(entry =>
+        {
+            result[entry.Key] = entry.Value;
+        });
+        return result;
+    }
 }
