@@ -703,9 +703,12 @@ public static partial class R
         public const string songSelectionJokerCountItemPicker = "songSelectionJokerCountItemPicker";
         public const string songSelectionPlaylistItemPicker = "songSelectionPlaylistItemPicker";
         public const string songSelectionUi = "songSelectionUi";
+        public const string SongSelectMenuUi = "SongSelectMenuUi";
         public const string songSelectPlayerSelectUi = "songSelectPlayerSelectUi";
+        public const string SongSelectSceneEditPlaylistDialogUi = "SongSelectSceneEditPlaylistDialogUi";
         public const string SongSelectSceneMicEntryUi = "SongSelectSceneMicEntryUi";
         public const string SongSelectScenePlayerSelectUi = "SongSelectScenePlayerSelectUi";
+        public const string SongSelectSearchPropertyDialogUi = "SongSelectSearchPropertyDialogUi";
         public const string SongSelectSongEntryUi = "SongSelectSongEntryUi";
         public const string songSettingsProblemHintIcon = "songSettingsProblemHintIcon";
         public const string songsOptionsButton = "songsOptionsButton";
