@@ -254,6 +254,7 @@ public static partial class R
         public const string legendContainer = "legendContainer";
         public const string legendInnerContainer = "legendInnerContainer";
         public const string lo = "lo";
+        public const string loadedSceneUi = "loadedSceneUi";
         public const string loadingLabel = "loadingLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logo = "logo";
@@ -365,6 +366,7 @@ public static partial class R
         public const string openPersistentDataPathLabel = "openPersistentDataPathLabel";
         public const string openSongEditorButton = "openSongEditorButton";
         public const string openSongFolderButton = "openSongFolderButton";
+        public const string optionsSceneScrollView = "optionsSceneScrollView";
         public const string outputTextField = "outputTextField";
         public const string overlay = "overlay";
         public const string overviewArea = "overviewArea";

@@ -264,10 +264,15 @@
 }
 
 .optionsOverviewButton {
-    height: var(--control-height-large);
-    width: var(--control-width-large);
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: center;
+    flex-direction: row;
+    /*color: #101828;*/
+    /*background-color: #FFFFFF;*/
+}
+
+.optionsOverviewButton > .fontIcon {
+    min-width: 40px;
 }
 
 .optionsOverviewButton .warning {

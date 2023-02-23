@@ -1,7 +1,8 @@
-﻿using PrimeInputActions;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ProTrans;
 using UniInject;
-using UniRx;
+using UniInject.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,44 +11,43 @@ using UnityEngine.UIElements;
 
 public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
+    public List<OptionSceneRecipe> optionSceneRecipes = new();
+    
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
-
     [Inject(UxmlName = R.UxmlNames.gameOptionsButton)]
-    private Button gameOptionsButton;
+    private ToggleButton gameOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.songsOptionsButton)]
-    private Button songsOptionsButton;
+    private ToggleButton songsOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.graphicsOptionsButton)]
-    private Button graphicsOptionsButton;
+    private ToggleButton graphicsOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.soundOptionsButton)]
-    private Button soundOptionsButton;
+    private ToggleButton soundOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.recordingOptionsButton)]
-    private Button recordingOptionsButton;
+    private ToggleButton recordingOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.profileOptionsButton)]
-    private Button profileOptionsButton;
+    private ToggleButton profileOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.designOptionsButton)]
-    private Button designOptionsButton;
+    private ToggleButton designOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.internetOptionsButton)]
-    private Button internetOptionsButton;
+    private ToggleButton internetOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.appOptionsButton)]
-    private Button appOptionsButton;
+    private ToggleButton appOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.developerOptionsButton)]
-    private Button developerOptionsButton;
+    private ToggleButton developerOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.webcamOptionsButton)]
-    private Button webcamOptionsButton;
+    private ToggleButton webcamOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.languageChooser)]
     private ItemPicker languageChooser;
@@ -61,6 +61,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.playerProfileSettingsProblemHintIcon)]
     private VisualElement playerProfileSettingsProblemHintIcon;
 
+    [Inject(UxmlName = R.UxmlNames.loadedSceneUi)]
+    private VisualElement loadedSceneUi;
+    
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -74,33 +77,99 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private SongMetaManager songMetaManager;
 
     [Inject]
-    private UIDocument uiDoc;
-
-    [Inject]
     private Injector injector;
 
-	private void Start()
+    [Inject]
+    private UIDocument uiDocument;
+    
+    private readonly List<GameObject> loadedGameObjects = new();
+    private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
+    private OptionSceneRecipe loadedSceneRecipe;
+    
+    private void Start()
     {
-        gameOptionsButton.Focus();
+        sceneToButtonMap.Add(EScene.OptionsGameScene, gameOptionsButton);
+        sceneToButtonMap.Add(EScene.SongLibraryOptionsScene, songsOptionsButton);
+        sceneToButtonMap.Add(EScene.OptionsGraphicsScene, graphicsOptionsButton);
+        sceneToButtonMap.Add(EScene.OptionsSoundScene, soundOptionsButton);
+        sceneToButtonMap.Add(EScene.RecordingOptionsScene, recordingOptionsButton);
+        sceneToButtonMap.Add(EScene.PlayerProfileSetupScene, profileOptionsButton);
+        sceneToButtonMap.Add(EScene.ThemeOptionsScene, designOptionsButton);
+        sceneToButtonMap.Add(EScene.NetworkOptionsScene, internetOptionsButton);
+        sceneToButtonMap.Add(EScene.CompanionAppOptionsScene, appOptionsButton);
+        sceneToButtonMap.Add(EScene.DevelopmentOptionsScene, developerOptionsButton);
+        sceneToButtonMap.Add(EScene.WebcamOptionsSecene, webcamOptionsButton);
 
-        gameOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsGameScene));
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
-        songsOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
-        graphicsOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsGraphicsScene));
-        soundOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsSoundScene));
-        recordingOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.RecordingOptionsScene));
-        profileOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.PlayerProfileSetupScene));
-        designOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ThemeOptionsScene));
-        internetOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.NetworkOptionsScene));
-        appOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CompanionAppOptionsScene));
-        developerOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene));
-        webcamOptionsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.WebcamOptionsSecene));
+        sceneToButtonMap.ForEach(entry =>
+        {
+           entry.Value.RegisterCallbackButtonTriggered(() => LoadScene(entry.Key)); 
+        });
+
+        gameOptionsButton.Focus();
 
         InitSettingsProblemHints();
         InitLanguageChooser();
+        
+        LoadOptionsScene(optionSceneRecipes.FirstOrDefault());
+    }
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.MainScene));
+    private void LoadScene(EScene scene)
+    {
+        OptionSceneRecipe sceneRecipe = optionSceneRecipes.FirstOrDefault(recipe => recipe.scene == scene);
+        if (sceneRecipe != null)
+        {
+            LoadOptionsScene(sceneRecipe);
+        }
+        else
+        {
+            sceneNavigator.LoadScene(scene);
+        }
+    }
+
+    private void LoadOptionsScene(OptionSceneRecipe sceneRecipe)
+    {
+        // Set button style
+        if (loadedSceneRecipe != null)
+        {
+            sceneToButtonMap[loadedSceneRecipe.scene].SetActive(false);
+        }
+        sceneToButtonMap[sceneRecipe.scene].SetActive(true);
+        
+        // Remove objects of old scene
+        loadedGameObjects.ForEach(Destroy);
+        loadedGameObjects.Clear();
+        
+        // Load scene UI
+        loadedSceneUi.Clear();
+        VisualElement loadedSceneVisualElement = sceneRecipe.visualTreeAsset.CloneTree().Children().FirstOrDefault();
+        loadedSceneUi.Add(loadedSceneVisualElement);
+
+        VisualElement scoreModeContainer = loadedSceneVisualElement.Q<VisualElement>(R.UxmlNames.scoreModeContainer);
+
+        // Load scene scripts.
+        // Add new bindings.
+        Injector loadedSceneInjector = injector.CreateChildInjector();
+        foreach (GameObject gameObjectRecipe in sceneRecipe.sceneGameObjects)
+        {
+            foreach (IBinder binder in gameObjectRecipe.GetComponentsInChildren<IBinder>())
+            {
+                binder.GetBindings().ForEach(binding => loadedSceneInjector.AddBinding(binding));
+            }
+        }
+
+        // Inject new game objects
+        foreach (GameObject gameObjectRecipe in sceneRecipe.sceneGameObjects)
+        {
+            GameObject loadedGameObject = Instantiate(gameObjectRecipe);
+            loadedGameObjects.Add(loadedGameObject);
+            
+            // Inject new game object
+            loadedSceneInjector
+                .WithRootVisualElement(loadedSceneVisualElement)
+                .InjectAllComponentsInChildren(loadedGameObject);
+        }
+
+        loadedSceneRecipe = sceneRecipe;
     }
 
     private void InitSettingsProblemHints()
@@ -133,7 +202,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     public void UpdateTranslation()
     {
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options);
-        backButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.back);
         gameOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_game_button);
         songsOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_button);
         soundOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_sound_button);

@@ -48,7 +48,6 @@ public static partial class R
         public const string noteAreaGridLabel = "noteAreaGridLabel";
         public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
         public const string optionsOverviewButton = "optionsOverviewButton";
-        public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
         public const string optionsSceneMainContainer = "optionsSceneMainContainer";
         public const string optionsSceneTitleAndImageContainer = "optionsSceneTitleAndImageContainer";
         public const string optionsSceneTitleContainer = "optionsSceneTitleContainer";
@@ -87,6 +86,7 @@ public static partial class R
         public const string titleImage = "titleImage";
         public const string titleSubText = "titleSubText";
         public const string titleText = "titleText";
+        public const string toggleButton = "toggleButton";
         public const string tooltip = "tooltip";
         public const string transparentBackgroundColor = "transparentBackgroundColor";
         public const string verticalGridLine = "verticalGridLine";

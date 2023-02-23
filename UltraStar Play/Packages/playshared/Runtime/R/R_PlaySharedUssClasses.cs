@@ -4,6 +4,7 @@ public static partial class R_PlayShared
     public static class UssClasses
     {
         public const string accordionRoot = "accordionRoot";
+        public const string active = "active";
         public const string asset = "asset";
         public const string bootstrapIcon = "bootstrapIcon";
         public const string centerHorizontalByMargin = "centerHorizontalByMargin";
