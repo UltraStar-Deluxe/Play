@@ -14,14 +14,14 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject(UxmlName = R.UxmlNames.deviceContainer)]
-    private VisualElement deviceContainer;
+    [Inject(UxmlName = R.UxmlNames.devicePicker)]
+    private ItemPicker devicePicker;
 
     [Inject(UxmlName = R.UxmlNames.webcamRenderContainer)]
     private Image webcamRenderContainer;
 
-    [Inject(UxmlName = R.UxmlNames.useWebcamContainer)]
-    private VisualElement useWebcamContainer;
+    [Inject(UxmlName = R.UxmlNames.useWebcamToggle)]
+    private Toggle useWebcamToggle;
 
     [Inject]
     private Settings settings;
@@ -40,18 +40,15 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     public void UpdateTranslation()
     {
-        useWebcamContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_webcam_useAsBackGroundInSingingScene);
-        useWebcamContainer.Q<Toggle>().value = settings.WebcamSettings.UseAsBackgroundInSingScene;
-        useWebcamContainer.Q<Toggle>().RegisterValueChangedCallback(
-            (changeEvent) => 
-                settings.WebcamSettings.UseAsBackgroundInSingScene = changeEvent.newValue
-            );
-        deviceContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_webcam_device);
+        useWebcamToggle.label = TranslationManager.GetTranslation(R.Messages.options_webcam_useAsBackGroundInSingingScene);
+        useWebcamToggle.value = settings.WebcamSettings.UseAsBackgroundInSingScene;
+        useWebcamToggle.RegisterValueChangedCallback(evt => settings.WebcamSettings.UseAsBackgroundInSingScene = evt.newValue);
+        devicePicker.Label = TranslationManager.GetTranslation(R.Messages.options_webcam_device);
     }
 
     private void InitWebcamPicker()
     {
-        devicePickerControl = new LabeledItemPickerControl<WebCamDevice>(deviceContainer.Q<ItemPicker>(), webCamManager.GetWebCamDevices());
+        devicePickerControl = new LabeledItemPickerControl<WebCamDevice>(devicePicker, webCamManager.GetWebCamDevices());
         devicePickerControl.GetLabelTextFunction = device => device.name;
         if (!TryReSelectLastWebcam() && devicePickerControl.Items.Count > 0)
         {
@@ -72,7 +69,6 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             Debug.Log("No webcam found");
             devicePickerControl.GetLabelTextFunction = nullDevice => TranslationManager.GetTranslation(R.Messages.options_webcam_noWebcamsAvailable);
             devicePickerControl.Items.Add(new WebCamDevice());
-            useWebcamContainer.SetEnabled(false);
         }
     }
 

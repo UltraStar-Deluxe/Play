@@ -17,14 +17,14 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
     [Inject]
     private TranslationManager translationManager;
 
-    [Inject(UxmlName = R.UxmlNames.resolutionContainer)]
-    private VisualElement resolutionContainer;
+    [Inject(UxmlName = R.UxmlNames.resolutionPicker)]
+    private ItemPicker resolutionPicker;
 
-    [Inject(UxmlName = R.UxmlNames.fpsContainer)]
-    private VisualElement fpsContainer;
+    [Inject(UxmlName = R.UxmlNames.targetFpsPicker)]
+    private ItemPicker targetFpsPicker;
 
-    [Inject(UxmlName = R.UxmlNames.fullscreenContainer)]
-    private VisualElement fullscreenContainer;
+    [Inject(UxmlName = R.UxmlNames.fullscreenModePicker)]
+    private ItemPicker fullscreenModePicker;
 
     [Inject]
     private Settings settings;
@@ -35,26 +35,26 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
         
         if (PlatformUtils.IsStandalone)
         {
-            new ScreenResolutionPickerControl(resolutionContainer.Q<ItemPicker>(), settings);
-            new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>(), settings, gameObject);
+            new ScreenResolutionPickerControl(resolutionPicker, settings);
+            new FullscreenModePickerControl(fullscreenModePicker, settings, gameObject);
         }
         else
         {
-            resolutionContainer.HideByDisplay();
-            fullscreenContainer.HideByDisplay();
+            resolutionPicker.HideByDisplay();
+            fullscreenModePicker.HideByDisplay();
         }
 
         List<int> fpsOptions = new() { 30, 60 };
-        new LabeledItemPickerControl<int>(fpsContainer.Q<ItemPicker>(), fpsOptions)
+        new LabeledItemPickerControl<int>(targetFpsPicker, fpsOptions)
             .Bind(() => settings.GraphicSettings.targetFps,
                 newValue => settings.GraphicSettings.targetFps = newValue);
     }
 
     public void UpdateTranslation()
     {
-        resolutionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_resolution);
-        fpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_targetFps);
-        fullscreenContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);
+        resolutionPicker.Label = TranslationManager.GetTranslation(R.Messages.options_resolution);
+        targetFpsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_targetFps);
+        fullscreenModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);
     }
 
     protected override void OnDestroy()

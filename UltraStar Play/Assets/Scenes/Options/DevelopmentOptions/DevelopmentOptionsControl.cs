@@ -20,23 +20,23 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject]
     private TranslationManager translationManager;
 
-    [Inject(UxmlName = R.UxmlNames.showFpsContainer)]
-    private VisualElement showFpsContainer;
+    [Inject(UxmlName = R.UxmlNames.showFpsPicker)]
+    private ItemPicker showFpsPicker;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmContainer)]
-    private VisualElement pitchDetectionAlgorithmContainer;
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
+    private ItemPicker pitchDetectionAlgorithmPicker;
 
-    [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNoteContainer)]
-    private VisualElement analyzeBeatsWithoutTargetNoteContainer;
+    [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNotePicker)]
+    private ItemPicker analyzeBeatsWithoutTargetNotePicker;
 
-    [Inject(UxmlName = R.UxmlNames.disableDynamicThemesContainer)]
-    private VisualElement disableDynamicThemesContainer;
+    [Inject(UxmlName = R.UxmlNames.disableDynamicThemesPicker)]
+    private ItemPicker disableDynamicThemesPicker;
 
-    [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidContainer)]
-    private VisualElement customEventSystemOptInOnAndroidContainer;
+    [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidPicker)]
+    private ItemPicker customEventSystemOptInOnAndroidPicker;
 
-    [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorContainer)]
-    private VisualElement useUniversalCharsetDetectorContainer;
+    [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorPicker)]
+    private ItemPicker useUniversalCharsetDetectorPicker;
 
     [Inject(UxmlName = R.UxmlNames.ipAddressLabel)]
     private Label ipAddressLabel;
@@ -80,19 +80,19 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     {
         base.Start();
         
-        new BoolPickerControl(showFpsContainer.Q<ItemPicker>())
+        new BoolPickerControl(showFpsPicker)
             .Bind(() => settings.DeveloperSettings.showFps,
                   newValue => settings.DeveloperSettings.showFps = newValue);
 
-        new PitchDetectionAlgorithmPicker(pitchDetectionAlgorithmContainer.Q<ItemPicker>())
+        new PitchDetectionAlgorithmPicker(pitchDetectionAlgorithmPicker)
             .Bind(() => settings.AudioSettings.pitchDetectionAlgorithm,
                 newValue => settings.AudioSettings.pitchDetectionAlgorithm = newValue);
 
-        new BoolPickerControl(analyzeBeatsWithoutTargetNoteContainer.Q<ItemPicker>())
+        new BoolPickerControl(analyzeBeatsWithoutTargetNotePicker)
             .Bind(() => settings.GraphicSettings.analyzeBeatsWithoutTargetNote,
                 newValue => settings.GraphicSettings.analyzeBeatsWithoutTargetNote = newValue);
 
-        new BoolPickerControl(disableDynamicThemesContainer.Q<ItemPicker>())
+        new BoolPickerControl(disableDynamicThemesPicker)
             .Bind(() => settings.DeveloperSettings.disableDynamicThemes,
                 disableDynamicThemes =>
                 {
@@ -103,11 +103,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                     settings.DeveloperSettings.disableDynamicThemes = disableDynamicThemes;
                 });
 
-        new BoolPickerControl(useUniversalCharsetDetectorContainer.Q<ItemPicker>())
+        new BoolPickerControl(useUniversalCharsetDetectorPicker)
                     .Bind(() => settings.DeveloperSettings.useUniversalCharsetDetector,
                         newValue => settings.DeveloperSettings.useUniversalCharsetDetector = newValue);
 
-        new BoolPickerControl(customEventSystemOptInOnAndroidContainer.Q<ItemPicker>())
+        new BoolPickerControl(customEventSystemOptInOnAndroidPicker)
             .Bind(() => settings.DeveloperSettings.enableEventSystemOnAndroid,
                 newValue =>
                 {
@@ -161,9 +161,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     public void UpdateTranslation()
     {
-        showFpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showFps);
-        pitchDetectionAlgorithmContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
-        analyzeBeatsWithoutTargetNoteContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
+        showFpsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showFps);
+        pitchDetectionAlgorithmPicker.Label = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
+        analyzeBeatsWithoutTargetNotePicker.Label = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
     }
 
     public List<IBinding> GetBindings()

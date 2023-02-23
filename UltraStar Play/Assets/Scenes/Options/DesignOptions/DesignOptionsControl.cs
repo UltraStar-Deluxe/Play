@@ -23,26 +23,26 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject]
     private ThemeManager themeManager;
 
-    [Inject(UxmlName = R.UxmlNames.themeContainer)]
-    private VisualElement themeContainer;
+    [Inject(UxmlName = R.UxmlNames.themePicker)]
+    private ItemPicker themePicker;
 
-    [Inject(UxmlName = R.UxmlNames.noteDisplayModeContainer)]
-    private VisualElement noteDisplayModeContainer;
+    [Inject(UxmlName = R.UxmlNames.noteDisplayModePicker)]
+    private ItemPicker noteDisplayModePicker;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsOnNotesContainer)]
-    private VisualElement lyricsOnNotesContainer;
+    [Inject(UxmlName = R.UxmlNames.lyricsOnNotesPicker)]
+    private ItemPicker lyricsOnNotesPicker;
 
-    [Inject(UxmlName = R.UxmlNames.staticLyricsContainer)]
-    private VisualElement staticLyricsContainer;
+    [Inject(UxmlName = R.UxmlNames.staticLyricsPicker)]
+    private ItemPicker staticLyricsPicker;
 
-    [Inject(UxmlName = R.UxmlNames.pitchIndicatorContainer)]
-    private VisualElement pitchIndicatorContainer;
+    [Inject(UxmlName = R.UxmlNames.pitchIndicatorPicker)]
+    private ItemPicker pitchIndicatorPicker;
 
-    [Inject(UxmlName = R.UxmlNames.imageAsCursorContainer)]
-    private VisualElement imageAsCursorContainer;
+    [Inject(UxmlName = R.UxmlNames.imageAsCursorPicker)]
+    private ItemPicker imageAsCursorPicker;
 
-    [Inject(UxmlName = R.UxmlNames.animateSceneChangeContainer)]
-    private VisualElement animateSceneChangeContainer;
+    [Inject(UxmlName = R.UxmlNames.animateSceneChangePicker)]
+    private ItemPicker animateSceneChangePicker;
 
     [Inject]
     private Settings settings;
@@ -54,33 +54,33 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     {
         base.Start();
         
-        new NoteDisplayModeItemPickerControl(noteDisplayModeContainer.Q<ItemPicker>())
+        new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
             .Bind(() => settings.GraphicSettings.noteDisplayMode,
                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
 
-        new BoolPickerControl(lyricsOnNotesContainer.Q<ItemPicker>())
+        new BoolPickerControl(lyricsOnNotesPicker)
             .Bind(() => settings.GraphicSettings.showLyricsOnNotes,
                 newValue => settings.GraphicSettings.showLyricsOnNotes = newValue);
 
-        new BoolPickerControl(staticLyricsContainer.Q<ItemPicker>())
+        new BoolPickerControl(staticLyricsPicker)
             .Bind(() => settings.GraphicSettings.showStaticLyrics,
                 newValue => settings.GraphicSettings.showStaticLyrics = newValue);
 
-        new BoolPickerControl(pitchIndicatorContainer.Q<ItemPicker>())
+        new BoolPickerControl(pitchIndicatorPicker)
             .Bind(() => settings.GraphicSettings.showPitchIndicator,
                 newValue => settings.GraphicSettings.showPitchIndicator = newValue);
 
-        new BoolPickerControl(imageAsCursorContainer.Q<ItemPicker>())
+        new BoolPickerControl(imageAsCursorPicker)
             .Bind(() => settings.GraphicSettings.useImageAsCursor,
                 newValue => settings.GraphicSettings.useImageAsCursor = newValue);
 
-        new BoolPickerControl(animateSceneChangeContainer.Q<ItemPicker>())
+        new BoolPickerControl(animateSceneChangePicker)
             .Bind(() => settings.GraphicSettings.AnimateSceneChange,
                 newValue => settings.GraphicSettings.AnimateSceneChange = newValue);
 
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
-        LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themeContainer.Q<ItemPicker>(), themeMetas);
+        LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themePicker, themeMetas);
         themePickerControl.GetLabelTextFunction = themeMeta => ThemeMetaUtils.GetDisplayName(themeMeta);
         themePickerControl.Bind(
             () => themeManager.GetCurrentTheme(),
@@ -89,12 +89,12 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     public void UpdateTranslation()
     {
-        themeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_design_theme);
-        noteDisplayModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
-        staticLyricsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showStaticLyrics);
-        lyricsOnNotesContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showLyricsOnNotes);
-        pitchIndicatorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showPitchIndicator);
-        imageAsCursorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
+        themePicker.Label = TranslationManager.GetTranslation(R.Messages.options_design_theme);
+        noteDisplayModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
+        staticLyricsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showStaticLyrics);
+        lyricsOnNotesPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showLyricsOnNotes);
+        pitchIndicatorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showPitchIndicator);
+        imageAsCursorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
     }
 
     public override bool HasHelpDialog => true;

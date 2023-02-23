@@ -360,6 +360,16 @@
     font-size: var(--font-size-l);
 }
 
+#loadedOptionsRoot > ItemPicker {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+#loadedOptionsRoot > ScrollView > ItemPicker {
+    margin-bottom: 16px;
+    height: auto;
+}
+
 /**************************************************/
 /* CREDITS SCENES */
 /**************************************************/

@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement>
+    <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; flex-grow: 1;">
-            <ui:VisualElement name="buttonRow" class="ml-auto mb-2" style="justify-content: flex-start;">
+            <ui:VisualElement name="buttonRow" class="ml-auto mb-3" style="justify-content: flex-start;">
                 <ui:Button text="View Log" display-tooltip-when-elided="true" name="showLogButton" class="controlMinWidth" style="margin-right: 5px;" />
                 <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="controlMinWidth" style="margin-right: 5px;" />
                 <ui:Button display-tooltip-when-elided="true" name="openPersistentDataPathButton" style="margin-right: 5px; flex-direction: row;">
@@ -10,30 +10,12 @@
                 </ui:Button>
                 <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
             </ui:VisualElement>
-            <ui:VisualElement name="showFpsContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Show FPS" name="Label" class="controlLabel" />
-                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:VisualElement name="pitchDetectionAlgorithmContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Pitch Detection Algorithm" name="Label" class="controlLabel" />
-                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" class="multiline" />
-            </ui:VisualElement>
-            <ui:VisualElement name="analyzeBeatsWithoutTargetNoteContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Analyze Beats Without Target Note" name="Label" class="controlLabel" />
-                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ui:VisualElement name="disableDynamicThemesContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Disable Dynamic Themes" name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" wrap-around="true" />
-            </ui:VisualElement>
-            <ui:VisualElement name="useUniversalCharsetDetectorContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings." name="Label" class="controlLabel" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" wrap-around="true" />
-            </ui:VisualElement>
-            <ui:VisualElement name="customEventSystemOptInOnAndroidContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Use custom event system for input actions.&#10;This enables keyboard and gamepad control but can cause issues on Android" name="Label" class="controlLabel" style="white-space: normal;" />
-                <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="ItemPicker" wrap-around="true" />
-            </ui:VisualElement>
+            <ItemPicker name="showFpsPicker" label="Show FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+            <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline" />
+            <ItemPicker name="analyzeBeatsWithoutTargetNotePicker" label="Analyze Beats Without Target Note" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+            <ItemPicker name="disableDynamicThemesPicker" label="Disable Dynamic Themes" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
+            <ItemPicker name="useUniversalCharsetDetectorPicker" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings." wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
+            <ItemPicker name="customEventSystemOptInOnAndroidPicker" label="Use custom event system for input actions.&#10;This enables keyboard and gamepad control but can cause issues on Android" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
             <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" />
             <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" style="margin-bottom: 10px;" />
             <ui:VisualElement name="networkConfigContainer">

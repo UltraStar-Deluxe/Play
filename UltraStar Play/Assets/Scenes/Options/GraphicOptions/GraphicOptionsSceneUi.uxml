@@ -1,17 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement>
-        <ui:VisualElement name="resolutionContainer" class="optionsLabelAndItemPicker">
-            <ui:Label text="Resolution" name="Label" class="controlLabel" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-        </ui:VisualElement>
-        <ui:VisualElement name="fpsContainer" class="optionsLabelAndItemPicker">
-            <ui:Label text="Target FPS" name="Label" class="controlLabel" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-        </ui:VisualElement>
-        <ui:VisualElement name="fullscreenContainer" class="optionsLabelAndItemPicker">
-            <ui:Label text="Fullscreen" name="Label" class="controlLabel" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-        </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;" />
+    <ui:VisualElement name="loadedOptionsRoot">
+        <ItemPicker name="resolutionPicker" label="Resolution" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+        <ItemPicker name="targetFpsPicker" label="Target FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+        <ItemPicker name="fullscreenModePicker" label="Fullscreen" wrap-around="true" min-value="0" max-value="100" step-value="10" />
     </ui:VisualElement>
 </ui:UXML>

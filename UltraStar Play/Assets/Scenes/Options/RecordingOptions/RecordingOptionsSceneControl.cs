@@ -12,7 +12,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
+public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITranslator, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new() { 0, 5, 10, 15, 20, 25, 30 };
@@ -50,35 +50,32 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
     [Inject]
     private ThemeManager themeManager;
 
-    [Inject(UxmlName = R.UxmlNames.deviceContainer)]
-    private VisualElement deviceContainer;
+    [Inject(UxmlName = R.UxmlNames.devicePicker)]
+    private ItemPicker devicePicker;
 
-    [Inject(UxmlName = R.UxmlNames.amplificationContainer)]
-    private VisualElement amplificationContainer;
+    [Inject(UxmlName = R.UxmlNames.amplificationPicker)]
+    private ItemPicker amplificationPicker;
 
-    [Inject(UxmlName = R.UxmlNames.noiseSuppressionContainer)]
-    private VisualElement noiseSuppressionContainer;
+    [Inject(UxmlName = R.UxmlNames.noiseSuppressionPicker)]
+    private ItemPicker noiseSuppressionPicker;
 
-    [Inject(UxmlName = R.UxmlNames.delayContainer)]
-    private VisualElement delayContainer;
+    [Inject(UxmlName = R.UxmlNames.delayPicker)]
+    private ItemPicker delayPicker;
 
-    [Inject(UxmlName = R.UxmlNames.colorContainer)]
-    private VisualElement colorContainer;
+    [Inject(UxmlName = R.UxmlNames.colorPicker)]
+    private ItemPicker colorPicker;
+
+    [Inject(UxmlName = R.UxmlNames.sampleRatePicker)]
+    private ItemPicker sampleRatePicker;
 
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
     private Toggle enabledToggle;
-
-    [Inject(UxmlName = R.UxmlNames.enabledLabel)]
-    private Label enabledLabel;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedLabel)]
     private Label notConnectedLabel;
-
-    [Inject(UxmlName = R.UxmlNames.sampleRateContainer)]
-    private VisualElement sampleRateContainer;
 
     [Inject(UxmlName = R.UxmlNames.deleteButton)]
     private Button deleteButton;
@@ -106,13 +103,13 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
     private readonly Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
     public IObservable<BeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
 
-    protected override void Start()
+    public void Start()
     {
         base.Start();
         
-        new AutoFitLabelControl(deviceContainer.Q<ItemPicker>().ItemLabel, 10, 15);
+        new AutoFitLabelControl(devicePicker.ItemLabel, 10, 15);
         
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
+        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, CreateMicProfiles());
         devicePickerControl.AutoSmallFont = false;
         devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
         if (!TryReSelectLastMicProfile())
@@ -122,14 +119,14 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
         devicePickerControl.Selection
             .Subscribe(micProfile => settings.LastMicProfileNameInRecordingOptionsScene = micProfile?.Name);
 
-        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationContainer.Q<ItemPicker>(), amplificationItems);
+        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems);
         amplificationPickerControl.GetLabelTextFunction = item => item + " %";
-        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionContainer.Q<ItemPicker>(), noiseSuppressionItems);
+        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionPicker, noiseSuppressionItems);
         noiseSuppressionPickerControl.GetLabelTextFunction = item => item + " %";
-        delayPickerControl = new NumberPickerControl(delayContainer.Q<ItemPicker>());
+        delayPickerControl = new NumberPickerControl(delayPicker);
         delayPickerControl.GetLabelTextFunction = item => item + " ms";
-        colorPickerControl = new ColorPickerControl(colorContainer.Q<ItemPicker>(), themeManager.GetMicrophoneColors());
-        sampleRatePickerControl = new SampleRatePickerControl(sampleRateContainer.Q<ItemPicker>());
+        colorPickerControl = new ColorPickerControl(colorPicker, themeManager.GetMicrophoneColors());
+        sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker);
         sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(() => DeleteSelectedRecordingDevice());
@@ -325,12 +322,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
     public void UpdateTranslation()
     {
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        enabledLabel.text = TranslationManager.GetTranslation(R.Messages.options_useForSinging);
-        colorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_color);
-        delayContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_delay);
-        amplificationContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_amplification);
-        noiseSuppressionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
-        sampleRateContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
+        enabledToggle.label = TranslationManager.GetTranslation(R.Messages.options_useForSinging);
+        colorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_color);
+        delayPicker.Label = TranslationManager.GetTranslation(R.Messages.options_delay);
+        amplificationPicker.Label = TranslationManager.GetTranslation(R.Messages.options_amplification);
+        noiseSuppressionPicker.Label = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
+        sampleRatePicker.Label = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
         calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
         notConnectedLabel.text = TranslationManager.GetTranslation(R.Messages.options_deviceNotConnected);

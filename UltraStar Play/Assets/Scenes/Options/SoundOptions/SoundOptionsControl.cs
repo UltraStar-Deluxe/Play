@@ -19,20 +19,11 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
     [Inject]
     private UIDocument uiDoc;
 
-    [Inject(UxmlName = R.UxmlNames.backgroundMusicVolumeLabel)]
-    private Label backgroundMusicVolumeLabel;
-
     [Inject(UxmlName = R.UxmlNames.backgroundMusicVolumeChooser)]
     private ItemPicker backgroundMusicVolumeChooser;
 
-    [Inject(UxmlName = R.UxmlNames.previewVolumeLabel)]
-    private Label previewVolumeLabel;
-
     [Inject(UxmlName = R.UxmlNames.previewVolumeChooser)]
     private ItemPicker previewVolumeChooser;
-
-    [Inject(UxmlName = R.UxmlNames.volumeLabel)]
-    private Label volumeLabel;
 
     [Inject(UxmlName = R.UxmlNames.volumeChooser)]
     private ItemPicker volumeChooser;
@@ -66,8 +57,8 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
 
     public void UpdateTranslation()
     {
-        backgroundMusicVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
-        previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
-        volumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_volume);
+        backgroundMusicVolumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
+        previewVolumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
+        volumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_volume);
     }
 }

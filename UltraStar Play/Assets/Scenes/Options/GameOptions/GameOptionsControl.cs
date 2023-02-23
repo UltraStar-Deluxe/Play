@@ -10,8 +10,8 @@ using UnityEngine.UIElements;
 
 public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
-    [Inject(UxmlName = R.UxmlNames.scoreModeContainer)]
-    private VisualElement scoreModeContainer;
+    [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
+    private ItemPicker scoreModePicker;
 
     [Inject(UxmlName = R.UxmlNames.languageChooser)]
     private ItemPicker languageChooser;
@@ -20,7 +20,7 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
     {
         base.Start();
         
-        new ScoreModeItemPickerControl(scoreModeContainer.Q<ItemPicker>())
+        new ScoreModeItemPickerControl(scoreModePicker)
             .Bind(() => settings.GameSettings.ScoreMode,
                   newValue => settings.GameSettings.ScoreMode = newValue);
 
@@ -29,7 +29,7 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
 
     public void UpdateTranslation()
     {
-        scoreModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
+        scoreModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
     }
     
     private void InitLanguageChooser()

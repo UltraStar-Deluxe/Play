@@ -232,6 +232,10 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             loadedSceneInjector
                 .WithRootVisualElement(loadedSceneVisualElement)
                 .InjectAllComponentsInChildren(loadedGameObject);
+            
+            // Update translations
+            loadedGameObject.GetComponentsInChildren<ITranslator>()
+                .ForEach(it => it.UpdateTranslation());
         }
 
         // Set loaded scene title

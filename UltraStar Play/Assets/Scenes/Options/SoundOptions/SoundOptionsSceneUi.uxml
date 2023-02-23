@@ -1,20 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement>
-        <ui:VisualElement name="volumeContainer" class="optionsLabelAndItemPicker">
-            <ui:Label text="Volume" name="volumeLabel" class="controlLabel" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="volumeChooser" />
-        </ui:VisualElement>
-        <ui:VisualElement name="previewVolumeContainer" class="optionsLabelAndItemPicker">
-            <ui:Label text="Preview Volume" name="previewVolumeLabel" class="controlLabel" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="previewVolumeChooser" />
-        </ui:VisualElement>
-        <ui:VisualElement name="backgroundMusicVolumeContainer" class="optionsLabelAndItemPicker">
-            <ui:Label text="Background Music Volume" name="backgroundMusicVolumeLabel" class="controlLabel" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundMusicVolumeChooser" />
-        </ui:VisualElement>
-        <ui:VisualElement name="animateSceneChangeVolumeContainer" class="optionsLabelAndItemPicker">
-            <ui:Label text="Scene Transition Volume" name="animateSceneChangeVolumeLabel" class="controlLabel" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animateSceneChangeVolumePicker" />
-        </ui:VisualElement>
+    <ui:VisualElement name="loadedOptionsRoot">
+        <ItemPicker name="volumeChooser" label="Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+        <ItemPicker name="previewVolumeChooser" label="Preview Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+        <ItemPicker name="backgroundMusicVolumeChooser" label="Background Music Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+        <ItemPicker name="animateSceneChangeVolumePicker" label="Scene Transition Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
     </ui:VisualElement>
 </ui:UXML>
