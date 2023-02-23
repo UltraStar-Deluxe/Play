@@ -7,6 +7,12 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+# Generated classes
+R_PlaySharedUssClasses.cs
+R_PlaySharedUxmlNames.cs
+RUssClasses.cs
+RUxmlNames.cs
+
 # Source maps
 *.*.map
 *.*.map.meta
