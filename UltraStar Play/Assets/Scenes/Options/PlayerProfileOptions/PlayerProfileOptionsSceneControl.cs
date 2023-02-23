@@ -124,6 +124,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
             titleToContentMap);
+        helpDialogControl.AddButton("Images Folder",
+            () => ApplicationUtils.OpenDirectory(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder()));
         return helpDialogControl;
     }
 }

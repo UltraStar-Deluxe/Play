@@ -111,6 +111,8 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddCustomThemes)));
+        helpDialogControl.AddButton("Themes Folder",
+            () => ApplicationUtils.OpenDirectory(ThemeManager.GetAbsoluteUserDefinedThemesFolder()));
         return helpDialogControl;
     }
 }

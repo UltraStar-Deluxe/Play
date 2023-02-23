@@ -4,6 +4,14 @@ using System.Linq;
 
 public class DirectoryUtils
 {
+    public static void CreateDirectory(string path)
+    {
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+    }
+    
     public static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
     {
         List<string> result = new();
