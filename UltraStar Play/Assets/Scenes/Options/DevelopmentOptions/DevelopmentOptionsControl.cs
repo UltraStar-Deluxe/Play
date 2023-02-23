@@ -156,7 +156,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     private void RestartScene()
     {
-        sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene);
+        sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.DevelopmentOptionsScene));
     }
 
     public void UpdateTranslation()
