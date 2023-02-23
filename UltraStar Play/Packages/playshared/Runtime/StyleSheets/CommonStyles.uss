@@ -8,6 +8,14 @@ VisualElement
     height: 100%;
 }
 
+#buttonRow {
+    flex-direction: row;
+}
+
+#row {
+    flex-direction: row;
+}
+
 .fullMinHeightUnityContentContainer #unity-content-container {
     min-height: 100%;
 }
