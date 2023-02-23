@@ -16,6 +16,8 @@ public class DefaultFocusableNavigator : FocusableNavigator
 
         base.Start();
 
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(100)
+            .Subscribe(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
             .Subscribe(_ => OnSubmit());
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()

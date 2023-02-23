@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -23,6 +24,9 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
     [Inject(Optional = true)]
     protected EventSystem eventSystem;
 
+    [Inject]
+    protected Settings settings;
+    
     public bool focusLastElementIfNothingFocused;
 
     public bool logFocusedVisualElements;
@@ -45,7 +49,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (eventSystem != null)
+        if (eventSystem != null
+            && settings.DeveloperSettings.enableEventSystemOnAndroid)
         {
             eventSystem.sendNavigationEvents = false;
         }
@@ -60,6 +65,12 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
                 }
             });
         }
+
+        DropdownField dropdownField = uiDocument.rootVisualElement.Q<DropdownField>();
+        dropdownField.RegisterValueChangedCallback(evt =>
+        {
+            Debug.Log("DropdownField value changed: " + evt.newValue);
+        });
     }
 
     protected virtual void Update()
@@ -89,14 +100,39 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
         {
             if (logFocusedVisualElements)
             {
-                Debug.Log("Moving focus to last focused VisualElement: " + lastFocusedVisualElement);
-                lastFocusedVisualElement.Focus();
+                DoFocusVisualElement(lastFocusedVisualElement,
+                    $"Moving focus to last focused VisualElement: {lastFocusedVisualElement}");
             }
+        }
+    }
+
+    public virtual void OnBack()
+    {
+        if (!settings.DeveloperSettings.enableEventSystemOnAndroid)
+        {
+            return;
+        }
+
+        if (IsDropdownList(FocusedVisualElement))
+        {
+            FocusedVisualElement.SendEvent(NavigationCancelEvent.GetPooled());
+            InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
         }
     }
 
     public virtual void OnSubmit()
     {
+        if (!settings.DeveloperSettings.enableEventSystemOnAndroid)
+        {
+            return;
+        }
+
+        if (IsDropdownList(FocusedVisualElement))
+        {
+            FocusedVisualElement.SendEvent(NavigationSubmitEvent.GetPooled());
+            return;
+        }
+
         VisualElement focusedVisualElement = FocusedVisualElement;
         if (focusedVisualElement != null)
         {
@@ -110,6 +146,11 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
 
     public virtual void OnNavigate(Vector2 navigationDirection)
     {
+        if (!settings.DeveloperSettings.enableEventSystemOnAndroid)
+        {
+            return;
+        }
+        
         VisualElement focusedVisualElement = FocusedVisualElement;
         if (focusedVisualElement == null)
         {
@@ -137,7 +178,44 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             return;
         }
 
+        if (IsDropdownList(focusedVisualElement))
+        {
+            NavigateDropdownList(focusedVisualElement, navigationDirection);
+        }
+        
         NavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection);
+    }
+
+    private void NavigateDropdownList(
+        VisualElement focusedVisualElement,
+        Vector2 navigationDirection)
+    {
+        if (logFocusedVisualElements)
+        {
+            Debug.Log("NavigateDropdownList");
+        }
+        
+        if (navigationDirection.y > 0)
+        {
+            focusedVisualElement.SendEvent(NavigationMoveEvent.GetPooled(NavigationMoveEvent.Direction.Up));
+        }
+        else if (navigationDirection.y < 0)
+        {
+            focusedVisualElement.SendEvent(NavigationMoveEvent.GetPooled(NavigationMoveEvent.Direction.Down));
+        }
+    }
+
+    private bool IsDropdownList(VisualElement focusedVisualElement)
+    {
+        if (focusedVisualElement.name != "unity-content-container"
+            && !focusedVisualElement.ClassListContains("unity-base-dropdown__item"))
+        {
+            return false;
+        }
+
+        VisualElement unityBaseDropdown = VisualElementUtils.GetParent(focusedVisualElement,
+                   parent => parent.ClassListContains("unity-base-dropdown"));
+        return unityBaseDropdown != null;
     }
 
     private void NavigateToBestMatchingNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
@@ -171,12 +249,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
         VisualElement nearestVisualElement = visualElementsInDirection.FindMinElement(visualElement => GetVisualElementDistance(visualElement, focusedVisualElement));
         if (nearestVisualElement != null)
         {
-            if (logFocusedVisualElements)
-            {
-                Debug.Log($"Moving focus to VisualElement with distance {GetVisualElementDistance(nearestVisualElement, focusedVisualElement)}: {nearestVisualElement}");
-            }
-            nearestVisualElement.Focus();
-            nearestVisualElement.ScrollToSelf();
+            DoFocusVisualElement(nearestVisualElement,
+                $"Moving focus to VisualElement with distance {GetVisualElementDistance(nearestVisualElement, focusedVisualElement)}: {nearestVisualElement}");
         }
         else
         {
@@ -189,18 +263,32 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
         }
     }
 
+    protected void DoFocusVisualElement(VisualElement visualElement, string logMessage)
+    {
+        if (logFocusedVisualElements
+            && !logMessage.IsNullOrEmpty())
+        {
+            Debug.Log(logMessage);
+        }
+
+        if (visualElement == null)
+        {
+            Debug.LogError("Attempt to focus null VisualElement");
+            return;
+        }
+
+        visualElement.Focus();
+        visualElement.ScrollToSelf();
+    }
+    
     private bool TryNavigateToCustomNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
     {
         CustomNavigationTarget customNavigationTarget = customNavigationTargets.FirstOrDefault(customNavigationTarget =>
             customNavigationTarget.Matches(focusedVisualElement, navigationDirection));
         if (customNavigationTarget != null)
         {
-            if (logFocusedVisualElements)
-            {
-                Debug.Log($"Moving focus to VisualElement from custom navigation target (start: {customNavigationTarget.StartVisualElement.name}, direction: {navigationDirection}, target: {customNavigationTarget.TargetVisualElement.name}");
-            }
-            customNavigationTarget.TargetVisualElement.Focus();
-            customNavigationTarget.TargetVisualElement.ScrollToSelf();
+            DoFocusVisualElement(customNavigationTarget.TargetVisualElement,
+                    $"Moving focus to VisualElement from custom navigation target (start: {customNavigationTarget.StartVisualElement.name}, direction: {navigationDirection}, target: {customNavigationTarget.TargetVisualElement.name}");
             return true;
         }
 
@@ -273,7 +361,12 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
                     is Button
                     or Toggle
                     or DropdownField
+                    or EnumField
                     or TextField
+                    or IntegerField
+                    or LongField
+                    or FloatField
+                    or DoubleField
                     or MinMaxSlider
                     or RadioButton)
             .Where(descendant => IsFocusableNow(descendant))
