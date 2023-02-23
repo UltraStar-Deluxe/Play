@@ -197,19 +197,9 @@ public static class CreateConstantsMenuItems
 
     private static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
     {
-        List<string> result = new();
-        foreach (string fileExtension in fileExtensions)
-        {
-            string[] files = Directory.GetFiles(folderPath, fileExtension, SearchOption.AllDirectories);
-            foreach (string file in files)
-            {
-                if (!IsFileIgnored(file))
-                {
-                    result.Add(file);
-                }
-            }
-        }
-        return result.Distinct().ToList();
+        return DirectoryUtils.GetFilesInFolder(folderPath, fileExtensions)
+            .Where(file => !IsFileIgnored(file))
+            .ToList();
     }
 
     private static bool IsFileIgnored(string file)
