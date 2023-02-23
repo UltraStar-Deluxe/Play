@@ -12,16 +12,13 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
+public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
 {
     [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject]
     private TranslationManager translationManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
 
     [Inject(UxmlName = R.UxmlNames.showFpsContainer)]
     private VisualElement showFpsContainer;
@@ -46,9 +43,6 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     [Inject(UxmlName = R.UxmlNames.httpServerPortLabel)]
     private Label httpServerPortLabel;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject(UxmlName = R.UxmlNames.showLogButton)]
     private Button showLogButton;
@@ -136,9 +130,6 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
             httpServerPortLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
         }
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => OnBack());
-
         // View and copy log
         showLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
         copyLogButton.RegisterCallbackButtonTriggered(() =>
@@ -157,10 +148,6 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
             openPersistentDataPathButton.HideByDisplay();
         }
         
-        // Back button
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
-        backButton.Focus();
-
         // Network config
         networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
     }
@@ -170,18 +157,11 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene);
     }
 
-    private void OnBack()
-    {
-        sceneNavigator.LoadScene(EScene.OptionsScene);
-    }
-
     public void UpdateTranslation()
     {
         showFpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showFps);
         pitchDetectionAlgorithmContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
         analyzeBeatsWithoutTargetNoteContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_development_title);
     }
 
     public List<IBinding> GetBindings()

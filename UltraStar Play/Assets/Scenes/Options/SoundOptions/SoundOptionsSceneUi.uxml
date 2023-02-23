@@ -1,35 +1,21 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" >
-        <ui:VisualElement class="optionsSceneMainContainer">
-            <ui:VisualElement name="topRow" class="optionsSceneTopRow">
-                <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
-                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <MaterialIcon name="titleImage" icon="campaign" />
-                        <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Sound Options" name="sceneTitle" class="titleText" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="volumeContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Volume" name="volumeLabel" class="controlLabel" />
-                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="volumeChooser" />
-            </ui:VisualElement>
-            <ui:VisualElement name="previewVolumeContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Preview Volume" name="previewVolumeLabel" class="controlLabel" />
-                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="previewVolumeChooser" />
-            </ui:VisualElement>
-            <ui:VisualElement name="backgroundMusicVolumeContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Background Music Volume" name="backgroundMusicVolumeLabel" class="controlLabel" />
-                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundMusicVolumeChooser" />
-            </ui:VisualElement>
-            <ui:VisualElement name="animateSceneChangeVolumeContainer" class="optionsLabelAndItemPicker">
-                <ui:Label text="Scene Transition Volume" name="animateSceneChangeVolumeLabel" class="controlLabel" />
-                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animateSceneChangeVolumePicker" />
-            </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
-            </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:VisualElement name="volumeContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Volume" name="volumeLabel" class="controlLabel" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="volumeChooser" />
         </ui:VisualElement>
+        <ui:VisualElement name="previewVolumeContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Preview Volume" name="previewVolumeLabel" class="controlLabel" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="previewVolumeChooser" />
+        </ui:VisualElement>
+        <ui:VisualElement name="backgroundMusicVolumeContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Background Music Volume" name="backgroundMusicVolumeLabel" class="controlLabel" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundMusicVolumeChooser" />
+        </ui:VisualElement>
+        <ui:VisualElement name="animateSceneChangeVolumeContainer" class="optionsLabelAndItemPicker">
+            <ui:Label text="Scene Transition Volume" name="animateSceneChangeVolumeLabel" class="controlLabel" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animateSceneChangeVolumePicker" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;" />
     </ui:VisualElement>
 </ui:UXML>

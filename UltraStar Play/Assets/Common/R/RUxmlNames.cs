@@ -230,7 +230,6 @@ public static partial class R
         public const string labelContainer = "labelContainer";
         public const string labels = "labels";
         public const string languageChooser = "languageChooser";
-        public const string languageContainer = "languageContainer";
         public const string languagePropertyContainer = "languagePropertyContainer";
         public const string layerColor = "layerColor";
         public const string layerEditableButton = "layerEditableButton";
@@ -254,7 +253,9 @@ public static partial class R
         public const string legendContainer = "legendContainer";
         public const string legendInnerContainer = "legendInnerContainer";
         public const string lo = "lo";
-        public const string loadedSceneUi = "loadedSceneUi";
+        public const string loadedSceneContainer = "loadedSceneContainer";
+        public const string loadedSceneContent = "loadedSceneContent";
+        public const string loadedSceneTitle = "loadedSceneTitle";
         public const string loadingLabel = "loadingLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logo = "logo";
@@ -425,7 +426,6 @@ public static partial class R
         public const string previousSongButton = "previousSongButton";
         public const string profileList = "profileList";
         public const string profileOptionsButton = "profileOptionsButton";
-        public const string profileOptionsButtonContainer = "profileOptionsButtonContainer";
         public const string propertyNameLabel = "propertyNameLabel";
         public const string propertyTextField = "propertyTextField";
         public const string quitButton = "quitButton";
@@ -437,7 +437,6 @@ public static partial class R
         public const string recordedNoteLabel = "recordedNoteLabel";
         public const string recordingGroup = "recordingGroup";
         public const string recordingOptionsButton = "recordingOptionsButton";
-        public const string recordingOptionsButtonContainer = "recordingOptionsButtonContainer";
         public const string recordingSettingsProblemHintIcon = "recordingSettingsProblemHintIcon";
         public const string recordingSourceContainer = "recordingSourceContainer";
         public const string recordingSourceItemPicker = "recordingSourceItemPicker";
@@ -574,7 +573,6 @@ public static partial class R
         public const string songListContainer = "songListContainer";
         public const string songMenuOverlay = "songMenuOverlay";
         public const string songMenuOverlayScrollView = "songMenuOverlayScrollView";
-        public const string songOptionsButtonContainer = "songOptionsButtonContainer";
         public const string songOrderPicker = "songOrderPicker";
         public const string songPreviewBackgroundImage = "songPreviewBackgroundImage";
         public const string songPreviewVideoImage = "songPreviewVideoImage";

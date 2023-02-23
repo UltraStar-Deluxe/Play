@@ -19,7 +19,7 @@ using static ThreadPool;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public TextAsset songArchiveEntryTextAsset;
@@ -35,12 +35,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     [Inject]
     private TranslationManager translationManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject(UxmlName = R.UxmlNames.statusLabel)]
     private Label statusLabel;
@@ -117,25 +111,18 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
-        backButton.Focus();
-
         urlChooserButton.RegisterCallbackButtonTriggered(() => ShowUrlChooserDialog());
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => OnBack());
     }
 
-    private void OnBack()
+    protected override bool TryGoBack()
     {
         if (helpDialogControl != null)
         {
             CloseHelp();
+            return true;
         }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene);
-        }
+
+        return false;
     }
 
     private void ShowUrlChooserDialog()
@@ -186,7 +173,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         urlChooserDialogControl.CloseDialog();
         urlChooserDialogControl = null;
-        backButton.Focus();
     }
 
     private void SelectSongArchiveUrl(string url)
@@ -199,8 +185,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         urlLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
         startDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_startDownloadButton);
         cancelDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_cancelDownloadButton);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_title);
     }
 
     void Update()

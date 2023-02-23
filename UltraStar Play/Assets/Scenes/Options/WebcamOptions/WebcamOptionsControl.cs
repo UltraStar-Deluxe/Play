@@ -9,13 +9,10 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
+public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [Inject]
     private SceneNavigator sceneNavigator;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
 
     [Inject(UxmlName = R.UxmlNames.deviceContainer)]
     private VisualElement deviceContainer;
@@ -25,9 +22,6 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject(UxmlName = R.UxmlNames.useWebcamContainer)]
     private VisualElement useWebcamContainer;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject]
     private Settings settings;
@@ -40,11 +34,6 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     private void Start()
     {
         InitWebcamPicker();
-
-        backButton.RegisterCallbackButtonTriggered(NavigateBack);
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5).Subscribe(_ => NavigateBack());
     }
 
     public void UpdateTranslation()
@@ -56,8 +45,6 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
                 settings.WebcamSettings.UseAsBackgroundInSingScene = changeEvent.newValue
             );
         deviceContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_webcam_device);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_webcam_title);
     }
 
     private void InitWebcamPicker()
@@ -85,12 +72,6 @@ public class WebcamOptionsControl : MonoBehaviour, INeedInjection, ITranslator
             devicePickerControl.Items.Add(new WebCamDevice());
             useWebcamContainer.SetEnabled(false);
         }
-    }
-
-    private void NavigateBack()
-    {
-
-        sceneNavigator.LoadScene(EScene.OptionsScene);
     }
 
     private bool TryReSelectLastWebcam()

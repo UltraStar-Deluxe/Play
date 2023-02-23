@@ -267,8 +267,7 @@
     justify-content: flex-start;
     align-items: center;
     flex-direction: row;
-    /*color: #101828;*/
-    /*background-color: #FFFFFF;*/
+    margin-bottom: 10px;
 }
 
 .optionsOverviewButton > .fontIcon {
@@ -355,6 +354,10 @@
 .songIssueMessage {
     font-size: var(--font-size-s);
     white-space: normal;
+}
+
+#loadedSceneTitle {
+    font-size: var(--font-size-l);
 }
 
 /**************************************************/

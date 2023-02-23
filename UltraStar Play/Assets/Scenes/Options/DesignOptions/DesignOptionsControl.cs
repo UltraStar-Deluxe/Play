@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
+public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -22,12 +22,6 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject]
     private ThemeManager themeManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject(UxmlName = R.UxmlNames.themeContainer)]
     private VisualElement themeContainer;
@@ -96,24 +90,17 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
             newValue => themeManager.SetCurrentTheme(newValue));
 
         helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => OnBack());
     }
 
-    private void OnBack()
+    protected override bool TryGoBack()
     {
         if (helpDialogControl != null)
         {
             CloseHelp();
+            return true;
         }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.OptionsScene);
-        }
+
+        return false;
     }
 
     public void UpdateTranslation()
@@ -124,8 +111,6 @@ public class DesignOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         lyricsOnNotesContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showLyricsOnNotes);
         pitchIndicatorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showPitchIndicator);
         imageAsCursorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_design_title);
     }
 
     private void ShowHelp()

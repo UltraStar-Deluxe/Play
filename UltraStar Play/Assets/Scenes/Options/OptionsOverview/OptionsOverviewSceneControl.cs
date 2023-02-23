@@ -1,21 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
+    private const EScene DefaultOptionsScene = EScene.OptionsGameScene;
+    
     public List<OptionSceneRecipe> optionSceneRecipes = new();
     
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
+    
+    [Inject(UxmlName = R.UxmlNames.titleContainer)]
+    private VisualElement titleContainer;
 
+    [Inject(UxmlName = R.UxmlNames.loadedSceneTitle)]
+    private Label loadedSceneTitle;
+    
     [Inject(UxmlName = R.UxmlNames.gameOptionsButton)]
     private ToggleButton gameOptionsButton;
 
@@ -49,9 +61,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.webcamOptionsButton)]
     private ToggleButton webcamOptionsButton;
 
-    [Inject(UxmlName = R.UxmlNames.languageChooser)]
-    private ItemPicker languageChooser;
-
     [Inject(UxmlName = R.UxmlNames.songSettingsProblemHintIcon)]
     private VisualElement songSettingsProblemHintIcon;
 
@@ -61,8 +70,14 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.playerProfileSettingsProblemHintIcon)]
     private VisualElement playerProfileSettingsProblemHintIcon;
 
-    [Inject(UxmlName = R.UxmlNames.loadedSceneUi)]
-    private VisualElement loadedSceneUi;
+    [Inject(UxmlName = R.UxmlNames.loadedSceneContent)]
+    private VisualElement loadedSceneContent;
+    
+    [Inject(UxmlName = R.UxmlNames.optionsSceneScrollView)]
+    private VisualElement optionsSceneScrollView;
+    
+    [Inject(UxmlName = R.UxmlNames.backButton)]
+    private Button backButton;
     
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -82,10 +97,18 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject]
     private UIDocument uiDocument;
     
+    [Inject]
+    private ThemeManager themeManager;
+    
+    [Inject]
+    private OptionsSceneData sceneData;
+    
+    private OptionSceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
-    private OptionSceneRecipe loadedSceneRecipe;
-    
+    private readonly Dictionary<EScene, string> sceneToShortNameMap = new();
+    private readonly Dictionary<EScene, string> sceneToLongNameMap = new();
+
     private void Start()
     {
         sceneToButtonMap.Add(EScene.OptionsGameScene, gameOptionsButton);
@@ -105,20 +128,35 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
            entry.Value.RegisterCallbackButtonTriggered(() => LoadScene(entry.Key)); 
         });
 
-        gameOptionsButton.Focus();
-
         InitSettingsProblemHints();
-        InitLanguageChooser();
         
-        LoadOptionsScene(optionSceneRecipes.FirstOrDefault());
+        LoadOptionsScene(sceneData.scene);
+        
+        // Options scene scroll view should be as wide as the title.
+        titleContainer.RegisterCallback<GeometryChangedEvent>(evt =>
+        {
+            float targetMinWidth = evt.newRect.width;
+            if (Math.Abs(optionsSceneScrollView.resolvedStyle.minWidth.value - targetMinWidth) > 1f)
+            {
+                optionsSceneScrollView.style.minWidth = targetMinWidth;
+            }
+        });
+
+        backButton.RegisterCallbackButtonTriggered(() => OnBack());
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
+            .Subscribe(_ => OnBack());
+    }
+
+    private void OnBack()
+    {
+        sceneNavigator.LoadScene(EScene.MainScene);
     }
 
     private void LoadScene(EScene scene)
     {
-        OptionSceneRecipe sceneRecipe = optionSceneRecipes.FirstOrDefault(recipe => recipe.scene == scene);
-        if (sceneRecipe != null)
+        if (optionSceneRecipes.AnyMatch(recipe => recipe.scene == scene))
         {
-            LoadOptionsScene(sceneRecipe);
+            LoadOptionsScene(scene);
         }
         else
         {
@@ -126,30 +164,26 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
     }
 
-    private void LoadOptionsScene(OptionSceneRecipe sceneRecipe)
+    private void LoadOptionsScene(EScene scene)
     {
-        // Set button style
         if (loadedSceneRecipe != null)
         {
-            sceneToButtonMap[loadedSceneRecipe.scene].SetActive(false);
+            UnloadOptionsScene(loadedSceneRecipe.scene);
         }
-        sceneToButtonMap[sceneRecipe.scene].SetActive(true);
-        
-        // Remove objects of old scene
-        loadedGameObjects.ForEach(Destroy);
-        loadedGameObjects.Clear();
-        
-        // Load scene UI
-        loadedSceneUi.Clear();
-        VisualElement loadedSceneVisualElement = sceneRecipe.visualTreeAsset.CloneTree().Children().FirstOrDefault();
-        loadedSceneUi.Add(loadedSceneVisualElement);
+        loadedSceneRecipe = optionSceneRecipes.FirstOrDefault(it => it.scene == scene);;
 
-        VisualElement scoreModeContainer = loadedSceneVisualElement.Q<VisualElement>(R.UxmlNames.scoreModeContainer);
+        // Set button style
+        sceneToButtonMap[scene].SetActive(true);
+        sceneToButtonMap[scene].Focus();
+        
+        // Load UI
+        VisualElement loadedSceneVisualElement = loadedSceneRecipe.visualTreeAsset.CloneTree().Children().FirstOrDefault();
+        loadedSceneContent.Add(loadedSceneVisualElement);
 
         // Load scene scripts.
         // Add new bindings.
         Injector loadedSceneInjector = injector.CreateChildInjector();
-        foreach (GameObject gameObjectRecipe in sceneRecipe.sceneGameObjects)
+        foreach (GameObject gameObjectRecipe in loadedSceneRecipe.sceneGameObjects)
         {
             foreach (IBinder binder in gameObjectRecipe.GetComponentsInChildren<IBinder>())
             {
@@ -158,7 +192,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
 
         // Inject new game objects
-        foreach (GameObject gameObjectRecipe in sceneRecipe.sceneGameObjects)
+        foreach (GameObject gameObjectRecipe in loadedSceneRecipe.sceneGameObjects)
         {
             GameObject loadedGameObject = Instantiate(gameObjectRecipe);
             loadedGameObjects.Add(loadedGameObject);
@@ -169,7 +203,21 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
                 .InjectAllComponentsInChildren(loadedGameObject);
         }
 
-        loadedSceneRecipe = sceneRecipe;
+        // Set loaded scene title
+        loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
+
+        // Apply theme to loaded UI
+        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+    }
+
+    private void UnloadOptionsScene(EScene scene)
+    {
+        sceneToButtonMap[scene].SetActive(false);
+        
+        loadedGameObjects.ForEach(Destroy);
+        loadedGameObjects.Clear();
+        
+        loadedSceneContent.Clear();
     }
 
     private void InitSettingsProblemHints()
@@ -190,41 +238,59 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             injector);
     }
 
-    private void InitLanguageChooser()
-    {
-        new LabeledItemPickerControl<SystemLanguage>(
-                languageChooser,
-                translationManager.GetTranslatedLanguages())
-            .Bind(() => translationManager.currentLanguage,
-                newValue => SetLanguage(newValue));
-    }
-
     public void UpdateTranslation()
     {
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options);
-        gameOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_game_button);
-        songsOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_button);
-        soundOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_sound_button);
-        graphicsOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_graphics_button);
-        recordingOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_recording_button);
-        profileOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_playerProfiles_button);
-        designOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_design_button);
-        internetOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_internet_button);
-        appOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_companionApp_button);
-        developerOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_development_button);
-        webcamOptionsButton.Q<Label>(R.UxmlNames.label).text = TranslationManager.GetTranslation(R.Messages.options_webcam_button);
+        
+        UpdateSceneToNameMap();
+        sceneToButtonMap.ForEach(entry =>
+        {
+            Button button = entry.Value;
+            Label label = button.Q<Label>(R.UxmlNames.label);
+            label.text = sceneToShortNameMap[entry.Key];
+        });
+
+        if (loadedSceneRecipe != null)
+        {
+            loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
+        }
     }
 
-    private void SetLanguage(SystemLanguage newValue)
+    private void UpdateSceneToNameMap()
     {
-        if (settings.GameSettings.language == newValue
-            && translationManager.currentLanguage == newValue)
-        {
-            return;
-        }
+        sceneToShortNameMap.Clear();
+        sceneToShortNameMap.Add(EScene.OptionsGameScene, TranslationManager.GetTranslation(R.Messages.options_game_button));
+        sceneToShortNameMap.Add(EScene.SongLibraryOptionsScene, TranslationManager.GetTranslation(R.Messages.options_songLibrary_button));
+        sceneToShortNameMap.Add(EScene.OptionsSoundScene, TranslationManager.GetTranslation(R.Messages.options_sound_button));
+        sceneToShortNameMap.Add(EScene.OptionsGraphicsScene, TranslationManager.GetTranslation(R.Messages.options_graphics_button));
+        sceneToShortNameMap.Add(EScene.RecordingOptionsScene, TranslationManager.GetTranslation(R.Messages.options_recording_button));
+        sceneToShortNameMap.Add(EScene.PlayerProfileSetupScene, TranslationManager.GetTranslation(R.Messages.options_playerProfiles_button));
+        sceneToShortNameMap.Add(EScene.ThemeOptionsScene, TranslationManager.GetTranslation(R.Messages.options_design_button));
+        sceneToShortNameMap.Add(EScene.NetworkOptionsScene, TranslationManager.GetTranslation(R.Messages.options_internet_button));
+        sceneToShortNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_button));
+        sceneToShortNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_button));
+        sceneToShortNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_button));
+        
+        sceneToLongNameMap.Clear();
+        sceneToLongNameMap.Add(EScene.OptionsGameScene, TranslationManager.GetTranslation(R.Messages.options_game_title));
+        sceneToLongNameMap.Add(EScene.SongLibraryOptionsScene, TranslationManager.GetTranslation(R.Messages.options_songLibrary_title));
+        sceneToLongNameMap.Add(EScene.OptionsSoundScene, TranslationManager.GetTranslation(R.Messages.options_sound_title));
+        sceneToLongNameMap.Add(EScene.OptionsGraphicsScene, TranslationManager.GetTranslation(R.Messages.options_graphics_title));
+        sceneToLongNameMap.Add(EScene.RecordingOptionsScene, TranslationManager.GetTranslation(R.Messages.options_recording_title));
+        sceneToLongNameMap.Add(EScene.PlayerProfileSetupScene, TranslationManager.GetTranslation(R.Messages.options_playerProfiles_title));
+        sceneToLongNameMap.Add(EScene.ThemeOptionsScene, TranslationManager.GetTranslation(R.Messages.options_design_title));
+        sceneToLongNameMap.Add(EScene.NetworkOptionsScene, TranslationManager.GetTranslation(R.Messages.options_internet_title));
+        sceneToLongNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_title));
+        sceneToLongNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_title));
+        sceneToLongNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_title));
+    }
 
-        settings.GameSettings.language = newValue;
-        translationManager.currentLanguage = settings.GameSettings.language;
-        translationManager.ReloadTranslationsAndUpdateScene();
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new();
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.BindExistingInstance(SceneNavigator.GetSceneData(new OptionsSceneData(DefaultOptionsScene)));
+        return bb.GetBindings();
     }
 }

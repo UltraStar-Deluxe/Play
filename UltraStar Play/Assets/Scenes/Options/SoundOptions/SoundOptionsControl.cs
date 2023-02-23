@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
+public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -18,9 +18,6 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject]
     private UIDocument uiDoc;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
 
     [Inject(UxmlName = R.UxmlNames.backgroundMusicVolumeLabel)]
     private Label backgroundMusicVolumeLabel;
@@ -43,9 +40,6 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.animateSceneChangeVolumePicker)]
     private ItemPicker animateSceneChangeVolumePicker;
 
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
-
     [Inject]
     private Settings settings;
 
@@ -66,12 +60,6 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         PercentNumberPickerControl animateSceneChangeVolumePickerControl = new(animateSceneChangeVolumePicker);
         animateSceneChangeVolumePickerControl.Bind(() => settings.AudioSettings.SceneChangeSoundVolumePercent,
             newValue => settings.AudioSettings.SceneChangeSoundVolumePercent = (int)newValue);
-
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
     }
 
     public void UpdateTranslation()
@@ -79,7 +67,5 @@ public class SoundOptionsControl : MonoBehaviour, INeedInjection, ITranslator
         backgroundMusicVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
         previewVolumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
         volumeLabel.text = TranslationManager.GetTranslation(R.Messages.options_volume);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_sound_title);
     }
 }

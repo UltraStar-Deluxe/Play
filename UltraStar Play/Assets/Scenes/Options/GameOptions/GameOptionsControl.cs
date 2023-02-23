@@ -13,6 +13,9 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
     [Inject(UxmlName = R.UxmlNames.scoreModeContainer)]
     private VisualElement scoreModeContainer;
 
+    [Inject(UxmlName = R.UxmlNames.languageChooser)]
+    private ItemPicker languageChooser;
+    
     protected override void Start()
     {
         base.Start();
@@ -20,12 +23,34 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
         new ScoreModeItemPickerControl(scoreModeContainer.Q<ItemPicker>())
             .Bind(() => settings.GameSettings.ScoreMode,
                   newValue => settings.GameSettings.ScoreMode = newValue);
+
+        InitLanguageChooser();
     }
 
     public void UpdateTranslation()
     {
         scoreModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_game_title);
+    }
+    
+    private void InitLanguageChooser()
+    {
+        new LabeledItemPickerControl<SystemLanguage>(
+                languageChooser,
+                translationManager.GetTranslatedLanguages())
+            .Bind(() => translationManager.currentLanguage,
+                newValue => SetLanguage(newValue));
+    }
+    
+    private void SetLanguage(SystemLanguage newValue)
+    {
+        if (settings.GameSettings.language == newValue
+            && translationManager.currentLanguage == newValue)
+        {
+            return;
+        }
+
+        settings.GameSettings.language = newValue;
+        translationManager.currentLanguage = settings.GameSettings.language;
+        translationManager.ReloadTranslationsAndUpdateScene();
     }
 }

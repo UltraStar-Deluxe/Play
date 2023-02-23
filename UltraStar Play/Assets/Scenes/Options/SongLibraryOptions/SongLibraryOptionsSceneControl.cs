@@ -92,7 +92,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         downloadSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
 
         // Custom navigation targets
-        focusableNavigator.AddCustomNavigationTarget(backButton, Vector2.left, helpButton, true);
         focusableNavigator.AddCustomNavigationTarget(helpButton, Vector2.left, songIssueButton, true);
         focusableNavigator.AddCustomNavigationTarget(songIssueButton, Vector2.left, downloadSceneButton, true);
 
@@ -143,20 +142,20 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         }
     }
 
-    protected override void OnBack()
+    protected override bool TryGoBack()
     {
         if (helpDialogControl != null)
         {
             CloseHelp();
+            return true;
         }
         else if (songIssueDialogControl != null)
         {
             CloseSongIssues();
+            return true;
         }
-        else
-        {
-            base.OnBack();
-        }
+
+        return false;
     }
 
     private void ShowHelp()
@@ -321,8 +320,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     public void UpdateTranslation()
     {
         downloadSceneButton.text = TranslationManager.GetTranslation(R.Messages.options_downloadSongs_button);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_title);
         androidSongFolderHintLabel.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidFolderHint,
             // AppSpecificStorageRelativePath is the same for internal memory and sd card.
             "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false));
@@ -375,7 +372,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         {
             settings.GameSettings.songDirs.RemoveAt(indexInList);
             UpdateSongFolderList();
-            backButton.Focus();
         });
 
         songFolderListEntryControls.Add(songFolderListEntryControl);

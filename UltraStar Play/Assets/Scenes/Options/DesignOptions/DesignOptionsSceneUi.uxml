@@ -1,52 +1,39 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background">
-        <ui:VisualElement class="optionsSceneMainContainer">
-            <ui:VisualElement name="topRow" class="optionsSceneTopRow">
-                <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
-                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <MaterialIcon icon="filter_b_and_w" name="titleImage" />
-                        <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Design" name="sceneTitle" class="titleText" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; height: 10%; flex-grow: 1; margin-bottom: 20px;">
+            <ui:VisualElement name="themeContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Theme" name="Label" class="controlLabel" />
+                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
             </ui:VisualElement>
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; height: 10%; flex-grow: 1; margin-bottom: 20px;">
-                <ui:VisualElement name="themeContainer" class="optionsLabelAndItemPicker">
-                    <ui:Label text="Theme" name="Label" class="controlLabel" />
-                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-                </ui:VisualElement>
-                <ui:VisualElement name="noteDisplayModeContainer" class="optionsLabelAndItemPicker">
-                    <ui:Label text="Note Display Mode" name="Label" class="controlLabel" />
-                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-                </ui:VisualElement>
-                <ui:VisualElement name="lyricsOnNotesContainer" class="optionsLabelAndItemPicker">
-                    <ui:Label text="Show Lyrics on Notes" name="Label" class="controlLabel" />
-                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-                </ui:VisualElement>
-                <ui:VisualElement name="staticLyricsContainer" class="optionsLabelAndItemPicker">
-                    <ui:Label text="Show Static Lyrics" name="Label" class="controlLabel" />
-                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-                </ui:VisualElement>
-                <ui:VisualElement name="pitchIndicatorContainer" class="optionsLabelAndItemPicker">
-                    <ui:Label text="Show Pitch Indicator" name="Label" class="controlLabel" />
-                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-                </ui:VisualElement>
-                <ui:VisualElement name="imageAsCursorContainer" class="optionsLabelAndItemPicker">
-                    <ui:Label text="Use Image as Cursor" name="Label" class="controlLabel" />
-                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-                </ui:VisualElement>
-                <ui:VisualElement name="animateSceneChangeContainer" class="optionsLabelAndItemPicker">
-                    <ui:Label text="Scene Transition" name="Label" class="controlLabel" />
-                    <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-                </ui:VisualElement>
-            </ui:ScrollView>
-            <ui:VisualElement name="buttonRow" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end; flex-direction: row;">
-                <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
-                    <MaterialIcon name="helpIcon" icon="help_outline" picking-mode="Ignore" />
-                </ui:Button>
-                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
+            <ui:VisualElement name="noteDisplayModeContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Note Display Mode" name="Label" class="controlLabel" />
+                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
             </ui:VisualElement>
+            <ui:VisualElement name="lyricsOnNotesContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Show Lyrics on Notes" name="Label" class="controlLabel" />
+                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
+            </ui:VisualElement>
+            <ui:VisualElement name="staticLyricsContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Show Static Lyrics" name="Label" class="controlLabel" />
+                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
+            </ui:VisualElement>
+            <ui:VisualElement name="pitchIndicatorContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Show Pitch Indicator" name="Label" class="controlLabel" />
+                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
+            </ui:VisualElement>
+            <ui:VisualElement name="imageAsCursorContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Use Image as Cursor" name="Label" class="controlLabel" />
+                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
+            </ui:VisualElement>
+            <ui:VisualElement name="animateSceneChangeContainer" class="optionsLabelAndItemPicker">
+                <ui:Label text="Scene Transition" name="Label" class="controlLabel" />
+                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
+            </ui:VisualElement>
+        </ui:ScrollView>
+        <ui:VisualElement name="buttonRow" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end; flex-direction: row;">
+            <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
+                <MaterialIcon name="helpIcon" icon="help_outline" picking-mode="Ignore" />
+            </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

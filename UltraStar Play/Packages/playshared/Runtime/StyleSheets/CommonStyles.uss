@@ -292,9 +292,7 @@ Button.tinyFont {
 }
 
 .settingsProblemHintIcon {
-    position: absolute;
-    right: 5px;
-    bottom: 5px;
+    margin-left: auto;
 }
 
 .wordWrap {

@@ -1,21 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" >
-        <ui:VisualElement class="optionsSceneMainContainer">
-            <ui:VisualElement name="topRow" class="optionsSceneTopRow">
-                <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
-                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <MaterialIcon name="titleImage" icon="phonelink_setup" />
-                        <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Companion Apps" name="sceneTitle" class="titleText" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:Label text="Connected Apps: 99" name="connectedClientCountLabel" class="controlLabel" style="width: 100%; margin-bottom: 20px; margin-top: 20px;" />
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="connectedClientList" class="roundCorners outline" style="width: 100%; min-height: 50px; flex-grow: 1; margin-bottom: 20px;" />
-            <ui:VisualElement style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
-            </ui:VisualElement>
-        </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:Label text="Connected Apps: 99" name="connectedClientCountLabel" class="controlLabel" style="width: 100%; margin-bottom: 20px;" />
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="connectedClientList" class="roundCorners outline" style="width: 100%; min-height: 50px; flex-grow: 1; margin-bottom: 20px;" />
     </ui:VisualElement>
 </ui:UXML>

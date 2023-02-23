@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public VisualTreeAsset playerProfileListEntryAsset;
@@ -20,17 +20,11 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
     [Inject]
     private TranslationManager translationManager;
 
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
     [Inject(UxmlName = R.UxmlNames.profileList)]
     private ScrollView profileList;
 
     [Inject(UxmlName = R.UxmlNames.addButton)]
     private Button addButton;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject(UxmlName = R.UxmlNames.helpButton)]
     private Button helpButton;
@@ -67,30 +61,21 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
         });
 
         helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => OnBack());
     }
 
-    private void OnBack()
+    protected override bool TryGoBack()
     {
         if (helpDialogControl != null)
         {
             CloseHelp();
+            return true;
         }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.OptionsScene);
-        }
+
+        return false;
     }
 
     public void UpdateTranslation()
     {
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_playerProfiles_title);
     }
 
     private void UpdatePlayerProfileList()
@@ -115,7 +100,6 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
             {
                 settings.PlayerProfiles.RemoveAt(indexInList);
                 UpdatePlayerProfileList();
-                backButton.Focus();
             });
 
         TextField nameTextField = result.Q<TextField>(R.UxmlNames.nameTextField);

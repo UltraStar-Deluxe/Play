@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,35 +23,27 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
     [Inject]
     protected Settings settings;
     
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    protected Label sceneTitle;
-    
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    protected Button backButton;
-
     protected readonly List<IDisposable> disposables = new();
     
 	protected virtual void Start() {
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
-        backButton.Focus();
-
-        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
+        disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back)
+            .PerformedAsObservable(5)
             .Subscribe(_ => OnBack()));
 	}
 
-    protected virtual void OnBack()
+    protected void OnBack()
     {
-        if (FindObjectOfType<OptionsOverviewSceneControl>() != null)
+        if (TryGoBack())
         {
-            // This game object has been loaded additively to the options overview scene.
-            // Go back to main menu.
-            sceneNavigator.LoadScene(EScene.MainScene);
-            return;
+            InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
         }
-        
-        sceneNavigator.LoadScene(EScene.OptionsScene);
     }
 
+    protected virtual bool TryGoBack()
+    {
+        return false;
+    }
+    
     private void OnDestroy()
     {
         disposables.ForEach(it => it.Dispose());

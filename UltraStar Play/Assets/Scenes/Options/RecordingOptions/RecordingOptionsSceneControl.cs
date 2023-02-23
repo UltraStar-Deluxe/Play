@@ -12,7 +12,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
+public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new() { 0, 5, 10, 15, 20, 25, 30 };
@@ -49,12 +49,6 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     [Inject]
     private ThemeManager themeManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject(UxmlName = R.UxmlNames.deviceContainer)]
     private VisualElement deviceContainer;
@@ -187,12 +181,6 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             .Subscribe(UpdateMicProfileNames)
             .AddTo(gameObject);
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => OnBack());
-
         calibrateDelayButton.RegisterCallbackButtonTriggered(() => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
             .Subscribe(calibrationResult =>
@@ -211,16 +199,15 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             });
     }
 
-    private void OnBack()
+    protected override bool TryGoBack()
     {
         if (helpDialogControl != null)
         {
             CloseHelp();
+            return true;
         }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.OptionsScene);
-        }
+
+        return false;
     }
 
     private void Update()
@@ -352,9 +339,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     public void UpdateTranslation()
     {
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
         enabledLabel.text = TranslationManager.GetTranslation(R.Messages.options_useForSinging);
         colorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_color);
         delayContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_delay);

@@ -23,7 +23,7 @@
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:VisualElement name="settingsButtonContainer" style="background-color: rgba(0, 0, 0, 0);">
                     <ui:Button text="Settings" name="settingsButton" class="mainSceneButton" />
-                    <MaterialIcon name="settingsProblemHintIcon" icon="warning" class="settingsProblemHintIcon warning rounded" />
+                    <MaterialIcon name="settingsProblemHintIcon" icon="warning" class="settingsProblemHintIcon warning rounded" style="position: absolute; bottom: 5px; right: 5px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="space" class="mainSceneButtonSpacer" />
                 <ui:Button text="Quit" name="quitButton" class="mainSceneButton mainSceneExitButton" style="display: flex;" />
