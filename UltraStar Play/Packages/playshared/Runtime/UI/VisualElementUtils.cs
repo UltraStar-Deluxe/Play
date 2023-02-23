@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public static class VisualElementUtils
@@ -67,5 +69,34 @@ public static class VisualElementUtils
                 visualElement.style.top = visualElement.style.bottom.value.value + shift.y;
             }
         }
+    }
+
+    public static List<VisualElement> GetParents(VisualElement visualElement)
+    {
+        List<VisualElement> parents = new();
+        VisualElement parent = visualElement.parent;
+        while (parent != null)
+        {
+            parents.Add(parent);
+            parent = parent.parent;
+        }
+
+        return parents;
+    }
+
+    public static VisualElement GetParent(VisualElement visualElement, Func<VisualElement, bool> condition)
+    {
+        List<VisualElement> parents = new();
+        VisualElement parent = visualElement.parent;
+        while (parent != null)
+        {
+            if (condition(parent))
+            {
+                return parent;
+            }
+            parent = parent.parent;
+        }
+
+        return null;
     }
 }
