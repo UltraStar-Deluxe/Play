@@ -12,8 +12,7 @@
             </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="bottomButtonRow" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: flex-end; flex-direction: row;">
-            <ui:Button text="Download Songs" name="downloadSceneButton" style="width: 240px;" />
-            <ui:VisualElement style="flex-direction: row;">
+            <ui:VisualElement class="ml-auto" style="flex-direction: row;">
                 <ui:Button name="songIssueButton" class="squareButton" style="margin-right: 5px;">
                     <MaterialIcon name="songIssueIcon" icon="warning" class="rounded" />
                 </ui:Button>

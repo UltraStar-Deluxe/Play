@@ -31,9 +31,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject]
     private UiManager uiManager;
 
-    [Inject(UxmlName = R.UxmlNames.downloadSceneButton)]
-    private Button downloadSceneButton;
-
     [Inject(UxmlName = R.UxmlNames.songList)]
     private ScrollView songList;
 
@@ -89,11 +86,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         addButton.RegisterCallbackButtonTriggered(() => AddNewSongFolder());
 
-        downloadSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
-
         // Custom navigation targets
         focusableNavigator.AddCustomNavigationTarget(helpButton, Vector2.left, songIssueButton, true);
-        focusableNavigator.AddCustomNavigationTarget(songIssueButton, Vector2.left, downloadSceneButton, true);
 
         helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
         songIssueButton.RegisterCallbackButtonTriggered(() => ShowSongIssues());
@@ -319,7 +313,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     public void UpdateTranslation()
     {
-        downloadSceneButton.text = TranslationManager.GetTranslation(R.Messages.options_downloadSongs_button);
         androidSongFolderHintLabel.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidFolderHint,
             // AppSpecificStorageRelativePath is the same for internal memory and sd card.
             "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false));
