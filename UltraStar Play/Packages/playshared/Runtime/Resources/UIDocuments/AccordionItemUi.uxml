@@ -4,8 +4,6 @@
             <ui:Label text="Accordion Item Title" display-tooltip-when-elided="true" name="accordionItemTitle" />
             <MaterialIcon name="toggleAccordionItemContentIcon" icon="expand_more" />
         </ui:Button>
-        <ui:VisualElement name="accordionItemContent">
-            <ui:Label text="Dummy Content" display-tooltip-when-elided="true" name="dummyContent" />
-        </ui:VisualElement>
+        <ui:VisualElement name="accordionItemContent" />
     </ui:VisualElement>
 </ui:UXML>

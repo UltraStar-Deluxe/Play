@@ -15,6 +15,7 @@ public class ItemPicker : VisualElement
         private readonly UxmlDoubleAttributeDescription stepValue = new() { name = "step-value", defaultValue = 1};
         private readonly UxmlBoolAttributeDescription noPreviousButton = new() { name = "no-previous-button", defaultValue = false};
         private readonly UxmlBoolAttributeDescription noNextButton = new() { name = "no-next-button", defaultValue = false};
+        private readonly UxmlStringAttributeDescription label = new() { name = "label", defaultValue = ""};
 
         public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
         {
@@ -29,6 +30,7 @@ public class ItemPicker : VisualElement
             target.StepValue = stepValue.GetValueFromBag(bag, cc);
             target.NoPreviousButton = noPreviousButton.GetValueFromBag(bag, cc);
             target.NoNextButton = noNextButton.GetValueFromBag(bag, cc);
+            target.Label = label.GetValueFromBag(bag, cc);
         }
     }
 
@@ -36,6 +38,18 @@ public class ItemPicker : VisualElement
     public double MinValue { get; set; }
     public double MaxValue { get; set; }
     public double StepValue { get; set; }
+    public string Label
+    {
+        get => LabelElement.text;
+        set
+        {
+            LabelElement.text = value;
+            if (LabelElement.text.IsNullOrEmpty())
+            {
+                LabelElement.HideByDisplay();
+            }
+        }
+    }
 
     public bool NoPreviousButton
     {
@@ -54,6 +68,8 @@ public class ItemPicker : VisualElement
     public Label ItemLabel { get; private set; }
     public Image ItemImage { get; private set; }
 
+    private Label LabelElement { get; set; }
+
     private object control;
 
     public ItemPicker()
@@ -68,10 +84,11 @@ public class ItemPicker : VisualElement
         }
         visualTreeAsset.CloneTree(this);
 
-        ItemLabel = this.Q<Label>("itemLabel");
-        ItemImage = this.Q<Image>("itemImage");
-        PreviousItemButton = this.Q<Button>("previousItemButton");
-        NextItemButton = this.Q<Button>("nextItemButton");
+        LabelElement = this.Q<Label>(R_PlayShared.UxmlNames.itemPickerLabel);
+        ItemLabel = this.Q<Label>(R_PlayShared.UxmlNames.itemLabel);
+        ItemImage = this.Q<Image>(R_PlayShared.UxmlNames.itemImage);
+        PreviousItemButton = this.Q<Button>(R_PlayShared.UxmlNames.previousItemButton);
+        NextItemButton = this.Q<Button>(R_PlayShared.UxmlNames.nextItemButton);
     }
 
     public virtual void InitControl(object itemPickerControl)

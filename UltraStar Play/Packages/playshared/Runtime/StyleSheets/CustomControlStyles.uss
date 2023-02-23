@@ -3,28 +3,47 @@
 /**************************************************/
 
 ItemPicker {
-    width: 300px;
     height: var(--control-height);
     min-width: var(--control-height-small);
+    flex-direction: row;
+    align-items: center;
 }
 
-ItemPicker Label {
-    -unity-background-scale-mode: scale-to-fit;
-    white-space: normal;
+.itemPickerContent {
+    flex-direction: row;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.controlWithLabelHorizontal .controlLabel {
+    margin-right: auto;
+    width: 40%;
+}
+
+.controlWithLabelVertical {
+    height: auto;
+}
+
+.controlWithLabelVertical .unity-text-field__input {
+    height: var(--control-height);
 }
 
 .itemPickerItemLabel {
+    -unity-background-scale-mode: scale-to-fit;
+    white-space: normal;
     background-color: var(--control-color-accent2);
     flex-grow: 1;
     flex-shrink: 1;
-    width: 100%;
     height: 100%;
     min-width: var(--control-height-small);
     min-height: var(--control-height-small);
     max-width: 100%;
     max-height: 100%;
     margin: 0;
-    padding: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0;
+    padding-bottom: 0;
     -unity-text-align: middle-center;
 }
 
@@ -41,12 +60,12 @@ ItemPicker Label {
     padding: 0;
 }
 
-ItemPicker #previousItemButton {
+.itemPickerPreviousItemButton {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-ItemPicker #nextItemButton {
+.itemPickerNextItemButton {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -162,8 +181,70 @@ ItemPicker #nextItemButton {
 }
 
 /**************************************************/
+/* BUTTON GROUP */
+/**************************************************/
+ButtonGroup {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+ButtonGroup > .unity-button {
+    border-radius: 0;
+    flex-grow: 1;
+}
+
+ButtonGroup.vertical > .unity-button {
+    margin-bottom: 1px;
+}
+
+ButtonGroup.vertical > .unity-button.firstChild {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+ButtonGroup.vertical > .unity-button.lastChild {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-bottom: 0;
+}
+
+ButtonGroup.horizontal > .unity-button {
+    margin-right: 1px;
+}
+
+ButtonGroup.horizontal > .unity-button.firstChild {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+ButtonGroup.horizontal > .unity-button.lastChild {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-right: 0;
+}
+
+/**************************************************/
 /* ACCORDION */
 /**************************************************/
+AccordionGroup {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+AccordionGroup > AccordionItem {
+    margin-bottom: 1px;
+}
+
+AccordionGroup > AccordionItem.firstChild {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+AccordionGroup > AccordionItem.lastChild {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-bottom: 0;
+}
 
 #accordionItemRoot {
     width: 100%;
@@ -171,8 +252,10 @@ ItemPicker #nextItemButton {
 }
 
 #accordionItemContent {
+    padding-left: 10px;
+    padding-right: 10px;
     overflow: hidden;
-    transition: height 0.5s;
+    transition: height 0.3s;
 }
 
 #toggleAccordionItemContentButton.unity-button {
@@ -183,7 +266,7 @@ ItemPicker #nextItemButton {
     transition: rotate 0.3s;
 }
 
-#accordionItemRoot.expanded #toggleAccordionItemContentIcon {
+AccordionItem.expanded #toggleAccordionItemContentIcon {
     transform-origin: 50% 50%;
     rotate: -180deg;
 }
@@ -267,6 +350,22 @@ TextField.placeholderVisible #unity-text-input {
 #menuOverlay .inputLegendLabel {
     width: 100%;
     -unity-text-align: middle-left;
+}
+
+/**************************************************/
+/* RADIAL PROGRESS BAR */
+/**************************************************/
+.radial-progress-bar {
+    min-width: 18px;
+    min-height: 18px;
+    --track-color: rgb(130, 130, 130);
+    --progress-color: rgb(46, 132, 24);
+    --percentage-color: white;
+}
+
+.radial-progress-bar__label {
+    -unity-text-align: middle-left;
+    color: var(--percentage-color);
 }
 
 /**************************************************/

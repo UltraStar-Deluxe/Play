@@ -55,7 +55,11 @@
             </ui:ScrollView>
             <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: flex-start; width: 100%; margin-top: 10px; flex-shrink: 0;">
                 <ui:Button text="View Log" display-tooltip-when-elided="true" name="showLogButton" class="controlMinWidth" style="margin-right: 5px;" />
-                <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="controlMinWidth" />
+                <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="controlMinWidth" style="margin-right: 5px;" />
+                <ui:Button display-tooltip-when-elided="true" name="openPersistentDataPathButton" style="margin-right: 5px; flex-direction: row;">
+                    <ui:Label tabindex="-1" text="Data Folder" display-tooltip-when-elided="true" name="openPersistentDataPathLabel" />
+                    <MaterialIcon tabindex="-1" icon="open_in_new" name="openPersistentDataPathIcon" />
+                </ui:Button>
                 <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
                 <ui:Button text="Back" display-tooltip-when-elided="true" name="backButton" class="controlMinWidth" />
             </ui:VisualElement>

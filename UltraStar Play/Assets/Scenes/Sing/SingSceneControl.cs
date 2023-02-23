@@ -673,9 +673,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             return Voice.soloVoiceName;
         }
 
-        if (sceneData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceName))
+        if (sceneData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceNameOrPerformerName))
         {
-            return voiceName;
+            // The given value could be "P1" / "P2" (i.e. a voiceName) or the performer's name (e.g. "Elvis").
+            string matchingVoiceName = SongMeta.VoiceNames
+                .Where(entry => entry.Key == voiceNameOrPerformerName
+                    || entry.Value == voiceNameOrPerformerName)
+                .Select(entry => entry.Key)
+                .FirstOrDefault();
+            return matchingVoiceName;
         }
 
         if (sceneData.SelectedPlayerProfiles.Count == 1)
@@ -759,8 +765,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private Voice GetVoice(PlayerProfile playerProfile)
     {
         string voiceName = GetVoiceName(playerProfile);
-        IReadOnlyCollection<Voice> voices = sceneData.SelectedSongMeta.GetVoices();
-        Voice matchingVoice = voices.FirstOrDefault(it => it.VoiceNameEquals(voiceName));
+        IReadOnlyCollection<Voice> voices = SongMeta.GetVoices();
+        Voice matchingVoice = voices.FirstOrDefault(it => Voice.VoiceNameEquals(it.Name, voiceName));
         if (matchingVoice != null)
         {
             return matchingVoice;

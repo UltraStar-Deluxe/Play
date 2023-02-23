@@ -1,6 +1,6 @@
 ﻿using UniInject;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -182,5 +182,6 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
     {
         dragListener.Dispose();
         VisualElement.RemoveFromHierarchy();
+        contextMenuControl.Dispose();
     }
 }

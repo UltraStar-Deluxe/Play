@@ -29,13 +29,16 @@ public static class JsonConverter
         return json;
     }
 
-    public static T FromJson<T>(string json) where T : new()
+    public static T FromJson<T>(string json, bool assertSuccessWithoutWarnings = true) where T : new()
     {
         fsData data = fsJsonParser.Parse(json);
         T deserialized = new();
-        CreateSerializer()
-            .TryDeserialize<T>(data, ref deserialized)
-            .AssertSuccessWithoutWarnings();
+        fsResult tryDeserialize = CreateSerializer()
+            .TryDeserialize<T>(data, ref deserialized);
+        if (assertSuccessWithoutWarnings)
+        {
+            tryDeserialize.AssertSuccessWithoutWarnings();
+        }
         return deserialized;
     }
 

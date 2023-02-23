@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/MainScene/CompanionStyles.uss?fileID=7433441132597879392&amp;guid=10474d1b67f8481fbb7ed771cc866f3e&amp;type=3#CompanionStyles" />
+    <ui:VisualElement name="microphoneUiRoot" style="flex-grow: 1; align-items: center; justify-content: center; position: absolute; width: 100%; height: 100%; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; display: flex;">
+        <ui:VisualElement name="row" style="flex-direction: row; width: 100%;">
+            <ui:TextField picking-mode="Ignore" value="MyCompanionApp" text="MyCompanionApp" name="clientNameTextField" style="flex-grow: 1;" />
+            <ui:VisualElement name="recordingDeviceColorIndicator" style="width: 32px; height: auto; background-color: rgb(220, 20, 60); margin-left: 2px; margin-right: 0; margin-top: 1px; margin-bottom: 1px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="toggleRecordingButtonContainer" style="flex-grow: 1; justify-content: center; align-items: center;">
+            <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton" class="startButtonClass" style="margin-bottom: 0; width: 256px; height: 256px; border-top-left-radius: 128px; border-bottom-left-radius: 128px; border-top-right-radius: 128px; border-bottom-right-radius: 128px; margin-left: 0; margin-right: 0; margin-top: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+                <MaterialIcon icon="mic" name="micIcon" style="font-size: 176px;" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="visualizeAudioToggleContainer" style="align-items: center; justify-content: center; width: 100%; flex-direction: row;">
+            <ui:Label text="Visualize audio" display-tooltip-when-elided="true" name="visualizeAudioLabel" style="margin-right: 5px;" />
+            <ui:Toggle name="visualizeAudioToggle" value="true" class="onlyVisibleWhenConnected" />
+        </ui:VisualElement>
+        <ui:VisualElement name="audioWaveForm" class="onlyVisibleWhenConnected" style="width: 100%; height: 100px; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; display: none;" />
+        <ui:Label text="Delay: 333ms, Amp: 0" display-tooltip-when-elided="true" name="recordingDeviceInfo" class="smallerFont" style="width: 100%; -unity-text-align: lower-center; white-space: normal;" />
+    </ui:VisualElement>
+</ui:UXML>

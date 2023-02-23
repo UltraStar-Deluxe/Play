@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -227,11 +226,11 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             return;
         }
 
-        void FillWithSongIssues(AccordionItemControl accordionItemControl, IReadOnlyList<SongIssue> songIssues)
+        void FillWithSongIssues(AccordionItem accordionItem, IReadOnlyList<SongIssue> songIssues)
         {
             if (songIssues.IsNullOrEmpty())
             {
-                accordionItemControl.AddVisualElement(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_noIssues)));
+                accordionItem.Add(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_noIssues)));
                 return;
             }
 
@@ -250,7 +249,7 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                     if (!lastSongMetaPath.IsNullOrEmpty())
                     {
                         // Add empty line
-                        accordionItemControl.AddVisualElement(new Label(""));
+                        accordionItem.Add(new Label(""));
                     }
                     // Add label for song
                     VisualElement visualElement = songIssueSongEntryUi.CloneTree().Children().First();
@@ -266,12 +265,12 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
                     {
                         openFolderButtonOfSongMeta.HideByDisplay();
                     }
-                    accordionItemControl.AddVisualElement(visualElement);
+                    accordionItem.Add(visualElement);
                 }
 
                 Label songIssueLabel = new($"• {songIssue.Message}");
                 songIssueLabel.AddToClassList("songIssueMessage");
-                accordionItemControl.AddVisualElement(songIssueLabel);
+                accordionItem.Add(songIssueLabel);
                 lastSongMetaPath = songMetaPath;
             });
         }
@@ -284,23 +283,26 @@ public class SongLibraryOptionsSceneControl : MonoBehaviour, INeedInjection, ITr
             .CreateAndInject<MessageDialogControl>();
         songIssueDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
 
-        AccordionItemControl errorsAccordionItemControl = uiManager.CreateAccordionItemControl();
-        errorsAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors);
-        songIssueDialogControl.AddVisualElement(errorsAccordionItemControl.VisualElement);
-        FillWithSongIssues(errorsAccordionItemControl, songMetaManager.GetSongErrors());
+        AccordionGroup accordionGroup = new();
+        songIssueDialogControl.AddVisualElement(accordionGroup);
+        
+        AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
+        errorsAccordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+        accordionGroup.Add(errorsAccordionItem);
+        FillWithSongIssues(errorsAccordionItem, songMetaManager.GetSongErrors());
 
-        AccordionItemControl warningsAccordionItemControl = uiManager.CreateAccordionItemControl();
-        warningsAccordionItemControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings);
-        songIssueDialogControl.AddVisualElement(warningsAccordionItemControl.VisualElement);
-        FillWithSongIssues(warningsAccordionItemControl, songMetaManager.GetSongWarnings());
+        AccordionItem warningsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings));
+        warningsAccordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+        accordionGroup.Add(warningsAccordionItem);
+        FillWithSongIssues(warningsAccordionItem, songMetaManager.GetSongWarnings());
 
         if (songMetaManager.GetSongErrors().Count > 0)
         {
-            errorsAccordionItemControl.ShowAccordionContent();
+            errorsAccordionItem.ShowAccordionContent();
         }
         else if (songMetaManager.GetSongWarnings().Count > 0)
         {
-            warningsAccordionItemControl.ShowAccordionContent();
+            warningsAccordionItem.ShowAccordionContent();
         }
 
         songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), () =>

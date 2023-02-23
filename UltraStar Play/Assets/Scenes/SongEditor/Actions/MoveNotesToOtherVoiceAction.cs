@@ -127,7 +127,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         }
         return note.Sentence != null
                && note.Sentence.Voice != null
-               && voiceNames.AnyMatch(voiceName => note.Sentence.Voice.VoiceNameEquals(voiceName));
+               && voiceNames.AnyMatch(voiceName => Voice.VoiceNameEquals(note.Sentence.Voice.Name, voiceName));
     }
 
     private class SentenceWithRange

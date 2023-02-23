@@ -200,7 +200,7 @@ public class SongMeta
 
     public Voice GetVoice(string voiceName)
     {
-        return GetVoices().FirstOrDefault(voice => voice.VoiceNameEquals(voiceName));
+        return GetVoices().FirstOrDefault(voice => Voice.VoiceNameEquals(voice.Name, voiceName));
     }
 
     public IReadOnlyList<Voice> GetVoices()

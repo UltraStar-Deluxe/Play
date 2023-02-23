@@ -116,7 +116,10 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     private void Start()
     {
+        new AutoFitLabelControl(deviceContainer.Q<ItemPicker>().ItemLabel, 10, 15);
+        
         devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
+        devicePickerControl.AutoSmallFont = false;
         devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
         if (!TryReSelectLastMicProfile())
         {
@@ -200,8 +203,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                 else
                 {
                     UiManager.CreateNotification(
-                        TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout),
-                        "error");
+                        TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
                 }
             });
     }

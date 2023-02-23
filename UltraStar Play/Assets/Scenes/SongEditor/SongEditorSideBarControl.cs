@@ -47,8 +47,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.toggleIssuesButton)]
     private Button toggleIssuesButton;
 
-    [Inject(UxmlName = R.UxmlNames.songPropertiesSideBarContainer)]
-    private VisualElement songPropertiesSideBarContainer;
+    [Inject(UxmlName = R.UxmlNames.sideBarSongPropertiesUi)]
+    private VisualElement sideBarSongPropertiesUi;
 
     [Inject(UxmlName = R.UxmlNames.toggleSongPropertiesButton)]
     private Button toggleSongPropertiesButton;
@@ -76,6 +76,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject(UxmlName = R.UxmlNames.pauseIcon)]
     private VisualElement pauseIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.sideBarSecondaryColumnUi)]
+    private VisualElement sideBarSecondaryColumnUi;
 
     [Inject]
     private Injector injector;
@@ -122,6 +125,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         injector.Inject(sideBarLayersControl);
         injector.Inject(sideBarSettingsControl);
 
+        sideBarSecondaryColumnUi.ShowByDisplay();
+        
         if (PlatformUtils.IsStandalone)
         {
             openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(songMeta));
@@ -248,7 +253,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         sideBarTabGroupControl.AllowNoContainerVisible = true;
         sideBarTabGroupControl.AddTabGroupButton(toggleIssuesButton, issuesSideBarContainer);
         sideBarTabGroupControl.AddTabGroupButton(toggleHelpButton, helpSideBarContainer);
-        sideBarTabGroupControl.AddTabGroupButton(toggleSongPropertiesButton, songPropertiesSideBarContainer);
+        sideBarTabGroupControl.AddTabGroupButton(toggleSongPropertiesButton, sideBarSongPropertiesUi);
         sideBarTabGroupControl.AddTabGroupButton(toggleLayersButton, layersSideBarContainer);
         sideBarTabGroupControl.AddTabGroupButton(toggleSettingsButton, settingsSideBarContainer);
         sideBarTabGroupControl.HideAllContainers();

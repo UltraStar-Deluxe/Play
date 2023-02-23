@@ -27,7 +27,8 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="nPlayerLayout" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; display: none; flex-direction: row;" />
             </ui:VisualElement>
-            <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: center; flex-direction: row;">
+            <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: center; flex-direction: row; flex-shrink: 0;">
+                <ui:Button name="restartButton" value="This is the about text on multiple lines." text="Restart" class="wideControl" style="white-space: nowrap; margin-right: 5px;" />
                 <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" style="white-space: nowrap;" />
             </ui:VisualElement>
         </ui:VisualElement>
