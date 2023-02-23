@@ -42,6 +42,7 @@ public static partial class R
         public const string marginBottomSmaller = "marginBottomSmaller";
         public const string middleCenterText = "middleCenterText";
         public const string modalDialogContainer = "modalDialogContainer";
+        public const string mr_3 = "mr-3";
         public const string multiline = "multiline";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";

@@ -15,7 +15,7 @@
                 <ui:Label text="Loaded Scene" name="loadedSceneTitle" style="-unity-font-style: bold; margin-left: 20px;" />
             </ui:VisualElement>
             <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="optionsSceneScrollView" vertical-scroller-visibility="AlwaysVisible" style="min-width: 25%; margin-right: 20px;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="optionsSceneScrollView" vertical-scroller-visibility="AlwaysVisible" class="mr-3" style="min-width: 25%;">
                     <ToggleButton name="gameOptionsButton" class="optionsOverviewButton toggleButton">
                         <MaterialIcon icon="sports_esports" name="image" />
                         <ui:Label text="Game" name="label" />
