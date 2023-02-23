@@ -22,7 +22,7 @@ $properties: ("m": margin, "p": padding);
         /*
          * #{$propertyLongName} - #{$sizeName} - #{$size}
          */
-        .#{$propertyShortName} {
+        .#{$propertyShortName}-#{$sizeName} {
             #{$propertyLongName}-left: #{$size};
             #{$propertyLongName}-right: #{$size};
             #{$propertyLongName}-top: #{$size};
@@ -38,7 +38,7 @@ $properties: ("m": margin, "p": padding);
         }
         
         .#{$propertyShortName}t-#{$sizeName} {
-            #{$propertyLongName}-right: #{$size};
+            #{$propertyLongName}-top: #{$size};
         }
         
         .#{$propertyShortName}b-#{$sizeName} {
