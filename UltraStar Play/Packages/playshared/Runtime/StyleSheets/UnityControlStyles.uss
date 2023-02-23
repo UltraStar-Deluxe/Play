@@ -101,21 +101,28 @@
 /**************************************************/
 
 .unity-base-popup-field {
-    background-color: var(--control-color);
-    height: var(--control-height);
-    -unity-text-align: middle-left;
+    color: var(--text-color);
+    margin: 0;
 }
 
-.unity-base-popup-field:hover {
+.unity-base-popup-field > .unity-base-field__input {
+    background-color: var(--control-color);
+    min-height: var(--control-height);
+}
+
+.unity-base-popup-field:hover > .unity-base-field__input {
     background-color: var(--control-color-accent1);
 }
 
-.unity-base-popup-field:focus {
+.unity-base-popup-field:focus > .unity-base-field__input {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-base-popup-field:active > .unity-base-field__input {
     background-color: var(--control-color-accent1);
 }
 
 .unity-base-popup-field .unity-base-popup-field__input {
-    background-color: rgb(66, 163, 231);
     padding: 0 5px;
     border-width: 0;
 }
@@ -137,6 +144,39 @@
 }
 
 .unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: var(--text-color);
+    -unity-background-scale-mode: scale-to-fit;
+    border-width: 0;
+}
+
+/**************************************************/
+/* ENUM FIELD */
+/**************************************************/
+.unity-enum-field {
+    color: var(--text-color);
+    margin: 0;
+}
+
+.unity-enum-field > .unity-base-field__input {
+    background-color: var(--control-color);
+    border-width: 0;
+    padding: 0 5px;
+    min-height: var(--control-height);
+}
+
+.unity-enum-field:hover > .unity-base-field__input {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-enum-field:focus > .unity-base-field__input {
+    background-color: var(--control-color-accent2);
+}
+
+.unity-enum-field:active > .unity-base-field__input {
+    background-color: var(--control-color-accent1);
+}
+
+.unity-enum-field__arrow {
     -unity-background-image-tint-color: var(--text-color);
     -unity-background-scale-mode: scale-to-fit;
     border-width: 0;
