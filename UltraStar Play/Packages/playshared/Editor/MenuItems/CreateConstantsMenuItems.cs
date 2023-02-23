@@ -201,9 +201,25 @@ public static class CreateConstantsMenuItems
         foreach (string fileExtension in fileExtensions)
         {
             string[] files = Directory.GetFiles(folderPath, fileExtension, SearchOption.AllDirectories);
-            result.AddRange(files);
+            foreach (string file in files)
+            {
+                if (!IsFileIgnored(file))
+                {
+                    result.Add(file);
+                }
+            }
         }
         return result.Distinct().ToList();
+    }
+
+    private static bool IsFileIgnored(string file)
+    {
+        if (Path.GetFileName(file) == "UtilityStyles.uss")
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private static string CreateClassCode(string className, string subClassName, List<string> constantValues, List<string> fieldNames = null, bool useConst = false)

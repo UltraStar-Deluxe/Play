@@ -7,6 +7,10 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+# Source maps
+*.*.map
+*.*.map.meta
+
 # Rider (JetBrains IDE) data
 .idea/
 
