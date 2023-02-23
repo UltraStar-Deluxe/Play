@@ -26,11 +26,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     [Inject(UxmlName = R.UxmlNames.addButton)]
     private Button addButton;
 
-    [Inject(UxmlName = R.UxmlNames.helpButton)]
-    private Button helpButton;
-
-    private MessageDialogControl helpDialogControl;
-
     [Inject]
     private Settings settings;
 
@@ -43,8 +38,10 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     [Inject]
     private ThemeManager themeManager;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         UpdatePlayerProfileList();
         settings.ObserveEveryValueChanged(s => s.PlayerProfiles)
             .Subscribe(onNext => UpdatePlayerProfileList())
@@ -59,19 +56,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             TextField nameTextField = profileList[profileList.childCount-1].Q<TextField>("nameTextField");
             nameTextField.Focus();
         });
-
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-    }
-
-    protected override bool TryGoBack()
-    {
-        if (helpDialogControl != null)
-        {
-            CloseHelp();
-            return true;
-        }
-
-        return false;
     }
 
     public void UpdateTranslation()
@@ -122,13 +106,9 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         return result;
     }
 
-    private void ShowHelp()
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
     {
-        if (helpDialogControl != null)
-        {
-            return;
-        }
-
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
@@ -141,20 +121,9 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
                 TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
                     "path", ApplicationUtils.ReplacePathsWithDisplayString(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder())) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
-            titleToContentMap,
-            CloseHelp);
-    }
-
-    private void CloseHelp()
-    {
-        if (helpDialogControl == null)
-        {
-            return;
-        }
-        helpDialogControl.CloseDialog();
-        helpDialogControl = null;
-        helpButton.Focus();
+            titleToContentMap);
+        return helpDialogControl;
     }
 }

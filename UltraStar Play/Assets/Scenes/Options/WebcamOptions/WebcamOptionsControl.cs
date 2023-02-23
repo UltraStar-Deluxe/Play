@@ -31,8 +31,10 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     private LabeledItemPickerControl<WebCamDevice> devicePickerControl;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         InitWebcamPicker();
     }
 

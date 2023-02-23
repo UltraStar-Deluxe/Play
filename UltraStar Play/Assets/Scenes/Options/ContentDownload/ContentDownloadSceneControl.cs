@@ -60,9 +60,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
     private Button urlChooserButton;
 
-    [Inject(UxmlName = R.UxmlNames.helpButton)]
-    private Button helpButton;
-
     [Inject]
     private SettingsManager settingsManager;
     
@@ -90,12 +87,12 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     // This string caches new log lines for other threads.
     private string newLogText;
 
-    private MessageDialogControl helpDialogControl;
-
     private int extractedEntryCount;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+
         songArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(songArchiveEntryTextAsset.text);
 
         statusLabel.text = "";
@@ -108,21 +105,8 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         {
             FetchFileSize();
         }
-
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-
+        
         urlChooserButton.RegisterCallbackButtonTriggered(() => ShowUrlChooserDialog());
-    }
-
-    protected override bool TryGoBack()
-    {
-        if (helpDialogControl != null)
-        {
-            CloseHelp();
-            return true;
-        }
-
-        return false;
     }
 
     private void ShowUrlChooserDialog()
@@ -549,22 +533,19 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         fileSize.text = "??? KB";
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
+        
         if (downloadRequest != null)
         {
             downloadRequest.Dispose();
         }
     }
 
-
-    private void ShowHelp()
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
     {
-        if (helpDialogControl != null)
-        {
-            return;
-        }
-
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_demoSongPackage_title),
@@ -574,22 +555,11 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads_title),
                 TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_title),
-            titleToContentMap,
-            CloseHelp);
+            titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToDownloadSongs)));
-    }
-
-    private void CloseHelp()
-    {
-        if (helpDialogControl == null)
-        {
-            return;
-        }
-        helpDialogControl.CloseDialog();
-        helpDialogControl = null;
-        helpButton.Focus();
+        return helpDialogControl;
     }
 }

@@ -128,7 +128,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
+    public MessageDialogControl CreateHelpDialogControl(
+        string dialogTitle,
+        Dictionary<string, string> titleToContentMap)
     {
         VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(helpDialog);
@@ -152,8 +154,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
 
         titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
 
-        Button closeDialogButton = helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
-            onCloseHelp);
+        Button closeDialogButton = helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close), helpDialogControl.CloseDialog);
         closeDialogButton.Focus();
 
         return helpDialogControl;

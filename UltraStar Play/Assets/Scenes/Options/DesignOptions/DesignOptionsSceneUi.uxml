@@ -30,10 +30,5 @@
                 <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
             </ui:VisualElement>
         </ui:ScrollView>
-        <ui:VisualElement name="buttonRow" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end; flex-direction: row;">
-            <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
-                <MaterialIcon name="helpIcon" icon="help_outline" picking-mode="Ignore" />
-            </ui:Button>
-        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -16,6 +16,5 @@
             <ui:Label text="Scene Transition Volume" name="animateSceneChangeVolumeLabel" class="controlLabel" />
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animateSceneChangeVolumePicker" />
         </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;" />
     </ui:VisualElement>
 </ui:UXML>

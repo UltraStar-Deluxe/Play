@@ -40,20 +40,11 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintContainer)]
     private VisualElement androidSongFolderHintContainer;
 
-    [Inject(UxmlName = R.UxmlNames.helpButton)]
-    private Button helpButton;
-
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintLabel)]
     private Label androidSongFolderHintLabel;
-
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private FocusableNavigator focusableNavigator;
-
-    [Inject(UxmlName = R.UxmlNames.songIssueButton)]
-    private Button songIssueButton;
-
-    [Inject(UxmlName = R.UxmlNames.songIssueIcon)]
-    private VisualElement songIssueIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.issuesIcon)]
+    private VisualElement issuesIcon;
 
     [Inject]
     private Settings settings;
@@ -64,8 +55,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject]
     private SongMetaManager songMetaManager;
 
-    private MessageDialogControl helpDialogControl;
-    private MessageDialogControl songIssueDialogControl;
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
 
     protected override void Start()
@@ -85,12 +74,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .AddTo(gameObject);
 
         addButton.RegisterCallbackButtonTriggered(() => AddNewSongFolder());
-
-        // Custom navigation targets
-        focusableNavigator.AddCustomNavigationTarget(helpButton, Vector2.left, songIssueButton, true);
-
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-        songIssueButton.RegisterCallbackButtonTriggered(() => ShowSongIssues());
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -124,41 +107,21 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private void UpdateSongIssues()
     {
         // Update icon
-        songIssueIcon.RemoveFromClassList("error");
-        songIssueIcon.RemoveFromClassList("warning");
+        issuesIcon.RemoveFromClassList("error");
+        issuesIcon.RemoveFromClassList("warning");
         if (songMetaManager.GetSongErrors().Count > 0)
         {
-            songIssueIcon.AddToClassList("error");
+            issuesIcon.AddToClassList("error");
         }
         else if (songMetaManager.GetSongWarnings().Count > 0)
         {
-            songIssueIcon.AddToClassList("warning");
+            issuesIcon.AddToClassList("warning");
         }
     }
 
-    protected override bool TryGoBack()
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
     {
-        if (helpDialogControl != null)
-        {
-            CloseHelp();
-            return true;
-        }
-        else if (songIssueDialogControl != null)
-        {
-            CloseSongIssues();
-            return true;
-        }
-
-        return false;
-    }
-
-    private void ShowHelp()
-    {
-        if (helpDialogControl != null)
-        {
-            return;
-        }
-
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title),
@@ -177,32 +140,18 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_androidSongFolders,
                     "androidAppSpecificStorageRelativePath", AndroidUtils.GetAppSpecificStorageRelativePath(false)));
         }
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title),
-            titleToContentMap,
-            CloseHelp);
+            titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
+        return helpDialogControl;
     }
-
-    private void CloseHelp()
+    
+    public override bool HasIssuesDialog => true;
+    public override MessageDialogControl CreateIssuesDialogControl()
     {
-        if (helpDialogControl == null)
-        {
-            return;
-        }
-        helpDialogControl.CloseDialog();
-        helpDialogControl = null;
-        helpButton.Focus();
-    }
-
-    private void ShowSongIssues()
-    {
-        if (songIssueDialogControl != null)
-        {
-            return;
-        }
-
         void FillWithSongIssues(AccordionItem accordionItem, IReadOnlyList<SongIssue> songIssues)
         {
             if (songIssues.IsNullOrEmpty())
@@ -255,13 +204,12 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         VisualElement dialog = dialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialog);
 
-        songIssueDialogControl = injector
-            .WithRootVisualElement(dialog)
+        MessageDialogControl issuesDialogControl = injector.WithRootVisualElement(dialog)
             .CreateAndInject<MessageDialogControl>();
-        songIssueDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
+        issuesDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
 
         AccordionGroup accordionGroup = new();
-        songIssueDialogControl.AddVisualElement(accordionGroup);
+        issuesDialogControl.AddVisualElement(accordionGroup);
         
         AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
         errorsAccordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
@@ -282,21 +230,16 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             warningsAccordionItem.ShowAccordionContent();
         }
 
-        songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), () =>
+        issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), () =>
         {
             songMetaManager.ReloadSongMetas();
-            CloseSongIssues();
+            issuesDialogControl.CloseDialog();
         });
-        Button closeDialogButton = songIssueDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
-            () => CloseSongIssues());
+        Button closeDialogButton = issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+            () => issuesDialogControl.CloseDialog());
         closeDialogButton.Focus();
-    }
 
-    private void CloseSongIssues()
-    {
-        songIssueDialogControl.CloseDialog();
-        songIssueDialogControl = null;
-        songIssueButton.Focus();
+        return issuesDialogControl;
     }
 
     private static void RequestExternalStoragePermissionIfNeeded()
@@ -371,8 +314,13 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         songList.Add(visualElement);
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
+        
+        issuesIcon.RemoveFromClassList("error");
+        issuesIcon.RemoveFromClassList("warning");
+        
         // Remove duplicate song folders
         settings.GameSettings.songDirs = settings.GameSettings.songDirs
             .Distinct()

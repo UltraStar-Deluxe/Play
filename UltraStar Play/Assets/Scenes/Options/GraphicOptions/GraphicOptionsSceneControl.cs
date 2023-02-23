@@ -29,8 +29,10 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
     [Inject]
     private Settings settings;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         if (PlatformUtils.IsStandalone)
         {
             new ScreenResolutionPickerControl(resolutionContainer.Q<ItemPicker>(), settings);
@@ -55,8 +57,9 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
         fullscreenContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         ApplyGraphicSettings();
     }
 

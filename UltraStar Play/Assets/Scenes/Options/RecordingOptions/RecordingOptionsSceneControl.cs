@@ -92,17 +92,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
     [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
     private Button calibrateDelayButton;
 
-    [Inject(UxmlName = R.UxmlNames.helpButton)]
-    private Button helpButton;
-
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
     private LabeledItemPickerControl<int> noiseSuppressionPickerControl;
     private NumberPickerControl delayPickerControl;
     private ColorPickerControl colorPickerControl;
-
-    private MessageDialogControl helpDialogControl;
 
     private MicProfile SelectedMicProfile => devicePickerControl.SelectedItem;
 
@@ -111,8 +106,10 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
     private readonly Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
     public IObservable<BeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         new AutoFitLabelControl(deviceContainer.Q<ItemPicker>().ItemLabel, 10, 15);
         
         devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
@@ -136,8 +133,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
         sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(() => DeleteSelectedRecordingDevice());
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-
+        
         devicePickerControl.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
         amplificationPickerControl.Selection.Subscribe(newValue =>
         {
@@ -197,17 +193,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
                         TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
                 }
             });
-    }
-
-    protected override bool TryGoBack()
-    {
-        if (helpDialogControl != null)
-        {
-            CloseHelp();
-            return true;
-        }
-
-        return false;
     }
 
     private void Update()
@@ -410,13 +395,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
         }
     }
 
-    private void ShowHelp()
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
     {
-        if (helpDialogControl != null)
-        {
-            return;
-        }
-
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay_title),
@@ -430,23 +411,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, INeedIn
             { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate_title),
                 TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
-            titleToContentMap,
-            CloseHelp);
+            titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
-    }
-
-    private void CloseHelp()
-    {
-        if (helpDialogControl == null)
-        {
-            return;
-        }
-        helpDialogControl.CloseDialog();
-        helpDialogControl = null;
-        helpButton.Focus();
+        return helpDialogControl;
     }
 
     private void InitPitchDetectionFromConnectionClient()

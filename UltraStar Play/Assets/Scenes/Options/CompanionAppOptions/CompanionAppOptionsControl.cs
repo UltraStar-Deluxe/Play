@@ -31,8 +31,10 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         UpdateConnectedClients();
         serverSideConnectRequestManager.ClientConnectedEventStream
             .Subscribe(_ => UpdateConnectedClients())

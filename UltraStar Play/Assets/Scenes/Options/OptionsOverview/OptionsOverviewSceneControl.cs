@@ -82,6 +82,12 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
     
+    [Inject(UxmlName = R.UxmlNames.helpButton)]
+    private Button helpButton;
+    
+    [Inject(UxmlName = R.UxmlNames.issuesButton)]
+    private Button issuesButton;
+    
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -111,6 +117,13 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
     private readonly Dictionary<EScene, string> sceneToShortNameMap = new();
     private readonly Dictionary<EScene, string> sceneToLongNameMap = new();
+
+    private AbstractOptionsSceneControl LoadedOptionsSceneControl => loadedGameObjects
+        .Select(it => it.GetComponentInChildren<AbstractOptionsSceneControl>())
+        .FirstOrDefault();
+
+    private MessageDialogControl helpDialogControl;
+    private MessageDialogControl issuesDialogControl;
 
     private void Start()
     {
@@ -146,6 +159,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             }
         });
 
+        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
+        issuesButton.RegisterCallbackButtonTriggered(() => ShowIssues());
+        
         backButton.RegisterCallbackButtonTriggered(() => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
@@ -153,7 +169,18 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void OnBack()
     {
-        sceneNavigator.LoadScene(EScene.MainScene);
+        if (helpDialogControl != null)
+        {
+            helpDialogControl.CloseDialog();
+        }
+        else if (issuesDialogControl != null)
+        {
+            issuesDialogControl.CloseDialog();
+        }
+        else
+        {
+            sceneNavigator.LoadScene(EScene.MainScene);
+        }
     }
 
     private void LoadScene(EScene scene)
@@ -210,6 +237,10 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         // Set loaded scene title
         loadedSceneTitle.text = sceneToLongNameMap[loadedSceneRecipe.scene];
 
+        // Hide buttons in top row
+        helpButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasHelpDialog);
+        issuesButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasIssuesDialog);
+        
         // Apply theme to loaded UI
         themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
@@ -298,5 +329,41 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(SceneNavigator.GetSceneData(new OptionsSceneData(DefaultOptionsScene)));
         return bb.GetBindings();
+    }
+
+    public void ShowHelp()
+    {
+        if (helpDialogControl != null)
+        {
+            return;
+        }
+
+        if (LoadedOptionsSceneControl.HasHelpDialog)
+        {
+            helpDialogControl = LoadedOptionsSceneControl.CreateHelpDialogControl();
+            helpDialogControl.DialogClosedEventStream.Subscribe(_ =>
+            {
+                helpDialogControl = null;
+                helpButton.Focus();
+            });
+        }
+    }
+
+    public void ShowIssues()
+    {
+        if (issuesDialogControl != null)
+        {
+            return;
+        }
+
+        if (LoadedOptionsSceneControl.HasHelpDialog)
+        {
+            issuesDialogControl = LoadedOptionsSceneControl.CreateIssuesDialogControl();
+            issuesDialogControl.DialogClosedEventStream.Subscribe(_ =>
+            {
+                issuesDialogControl = null;
+                issuesButton.Focus();
+            });
+        }
     }
 }

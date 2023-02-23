@@ -44,19 +44,16 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.animateSceneChangeContainer)]
     private VisualElement animateSceneChangeContainer;
 
-    [Inject(UxmlName = R.UxmlNames.helpButton)]
-    private Button helpButton;
-
     [Inject]
     private Settings settings;
 
     [Inject]
     private UiManager uiManager;
 
-    private MessageDialogControl helpDialogControl;
-
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         new NoteDisplayModeItemPickerControl(noteDisplayModeContainer.Q<ItemPicker>())
             .Bind(() => settings.GraphicSettings.noteDisplayMode,
                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
@@ -88,19 +85,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         themePickerControl.Bind(
             () => themeManager.GetCurrentTheme(),
             newValue => themeManager.SetCurrentTheme(newValue));
-
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-    }
-
-    protected override bool TryGoBack()
-    {
-        if (helpDialogControl != null)
-        {
-            CloseHelp();
-            return true;
-        }
-
-        return false;
     }
 
     public void UpdateTranslation()
@@ -113,35 +97,20 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         imageAsCursorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
     }
 
-    private void ShowHelp()
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
     {
-        if (helpDialogControl != null)
-        {
-            return;
-        }
-
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes_title),
                 TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes,
                     "path", ApplicationUtils.ReplacePathsWithDisplayString(ThemeManager.GetAbsoluteUserDefinedThemesFolder())) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_title),
-            titleToContentMap,
-            CloseHelp);
+            titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddCustomThemes)));
-    }
-
-    private void CloseHelp()
-    {
-        if (helpDialogControl == null)
-        {
-            return;
-        }
-        helpDialogControl.CloseDialog();
-        helpDialogControl = null;
-        helpButton.Focus();
+        return helpDialogControl;
     }
 }

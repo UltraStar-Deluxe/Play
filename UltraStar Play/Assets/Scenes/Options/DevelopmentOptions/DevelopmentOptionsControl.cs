@@ -76,8 +76,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     private NetworkConfigControl networkConfigControl;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         new BoolPickerControl(showFpsContainer.Q<ItemPicker>())
             .Bind(() => settings.DeveloperSettings.showFps,
                   newValue => settings.DeveloperSettings.showFps = newValue);

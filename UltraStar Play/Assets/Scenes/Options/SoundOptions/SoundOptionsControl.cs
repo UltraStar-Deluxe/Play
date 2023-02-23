@@ -43,8 +43,10 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
     [Inject]
     private Settings settings;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         PercentNumberPickerControl backgroundMusicVolumePickerControl = new(backgroundMusicVolumeChooser);
         backgroundMusicVolumePickerControl.Bind(() => settings.AudioSettings.BackgroundMusicVolumePercent,
             newValue => settings.AudioSettings.BackgroundMusicVolumePercent = (int)newValue);

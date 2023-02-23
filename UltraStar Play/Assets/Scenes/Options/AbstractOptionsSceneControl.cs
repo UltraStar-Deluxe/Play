@@ -43,10 +43,22 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
     {
         return false;
     }
-    
-    private void OnDestroy()
+
+    protected virtual void OnDestroy()
     {
         disposables.ForEach(it => it.Dispose());
         disposables.Clear();
+    }
+
+    public virtual bool HasHelpDialog => false;
+    public virtual MessageDialogControl CreateHelpDialogControl()
+    {
+        return null;
+    }
+
+    public virtual bool HasIssuesDialog => false;
+    public virtual MessageDialogControl CreateIssuesDialogControl()
+    {
+        return null;
     }
 }
