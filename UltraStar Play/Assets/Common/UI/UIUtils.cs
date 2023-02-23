@@ -28,17 +28,13 @@ public static class UIUtils
             return;
         }
         bool isPointerOver = false;
+        bool hasFocus = false;
 
         ControlColorConfig GetControlColorConfig()
         {
             return visualElementToControlColorConfig[hoverRoot];
         }
         
-        bool HasFocus()
-        {
-            return hoverRoot.focusController.focusedElement == hoverRoot;
-        }
-
         bool IsToggleButtonActive()
         {
             return hoverRoot is ToggleButton toggleButton
@@ -69,7 +65,7 @@ public static class UIUtils
         void UpdateStyles()
         {
             bool shouldApplyHoverStyle = isPointerOver;
-            bool shouldApplyFocusStyle = HasFocus();
+            bool shouldApplyFocusStyle = hasFocus;
             bool shouldApplyActiveToggleButtonStyle = IsToggleButtonActive();
             if (!shouldApplyHoverStyle && !shouldApplyFocusStyle && !shouldApplyActiveToggleButtonStyle)
             {
@@ -105,8 +101,17 @@ public static class UIUtils
                 UpdateStyles();
             });
 
-            hoverRoot.RegisterCallback<FocusEvent>(evt => UpdateStyles());
-            hoverRoot.RegisterCallback<BlurEvent>(evt => UpdateStyles());
+            hoverRoot.RegisterCallback<FocusEvent>(evt =>
+            {
+                hasFocus = true;
+                UpdateStyles();
+            });
+            hoverRoot.RegisterCallback<BlurEvent>(evt =>
+            {
+                hasFocus = false;
+                UpdateStyles();
+            });
+            
             if (hoverRoot is ToggleButton toggleButton)
             {
                 toggleButton.IsActiveChangedEventStream.Subscribe(_ => UpdateStyles());
