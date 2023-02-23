@@ -14,7 +14,7 @@ public static class UIUtils
         }
     }
 
-    private static readonly HashSet<VisualElement> visualElementsWithCustomCallbacks = new();
+    private static readonly Dictionary<VisualElement, ControlColorConfig> visualElementToControlColorConfig = new();
 
     public static void SetBackgroundStyleWithHoverAndFocus(VisualElement root, ControlColorConfig controlColorConfig)
     {
@@ -29,6 +29,11 @@ public static class UIUtils
         }
         bool isPointerOver = false;
 
+        ControlColorConfig GetControlColorConfig()
+        {
+            return visualElementToControlColorConfig[hoverRoot];
+        }
+        
         bool HasFocus()
         {
             return hoverRoot.focusController.focusedElement == hoverRoot;
@@ -42,26 +47,24 @@ public static class UIUtils
 
         void ApplyActiveToggleButtonStyle()
         {
-            root.style.backgroundColor = controlColorConfig.activeToggleButtonColor;
+            root.style.backgroundColor = GetControlColorConfig().activeToggleButtonColor;
         }
         
         void ApplyFocusStyle()
         {
-            root.style.backgroundColor = controlColorConfig.focusBackgroundColor;
+            root.style.backgroundColor = GetControlColorConfig().focusBackgroundColor;
         }
 
         void ApplyHoverStyle()
         {
-            root.style.backgroundColor = controlColorConfig.hoverBackgroundColor;
+            root.style.backgroundColor = GetControlColorConfig().hoverBackgroundColor;
         }
 
         void ApplyDefaultStyle()
         {
-            root.style.color = controlColorConfig.fontColor;
-            root.style.backgroundColor = controlColorConfig.backgroundColor;
+            root.style.color = GetControlColorConfig().fontColor;
+            root.style.backgroundColor = GetControlColorConfig().backgroundColor;
         }
-
-        ApplyDefaultStyle();
 
         void UpdateStyles()
         {
@@ -86,11 +89,11 @@ public static class UIUtils
             }
         }
 
-        // We can't access pseudo states through the API (e.g. :hover), so we have to manually mimic them
-        if (!visualElementsWithCustomCallbacks.Contains(hoverRoot))
+        // We can't access pseudo states through the API (e.g. :hover), so we have to manually mimic them.
+        // But we do not want to register events multiple times.
+        // However, the color config should be updated when called anew. This is why it is stored in a map.
+        if (!visualElementToControlColorConfig.ContainsKey(hoverRoot))
         {
-            visualElementsWithCustomCallbacks.Add(hoverRoot);
-
             hoverRoot.RegisterCallback<PointerEnterEvent>(evt =>
             {
                 isPointerOver = true;
@@ -108,9 +111,9 @@ public static class UIUtils
             {
                 toggleButton.IsActiveChangedEventStream.Subscribe(_ => UpdateStyles());
             }
-
-            UpdateStyles();
         }
+        visualElementToControlColorConfig[hoverRoot] = controlColorConfig;
+        UpdateStyles();
     }
 
     private static bool IgnoreNonFocusNonHoverBackgroundColor(VisualElement root)
