@@ -186,25 +186,40 @@
 /**************************************************/
 
 .unity-toggle {
-    width: var(--control-height);
-    height: var(--control-height);
     margin: 0;
     padding: 0;
+    align-items: center;
 }
 
-.unity-toggle .unity-toggle__input {
+.unity-toggle__label {
+    white-space: normal;
+    flex-shrink: 1;
+    margin-right: auto;
+}
+
+.unity-toggle__input {
+    width: var(--control-height);
+    height: var(--control-height);
+    min-width: var(--control-height);
+    min-height: var(--control-height);
+    margin: 0;
+    padding: 0;
+    flex-grow: 0;
     background-color: var(--control-color);
     align-items: center;
     align-content: center;
     justify-content: center;
-}
-
-.unity-toggle:hover .unity-toggle__input {
-    background-color: var(--control-color-accent1);
+    border-width: 0;
+    border-color: rgba(0, 0, 0, 0);
+    border-radius: 5px;
 }
 
 .unity-toggle:focus .unity-toggle__input {
     background-color: var(--control-color-accent1);
+}
+
+.unity-toggle:hover .unity-toggle__input {
+    background-color: var(--control-color-accent2);
 }
 
 .unity-toggle:active .unity-toggle__input {
@@ -216,10 +231,12 @@
     border-width: 0;
 }
 
-.unity-toggle__checkmark {
+.unity-toggle__checkmark
+{
     -unity-background-image-tint-color: var(--text-color);
     -unity-background-scale-mode: scale-to-fit;
     background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
     width: 100%;
     height: 100%;
 }
@@ -244,8 +261,8 @@
 /**************************************************/
 
 .unity-scroll-view #unity-content-container {
-    padding-right: 10px;
     padding-bottom: 10px;
+    /*align-items: flex-start;*/
 }
 
 .unity-scroller--vertical {
