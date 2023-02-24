@@ -105,6 +105,16 @@
     margin-right: 16px;
 }
 
+.topLyricsContainer .lyricsContainer {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.bottomLyricsContainer .lyricsContainer {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
 #playerScoreProgressBar {
     width: 140%;
     height: 140%;
