@@ -21,6 +21,7 @@ public class ThemeJson
     public Dictionary<string, Color32> phraseRatingColors;
     public Dictionary<string, Color32> songEditorLayerColors;
     public string backgroundMusic;
+    public Color32 lyricsContainerColor;
 
     /**
      * Time with unit for scene transition, e.g. "0.5s" or "200 ms".
