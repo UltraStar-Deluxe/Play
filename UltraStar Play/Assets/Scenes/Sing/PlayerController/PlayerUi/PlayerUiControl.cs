@@ -240,7 +240,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         return visualElement;
     }
 
-    private void ShowTotalScore(int score)
+    public void ShowTotalScore(int score, bool animate = true)
     {
         if (settings.GameSettings.ScoreMode == EScoreMode.None)
         {
@@ -261,13 +261,22 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             score = 0;
         }
-        totalScoreAnimationId = LeanTween.value(singSceneControl.gameObject, lastDisplayedScore, score, 1f)
-            .setOnUpdate((float interpolatedScoreValue) =>
-            {
-                playerScoreLabel.text = interpolatedScoreValue.ToString("0");
-                playerScoreProgressBar.progress = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
-            })
-            .id;
+
+        if (animate)
+        {
+            totalScoreAnimationId = LeanTween.value(singSceneControl.gameObject, lastDisplayedScore, score, 1f)
+                .setOnUpdate((float interpolatedScoreValue) =>
+                {
+                    playerScoreLabel.text = interpolatedScoreValue.ToString("0");
+                    playerScoreProgressBar.progress = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+                })
+                .id;
+        }
+        else
+        {
+            playerScoreLabel.text = score.ToString("0");
+            playerScoreProgressBar.progress = (float)(100.0 * score / PlayerScoreControl.maxScore);
+        }
     }
 
     private void CreatePerfectSentenceEffect()
