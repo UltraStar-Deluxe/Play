@@ -2,7 +2,7 @@
 using UniInject;
 using UnityEngine.UIElements;
 
-public class MicWithNameControl : INeedInjection, IInjectionFinishedListener
+public class MicWithNameControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     [Inject(UxmlName = R_PlayShared.UxmlNames.micButton)]
     private Button micButton;
@@ -33,5 +33,10 @@ public class MicWithNameControl : INeedInjection, IInjectionFinishedListener
         
         injector.Inject(MicProgressBarRecordingControl);
         MicProgressBarRecordingControl.MicProgressBarControl.OnProgressBarFilled = localMicProfile => OnMicSelected?.Invoke(localMicProfile);
+    }
+
+    public void Dispose()
+    {
+        MicProgressBarRecordingControl?.Dispose();
     }
 }

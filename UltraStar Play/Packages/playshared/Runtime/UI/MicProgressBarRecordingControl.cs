@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinishedListener
+public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     private const float SampleVolumeThreshold = 0.3f;
     private const float TargetNoiseAboveThresholdDurationInMillis = 1000;
@@ -15,10 +14,17 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
     [Inject]
     private Injector injector;
 
-    [Inject]
-    private MicSampleRecorder micSampleRecorder;
+    public MicProfile MicProfile
+    {
+        get => MicProgressBarControl.MicProfile;
+        set
+        {
+            MicProgressBarControl.MicProfile = value;
+            UpdateRecordingEventSubscription();
+        }
+    }
 
-    private MicProfile MicProfile => MicProgressBarControl.MicProfile;
+    private IDisposable recordingEventDisposable;
 
     private long lastRecordingEventTimeInMillis;
     private double noiseAboveThresholdDurationInMillis;
@@ -26,11 +32,25 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
     public void OnInjectionFinished()
     {
         injector.Inject(MicProgressBarControl);
+        UpdateRecordingEventSubscription();
+    }
 
+    private void UpdateRecordingEventSubscription()
+    {
+        if (recordingEventDisposable != null)
+        {
+            recordingEventDisposable.Dispose();
+        }
+        
+        MicSampleRecorder micSampleRecorder = GameObject.FindObjectsOfType<MicSampleRecorder>()
+            .FirstOrDefault(it => it.MicProfile == MicProfile);
         if (micSampleRecorder != null)
         {
-            micSampleRecorder.RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
+            recordingEventDisposable = micSampleRecorder.RecordingEventStream
+                .Subscribe(evt => OnRecordingEvent(evt));
         }
+        
+        lastRecordingEventTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
     
     private void OnRecordingEvent(RecordingEvent evt)
@@ -63,5 +83,10 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         
         // Update progress in UI
         MicProgressBarControl.ProgressBarValue = (float)(100 * (noiseAboveThresholdDurationInMillis / TargetNoiseAboveThresholdDurationInMillis));
+    }
+
+    public void Dispose()
+    {
+        recordingEventDisposable?.Dispose();
     }
 }

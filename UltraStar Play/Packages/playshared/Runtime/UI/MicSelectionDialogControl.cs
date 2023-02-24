@@ -38,21 +38,17 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
     private void UpdateMicProfileList()
     {
         dialogMessageContainer.Clear();
+        micWithNameControls.ForEach(it => it.Dispose());
         micWithNameControls.Clear();
-
-        List<MicSampleRecorder> micSampleRecorders = GameObject.FindObjectsOfType<MicSampleRecorder>().ToList();
 
         micProfiles.ForEach(otherMicProfile =>
         {
             VisualElement micWithName = micWithNameUi.CloneTreeAndGetFirstChild();
             AddVisualElement(micWithName);
 
-            MicSampleRecorder micSampleRecorder = micSampleRecorders.FirstOrDefault(micSampleRecorder => micSampleRecorder.MicProfile == otherMicProfile);
-
             MicWithNameControl micWithNameControl = injector
                 .WithRootVisualElement(micWithName)
                 .WithBindingForInstance(otherMicProfile)
-                .WithBindingForInstance(micSampleRecorder)
                 .CreateAndInject<MicWithNameControl>();
             micWithNameControl.OnMicSelected = OnMicSelected;
             
@@ -65,7 +61,14 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
         OnMicProfileSelected?.Invoke(newMicProfile);
         CloseDialog();
     }
-    
+
+    public override void CloseDialog()
+    {
+        micWithNameControls.ForEach(it => it.Dispose());
+        micWithNameControls.Clear();
+        base.CloseDialog();
+    }
+
     public class MicProfileChangedEvent
     {
         public string playerName;
