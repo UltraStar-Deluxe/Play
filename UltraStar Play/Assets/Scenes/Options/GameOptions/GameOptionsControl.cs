@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -13,8 +15,8 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
     [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
     private ItemPicker scoreModePicker;
 
-    [Inject(UxmlName = R.UxmlNames.languageChooser)]
-    private ItemPicker languageChooser;
+    [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
+    private DropdownField languageDropdownField;
     
     protected override void Start()
     {
@@ -34,13 +36,20 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
     
     private void InitLanguageChooser()
     {
-        new LabeledItemPickerControl<SystemLanguage>(
-                languageChooser,
-                translationManager.GetTranslatedLanguages())
-            .Bind(() => translationManager.currentLanguage,
-                newValue => SetLanguage(newValue));
+        languageDropdownField.choices = translationManager.GetTranslatedLanguages()
+            .Select(languageEnum => languageEnum.ToString())
+            .ToList();
+        languageDropdownField.value = translationManager.currentLanguage.ToString();
+
+        languageDropdownField.RegisterValueChangedCallback(evt =>
+        {
+            if (Enum.TryParse(evt.newValue, out SystemLanguage newValue))
+            {
+                SetLanguage(newValue);
+            }
+        });
     }
-    
+
     private void SetLanguage(SystemLanguage newValue)
     {
         if (settings.GameSettings.language == newValue

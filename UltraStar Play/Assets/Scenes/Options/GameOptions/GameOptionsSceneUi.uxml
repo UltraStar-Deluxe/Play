@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ItemPicker name="languageChooser" label="Language" style="margin-bottom: 20px;" />
+        <ui:DropdownField label="Language" index="-1" choices="a, b, c, d" name="languageDropdownField" class="mb-3" />
         <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="scoreModePicker" label="Score" />
     </ui:VisualElement>
 </ui:UXML>

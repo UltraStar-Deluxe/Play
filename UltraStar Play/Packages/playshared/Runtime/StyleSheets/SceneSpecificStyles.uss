@@ -360,6 +360,10 @@
     font-size: var(--font-size-l);
 }
 
+#loadedOptionsRoot > DropdownField > .unity-base-field__label {
+    width: 300px;
+}
+
 #loadedOptionsRoot > ItemPicker {
     margin-bottom: 16px;
     height: auto;
