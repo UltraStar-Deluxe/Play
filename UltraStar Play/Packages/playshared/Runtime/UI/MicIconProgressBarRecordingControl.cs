@@ -37,9 +37,14 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
 
     private void UpdateRecordingEventSubscription()
     {
-        if (recordingEventDisposable != null)
+        MicProgressBarControl.ProgressBarValue = 0;
+        noiseAboveThresholdDurationInMillis = 0;
+        lastRecordingEventTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        recordingEventDisposable?.Dispose();
+
+        if (MicProfile == null)
         {
-            recordingEventDisposable.Dispose();
+            return;
         }
         
         MicSampleRecorder micSampleRecorder = GameObject.FindObjectsOfType<MicSampleRecorder>()
@@ -50,7 +55,6 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
                 .Subscribe(evt => OnRecordingEvent(evt));
         }
         
-        lastRecordingEventTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
     
     private void OnRecordingEvent(RecordingEvent evt)
