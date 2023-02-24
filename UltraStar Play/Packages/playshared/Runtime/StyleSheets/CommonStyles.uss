@@ -16,6 +16,11 @@ VisualElement
     flex-direction: row;
 }
 
+.circle
+{
+    border-radius: 50%;
+}
+
 .fullMinHeightUnityContentContainer #unity-content-container {
     min-height: 100%;
 }
