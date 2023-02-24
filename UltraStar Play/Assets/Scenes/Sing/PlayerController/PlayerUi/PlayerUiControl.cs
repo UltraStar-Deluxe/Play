@@ -226,15 +226,20 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
         visualElement.Q<Label>().text = sentenceRating.Text;
         visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
-        visualElement.style.right = 0;
         parentContainer.Add(visualElement);
 
-        // Animate moving upwards, then destroy
-        float visualElementHeight = 30;
-        visualElement.style.top = visualElementHeight;
-        LeanTween.value(singSceneControl.gameObject, visualElementHeight, 0, 1f)
+        // Animate movement, then destroy
+        void SetPosition(float value)
+        {
+            visualElement.style.bottom = new StyleLength(new Length(value, LengthUnit.Percent));
+        }
+        
+        float fromValue = 100;
+        float untilValue = 0;
+        SetPosition(fromValue);
+        LeanTween.value(singSceneControl.gameObject, fromValue, untilValue, 1f)
             .setEaseInSine()
-            .setOnUpdate(interpolatedTop => visualElement.style.top = interpolatedTop)
+            .setOnUpdate(interpolatedValue => SetPosition(interpolatedValue))
             .setOnComplete(visualElement.RemoveFromHierarchy);
         return visualElement;
     }

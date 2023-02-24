@@ -123,6 +123,17 @@
     -unity-text-outline-color: rgba(32, 32, 32, 0.5);
 }
 
+#playerNameLabel {
+    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/Inter/static/Inter-ExtraBold SDF.asset');
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(32, 32, 32, 0.2);
+}
+
+.playerScoreLabel {
+    -unity-font-style: bold;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5)
+}
+
 .currentLyrics {
     font-size: var(--font-size-xl);
     margin-bottom: 5px;
