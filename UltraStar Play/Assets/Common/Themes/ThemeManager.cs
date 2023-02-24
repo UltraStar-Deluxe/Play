@@ -460,83 +460,52 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             activeToggleButtonColor = backgroundButtonColorFocus,
         };
 
-        // Change color of UXML elements:
-        root.Query(null, "currentNoteLyrics", "previousNoteLyrics")
-            .ForEach(el => el.style.color = backgroundButtonColor);
+        // Scene specific elements
+        ApplyThemeSpecificStylesToVisualElementsInScene(ESceneUtils.GetCurrentScene(), buttonColorConfig);
 
+        // Labels
+        root.Query<Label>().ForEach(label => label.style.color = new StyleColor(fontColorLabels));
+        
+        // Buttons
         root.Query<Button>().ForEach(button =>
         {
-            foreach (string excludedNameOrClass in new []{"transparentBackgroundColor", "hiddenContinueButton"})
-            {
-                if (button.ClassListContains(excludedNameOrClass) || button.name == excludedNameOrClass)
-                {
-                    return;
-                }
-            }
-
-            if (alreadyProcessedVisualElements.Contains(button))
-            {
-                return;
-            }
-            alreadyProcessedVisualElements.Add(button);
-
             if (button is ToggleButton)
             {
-                UIUtils.SetBackgroundStyleWithHoverAndFocus(button, toggleButtonColorConfig);
+                ApplyControlColorConfigToVisualElement(button, toggleButtonColorConfig);
             }
             else
             {
-                UIUtils.SetBackgroundStyleWithHoverAndFocus(button, buttonColorConfig);
+                ApplyControlColorConfigToVisualElement(button, buttonColorConfig);
             }
 
-            VisualElement image = button.Q("image");
-            if (image != null)
-            {
-                image.style.unityBackgroundImageTintColor = fontColorButtons;
-            }
-
-            VisualElement backImage = button.Q("backImage");
-            if (backImage != null)
-            {
-                backImage.style.unityBackgroundImageTintColor = fontColorButtons;
-            }
+            button.style.color = fontColorButtons;
+            button.Query<Label>().ForEach(label => label.style.color = fontColorButtons);
         });
-        root.Query<VisualElement>(null, "unity-toggle__input").ForEach(entry =>
+
+        // ItemPickers
+        root.Query(null, "itemPickerItemLabel").ForEach(label =>
         {
-            if (alreadyProcessedVisualElements.Contains(entry))
-            {
-                return;
-            }
-            alreadyProcessedVisualElements.Add(entry);
-            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, entry.parent, buttonColorConfig);
+            label.style.backgroundColor = itemPickerBackgroundColor;
+            label.style.color = buttonColorConfig.fontColor;
         });
 
-        root.Query<DropdownField>().ForEach(dropdownField =>
+        // Unity controls
+        List<string> ussClassNamesForApplyButtonColors = new()
         {
-            if (alreadyProcessedVisualElements.Contains(dropdownField))
-            {
-                return;
-            }
-            alreadyProcessedVisualElements.Add(dropdownField);
-            
-            dropdownField.RegisterCallback<NavigationSubmitEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
-            dropdownField.RegisterCallback<ClickEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
-            dropdownField.RegisterCallback<PointerDownEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+            "unity-toggle__input",
+            "unity-base-popup-field__input",
+            "unity-enum-field__input",
+        };
+        ussClassNamesForApplyButtonColors.ForEach(ussClassName =>
+        {
+            root.Query<VisualElement>(null, ussClassName)
+                .ForEach(element => ApplyControlColorConfigToVisualElement(element, buttonColorConfig, true));
         });
 
-        root.Query<EnumField>().ForEach(enumField =>
-        {
-            if (alreadyProcessedVisualElements.Contains(enumField))
-            {
-                return;
-            }
-            alreadyProcessedVisualElements.Add(enumField);
-            
-            enumField.RegisterCallback<NavigationSubmitEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
-            enumField.RegisterCallback<ClickEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
-            enumField.RegisterCallback<PointerDownEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
-        });
-        
+        // Dropdown menus
+        root.Query<DropdownField>().ForEach(RegisterOpenDropdownMenuCallback);
+        root.Query<EnumField>().ForEach(RegisterOpenDropdownMenuCallback);
+
         if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController, out VisualElement unityBaseDropdown))
         {
             unityBaseDropdown.Query<VisualElement>(null, "unity-base-dropdown__container-inner").ForEach(entry =>
@@ -549,42 +518,79 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 entry.style.backgroundColor = buttonColorConfig.backgroundColor;
             });
         }
-        
-        root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
+    }
+    
+    private void RegisterOpenDropdownMenuCallback(VisualElement visualElement)
+    {
+        if (alreadyProcessedVisualElements.Contains(visualElement))
         {
-            if (alreadyProcessedVisualElements.Contains(entry))
-            {
-                return;
-            }
-            alreadyProcessedVisualElements.Add(entry);
-            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
-        });
-        
-        root.Query<VisualElement>(null, "unity-enum-field__input").ForEach(entry =>
-        {
-            if (alreadyProcessedVisualElements.Contains(entry))
-            {
-                return;
-            }
-            alreadyProcessedVisualElements.Add(entry);
-            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
-        });
+            return;
+        }
+        alreadyProcessedVisualElements.Add(visualElement);
+            
+        visualElement.RegisterCallback<NavigationSubmitEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+        visualElement.RegisterCallback<ClickEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+        visualElement.RegisterCallback<PointerDownEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+    }
 
-        root.Query<VisualElement>(null, "unity-base-popup-field__input").ForEach(entry =>
-        {
-            if (alreadyProcessedVisualElements.Contains(entry))
-            {
-                return;
-            }
-            alreadyProcessedVisualElements.Add(entry);
-            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
-        });
-        
-        UIUtils.ApplyFontColorForElements(root, new []{"Label", "titleImage", "sceneTitle", "sceneSubtitle"}, null, fontColorLabels);
-        UIUtils.ApplyFontColorForElements(root, new []{"itemLabel"}, null, fontColorButtons);
+    private void ApplyThemeSpecificStylesToVisualElementsInScene(
+        EScene currentScene,
+        ControlColorConfig buttonColorConfig)
+    {
+        VisualElement root = uiDocument.rootVisualElement;
+        ThemeMeta currentThemeMeta = GetCurrentTheme();
 
-        root.Query(null, "itemPickerItemLabel").ForEach(label => label.style.backgroundColor = itemPickerBackgroundColor);
-        root.Query("titleImage").ForEach(image => image.style.unityBackgroundImageTintColor = fontColorLabels);
+        if (currentScene is EScene.SingScene)
+        {
+            root.Query(null, "currentNoteLyrics", "previousNoteLyrics")
+                .ForEach(el => el.style.color = new StyleColor(currentThemeMeta.ThemeJson.buttonMainColor));
+        }
+        else if (currentScene is EScene.SongSelectScene)
+        {
+            root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
+            {
+                if (alreadyProcessedVisualElements.Contains(entry))
+                {
+                    return;
+                }
+                alreadyProcessedVisualElements.Add(entry);
+                UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
+            });
+        }
+    }
+
+    private bool IsSkipApplyThemeStylesToVisualElement(VisualElement visualElement)
+    {
+        List<string> ignoredUxmlNamesAndUssClasses = new ()
+        {
+            "transparentBackgroundColor",
+            "hiddenContinueButton"
+        };
+        
+        foreach (string excludedNameOrClass in ignoredUxmlNamesAndUssClasses)
+        {
+            if (visualElement.ClassListContains(excludedNameOrClass) || visualElement.name == excludedNameOrClass)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private void ApplyControlColorConfigToVisualElement(VisualElement visualElement, ControlColorConfig controlColorConfig, bool useParentElementAsHoverRoot = false)
+    {
+        if (alreadyProcessedVisualElements.Contains(visualElement)
+            || IsSkipApplyThemeStylesToVisualElement(visualElement))
+        {
+            return;
+        }
+        alreadyProcessedVisualElements.Add(visualElement);
+
+        VisualElement hoverRoot = useParentElementAsHoverRoot
+            ? visualElement.parent
+            : visualElement;
+        UIUtils.SetBackgroundStyleWithHoverAndFocus(visualElement, hoverRoot, controlColorConfig);
     }
 
     private void OnOpenDropdownMenu()

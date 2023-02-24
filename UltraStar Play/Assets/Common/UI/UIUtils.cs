@@ -126,20 +126,6 @@ public static class UIUtils
         return root.ClassListContains("toggleButton");
     }
 
-    public static void ApplyFontColorForElements(VisualElement root, string[] names, string[] classes, Color fontColor)
-    {
-        if (names == null)
-        {
-            root.Query(null, classes).ForEach(element => element.style.color = fontColor);
-            return;
-        }
-
-        foreach (string name in names)
-        {
-            root.Query(name, classes).ForEach(element => element.style.color = fontColor);
-        }
-    }
-
     public static Color ColorHSVOffset(Color inputColor, float hueOffset, float saturationOffset, float valueOffset)
     {
         float h, s, v;
