@@ -542,11 +542,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         if (currentScene is EScene.SingScene)
         {
-            root.Query(null, "currentNoteLyrics", "previousNoteLyrics").ForEach(element =>
-                element.style.color = new StyleColor(currentThemeMeta.ThemeJson.buttonMainColor));
-
             root.Query(null, "lyricsContainer").ForEach(element =>
-                element.style.backgroundColor = GetColorOrFallback(currentThemeMeta.ThemeJson.lyricsContainerColor, Colors.CreateColor("#00000099")));
+                element.style.backgroundColor = currentThemeMeta.ThemeJson.lyricsContainerColor
+                    .OrIfDefault(Colors.CreateColor("#00000099")));
         }
         else if (currentScene is EScene.SongSelectScene)
         {
@@ -560,16 +558,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
             });
         }
-    }
-
-    private Color GetColorOrFallback(Color32 color, Color32 fallback)
-    {
-        if (Equals(color, default(Color32)))
-        {
-            return fallback;
-        }
-
-        return color;
     }
 
     private bool IsSkipApplyThemeStylesToVisualElement(VisualElement visualElement)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -33,6 +34,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private ThemeManager themeManager;
+    
     private Sentence previousSentence;
     private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new();
 
@@ -131,16 +135,25 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             {
                 label.AddToClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
+                
+                themeManager.GetCurrentTheme().ThemeJson.previousNoteLyricsColor.IfNotDefault(color =>
+                    label.style.color = new StyleColor(color));
             }
             else if (i == currentNoteIndex)
             {
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.AddToClassList(R.UssClasses.currentNoteLyrics);
+                
+                themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
+                    label.style.color = new StyleColor(color));
             }
             else
             {
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
+                
+                themeManager.GetCurrentTheme().ThemeJson.lyricsColor.IfNotDefault(color =>
+                    label.style.color = new StyleColor(color));
             }
         }
     }
@@ -215,8 +228,10 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.AddToClassList(R.UssClasses.nextLyrics);
             }
 
+            themeManager.GetCurrentTheme().ThemeJson.lyricsColor.IfNotDefault(color =>
+                label.style.color = new StyleColor(color));
+            
             visualElement.Add(label);
-
         });
     }
 
