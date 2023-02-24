@@ -33,9 +33,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject(UxmlName = R.UxmlNames.playerScoreContainer)]
-    private VisualElement playerScoreContainer;
-
     [Inject(UxmlName = R.UxmlNames.playerScoreLabel)]
     private Label playerScoreLabel;
 
@@ -45,6 +42,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
 
+    [Inject(UxmlName = R.UxmlNames.playerImageBorder)]
+    private VisualElement playerImageBorder;
+    
     [Inject(UxmlName = R.UxmlNames.playerNameLabel)]
     private Label playerNameLabel;
 
@@ -91,10 +91,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 ShowTotalScore(playerScoreControl.TotalScore);
                 ShowSentenceRating(sentenceScoreEvent.SentenceRating, sentenceRatingContainer);
             });
-        }
-        else
-        {
-            playerScoreContainer.HideByDisplay();
         }
 
         // Show an effect for perfectly sung notes
@@ -150,13 +146,14 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .CreateAndInject<PlayerProfileImageControl>();
         if (micProfile != null)
         {
-            playerScoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
             playerScoreProgressBar.ShowByDisplay();
             playerScoreProgressBar.progressColor = micProfile.Color;
+            playerImageBorder.SetBorderColor(micProfile.Color);
         }
         else
         {
             playerScoreProgressBar.HideByDisplay();
+            playerImageBorder.HideByDisplay();
         }
     }
 

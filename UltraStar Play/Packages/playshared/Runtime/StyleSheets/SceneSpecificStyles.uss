@@ -103,11 +103,21 @@
 /**************************************************/
 
 #playerScoreProgressBar {
-    width: 130%;
-    height: 130%;
+    width: 140%;
+    height: 140%;
     --track-color: #f2f4f7;
     --progress-color: #2e8418;
     --border-size: 8;
+    border-radius: 50%;
+}
+
+#playerImageBorder {
+    border-radius: 50%;
+    border-color: #2e8418;
+    border-width: 3%;
+    /* for perfect circle: width and height = 100% + (4 * border-width%) */ 
+    width: 112%;
+    height: 112%;
 }
 
 .lyricsContainer {
