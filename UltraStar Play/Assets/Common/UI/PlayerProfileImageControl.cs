@@ -44,11 +44,6 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
         uiManager.LoadPlayerProfileImage(playerProfile.ImagePath, loadedSprite =>
         {
             image.style.backgroundImage = new StyleBackground(loadedSprite);
-
-            if (micProfile != null)
-            {
-                image.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
-            }
         });
     }
 }
