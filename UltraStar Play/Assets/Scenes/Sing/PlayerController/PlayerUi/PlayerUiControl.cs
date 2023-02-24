@@ -51,6 +51,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.leadingPlayerIcon)]
     private VisualElement leadingPlayerIcon;
 
+    [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
+    private RadialProgressBar playerScoreProgressBar;
+    
     [Inject]
     private Settings settings;
 
@@ -138,6 +141,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             // because it is neither associated with a score nor with lyrics.
             playerNameLabel.HideByDisplay();
             playerImage.HideByDisplay();
+            playerScoreProgressBar.HideByDisplay();
             return;
         }
 
@@ -147,6 +151,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         if (micProfile != null)
         {
             playerScoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+            playerScoreProgressBar.ShowByDisplay();
+            playerScoreProgressBar.progressColor = micProfile.Color;
+        }
+        else
+        {
+            playerScoreProgressBar.HideByDisplay();
         }
     }
 
@@ -251,7 +261,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             score = 0;
         }
         totalScoreAnimationId = LeanTween.value(singSceneControl.gameObject, lastDisplayedScore, score, 1f)
-            .setOnUpdate((float interpolatedScoreValue) => playerScoreLabel.text = interpolatedScoreValue.ToString("0"))
+            .setOnUpdate((float interpolatedScoreValue) =>
+            {
+                playerScoreLabel.text = interpolatedScoreValue.ToString("0");
+                playerScoreProgressBar.progress = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+            })
             .id;
     }
 

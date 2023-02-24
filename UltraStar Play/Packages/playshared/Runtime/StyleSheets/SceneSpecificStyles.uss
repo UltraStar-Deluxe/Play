@@ -102,6 +102,14 @@
 /* SING SCENE */
 /**************************************************/
 
+#playerScoreProgressBar {
+    width: 130%;
+    height: 130%;
+    --track-color: #f2f4f7;
+    --progress-color: #2e8418;
+    --border-size: 8;
+}
+
 .lyricsContainer {
     align-items: center;
     background-color: rgba(0, 0, 0, 0.75);
