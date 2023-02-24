@@ -8,7 +8,7 @@
                         <RadialProgressBar show-label="false" progress="80" name="playerScoreProgressBar" class="overlay" />
                         <ui:VisualElement name="playerImageBorder" class="circle overlay" style="align-items: center;" />
                         <ui:VisualElement name="playerImage" class="circle" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit;" />
-                        <ui:VisualElement name="leadingPlayerIcon" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/LeadingPlayerCrown.svg?fileID=7388822144124034973&amp;guid=8f8cd0bf8e4776546b467068aacdf098&amp;type=3#LeadingPlayerCrown&apos;); -unity-background-scale-mode: scale-to-fit; margin-top: -5px; margin-bottom: -5px; flex-shrink: 2; position: absolute; bottom: 100%;" />
+                        <ui:VisualElement name="leadingPlayerIcon" />
                     </ui:VisualElement>
                     <ui:VisualElement name="playerNameContainer" style="margin-left: 10px; margin-right: 10px;">
                         <ui:Label text="99999" name="playerScoreLabel" class="playerScoreLabel" />

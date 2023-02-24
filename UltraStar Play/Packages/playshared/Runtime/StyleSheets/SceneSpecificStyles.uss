@@ -207,10 +207,14 @@
     display: none;
 }
 
-.singScenePlayerUi #leadingPlayerIcon {
-    flex-shrink: 0;
+#leadingPlayerIcon {
+    position: absolute;
+    bottom: 80%;
     width: var(--font-size-xxl);
     height: var(--font-size-xxl);
+    flex-shrink: 0;
+    background-image: url('project://database/Assets/Common/Graphics/Icons/LeadingPlayerCrown.svg?fileID=7388822144124034973&guid=8f8cd0bf8e4776546b467068aacdf098&type=3#LeadingPlayerCrown');
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .singScenePlayerUi.singScenePlayerUiSmall #leadingPlayerIcon {
