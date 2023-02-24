@@ -99,4 +99,30 @@ public static class VisualElementUtils
 
         return null;
     }
+
+    public static VisualElement GetFocusedVisualElement(FocusController focusController)
+    {
+        VisualElement focusedVisualElement = focusController.focusedElement as VisualElement;
+        return focusedVisualElement;
+    }
+
+    public static bool IsDropdownListFocused(FocusController focusController)
+    {
+        return IsDropdownListFocused(focusController, out VisualElement _);
+    }
+    
+    public static bool IsDropdownListFocused(FocusController focusController, out VisualElement unityBaseDropdown)
+    {
+        VisualElement focusedVisualElement = GetFocusedVisualElement(focusController);
+        if (focusedVisualElement == null
+            || focusedVisualElement.name !="unity-content-container")
+        {
+            unityBaseDropdown = null;
+            return false;
+        }
+
+        unityBaseDropdown = GetParent(focusedVisualElement,
+            parent => parent.ClassListContains("unity-base-dropdown"));
+        return unityBaseDropdown != null;
+    }
 }

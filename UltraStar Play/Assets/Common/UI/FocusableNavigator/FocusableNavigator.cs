@@ -113,7 +113,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (IsDropdownList(FocusedVisualElement))
+        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
         {
             FocusedVisualElement.SendEvent(NavigationCancelEvent.GetPooled());
             InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
@@ -127,7 +127,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (IsDropdownList(FocusedVisualElement))
+        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
         {
             FocusedVisualElement.SendEvent(NavigationSubmitEvent.GetPooled());
             return;
@@ -178,7 +178,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (IsDropdownList(focusedVisualElement))
+        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
         {
             NavigateDropdownList(focusedVisualElement, navigationDirection);
         }
@@ -204,20 +204,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
             focusedVisualElement.SendEvent(NavigationMoveEvent.GetPooled(NavigationMoveEvent.Direction.Down));
         }
     }
-
-    private bool IsDropdownList(VisualElement focusedVisualElement)
-    {
-        if (focusedVisualElement.name != "unity-content-container"
-            && !focusedVisualElement.ClassListContains("unity-base-dropdown__item"))
-        {
-            return false;
-        }
-
-        VisualElement unityBaseDropdown = VisualElementUtils.GetParent(focusedVisualElement,
-                   parent => parent.ClassListContains("unity-base-dropdown"));
-        return unityBaseDropdown != null;
-    }
-
+    
     private void NavigateToBestMatchingNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
     {
         // Find eligible elements for navigation, i.e., all descendants of the current focusableNavigatorRootVisualElement.

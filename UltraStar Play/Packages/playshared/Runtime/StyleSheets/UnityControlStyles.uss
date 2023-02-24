@@ -194,13 +194,14 @@
 }
 
 .unity-base-dropdown__container-inner {
+    background-color: var(--control-color);
     border-width: 0;
     padding: 0;
     margin: 0;
 }
 
 .unity-base-dropdown__item {
-    background-color: var(--control-color);
+    background-color: rgba(0, 0, 0, 0);
     padding: 0 5px;
     margin: 0;
     border-width: 0;
@@ -209,7 +210,7 @@
 }
 
 .unity-base-dropdown__item:hover {
-    background-color: rgb(125, 198, 233);
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .unity-base-dropdown__label {

@@ -63,6 +63,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private bool anyThemeLoaded;
 
+    private bool isDropdownMenuOpened;
+    
     [Inject]
     private Settings settings;
 
@@ -78,6 +80,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedThemesFolder());
         ImageManager.AddSpriteHolder(this);
+    }
+
+    protected void LateUpdate()
+    {
+        // Use LateUpdate to apply theme styles
+        // because this works for newly opened DropdownMenus in the same frame.
+        if (isDropdownMenuOpened)
+        {
+            isDropdownMenuOpened = false;
+            ApplyThemeSpecificStylesToVisualElementsInScene();
+        }
     }
 
     public void UpdateSceneTextures(Texture transitionTexture)
@@ -497,6 +510,46 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             alreadyProcessedVisualElements.Add(entry);
             UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, entry.parent, buttonColorConfig);
         });
+
+        root.Query<DropdownField>().ForEach(dropdownField =>
+        {
+            if (alreadyProcessedVisualElements.Contains(dropdownField))
+            {
+                return;
+            }
+            alreadyProcessedVisualElements.Add(dropdownField);
+            
+            dropdownField.RegisterCallback<NavigationSubmitEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+            dropdownField.RegisterCallback<ClickEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+            dropdownField.RegisterCallback<PointerDownEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+        });
+
+        root.Query<EnumField>().ForEach(enumField =>
+        {
+            if (alreadyProcessedVisualElements.Contains(enumField))
+            {
+                return;
+            }
+            alreadyProcessedVisualElements.Add(enumField);
+            
+            enumField.RegisterCallback<NavigationSubmitEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+            enumField.RegisterCallback<ClickEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+            enumField.RegisterCallback<PointerDownEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
+        });
+        
+        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController, out VisualElement unityBaseDropdown))
+        {
+            unityBaseDropdown.Query<VisualElement>(null, "unity-base-dropdown__container-inner").ForEach(entry =>
+            {
+                if (alreadyProcessedVisualElements.Contains(entry))
+                {
+                    return;
+                }
+                alreadyProcessedVisualElements.Add(entry);
+                entry.style.backgroundColor = buttonColorConfig.backgroundColor;
+            });
+        }
+        
         root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
         {
             if (alreadyProcessedVisualElements.Contains(entry))
@@ -506,12 +559,37 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             alreadyProcessedVisualElements.Add(entry);
             UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
         });
+        
+        root.Query<VisualElement>(null, "unity-enum-field__input").ForEach(entry =>
+        {
+            if (alreadyProcessedVisualElements.Contains(entry))
+            {
+                return;
+            }
+            alreadyProcessedVisualElements.Add(entry);
+            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
+        });
 
+        root.Query<VisualElement>(null, "unity-base-popup-field__input").ForEach(entry =>
+        {
+            if (alreadyProcessedVisualElements.Contains(entry))
+            {
+                return;
+            }
+            alreadyProcessedVisualElements.Add(entry);
+            UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
+        });
+        
         UIUtils.ApplyFontColorForElements(root, new []{"Label", "titleImage", "sceneTitle", "sceneSubtitle"}, null, fontColorLabels);
         UIUtils.ApplyFontColorForElements(root, new []{"itemLabel"}, null, fontColorButtons);
 
         root.Query(null, "itemPickerItemLabel").ForEach(label => label.style.backgroundColor = itemPickerBackgroundColor);
         root.Query("titleImage").ForEach(image => image.style.unityBackgroundImageTintColor = fontColorLabels);
+    }
+
+    private void OnOpenDropdownMenu()
+    {
+        isDropdownMenuOpened = true;
     }
 
     public float GetSceneChangeAnimationTimeInSeconds()
