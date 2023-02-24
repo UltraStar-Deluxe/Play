@@ -192,18 +192,25 @@
     padding-right: 10px;
 }
 
+#sentenceRatingContainer {
+    position: absolute;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+}
+
 #root.singScenePlayerUiSmall {
     padding-top: 0;
     padding-bottom: 0;
 }
 
-.singScenePlayerUi #playerImage {
+#playerInfoContainer #playerImage {
     flex-shrink: 0;
     width: 38px;
     height: 38px;
 }
 
-.singScenePlayerUi.singScenePlayerUiSmall #playerImage {
+.singScenePlayerUi.singScenePlayerUiSmall #playerInfoContainer #playerImage {
     display: none;
 }
 

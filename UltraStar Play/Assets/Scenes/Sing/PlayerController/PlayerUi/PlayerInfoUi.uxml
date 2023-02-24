@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="playerInfoContainer" style="flex-direction: row; align-items: center;">
+        <ui:VisualElement name="playerImageContainer" style="justify-content: center; align-items: center;">
+            <RadialProgressBar show-label="false" progress="80" name="playerScoreProgressBar" class="overlay" />
+            <ui:VisualElement name="playerImageBorder" class="circle overlay" style="align-items: center;" />
+            <ui:VisualElement name="playerImage" class="circle" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit;" />
+            <ui:VisualElement name="leadingPlayerIcon" />
+            <MaterialIcon name="micDisconnectedIcon" icon="mic_off" class="error circle" style="position: absolute; background-color: rgba(0, 0, 0, 0.75);" />
+        </ui:VisualElement>
+        <ui:VisualElement name="playerNameContainer" style="margin-left: 10px; margin-right: 10px;">
+            <ui:Label text="99999" name="playerScoreLabel" class="playerScoreLabel" />
+            <ui:Label text="Player 01" name="playerNameLabel" class="largeFont" />
+        </ui:VisualElement>
+        <ui:VisualElement name="sentenceRatingContainer" />
+    </ui:VisualElement>
+</ui:UXML>

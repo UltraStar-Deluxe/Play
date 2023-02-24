@@ -1,26 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="NoteUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/NoteUi.uxml?fileID=9197481963319205126&amp;guid=726e4c425e366bc4781f431b540ceb7f&amp;type=3#NoteUi" />
+    <ui:Template name="PlayerInfoUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerInfoUi.uxml?fileID=9197481963319205126&amp;guid=063c379bdb2070f438a6d361949a732d&amp;type=3#PlayerInfoUi" />
     <ui:VisualElement name="root" class="singScenePlayerUi" style="flex-grow: 1; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
         <ui:VisualElement name="column">
             <ui:VisualElement name="row" style="flex-direction: row; align-items: flex-end; margin-left: 20px; margin-right: 20px;">
-                <ui:VisualElement name="playerInfoContainer" style="flex-direction: row; align-items: flex-end;">
-                    <ui:VisualElement name="playerImageContainer" style="justify-content: center; align-items: center;">
-                        <RadialProgressBar show-label="false" progress="80" name="playerScoreProgressBar" class="overlay" />
-                        <ui:VisualElement name="playerImageBorder" class="circle overlay" style="align-items: center;" />
-                        <ui:VisualElement name="playerImage" class="circle" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit;" />
-                        <ui:VisualElement name="leadingPlayerIcon" />
-                    </ui:VisualElement>
-                    <ui:VisualElement name="playerNameContainer" style="margin-left: 10px; margin-right: 10px;">
-                        <ui:Label text="99999" name="playerScoreLabel" class="playerScoreLabel" />
-                        <ui:Label text="Player 01" name="playerNameLabel" class="largeFont" />
-                    </ui:VisualElement>
-                    <ui:VisualElement name="sentenceRatingContainer" class="overlay" style="align-items: flex-start;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="spacer" style="flex-grow: 1;" />
-                <ui:VisualElement name="micDisconnectedContainer" style="flex-direction: row; align-items: flex-end; width: auto; height: 100%;">
-                    <ui:Label text="Mic Disconnected" display-tooltip-when-elided="true" name="micDisconnectedLabel" class="error" style="-unity-font-style: bold; -unity-text-align: lower-left; -unity-text-outline-color: rgb(255, 255, 255); text-shadow: 0 0 1px rgb(0, 0, 0);" />
-                    <MaterialIcon name="micDisconnectedIcon" icon="mic" class="error" />
-                </ui:VisualElement>
+                <ui:Instance template="PlayerInfoUi" name="PlayerInfoUi" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="noteContainer" style="flex-grow: 1; width: 100%;">

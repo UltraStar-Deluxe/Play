@@ -36,8 +36,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.playerScoreLabel)]
     private Label playerScoreLabel;
 
-    [Inject(UxmlName = R.UxmlNames.micDisconnectedContainer)]
-    private VisualElement micDisconnectedContainer;
+    [Inject(UxmlName = R.UxmlNames.micDisconnectedIcon)]
+    private VisualElement micDisconnectedIcon;
 
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
@@ -190,13 +190,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void HideMicDisconnectedInfo()
     {
-        micDisconnectedContainer.HideByVisibility();
+        micDisconnectedIcon.HideByVisibility();
     }
 
     private void ShowMicDisconnectedInfo()
     {
-        micDisconnectedContainer.ShowByVisibility();
-        micDisconnectedContainer.Q<Label>().text = "Mic Disconnected";
+        micDisconnectedIcon.ShowByVisibility();
 
         // Bouncy size animation
         if (micDisconnectedAnimationId > 0)
@@ -205,10 +204,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         Vector3 from = Vector3.one * 0.5f;
-        micDisconnectedContainer.style.scale = new StyleScale(new Scale(from));
+        micDisconnectedIcon.style.scale = new StyleScale(new Scale(from));
         micDisconnectedAnimationId = LeanTween.value(singSceneControl.gameObject, from, Vector3.one, 0.5f)
             .setEaseSpring()
-            .setOnUpdate(s => micDisconnectedContainer.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))))
+            .setOnUpdate(s => micDisconnectedIcon.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))))
             .id;
     }
 
