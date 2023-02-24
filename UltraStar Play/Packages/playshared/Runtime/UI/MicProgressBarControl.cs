@@ -6,8 +6,17 @@ public class MicProgressBarControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R_PlayShared.UxmlNames.micProgressBar)]
     private RadialProgressBar micProgressBar;
 
-    [Inject]
-    public MicProfile MicProfile { get; set; }
+    [Inject(Optional = true)]
+    private MicProfile micProfile;
+    public MicProfile MicProfile
+    {
+        get => micProfile;
+        set
+        {
+            micProfile = value;
+            UpdateMicProgressBar();
+        }
+    }
 
     public Action<MicProfile> OnProgressBarFilled { get; set; }
 
@@ -29,6 +38,16 @@ public class MicProgressBarControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         micProgressBar.HideByDisplay();
+        UpdateMicProgressBar();
+    }
+
+    private void UpdateMicProgressBar()
+    {
+        if (MicProfile == null)
+        {
+            micProgressBar.HideByDisplay();
+            return;
+        }
         micProgressBar.progressColor = MicProfile.Color;
     }
 }
