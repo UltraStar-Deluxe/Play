@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public static class ColorExtensions
 {
@@ -76,5 +77,23 @@ public static class ColorExtensions
             && color.g == other.g
             && color.b == other.b
             && color.a == other.a;
+    }
+    
+    public static void IfNotDefault(this Color32 color, Action<Color32> action)
+    {
+        if (!Equals(color, default(Color32)))
+        {
+            action(color);
+        }
+    }
+    
+    public static Color OrIfDefault(this Color32 color, Color32 fallback)
+    {
+        if (Equals(color, default(Color32)))
+        {
+            return fallback;
+        }
+
+        return color;
     }
 }
