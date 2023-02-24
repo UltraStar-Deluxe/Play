@@ -35,7 +35,13 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     [Inject(Key = nameof(playerUi))]
     private VisualTreeAsset playerUi;
-
+    
+    [Inject(Key = nameof(playerInfoUi))]
+    private VisualTreeAsset playerInfoUi;
+    
+    [Inject(UxmlName = R.UxmlNames.playerInfoUiList)]
+    private VisualElement playerInfoUiList;
+    
     private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new();
     public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
 
@@ -65,9 +71,16 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
         // Inject all children
         VisualElement playerUiVisualElement = playerUi.CloneTree().Children().First();
-        Injector playerUiControlInjector = UniInjectUtils.CreateInjector(childrenInjector);
-        playerUiControlInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, playerUiVisualElement);
-        playerUiControlInjector.AddBindingForInstance(playerUiControlInjector);
+        
+        VisualElement playerInfoUiVisualElement = playerInfoUi.CloneTree().Children().First();
+        playerInfoUiList.Add(playerInfoUiVisualElement);
+        
+        // The injector hierarchy is searched from the bottom up.
+        // Thus, we can create an injection hierarchy with elements that are not necessarily in the same VisualElement hierarchy.
+        Injector playerUiControlInjector = childrenInjector.CreateChildInjector()
+            .WithRootVisualElement(playerInfoUiVisualElement)
+            .CreateChildInjector()
+            .WithRootVisualElement(playerUiVisualElement);
         playerUiControlInjector.Inject(PlayerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {

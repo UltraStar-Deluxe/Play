@@ -37,6 +37,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public VisualTreeAsset playerUi;
 
     [InjectedInInspector]
+    public VisualTreeAsset playerInfoUi;
+
+    [InjectedInInspector]
     public VisualTreeAsset sentenceRatingUi;
 
     [InjectedInInspector]
@@ -102,6 +105,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
+    [Inject(UxmlName = R.UxmlNames.playerInfoUiList)]
+    private VisualElement playerInfoUiList;
+    
     [Inject]
     private UIDocument uiDocument;
 
@@ -285,6 +291,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
             .ToList()
             .ForEach(it => it.RemoveFromHierarchy());
+        playerInfoUiList.Clear();
         if (playerCount <= 1)
         {
             // Add empty VisualElement as spacer. Otherwise the player UI would take all the available space.
@@ -754,6 +761,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
+        bb.Bind(nameof(playerInfoUi)).ToExistingInstance(playerInfoUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
         bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);
         bb.Bind(nameof(perfectEffectStarUi)).ToExistingInstance(perfectEffectStarUi);

@@ -1,6 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Packages/playshared/Runtime/StyleSheets/MainStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#MainStyles" />
     <ui:VisualElement name="lyricsContainer" class="lyricsContainer">
+        <ui:VisualElement name="contentContainer" content-container="true" style="width: 100%;"></ui:VisualElement>
         <ui:VisualElement name="currentSentenceContainer" style="flex-direction: row; width: 100%; align-items: center; justify-content: center;">
             <MaterialIcon icon="forward" name="positionBeforeLyricsIndicator" />
             <ui:Label text="Lo" display-tooltip-when-elided="true" name="lo" class="currentLyrics singingLyrics previousNoteLyrics" />

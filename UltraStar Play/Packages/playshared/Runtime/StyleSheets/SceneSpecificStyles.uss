@@ -101,6 +101,9 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+#playerInfoUiList > * {
+    margin-right: 16px;
+}
 
 #playerScoreProgressBar {
     width: 140%;
