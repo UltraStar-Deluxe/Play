@@ -175,9 +175,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.noteDisplayModePicker)]
     private ItemPicker noteDisplayModePicker;
 
-    [Inject(UxmlName = R.UxmlNames.micListOverlay)]
-    private VisualElement micListOverlay;
-
     [Inject(UxmlName = R.UxmlNames.singingOptionsScrollView)]
     private VisualElement singingOptionsScrollView;
 
@@ -398,7 +395,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void ShowPlayerSelectContainer()
     {
         playerScrollView.ShowByDisplay();
-        micListOverlay.ShowByDisplay();
         singingOptionsScrollView.HideByDisplay();
         toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).ShowByDisplay();
         toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).HideByDisplay();
@@ -407,7 +403,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void ShowSingingOptionsContainer()
     {
         playerScrollView.HideByDisplay();
-        micListOverlay.HideByDisplay();
         singingOptionsScrollView.ShowByDisplay();
         toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).HideByDisplay();
         toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).ShowByDisplay();
