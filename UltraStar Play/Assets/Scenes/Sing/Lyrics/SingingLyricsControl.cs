@@ -51,6 +51,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
+        
+        themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
+            positionBeforeLyricsIndicator.style.color = new StyleColor(color));
     }
 
     public void Update(double positionInSongInMillis)
