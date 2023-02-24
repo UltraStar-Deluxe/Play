@@ -47,7 +47,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public SongSelectPlayerListControl playerListControl;
 
     [InjectedInInspector]
-    public SongSelectMicListControl micListControl;
+    public MicPitchTracker micPitchTrackerPrefab;
 
     [Inject]
     private UiManager uiManager;
@@ -726,16 +726,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             StartSingScene(SelectedSong);
         }
-        else if (SelectedSong.VoiceNames.Count <= 1
-                 && playerListControl.PlayerEntryControlControls.Count == 1
-                 && micListControl.MicEntryControls.Count == 1)
-        {
-            // There is one mic for only one player and only one voice to sing.
-            // Thus, there is no choice to make and the song can be started immediately.
-            playerListControl.PlayerEntryControlControls[0].MicProfile = micListControl.MicEntryControls[0].MicProfile;
-            playerListControl.PlayerEntryControlControls[0].SetSelected(true);
-            StartSingScene(SelectedSong);
-        }
         else
         {
             if (SelectedSong == null)
@@ -905,6 +895,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         bb.BindExistingInstance(focusableNavigator);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(focusableNavigator);
         bb.BindExistingInstance(songPreviewControl);
+        bb.Bind(nameof(micPitchTrackerPrefab)).ToExistingInstance(micPitchTrackerPrefab);
         return bb.GetBindings();
     }
 

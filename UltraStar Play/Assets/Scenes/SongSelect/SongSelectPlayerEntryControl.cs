@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener
+public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    [Inject(Key = nameof(micPitchTrackerPrefab))]
+    private MicPitchTracker micPitchTrackerPrefab;
+    
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     private VisualElement visualElement;
 
@@ -17,6 +22,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
     public Toggle EnabledToggle { get; private set; }
 
+    [Inject]
+    private Injector injector;
+    
     private LabeledItemPickerControl<Voice> voiceChooserControl;
 
     // The PlayerProfile is set in Init and must not be null.
@@ -42,12 +50,19 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
                 micIcon.ShowByVisibility();
                 micIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
             }
+
+            UpdateMicPitchTracker();
+            micProgressBarRecordingControl.MicProfile = MicProfile;
         }
     }
 
     public Voice Voice => voiceChooserControl.ItemPicker.IsVisibleByDisplay()
         ? voiceChooserControl.Selection.Value
         : null;
+
+    private MicPitchTracker micPitchTracker;
+
+    private readonly MicProgressBarRecordingControl micProgressBarRecordingControl = new();
 
     public bool IsSelected
     {
@@ -63,6 +78,11 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         voiceChooserControl.GetLabelTextFunction = voice => voice != null
             ? voice.Name
             : "";
+        
+        InitMicPitchTracker();
+
+        injector.Inject(micProgressBarRecordingControl);
+        micProgressBarRecordingControl.MicProfile = MicProfile;
     }
 
     public void SetSelected(bool newIsSelected)
@@ -93,5 +113,38 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         voiceChooserControl.GetLabelTextFunction = voice => voice != null
             ? selectedSong.VoiceNames[voice.Name]
             : "";
+    }
+
+    private void InitMicPitchTracker()
+    {
+        micPitchTracker = GameObject.Instantiate(micPitchTrackerPrefab);
+        injector.InjectAllComponentsInChildren(micPitchTracker);
+        micPitchTracker.MicProfile = micProfile;
+        UpdateMicPitchTracker();
+    }
+    
+    private void UpdateMicPitchTracker()
+    {
+        micPitchTracker.MicProfile = micProfile;
+        if (micProfile == null
+            || micProfile.IsInputFromConnectedClient)
+        {
+            if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
+            {
+                micPitchTracker.MicSampleRecorder.StopRecording();
+            }
+        }
+        else
+        {
+            if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
+            {
+                micPitchTracker.MicSampleRecorder.StartRecording();
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        GameObject.Destroy(micPitchTracker);
     }
 }

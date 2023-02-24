@@ -307,7 +307,8 @@ MonoBehaviour:
   focusableNavigator: {fileID: 1565359474}
   songPreviewControl: {fileID: 974432512}
   playerListControl: {fileID: 922159446}
-  micListControl: {fileID: 1127310616}
+  micPitchTrackerPrefab: {fileID: 4222735436031177209, guid: a7725a62aafd2eb4f8a94b6af1b6b044,
+    type: 3}
 --- !u!4 &620408750
 Transform:
   m_ObjectHideFlags: 0
