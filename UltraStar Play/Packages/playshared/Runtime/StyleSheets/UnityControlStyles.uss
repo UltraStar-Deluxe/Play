@@ -108,6 +108,8 @@
 .unity-base-popup-field > .unity-base-field__input {
     background-color: var(--control-color);
     min-height: var(--control-height);
+    margin: 0;
+    padding: 0 5px;
 }
 
 .unity-base-popup-field:hover > .unity-base-field__input {
@@ -160,6 +162,7 @@
 .unity-enum-field > .unity-base-field__input {
     background-color: var(--control-color);
     border-width: 0;
+    margin: 0;
     padding: 0 5px;
     min-height: var(--control-height);
 }
