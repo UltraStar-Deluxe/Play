@@ -373,9 +373,9 @@ TextField.placeholderVisible #unity-text-input {
 .radial-progress-bar {
     min-width: 18px;
     min-height: 18px;
-    --track-color: rgb(130, 130, 130);
-    --progress-color: rgb(46, 132, 24);
-    --percentage-color: white;
+    --track-color: #f2f4f7;
+    --progress-color: #2e8418;
+    --border-size: 6;
 }
 
 .radial-progress-bar__label {

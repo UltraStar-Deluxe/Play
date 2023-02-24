@@ -13,7 +13,6 @@ public class RadialProgressBar : VisualElement
         // The progress property is exposed to UXML.
         UxmlFloatAttributeDescription m_ProgressAttribute = new UxmlFloatAttributeDescription() { name = "progress" };
         UxmlBoolAttributeDescription m_ShowLabelAttribute = new UxmlBoolAttributeDescription() { name = "show-label", defaultValue = true};
-        UxmlFloatAttributeDescription m_BorderSizeAttribute = new UxmlFloatAttributeDescription() { name = "border-size", defaultValue = 6f};
 
         // The Init method is used to assign to the C# progress property from the value of the progress UXML
         // attribute.
@@ -24,7 +23,6 @@ public class RadialProgressBar : VisualElement
             RadialProgressBar target = ve as RadialProgressBar;
             target.progress = m_ProgressAttribute.GetValueFromBag(bag, cc);
             target.showLabel = m_ShowLabelAttribute.GetValueFromBag(bag, cc);
-            target.borderSize = m_BorderSizeAttribute.GetValueFromBag(bag, cc);
         }
     }
 
@@ -36,8 +34,9 @@ public class RadialProgressBar : VisualElement
     public static readonly string ussLabelClassName = "radial-progress-bar__label";
 
     // These objects allow C# code to access custom USS properties.
-    static CustomStyleProperty<Color> s_TrackColor = new CustomStyleProperty<Color>("--track-color");
-    static CustomStyleProperty<Color> s_ProgressColor = new CustomStyleProperty<Color>("--progress-color");
+    static CustomStyleProperty<Color> s_TrackColor = new("--track-color");
+    static CustomStyleProperty<Color> s_ProgressColor = new("--progress-color");
+    static CustomStyleProperty<float> s_BorderSize = new("--border-size");
 
     // These are the meshes this control uses.
     EllipseMesh m_TrackMesh;
@@ -69,11 +68,13 @@ public class RadialProgressBar : VisualElement
         }
     }
 
+    private bool overwriteBorderSize;
     public float borderSize
     {
-        get => m_ProgressMesh.borderSize;
+        get => m_TrackMesh.borderSize;
         set
         {
+            overwriteBorderSize = true;
             m_TrackMesh.borderSize = value;
             m_ProgressMesh.borderSize = value;
             MarkDirtyRepaint();
@@ -154,17 +155,24 @@ public class RadialProgressBar : VisualElement
     void UpdateCustomStyles()
     {
         if (!overwriteProgressColor
-            && customStyle.TryGetValue(s_ProgressColor, out var progressColor))
+            && customStyle.TryGetValue(s_ProgressColor, out Color newProgressColor))
         {
-            m_ProgressMesh.color = progressColor;
+            m_ProgressMesh.color = newProgressColor;
         }
 
         if (!overwriteTrackColor
-            && customStyle.TryGetValue(s_TrackColor, out var trackColor))
+            && customStyle.TryGetValue(s_TrackColor, out Color newTrackColor))
         {
-            m_TrackMesh.color = trackColor;
+            m_TrackMesh.color = newTrackColor;
         }
 
+        if (!overwriteBorderSize
+            && customStyle.TryGetValue(s_BorderSize, out float newBorderSize))
+        {
+            m_TrackMesh.borderSize = newBorderSize;
+            m_ProgressMesh.borderSize = newBorderSize;
+        }
+        
         if (m_ProgressMesh.isDirty || m_TrackMesh.isDirty)
         {
             MarkDirtyRepaint();
