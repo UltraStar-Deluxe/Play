@@ -182,4 +182,12 @@ public static class VisualElementExtensions
         }
         return ancestors;
     }
+
+    public static void SetBorderColor(this VisualElement visualElement, Color color)
+    {
+        visualElement.style.borderLeftColor = color;
+        visualElement.style.borderRightColor = color;
+        visualElement.style.borderTopColor = color;
+        visualElement.style.borderBottomColor = color;
+    }
 }
