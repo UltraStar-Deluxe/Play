@@ -192,8 +192,10 @@ public class RadialProgressBar : VisualElement
     // the index arrays is used to progressively reveal parts of the mesh.
     void DrawMeshes(MeshGenerationContext context)
     {
-        float halfWidth = contentRect.width * 0.5f;
-        float halfHeight = contentRect.height * 0.5f;
+        float outerWidth = contentRect.width;
+        float outerHeight = contentRect.height;
+        float halfWidth = outerWidth * 0.5f;
+        float halfHeight = outerHeight * 0.5f;
 
         if (halfWidth < 2.0f || halfHeight < 2.0f)
             return;
@@ -201,11 +203,19 @@ public class RadialProgressBar : VisualElement
         m_ProgressMesh.width = halfWidth;
         m_ProgressMesh.height = halfHeight;
         m_ProgressMesh.borderSize = borderSize;
+        m_ProgressMesh.borderTopWidth = resolvedStyle.borderTopWidth;
+        m_ProgressMesh.borderBottomWidth = resolvedStyle.borderBottomWidth;
+        m_ProgressMesh.borderLeftWidth = resolvedStyle.borderLeftWidth;
+        m_ProgressMesh.borderRightWidth = resolvedStyle.borderRightWidth;
         m_ProgressMesh.UpdateMesh();
 
         m_TrackMesh.width = halfWidth;
         m_TrackMesh.height = halfHeight;
         m_TrackMesh.borderSize = borderSize;
+        m_TrackMesh.borderTopWidth = resolvedStyle.borderTopWidth;
+        m_TrackMesh.borderBottomWidth = resolvedStyle.borderBottomWidth;
+        m_TrackMesh.borderLeftWidth = resolvedStyle.borderLeftWidth;
+        m_TrackMesh.borderRightWidth = resolvedStyle.borderRightWidth;
         m_TrackMesh.UpdateMesh();
 
         // Draw track mesh first

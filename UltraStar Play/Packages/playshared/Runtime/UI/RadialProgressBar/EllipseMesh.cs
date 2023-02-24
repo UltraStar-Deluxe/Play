@@ -7,6 +7,10 @@ public class EllipseMesh
     int m_NumSteps;
     float m_Width;
     float m_Height;
+    float m_borderTopWidth;
+    float m_borderBottomWidth;
+    float m_borderLeftWidth;
+    float m_borderRightWidth;
     Color m_Color;
     float m_BorderSize;
     bool m_IsDirty;
@@ -44,14 +48,14 @@ public class EllipseMesh
             float outerX = Mathf.Sin(radians) * width;
             float outerY = Mathf.Cos(radians) * height;
             Vertex outerVertex = new Vertex();
-            outerVertex.position = new Vector3(width + outerX, height + outerY, Vertex.nearZ);
+            outerVertex.position = new Vector3(borderLeftWidth + width + outerX, borderTopWidth + height + outerY, Vertex.nearZ);
             outerVertex.tint = color;
             vertices[i * 2] = outerVertex;
 
-            float innerX = Mathf.Sin(radians) * (width - borderSize);
-            float innerY = Mathf.Cos(radians) * (height - borderSize);
+            float innerX = Mathf.Sin(radians) * (borderLeftWidth + width - borderSize);
+            float innerY = Mathf.Cos(radians) * (borderTopWidth + height - borderSize);
             Vertex innerVertex = new Vertex();
-            innerVertex.position = new Vector3(width + innerX, height + innerY, Vertex.nearZ);
+            innerVertex.position = new Vector3(borderLeftWidth + width + innerX, borderTopWidth + height + innerY, Vertex.nearZ);
             innerVertex.tint = color;
             vertices[i * 2 + 1] = innerVertex;
 
@@ -116,4 +120,27 @@ public class EllipseMesh
         set => CompareAndWrite(ref m_BorderSize, value);
     }
 
+    public float borderLeftWidth
+    {
+        get => m_borderLeftWidth;
+        set => CompareAndWrite(ref m_borderLeftWidth, value);
+    }
+    
+    public float borderRightWidth
+    {
+        get => m_borderRightWidth;
+        set => CompareAndWrite(ref m_borderRightWidth, value);
+    }
+    
+    public float borderTopWidth
+    {
+        get => m_borderTopWidth;
+        set => CompareAndWrite(ref m_borderTopWidth, value);
+    }
+    
+    public float borderBottomWidth
+    {
+        get => m_borderBottomWidth;
+        set => CompareAndWrite(ref m_borderBottomWidth, value);
+    }
 }
