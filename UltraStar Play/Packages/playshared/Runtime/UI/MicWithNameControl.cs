@@ -1,6 +1,5 @@
 ﻿using System;
 using UniInject;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 public class MicWithNameControl : INeedInjection, IInjectionFinishedListener
@@ -14,28 +13,15 @@ public class MicWithNameControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R_PlayShared.UxmlNames.micIcon)]
     private VisualElement micIcon;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.micProgressBar)]
-    private RadialProgressBar micProgressBar;
-    
     [Inject]
     public MicProfile MicProfile { get; set; }
 
+    [Inject]
+    private Injector injector;
+
+    public MicProgressBarRecordingControl MicProgressBarRecordingControl { get; private set; } = new();
+    
     public Action<MicProfile> OnMicSelected { get; set; }
-
-    public float ProgressBarValue
-    {
-        get => micProgressBar.value;
-        set
-        {
-            micProgressBar.value = value;
-            micProgressBar.SetVisibleByDisplay(value > 0);
-
-            if (value >= micProgressBar.highValue)
-            {
-                OnMicSelected?.Invoke(MicProfile);
-            }
-        }
-    }
 
     public void OnInjectionFinished()
     {
@@ -44,7 +30,8 @@ public class MicWithNameControl : INeedInjection, IInjectionFinishedListener
         nameLabel.RegisterCallback<ClickEvent>(evt => OnMicSelected?.Invoke(MicProfile));
         micIcon.style.unityBackgroundImageTintColor = new StyleColor(MicProfile.Color);
         micIcon.style.unityBackgroundImageTintColor = new StyleColor(MicProfile.Color);
-        micProgressBar.HideByDisplay();
-        micProgressBar.progressColor = MicProfile.Color;
+        
+        injector.Inject(MicProgressBarRecordingControl);
+        MicProgressBarRecordingControl.MicProgressBarControl.OnProgressBarFilled = localMicProfile => OnMicSelected?.Invoke(localMicProfile);
     }
 }
