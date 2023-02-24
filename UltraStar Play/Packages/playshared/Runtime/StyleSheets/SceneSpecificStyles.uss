@@ -111,7 +111,7 @@
 .singingLyrics {
     -unity-font-style: bold;
     -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(64, 64, 64, 0.75);
+    -unity-text-outline-color: rgba(32, 32, 32, 0.5);
 }
 
 .currentLyrics {
