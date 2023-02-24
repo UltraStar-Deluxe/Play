@@ -230,6 +230,8 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
             themeManager.GetCurrentTheme().ThemeJson.lyricsColor.IfNotDefault(color =>
                 label.style.color = new StyleColor(color));
+            themeManager.GetCurrentTheme().ThemeJson.lyricsOutlineColor.IfNotDefault(color =>
+                label.style.unityTextOutlineColor = new StyleColor(color));
             
             visualElement.Add(label);
         });
