@@ -282,6 +282,10 @@ Button.tinyFont {
     -unity-text-outline-color: rgba(64, 64, 64, 0.5);
 }
 
+.textShadow {
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
 .textColorTint {
     -unity-background-image-tint-color: var(--text-color);
 }
