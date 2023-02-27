@@ -29,9 +29,6 @@ public class SingingResultsSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => singingResultsSceneControl.FinishScene());
         InputManager.GetInputAction(R.InputActions.usplay_space).PerformedAsObservable()
             .Subscribe(_ => singingResultsSceneControl.FinishScene());
-            
-        InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
-            .Subscribe(_ => singingResultsSceneControl.FinishScene());
 
     }
 }
