@@ -25,12 +25,15 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public SongPreviewControl songPreviewControl;
 
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
+    [Inject(UxmlName = R.UxmlNames.artistLabel)]
+    private Label artistLabel;
 
-    [Inject(UxmlName = R.UxmlNames.sceneSubtitle)]
-    private Label songLabel;
-
+    [Inject(UxmlName = R.UxmlNames.titleLabel)]
+    private Label titleLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.coverImage)]
+    private VisualElement coverImage;
+    
     [Inject(UxmlName = R.UxmlNames.onePlayerLayout)]
     private VisualElement onePlayerLayout;
 
@@ -119,9 +122,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void FillLayout()
     {
         SongMeta songMeta = sceneData.SongMeta;
-        string titleText = songMeta.Title.IsNullOrEmpty() ? "" : songMeta.Title;
-        string artistText = songMeta.Artist.IsNullOrEmpty() ? "" : " - " + songMeta.Artist;
-        songLabel.text = titleText + artistText;
+        artistLabel.text = songMeta.Artist;
+        titleLabel.text = songMeta.Title;
+        SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, coverImage);
 
         VisualElement selectedLayout = GetSelectedLayout();
         if (selectedLayout == nPlayerLayout)
@@ -282,7 +285,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     public void UpdateTranslation()
     {
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
     }
 }
