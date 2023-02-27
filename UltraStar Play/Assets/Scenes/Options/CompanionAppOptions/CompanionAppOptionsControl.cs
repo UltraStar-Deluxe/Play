@@ -13,20 +13,11 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     [InjectedInInspector]
     public VisualTreeAsset connectedClientListEntryAsset;
 
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
     [Inject(UxmlName = R.UxmlNames.connectedClientCountLabel)]
     private Label connectedClientCountLabel;
 
     [Inject(UxmlName = R.UxmlNames.connectedClientList)]
     private ScrollView connectedClientList;
-
-    [Inject]
-    private Settings settings;
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;

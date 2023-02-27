@@ -10,12 +10,6 @@ using UnityEngine.UIElements;
 
 public class NetworkOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
     public void UpdateTranslation()
     {
     }

@@ -14,12 +14,6 @@ using IBinding = UniInject.IBinding;
 
 public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
 {
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
     [Inject(UxmlName = R.UxmlNames.showFpsPicker)]
     private ItemPicker showFpsPicker;
 
@@ -52,9 +46,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
-
-    [Inject]
-    private Settings settings;
 
     [Inject]
     private ThemeManager themeManager;

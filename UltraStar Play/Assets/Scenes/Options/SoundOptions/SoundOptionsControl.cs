@@ -11,12 +11,6 @@ using UnityEngine.UIElements;
 public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
-    [Inject]
     private UIDocument uiDoc;
 
     [Inject(UxmlName = R.UxmlNames.backgroundMusicVolumeChooser)]
@@ -30,9 +24,6 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
 
     [Inject(UxmlName = R.UxmlNames.animateSceneChangeVolumePicker)]
     private ItemPicker animateSceneChangeVolumePicker;
-
-    [Inject]
-    private Settings settings;
 
     protected override void Start()
     {

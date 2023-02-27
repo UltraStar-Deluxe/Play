@@ -11,9 +11,6 @@ using UnityEngine.UIElements;
 
 public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
     [Inject(UxmlName = R.UxmlNames.devicePicker)]
     private ItemPicker devicePicker;
 
@@ -22,9 +19,6 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     [Inject(UxmlName = R.UxmlNames.useWebcamToggle)]
     private Toggle useWebcamToggle;
-
-    [Inject]
-    private Settings settings;
 
     [Inject]
     private WebCamManager webCamManager;

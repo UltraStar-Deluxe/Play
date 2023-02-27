@@ -45,10 +45,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     
     [Inject(UxmlName = R.UxmlNames.issuesIcon)]
     private VisualElement issuesIcon;
-
-    [Inject]
-    private Settings settings;
-
+    
     [Inject]
     private Injector injector;
 

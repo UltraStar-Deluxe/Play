@@ -11,12 +11,6 @@ using UnityEngine.UIElements;
 
 public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
     [Inject(UxmlName = R.UxmlNames.resolutionPicker)]
     private ItemPicker resolutionPicker;
 
@@ -25,9 +19,6 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
 
     [Inject(UxmlName = R.UxmlNames.fullscreenModePicker)]
     private ItemPicker fullscreenModePicker;
-
-    [Inject]
-    private Settings settings;
 
     protected override void Start()
     {

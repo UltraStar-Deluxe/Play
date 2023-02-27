@@ -30,16 +30,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     private UiManager uiManager;
 
     [Inject]
-    private Settings settings;
-
-    [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
-
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
 
     [Inject]
     private UIDocument uiDocument;
@@ -103,7 +94,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     private readonly Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
     public IObservable<BeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
 
-    public void Start()
+    protected override void Start()
     {
         base.Start();
         

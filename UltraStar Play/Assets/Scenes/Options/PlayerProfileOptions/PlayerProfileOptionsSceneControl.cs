@@ -14,20 +14,11 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     [InjectedInInspector]
     public VisualTreeAsset playerProfileListEntryAsset;
 
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
     [Inject(UxmlName = R.UxmlNames.profileList)]
     private ScrollView profileList;
 
     [Inject(UxmlName = R.UxmlNames.addButton)]
     private Button addButton;
-
-    [Inject]
-    private Settings settings;
 
     [Inject]
     private UiManager uiManager;

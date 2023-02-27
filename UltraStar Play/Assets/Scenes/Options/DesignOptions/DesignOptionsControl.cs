@@ -15,12 +15,6 @@ using UnityEngine.UIElements;
 public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
-    [Inject]
     private ThemeManager themeManager;
 
     [Inject(UxmlName = R.UxmlNames.themePicker)]
@@ -43,9 +37,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     [Inject(UxmlName = R.UxmlNames.animateSceneChangePicker)]
     private ItemPicker animateSceneChangePicker;
-
-    [Inject]
-    private Settings settings;
 
     [Inject]
     private UiManager uiManager;

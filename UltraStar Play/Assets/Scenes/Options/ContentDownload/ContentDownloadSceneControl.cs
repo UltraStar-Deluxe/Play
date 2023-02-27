@@ -30,12 +30,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     [Inject]
     private UIDocument uiDocument;
 
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
     [Inject(UxmlName = R.UxmlNames.statusLabel)]
     private Label statusLabel;
 
@@ -62,9 +56,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
     [Inject]
     private SettingsManager settingsManager;
-    
-    [Inject]
-    private Settings settings;
     
     [Inject]
     private SongMetaManager songMetaManager;
