@@ -4,6 +4,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -72,19 +73,44 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private bool playbackJustStarted;
     private float playbackStartTimeInSeconds;
     
+    private bool isPopupMenuOpen;
+    private float popupMenuClosedTimeInSeconds;
+    
     public void OnInjectionFinished()
     {
         contextMenuControl = injector
             .WithRootVisualElement(openControlsMenuButton)
             .CreateAndInject<ContextMenuControl>();
         contextMenuControl.FillContextMenuAction = FillContextMenu;
+        contextMenuControl.ContextMenuOpenedEventStream.Subscribe(OnContextMenuOpened);
+        contextMenuControl.ContextMenuClosedEventStream.Subscribe(OnContextMenuClosed);
         
-        toggleMuteButton.RegisterCallbackButtonTriggered(() => ToggleMute());
+        openControlsMenuButton.RegisterCallbackButtonTriggered(() =>
+        {
+            if (isPopupMenuOpen
+                || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
+            {
+                return;
+            }
+
+            contextMenuControl.OpenContextMenu(Vector2.zero);
+        });
+        
+        toggleMuteButton.RegisterCallbackButtonTriggered(() =>
+        {
+            ToggleMute();
+        });
         UpdateMuteIcon();
         
         togglePlaybackButton.RegisterCallbackButtonTriggered(() => TogglePlayPause());
         governanceOverlay.RegisterCallback<PointerDownEvent>(evt =>
         {
+            if (isPopupMenuOpen
+                || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
+            {
+                return;
+            }
+            
             if (evt.button == 0)
             {
                 TogglePlayPause();
@@ -145,18 +171,18 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private void HideOverlayAndCursor()
     {
         governanceOverlay.style.opacity = 0;
-        UnityEngine.Cursor.visible = false;
+        Cursor.visible = false;
     }
 
     private void ShowOverlayAndCursor()
     {
         governanceOverlay.style.opacity = 1;
-        UnityEngine.Cursor.visible = true;
+        Cursor.visible = true;
     }
 
     public void Dispose()
     {
-        UnityEngine.Cursor.visible = true;
+        Cursor.visible = true;
     }
     
     private void TogglePlayPause()
@@ -179,8 +205,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     private void UpdateMuteIcon()
     {
-        muteIcon.SetVisibleByDisplay(!volumeControl.IsMuted);
-        unmuteIcon.SetVisibleByDisplay(volumeControl.IsMuted);
+        muteIcon.SetVisibleByDisplay(volumeControl.IsMuted);
+        unmuteIcon.SetVisibleByDisplay(!volumeControl.IsMuted);
     }
 
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
@@ -198,5 +224,17 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             () => singSceneControl.FinishScene(false));
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
             () => singSceneControl.OpenSongInEditor());
+    }
+
+    private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)
+    {
+        isPopupMenuOpen = false;
+        popupMenuClosedTimeInSeconds = Time.time;
+    }
+    
+    private void OnContextMenuOpened(ContextMenuPopupControl contextMenuPopupControl)
+    {
+        isPopupMenuOpen = true;
+        new AnchoredPopupControl(contextMenuPopupControl.VisualElement, openControlsMenuButton, Corner2D.TopRight);   
     }
 }
