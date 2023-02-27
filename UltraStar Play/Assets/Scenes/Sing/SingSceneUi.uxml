@@ -46,7 +46,7 @@
                     <ui:Label tabindex="-1" text="Some Artist" display-tooltip-when-elided="true" name="artistLabel" picking-mode="Ignore" class="textShadow" style="-unity-font-style: bold; font-size: 14px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="bottomControls" style="background-color: rgba(32, 32, 32, 0.88); width: 100%; align-items: center;">
+            <ui:VisualElement name="bottomControls" class="overlayBackground" style="width: 100%; align-items: center;">
                 <ui:VisualElement name="inputLegend" picking-mode="Ignore" class="smallerFont inputLegendBar" style="bottom: 0; width: 100%; flex-wrap: wrap; display: none;">
                     <ui:Instance template="InputDeviceIconContainer" name="inputDeviceIconTemplate" style="position: absolute; left: 10px; height: 100%;" />
                     <ui:Label text="Back: Escape" display-tooltip-when-elided="true" name="inputLegendLabel" class="inputLegendLabel" />

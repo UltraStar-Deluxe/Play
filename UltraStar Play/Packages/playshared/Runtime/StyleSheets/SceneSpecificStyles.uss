@@ -101,6 +101,20 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+.singSceneContextMenu {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-width: 0;
+    border-radius: 10px;
+}
+
+.singSceneContextMenu .unity-button {
+    background-color: rgba(32, 32, 32, 0);
+}
+
+.singSceneContextMenu .unity-button:hover {
+    background-color: rgba(64, 64, 64, 1);
+}
+
 #governanceOverlay {
     transition: opacity 0.3s;
 }

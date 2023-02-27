@@ -235,6 +235,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private void OnContextMenuOpened(ContextMenuPopupControl contextMenuPopupControl)
     {
         isPopupMenuOpen = true;
-        new AnchoredPopupControl(contextMenuPopupControl.VisualElement, openControlsMenuButton, Corner2D.TopRight);   
+        new AnchoredPopupControl(contextMenuPopupControl.VisualElement, openControlsMenuButton, Corner2D.TopRight);
+        contextMenuPopupControl.VisualElement.AddToClassList("singSceneContextMenu");
     }
 }
