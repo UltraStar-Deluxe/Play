@@ -43,11 +43,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.continueButton)]
     private Button continueButton;
 
-    [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
-    private Button hiddenContinueButton;
-
     [Inject(UxmlName = R.UxmlNames.restartButton)]
     public Button restartButton;
+    
+    [Inject(UxmlName = R.UxmlNames.background)]
+    public VisualElement background;
     
     [Inject]
     private Statistics statistics;
@@ -82,18 +82,21 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     void Start()
     {
-        hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
+        background.RegisterCallback<PointerUpEvent>(evt => FinishScene());
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         continueButton.Focus();
         
         restartButton.RegisterCallbackButtonTriggered(() => RestartSingScene());
 
-        // Click through to hiddenContinueButton
-        uiDocument.rootVisualElement.Query<VisualElement>()
-            .ToList()
-            .ForEach(visualElement => visualElement.pickingMode = visualElement is Button
-                ? PickingMode.Position
-                : PickingMode.Ignore);
+        // Click through to background
+        background.Query<VisualElement>().ForEach(visualElement =>
+        {
+            if (visualElement is not Button
+                && visualElement != background)
+            {
+                visualElement.pickingMode = PickingMode.Ignore;
+            }
+        });
 
         songAudioPlayer.Init(sceneData.SongMeta);
 
