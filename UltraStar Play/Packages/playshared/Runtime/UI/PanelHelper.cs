@@ -16,11 +16,16 @@ public class PanelHelper
     private Vector2 panelScreenMin;
 
     public PanelHelper(UIDocument document)
+        : this(document.rootVisualElement.panel, document.panelSettings)
     {
-        panel = document.rootVisualElement.panel;
-        panelSettings = document.panelSettings;
     }
 
+    public PanelHelper(IPanel panel, PanelSettings panelSettings)
+    {
+        this.panel = panel;
+        this.panelSettings = panelSettings;
+    }
+    
     public Vector2 ScreenToPanel(Vector2 v)
     {
         return RuntimePanelUtils.ScreenToPanel(panel, v);
