@@ -33,6 +33,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     private PanelHelper panelHelper;
 
     private VisualElement visualElement;
+    public VisualElement VisualElement => visualElement;
 
     private readonly GameObject gameObject;
     private readonly Vector2 position;
@@ -41,6 +42,9 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     private Vector2 lastSize;
     private Vector2 lastPosition;
+    
+    private readonly Subject<bool> contextMenuClosedEventStream = new();
+    public IObservable<bool> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
     public ContextMenuPopupControl(GameObject gameObject, Vector2 position)
     {
@@ -125,6 +129,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         closeContextMenuDisposable.Dispose();
         visualElement.RemoveFromHierarchy();
         OpenContextMenuPopups.Remove(this);
+        contextMenuClosedEventStream.OnNext(true);
     }
 
     private static void CloseAllOpenContextMenus()

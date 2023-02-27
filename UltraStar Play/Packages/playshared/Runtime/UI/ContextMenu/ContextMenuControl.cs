@@ -33,6 +33,12 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     private Vector2 pointerDownPosition;
 
     private readonly List<IDisposable> disposables = new();
+    
+    private readonly Subject<ContextMenuPopupControl> contextMenuOpenedEventStream = new();
+    public IObservable<ContextMenuPopupControl> ContextMenuOpenedEventStream => contextMenuOpenedEventStream;
+    
+    private readonly Subject<ContextMenuPopupControl> contextMenuClosedEventStream = new();
+    public IObservable<ContextMenuPopupControl> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
     public virtual void OnInjectionFinished()
     {
@@ -101,6 +107,9 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
         ContextMenuPopupControl contextMenuPopup = new(gameObject, position);
         injector.Inject(contextMenuPopup);
         FillContextMenuAction(contextMenuPopup);
+
+        contextMenuPopup.ContextMenuClosedEventStream.Subscribe(_ => contextMenuClosedEventStream.OnNext(contextMenuPopup));
+        contextMenuOpenedEventStream.OnNext(contextMenuPopup);
     }
 
     public void Dispose()
