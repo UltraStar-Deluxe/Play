@@ -105,8 +105,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
-    [Inject(UxmlName = R.UxmlNames.playerInfoUiList)]
-    private VisualElement playerInfoUiList;
+    [Inject(UxmlClass = R.UssClasses.playerInfoUiList)]
+    private List<VisualElement> playerInfoUiLists;
     
     [Inject]
     private UIDocument uiDocument;
@@ -291,7 +291,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
             .ToList()
             .ForEach(it => it.RemoveFromHierarchy());
-        playerInfoUiList.Clear();
+        playerInfoUiLists.ForEach(playerInfoUiList => playerInfoUiList.Clear());
         if (playerCount <= 1)
         {
             // Add empty VisualElement as spacer. Otherwise the player UI would take all the available space.
@@ -354,7 +354,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
         else
         {
-            topLyricsContainer.HideByDisplay();
+            if (sceneData.SelectedPlayerProfiles.Count > 8)
+            {
+                // Do not show lyrics at the top, but show player info UI.
+                topLyricsContainer.Q<VisualElement>(R.UxmlNames.currentSentenceContainer).HideByDisplay();
+                topLyricsContainer.Q<VisualElement>(R.UxmlNames.nextSentenceContainer).HideByDisplay();
+            }
+            else
+            {
+                topLyricsContainer.HideByDisplay();
+            }
             bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, PlayerControls[0]);
         }
     }
@@ -648,6 +657,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         playerControlInjector.AddBindingForInstance(voice);
         playerControlInjector.AddBindingForInstance(micProfile);
         playerControlInjector.AddBindingForInstance(playerControlInjector, RebindingBehavior.Ignore);
+        playerControlInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(playerIndex)));
         playerControlInjector.Inject(playerControl);
 
         PlayerControls.Add(playerControl);

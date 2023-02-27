@@ -589,7 +589,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &908260463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -709,6 +709,8 @@ MonoBehaviour:
   playerControlPrefab: {fileID: 2965445179344377450, guid: 614fa56bea7fef5428e98f6522cee8eb,
     type: 3}
   playerUi: {fileID: 9197481963319205126, guid: 9b1872cb139c5e34f94035c97230fb5b,
+    type: 3}
+  playerInfoUi: {fileID: 9197481963319205126, guid: 063c379bdb2070f438a6d361949a732d,
     type: 3}
   sentenceRatingUi: {fileID: 9197481963319205126, guid: fc5ccc90fb3478b49bea1f39b1e6bcce,
     type: 3}

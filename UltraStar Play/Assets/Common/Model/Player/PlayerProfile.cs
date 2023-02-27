@@ -22,4 +22,9 @@ public class PlayerProfile
         this.Difficulty = difficulty;
         this.ImagePath = imagePath;
     }
+
+    public override string ToString()
+    {
+        return $"PlayerProfile(Name: {Name})";
+    }
 }
