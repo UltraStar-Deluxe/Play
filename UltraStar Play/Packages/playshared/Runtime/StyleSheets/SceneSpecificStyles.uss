@@ -164,7 +164,7 @@
     -unity-text-outline-color: rgba(32, 32, 32, 0.5);
 }
 
-#playerNameLabel {
+.lyricsContainer #playerNameLabel {
     -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/Inter/static/Inter-ExtraBold SDF.asset');
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgba(32, 32, 32, 0.2);
@@ -285,11 +285,11 @@
 }
 
 #normalNoteScore > #scoreIcon {
-    background-color: #F79009;
+    background-color: #12B76A;
 }
 
 #goldenNoteScore > #scoreIcon {
-    background-color: #12B76A;
+    background-color: #F79009;
 }
 
 #phraseBonusScore > #scoreIcon {
@@ -307,44 +307,68 @@
 #singingResultsScoresContainer {
     height: 50%;
     width: 100%;
-    flex-grow: 1;
-    flex-shrink: 0;
+    flex-shrink: 1;
 }
 
-.singingResultUiSmall Label {
+#singingResultsPlayerUiRoot {
+    max-width: 400px;
+    max-height: 300px;
+}
+
+#playerScoreProgressBar.singingResults {
+    min-width: 30px;
+    min-height: 30px;
+    --border-size: 24;
+}
+
+#singingResultsPlayerUiRoot AspectRatioPanel {
+    min-width: 30px;
+    min-height: 30px;
+}
+
+.singingResultUi-3 #playerInfoContainer {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+#singingResultsPlayerUiRoot.singingResultUi-3 {
+    padding: 8px;
+    margin-bottom: 16px;
+    max-width: 250px;
+}
+
+.singingResultUi-3 #playerScoreProgressBar {
+    --border-size: 16;
+}
+
+.singingResultUi-3 Label {
     font-size: var(--font-size-s);
 }
 
-.singingResultUiSmall #ratingLabel {
+.singingResultUi-3 #ratingLabel {
+    visibility: hidden;
+}
+
+.singingResultUi-4 #topContainer {
+    flex-direction: row;
+}
+.singingResultUi-4 #topContainer > * {
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.singingResultUi-4 #bottomContainer {
     display: none;
 }
 
-.singingResultUiSmall #scoreIcon {
+.singingResultUi-5 #scoreIcon {
     display: none;
 }
 
-.singingResultUiSmall #ratingLabel {
-    display: none;
-}
-
-.singingResultUiSmaller Label {
-    font-size: var(--font-size-xs);
-}
-
-.singingResultUiSmaller #ratingImage {
-    display: none;
-}
-
-.singingResultUiSmaller #playerImage {
-    display: none;
-}
-
-.singingResultUiSmaller #singingResultsScoresContainer {
-    height: 91%;
-}
-
-.singingResultUiSmallest .scoreRow {
-    border-bottom-width: 0;
+#singingResultsPlayerUiRoot.singingResultUi-3 {
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    max-width: 250px;
 }
 
 /**************************************************/

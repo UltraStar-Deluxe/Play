@@ -167,10 +167,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     private void PrepareNPlayerLayout()
     {
         int playerCount = sceneData.PlayerProfiles.Count;
+        
         // Add elements to "square similar" grid
         int columns = (int)Math.Sqrt(sceneData.PlayerProfiles.Count);
         int rows = (int)Math.Ceiling((float)playerCount / columns);
-        if (sceneData.PlayerProfiles.Count == 3)
+        if (playerCount == 3)
         {
             columns = 3;
             rows = 1;
@@ -180,6 +181,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         for (int column = 0; column < columns; column++)
         {
             VisualElement columnElement = new();
+            columnElement.name = "column";
             columnElement.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
             columnElement.style.height = new StyleLength(Length.Percent(100f));
             columnElement.style.width = new StyleLength(Length.Percent(100f / columns));
@@ -187,15 +189,14 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
             for (int row = 0; row < rows; row++)
             {
-                TemplateContainer templateContainer = nPlayerUi.CloneTree();
-                VisualElement playerUi = templateContainer.Children().FirstOrDefault();
-                playerUi.name = R.UxmlNames.singingResultsPlayerUi;
-                playerUi.style.marginBottom = new StyleLength(20);
-                playerUi.AddToClassList("singingResultUiSmall");
-                if (rows > 2)
+                VisualElement playerUi = nPlayerUi.CloneTree().Children().FirstOrDefault();
+                playerUi.style.height = new StyleLength(Length.Percent(100f / rows));
+                
+                for (int i = 1; i <= playerCount; i++)
                 {
-                    playerUi.AddToClassList("singingResultUiSmaller");
+                    playerUi.AddToClassList($"singingResultUi-{i}");
                 }
+                
                 if (rows > 3)
                 {
                     playerUi.AddToClassList("singingResultUiSmallest");
@@ -218,6 +219,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         layouts.Add(onePlayerLayout);
         layouts.Add(twoPlayerLayout);
         layouts.Add(nPlayerLayout);
+        nPlayerLayout.Clear();
 
         VisualElement selectedLayout = GetSelectedLayout();
         foreach (VisualElement layout in layouts)
@@ -286,5 +288,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
+    }
+
+    private void OnDestroy()
+    {
+        singingResultsPlayerUiControls.ForEach(it => it.Dispose());
     }
 }
