@@ -95,6 +95,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setOnUpdate(interpolatedValue => SetScoreLabelText(totalScoreContainer, interpolatedValue));
 
         // Score bar (animated)
+        if (micProfile != null)
+        {
+            filledScoreBar.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+        }
         float playerScorePercent = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
         float minScoreBarHeightInPercent = 5f;
         float maxScoreBarHeightInPercent = minScoreBarHeightInPercent + ((100f - minScoreBarHeightInPercent) * playerScorePercent);
