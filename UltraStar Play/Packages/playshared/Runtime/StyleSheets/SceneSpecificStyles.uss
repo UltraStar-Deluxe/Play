@@ -275,10 +275,33 @@
 /* SINGING RESULTS SCENE */
 /**************************************************/
 
+#scoreIcon {
+    margin-right: 8px;
+    border-radius: 50%;
+}
+
+#scoreIcon > #musicNoteIcon {
+    font-size: 12px;
+}
+
+#normalNoteScore > #scoreIcon {
+    background-color: #F79009;
+}
+
+#goldenNoteScore > #scoreIcon {
+    background-color: #12B76A;
+}
+
+#phraseBonusScore > #scoreIcon {
+    background-color: #F04438;
+}
+
+#totalScore > #scoreIcon {
+    visibility: hidden;
+}
+
 .scoreRow {
     padding: 5px;
-    border-bottom-width: 1px;
-    border-bottom-color: var(--text-color);
 }
 
 #singingResultsScoresContainer {
