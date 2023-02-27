@@ -211,9 +211,6 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
-            () => singSceneControl.TogglePlayPause());
-
         webcamControl.AddToContextMenu(contextMenuPopup);
         
         contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
