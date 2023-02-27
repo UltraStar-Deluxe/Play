@@ -55,6 +55,10 @@ VisualElement
     justify-content: center;
 }
 
+.overlayBackground {
+    background-color: rgba(32, 32, 32, 0.5);
+}
+
 .roundButton {
     width: var(--round-button-size);
     height: var(--round-button-size);
