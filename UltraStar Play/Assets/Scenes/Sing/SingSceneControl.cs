@@ -96,12 +96,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.playerUiContainer)]
     private VisualElement playerUiContainer;
 
-    [Inject(UxmlName = R.UxmlNames.pauseOverlay)]
-    private VisualElement pauseOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.doubleClickToTogglePauseElement)]
-    private VisualElement doubleClickToTogglePauseElement;
-
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
@@ -136,8 +130,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private MessageDialogControl dialogControl;
     public bool IsDialogOpen => dialogControl != null;
 
-    private ContextMenuControl contextMenuControl;
     private CommonScoreControl commonScoreControl;
+    private readonly SingSceneGovernanceControl singSceneGovernanceControl = new();
 
     public bool IsCommonScore => settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
                                  && sceneData.SelectedPlayerProfiles.Count >= 2;
@@ -156,10 +150,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         startTimeInSeconds = Time.time;
 
-        pauseOverlay.HideByDisplay();
-        new DoubleClickControl(doubleClickToTogglePauseElement).DoublePointerDownEventStream
-            .Subscribe(_ => TogglePlayPause());
-
+        injector.Inject(singSceneGovernanceControl);
+        
         // Prepare player UI layout (depends on player count)
         PreparePlayerUiLayout();
 
@@ -230,12 +222,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
-        // Register ContextMenu
-        contextMenuControl = injector
-            .WithRootVisualElement(doubleClickToTogglePauseElement)
-            .CreateAndInject<ContextMenuControl>();
-        contextMenuControl.FillContextMenuAction = FillContextMenu;
-
         // Automatically start recording on companion apps
         PlayerControls.ForEach(playerControl =>
         {
@@ -263,6 +249,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public void OnDestroy()
     {
         webcamControl.Stop();
+        singSceneGovernanceControl?.Dispose();
     }
 
     private void InitDummySingers()
@@ -462,6 +449,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                 statistics.RecordSongStarted(SongMeta);
             }
         }
+        
+        singSceneGovernanceControl.Update();
     }
 
     public void SkipToNextSingableNote()
@@ -714,13 +703,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         if (songAudioPlayer.IsPlaying)
         {
-            pauseOverlay.ShowByDisplay();
             songAudioPlayer.PauseAudio();
             PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         }
         else
         {
-            pauseOverlay.HideByDisplay();
             songAudioPlayer.PlayAudio();
             PlayerControls.ForEach(playerControl =>
             {
@@ -770,6 +757,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(loadedSceneData.SelectedSongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(webcamControl);
+        bb.BindExistingInstance(singSceneGovernanceControl);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(playerInfoUi)).ToExistingInstance(playerInfoUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
@@ -838,22 +827,5 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         dialogControl.CloseDialog();
         dialogControl = null;
-    }
-
-    protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
-    {
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
-            () => TogglePlayPause());
-
-        webcamControl.AddToContextMenu(contextMenuPopup);
-        
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
-            () => Restart());
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
-            () => SkipToNextSingableNote());
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_exitSong),
-            () => FinishScene(false));
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
-            () => OpenSongInEditor());
     }
 }

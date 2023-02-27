@@ -101,6 +101,10 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+#governanceOverlay {
+    transition: opacity 0.3s;
+}
+
 #playerInfoUiList > * {
     margin-right: 16px;
 }
@@ -186,12 +190,8 @@
     margin-bottom: 0;
 }
 
-.timeBar {
-    background-color: rgba(41, 58, 58, 0.8);
-    padding-top: 0;
-    padding-bottom: 0;
-    padding-left: 15px;
-    padding-right: 15px;
+#timeBar {
+    padding: 0;
 }
 
 .innerTimeBarSentenceEntryContainer {

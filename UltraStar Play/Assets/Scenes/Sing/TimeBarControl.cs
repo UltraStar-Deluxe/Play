@@ -12,9 +12,6 @@ public class TimeBarControl : INeedInjection
     [Inject(UxmlName = R.UxmlNames.timeBarPositionIndicator)]
     private VisualElement timeBarPositionIndicator;
 
-    [Inject(UxmlName = R.UxmlNames.timeLabel)]
-    private Label timeLabel;
-
     [Inject(UxmlName = R.UxmlNames.timeValueLabel)]
     private Label timeValueLabel;
 

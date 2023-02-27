@@ -35,21 +35,39 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:Instance>
-        <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex;">
-            <ui:Label text="Time" display-tooltip-when-elided="true" name="timeLabel" />
-            <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; margin-left: 15px; margin-right: 15px; margin-top: 3px; margin-bottom: 2px;">
-                <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
-                <ui:VisualElement name="timeBarPositionIndicator" style="height: 100%; width: 4px; background-color: rgb(0, 0, 0); position: absolute;" />
+        <ui:VisualElement name="governanceOverlay" style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: flex-start;">
+            <ui:VisualElement name="centerControls" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; justify-content: center; align-items: center;">
+                <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" class="circle overlay" style="width: 70px; height: 70px;">
+                    <MaterialIcon tabindex="-1" icon="pause" name="pauseIcon" picking-mode="Ignore" style="font-size: 48px;" />
+                    <MaterialIcon tabindex="-1" icon="play_arrow" name="playIcon" picking-mode="Ignore" style="font-size: 48px; display: none;" />
+                </ui:Button>
+                <ui:VisualElement name="songInfoContainer" picking-mode="Ignore" style="align-items: center; bottom: 20%; position: absolute;">
+                    <ui:Label tabindex="-1" text="Some Title" display-tooltip-when-elided="true" name="titleLabel" picking-mode="Ignore" class="textShadow" style="-unity-font-style: bold; font-size: 24px;" />
+                    <ui:Label tabindex="-1" text="Some Artist" display-tooltip-when-elided="true" name="artistLabel" picking-mode="Ignore" class="textShadow" style="-unity-font-style: bold; font-size: 14px;" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" />
-        </ui:VisualElement>
-        <ui:VisualElement name="pauseOverlay" style="position: absolute; width: 100%; height: 100%; display: none; align-items: center; justify-content: flex-start; background-color: rgba(0, 0, 0, 0.5);">
-            <ui:Label text="Pause" display-tooltip-when-elided="true" name="pauseOverlayTitle" picking-mode="Ignore" class="textOutline" style="-unity-font-style: bold-and-italic; font-size: 48px; width: 100%; height: 100%; position: absolute; -unity-text-align: middle-center;" />
-            <ui:VisualElement name="inputLegend" picking-mode="Ignore" class="smallerFont inputLegendBar" style="bottom: 0; width: 100%; position: absolute; flex-wrap: wrap;">
-                <ui:Instance template="InputDeviceIconContainer" name="inputDeviceIconTemplate" style="position: absolute; left: 10px; height: 100%;" />
-                <ui:Label text="Back: Escape" display-tooltip-when-elided="true" name="inputLegendLabel" class="inputLegendLabel" />
+            <ui:VisualElement name="bottomControls" style="background-color: rgba(32, 32, 32, 0.88); width: 100%; align-items: center;">
+                <ui:VisualElement name="inputLegend" picking-mode="Ignore" class="smallerFont inputLegendBar" style="bottom: 0; width: 100%; flex-wrap: wrap; display: none;">
+                    <ui:Instance template="InputDeviceIconContainer" name="inputDeviceIconTemplate" style="position: absolute; left: 10px; height: 100%;" />
+                    <ui:Label text="Back: Escape" display-tooltip-when-elided="true" name="inputLegendLabel" class="inputLegendLabel" />
+                </ui:VisualElement>
+                <ui:VisualElement name="row" class="p-1" style="background-color: rgba(0, 0, 0, 0); width: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="toggleMuteButton" class="transparentBackgroundColor">
+                        <MaterialIcon tabindex="-1" icon="volume_off" name="muteIcon" picking-mode="Ignore" />
+                        <MaterialIcon tabindex="-1" icon="volume_up" name="unmuteIcon" picking-mode="Ignore" style="display: none;" />
+                    </ui:Button>
+                    <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex; flex-grow: 1; align-items: center;">
+                        <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1" />
+                        <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; justify-content: center; height: 5px;">
+                            <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
+                            <ui:VisualElement name="timeBarPositionIndicator" style="height: 100%; width: 4px; background-color: rgb(0, 0, 0); position: absolute;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Button display-tooltip-when-elided="true" name="openControlsMenuButton" class="transparentBackgroundColor">
+                        <MaterialIcon tabindex="-1" icon="settings" name="settingsIcon" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="doubleClickToTogglePauseElement" style="position: absolute; width: 100%; height: 100%; right: 0; left: 0;" />
     </ui:VisualElement>
 </ui:UXML>
