@@ -8,7 +8,7 @@
             <MaterialIcon name="micDisconnectedIcon" icon="mic_off" class="error circle" style="position: absolute; background-color: rgba(0, 0, 0, 0.75);" />
         </ui:VisualElement>
         <ui:VisualElement name="playerNameContainer" style="margin-left: 10px; margin-right: 10px;">
-            <ui:Label text="99999" name="playerScoreLabel" class="playerScoreLabel ellipsis" style="flex-shrink: 1;" />
+            <ui:Label text="99999" name="playerScoreLabel" class="playerScoreLabel ellipsis" style="flex-shrink: 1; width: 70px;" />
             <ui:Label text="Player 01" name="playerNameLabel" class="largeFont ellipsis" style="flex-shrink: 1;" />
         </ui:VisualElement>
         <ui:VisualElement name="sentenceRatingContainer" />

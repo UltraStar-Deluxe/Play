@@ -8,6 +8,8 @@
             <ItemPicker name="pitchIndicatorPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Show Pitch Indicator" />
             <ItemPicker name="imageAsCursorPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Use Image as Cursor" />
             <ItemPicker name="animateSceneChangePicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Scene Transition" />
+            <ItemPicker name="showPlayerNamePicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Show Player Names" />
+            <ItemPicker name="showScoreNumberPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Show Score Numbers" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

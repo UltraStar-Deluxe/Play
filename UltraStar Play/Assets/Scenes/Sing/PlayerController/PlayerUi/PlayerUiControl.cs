@@ -147,13 +147,23 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         if (micProfile != null)
         {
             playerScoreProgressBar.ShowByDisplay();
+            playerScoreProgressBar.ShowByVisibility();
             playerScoreProgressBar.progressColor = micProfile.Color;
             playerImageBorder.SetBorderColor(micProfile.Color);
         }
         else
         {
-            playerScoreProgressBar.HideByDisplay();
-            playerImageBorder.HideByDisplay();
+            playerScoreProgressBar.HideByVisibility();
+            playerImageBorder.HideByVisibility();
+        }
+
+        if (!settings.GraphicSettings.showPlayerNames)
+        {
+            playerNameLabel.HideByDisplay();
+        }
+        if (!settings.GraphicSettings.showScoreNumbers)
+        {
+            playerScoreLabel.HideByDisplay();
         }
     }
 

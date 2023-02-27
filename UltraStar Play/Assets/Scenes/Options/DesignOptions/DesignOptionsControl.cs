@@ -38,6 +38,12 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.animateSceneChangePicker)]
     private ItemPicker animateSceneChangePicker;
 
+    [Inject(UxmlName = R.UxmlNames.showPlayerNamePicker)]
+    private ItemPicker showPlayerNamePicker;
+    
+    [Inject(UxmlName = R.UxmlNames.showScoreNumberPicker)]
+    private ItemPicker showScoreNumberPicker;
+    
     [Inject]
     private UiManager uiManager;
 
@@ -69,6 +75,14 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             .Bind(() => settings.GraphicSettings.AnimateSceneChange,
                 newValue => settings.GraphicSettings.AnimateSceneChange = newValue);
 
+        new BoolPickerControl(showPlayerNamePicker)
+            .Bind(() => settings.GraphicSettings.showPlayerNames,
+                newValue => settings.GraphicSettings.showPlayerNames = newValue);
+        
+        new BoolPickerControl(showScoreNumberPicker)
+            .Bind(() => settings.GraphicSettings.showScoreNumbers,
+                newValue => settings.GraphicSettings.showScoreNumbers = newValue);
+        
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
         LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themePicker, themeMetas);

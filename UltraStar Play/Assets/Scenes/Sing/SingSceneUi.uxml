@@ -2,7 +2,7 @@
     <ui:Template name="SingingLyricsTopUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsTopUi.uxml?fileID=9197481963319205126&amp;guid=e18d38c5ebc9c0e479d9ee9fa4ee4481&amp;type=3#SingingLyricsTopUi" />
     <ui:Template name="PlayerInfoUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerInfoUi.uxml?fileID=9197481963319205126&amp;guid=063c379bdb2070f438a6d361949a732d&amp;type=3#PlayerInfoUi" />
     <ui:Template name="PlayerUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerUi.uxml?fileID=9197481963319205126&amp;guid=9b1872cb139c5e34f94035c97230fb5b&amp;type=3#PlayerUi" />
-    <ui:Template name="SingingLyricsUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsBottomUi.uxml?fileID=9197481963319205126&amp;guid=3b914bf71af2e4748a4d38d046a11420&amp;type=3#SingingLyricsTopUi" />
+    <ui:Template name="SingingLyricsUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsBottomUi.uxml?fileID=9197481963319205126&amp;guid=3b914bf71af2e4748a4d38d046a11420&amp;type=3#SingingLyricsBottomUi" />
     <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/UIDocuments/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
     <ui:VisualElement name="background">
         <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
