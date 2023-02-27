@@ -100,7 +100,7 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             songTitle.text = songMeta.Title;
             UpdateFontSize();
             UpdateIcons();
-            UpdateCover(songMeta);
+            UpdateCover();
         }
     }
 
@@ -220,24 +220,9 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
         SetSize(Vector2.Lerp(animStartSize, targetSize, animPercent));
     }
 
-    private void UpdateCover(SongMeta coverSongMeta)
+    private void UpdateCover()
     {
-        string coverUri = SongMetaUtils.GetCoverUri(coverSongMeta);
-        if (coverUri.IsNullOrEmpty())
-        {
-            // Try the background image as fallback
-            coverUri = SongMetaUtils.GetBackgroundUri(coverSongMeta);
-            if (coverUri.IsNullOrEmpty())
-            {
-                return;
-            }
-        }
-
-        ImageManager.LoadSpriteFromUri(coverUri, loadedSprite =>
-        {
-            songImageOuter.style.backgroundImage = new StyleBackground(loadedSprite);
-            songImageInner.style.backgroundImage = new StyleBackground(loadedSprite);
-        });
+        SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, songImageInner, songImageOuter);
     }
 
     public void OnBeginDrag(GeneralDragEvent dragEvent)
