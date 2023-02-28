@@ -173,13 +173,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             DisableStaticBackground();
             return;
         }
-
-        string absoluteFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, themeMeta.ThemeJson.staticBackground.imagePath);
+        
+        StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForCurrentScene(themeMeta);
+        string absoluteFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
         ImageManager.LoadSpriteFromUri(absoluteFilePath, loadedSprite =>
         {
             backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-            if (!themeMeta.ThemeJson.staticBackground.scaleMode.IsNullOrEmpty()
-                && Enum.TryParse(themeMeta.ThemeJson.staticBackground.scaleMode, out ScaleMode scaleMode))
+            if (!staticBackgroundJson.scaleMode.IsNullOrEmpty()
+                && Enum.TryParse(staticBackgroundJson.scaleMode, out ScaleMode scaleMode))
             {
                 backgroundElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(scaleMode);
             }

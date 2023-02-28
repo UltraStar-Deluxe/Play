@@ -9,5 +9,11 @@
     "staticBackground": {
         "imagePath": "backgrounds/dot-grid.jpg",
         "scaleMode": "ScaleAndCrop",
+    },
+    "sceneSpecificStaticBackgrounds": {
+        "MainScene": {
+          "imagePath": "backgrounds/main-scene-bg.jpg",
+          "scaleMode": "ScaleAndCrop",
+        } 
     }
 }

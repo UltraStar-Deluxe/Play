@@ -11,6 +11,7 @@ using UnityEngine.Serialization;
 public class ThemeJson
 {
     public StaticBackgroundJson staticBackground;
+    public Dictionary<string, StaticBackgroundJson> sceneSpecificStaticBackgrounds;
     public DynamicBackgroundJson dynamicBackground;
     public SongRatingIconsJson songRatingIcons;
     

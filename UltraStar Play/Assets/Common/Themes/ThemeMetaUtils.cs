@@ -26,9 +26,21 @@ public static class ThemeMetaUtils
 
     public static bool HasStaticBackground(ThemeMeta themeMeta, Settings settings)
     {
+        StaticBackgroundJson staticBackgroundJson = GetStaticBackgroundJsonForCurrentScene(themeMeta);
         return !settings.DeveloperSettings.disableDynamicThemes
-               && themeMeta.ThemeJson.staticBackground != null
-               && !themeMeta.ThemeJson.staticBackground.imagePath.IsNullOrEmpty();
+               && (staticBackgroundJson != null
+                   && !staticBackgroundJson.imagePath.IsNullOrEmpty());
+    }
+
+    public static StaticBackgroundJson GetStaticBackgroundJsonForCurrentScene(ThemeMeta themeMeta)
+    {
+        EScene currentScene = ESceneUtils.GetCurrentScene();
+        if (themeMeta.ThemeJson.sceneSpecificStaticBackgrounds.TryGetValue(currentScene.ToString(), out StaticBackgroundJson staticBackgroundJson))
+        {
+            return staticBackgroundJson;
+        }
+        
+        return themeMeta.ThemeJson.staticBackground;
     }
 
     public static bool HasDynamicBackground(ThemeMeta themeMeta, Settings settings)
