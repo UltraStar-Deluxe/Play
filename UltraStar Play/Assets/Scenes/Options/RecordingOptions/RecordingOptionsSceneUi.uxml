@@ -6,13 +6,15 @@
             <ui:VisualElement name="audioWaveForm" style="flex-grow: 1; height: 100%; flex-direction: row; width: auto;" />
         </ui:VisualElement>
         <ui:ScrollView vertical-scroller-visibility="AlwaysVisible" style="width: 100%; height: 10%; margin-bottom: 20px; flex-grow: 1;">
-            <ui:Toggle name="enabledToggle" label="Use for Singing" style="-unity-text-align: upper-center;" />
-            <ItemPicker name="colorPicker" label="Color" wrap-around="false" min-value="0" max-value="100" step-value="10" />
-            <ItemPicker name="delayPicker" label="Delay" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
-            <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis ml-auto mb-3" />
-            <ItemPicker name="amplificationPicker" label="Amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-            <ItemPicker name="noiseSuppressionPicker" label="Noise Suppression" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-            <ItemPicker name="sampleRatePicker" label="Sample Rate" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+            <ui:VisualElement name="column" class="child-mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                <ui:Toggle name="enabledToggle" label="Use for Singing" style="-unity-text-align: upper-center;" />
+                <ItemPicker name="colorPicker" label="Color" wrap-around="false" min-value="0" max-value="100" step-value="10" />
+                <ItemPicker name="delayPicker" label="Delay" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
+                <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis ml-auto mb-3" />
+                <ItemPicker name="amplificationPicker" label="Amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+                <ItemPicker name="noiseSuppressionPicker" label="Noise Suppression" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+                <ItemPicker name="sampleRatePicker" label="Sample Rate" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+            </ui:VisualElement>
         </ui:ScrollView>
         <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
             <ui:VisualElement name="notConnectedContainer" picking-mode="Ignore" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
