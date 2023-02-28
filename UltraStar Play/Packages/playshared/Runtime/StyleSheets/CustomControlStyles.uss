@@ -17,12 +17,16 @@ ToggleButton.active {
     color: var(--control-color-accent2);
 }
 
+.backgroundHighlightButton {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 .backgroundHighlightButton:hover {
-    color: var(--control-color-accent1);
+    background-color: rgba(92, 92, 92, 0.3);
 }
 
 .backgroundHighlightButton:focus {
-    color: var(--control-color-accent2);
+    background-color: rgba(92, 92, 92, 0.3);
 }
 
 /**************************************************/

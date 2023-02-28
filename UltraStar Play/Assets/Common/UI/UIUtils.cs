@@ -44,44 +44,28 @@ public static class UIUtils
         void ApplyActiveStyle()
         {
             ControlColorConfig colorConfig = GetControlColorConfig();
-            colorConfig.activeBackgroundColor.IfNotDefault(color =>
-            {
-                Debug.Log($"Active Style BG: {color}, {root}");
-                root.style.backgroundColor = color;
-            }) ;
+            colorConfig.activeBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color) ;
             colorConfig.activeFontColor.IfNotDefault(color => root.style.color = color);
         }
         
         void ApplyFocusStyle()
         {
             ControlColorConfig colorConfig = GetControlColorConfig();
-            colorConfig.focusBackgroundColor.IfNotDefault(color =>
-            {
-                Debug.Log($"Focus Style BG: {color}, {root}");
-                root.style.backgroundColor = color;
-            }) ;
+            colorConfig.focusBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color) ;
             colorConfig.focusFontColor.IfNotDefault(color => root.style.color = color);
         }
 
         void ApplyHoverStyle()
         {
             ControlColorConfig colorConfig = GetControlColorConfig();
-            colorConfig.hoverBackgroundColor.IfNotDefault(color =>
-            {
-                Debug.Log($"Hover Style BG: {color}, {root}");
-                root.style.backgroundColor = color;
-            });
+            colorConfig.hoverBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
             colorConfig.hoverFontColor.IfNotDefault(color => root.style.color = color);
         }
 
         void ApplyDefaultStyle()
         {
             ControlColorConfig colorConfig = GetControlColorConfig();
-            colorConfig.backgroundColor.IfNotDefault(color =>
-            {
-                Debug.Log($"Default Style BG: {color}, {root}");
-                root.style.backgroundColor = color;
-            }) ;
+            colorConfig.backgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
             colorConfig.fontColor.IfNotDefault(color => root.style.color = color);
         }
 
