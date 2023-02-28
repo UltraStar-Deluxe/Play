@@ -56,3 +56,44 @@ $properties: ("m": margin, "p": padding);
         }
     }
 }
+
+/* Horizontal and vertical lists */
+@each $propertyShortName, $propertyLongName in $properties {
+    @each $sizeName, $size in $sizes {
+        /*
+         * child - #{$propertyLongName} - #{$sizeName} - #{$size}
+         */
+        .child-#{$propertyShortName}-#{$sizeName} > * {
+            #{$propertyLongName}-left: #{$size};
+            #{$propertyLongName}-right: #{$size};
+            #{$propertyLongName}-top: #{$size};
+            #{$propertyLongName}-bottom: #{$size};
+        }
+
+        .child-#{$propertyShortName}l-#{$sizeName} > * {
+            #{$propertyLongName}-left: #{$size};
+        }
+
+        .child-#{$propertyShortName}r-#{$sizeName} > * {
+            #{$propertyLongName}-right: #{$size};
+        }
+
+        .child-#{$propertyShortName}t-#{$sizeName} > * {
+            #{$propertyLongName}-top: #{$size};
+        }
+
+        .child-#{$propertyShortName}b-#{$sizeName} > * {
+            #{$propertyLongName}-bottom: #{$size};
+        }
+
+        .child-#{$propertyShortName}x-#{$sizeName} > * {
+            #{$propertyLongName}-left: #{$size};
+            #{$propertyLongName}-right: #{$size};
+        }
+
+        .child-#{$propertyShortName}y-#{$sizeName} > * {
+            #{$propertyLongName}-top: #{$size};
+            #{$propertyLongName}-bottom: #{$size};
+        }
+    }
+}
