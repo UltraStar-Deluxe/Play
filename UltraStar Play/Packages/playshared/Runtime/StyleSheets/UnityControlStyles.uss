@@ -9,6 +9,10 @@
     font-size: var(--font-size);
 }
 
+.unity-base-field:focus .unity-base-field__label {
+    color: var(--text-color);
+}
+
 /**************************************************/
 /* TEXT FIELD */
 /**************************************************/
