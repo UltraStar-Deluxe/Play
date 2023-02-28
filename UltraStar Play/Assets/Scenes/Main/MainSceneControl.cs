@@ -15,6 +15,13 @@ using IBinding = UniInject.IBinding;
 
 public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        hasLoggedVersionInfo = false;
+    }
+    private static bool hasLoggedVersionInfo;
+    
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
@@ -38,12 +45,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     [Inject]
     private SongMetaManager songMetaManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.sceneSubtitle)]
-    private Label sceneSubtitle;
 
     [Inject(UxmlName = R.UxmlNames.startButton)]
     private Button startButton;
@@ -78,6 +79,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
     private Label buildTimeStampText;
 
+    [Inject(UxmlName = R.UxmlNames.versionDetailsContainer)]
+    private VisualElement versionDetailsContainer;
+    
     [Inject]
     private Settings settings;
 
@@ -96,6 +100,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     private void Start()
     {
+        if (!hasLoggedVersionInfo)
+        {
+            hasLoggedVersionInfo = true;
+            Debug.Log("Version info: " + versionPropertiesTextAsset.text);
+        }
+
         startButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongSelectScene));
         startButton.Focus();
         settingsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
@@ -103,6 +113,21 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         creditsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CreditsScene));
         quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
         createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
+
+        LeanTween.value(gameObject, 0, 1, 1f)
+            .setOnUpdate(value =>
+            {
+                settingsProblemHintIcon.style.bottom = Length.Percent(value * 100);
+                settingsProblemHintIcon.style.scale = new Vector2(value, value);
+            })
+            .setEaseSpring();
+
+        semanticVersionText.RegisterCallback<PointerDownEvent>(_ =>
+        {
+            versionDetailsContainer.ShowByDisplay();
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10, () => versionDetailsContainer.HideByDisplay()));
+            Debug.Log("Version info: " + versionPropertiesTextAsset.text);
+        });
 
         InitButtonDescription(startButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description));
         InitButtonDescription(settingsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_description));
@@ -114,7 +139,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
         UpdateVersionInfoText();
 
-        sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
+        // sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
 
         InitInputActions();
 
@@ -137,18 +162,15 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     private void InitButtonDescription(Button button, string description)
     {
-        button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = description);
-        button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = description);
+        // button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = description);
+        // button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = description);
     }
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
+        // sceneTitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
-        createSongButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_label);
-        settingsButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_label);
-        quitButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_label);
     }
 
     private void UpdateVersionInfoText()

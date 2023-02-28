@@ -3,27 +3,8 @@
 /**************************************************/
 
 .mainSceneButton {
-    -unity-font-style: bold;
-    width: var(--main-scene-button-width);
-    height: var(--control-height-large);
-    margin: 0;
-}
-
-.mainSceneButton.roundButton {
-    width: 40px;
-    height: 40px;
-    border-radius: 40px;
-    padding: 5px;
-}
-
-.mainSceneButton#startButton {
-    width: var(--main-scene-sing-button-width);
-    height: var(--control-height-large);
-}
-
-.mainSceneButtonSpacer {
-    width: 10px;
-    height: 10px;
+    width: 150px;
+    height: 60px;
 }
 
 /**************************************************/
