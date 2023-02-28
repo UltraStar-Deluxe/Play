@@ -156,7 +156,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
 
         List<VisualElement> playerUis = selectedLayout
-            .Query<VisualElement>(R.UxmlNames.singingResultsPlayerUi)
+            .Query<VisualElement>(R.UxmlNames.singingResultsPlayerUiRoot)
             .ToList();
 
         singingResultsPlayerUiControls = new List<SingingResultsPlayerControl>();
@@ -242,12 +242,16 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         layouts.Add(onePlayerLayout);
         layouts.Add(twoPlayerLayout);
         layouts.Add(nPlayerLayout);
-        nPlayerLayout.Clear();
 
         VisualElement selectedLayout = GetSelectedLayout();
         foreach (VisualElement layout in layouts)
         {
             layout.SetVisibleByDisplay(layout == selectedLayout);
+            if (layout != selectedLayout
+                || layout == nPlayerLayout)
+            {
+                layout.Clear();
+            }
         }
     }
 
