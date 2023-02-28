@@ -27,8 +27,8 @@ indent_size = 2
 indent_size = 2
 
 # JSON files
-[*.json]
-indent_size = 2
+[*.{json, jsonc}]
+indent_size = 4
 
 # Powershell files
 [*.ps1]
