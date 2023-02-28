@@ -1,4 +1,24 @@
 {
+    "buttonBackgroundGradient": {
+        "startColor": "#101828",
+        "endColor": "#475467",
+        "angleDegrees": 45,
+    },
+    "hoverButtonBackgroundGradient": {
+        "endColor": "#000000",
+        "startColor": "#101828",
+        "angleDegrees": 45,
+    },
+    "focusButtonBackgroundGradient": {
+        "endColor": "#000000",
+        "startColor": "#101828",
+        "angleDegrees": 45,
+    },
+    "activeButtonBackgroundGradient": {
+        "endColor": "#000000",
+        "startColor": "#101828",
+        "angleDegrees": 45,
+    },
     "backgroundColorButtons": "#475467",
     "fontColorButtons": "#D0D5DD",
     "lyricsColor": "#FFFFFF",
@@ -12,8 +32,8 @@
     },
     "sceneSpecificStaticBackgrounds": {
         "MainScene": {
-          "imagePath": "backgrounds/main-scene-bg.jpg",
-          "scaleMode": "ScaleAndCrop",
-        } 
+            "imagePath": "backgrounds/main-scene-bg.jpg",
+            "scaleMode": "ScaleAndCrop",
+        }
     }
 }

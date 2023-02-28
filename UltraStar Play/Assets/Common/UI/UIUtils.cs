@@ -44,28 +44,60 @@ public static class UIUtils
         void ApplyActiveStyle()
         {
             ControlColorConfig colorConfig = GetControlColorConfig();
-            colorConfig.activeBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color) ;
+            if (colorConfig.activeBackgroundGradient != null)
+            {
+                root.style.backgroundImage = new StyleBackground(ImageManager.GetGradientTexture(colorConfig.activeBackgroundGradient));
+            }
+            else
+            {
+                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                colorConfig.activeBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
+            }
             colorConfig.activeFontColor.IfNotDefault(color => root.style.color = color);
         }
         
         void ApplyFocusStyle()
         {
             ControlColorConfig colorConfig = GetControlColorConfig();
-            colorConfig.focusBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color) ;
+            if (colorConfig.focusBackgroundGradient != null)
+            {
+                root.style.backgroundImage = new StyleBackground(ImageManager.GetGradientTexture(colorConfig.focusBackgroundGradient));
+            }
+            else
+            {
+                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                colorConfig.focusBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
+            }
             colorConfig.focusFontColor.IfNotDefault(color => root.style.color = color);
         }
 
         void ApplyHoverStyle()
         {
             ControlColorConfig colorConfig = GetControlColorConfig();
-            colorConfig.hoverBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
+            if (colorConfig.hoverBackgroundGradient != null)
+            {
+                root.style.backgroundImage = new StyleBackground(ImageManager.GetGradientTexture(colorConfig.hoverBackgroundGradient));
+            }
+            else
+            {
+                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                colorConfig.hoverBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
+            }
             colorConfig.hoverFontColor.IfNotDefault(color => root.style.color = color);
         }
 
         void ApplyDefaultStyle()
         {
             ControlColorConfig colorConfig = GetControlColorConfig();
-            colorConfig.backgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
+            if (colorConfig.backgroundGradient != null)
+            {
+                root.style.backgroundImage = new StyleBackground(ImageManager.GetGradientTexture(colorConfig.backgroundGradient));
+            }
+            else
+            {
+                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                colorConfig.backgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
+            }
             colorConfig.fontColor.IfNotDefault(color => root.style.color = color);
         }
 

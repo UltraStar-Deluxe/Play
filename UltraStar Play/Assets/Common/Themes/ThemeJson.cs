@@ -15,6 +15,10 @@ public class ThemeJson
     public DynamicBackgroundJson dynamicBackground;
     public SongRatingIconsJson songRatingIcons;
     
+    public GradientConfig buttonBackgroundGradient;
+    public GradientConfig hoverButtonBackgroundGradient;
+    public GradientConfig focusButtonBackgroundGradient;
+    public GradientConfig activeButtonBackgroundGradient;
     public Color32 backgroundColorButtons;
     public Color32 fontColorButtons;
     

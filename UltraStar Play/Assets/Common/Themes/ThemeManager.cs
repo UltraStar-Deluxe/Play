@@ -442,13 +442,22 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         VisualElement root = uiDocument.rootVisualElement;
 
         Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(currentThemeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
-        
+
+        Color defaultLabelColor = Colors.CreateColor("#d0d0d0");
+        Color defaultButtonColor = Colors.CreateColor("#d0d0d0");
+
         ControlColorConfig defaultControlColorConfig = new()
         {
             fontColor = currentThemeMeta.ThemeJson.fontColorButtons,
+            
             backgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons,
             hoverBackgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
             focusBackgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
+            
+            backgroundGradient = currentThemeMeta.ThemeJson.buttonBackgroundGradient,
+            hoverBackgroundGradient = currentThemeMeta.ThemeJson.hoverButtonBackgroundGradient,
+            focusBackgroundGradient = currentThemeMeta.ThemeJson.focusButtonBackgroundGradient,
+            activeBackgroundGradient = currentThemeMeta.ThemeJson.activeButtonBackgroundGradient,
         };
         
         // Scene specific elements
@@ -456,7 +465,16 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         // Labels
         root.Query<Label>().ForEach(label =>
-            currentThemeMeta.ThemeJson.fontColorLabels.IfNotDefault(color => label.style.color = new StyleColor(color)));
+        {
+            if (currentThemeMeta.ThemeJson.fontColorLabels != default(Color))
+            {
+                label.style.color = new StyleColor(currentThemeMeta.ThemeJson.fontColorLabels);
+            }
+            else
+            {
+                label.style.color = defaultLabelColor;
+            }
+        });
         
         // Buttons
         root.Query<Button>().ForEach(button =>
@@ -555,6 +573,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
                 hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
                 focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
+                
+                backgroundGradient = themeMeta.ThemeJson.buttonBackgroundGradient,
+                hoverBackgroundGradient = themeMeta.ThemeJson.hoverButtonBackgroundGradient,
+                focusBackgroundGradient = themeMeta.ThemeJson.focusButtonBackgroundGradient,
+                activeBackgroundGradient = themeMeta.ThemeJson.activeButtonBackgroundGradient,
             };
         }
     }

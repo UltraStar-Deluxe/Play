@@ -35,7 +35,8 @@ public static class ThemeMetaUtils
     public static StaticBackgroundJson GetStaticBackgroundJsonForCurrentScene(ThemeMeta themeMeta)
     {
         EScene currentScene = ESceneUtils.GetCurrentScene();
-        if (themeMeta.ThemeJson.sceneSpecificStaticBackgrounds.TryGetValue(currentScene.ToString(), out StaticBackgroundJson staticBackgroundJson))
+        if (themeMeta.ThemeJson.sceneSpecificStaticBackgrounds != null
+            && themeMeta.ThemeJson.sceneSpecificStaticBackgrounds.TryGetValue(currentScene.ToString(), out StaticBackgroundJson staticBackgroundJson))
         {
             return staticBackgroundJson;
         }

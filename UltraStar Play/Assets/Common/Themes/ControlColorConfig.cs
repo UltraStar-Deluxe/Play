@@ -11,4 +11,9 @@ public class ControlColorConfig
     public Color hoverBackgroundColor;
     public Color focusBackgroundColor;
     public Color activeBackgroundColor;
+    
+    public GradientConfig backgroundGradient;
+    public GradientConfig hoverBackgroundGradient;
+    public GradientConfig focusBackgroundGradient;
+    public GradientConfig activeBackgroundGradient;
 }
