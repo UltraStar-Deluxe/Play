@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ICSharpCode.SharpZipLib.Zip;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -25,6 +26,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public SongPreviewControl songPreviewControl;
 
+    [InjectedInInspector]
+    public VisualTreeAsset highscoreEntryUi;
+
     [Inject(UxmlName = R.UxmlNames.artistLabel)]
     private Label artistLabel;
 
@@ -47,10 +51,22 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     private Button continueButton;
 
     [Inject(UxmlName = R.UxmlNames.restartButton)]
-    public Button restartButton;
+    private Button restartButton;
     
     [Inject(UxmlName = R.UxmlNames.background)]
-    public VisualElement background;
+    private VisualElement background;
+    
+    [Inject(UxmlName = R.UxmlNames.showCurrentResultsButton)]
+    private Button showCurrentResultsButton;
+    
+    [Inject(UxmlName = R.UxmlNames.showHighscoreButton)]
+    private Button showHighscoreButton;
+    
+    [Inject(UxmlName = R.UxmlNames.playerResultsRoot)]
+    private VisualElement playerResultsRoot;
+    
+    [Inject(UxmlName = R.UxmlNames.highscoresRoot)]
+    private VisualElement highscoresRoot;
     
     [Inject]
     private Statistics statistics;
@@ -75,6 +91,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     private List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
 
+    private readonly SingingResultsHighscoreControl highscoreControl = new();
+    
     public static SingingResultsSceneControl Instance
     {
         get
@@ -85,9 +103,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     void Start()
     {
+        injector.Inject(highscoreControl);
+        
         background.RegisterCallback<PointerUpEvent>(evt => FinishScene());
         continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
         continueButton.Focus();
+
+        TabGroupControl tabGroupControl = new();
+        tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
+        tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
+        tabGroupControl.ShowContainer(playerResultsRoot);
+        showHighscoreButton.RegisterCallbackButtonTriggered(() => highscoreControl.Init());
         
         restartButton.RegisterCallbackButtonTriggered(() => RestartSingScene());
 
@@ -107,7 +133,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         songPreviewControl.AudioFadeInDurationInSeconds = 2;
         songPreviewControl.VideoFadeInDurationInSeconds = 2;
         songPreviewControl.StartSongPreview(sceneData.SongMeta);
-
+        
         ActivateLayout();
         FillLayout();
     }
@@ -269,6 +295,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<SingingResultsSceneData>());
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songPreviewControl);
+        bb.Bind(nameof(highscoreEntryUi)).ToExistingInstance(highscoreEntryUi);
         return bb.GetBindings();
     }
 

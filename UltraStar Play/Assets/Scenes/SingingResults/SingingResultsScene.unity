@@ -734,6 +734,8 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: a6393dfa169b0764d80cb569f918b34c, type: 3}
   songAudioPlayer: {fileID: 1675863559}
   songPreviewControl: {fileID: 978523250}
+  highscoreEntryUi: {fileID: 9197481963319205126, guid: 423491fc58834f64fbdba496866fa14f,
+    type: 3}
 --- !u!4 &2004138224
 Transform:
   m_ObjectHideFlags: 0

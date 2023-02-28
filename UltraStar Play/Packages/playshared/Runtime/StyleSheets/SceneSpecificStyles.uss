@@ -371,6 +371,16 @@
     max-width: 250px;
 }
 
+#highscoreEntryUiRoot #posLabel {
+    background-color: #12B76A;
+    border-radius: 50%;
+    font-size: 20px;
+    width: 32;
+    height: 32;
+    margin-right: 16px;
+    -unity-text-align: middle-center;
+}
+
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
