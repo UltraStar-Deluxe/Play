@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -154,16 +155,11 @@ public static class VisualElementExtensions
         }
 
         List<VisualElement> visualElementAndAncestors = new();
-        visualElementAndAncestors.Add(visualElement);
-        visualElementAndAncestors.AddRange(visualElement.GetAncestors());
-        visualElementAndAncestors.ForEach(ancestor =>
-        {
-            VisualElement parent = ancestor.parent;
-            if (parent is ScrollView scrollView)
-            {
-                scrollView.ScrollTo(ancestor);
-            }
-        });
+        List<ScrollView> ancestorScrollViews = visualElement
+            .GetAncestors()
+            .OfType<ScrollView>()
+            .ToList();
+        ancestorScrollViews.ForEach(scrollView => scrollView.ScrollTo(visualElement));
     }
 
     public static List<VisualElement> GetAncestors(this VisualElement visualElement)
