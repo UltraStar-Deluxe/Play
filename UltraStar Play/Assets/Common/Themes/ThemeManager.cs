@@ -405,8 +405,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return themeMetas;
     }
 
-    public void ApplyThemeSpecificStylesToVisualElementsInScene()
+    public static void ApplyThemeSpecificStylesToVisualElementsInScene()
     {
+        ThemeManager themeManager = Instance;
+        if (themeManager != null)
+        {
+            themeManager.DoApplyThemeSpecificStylesToVisualElementsInScene();
+        }
+    }
+    
+    private void DoApplyThemeSpecificStylesToVisualElementsInScene()
+    {        
         if (settings.DeveloperSettings.disableDynamicThemes)
         {
             DisableDynamicBackground();

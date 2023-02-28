@@ -107,9 +107,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private UIDocument uiDocument;
     
     [Inject]
-    private ThemeManager themeManager;
-    
-    [Inject]
     private OptionsSceneData sceneData;
     
     private OptionSceneRecipe loadedSceneRecipe;
@@ -246,7 +243,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         issuesButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasIssuesDialog);
         
         // Apply theme to loaded UI
-        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
     private void UnloadOptionsScene(EScene scene)
@@ -350,6 +347,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
                 helpDialogControl = null;
                 helpButton.Focus();
             });
+            ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
     }
 
@@ -368,6 +366,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
                 issuesDialogControl = null;
                 issuesButton.Focus();
             });
+            ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
     }
 }

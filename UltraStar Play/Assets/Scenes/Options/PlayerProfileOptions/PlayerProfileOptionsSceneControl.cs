@@ -26,9 +26,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     [Inject]
     private WebCamManager webCamManager;
 
-    [Inject]
-    private ThemeManager themeManager;
-
     protected override void Start()
     {
         base.Start();
@@ -63,7 +60,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             index++;
         });
 
-        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
     private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)

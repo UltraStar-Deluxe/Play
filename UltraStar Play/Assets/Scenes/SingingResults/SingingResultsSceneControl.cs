@@ -81,9 +81,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     private Settings settings;
 
     [Inject]
-    private ThemeManager themeManager;
-
-    [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject]

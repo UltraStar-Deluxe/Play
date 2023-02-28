@@ -105,9 +105,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject]
     private UIDocument uiDocument;
 
-    [Inject]
-    private ThemeManager themeManager;
-
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
     private PlayerControl lastLeadingPlayerControl;
@@ -208,7 +205,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
 
-            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+            ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
 
         webcamControl.InitWebcam();

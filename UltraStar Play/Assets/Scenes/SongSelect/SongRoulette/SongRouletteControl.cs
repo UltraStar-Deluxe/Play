@@ -32,9 +32,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject]
     private PlaylistManager playlistManager;
 
-    [Inject]
-    private ThemeManager themeManager;
-
     [Inject(UxmlName = R.UxmlNames.songEntryContainer)]
     private VisualElement songEntryContainer;
 
@@ -212,7 +209,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
         if (themeNeedsUpdate)
         {
             themeNeedsUpdate = false;
-            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+            ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
     }
 
