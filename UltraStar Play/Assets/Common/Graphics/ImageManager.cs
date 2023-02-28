@@ -15,9 +15,11 @@ public static class ImageManager
     {
         spriteHolders.Clear();
         ClearCache();
+        ClearGradientTextures();
     }
 
     private static readonly HashSet<ISpriteHolder> spriteHolders = new();
+    private static readonly Dictionary<GradientConfig, Texture2D> gradientConfigToTexture = new();
 
     // When the cache has reached the critical size, then unused sprites are searched in the scene
     // and removed from memory.
@@ -140,6 +142,19 @@ public static class ImageManager
         }
     }
 
+    public static Texture2D GetGradientTexture(GradientConfig gradientConfig)
+    {
+        if (gradientConfigToTexture.TryGetValue(gradientConfig, out Texture2D texture))
+        {
+            return texture;
+        }
+
+        Texture2D texture2D = TextureUtils.CreateGradientTexture(2);
+        TextureUtils.FillTextureWithGradient(texture2D, gradientConfig.startColor, gradientConfig.endColor, gradientConfig.angleDegrees);
+        gradientConfigToTexture[gradientConfig] = texture2D;
+        return texture2D;
+    }
+    
     private static void RemoveCachedSprite(CachedSprite cachedSprite)
     {
         spriteCache.Remove(cachedSprite.Source);
@@ -152,6 +167,12 @@ public static class ImageManager
             }
             GameObjectUtils.Destroy(cachedSprite.Sprite);
         }
+    }
+
+    private static void ClearGradientTextures()
+    {
+        gradientConfigToTexture.ForEach(entry => GameObject.Destroy(entry.Value));
+        gradientConfigToTexture.Clear();
     }
 
     private class CachedSprite
