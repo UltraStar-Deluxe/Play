@@ -1,7 +1,6 @@
 {
     "fontColorButtons": "#33337F",
-    "fontColor": "#33337F",
-    "buttonMainColor": "#4C99FF",
+    "backgroundColorButtons": "#4C99FF",
     "dynamicBackground": {
         "gradientRampFile": "gradients/ocean.png",
         "gradientType": "Linear",

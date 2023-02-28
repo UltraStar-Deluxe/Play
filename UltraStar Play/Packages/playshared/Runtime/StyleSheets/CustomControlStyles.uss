@@ -1,5 +1,5 @@
 /**************************************************/
-/* TOGGLE BUTTON */
+/* BUTTONS */
 /**************************************************/
 ToggleButton {
     background-color: rgba(0, 0, 0, 0);
@@ -7,6 +7,22 @@ ToggleButton {
 
 ToggleButton.active {
     background-color: var(--control-color-accent2);
+}
+
+.textHighlightButton:hover {
+    color: var(--control-color-accent1);
+}
+
+.textHighlightButton:focus {
+    color: var(--control-color-accent2);
+}
+
+.backgroundHighlightButton:hover {
+    color: var(--control-color-accent1);
+}
+
+.backgroundHighlightButton:focus {
+    color: var(--control-color-accent2);
 }
 
 /**************************************************/

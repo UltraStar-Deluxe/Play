@@ -431,62 +431,36 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         VisualElement root = uiDocument.rootVisualElement;
 
-        Color backgroundButtonColor = currentThemeMeta.ThemeJson.buttonMainColor;
-        Color backgroundButtonColorHover = Color.Lerp(backgroundButtonColor, Color.white, 0.2f);
-        Color backgroundButtonColorFocus = Color.Lerp(backgroundButtonColor, Color.white, 0.2f);
-        Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(backgroundButtonColor, 0, -0.1f, 0.01f);
-
-        Color fontColorAll = currentThemeMeta.ThemeJson.fontColor;
-        bool useGlobalFontColor = fontColorAll != Color.clear;
-
-        Color fontColorButtons = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeJson.fontColorButtons;
-        Color fontColorLabels = useGlobalFontColor ? fontColorAll : currentThemeMeta.ThemeJson.fontColorLabels;
-
-        ControlColorConfig buttonColorConfig = new()
+        Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(currentThemeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
+        
+        ControlColorConfig defaultControlColorConfig = new()
         {
-            fontColor = fontColorButtons,
-            backgroundColor = backgroundButtonColor,
-            hoverBackgroundColor = backgroundButtonColorHover,
-            focusBackgroundColor = backgroundButtonColorFocus,
-            activeToggleButtonColor = backgroundButtonColorFocus,
+            fontColor = currentThemeMeta.ThemeJson.fontColorButtons,
+            backgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons,
+            hoverBackgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
+            focusBackgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
         };
         
-        ControlColorConfig toggleButtonColorConfig = new()
-        {
-            fontColor = fontColorButtons,
-            backgroundColor = Colors.clear,
-            hoverBackgroundColor = backgroundButtonColorHover.WithAlpha(0.5f),
-            focusBackgroundColor = backgroundButtonColorFocus.WithAlpha(0.5f),
-            activeToggleButtonColor = backgroundButtonColorFocus,
-        };
-
         // Scene specific elements
-        ApplyThemeSpecificStylesToVisualElementsInScene(ESceneUtils.GetCurrentScene(), buttonColorConfig);
+        ApplyThemeSpecificStylesToVisualElementsInScene(currentThemeMeta, ESceneUtils.GetCurrentScene());
 
         // Labels
-        root.Query<Label>().ForEach(label => label.style.color = new StyleColor(fontColorLabels));
+        root.Query<Label>().ForEach(label =>
+            currentThemeMeta.ThemeJson.fontColorLabels.IfNotDefault(color => label.style.color = new StyleColor(color)));
         
         // Buttons
         root.Query<Button>().ForEach(button =>
         {
-            if (button is ToggleButton)
-            {
-                ApplyControlColorConfigToVisualElement(button, toggleButtonColorConfig);
-            }
-            else
-            {
-                ApplyControlColorConfigToVisualElement(button, buttonColorConfig);
-            }
-
-            button.style.color = fontColorButtons;
-            button.Query<Label>().ForEach(label => label.style.color = fontColorButtons);
+            ControlColorConfig colorConfig = GetButtonColorConfig(currentThemeMeta, button);
+            
+            ApplyControlColorConfigToVisualElement(button, colorConfig);
         });
 
         // ItemPickers
         root.Query(null, "itemPickerItemLabel").ForEach(label =>
         {
             label.style.backgroundColor = itemPickerBackgroundColor;
-            label.style.color = buttonColorConfig.fontColor;
+            label.style.color = defaultControlColorConfig.fontColor;
         });
 
         // Unity controls
@@ -499,7 +473,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ussClassNamesForApplyButtonColors.ForEach(ussClassName =>
         {
             root.Query<VisualElement>(null, ussClassName)
-                .ForEach(element => ApplyControlColorConfigToVisualElement(element, buttonColorConfig, true));
+                .ForEach(element => ApplyControlColorConfigToVisualElement(element, defaultControlColorConfig, true));
         });
 
         // Dropdown menus
@@ -515,11 +489,66 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     return;
                 }
                 alreadyProcessedVisualElements.Add(entry);
-                entry.style.backgroundColor = buttonColorConfig.backgroundColor;
+                entry.style.backgroundColor = defaultControlColorConfig.backgroundColor;
             });
         }
     }
-    
+
+    private ControlColorConfig GetButtonColorConfig(ThemeMeta themeMeta, Button button)
+    {
+        if (button.ClassListContains("textHighlightButton"))
+        {
+            return new ControlColorConfig()
+            {
+                backgroundColor = Colors.clearWhite,
+                fontColor = themeMeta.ThemeJson.fontColorButtons.WithLerp(Color.black, 0.5f),
+                hoverFontColor = themeMeta.ThemeJson.fontColorButtons,
+                focusFontColor = themeMeta.ThemeJson.fontColorButtons,
+                activeFontColor = themeMeta.ThemeJson.fontColorButtons.WithLerp(Color.black, 0.1f),
+            };
+        }
+        else if (button.ClassListContains("backgroundHighlightButton"))
+        {
+            return new ControlColorConfig()
+            {
+                fontColor = themeMeta.ThemeJson.fontColorButtons,
+                backgroundColor = Colors.clearWhite,
+                hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
+                focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(225),
+            };
+        }
+        else if (button is ToggleButton)
+        {
+            return new ControlColorConfig()
+            {
+                fontColor = themeMeta.ThemeJson.fontColorButtons,
+                backgroundColor = Colors.clearWhite,
+                hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
+                focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(225),
+                activeBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
+            };
+        }
+        else if (button.ClassListContains("transparentBackgroundColor")) 
+        {
+            return new ControlColorConfig()
+            {
+                backgroundColor = Color.clear,
+                hoverBackgroundColor = Color.clear,
+                focusBackgroundColor = Color.clear,
+            };
+        }
+        else
+        {
+            return new ControlColorConfig()
+            {
+                fontColor = themeMeta.ThemeJson.fontColorButtons,
+                backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
+                hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
+                focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
+            };
+        }
+    }
+
     private void RegisterOpenDropdownMenuCallback(VisualElement visualElement)
     {
         if (alreadyProcessedVisualElements.Contains(visualElement))
@@ -534,8 +563,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     }
 
     private void ApplyThemeSpecificStylesToVisualElementsInScene(
-        EScene currentScene,
-        ControlColorConfig buttonColorConfig)
+        ThemeMeta themeMeta,
+        EScene currentScene)
     {
         VisualElement root = uiDocument.rootVisualElement;
         ThemeMeta currentThemeMeta = GetCurrentTheme();
@@ -555,7 +584,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     return;
                 }
                 alreadyProcessedVisualElements.Add(entry);
-                UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, buttonColorConfig);
+                UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, new ControlColorConfig()
+                {
+                    backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
+                });
             });
         }
     }
@@ -564,7 +596,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         List<string> ignoredUxmlNamesAndUssClasses = new ()
         {
-            "transparentBackgroundColor",
             "hiddenContinueButton"
         };
         

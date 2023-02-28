@@ -1,6 +1,11 @@
 {
-    "fontColor": "#D0D5DD",
-    "buttonMainColor": "#475467",
+    "backgroundColorButtons": "#475467",
+    "fontColorButtons": "#D0D5DD",
+    "lyricsColor": "#FFFFFF",
+    "lyricsOutlineColor": "#00000000",
+    "currentNoteLyricsColor": "#9E77ED",
+    "previousNoteLyricsColor": "#9E77ED",
+    "lyricsContainerColor": "#00000099",
     "staticBackground": {
         "imagePath": "backgrounds/dot-grid.jpg",
         "scaleMode": "ScaleAndCrop",

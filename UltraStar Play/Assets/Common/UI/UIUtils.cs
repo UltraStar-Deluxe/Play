@@ -41,25 +41,48 @@ public static class UIUtils
                    && toggleButton.IsActive;
         }
 
-        void ApplyActiveToggleButtonStyle()
+        void ApplyActiveStyle()
         {
-            root.style.backgroundColor = GetControlColorConfig().activeToggleButtonColor;
+            ControlColorConfig colorConfig = GetControlColorConfig();
+            colorConfig.activeBackgroundColor.IfNotDefault(color =>
+            {
+                Debug.Log($"Active Style BG: {color}, {root}");
+                root.style.backgroundColor = color;
+            }) ;
+            colorConfig.activeFontColor.IfNotDefault(color => root.style.color = color);
         }
         
         void ApplyFocusStyle()
         {
-            root.style.backgroundColor = GetControlColorConfig().focusBackgroundColor;
+            ControlColorConfig colorConfig = GetControlColorConfig();
+            colorConfig.focusBackgroundColor.IfNotDefault(color =>
+            {
+                Debug.Log($"Focus Style BG: {color}, {root}");
+                root.style.backgroundColor = color;
+            }) ;
+            colorConfig.focusFontColor.IfNotDefault(color => root.style.color = color);
         }
 
         void ApplyHoverStyle()
         {
-            root.style.backgroundColor = GetControlColorConfig().hoverBackgroundColor;
+            ControlColorConfig colorConfig = GetControlColorConfig();
+            colorConfig.hoverBackgroundColor.IfNotDefault(color =>
+            {
+                Debug.Log($"Hover Style BG: {color}, {root}");
+                root.style.backgroundColor = color;
+            });
+            colorConfig.hoverFontColor.IfNotDefault(color => root.style.color = color);
         }
 
         void ApplyDefaultStyle()
         {
-            root.style.color = GetControlColorConfig().fontColor;
-            root.style.backgroundColor = GetControlColorConfig().backgroundColor;
+            ControlColorConfig colorConfig = GetControlColorConfig();
+            colorConfig.backgroundColor.IfNotDefault(color =>
+            {
+                Debug.Log($"Default Style BG: {color}, {root}");
+                root.style.backgroundColor = color;
+            }) ;
+            colorConfig.fontColor.IfNotDefault(color => root.style.color = color);
         }
 
         void UpdateStyles()
@@ -81,7 +104,7 @@ public static class UIUtils
             }
             else if (shouldApplyActiveToggleButtonStyle)
             {
-                ApplyActiveToggleButtonStyle();
+                ApplyActiveStyle();
             }
         }
 

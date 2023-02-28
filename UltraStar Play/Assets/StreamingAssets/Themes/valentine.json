@@ -1,7 +1,7 @@
 {
     "fontColorLabels": "#4C1933",
     "fontColorButtons": "#F2D8D8",
-    "buttonMainColor": "#DB5D77",
+    "backgroundColorButtons": "#DB5D77",
     "dynamicBackground": {
         "gradientRampFile": "gradients/yellow pink.png",
         "gradientType": "Linear",

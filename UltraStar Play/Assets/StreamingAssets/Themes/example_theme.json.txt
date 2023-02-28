@@ -7,13 +7,9 @@
     "fontColorButtons": "#E5E5E5",
     // The color of the main texts displayed over the background.
     "fontColorLabels": "#E5E5E5",
-    // The color of all the texts, over buttons and backgrounds.
-    // If set, the values defined for "fontColorLabels" and "fontColorButtons"
-    // will be ignored.
-    "fontColor": "#E5E5E5",
 
     // The main color of the buttons, e.g. the buttons in the main menu
-    "buttonMainColor": "#3399D8",
+    "backgroundColorButtons": "#3399D8",
 
     // This group defines the dynamic background parameters.
     "dynamicBackground": {

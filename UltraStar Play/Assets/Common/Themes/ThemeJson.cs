@@ -13,14 +13,18 @@ public class ThemeJson
     public StaticBackgroundJson staticBackground;
     public DynamicBackgroundJson dynamicBackground;
     public SongRatingIconsJson songRatingIcons;
-    public Color32 buttonMainColor;
+    
+    public Color32 backgroundColorButtons;
     public Color32 fontColorButtons;
+    
     public Color32 fontColorLabels;
-    public Color32 fontColor;
+    
     public List<Color32> microphoneColors;
     public Dictionary<string, Color32> phraseRatingColors;
     public Dictionary<string, Color32> songEditorLayerColors;
+    
     public string backgroundMusic;
+    
     public Color32 lyricsContainerColor;
     public Color32 lyricsColor;
     public Color32 lyricsOutlineColor;

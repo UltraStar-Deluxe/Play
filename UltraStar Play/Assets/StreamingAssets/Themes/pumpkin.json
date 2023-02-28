@@ -1,7 +1,7 @@
 {
     "fontColorLabels": "#B299E5",
     "fontColorButtons": "#E1E1E1E5",
-    "buttonMainColor": "#CC6633",
+    "backgroundColorButtons": "#CC6633",
     "dynamicBackground": {
         "gradientRampFile": "gradients/pumpkin repeat.png",
         "gradientType": "Repeated",

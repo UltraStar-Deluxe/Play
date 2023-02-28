@@ -1,7 +1,7 @@
 {
     "fontColorButtons": "#af4e56",
     "fontColorLabels": "#32513c",
-    "buttonMainColor": "#e88383",
+    "backgroundColorButtons": "#e88383",
     "dynamicBackground": {
         "gradientRampFile": "gradients/green watermelon.png",
         "gradientType": "Repeated",

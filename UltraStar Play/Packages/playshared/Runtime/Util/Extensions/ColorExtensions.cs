@@ -22,7 +22,12 @@ public static class ColorExtensions
     {
         return new Color(color.r, color.g, color.b, alpha);
     }
-
+    
+    public static Color WithLerp(this Color color, Color targetColor, float factor)
+    {
+        return Color.Lerp(color, targetColor, factor);
+    }
+    
     public static Color RgbToHsv(this Color color)
     {
         Color.RGBToHSV(color, out float h, out float s, out float v);
@@ -43,6 +48,24 @@ public static class ColorExtensions
         return new Color(newR, newG, newB, newAlpha);
     }
 
+    public static void IfNotDefault(this Color color, Action<Color> action)
+    {
+        if (!Equals(color, default(Color)))
+        {
+            action(color);
+        }
+    }
+    
+    public static Color OrIfDefault(this Color color, Color fallback)
+    {
+        if (Equals(color, default(Color)))
+        {
+            return fallback;
+        }
+
+        return color;
+    }
+    
     ///////////////////////////////////////////////////////
     // Color32
     ///////////////////////////////////////////////////////
@@ -66,6 +89,11 @@ public static class ColorExtensions
         return new Color32(color.r, color.g, color.b, alpha);
     }
 
+    public static Color32 WithLerp(this Color32 color, Color32 targetColor, float factor)
+    {
+        return Color32.Lerp(color, targetColor, factor);
+    }
+    
     public static Color32 HsvToRgb(this Color32 color)
     {
         return Color.HSVToRGB(color.r / 255f, color.g / 255f, color.b / 255f).WithAlpha(color.a / 255f);

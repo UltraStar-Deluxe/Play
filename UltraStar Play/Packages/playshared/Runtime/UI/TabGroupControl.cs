@@ -48,11 +48,28 @@ public class TabGroupControl
     {
         if (controlledContainer != null)
         {
-            controlledContainer.ShowByDisplay();
+            buttonToContainerMap
+                .Where(entry => entry.Value == controlledContainer)
+                .ForEach(entry =>
+                {
+                    entry.Value.ShowByDisplay();
+                    if (entry.Key is ToggleButton toggleButton)
+                    {
+                        toggleButton.SetActive(true);
+                    }
+                });
         }
+
         // Hide others
-        buttonToContainerMap.Values
-            .Where(it => it != controlledContainer)
-            .ForEach(it => it.HideByDisplay());
+        buttonToContainerMap
+            .Where(entry => entry.Value != controlledContainer)
+            .ForEach(entry =>
+            {
+                entry.Value.HideByDisplay();
+                if (entry.Key is ToggleButton toggleButton)
+                {
+                    toggleButton.SetActive(false);
+                }
+            });
     }
 }
