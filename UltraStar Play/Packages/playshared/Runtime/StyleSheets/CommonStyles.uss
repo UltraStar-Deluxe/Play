@@ -59,7 +59,7 @@ VisualElement
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.roundButton {
+.circleButton {
     width: var(--round-button-size);
     height: var(--round-button-size);
     border-radius: var(--round-button-size);

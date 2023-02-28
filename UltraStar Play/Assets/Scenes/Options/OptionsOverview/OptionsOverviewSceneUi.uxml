@@ -2,7 +2,7 @@
     <ui:VisualElement name="background" class="px-4 pb-4 pt-2" style="align-items: flex-start;">
         <ui:VisualElement name="row" class="pb-2" style="justify-content: flex-start; align-items: center; width: 100%;">
             <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer" style="width: auto;">
-                <ui:Button name="backButton" class="transparentBackgroundColor">
+                <ui:Button name="backButton" class="circleButton backgroundHighlightButton mr-2">
                     <MaterialIcon icon="arrow_back" name="image" />
                 </ui:Button>
                 <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">

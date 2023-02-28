@@ -7,7 +7,7 @@
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="songList" class="roundCorners outline" style="width: 100%; height: 100%;">
                 <ui:Label text="Label" display-tooltip-when-elided="true" />
             </ui:ScrollView>
-            <ui:Button name="addButton" class="middleCenterText outline roundButton" style="position: absolute; bottom: 20px; right: 29px; font-size: 30px;">
+            <ui:Button name="addButton" class="middleCenterText outline circleButton" style="position: absolute; bottom: 20px; right: 29px; font-size: 30px;">
                 <MaterialIcon name="addIcon" icon="add" />
             </ui:Button>
         </ui:VisualElement>
