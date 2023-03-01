@@ -120,6 +120,12 @@ VisualElement
     -unity-text-align: middle-center;
 }
 
+/*.flexWrapScrollView .unity-scroll-view--vertical > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroll-view__content-viewport > .unity-scroll-view__content-container  {*/
+.flexWrapScrollView #unity-content-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
 .controlLabel {
     -unity-text-align: middle-left;
     width: 300px;
