@@ -58,7 +58,7 @@
                     <MaterialIcon icon="filter_b_and_w" name="image" />
                     <ui:Label text="Design" name="label" />
                 </ToggleButton>
-                <ToggleButton name="internetOptionsButton" class="optionsOverviewButton">
+                <ToggleButton name="internetOptionsButton" class="optionsOverviewButton" style="display: none;">
                     <MaterialIcon icon="cloud" name="image" />
                     <ui:Label text="Internet" name="label" />
                 </ToggleButton>
