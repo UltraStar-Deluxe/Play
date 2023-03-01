@@ -60,7 +60,7 @@
                         <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1" />
                         <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; justify-content: center; height: 5px;">
                             <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
-                            <ui:VisualElement name="timeBarPositionIndicator" style="height: 100%; width: 4px; background-color: rgb(0, 0, 0); position: absolute;" />
+                            <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;" />
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:Button display-tooltip-when-elided="true" name="openControlsMenuButton" class="transparentBackgroundColor">

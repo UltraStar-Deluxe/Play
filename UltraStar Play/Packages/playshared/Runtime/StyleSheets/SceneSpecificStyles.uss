@@ -190,7 +190,15 @@
 }
 
 .innerTimeBarSentenceEntryContainer {
-    background-color: rgb(61, 91, 91);
+    background-color: #344054;
+    border-radius: 4px;
+}
+
+#timeBarPositionIndicator {
+    background-color: var(--text-color);
+    width: 8px;
+    height: 100%;
+    border-radius: 4px;
 }
 
 #root.singScenePlayerUi {

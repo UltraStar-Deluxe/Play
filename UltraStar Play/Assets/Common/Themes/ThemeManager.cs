@@ -605,14 +605,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (currentScene is EScene.SingScene)
         {
             currentThemeMeta.ThemeJson.lyricsContainerGradient.IfNotNull(gradient =>
-            root.Query(null, "lyricsContainer").ForEach(element =>
-                element.style.backgroundColor = currentThemeMeta.ThemeJson.lyricsContainerColor
-                    .OrIfDefault(Colors.CreateColor("#00000099")));
+                root.Query(null, "lyricsContainer").ForEach(element =>
                 {
                     element.style.backgroundImage = GradientManager.GetGradientTexture(gradient);
                     element.style.backgroundColor = new StyleColor(StyleKeyword.None);
                 }));
             
+            currentThemeMeta.ThemeJson.fontColorButtons.IfNotDefault(color =>
+                root.Q(R.UxmlNames.timeBarPositionIndicator).style.backgroundColor = new StyleColor(color));
         }
         else if (currentScene is EScene.SongSelectScene)
         {
