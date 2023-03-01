@@ -92,7 +92,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             }
         }
 
-        FinishScene();
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () => FinishScene()));
     }
 
     private void ShowGeneralErrorMessage()
