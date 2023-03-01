@@ -35,8 +35,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     [Inject(UxmlName = R.UxmlNames.openControlsMenuButton)]
     private Button openControlsMenuButton;
     
-    [Inject(UxmlName = R.UxmlNames.bottomControls)]
-    private VisualElement bottomControls;
+    [Inject(UxmlName = R.UxmlNames.bottomControlsContainer)]
+    private VisualElement bottomControlsContainer;
     
     [Inject(UxmlName = R.UxmlNames.artistLabel)]
     private Label artistLabel;
@@ -125,9 +125,14 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => UpdatePlaybackIcon());
         UpdatePlaybackIcon();
 
-        bottomControls.RegisterCallback<PointerEnterEvent>(evt => isPointerOverBottomControls = true);
-        bottomControls.RegisterCallback<PointerLeaveEvent>(evt => isPointerOverBottomControls = false);
-
+        bottomControlsContainer.RegisterCallback<PointerEnterEvent>(evt => isPointerOverBottomControls = true);
+        bottomControlsContainer.RegisterCallback<PointerLeaveEvent>(evt => isPointerOverBottomControls = false);
+        bottomControlsContainer.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(new()
+        {
+            startColor = Colors.black,
+            endColor = Colors.clearBlack,
+        }));
+        
         artistLabel.text = songMeta.Artist;
         titleLabel.text = songMeta.Title;
         
