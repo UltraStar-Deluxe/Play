@@ -46,7 +46,7 @@ public static class UIUtils
             ControlColorConfig colorConfig = GetControlColorConfig();
             if (colorConfig.activeBackgroundGradient != null)
             {
-                root.style.backgroundImage = new StyleBackground(ImageManager.GetGradientTexture(colorConfig.activeBackgroundGradient));
+                root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(colorConfig.activeBackgroundGradient));
             }
             else
             {
@@ -61,7 +61,7 @@ public static class UIUtils
             ControlColorConfig colorConfig = GetControlColorConfig();
             if (colorConfig.focusBackgroundGradient != null)
             {
-                root.style.backgroundImage = new StyleBackground(ImageManager.GetGradientTexture(colorConfig.focusBackgroundGradient));
+                root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(colorConfig.focusBackgroundGradient));
             }
             else
             {
@@ -76,7 +76,8 @@ public static class UIUtils
             ControlColorConfig colorConfig = GetControlColorConfig();
             if (colorConfig.hoverBackgroundGradient != null)
             {
-                root.style.backgroundImage = new StyleBackground(ImageManager.GetGradientTexture(colorConfig.hoverBackgroundGradient));
+                MainThreadDispatcher.StartCoroutine(AnimationUtils.TransitionBackgroundImageGradientCoroutine());
+                root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(colorConfig.hoverBackgroundGradient));
             }
             else
             {
@@ -91,7 +92,7 @@ public static class UIUtils
             ControlColorConfig colorConfig = GetControlColorConfig();
             if (colorConfig.backgroundGradient != null)
             {
-                root.style.backgroundImage = new StyleBackground(ImageManager.GetGradientTexture(colorConfig.backgroundGradient));
+                root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(colorConfig.backgroundGradient));
             }
             else
             {

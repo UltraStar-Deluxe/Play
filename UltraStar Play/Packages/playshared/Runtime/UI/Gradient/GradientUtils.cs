@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public static class TextureUtils
 {
@@ -6,9 +7,9 @@ public static class TextureUtils
      * Creates a small texture to be filled with a gradient.
      * The graphics engine will interpolate pixels as needed from the small texture.
      */
-    public static Texture2D CreateGradientTexture(int colorCount)
+    public static Texture2D CreateGradientTexture(int width, int height)
     {
-        Texture2D texture2D = new Texture2D(colorCount * 8, colorCount * 8, TextureFormat.RGBA32, false);
+        Texture2D texture2D = new(width, height, TextureFormat.RGBA32, false);
         texture2D.filterMode = FilterMode.Bilinear;
         texture2D.wrapMode = TextureWrapMode.Mirror;
         return texture2D;
