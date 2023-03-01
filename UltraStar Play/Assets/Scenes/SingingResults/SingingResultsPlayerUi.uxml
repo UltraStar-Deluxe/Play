@@ -8,7 +8,7 @@
                         <ui:VisualElement name="playerImage" class="circle" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit; width: 80%; height: 80%;" />
                         <ui:VisualElement picking-mode="Ignore" name="ratingIconAndText" style="position: absolute; height: 100%; left: 50%; bottom: 33%; width: 100%; align-items: center;">
                             <ui:Label text="Tone Deaf" display-tooltip-when-elided="true" name="ratingLabel" picking-mode="Ignore" style="-unity-text-align: upper-center;" />
-                            <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; width: 66%; height: 66%;" />
+                            <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; width: 50%; height: 50%;" />
                         </ui:VisualElement>
                     </AspectRatioPanel>
                 </ui:VisualElement>

@@ -264,6 +264,17 @@
 /* SINGING RESULTS SCENE */
 /**************************************************/
 
+.singingResultsPlayerUiColumn {
+    align-items: flex-end;
+}
+
+#noHighscoresLabel {
+    width: 100%;
+    -unity-text-align: middle-center;
+    -unity-font-style: italic;
+    margin-top: 16px;
+}
+
 #newHighscoreContainer {
     flex-direction: row;
     justify-content: center;
@@ -317,8 +328,8 @@
 }
 
 #singingResultsPlayerUiRoot {
-    max-width: 400px;
-    max-height: 300px;
+    max-width: 250px;
+    max-height: 250px;
 }
 
 #playerScoreProgressBar.singingResults {

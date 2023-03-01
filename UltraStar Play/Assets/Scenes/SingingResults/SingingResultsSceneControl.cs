@@ -57,10 +57,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
     private VisualElement background;
     
     [Inject(UxmlName = R.UxmlNames.showCurrentResultsButton)]
-    private Button showCurrentResultsButton;
+    private ToggleButton showCurrentResultsButton;
     
     [Inject(UxmlName = R.UxmlNames.showHighscoreButton)]
-    private Button showHighscoreButton;
+    private ToggleButton showHighscoreButton;
     
     [Inject(UxmlName = R.UxmlNames.playerResultsRoot)]
     private VisualElement playerResultsRoot;
@@ -110,6 +110,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.ShowContainer(playerResultsRoot);
+        showCurrentResultsButton.SetActive(true);
         showHighscoreButton.RegisterCallbackButtonTriggered(() => highscoreControl.Init());
         
         restartButton.RegisterCallbackButtonTriggered(() => RestartSingScene());
@@ -205,6 +206,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         {
             VisualElement columnElement = new();
             columnElement.name = "column";
+            columnElement.AddToClassList("singingResultsPlayerUiColumn");
             columnElement.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
             columnElement.style.height = new StyleLength(Length.Percent(100f));
             columnElement.style.width = new StyleLength(Length.Percent(100f / columns));
