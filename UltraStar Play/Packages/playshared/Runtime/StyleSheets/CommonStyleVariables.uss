@@ -13,6 +13,8 @@
     --font-size-xxl: 26px;
     --font-icon-size: 32px;
     --control-height: 40px;
+    --control-height-double: 80px;
+    --control-height-half: 20px;
     --control-height-small: 30px;
     --control-height-large: 92px;
     --control-width: 120px;
