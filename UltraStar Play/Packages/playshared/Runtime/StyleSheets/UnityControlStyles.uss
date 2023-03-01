@@ -74,6 +74,7 @@
 /**************************************************/
 
 .unity-button {
+    transition: background-color 0.2s;
     background-color: var(--control-color);
     color: var(--text-color);
     height: var(--control-height);
@@ -110,6 +111,7 @@
 }
 
 .unity-base-popup-field > .unity-base-field__input {
+    transition: background-color 0.2s;
     background-color: var(--control-color);
     min-height: var(--control-height);
     margin: 0;
@@ -164,6 +166,7 @@
 }
 
 .unity-enum-field > .unity-base-field__input {
+    transition: background-color 0.2s;
     background-color: var(--control-color);
     border-width: 0;
     margin: 0;
@@ -201,6 +204,7 @@
 }
 
 .unity-base-dropdown__container-inner {
+    transition: background-color 0.2s;
     background-color: var(--control-color);
     border-width: 0;
     padding: 0;
@@ -246,6 +250,8 @@
 }
 
 .unity-toggle__input {
+    transition: background-color 0.2s;
+    background-color: var(--control-color);
     width: var(--control-height);
     height: var(--control-height);
     min-width: var(--control-height);
@@ -253,7 +259,6 @@
     margin: 0;
     padding: 0;
     flex-grow: 0;
-    background-color: var(--control-color);
     align-items: center;
     align-content: center;
     justify-content: center;

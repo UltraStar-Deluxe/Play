@@ -540,7 +540,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return new ControlColorConfig()
             {
                 fontColor = themeMeta.ThemeJson.fontColorButtons,
-                backgroundColor = Colors.clearWhite,
+                backgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(0),
                 hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
                 focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(225),
             };
@@ -550,7 +550,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return new ControlColorConfig()
             {
                 fontColor = themeMeta.ThemeJson.fontColorButtons,
-                backgroundColor = Colors.clearWhite,
+                backgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(0),
                 hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
                 focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(225),
                 activeBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
