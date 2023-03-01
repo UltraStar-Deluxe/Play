@@ -25,7 +25,10 @@
     "lyricsOutlineColor": "#00000000",
     "currentNoteLyricsColor": "#9E77ED",
     "previousNoteLyricsColor": "#9E77ED",
-    "lyricsContainerColor": "#00000099",
+    "lyricsContainerGradient": {
+        "startColor": "#000000",
+        "endColor": "#1E232B",
+    },
     "staticBackground": {
         "imagePath": "backgrounds/dot-grid.jpg",
         "scaleMode": "ScaleAndCrop",
