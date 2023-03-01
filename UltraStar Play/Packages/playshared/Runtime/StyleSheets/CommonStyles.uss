@@ -123,7 +123,6 @@ VisualElement
 .controlLabel {
     -unity-text-align: middle-left;
     width: 300px;
-    -unity-font-style: bold;
     font-size: var(--font-size);
 }
 
