@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ui:VisualElement name="songListContainer" style="margin-bottom: 20px; flex-grow: 1; min-height: 200px;">
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="profileList" class="outline roundCorners" style="height: 100%;" />
-            <ui:Button name="addButton" class="middleCenterText circleButton outline" style="position: absolute; bottom: 20px; right: 30px; font-size: 30px;">
+        <ui:VisualElement name="songListContainer" style="flex-grow: 1; min-height: 200px;">
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="profileList" class="roundCorners mb-3" style="height: 100%;" />
+            <ui:Button name="addButton" class="middleCenterText circleButton" style="font-size: 30px; align-self: center; bottom: 0;">
                 <MaterialIcon name="addIcon" icon="add" />
             </ui:Button>
         </ui:VisualElement>
