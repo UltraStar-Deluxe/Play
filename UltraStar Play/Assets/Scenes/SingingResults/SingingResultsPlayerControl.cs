@@ -20,6 +20,12 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject]
     private PlayerScoreControlData playerScoreData;
 
+    [Inject]
+    private Statistics statistics;
+    
+    [Inject]
+    private SingingResultsSceneData sceneData;
+    
     [Inject(UxmlName = R.UxmlNames.normalNoteScore)]
     private VisualElement normalNoteScoreContainer;
 
@@ -47,6 +53,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;
 
+    [Inject(UxmlName = R.UxmlNames.newHighscoreContainer)]
+    private VisualElement newHighscoreContainer;
+    
     [Inject]
     private SongRating songRating;
 
@@ -70,6 +79,19 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         injector.WithRootVisualElement(playerImage)
             .CreateAndInject<PlayerProfileImageControl>();
 
+        if (IsNewHighscore())
+        {
+            newHighscoreContainer.ShowByDisplay();
+            // Bouncy size animation
+            LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
+                .setEaseSpring()
+                .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+        }
+        else
+        {
+            newHighscoreContainer.HideByDisplay();
+        }
+        
         // Song rating
         LoadSongRatingSprite(songRating.EnumValue, songRatingSprite =>
         {
@@ -109,6 +131,24 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .id;
 
         UpdateTranslation();
+    }
+
+    private bool IsNewHighscore()
+    {
+        if (playerScoreData.TotalScore <= 0)
+        {
+            return false;
+        }
+        
+        LocalStatistic localStatistic = statistics.GetLocalStats(sceneData.SongMeta);
+        if (localStatistic == null
+            || localStatistic.StatsEntries == null
+            || localStatistic.StatsEntries.SongStatistics.IsNullOrEmpty())
+        {
+            return false;
+        }
+        
+        return localStatistic.StatsEntries.GetTopScores(1).FirstOrDefault().Score == playerScoreData.TotalScore;
     }
 
     private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)

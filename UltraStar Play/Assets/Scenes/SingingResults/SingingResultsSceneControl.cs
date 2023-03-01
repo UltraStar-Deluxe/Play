@@ -271,21 +271,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
 
     public void FinishScene()
     {
-        if (statistics.HasHighscore(sceneData.SongMeta))
-        {
-            // Go to highscore scene
-            HighscoreSceneData highscoreSceneData = new();
-            highscoreSceneData.SongMeta = sceneData.SongMeta;
-            highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
-            sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
-        }
-        else
-        {
-            // No highscores to show, thus go to song select scene
-            SongSelectSceneData songSelectSceneData = new();
-            songSelectSceneData.SongMeta = sceneData.SongMeta;
-            sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
-        }
+        // No highscores to show, thus go to song select scene
+        SongSelectSceneData songSelectSceneData = new();
+        songSelectSceneData.SongMeta = sceneData.SongMeta;
+        sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
     public List<IBinding> GetBindings()

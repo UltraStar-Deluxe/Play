@@ -466,6 +466,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         // Labels
         root.Query<Label>().ForEach(label =>
         {
+            if (IsIgnoredLabel(label))
+            {
+                return;
+            }
+            
             if (currentThemeMeta.ThemeJson.fontColorLabels != default(Color))
             {
                 label.style.color = new StyleColor(currentThemeMeta.ThemeJson.fontColorLabels);
@@ -532,6 +537,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 entry.style.backgroundColor = defaultControlColorConfig.backgroundColor;
             });
         }
+    }
+
+    private bool IsIgnoredLabel(Label label)
+    {
+        return label.name
+            is R.UxmlNames.newHighscoreLabel
+            or R.UxmlNames.newHighscoreIcon;
     }
 
     private ControlColorConfig GetButtonColorConfig(ThemeMeta themeMeta, Button button)

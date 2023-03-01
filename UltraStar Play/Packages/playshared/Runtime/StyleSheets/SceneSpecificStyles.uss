@@ -264,6 +264,23 @@
 /* SINGING RESULTS SCENE */
 /**************************************************/
 
+#newHighscoreContainer {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 16px;
+    background-color: #ECFDF3;
+    padding: 2px;
+}
+
+#newHighscoreContainer > * {
+    color: #027A48;
+}
+
+#newHighscoreLabel {
+    -unity-font-style: bold-and-italic;
+}
+
 #scoreIcon {
     margin-right: 8px;
     border-radius: 50%;
