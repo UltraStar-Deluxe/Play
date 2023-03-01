@@ -383,7 +383,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         List<string> themeFolders = new List<string>
         {
-            ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName),
+            GetAbsoluteDefaultThemesFolder(),
             GetAbsoluteUserDefinedThemesFolder(),
         };
 
@@ -691,6 +691,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return $"{Application.persistentDataPath}/{ThemeFolderName}";
     }
 
+    public static string GetAbsoluteDefaultThemesFolder()
+    {
+        return ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName);
+    }
+    
     private void DisableDynamicBackground()
     {
         backgroundShaderControl.DisableShader();
@@ -775,5 +780,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             result[entry.Key] = entry.Value;
         });
         return result;
+    }
+
+    public void ReloadThemes()
+    {
+        themeMetas.Clear();
+        LoadCurrentTheme();
     }
 }
