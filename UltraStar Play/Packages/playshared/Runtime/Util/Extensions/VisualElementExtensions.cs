@@ -186,4 +186,12 @@ public static class VisualElementExtensions
         visualElement.style.borderTopColor = color;
         visualElement.style.borderBottomColor = color;
     }
+    
+    public static void SetBorderWidth(this VisualElement visualElement, float value)
+    {
+        visualElement.style.borderLeftWidth = value;
+        visualElement.style.borderRightWidth = value;
+        visualElement.style.borderTopWidth = value;
+        visualElement.style.borderBottomWidth = value;
+    }
 }

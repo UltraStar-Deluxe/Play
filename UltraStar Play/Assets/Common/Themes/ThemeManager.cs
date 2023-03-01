@@ -497,11 +497,23 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             "unity-toggle__input",
             "unity-base-popup-field__input",
             "unity-enum-field__input",
+            "slide-toggle__input",
         };
         ussClassNamesForApplyButtonColors.ForEach(ussClassName =>
         {
             root.Query<VisualElement>(null, ussClassName)
                 .ForEach(element => ApplyControlColorConfigToVisualElement(element, defaultControlColorConfig, true));
+        });
+        
+        // Remove border
+        List<string> ussClassNamesForRemoveBorder = new()
+        {
+            "slide-toggle__input",
+            "slide-toggle__input-knob",
+        };
+        ussClassNamesForRemoveBorder.ForEach(ussClassName =>
+        {
+            root.Query(null,ussClassName).ForEach(it => it.SetBorderColor(Colors.clearBlack));
         });
 
         // Dropdown menus
