@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UniInject;
+using UniRx;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -29,6 +30,9 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         targetFrameRate = settings.GraphicSettings.targetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
+
+        settings.ObserveEveryValueChanged(it => it.GraphicSettings.targetFps)
+            .Subscribe(newValue => targetFrameRate = newValue);
     }
 
     private void Update()
