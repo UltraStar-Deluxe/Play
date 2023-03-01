@@ -204,7 +204,6 @@
 }
 
 .unity-base-dropdown__container-inner {
-    transition: background-color 0.2s;
     background-color: var(--control-color);
     border-width: 0;
     padding: 0;
