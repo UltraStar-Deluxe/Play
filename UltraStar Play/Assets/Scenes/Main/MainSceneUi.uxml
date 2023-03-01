@@ -6,13 +6,13 @@
             <ui:Button text="Team&#10;&amp; Tournament" name="partyButton" class="mainSceneButton" />
         </ui:VisualElement>
         <ui:VisualElement name="bottomButtonRow" class="child-mr-2" style="width: 100%; align-items: center; flex-direction: row; justify-content: flex-end; position: absolute; bottom: 5px;">
-            <ui:VisualElement name="versionInfoContainer" style="padding-left: 2px; padding-right: 2px; padding-top: 2px; padding-bottom: 2px; align-items: flex-start; margin-right: auto;">
-                <ui:Label text="Version xx.yy.zz" name="semanticVersionText" style="font-size: 12px; background-color: rgb(242, 244, 247); color: rgb(52, 64, 84); -unity-text-align: upper-center; border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; height: auto; padding-left: 8px; padding-right: 8px; padding-top: 4px; padding-bottom: 4px;" />
-                <ui:VisualElement name="versionDetailsContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); bottom: 110%; position: absolute; display: none;">
-                    <ui:Label text="Commit: 5e07588" name="commitHashText" style="font-size: 12px;" />
-                    <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampText" style="font-size: 12px;" />
+            <ui:Button name="versionInfoContainer" class="backgroundHighlightButton focusableNavigatorIgnore" style="right: 5px; margin-right: auto; overflow: visible; align-items: flex-start;">
+                <ui:Label text="Version xx.yy.zz" name="semanticVersionText" style="font-size: 12px; -unity-text-align: upper-center; border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; height: auto;" />
+                <ui:VisualElement name="versionDetailsContainer" style="background-color: rgba(0, 0, 0, 0); bottom: 110%; position: absolute; display: none; align-items: flex-start;">
+                    <ui:Label text="Commit: 5e07588" name="commitHashText" style="font-size: 12px; -unity-text-align: middle-left;" />
+                    <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampText" style="font-size: 12px; -unity-text-align: middle-left;" />
                 </ui:VisualElement>
-            </ui:VisualElement>
+            </ui:Button>
             <ui:Button name="createSongButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
                 <MaterialIcon name="createSongIcon" icon="handyman" />
             </ui:Button>
