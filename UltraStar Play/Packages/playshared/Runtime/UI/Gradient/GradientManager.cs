@@ -33,14 +33,19 @@ public static class GradientManager
     public static List<GradientConfig> GetGradientConfigsForTransition(GradientConfig fromGradient, GradientConfig toGradient, float animTimeInSeconds)
     {
         List<GradientConfig> gradientConfigs = new();
-        int iterations = (int)(Application.targetFrameRate * animTimeInSeconds) + 1;
-        for (int i = 0; i < iterations; i++)
+        int targetFrameRate = Application.targetFrameRate;
+        if (targetFrameRate <= 0)
+        {
+            targetFrameRate = 30;
+        }
+        int frames = (int)(animTimeInSeconds * targetFrameRate);
+        for (int i = 0; i < frames; i++)
         {
             GradientConfig gradientConfig = new()
             {
-                startColor = Color32.Lerp(fromGradient.startColor, toGradient.startColor, i / (float)iterations),
-                endColor = Color32.Lerp(fromGradient.endColor, toGradient.endColor, i / (float)iterations),
-                angleDegrees = Mathf.Lerp(fromGradient.angleDegrees, toGradient.angleDegrees, i / (float)iterations)
+                startColor = Color32.Lerp(fromGradient.startColor, toGradient.startColor, i / (float)frames),
+                endColor = Color32.Lerp(fromGradient.endColor, toGradient.endColor, i / (float)frames),
+                angleDegrees = Mathf.Lerp(fromGradient.angleDegrees, toGradient.angleDegrees, i / (float)frames)
             };
             gradientConfigs.Add(gradientConfig);
         }

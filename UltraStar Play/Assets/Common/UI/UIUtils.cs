@@ -15,7 +15,7 @@ public static class UIUtils
     }
 
     private static readonly Dictionary<VisualElement, ControlColorConfig> visualElementToControlColorConfig = new();
-
+    
     public static void SetBackgroundStyleWithHoverAndFocus(VisualElement root, ControlColorConfig controlColorConfig)
     {
         SetBackgroundStyleWithHoverAndFocus(root, root, controlColorConfig);
@@ -30,9 +30,40 @@ public static class UIUtils
         bool isPointerOver = false;
         bool hasFocus = false;
 
+        float initTimeInSeconds = Time.time;
+        float transitionTimeInSeconds = 0.2f;
+        GradientConfig currentGradientConfig = null;
+
         ControlColorConfig GetControlColorConfig()
         {
             return visualElementToControlColorConfig[hoverRoot];
+        }
+
+        void ApplyGradient(GradientConfig newGradientConfig)
+        {
+            if (newGradientConfig == null)
+            {
+                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+            }
+            else
+            {
+                if (currentGradientConfig == null
+                    || !TimeUtils.IsDurationAboveThreshold(initTimeInSeconds, 0.1f))
+                {
+                    // Immediately apply the new gradient
+                    root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(newGradientConfig));
+                }
+                else
+                {
+                    // Transition to new gradient
+                    MainThreadDispatcher.StartCoroutine(AnimationUtils.TransitionBackgroundImageGradientCoroutine(
+                        root,
+                        currentGradientConfig,
+                        newGradientConfig,
+                        transitionTimeInSeconds));
+                }
+            }
+            currentGradientConfig = newGradientConfig;
         }
         
         bool IsToggleButtonActive()
@@ -46,11 +77,11 @@ public static class UIUtils
             ControlColorConfig colorConfig = GetControlColorConfig();
             if (colorConfig.activeBackgroundGradient != null)
             {
-                root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(colorConfig.activeBackgroundGradient));
+                ApplyGradient(colorConfig.activeBackgroundGradient);
             }
             else
             {
-                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                ApplyGradient(null);
                 colorConfig.activeBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
             }
             colorConfig.activeFontColor.IfNotDefault(color => root.style.color = color);
@@ -61,11 +92,11 @@ public static class UIUtils
             ControlColorConfig colorConfig = GetControlColorConfig();
             if (colorConfig.focusBackgroundGradient != null)
             {
-                root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(colorConfig.focusBackgroundGradient));
+                ApplyGradient(colorConfig.focusBackgroundGradient);
             }
             else
             {
-                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                ApplyGradient(null);
                 colorConfig.focusBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
             }
             colorConfig.focusFontColor.IfNotDefault(color => root.style.color = color);
@@ -76,12 +107,11 @@ public static class UIUtils
             ControlColorConfig colorConfig = GetControlColorConfig();
             if (colorConfig.hoverBackgroundGradient != null)
             {
-                MainThreadDispatcher.StartCoroutine(AnimationUtils.TransitionBackgroundImageGradientCoroutine());
-                root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(colorConfig.hoverBackgroundGradient));
+                ApplyGradient(colorConfig.hoverBackgroundGradient);
             }
             else
             {
-                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                ApplyGradient(null);
                 colorConfig.hoverBackgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
             }
             colorConfig.hoverFontColor.IfNotDefault(color => root.style.color = color);
@@ -92,11 +122,11 @@ public static class UIUtils
             ControlColorConfig colorConfig = GetControlColorConfig();
             if (colorConfig.backgroundGradient != null)
             {
-                root.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(colorConfig.backgroundGradient));
+                ApplyGradient(colorConfig.backgroundGradient);
             }
             else
             {
-                root.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                ApplyGradient(null);
                 colorConfig.backgroundColor.IfNotDefault(color => root.style.backgroundColor = color);
             }
             colorConfig.fontColor.IfNotDefault(color => root.style.color = color);

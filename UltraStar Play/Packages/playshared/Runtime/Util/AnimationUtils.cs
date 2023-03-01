@@ -56,11 +56,17 @@ public static class AnimationUtils
         }
     }
     
-    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement bgTest, List<GradientConfig> gradientConfigs, float animTimeInSeconds)
+    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement, GradientConfig fromGradientConfig, GradientConfig toGradientConfig, float animTimeInSeconds)
+    {
+        List<GradientConfig> gradientConfigs = GradientManager.GetGradientConfigsForTransition(fromGradientConfig, toGradientConfig, animTimeInSeconds);
+        return TransitionBackgroundImageGradientCoroutine(visualElement, gradientConfigs, animTimeInSeconds);
+    }
+    
+    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement, List<GradientConfig> gradientConfigs, float animTimeInSeconds)
     {
         foreach (GradientConfig gradientConfig in gradientConfigs)
         {
-            bgTest.style.backgroundImage = GradientManager.GetGradientTexture(gradientConfig);
+            visualElement.style.backgroundImage = GradientManager.GetGradientTexture(gradientConfig);
             yield return new WaitForSeconds(animTimeInSeconds / gradientConfigs.Count);
         }
     }
