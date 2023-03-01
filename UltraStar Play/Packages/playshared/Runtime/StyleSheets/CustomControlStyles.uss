@@ -393,6 +393,8 @@ TextField.placeholderVisible #unity-text-input {
 .slide-toggle {
     width: var(--control-height-double);
     height: var(--control-height);
+    margin: 0;
+    padding: 0;
 }
 
 .slide-toggle__input {

@@ -1,7 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="PlayerProfileListEntryUi" src="project://database/Assets/Scenes/Options/PlayerProfileOptions/PlayerProfileListEntryUi.uxml?fileID=9197481963319205126&amp;guid=02348618f8cffba42864c8979a4bd8ba&amp;type=3#PlayerProfileListEntryUi" />
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:VisualElement name="songListContainer" style="flex-grow: 1; min-height: 200px;">
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="profileList" class="roundCorners mb-3" style="height: 100%;" />
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="playerProfileList" class="roundCorners mb-3 flexWrapScrollView">
+                <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+                <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+                <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+            </ui:ScrollView>
             <ui:Button name="addButton" class="middleCenterText circleButton" style="font-size: 30px; align-self: center; bottom: 0;">
                 <MaterialIcon name="addIcon" icon="add" />
             </ui:Button>

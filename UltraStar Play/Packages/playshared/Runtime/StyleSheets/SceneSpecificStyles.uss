@@ -402,6 +402,22 @@
 /* OPTIONS SCENES */
 /**************************************************/
 
+#playerProfileInactiveOverlay {
+    transition: background-color 0.5s;
+}
+
+#playerProfileEntryContent {
+    border-color: var(--text-color);
+}
+
+#playerProfileImagePicker #previousItemButton {
+    width: 25px;
+}
+
+#playerProfileImagePicker #nextItemButton {
+    width: 25px;
+}
+
 .optionsOverviewButtonRow {
     width: 100%;
     height: 25%;

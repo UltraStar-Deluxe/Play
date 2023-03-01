@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -14,8 +15,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     [InjectedInInspector]
     public VisualTreeAsset playerProfileListEntryAsset;
 
-    [Inject(UxmlName = R.UxmlNames.profileList)]
-    private ScrollView profileList;
+    [Inject(UxmlName = R.UxmlNames.playerProfileList)]
+    private ScrollView playerProfileList;
 
     [Inject(UxmlName = R.UxmlNames.addButton)]
     private Button addButton;
@@ -41,7 +42,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             UpdatePlayerProfileList();
 
             // Focus on the name of the newly added player to directly allow changing its name
-            TextField nameTextField = profileList[profileList.childCount-1].Q<TextField>("nameTextField");
+            TextField nameTextField = playerProfileList[playerProfileList.childCount-1].Q<TextField>("nameTextField");
             nameTextField.Focus();
         });
     }
@@ -52,11 +53,11 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
     private void UpdatePlayerProfileList()
     {
-        profileList.Clear();
+        playerProfileList.Clear();
         int index = 0;
         settings.PlayerProfiles.ForEach(playerProfile =>
         {
-            profileList.Add(CreatePlayerProfileEntry(playerProfile, index));
+            playerProfileList.Add(CreatePlayerProfileEntry(playerProfile, index));
             index++;
         });
 
@@ -65,7 +66,22 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
     private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
     {
-        VisualElement result = playerProfileListEntryAsset.CloneTree();
+        VisualElement result = playerProfileListEntryAsset.CloneTree().Children().FirstOrDefault();
+
+        VisualElement playerProfileInactiveOverlay = result.Q<VisualElement>(R.UxmlNames.playerProfileInactiveOverlay);
+
+        void UpdatePlayerProfileInactiveOverlay()
+        {
+            playerProfileInactiveOverlay.ShowByDisplay();
+            if (playerProfile.IsEnabled)
+            {
+                playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(Colors.clearBlack);
+            }
+            else
+            {
+                playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.5f));
+            }
+        }
 
         Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
         deleteButton.RegisterCallbackButtonTriggered(() =>
@@ -78,10 +94,14 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         nameTextField.value = playerProfile.Name;
         nameTextField.RegisterValueChangedCallback(evt => playerProfile.Name = evt.newValue);
 
-        Toggle enabledToggle = result.Q<Toggle>(R.UxmlNames.enabledToggle);
+        SlideToggle enabledToggle = result.Q<SlideToggle>(R.UxmlNames.enabledToggle);
         enabledToggle.value = playerProfile.IsEnabled;
-        enabledToggle.RegisterValueChangedCallback(evt => playerProfile.IsEnabled = evt.newValue);
-        result.Q<Label>(R.UxmlNames.enabledLabel).text = TranslationManager.GetTranslation(R.Messages.active);
+        enabledToggle.RegisterValueChangedCallback(evt =>
+        {
+            playerProfile.IsEnabled = evt.newValue;
+            UpdatePlayerProfileInactiveOverlay();
+        });
+        UpdatePlayerProfileInactiveOverlay();
 
         new PlayerProfileImagePickerControl(result.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
             .Bind(() => playerProfile.ImagePath,
