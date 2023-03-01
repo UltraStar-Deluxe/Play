@@ -34,9 +34,11 @@
                     <ui:Label text="Chain +1" display-tooltip-when-elided="true" name="bonusLabel" class="smallFont" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgb(0, 0, 0); color: rgb(15, 255, 0); -unity-text-align: upper-center; position: absolute; top: -100%;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: space-between; align-items: flex-end; flex-direction: row;">
-                <ui:Button name="skipButton" value="This is the about text on multiple lines." text="Skip" class="controlMinWidth" />
-                <ui:Button name="backButton" value="This is the about text on multiple lines." text="Back" class="controlMinWidth" />
+            <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; align-items: flex-end; flex-direction: row;">
+                <ui:Button name="backButton" value="This is the about text on multiple lines." class="controlMinWidth transparentBackgroundColor">
+                    <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" />
+                </ui:Button>
+                <ui:Button name="skipButton" value="This is the about text on multiple lines." text="Skip" class="controlMinWidth transparentBackgroundColor" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

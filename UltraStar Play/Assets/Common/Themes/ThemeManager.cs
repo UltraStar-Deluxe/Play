@@ -130,9 +130,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         EScene currentScene = ESceneUtils.GetCurrentScene();
-        if (currentScene == EScene.SongEditorScene)
+        if (IsIgnoredScene(currentScene))
         {
-            // Song editor is out of scope for theming.
             return;
         }
 
@@ -423,7 +422,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         EScene currentScene = ESceneUtils.GetCurrentScene();
-        if (currentScene == EScene.SongEditorScene)
+        if (IsIgnoredScene(currentScene))
         {
             // Song editor is out of scope for theming.
             return;
@@ -544,6 +543,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return label.name
             is R.UxmlNames.newHighscoreLabel
             or R.UxmlNames.newHighscoreIcon;
+    }
+
+    private bool IsIgnoredScene(EScene currentScene)
+    {
+        return currentScene
+            is EScene.SongEditorScene
+            or EScene.CreditsScene;
     }
 
     private ControlColorConfig GetButtonColorConfig(ThemeMeta themeMeta, Button button)
