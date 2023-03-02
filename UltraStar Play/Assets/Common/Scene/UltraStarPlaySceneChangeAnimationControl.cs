@@ -97,19 +97,19 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         LeanTween.value(gameObject, 0, 1, sceneChangeAnimationTimeInSeconds)
             .setOnStart(() =>
             {
-                themeManager.BackgroundShaderControl.SetTransitionAnimationEnabled(true);
+                themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
             })
             .setOnUpdate((float animTimePercent) =>
             {
                 // Scale and fade out the snapshot of the old UIDocument.
                 // Handled by the background shader to get correct premultiplied
                 // blending and avoid the one-frame flicker issue.
-                themeManager.BackgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
+                themeManager.backgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
             })
             .setEaseInSine()
             .setOnComplete(() =>
             {
-                themeManager.BackgroundShaderControl.SetTransitionAnimationEnabled(false);
+                themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
             });
     }
 

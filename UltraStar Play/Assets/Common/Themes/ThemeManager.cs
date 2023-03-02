@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UniInject;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 // Handles the loading, saving and application of themes for the app
@@ -19,22 +20,20 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     public static ThemeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeManager>();
 
+    [InjectedInInspector]
     public Material backgroundMaterial;
+    
+    [InjectedInInspector]
     public Material particleMaterial;
+    
+    [InjectedInInspector]
     public ParticleSystem backgroundParticleSystem;
 
-    private BackgroundShaderControl backgroundShaderControl;
-    public BackgroundShaderControl BackgroundShaderControl
-    {
-        get
-        {
-            if (backgroundShaderControl == null)
-            {
-                backgroundShaderControl = GetComponentInChildren<BackgroundShaderControl>();
-            }
-            return backgroundShaderControl;
-        }
-    }
+    [InjectedInInspector]
+    public BackgroundShaderControl backgroundShaderControl;
+    
+    [InjectedInInspector]
+    public bool renderUiWithBackgroundShader = true;
 
     private Material backgroundMaterialCopy;
     private Material particleMaterialCopy;
@@ -105,11 +104,19 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             particleMaterialCopy = new Material(particleMaterial);
         }
 
-        // UI is rendered into a RenderTexture, which is then blended into the screen using the background shader
-        uiDocument.panelSettings.targetTexture = UiRenderTexture;
-        BackgroundShaderControl.SetUiRenderTextures(
-            UiRenderTexture,
-            transitionTexture);
+        if (renderUiWithBackgroundShader)
+        {
+            // The UIDocument is rendered into a RenderTexture, which is then blended into the background shader.
+            uiDocument.panelSettings.targetTexture = UiRenderTexture;
+            backgroundShaderControl.SetUiRenderTextures(
+                UiRenderTexture,
+                transitionTexture);
+        }
+        else
+        {
+            // The UIDocument is rendered directly to the screen by Unity.
+            uiDocument.panelSettings.targetTexture = null;
+        }
 
         if (anyThemeLoaded)
         {
@@ -231,7 +238,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             }
         }
 
-        Color patternColor = Color.clear; // default to clear to hide pattern if no file specified or found
+        // default to Color.clear to hide pattern if no file specified or found
+        Color patternColor = Color.clear;
         if (!backgroundJson.patternFile.IsNullOrEmpty())
         {
             string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.patternFile);
