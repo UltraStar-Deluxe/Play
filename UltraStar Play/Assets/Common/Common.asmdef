@@ -3,6 +3,8 @@
     "rootNamespace": "",
     "references": [
         "Unity.InputSystem",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
         "Serilog",
         "Plugins",
         "UniRx",
