@@ -174,13 +174,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings))
+        EScene currentScene = ESceneUtils.GetCurrentScene();
+        if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings, currentScene))
         {
             DisableStaticBackground();
             return;
         }
         
-        StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForCurrentScene(themeMeta);
+        StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForScene(themeMeta, currentScene);
         string absoluteFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
         ImageManager.LoadSpriteFromUri(absoluteFilePath, loadedSprite =>
         {
@@ -195,7 +196,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
-        if (!ThemeMetaUtils.HasDynamicBackground(themeMeta, settings))
+        EScene currentScene = ESceneUtils.GetCurrentScene();
+        if (!ThemeMetaUtils.HasDynamicBackground(themeMeta, settings, currentScene))
         {
             DisableDynamicBackground();
             return;

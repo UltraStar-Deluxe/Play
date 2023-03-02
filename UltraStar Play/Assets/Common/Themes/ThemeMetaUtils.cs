@@ -24,19 +24,24 @@ public static class ThemeMetaUtils
         return $"{Path.GetDirectoryName(themeMeta.AbsoluteFilePath)}/{path}";
     }
 
-    public static bool HasStaticBackground(ThemeMeta themeMeta, Settings settings)
+    public static bool HasStaticBackground(ThemeMeta themeMeta, Settings settings, EScene scene)
     {
-        StaticBackgroundJson staticBackgroundJson = GetStaticBackgroundJsonForCurrentScene(themeMeta);
+        if (scene is EScene.SingScene)
+        {
+            // No theme background in sing scene
+            return false;
+        }
+        
+        StaticBackgroundJson staticBackgroundJson = GetStaticBackgroundJsonForScene(themeMeta, scene);
         return !settings.DeveloperSettings.disableDynamicThemes
                && (staticBackgroundJson != null
                    && !staticBackgroundJson.imagePath.IsNullOrEmpty());
     }
 
-    public static StaticBackgroundJson GetStaticBackgroundJsonForCurrentScene(ThemeMeta themeMeta)
+    public static StaticBackgroundJson GetStaticBackgroundJsonForScene(ThemeMeta themeMeta, EScene scene)
     {
-        EScene currentScene = ESceneUtils.GetCurrentScene();
         if (themeMeta.ThemeJson.sceneSpecificStaticBackgrounds != null
-            && themeMeta.ThemeJson.sceneSpecificStaticBackgrounds.TryGetValue(currentScene.ToString(), out StaticBackgroundJson staticBackgroundJson))
+            && themeMeta.ThemeJson.sceneSpecificStaticBackgrounds.TryGetValue(scene.ToString(), out StaticBackgroundJson staticBackgroundJson))
         {
             return staticBackgroundJson;
         }
@@ -44,9 +49,15 @@ public static class ThemeMetaUtils
         return themeMeta.ThemeJson.staticBackground;
     }
 
-    public static bool HasDynamicBackground(ThemeMeta themeMeta, Settings settings)
+    public static bool HasDynamicBackground(ThemeMeta themeMeta, Settings settings, EScene scene)
     {
+        if (scene is EScene.SingScene)
+        {
+            // No theme background in sing scene
+            return false;
+        }
+        
         return !settings.DeveloperSettings.disableDynamicThemes
-                && !HasStaticBackground(themeMeta, settings);
+                && themeMeta.ThemeJson.dynamicBackground != null;
     }
 }
