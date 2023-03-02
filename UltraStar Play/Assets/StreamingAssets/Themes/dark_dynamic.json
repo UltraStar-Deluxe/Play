@@ -1,0 +1,55 @@
+{
+    "buttonBackgroundGradient": {
+        "startColor": "#101828",
+        "endColor": "#475467",
+        "angleDegrees": 45,
+    },
+    "hoverButtonBackgroundGradient": {
+        "startColor": "#101828",
+        "endColor": "#000000",
+        "angleDegrees": 45,
+    },
+    "focusButtonBackgroundGradient": {
+        "startColor": "#101828",
+        "endColor": "#000000",
+        "angleDegrees": 45,
+    },
+    "activeButtonBackgroundGradient": {
+        "startColor": "#101828",
+        "endColor": "#000000",
+        "angleDegrees": 45,
+    },
+    "backgroundColorButtons": "#475467",
+    "fontColorButtons": "#D0D5DD",
+    "lyricsColor": "#FFFFFF",
+    "lyricsOutlineColor": "#00000000",
+    "currentNoteLyricsColor": "#9E77ED",
+    "previousNoteLyricsColor": "#9E77ED",
+    "lyricsContainerGradient": {
+        "startColor": "#000000",
+        "endColor": "#1E232B",
+    },
+//    "staticBackground": {
+//        "imagePath": "backgrounds/dot-grid.jpg",
+//        "scaleMode": "ScaleAndCrop",
+//    },
+    "sceneSpecificStaticBackgrounds": {
+        "MainScene": {
+            "imagePath": "backgrounds/vinyl.png",
+//            "imagePath": "backgrounds/dot-grid-with-vinyl.jpg",
+            "scaleMode": "ScaleAndCrop",
+        }
+    },
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/dark green.png",
+        "gradientType": "Linear",
+        "gradientScale": 2.5,
+        "gradientSmoothness": 0.0,
+        "gradientAngle": 70.0,
+        "gradientAnimation": true,
+        "gradientAnimSpeed": 1.5,
+        "gradientAnimAmplitude": 0.3,
+        "particleFile": "particles/logo.png",
+        "particleOpacity": 1.0
+    }
+}
