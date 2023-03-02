@@ -234,7 +234,6 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 labels.ForEach(label => label.style.fontSize = fontSize);
             }
         }
-        Debug.Log($"Final font size: {fontSize}");
     }
 
     private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence)
