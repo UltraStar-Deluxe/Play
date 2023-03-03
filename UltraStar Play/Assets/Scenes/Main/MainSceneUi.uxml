@@ -20,11 +20,11 @@
                 <MaterialIcon name="settingsIcon" icon="settings" />
                 <MaterialIcon name="settingsProblemHintIcon" icon="warning" class="settingsProblemHintIcon warning rounded" style="position: absolute; bottom: 100%;" />
             </ui:Button>
-            <ui:Button name="creditsButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
-                <MaterialIcon name="creditsIcon" icon="groups" />
-            </ui:Button>
             <ui:Button name="aboutButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
                 <MaterialIcon name="aboutIcon" icon="info_outline" />
+            </ui:Button>
+            <ui:Button name="creditsButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
+                <MaterialIcon name="creditsIcon" icon="groups" />
             </ui:Button>
             <ui:Button name="quitButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
                 <MaterialIcon name="quitIcon" icon="logout" />

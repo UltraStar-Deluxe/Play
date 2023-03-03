@@ -32,6 +32,20 @@
                     <ui:Label text="Songs" name="label" />
                     <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
                 </ToggleButton>
+                <ToggleButton name="profileOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="people" name="image" />
+                    <ui:Label text="Players" name="label" />
+                    <MaterialIcon name="playerProfileSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
+                </ToggleButton>
+                <ToggleButton name="recordingOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="mic" name="image" />
+                    <ui:Label text="Recording" name="label" />
+                    <MaterialIcon name="recordingSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
+                </ToggleButton>
+                <ToggleButton name="designOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="filter_b_and_w" name="image" />
+                    <ui:Label text="Design" name="label" />
+                </ToggleButton>
                 <ToggleButton name="contentDownloadButton" class="optionsOverviewButton">
                     <MaterialIcon icon="cloud_download" name="image" />
                     <ui:Label text="Download" name="label" />
@@ -43,20 +57,6 @@
                 <ToggleButton name="soundOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="campaign" name="image" />
                     <ui:Label text="Sound" name="label" />
-                </ToggleButton>
-                <ToggleButton name="recordingOptionsButton" class="optionsOverviewButton">
-                    <MaterialIcon icon="mic" name="image" />
-                    <ui:Label text="Recording" name="label" />
-                    <MaterialIcon name="recordingSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                </ToggleButton>
-                <ToggleButton name="profileOptionsButton" class="optionsOverviewButton">
-                    <MaterialIcon icon="people" name="image" />
-                    <ui:Label text="Players" name="label" />
-                    <MaterialIcon name="playerProfileSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                </ToggleButton>
-                <ToggleButton name="designOptionsButton" class="optionsOverviewButton">
-                    <MaterialIcon icon="filter_b_and_w" name="image" />
-                    <ui:Label text="Design" name="label" />
                 </ToggleButton>
                 <ToggleButton name="internetOptionsButton" class="optionsOverviewButton" style="display: none;">
                     <MaterialIcon icon="cloud" name="image" />
