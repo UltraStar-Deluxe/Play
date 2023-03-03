@@ -33,6 +33,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public BackgroundShaderControl backgroundShaderControl;
     
     [InjectedInInspector]
+    public SceneRecipeManager sceneRecipeManager;
+    
+    [InjectedInInspector]
     public bool renderUiWithBackgroundShader = true;
 
     private Material backgroundMaterialCopy;
@@ -136,7 +139,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        EScene currentScene = ESceneUtils.GetCurrentScene();
+        EScene currentScene = GetCurrentScene();
         if (IsIgnoredScene(currentScene))
         {
             return;
@@ -174,7 +177,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        EScene currentScene = ESceneUtils.GetCurrentScene();
+        EScene currentScene = GetCurrentScene();
         if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings, currentScene))
         {
             DisableStaticBackground();
@@ -196,7 +199,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
-        EScene currentScene = ESceneUtils.GetCurrentScene();
+        EScene currentScene = GetCurrentScene();
         if (!ThemeMetaUtils.HasDynamicBackground(themeMeta, settings, currentScene))
         {
             DisableDynamicBackground();
@@ -431,7 +434,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        EScene currentScene = ESceneUtils.GetCurrentScene();
+        EScene currentScene = GetCurrentScene();
         if (IsIgnoredScene(currentScene))
         {
             // Song editor is out of scope for theming.
@@ -470,7 +473,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         };
         
         // Scene specific elements
-        ApplyThemeSpecificStylesToVisualElementsInScene(currentThemeMeta, ESceneUtils.GetCurrentScene());
+        ApplyThemeSpecificStylesToVisualElementsInScene(currentThemeMeta, GetCurrentScene());
 
         // Labels
         root.Query<Label>().ForEach(label =>
@@ -826,5 +829,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         themeMetas.Clear();
         LoadCurrentTheme();
+    }
+
+    private EScene GetCurrentScene()
+    {
+        return sceneRecipeManager.GetCurrentScene();
     }
 }

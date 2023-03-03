@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 [Serializable]
-public class OptionSceneRecipe
+public class SceneRecipe
 {
     public EScene scene;
     public VisualTreeAsset visualTreeAsset;

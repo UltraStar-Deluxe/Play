@@ -15,6 +15,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         BindingBuilder bb = new();
         bb.BindExistingInstance(ApplicationManager.Instance);
         bb.BindExistingInstance(SceneNavigator.Instance);
+        bb.BindExistingInstance(SceneRecipeManager.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
         bb.BindExistingInstance(SongMetaManager.Instance);
         bb.BindExistingInstance(CursorManager.Instance);
@@ -56,11 +57,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
     private static UIDocument GetUiDocument()
     {
-        GameObject uiDocGameObject = GameObject.FindWithTag("UIDocument");
-        if (uiDocGameObject != null)
-        {
-            return uiDocGameObject.GetComponent<UIDocument>();
-        }
-        return null;
+        return UIDocumentUtils.FindUIDocumentOrThrow();
     }
 }

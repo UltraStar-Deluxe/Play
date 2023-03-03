@@ -468,6 +468,61 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c4e7e27d5dc334f897797d58a6b33d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &423153887855436276
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 280779799394265030}
+  - component: {fileID: 942213526363841176}
+  m_Layer: 0
+  m_Name: SceneRecipeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &280779799394265030
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 423153887855436276}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &942213526363841176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 423153887855436276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93b005c7ba93494d9f65062be80f30dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneRecipes:
+  - scene: 1
+    visualTreeAsset: {fileID: 9197481963319205126, guid: c19b6f07b79a1e74a84b4db36131931b,
+      type: 3}
+    sceneGameObjects:
+    - {fileID: 3044738762715273925, guid: 74d0c9bd44a862b4d84be5022bef470c, type: 3}
+  - scene: 2
+    visualTreeAsset: {fileID: 9197481963319205126, guid: 0017e6d7660c40148b944c881b882a29,
+      type: 3}
+    sceneGameObjects:
+    - {fileID: 4338268886086358250, guid: a8a15de8bf7907f4aac45c6b7968a3bb, type: 3}
 --- !u!1 &441033943908778027
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,6 +654,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 280779799394265030}
   - {fileID: 4725083428892299482}
   - {fileID: 3855433877842653761}
   - {fileID: 4351641984961804500}
@@ -6291,6 +6347,7 @@ MonoBehaviour:
   particleMaterial: {fileID: 2100000, guid: 8c900c152afa98e47b70ef388519dadd, type: 2}
   backgroundParticleSystem: {fileID: 2908706229821383298}
   backgroundShaderControl: {fileID: 3631161383212934469}
+  sceneRecipeManager: {fileID: 942213526363841176}
   renderUiWithBackgroundShader: 1
 --- !u!1 &2981502673358573187
 GameObject:

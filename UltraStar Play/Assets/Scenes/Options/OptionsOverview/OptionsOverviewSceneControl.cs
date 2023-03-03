@@ -17,7 +17,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 {
     private const EScene DefaultOptionsScene = EScene.OptionsGameScene;
     
-    public List<OptionSceneRecipe> optionSceneRecipes = new();
+    public List<SceneRecipe> optionSceneRecipes = new();
     
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -109,7 +109,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject]
     private OptionsSceneData sceneData;
     
-    private OptionSceneRecipe loadedSceneRecipe;
+    private SceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
     private readonly Dictionary<EScene, string> sceneToShortNameMap = new();
@@ -194,10 +194,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void LoadOptionsScene(EScene scene)
     {
-        if (loadedSceneRecipe != null)
-        {
-            UnloadOptionsScene(loadedSceneRecipe.scene);
-        }
+        UnloadLastOptionsScene();
         loadedSceneRecipe = optionSceneRecipes.FirstOrDefault(it => it.scene == scene);;
 
         // Set button style
@@ -246,14 +243,20 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
-    private void UnloadOptionsScene(EScene scene)
+    private void UnloadLastOptionsScene()
     {
-        sceneToButtonMap[scene].SetActive(false);
+        if (loadedSceneRecipe == null)
+        {
+            return;
+        }
+
+        sceneToButtonMap[loadedSceneRecipe.scene].SetActive(false);
         
         loadedGameObjects.ForEach(Destroy);
         loadedGameObjects.Clear();
         
         loadedSceneContent.Clear();
+        loadedSceneRecipe = null;
     }
 
     private void InitSettingsProblemHints()
@@ -368,5 +371,10 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             });
             ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
         }
+    }
+
+    private void OnDestroy()
+    {
+        UnloadLastOptionsScene();
     }
 }

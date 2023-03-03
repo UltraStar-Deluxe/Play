@@ -35,6 +35,9 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SceneRecipeManager sceneRecipeManager;
+    
     public bool logSceneChangeDuration;
 
     protected override object GetInstance()
@@ -77,18 +80,35 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
     public void LoadScene(EScene scene)
     {
-        EScene currentScene = ESceneUtils.GetCurrentScene();
+        EScene currentScene = sceneRecipeManager.GetCurrentScene();
 
         beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
 
-        void DoChangeScene() => SceneManager.LoadSceneAsync((int)scene, new LoadSceneParameters(LoadSceneMode.Single, LocalPhysicsMode.None));
         if (settings.GraphicSettings.AnimateSceneChange)
         {
-            sceneChangeAnimationControl.AnimateChangeToScene(DoChangeScene, () => sceneChangeAnimationControl.StartSceneChangeAnimation(currentScene, scene));
+            sceneChangeAnimationControl.AnimateChangeToScene(
+                () => DoChangeScene(scene),
+                () => sceneChangeAnimationControl.StartSceneChangeAnimation(currentScene, scene));
         }
         else
         {
-            DoChangeScene();
+            DoChangeScene(scene);
+        }
+    }
+
+    private void DoChangeScene(EScene scene)
+    {
+        sceneRecipeManager.UnloadScene();
+        
+        SceneRecipe sceneRecipe = sceneRecipeManager.GetSceneRecipe(scene);
+        if (sceneRecipe != null)
+        {
+            sceneRecipeManager.LoadSceneFromRecipe(sceneRecipe);
+            sceneChangedEventStream.OnNext(new SceneChangedEvent());
+        }
+        else
+        {
+            SceneManager.LoadSceneAsync((int)scene, new LoadSceneParameters(LoadSceneMode.Single, LocalPhysicsMode.None));
         }
     }
 
