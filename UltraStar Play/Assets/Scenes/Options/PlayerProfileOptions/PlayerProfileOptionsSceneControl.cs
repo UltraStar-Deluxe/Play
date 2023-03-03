@@ -32,14 +32,11 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         base.Start();
         
         UpdatePlayerProfileList();
-        settings.ObserveEveryValueChanged(s => s.PlayerProfiles)
-            .Subscribe(onNext => UpdatePlayerProfileList())
-            .AddTo(gameObject);
 
         addButton.RegisterCallbackButtonTriggered(() =>
         {
             settings.PlayerProfiles.Add(new PlayerProfile());
-            UpdatePlayerProfileList();
+            CreatePlayerProfileEntry(settings.PlayerProfiles.FirstOrDefault(), settings.PlayerProfiles.Count - 1);
 
             // Focus on the name of the newly added player to directly allow changing its name
             TextField nameTextField = playerProfileList[playerProfileList.childCount-1].Q<TextField>("nameTextField");
@@ -57,61 +54,61 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         int index = 0;
         settings.PlayerProfiles.ForEach(playerProfile =>
         {
-            playerProfileList.Add(CreatePlayerProfileEntry(playerProfile, index));
+            CreatePlayerProfileEntry(playerProfile, index);
             index++;
         });
 
-        ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        // ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
-    private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
+    private void UpdatePlayerProfileInactiveOverlay(PlayerProfile playerProfile, VisualElement playerProfileInactiveOverlay)
     {
-        VisualElement result = playerProfileListEntryAsset.CloneTree().Children().FirstOrDefault();
-
-        VisualElement playerProfileInactiveOverlay = result.Q<VisualElement>(R.UxmlNames.playerProfileInactiveOverlay);
-
-        void UpdatePlayerProfileInactiveOverlay()
+        playerProfileInactiveOverlay.ShowByDisplay();
+        if (playerProfile.IsEnabled)
         {
-            playerProfileInactiveOverlay.ShowByDisplay();
-            if (playerProfile.IsEnabled)
-            {
-                playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(Colors.clearBlack);
-            }
-            else
-            {
-                playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.5f));
-            }
+            playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(Colors.clearBlack);
         }
+        else
+        {
+            playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.5f));
+        }
+    }
+    
+    private void CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
+    {
+        VisualElement visualElement = playerProfileListEntryAsset.CloneTree().Children().FirstOrDefault();
 
-        Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
+        VisualElement playerProfileInactiveOverlay = visualElement.Q<VisualElement>(R.UxmlNames.playerProfileInactiveOverlay);
+
+        Button deleteButton = visualElement.Q<Button>(R.UxmlNames.deleteButton);
         deleteButton.RegisterCallbackButtonTriggered(() =>
-            {
-                settings.PlayerProfiles.RemoveAt(indexInList);
-                UpdatePlayerProfileList();
-            });
+        {
+            settings.PlayerProfiles.RemoveAt(indexInList);
+            visualElement.RemoveFromHierarchy();
+        });
 
-        TextField nameTextField = result.Q<TextField>(R.UxmlNames.nameTextField);
+        TextField nameTextField = visualElement.Q<TextField>(R.UxmlNames.nameTextField);
         nameTextField.value = playerProfile.Name;
         nameTextField.RegisterValueChangedCallback(evt => playerProfile.Name = evt.newValue);
 
-        SlideToggle enabledToggle = result.Q<SlideToggle>(R.UxmlNames.enabledToggle);
+        SlideToggle enabledToggle = visualElement.Q<SlideToggle>(R.UxmlNames.enabledToggle);
         enabledToggle.value = playerProfile.IsEnabled;
         enabledToggle.RegisterValueChangedCallback(evt =>
         {
             playerProfile.IsEnabled = evt.newValue;
-            UpdatePlayerProfileInactiveOverlay();
+            UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
         });
-        UpdatePlayerProfileInactiveOverlay();
+        UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
 
-        new PlayerProfileImagePickerControl(result.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
+        new PlayerProfileImagePickerControl(visualElement.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
             .Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
-        new DifficultyPicker(result.Q<ItemPicker>(R.UxmlNames.difficultyPicker))
+        new DifficultyPicker(visualElement.Q<ItemPicker>(R.UxmlNames.difficultyPicker))
             .Bind(() => playerProfile.Difficulty,
                 newValue => playerProfile.Difficulty = newValue);
 
-        return result;
+        playerProfileList.Add(visualElement);
     }
 
     public override bool HasHelpDialog => true;
