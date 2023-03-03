@@ -523,6 +523,16 @@ MonoBehaviour:
       type: 3}
     sceneGameObjects:
     - {fileID: 4338268886086358250, guid: a8a15de8bf7907f4aac45c6b7968a3bb, type: 3}
+  - scene: 3
+    visualTreeAsset: {fileID: 9197481963319205126, guid: 39762b6f8c0ef814abc90e633753fe57,
+      type: 3}
+    sceneGameObjects:
+    - {fileID: 3395702942276758911, guid: 967c398ebbc559343b89501c68fcf341, type: 3}
+  - scene: 21
+    visualTreeAsset: {fileID: 9197481963319205126, guid: ecc122a3e12487d4a8ba1f75e28cbf42,
+      type: 3}
+    sceneGameObjects:
+    - {fileID: 127396585186539281, guid: 7fb08cad747a39848bfd617b8ab37cc4, type: 3}
 --- !u!1 &441033943908778027
 GameObject:
   m_ObjectHideFlags: 0
