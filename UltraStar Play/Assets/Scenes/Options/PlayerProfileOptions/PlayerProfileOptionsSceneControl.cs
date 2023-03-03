@@ -58,7 +58,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             index++;
         });
 
-        // ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
     }
 
     private void UpdatePlayerProfileInactiveOverlay(PlayerProfile playerProfile, VisualElement playerProfileInactiveOverlay)
