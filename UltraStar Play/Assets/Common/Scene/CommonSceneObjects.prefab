@@ -543,6 +543,11 @@ MonoBehaviour:
       type: 3}
     sceneGameObjects:
     - {fileID: 3706478735755504748, guid: 0f35eb07433348d4abddb4095d2d1e17, type: 3}
+  - scene: 9
+    visualTreeAsset: {fileID: 9197481963319205126, guid: d9a1cb935ed83c242b57d96fd786ce11,
+      type: 3}
+    sceneGameObjects:
+    - {fileID: 284005702175915694, guid: 88dee54af041b404db711740a9f4c950, type: 3}
 --- !u!1 &441033943908778027
 GameObject:
   m_ObjectHideFlags: 0
