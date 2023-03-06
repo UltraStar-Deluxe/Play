@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
+using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -12,13 +14,19 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
     public static SceneRecipeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneRecipeManager>();
 
     [InjectedInInspector]
+    public GameObject inputManagerPrefab;
+    
+    [InjectedInInspector]
     public List<SceneRecipe> sceneRecipes;
 
     [Inject]
     private UIDocument uiDocument;
     
     [Inject]
-    private Injector injector;
+    private DontDestroyOnLoadManager dontDestroyOnLoadManager;
+
+    [Inject]
+    private UltraStarPlayInputManager ultraStarPlayInputManager;
 
     private SceneRecipe loadedSceneRecipe;
         
@@ -34,7 +42,6 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
 
     public void LoadSceneFromRecipe(SceneRecipe sceneRecipe)
     {
-        UnloadScene();
         loadedSceneRecipe = sceneRecipe;
 
         Debug.Log($"Loading scene recipe {sceneRecipe.scene}");
@@ -53,7 +60,12 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Add new bindings from loaded objects.
-        Injector loadedSceneInjector = injector.CreateChildInjector();
+        Injector loadedSceneInjector = UniInjectUtils.CreateInjector();
+        foreach (IBinder binder in dontDestroyOnLoadManager.transform.GetComponentsInChildren<IBinder>())
+        {
+            binder.GetBindings().ForEach(binding => loadedSceneInjector.AddBinding(binding));
+        }
+
         foreach (GameObject loadedGameObject in loadedGameObjects)
         {
             foreach (IBinder binder in loadedGameObject.GetComponentsInChildren<IBinder>())
@@ -63,6 +75,11 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Inject loaded objects
+        foreach (INeedInjection iNeedInjection in dontDestroyOnLoadManager.transform.GetComponentsInChildren<INeedInjection>())
+        {
+            loadedSceneInjector.Inject(iNeedInjection);
+        }
+        
         foreach (GameObject loadedGameObject in loadedGameObjects)
         {
             loadedSceneInjector
@@ -93,13 +110,19 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
             }
             Destroy(loadedGameObject);
         }
+        
+        // Unregister InputActions. Therefor, destroy and recreate InputManager.
+        DestroyImmediate(InputManager.Instance.gameObject);
+        CommonSceneObjects commonSceneObjects = CommonSceneObjects.Instance;
+        Instantiate(inputManagerPrefab, commonSceneObjects.transform);
+        
         loadedSceneRecipe = null;
     }
 
     private bool ShouldKeepLoadedGameObject(GameObject loadedGameObject)
     {
         return loadedGameObject.GetComponent<UIDocument>() != null
-            || loadedGameObject.GetComponentInChildren<CommonSceneObjectsBinder>() != null;
+            || loadedGameObject == CommonSceneObjects.Instance.gameObject;
     }
 
     public EScene GetCurrentScene()

@@ -60,7 +60,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
             {
                 Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms");
             }
-        });
+        }).AddTo(gameObject);
     }
 
     protected override void OnEnableSingleton()
@@ -87,28 +87,29 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         if (settings.GraphicSettings.AnimateSceneChange)
         {
             sceneChangeAnimationControl.AnimateChangeToScene(
-                () => DoChangeScene(scene),
+                () => DoChangeScene(currentScene, scene),
                 () => sceneChangeAnimationControl.StartSceneChangeAnimation(currentScene, scene));
         }
         else
         {
-            DoChangeScene(scene);
+            DoChangeScene(currentScene, scene);
         }
     }
 
-    private void DoChangeScene(EScene scene)
+    private void DoChangeScene(EScene currentScene, EScene targetScene)
     {
         sceneRecipeManager.UnloadScene();
         
-        SceneRecipe sceneRecipe = sceneRecipeManager.GetSceneRecipe(scene);
-        if (sceneRecipe != null)
+        SceneRecipe sceneRecipe = sceneRecipeManager.GetSceneRecipe(targetScene);
+        if (sceneRecipe != null
+            && currentScene != EScene.SongEditorScene)
         {
             sceneRecipeManager.LoadSceneFromRecipe(sceneRecipe);
             sceneChangedEventStream.OnNext(new SceneChangedEvent());
         }
         else
         {
-            SceneManager.LoadSceneAsync((int)scene, new LoadSceneParameters(LoadSceneMode.Single, LocalPhysicsMode.None));
+            SceneManager.LoadSceneAsync((int)targetScene, new LoadSceneParameters(LoadSceneMode.Single, LocalPhysicsMode.None));
         }
     }
 

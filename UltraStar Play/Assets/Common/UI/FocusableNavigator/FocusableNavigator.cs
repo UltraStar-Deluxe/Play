@@ -16,7 +16,7 @@ using UnityEngine.UIElements;
  * (e.g. arrow keys or controller stick).
  * And sends submit event to focused VisualElement on corresponding InputAction.
  */
-public class FocusableNavigator : MonoBehaviour, INeedInjection
+public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     protected UIDocument uiDocument;
@@ -42,7 +42,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection
 
     private readonly List<CustomNavigationTarget> customNavigationTargets = new();
 
-    public virtual void Start()
+    public virtual void OnInjectionFinished()
     {
         if (!gameObject.activeInHierarchy)
         {

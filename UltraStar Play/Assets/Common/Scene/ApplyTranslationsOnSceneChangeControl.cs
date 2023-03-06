@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
@@ -8,15 +9,33 @@ using Debug = UnityEngine.Debug;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ApplyTranslationsOnSceneInjectionFinished : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
+public class ApplyTranslationsOnSceneChangeControl : AbstractSingletonBehaviour, INeedInjection
 {
+    public static ApplyTranslationsOnSceneChangeControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplyTranslationsOnSceneChangeControl>();
+    
     [Inject]
     private ISettings settings;
 
     [Inject]
     private TranslationManager translationManager;
     
-    public void OnSceneInjectionFinished()
+    [Inject]
+    private SceneNavigator sceneNavigator;
+    
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        ApplyTranslations();
+        sceneNavigator.SceneChangedEventStream
+            .Subscribe(_ => ApplyTranslations())
+            .AddTo(gameObject);
+    }
+    
+    public void ApplyTranslations()
     {
         if (translationManager.currentLanguage != settings.Language)
         {

@@ -1,4 +1,5 @@
 using PrimeInputActions;
+using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,13 +9,13 @@ using UnityEngine.UIElements;
 
 public class DefaultFocusableNavigator : FocusableNavigator
 {
-	public override void Start() {
+	public override void OnInjectionFinished() {
         if (!gameObject.activeInHierarchy)
         {
             return;
         }
 
-        base.Start();
+        base.OnInjectionFinished();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(100)
             .Subscribe(_ => OnBack());

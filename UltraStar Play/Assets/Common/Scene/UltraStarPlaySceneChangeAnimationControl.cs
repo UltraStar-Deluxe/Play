@@ -3,7 +3,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection, ISceneInjectionFinishedListener
+public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection
 {
     public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
@@ -40,13 +40,11 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         return Instance;
     }
 
-    public void OnSceneInjectionFinished()
+    protected override void StartSingleton()
     {
-        if (this != Instance)
-        {
-            return;
-        }
-
+        sceneNavigator.SceneChangedEventStream
+            .Subscribe(_ => UpdateSceneTexturesAndTransition())
+            .AddTo(gameObject);
         UpdateSceneTexturesAndTransition();
     }
 

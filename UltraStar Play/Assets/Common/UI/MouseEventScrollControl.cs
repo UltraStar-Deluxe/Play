@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
  *
  * See https://forum.unity.com/threads/scroll-view-touch-input-on-mobile-scroll-by-drag.945898/
  */
-public class MouseEventScrollControl : MonoBehaviour, INeedInjection
+public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private UIDocument uiDocument;
@@ -22,7 +22,7 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection
     private Vector2 dragStartScrollOffset;
     private Vector2 dragStartPosition;
 
-    public void Start()
+    public void OnInjectionFinished()
     {
         List<ScrollView> scrollViews = uiDocument.rootVisualElement.Query<ScrollView>()
             .ToList();
