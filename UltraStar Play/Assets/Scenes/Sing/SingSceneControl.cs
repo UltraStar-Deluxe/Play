@@ -205,7 +205,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             Button okButton = dialogControl.AddButton("OK", CloseDialog);
             okButton.Focus();
 
-            ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+            ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
         }
 
         webcamControl.InitWebcam();

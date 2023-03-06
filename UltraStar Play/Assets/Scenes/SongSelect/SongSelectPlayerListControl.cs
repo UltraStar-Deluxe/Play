@@ -87,6 +87,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         {
             CreateListEntry(playerProfile);
         }
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerScrollView);
     }
 
     private void CreateListEntry(PlayerProfile playerProfile)

@@ -209,7 +209,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection, ITranslator
         if (themeNeedsUpdate)
         {
             themeNeedsUpdate = false;
-            ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+            ThemeManager.ApplyThemeSpecificStylesToVisualElements(songEntryContainer);
         }
     }
 

@@ -36,8 +36,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public SceneRecipeManager sceneRecipeManager;
     
     [InjectedInInspector]
+    public Camera backgroundParticlesCamera;
+    
+    [InjectedInInspector]
     public bool renderUiWithBackgroundShader = true;
 
+    [InjectedInInspector]
+    public bool applyThemeSpecificStyles = true;
+    
     private Material backgroundMaterialCopy;
     private Material particleMaterialCopy;
 
@@ -52,6 +58,20 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             }
 
             return uiRenderTexture;
+        }
+    }
+    
+    private RenderTexture particleRenderTexture;
+    public RenderTexture ParticleRenderTexture
+    {
+        get
+        {
+            if (particleRenderTexture == null)
+            {
+                particleRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
+            }
+
+            return particleRenderTexture;
         }
     }
 
@@ -91,7 +111,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (isDropdownMenuOpened)
         {
             isDropdownMenuOpened = false;
-            ApplyThemeSpecificStylesToVisualElementsInScene();
+            ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement);
         }
     }
 
@@ -110,20 +130,23 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (renderUiWithBackgroundShader)
         {
             // The UIDocument is rendered into a RenderTexture, which is then blended into the background shader.
+            backgroundParticlesCamera.targetTexture = ParticleRenderTexture;
             uiDocument.panelSettings.targetTexture = UiRenderTexture;
             backgroundShaderControl.SetUiRenderTextures(
                 UiRenderTexture,
+                ParticleRenderTexture,
                 transitionTexture);
         }
         else
         {
             // The UIDocument is rendered directly to the screen by Unity.
             uiDocument.panelSettings.targetTexture = null;
+            backgroundParticlesCamera.gameObject.SetActive(false);
         }
 
         if (anyThemeLoaded)
         {
-            ApplyThemeSpecificStylesToVisualElementsInScene();
+            ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement);
         }
         else
         {
@@ -158,7 +181,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             alreadyProcessedVisualElements.Clear();
             ApplyThemeBackground(themeMeta);
-            ApplyThemeSpecificStylesToVisualElementsInScene();
+            ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement);
             anyThemeLoaded = true;
         }));
     }
@@ -417,17 +440,24 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return themeMetas;
     }
 
-    public static void ApplyThemeSpecificStylesToVisualElementsInScene()
+    public static void ApplyThemeSpecificStylesToVisualElements(VisualElement root)
     {
         ThemeManager themeManager = Instance;
         if (themeManager != null)
         {
-            themeManager.DoApplyThemeSpecificStylesToVisualElementsInScene();
+            themeManager.DoApplyThemeSpecificStylesToVisualElements(root);
         }
     }
     
-    private void DoApplyThemeSpecificStylesToVisualElementsInScene()
-    {        
+    private void DoApplyThemeSpecificStylesToVisualElements(VisualElement root)
+    {
+        if (!applyThemeSpecificStyles)
+        {
+            return;
+        }
+
+        using DisposableStopwatch d = new("DoApplyThemeSpecificStylesToVisualElements took <ms>");
+
         if (settings.DeveloperSettings.disableDynamicThemes)
         {
             DisableDynamicBackground();
@@ -451,8 +481,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         ApplyThemeStaticBackground(currentThemeMeta);
 
-        VisualElement root = uiDocument.rootVisualElement;
-
         Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(currentThemeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
 
         Color defaultLabelColor = Colors.CreateColor("#d0d0d0");
@@ -473,7 +501,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         };
         
         // Scene specific elements
-        ApplyThemeSpecificStylesToVisualElementsInScene(currentThemeMeta, GetCurrentScene());
+        ApplyThemeSpecificStylesToVisualElements(root, currentThemeMeta, GetCurrentScene());
 
         // Labels
         root.Query<Label>().ForEach(label =>
@@ -638,11 +666,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         visualElement.RegisterCallback<PointerDownEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
     }
 
-    private void ApplyThemeSpecificStylesToVisualElementsInScene(
+    private void ApplyThemeSpecificStylesToVisualElements(
+        VisualElement root,
         ThemeMeta themeMeta,
         EScene currentScene)
     {
-        VisualElement root = uiDocument.rootVisualElement;
         ThemeMeta currentThemeMeta = GetCurrentTheme();
 
         if (currentScene is EScene.SingScene)

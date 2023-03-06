@@ -10,7 +10,6 @@ public class BackgroundShaderControl : MonoBehaviour
     private static readonly int _TimeApplication = Shader.PropertyToID("_TimeApplication");
 
     public Material material;
-    public RenderTexture particleRenderTexture;
 
     private void Awake()
     {
@@ -26,11 +25,11 @@ public class BackgroundShaderControl : MonoBehaviour
         Shader.SetGlobalFloat(_TimeApplication, Time.time);
     }
 
-    public void SetUiRenderTextures(RenderTexture uiRenderTexture, Texture transitionTexture)
+    public void SetUiRenderTextures(RenderTexture uiRenderTexture, RenderTexture particleRenderTexture, Texture transitionTexture)
     {
         material.SetTexture(_UiTex, uiRenderTexture);
-        material.SetTexture(_TransitionTex, transitionTexture);
         material.SetTexture(_ParticleTex, particleRenderTexture);
+        material.SetTexture(_TransitionTex, transitionTexture);
     }
 
     public void SetTransitionAnimationEnabled(bool enable)

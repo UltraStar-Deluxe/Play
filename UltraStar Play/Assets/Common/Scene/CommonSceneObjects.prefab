@@ -818,8 +818,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: f7976d665216032408a77e0afc13b55f, type: 2}
-  particleRenderTexture: {fileID: 8400000, guid: c247ad28177300f41b800e8b9c1ff0f4,
-    type: 2}
 --- !u!1 &1197462286522570267
 GameObject:
   m_ObjectHideFlags: 0
@@ -1078,7 +1076,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 2
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: c247ad28177300f41b800e8b9c1ff0f4, type: 2}
+  m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -6335,6 +6333,7 @@ MonoBehaviour:
   backgroundParticleSystem: {fileID: 2908706229821383298}
   backgroundShaderControl: {fileID: 3631161383212934469}
   sceneRecipeManager: {fileID: 942213526363841176}
+  backgroundParticlesCamera: {fileID: 1790431304843377592}
   renderUiWithBackgroundShader: 1
 --- !u!1 &2981502673358573187
 GameObject:

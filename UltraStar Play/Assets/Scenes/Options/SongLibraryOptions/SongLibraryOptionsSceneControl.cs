@@ -285,7 +285,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 index++;
             });
         }
-        ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songList);
     }
 
     private void CreateSongFolderEntryControl(string path, int indexInList)

@@ -95,7 +95,7 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Apply theme to loaded UI
-        ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
     }
 
     public void UnloadScene()

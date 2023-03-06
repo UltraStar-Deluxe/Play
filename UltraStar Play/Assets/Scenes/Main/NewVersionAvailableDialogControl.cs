@@ -41,7 +41,7 @@ public class NewVersionAvailableDialogControl : AbstractDialogControl, IInjectio
         VisualElement parentVisualElement,
         Dictionary<string, string> remoteVersionProperties)
     {
-        this.dialogRootVisualElement = dialogRootVisualElement;
+        this.DialogRootVisualElement = dialogRootVisualElement;
         this.parentVisualElement = parentVisualElement;
         remoteVersionProperties.TryGetValue("release", out remoteRelease);
         remoteVersionProperties.TryGetValue("name", out releaseName);
@@ -71,7 +71,7 @@ public class NewVersionAvailableDialogControl : AbstractDialogControl, IInjectio
 
         UpdateTranslation();
 
-        parentVisualElement.Add(dialogRootVisualElement);
+        parentVisualElement.Add(DialogRootVisualElement);
 
         closeButton.Focus();
     }
