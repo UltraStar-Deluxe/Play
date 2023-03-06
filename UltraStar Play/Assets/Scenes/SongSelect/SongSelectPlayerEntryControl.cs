@@ -117,6 +117,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private void InitMicPitchTracker()
     {
+        return;
         micPitchTracker = GameObject.Instantiate(micPitchTrackerPrefab);
         injector.InjectAllComponentsInChildren(micPitchTracker);
         micPitchTracker.MicProfile = micProfile;
@@ -125,6 +126,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     
     private void UpdateMicPitchTracker()
     {
+        return;
         micPitchTracker.MicProfile = micProfile;
         if (micProfile == null
             || micProfile.IsInputFromConnectedClient)
