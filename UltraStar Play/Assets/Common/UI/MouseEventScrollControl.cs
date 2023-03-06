@@ -22,13 +22,36 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
     private Vector2 dragStartScrollOffset;
     private Vector2 dragStartPosition;
 
+    private HashSet<ScrollView> seenScrollViews = new();
+
     public void OnInjectionFinished()
+    {
+        DoRegisterMouseScrollEvents();
+    }
+
+    public static void RegisterMouseScrollEvents()
+    {
+        MouseEventScrollControl mouseEventScrollControl = FindObjectOfType<MouseEventScrollControl>();
+        if (mouseEventScrollControl == null)
+        {
+            return;
+        }
+        mouseEventScrollControl.DoRegisterMouseScrollEvents();
+    }
+    
+    private void DoRegisterMouseScrollEvents()
     {
         List<ScrollView> scrollViews = uiDocument.rootVisualElement.Query<ScrollView>()
             .ToList();
 
         scrollViews.ForEach(scrollView =>
         {
+            if (seenScrollViews.Contains(scrollView))
+            {
+                return;
+            }
+            seenScrollViews.Add(scrollView);
+            
             VisualElement contentViewport = scrollView.Q<VisualElement>("unity-content-viewport");
 
             contentViewport.RegisterCallback<MouseDownEvent>(evt => OnMouseDown(evt, scrollView), TrickleDown.TrickleDown);

@@ -241,6 +241,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         
         // Apply theme to loaded UI
         ThemeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        
+        // Scroll with mouse drag
+        MouseEventScrollControl.RegisterMouseScrollEvents();
     }
 
     private void UnloadLastOptionsScene()
