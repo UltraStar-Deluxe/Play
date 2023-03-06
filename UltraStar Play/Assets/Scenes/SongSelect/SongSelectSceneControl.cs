@@ -278,6 +278,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void Start()
     {
+        Debug.Log("Start SongSelectScene");
         songMetaManager.ScanFilesIfNotDoneYet();
         // Give the song search some time, otherwise the "no songs found" label flickers once.
         if (!SongMetaManager.IsSongScanFinished)
@@ -918,7 +919,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void UpdateFilteredSongs()
     {
-        songRouletteControl.SetSongs(GetFilteredSongMetas());
+        List<SongMeta> filteredSongMetas = GetFilteredSongMetas();
+        if (!filteredSongMetas.IsNullOrEmpty()
+            && filteredSongMetas.SequenceEqual(songRouletteControl.Songs))
+        {
+            return;
+        }
+        songRouletteControl.SetSongs(filteredSongMetas);
     }
 
     public bool IsPlaylistActive()
