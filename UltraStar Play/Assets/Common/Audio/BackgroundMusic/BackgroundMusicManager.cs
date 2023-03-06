@@ -35,8 +35,8 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
                 return false;
             }
 
-            EScene sceneEnum = ESceneUtils.GetSceneByBuildIndex(SceneManager.GetActiveScene().buildIndex);
-            return !scenesWithoutBackgroundMusic.Contains(sceneEnum);
+            EScene currentScene = sceneRecipeManager.GetCurrentScene();
+            return !scenesWithoutBackgroundMusic.Contains(currentScene);
         }
     }
 
@@ -46,6 +46,9 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SceneRecipeManager sceneRecipeManager;
+    
     [Inject]
     private ThemeManager themeManager;
 
