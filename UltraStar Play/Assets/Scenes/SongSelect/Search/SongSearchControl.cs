@@ -25,9 +25,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject(UxmlName = R.UxmlNames.searchPropertyButton)]
     private Button searchPropertyButton;
 
-    [Inject(UxmlName = R.UxmlNames.closeSearchPropertyDropdownButton)]
-    private Button closeSearchPropertyDropdownButton;
-
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownTitle)]
     private Label searchPropertyDropdownTitle;
 
@@ -97,7 +94,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
                 ShowSearchPropertyDropdownOverlay();
             }
         });
-        closeSearchPropertyDropdownButton.RegisterCallbackButtonTriggered(() => searchPropertyDropdownOverlay.HideByDisplay());
+        VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(searchPropertyDropdownOverlay);
 
         RegisterToggleSearchPropertyCallback(artistPropertyContainer.Q<Toggle>(), ESearchProperty.Artist);
         RegisterToggleSearchPropertyCallback(titlePropertyContainer.Q<Toggle>(), ESearchProperty.Title);

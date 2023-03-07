@@ -54,18 +54,14 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         
         // Select random song
         InputManager.GetInputAction(R.InputActions.usplay_randomSong).PerformedAsObservable()
-            .Where(_ => !songSelectSceneControl.IsPlayerSelectOverlayVisible)
             .Subscribe(_ => songSelectSceneControl.OnRandomSong());
         
         // Open the song editor
         InputManager.GetInputAction(R.InputActions.usplay_openSongEditor).PerformedAsObservable()
-            .Where(_ => !songSelectSceneControl.IsMenuOverlayVisible
-                        && !songSelectSceneControl.IsPlayerSelectOverlayVisible)
             .Subscribe(_ => songSelectSceneControl.StartSongEditorScene());
         
         // Toggle selected players
         InputManager.GetInputAction(R.InputActions.usplay_togglePlayers).PerformedAsObservable()
-            .Where(_ => songSelectSceneControl.IsPlayerSelectOverlayVisible)
             .Subscribe(_ => songSelectSceneControl.ToggleSelectedPlayers());
         
         // Open the sing scene
@@ -92,8 +88,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
         // Toggle song menu overlay
         InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
-            .Where(_ => !songSelectSceneControl.IsPlayerSelectOverlayVisible)
-            .Where(_ => !songSelectSceneControl.IsMenuOverlayVisible)
             .Where(_ => !songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
             .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
     }
@@ -113,11 +107,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
-        if (songSelectSceneControl.IsPlayerSelectOverlayVisible)
-        {
-            return;
-        }
-
         if (context.ReadValue<Vector2>().y < 0) 
         {
             songRouletteControl.SelectNextSong();
@@ -136,15 +125,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
         else if (songSelectSceneControl.IsSearchExpressionInfoOverlayVisible)
         {
-            songSelectSceneControl.HideSearchExpressionInfoOverlay();
+            songSelectSceneControl.CloseSearchExpressionHelp();
         }
         else if (songSelectSceneControl.SongSearchControl.IsSearchPropertyDropdownVisible)
         {
             songSelectSceneControl.SongSearchControl.HideSearchPropertyDropdownOverlay();
-        }
-        else if (songSelectSceneControl.IsPlayerSelectOverlayVisible)
-        {
-            songSelectSceneControl.HidePlayerSelectOverlay();
         }
         else if (songRouletteControl.IsSongMenuOverlayVisible)
         {
@@ -153,14 +138,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         else if (songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
         {
             songSelectSceneControl.SubmitSearch();
-        }
-        else if (songSelectSceneControl.IsMenuOverlayVisible)
-        {
-            songSelectSceneControl.HideMenuOverlay();
-        }
-        else if (songSelectSceneControl.IsSongDetailOverlayVisible)
-        {
-            songSelectSceneControl.HideSongDetailOverlay();
         }
         else if (songSelectSceneControl.IsPlaylistActive())
         {

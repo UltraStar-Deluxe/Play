@@ -11,6 +11,12 @@
 /* SONG SELECT SCENE */
 /**************************************************/
 
+#searchTextField #unity-text-input {
+    height: 100%;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
 #songMenuOverlay Button {
     margin-bottom: 5px;
     width: 100%;

@@ -64,9 +64,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
-    [Inject(UxmlName = R.UxmlNames.menuOverlayInputLegend)]
-    private VisualElement menuOverlayInputLegend;
-
     [Inject(UxmlName = R.UxmlNames.songIndexLabel)]
     private Label songIndexLabel;
 
@@ -87,9 +84,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.timesCanceledLabel)]
     private Label timesCanceledLabel;
-
-    [Inject(UxmlName = R.UxmlNames.videoIcon)]
-    private VisualElement videoIndicator;
 
     [Inject(UxmlName = R.UxmlNames.duetIcon)]
     private VisualElement duetIcon;
@@ -112,53 +106,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.fuzzySearchTextLabel)]
     private Label fuzzySearchTextLabel;
 
-    [Inject(UxmlName = R.UxmlNames.songSelectPlayerSelectUi)]
-    private VisualElement songSelectPlayerSelectUi;
-
-    [Inject(UxmlName = R.UxmlNames.closePlayerSelectOverlayButton)]
-    private Button closePlayerSelectOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.leftLyricsOverlay)]
-    private VisualElement leftLyricsOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.rightLyricsOverlay)]
-    private VisualElement rightLyricsOverlay;
-
     [Inject(UxmlName = R.UxmlNames.startButton)]
     private Button startButton;
 
-    [Inject(UxmlName = R.UxmlNames.menuButton)]
-    private Button menuButton;
-
-    [Inject(UxmlName = R.UxmlNames.menuOverlay)]
-    private VisualElement menuOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.closeMenuOverlayButton)]
-    private Button closeMenuOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.songDetailOverlay)]
-    private VisualElement songDetailOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.toggleSongDetailOverlayButton)]
-    private Button toggleSongDetailOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.songDetailOverlayScrollView)]
-    private VisualElement songDetailOverlayScrollView;
-
-    [Inject(UxmlName = R.UxmlNames.backToMainMenuButton)]
-    private Button backToMainMenuButton;
+    [Inject(UxmlName = R.UxmlNames.quitSceneButton)]
+    private Button quitSceneButton;
 
     [Inject(UxmlName = R.UxmlNames.nextSongButton)]
     private Button nextSongButton;
 
     [Inject(UxmlName = R.UxmlNames.previousSongButton)]
     private Button previousSongButton;
-
-    [Inject(UxmlName = R.UxmlNames.duetLegendLabel)]
-    private Label duetLegendLabel;
-
-    [Inject(UxmlName = R.UxmlNames.videoLegendLabel)]
-    private Label videoLegendLabel;
 
     [Inject(UxmlName = R.UxmlNames.songOrderPicker)]
     private ItemPicker songOrderItemPicker;
@@ -227,24 +185,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
     private Button showSearchExpressionInfoButton;
 
-    [Inject(UxmlName = R.UxmlNames.closeSearchExpressionInfoButton)]
-    private Button closeSearchExpressionInfoButton;
-
-    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoOverlay)]
-    private VisualElement searchExpressionInfoOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoLabel)]
-    private Label searchExpressionInfoLabel;
-
-    [Inject(UxmlName = R.UxmlNames.searchExpressionInfoSyntaxTipsLabel)]
-    private Label searchExpressionInfoSyntaxTipsLabel;
-
     public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
-    public bool IsPlayerSelectOverlayVisible => songSelectPlayerSelectUi.IsVisibleByDisplay();
-    public bool IsMenuOverlayVisible => menuOverlay.IsVisibleByDisplay();
-    public bool IsSongDetailOverlayVisible => songDetailOverlay.IsVisibleByDisplay();
-    public bool IsSearchExpressionInfoOverlayVisible => searchExpressionInfoOverlay.IsVisibleByDisplay();
+    public bool IsSearchExpressionInfoOverlayVisible => searchExpressionHelpDialogControl != null;
 
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
@@ -276,6 +219,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
+    private MessageDialogControl searchExpressionHelpDialogControl;
+
     private void Start()
     {
         Debug.Log("Start SongSelectScene");
@@ -288,17 +233,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSongMetas();
 
-        HidePlayerSelectOverlay();
-        HideMenuOverlay();
-        HideSongDetailOverlay();
-        HideSearchExpressionInfoOverlay();
-
         SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
 
         // Register Callbacks
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
-
-        closePlayerSelectOverlayButton.RegisterCallbackButtonTriggered(() => HidePlayerSelectOverlay());
 
         fuzzySearchTextLabel.ShowByDisplay();
         songSelectSceneInputControl.FuzzySearchText
@@ -306,21 +244,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
 
-        menuButton.RegisterCallbackButtonTriggered(() => ShowMenuOverlay());
-        closeMenuOverlayButton.RegisterCallbackButtonTriggered(() => HideMenuOverlay());
-        backToMainMenuButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
-
-        toggleSongDetailOverlayButton.RegisterCallbackButtonTriggered(() =>
-        {
-            if (IsSongDetailOverlayVisible)
-            {
-                HideSongDetailOverlay();
-            }
-            else
-            {
-                ShowSongDetailOverlay();
-            }
-        });
+        quitSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
 
         InitSearchExpressionInfo();
 
@@ -381,16 +305,40 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Bind(() => settings.GraphicSettings.noteDisplayMode,
                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
     }
-
-    public void HideSearchExpressionInfoOverlay()
-    {
-        searchExpressionInfoOverlay.HideByDisplay();
-    }
-
+    
     private void InitSearchExpressionInfo()
     {
-        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => searchExpressionInfoOverlay.ShowByDisplay());
-        closeSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => HideSearchExpressionInfoOverlay());
+        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => ShowSearchExpressionHelpDialog());
+    }
+
+    private void ShowSearchExpressionHelpDialog()
+    {
+        if (searchExpressionHelpDialogControl != null)
+        {
+            return;
+        }
+        
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { "Search Expressions",
+                TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo) },
+            { "Syntax",
+                TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips) },
+        };
+        searchExpressionHelpDialogControl = uiManager.CreateHelpDialogControl(
+            "Advanced Search Expressions",
+            titleToContentMap);
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionHelpDialogControl.DialogRootVisualElement);
+    }
+    
+    public void CloseSearchExpressionHelp()
+    {
+        if (searchExpressionHelpDialogControl == null)
+        {
+            return;
+        }
+        searchExpressionHelpDialogControl.CloseDialog();
     }
 
     private void ShowPlayerSelectContainer()
@@ -434,29 +382,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             nextSongButton.text = ">";
             previousSongButton.text = "<";
         }
-    }
-
-    public void ShowMenuOverlay()
-    {
-        menuOverlay.ShowByDisplay();
-        closeMenuOverlayButton.Focus();
-    }
-
-    public void HideMenuOverlay()
-    {
-        menuOverlay.HideByDisplay();
-        menuButton.Focus();
-    }
-
-    public void ShowSongDetailOverlay()
-    {
-        songDetailOverlay.ShowByDisplay();
-        UpdateSongDetailsInOverlay();
-    }
-
-    public void HideSongDetailOverlay()
-    {
-        songDetailOverlay.HideByDisplay();
     }
 
     private void UpdateFavoriteIcon()
@@ -522,9 +447,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Instead, the label is updated when the AudioClip has been loaded.
         durationLabel.text = "";
 
-        bool hasVideo = !selectedSong.Video.IsNullOrEmpty();
-        videoIndicator.SetVisibleByVisibility(hasVideo);
-
         bool isDuet = selectedSong.VoiceNames.Count > 1;
         duetIcon.SetVisibleByVisibility(isDuet);
 
@@ -532,9 +454,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         UpdateSongStatistics(selectedSong);
 
-        if (IsSongDetailOverlayVisible)
+        // Show lyrics for duet song
+        bool hasMultipleVoices = SelectedSong.VoiceNames.Count > 1;
+        if (hasMultipleVoices)
         {
-            UpdateSongDetailsInOverlay();
+            playerListControl.ShowVoiceSelection(SelectedSong);
+        }
+        else
+        {
+            playerListControl.HideVoiceSelection();
         }
     }
 
@@ -706,7 +634,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         yearLabel.text = "";
         timesClearedLabel.text = "";
         timesCanceledLabel.text = "";
-        videoIndicator.HideByVisibility();
         duetIcon.HideByVisibility();
         UpdateFavoriteIcon();
     }
@@ -718,78 +645,35 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void CheckAudioAndStartSingScene()
     {
-        if (songSelectPlayerSelectUi.IsVisibleByDisplay())
+        if (SelectedSong == null)
         {
-            StartSingScene(SelectedSong);
+            return;
         }
-        else
+
+        // Check that the audio file exists
+        if (!WebRequestUtils.IsHttpOrHttpsUri(SelectedSong.Mp3))
         {
-            if (SelectedSong == null)
+            string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
+            if (!SongMetaUtils.AudioResourceExists(SelectedSong))
             {
-                return;
-            }
-
-            // Check that the audio file exists
-            if (!WebRequestUtils.IsHttpOrHttpsUri(SelectedSong.Mp3))
-            {
-                string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
-                if (!SongMetaUtils.AudioResourceExists(SelectedSong))
-                {
-                    string message = "Audio file resource does not exist: " + audioUri;
-                    Debug.Log(message);
-                    UiManager.CreateNotification(message);
-                    return;
-                }
-            }
-
-            // Check that the used audio format can be loaded.
-            songAudioPlayer.Init(SelectedSong);
-            if (!songAudioPlayer.HasAudioClip)
-            {
-                string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
+                string message = "Audio file resource does not exist: " + audioUri;
                 Debug.Log(message);
                 UiManager.CreateNotification(message);
                 return;
             }
-
-            ShowPlayerSelectOverlay();
         }
-    }
 
-    private void ShowPlayerSelectOverlay()
-    {
-        songSelectPlayerSelectUi.ShowByDisplay();
-        UpdateInputLegend();
-
-        // Show lyrics for duet song
-        bool hasMultipleVoices = SelectedSong.VoiceNames.Count > 1;
-        leftLyricsOverlay.SetVisibleByDisplay(hasMultipleVoices);
-        rightLyricsOverlay.SetVisibleByDisplay(hasMultipleVoices);
-        if (hasMultipleVoices)
+        // Check that the used audio format can be loaded.
+        songAudioPlayer.Init(SelectedSong);
+        if (!songAudioPlayer.HasAudioClip)
         {
-            List<string> voiceNames = SelectedSong.VoiceNames.Values.ToList();
-            leftLyricsOverlay.Q<Label>(R.UxmlNames.voiceNameLabel).text = voiceNames[0];
-            leftLyricsOverlay.Q<Label>(R.UxmlNames.lyricsLabel).text = SongMetaUtils.GetLyrics(SelectedSong, Voice.firstVoiceName);
-
-            rightLyricsOverlay.Q<Label>(R.UxmlNames.voiceNameLabel).text = voiceNames[1];
-            rightLyricsOverlay.Q<Label>(R.UxmlNames.lyricsLabel).text = SongMetaUtils.GetLyrics(SelectedSong, Voice.secondVoiceName);
-
-            playerListControl.ShowVoiceSelection(SelectedSong);
+            string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
+            Debug.Log(message);
+            UiManager.CreateNotification(message);
+            return;
         }
-        else
-        {
-            playerListControl.HideVoiceSelection();
-        }
-
-        // Focus start button, such that it can be triggered by keyboard
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
-            songSelectPlayerSelectUi.Q<Button>(R.UxmlNames.startButton).Focus()));
-    }
-
-    public void HidePlayerSelectOverlay()
-    {
-        songSelectPlayerSelectUi.HideByDisplay();
-        UpdateInputLegend();
+        
+        StartSingScene(SelectedSong);
     }
 
     public void StartSongEditorScene()
@@ -959,19 +843,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
 
-        menuButton.text = TranslationManager.GetTranslation(R.Messages.menu);
-        closeMenuOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        backToMainMenuButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
-        toggleSongDetailOverlayButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_toggleSongDetailsButton);
-        duetLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_duetLegendLabel);
-        videoLegendLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_videoLegendLabel);
-        closePlayerSelectOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         noteDisplayModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
         noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);
-        searchExpressionInfoLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo);
-        searchExpressionInfoSyntaxTipsLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionInfo_syntaxTips);
         downloadSongsButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_downloadSongsButton);
         addSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_addSongFolderButton);
 
@@ -1004,113 +879,36 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateInputLegend()
     {
-        inputLegend.Query<Label>()
-            .Where(label => label is not FontIcon)
-            .ForEach(label => label.RemoveFromHierarchy());
-
-        if (IsPlayerSelectOverlayVisible)
-        {
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-                TranslationManager.GetTranslation(R.Messages.back),
-                inputLegend);
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_togglePlayers,
-                TranslationManager.GetTranslation(R.Messages.action_togglePlayers),
-                inputLegend);
-        }
-        else
-        {
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-                TranslationManager.GetTranslation(R.Messages.back),
-                inputLegend);
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.ui_submit,
-                TranslationManager.GetTranslation(R.Messages.submit),
-                inputLegend);
-            InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleSongMenu,
-                TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
-                inputLegend);
-        }
-        if (inputManager.InputDeviceEnum == EInputDevice.Touch)
-        {
-            inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-                TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
-                TranslationManager.GetTranslation(R.Messages.action_longPress))));
-        }
-
-        menuOverlayInputLegend.Clear();
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_randomSong,
-            TranslationManager.GetTranslation(R.Messages.action_randomSong),
-            menuOverlayInputLegend);
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor,
-            TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
-            menuOverlayInputLegend);
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleFavorite,
-            TranslationManager.GetTranslation(R.Messages.action_toggleFavorites),
-            menuOverlayInputLegend);
-    }
-
-    private void UpdateSongDetailsInOverlay()
-    {
-        songDetailOverlayScrollView.Clear();
-        SongMeta songMeta = SelectedSong;
-        if (songMeta == null)
-        {
-            return;
-        }
-
-        Label CreateSongDetailLabel(string fieldName, object fieldValue)
-        {
-            Label label = new();
-            label.enableRichText = true;
-            label.AddToClassList("songDetailOverlayLabel");
-            string fieldValueDisplayString = fieldValue?.ToString();
-            fieldValueDisplayString = fieldValueDisplayString.IsNullOrEmpty()
-                ? "-"
-                : fieldValueDisplayString;
-            label.text = $"<b><u>{fieldName}</u></b>: {fieldValueDisplayString}";
-            return label;
-        }
-
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Artist", songMeta.Artist));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Title", songMeta.Title));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Genre", songMeta.Genre));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Year", songMeta.Year > 0 ? songMeta.Year : null));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Audio", songMeta.Mp3));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Gap", songMeta.Gap));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Bpm", songMeta.Bpm));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Video", songMeta.Video));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Video Gap", songMeta.VideoGap));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Cover", songMeta.Cover));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Language", songMeta.Language));
-        songDetailOverlayScrollView.Add(CreateSongDetailLabel("Edition", songMeta.Edition));
-        songDetailOverlayScrollView.Add(new Label("\n"));
-
-        songMeta.VoiceNames.Keys.ForEach(voiceNameKey =>
-        {
-            string lyrics = SongMetaUtils.GetLyrics(songMeta, voiceNameKey);
-            if (lyrics.IsNullOrEmpty())
-            {
-                return;
-            }
-
-            if (voiceNameKey != Voice.soloVoiceName)
-            {
-                Label voiceNameLabel = new();
-                voiceNameLabel.enableRichText = true;
-                voiceNameLabel.AddToClassList("songDetailOverlayLabel");
-                string voiceName = songMeta.VoiceNames[voiceNameKey];
-                string voiceNameText = voiceName != voiceNameKey
-                    ? $" ({voiceName})"
-                    : "";
-                voiceNameLabel.text = $"<b>{voiceNameKey}{voiceNameText}</b>";
-                songDetailOverlayScrollView.Add(voiceNameLabel);
-            }
-
-            Label lyricsLabel = new();
-            lyricsLabel.AddToClassList("songDetailOverlayLabel");
-            lyricsLabel.text = lyrics;
-
-            songDetailOverlayScrollView.Add(lyricsLabel);
-            songDetailOverlayScrollView.Add(new Label("\n"));
-        });
+        // inputLegend.Query<Label>()
+        //     .Where(label => label is not FontIcon)
+        //     .ForEach(label => label.RemoveFromHierarchy());
+        //
+        // if (IsPlayerSelectOverlayVisible)
+        // {
+        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
+        //         TranslationManager.GetTranslation(R.Messages.back),
+        //         inputLegend);
+        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_togglePlayers,
+        //         TranslationManager.GetTranslation(R.Messages.action_togglePlayers),
+        //         inputLegend);
+        // }
+        // else
+        // {
+        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
+        //         TranslationManager.GetTranslation(R.Messages.back),
+        //         inputLegend);
+        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.ui_submit,
+        //         TranslationManager.GetTranslation(R.Messages.submit),
+        //         inputLegend);
+        //     InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_toggleSongMenu,
+        //         TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
+        //         inputLegend);
+        // }
+        // if (inputManager.InputDeviceEnum == EInputDevice.Touch)
+        // {
+        //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
+        //         TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
+        //         TranslationManager.GetTranslation(R.Messages.action_longPress))));
+        // }
     }
 }

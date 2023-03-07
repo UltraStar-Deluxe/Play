@@ -98,12 +98,6 @@ VisualElement
     background-color: rgba(0, 0, 0, 0);
 }
 
-#searchTextField #unity-text-input {
-    height: 100%;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-
 .textFieldHint {
     position: absolute;
     left: 10px;

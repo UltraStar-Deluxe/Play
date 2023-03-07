@@ -22,9 +22,6 @@ public class SongSelectFocusableNavigator : FocusableNavigator
     [Inject(UxmlName = R.UxmlNames.topContent)]
     private VisualElement topContent;
 
-    [Inject(UxmlName = R.UxmlNames.menuButton)]
-    private VisualElement menuButton;
-
     private void Awake()
     {
         SetOtherFocusableNavigatorsActive(false);
@@ -58,7 +55,6 @@ public class SongSelectFocusableNavigator : FocusableNavigator
     public override void OnNavigate(Vector2 navigationDirection)
     {
         if (navigationDirection.y < 0
-            && FocusedVisualElement != menuButton
             && GetFocusableNavigatorRootVisualElement() == topContent)
         {
             FocusSongRoulette();

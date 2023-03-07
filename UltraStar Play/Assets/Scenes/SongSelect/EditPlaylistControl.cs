@@ -17,6 +17,9 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject(UxmlName = R.UxmlNames.editPlaylistOverlay)]
     private VisualElement editPlaylistOverlay;
+    
+    [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
+    private VisualElement searchPropertyDropdownOverlay;
 
     [Inject(UxmlName = R.UxmlNames.playlistChooserDropdownTitle)]
     private Label playlistChooserDropdownTitle;
@@ -128,8 +131,8 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         titleText = "Edit Playlist";
         editPlaylistDialogTitle.text = titleText;
         playlistNameTextField.value = currentPlaylist.Name;
-        songSelectSceneControl.HideMenuOverlay();
         editPlaylistOverlay.ShowByDisplay();
+        searchPropertyDropdownOverlay.HideByDisplay();
 
         ShowDeleteAndSubmitButtons();
     }
@@ -175,7 +178,5 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
     public void UpdateTranslation()
     {
         playlistChooserDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_playlistDropdownTitle);
-        editPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_editPlaylistButton);
-        createPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_createPlaylistButton);
     }
 }
