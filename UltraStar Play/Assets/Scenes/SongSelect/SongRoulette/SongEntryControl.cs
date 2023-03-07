@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>, ISlotListItem, IInjectionFinishedListener, ITranslator, IDisposable
+public class SongEntryControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private SongRouletteControl songRouletteControl;
@@ -44,42 +44,13 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
     [Inject(UxmlName = R.UxmlNames.songEntryUiRoot)]
     private VisualElement songEntryUiRoot;
 
-    [Inject(UxmlName = R.UxmlNames.songMenuOverlay)]
-    private VisualElement songOverlayMenu;
-
-    [Inject(UxmlName = R.UxmlNames.modifyPlaylistButtonContainer)]
-    private VisualElement modifyPlaylistButtonContainer;
-
-    [Inject(UxmlName = R.UxmlNames.singThisSongButton)]
-    private Button singThisSongButton;
-
-    [Inject(UxmlName = R.UxmlNames.openSongEditorButton)]
-    private Button openSongEditorButton;
-
-    [Inject(UxmlName = R.UxmlNames.reloadSongButton)]
-    private Button reloadSongButton;
-
-    [Inject(UxmlName = R.UxmlNames.openSongFolderButton)]
-    private Button openSongFolderButton;
-
-    [Inject(UxmlName = R.UxmlNames.closeSongOverlayButton)]
-    private Button closeSongOverlayButton;
-
-    [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
-    public VisualElement SongPreviewVideoImage { get; private set; }
-
-    [Inject(UxmlName = R.UxmlNames.songPreviewBackgroundImage)]
-    public VisualElement SongPreviewBackgroundImage { get; private set; }
-
-    [Inject]
-    private UIDocument uiDocument;
+    [Inject(UxmlName = R.UxmlNames.openSongMenuButton)]
+    private Button openSongMenuButton;
 
     [Inject]
     private Injector injector;
 
     public string Name { get; set; }
-
-    public bool IsSongMenuOverlayVisible => songOverlayMenu.IsVisibleByDisplay();
 
     public readonly Subject<bool> clickEventStream = new();
     public IObservable<bool> ClickEventStream => clickEventStream;
@@ -98,391 +69,101 @@ public class SongEntryControl : INeedInjection, IDragListener<GeneralDragEvent>,
             songMeta = value;
             songArtist.text = songMeta.Artist;
             songTitle.text = songMeta.Title;
-            UpdateFontSize();
             UpdateIcons();
             UpdateCover();
         }
     }
 
-    private void UpdateFontSize()
-    {
-        songArtist.RemoveFromClassList("smallFont");
-        songArtist.RemoveFromClassList("smallerFont");
-        songArtist.RemoveFromClassList("tinyFont");
-        if (songArtist.text.Length >= 20)
-        {
-            songArtist.AddToClassList("tinyFont");
-        }
-        else if (songArtist.text.Length >= 12)
-        {
-            songArtist.AddToClassList("smallerFont");
-        }
-        else
-        {
-            songArtist.AddToClassList("smallFont");
-        }
-
-        songTitle.RemoveFromClassList("smallFont");
-        songTitle.RemoveFromClassList("smallerFont");
-        songTitle.RemoveFromClassList("tinyFont");
-        if (songTitle.text.Length >= 60)
-        {
-            songTitle.AddToClassList("tinyFont");
-        }
-        else if (songTitle.text.Length >= 40)
-        {
-            songTitle.AddToClassList("smallerFont");
-        }
-        else
-        {
-            songTitle.AddToClassList("smallFont");
-        }
-    }
-
-    private SongEntryPlaceholderControl targetPlaceholderControl;
-    public SongEntryPlaceholderControl TargetPlaceholderControl
-    {
-        get
-        {
-            return targetPlaceholderControl;
-        }
-        set
-        {
-            if (targetPlaceholderControl == value)
-            {
-                return;
-            }
-            targetPlaceholderControl = value;
-            if (targetPlaceholderControl != null)
-            {
-                StartAnimationTowardsTargetPlaceholder();
-            }
-        }
-    }
-
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
 
-    private Vector2 animStartPosition;
-    private Vector2 animStartSize;
+    private ContextMenuControl contextMenuControl;
 
-    private GeneralDragControl dragControl;
-
-    private IEnumerator showSongMenuOverlayCoroutine;
-    private bool isPointerDown;
-
-    public SongEntryControl(
-        VisualElement visualElement,
-        SongEntryPlaceholderControl targetPlaceholderControl,
-        Vector2 initialPosition,
-        Vector2 initialSize)
-    {
-        this.VisualElement = visualElement;
-        this.targetPlaceholderControl = targetPlaceholderControl;
-
-        // Initial size and position
-        SetPosition(initialPosition);
-        SetSize(initialSize);
-        animStartPosition = initialPosition;
-        animStartSize = initialSize;
-    }
-
-    public void Update()
-    {
-        // Destroy this item when it does not have a target.
-        if (TargetPlaceholderControl == null)
-        {
-            songRouletteControl.RemoveSongRouletteItem(this);
-            Dispose();
-            return;
-        }
-        
-        if (songRouletteControl.IsDrag
-            || songRouletteControl.IsFlickGesture)
-        {
-            return;
-        }
-
-        // Workaround for NaN in size value
-        if (float.IsNaN(VisualElement.resolvedStyle.height)
-            || float.IsNaN(VisualElement.resolvedStyle.width))
-        {
-            SetSize(TargetPlaceholderControl.GetSize());
-        }
-
-        UpdateMoveToTargetPosition(TargetPlaceholderControl.GetPosition(), TargetPlaceholderControl.GetSize());
-    }
-
-    private void UpdateMoveToTargetPosition(Vector2 targetPosition, Vector2 targetSize)
-    {
-        float animPercent = songRouletteControl.AnimTimeInSeconds / songRouletteControl.MaxAnimTimeInSeconds;
-        Vector2 animatedPosition = Vector2.Lerp(animStartPosition, targetPosition, animPercent);
-        SetPosition(animatedPosition);
-        SetSize(Vector2.Lerp(animStartSize, targetSize, animPercent));
-    }
-
-    private void UpdateCover()
-    {
-        SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, songImageInner, songImageOuter);
-    }
-
-    public void OnBeginDrag(GeneralDragEvent dragEvent)
-    {
-        if (IsSongMenuOverlayVisible)
-        {
-            CancelDrag();
-            return;
-        }
-
-        songRouletteControl.OnBeginDrag(this);
-    }
-
-    public void OnDrag(GeneralDragEvent dragEvent)
-    {
-        songRouletteControl.OnDrag(this, dragEvent.ScreenCoordinateInPixels.DragDelta);
-    }
-
-    public void OnEndDrag(GeneralDragEvent dragEvent)
-    {
-        songRouletteControl.OnEndDrag(dragEvent != null ? dragEvent.ScreenCoordinateInPixels.DragDelta : Vector2.zero);
-    }
-
-    public void CancelDrag()
-    {
-        dragControl.CancelDrag();
-    }
-
-    public bool IsCanceled()
-    {
-        return dragControl.IsCanceled;
-    }
-
-    public ISlotListSlot GetCurrentSlot()
-    {
-        return TargetPlaceholderControl;
-    }
-
-    public Vector2 GetPosition()
-    {
-        return new Vector2(VisualElement.resolvedStyle.left, VisualElement.resolvedStyle.top);
-    }
+    private bool isPopupMenuOpen;
+    private float popupMenuClosedTimeInSeconds;
     
-    public void SetSize(Vector2 newSize)
-    {
-        VisualElement.style.width = newSize.x;
-        VisualElement.style.height = newSize.y;
-    }
-
-    public Vector2 GetSize()
-    {
-        return VisualElement.contentRect.size;
-    }
-
-    public void SetPosition(Vector2 newPosition)
-    {
-        VisualElement.style.left = newPosition.x;
-        VisualElement.style.top = newPosition.y;
-    }
-    
-    public void StartAnimationTowardsTargetPlaceholder()
-    {
-        animStartPosition = GetPosition();
-        animStartSize = GetSize();
-    }
-
-    public void StartAnimationToFullScale()
-    {
-        VisualElement.style.scale = new StyleScale(new Scale(Vector3.zero));
-        LeanTween.value(songRouletteControl.gameObject, Vector3.zero, Vector3.one, songRouletteControl.MaxAnimTimeInSeconds)
-            .setOnUpdate((Vector3 value) => VisualElement.style.scale = new StyleScale(new Scale(value)));
-    }
-
     public void OnInjectionFinished()
     {
-        SongPreviewVideoImage.HideByDisplay();
-        SongPreviewBackgroundImage.HideByDisplay();
-
-        HideSongMenuOverlay();
-
-        singThisSongButton.RegisterCallbackButtonTriggered(() =>
-        {
-            HideSongMenuOverlay();
-            songSelectSceneControl.CheckAudioAndStartSingScene();
-        });
-        closeSongOverlayButton.RegisterCallbackButtonTriggered(() =>
-        {
-            HideSongMenuOverlay();
-            InputManager.GetInputAction(R.InputActions.ui_submit).CancelNotifyForThisFrame();
-        });
-        openSongEditorButton.RegisterCallbackButtonTriggered(() => songSelectSceneControl.StartSongEditorScene());
-        if (PlatformUtils.IsStandalone)
-        {
-            openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(SongMeta));
-            reloadSongButton.RegisterCallbackButtonTriggered(() =>
-            {
-                SongMeta.Reload();
-                HideSongMenuOverlay();
-            });
-        }
-        else
-        {
-            openSongFolderButton.HideByDisplay();
-            reloadSongButton.HideByDisplay();
-        }
+        InitSongMenu();
 
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateIcons());
+    }
 
-        // Add itself as IDragListener to be notified when it is dragged.
-        dragControl = injector
-            .WithRootVisualElement(songEntryUiRoot)
-            .CreateAndInject<GeneralDragControl>();
-        dragControl.AddListener(this);
-        // Only listen to left mouse button / touch gesture
-        dragControl.ButtonFilter = new List<int> { 0 };
-
-        // Ignore button click after dragging
-        dragControl.DragState.Subscribe(dragState =>
-        {
-            if (dragState == EDragState.Dragging)
-            {
-                ignoreNextClickEvent = true;
-            }
-        });
+    private void InitSongMenu()
+    {
+        contextMenuControl = injector
+            .WithRootVisualElement(openSongMenuButton)
+            .CreateAndInject<ContextMenuControl>();
+        contextMenuControl.FillContextMenuAction = FillContextMenu;
+        contextMenuControl.ContextMenuOpenedEventStream.Subscribe(OnContextMenuOpened);
+        contextMenuControl.ContextMenuClosedEventStream.Subscribe(OnContextMenuClosed);
         
-        songEntryUiRoot.RegisterCallback<PointerDownEvent>(evt => OnPointerDownOnThisVisualElement(evt), TrickleDown.TrickleDown);
-        // Listen to any PointerUp event, not only above this VisualElement.
-        uiDocument.rootVisualElement.RegisterCallback<PointerUpEvent>(_ => OnPointerUpOnAnyVisualElement(), TrickleDown.TrickleDown);
-
-        // Stop coroutine when dragging
-        dragControl.DragState.Subscribe(dragState =>
+        openSongMenuButton.RegisterCallbackButtonTriggered(() =>
         {
-            if (dragState == EDragState.Dragging)
+            if (isPopupMenuOpen
+                || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
             {
-                StopShowSongMenuOverlayCoroutine();
+                return;
             }
+
+            contextMenuControl.OpenContextMenu(Vector2.zero);
         });
-
-        UpdateTranslation();
     }
 
-    private void OnPointerDownOnThisVisualElement(IPointerEvent pointerEvent)
+    private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
-        if (pointerEvent.button == 1)
-        {
-            // Right click to open song menu
-            songRouletteControl.SelectSong(songMeta);
-            songRouletteControl.ShowSongMenuOverlay();
-            return;
-        }
-
-        if (IsSongMenuOverlayVisible)
-        {
-            CancelDrag();
-            return;
-        }
-
-        isPointerDown = true;
-        StartShowSongMenuOverlayCoroutine();
-    }
-
-    private void OnPointerUpOnAnyVisualElement()
-    {
-        if (isPointerDown
-            && !dragControl.IsDragging
-            && !ignoreNextClickEvent)
-        {
-            clickEventStream.OnNext(true);
-        }
-        isPointerDown = false;
-        StopShowSongMenuOverlayCoroutine();
-        ignoreNextClickEvent = false;
-    }
-
-    private void StartShowSongMenuOverlayCoroutine()
-    {
-        StopShowSongMenuOverlayCoroutine();
-
-        showSongMenuOverlayCoroutine = CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () =>
-        {
-            if (songRouletteControl.SelectedSongEntryControl != this
-                && isPointerDown)
-            {
-                songRouletteControl.SelectSong(songMeta);
-            }
-            ignoreNextClickEvent = true;
-            ShowSongMenuOverlay();
-        });
-        songRouletteControl.StartCoroutine(showSongMenuOverlayCoroutine);
-    }
-
-    private void StopShowSongMenuOverlayCoroutine()
-    {
-        if (showSongMenuOverlayCoroutine != null)
-        {
-            songRouletteControl.StopCoroutine(showSongMenuOverlayCoroutine);
-            showSongMenuOverlayCoroutine = null;
-        }
-    }
-
-    public void ShowSongMenuOverlay()
-    {
-        InitModifyPlaylistButtons();
-        songOverlayMenu.ShowByDisplay();
-        singThisSongButton.Focus();
-    }
-
-    private void InitModifyPlaylistButtons()
-    {
-        modifyPlaylistButtonContainer.Clear();
+        // Add / remove from playlist
         playlistManager.Playlists
             .Where(playlist => !(playlist is UltraStarAllSongsPlaylist))
             .ForEach(playlist =>
+            {
+                string playlistName = playlist.Name;
+                if (playlistManager.HasSongEntry(playlist, songMeta))
+                {
+                    contextMenuPopup.AddItem($"Remove from '{playlistName}'",
+                        () => playlistManager.RemoveSongFromPlaylist(playlist, songMeta));
+                }
+                else
+                {
+                    contextMenuPopup.AddItem($"Add to '{playlistName}'",
+                        () => playlistManager.AddSongToPlaylist(playlist, songMeta));
+                }
+            });
+
+        // Open song editor / song folder
+        contextMenuPopup.AddItem("Open Editor",
+            () => songSelectSceneControl.StartSongEditorScene());
+        if (PlatformUtils.IsStandalone)
         {
-            string playlistName = playlist.Name;
-            Button button = new();
-            button.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
-            button.AddToClassList("smallFont");
-            modifyPlaylistButtonContainer.Add(button);
-            if (playlistManager.HasSongEntry(playlist, songMeta))
-            {
-                button.text = $"Remove from\n'{playlistName}'";
-                button.RegisterCallbackButtonTriggered(() => playlistManager.RemoveSongFromPlaylist(playlist, songMeta));
-            }
-            else
-            {
-                button.text = $"Add to\n'{playlistName}'";
-                button.RegisterCallbackButtonTriggered(() => playlistManager.AddSongToPlaylist(playlist, songMeta));
-            }
-        });
+            contextMenuPopup.AddItem("Open Folder",
+                () => SongMetaUtils.OpenDirectory(SongMeta));
+            contextMenuPopup.AddItem("Reload Song",
+                () => SongMeta.Reload());
+        }
     }
 
-    public void HideSongMenuOverlay()
+    private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)
     {
-        songOverlayMenu.HideByDisplay();
+        isPopupMenuOpen = false;
+        popupMenuClosedTimeInSeconds = Time.time;
+    }
+    
+    private void OnContextMenuOpened(ContextMenuPopupControl contextMenuPopupControl)
+    {
+        isPopupMenuOpen = true;
+        new AnchoredPopupControl(contextMenuPopupControl.VisualElement, openSongMenuButton, Corner2D.BottomLeft);
+        contextMenuPopupControl.VisualElement.AddToClassList("singSceneContextMenu");
+    }
+    
+    private void UpdateCover()
+    {
+        SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, songImageInner, songImageOuter);
     }
 
     private void UpdateIcons()
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
         duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
-    }
-
-    public void UpdateTranslation()
-    {
-        singThisSongButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_startButton);
-        openSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_openSongFolder);
-        openSongEditorButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_songMenu_openSongEditor);
-        closeSongOverlayButton.text = TranslationManager.GetTranslation(R.Messages.back);
-    }
-
-    public void Dispose()
-    {
-        TargetPlaceholderControl = null;
-        VisualElement.RemoveFromHierarchy();
-        if (songRouletteControl.DragSongRouletteItem == this)
-        {
-            OnEndDrag(null);
-        }
-        dragControl?.Dispose();
     }
 }

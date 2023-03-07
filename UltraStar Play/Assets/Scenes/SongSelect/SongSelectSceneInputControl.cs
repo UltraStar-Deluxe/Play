@@ -87,9 +87,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => characterQuickJumpListControl.SelectPreviousCharacter());
 
         // Toggle song menu overlay
-        InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
-            .Where(_ => !songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
-            .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
+        // InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
+        //     .Where(_ => !songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
+        //     .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
@@ -130,10 +130,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         else if (songSelectSceneControl.SongSearchControl.IsSearchPropertyDropdownVisible)
         {
             songSelectSceneControl.SongSearchControl.HideSearchPropertyDropdownOverlay();
-        }
-        else if (songRouletteControl.IsSongMenuOverlayVisible)
-        {
-            songRouletteControl.HideSongMenuOverlay();
         }
         else if (songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
         {

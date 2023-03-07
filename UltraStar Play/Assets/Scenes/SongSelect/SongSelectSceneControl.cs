@@ -73,18 +73,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.durationLabel)]
     private Label durationLabel;
 
-    [Inject(UxmlName = R.UxmlNames.yearLabel)]
-    private Label yearLabel;
-
-    [Inject(UxmlName = R.UxmlNames.genreLabel)]
-    private Label genreLabel;
-
-    [Inject(UxmlName = R.UxmlNames.timesClearedLabel)]
-    private Label timesClearedLabel;
-
-    [Inject(UxmlName = R.UxmlNames.timesCanceledLabel)]
-    private Label timesCanceledLabel;
-
     [Inject(UxmlName = R.UxmlNames.duetIcon)]
     private VisualElement duetIcon;
 
@@ -93,12 +81,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
     private MaterialIcon favoriteIcon;
-
-    [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
-    private VisualElement localHighScoreContainer;
-
-    [Inject(UxmlName = R.UxmlNames.onlineHighScoreContainer)]
-    private VisualElement onlineHighScoreContainer;
 
     [Inject(UxmlName = R.UxmlNames.toggleFavoriteButton)]
     private Button toggleFavoriteButton;
@@ -112,11 +94,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.quitSceneButton)]
     private Button quitSceneButton;
 
-    [Inject(UxmlName = R.UxmlNames.nextSongButton)]
-    private Button nextSongButton;
-
-    [Inject(UxmlName = R.UxmlNames.previousSongButton)]
-    private Button previousSongButton;
+    [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
+    private VisualElement localHighScoreContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.selectedSongArtist)]
+    private Label selectedSongArtist;
+    
+    [Inject(UxmlName = R.UxmlNames.selectedSongTitle)]
+    private Label selectedSongTitle;
+    
+    [Inject(UxmlName = R.UxmlNames.selectedSongImageOuter)]
+    private VisualElement selectedSongImageOuter;
+    
+    [Inject(UxmlName = R.UxmlNames.selectedSongImageInner)]
+    private VisualElement selectedSongImageInner;
 
     [Inject(UxmlName = R.UxmlNames.songOrderPicker)]
     private ItemPicker songOrderItemPicker;
@@ -248,11 +239,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSearchExpressionInfo();
 
-        nextSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectNextSong());
-        previousSongButton.RegisterCallbackButtonTriggered(() => songRouletteControl.SelectPreviousSong());
-        UpdateNextAndPreviousSongButtonLabels();
-        inputManager.InputDeviceChangeEventStream.Subscribe(evt => UpdateNextAndPreviousSongButtonLabels());
-
         songIndexButton.RegisterCallbackButtonTriggered(() => songSearchControl.SetSearchText($"#{SelectedSongIndex + 1}"));
 
         SongSearchControl.SearchChangedEventStream
@@ -370,20 +356,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    private void UpdateNextAndPreviousSongButtonLabels()
-    {
-        if (inputManager.InputDeviceEnum == EInputDevice.Gamepad)
-        {
-            nextSongButton.text = "R1 >";
-            previousSongButton.text = "< L1";
-        }
-        else
-        {
-            nextSongButton.text = ">";
-            previousSongButton.text = "<";
-        }
-    }
-
     private void UpdateFavoriteIcon()
     {
         bool isFavorite = IsFavorite(SelectedSong);
@@ -426,8 +398,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void OnSongSelectionChanged(SongSelection selection)
     {
-        songRouletteControl.HideSongMenuOverlay();
-
         SongMeta selectedSong = selection.SongMeta;
         if (selectedSong == null)
         {
@@ -436,10 +406,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        genreLabel.text = selectedSong.Genre;
-        yearLabel.text = selectedSong.Year > 0
-            ? selectedSong.Year.ToString()
-            : "";
+        selectedSongArtist.text = selectedSong.Artist;
+        selectedSongTitle.text = selectedSong.Title;
+        SongMetaImageUtils.SetCoverOrBackgroundImage(selection.SongMeta, selectedSongImageInner, selectedSongImageOuter);
         songIndexLabel.text = (selection.SongIndex + 1) + "\nof " + selection.SongsCount;
 
         // The song duration requires loading the audio file.
@@ -478,41 +447,28 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         LocalStatistic localStatistic = statistics.GetLocalStats(songMeta);
         if (localStatistic != null)
         {
-            timesClearedLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_timesClearedInfo,
-                "value", localStatistic.TimesFinished);
-            timesCanceledLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_timesCanceledInfo,
-                "value", localStatistic.TimesCanceled);
-
-            List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(3);
+            List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(1);
             List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
 
             UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);
-            UpdateTopScoreLabels(new List<int>(), onlineHighScoreContainer);
         }
         else
         {
-            timesClearedLabel.text = "";
-            timesCanceledLabel.text = "";
-
             UpdateTopScoreLabels(new List<int>(), localHighScoreContainer);
-            UpdateTopScoreLabels(new List<int>(), onlineHighScoreContainer);
         }
     }
 
     private void UpdateTopScoreLabels(List<int> topScores, VisualElement labelContainer)
     {
-        string firstScore = topScores.Count >= 1
-            ? topScores[0].ToString()
-            : "-";
-        string secondScore = topScores.Count >= 2
-            ? topScores[1].ToString()
-            : "-";
-        string thirdScore = topScores.Count >= 3
-            ? topScores[2].ToString()
-            : "-";
-        labelContainer.Q<Label>(R.UxmlNames.first).text = firstScore;
-        labelContainer.Q<Label>(R.UxmlNames.second).text = secondScore;
-        labelContainer.Q<Label>(R.UxmlNames.third).text = thirdScore;
+        List<Label> labels = labelContainer.Query<Label>().ToList();
+        for (int i = 0; i < labels.Count; i++)
+        {
+            string scoreText = topScores.Count >= i + 1
+                ? topScores[i].ToString()
+                : "-";
+            
+            labels[i].text = scoreText;
+        }
     }
 
     public void DoFuzzySearch(string text)
@@ -630,10 +586,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void SetEmptySongDetails()
     {
-        genreLabel.text = "";
-        yearLabel.text = "";
-        timesClearedLabel.text = "";
-        timesCanceledLabel.text = "";
+        selectedSongArtist.text = "";
+        selectedSongTitle.text = "";
         duetIcon.HideByVisibility();
         UpdateFavoriteIcon();
     }
@@ -850,12 +804,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         downloadSongsButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_downloadSongsButton);
         addSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_addSongFolderButton);
 
-        localHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_localTopScoresTitle);
-        onlineHighScoreContainer.Q<Label>(R.UxmlNames.title).text = TranslationManager.GetTranslation(R.Messages.songSelectScene_onlineTopScoresTitle);
-
         PlaylistChooserControl.UpdateTranslation();
         SongSearchControl.UpdateTranslation();
-        songRouletteControl.UpdateTranslation();
         UpdateInputLegend();
     }
 
