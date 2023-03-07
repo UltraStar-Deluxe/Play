@@ -125,4 +125,22 @@ public static class VisualElementUtils
             parent => parent.ClassListContains("unity-base-dropdown"));
         return unityBaseDropdown != null;
     }
+    
+    public static void RegisterCallbackToHideByDisplayOnDirectClick(VisualElement visualElement, Action onHide=null)
+    {
+        visualElement.RegisterCallback<PointerDownEvent>(evt =>
+        {
+            if (evt.target == visualElement)
+            {
+                if (onHide != null)
+                {
+                    onHide();
+                }
+                else
+                {
+                    visualElement.HideByDisplay();
+                }
+            }
+        });
+    }
 }
