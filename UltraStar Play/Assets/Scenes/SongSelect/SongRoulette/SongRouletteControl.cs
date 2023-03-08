@@ -129,7 +129,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     private void UpdateListViewItems()
     {
-        Debug.Log($"UpdateListViewItems: {songs.Count}");
         songListView.itemsSource = new List<SongMeta>(songs);
         songListView.RefreshItems();
         if (Selection.Value.SongMeta != null)

@@ -65,12 +65,6 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                 }
             });
         }
-
-        DropdownField dropdownField = uiDocument.rootVisualElement.Q<DropdownField>();
-        dropdownField.RegisterValueChangedCallback(evt =>
-        {
-            Debug.Log("DropdownField value changed: " + evt.newValue);
-        });
     }
 
     protected virtual void Update()
