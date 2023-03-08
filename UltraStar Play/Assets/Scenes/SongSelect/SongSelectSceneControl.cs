@@ -33,13 +33,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [InjectedInInspector]
     public SongRouletteControl songRouletteControl;
-
-    [InjectedInInspector]
-    public CharacterQuickJumpListControl characterQuickJumpListControl;
     
-    [InjectedInInspector]
-    public SongSelectFocusableNavigator focusableNavigator;
-
     [InjectedInInspector]
     public SongSelectSongPreviewControl songPreviewControl;
 
@@ -67,8 +61,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.songIndexLabel)]
     private Label songIndexLabel;
 
-    [Inject(UxmlName = R.UxmlNames.songIndexButton)]
-    private Button songIndexButton;
+    [Inject(UxmlName = R.UxmlNames.songIndexContainer)]
+    private VisualElement songIndexContainer;
 
     [Inject(UxmlName = R.UxmlNames.durationLabel)]
     private Label durationLabel;
@@ -109,8 +103,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.selectedSongImageInner)]
     private VisualElement selectedSongImageInner;
 
-    [Inject(UxmlName = R.UxmlNames.songOrderPicker)]
-    private ItemPicker songOrderItemPicker;
+    [Inject(UxmlName = R.UxmlNames.songOrderDropdownField)]
+    private EnumField songOrderDropdownField;
 
     [Inject(UxmlName = R.UxmlNames.scoreModeLabel)]
     private Label scoreModeLabel;
@@ -132,8 +126,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.playerScrollView)]
     private VisualElement playerScrollView;
-
-    public SongOrderPickerControl SongOrderPickerControl { get; private set; }
 
     [Inject]
     private SongSelectSceneData sceneData;
@@ -224,7 +216,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSongMetas();
 
-        SongOrderPickerControl = new SongOrderPickerControl(songOrderItemPicker);
+        songOrderDropdownField.value = settings.SongSelectSettings.songOrder;
+        songOrderDropdownField.RegisterValueChangedCallback(evt =>
+        {
+            Debug.Log($"New order: {evt.newValue}");
+            settings.SongSelectSettings.songOrder = (ESongOrder)evt.newValue;
+            UpdateFilteredSongs();
+        });
 
         // Register Callbacks
         toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
@@ -239,20 +237,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSearchExpressionInfo();
 
-        songIndexButton.RegisterCallbackButtonTriggered(() => songSearchControl.SetSearchText($"#{SelectedSongIndex + 1}"));
+        songIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{SelectedSongIndex + 1}"));
 
         SongSearchControl.SearchChangedEventStream
             .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(_ => OnSearchTextChanged());
 
         PlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
-
-        SongOrderPickerControl.Selection.Subscribe(newValue =>
-        {
-            settings.SongSelectSettings.songOrder = newValue;
-            characterQuickJumpListControl.UpdateCharacters();
-            UpdateFilteredSongs();
-        });
 
         playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
         {
@@ -270,8 +261,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
-
-        focusableNavigator.FocusSongRoulette();
 
         songAudioPlayer.AudioClipLoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
@@ -409,7 +398,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         selectedSongArtist.text = selectedSong.Artist;
         selectedSongTitle.text = selectedSong.Title;
         SongMetaImageUtils.SetCoverOrBackgroundImage(selection.SongMeta, selectedSongImageInner, selectedSongImageOuter);
-        songIndexLabel.text = (selection.SongIndex + 1) + "\nof " + selection.SongsCount;
+        songIndexLabel.text = $"{selection.SongIndex + 1} / {selection.SongsCount}";
 
         // The song duration requires loading the audio file.
         // Loading every song only to show its duration is slow (e.g. when scrolling through songs).
@@ -684,7 +673,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private object GetSongMetaOrderByProperty(SongMeta songMeta)
     {
-        switch (SongOrderPickerControl.SelectedItem)
+        switch (songOrderDropdownField.value)
         {
             case ESongOrder.Artist:
                 return songMeta.Artist;
@@ -703,7 +692,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             case ESongOrder.CountFinished:
                 return statistics.GetLocalStats(songMeta)?.TimesFinished;
             default:
-                Debug.LogWarning("Unknown order for songs: " + SongOrderPickerControl.SelectedItem);
+                Debug.LogWarning("Unknown order for songs: " + songOrderDropdownField.value);
                 return songMeta.Artist;
         }
     }
@@ -723,11 +712,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         bb.BindExistingInstance(songSelectSceneInputControl);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
-        bb.BindExistingInstance(SongOrderPickerControl);
-        bb.BindExistingInstance(characterQuickJumpListControl);
         bb.BindExistingInstance(playerListControl);
-        bb.BindExistingInstance(focusableNavigator);
-        bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(focusableNavigator);
         bb.BindExistingInstance(songPreviewControl);
         bb.Bind(nameof(micPitchTrackerPrefab)).ToExistingInstance(micPitchTrackerPrefab);
         return bb.GetBindings();
@@ -804,7 +789,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         downloadSongsButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_downloadSongsButton);
         addSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_addSongFolderButton);
 
-        PlaylistChooserControl.UpdateTranslation();
         SongSearchControl.UpdateTranslation();
         UpdateInputLegend();
     }

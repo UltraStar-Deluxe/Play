@@ -54,6 +54,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     [Inject(UxmlName = R.UxmlNames.searchErrorIcon)]
     private VisualElement searchErrorIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownContainer)]
+    private VisualElement searchPropertyDropdownContainer;
 
     [Inject]
     private Injector injector;
@@ -109,6 +112,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             .Subscribe(evt => UpdateTextFieldHint());
 
         UpdateTextFieldHint();
+        
+        new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
     }
 
     private void UpdateSearchTextFieldHint()

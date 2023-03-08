@@ -90,53 +90,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songEntryUi: {fileID: 9197481963319205126, guid: e1997eb384bb6554d805a53cd309ec16,
     type: 3}
-  showRouletteItemPlaceholders: 0
---- !u!1 &3983233235512627596
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3983233235512627597}
-  - component: {fileID: 3983233235512627594}
-  m_Layer: 0
-  m_Name: CharacterQuickJumpListControl
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3983233235512627597
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3983233235512627596}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -309.66382, y: -354.43085, z: 113.38186}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3983233236733248985}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3983233235512627594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3983233235512627596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fed28bd4bfd489458ca5d2ee9bd882f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterUi: {fileID: 9197481963319205126, guid: dcf63803742d62a42ad0863d3a676a1f,
-    type: 3}
 --- !u!1 &3983233235538623511
 GameObject:
   m_ObjectHideFlags: 0
@@ -275,7 +228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d193deecfd36cb84886c844c4f683c78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterQuickJumpListControl: {fileID: 3983233235512627594}
+  characterQuickJumpListControl: {fileID: 0}
 --- !u!1 &3983233236104469294
 GameObject:
   m_ObjectHideFlags: 0
@@ -447,7 +400,6 @@ Transform:
   - {fileID: 3983233237116776904}
   - {fileID: 3983233236451143433}
   - {fileID: 3983233235319031913}
-  - {fileID: 3983233235512627597}
   - {fileID: 3983233236528565921}
   - {fileID: 3983233235440235726}
   - {fileID: 3983233235667187888}
@@ -507,7 +459,7 @@ MonoBehaviour:
   songAudioPlayer: {fileID: 6361283014502315137}
   songVideoPlayer: {fileID: 3983233235667187891}
   songRouletteControl: {fileID: 3983233235440235729}
-  characterQuickJumpListControl: {fileID: 3983233235512627594}
+  characterQuickJumpListControl: {fileID: 0}
   focusableNavigator: {fileID: 3983233236104469292}
   songPreviewControl: {fileID: 3983233236528566110}
   playerListControl: {fileID: 3983233236451143432}

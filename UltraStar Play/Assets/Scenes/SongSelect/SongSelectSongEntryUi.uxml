@@ -13,7 +13,7 @@
                     <ui:VisualElement name="songEntryDuetIcon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=21300000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="column" style="justify-content: center;">
+            <ui:VisualElement name="column" style="justify-content: center; flex-shrink: 0;">
                 <ui:Button display-tooltip-when-elided="true" name="openSongMenuButton" class="squareButton backgroundHighlightButton">
                     <MaterialIcon tabindex="-1" picking-mode="Ignore" name="openSongMenuIcon" icon="more_vert" />
                 </ui:Button>

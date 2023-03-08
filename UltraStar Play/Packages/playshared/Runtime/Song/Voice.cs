@@ -9,6 +9,7 @@ public class Voice : ISerializationCallbackReceiver
     public static readonly string soloVoiceName = "";
     public static readonly string firstVoiceName = "P1";
     public static readonly string secondVoiceName = "P2";
+    public static readonly IReadOnlyList<string> voiceNames = new List<string> { firstVoiceName, secondVoiceName, };
 
     public static readonly IComparer<Voice> comparerByName = new VoiceComparerByName();
 

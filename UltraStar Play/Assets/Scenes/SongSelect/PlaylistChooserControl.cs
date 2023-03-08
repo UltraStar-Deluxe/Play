@@ -8,19 +8,10 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener, ITranslator
+public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 {
-    [Inject(UxmlName = R.UxmlNames.playlistChooserButton)]
-    private Button playlistChooserButton;
-
-    [Inject(UxmlName = R.UxmlNames.closePlaylistChooserDropdownButton)]
-    private Button closePlaylistChooserDropdownButton;
-
-    [Inject(UxmlName = R.UxmlNames.playlistChooserDropdownOverlay)]
-    private VisualElement playlistChooserDropdownOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.playlistChooserDropdownScrollView)]
-    private ScrollView playlistChooserDropdownScrollView;
+    [Inject(UxmlName = R.UxmlNames.playlistDropdownField)]
+    private DropdownField playlistDropdownField;
 
     [Inject]
     private PlaylistManager playlistManager;
@@ -32,32 +23,23 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     public ReactiveProperty<UltraStarPlaylist> Selection { get; private set; } = new();
 
-    public bool IsPlaylistChooserDropdownOverlayVisible => playlistChooserDropdownOverlay.IsVisibleByDisplay();
-
     public void OnInjectionFinished()
     {
-
         InitItems();
 
         // Update settings
         Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = newPlaylist.Name);
 
-        // Show playlist name in button
-        Selection.Subscribe(playlist => playlistChooserButton.text = GetDisplayString(playlist));
-
-        HidePlaylistChooserDropdownOverlay();
-        playlistChooserButton.RegisterCallbackButtonTriggered(() =>
+        playlistDropdownField.choices = items
+            .Select(playlist => GetDisplayString(playlist))
+            .ToList();
+        playlistDropdownField.value = GetDisplayString(items.FirstOrDefault());
+        playlistDropdownField.RegisterValueChangedCallback(evt =>
         {
-            if (IsPlaylistChooserDropdownOverlayVisible)
-            {
-                HidePlaylistChooserDropdownOverlay();
-            }
-            else
-            {
-                ShowPlaylistChooserDropdownOverlay();
-            }
+            UltraStarPlaylist playlist = items
+                .FirstOrDefault(playlist => GetDisplayString(playlist) == evt.newValue);
+            Selection.Value = playlist.OrIfNull(new UltraStarAllSongsPlaylist());
         });
-        closePlaylistChooserDropdownButton.RegisterCallbackButtonTriggered(() => HidePlaylistChooserDropdownOverlay());
 
         playlistManager.PlaylistChangeEventStream
             .Subscribe(_ => InitItems());
@@ -108,49 +90,11 @@ public class PlaylistChooserControl : INeedInjection, IInjectionFinishedListener
 
     public void FocusPlaylistChooser()
     {
-        playlistChooserButton.Focus();
+        playlistDropdownField.Focus();
     }
 
     public void Reset()
     {
         Selection.Value = items[0];
-    }
-
-    public void HidePlaylistChooserDropdownOverlay()
-    {
-        playlistChooserDropdownOverlay.HideByDisplay();
-    }
-
-    public void ShowPlaylistChooserDropdownOverlay()
-    {
-        playlistChooserDropdownOverlay.ShowByDisplay();
-
-        // Fill dropdown with playlist buttons
-        playlistChooserDropdownScrollView.Clear();
-        items.ForEach(item => playlistChooserDropdownScrollView.Add(CreatePlaylistButton(item)));
-
-        // Focus first button
-        playlistChooserDropdownScrollView.Children()
-            .FirstOrDefault()
-            .IfNotNull(child => child.Focus());
-    }
-
-    private Button CreatePlaylistButton(UltraStarPlaylist item)
-    {
-        Button button = new();
-        button.text = GetDisplayString(item);
-        button.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
-
-        button.RegisterCallbackButtonTriggered(() =>
-        {
-            Selection.Value = item;
-            HidePlaylistChooserDropdownOverlay();
-        });
-        return button;
-    }
-
-    public void UpdateTranslation()
-    {
-        playlistChooserButton.text = GetDisplayString(Selection.Value);
     }
 }

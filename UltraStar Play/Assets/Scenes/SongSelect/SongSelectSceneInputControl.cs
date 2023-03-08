@@ -19,12 +19,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject]
-    private FocusableNavigator navigator;
-
-    [Inject]
-    public CharacterQuickJumpListControl characterQuickJumpListControl;
-
     [Inject(UxmlName = R.UxmlNames.inputLegend, Optional = true)]
     private VisualElement inputLegendContainer;
 
@@ -72,24 +66,18 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         
         // Select controls
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
-            .Subscribe(context => navigator.OnNavigate(context.ReadValue<Vector2>()));
+            .Subscribe(context => OnNavigate(context.ReadValue<Vector2>()));
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
             .Subscribe(OnScrollWheel);
         InputManager.GetInputAction(R.InputActions.usplay_nextSong).PerformedAsObservable()
             .Subscribe(_ => songRouletteControl.SelectNextSong());
         InputManager.GetInputAction(R.InputActions.usplay_previousSong).PerformedAsObservable()
             .Subscribe(_ => songRouletteControl.SelectPreviousSong());
+    }
 
-        // Select next / previous character-quick-jump character
-        InputManager.GetInputAction(R.InputActions.usplay_nextCharacterQuickJumpCharacter).PerformedAsObservable()
-            .Subscribe(_ => characterQuickJumpListControl.SelectNextCharacter());
-        InputManager.GetInputAction(R.InputActions.usplay_previousCharacterQuickJumpCharacter).PerformedAsObservable()
-            .Subscribe(_ => characterQuickJumpListControl.SelectPreviousCharacter());
-
-        // Toggle song menu overlay
-        // InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
-        //     .Where(_ => !songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
-        //     .Subscribe(_ => songRouletteControl.ToggleSongMenuOverlay());
+    private void OnNavigate(Vector2 direction)
+    {
+        // focusableNavigator.OnNavigate(direction);
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
@@ -101,7 +89,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
         else
         {
-            navigator.OnSubmit();
+            // focusableNavigator.OnSubmit();
         }
     }
 
@@ -119,11 +107,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack()
     {
-        if (songSelectSceneControl.PlaylistChooserControl.IsPlaylistChooserDropdownOverlayVisible)
-        {
-            songSelectSceneControl.PlaylistChooserControl.HidePlaylistChooserDropdownOverlay();
-        }
-        else if (songSelectSceneControl.IsSearchExpressionInfoOverlayVisible)
+        if (songSelectSceneControl.IsSearchExpressionInfoOverlayVisible)
         {
             songSelectSceneControl.CloseSearchExpressionHelp();
         }
