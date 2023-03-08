@@ -483,9 +483,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(currentThemeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
 
-        Color defaultLabelColor = Colors.CreateColor("#d0d0d0");
-        Color defaultButtonColor = Colors.CreateColor("#d0d0d0");
-
         ControlColorConfig defaultControlColorConfig = new()
         {
             fontColor = currentThemeMeta.ThemeJson.fontColorButtons,
@@ -504,6 +501,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ApplyThemeSpecificStylesToVisualElements(root, currentThemeMeta, GetCurrentScene());
 
         // Labels
+        Color32 labelColor = ThemeMetaUtils.GetLabelColor(currentThemeMeta.ThemeJson);
         root.Query<Label>().ForEach(label =>
         {
             if (IsIgnoredLabel(label))
@@ -511,15 +509,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 return;
             }
             
-            if (currentThemeMeta.ThemeJson.fontColorLabels != default(Color))
-            {
-                label.style.color = new StyleColor(currentThemeMeta.ThemeJson.fontColorLabels);
-            }
-            else
-            {
-                label.style.color = defaultLabelColor;
-            }
+            label.style.color = new StyleColor(labelColor);
         });
+        root.Query(null, R.UssClasses.textColorTint)
+            .ForEach(micIcon => micIcon.style.unityBackgroundImageTintColor = new StyleColor(labelColor));
         
         // Buttons
         root.Query<Button>().ForEach(button =>
@@ -683,7 +676,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 }));
             
             currentThemeMeta.ThemeJson.fontColorButtons.IfNotDefault(color =>
-                root.Q(R.UxmlNames.timeBarPositionIndicator).style.backgroundColor = new StyleColor(color));
+                root.Query(R.UxmlNames.timeBarPositionIndicator).ForEach(it => it.style.backgroundColor = new StyleColor(color)));
         }
         else if (currentScene is EScene.SongSelectScene)
         {
