@@ -15,6 +15,6 @@
                 <ui:VisualElement name="noMicIcon" class="textColorTint overlay" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MicrophoneAltStrikethrough.svg?fileID=7388822144124034973&amp;guid=484ad862a8cd4084a8ebd54ea4a57ba1&amp;type=3#MicrophoneAltStrikethrough&apos;);" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:Button text="P1" display-tooltip-when-elided="true" name="toggleVoiceButton" class="backgroundHighlightButton" />
+        <ui:Button text="P1" display-tooltip-when-elided="true" name="toggleVoiceButton" class="backgroundHighlightButton smallerFont" style="height: auto;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -333,6 +333,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                     settings.GameSettings.ScoreMode = EScoreMode.Individual;
                 }
                 UpdateDifficultyAndScoreModeButtons();
+                UpdateSongStatistics(SelectedSong);
             });
         });
         UpdateDifficultyAndScoreModeButtons();
@@ -526,7 +527,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         LocalStatistic localStatistic = statistics.GetLocalStats(songMeta);
         if (localStatistic != null)
         {
-            List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(1);
+            List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(1, settings.GameSettings.Difficulty);
             List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
 
             UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);

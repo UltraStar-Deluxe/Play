@@ -148,7 +148,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             return false;
         }
         
-        return localStatistic.StatsEntries.GetTopScores(1).FirstOrDefault().Score == playerScoreData.TotalScore;
+        return localStatistic.StatsEntries
+            .GetTopScores(1, playerProfile.Difficulty)
+            .FirstOrDefault().Score == playerScoreData.TotalScore;
     }
 
     private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
