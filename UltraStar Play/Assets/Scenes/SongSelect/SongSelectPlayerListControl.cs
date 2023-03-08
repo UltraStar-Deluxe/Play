@@ -27,7 +27,6 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     public VisualElement playerScrollView;
 
     private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new();
-    public List<SongSelectPlayerEntryControl> PlayerEntryControlControls => playerEntryControls;
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
@@ -276,6 +275,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         // Remember the currently assigned microphones
         lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
+        playerEntryControls.ForEach(control => control.Dispose());
     }
 
     private void HideVoiceSelection()

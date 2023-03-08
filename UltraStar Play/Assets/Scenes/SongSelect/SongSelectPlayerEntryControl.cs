@@ -84,7 +84,14 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         InitVoiceSelection();
 
         // Delay mic initialization because it takes some time and scene change should happen fast.
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () => InitMicPitchTracker()));
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () =>
+        {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+            InitMicPitchTracker();
+        }));
 
         injector.Inject(micProgressBarRecordingControl);
         micProgressBarRecordingControl.MicProfile = MicProfile;
