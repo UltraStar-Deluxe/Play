@@ -26,6 +26,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private ListView songListView;
     
+    [Inject(UxmlName = R.UxmlNames.mediumDifficultyButton)]
+    private Button mediumDifficultyButton;
+    
     private List<SongMeta> songs = new();
     public IReadOnlyList<SongMeta> Songs => songs;
 
@@ -57,7 +60,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     private void Start()
     {
-        songListView.itemsSource = new List<SongMeta>();
         songListView.makeItem = () =>
         {
             VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
@@ -114,9 +116,26 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         {
             Selection.Value = new SongSelection(null, -1, 0);
         }
-        
-        songListView.itemsSource = songs; 
+
+        if (!VisualElementUtils.HasGeometry(songListView))
+        {
+            songListView.RegisterCallbackOneShot<GeometryChangedEvent>(_ => UpdateListViewItems());
+        }
+        else
+        {
+            UpdateListViewItems();
+        }
+    }
+
+    private void UpdateListViewItems()
+    {
+        Debug.Log($"UpdateListViewItems: {songs.Count}");
+        songListView.itemsSource = new List<SongMeta>(songs);
         songListView.RefreshItems();
+        if (Selection.Value.SongMeta != null)
+        {
+            songListView.SetSelection(Selection.Value.SongIndex);
+        }
     }
 
     private int GetSongIndex(SongMeta songMeta)
