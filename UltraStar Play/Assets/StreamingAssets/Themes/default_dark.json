@@ -38,5 +38,6 @@
             "imagePath": "backgrounds/dot-grid-with-vinyl.jpg",
             "scaleMode": "ScaleAndCrop",
         }
-    }
+    },
+    "sceneTransitionAnimationTime": "300ms"
 }

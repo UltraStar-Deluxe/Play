@@ -29,10 +29,10 @@
         "startColor": "#000000",
         "endColor": "#1E232B",
     },
-//    "staticBackground": {
-//        "imagePath": "backgrounds/dot-grid.jpg",
-//        "scaleMode": "ScaleAndCrop",
-//    },
+    "staticBackground": {
+        "imagePath": "backgrounds/semi-transparent.png",
+        "scaleMode": "StretchToFill",
+    },
     "sceneSpecificStaticBackgrounds": {
         "MainScene": {
             "imagePath": "backgrounds/vinyl.png",
@@ -51,5 +51,6 @@
         "gradientAnimAmplitude": 0.3,
         "particleFile": "particles/logo.png",
         "particleOpacity": 1.0
-    }
+    },
+    "sceneTransitionAnimationTime": "300ms"
 }
