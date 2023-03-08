@@ -78,7 +78,6 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener
     public VisualElement VisualElement { get; private set; }
 
     private ContextMenuControl contextMenuControl;
-
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
     

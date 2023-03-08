@@ -125,22 +125,26 @@ public static class VisualElementUtils
             parent => parent.ClassListContains("unity-base-dropdown"));
         return unityBaseDropdown != null;
     }
-    
-    public static void RegisterCallbackToHideByDisplayOnDirectClick(VisualElement visualElement, Action onHide=null)
+
+    public static void RegisterDirectClickCallback(VisualElement visualElement, Action onDirectClick = null)
     {
         visualElement.RegisterCallback<PointerDownEvent>(evt =>
         {
             if (evt.target == visualElement)
             {
-                if (onHide != null)
-                {
-                    onHide();
-                }
-                else
-                {
-                    visualElement.HideByDisplay();
-                }
+                onDirectClick();
             }
         });
+    }
+    
+    public static void RegisterCallbackToHideByDisplayOnDirectClick(VisualElement visualElement)
+    {
+        RegisterDirectClickCallback(visualElement, visualElement.HideByDisplay);
+    }
+
+    public static bool HasGeometry(VisualElement visualElement)
+    {
+        return !float.IsNaN(visualElement.worldBound.width)
+            && !float.IsNaN(visualElement.worldBound.height);
     }
 }

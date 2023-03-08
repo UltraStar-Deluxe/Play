@@ -29,8 +29,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.togglePlayerSelectedButton)]
     private Button togglePlayerSelectedButton;
     
-    [Inject(UxmlName = R.UxmlNames.voiceChooser)]
-    private DropdownField voiceChooser;
+    [Inject(UxmlName = R.UxmlNames.toggleVoiceButton)]
+    private Button toggleVoiceButton;
     
     [Inject]
     private Injector injector;
@@ -66,8 +66,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    public string VoiceName => voiceChooser.IsVisibleByDisplay()
-        ? voiceChooser.value
+    private readonly ReactiveProperty<string> selectedVoiceName = new(Voice.firstVoiceName);
+    public string VoiceName => toggleVoiceButton.IsVisibleByDisplay()
+        ? selectedVoiceName.Value
         : null;
 
     private MicPitchTracker micPitchTracker;
@@ -76,13 +77,14 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     public ReactiveProperty<bool> IsSelected {get; private set; } = new(false);
 
+    private Dictionary<string, string> voiceNames;
+
     public void OnInjectionFinished()
     {
-        voiceChooser.choices = Voice.voiceNames.ToList();
-        voiceChooser.value = voiceChooser.choices.FirstOrDefault();
-        voiceChooser.HideByDisplay();
+        InitVoiceSelection();
 
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () => InitMicPitchTracker()));
+        // Delay mic initialization because it takes some time and scene change should happen fast.
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () => InitMicPitchTracker()));
 
         injector.Inject(micProgressBarRecordingControl);
         micProgressBarRecordingControl.MicProfile = MicProfile;
@@ -104,6 +106,30 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         });
     }
 
+    private void InitVoiceSelection()
+    {
+        selectedVoiceName.Subscribe(_ => UpdateToggleVoiceButtonText());
+        toggleVoiceButton.RegisterCallbackButtonTriggered(() =>
+        {
+            selectedVoiceName.Value = selectedVoiceName.Value == Voice.firstVoiceName
+                ? Voice.secondVoiceName
+                : Voice.firstVoiceName;
+        });
+    }
+
+    private void UpdateToggleVoiceButtonText()
+    {
+        if (!voiceNames.IsNullOrEmpty()
+            && voiceNames.ContainsKey(selectedVoiceName.Value))
+        {
+            toggleVoiceButton.text = voiceNames[selectedVoiceName.Value];
+        }
+        else
+        {
+            toggleVoiceButton.text = selectedVoiceName.Value;
+        }
+    }
+
     public void Init(PlayerProfile playerProfile)
     {
         this.PlayerProfile = playerProfile;
@@ -116,23 +142,21 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     public void HideVoiceSelection()
     {
-        voiceChooser.HideByDisplay();
+        toggleVoiceButton.HideByDisplay();
     }
 
     public void ShowVoiceSelection(SongMeta selectedSong, int selectedVoiceIndex)
     {
-        List<string> voiceNames = selectedSong.GetVoices()
-            .Select(entry => entry.Name)
-            .ToList();
-        voiceChooser.ShowByDisplay();
-        voiceChooser.choices = voiceNames;
-        voiceChooser.value = voiceNames[selectedVoiceIndex];
-        voiceChooser.userData = selectedSong;
+        voiceNames = selectedSong.VoiceNames;
+        toggleVoiceButton.ShowByDisplay();
+        UpdateToggleVoiceButtonText();
+        selectedVoiceName.Value = selectedVoiceIndex == 0
+            ? Voice.firstVoiceName
+            : Voice.secondVoiceName;
     }
 
     private void InitMicPitchTracker()
     {
-        using DisposableStopwatch disposableStopwatch = new("InitMicPitchTracker took <ms>");
         micPitchTracker = GameObject.Instantiate(micPitchTrackerPrefab);
         injector.InjectAllComponentsInChildren(micPitchTracker);
         micPitchTracker.MicProfile = micProfile;

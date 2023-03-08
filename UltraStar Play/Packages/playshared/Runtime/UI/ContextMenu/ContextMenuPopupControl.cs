@@ -123,6 +123,11 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         injector.WithRootVisualElement(contextMenuItemVisualElement).Inject(contextMenuItem);
         visualElement.Add(contextMenuItemVisualElement);
     }
+    
+    public void AddVisualElement(VisualElement newVisualElement)
+    {
+        visualElement.Add(newVisualElement);
+    }
 
     public void CloseContextMenu()
     {

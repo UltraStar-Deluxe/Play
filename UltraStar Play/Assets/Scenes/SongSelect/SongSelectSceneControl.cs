@@ -118,12 +118,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.noteDisplayModePicker)]
     private ItemPicker noteDisplayModePicker;
 
-    [Inject(UxmlName = R.UxmlNames.singingOptionsScrollView)]
-    private VisualElement singingOptionsScrollView;
-
     [Inject(UxmlName = R.UxmlNames.toggleSingingOptionsButton)]
     private Button toggleSingingOptionsButton;
 
+    [Inject(UxmlName = R.UxmlNames.showLyricsButton)]
+    private Button showLyricsButton;
+    
     [Inject(UxmlName = R.UxmlNames.playerScrollView)]
     private VisualElement playerScrollView;
 
@@ -167,7 +167,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
     private Button showSearchExpressionInfoButton;
-
+    
+    [Inject(UxmlName = R.UxmlNames.singingOptionsDropdownOverlay)]
+    private VisualElement singingOptionsDropdownOverlay;
+    
+    [Inject(UxmlName = R.UxmlNames.singingOptionsDropdownContainer)]
+    private VisualElement singingOptionsDropdownContainer;
+    
     public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
     public bool IsSearchExpressionInfoOverlayVisible => searchExpressionHelpDialogControl != null;
@@ -203,10 +209,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     }
 
     private MessageDialogControl searchExpressionHelpDialogControl;
+    private MessageDialogControl lyricsDialogControl;
 
     private void Start()
     {
-        Debug.Log("Start SongSelectScene");
         songMetaManager.ScanFilesIfNotDoneYet();
         // Give the song search some time, otherwise the "no songs found" label flickers once.
         if (!SongMetaManager.IsSongScanFinished)
@@ -216,6 +222,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSongMetas();
 
+        showLyricsButton.RegisterCallbackButtonTriggered(() => ShowLyricsPopup());
+        
         songOrderDropdownField.value = settings.SongSelectSettings.songOrder;
         songOrderDropdownField.RegisterValueChangedCallback(evt =>
         {
@@ -268,9 +276,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         downloadSongsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
         addSongFolderButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
 
-        // Toggle player select and singing options container
-        ShowPlayerSelectContainer();
-        toggleSingingOptionsButton.RegisterCallbackButtonTriggered(() => TogglePlayerSelectAndSingingOptions());
+        // Show options in popup
+        singingOptionsDropdownOverlay.HideByDisplay();
+        toggleSingingOptionsButton.RegisterCallbackButtonTriggered(() =>
+        {
+            singingOptionsDropdownOverlay.ToggleVisibleByDisplay();
+        });
+        VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(singingOptionsDropdownOverlay);
+        new AnchoredPopupControl(singingOptionsDropdownContainer, toggleSingingOptionsButton, Corner2D.TopRight);
 
         // Init singing options
         new ScoreModeItemPickerControl(scoreModePicker)
@@ -286,6 +299,49 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => ShowSearchExpressionHelpDialog());
     }
 
+    private void ShowLyricsPopup()
+    {
+        if (lyricsDialogControl != null
+            || SelectedSong == null)
+        {
+            return;
+        }
+
+        lyricsDialogControl = uiManager.CreateDialogControl($"{SelectedSong.Title}");
+        lyricsDialogControl.DialogClosedEventStream.Subscribe(_ => lyricsDialogControl = null);
+        
+        Label CreateLyricsLabel(string lyrics)
+        {
+            Label lyricsLabel = new Label(lyrics);
+            lyricsLabel.enableRichText = true;
+            lyricsLabel.AddToClassList("songSelectLyricsPreview");
+            return lyricsLabel;
+        }
+        
+        if (SelectedSong.GetVoices().Count < 2)
+        {
+            string lyrics = SongMetaUtils.GetLyrics(SelectedSong, Voice.firstVoiceName);
+            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(lyrics));
+        }
+        else
+        {
+            string firstVoiceLyrics = $"<i><b>{SelectedSong.VoiceNames.FirstOrDefault().Value}</b></i>\n\n" 
+                                      + SongMetaUtils.GetLyrics(SelectedSong, Voice.firstVoiceName);
+            string secondVoiceLyrics = $"<i><b>{SelectedSong.VoiceNames.LastOrDefault().Value}</b></i>\n\n" 
+                                       + SongMetaUtils.GetLyrics(SelectedSong, Voice.secondVoiceName);
+            
+            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
+            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
+        }
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(lyricsDialogControl.DialogRootVisualElement);
+    }
+
+    private void CloseLyricsPopup()
+    {
+        lyricsDialogControl?.CloseDialog();
+    }
+    
     private void ShowSearchExpressionHelpDialog()
     {
         if (searchExpressionHelpDialogControl != null)
@@ -309,40 +365,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     public void CloseSearchExpressionHelp()
     {
-        if (searchExpressionHelpDialogControl == null)
-        {
-            return;
-        }
-        searchExpressionHelpDialogControl.CloseDialog();
-    }
-
-    private void ShowPlayerSelectContainer()
-    {
-        playerScrollView.ShowByDisplay();
-        singingOptionsScrollView.HideByDisplay();
-        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).ShowByDisplay();
-        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).HideByDisplay();
-    }
-
-    private void ShowSingingOptionsContainer()
-    {
-        playerScrollView.HideByDisplay();
-        singingOptionsScrollView.ShowByDisplay();
-        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.settingsIcon).HideByDisplay();
-        toggleSingingOptionsButton.Q<VisualElement>(R.UxmlNames.playersIcon).ShowByDisplay();
-
-    }
-
-    private void TogglePlayerSelectAndSingingOptions()
-    {
-        if (playerScrollView.IsVisibleByDisplay())
-        {
-            ShowSingingOptionsContainer();
-        }
-        else
-        {
-            ShowPlayerSelectContainer();
-        }
+        searchExpressionHelpDialogControl?.CloseDialog();
     }
 
     private void UpdateFavoriteIcon()
@@ -377,12 +400,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         lastSongMetasReloadFrame = Time.frameCount;
         UpdateFilteredSongs();
+        songRouletteControl.Selection.Subscribe(newValue => OnSongSelectionChanged(newValue));
+
         if (sceneData.SongMeta != null)
         {
             songRouletteControl.SelectSong(sceneData.SongMeta);
         }
-
-        songRouletteControl.Selection.Subscribe(newValue => OnSongSelectionChanged(newValue));
     }
 
     private void OnSongSelectionChanged(SongSelection selection)
@@ -412,16 +435,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         UpdateSongStatistics(selectedSong);
 
-        // Show lyrics for duet song
-        bool hasMultipleVoices = SelectedSong.VoiceNames.Count > 1;
-        if (hasMultipleVoices)
-        {
-            playerListControl.ShowVoiceSelection(SelectedSong);
-        }
-        else
-        {
-            playerListControl.HideVoiceSelection();
-        }
+        // Choose lyrics for duet song
+        playerListControl.UpdateVoiceSelection();
     }
 
     private void UpdateSongDurationLabel(double durationInMillis)

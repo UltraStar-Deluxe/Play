@@ -72,6 +72,9 @@
 /**************************************************/
 /* BUTTON */
 /**************************************************/
+.unity-list-view__empty-label {
+    display: none;
+}
 
 .unity-button {
     transition: background-color 0.2s;

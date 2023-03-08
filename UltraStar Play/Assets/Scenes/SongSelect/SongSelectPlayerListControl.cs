@@ -87,6 +87,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         {
             CreateListEntry(playerProfile);
         }
+        UpdateVoiceSelection();
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerScrollView);
     }
 
@@ -277,7 +278,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
     }
 
-    public void HideVoiceSelection()
+    private void HideVoiceSelection()
     {
         playerEntryControls.ForEach(entry =>
         {
@@ -285,13 +286,28 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         });
     }
 
-    public void ShowVoiceSelection(SongMeta selectedSong)
+    private void ShowVoiceSelection(SongMeta songMeta)
     {
         int voiceIndex = 0;
         playerEntryControls.ForEach(entry =>
         {
-            entry.ShowVoiceSelection(selectedSong, voiceIndex);
-            voiceIndex = (voiceIndex + 1) % selectedSong.VoiceNames.Count;
+            entry.ShowVoiceSelection(songMeta, voiceIndex);
+            voiceIndex = (voiceIndex + 1) % songMeta.VoiceNames.Count;
         });
+    }
+    
+    public void UpdateVoiceSelection()
+    {
+        SongMeta selectedSong = songRouletteControl.Selection.Value.SongMeta;
+        bool hasMultipleVoices = selectedSong != null
+            && selectedSong.VoiceNames.Count > 1;
+        if (hasMultipleVoices)
+        {
+            ShowVoiceSelection(selectedSong);
+        }
+        else
+        {
+            HideVoiceSelection();
+        }
     }
 }

@@ -10,6 +10,15 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+.songSelectLyricsPreview {
+    width: 100%;
+    white-space: normal;
+    max-width: 400px;
+}
+
+#playerImage {
+    transition: -unity-background-image-tint-color 0.5s;
+}
 
 #searchTextField #unity-text-input {
     height: 100%;

@@ -67,7 +67,7 @@
                                 </ui:VisualElement>
                             </ui:VisualElement>
                             <ui:VisualElement name="iconContainer" class="mt-auto" style="align-items: center; height: 100%;">
-                                <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="transparentBackgroundColor" style="overflow: visible; width: 40px; height: 40px;">
+                                <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="backgroundHighlightButton" style="overflow: visible; width: 40px; height: 40px;">
                                     <MaterialIcon name="favoriteIcon" icon="favorite" />
                                     <MaterialIcon name="noFavoriteIcon" icon="favorite_border" />
                                 </ui:Button>
@@ -75,8 +75,11 @@
                                     <MaterialIcon name="songIndexIcon" icon="album" picking-mode="Ignore" style="font-size: 32px;" />
                                     <ui:Label text="1000 / 9999" display-tooltip-when-elided="true" name="songIndexLabel" enable-rich-text="false" picking-mode="Ignore" style="-unity-text-align: upper-right;" />
                                 </ui:VisualElement>
-                                <ui:VisualElement name="duetIcon" class="textColorTint" style="width: 32px; height: 32px; display: flex; flex-direction: row; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;);" />
-                                <ui:Label text="3:23" display-tooltip-when-elided="true" name="durationLabel" class="ml-auto mt-auto" style="-unity-text-align: upper-right; width: 30%;" />
+                                <ui:Button display-tooltip-when-elided="true" name="showLyricsButton" class="squareButton backgroundHighlightButton">
+                                    <MaterialIcon tabindex="-1" name="lyricsIcon" icon="lyrics" />
+                                </ui:Button>
+                                <ui:VisualElement name="duetIcon" class="textColorTint" style="width: 24px; height: 24px; display: flex; flex-direction: row; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); -unity-background-scale-mode: scale-to-fit;" />
+                                <ui:Label text="3:23" display-tooltip-when-elided="true" name="durationLabel" class="mt-auto smallerFont" style="-unity-text-align: upper-right;" />
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
@@ -95,19 +98,9 @@
                             <MaterialIcon name="playersIcon" icon="manage_accounts" style="position: absolute; display: none;" />
                         </ui:Button>
                     </ui:VisualElement>
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" class="pr-2 flexWrapScrollView" style="flex-grow: 1; width: 100%; align-items: flex-start;">
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" class="pr-2 flexWrapScrollView" style="width: 100%; align-items: flex-start;">
                         <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
                         <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
-                    </ui:ScrollView>
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="singingOptionsScrollView" class="pr-2" style="width: 100%; flex-grow: 1;">
-                        <ui:VisualElement name="scoreModeContainer">
-                            <ui:Label text="Score" display-tooltip-when-elided="true" name="scoreModeLabel" class="smallFont" />
-                            <ItemPicker no-previous-button="true" name="scoreModePicker" wrap-around="true" class="smallControl" style="width: auto;" />
-                        </ui:VisualElement>
-                        <ui:VisualElement name="noteDIsplayModeContainer">
-                            <ui:Label text="Note Display Mode" display-tooltip-when-elided="true" name="noteDisplayModeLabel" class="smallFont" />
-                            <ItemPicker no-previous-button="true" name="noteDisplayModePicker" wrap-around="true" class="smallControl" style="width: auto;" />
-                        </ui:VisualElement>
                     </ui:ScrollView>
                 </ui:ScrollView>
             </ui:VisualElement>
@@ -124,6 +117,18 @@
         <ui:VisualElement name="searchPropertyDropdownOverlay" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; display: none;">
             <ui:VisualElement name="searchPropertyDropdownContainer" class="roundCorners" style="position: absolute; width: 35%; background-color: rgba(32, 32, 32, 0.88); top: 18%; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; flex-direction: column; height: 80%;">
                 <ui:Instance template="SongSelectSearchPropertyDialogUi" name="SongSelectSearchPropertyDialogUi" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="singingOptionsDropdownOverlay" class="focusableNavigatorRoot overlay" style="display: none;">
+            <ui:VisualElement name="singingOptionsDropdownContainer" class="roundCorners" style="position: absolute; background-color: rgba(32, 32, 32, 0.88); top: 18%; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; flex-direction: column; width: 35%;">
+                <ui:VisualElement name="scoreModeContainer">
+                    <ui:Label text="Score" display-tooltip-when-elided="true" name="scoreModeLabel" class="smallFont" />
+                    <ItemPicker no-previous-button="true" name="scoreModePicker" wrap-around="true" class="smallControl" style="width: auto;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="noteDIsplayModeContainer">
+                    <ui:Label text="Note Display Mode" display-tooltip-when-elided="true" name="noteDisplayModeLabel" class="smallFont" />
+                    <ItemPicker no-previous-button="true" name="noteDisplayModePicker" wrap-around="true" class="smallControl" style="width: auto;" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="playlistChooserDropdownOverlay" picking-mode="Ignore" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; display: none;">
