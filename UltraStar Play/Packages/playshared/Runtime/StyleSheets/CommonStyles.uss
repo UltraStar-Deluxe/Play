@@ -184,7 +184,15 @@ Button.smallFont {
     font-size: var(--font-size-s);
 }
 
+ToggleButton.smallFont {
+    font-size: var(--font-size-s);
+}
+
 Button.smallerFont {
+    font-size: var(--font-size-xs);
+}
+
+ToggleButton.smallerFont {
     font-size: var(--font-size-xs);
 }
 

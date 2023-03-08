@@ -127,6 +127,27 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.playerScrollView)]
     private VisualElement playerScrollView;
 
+    [Inject(UxmlName = R.UxmlNames.noScoresButton)]
+    private ToggleButton noScoresButton;
+    
+    [Inject(UxmlName = R.UxmlNames.easyDifficultyButton)]
+    private ToggleButton easyDifficultyButton;
+    
+    [Inject(UxmlName = R.UxmlNames.mediumDifficultyButton)]
+    private ToggleButton mediumDifficultyButton;
+    
+    [Inject(UxmlName = R.UxmlNames.hardDifficultyButton)]
+    private ToggleButton hardDifficultyButton;
+    
+    [Inject(UxmlName = R.UxmlNames.toggleCoopModeButton)]
+    private Button toggleCoopModeButton;
+    
+    [Inject(UxmlName = R.UxmlNames.coopIcon)]
+    private VisualElement coopIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.noCoopIcon)]
+    private VisualElement noCoopIcon;
+    
     [Inject]
     private SongSelectSceneData sceneData;
 
@@ -222,6 +243,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSongMetas();
 
+        InitDifficultyAndScoreMode();
+
         showLyricsButton.RegisterCallbackButtonTriggered(() => ShowLyricsPopup());
         
         songOrderDropdownField.value = settings.SongSelectSettings.songOrder;
@@ -293,7 +316,59 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Bind(() => settings.GraphicSettings.noteDisplayMode,
                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
     }
-    
+
+    private void InitDifficultyAndScoreMode()
+    {
+        // Set difficulty for all players
+        settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
+            .Subscribe(newValue => settings.PlayerProfiles.ForEach(it => it.Difficulty = newValue));
+
+        GetDifficultyToButtonMap().ForEach(entry =>
+        {
+            entry.Value.RegisterCallbackButtonTriggered(() =>
+            {
+                settings.GameSettings.Difficulty = entry.Key;
+                if (settings.GameSettings.ScoreMode == EScoreMode.None)
+                {
+                    settings.GameSettings.ScoreMode = EScoreMode.Individual;
+                }
+                UpdateDifficultyAndScoreModeButtons();
+            });
+        });
+        UpdateDifficultyAndScoreModeButtons();
+        
+        noScoresButton.RegisterCallbackButtonTriggered(() =>
+        {
+            settings.GameSettings.ScoreMode = EScoreMode.None;
+            UpdateDifficultyAndScoreModeButtons();
+        });
+        
+        toggleCoopModeButton.RegisterCallbackButtonTriggered(() =>
+        {
+            if (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage)
+            {
+                settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            }
+            else
+            {
+                settings.GameSettings.ScoreMode = EScoreMode.CommonAverage;
+            }
+            UpdateDifficultyAndScoreModeButtons();
+        });
+    }
+
+    private void UpdateDifficultyAndScoreModeButtons()
+    {
+        GetDifficultyToButtonMap().ForEach(entry =>
+        {
+            bool isSelectedDifficulty = settings.GameSettings.Difficulty == entry.Key;
+            entry.Value.SetActive(isSelectedDifficulty && settings.GameSettings.ScoreMode != EScoreMode.None);
+        });
+        noScoresButton.SetActive(settings.GameSettings.ScoreMode == EScoreMode.None);
+        coopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode == EScoreMode.CommonAverage);
+        noCoopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode != EScoreMode.CommonAverage);
+    }
+
     private void InitSearchExpressionInfo()
     {
         showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => ShowSearchExpressionHelpDialog());
@@ -859,5 +934,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         //         TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
         //         TranslationManager.GetTranslation(R.Messages.action_longPress))));
         // }
+    }
+
+    private Dictionary<EDifficulty, ToggleButton> GetDifficultyToButtonMap()
+    {
+        return new Dictionary<EDifficulty, ToggleButton>
+        {
+            { EDifficulty.Easy, easyDifficultyButton },
+            { EDifficulty.Medium, mediumDifficultyButton },
+            { EDifficulty.Hard, hardDifficultyButton },
+        };
     }
 }
