@@ -264,20 +264,27 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void InitSettingsProblemHints()
     {
-        new SettingsProblemHintControl(
+        SettingsProblemHintControl songSettingsProblemHintControl = new(
             songSettingsProblemHintIcon,
             SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager),
             injector);
 
-        new SettingsProblemHintControl(
+        SettingsProblemHintControl recordingSettingsProblemHintControl = new(
             recordingSettingsProblemHintIcon,
             SettingsProblemHintControl.GetRecordingSettingsProblems(settings),
             injector);
 
-        new SettingsProblemHintControl(
+        SettingsProblemHintControl playerProfileSettingsProblemHintControl = new(
             playerProfileSettingsProblemHintIcon,
             SettingsProblemHintControl.GetPlayerSettingsProblems(settings),
             injector);
+
+        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
+        {
+            songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager));
+            recordingSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
+            playerProfileSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
+        }));
     }
 
     public void UpdateTranslation()

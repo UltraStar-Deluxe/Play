@@ -14,11 +14,18 @@ using UniRx;
 
 public class SettingsProblemHintControl
 {
+    private readonly VisualElement visualElement;
+    private readonly TooltipControl tooltipControl;
+
+    private bool hasIssues;
+    
     public SettingsProblemHintControl(VisualElement visualElement, List<string> settingsProblems, Injector injector)
     {
-        visualElement.SetVisibleByDisplay(!settingsProblems.IsNullOrEmpty());
-        TooltipControl settingsProblemTooltipControl = new(visualElement);
-        settingsProblemTooltipControl.TooltipText = settingsProblems.JoinWith("\n\n");
+        this.tooltipControl = new(visualElement);
+        this.visualElement = visualElement;
+        this.visualElement.style.scale = Vector2.zero;
+        this.visualElement.SetVisibleByDisplay(!settingsProblems.IsNullOrEmpty());
+        SetProblems(settingsProblems);
     }
 
     public static List<string> GetAllSettingsProblems(Settings settings, SongMetaManager songMetaManager)
@@ -154,5 +161,34 @@ public class SettingsProblemHintControl
             potentialParentAbsolutePath += Path.DirectorySeparatorChar;
         }
         return potentialSubfolderInfo.FullName.StartsWith(potentialParentAbsolutePath);
+    }
+
+    public void SetProblems(List<string> settingsProblems)
+    {
+        bool hasIssues = !settingsProblems.IsNullOrEmpty();
+        if (hasIssues
+            && !this.hasIssues)
+        {
+            visualElement.ShowByDisplay();
+            LeanTween.value(GameObjectUtils.FindAnyGameObject(), 0, 1, 1f)
+                .setOnUpdate(value =>
+                {
+                    visualElement.style.scale = new Vector2(value, value);
+                })
+                .setEaseSpring();
+        }
+        else if (!hasIssues
+                 && this.hasIssues)
+        {
+            LeanTween.value(GameObjectUtils.FindAnyGameObject(), 1, 0, 0.3f)
+                .setOnUpdate(value =>
+                {
+                    visualElement.style.scale = new Vector2(value, value);
+                })
+                .setEaseLinear();
+        }
+        this.hasIssues = hasIssues;
+        
+        tooltipControl.TooltipText = settingsProblems.JoinWith("\n\n");
     }
 }
