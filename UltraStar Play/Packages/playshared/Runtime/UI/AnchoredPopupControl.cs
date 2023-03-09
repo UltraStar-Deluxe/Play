@@ -9,6 +9,7 @@ public class AnchoredPopupControl
 
     private readonly PanelHelper panelHelper;
     private Vector2 lastPopupSize;
+    private Vector2 lastPopupPosition;
     
     public AnchoredPopupControl(VisualElement popupElement, VisualElement anchorElement, Corner2D anchorCorner)
     {
@@ -20,10 +21,10 @@ public class AnchoredPopupControl
         
         popupElement.RegisterCallback<GeometryChangedEvent>(_ =>
         {
-            if (lastPopupSize != PopupElement.contentRect.size)
+            if (Vector2.Distance(lastPopupSize, PopupElement.contentRect.size) > 1f)
             {
-                lastPopupSize = PopupElement.contentRect.size;
                 UpdatePosition();
+                lastPopupSize = PopupElement.contentRect.size;
             }
         });
         anchorElement.RegisterCallback<GeometryChangedEvent>(_ => UpdatePosition());
@@ -61,6 +62,8 @@ public class AnchoredPopupControl
             PopupElement.style.left = anchorPosition.x;
             PopupElement.style.right = new StyleLength(StyleKeyword.Auto);
         }
+        
+        VisualElementUtils.MoveVisualElementFullyInsideScreen(PopupElement, panelHelper);
     }
     
     private Justify GetAnchorJustifyContent()
