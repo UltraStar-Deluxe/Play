@@ -57,7 +57,7 @@
                         <MaterialIcon tabindex="-1" icon="volume_up" name="unmuteIcon" picking-mode="Ignore" style="display: none;" />
                     </ui:Button>
                     <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex; flex-grow: 1; align-items: center;">
-                        <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1" />
+                        <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1" style="min-width: 30px;" />
                         <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; justify-content: center; height: 5px;">
                             <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
                             <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;" />
