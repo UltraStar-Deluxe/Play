@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UniInject;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,8 +20,7 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
     private bool dragging;
     private Vector2 dragStartScrollOffset;
     private Vector2 dragStartPosition;
-
-    private HashSet<ScrollView> seenScrollViews = new();
+    private ScrollView mouseDownScrollView;
 
     public void OnInjectionFinished()
     {
@@ -41,23 +39,10 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
     
     private void DoRegisterMouseScrollEvents()
     {
-        List<ScrollView> scrollViews = uiDocument.rootVisualElement.Query<ScrollView>()
-            .ToList();
-
-        scrollViews.ForEach(scrollView =>
-        {
-            if (seenScrollViews.Contains(scrollView))
-            {
-                return;
-            }
-            seenScrollViews.Add(scrollView);
-            
-            VisualElement contentViewport = scrollView.Q<VisualElement>("unity-content-viewport");
-
-            contentViewport.RegisterCallback<MouseDownEvent>(evt => OnMouseDown(evt, scrollView), TrickleDown.TrickleDown);
-            contentViewport.RegisterCallback<MouseMoveEvent>(evt => OnMouseMove(evt, scrollView), TrickleDown.TrickleDown);
-            contentViewport.RegisterCallback<MouseUpEvent>(evt => OnMouseUp(), TrickleDown.TrickleDown);
-        });
+        VisualElement rootVisualElement = uiDocument.rootVisualElement;
+        rootVisualElement.RegisterCallback<MouseMoveEvent>(evt => OnMouseMoveOnRootVisualElement(evt), TrickleDown.TrickleDown);
+        rootVisualElement.RegisterCallback<MouseDownEvent>(evt => OnMouseDownOnRootVisualElement(evt), TrickleDown.TrickleDown);
+        rootVisualElement.RegisterCallback<MouseUpEvent>(evt => OnMouseUpOnRootVisualElement(), TrickleDown.TrickleDown);
     }
 
     private void Update()
@@ -68,11 +53,11 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
             && Mouse.current != null
             && !Mouse.current.leftButton.isPressed)
         {
-            OnMouseUp();
+            OnMouseUpOnRootVisualElement();
         }
     }
 
-    private void OnMouseDown(MouseDownEvent evt, ScrollView scrollView)
+    private void OnMouseDownOnRootVisualElement(MouseDownEvent evt)
     {
         if (Touchscreen.current != null)
         {
@@ -80,25 +65,45 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
             return;
         }
 
+        if (evt.target is not VisualElement visualElement)
+        {
+            return;
+        }
+
+        if (visualElement is ScrollView scrollView)
+        {
+            mouseDownScrollView = scrollView;
+        }
+        else
+        {
+            mouseDownScrollView = VisualElementUtils.GetParent(visualElement, parent => parent is ScrollView) as ScrollView;
+        }
+
+        if (mouseDownScrollView == null)
+        {
+            return;
+        }
+        
         dragging = true;
         dragStartPosition = evt.localMousePosition;
-        dragStartScrollOffset = scrollView.scrollOffset;
+        dragStartScrollOffset = mouseDownScrollView.scrollOffset;
     }
 
-    private void OnMouseMove(MouseMoveEvent evt, ScrollView scrollView)
+    private void OnMouseMoveOnRootVisualElement(MouseMoveEvent evt)
     {
         if (dragging
             && !(uiDocument.rootVisualElement.focusController.focusedElement is TextField))
         {
             Vector2 dragDelta = dragStartPosition - evt.localMousePosition;
-            scrollView.scrollOffset = new Vector2(
+            mouseDownScrollView.scrollOffset = new Vector2(
                 dragStartScrollOffset.x + dragDelta.x,
                 dragStartScrollOffset.y + dragDelta.y);
         }
     }
 
-    private void OnMouseUp()
+    private void OnMouseUpOnRootVisualElement()
     {
+        mouseDownScrollView = null;
         dragging = false;
     }
 }
