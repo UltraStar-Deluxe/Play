@@ -483,7 +483,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         Color itemPickerBackgroundColor = Colors.HsvOffset(themeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
 
-        ControlColorConfig defaultControlColorConfig = new()
+        ControlStyleConfig defaultControlStyleConfig = new()
         {
             fontColor = themeMeta.ThemeJson.fontColorButtons,
             
@@ -509,16 +509,16 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         // Buttons
         root.Query<Button>().ForEach(button =>
         {
-            ControlColorConfig colorConfig = GetButtonColorConfig(themeMeta, button);
+            ControlStyleConfig styleConfig = GetButtonColorConfig(themeMeta, button);
             
-            ApplyControlColorConfigToVisualElement(button, colorConfig);
+            ApplyControlColorConfigToVisualElement(button, styleConfig);
         });
 
         // ItemPickers
         root.Query(null, "itemPickerItemLabel").ForEach(label =>
         {
             label.style.backgroundColor = itemPickerBackgroundColor;
-            label.style.color = defaultControlColorConfig.fontColor;
+            label.style.color = defaultControlStyleConfig.fontColor;
         });
 
         // Unity controls
@@ -532,7 +532,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ussClassNamesForApplyButtonColors.ForEach(ussClassName =>
         {
             root.Query<VisualElement>(null, ussClassName)
-                .ForEach(element => ApplyControlColorConfigToVisualElement(element, defaultControlColorConfig, true));
+                .ForEach(element => ApplyControlColorConfigToVisualElement(element, defaultControlStyleConfig, true));
         });
         
         // Remove border
@@ -559,7 +559,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     return;
                 }
                 alreadyProcessedVisualElements.Add(entry);
-                entry.style.backgroundColor = defaultControlColorConfig.backgroundColor;
+                entry.style.backgroundColor = defaultControlStyleConfig.backgroundColor;
             });
         }
     }
@@ -571,11 +571,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             or EScene.CreditsScene;
     }
 
-    private ControlColorConfig GetButtonColorConfig(ThemeMeta themeMeta, Button button)
+    private ControlStyleConfig GetButtonColorConfig(ThemeMeta themeMeta, Button button)
     {
         if (button.ClassListContains("textHighlightButton"))
         {
-            return new ControlColorConfig()
+            return new ControlStyleConfig()
             {
                 backgroundColor = Colors.clearWhite,
                 fontColor = themeMeta.ThemeJson.fontColorButtons.WithLerp(Color.black, 0.5f),
@@ -586,7 +586,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         else if (button.ClassListContains("backgroundHighlightButton"))
         {
-            return new ControlColorConfig()
+            return new ControlStyleConfig()
             {
                 fontColor = themeMeta.ThemeJson.fontColorButtons,
                 backgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(0),
@@ -596,7 +596,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         else if (button is ToggleButton)
         {
-            return new ControlColorConfig()
+            return new ControlStyleConfig()
             {
                 fontColor = themeMeta.ThemeJson.fontColorButtons,
                 backgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(0),
@@ -607,7 +607,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         else if (button.ClassListContains("transparentBackgroundColor")) 
         {
-            return new ControlColorConfig()
+            return new ControlStyleConfig()
             {
                 backgroundColor = Color.clear,
                 hoverBackgroundColor = Color.clear,
@@ -616,7 +616,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         else
         {
-            return new ControlColorConfig()
+            return new ControlStyleConfig()
             {
                 fontColor = themeMeta.ThemeJson.fontColorButtons,
                 backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
@@ -672,7 +672,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     return;
                 }
                 alreadyProcessedVisualElements.Add(entry);
-                ApplyThemeStyleUtils.ApplyControlStyles(entry, new ControlColorConfig()
+                ApplyThemeStyleUtils.ApplyControlStyles(entry, new ControlStyleConfig()
                 {
                     backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
                 });
@@ -698,7 +698,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return false;
     }
     
-    private void ApplyControlColorConfigToVisualElement(VisualElement visualElement, ControlColorConfig controlColorConfig, bool useParentElementAsCallbackTarget = false)
+    private void ApplyControlColorConfigToVisualElement(VisualElement visualElement, ControlStyleConfig controlStyleConfig, bool useParentElementAsCallbackTarget = false)
     {
         if (alreadyProcessedVisualElements.Contains(visualElement)
             || IsSkipApplyThemeStylesToVisualElement(visualElement))
@@ -710,7 +710,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         VisualElement callbackTarget = useParentElementAsCallbackTarget
             ? visualElement.parent
             : visualElement;
-        ApplyThemeStyleUtils.ApplyControlStyles(visualElement, callbackTarget, controlColorConfig);
+        ApplyThemeStyleUtils.ApplyControlStyles(visualElement, callbackTarget, controlStyleConfig);
     }
 
     private void OnOpenDropdownMenu()

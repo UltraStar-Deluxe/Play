@@ -8,12 +8,12 @@ public static class ApplyThemeStyleUtils
 {
     private static readonly Dictionary<VisualElement, VisualElementData> visualElementToData = new();
     
-    public static void ApplyControlStyles(VisualElement visualElement, ControlColorConfig controlColorConfig)
+    public static void ApplyControlStyles(VisualElement visualElement, ControlStyleConfig controlStyleConfig)
     {
-        ApplyControlStyles(visualElement, visualElement, controlColorConfig);
+        ApplyControlStyles(visualElement, visualElement, controlStyleConfig);
     }
 
-    public static void ApplyControlStyles(VisualElement visualElement, VisualElement callbackTarget, ControlColorConfig controlColorConfig)
+    public static void ApplyControlStyles(VisualElement visualElement, VisualElement callbackTarget, ControlStyleConfig controlStyleConfig)
     {
         if (visualElement == null)
         {
@@ -30,7 +30,7 @@ public static class ApplyThemeStyleUtils
                 visualElement = visualElement,
                 callbackTarget = callbackTarget,
                 initTimeInSeconds = Time.time,
-                controlColorConfig = controlColorConfig,
+                controlStyleConfig = controlStyleConfig,
             };
             visualElementToData[visualElement] = data;
         }
@@ -41,7 +41,7 @@ public static class ApplyThemeStyleUtils
             RegisterCallbacks(visualElement);
         }
         
-        data.controlColorConfig = controlColorConfig;
+        data.controlStyleConfig = controlStyleConfig;
         UpdateStyles(data);
     }
 
@@ -155,51 +155,51 @@ public static class ApplyThemeStyleUtils
     private static void ApplyActiveStyle(VisualElementData data)
     {
         ApplyStyle(data,
-            data.controlColorConfig.activeFontColor,
-            data.controlColorConfig.activeBorderColor,
-            data.controlColorConfig.activeBackgroundColor,
-            data.controlColorConfig.activeBackgroundGradient,
-            data.controlColorConfig.activeBackgroundImage);
+            data.controlStyleConfig.activeFontColor,
+            data.controlStyleConfig.activeBorderColor,
+            data.controlStyleConfig.activeBackgroundColor,
+            data.controlStyleConfig.activeBackgroundGradient,
+            data.controlStyleConfig.activeBackgroundImage);
     }
 
     private static void ApplyFocusStyle(VisualElementData data)
     {
         ApplyStyle(data,
-            data.controlColorConfig.focusFontColor,
-            data.controlColorConfig.focusBorderColor,
-            data.controlColorConfig.focusBackgroundColor,
-            data.controlColorConfig.focusBackgroundGradient,
-            data.controlColorConfig.focusBackgroundImage);
+            data.controlStyleConfig.focusFontColor,
+            data.controlStyleConfig.focusBorderColor,
+            data.controlStyleConfig.focusBackgroundColor,
+            data.controlStyleConfig.focusBackgroundGradient,
+            data.controlStyleConfig.focusBackgroundImage);
     }
 
     private static void ApplyHoverStyle(VisualElementData data)
     {
         ApplyStyle(data,
-            data.controlColorConfig.hoverFontColor,
-            data.controlColorConfig.hoverBorderColor,
-            data.controlColorConfig.hoverBackgroundColor,
-            data.controlColorConfig.hoverBackgroundGradient,
-            data.controlColorConfig.hoverBackgroundImage);
+            data.controlStyleConfig.hoverFontColor,
+            data.controlStyleConfig.hoverBorderColor,
+            data.controlStyleConfig.hoverBackgroundColor,
+            data.controlStyleConfig.hoverBackgroundGradient,
+            data.controlStyleConfig.hoverBackgroundImage);
     }
 
     private static void ApplyDefaultStyle(VisualElementData data)
     {
         ApplyStyle(data,
-            data.controlColorConfig.fontColor,
-            data.controlColorConfig.borderColor,
-            data.controlColorConfig.backgroundColor,
-            data.controlColorConfig.backgroundGradient,
-            data.controlColorConfig.backgroundImage);
+            data.controlStyleConfig.fontColor,
+            data.controlStyleConfig.borderColor,
+            data.controlStyleConfig.backgroundColor,
+            data.controlStyleConfig.backgroundGradient,
+            data.controlStyleConfig.backgroundImage);
     }
     
     private static void ApplyDisabledStyle(VisualElementData data)
     {
         ApplyStyle(data,
-            data.controlColorConfig.disabledFontColor,
-            data.controlColorConfig.disabledBorderColor,
-            data.controlColorConfig.disabledBackgroundColor,
-            data.controlColorConfig.disabledBackgroundGradient,
-            data.controlColorConfig.disabledBackgroundImage);
+            data.controlStyleConfig.disabledFontColor,
+            data.controlStyleConfig.disabledBorderColor,
+            data.controlStyleConfig.disabledBackgroundColor,
+            data.controlStyleConfig.disabledBackgroundGradient,
+            data.controlStyleConfig.disabledBackgroundImage);
     }
 
     private static void UpdateStyles(VisualElementData data)
@@ -241,7 +241,7 @@ public static class ApplyThemeStyleUtils
         public bool isActive;
         
         public float initTimeInSeconds;
-        public ControlColorConfig controlColorConfig;
+        public ControlStyleConfig controlStyleConfig;
         public GradientConfig currentGradientConfig;
     }
 

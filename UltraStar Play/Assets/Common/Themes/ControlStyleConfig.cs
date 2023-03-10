@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class ControlColorConfig
+public class ControlStyleConfig
 {
     public Color fontColor;
     public Color hoverFontColor;
