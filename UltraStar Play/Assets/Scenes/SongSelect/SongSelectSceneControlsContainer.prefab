@@ -90,52 +90,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songEntryUi: {fileID: 9197481963319205126, guid: e1997eb384bb6554d805a53cd309ec16,
     type: 3}
---- !u!1 &3983233235538623511
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3983233235538623509}
-  - component: {fileID: 3983233235538623508}
-  m_Layer: 0
-  m_Name: SongSelectSceneControlNavigator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3983233235538623509
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3983233235538623511}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -309.66382, y: -354.43085, z: 113.38186}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3983233236733248985}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3983233235538623508
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3983233235538623511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f880e0660a67ec47aff907058c2093f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  focusLastElementIfNothingFocused: 1
-  logFocusedVisualElements: 0
 --- !u!1 &3983233235667187890
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,53 +182,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d193deecfd36cb84886c844c4f683c78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterQuickJumpListControl: {fileID: 0}
---- !u!1 &3983233236104469294
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3983233236104469295}
-  - component: {fileID: 3983233236104469292}
-  m_Layer: 0
-  m_Name: SongSelectFocusableNavigator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3983233236104469295
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3983233236104469294}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -309.66382, y: -354.43085, z: 113.38186}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3983233236733248985}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3983233236104469292
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3983233236104469294}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4879dc1082740b2912d1e28d035def2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  focusLastElementIfNothingFocused: 0
-  logFocusedVisualElements: 0
 --- !u!1 &3983233236451143435
 GameObject:
   m_ObjectHideFlags: 0
@@ -395,8 +302,6 @@ Transform:
   m_Children:
   - {fileID: 3983233236753877488}
   - {fileID: 3983233236013556572}
-  - {fileID: 3983233236104469295}
-  - {fileID: 3983233235538623509}
   - {fileID: 3983233237116776904}
   - {fileID: 3983233236451143433}
   - {fileID: 3983233235319031913}
@@ -405,7 +310,7 @@ Transform:
   - {fileID: 3983233235667187888}
   - {fileID: 6731677106840325797}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3983233236753877490
 GameObject:
@@ -459,8 +364,6 @@ MonoBehaviour:
   songAudioPlayer: {fileID: 6361283014502315137}
   songVideoPlayer: {fileID: 3983233235667187891}
   songRouletteControl: {fileID: 3983233235440235729}
-  characterQuickJumpListControl: {fileID: 0}
-  focusableNavigator: {fileID: 3983233236104469292}
   songPreviewControl: {fileID: 3983233236528566110}
   playerListControl: {fileID: 3983233236451143432}
   micPitchTrackerPrefab: {fileID: 4222735436031177209, guid: a7725a62aafd2eb4f8a94b6af1b6b044,

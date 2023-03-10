@@ -246,8 +246,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             if (logFocusedVisualElements)
             {
                 Debug.Log($"Moving focus to first focusable VisualElement in selected ListView item: {firstFocusableVisualElement}");
-                firstFocusableVisualElement.Focus();
             }
+            firstFocusableVisualElement.Focus();
         }
     }
 
@@ -436,7 +436,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                     or FloatField
                     or DoubleField
                     or MinMaxSlider
-                    or RadioButton)
+                    or RadioButton
+                    or ListView)
             .Where(descendant => IsFocusableNow(descendant))
             .ToList();
         return descendants;

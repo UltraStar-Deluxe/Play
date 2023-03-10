@@ -15,7 +15,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="column" style="justify-content: center; flex-shrink: 0;">
                 <ui:Button display-tooltip-when-elided="true" name="openSongMenuButton" class="squareButton backgroundHighlightButton">
-                    <MaterialIcon tabindex="-1" picking-mode="Ignore" name="openSongMenuIcon" icon="more_vert" />
+                    <MaterialIcon tabindex="-1" picking-mode="Ignore" name="openSongMenuIcon" icon="more_vert" style="font-size: 18px;" />
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>

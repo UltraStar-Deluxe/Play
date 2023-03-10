@@ -263,6 +263,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
         startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
+        startButton.Focus();
 
         quitSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
 

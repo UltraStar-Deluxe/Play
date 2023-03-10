@@ -172,7 +172,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
             Debug.LogError(errorMessage);
             UiManager.CreateNotification(errorMessage);
         }
-        editPlaylistOverlay.HideByDisplay();
+        HideEditPlaylistDialog();
     }
 
     public void UpdateTranslation()

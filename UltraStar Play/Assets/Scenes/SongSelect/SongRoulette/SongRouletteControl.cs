@@ -133,7 +133,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         songListView.RefreshItems();
         if (Selection.Value.SongMeta != null)
         {
-            songListView.SetSelection(Selection.Value.SongIndex);
+            songListView.SetSelectionAndScrollTo(Selection.Value.SongIndex);
         }
     }
 
@@ -152,8 +152,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         int songIndex = songs.IndexOf(songMeta);
         if (songListView.selectedIndex != songIndex)
         {
-            songListView.SetSelection(songIndex);
-            songListView.ScrollToItem(songIndex);
+            songListView.SetSelectionAndScrollTo(songIndex);
         }
         Selection.Value = new SongSelection(songMeta, songIndex, songs.Count);
     }
