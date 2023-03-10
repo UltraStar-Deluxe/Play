@@ -65,6 +65,14 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                 }
             });
         }
+
+        noNavigationTargetFoundEventStream.Subscribe(evt =>
+        {
+            if (logFocusedVisualElements)
+            {
+                Debug.Log($"No navigation target found: {evt}");
+            }
+        });
     }
 
     protected virtual void Update()
@@ -175,9 +183,72 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
         {
             NavigateDropdownList(focusedVisualElement, navigationDirection);
+            return;
+        }
+        
+        if (focusedVisualElement is ListView listView
+            && TryNavigateListView(listView, navigationDirection))
+        {
+            return;
         }
         
         NavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection);
+    }
+
+    private bool TryNavigateListView(
+        ListView listView,
+        Vector2 navigationDirection)
+    {
+        if (listView.itemsSource.Count == 0)
+        {
+            return false;
+        }
+        
+        int selectedIndex = listView.selectedIndex;
+        if (navigationDirection.y > 0
+            && selectedIndex > 0)
+        {
+            if (logFocusedVisualElements)
+            {
+                Debug.Log("Select previous item in ListView");
+            }
+            listView.SetSelectionAndScrollTo(selectedIndex - 1);
+            TryFocusSelectedListViewItem(listView);
+            return true;
+        }
+        else if (navigationDirection.y < 0
+                 && selectedIndex < listView.itemsSource.Count - 1)
+        {
+            if (logFocusedVisualElements)
+            {
+                Debug.Log("Select next item in ListView");
+            }
+            listView.SetSelectionAndScrollTo(selectedIndex + 1);
+            TryFocusSelectedListViewItem(listView);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void TryFocusSelectedListViewItem(ListView listView)
+    {
+        VisualElement selectedVisualElement = listView.GetSelectedVisualElement();
+        if (selectedVisualElement != null)
+        {
+            List<VisualElement> focusableVisualElements = GetFocusableVisualElementsInDescendants(selectedVisualElement);
+            if (focusableVisualElements.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            VisualElement firstFocusableVisualElement = focusableVisualElements[0];
+            if (logFocusedVisualElements)
+            {
+                Debug.Log($"Moving focus to first focusable VisualElement in selected ListView item: {firstFocusableVisualElement}");
+                firstFocusableVisualElement.Focus();
+            }
+        }
     }
 
     private void NavigateDropdownList(
@@ -258,8 +329,24 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
-        visualElement.Focus();
-        visualElement.ScrollToSelf();
+        if (visualElement is ListView focusedListView)
+        {
+            TryFocusSelectedListViewItem(focusedListView);
+        }
+
+        ListView parentListView = VisualElementUtils.GetParent(visualElement, parent => parent is ListView) as ListView;
+        if (parentListView != null)
+        {
+            parentListView.Focus();
+            parentListView.ScrollToSelf();
+            
+            TryFocusSelectedListViewItem(parentListView);
+        }
+        else
+        {
+            visualElement.Focus();
+            visualElement.ScrollToSelf();
+        }
     }
     
     private bool TryNavigateToCustomNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)

@@ -194,4 +194,15 @@ public static class VisualElementExtensions
         visualElement.style.borderTopWidth = value;
         visualElement.style.borderBottomWidth = value;
     }
+
+    public static void SetSelectionAndScrollTo(this ListView listView, int index)
+    {
+        listView.SetSelection(index);
+        listView.ScrollToItem(index);
+    }
+    
+    public static VisualElement GetSelectedVisualElement(this ListView listView)
+    {
+        return listView.Q<VisualElement>(className: "unity-collection-view__item--selected");
+    }
 }
