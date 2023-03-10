@@ -26,6 +26,15 @@
     border-bottom-left-radius: 5px;
 }
 
+#searchTextField.noSearchResults {
+    border-color: red;
+    border-width: 2px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
 #songMenuOverlay Button {
     margin-bottom: 5px;
     width: 100%;

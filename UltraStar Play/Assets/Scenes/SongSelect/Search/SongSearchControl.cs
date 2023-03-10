@@ -61,6 +61,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongRouletteControl songRouletteControl;
+
     private TooltipControl searchErrorIconTooltipControl;
 
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
@@ -108,6 +111,19 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         RegisterToggleSearchPropertyCallback(lyricsPropertyContainer.Q<Toggle>(), ESearchProperty.Lyrics);
 
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
+
+        songRouletteControl.SongListChangedEventStream.Subscribe(songList =>
+        {
+            if (songList.IsNullOrEmpty()
+                && !GetRawSearchText().IsNullOrEmpty())
+            {
+                searchTextField.AddToClassList("noSearchResults");
+            }
+            else
+            {
+                searchTextField.RemoveFromClassList("noSearchResults");
+            }
+        });
     }
 
     private void UpdateSearchTextFieldHint()

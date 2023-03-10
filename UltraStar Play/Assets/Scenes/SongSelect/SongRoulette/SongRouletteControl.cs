@@ -37,6 +37,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private readonly Subject<SongSelection> selectionClickedEventStream = new();
     public IObservable<SongSelection> SelectionClickedEventStream => selectionClickedEventStream;
 
+    private readonly Subject<List<SongMeta>> songListChangedEventStream = new();
+    public IObservable<List<SongMeta>> SongListChangedEventStream => songListChangedEventStream;
+
     private int SelectedSongIndex
     {
         get
@@ -125,6 +128,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         {
             UpdateListViewItems();
         }
+        
+        songListChangedEventStream.OnNext(songs);
     }
 
     private void UpdateListViewItems()
