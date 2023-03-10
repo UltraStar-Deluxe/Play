@@ -107,12 +107,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         RegisterToggleSearchPropertyCallback(languagePropertyContainer.Q<Toggle>(), ESearchProperty.Language);
         RegisterToggleSearchPropertyCallback(lyricsPropertyContainer.Q<Toggle>(), ESearchProperty.Lyrics);
 
-        SearchChangedEventStream
-            .Where(evt => evt is SearchPropertyChangedEvent)
-            .Subscribe(evt => UpdateTextFieldHint());
-
-        UpdateTextFieldHint();
-        
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
     }
 
@@ -121,17 +115,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         searchTextFieldHint.SetVisibleByDisplay(
             GetRawSearchText().IsNullOrEmpty()
             && searchTextField.focusController.focusedElement != searchTextField);
-    }
-
-    private void UpdateTextFieldHint()
-    {
-        List<string> searchPropertyStrings = searchProperties
-            .Select(it => GetTranslation(it))
-            .ToList();
-        searchPropertyStrings.Sort();
-        string hint = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint,
-            "properties", string.Join(", ", searchPropertyStrings));
-        searchTextFieldHint.text = hint;
     }
 
     private string GetTranslation(ESearchProperty searchProperty)
@@ -366,6 +349,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         languagePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_language);
         lyricsPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
         yearPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_year);
-        UpdateTextFieldHint();
+        searchTextFieldHint.text = "What do you want to sing today?";
     }
 }
