@@ -5,15 +5,9 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ContextMenuPopupManager : AbstractSingletonBehaviour
+public class ContextMenuPopupManager : AbstractSingletonBehaviour, ISceneInjectionFinishedListener
 {
-    public static ContextMenuPopupManager Instance
-    {
-        get
-        {
-            return GameObjectUtils.FindComponentWithTag<ContextMenuPopupManager>("ContextMenuPopupManager");
-        }
-    }
+    public static ContextMenuPopupManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ContextMenuPopupManager>();
 
     [InjectedInInspector]
     public VisualTreeAsset contextMenuUi;
@@ -29,7 +23,7 @@ public class ContextMenuPopupManager : AbstractSingletonBehaviour
         return Instance;
     }
 
-    private void Start()
+    public void OnSceneInjectionFinished()
     {
         // Close context menu via "back" InputAction with high priority
         InputManager.GetInputAction("usplay/back").PerformedAsObservable(100)

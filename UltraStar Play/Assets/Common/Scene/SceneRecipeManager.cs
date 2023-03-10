@@ -59,8 +59,13 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
             loadedGameObjects.Add(loadedGameObject);
         }
 
+        List<GameObject> loadedGameObjectsAndDontDestroyOnLoadManager = loadedGameObjects
+            .Union(new List<GameObject> { dontDestroyOnLoadManager.gameObject })
+            .ToList();
+        
         // Add new bindings from loaded objects.
-        Injector loadedSceneInjector = UniInjectUtils.CreateInjector();
+        Injector loadedSceneInjector = UniInjectUtils.CreateInjector()
+            .WithRootVisualElement(loadedSceneVisualElement);
         foreach (IBinder binder in dontDestroyOnLoadManager.transform.GetComponentsInChildren<IBinder>())
         {
             binder.GetBindings().ForEach(binding => loadedSceneInjector.AddBinding(binding));
@@ -79,12 +84,18 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
         {
             loadedSceneInjector.Inject(iNeedInjection);
         }
-        
         foreach (GameObject loadedGameObject in loadedGameObjects)
         {
-            loadedSceneInjector
-                .WithRootVisualElement(loadedSceneVisualElement)
-                .InjectAllComponentsInChildren(loadedGameObject);
+            loadedSceneInjector.InjectAllComponentsInChildren(loadedGameObject, true);
+        }
+
+        // Notify about injection finished
+        foreach (GameObject loadedGameObject in loadedGameObjectsAndDontDestroyOnLoadManager)
+        {
+            foreach (ISceneInjectionFinishedListener sceneInjectionFinishedListener in loadedGameObject.GetComponentsInChildren<ISceneInjectionFinishedListener>())
+            {
+                sceneInjectionFinishedListener.OnSceneInjectionFinished();
+            }
         }
         
         // Update translations
