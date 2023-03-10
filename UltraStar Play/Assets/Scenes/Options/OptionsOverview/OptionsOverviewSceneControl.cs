@@ -180,7 +180,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
     }
 
-    private void LoadScene(EScene scene)
+    public void LoadScene(EScene scene)
     {
         if (optionSceneRecipes.AnyMatch(recipe => recipe.scene == scene))
         {

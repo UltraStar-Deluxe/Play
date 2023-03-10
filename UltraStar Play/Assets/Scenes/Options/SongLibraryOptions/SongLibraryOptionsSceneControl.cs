@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -52,6 +51,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject]
     private SongMetaManager songMetaManager;
 
+    [Inject]
+    private OptionsOverviewSceneControl optionsOverviewSceneControl;
+    
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
 
     protected override void Start()
@@ -265,13 +267,22 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
             Label noSongsFoundLabel = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
-            noSongsFoundLabel.AddToClassList("centerHorizontalByMargin");
+            noSongsFoundLabel.AddToClassList("mx-auto");
+            noSongsFoundLabel.style.whiteSpace = WhiteSpace.Normal;
             noSongsFoundLabel.style.marginTop = 10;
             noSongsFoundLabel.style.marginBottom = 5;
             songList.Add(noSongsFoundLabel);
 
+            Button downloadSongsButton = new();
+            downloadSongsButton.text = "Download songs";
+            downloadSongsButton.AddToClassList("mx-auto");
+            downloadSongsButton.AddToClassList("songLibraryNoSongsButton");
+            downloadSongsButton.RegisterCallbackButtonTriggered(() => optionsOverviewSceneControl.LoadScene(EScene.ContentDownloadScene));
+            songList.Add(downloadSongsButton);
+            
             Button viewMoreButton = new();
-            viewMoreButton.AddToClassList("centerHorizontalByMargin");
+            viewMoreButton.AddToClassList("mx-auto");
+            viewMoreButton.AddToClassList("songLibraryNoSongsButton");
             viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
             viewMoreButton.RegisterCallbackButtonTriggered(() => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
             songList.Add(viewMoreButton);

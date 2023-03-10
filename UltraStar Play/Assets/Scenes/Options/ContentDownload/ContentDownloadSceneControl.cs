@@ -7,10 +7,8 @@ using System.Text;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.Zip;
-using PrimeInputActions;
 using ProTrans;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -124,19 +122,22 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         songArchiveEntries.ForEach(songArchiveEntry =>
         {
             Button songArchiveUrlButton = new();
+            songArchiveUrlButton.AddToClassList("songArchiveUrlButton");
             songArchiveUrlButton.text = songArchiveEntry.Url;
             songArchiveUrlButton.RegisterCallbackButtonTriggered(() =>
             {
                 SelectSongArchiveUrl(songArchiveEntry.Url);
                 CloseUrlChooserDialog();
             });
-            songArchiveUrlButton.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+            songArchiveUrlButton.style.height = new StyleLength(StyleKeyword.Auto);
             urlChooserDialogControl.AddVisualElement(songArchiveUrlButton);
 
             Label songArchiveInfoLabel = new(songArchiveEntry.Description);
             songArchiveInfoLabel.AddToClassList("songArchiveInfoLabel");
             urlChooserDialogControl.AddVisualElement(songArchiveInfoLabel);
         });
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialog);
     }
 
     private void CloseUrlChooserDialog()
@@ -361,7 +362,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
         AddToDebugAndUiLog("Preparing to unpack the downloaded song package.");
         string songsPath = ApplicationManager.PersistentSongsPath();
-        PoolHandle handle = ThreadPool.QueueUserWorkItem(poolHandle =>
+        PoolHandle handle = QueueUserWorkItem(poolHandle =>
         {
             if (archivePath.ToLowerInvariant().EndsWith("tar"))
             {

@@ -297,8 +297,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songAudioPlayer.AudioClipLoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
 
-        downloadSongsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.ContentDownloadScene));
-        addSongFolderButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
+        downloadSongsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.ContentDownloadScene)));
+        addSongFolderButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
 
         // Show options in popup
         singingOptionsDropdownOverlay.HideByDisplay();
@@ -877,9 +877,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
         noteDisplayModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
-        noSongsFoundLabel.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound);
-        downloadSongsButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_downloadSongsButton);
-        addSongFolderButton.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_noSongsFound_addSongFolderButton);
 
         SongSearchControl.UpdateTranslation();
         UpdateInputLegend();

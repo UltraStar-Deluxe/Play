@@ -25,11 +25,6 @@ VisualElement
     min-height: 100%;
 }
 
-.centerHorizontalByMargin {
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .centerVerticalByMargin {
     margin-top: auto;
     margin-bottom: auto;
@@ -118,6 +113,10 @@ VisualElement
 .flexWrapScrollView #unity-content-container {
     flex-direction: row;
     flex-wrap: wrap;
+}
+
+.controlMinWidth {
+    min-width: var(--control-width);
 }
 
 .controlLabel {

@@ -522,8 +522,20 @@
     align-items: center;
 }
 
+.songArchiveUrlButton {
+    -unity-text-align: middle-left;
+    height: auto;
+    width: 100%;
+    white-space: normal;
+}
+
+.songLibraryNoSongsButton {
+    width: 150px;
+    margin-bottom: 8px;
+}
+
 .songArchiveInfoLabel {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-s);
     margin-bottom: 15px;
     white-space: normal;
 }
