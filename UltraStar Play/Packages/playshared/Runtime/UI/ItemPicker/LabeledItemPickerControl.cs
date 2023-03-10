@@ -44,11 +44,11 @@ public class LabeledItemPickerControl<T> : ListedItemPickerControl<T>
             if (ItemPicker.ItemLabel.text.Length > 28
                 || ItemPicker.ItemLabel.text.Contains("\n"))
             {
-                ItemPicker.AddToClassListIfNew(smallFontUssClass);
+                ItemPicker.ItemLabel.AddToClassListIfNew(smallFontUssClass);
             }
             else
             {
-                ItemPicker.RemoveFromClassList(smallFontUssClass);
+                ItemPicker.ItemLabel.RemoveFromClassList(smallFontUssClass);
             }
         }
     }
