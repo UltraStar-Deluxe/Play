@@ -481,7 +481,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         ApplyThemeStaticBackground(currentThemeMeta);
 
-        Color itemPickerBackgroundColor = UIUtils.ColorHSVOffset(currentThemeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
+        Color itemPickerBackgroundColor = Colors.HsvOffset(currentThemeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
 
         ControlColorConfig defaultControlColorConfig = new()
         {
@@ -687,7 +687,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     return;
                 }
                 alreadyProcessedVisualElements.Add(entry);
-                UIUtils.SetBackgroundStyleWithHoverAndFocus(entry, new ControlColorConfig()
+                ApplyThemeStyleUtils.ApplyControlStyles(entry, new ControlColorConfig()
                 {
                     backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
                 });
@@ -713,7 +713,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return false;
     }
     
-    private void ApplyControlColorConfigToVisualElement(VisualElement visualElement, ControlColorConfig controlColorConfig, bool useParentElementAsHoverRoot = false)
+    private void ApplyControlColorConfigToVisualElement(VisualElement visualElement, ControlColorConfig controlColorConfig, bool useParentElementAsCallbackTarget = false)
     {
         if (alreadyProcessedVisualElements.Contains(visualElement)
             || IsSkipApplyThemeStylesToVisualElement(visualElement))
@@ -722,10 +722,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         alreadyProcessedVisualElements.Add(visualElement);
 
-        VisualElement hoverRoot = useParentElementAsHoverRoot
+        VisualElement callbackTarget = useParentElementAsCallbackTarget
             ? visualElement.parent
             : visualElement;
-        UIUtils.SetBackgroundStyleWithHoverAndFocus(visualElement, hoverRoot, controlColorConfig);
+        ApplyThemeStyleUtils.ApplyControlStyles(visualElement, callbackTarget, controlColorConfig);
     }
 
     private void OnOpenDropdownMenu()
