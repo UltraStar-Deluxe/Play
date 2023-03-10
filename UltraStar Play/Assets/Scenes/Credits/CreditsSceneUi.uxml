@@ -36,10 +36,10 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; align-items: flex-end; flex-direction: row;">
-                    <ui:Button name="backButton" value="This is the about text on multiple lines." class="controlMinWidth backgroundHighlightButton circle squareButton">
+                    <ui:Button name="backButton" value="This is the about text on multiple lines." class="backgroundHighlightButton circle squareButton">
                         <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" />
                     </ui:Button>
-                    <ui:Button name="skipButton" value="This is the about text on multiple lines." text="Skip" class="controlMinWidth backgroundHighlightButton circle squareButton smallFont" />
+                    <ui:Button name="skipButton" value="This is the about text on multiple lines." text="Skip" class="backgroundHighlightButton circle squareButton smallFont" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
