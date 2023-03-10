@@ -23,8 +23,8 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public VisualTreeAsset playerEntryUi;
 
-    [Inject(UxmlName = R.UxmlNames.playerScrollView)]
-    public VisualElement playerScrollView;
+    [Inject(UxmlName = R.UxmlNames.playerList)]
+    private VisualElement playerList;
 
     private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new();
 
@@ -76,7 +76,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private void UpdateListEntries()
     {
         // Remove old entries
-        playerScrollView.Clear();
+        playerList.Clear();
         playerEntryControls.Clear();
 
         // Create new entries
@@ -87,13 +87,13 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             CreateListEntry(playerProfile);
         }
         UpdateVoiceSelection();
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerScrollView);
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerList);
     }
 
     private void CreateListEntry(PlayerProfile playerProfile)
     {
         VisualElement playerEntryVisualElement = playerEntryUi.CloneTree().Children().FirstOrDefault();
-        playerScrollView.Add(playerEntryVisualElement);
+        playerList.Add(playerEntryVisualElement);
 
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)

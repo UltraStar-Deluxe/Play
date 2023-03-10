@@ -103,10 +103,10 @@
                             <MaterialIcon name="playersIcon" icon="manage_accounts" style="position: absolute; display: none;" />
                         </ui:Button>
                     </ui:VisualElement>
-                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerScrollView" class="pr-2 flexWrapScrollView" style="width: 100%; align-items: flex-start;">
+                    <ui:VisualElement scroll-deceleration-rate="0,135" elasticity="0,1" name="playerList" class="pr-2 flexWrapScrollView" style="align-items: flex-start; flex-wrap: wrap; flex-direction: row;">
                         <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
                         <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
-                    </ui:ScrollView>
+                    </ui:VisualElement>
                 </ui:ScrollView>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -132,6 +132,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             startColor = Colors.black,
             endColor = Colors.clearBlack,
         }));
+        bottomControlsContainer.style.backgroundColor = new StyleColor(Colors.clearBlack);
         
         artistLabel.text = songMeta.Artist;
         titleLabel.text = songMeta.Title;

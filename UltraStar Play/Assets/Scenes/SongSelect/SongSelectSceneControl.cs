@@ -124,8 +124,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.showLyricsButton)]
     private Button showLyricsButton;
     
-    [Inject(UxmlName = R.UxmlNames.playerScrollView)]
-    private VisualElement playerScrollView;
+    [Inject(UxmlName = R.UxmlNames.playerList)]
+    private VisualElement playerList;
 
     [Inject(UxmlName = R.UxmlNames.noScoresButton)]
     private ToggleButton noScoresButton;
