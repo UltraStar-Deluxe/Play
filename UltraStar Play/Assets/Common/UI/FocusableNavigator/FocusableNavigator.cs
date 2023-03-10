@@ -428,6 +428,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                 || descendant
                     is Button
                     or Toggle
+                    or SlideToggle
                     or DropdownField
                     or EnumField
                     or TextField
