@@ -20,6 +20,12 @@ public class ControlColorConfig
     public GradientConfig activeBackgroundGradient;
     public GradientConfig disabledBackgroundGradient;
     
+    public Color borderColor;
+    public Color hoverBorderColor;
+    public Color focusBorderColor;
+    public Color activeBorderColor;
+    public Color disabledBorderColor;
+
     public string backgroundImage;
     public string hoverBackgroundImage;
     public string focusBackgroundImage;

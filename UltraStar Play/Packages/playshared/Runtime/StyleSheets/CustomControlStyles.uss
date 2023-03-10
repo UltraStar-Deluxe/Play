@@ -412,7 +412,7 @@ TextField.placeholderVisible #unity-text-input {
     position: absolute;
     height: 90%;
     width: 45%;
-    background-color: var(--text-color);
+    background-color: var(--font-color);
     border-radius: 50%;
     transition: translate 0.5s, background-color 0.5s;
     translate: 5 5%;

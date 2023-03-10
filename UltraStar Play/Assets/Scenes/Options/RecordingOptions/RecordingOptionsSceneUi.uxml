@@ -18,8 +18,8 @@
         </ui:ScrollView>
         <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
             <ui:VisualElement name="notConnectedContainer" picking-mode="Ignore" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
-                <MaterialIcon name="warningIcon" icon="warning" class="warning rounded" />
-                <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warning" />
+                <MaterialIcon name="warningIcon" icon="warningFontColor" class="warning rounded" />
+                <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warningFontColor" />
             </ui:VisualElement>
             <ui:Button text="Delete" name="deleteButton" class="controlMinWidth ml-auto" style="visibility: visible; display: flex;" />
         </ui:VisualElement>

@@ -218,4 +218,14 @@ public static class Colors
             throw new ArgumentException($"Cannot create Color32 for {originalHexColor}", e);
         }
     }
+    
+    public static Color HsvOffset(Color inputColor, float hueOffset, float saturationOffset, float valueOffset)
+    {
+        float h, s, v;
+        Color.RGBToHSV(inputColor, out h, out s, out v);
+        h += hueOffset;
+        s += saturationOffset;
+        v += valueOffset;
+        return Color.HSVToRGB(h, s, v);
+    }
 }

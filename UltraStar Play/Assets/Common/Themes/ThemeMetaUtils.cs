@@ -61,11 +61,4 @@ public static class ThemeMetaUtils
         return !settings.DeveloperSettings.disableDynamicThemes
                 && themeMeta.ThemeJson.dynamicBackground != null;
     }
-
-    public static Color32 GetLabelColor(ThemeJson themeJson)
-    {
-        return themeJson.fontColorLabels
-            .OrIfDefault(themeJson.fontColorButtons)
-            .OrIfDefault(Colors.CreateColor("#d0d0d0"));
-    }
 }

@@ -38,7 +38,7 @@ VisualElement
 }
 
 .outline {
-    border-color: var(--text-color);
+    border-color: var(--font-color);
     border-width: 1px;
 }
 
@@ -96,7 +96,7 @@ VisualElement
 .textFieldHint {
     position: absolute;
     left: 10px;
-    color: var(--text-color-inverted);
+    color: var(--font-color-inverted);
     -unity-font-style: italic;
     font-size: var(--font-size-s);
 }
@@ -155,7 +155,7 @@ VisualElement
 
 .noBackground TextInput {
     background-color: rgba(0, 0, 0, 0);
-    color: var(--text-color);
+    color: var(--font-color);
     border-width: 0;
 }
 
@@ -252,17 +252,27 @@ Button.tinyFont {
 }
 
 #notificationLabel.error {
-    color: var(--text-color-error);
+    color: var(--font-color-error);
 }
 
-.error {
-    color: var(--text-color-error);
-    -unity-background-image-tint-color: var(--text-color-error);
+.fontColor {
+    color: var(--font-color);
+    -unity-background-image-tint-color: var(--font-color);
 }
 
-.warning {
-    color: var(--text-color-warning);
-    -unity-background-image-tint-color: var(--text-color-warning);
+.secondaryFontColor {
+    color: var(--font-color-secondary);
+    -unity-background-image-tint-color: var(--font-color-secondary);
+}
+
+.warningFontColor {
+    color: var(--font-color-warning);
+    -unity-background-image-tint-color: var(--font-color-warning);
+}
+
+.errorFontColor {
+    color: var(--font-color-error);
+    -unity-background-image-tint-color: var(--font-color-error);
 }
 
 .smallControl {
@@ -282,7 +292,7 @@ Button.tinyFont {
 }
 
 .outlineOnFocus:focus {
-    border-color: var(--text-color);
+    border-color: var(--font-color);
     border-width: 1px;
 }
 
@@ -294,10 +304,6 @@ Button.tinyFont {
 
 .textShadow {
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
-}
-
-.textColorTint {
-    -unity-background-image-tint-color: var(--text-color);
 }
 
 #titleImageAndText #titleImage {

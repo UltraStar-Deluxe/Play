@@ -109,11 +109,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
         }
 
-        themeManager.GetCurrentTheme().ThemeJson.fontColorButtons.IfNotDefault(color =>
-            logo.style.unityBackgroundImageTintColor = new StyleColor(color));
-        themeManager.GetCurrentTheme().ThemeJson.fontColorLabels.IfNotDefault(color =>
-            logo.style.unityBackgroundImageTintColor = new StyleColor(color));
-        
         startButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongSelectScene));
         startButton.Focus();
         settingsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));

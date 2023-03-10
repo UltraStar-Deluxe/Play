@@ -127,6 +127,7 @@ public static class ApplyThemeStyleUtils
 
     private static void ApplyStyle(VisualElementData data,
         Color32 fontColor,
+        Color32 borderColor,
         Color32 backgroundColor,
         GradientConfig backgroundGradient,
         string backgroundImage)
@@ -147,6 +148,7 @@ public static class ApplyThemeStyleUtils
             ApplyGradient(data, null);
             backgroundColor.IfNotDefault(color => visualElement.style.backgroundColor = new StyleColor(color));
         }
+        borderColor.IfNotDefault(color => visualElement.SetBorderColor(color));
         fontColor.IfNotDefault(color => visualElement.style.color = new StyleColor(color));
     }
     
@@ -154,6 +156,7 @@ public static class ApplyThemeStyleUtils
     {
         ApplyStyle(data,
             data.controlColorConfig.activeFontColor,
+            data.controlColorConfig.activeBorderColor,
             data.controlColorConfig.activeBackgroundColor,
             data.controlColorConfig.activeBackgroundGradient,
             data.controlColorConfig.activeBackgroundImage);
@@ -163,6 +166,7 @@ public static class ApplyThemeStyleUtils
     {
         ApplyStyle(data,
             data.controlColorConfig.focusFontColor,
+            data.controlColorConfig.focusBorderColor,
             data.controlColorConfig.focusBackgroundColor,
             data.controlColorConfig.focusBackgroundGradient,
             data.controlColorConfig.focusBackgroundImage);
@@ -172,6 +176,7 @@ public static class ApplyThemeStyleUtils
     {
         ApplyStyle(data,
             data.controlColorConfig.hoverFontColor,
+            data.controlColorConfig.hoverBorderColor,
             data.controlColorConfig.hoverBackgroundColor,
             data.controlColorConfig.hoverBackgroundGradient,
             data.controlColorConfig.hoverBackgroundImage);
@@ -181,6 +186,7 @@ public static class ApplyThemeStyleUtils
     {
         ApplyStyle(data,
             data.controlColorConfig.fontColor,
+            data.controlColorConfig.borderColor,
             data.controlColorConfig.backgroundColor,
             data.controlColorConfig.backgroundGradient,
             data.controlColorConfig.backgroundImage);
@@ -190,6 +196,7 @@ public static class ApplyThemeStyleUtils
     {
         ApplyStyle(data,
             data.controlColorConfig.disabledFontColor,
+            data.controlColorConfig.disabledBorderColor,
             data.controlColorConfig.disabledBackgroundColor,
             data.controlColorConfig.disabledBackgroundGradient,
             data.controlColorConfig.disabledBackgroundImage);
@@ -236,5 +243,49 @@ public static class ApplyThemeStyleUtils
         public float initTimeInSeconds;
         public ControlColorConfig controlColorConfig;
         public GradientConfig currentGradientConfig;
+    }
+
+    public static void ApplyPrimaryFontColor(Color32 fontColor, VisualElement root)
+    {
+        fontColor.IfNotDefault(color =>
+        {
+            root.Query<Label>()
+                .Where(label => !label.ClassListContains("secondaryFontColor")
+                                && !label.ClassListContains("warningFontColor")
+                                && !label.ClassListContains("errorFontColor"))
+                .ForEach(label => label.style.color = new StyleColor(color));
+            root.Query(null, R.UssClasses.fontColor)
+                .ForEach(visualElement => visualElement.style.unityBackgroundImageTintColor = new StyleColor(color));
+        });
+    }
+
+    public static void ApplySecondaryFontColor(Color32 fontColor, VisualElement root)
+    {
+        fontColor.IfNotDefault(color =>
+        {
+            root.Query<Label>()
+                .Where(label => label.ClassListContains("secondaryFontColor"))
+                .ForEach(label => label.style.color = new StyleColor(color));
+        });
+    }
+
+    public static void ApplyWarningFontColor(Color32 fontColor, VisualElement root)
+    {
+        fontColor.IfNotDefault(color =>
+        {
+            root.Query<Label>()
+                .Where(label => label.ClassListContains("warningFontColor"))
+                .ForEach(label => label.style.color = new StyleColor(color));
+        });
+    }
+    
+    public static void ApplyErrorFontColor(Color32 fontColor, VisualElement root)
+    {
+        fontColor.IfNotDefault(color =>
+        {
+            root.Query<Label>()
+                .Where(label => label.ClassListContains("errorFontColor"))
+                .ForEach(label => label.style.color = new StyleColor(color));
+        });
     }
 }

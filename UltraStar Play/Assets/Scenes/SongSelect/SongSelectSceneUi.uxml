@@ -26,7 +26,7 @@
                         </ui:TextField>
                         <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; overflow: visible;">
                             <BootstrapIcon tabindex="-1" name="searchIcon" icon="funnel-fill" picking-mode="Ignore" style="position: absolute; font-size: 20px;" />
-                            <MaterialIcon name="searchErrorIcon" icon="warning" class="warning rounded" />
+                            <MaterialIcon name="searchErrorIcon" icon="warningFontColor" class="warning rounded" />
                         </ui:Button>
                     </ui:VisualElement>
                     <ui:ListView focusable="true" name="songListView" fixed-item-height="66" style="flex-grow: 1;" />
@@ -76,7 +76,7 @@
                                 <ui:Button display-tooltip-when-elided="true" name="showLyricsButton" class="squareButton backgroundHighlightButton">
                                     <MaterialIcon tabindex="-1" name="lyricsIcon" icon="lyrics" />
                                 </ui:Button>
-                                <ui:VisualElement name="duetIcon" class="textColorTint" style="width: 24px; height: 24px; display: flex; flex-direction: row; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); -unity-background-scale-mode: scale-to-fit;" />
+                                <ui:VisualElement name="duetIcon" class="fontColor" style="width: 24px; height: 24px; display: flex; flex-direction: row; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); -unity-background-scale-mode: scale-to-fit;" />
                                 <ui:Label text="3:23" display-tooltip-when-elided="true" name="durationLabel" class="mt-auto smallerFont" style="-unity-text-align: upper-right;" />
                             </ui:VisualElement>
                         </ui:VisualElement>

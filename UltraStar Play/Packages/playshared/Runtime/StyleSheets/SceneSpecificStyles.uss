@@ -219,7 +219,7 @@
 }
 
 #timeBarPositionIndicator {
-    background-color: var(--text-color);
+    background-color: var(--font-color);
     width: 8px;
     height: 100%;
     border-radius: 4px;
@@ -431,7 +431,7 @@
 }
 
 #playerProfileEntryContent {
-    border-color: var(--text-color);
+    border-color: var(--font-color);
 }
 
 #playerProfileImagePicker #previousItemButton {
@@ -463,12 +463,12 @@
 }
 
 .optionsOverviewButton .warning {
-    color: var(--text-color-warning);
-    -unity-background-image-tint-color: var(--text-color-warning);
+    color: var(--font-color-warning);
+    -unity-background-image-tint-color: var(--font-color-warning);
 }
 
 .optionsOverviewButton VisualElement {
-    -unity-background-image-tint-color: var(--text-color);
+    -unity-background-image-tint-color: var(--font-color);
     -unity-background-scale-mode: scale-to-fit;
     width: var(--font-size-xl);
     height: var(--font-size-xl);
@@ -547,7 +547,7 @@
     margin-right: auto;
     font-size: var(--font-size-s);
     white-space: normal;
-    border-bottom-color: var(--text-color);
+    border-bottom-color: var(--font-color);
     border-bottom-width: 1px;
 }
 

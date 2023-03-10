@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using UniInject;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 // Handles the loading, saving and application of themes for the app
@@ -471,53 +470,46 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        ThemeMeta currentThemeMeta = GetCurrentTheme();
-        if(currentThemeMeta == null
-           || currentThemeMeta.ThemeJson == null)
+        ThemeMeta themeMeta = GetCurrentTheme();
+        if(themeMeta == null
+           || themeMeta.ThemeJson == null)
         {
             Debug.LogWarning("Not applying theme styles because current theme is null");
             return;
         }
+        ThemeJson themeJson = themeMeta.ThemeJson;
+        
+        ApplyThemeStaticBackground(themeMeta);
 
-        ApplyThemeStaticBackground(currentThemeMeta);
-
-        Color itemPickerBackgroundColor = Colors.HsvOffset(currentThemeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
+        Color itemPickerBackgroundColor = Colors.HsvOffset(themeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
 
         ControlColorConfig defaultControlColorConfig = new()
         {
-            fontColor = currentThemeMeta.ThemeJson.fontColorButtons,
+            fontColor = themeMeta.ThemeJson.fontColorButtons,
             
-            backgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons,
-            hoverBackgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
-            focusBackgroundColor = currentThemeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
+            backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
+            hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
+            focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
             
-            backgroundGradient = currentThemeMeta.ThemeJson.buttonBackgroundGradient,
-            hoverBackgroundGradient = currentThemeMeta.ThemeJson.hoverButtonBackgroundGradient,
-            focusBackgroundGradient = currentThemeMeta.ThemeJson.focusButtonBackgroundGradient,
-            activeBackgroundGradient = currentThemeMeta.ThemeJson.activeButtonBackgroundGradient,
+            backgroundGradient = themeMeta.ThemeJson.buttonBackgroundGradient,
+            hoverBackgroundGradient = themeMeta.ThemeJson.hoverButtonBackgroundGradient,
+            focusBackgroundGradient = themeMeta.ThemeJson.focusButtonBackgroundGradient,
+            activeBackgroundGradient = themeMeta.ThemeJson.activeButtonBackgroundGradient,
         };
         
         // Scene specific elements
-        ApplyThemeSpecificStylesToVisualElements(root, currentThemeMeta, GetCurrentScene());
+        ApplyThemeSpecificStylesToVisualElements(root, themeMeta, GetCurrentScene());
 
-        // Labels
-        Color32 labelColor = ThemeMetaUtils.GetLabelColor(currentThemeMeta.ThemeJson);
-        root.Query<Label>().ForEach(label =>
-        {
-            if (IsIgnoredLabel(label))
-            {
-                return;
-            }
-            
-            label.style.color = new StyleColor(labelColor);
-        });
-        root.Query(null, R.UssClasses.textColorTint)
-            .ForEach(micIcon => micIcon.style.unityBackgroundImageTintColor = new StyleColor(labelColor));
+        // Basic font colors
+        ApplyThemeStyleUtils.ApplyPrimaryFontColor(themeJson.primaryFontColor, root);
+        ApplyThemeStyleUtils.ApplySecondaryFontColor(themeJson.secondaryFontColor, root);
+        ApplyThemeStyleUtils.ApplyWarningFontColor(themeJson.warningFontColor, root);
+        ApplyThemeStyleUtils.ApplyErrorFontColor(themeJson.errorFontColor, root);
         
         // Buttons
         root.Query<Button>().ForEach(button =>
         {
-            ControlColorConfig colorConfig = GetButtonColorConfig(currentThemeMeta, button);
+            ControlColorConfig colorConfig = GetButtonColorConfig(themeMeta, button);
             
             ApplyControlColorConfigToVisualElement(button, colorConfig);
         });
@@ -570,13 +562,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 entry.style.backgroundColor = defaultControlColorConfig.backgroundColor;
             });
         }
-    }
-
-    private bool IsIgnoredLabel(Label label)
-    {
-        return label.name
-            is R.UxmlNames.newHighscoreLabel
-            or R.UxmlNames.newHighscoreIcon;
     }
 
     private bool IsIgnoredScene(EScene currentScene)

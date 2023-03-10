@@ -1,6 +1,7 @@
 #songEditorRoot {
-    --text-color: rgb(208, 208, 208);
-    --text-color-inverted: rgb(64, 64, 64);
+    --font-color: rgb(208, 208, 208);
+    --font-color-secondary: #667085;
+    --font-color-inverted: rgb(64, 64, 64);
     --control-color: rgb(88, 88, 88);
     --control-color-accent1: rgb(103, 103, 103);
     --control-color-accent2: rgb(70, 96, 124);
@@ -117,7 +118,7 @@ Button.selected:hover {
     height: 100%;
     -unity-text-align: middle-center;
     -unity-background-scale-mode: scale-to-fit;
-    -unity-background-image-tint-color: var(--text-color);
+    -unity-background-image-tint-color: var(--font-color);
 }
 
 .leftSideBar MaterialIcon {
@@ -195,7 +196,7 @@ Button.selected:hover {
 }
 
 .songEditorSettingsGroup {
-    border-color: var(--text-color);
+    border-color: var(--font-color);
     border-top-width: 1px;
     width: 100%;
     min-height: 50px;

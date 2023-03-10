@@ -22,7 +22,10 @@ public class ThemeJson
     public Color32 backgroundColorButtons;
     public Color32 fontColorButtons;
     
-    public Color32 fontColorLabels;
+    public Color32 primaryFontColor;
+    public Color32 secondaryFontColor;
+    public Color32 warningFontColor;
+    public Color32 errorFontColor;
     
     public List<Color32> microphoneColors;
     public Dictionary<string, Color32> phraseRatingColors;

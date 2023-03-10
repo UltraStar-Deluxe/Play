@@ -3,14 +3,14 @@
 /**************************************************/
 
 .unity-label {
-    color: var(--text-color);
+    color: var(--font-color);
     margin: 0;
     padding: 0;
     font-size: var(--font-size);
 }
 
 .unity-base-field:focus .unity-base-field__label {
-    color: var(--text-color);
+    color: var(--font-color);
 }
 
 /**************************************************/
@@ -24,8 +24,8 @@
 }
 
 .unity-base-text-field__input {
-    --unity-cursor-color: var(--text-color-inverted);
-    color: var(--text-color-inverted);
+    --unity-cursor-color: var(--font-color-inverted);
+    color: var(--font-color-inverted);
     font-size: var(--font-size-s);
     margin: 0;
     padding: 0 5px;
@@ -79,7 +79,7 @@
 .unity-button {
     transition: background-color 0.2s;
     background-color: var(--control-color);
-    color: var(--text-color);
+    color: var(--font-color);
     height: var(--control-height);
     font-size: var(--font-size);
     border-width: 0;
@@ -109,7 +109,7 @@
 /**************************************************/
 
 .unity-base-popup-field {
-    color: var(--text-color);
+    color: var(--font-color);
     margin: 0;
 }
 
@@ -147,7 +147,7 @@
 }
 
 .unity-base-popup-field__text {
-    color: var(--text-color);
+    color: var(--font-color);
     margin: 0;
     padding: 0;
     border-width: 0;
@@ -155,7 +155,7 @@
 }
 
 .unity-base-popup-field__arrow {
-    -unity-background-image-tint-color: var(--text-color);
+    -unity-background-image-tint-color: var(--font-color);
     -unity-background-scale-mode: scale-to-fit;
     border-width: 0;
 }
@@ -164,7 +164,7 @@
 /* ENUM FIELD */
 /**************************************************/
 .unity-enum-field {
-    color: var(--text-color);
+    color: var(--font-color);
     margin: 0;
 }
 
@@ -190,7 +190,7 @@
 }
 
 .unity-enum-field__arrow {
-    -unity-background-image-tint-color: var(--text-color);
+    -unity-background-image-tint-color: var(--font-color);
     -unity-background-scale-mode: scale-to-fit;
     border-width: 0;
 }
@@ -219,7 +219,7 @@
     margin: 0;
     border-width: 0;
     border-bottom-width: 2px;
-    border-color: var(--text-color);
+    border-color: var(--font-color);
 }
 
 .unity-base-dropdown__item:hover {
@@ -288,7 +288,7 @@
 
 .unity-toggle__checkmark
 {
-    -unity-background-image-tint-color: var(--text-color);
+    -unity-background-image-tint-color: var(--font-color);
     -unity-background-scale-mode: scale-to-fit;
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
