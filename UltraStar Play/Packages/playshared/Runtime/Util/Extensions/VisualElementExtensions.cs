@@ -45,7 +45,7 @@ public static class VisualElementExtensions
 
     public static bool IsVisibleByDisplay(this VisualElement visualElement)
     {
-        return visualElement.style.display != DisplayStyle.None;
+        return visualElement.resolvedStyle.display != DisplayStyle.None;
     }
 
     public static void SetVisibleByDisplay(this VisualElement visualElement, bool isVisible)
