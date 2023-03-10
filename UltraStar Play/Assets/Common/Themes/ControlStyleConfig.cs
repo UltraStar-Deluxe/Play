@@ -2,17 +2,19 @@
 
 public class ControlStyleConfig
 {
-    public Color fontColor;
-    public Color hoverFontColor;
-    public Color focusFontColor;
-    public Color activeFontColor;
-    public Color disabledFontColor;
+    public string name;
+    
+    public Color32 fontColor;
+    public Color32 hoverFontColor;
+    public Color32 focusFontColor;
+    public Color32 activeFontColor;
+    public Color32 disabledFontColor;
 
-    public Color backgroundColor;
-    public Color hoverBackgroundColor;
-    public Color focusBackgroundColor;
-    public Color activeBackgroundColor;
-    public Color disabledBackgroundColor;
+    public Color32 backgroundColor;
+    public Color32 hoverBackgroundColor;
+    public Color32 focusBackgroundColor;
+    public Color32 activeBackgroundColor;
+    public Color32 disabledBackgroundColor;
     
     public GradientConfig backgroundGradient;
     public GradientConfig hoverBackgroundGradient;
@@ -20,11 +22,11 @@ public class ControlStyleConfig
     public GradientConfig activeBackgroundGradient;
     public GradientConfig disabledBackgroundGradient;
     
-    public Color borderColor;
-    public Color hoverBorderColor;
-    public Color focusBorderColor;
-    public Color activeBorderColor;
-    public Color disabledBorderColor;
+    public Color32 borderColor;
+    public Color32 hoverBorderColor;
+    public Color32 focusBorderColor;
+    public Color32 activeBorderColor;
+    public Color32 disabledBorderColor;
 
     public string backgroundImage;
     public string hoverBackgroundImage;

@@ -41,6 +41,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             // Focus on the name of the newly added player to directly allow changing its name
             TextField nameTextField = playerProfileList[playerProfileList.childCount-1].Q<TextField>("nameTextField");
             nameTextField.Focus();
+            
+            ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
         });
     }
 

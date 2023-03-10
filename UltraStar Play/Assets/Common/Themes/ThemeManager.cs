@@ -441,6 +441,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     public static void ApplyThemeSpecificStylesToVisualElements(VisualElement root)
     {
+        // using DisposableStopwatch d = new("ApplyThemeSpecificStylesToVisualElements took <ms>");
+        
         ThemeManager themeManager = Instance;
         if (themeManager != null)
         {
@@ -454,8 +456,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             return;
         }
-
-        using DisposableStopwatch d = new("DoApplyThemeSpecificStylesToVisualElements took <ms>");
 
         if (settings.DeveloperSettings.disableDynamicThemes)
         {
@@ -481,25 +481,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         
         ApplyThemeStaticBackground(themeMeta);
 
-        Color itemPickerBackgroundColor = Colors.HsvOffset(themeMeta.ThemeJson.backgroundColorButtons, 0, -0.1f, 0.01f);
 
-        ControlStyleConfig defaultControlStyleConfig = new()
-        {
-            fontColor = themeMeta.ThemeJson.fontColorButtons,
-            
-            backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
-            hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
-            focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
-            
-            backgroundGradient = themeMeta.ThemeJson.buttonBackgroundGradient,
-            hoverBackgroundGradient = themeMeta.ThemeJson.hoverButtonBackgroundGradient,
-            focusBackgroundGradient = themeMeta.ThemeJson.focusButtonBackgroundGradient,
-            activeBackgroundGradient = themeMeta.ThemeJson.activeButtonBackgroundGradient,
-        };
+        ControlStyleConfig defaultControlStyleConfig = themeMeta.ThemeJson.defaultControl;
         
         // Scene specific elements
         ApplyThemeSpecificStylesToVisualElements(root, themeMeta, GetCurrentScene());
-
+        
         // Basic font colors
         ApplyThemeStyleUtils.ApplyPrimaryFontColor(themeJson.primaryFontColor, root);
         ApplyThemeStyleUtils.ApplySecondaryFontColor(themeJson.secondaryFontColor, root);
@@ -509,33 +496,81 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         // Buttons
         root.Query<Button>().ForEach(button =>
         {
-            ControlStyleConfig styleConfig = GetButtonColorConfig(themeMeta, button);
-            
+            ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, button);
             ApplyControlColorConfigToVisualElement(button, styleConfig);
         });
 
         // ItemPickers
-        root.Query(null, "itemPickerItemLabel").ForEach(label =>
+        if (defaultControlStyleConfig != null)
         {
-            label.style.backgroundColor = itemPickerBackgroundColor;
-            label.style.color = defaultControlStyleConfig.fontColor;
-        });
-
-        // Unity controls
-        List<string> ussClassNamesForApplyButtonColors = new()
+            Color itemPickerBackgroundColor = Colors.HsvOffset(defaultControlStyleConfig.backgroundColor, 0, -0.1f, 0.01f);
+            root.Query(null, "itemPickerItemLabel").ForEach(label =>
+            {
+                label.style.backgroundColor = itemPickerBackgroundColor;
+                defaultControlStyleConfig.fontColor.IfNotDefault(fontColor => label.style.color = new StyleColor(fontColor));
+            });
+        }
+        
+        // Toggle
+        root.Query<Toggle>().ForEach(toggle =>
         {
-            "unity-toggle__input",
-            "unity-base-popup-field__input",
-            "unity-enum-field__input",
-            "slide-toggle__input",
-        };
-        ussClassNamesForApplyButtonColors.ForEach(ussClassName =>
-        {
-            root.Query<VisualElement>(null, ussClassName)
-                .ForEach(element => ApplyControlColorConfigToVisualElement(element, defaultControlStyleConfig, true));
+            VisualElement styleTarget = toggle.Q(null, "unity-toggle__input");
+            ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, toggle);
+            ApplyControlColorConfigToVisualElement(toggle, styleConfig, styleTarget);
         });
         
-        // Remove border
+        // SlideToggle
+        root.Query<SlideToggle>().ForEach(slideToggle =>
+        {
+            VisualElement styleTarget = slideToggle.Q(null, "slide-toggle__input");
+            ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, slideToggle);
+            ApplyControlColorConfigToVisualElement(slideToggle, styleConfig, styleTarget);
+        });
+        
+        // Dropdown menus
+        if (defaultControlStyleConfig != null)
+        {
+            List<string> ussClassNamesForApplyButtonColors = new()
+            {
+                "unity-base-popup-field__input",
+                "unity-enum-field__input",
+            };
+            ussClassNamesForApplyButtonColors.ForEach(ussClassName =>
+            {
+                root.Query<VisualElement>(null, ussClassName)
+                    .ForEach(styleTarget =>
+                    {
+                        ApplyControlColorConfigToVisualElement(styleTarget, defaultControlStyleConfig);
+                    });
+            });
+            
+            root.Query<DropdownField>().ForEach(RegisterOpenDropdownMenuCallback);
+            root.Query<EnumField>().ForEach(RegisterOpenDropdownMenuCallback);
+            if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController, out VisualElement unityBaseDropdown))
+            {
+                unityBaseDropdown.Query<VisualElement>(null, "unity-base-dropdown__container-inner").ForEach(entry =>
+                {
+                    if (alreadyProcessedVisualElements.Contains(entry))
+                    {
+                        return;
+                    }
+                    alreadyProcessedVisualElements.Add(entry);
+                    entry.style.backgroundColor = new StyleColor(defaultControlStyleConfig.backgroundColor);
+                });
+            }
+        }
+        
+        // ListViews
+        root.Query<ListView>().ForEach(listView => ApplyThemeStyleUtils.UpdateStylesOnListViewSelectionChanged(listView));
+        
+        // Panels
+        root.Query<VisualElement>(null, "panel").ForEach(visualElement =>
+        {
+            ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, visualElement);
+            ApplyControlColorConfigToVisualElement(visualElement, styleConfig);
+        });
+        
+        // Remove borders
         List<string> ussClassNamesForRemoveBorder = new()
         {
             "slide-toggle__input",
@@ -545,23 +580,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             root.Query(null,ussClassName).ForEach(it => it.SetBorderColor(Colors.clearBlack));
         });
-
-        // Dropdown menus
-        root.Query<DropdownField>().ForEach(RegisterOpenDropdownMenuCallback);
-        root.Query<EnumField>().ForEach(RegisterOpenDropdownMenuCallback);
-
-        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController, out VisualElement unityBaseDropdown))
-        {
-            unityBaseDropdown.Query<VisualElement>(null, "unity-base-dropdown__container-inner").ForEach(entry =>
-            {
-                if (alreadyProcessedVisualElements.Contains(entry))
-                {
-                    return;
-                }
-                alreadyProcessedVisualElements.Add(entry);
-                entry.style.backgroundColor = defaultControlStyleConfig.backgroundColor;
-            });
-        }
     }
 
     private bool IsIgnoredScene(EScene currentScene)
@@ -571,64 +589,75 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             or EScene.CreditsScene;
     }
 
-    private ControlStyleConfig GetButtonColorConfig(ThemeMeta themeMeta, Button button)
+    private ControlStyleConfig GetColorStyleConfig(ThemeMeta themeMeta, VisualElement visualElement)
     {
-        if (button.ClassListContains("textHighlightButton"))
+        if (visualElement.ClassListContains("transparentButton")
+            || visualElement is ToggleButton)
         {
-            return new ControlStyleConfig()
-            {
-                backgroundColor = Colors.clearWhite,
-                fontColor = themeMeta.ThemeJson.fontColorButtons.WithLerp(Color.black, 0.5f),
-                hoverFontColor = themeMeta.ThemeJson.fontColorButtons,
-                focusFontColor = themeMeta.ThemeJson.fontColorButtons,
-                activeFontColor = themeMeta.ThemeJson.fontColorButtons.WithLerp(Color.black, 0.1f),
-            };
+            return ObjectUtils.FirstNonDefault(
+                themeMeta.ThemeJson.transparentButton,
+                themeMeta.ThemeJson.textOnlyButton,
+                themeMeta.ThemeJson.defaultControl);
         }
-        else if (button.ClassListContains("backgroundHighlightButton"))
+        
+        if (visualElement.ClassListContains("textOnlyButton"))
         {
-            return new ControlStyleConfig()
-            {
-                fontColor = themeMeta.ThemeJson.fontColorButtons,
-                backgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(0),
-                hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
-                focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(225),
-            };
+            return ObjectUtils.FirstNonDefault(
+                themeMeta.ThemeJson.textOnlyButton,
+                themeMeta.ThemeJson.transparentButton,
+                themeMeta.ThemeJson.defaultControl);
         }
-        else if (button is ToggleButton)
+        
+        if (visualElement.ClassListContains("lightButton"))
         {
-            return new ControlStyleConfig()
-            {
-                fontColor = themeMeta.ThemeJson.fontColorButtons,
-                backgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(0),
-                hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
-                focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(225),
-                activeBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithAlpha(127),
-            };
+            return ObjectUtils.FirstNonDefault(
+                themeMeta.ThemeJson.lightButton,
+                themeMeta.ThemeJson.textOnlyButton,
+                themeMeta.ThemeJson.transparentButton,
+                themeMeta.ThemeJson.defaultControl);
         }
-        else if (button.ClassListContains("transparentBackgroundColor")) 
+
+        if (visualElement.ClassListContains("dangerButton"))
+        {
+            return ObjectUtils.FirstNonDefault(
+                themeMeta.ThemeJson.dangerButton,
+                themeMeta.ThemeJson.defaultControl);
+        }
+        
+        if (visualElement.ClassListContains("transparentBackgroundColor")) 
         {
             return new ControlStyleConfig()
             {
                 backgroundColor = Color.clear,
                 hoverBackgroundColor = Color.clear,
                 focusBackgroundColor = Color.clear,
+                activeBackgroundColor = Color.clear,
+                disabledBackgroundColor = Color.clear,
             };
         }
-        else
+        
+        if (visualElement.ClassListContains("panel")) 
         {
-            return new ControlStyleConfig()
-            {
-                fontColor = themeMeta.ThemeJson.fontColorButtons,
-                backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
-                hoverBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
-                focusBackgroundColor = themeMeta.ThemeJson.backgroundColorButtons.WithLerp(Color.white, 0.2f),
-                
-                backgroundGradient = themeMeta.ThemeJson.buttonBackgroundGradient,
-                hoverBackgroundGradient = themeMeta.ThemeJson.hoverButtonBackgroundGradient,
-                focusBackgroundGradient = themeMeta.ThemeJson.focusButtonBackgroundGradient,
-                activeBackgroundGradient = themeMeta.ThemeJson.activeButtonBackgroundGradient,
-            };
+            return ObjectUtils.FirstNonDefault(
+                themeMeta.ThemeJson.panel,
+                themeMeta.ThemeJson.defaultControl);
         }
+        
+        if (visualElement is SlideToggle)
+        {
+            return ObjectUtils.FirstNonDefault(
+                themeMeta.ThemeJson.slideToggleOff,
+                themeMeta.ThemeJson.defaultControl);
+        }
+        
+        if (visualElement is Toggle)
+        {
+            return ObjectUtils.FirstNonDefault(
+                themeMeta.ThemeJson.toggle,
+                themeMeta.ThemeJson.defaultControl);
+        }
+
+        return themeMeta.ThemeJson.defaultControl;
     }
 
     private void RegisterOpenDropdownMenuCallback(VisualElement visualElement)
@@ -660,23 +689,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     element.style.backgroundColor = new StyleColor(StyleKeyword.None);
                 }));
             
-            currentThemeMeta.ThemeJson.fontColorButtons.IfNotDefault(color =>
+            currentThemeMeta.ThemeJson.primaryFontColor.IfNotDefault(color =>
                 root.Query(R.UxmlNames.timeBarPositionIndicator).ForEach(it => it.style.backgroundColor = new StyleColor(color)));
-        }
-        else if (currentScene is EScene.SongSelectScene)
-        {
-            root.Query<VisualElement>("songEntryUiRoot").ForEach(entry =>
-            {
-                if (alreadyProcessedVisualElements.Contains(entry))
-                {
-                    return;
-                }
-                alreadyProcessedVisualElements.Add(entry);
-                ApplyThemeStyleUtils.ApplyControlStyles(entry, new ControlStyleConfig()
-                {
-                    backgroundColor = themeMeta.ThemeJson.backgroundColorButtons,
-                });
-            });
         }
     }
 
@@ -698,19 +712,21 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return false;
     }
     
-    private void ApplyControlColorConfigToVisualElement(VisualElement visualElement, ControlStyleConfig controlStyleConfig, bool useParentElementAsCallbackTarget = false)
+    private void ApplyControlColorConfigToVisualElement(VisualElement visualElement, ControlStyleConfig controlStyleConfig, VisualElement styleTarget=null)
     {
-        if (alreadyProcessedVisualElements.Contains(visualElement)
+        if (controlStyleConfig == null
+            || alreadyProcessedVisualElements.Contains(visualElement)
             || IsSkipApplyThemeStylesToVisualElement(visualElement))
         {
             return;
         }
         alreadyProcessedVisualElements.Add(visualElement);
 
-        VisualElement callbackTarget = useParentElementAsCallbackTarget
-            ? visualElement.parent
-            : visualElement;
-        ApplyThemeStyleUtils.ApplyControlStyles(visualElement, callbackTarget, controlStyleConfig);
+        if (styleTarget == null)
+        {
+            styleTarget = visualElement;
+        }
+        ApplyThemeStyleUtils.ApplyControlStyles(visualElement, styleTarget, controlStyleConfig);
     }
 
     private void OnOpenDropdownMenu()

@@ -1,26 +1,67 @@
 {
-    "buttonBackgroundGradient": {
-        "startColor": "#101828",
-        "endColor": "#475467",
-        "angleDegrees": 45,
+    "defaultControl": {
+        "fontColor": "#D0D5DD",
+        "backgroundColor": "#475467",
+        "backgroundGradient": {
+            "startColor": "#101828",
+            "endColor": "#475467",
+            "angleDegrees": 45,
+        },
+        "hoverBackgroundGradient": {
+            "startColor": "#101828",
+            "endColor": "#000000",
+            "angleDegrees": 45,
+        },
+        "focusBackgroundGradient": {
+            "startColor": "#101828",
+            "endColor": "#000000",
+            "angleDegrees": 45,
+        },
+        "activeBackgroundGradient": {
+            "startColor": "#101828",
+            "endColor": "#000000",
+            "angleDegrees": 45,
+        },
     },
-    "hoverButtonBackgroundGradient": {
-        "startColor": "#101828",
-        "endColor": "#000000",
-        "angleDegrees": 45,
+
+    "transparentButton": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#202020dd",
+        "focusBackgroundColor": "#202020ff",
+        "activeBackgroundColor": "#404040ff",
     },
-    "focusButtonBackgroundGradient": {
-        "startColor": "#101828",
-        "endColor": "#000000",
-        "angleDegrees": 45,
+
+    "lightButton": {
+        "fontColor": "#101828",
+        "backgroundColor": "#F9F5FF",
+        "hoverBackgroundColor": "#7C7A80",
+        "focusBackgroundColor": "#7C7A80",
+        "activeBackgroundColor": "#7C7A80",
     },
-    "activeButtonBackgroundGradient": {
-        "startColor": "#101828",
-        "endColor": "#000000",
-        "angleDegrees": 45,
+
+    "panel": {
+        "backgroundColor": "#475467",
+        "hoverBackgroundColor": "#7B91B3",
+        "focusBackgroundColor": "#7B91B3",
+        "activeBackgroundColor": "#7B91B3",
     },
-    "backgroundColorButtons": "#475467",
-    "fontColorButtons": "#D0D5DD",
+
+    "slideToggleOff": {
+        "name": "slideToggleOff",
+        "backgroundColor": "#aa0000",
+        "hoverBackgroundColor": "#ff0000",
+        "focusBackgroundColor": "#ffaa00",
+        "activeBackgroundColor": "#ffaaaa",
+    },
+
+    "slideToggleOn": {
+        "name": "slideToggle",
+        "backgroundColor": "#00aa00",
+        "hoverBackgroundColor": "#00ff00",
+        "focusBackgroundColor": "#00ffaa",
+        "activeBackgroundColor": "#aaffff",
+    },
+
     "lyricsColor": "#FFFFFF",
     "lyricsOutlineColor": "#00000000",
     "currentNoteLyricsColor": "#9E77ED",

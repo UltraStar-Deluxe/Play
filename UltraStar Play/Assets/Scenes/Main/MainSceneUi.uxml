@@ -6,27 +6,27 @@
             <ui:Button text="Team&#10;&amp; Tournament" name="partyButton" class="mainSceneButton" />
         </ui:VisualElement>
         <ui:VisualElement name="bottomButtonRow" class="child-mr-2" style="width: 100%; align-items: center; flex-direction: row; justify-content: flex-end; position: absolute; bottom: 5px;">
-            <ui:Button name="versionInfoContainer" class="backgroundHighlightButton focusableNavigatorIgnore" style="right: 5px; margin-right: auto; overflow: visible; align-items: flex-start;">
+            <ui:Button name="versionInfoContainer" class="transparentButton focusableNavigatorIgnore" style="right: 5px; margin-right: auto; overflow: visible; align-items: flex-start;">
                 <ui:Label text="Version xx.yy.zz" name="semanticVersionText" style="font-size: 12px; -unity-text-align: upper-center; border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; height: auto;" />
                 <ui:VisualElement name="versionDetailsContainer" style="background-color: rgba(0, 0, 0, 0); bottom: 110%; position: absolute; display: none; align-items: flex-start;">
                     <ui:Label text="Commit: 5e07588" name="commitHashText" style="font-size: 12px; -unity-text-align: middle-left;" />
                     <ui:Label text="Build timestamp: yyMMddHHmm" name="buildTimeStampText" style="font-size: 12px; -unity-text-align: middle-left;" />
                 </ui:VisualElement>
             </ui:Button>
-            <ui:Button name="createSongButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
+            <ui:Button name="createSongButton" class="transparentButton circleButton" style="right: 5px;">
                 <MaterialIcon name="createSongIcon" icon="handyman" />
             </ui:Button>
-            <ui:Button name="settingsButton" class="backgroundHighlightButton circleButton" style="right: 5px; overflow: visible;">
+            <ui:Button name="settingsButton" class="transparentButton circleButton" style="right: 5px; overflow: visible;">
                 <MaterialIcon name="settingsIcon" icon="settings" />
                 <MaterialIcon name="settingsProblemHintIcon" icon="warning" class="settingsProblemHintIcon rounded warningFontColor" style="position: absolute; bottom: 100%;" />
             </ui:Button>
-            <ui:Button name="aboutButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
+            <ui:Button name="aboutButton" class="transparentButton circleButton" style="right: 5px;">
                 <MaterialIcon name="aboutIcon" icon="info_outline" />
             </ui:Button>
-            <ui:Button name="creditsButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
+            <ui:Button name="creditsButton" class="transparentButton circleButton" style="right: 5px;">
                 <MaterialIcon name="creditsIcon" icon="groups" />
             </ui:Button>
-            <ui:Button name="quitButton" class="backgroundHighlightButton circleButton" style="right: 5px;">
+            <ui:Button name="quitButton" class="transparentButton circleButton" style="right: 5px;">
                 <MaterialIcon name="quitIcon" icon="logout" />
             </ui:Button>
         </ui:VisualElement>

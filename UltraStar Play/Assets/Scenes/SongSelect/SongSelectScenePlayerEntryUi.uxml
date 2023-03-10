@@ -3,7 +3,7 @@
         <ui:VisualElement name="row" style="flex-direction: row; align-items: flex-end; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-items: center;">
                 <ui:VisualElement name="playerImageContainer" style="justify-content: center; align-items: center; flex-shrink: 0; width: 48px; height: 48px;">
-                    <ui:Button display-tooltip-when-elided="true" name="togglePlayerSelectedButton" class="overlay backgroundHighlightButton circle" style="width: 110%; height: 110%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="togglePlayerSelectedButton" class="overlay transparentButton circle" style="width: 110%; height: 110%;" />
                     <ui:VisualElement name="playerImage" picking-mode="Ignore" class="circle overlay" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit;" />
                 </ui:VisualElement>
                 <ui:Label text="Player01" display-tooltip-when-elided="true" name="nameLabel" style="flex-grow: 1; display: none;" />
@@ -15,6 +15,6 @@
                 <ui:VisualElement name="noMicIcon" class="fontColor overlay" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MicrophoneAltStrikethrough.svg?fileID=7388822144124034973&amp;guid=484ad862a8cd4084a8ebd54ea4a57ba1&amp;type=3#MicrophoneAltStrikethrough&apos;);" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:Button text="P1" display-tooltip-when-elided="true" name="toggleVoiceButton" class="backgroundHighlightButton smallerFont" style="height: auto;" />
+        <ui:Button text="P1" display-tooltip-when-elided="true" name="toggleVoiceButton" class="transparentButton smallerFont" style="height: auto;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 /**
  * Data structure for theme files.
@@ -15,12 +14,15 @@ public class ThemeJson
     public DynamicBackgroundJson dynamicBackground;
     public SongRatingIconsJson songRatingIcons;
     
-    public GradientConfig buttonBackgroundGradient;
-    public GradientConfig hoverButtonBackgroundGradient;
-    public GradientConfig focusButtonBackgroundGradient;
-    public GradientConfig activeButtonBackgroundGradient;
-    public Color32 backgroundColorButtons;
-    public Color32 fontColorButtons;
+    public ControlStyleConfig defaultControl;
+    public ControlStyleConfig transparentButton;
+    public ControlStyleConfig textOnlyButton;
+    public ControlStyleConfig lightButton;
+    public ControlStyleConfig dangerButton;
+    public ControlStyleConfig toggle;
+    public ControlStyleConfig slideToggleOff;
+    public ControlStyleConfig slideToggleOn;
+    public ControlStyleConfig panel;
     
     public Color32 primaryFontColor;
     public Color32 secondaryFontColor;

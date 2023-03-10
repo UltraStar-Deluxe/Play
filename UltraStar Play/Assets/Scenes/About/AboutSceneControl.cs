@@ -62,7 +62,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     private void CreateAboutTextButton(TextAsset textAsset)
     {
         ToggleButton button = new();
-        button.AddToClassList("backgroundHighlightButton");
+        button.AddToClassList("transparentButton");
         button.text = textAsset.name;
         button.RegisterCallbackButtonTriggered(() =>
         {

@@ -76,6 +76,34 @@
     display: none;
 }
 
+.unity-collection-view__item {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-collection-view__item:hover {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-collection-view__item:hover:enabled {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-collection-view__item--selected {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-collection-view__item--selected:hover {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-collection-view__item--selected:hover:enabled {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.unity-collection-view:focus .unity-collection-view__item--selected {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 .unity-button {
     transition: background-color 0.2s;
     background-color: var(--control-color);

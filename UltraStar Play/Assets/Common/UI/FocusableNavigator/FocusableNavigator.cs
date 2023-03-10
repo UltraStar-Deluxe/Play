@@ -334,7 +334,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             TryFocusSelectedListViewItem(focusedListView);
         }
 
-        ListView parentListView = VisualElementUtils.GetParent(visualElement, parent => parent is ListView) as ListView;
+        ListView parentListView = visualElement.GetParent(parent => parent is ListView) as ListView;
         if (parentListView != null)
         {
             parentListView.Focus();

@@ -205,4 +205,33 @@ public static class VisualElementExtensions
     {
         return listView.Q<VisualElement>(className: "unity-collection-view__item--selected");
     }
+
+    public static VisualElement GetParent(this VisualElement visualElement, Func<VisualElement, bool> condition=null)
+    {
+        VisualElement parent = visualElement.parent;
+        while (parent != null)
+        {
+            if (condition == null
+                || condition(parent))
+            {
+                return parent;
+            }
+            parent = parent.parent;
+        }
+
+        return null;
+    }
+    
+    public static List<VisualElement> GetParents(VisualElement visualElement)
+    {
+        List<VisualElement> parents = new();
+        VisualElement parent = visualElement.parent;
+        while (parent != null)
+        {
+            parents.Add(parent);
+            parent = parent.parent;
+        }
+
+        return parents;
+    }
 }

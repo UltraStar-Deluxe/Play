@@ -66,6 +66,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         songListView.makeItem = () =>
         {
             VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
+            ThemeManager.ApplyThemeSpecificStylesToVisualElements(songEntryVisualElement);
             return songEntryVisualElement;
         };
         songListView.bindItem = (VisualElement element, int index) =>

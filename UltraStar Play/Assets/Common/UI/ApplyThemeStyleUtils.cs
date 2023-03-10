@@ -7,13 +7,14 @@ using UnityEngine.UIElements;
 public static class ApplyThemeStyleUtils
 {
     private static readonly Dictionary<VisualElement, VisualElementData> visualElementToData = new();
+    private static readonly Dictionary<ListView, VisualElement> listViewToSelectedVisualElement = new();
     
     public static void ApplyControlStyles(VisualElement visualElement, ControlStyleConfig controlStyleConfig)
     {
         ApplyControlStyles(visualElement, visualElement, controlStyleConfig);
     }
 
-    public static void ApplyControlStyles(VisualElement visualElement, VisualElement callbackTarget, ControlStyleConfig controlStyleConfig)
+    public static void ApplyControlStyles(VisualElement visualElement, VisualElement styleTarget, ControlStyleConfig controlStyleConfig)
     {
         if (visualElement == null)
         {
@@ -28,7 +29,7 @@ public static class ApplyThemeStyleUtils
             data = new VisualElementData()
             {
                 visualElement = visualElement,
-                callbackTarget = callbackTarget,
+                styleTarget = styleTarget,
                 initTimeInSeconds = Time.time,
                 controlStyleConfig = controlStyleConfig,
             };
@@ -52,34 +53,33 @@ public static class ApplyThemeStyleUtils
         {
             return;
         }
-        VisualElement callbackTarget = data.callbackTarget;
 
         // Hover events
-        callbackTarget.RegisterCallback<PointerEnterEvent>(evt =>
+        visualElement.RegisterCallback<PointerEnterEvent>(evt =>
         {
             data.isPointerOver = true;
             UpdateStyles(data);
         });
-        callbackTarget.RegisterCallback<PointerLeaveEvent>(evt =>
+        visualElement.RegisterCallback<PointerLeaveEvent>(evt =>
         {
             data.isPointerOver = false;
             UpdateStyles(data);
         });
 
         // Focus events
-        callbackTarget.RegisterCallback<FocusEvent>(evt =>
+        visualElement.RegisterCallback<FocusEvent>(evt =>
         {
             data.hasFocus = true;
             UpdateStyles(data);
         });
-        callbackTarget.RegisterCallback<BlurEvent>(evt =>
+        visualElement.RegisterCallback<BlurEvent>(evt =>
         {
             data.hasFocus = false;
             UpdateStyles(data);
         });
 
         // Active events
-        if (callbackTarget is ToggleButton toggleButton)
+        if (visualElement is ToggleButton toggleButton)
         {
             toggleButton.IsActiveChangedEventStream.Subscribe(isActive =>
             {
@@ -87,13 +87,56 @@ public static class ApplyThemeStyleUtils
                 UpdateStyles(data);
             });
         }
-        else if (callbackTarget is SlideToggle slideToggle)
+        else if (visualElement is SlideToggle slideToggle)
         {
             slideToggle.RegisterValueChangedCallback(evt =>
             {
-                data.isActive = evt.newValue;
                 UpdateStyles(data);
             });
+        }
+    }
+
+    public static void UpdateStylesOnListViewSelectionChanged(ListView listView)
+    {
+        if (listView != null
+            && !listViewToSelectedVisualElement.ContainsKey(listView))
+        {
+            VisualElement initialSelectedVisualElement = listView.GetSelectedVisualElement();
+            listViewToSelectedVisualElement[listView] = initialSelectedVisualElement;
+            listView.selectionChanged += selectedObjects => OnListViewSelectionChanged(listView, selectedObjects);
+        }
+    }
+
+    private static void OnListViewSelectionChanged(ListView listView, IEnumerable<object> selectedObjects)
+    {
+        VisualElement oldSelectedVisualElement = listViewToSelectedVisualElement[listView];
+        VisualElement newSelectedVisualElement = listView.GetSelectedVisualElement();
+        listViewToSelectedVisualElement[listView] = newSelectedVisualElement;
+
+        if (oldSelectedVisualElement != null)
+        {
+            VisualElement oldListItem = oldSelectedVisualElement.ClassListContains("listItem")
+                ? oldSelectedVisualElement
+                : oldSelectedVisualElement.Q(null, "listItem");
+            if (oldListItem != null
+                && visualElementToData.TryGetValue(oldListItem, out VisualElementData oldListItemData))
+            {
+                oldListItemData.isActive = false;
+                UpdateStyles(oldListItemData);
+            }
+        }
+
+        if (newSelectedVisualElement != null)
+        {
+            VisualElement newListItem = newSelectedVisualElement.ClassListContains("listItem")
+                ? newSelectedVisualElement
+                : newSelectedVisualElement.Q(null, "listItem");
+            if (newListItem != null
+                && visualElementToData.TryGetValue(newListItem, out VisualElementData newListItemData))
+            {
+                newListItemData.isActive = true;
+                UpdateStyles(newListItemData);
+            }
         }
     }
 
@@ -132,7 +175,7 @@ public static class ApplyThemeStyleUtils
         GradientConfig backgroundGradient,
         string backgroundImage)
     {
-        VisualElement visualElement = data.visualElement;
+        VisualElement visualElement = data.styleTarget;
         if (!backgroundImage.IsNullOrEmpty()
             && File.Exists(backgroundImage))
         {
@@ -149,57 +192,78 @@ public static class ApplyThemeStyleUtils
             backgroundColor.IfNotDefault(color => visualElement.style.backgroundColor = new StyleColor(color));
         }
         borderColor.IfNotDefault(color => visualElement.SetBorderColor(color));
-        fontColor.IfNotDefault(color => visualElement.style.color = new StyleColor(color));
+        fontColor.IfNotDefault(color =>
+        {
+            visualElement.style.color = new StyleColor(color);
+            visualElement.Query<Label>().ForEach(label => label.style.color = new StyleColor(color));
+        });
+    }
+
+    private static ControlStyleConfig GetControlStyleConfig(VisualElementData data)
+    {
+        if (data.visualElement is SlideToggle slideToggle
+            && slideToggle.value)
+        {
+            // Dirty hack to get the correct style for the slide toggle
+            return ThemeManager.Instance.GetCurrentTheme().ThemeJson.slideToggleOn;
+        }
+
+        return data.controlStyleConfig;
     }
     
     private static void ApplyActiveStyle(VisualElementData data)
     {
+        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
         ApplyStyle(data,
-            data.controlStyleConfig.activeFontColor,
-            data.controlStyleConfig.activeBorderColor,
-            data.controlStyleConfig.activeBackgroundColor,
-            data.controlStyleConfig.activeBackgroundGradient,
-            data.controlStyleConfig.activeBackgroundImage);
+            controlStyleConfig.activeFontColor,
+            controlStyleConfig.activeBorderColor,
+            controlStyleConfig.activeBackgroundColor,
+            controlStyleConfig.activeBackgroundGradient,
+            controlStyleConfig.activeBackgroundImage);
     }
 
     private static void ApplyFocusStyle(VisualElementData data)
     {
+        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
         ApplyStyle(data,
-            data.controlStyleConfig.focusFontColor,
-            data.controlStyleConfig.focusBorderColor,
-            data.controlStyleConfig.focusBackgroundColor,
-            data.controlStyleConfig.focusBackgroundGradient,
-            data.controlStyleConfig.focusBackgroundImage);
+            controlStyleConfig.focusFontColor,
+            controlStyleConfig.focusBorderColor,
+            controlStyleConfig.focusBackgroundColor,
+            controlStyleConfig.focusBackgroundGradient,
+            controlStyleConfig.focusBackgroundImage);
     }
 
     private static void ApplyHoverStyle(VisualElementData data)
     {
+        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
         ApplyStyle(data,
-            data.controlStyleConfig.hoverFontColor,
-            data.controlStyleConfig.hoverBorderColor,
-            data.controlStyleConfig.hoverBackgroundColor,
-            data.controlStyleConfig.hoverBackgroundGradient,
-            data.controlStyleConfig.hoverBackgroundImage);
+            controlStyleConfig.hoverFontColor,
+            controlStyleConfig.hoverBorderColor,
+            controlStyleConfig.hoverBackgroundColor,
+            controlStyleConfig.hoverBackgroundGradient,
+            controlStyleConfig.hoverBackgroundImage);
     }
 
     private static void ApplyDefaultStyle(VisualElementData data)
     {
+        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
         ApplyStyle(data,
-            data.controlStyleConfig.fontColor,
-            data.controlStyleConfig.borderColor,
-            data.controlStyleConfig.backgroundColor,
-            data.controlStyleConfig.backgroundGradient,
-            data.controlStyleConfig.backgroundImage);
+            controlStyleConfig.fontColor,
+            controlStyleConfig.borderColor,
+            controlStyleConfig.backgroundColor,
+            controlStyleConfig.backgroundGradient,
+            controlStyleConfig.backgroundImage);
     }
     
     private static void ApplyDisabledStyle(VisualElementData data)
     {
+        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
         ApplyStyle(data,
-            data.controlStyleConfig.disabledFontColor,
-            data.controlStyleConfig.disabledBorderColor,
-            data.controlStyleConfig.disabledBackgroundColor,
-            data.controlStyleConfig.disabledBackgroundGradient,
-            data.controlStyleConfig.disabledBackgroundImage);
+            controlStyleConfig.disabledFontColor,
+            controlStyleConfig.disabledBorderColor,
+            controlStyleConfig.disabledBackgroundColor,
+            controlStyleConfig.disabledBackgroundGradient,
+            controlStyleConfig.disabledBackgroundImage);
     }
 
     private static void UpdateStyles(VisualElementData data)
@@ -234,7 +298,7 @@ public static class ApplyThemeStyleUtils
     private class VisualElementData
     {
         public VisualElement visualElement;
-        public VisualElement callbackTarget;
+        public VisualElement styleTarget;
         public bool hasRegisteredCallbacks;
         public bool isPointerOver;
         public bool hasFocus;

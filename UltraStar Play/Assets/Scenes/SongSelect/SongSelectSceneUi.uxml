@@ -6,7 +6,7 @@
     <ui:VisualElement name="background" style="width: 100%; height: 100%;">
         <ui:VisualElement name="topContent" style="flex-shrink: 0; flex-direction: row;">
             <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
-                <ui:Button name="quitSceneButton" class="circleButton backgroundHighlightButton mr-2" style="height: 40px; width: 40px;">
+                <ui:Button name="quitSceneButton" class="circleButton transparentButton mr-2" style="height: 40px; width: 40px;">
                     <MaterialIcon icon="arrow_back" name="backIcon" picking-mode="Ignore" />
                 </ui:Button>
                 <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
@@ -65,7 +65,7 @@
                                 </ui:VisualElement>
                             </ui:VisualElement>
                             <ui:VisualElement name="iconContainer" class="mt-auto" style="align-items: center; height: 100%; flex-shrink: 0;">
-                                <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="backgroundHighlightButton" style="overflow: visible; width: 40px; height: 40px;">
+                                <ui:Button display-tooltip-when-elided="true" name="toggleFavoriteButton" class="transparentButton" style="overflow: visible; width: 40px; height: 40px;">
                                     <MaterialIcon name="favoriteIcon" icon="favorite" />
                                     <MaterialIcon name="noFavoriteIcon" icon="favorite_border" />
                                 </ui:Button>
@@ -73,7 +73,7 @@
                                     <MaterialIcon name="songIndexIcon" icon="album" picking-mode="Ignore" style="font-size: 32px;" />
                                     <ui:Label text="1000 / 9999" display-tooltip-when-elided="true" name="songIndexLabel" enable-rich-text="false" picking-mode="Ignore" style="-unity-text-align: upper-right;" />
                                 </ui:VisualElement>
-                                <ui:Button display-tooltip-when-elided="true" name="showLyricsButton" class="squareButton backgroundHighlightButton">
+                                <ui:Button display-tooltip-when-elided="true" name="showLyricsButton" class="squareButton transparentButton">
                                     <MaterialIcon tabindex="-1" name="lyricsIcon" icon="lyrics" />
                                 </ui:Button>
                                 <ui:VisualElement name="duetIcon" class="fontColor" style="width: 24px; height: 24px; display: flex; flex-direction: row; background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); -unity-background-scale-mode: scale-to-fit;" />
@@ -87,7 +87,7 @@
                             <ToggleButton text="Easy" display-tooltip-when-elided="true" name="easyDifficultyButton" class="mr-2 smallFont" style="flex-grow: 1; width: 10%; height: auto;" />
                             <ToggleButton text="Medium" display-tooltip-when-elided="true" name="mediumDifficultyButton" class="mr-2 smallFont" style="width: 10%; flex-grow: 1; height: auto;" />
                             <ToggleButton text="Hard" display-tooltip-when-elided="true" name="hardDifficultyButton" class="mr-2 smallFont" style="width: 10%; flex-grow: 1; height: auto;" />
-                            <ui:Button display-tooltip-when-elided="true" name="toggleCoopModeButton" class="backgroundHighlightButton" style="height: auto;">
+                            <ui:Button display-tooltip-when-elided="true" name="toggleCoopModeButton" class="transparentButton" style="height: auto;">
                                 <MaterialIcon tabindex="-1" name="coopIcon" icon="diversity_1" />
                                 <MaterialIcon tabindex="-1" name="noCoopIcon" icon="groups" />
                                 <ui:Label tabindex="-1" text="Co-op" display-tooltip-when-elided="true" name="toggleCoopModeButtonLabel" class="tinyFont" style="font-size: 10px;" />

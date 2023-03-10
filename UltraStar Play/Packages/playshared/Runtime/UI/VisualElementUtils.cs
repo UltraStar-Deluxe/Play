@@ -71,35 +71,6 @@ public static class VisualElementUtils
         }
     }
 
-    public static List<VisualElement> GetParents(VisualElement visualElement)
-    {
-        List<VisualElement> parents = new();
-        VisualElement parent = visualElement.parent;
-        while (parent != null)
-        {
-            parents.Add(parent);
-            parent = parent.parent;
-        }
-
-        return parents;
-    }
-
-    public static VisualElement GetParent(VisualElement visualElement, Func<VisualElement, bool> condition)
-    {
-        List<VisualElement> parents = new();
-        VisualElement parent = visualElement.parent;
-        while (parent != null)
-        {
-            if (condition(parent))
-            {
-                return parent;
-            }
-            parent = parent.parent;
-        }
-
-        return null;
-    }
-
     public static VisualElement GetFocusedVisualElement(FocusController focusController)
     {
         VisualElement focusedVisualElement = focusController.focusedElement as VisualElement;
@@ -121,8 +92,7 @@ public static class VisualElementUtils
             return false;
         }
 
-        unityBaseDropdown = GetParent(focusedVisualElement,
-            parent => parent.ClassListContains("unity-base-dropdown"));
+        unityBaseDropdown = focusedVisualElement.GetParent(parent => parent.ClassListContains("unity-base-dropdown"));
         return unityBaseDropdown != null;
     }
 
