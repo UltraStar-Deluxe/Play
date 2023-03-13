@@ -564,7 +564,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         root.Query<ListView>().ForEach(listView => ApplyThemeStyleUtils.UpdateStylesOnListViewSelectionChanged(listView));
         
         // Panels
-        root.Query<VisualElement>(null, "panel").ForEach(visualElement =>
+        root.Query<VisualElement>(null, "dynamicPanel").ForEach(visualElement =>
+        {
+            ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, visualElement);
+            ApplyControlColorConfigToVisualElement(visualElement, styleConfig);
+        });
+        
+        root.Query<VisualElement>(null, "staticPanel").ForEach(visualElement =>
         {
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, visualElement);
             ApplyControlColorConfigToVisualElement(visualElement, styleConfig);
@@ -636,10 +642,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             };
         }
         
-        if (visualElement.ClassListContains("panel")) 
+        if (visualElement.ClassListContains("dynamicPanel")) 
         {
             return ObjectUtils.FirstNonDefault(
-                themeMeta.ThemeJson.panel,
+                themeMeta.ThemeJson.dynamicPanel,
+                themeMeta.ThemeJson.defaultControl);
+        }
+        
+        if (visualElement.ClassListContains("staticPanel")) 
+        {
+            return ObjectUtils.FirstNonDefault(
+                themeMeta.ThemeJson.staticPanel,
                 themeMeta.ThemeJson.defaultControl);
         }
         

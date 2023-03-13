@@ -22,7 +22,8 @@ public class ThemeJson
     public ControlStyleConfig toggle;
     public ControlStyleConfig slideToggleOff;
     public ControlStyleConfig slideToggleOn;
-    public ControlStyleConfig panel;
+    public ControlStyleConfig dynamicPanel;
+    public ControlStyleConfig staticPanel;
     
     public Color32 primaryFontColor;
     public Color32 secondaryFontColor;

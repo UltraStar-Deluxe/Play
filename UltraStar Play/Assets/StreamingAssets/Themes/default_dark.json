@@ -39,11 +39,15 @@
         "activeBackgroundColor": "#7C7A80",
     },
 
-    "panel": {
+    "dynamicPanel": {
         "backgroundColor": "#475467",
         "hoverBackgroundColor": "#7B91B3",
         "focusBackgroundColor": "#7B91B3",
         "activeBackgroundColor": "#7B91B3",
+    },
+
+    "staticPanel": {
+        "backgroundColor": "#475467",
     },
 
     "slideToggleOff": {
