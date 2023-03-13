@@ -5,6 +5,9 @@
                 <ui:VisualElement name="dialogTitleImage" class="dialogTitleImage warning" style="display: none;" />
                 <MaterialIcon name="dialogTitleMaterialIcon" style="display: none;" />
                 <ui:Label text="Dialog Title" name="dialogTitle" class="dialogTitle" style="flex-grow: 1;" />
+                <ui:Button display-tooltip-when-elided="true" name="defaultCloseDialogButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
+                    <MaterialIcon tabindex="-1" picking-mode="Ignore" name="closeIcon" icon="close" style="font-size: 20px;" />
+                </ui:Button>
             </ui:VisualElement>
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%;">
                 <ui:VisualElement name="dialogMessageContainer" style="align-items: center; justify-content: center; flex-grow: 1;">

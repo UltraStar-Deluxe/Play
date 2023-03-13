@@ -234,9 +234,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             songMetaManager.ReloadSongMetas();
             issuesDialogControl.CloseDialog();
         });
-        Button closeDialogButton = issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
-            () => issuesDialogControl.CloseDialog());
-        closeDialogButton.Focus();
 
         return issuesDialogControl;
     }

@@ -139,9 +139,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
             .CreateAndInject<MessageDialogControl>();
         dialogControl.Title = dialogTitle;
 
-        Button closeDialogButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close), dialogControl.CloseDialog);
-        closeDialogButton.Focus();
-
         return dialogControl;
     }
     
@@ -170,9 +167,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
-
-        Button closeDialogButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close), dialogControl.CloseDialog);
-        closeDialogButton.Focus();
 
         return dialogControl;
     }

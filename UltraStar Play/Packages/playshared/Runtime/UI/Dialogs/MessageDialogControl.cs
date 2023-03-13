@@ -22,6 +22,9 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogButtonContainer)]
     private VisualElement dialogButtonContainer;
 
+    [Inject(UxmlName = R_PlayShared.UxmlNames.defaultCloseDialogButton)]
+    private Button defaultCloseDialogButton;
+    
     [Inject]
     private Injector injector;
 
@@ -69,6 +72,10 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
         
         // Close by clicking on background
         VisualElementUtils.RegisterDirectClickCallback(DialogRootVisualElement, () => CloseDialog());
+        
+        // Close by clicking on default close button
+        defaultCloseDialogButton.RegisterCallbackButtonTriggered(() => CloseDialog());
+        defaultCloseDialogButton.Focus();
     }
 
     public Button AddButton(string text, Action callback)

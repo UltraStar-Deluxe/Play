@@ -115,10 +115,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
         urlChooserDialogControl.Title = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
 
-        Button closeDialogButton = urlChooserDialogControl.AddButton(
-            TranslationManager.GetTranslation(R.Messages.close), () => CloseUrlChooserDialog());
-        closeDialogButton.Focus();
-
         // Create a button in the dialog for every archive URL
         songArchiveEntries.ForEach(songArchiveEntry =>
         {
