@@ -124,19 +124,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void Start()
     {
-        sceneToButtonMap.Add(EScene.ContentDownloadScene, contentDownloadButton);
-        sceneToButtonMap.Add(EScene.OptionsGameScene, gameOptionsButton);
-        sceneToButtonMap.Add(EScene.SongLibraryOptionsScene, songsOptionsButton);
-        sceneToButtonMap.Add(EScene.OptionsGraphicsScene, graphicsOptionsButton);
-        sceneToButtonMap.Add(EScene.OptionsSoundScene, soundOptionsButton);
-        sceneToButtonMap.Add(EScene.RecordingOptionsScene, recordingOptionsButton);
-        sceneToButtonMap.Add(EScene.PlayerProfileSetupScene, profileOptionsButton);
-        sceneToButtonMap.Add(EScene.ThemeOptionsScene, designOptionsButton);
-        sceneToButtonMap.Add(EScene.NetworkOptionsScene, internetOptionsButton);
-        sceneToButtonMap.Add(EScene.CompanionAppOptionsScene, appOptionsButton);
-        sceneToButtonMap.Add(EScene.DevelopmentOptionsScene, developerOptionsButton);
-        sceneToButtonMap.Add(EScene.WebcamOptionsSecene, webcamOptionsButton);
-
+        UpdateSceneToButtonMap();
+        UpdateSceneToNameMap();
+        
         sceneToButtonMap.ForEach(entry =>
         {
            entry.Value.RegisterCallbackButtonTriggered(() => LoadScene(entry.Key)); 
@@ -334,6 +324,22 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToLongNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_title));
         sceneToLongNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_title));
         sceneToLongNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_title));
+    }
+    
+    private void UpdateSceneToButtonMap()
+    {
+        sceneToButtonMap.Add(EScene.ContentDownloadScene, contentDownloadButton);
+        sceneToButtonMap.Add(EScene.OptionsGameScene, gameOptionsButton);
+        sceneToButtonMap.Add(EScene.SongLibraryOptionsScene, songsOptionsButton);
+        sceneToButtonMap.Add(EScene.OptionsGraphicsScene, graphicsOptionsButton);
+        sceneToButtonMap.Add(EScene.OptionsSoundScene, soundOptionsButton);
+        sceneToButtonMap.Add(EScene.RecordingOptionsScene, recordingOptionsButton);
+        sceneToButtonMap.Add(EScene.PlayerProfileSetupScene, profileOptionsButton);
+        sceneToButtonMap.Add(EScene.ThemeOptionsScene, designOptionsButton);
+        sceneToButtonMap.Add(EScene.NetworkOptionsScene, internetOptionsButton);
+        sceneToButtonMap.Add(EScene.CompanionAppOptionsScene, appOptionsButton);
+        sceneToButtonMap.Add(EScene.DevelopmentOptionsScene, developerOptionsButton);
+        sceneToButtonMap.Add(EScene.WebcamOptionsSecene, webcamOptionsButton);
     }
 
     public List<IBinding> GetBindings()

@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement>
-        <ui:VisualElement name="urlContainer" style="flex-direction: row; align-items: flex-start; margin-bottom: 5px;">
+    <ui:VisualElement name="background">
+        <ui:VisualElement name="urlContainer" class="mb-2" style="flex-direction: row; align-items: flex-start;">
             <ui:Label text="Archive URL" display-tooltip-when-elided="true" name="urlLabel" style="width: auto; margin-right: 20px;" />
             <ui:VisualElement name="urlChooserComboContainer" style="flex-direction: row; flex-grow: 1;">
                 <ui:TextField picking-mode="Ignore" text="http://my-url.com/my-file.zip" name="urlTextField" style="width: auto; flex-grow: 1; flex-shrink: 1;" />
@@ -9,16 +9,18 @@
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="downloadControlsContainer" style="width: 100%; flex-direction: row; justify-content: space-between; align-items: flex-end;">
-            <ui:Label text="9999 MB" display-tooltip-when-elided="true" name="sizeLabel" style="border-right-width: 20px; width: 20%;" />
+        <ui:VisualElement name="downloadControlsContainer" class="mb-2" style="width: 100%; flex-direction: row; justify-content: space-between; align-items: flex-end;">
             <ui:Label text="Not Started" display-tooltip-when-elided="true" name="statusLabel" style="border-right-width: 20px; width: 20%;" />
             <ui:VisualElement name="buttonContainer" style="flex-direction: row; flex-grow: 1; justify-content: flex-end;">
                 <ui:Button text="Start Download" display-tooltip-when-elided="true" name="startButton" class="controlMinWidth" style="width: 200px; margin-right: 5px;" />
                 <ui:Button text="Cancel Download" display-tooltip-when-elided="true" name="cancelButton" class="controlMinWidth" style="width: 200px;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" class="roundCorners outline" style="height: 10%; width: 100%; flex-grow: 1; margin-top: 5px; margin-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; background-color: rgba(0, 0, 0, 0.25);">
-            <ui:TextField picking-mode="Ignore" value="_" text="_" name="outputTextField" multiline="true" readonly="true" class="noBackground smallFont focusableNavigatorIgnore" style="height: auto; flex-wrap: wrap; white-space: normal;" />
-        </ui:ScrollView>
+        <AccordionGroup name="downloadDetailsAccordionGroup">
+            <AccordionItem name="downloadDetailsAccordionItem" label="Details" content-visible="false">
+                <ui:Label text="9999 MB" display-tooltip-when-elided="true" name="sizeLabel" class="mb-2" style="border-right-width: 20px; width: 20%;" />
+                <ui:TextField picking-mode="Ignore" value="_" text="_" name="outputTextField" multiline="true" readonly="false" class="noBackground smallFont focusableNavigatorIgnore" style="flex-wrap: wrap; white-space: normal; height: auto; flex-grow: 1; min-height: 250px;" />
+            </AccordionItem>
+        </AccordionGroup>
     </ui:VisualElement>
 </ui:UXML>

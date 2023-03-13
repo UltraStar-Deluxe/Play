@@ -77,6 +77,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     private string newLogText;
 
     private int extractedEntryCount;
+    private bool hasFileSize;
 
     protected override void Start()
     {
@@ -263,10 +264,17 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             && downloadRequest.downloadHandler != null
             && !downloadRequest.downloadHandler.isDone)
         {
-            float progress;
+            string progressText;
             try
             {
-                progress = downloadRequest.downloadProgress;
+                if (hasFileSize)
+                {
+                    progressText = Math.Round(downloadRequest.downloadProgress * 100) + "%";
+                }
+                else
+                {
+                    progressText = ByteSizeUtils.GetHumanReadableByteSize((long)downloadRequest.downloadedBytes);
+                }
             }
             catch (Exception ex)
             {
@@ -275,7 +283,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
                 statusLabel.text = "?";
                 yield break;
             }
-            string progressText = Math.Round(progress * 100) + "%";
+
             statusLabel.text = progressText;
             yield return new WaitForSeconds(0.1f);
         }
@@ -297,11 +305,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     private void AddToUiLog(string message)
     {
         newLogText += message + "\n";
-    }
-
-    public void UpdateFileSize()
-    {
-        StartCoroutine(FileSizeUpdateAsync(DownloadUrl));
     }
 
     private IEnumerator FileSizeUpdateAsync(string url)
@@ -334,15 +337,8 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             else
             {
                 long size = Convert.ToInt64(contentLength);
-                long kiloByte = size / 1024;
-                if (kiloByte > 1024)
-                {
-                    fileSize.text = Math.Round((double)kiloByte / 1024) + " MB";
-                }
-                else
-                {
-                    fileSize.text = Math.Round((double)kiloByte) + " KB";
-                }
+                fileSize.text = ByteSizeUtils.GetHumanReadableByteSize(size);
+                hasFileSize = true;
             }
         }
     }
@@ -523,6 +519,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     private void ResetFileSizeText()
     {
         fileSize.text = "??? KB";
+        hasFileSize = false;
     }
 
     protected override void OnDestroy()
