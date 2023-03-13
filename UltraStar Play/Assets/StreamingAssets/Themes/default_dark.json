@@ -6,6 +6,8 @@
         "hoverBackgroundGradient": "45deg, #101828, #000000",
         "focusBackgroundGradient": "45deg, #101828, #000000",
         "activeBackgroundGradient": "45deg, #101828, #000000",
+        "borderColor": "#00000100",
+        "focusBorderColor": "#4F5B6F",
     },
 
     "transparentButton": {

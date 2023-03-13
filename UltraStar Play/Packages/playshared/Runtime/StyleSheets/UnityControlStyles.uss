@@ -105,12 +105,12 @@
 }
 
 .unity-button {
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s;
     background-color: var(--control-color);
     color: var(--font-color);
     height: var(--control-height);
     font-size: var(--font-size);
-    border-width: 0;
+    border-width: 2px;
     border-color: rgba(0, 0, 0, 0);
     border-radius: 5px;
     align-items: center;

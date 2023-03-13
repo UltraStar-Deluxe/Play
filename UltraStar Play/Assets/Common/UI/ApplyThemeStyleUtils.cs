@@ -192,7 +192,8 @@ public static class ApplyThemeStyleUtils
             ApplyGradient(data, null);
             backgroundColor.IfNotDefault(color => visualElement.style.backgroundColor = new StyleColor(color));
         }
-        borderColor.IfNotDefault(color => visualElement.SetBorderColor(color));
+
+        visualElement.SetBorderColor(borderColor);
         fontColor.IfNotDefault(color =>
         {
             visualElement.style.color = new StyleColor(color);
