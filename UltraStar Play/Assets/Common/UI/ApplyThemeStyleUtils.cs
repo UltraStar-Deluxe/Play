@@ -27,6 +27,7 @@ public static class ApplyThemeStyleUtils
                 styleTarget = styleTarget,
                 initTimeInSeconds = Time.time,
                 controlStyleConfig = controlStyleConfig,
+                hasFocus = visualElement.focusController?.focusedElement == visualElement,
             };
             visualElementToData[visualElement] = data;
         }
@@ -69,7 +70,7 @@ public static class ApplyThemeStyleUtils
         });
         visualElement.RegisterCallback<BlurEvent>(evt =>
         {
-            data.hasFocus = false;
+            data.hasFocus =false;
             UpdateStyles(data);
         });
 
