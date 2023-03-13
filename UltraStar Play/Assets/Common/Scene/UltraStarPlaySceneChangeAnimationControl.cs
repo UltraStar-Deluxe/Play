@@ -12,6 +12,15 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     {
         get
         {
+            if (uiCopyRenderTexture != null
+                && (uiCopyRenderTexture.width != Screen.width
+                    || uiCopyRenderTexture.height != Screen.height))
+            {
+                Debug.Log("Recreate uiCopyRenderTexture because of screen size change.");
+                Destroy(uiCopyRenderTexture);
+                uiCopyRenderTexture = null;
+            }
+            
             if (uiCopyRenderTexture == null)
             {
                 uiCopyRenderTexture = new RenderTexture(Screen.width, Screen.height, 24);

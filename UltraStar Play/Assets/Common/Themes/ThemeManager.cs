@@ -51,6 +51,15 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         get
         {
+            if (uiRenderTexture != null
+                && (uiRenderTexture.width != Screen.width
+                    || uiRenderTexture.height != Screen.height))
+            {
+                Debug.Log("Recreate uiRenderTexture because of screen size change.");
+                Destroy(uiRenderTexture);
+                uiRenderTexture = null;
+            }
+            
             if (uiRenderTexture == null)
             {
                 uiRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
@@ -65,6 +74,15 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         get
         {
+            if (particleRenderTexture != null
+                 && (particleRenderTexture.width != Screen.width
+                     || particleRenderTexture.height != Screen.height))
+            {
+                Debug.Log("Recreate particleRenderTexture because of screen size change.");
+                Destroy(particleRenderTexture);
+                particleRenderTexture = null;
+            }
+            
             if (particleRenderTexture == null)
             {
                 particleRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);

@@ -3,5 +3,6 @@
         <ItemPicker name="resolutionPicker" label="Resolution" wrap-around="true" min-value="0" max-value="100" step-value="10" />
         <ItemPicker name="targetFpsPicker" label="Target FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" />
         <ItemPicker name="fullscreenModePicker" label="Fullscreen" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+        <ui:Button text="Apply" display-tooltip-when-elided="true" name="applyResolutionButton" class="controlMinWidth" style="align-self: flex-end;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -20,9 +20,20 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
     [Inject(UxmlName = R.UxmlNames.fullscreenModePicker)]
     private ItemPicker fullscreenModePicker;
 
+    [Inject(UxmlName = R.UxmlNames.applyResolutionButton)]
+    private Button applyResolutionButton;
+    
+    ScreenResolution lastScreenResolution;
+    FullScreenMode lastFullscreenMode;
+    
     protected override void Start()
     {
         base.Start();
+
+        lastScreenResolution = settings.GraphicSettings.resolution;
+        lastFullscreenMode = settings.GraphicSettings.fullScreenMode;
+        
+        applyResolutionButton.RegisterCallbackButtonTriggered(() => ApplyGraphicSettings());
         
         if (PlatformUtils.IsStandalone)
         {
@@ -48,12 +59,6 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
         fullscreenModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);
     }
 
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        ApplyGraphicSettings();
-    }
-
     private void ApplyGraphicSettings()
     {
         if (!PlatformUtils.IsStandalone)
@@ -65,9 +70,19 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
         FullScreenMode fullScreenMode = settings.GraphicSettings.fullScreenMode;
         if (res.Width > 0
             && res.Height > 0
-            && res.RefreshRate > 0)
+            && res.RefreshRate > 0
+            
+            && (res.Width != lastScreenResolution.Width
+                || res.Height != lastScreenResolution.Height
+                || res.RefreshRate != lastScreenResolution.RefreshRate
+                || fullScreenMode != lastFullscreenMode) )
         {
             Screen.SetResolution(res.Width, res.Height, fullScreenMode, res.RefreshRate);
+            
+            // Reload scene.
+            // The RenderTextures (UI, scene transition) are recreated when the Screen resolution does not match anymore.
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
+                () => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.OptionsGraphicsScene))));
         }
         else
         {
