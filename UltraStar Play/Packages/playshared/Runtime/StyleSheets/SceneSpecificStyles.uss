@@ -430,7 +430,7 @@
 /* OPTIONS SCENES */
 /**************************************************/
 
-#playerProfileInactiveOverlay {
+.inactiveOverlay {
     transition: background-color 0.5s;
 }
 

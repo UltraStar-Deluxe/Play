@@ -51,18 +51,18 @@
 
     "slideToggleOff": {
         "name": "slideToggleOff",
-        "backgroundColor": "#aa0000",
-        "hoverBackgroundColor": "#ff0000",
-        "focusBackgroundColor": "#ffaa00",
-        "activeBackgroundColor": "#ffaaaa",
+        "backgroundColor": "#475467",
+        "hoverBackgroundColor": "#344054",
+        "focusBackgroundColor": "#344054",
+        "activeBackgroundColor": "#344054",
     },
 
     "slideToggleOn": {
         "name": "slideToggle",
-        "backgroundColor": "#00aa00",
-        "hoverBackgroundColor": "#00ff00",
-        "focusBackgroundColor": "#00ffaa",
-        "activeBackgroundColor": "#aaffff",
+        "backgroundColor": "#12B76A",
+        "hoverBackgroundColor": "#14C472",
+        "focusBackgroundColor": "#0C7846",
+        "activeBackgroundColor": "#109E5C",
     },
 
     "primaryFontColor":  "#F9FAFB",

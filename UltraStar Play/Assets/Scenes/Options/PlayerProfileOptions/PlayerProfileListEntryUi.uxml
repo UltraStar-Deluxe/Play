@@ -15,7 +15,7 @@
                 <ui:TextField picking-mode="Ignore" text="New Player" name="nameTextField" style="margin-left: 8px; margin-right: 8px; margin-bottom: 4px;" />
             </ui:VisualElement>
             <ItemPicker name="difficultyPicker" style="display: none; margin-left: 8px; margin-right: 8px; margin-top: 8px; margin-bottom: 8px;" />
-            <ui:VisualElement name="playerProfileInactiveOverlay" picking-mode="Ignore" style="background-color: rgba(0, 0, 0, 0.5); position: absolute; width: 100%; height: 100%; border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;" />
+            <ui:VisualElement name="playerProfileInactiveOverlay" class="inactiveOverlay" picking-mode="Ignore" style="background-color: rgba(0, 0, 0, 0.5); position: absolute; width: 100%; height: 100%; border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;" />
             <ui:VisualElement name="row" style="justify-content: space-between; margin-left: 8px; margin-right: 8px; margin-bottom: 8px;">
                 <SlideToggle name="enabledToggle" />
                 <ui:Button name="deleteButton" class="dangerButton squareButton">

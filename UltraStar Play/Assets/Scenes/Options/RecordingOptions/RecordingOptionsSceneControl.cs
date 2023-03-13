@@ -60,7 +60,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     private ItemPicker sampleRatePicker;
 
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
-    private Toggle enabledToggle;
+    private SlideToggle enabledToggle;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
@@ -80,6 +80,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
     private Button calibrateDelayButton;
 
+    [Inject(UxmlName = R.UxmlNames.recordingDeviceInactiveOverlay)]
+    private VisualElement recordingDeviceInactiveOverlay;
+    
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
@@ -238,6 +241,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         {
             settings.MicProfiles.AddIfNotContains(SelectedMicProfile);
         }
+        
+        UpdateRecordingDeviceInactiveOverlay();
     }
 
     private IConnectedClientHandler GetConnectedClientHandler()
@@ -272,7 +277,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         sampleRatePickerControl.TrySelectItem(micProfile.SampleRate);
 
         enabledToggle.value = micProfile.IsEnabled;
-
+        UpdateRecordingDeviceInactiveOverlay();
+        
         if (micProfile.IsConnected(serverSideConnectRequestManager))
         {
             notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
@@ -290,6 +296,13 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
         UpdateSampleRateLabel();
         InitPitchDetectionFromConnectionClient();
+    }
+
+    private void UpdateRecordingDeviceInactiveOverlay()
+    {
+        recordingDeviceInactiveOverlay.style.backgroundColor = enabledToggle.value
+            ? new StyleColor(Color.clear)
+            : new StyleColor(new Color(0, 0, 0, 0.5f));
     }
 
     private void DeleteSelectedRecordingDevice()
@@ -313,7 +326,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     public void UpdateTranslation()
     {
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        enabledToggle.label = TranslationManager.GetTranslation(R.Messages.options_useForSinging);
         colorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_color);
         delayPicker.Label = TranslationManager.GetTranslation(R.Messages.options_delay);
         amplificationPicker.Label = TranslationManager.GetTranslation(R.Messages.options_amplification);
