@@ -5,7 +5,7 @@ using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
 
-public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedListener
+public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinishedListener
 {
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogTitleImage)]
     public VisualElement DialogTitleImage { get; private set; }
@@ -22,14 +22,9 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogButtonContainer)]
     private VisualElement dialogButtonContainer;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.defaultCloseDialogButton)]
-    private Button defaultCloseDialogButton;
-    
     [Inject]
     private Injector injector;
-
-    private VisualElement lastFocusedVisualElement;
-
+    
     public string Title
     {
         get
@@ -56,26 +51,12 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
         }
     }
 
-    public void OnInjectionFinished()
+    public override void OnInjectionFinished()
     {
-        lastFocusedVisualElement = DialogRootVisualElement.focusController.focusedElement as VisualElement;
+        base.OnInjectionFinished();
         
         dialogTitle.text = "";
         dialogMessage.text = "";
-
-        // Close dialog using "back" InputAction with high priority
-        disposables.Add(InputManager.GetInputAction("usplay/back").PerformedAsObservable(100).Subscribe(context =>
-        {
-            CloseDialog();
-            InputManager.GetInputAction("usplay/back").CancelNotifyForThisFrame();
-        }));
-        
-        // Close by clicking on background
-        VisualElementUtils.RegisterDirectClickCallback(DialogRootVisualElement, () => CloseDialog());
-        
-        // Close by clicking on default close button
-        defaultCloseDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
-        defaultCloseDialogButton.Focus();
     }
 
     public Button AddButton(string text, EventCallback<EventBase> callback)

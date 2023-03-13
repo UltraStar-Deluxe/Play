@@ -264,16 +264,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);
     }
 
-    public void CloseNewSongDialog()
-    {
-        if (newSongDialogControl == null)
-        {
-            return;
-        }
-
-        newSongDialogControl.CloseDialog();
-    }
-
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();

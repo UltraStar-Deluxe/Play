@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NewSongDialogControl : AbstractDialogControl, IInjectionFinishedListener
+public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinishedListener
 {
     [Inject(UxmlName = R.UxmlNames.artistTextField)]
     private TextField artistTextField;
@@ -33,8 +33,10 @@ public class NewSongDialogControl : AbstractDialogControl, IInjectionFinishedLis
     [Inject]
     private UiManager uiManager;
 
-    public void OnInjectionFinished()
+    public override void OnInjectionFinished()
     {
+        base.OnInjectionFinished();
+        
         cancelButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         okButton.RegisterCallbackButtonTriggered(_ => TryCreateNewSong());
 
