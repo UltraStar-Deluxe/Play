@@ -9,10 +9,10 @@
                 <ui:Label text="Player01" display-tooltip-when-elided="true" name="nameLabel" style="flex-grow: 1; display: none;" />
             </ui:VisualElement>
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: space-around;" />
-            <ui:Button display-tooltip-when-elided="true" name="micButton" class="transparentBackgroundColor squareButton">
+            <ui:Button display-tooltip-when-elided="true" name="micButton" class="squareButton transparentButton">
                 <RadialProgressBar show-label="false" name="micProgressBar" progress="80" style="position: absolute; width: 100%; height: 100%;" />
                 <ui:VisualElement name="micIcon" class="overlay" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MicrophoneAlt.svg?fileID=7388822144124034973&amp;guid=677e63ce925eba54092c6a82f773fbc9&amp;type=3#MicrophoneAlt&apos;);" />
-                <ui:VisualElement name="noMicIcon" class="fontColor overlay" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MicrophoneAltStrikethrough.svg?fileID=7388822144124034973&amp;guid=484ad862a8cd4084a8ebd54ea4a57ba1&amp;type=3#MicrophoneAltStrikethrough&apos;);" />
+                <ui:VisualElement name="noMicIcon" class="overlay secondaryFontColor" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/MicrophoneAltStrikethrough.svg?fileID=7388822144124034973&amp;guid=484ad862a8cd4084a8ebd54ea4a57ba1&amp;type=3#MicrophoneAltStrikethrough&apos;);" />
             </ui:Button>
         </ui:VisualElement>
         <ui:Button text="P1" display-tooltip-when-elided="true" name="toggleVoiceButton" class="transparentButton smallerFont" style="height: auto;" />

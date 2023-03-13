@@ -12,19 +12,27 @@
 
     "transparentButton": {
         "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#404040dd",
-        "focusBackgroundColor": "#404040ff",
-        "activeBackgroundColor": "#606060ff",
+        "hoverBackgroundColor": "#CCCCCC",
+        "focusBackgroundColor": "#FFFFFF",
+        "activeBackgroundColor": "#FFFFFF",
+
+        "fontColor": "#F9FAFB",
+        "hoverFontColor": "#344054",
+        "focusFontColor": "#344054",
+        "activeFontColor": "#344054"
     },
 
     "lightButton": {
-        "fontColor": "#101828",
-        "backgroundColor": "#D0D5DD",
-        "hoverBackgroundColor": "#F9F5FF",
-        "focusBackgroundColor": "#F9F5FF",
-        "activeBackgroundColor": "#F9F5FF",
+        "backgroundColor": "#F9FAFB",
+        "hoverBackgroundColor": "#344054",
+        "focusBackgroundColor": "#344054",
+        "activeBackgroundColor": "#404040dd",
         "borderColor": "#00000100",
-        "focusBorderColor": "#D0D5DD"
+        
+        "fontColor": "#344054",
+        "hoverFontColor": "#F9FAFB",
+        "focusFontColor": "#F9FAFB",
+        "activeFontColor": "#F9FAFB"
     },
 
     "dynamicPanel": {
@@ -35,7 +43,10 @@
     },
 
     "staticPanel": {
-        "backgroundColor": "#1D2939",
+        "backgroundGradient": "26.57deg, #1D2939, #344054",
+        "hoverBackgroundGradient": "26.57deg, #1D2939, #344054",
+        "focusBackgroundGradient": "26.57deg, #1D2939, #344054",
+        "activeBackgroundGradient": "26.57deg, #1D2939, #344054",
     },
 
     "slideToggleOff": {

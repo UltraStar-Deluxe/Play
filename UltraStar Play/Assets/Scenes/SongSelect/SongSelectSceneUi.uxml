@@ -81,25 +81,29 @@
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="difficultyButtonContainer" class="pr-2 mb-2" style="background-color: rgba(0, 0, 0, 0); flex-shrink: 0;">
-                        <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); justify-content: space-around; min-height: 40px;">
-                            <ToggleButton text="No Scores" display-tooltip-when-elided="true" name="noScoresButton" class="mr-2 smallFont secondaryFontColor" style="flex-grow: 1; width: 10%; height: auto;" />
-                            <ToggleButton text="Easy" display-tooltip-when-elided="true" name="easyDifficultyButton" class="mr-2 smallFont secondaryFontColor" style="flex-grow: 1; width: 10%; height: auto;" />
-                            <ToggleButton text="Medium" display-tooltip-when-elided="true" name="mediumDifficultyButton" class="mr-2 smallFont secondaryFontColor" style="width: 10%; flex-grow: 1; height: auto;" />
-                            <ToggleButton text="Hard" display-tooltip-when-elided="true" name="hardDifficultyButton" class="mr-2 smallFont secondaryFontColor" style="width: 10%; flex-grow: 1; height: auto;" />
-                            <ui:Button display-tooltip-when-elided="true" name="toggleCoopModeButton" class="transparentButton" style="height: auto;">
-                                <MaterialIcon tabindex="-1" name="coopIcon" icon="diversity_1" />
-                                <MaterialIcon tabindex="-1" name="noCoopIcon" icon="groups" />
-                                <ui:Label tabindex="-1" text="Co-op" display-tooltip-when-elided="true" name="toggleCoopModeButtonLabel" class="tinyFont" style="font-size: 10px;" />
-                            </ui:Button>
+                    <ui:VisualElement name="row" class="mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                        <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                            <ui:VisualElement name="difficultyButtonContainer" class="pr-2 mb-2" style="background-color: rgba(0, 0, 0, 0); flex-shrink: 0;">
+                                <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); justify-content: space-around;">
+                                    <ToggleButton text="No Scores" display-tooltip-when-elided="true" name="noScoresButton" class="mr-2 smallFont" style="flex-grow: 1; width: 10%; height: auto;" />
+                                    <ToggleButton text="Easy" display-tooltip-when-elided="true" name="easyDifficultyButton" class="mr-2 smallFont" style="flex-grow: 1; width: 10%; height: auto;" />
+                                    <ToggleButton text="Medium" display-tooltip-when-elided="true" name="mediumDifficultyButton" class="mr-2 smallFont" style="width: 10%; flex-grow: 1; height: auto;" />
+                                    <ToggleButton text="Hard" display-tooltip-when-elided="true" name="hardDifficultyButton" class="smallFont" style="width: 10%; height: auto; flex-grow: 1;" />
+                                    <ToggleButton display-tooltip-when-elided="true" name="toggleCoopModeButton" class="ml-2" style="padding-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0; overflow: visible;">
+                                        <MaterialIcon tabindex="-1" name="coopIcon" icon="diversity_1" style="font-size: 20px;" />
+                                        <MaterialIcon tabindex="-1" name="noCoopIcon" icon="groups" style="font-size: 20px; display: none;" />
+                                        <ui:Label tabindex="-1" text="Co-op" display-tooltip-when-elided="true" name="toggleCoopModeButtonLabel" class="tinyFont" />
+                                    </ToggleButton>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                            <ui:VisualElement name="row" class="pr-2" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; flex-shrink: 0;">
+                                <ui:Button text="Play" display-tooltip-when-elided="true" name="startButton" style="flex-grow: 1;" />
+                                <ui:Button display-tooltip-when-elided="true" name="toggleSingingOptionsButton" class="squareButton ml-2" style="display: none;">
+                                    <MaterialIcon name="settingsIcon" icon="settings" style="position: absolute;" />
+                                    <MaterialIcon name="playersIcon" icon="manage_accounts" style="position: absolute; display: none;" />
+                                </ui:Button>
+                            </ui:VisualElement>
                         </ui:VisualElement>
-                    </ui:VisualElement>
-                    <ui:VisualElement name="row" class="pr-2 mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; flex-shrink: 0;">
-                        <ui:Button text="Play" display-tooltip-when-elided="true" name="startButton" style="flex-grow: 1;" />
-                        <ui:Button display-tooltip-when-elided="true" name="toggleSingingOptionsButton" class="squareButton ml-2" style="display: none;">
-                            <MaterialIcon name="settingsIcon" icon="settings" style="position: absolute;" />
-                            <MaterialIcon name="playersIcon" icon="manage_accounts" style="position: absolute; display: none;" />
-                        </ui:Button>
                     </ui:VisualElement>
                     <ui:VisualElement scroll-deceleration-rate="0,135" elasticity="0,1" name="playerList" class="pr-2 flexWrapScrollView" style="align-items: flex-start; flex-wrap: wrap; flex-direction: row;">
                         <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />

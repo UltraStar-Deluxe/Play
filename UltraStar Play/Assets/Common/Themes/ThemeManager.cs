@@ -128,7 +128,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (isDropdownMenuOpened)
         {
             isDropdownMenuOpened = false;
-            ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement);
+            ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement.focusController.focusedElement as VisualElement);
         }
     }
 
@@ -459,6 +459,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     public static void ApplyThemeSpecificStylesToVisualElements(VisualElement root)
     {
+        if (root == null)
+        {
+            return;
+        }
         // using DisposableStopwatch d = new("ApplyThemeSpecificStylesToVisualElements took <ms>");
         
         ThemeManager themeManager = Instance;

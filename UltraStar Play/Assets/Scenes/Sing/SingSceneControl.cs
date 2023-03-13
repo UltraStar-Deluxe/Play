@@ -190,7 +190,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             dialogControl = UiManager.Instance.CreateDialogControl(title);
             dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
             dialogControl.Message = message;
-            dialogControl.AddButton("OK", _ => dialogControl?.CloseDialog());
 
             ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
         }

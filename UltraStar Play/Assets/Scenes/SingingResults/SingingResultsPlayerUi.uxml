@@ -14,7 +14,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="playerNameAndTotalScoreContainer" style="background-color: rgba(0, 0, 0, 0);">
                     <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" style="-unity-text-align: upper-center;" />
-                    <ui:Label text="99999" display-tooltip-when-elided="true" name="totalScoreLabel" picking-mode="Ignore" class="largerFont" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                    <ui:Label text="99999" display-tooltip-when-elided="true" name="totalScoreLabel" picking-mode="Ignore" class="largerFont" style="-unity-text-align: upper-center; -unity-font-style: bold; min-width: 85px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="bottomContainer" style="flex-shrink: 2;">

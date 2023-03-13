@@ -325,3 +325,7 @@ Button.tinyFont {
 .backgroundTransition {
     transition: background-color 0.2s, border-color 0.2s;
 }
+
+.staticPanel {
+    background-color: #344054;
+}

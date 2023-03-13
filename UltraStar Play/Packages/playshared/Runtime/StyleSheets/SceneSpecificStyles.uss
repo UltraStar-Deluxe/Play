@@ -246,8 +246,8 @@
 
 #playerInfoContainer #playerImage {
     flex-shrink: 0;
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
 }
 
 .singScenePlayerUi.singScenePlayerUiSmall #playerInfoContainer #playerImage {
@@ -287,6 +287,10 @@
 /**************************************************/
 /* SINGING RESULTS SCENE */
 /**************************************************/
+#scoreValue {
+    min-width: 45px;
+    -unity-text-align: middle-right;
+}
 
 .singingResultsPlayerUiColumn {
     align-items: flex-end;
