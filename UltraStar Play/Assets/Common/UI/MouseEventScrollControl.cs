@@ -76,7 +76,7 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
         }
         else
         {
-            mouseDownScrollView = visualElement.GetParent(parent => parent is ScrollView) as ScrollView;
+            mouseDownScrollView = visualElement.GetFirstAncestorOfType<ScrollView>();
         }
 
         if (mouseDownScrollView == null)
