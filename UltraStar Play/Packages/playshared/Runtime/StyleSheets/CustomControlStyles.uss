@@ -59,10 +59,14 @@ ItemPicker {
     height: var(--control-height);
 }
 
+.itemPickerControlsRow {
+    border-radius: 5px;
+    background-color: var(--control-color);
+}
+
 .itemPickerItemLabel {
     -unity-background-scale-mode: scale-to-fit;
     white-space: normal;
-    background-color: var(--control-color-accent2);
     flex-grow: 1;
     flex-shrink: 1;
     height: 100%;
@@ -71,8 +75,6 @@ ItemPicker {
     max-width: 100%;
     max-height: 100%;
     margin: 0;
-    padding-left: 5px;
-    padding-right: 5px;
     padding-top: 0;
     padding-bottom: 0;
     -unity-text-align: middle-center;
@@ -81,7 +83,7 @@ ItemPicker {
 .itemPickerButton {
     flex-grow: 0;
     flex-shrink: 0;
-    width: 60px;
+    width: 40px;
     height: 100%;
     min-width: var(--control-height-small);
     min-height: var(--control-height-small);

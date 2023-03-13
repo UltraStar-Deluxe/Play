@@ -503,11 +503,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         // ItemPickers
         if (defaultControlStyleConfig != null)
         {
-            Color itemPickerBackgroundColor = Colors.HsvOffset(defaultControlStyleConfig.backgroundColor, 0, -0.1f, 0.01f);
-            root.Query(null, "itemPickerItemLabel").ForEach(label =>
+            root.Query(null, "itemPickerControlsRow").ForEach(controlsRow =>
             {
-                label.style.backgroundColor = itemPickerBackgroundColor;
-                defaultControlStyleConfig.fontColor.IfNotDefault(fontColor => label.style.color = new StyleColor(fontColor));
+                defaultControlStyleConfig.backgroundColor.IfNotDefault(backgroundColor =>
+                {
+                    controlsRow.style.backgroundColor = new StyleColor(backgroundColor);
+                });
+                
+                defaultControlStyleConfig.fontColor.IfNotDefault(fontColor =>
+                {
+                    controlsRow.Query<Label>().ForEach(label => label.style.color = new StyleColor(fontColor));
+                });
             });
         }
         
