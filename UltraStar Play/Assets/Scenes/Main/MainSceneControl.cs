@@ -233,8 +233,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         quitGameDialogControl.Message = $"\n{TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message)}\n";
 
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => CloseQuitGameDialog());
-        Button yesButton = quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
-        yesButton.Focus();
+        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);
     }
