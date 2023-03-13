@@ -1,34 +1,81 @@
 {
-    "buttonBackgroundGradient": {
-        "startColor": "#101828",
-        "endColor": "#475467",
-        "angleDegrees": 45,
+    "defaultControl": {
+        "fontColor": "#D0D5DD",
+        "backgroundColor": "#475467",
+        "backgroundGradient": "45deg, #101828, #475467",
+        "hoverBackgroundGradient": "45deg, #101828, #000000",
+        "focusBackgroundGradient": "45deg, #101828, #000000",
+        "activeBackgroundGradient": "45deg, #101828, #000000",
+        "borderColor": "#00000100",
+        "focusBorderColor": "#4F5B6F",
     },
-    "hoverButtonBackgroundGradient": {
-        "startColor": "#101828",
-        "endColor": "#000000",
-        "angleDegrees": 45,
+
+    "transparentButton": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#CCCCCC",
+        "focusBackgroundColor": "#FFFFFF",
+        "activeBackgroundColor": "#FFFFFF",
+
+        "fontColor": "#F9FAFB",
+        "hoverFontColor": "#344054",
+        "focusFontColor": "#344054",
+        "activeFontColor": "#344054"
     },
-    "focusButtonBackgroundGradient": {
-        "startColor": "#101828",
-        "endColor": "#000000",
-        "angleDegrees": 45,
+
+    "lightButton": {
+        "backgroundColor": "#F9FAFB",
+        "hoverBackgroundColor": "#344054",
+        "focusBackgroundColor": "#344054",
+        "activeBackgroundColor": "#404040dd",
+        "borderColor": "#00000100",
+
+        "fontColor": "#344054",
+        "hoverFontColor": "#F9FAFB",
+        "focusFontColor": "#F9FAFB",
+        "activeFontColor": "#F9FAFB"
     },
-    "activeButtonBackgroundGradient": {
-        "startColor": "#101828",
-        "endColor": "#000000",
-        "angleDegrees": 45,
+
+    "dynamicPanel": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#1D2939",
+        "focusBackgroundColor": "#1D2939",
+        "activeBackgroundColor": "#1D2939"
     },
-    "backgroundColorButtons": "#475467",
-    "fontColorButtons": "#D0D5DD",
+
+    "staticPanel": {
+        "backgroundGradient": "26.57deg, #1D2939, #344054",
+        "hoverBackgroundGradient": "26.57deg, #1D2939, #344054",
+        "focusBackgroundGradient": "26.57deg, #1D2939, #344054",
+        "activeBackgroundGradient": "26.57deg, #1D2939, #344054",
+    },
+
+    "slideToggleOff": {
+        "name": "slideToggleOff",
+        "backgroundColor": "#475467",
+        "hoverBackgroundColor": "#344054",
+        "focusBackgroundColor": "#344054",
+        "activeBackgroundColor": "#344054",
+    },
+
+    "slideToggleOn": {
+        "name": "slideToggle",
+        "backgroundColor": "#12B76A",
+        "hoverBackgroundColor": "#14C472",
+        "focusBackgroundColor": "#0C7846",
+        "activeBackgroundColor": "#109E5C",
+    },
+
+    "primaryFontColor":  "#F9FAFB",
+    "secondaryFontColor": "#98A2B3",
+    "warningFontColor":  "#FEC84B",
+    "errorFontColor": "#F97066",
+
     "lyricsColor": "#FFFFFF",
     "lyricsOutlineColor": "#00000000",
     "currentNoteLyricsColor": "#9E77ED",
     "previousNoteLyricsColor": "#9E77ED",
-    "lyricsContainerGradient": {
-        "startColor": "#000000",
-        "endColor": "#1E232B",
-    },
+    "lyricsContainerGradient": "#000000, #1E232B",
+    
     "staticBackground": {
         "imagePath": "backgrounds/semi-transparent.png",
         "scaleMode": "StretchToFill",
