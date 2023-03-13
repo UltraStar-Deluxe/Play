@@ -197,8 +197,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
-    public bool IsSearchExpressionInfoOverlayVisible => searchExpressionHelpDialogControl != null;
-
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
     {
@@ -413,11 +411,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(lyricsDialogControl.DialogRootVisualElement);
     }
-
-    private void CloseLyricsPopup()
-    {
-        lyricsDialogControl?.CloseDialog();
-    }
     
     private void ShowSearchExpressionHelpDialog()
     {
@@ -436,6 +429,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         searchExpressionHelpDialogControl = uiManager.CreateHelpDialogControl(
             "Advanced Search Expressions",
             titleToContentMap);
+        searchExpressionHelpDialogControl.DialogClosedEventStream.Subscribe(_ => searchExpressionHelpDialogControl = null);
         
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionHelpDialogControl.DialogRootVisualElement);
     }

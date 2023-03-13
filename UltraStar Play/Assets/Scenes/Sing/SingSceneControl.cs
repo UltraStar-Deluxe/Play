@@ -125,7 +125,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private TimeBarControl timeBarControl;
 
     private MessageDialogControl dialogControl;
-    public bool IsDialogOpen => dialogControl != null;
 
     private CommonScoreControl commonScoreControl;
     private readonly SingSceneGovernanceControl singSceneGovernanceControl = new();

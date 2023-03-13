@@ -211,7 +211,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         }
 
         quitGameDialogControl.CloseDialog();
-        quitGameDialogControl = null;
         // Must not immediately focus next button or it will trigger as well
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => quitButton.Focus()));
     }
@@ -229,6 +228,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         quitGameDialogControl = injector
             .WithRootVisualElement(visualElement)
             .CreateAndInject<MessageDialogControl>();
+        quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
         quitGameDialogControl.Title = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title);
         quitGameDialogControl.Message = $"\n{TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message)}\n";
 
@@ -273,7 +273,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         }
 
         newSongDialogControl.CloseDialog();
-        newSongDialogControl = null;
     }
 
     public List<IBinding> GetBindings()
@@ -287,21 +286,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     private void OnBack()
     {
-        if (IsNewSongDialogOpen)
-        {
-            CloseNewSongDialog();
-        }
-        else if (IsQuitGameDialogOpen)
-        {
-            CloseQuitGameDialog();
-        }
-        else if (newVersionChecker.IsNewVersionAvailableDialogOpen)
-        {
-            newVersionChecker.CloseNewVersionAvailableDialog();
-        }
-        else
-        {
-            OpenQuitGameDialog();
-        }
+        OpenQuitGameDialog();
     }
 }

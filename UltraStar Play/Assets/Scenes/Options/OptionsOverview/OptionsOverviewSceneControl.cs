@@ -147,7 +147,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         });
 
         helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-        issuesButton.RegisterCallbackButtonTriggered(() => ShowIssues());
+        issuesButton.RegisterCallbackButtonTriggered(() => ShowIssuesDialog());
         
         backButton.RegisterCallbackButtonTriggered(() => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
@@ -156,18 +156,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     private void OnBack()
     {
-        if (helpDialogControl != null)
-        {
-            helpDialogControl.CloseDialog();
-        }
-        else if (issuesDialogControl != null)
-        {
-            issuesDialogControl.CloseDialog();
-        }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.MainScene);
-        }
+        sceneNavigator.LoadScene(EScene.MainScene);
     }
 
     public void LoadScene(EScene scene)
@@ -370,7 +359,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
     }
 
-    public void ShowIssues()
+    public void ShowIssuesDialog()
     {
         if (issuesDialogControl != null)
         {

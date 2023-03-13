@@ -142,9 +142,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         Button closeDialogButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close), dialogControl.CloseDialog);
         closeDialogButton.Focus();
 
-        // Close dialog by clicking on background
-        VisualElementUtils.RegisterDirectClickCallback(dialogVisualElement, () => dialogControl.CloseDialog());
-
         return dialogControl;
     }
     
@@ -176,9 +173,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
 
         Button closeDialogButton = dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close), dialogControl.CloseDialog);
         closeDialogButton.Focus();
-
-        // Close dialog by clicking on background
-        VisualElementUtils.RegisterDirectClickCallback(dialogVisualElement, () => dialogControl.CloseDialog());
 
         return dialogControl;
     }

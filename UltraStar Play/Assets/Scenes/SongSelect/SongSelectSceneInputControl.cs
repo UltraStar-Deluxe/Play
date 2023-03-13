@@ -107,11 +107,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack()
     {
-        if (songSelectSceneControl.IsSearchExpressionInfoOverlayVisible)
-        {
-            songSelectSceneControl.CloseSearchExpressionHelp();
-        }
-        else if (songSelectSceneControl.SongSearchControl.IsSearchPropertyDropdownVisible)
+        if (songSelectSceneControl.SongSearchControl.IsSearchPropertyDropdownVisible)
         {
             songSelectSceneControl.SongSearchControl.HideSearchPropertyDropdownOverlay();
         }

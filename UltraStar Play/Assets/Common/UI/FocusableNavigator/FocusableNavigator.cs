@@ -32,6 +32,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     public bool logFocusedVisualElements;
 
     public VisualElement FocusedVisualElement => uiDocument.rootVisualElement.focusController.focusedElement as VisualElement;
+    private bool triedToFocusLastVisualElement;
     protected VisualElement lastFocusedVisualElement;
 
     protected readonly Subject<NoNavigationTargetFoundEvent> noNavigationTargetFoundEventStream = new();
@@ -91,12 +92,18 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public void TryFocusLastFocusedVisualElement()
     {
+        if (triedToFocusLastVisualElement)
+        {
+            return;
+        }
+        
         if (lastFocusedVisualElement != null
             && IsFocusableNow(lastFocusedVisualElement))
         {
             DoFocusVisualElement(lastFocusedVisualElement,
                 $"Moving focus to last focused VisualElement: {lastFocusedVisualElement}");
         }
+        triedToFocusLastVisualElement = true;
     }
 
     public virtual void OnBack()
@@ -367,6 +374,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             visualElement.Focus();
             visualElement.ScrollToSelf();
         }
+        
+        triedToFocusLastVisualElement = false;
     }
     
     private bool TryNavigateToCustomNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
@@ -530,12 +539,12 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         return visualElement != null
                && visualElement.IsVisibleByDisplay()
-               && visualElement.GetAncestors().AllMatch(ancestor => ancestor.IsVisibleByDisplay())
                && !float.IsNaN(visualElement.worldBound.center.x)
                && !float.IsNaN(visualElement.worldBound.center.y)
                && visualElement is not Focusable { focusable: false }
                && visualElement.enabledInHierarchy
                && visualElement.canGrabFocus
-               && !visualElement.ClassListContains(R.UssClasses.focusableNavigatorIgnore);
+               && !visualElement.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
+               && visualElement.GetAncestors().AllMatch(ancestor => ancestor.IsVisibleByDisplay());
     }
 }

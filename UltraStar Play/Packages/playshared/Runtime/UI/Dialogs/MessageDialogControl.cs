@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using PrimeInputActions;
 using UniInject;
+using UniRx;
 using UnityEngine.UIElements;
 
 public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedListener
@@ -22,6 +24,8 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
 
     [Inject]
     private Injector injector;
+
+    private VisualElement lastFocusedVisualElement;
 
     public string Title
     {
@@ -51,8 +55,20 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
 
     public void OnInjectionFinished()
     {
+        lastFocusedVisualElement = DialogRootVisualElement.focusController.focusedElement as VisualElement;
+        
         dialogTitle.text = "";
         dialogMessage.text = "";
+
+        // Close dialog using "back" InputAction with high priority
+        disposables.Add(InputManager.GetInputAction("usplay/back").PerformedAsObservable(100).Subscribe(context =>
+        {
+            CloseDialog();
+            InputManager.GetInputAction("usplay/back").CancelNotifyForThisFrame();
+        }));
+        
+        // Close by clicking on background
+        VisualElementUtils.RegisterDirectClickCallback(DialogRootVisualElement, () => CloseDialog());
     }
 
     public Button AddButton(string text, Action callback)
@@ -64,11 +80,22 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
         button.focusable = true;
         button.RegisterCallbackButtonTriggered(callback);
 
+        button.Focus();
+        
         return button;
     }
 
     public void AddVisualElement(VisualElement visualElement)
     {
         dialogMessageContainer.Add(visualElement);
+    }
+
+    public override void CloseDialog()
+    {
+        base.CloseDialog();
+        if (lastFocusedVisualElement != null)
+        {
+            lastFocusedVisualElement.Focus();
+        }
     }
 }
