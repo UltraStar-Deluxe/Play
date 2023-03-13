@@ -58,8 +58,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private readonly List<SongEntryControl> songEntryControls = new();
     public IReadOnlyList<SongEntryControl> SongEntryControls => songEntryControls;
-    public SongEntryControl SelectedSongEntryControl => songEntryControls
-        .FirstOrDefault(it => it.SongMeta == Selection.Value.SongMeta);
 
     private void Start()
     {
@@ -77,6 +75,20 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             if (songListView.selectedIndex == index)
             {
                 ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, true);
+            }
+            else
+            {
+                ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, false);
+            }
+        };
+        songListView.unbindItem = (VisualElement element, int index) =>
+        {
+            SongMeta songMeta = songs[index];
+            SongEntryControl songEntryControl = songEntryControls.FirstOrDefault(it => it.SongMeta == songMeta);
+            if (songEntryControl != null)
+            {
+                songEntryControl.Dispose();
+                songEntryControls.Remove(songEntryControl);
             }
         };
         songListView.selectionChanged += OnSongListViewSelectionChanged;

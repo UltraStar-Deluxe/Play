@@ -135,6 +135,10 @@ public static class ApplyThemeStyleUtils
         {
             listViewToSelectedVisualElement[listView] = listItemAncestor;
         }
+        else if (listViewToSelectedVisualElement[listView] == listItemAncestor)
+        {
+            listViewToSelectedVisualElement[listView] = null;
+        }
     }
 
     private static void ApplyGradient(VisualElementData data, GradientConfig newGradientConfig)
