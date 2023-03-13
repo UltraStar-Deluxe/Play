@@ -122,14 +122,17 @@
 
 .unity-button:hover {
     background-color: var(--control-color-accent1);
+    border-color: rgba(0, 0, 0, 0);
 }
 
 .unity-button:focus {
     background-color: var(--control-color-accent1);
+    border-color: rgba(0, 0, 0, 0);
 }
 
 .unity-button:active {
     background-color: var(--control-color-accent2);
+    border-color: rgba(0, 0, 0, 0);
 }
 
 /**************************************************/
