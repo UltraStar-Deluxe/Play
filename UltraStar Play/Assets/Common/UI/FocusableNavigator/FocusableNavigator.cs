@@ -55,17 +55,6 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             eventSystem.sendNavigationEvents = false;
         }
 
-        if (focusLastElementIfNothingFocused)
-        {
-            NoNavigationTargetFoundEventStream.Subscribe(evt =>
-            {
-                if (evt.FocusedVisualElement == null)
-                {
-                    FocusLastFocusedVisualElement();
-                }
-            });
-        }
-
         noNavigationTargetFoundEventStream.Subscribe(evt =>
         {
             if (logFocusedVisualElements)
@@ -89,22 +78,24 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         }
 
         VisualElement focusedVisualElement = FocusedVisualElement;
-        if (focusedVisualElement != null)
+        if (focusedVisualElement == null
+            && focusLastElementIfNothingFocused)
+        {
+            TryFocusLastFocusedVisualElement();
+        }
+        else if (focusedVisualElement != null)
         {
             lastFocusedVisualElement = focusedVisualElement;
         }
     }
 
-    public void FocusLastFocusedVisualElement()
+    public void TryFocusLastFocusedVisualElement()
     {
         if (lastFocusedVisualElement != null
             && IsFocusableNow(lastFocusedVisualElement))
         {
-            if (logFocusedVisualElements)
-            {
-                DoFocusVisualElement(lastFocusedVisualElement,
-                    $"Moving focus to last focused VisualElement: {lastFocusedVisualElement}");
-            }
+            DoFocusVisualElement(lastFocusedVisualElement,
+                $"Moving focus to last focused VisualElement: {lastFocusedVisualElement}");
         }
     }
 

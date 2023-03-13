@@ -71,7 +71,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator
             && GetFocusableNavigatorRootVisualElement(lastFocusedVisualElement) != null
             && !lastFocusedVisualElement.GetAncestors().Contains(topContent))
         {
-            FocusLastFocusedVisualElement();
+            TryFocusLastFocusedVisualElement();
             return;
         }
 
