@@ -13,6 +13,7 @@ public static class JsonConverter
     {
         fsSerializer newSerializer = new();
         newSerializer.AddConverter(new Color32Converter());
+        newSerializer.AddConverter(new GradientConfigConverter());
         return newSerializer;
     }
 

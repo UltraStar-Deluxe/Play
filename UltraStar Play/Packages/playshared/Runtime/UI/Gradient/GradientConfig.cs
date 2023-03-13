@@ -7,6 +7,17 @@ public class GradientConfig : IEquatable<GradientConfig>
     public Color32 endColor;
     public float angleDegrees;
 
+    public GradientConfig()
+    {
+    }
+    
+    public GradientConfig(Color32 startColor, Color32 endColor, float angleDegrees = 0)
+    {
+        this.startColor = startColor;
+        this.endColor = endColor;
+        this.angleDegrees = angleDegrees;
+    }
+
     public bool Equals(GradientConfig other)
     {
         if (ReferenceEquals(null, other))
@@ -45,5 +56,10 @@ public class GradientConfig : IEquatable<GradientConfig>
     public override int GetHashCode()
     {
         return HashCode.Combine(startColor, endColor, angleDegrees);
+    }
+
+    public override string ToString()
+    {
+        return GradientConfigUtils.ToCssSyntax(this);
     }
 }
