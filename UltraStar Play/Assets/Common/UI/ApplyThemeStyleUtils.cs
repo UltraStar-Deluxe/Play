@@ -105,33 +105,35 @@ public static class ApplyThemeStyleUtils
     private static void OnListViewSelectionChanged(ListView listView, IEnumerable<object> selectedObjects)
     {
         VisualElement oldSelectedVisualElement = listViewToSelectedVisualElement[listView];
+        SetListViewItemActive(listView, oldSelectedVisualElement, false);
+
         VisualElement newSelectedVisualElement = listView.GetSelectedVisualElement();
-        listViewToSelectedVisualElement[listView] = newSelectedVisualElement;
-
-        if (oldSelectedVisualElement != null)
-        {
-            VisualElement oldListItem = oldSelectedVisualElement.ClassListContains("listItem")
-                ? oldSelectedVisualElement
-                : oldSelectedVisualElement.Q(null, "listItem");
-            if (oldListItem != null
-                && visualElementToData.TryGetValue(oldListItem, out VisualElementData oldListItemData))
-            {
-                oldListItemData.isActive = false;
-                UpdateStyles(oldListItemData);
-            }
-        }
-
         if (newSelectedVisualElement != null)
         {
-            VisualElement newListItem = newSelectedVisualElement.ClassListContains("listItem")
-                ? newSelectedVisualElement
-                : newSelectedVisualElement.Q(null, "listItem");
-            if (newListItem != null
-                && visualElementToData.TryGetValue(newListItem, out VisualElementData newListItemData))
-            {
-                newListItemData.isActive = true;
-                UpdateStyles(newListItemData);
-            }
+            SetListViewItemActive(listView, newSelectedVisualElement, true);
+        }
+    }
+
+    public static void SetListViewItemActive(ListView listView, VisualElement listItemAncestor, bool isActive)
+    {
+        if (listItemAncestor == null)
+        {
+            return;
+        }
+        
+        VisualElement listItem = listItemAncestor.ClassListContains("listItem")
+            ? listItemAncestor
+            : listItemAncestor.Q(null, "listItem");
+        if (listItem != null
+            && visualElementToData.TryGetValue(listItem, out VisualElementData listItemData))
+        {
+            listItemData.isActive = isActive;
+            UpdateStyles(listItemData);
+        }
+
+        if (isActive)
+        {
+            listViewToSelectedVisualElement[listView] = listItemAncestor;
         }
     }
 

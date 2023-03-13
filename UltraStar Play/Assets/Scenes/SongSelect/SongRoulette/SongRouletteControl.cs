@@ -74,6 +74,10 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             SongMeta songMeta = songs[index];
             element.userData = songMeta;
             CreateSongEntryControl(songMeta, element);
+            if (songListView.selectedIndex == index)
+            {
+                ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, true);
+            }
         };
         songListView.selectionChanged += OnSongListViewSelectionChanged;
     }
