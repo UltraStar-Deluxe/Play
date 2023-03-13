@@ -9,11 +9,6 @@ public static class ApplyThemeStyleUtils
     private static readonly Dictionary<VisualElement, VisualElementData> visualElementToData = new();
     private static readonly Dictionary<ListView, VisualElement> listViewToSelectedVisualElement = new();
     
-    public static void ApplyControlStyles(VisualElement visualElement, ControlStyleConfig controlStyleConfig)
-    {
-        ApplyControlStyles(visualElement, visualElement, controlStyleConfig);
-    }
-
     public static void ApplyControlStyles(VisualElement visualElement, VisualElement styleTarget, ControlStyleConfig controlStyleConfig)
     {
         if (visualElement == null)
@@ -142,7 +137,7 @@ public static class ApplyThemeStyleUtils
 
     private static void ApplyGradient(VisualElementData data, GradientConfig newGradientConfig)
     {
-        VisualElement visualElement = data.visualElement;
+        VisualElement visualElement = data.styleTarget;
         if (newGradientConfig == null)
         {
             visualElement.style.backgroundImage = new StyleBackground(StyleKeyword.None);
