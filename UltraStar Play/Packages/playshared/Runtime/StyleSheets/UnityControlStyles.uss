@@ -163,7 +163,7 @@
 
 .unity-base-popup-field .unity-base-popup-field__input {
     padding: 0 5px;
-    border-width: 0;
+    border-width: 2px;
 }
 
 .unity-base-popup-field:hover .unity-base-popup-field__input {
@@ -199,7 +199,7 @@
 .unity-enum-field > .unity-base-field__input {
     transition: background-color 0.2s;
     background-color: var(--control-color);
-    border-width: 0;
+    border-width: 2px;
     margin: 0;
     padding: 0 5px;
     min-height: var(--control-height);
@@ -292,7 +292,7 @@
     align-items: center;
     align-content: center;
     justify-content: center;
-    border-width: 0;
+    border-width: 2px;
     border-color: rgba(0, 0, 0, 0);
     border-radius: 5px;
 }
@@ -307,11 +307,6 @@
 
 .unity-toggle:active .unity-toggle__input {
     background-color: var(--control-color-accent2);
-}
-
-.unity-toggle VisualElement {
-    border-radius: 5px;
-    border-width: 0;
 }
 
 .unity-toggle__checkmark
