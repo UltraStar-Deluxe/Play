@@ -27,11 +27,6 @@
                     <MaterialIcon icon="sports_esports" name="image" />
                     <ui:Label text="Game" name="label" />
                 </ToggleButton>
-                <ToggleButton name="songsOptionsButton" class="optionsOverviewButton toggleButton">
-                    <MaterialIcon icon="music_note" name="image" />
-                    <ui:Label text="Songs" name="label" />
-                    <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                </ToggleButton>
                 <ToggleButton name="profileOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="people" name="image" />
                     <ui:Label text="Players" name="label" />
@@ -42,13 +37,18 @@
                     <ui:Label text="Recording" name="label" />
                     <MaterialIcon name="recordingSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
                 </ToggleButton>
-                <ToggleButton name="designOptionsButton" class="optionsOverviewButton">
-                    <MaterialIcon icon="filter_b_and_w" name="image" />
-                    <ui:Label text="Design" name="label" />
+                <ToggleButton name="songsOptionsButton" class="optionsOverviewButton toggleButton">
+                    <MaterialIcon icon="music_note" name="image" />
+                    <ui:Label text="Songs" name="label" />
+                    <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
                 </ToggleButton>
                 <ToggleButton name="contentDownloadButton" class="optionsOverviewButton">
                     <MaterialIcon icon="cloud_download" name="image" />
                     <ui:Label text="Download" name="label" />
+                </ToggleButton>
+                <ToggleButton name="designOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="filter_b_and_w" name="image" />
+                    <ui:Label text="Design" name="label" />
                 </ToggleButton>
                 <ToggleButton name="graphicsOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="desktop_windows" name="image" />
