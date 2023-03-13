@@ -174,14 +174,24 @@ public static class ApplyThemeStyleUtils
         Color32 borderColor,
         Color32 backgroundColor,
         GradientConfig backgroundGradient,
-        string backgroundImage)
+        string backgroundImagePath)
     {
         VisualElement visualElement = data.styleTarget;
-        if (!backgroundImage.IsNullOrEmpty()
-            && File.Exists(backgroundImage))
+        if (!backgroundImagePath.IsNullOrEmpty())
         {
-            ImageManager.LoadSpriteFromFile(backgroundImage,
-                loadedSprite => visualElement.style.backgroundImage = new StyleBackground(loadedSprite));
+            string absoluteBackgroundImagePath = PathUtils.IsAbsolutePath(backgroundImagePath)
+                ? backgroundImagePath
+                : ThemeMetaUtils.GetAbsoluteFilePath(ThemeManager.Instance.GetCurrentTheme(), backgroundImagePath);
+            if (File.Exists(absoluteBackgroundImagePath))
+            {
+                ImageManager.LoadSpriteFromFile(absoluteBackgroundImagePath,
+                    loadedSprite => visualElement.style.backgroundImage = new StyleBackground(loadedSprite));
+                visualElement.style.backgroundColor = new StyleColor(StyleKeyword.None);
+            }
+            else
+            {
+                Debug.LogWarning($"Could not find background image at path {absoluteBackgroundImagePath}");
+            }
         }
         else if (backgroundGradient != null)
         {
