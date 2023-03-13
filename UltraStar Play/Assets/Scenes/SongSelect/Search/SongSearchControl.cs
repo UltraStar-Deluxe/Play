@@ -82,7 +82,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
         searchTextField.RegisterCallback<FocusEvent>(evt => UpdateSearchTextFieldHint());
-        searchTextField.RegisterCallback<BlurEvent>(evt => UpdateSearchTextFieldHint());
+        searchTextField.RegisterCallback<BlurEvent>(evt => UpdateSearchTextFieldHint(true));
         UpdateSearchTextFieldHint();
 
         searchErrorIcon.HideByDisplay();
@@ -126,11 +126,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         });
     }
 
-    private void UpdateSearchTextFieldHint()
+    private void UpdateSearchTextFieldHint(bool isBlurEvent = false)
     {
         searchTextFieldHint.SetVisibleByDisplay(
             GetRawSearchText().IsNullOrEmpty()
-            && searchTextField.focusController.focusedElement != searchTextField);
+            && (isBlurEvent || searchTextField.focusController.focusedElement != searchTextField));
     }
 
     private string GetTranslation(ESearchProperty searchProperty)

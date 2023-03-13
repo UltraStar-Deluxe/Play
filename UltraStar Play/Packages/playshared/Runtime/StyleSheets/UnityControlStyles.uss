@@ -147,6 +147,7 @@
     min-height: var(--control-height);
     margin: 0;
     padding: 0 5px;
+    border-radius: 5px;
 }
 
 .unity-base-popup-field:hover > .unity-base-field__input {
@@ -199,6 +200,7 @@
 .unity-enum-field > .unity-base-field__input {
     transition: background-color 0.2s;
     background-color: var(--control-color);
+    border-radius: 5px;
     border-width: 2px;
     margin: 0;
     padding: 0 5px;

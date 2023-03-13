@@ -29,6 +29,22 @@ ToggleButton.active {
     background-color: rgba(92, 92, 92, 0.3);
 }
 
+.lightButton .unity-label {
+    color: rgb(16, 24, 40);
+}
+
+.lightButton {
+    background-color: rgb(249, 245, 255);
+    color: rgb(16, 24, 40);
+}
+
+.lightButton:hover {
+    background-color: rgba(249, 245, 255, 0.5);
+}
+
+.lightButton:focus {
+    background-color: rgba(249, 245, 255, 0.5);
+}
 /**************************************************/
 /* ITEM PICKER */
 /**************************************************/

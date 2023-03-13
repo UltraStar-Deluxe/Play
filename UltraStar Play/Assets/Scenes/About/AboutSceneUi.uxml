@@ -14,12 +14,10 @@
         </ui:VisualElement>
         <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
             <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="aboutTextsScrollView" vertical-scroller-visibility="AlwaysVisible" class="mr-3" style="min-width: 25%;">
-                <ToggleButton name="aboutUSPlayButton" class="optionsOverviewButton toggleButton">
-                    <MaterialIcon icon="sports_esports" name="image" />
+                <ToggleButton name="aboutUSPlayButton" class="toggleButton mb-2">
                     <ui:Label text="UltraStar Play" name="label" />
                 </ToggleButton>
-                <ToggleButton name="songsOptionsButton" class="optionsOverviewButton toggleButton">
-                    <MaterialIcon icon="list" name="image" />
+                <ToggleButton name="songsOptionsButton" class="toggleButton mb-2">
                     <ui:Label text="Licenses" name="label" />
                 </ToggleButton>
             </ui:ScrollView>

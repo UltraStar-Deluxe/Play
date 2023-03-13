@@ -1,12 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="songEntryUiRoot" class="roundCorners" style="height: 66px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px;">
-        <ui:VisualElement name="row" class="listItem dynamicPanel" style="background-color: rgb(6, 170, 233); border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; overflow: hidden;">
+        <ui:VisualElement name="row" class="listItem dynamicPanel backgroundTransition" style="background-color: rgb(6, 170, 233); border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; overflow: hidden;">
             <ui:VisualElement name="songImageOuter" picking-mode="Ignore" class="mr-2" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-and-crop; flex-shrink: 0; min-width: 20px; min-height: 20px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; height: 58px; width: 58px;">
                 <ui:VisualElement name="songImageInner" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-to-fit; flex-grow: 1; display: none;" />
             </ui:VisualElement>
             <ui:VisualElement name="songInfoContainer" picking-mode="Ignore" style="min-height: 50px; flex-grow: 1;">
                 <ui:Label text="Some very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" style="white-space: normal; -unity-font-style: bold;" />
-                <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="smallFont" />
+                <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="smallFont secondaryFontColor" />
                 <ui:VisualElement name="titleRow" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; align-items: center;" />
                 <ui:VisualElement name="iconBar" picking-mode="Ignore" class="mt-auto" style="flex-shrink: 0; align-items: center; flex-direction: row;">
                     <MaterialIcon name="songEntryFavoriteIcon" icon="favorite" class="smallFont fontColor" />

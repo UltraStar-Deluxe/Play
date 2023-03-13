@@ -6,7 +6,7 @@
                 <ui:VisualElement name="songInfoContainer" style="padding-left: 10px;">
                     <ui:VisualElement name="coverImage" class="mb-3" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); height: 150px; -unity-background-scale-mode: scale-to-fit; width: 150px;" />
                     <ui:Label text="Some Title" name="titleLabel" style="-unity-font-style: bold; font-size: 20px; white-space: normal;" />
-                    <ui:Label text="Some Artist" name="artistLabel" style="-unity-font-style: normal; font-size: 14px; white-space: normal;" />
+                    <ui:Label text="Some Artist" name="artistLabel" class="secondaryFontColor" style="-unity-font-style: normal; font-size: 14px; white-space: normal;" />
                 </ui:VisualElement>
                 <ToggleButton text="Your Results" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
                 <ToggleButton text="Highscores" display-tooltip-when-elided="true" name="showHighscoreButton" style="-unity-text-align: middle-left;" />

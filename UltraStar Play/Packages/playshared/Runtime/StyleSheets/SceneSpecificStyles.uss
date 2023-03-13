@@ -462,18 +462,6 @@
     min-width: 40px;
 }
 
-.optionsOverviewButton .warning {
-    color: var(--font-color-warning);
-    -unity-background-image-tint-color: var(--font-color-warning);
-}
-
-.optionsOverviewButton VisualElement {
-    -unity-background-image-tint-color: var(--font-color);
-    -unity-background-scale-mode: scale-to-fit;
-    width: var(--font-size-xl);
-    height: var(--font-size-xl);
-}
-
 .optionsLabelAndItemPicker {
     flex-direction: row;
     justify-content: space-between;

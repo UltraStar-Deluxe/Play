@@ -1,6 +1,6 @@
 :root {
     --font-color: rgb(240, 240, 240);
-    --font-color-secondary: #667085;
+    --font-color-secondary: #A8A8A8;
     --font-color-inverted: rgb(64, 64, 64);
     --font-color-accent1: lightgrey;
     --font-color-error: rgb(220, 53, 69);

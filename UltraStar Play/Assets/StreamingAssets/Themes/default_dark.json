@@ -19,21 +19,23 @@
 
     "lightButton": {
         "fontColor": "#101828",
-        "backgroundColor": "#F9F5FF",
-        "hoverBackgroundColor": "#7C7A80",
-        "focusBackgroundColor": "#7C7A80",
-        "activeBackgroundColor": "#7C7A80",
+        "backgroundColor": "#D0D5DD",
+        "hoverBackgroundColor": "#F9F5FF",
+        "focusBackgroundColor": "#F9F5FF",
+        "activeBackgroundColor": "#F9F5FF",
+        "borderColor": "#00000100",
+        "focusBorderColor": "#D0D5DD"
     },
 
     "dynamicPanel": {
-        "backgroundColor": "#475467",
-        "hoverBackgroundColor": "#7B91B3",
-        "focusBackgroundColor": "#7B91B3",
-        "activeBackgroundColor": "#7B91B3",
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#1D2939",
+        "focusBackgroundColor": "#1D2939",
+        "activeBackgroundColor": "#1D2939"
     },
 
     "staticPanel": {
-        "backgroundColor": "#475467",
+        "backgroundColor": "#1D2939",
     },
 
     "slideToggleOff": {
@@ -52,6 +54,11 @@
         "activeBackgroundColor": "#aaffff",
     },
 
+    "primaryFontColor":  "#F9FAFB",
+    "secondaryFontColor": "#98A2B3",
+    "warningFontColor":  "#FEC84B",
+    "errorFontColor": "#F97066",
+    
     "lyricsColor": "#FFFFFF",
     "lyricsOutlineColor": "#00000000",
     "currentNoteLyricsColor": "#9E77ED",

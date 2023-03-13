@@ -46,9 +46,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public VisualTreeAsset noteUi;
 
     [InjectedInInspector]
-    public VisualTreeAsset dialogUi;
-
-    [InjectedInInspector]
     public VisualTreeAsset perfectEffectStarUi;
 
     [InjectedInInspector]
@@ -190,20 +187,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
                 "playerNameCsv", playerNameCsv);
 
-            VisualElement visualElement = dialogUi.CloneTree();
-            visualElement.AddToClassList("overlay");
-            background.Add(visualElement);
-
-            dialogControl = injector
-                .WithRootVisualElement(visualElement)
-                .CreateAndInject<MessageDialogControl>();
+            dialogControl = UiManager.Instance.CreateDialogControl(title);
             dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
-            dialogControl.Title = title;
             dialogControl.Message = message;
-            dialogControl.DialogTitleImage.ShowByDisplay();
-            dialogControl.DialogTitleImage.AddToClassList(R.UssClasses.warning);
-            Button okButton = dialogControl.AddButton("OK", _ => dialogControl?.CloseDialog());
-            okButton.Focus();
+            dialogControl.AddButton("OK", _ => dialogControl?.CloseDialog());
 
             ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
         }

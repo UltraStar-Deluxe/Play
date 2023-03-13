@@ -321,3 +321,7 @@ Button.tinyFont {
 .wordWrap Label {
     white-space: normal;
 }
+
+.backgroundTransition {
+    transition: background-color 0.2s, border-color 0.2s;
+}

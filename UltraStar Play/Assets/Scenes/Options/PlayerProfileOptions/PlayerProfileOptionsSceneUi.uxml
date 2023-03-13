@@ -7,7 +7,7 @@
                 <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
                 <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
             </ui:ScrollView>
-            <ui:Button name="addButton" class="middleCenterText circleButton" style="font-size: 30px; align-self: center; bottom: 0;">
+            <ui:Button name="addButton" class="middleCenterText circleButton lightButton" style="font-size: 30px; align-self: center; bottom: 0;">
                 <MaterialIcon name="addIcon" icon="add" />
             </ui:Button>
         </ui:VisualElement>

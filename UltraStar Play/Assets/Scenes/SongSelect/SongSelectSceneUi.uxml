@@ -21,8 +21,8 @@
                 <ui:VisualElement name="songListColumn" class="mr-3" style="width: 40%;">
                     <ui:VisualElement name="searchBarContainer" style="flex-direction: row; flex-shrink: 0; margin-left: auto; width: 100%;">
                         <ui:TextField picking-mode="Ignore" name="searchTextField" hide-placeholder-on-focus="true" style="align-items: center; flex-grow: 1;">
-                            <ui:Label tabindex="-1" text="Search artist, title" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="textFieldHint" />
-                            <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" class="pr-3" style="position: absolute; -unity-text-align: middle-right; width: 100%; display: flex; height: 100%; justify-content: center;" />
+                            <ui:Label tabindex="-1" text="Search artist, title" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="textFieldHint secondaryFontColor" />
+                            <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" class="pr-3 secondaryFontColor smallFont" style="position: absolute; -unity-text-align: middle-right; width: 100%; display: flex; height: 100%; justify-content: center;" />
                         </ui:TextField>
                         <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; overflow: visible;">
                             <BootstrapIcon tabindex="-1" name="searchIcon" icon="funnel-fill" picking-mode="Ignore" style="position: absolute; font-size: 20px;" />
@@ -31,9 +31,9 @@
                     </ui:VisualElement>
                     <ui:ListView focusable="true" name="songListView" fixed-item-height="66" style="flex-grow: 1;" />
                     <ui:VisualElement name="noSongsFoundContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; display: flex; align-items: stretch; justify-content: center;">
-                        <MaterialIcon tabindex="-1" name="noSongsFoundIcon" icon="cloud_download" style="font-size: 64px;" />
-                        <ui:Label text="You have no songs downloaded yet." display-tooltip-when-elided="true" name="noSongsFoundLabel" class="largerFont" style="white-space: normal; display: flex; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; -unity-font-style: bold;" />
-                        <ui:Label text="Try adding some songs below" display-tooltip-when-elided="true" name="tryAddSongsLabel" class="my-3" style="white-space: normal; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; width: 100%;" />
+                        <MaterialIcon tabindex="-1" name="noSongsFoundIcon" icon="cloud_download" class="secondaryFontColor" style="font-size: 64px;" />
+                        <ui:Label text="You have no songs downloaded yet." display-tooltip-when-elided="true" name="noSongsFoundLabel" class="largerFont secondaryFontColor" style="white-space: normal; display: flex; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; -unity-font-style: bold;" />
+                        <ui:Label text="Try adding some songs below" display-tooltip-when-elided="true" name="tryAddSongsLabel" class="my-3 secondaryFontColor" style="white-space: normal; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; width: 100%;" />
                         <ui:VisualElement name="noSongsFoundButtonContainer" class="smallFont child-mb-2" style="flex-direction: column; justify-content: center; align-items: stretch;">
                             <ui:Button display-tooltip-when-elided="true" name="downloadSongsButton" style="flex-direction: row;">
                                 <MaterialIcon tabindex="-1" name="downloadSongsIcon" icon="cloud_download" class="mx-2" style="font-size: 24px;" />
@@ -56,11 +56,11 @@
                             </ui:VisualElement>
                             <ui:VisualElement name="selectedSongDetails" class="ml-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                                 <ui:Label tabindex="-1" text="Some Very Very Long Title" display-tooltip-when-elided="true" name="selectedSongTitle" class="largerFont" style="-unity-font-style: bold; white-space: normal;" />
-                                <ui:Label tabindex="-1" text="Some Very Very Long Artist Name" display-tooltip-when-elided="true" name="selectedSongArtist" class="smallFont" style="white-space: normal;" />
+                                <ui:Label tabindex="-1" text="Some Very Very Long Artist Name" display-tooltip-when-elided="true" name="selectedSongArtist" class="smallFont secondaryFontColor" style="white-space: normal;" />
                                 <ui:VisualElement name="selectedSongHighscoreContainer" class="mt-3">
                                     <ui:Label tabindex="-1" text="High Score" display-tooltip-when-elided="true" name="highscoreTitleLabel" class="smallFont" style="-unity-font-style: bold;" />
                                     <ui:VisualElement name="localHighScoreContainer">
-                                        <ui:Label tabindex="-1" text="10000" display-tooltip-when-elided="true" name="highscoreValueLabel" class="smallFont py-1" />
+                                        <ui:Label tabindex="-1" text="10000" display-tooltip-when-elided="true" name="highscoreValueLabel" class="smallFont py-1 secondaryFontColor" />
                                     </ui:VisualElement>
                                 </ui:VisualElement>
                             </ui:VisualElement>
@@ -83,10 +83,10 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="difficultyButtonContainer" class="pr-2 mb-2" style="background-color: rgba(0, 0, 0, 0); flex-shrink: 0;">
                         <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); justify-content: space-around; min-height: 40px;">
-                            <ToggleButton text="No Scores" display-tooltip-when-elided="true" name="noScoresButton" class="mr-2 smallFont" style="flex-grow: 1; width: 10%; height: auto;" />
-                            <ToggleButton text="Easy" display-tooltip-when-elided="true" name="easyDifficultyButton" class="mr-2 smallFont" style="flex-grow: 1; width: 10%; height: auto;" />
-                            <ToggleButton text="Medium" display-tooltip-when-elided="true" name="mediumDifficultyButton" class="mr-2 smallFont" style="width: 10%; flex-grow: 1; height: auto;" />
-                            <ToggleButton text="Hard" display-tooltip-when-elided="true" name="hardDifficultyButton" class="mr-2 smallFont" style="width: 10%; flex-grow: 1; height: auto;" />
+                            <ToggleButton text="No Scores" display-tooltip-when-elided="true" name="noScoresButton" class="mr-2 smallFont secondaryFontColor" style="flex-grow: 1; width: 10%; height: auto;" />
+                            <ToggleButton text="Easy" display-tooltip-when-elided="true" name="easyDifficultyButton" class="mr-2 smallFont secondaryFontColor" style="flex-grow: 1; width: 10%; height: auto;" />
+                            <ToggleButton text="Medium" display-tooltip-when-elided="true" name="mediumDifficultyButton" class="mr-2 smallFont secondaryFontColor" style="width: 10%; flex-grow: 1; height: auto;" />
+                            <ToggleButton text="Hard" display-tooltip-when-elided="true" name="hardDifficultyButton" class="mr-2 smallFont secondaryFontColor" style="width: 10%; flex-grow: 1; height: auto;" />
                             <ui:Button display-tooltip-when-elided="true" name="toggleCoopModeButton" class="transparentButton" style="height: auto;">
                                 <MaterialIcon tabindex="-1" name="coopIcon" icon="diversity_1" />
                                 <MaterialIcon tabindex="-1" name="noCoopIcon" icon="groups" />

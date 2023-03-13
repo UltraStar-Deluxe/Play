@@ -1,6 +1,6 @@
 #songEditorRoot {
     --font-color: rgb(208, 208, 208);
-    --font-color-secondary: #667085;
+    --font-color-secondary: #A8A8A8;
     --font-color-inverted: rgb(64, 64, 64);
     --control-color: rgb(88, 88, 88);
     --control-color-accent1: rgb(103, 103, 103);
