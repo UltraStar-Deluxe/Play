@@ -16,7 +16,7 @@ public class TabGroupControl
     public void AddTabGroupButton(Button button, VisualElement controlledContainer)
     {
         buttonToContainerMap.Add(button, controlledContainer);
-        button.RegisterCallbackButtonTriggered(() => OnButtonTriggered(button));
+        button.RegisterCallbackButtonTriggered(_ => OnButtonTriggered(button));
     }
 
     private void OnButtonTriggered(Button button)

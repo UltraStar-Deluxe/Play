@@ -49,9 +49,9 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IBinder, ITr
 
     void Start()
     {
-        continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
-        hiddenContinueButton.RegisterCallbackButtonTriggered(() => FinishScene());
-        nextDifficultyButton.RegisterCallbackButtonTriggered(() => ShowNextDifficulty(1));
+        continueButton.RegisterCallbackButtonTriggered(_ => FinishScene());
+        hiddenContinueButton.RegisterCallbackButtonTriggered(_ => FinishScene());
+        nextDifficultyButton.RegisterCallbackButtonTriggered(_ => ShowNextDifficulty(1));
         ShowHighscores(sceneData.SongMeta, sceneData.Difficulty);
 
         // Click through to hiddenContinueButton

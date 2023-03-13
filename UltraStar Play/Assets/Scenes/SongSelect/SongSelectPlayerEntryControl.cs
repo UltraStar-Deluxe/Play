@@ -96,7 +96,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         injector.Inject(micProgressBarRecordingControl);
         micProgressBarRecordingControl.MicProfile = MicProfile;
 
-        togglePlayerSelectedButton.RegisterCallbackButtonTriggered(() => IsSelected.Value = !IsSelected.Value);
+        togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ => IsSelected.Value = !IsSelected.Value);
         
         IsSelected.Subscribe(newValue =>
         {
@@ -116,7 +116,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private void InitVoiceSelection()
     {
         selectedVoiceName.Subscribe(_ => UpdateToggleVoiceButtonText());
-        toggleVoiceButton.RegisterCallbackButtonTriggered(() =>
+        toggleVoiceButton.RegisterCallbackButtonTriggered(_ =>
         {
             selectedVoiceName.Value = selectedVoiceName.Value == Voice.firstVoiceName
                 ? Voice.secondVoiceName

@@ -72,7 +72,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .Subscribe(onNext => UpdateSongFolderList())
             .AddTo(gameObject);
 
-        addButton.RegisterCallbackButtonTriggered(() => AddNewSongFolder());
+        addButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -144,7 +144,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
         return helpDialogControl;
     }
     
@@ -184,7 +184,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                         && !songIssue.SongMeta.Directory.IsNullOrEmpty()
                         && Directory.Exists(songIssue.SongMeta.Directory))
                     {
-                        openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
+                        openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
                     }
                     else
                     {
@@ -229,7 +229,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             warningsAccordionItem.ShowAccordionContent();
         }
 
-        issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), () =>
+        issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), _ =>
         {
             songMetaManager.ReloadSongMetas();
             issuesDialogControl.CloseDialog();
@@ -274,14 +274,14 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             downloadSongsButton.text = "Download songs";
             downloadSongsButton.AddToClassList("mx-auto");
             downloadSongsButton.AddToClassList("songLibraryNoSongsButton");
-            downloadSongsButton.RegisterCallbackButtonTriggered(() => optionsOverviewSceneControl.LoadScene(EScene.ContentDownloadScene));
+            downloadSongsButton.RegisterCallbackButtonTriggered(_ => optionsOverviewSceneControl.LoadScene(EScene.ContentDownloadScene));
             songList.Add(downloadSongsButton);
             
             Button viewMoreButton = new();
             viewMoreButton.AddToClassList("mx-auto");
             viewMoreButton.AddToClassList("songLibraryNoSongsButton");
             viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
-            viewMoreButton.RegisterCallbackButtonTriggered(() => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
+            viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
             songList.Add(viewMoreButton);
         }
         else

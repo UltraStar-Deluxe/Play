@@ -74,11 +74,11 @@ public class MessageDialogControl : AbstractDialogControl, IInjectionFinishedLis
         VisualElementUtils.RegisterDirectClickCallback(DialogRootVisualElement, () => CloseDialog());
         
         // Close by clicking on default close button
-        defaultCloseDialogButton.RegisterCallbackButtonTriggered(() => CloseDialog());
+        defaultCloseDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         defaultCloseDialogButton.Focus();
     }
 
-    public Button AddButton(string text, Action callback)
+    public Button AddButton(string text, EventCallback<EventBase> callback)
     {
         Button button = new();
         dialogButtonContainer.Add(button);

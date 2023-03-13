@@ -103,7 +103,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         injector.Inject(highscoreControl);
         
         background.RegisterCallback<PointerUpEvent>(evt => FinishScene());
-        continueButton.RegisterCallbackButtonTriggered(() => FinishScene());
+        continueButton.RegisterCallbackButtonTriggered(_ => FinishScene());
         continueButton.Focus();
 
         TabGroupControl tabGroupControl = new();
@@ -111,9 +111,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IBinder
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.ShowContainer(playerResultsRoot);
         showCurrentResultsButton.SetActive(true);
-        showHighscoreButton.RegisterCallbackButtonTriggered(() => highscoreControl.Init());
+        showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
         
-        restartButton.RegisterCallbackButtonTriggered(() => RestartSingScene());
+        restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
 
         // Click through to background
         background.Query<VisualElement>().ForEach(visualElement =>

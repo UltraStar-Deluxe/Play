@@ -85,7 +85,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         contextMenuControl.ContextMenuOpenedEventStream.Subscribe(OnContextMenuOpened);
         contextMenuControl.ContextMenuClosedEventStream.Subscribe(OnContextMenuClosed);
         
-        openControlsMenuButton.RegisterCallbackButtonTriggered(() =>
+        openControlsMenuButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (isPopupMenuOpen
                 || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
@@ -96,13 +96,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             contextMenuControl.OpenContextMenu(Vector2.zero);
         });
         
-        toggleMuteButton.RegisterCallbackButtonTriggered(() =>
+        toggleMuteButton.RegisterCallbackButtonTriggered(_ =>
         {
             ToggleMute();
         });
         UpdateMuteIcon();
         
-        togglePlaybackButton.RegisterCallbackButtonTriggered(() => TogglePlayPause());
+        togglePlaybackButton.RegisterCallbackButtonTriggered(_ => TogglePlayPause());
         governanceOverlay.RegisterCallback<PointerDownEvent>(evt =>
         {
             if (isPopupMenuOpen

@@ -88,15 +88,15 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         statusLabel.text = "";
         SelectSongArchiveUrl(songArchiveEntries[0].Url);
 
-        startDownloadButton.RegisterCallbackButtonTriggered(() => StartDownload());
-        cancelDownloadButton.RegisterCallbackButtonTriggered(() => CancelDownload());
+        startDownloadButton.RegisterCallbackButtonTriggered(_ => StartDownload());
+        cancelDownloadButton.RegisterCallbackButtonTriggered(_ => CancelDownload());
         downloadPath.RegisterValueChangedCallback(evt => FetchFileSize());
         if (!DownloadUrl.IsNullOrEmpty())
         {
             FetchFileSize();
         }
         
-        urlChooserButton.RegisterCallbackButtonTriggered(() => ShowUrlChooserDialog());
+        urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
     }
 
     private void ShowUrlChooserDialog()
@@ -121,7 +121,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             Button songArchiveUrlButton = new();
             songArchiveUrlButton.AddToClassList("songArchiveUrlButton");
             songArchiveUrlButton.text = songArchiveEntry.Url;
-            songArchiveUrlButton.RegisterCallbackButtonTriggered(() =>
+            songArchiveUrlButton.RegisterCallbackButtonTriggered(_ =>
             {
                 SelectSongArchiveUrl(songArchiveEntry.Url);
                 CloseUrlChooserDialog();
@@ -544,7 +544,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToDownloadSongs)));
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToDownloadSongs)));
         return helpDialogControl;
     }
 }

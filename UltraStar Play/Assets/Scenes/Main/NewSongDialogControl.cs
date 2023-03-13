@@ -35,8 +35,8 @@ public class NewSongDialogControl : AbstractDialogControl, IInjectionFinishedLis
 
     public void OnInjectionFinished()
     {
-        cancelButton.RegisterCallbackButtonTriggered(() => CloseDialog());
-        okButton.RegisterCallbackButtonTriggered(() => TryCreateNewSong());
+        cancelButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
+        okButton.RegisterCallbackButtonTriggered(_ => TryCreateNewSong());
 
         artistTextField.value = "";
         titleTextField.value = "";

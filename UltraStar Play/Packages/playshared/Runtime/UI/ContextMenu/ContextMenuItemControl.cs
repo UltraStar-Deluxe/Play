@@ -27,7 +27,7 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         label.text = text;
-        button.RegisterCallbackButtonTriggered(() =>
+        button.RegisterCallbackButtonTriggered(_ =>
         {
             if (button.focusController.focusedElement == button)
             {

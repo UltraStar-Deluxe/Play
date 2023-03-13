@@ -120,7 +120,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker);
         sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
-        deleteButton.RegisterCallbackButtonTriggered(() => DeleteSelectedRecordingDevice());
+        deleteButton.RegisterCallbackButtonTriggered(_ => DeleteSelectedRecordingDevice());
         
         devicePickerControl.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
         amplificationPickerControl.Selection.Subscribe(newValue =>
@@ -165,7 +165,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             .Subscribe(UpdateMicProfileNames)
             .AddTo(gameObject);
 
-        calibrateDelayButton.RegisterCallbackButtonTriggered(() => calibrateMicDelayControl.StartCalibration());
+        calibrateDelayButton.RegisterCallbackButtonTriggered(_ => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
             .Subscribe(calibrationResult =>
             {
@@ -403,7 +403,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
         return helpDialogControl;
     }
 

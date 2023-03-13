@@ -129,7 +129,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         
         sceneToButtonMap.ForEach(entry =>
         {
-           entry.Value.RegisterCallbackButtonTriggered(() => LoadScene(entry.Key)); 
+           entry.Value.RegisterCallbackButtonTriggered(_ => LoadScene(entry.Key)); 
         });
 
         InitSettingsProblemHints();
@@ -146,10 +146,10 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             }
         });
 
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-        issuesButton.RegisterCallbackButtonTriggered(() => ShowIssuesDialog());
+        helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
+        issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
         
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
+        backButton.RegisterCallbackButtonTriggered(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
     }

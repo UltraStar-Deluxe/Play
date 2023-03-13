@@ -115,9 +115,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddCustomThemes)));
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddCustomThemes)));
         helpDialogControl.AddButton("Themes Folder",
-            () => ApplicationUtils.OpenDirectory(ThemeManager.GetAbsoluteUserDefinedThemesFolder()));
+            _ => ApplicationUtils.OpenDirectory(ThemeManager.GetAbsoluteUserDefinedThemesFolder()));
         return helpDialogControl;
     }
 }

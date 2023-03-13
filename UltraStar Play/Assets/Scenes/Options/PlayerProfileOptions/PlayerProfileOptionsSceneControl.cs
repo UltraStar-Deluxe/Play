@@ -33,7 +33,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         
         UpdatePlayerProfileList();
 
-        addButton.RegisterCallbackButtonTriggered(() =>
+        addButton.RegisterCallbackButtonTriggered(_ =>
         {
             settings.PlayerProfiles.Add(new PlayerProfile());
             CreatePlayerProfileEntry(settings.PlayerProfiles.FirstOrDefault(), settings.PlayerProfiles.Count - 1);
@@ -83,7 +83,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         VisualElement playerProfileInactiveOverlay = visualElement.Q<VisualElement>(R.UxmlNames.playerProfileInactiveOverlay);
 
         Button deleteButton = visualElement.Q<Button>(R.UxmlNames.deleteButton);
-        deleteButton.RegisterCallbackButtonTriggered(() =>
+        deleteButton.RegisterCallbackButtonTriggered(_ =>
         {
             settings.PlayerProfiles.RemoveAt(indexInList);
             visualElement.RemoveFromHierarchy();
@@ -132,7 +132,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton("Images Folder",
-            () => ApplicationUtils.OpenDirectory(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder()));
+            _ => ApplicationUtils.OpenDirectory(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder()));
         return helpDialogControl;
     }
 }

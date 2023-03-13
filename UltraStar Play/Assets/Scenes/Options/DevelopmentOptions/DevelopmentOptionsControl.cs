@@ -124,8 +124,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         }
 
         // View and copy log
-        showLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
-        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        showLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
+        copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");
@@ -134,7 +134,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         // Open persistent data path
         if (PlatformUtils.IsStandalone)
         {
-            openPersistentDataPathButton.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(Application.persistentDataPath));
+            openPersistentDataPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(Application.persistentDataPath));
         }
         else
         {

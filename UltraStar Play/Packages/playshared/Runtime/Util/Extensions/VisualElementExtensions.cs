@@ -6,16 +6,16 @@ using UnityEngine.UIElements;
 
 public static class VisualElementExtensions
 {
-    public static void RegisterCallbackButtonTriggered(this Button button, Action callback)
+    public static void RegisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback)
     {
-        button.RegisterCallback<ClickEvent>(_ => callback());
-        button.RegisterCallback<NavigationSubmitEvent>(_ => callback());
+        button.RegisterCallback<ClickEvent>(callback);
+        button.RegisterCallback<NavigationSubmitEvent>(callback);
     }
 
-    public static void UnregisterCallbackButtonTriggered(this Button button, Action callback)
+    public static void UnregisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback)
     {
-        button.UnregisterCallback<ClickEvent>(_ => callback());
-        button.UnregisterCallback<NavigationSubmitEvent>(_ => callback());
+        button.UnregisterCallback<ClickEvent>(callback);
+        button.UnregisterCallback<NavigationSubmitEvent>(callback);
     }
 
     public static void AddToClassListIfNew(this VisualElement visualElement, params string[] newClasses)

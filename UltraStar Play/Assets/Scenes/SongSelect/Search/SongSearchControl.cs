@@ -89,7 +89,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         searchErrorIconTooltipControl = new(searchErrorIcon);
 
         HideSearchPropertyDropdownOverlay();
-        searchPropertyButton.RegisterCallbackButtonTriggered(() =>
+        searchPropertyButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (IsSearchPropertyDropdownVisible)
             {

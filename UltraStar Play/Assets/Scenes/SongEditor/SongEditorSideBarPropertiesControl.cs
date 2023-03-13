@@ -66,9 +66,9 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
         bpmTextField.AddToClassList("disabled");
         bpmTextField.value = songMeta.Bpm.ToString("0.00", CultureInfo.InvariantCulture);
 
-        setBpmChangeNoteDurationButton.RegisterCallbackButtonTriggered(() =>
+        setBpmChangeNoteDurationButton.RegisterCallbackButtonTriggered(_ =>
             songEditorSceneControl.CreateNumberInputDialog("Set BPM and change note duration", "Enter new BPM value", newBpm => applyBpmDontAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
-        setBpmKeepNoteDurationButton.RegisterCallbackButtonTriggered(() =>
+        setBpmKeepNoteDurationButton.RegisterCallbackButtonTriggered(_ =>
             songEditorSceneControl.CreateNumberInputDialog("Set BPM but keep note duration", "Enter new BPM value", newBpm => applyBpmAndAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
     }
 

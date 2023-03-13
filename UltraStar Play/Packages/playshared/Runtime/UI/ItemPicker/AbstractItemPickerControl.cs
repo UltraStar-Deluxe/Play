@@ -11,11 +11,11 @@ public abstract class AbstractItemPickerControl<T>
         this.ItemPicker = itemPicker;
         if (itemPicker.PreviousItemButton != null)
         {
-            itemPicker.PreviousItemButton.RegisterCallbackButtonTriggered(() => SelectPreviousItem());
+            itemPicker.PreviousItemButton.RegisterCallbackButtonTriggered(_ => SelectPreviousItem());
         }
         if (itemPicker.NextItemButton != null)
         {
-            itemPicker.NextItemButton.RegisterCallbackButtonTriggered(() => SelectNextItem());
+            itemPicker.NextItemButton.RegisterCallbackButtonTriggered(_ => SelectNextItem());
         }
     }
 

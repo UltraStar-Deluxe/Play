@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEntryControl : INeedInjection, IInjectionFinishedListener
+public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     [Inject]
     private SongRouletteControl songRouletteControl;
@@ -81,14 +81,38 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
     
+    private bool isInitialized;
+
     public void OnInjectionFinished()
     {
+        Init();
+        RegisterCallbacks();
+    }
+
+    private void RegisterCallbacks()
+    {
+        openSongMenuButton.RegisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
+    }
+
+    private void UnregisterCallbacks()
+    {
+        openSongMenuButton.UnregisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
+    }
+
+    private void Init()
+    {
+        if (isInitialized)
+        {
+            return;
+        }
+        isInitialized = true;
+
         InitSongMenu();
 
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateIcons());
     }
-
+    
     private void InitSongMenu()
     {
         contextMenuControl = injector
@@ -97,19 +121,19 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener
         contextMenuControl.FillContextMenuAction = FillContextMenu;
         contextMenuControl.ContextMenuOpenedEventStream.Subscribe(OnContextMenuOpened);
         contextMenuControl.ContextMenuClosedEventStream.Subscribe(OnContextMenuClosed);
-        
-        openSongMenuButton.RegisterCallbackButtonTriggered(() =>
-        {
-            if (isPopupMenuOpen
-                || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
-            {
-                return;
-            }
-
-            contextMenuControl.OpenContextMenu(Vector2.zero);
-        });
     }
 
+    private void OnOpenSongMenuButtonClicked(EventBase evt)
+    {
+        if (isPopupMenuOpen
+            || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
+        {
+            return;
+        }
+
+        contextMenuControl.OpenContextMenu(Vector2.zero);
+    }
+    
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
         // Add / remove from playlist
@@ -157,12 +181,35 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener
     
     private void UpdateCover()
     {
-        SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, songImageInner, songImageOuter);
+        SongMeta coverSongMeta = songMeta;
+        string uri = SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta);
+        if (uri.IsNullOrEmpty())
+        {
+            songImageOuter.style.backgroundImage = new StyleBackground();
+            songImageInner.style.backgroundImage = new StyleBackground();
+            return;
+        }
+        
+        ImageManager.LoadSpriteFromUri(uri, loadedSprite =>
+        {
+            if (coverSongMeta != songMeta)
+            {
+                // The associated song has changed in the meantime.
+                return;
+            }
+            songImageOuter.style.backgroundImage = new StyleBackground(loadedSprite);
+            songImageInner.style.backgroundImage = new StyleBackground(loadedSprite);
+        });
     }
 
     private void UpdateIcons()
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta.Artist, songMeta.Title));
         duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
+    }
+
+    public void Dispose()
+    {
+        UnregisterCallbacks();
     }
 }

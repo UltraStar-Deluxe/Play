@@ -91,8 +91,8 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
 
     public virtual void OnInjectionFinished()
     {
-        okButton.RegisterCallbackButtonTriggered(() => TrySubmitValue(textField.value));
-        cancelButton.RegisterCallbackButtonTriggered(() => CloseDialog());
+        okButton.RegisterCallbackButtonTriggered(_ => TrySubmitValue(textField.value));
+        cancelButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         textField.RegisterValueChangedCallback(evt => ValidateValue(evt.newValue, true));
 
         cancelButton.Focus();

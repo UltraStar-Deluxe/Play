@@ -26,7 +26,7 @@ public class CreditsSceneControl : MonoBehaviour, INeedInjection, ITranslator, I
 
     private void Start()
     {
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
+        backButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.MainScene));
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.MainScene));
         backButton.Focus();

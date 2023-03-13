@@ -26,7 +26,7 @@
                         </ui:TextField>
                         <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; overflow: visible;">
                             <BootstrapIcon tabindex="-1" name="searchIcon" icon="funnel-fill" picking-mode="Ignore" style="position: absolute; font-size: 20px;" />
-                            <MaterialIcon name="searchErrorIcon" icon="warningFontColor" class="warning rounded" />
+                            <MaterialIcon name="searchErrorIcon" icon="warning" class="rounded warningFontColor" />
                         </ui:Button>
                     </ui:VisualElement>
                     <ui:ListView focusable="true" name="songListView" fixed-item-height="66" style="flex-grow: 1;" />

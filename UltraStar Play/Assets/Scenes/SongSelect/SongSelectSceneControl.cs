@@ -243,7 +243,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitDifficultyAndScoreMode();
 
-        showLyricsButton.RegisterCallbackButtonTriggered(() => ShowLyricsPopup());
+        showLyricsButton.RegisterCallbackButtonTriggered(_ => ShowLyricsPopup());
         
         songOrderDropdownField.value = settings.SongSelectSettings.songOrder;
         songOrderDropdownField.RegisterValueChangedCallback(evt =>
@@ -254,16 +254,16 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
 
         // Register Callbacks
-        toggleFavoriteButton.RegisterCallbackButtonTriggered(() => ToggleSelectedSongIsFavorite());
+        toggleFavoriteButton.RegisterCallbackButtonTriggered(_ => ToggleSelectedSongIsFavorite());
 
         fuzzySearchTextLabel.ShowByDisplay();
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
-        startButton.RegisterCallbackButtonTriggered(() => CheckAudioAndStartSingScene());
+        startButton.RegisterCallbackButtonTriggered(_ => CheckAudioAndStartSingScene());
         startButton.Focus();
 
-        quitSceneButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
+        quitSceneButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.MainScene));
 
         InitSearchExpressionInfo();
 
@@ -295,12 +295,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songAudioPlayer.AudioClipLoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
 
-        downloadSongsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.ContentDownloadScene)));
-        addSongFolderButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
+        downloadSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.ContentDownloadScene)));
+        addSongFolderButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
 
         // Show options in popup
         singingOptionsDropdownOverlay.HideByDisplay();
-        toggleSingingOptionsButton.RegisterCallbackButtonTriggered(() =>
+        toggleSingingOptionsButton.RegisterCallbackButtonTriggered(_ =>
         {
             singingOptionsDropdownOverlay.ToggleVisibleByDisplay();
         });
@@ -324,7 +324,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         GetDifficultyToButtonMap().ForEach(entry =>
         {
-            entry.Value.RegisterCallbackButtonTriggered(() =>
+            entry.Value.RegisterCallbackButtonTriggered(_ =>
             {
                 settings.GameSettings.Difficulty = entry.Key;
                 if (settings.GameSettings.ScoreMode == EScoreMode.None)
@@ -337,13 +337,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
         UpdateDifficultyAndScoreModeButtons();
         
-        noScoresButton.RegisterCallbackButtonTriggered(() =>
+        noScoresButton.RegisterCallbackButtonTriggered(_ =>
         {
             settings.GameSettings.ScoreMode = EScoreMode.None;
             UpdateDifficultyAndScoreModeButtons();
         });
         
-        toggleCoopModeButton.RegisterCallbackButtonTriggered(() =>
+        toggleCoopModeButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage)
             {
@@ -371,7 +371,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void InitSearchExpressionInfo()
     {
-        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(() => ShowSearchExpressionHelpDialog());
+        showSearchExpressionInfoButton.RegisterCallbackButtonTriggered(_ => ShowSearchExpressionHelpDialog());
     }
 
     private void ShowLyricsPopup()

@@ -197,11 +197,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             dialogControl = injector
                 .WithRootVisualElement(visualElement)
                 .CreateAndInject<MessageDialogControl>();
+            dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
             dialogControl.Title = title;
             dialogControl.Message = message;
             dialogControl.DialogTitleImage.ShowByDisplay();
             dialogControl.DialogTitleImage.AddToClassList(R.UssClasses.warning);
-            Button okButton = dialogControl.AddButton("OK", CloseDialog);
+            Button okButton = dialogControl.AddButton("OK", _ => dialogControl?.CloseDialog());
             okButton.Focus();
 
             ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
@@ -812,16 +813,5 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                 TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
                 TranslationManager.GetTranslation(R.Messages.action_navigateRight))));
         }
-    }
-
-    public void CloseDialog()
-    {
-        if (dialogControl == null)
-        {
-            return;
-        }
-
-        dialogControl.CloseDialog();
-        dialogControl = null;
     }
 }

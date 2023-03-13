@@ -51,20 +51,20 @@ public class NewVersionAvailableDialogControl : AbstractDialogControl, IInjectio
     public void OnInjectionFinished()
     {
         // Add callbacks to buttons
-        ignoreThisVersionButton.RegisterCallbackButtonTriggered(() =>
+        ignoreThisVersionButton.RegisterCallbackButtonTriggered(_ =>
         {
             settings.IgnoredReleases.AddIfNotContains(remoteRelease);
             CloseDialog();
         });
 
-        ignoreAllFutureVersionsButton.RegisterCallbackButtonTriggered(() =>
+        ignoreAllFutureVersionsButton.RegisterCallbackButtonTriggered(_ =>
         {
             settings.IgnoredReleases.Clear();
             settings.IgnoredReleases.Add("all");
             CloseDialog();
         });
 
-        closeButton.RegisterCallbackButtonTriggered(() =>
+        closeButton.RegisterCallbackButtonTriggered(_ =>
         {
             CloseDialog();
         });

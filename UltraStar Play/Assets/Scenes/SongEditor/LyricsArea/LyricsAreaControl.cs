@@ -125,8 +125,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             textField.SetValueWithoutNotify(visibleWhiteSpaceText);
         });
 
-        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.firstVoiceName));
-        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(() => Voice = songMeta.GetVoice(Voice.secondVoiceName));
+        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(_ => Voice = songMeta.GetVoice(Voice.firstVoiceName));
+        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(_ => Voice = songMeta.GetVoice(Voice.secondVoiceName));
 
         UpdateVoiceButtons();
     }

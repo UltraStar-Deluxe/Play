@@ -33,7 +33,7 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
         lastScreenResolution = settings.GraphicSettings.resolution;
         lastFullscreenMode = settings.GraphicSettings.fullScreenMode;
         
-        applyResolutionButton.RegisterCallbackButtonTriggered(() => ApplyGraphicSettings());
+        applyResolutionButton.RegisterCallbackButtonTriggered(_ => ApplyGraphicSettings());
         
         if (PlatformUtils.IsStandalone)
         {

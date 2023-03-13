@@ -109,13 +109,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
         }
 
-        startButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongSelectScene));
+        startButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.SongSelectScene));
         startButton.Focus();
-        settingsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-        aboutButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.AboutScene));
-        creditsButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.CreditsScene));
-        quitButton.RegisterCallbackButtonTriggered(() => OpenQuitGameDialog());
-        createSongButton.RegisterCallbackButtonTriggered(() => OpenNewSongDialog());
+        settingsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+        aboutButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.AboutScene));
+        creditsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.CreditsScene));
+        quitButton.RegisterCallbackButtonTriggered(_ => OpenQuitGameDialog());
+        createSongButton.RegisterCallbackButtonTriggered(_ => OpenNewSongDialog());
 
         LeanTween.value(gameObject, 0, 1, 1f)
             .setOnUpdate(value =>
@@ -232,8 +232,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         quitGameDialogControl.Title = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title);
         quitGameDialogControl.Message = $"\n{TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message)}\n";
 
-        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () => CloseQuitGameDialog());
-        Button yesButton = quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () => ApplicationUtils.QuitOrStopPlayMode());
+        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => CloseQuitGameDialog());
+        Button yesButton = quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
         yesButton.Focus();
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);

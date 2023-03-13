@@ -43,7 +43,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         CreateAboutTextButtons();
         ShowAboutText(textAssets.FirstOrDefault());
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
+        backButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.MainScene));
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.MainScene));
     }
@@ -64,7 +64,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         ToggleButton button = new();
         button.AddToClassList("transparentButton");
         button.text = textAsset.name;
-        button.RegisterCallbackButtonTriggered(() =>
+        button.RegisterCallbackButtonTriggered(_ =>
         {
             ShowAboutText(textAsset);
 

@@ -78,7 +78,7 @@ public class AccordionItem : VisualElement
         ToggleContentButton = this.Q<Button>(R_PlayShared.UxmlNames.toggleAccordionItemContentButton);
         ContentElement = this.Q<VisualElement>(R_PlayShared.UxmlNames.accordionItemContent);
         
-        ToggleContentButton.RegisterCallbackButtonTriggered(() => ToggleContentVisible());
+        ToggleContentButton.RegisterCallbackButtonTriggered(_ => ToggleContentVisible());
 
         ContentElement.RegisterCallback<GeometryChangedEvent>(evt =>
         {

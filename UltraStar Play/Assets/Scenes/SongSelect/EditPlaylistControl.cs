@@ -60,22 +60,22 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         songSelectSceneControl.PlaylistChooserControl.Selection
             .Subscribe(newValue => currentPlaylist = newValue);
 
-        editPlaylistButton.RegisterCallbackButtonTriggered(() => ShowEditCurrentPlaylistDialog());
-        createPlaylistButton.RegisterCallbackButtonTriggered(() => CreateThenEditNewPlaylist());
-        submitEditPlaylistButton.RegisterCallbackButtonTriggered(() => SubmitEditPlaylistDialog());
+        editPlaylistButton.RegisterCallbackButtonTriggered(_ => ShowEditCurrentPlaylistDialog());
+        createPlaylistButton.RegisterCallbackButtonTriggered(_ => CreateThenEditNewPlaylist());
+        submitEditPlaylistButton.RegisterCallbackButtonTriggered(_ => SubmitEditPlaylistDialog());
         playlistNameTextField.RegisterValueChangedCallback(evt => OnPlaylistNameTextFieldChanged(evt.newValue));
 
-        deletePlaylistButton.RegisterCallbackButtonTriggered(() =>
+        deletePlaylistButton.RegisterCallbackButtonTriggered(_ =>
         {
             ShowConfirmAndCancelDeleteButtons();
             cancelDeletePlaylistButton.Focus();
         });
-        cancelDeletePlaylistButton.RegisterCallbackButtonTriggered(() =>
+        cancelDeletePlaylistButton.RegisterCallbackButtonTriggered(_ =>
         {
             ShowDeleteAndSubmitButtons();
             submitEditPlaylistButton.Focus();
         });
-        confirmDeletePlaylistButton.RegisterCallbackButtonTriggered(() =>
+        confirmDeletePlaylistButton.RegisterCallbackButtonTriggered(_ =>
         {
             string errorMessage = playlistManager.TryRemovePlaylist(currentPlaylist);
             if (!errorMessage.IsNullOrEmpty())
