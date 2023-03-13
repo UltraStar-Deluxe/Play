@@ -886,6 +886,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         selectedSongBeforeSearch = SelectedSong;
         songSearchControl.ResetSearchText();
+        startButton.Focus();
     }
 
     public void OnInjectionFinished()

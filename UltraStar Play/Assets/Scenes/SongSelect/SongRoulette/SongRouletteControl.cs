@@ -83,7 +83,12 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         };
         songListView.unbindItem = (VisualElement element, int index) =>
         {
-            SongMeta songMeta = songs[index];
+            SongMeta songMeta = element.userData as SongMeta;
+            if (songMeta == null)
+            {
+                return;
+            }
+            
             SongEntryControl songEntryControl = songEntryControls.FirstOrDefault(it => it.SongMeta == songMeta);
             if (songEntryControl != null)
             {

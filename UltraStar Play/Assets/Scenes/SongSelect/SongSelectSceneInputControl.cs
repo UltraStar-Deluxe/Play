@@ -19,6 +19,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     [Inject]
     private SceneNavigator sceneNavigator;
 
+    [Inject(UxmlName = R.UxmlNames.songListView)]
+    private VisualElement songListView;
+    
     [Inject(UxmlName = R.UxmlNames.inputLegend, Optional = true)]
     private VisualElement inputLegendContainer;
 
@@ -84,12 +87,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     {
         if (songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
         {
-            // Remove focus
             songSelectSceneControl.SubmitSearch();
         }
-        else
+        else if (songListView.focusController.focusedElement == songListView)
         {
-            // focusableNavigator.OnSubmit();
+            songSelectSceneControl.CheckAudioAndStartSingScene();
         }
     }
 

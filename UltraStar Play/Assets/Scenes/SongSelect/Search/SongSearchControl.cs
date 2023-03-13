@@ -165,6 +165,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void HideSearchPropertyDropdownOverlay()
     {
         searchPropertyDropdownOverlay.HideByDisplay();
+        searchPropertyButton.Focus();
     }
 
     public List<SongMeta> GetFilteredSongMetas(List<SongMeta> songMetas)
