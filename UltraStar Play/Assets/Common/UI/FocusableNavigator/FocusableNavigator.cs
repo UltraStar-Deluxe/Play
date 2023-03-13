@@ -183,7 +183,24 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
         
+        ScrollView parentScrollView = focusedVisualElement.GetFirstAncestorOfType<ScrollView>();
+        if (parentScrollView != null
+            && TryNavigateScrollView(parentScrollView, focusedVisualElement, navigationDirection))
+        {
+            return;
+        }
+        
         NavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection);
+    }
+
+    private bool TryNavigateScrollView(
+        ScrollView scrollView,
+        VisualElement focusedVisualElement,
+        Vector2 navigationDirection)
+    {
+        // Try to navigate within the ScrollView
+        List<VisualElement> focusableVisualElements = GetFocusableVisualElementsInDescendants(scrollView);
+        return TryNavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection, focusableVisualElements);
     }
 
     private bool TryNavigateListView(
@@ -275,14 +292,30 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             });
             return;
         }
-        Rect startRect = focusedVisualElement.worldBound;
 
         List<VisualElement> focusableVisualElements = GetFocusableVisualElementsInDescendants(focusableNavigatorRootVisualElement);
         focusableVisualElements = focusableVisualElements
             .Where(it => it != focusedVisualElement)
             .ToList();
 
+        if (!TryNavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection, focusableVisualElements))
+        {
+            noNavigationTargetFoundEventStream.OnNext(new NoNavigationTargetFoundEvent
+            {
+                NavigationDirection = navigationDirection,
+                FocusableNavigatorRootVisualElement = focusableNavigatorRootVisualElement,
+                FocusedVisualElement = focusedVisualElement,
+            });
+        }
+    }
+
+    private bool TryNavigateToBestMatchingNavigationTarget(
+        VisualElement focusedVisualElement,
+        Vector2 navigationDirection,
+        List<VisualElement> focusableVisualElements)
+    {
         // Only consider the VisualElements that are in the navigation direction
+        Rect startRect = focusedVisualElement.worldBound;
         List<VisualElement> visualElementsInDirection = GetVisualElementsInDirection(
             startRect,
             navigationDirection,
@@ -294,15 +327,11 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             DoFocusVisualElement(nearestVisualElement,
                 $"Moving focus to VisualElement with distance {GetVisualElementDistance(nearestVisualElement, focusedVisualElement)}: {nearestVisualElement}");
+            return true;
         }
         else
         {
-            noNavigationTargetFoundEventStream.OnNext(new NoNavigationTargetFoundEvent
-            {
-                NavigationDirection = navigationDirection,
-                FocusableNavigatorRootVisualElement = focusableNavigatorRootVisualElement,
-                FocusedVisualElement = focusedVisualElement,
-            });
+            return false;
         }
     }
 
@@ -325,7 +354,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             TryFocusSelectedListViewItem(focusedListView);
         }
 
-        ListView parentListView = visualElement.GetParent(parent => parent is ListView) as ListView;
+        ListView parentListView = visualElement.GetFirstAncestorOfType<ListView>();
         if (parentListView != null)
         {
             parentListView.Focus();
