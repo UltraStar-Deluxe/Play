@@ -7,8 +7,8 @@
         <ui:VisualElement name="titleContainer" style="align-items: center; width: 100%; justify-content: flex-start; top: auto; flex-direction: row; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center; flex-grow: 1; justify-content: center;">
                 <ui:VisualElement name="titleAndDescription" style="flex-direction: row; align-items: center;">
-                    <ui:VisualElement name="logo" class="mr-2" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Logos/LogoSmall-512.png?fileID=2800000&amp;guid=f3ab5af68813c5446a5f5403af87b6c7&amp;type=3#LogoSmall-512&apos;); width: 48px; height: 48px;" />
-                    <ui:Label text="UltraStar Play  Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold;" />
+                    <ui:VisualElement name="logo" class="mr-2" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Logos/LogoSmall-512.png?fileID=2800000&amp;guid=f3ab5af68813c5446a5f5403af87b6c7&amp;type=3#LogoSmall-512&apos;); width: 48px; height: 48px; flex-shrink: 0;" />
+                    <ui:Label text="UltraStar Play  Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:Button display-tooltip-when-elided="true" name="showMenuButton" style="align-items: center; justify-content: center; width: 48px; height: 48px; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 5px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
