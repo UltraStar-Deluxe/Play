@@ -10,7 +10,7 @@
             </ui:VisualElement>
             <ui:Button display-tooltip-when-elided="true" name="micButton" class="squareButton transparentButton" style="margin-left: 1px;">
                 <RadialProgressBar show-label="false" name="micProgressBar" progress="80" style="position: absolute; width: 100%; height: 100%;" />
-                <MaterialIcon tabindex="-1" name="micIcon" icon="mic" class="textOutline" />
+                <MaterialIcon tabindex="-1" name="micIcon" icon="mic" class="textOutline ignoreTheme" />
                 <MaterialIcon tabindex="-1" name="noMicIcon" icon="mic_off" class="secondaryFontColor textOutline" style="display: none;" />
             </ui:Button>
         </ui:VisualElement>

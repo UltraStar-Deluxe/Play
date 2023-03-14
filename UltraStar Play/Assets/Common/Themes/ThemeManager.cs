@@ -534,7 +534,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 
                 defaultControlStyleConfig.fontColor.IfNotDefault(fontColor =>
                 {
-                    controlsRow.Query<Label>().ForEach(label => label.style.color = new StyleColor(fontColor));
+                    controlsRow.Query<Label>().ForEach(label =>
+                    {
+                        if (ApplyThemeStyleUtils.IsIgnoredVisualElement(label))
+                        {
+                            return;
+                        }
+                        label.style.color = new StyleColor(fontColor);
+                    });
                 });
             });
         }

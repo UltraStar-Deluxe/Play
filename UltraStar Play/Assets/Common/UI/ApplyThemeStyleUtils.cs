@@ -178,6 +178,11 @@ public static class ApplyThemeStyleUtils
         string backgroundImagePath)
     {
         VisualElement visualElement = data.styleTarget;
+        if (IsIgnoredVisualElement(visualElement))
+        {
+            return;
+        }
+        
         if (!backgroundImagePath.IsNullOrEmpty())
         {
             string absoluteBackgroundImagePath = PathUtils.IsAbsolutePath(backgroundImagePath)
@@ -208,10 +213,23 @@ public static class ApplyThemeStyleUtils
         fontColor.IfNotDefault(color =>
         {
             visualElement.style.color = new StyleColor(color);
-            visualElement.Query<Label>().ForEach(label => label.style.color = new StyleColor(color));
+            visualElement.Query<Label>()
+                .ForEach(label =>
+                {
+                    if (IsIgnoredVisualElement(label))
+                    {
+                        return;
+                    }
+                    label.style.color = new StyleColor(color);
+                });
         });
     }
 
+    public static bool IsIgnoredVisualElement(VisualElement visualElement)
+    {
+        return visualElement.ClassListContains("ignoreTheme");
+    }
+    
     private static ControlStyleConfig GetControlStyleConfig(VisualElementData data)
     {
         if (data.visualElement is SlideToggle slideToggle
@@ -329,7 +347,8 @@ public static class ApplyThemeStyleUtils
             root.Query<Label>()
                 .Where(label => !label.ClassListContains("secondaryFontColor")
                                 && !label.ClassListContains("warningFontColor")
-                                && !label.ClassListContains("errorFontColor"))
+                                && !label.ClassListContains("errorFontColor")
+                                && !IsIgnoredVisualElement(label))
                 .ForEach(label => label.style.color = new StyleColor(color));
             root.Query(null, R.UssClasses.fontColor)
                 .ForEach(visualElement => visualElement.style.unityBackgroundImageTintColor = new StyleColor(color));
@@ -341,7 +360,10 @@ public static class ApplyThemeStyleUtils
         fontColor.IfNotDefault(color =>
         {
             root.Query<Label>()
-                .Where(label => label.ClassListContains("secondaryFontColor"))
+                .Where(label => label.ClassListContains("secondaryFontColor")
+                                && !label.ClassListContains("warningFontColor")
+                                && !label.ClassListContains("errorFontColor")
+                                && !IsIgnoredVisualElement(label))
                 .ForEach(label => label.style.color = new StyleColor(color));
         });
     }
@@ -351,7 +373,8 @@ public static class ApplyThemeStyleUtils
         fontColor.IfNotDefault(color =>
         {
             root.Query<Label>()
-                .Where(label => label.ClassListContains("warningFontColor"))
+                .Where(label => label.ClassListContains("warningFontColor")
+                                && !IsIgnoredVisualElement(label))
                 .ForEach(label => label.style.color = new StyleColor(color));
         });
     }
@@ -361,7 +384,8 @@ public static class ApplyThemeStyleUtils
         fontColor.IfNotDefault(color =>
         {
             root.Query<Label>()
-                .Where(label => label.ClassListContains("errorFontColor"))
+                .Where(label => label.ClassListContains("errorFontColor")
+                                && !IsIgnoredVisualElement(label))
                 .ForEach(label => label.style.color = new StyleColor(color));
         });
     }
