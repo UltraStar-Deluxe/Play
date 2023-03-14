@@ -145,9 +145,8 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
         VisualElement visualElement = songPropertySideBarEntryUi.CloneTree().Children().First();
         songPropertiesSideBarContainer.Add(visualElement);
 
-        Label label = visualElement.Q<Label>(R.UxmlNames.propertyNameLabel);
-        label.text = labelText;
         TextField textField = visualElement.Q<TextField>(R.UxmlNames.propertyTextField);
+        textField.label = labelText;
         textField.isDelayed = true;
         textField.value = valueGetter();
         bool isReadOnly = valueSetter == null;
@@ -180,7 +179,6 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
         songPropertyInputControls.Add(new SongPropertyInputControl
         {
             TextField = textField,
-            Label = label,
             LabelText = labelText,
             ValueGetter = valueGetter,
             ValueSetter = valueSetter
@@ -204,7 +202,6 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
     private class SongPropertyInputControl
     {
         public TextField TextField { get; set; }
-        public Label Label { get; set; }
         public string LabelText { get; set; }
         public Func<string> ValueGetter { get; set; }
         public Action<string> ValueSetter { get; set; }
