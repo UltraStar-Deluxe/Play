@@ -245,3 +245,19 @@ ScrollView #unity-content-container {
     width: 1px;
     height: 100%;
 }
+
+SongEditorSideBarGroup > .unity-base-field {
+    margin-bottom: 8px;
+}
+
+SongEditorSideBarGroup > .unity-button {
+    margin-bottom: 8px;
+}
+
+SongEditorSideBarGroup > ItemPicker {
+    margin-bottom: 8px;
+}
+
+.controlLabel {
+    width: auto;
+}

@@ -69,6 +69,7 @@ ItemPicker {
 
 .controlWithLabelVertical {
     height: auto;
+    align-items: stretch;
 }
 
 .controlWithLabelVertical .unity-text-field__input {

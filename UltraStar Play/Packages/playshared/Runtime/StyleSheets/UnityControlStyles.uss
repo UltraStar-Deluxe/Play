@@ -412,10 +412,14 @@
     border-radius: 5px;
 }
 
+.unity-base-slider--horizontal .unity-base-slider__input {
+    height: auto;
+}
+
 .unity-base-slider--horizontal .unity-base-slider__dragger {
     height: 10px;
     margin: 0;
-    top: 8px;
+    top: -1px;
     border-radius: 5px;
 }
 
