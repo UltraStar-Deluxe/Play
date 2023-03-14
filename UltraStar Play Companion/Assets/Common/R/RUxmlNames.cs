@@ -22,6 +22,7 @@ public static partial class R
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
+        public const string logo = "logo";
         public const string menuIcon = "menuIcon";
         public const string menuOverlay = "menuOverlay";
         public const string menuOverlayContent = "menuOverlayContent";
@@ -69,7 +70,6 @@ public static partial class R
         public const string udpPortOnServerLabel = "udpPortOnServerLabel";
         public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string viewLogButton = "viewLogButton";
-        public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";
     }

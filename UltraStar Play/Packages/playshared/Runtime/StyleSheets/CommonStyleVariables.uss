@@ -1,6 +1,6 @@
 :root {
-    --font-color: rgb(240, 240, 240);
-    --font-color-secondary: #A8A8A8;
+    --font-color: #F0F0F0;
+    --font-color-secondary: #CCCCCC;
     --font-color-inverted: rgb(64, 64, 64);
     --font-color-accent1: lightgrey;
     --font-color-error: rgb(220, 53, 69);
@@ -23,9 +23,9 @@
     --control-width-large: 150px;
     --round-button-size: 50px;
     --radio-button-size: 20px;
-    --control-color: rgb(66, 163, 231);
-    --control-color-accent1: rgb(125, 198, 233);
-    --control-color-accent2: rgb(99, 154, 183);
+    --control-color: #475467;
+    --control-color-accent1: #6A7D99;
+    --control-color-accent2: #6A7D99;
     --control-danger: rgb(220, 53, 69);
     --control-danger-accent1: rgb(200, 35, 51);
     --main-scene-button-width: 150px;

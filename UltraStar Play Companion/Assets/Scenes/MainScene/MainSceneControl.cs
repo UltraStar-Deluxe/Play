@@ -66,9 +66,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.clientNameTextField)]
     private TextField clientNameTextField;
 
-    [Inject(UxmlName = R.UxmlNames.visualizeAudioLabel)]
-    private Label visualizeAudioLabel;
-
     [Inject(UxmlName = R.UxmlNames.visualizeAudioToggle)]
     private Toggle visualizeAudioToggle;
     
@@ -309,7 +306,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         recordingDeviceLabel.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
         languageLabel.text = TranslationManager.GetTranslation(R.Messages.language);
         devModeLabel.text = TranslationManager.GetTranslation(R.Messages.devMode);
-        visualizeAudioLabel.text = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
+        visualizeAudioToggle.label = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
         showMicViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showMicrophone);
         showSongViewButton.text = TranslationManager.GetTranslation(R.Messages.companionApp_button_showSongs);
         closeMenuButton.text = TranslationManager.GetTranslation(R.Messages.back);
