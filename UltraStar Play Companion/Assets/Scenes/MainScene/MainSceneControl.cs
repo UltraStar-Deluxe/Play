@@ -232,7 +232,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         tabGroupControl.AddTabGroupButton(showSongViewButton, songViewContainer);
         tabGroupControl.ShowContainer(micViewContainer);
 
-        showSongViewButton.RegisterCallbackButtonTriggered(() =>
+        showSongViewButton.RegisterCallbackButtonTriggered(_ =>
         {
             micSampleRecorder.StopRecording();
             songSearchTextField.value = "";
@@ -273,13 +273,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
         // Show/hide menu overlay
         HideMenu();
-        showMenuButton.RegisterCallbackButtonTriggered(() => ShowMenu());
-        hiddenCloseMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
-        closeMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
+        showMenuButton.RegisterCallbackButtonTriggered(_ => ShowMenu());
+        hiddenCloseMenuButton.RegisterCallbackButtonTriggered(_ => HideMenu());
+        closeMenuButton.RegisterCallbackButtonTriggered(_ => HideMenu());
         
         // View and copy log
-        viewLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
-        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        viewLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
+        copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");
@@ -479,7 +479,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         }
     }
 
-    private void ToggleRecording()
+    private void ToggleRecording(EventBase evt)
     {
         if (micSampleRecorder.IsRecording.Value)
         {
