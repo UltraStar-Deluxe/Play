@@ -35,6 +35,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject]
     private Injector injector;
     
+    [Inject]
+    private Settings settings;
+    
     // The PlayerProfile is set in Init and must not be null.
     public PlayerProfile PlayerProfile { get; private set; }
 
@@ -58,6 +61,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             {
                 micIcon.ShowByDisplay();
                 noMicIcon.HideByDisplay();
+                micIcon.style.color = new StyleColor(micProfile.Color);
                 micIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
             }
 
@@ -83,15 +87,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     {
         InitVoiceSelection();
 
-        // Delay mic initialization because it takes some time and scene change should happen fast.
-        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () =>
-        {
-            if (!Application.isPlaying)
-            {
-                return;
-            }
-            InitMicPitchTracker();
-        }));
+        InitMicPitchTracker();
 
         injector.Inject(micProgressBarRecordingControl);
         micProgressBarRecordingControl.MicProfile = MicProfile;
@@ -179,14 +175,17 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         
         micPitchTracker.MicProfile = micProfile;
         if (micProfile == null
-            || micProfile.IsInputFromConnectedClient)
+            || micProfile.IsInputFromConnectedClient
+            || !settings.SongSelectSettings.micTestActive)
         {
             if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {
                 micPitchTracker.MicSampleRecorder.StopRecording();
             }
         }
-        else
+        else if (micProfile != null
+                 && !micProfile.IsInputFromConnectedClient
+                 && settings.SongSelectSettings.micTestActive)
         {
             if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {

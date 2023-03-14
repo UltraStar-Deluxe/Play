@@ -89,7 +89,7 @@
                                     <ToggleButton text="Easy" display-tooltip-when-elided="true" name="easyDifficultyButton" class="mr-2 smallFont" style="flex-grow: 1; width: 10%; height: auto;" />
                                     <ToggleButton text="Medium" display-tooltip-when-elided="true" name="mediumDifficultyButton" class="mr-2 smallFont" style="width: 10%; flex-grow: 1; height: auto;" />
                                     <ToggleButton text="Hard" display-tooltip-when-elided="true" name="hardDifficultyButton" class="smallFont" style="width: 10%; height: auto; flex-grow: 1;" />
-                                    <ToggleButton display-tooltip-when-elided="true" name="toggleCoopModeButton" class="ml-2" style="padding-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0; overflow: visible;">
+                                    <ToggleButton display-tooltip-when-elided="true" name="toggleCoopModeButton" class="ml-2 squareButton" style="padding-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0; overflow: visible;">
                                         <MaterialIcon tabindex="-1" name="coopIcon" icon="diversity_1" style="font-size: 20px;" />
                                         <MaterialIcon tabindex="-1" name="noCoopIcon" icon="groups" style="font-size: 20px; display: none;" />
                                         <ui:Label tabindex="-1" text="Co-op" display-tooltip-when-elided="true" name="toggleCoopModeButtonLabel" class="tinyFont" />
@@ -98,6 +98,11 @@
                             </ui:VisualElement>
                             <ui:VisualElement name="row" class="pr-2" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; flex-shrink: 0;">
                                 <ui:Button text="Play" display-tooltip-when-elided="true" name="startButton" style="flex-grow: 1;" />
+                                <ToggleButton display-tooltip-when-elided="true" name="toggleMicCheckButton" class="ml-2 squareButton" style="padding-top: 0; padding-bottom: 0; padding-left: 0; padding-right: 0; overflow: visible;">
+                                    <MaterialIcon tabindex="-1" name="micCheckIcon" icon="mic" style="font-size: 20px;" />
+                                    <MaterialIcon tabindex="-1" name="noMicCheckIcon" icon="mic_off" style="font-size: 20px; display: none;" />
+                                    <ui:Label tabindex="-1" text="Test" display-tooltip-when-elided="true" name="toggleMicCheckButtonLabel" class="tinyFont" />
+                                </ToggleButton>
                                 <ui:Button display-tooltip-when-elided="true" name="toggleSingingOptionsButton" class="squareButton ml-2" style="display: none;">
                                     <MaterialIcon name="settingsIcon" icon="settings" style="position: absolute;" />
                                     <MaterialIcon name="playersIcon" icon="manage_accounts" style="position: absolute; display: none;" />

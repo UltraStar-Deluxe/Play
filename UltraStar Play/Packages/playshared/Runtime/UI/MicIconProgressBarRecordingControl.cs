@@ -53,6 +53,13 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         {
             recordingEventDisposable = micSampleRecorder.RecordingEventStream
                 .Subscribe(evt => OnRecordingEvent(evt));
+            micSampleRecorder.IsRecording.Subscribe(newValue =>
+            {
+                if (!newValue)
+                {
+                    MicProgressBarControl.ProgressBarValue = 0;
+                }
+            });
         }
         
     }

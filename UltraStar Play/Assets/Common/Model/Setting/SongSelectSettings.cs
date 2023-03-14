@@ -11,4 +11,5 @@ public class SongSelectSettings
         ESearchProperty.Title,
     };
     public string playlistName = "";
+    public bool micTestActive;
 }

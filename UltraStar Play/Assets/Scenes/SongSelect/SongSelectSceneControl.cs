@@ -195,6 +195,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.singingOptionsDropdownContainer)]
     private VisualElement singingOptionsDropdownContainer;
     
+    [Inject(UxmlName = R.UxmlNames.toggleMicCheckButton)]
+    private ToggleButton toggleMicCheckButton;
+    
+    [Inject(UxmlName = R.UxmlNames.micCheckIcon)]
+    private VisualElement micCheckIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.noMicCheckIcon)]
+    private VisualElement noMicCheckIcon;
+    
     public PlaylistChooserControl PlaylistChooserControl { get; private set; }
 
     private SongSearchControl songSearchControl;
@@ -244,6 +253,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         InitDifficultyAndScoreMode();
 
         showLyricsButton.RegisterCallbackButtonTriggered(_ => ShowLyricsPopup());
+        
+        toggleMicCheckButton.RegisterCallbackButtonTriggered(_ => ToggleMicCheckActive());
+        UpdateMicCheckButton();
         
         songOrderDropdownField.value = settings.SongSelectSettings.songOrder;
         songOrderDropdownField.RegisterValueChangedCallback(evt =>
@@ -314,6 +326,32 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
             .Bind(() => settings.GraphicSettings.noteDisplayMode,
                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
+    }
+
+    private void UpdateMicCheckButton()
+    {
+        toggleMicCheckButton.SetActive(settings.SongSelectSettings.micTestActive);
+        micCheckIcon.SetVisibleByDisplay(settings.SongSelectSettings.micTestActive);
+        noMicCheckIcon.SetVisibleByDisplay(!settings.SongSelectSettings.micTestActive);
+    }
+
+    private void ToggleMicCheckActive()
+    {
+        settings.SongSelectSettings.micTestActive = !settings.SongSelectSettings.micTestActive;
+        UpdateMicCheckButton();
+        
+        if (settings.SongSelectSettings.micTestActive)
+        {
+            FindObjectsOfType<MicSampleRecorder>()
+                .Where(it => it.MicProfile != null && !it.IsRecording.Value)
+                .ForEach(it => it.StartRecording());
+        }
+        else
+        {
+            FindObjectsOfType<MicSampleRecorder>()
+                .Where(it => it.MicProfile != null && it.IsRecording.Value)
+                .ForEach(it => it.StopRecording());
+        }
     }
 
     private void InitDifficultyAndScoreMode()
