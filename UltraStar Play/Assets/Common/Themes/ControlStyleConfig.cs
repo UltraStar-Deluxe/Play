@@ -2,6 +2,7 @@
 
 public class ControlStyleConfig
 {
+    // Optional name for debugging purposes
     public string name;
     
     public Color32 fontColor;

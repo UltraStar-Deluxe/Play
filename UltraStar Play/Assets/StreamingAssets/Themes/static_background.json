@@ -1,9 +1,0 @@
-{
-    "fontColorButtons": "#E5E5E5",
-    "backgroundColorButtons": "#3399D8",
-    "sceneTransitionAnimationTime": "250ms",
-    "staticBackground": {
-        "imagePath": "backgrounds/open-sign-1836961_1920.jpg",
-        "scaleMode": "ScaleAndCrop",
-    }
-}

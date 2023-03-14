@@ -1,7 +1,34 @@
 {
-    "fontColorLabels": "#B299E5",
-    "fontColorButtons": "#E1E1E1E5",
-    "backgroundColorButtons": "#CC6633",
+    "defaultControl": {
+        "fontColor": "#E1E1E1E5",
+        "backgroundColor": "#CC6633",
+        "hoverBackgroundColor": "#F2793D",
+        "focusBackgroundColor": "#F2793D",
+        "activeBackgroundColor": "#CC6633",
+        "focusBorderColor": "#CC6633",
+    },
+
+    "transparentButton": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#20202060",
+        "focusBackgroundColor": "#20202080",
+        "activeBackgroundColor": "#40404080",
+    },
+
+    "dynamicPanel": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#1D2939",
+        "focusBackgroundColor": "#1D2939",
+        "activeBackgroundColor": "#1D2939"
+    },
+
+    "staticPanel": {
+        "backgroundGradient": "24deg, #233043, #344054",
+    },
+
+    "primaryFontColor": "#B299E5",
+    "secondaryFontColor": "#9580BF",
+    
     "dynamicBackground": {
         "gradientRampFile": "gradients/pumpkin repeat.png",
         "gradientType": "Repeated",

@@ -1,7 +1,45 @@
 {
-    "fontColorLabels": "#4C1933",
-    "fontColorButtons": "#F2D8D8",
-    "backgroundColorButtons": "#DB5D77",
+    "defaultControl": {
+        "fontColor": "#F2D8D8",
+        "backgroundColor": "#DB5D77",
+        "hoverBackgroundColor": "#BF5067",
+        "focusBackgroundColor": "#BF5067",
+        "activeBackgroundColor": "#DB5D77",
+        "focusBorderColor": "#DB5D77",
+    },
+
+    "transparentButton": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#20202060",
+        "focusBackgroundColor": "#20202080",
+        "activeBackgroundColor": "#40404080",
+    },
+
+    "dynamicPanel": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#1D2939",
+        "focusBackgroundColor": "#1D2939",
+        "activeBackgroundColor": "#1D2939"
+    },
+
+    "staticPanel": {
+        "backgroundGradient": "24deg, #233043, #344054",
+    },
+
+    "staticBackground": {
+        "imagePath": "backgrounds/black-10percent.png",
+        "scaleMode": "StretchToFill",
+    },
+    "sceneSpecificStaticBackgrounds": {
+        "MainScene": {
+            "imagePath": "backgrounds/fully-transparent.png",
+            "scaleMode": "ScaleAndCrop",
+        }
+    },
+    
+    "primaryFontColor": "#F0F0F0",
+    "secondaryFontColor": "#CCCCCC",
+    
     "dynamicBackground": {
         "gradientRampFile": "gradients/yellow pink.png",
         "gradientType": "Linear",

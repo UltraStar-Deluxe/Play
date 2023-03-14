@@ -50,6 +50,11 @@ public static class ApplyThemeStyleUtils
             return;
         }
 
+        if (visualElement.ClassListContains("staticPanel"))
+        {
+            return;
+        }
+        
         // Hover events
         visualElement.RegisterCallback<PointerEnterEvent>(evt =>
         {
@@ -236,7 +241,11 @@ public static class ApplyThemeStyleUtils
             && slideToggle.value)
         {
             // Dirty hack to get the correct style for the slide toggle
-            return ThemeManager.Instance.GetCurrentTheme().ThemeJson.slideToggleOn;
+            ControlStyleConfig slideToggleOnStyle = ThemeManager.Instance.GetCurrentTheme().ThemeJson.slideToggleOn;
+            if (slideToggleOnStyle != null)
+            {
+                return slideToggleOnStyle;
+            }
         }
 
         return data.controlStyleConfig;

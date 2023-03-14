@@ -1,7 +1,45 @@
 {
-    "fontColorButtons": "#af4e56",
-    "fontColorLabels": "#32513c",
-    "backgroundColorButtons": "#e88383",
+    "defaultControl": {
+        "fontColor": "#af4e56",
+        "backgroundColor": "#e88383",
+        "hoverBackgroundColor": "#FF8F8F",
+        "focusBackgroundColor": "#FF8F8F",
+        "activeBackgroundColor": "#FF8F8F",
+        "focusBorderColor": "#e88383",
+    },
+
+    "transparentButton": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#20202060",
+        "focusBackgroundColor": "#20202080",
+        "activeBackgroundColor": "#40404080",
+    },
+
+    "dynamicPanel": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#1D2939",
+        "focusBackgroundColor": "#1D2939",
+        "activeBackgroundColor": "#1D2939"
+    },
+
+    "staticPanel": {
+        "backgroundColor": "#A5BF6C",
+    },
+
+    "staticBackground": {
+        "imagePath": "backgrounds/black-10percent.png",
+        "scaleMode": "StretchToFill",
+    },
+    "sceneSpecificStaticBackgrounds": {
+        "MainScene": {
+            "imagePath": "backgrounds/fully-transparent.png",
+            "scaleMode": "ScaleAndCrop",
+        }
+    },
+
+    "primaryFontColor": "#32513c",
+    "secondaryFontColor": "#4C7A5B",
+    
     "dynamicBackground": {
         "gradientRampFile": "gradients/green watermelon.png",
         "gradientType": "Repeated",
