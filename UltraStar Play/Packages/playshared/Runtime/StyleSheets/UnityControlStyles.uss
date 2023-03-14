@@ -17,7 +17,7 @@
 /* TEXT FIELD */
 /**************************************************/
 
-.unity-base-text-field {
+.unity-base-text-field > .unity-base-text-field__input {
     height: var(--control-height);
     -unity-text-align: middle-left;
     margin: 0;
