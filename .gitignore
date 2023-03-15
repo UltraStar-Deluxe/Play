@@ -8,10 +8,12 @@
 Assets/AssetStoreTools*
 
 # Generated classes
-R_PlaySharedUssClasses.cs
-R_PlaySharedUxmlNames.cs
-RUssClasses.cs
-RUxmlNames.cs
+# TODO: Cannot generate code in Unity from C#. Thus, all generated files need to be added to Git.
+#       See https://forum.unity.com/threads/generate-code-before-build-in-project-with-compiler-errors.1412511/#post-8878443.
+#R_PlaySharedUssClasses.cs
+#R_PlaySharedUxmlNames.cs
+#RUssClasses.cs
+#RUxmlNames.cs
 
 # Source maps
 *.*.map
