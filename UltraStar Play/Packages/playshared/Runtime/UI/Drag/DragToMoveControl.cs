@@ -6,8 +6,6 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
 {
     private Vector2 dragStartPositionInPx;
 
-    private bool isCanceled;
-
     private readonly Subject<Vector2> movedEventStream = new();
     public IObservable<Vector2> MovedEventStream => movedEventStream;
 
@@ -23,7 +21,6 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
         dragStartPositionInPx = new Vector2(
             targetVisualElement.resolvedStyle.left,
             targetVisualElement.resolvedStyle.top);
-        isCanceled = false;
     }
 
     public void OnDrag(GeneralDragEvent dragEvent)
@@ -43,12 +40,11 @@ public class DragToMoveControl : GeneralDragControl, IDragListener<GeneralDragEv
     {
         base.CancelDrag();
         MoveTo(dragStartPositionInPx);
-        isCanceled = true;
     }
 
-    public bool IsCanceled()
+    public new bool IsCanceled()
     {
-        return isCanceled;
+        return base.IsCanceled;
     }
 
     private void MoveTo(Vector2 positionInPx)
