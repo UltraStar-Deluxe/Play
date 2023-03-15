@@ -43,7 +43,6 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     private void Update()
     {
         UpdateWaveForm();
-        micPitchTracker.AudioSamplesAnalyzer.ModifySamplesInPlace = false;
     }
 
     private void UpdateWaveForm()
