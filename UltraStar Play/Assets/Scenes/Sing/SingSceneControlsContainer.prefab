@@ -241,7 +241,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1084258561304435913
 Transform:
   m_ObjectHideFlags: 0
@@ -370,8 +370,6 @@ MonoBehaviour:
   sentenceRatingUi: {fileID: 9197481963319205126, guid: fc5ccc90fb3478b49bea1f39b1e6bcce,
     type: 3}
   noteUi: {fileID: 9197481963319205126, guid: 726e4c425e366bc4781f431b540ceb7f, type: 3}
-  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
-    type: 3}
   perfectEffectStarUi: {fileID: 9197481963319205126, guid: 1a17d33675a3b2f4fb69ca0b3c8c6661,
     type: 3}
   goldenNoteStarUi: {fileID: 9197481963319205126, guid: e7f43ec8168761646ab238a5567dcdf8,
@@ -532,7 +530,7 @@ Transform:
   - {fileID: 1084258560531820790}
   - {fileID: 729696328608357567}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &6921073708788144763
 PrefabInstance:

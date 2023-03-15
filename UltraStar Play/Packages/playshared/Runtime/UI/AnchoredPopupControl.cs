@@ -83,8 +83,8 @@ public class AnchoredPopupControl
                 return new Vector2(AnchorElement.worldBound.xMin, AnchorElement.worldBound.yMax);
             case Corner2D.BottomRight:
                 return new Vector2(AnchorElement.worldBound.xMax, AnchorElement.worldBound.yMax);
+            default: 
+                return Vector2.zero;
         }
-
-        return Vector2.zero;
     }
 }

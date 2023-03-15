@@ -19,7 +19,7 @@ public class FixLengthList<T> : IEnumerable<T>
     
     private List<T> list;
 
-    private Func<T> createInstanceFunction;
+    private readonly Func<T> createInstanceFunction;
     
     public FixLengthList(int fixLength, Func<T> createInstanceFunction)
     {
@@ -69,13 +69,6 @@ public class FixLengthList<T> : IEnumerable<T>
             {
                 T instance = createInstanceFunction();
                 list.Add(instance);
-            }
-            else
-            {
-                if (list[i] == null)
-                {
-                    list[i] = createInstanceFunction();
-                }
             }
         }
     }
