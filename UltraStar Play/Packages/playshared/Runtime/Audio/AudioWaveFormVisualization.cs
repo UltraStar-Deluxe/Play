@@ -1,4 +1,5 @@
-﻿using UniInject;
+﻿using System.Collections.Generic;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,6 +9,8 @@ public class AudioWaveFormVisualization : INeedInjection
 
     private readonly DynamicTexture dynTexture;
 
+    private FixLengthList<MinMax> minMaxValues;
+    
     public AudioWaveFormVisualization(GameObject gameObject, VisualElement visualElement)
     {
         dynTexture = new DynamicTexture(gameObject, visualElement);
@@ -27,8 +30,8 @@ public class AudioWaveFormVisualization : INeedInjection
 
         dynTexture.ClearTexture();
 
-        Vector2[] minMaxValues = CalculateMinAndMaxValues(audioClip);
-        DrawMinAndMaxValuesToTexture(minMaxValues);
+        CalculateMinAndMaxValues(audioClip);
+        DrawMinAndMaxValuesToTexture();
     }
 
     public void DrawWaveFormValues(float[] samples, int offset, int length)
@@ -71,20 +74,13 @@ public class AudioWaveFormVisualization : INeedInjection
 
         dynTexture.ClearTexture();
 
-        Vector2[] minMaxValues = CalculateMinAndMaxValues(samples);
-        DrawMinAndMaxValuesToTexture(minMaxValues);
+        CalculateMinAndMaxValues(samples);
+        DrawMinAndMaxValuesToTexture();
     }
 
-    private float[] CopyAudioClipSamples(AudioClip audioClip)
+    private void CalculateMinAndMaxValues(float[] samples)
     {
-        float[] samples = new float[audioClip.samples];
-        audioClip.GetData(samples, 0);
-        return samples;
-    }
-
-    private Vector2[] CalculateMinAndMaxValues(float[] samples)
-    {
-        Vector2[] minMaxValues = new Vector2[dynTexture.TextureWidth];
+        PrepareMinMaxValues(dynTexture.TextureWidth);
 
         // calculate window size to fit all samples in the texture
         int windowSize = samples.Length / dynTexture.TextureWidth;
@@ -93,16 +89,26 @@ public class AudioWaveFormVisualization : INeedInjection
         for (int i = 0; i < dynTexture.TextureWidth; i++)
         {
             int offset = i * windowSize;
-            Vector2 minMax = FindMinAndMaxValues(samples, offset, windowSize);
-            minMaxValues[i] = minMax;
+            FindMinAndMaxValues(samples, offset, windowSize, out float min, out float max);
+            minMaxValues[i].min = min;
+            minMaxValues[i].max = max;
         }
-
-        return minMaxValues;
     }
 
-    private Vector2[] CalculateMinAndMaxValues(AudioClip audioClip)
+    private void PrepareMinMaxValues(int size)
     {
-        Vector2[] minMaxValues = new Vector2[dynTexture.TextureWidth];
+        if (minMaxValues == null)
+        {
+            minMaxValues = new FixLengthList<MinMax>(size, () => new MinMax());
+            return;
+        }
+        
+        minMaxValues.FixLength = size;
+    }
+
+    private void CalculateMinAndMaxValues(AudioClip audioClip)
+    {
+        PrepareMinMaxValues(dynTexture.TextureWidth);
 
         // calculate window size to fit all samples in the texture
         int windowSize = audioClip.samples / dynTexture.TextureWidth;
@@ -113,17 +119,16 @@ public class AudioWaveFormVisualization : INeedInjection
         {
             int offset = i * windowSize;
             audioClip.GetData(windowSamples, offset);
-            Vector2 minMax = FindMinAndMaxValues(windowSamples, 0, windowSize);
-            minMaxValues[i] = minMax;
+            FindMinAndMaxValues(windowSamples, 0, windowSize, out float min, out float max);
+            minMaxValues[i].min = min;
+            minMaxValues[i].max = max;
         }
-
-        return minMaxValues;
     }
 
-    private Vector2 FindMinAndMaxValues(float[] samples, int offset, int length)
+    private void FindMinAndMaxValues(float[] samples, int offset, int length, out float min, out float max)
     {
-        float min = float.MaxValue;
-        float max = float.MinValue;
+        min = float.MaxValue;
+        max = float.MinValue;
 
         for (int i = 0; i < length; i++)
         {
@@ -143,17 +148,16 @@ public class AudioWaveFormVisualization : INeedInjection
                 max = f;
             }
         }
-        return new Vector2(min, max);
     }
 
-    private void DrawMinAndMaxValuesToTexture(Vector2[] minMaxValues)
+    private void DrawMinAndMaxValuesToTexture()
     {
         // Draw the waveform
         for (int x = 0; x < dynTexture.TextureWidth; x++)
         {
-            Vector2 minMax = minMaxValues[x];
-            float min = minMax.x;
-            float max = minMax.y;
+            MinMax minMax = minMaxValues[x];
+            float min = minMax.min;
+            float max = minMax.max;
 
             // Draw the pixels
             int yMin = (int)(dynTexture.TextureHeight * (min + 1f) / 2f);
@@ -166,5 +170,27 @@ public class AudioWaveFormVisualization : INeedInjection
 
         // upload to the graphics card 
         dynTexture.ApplyTexture();
+    }
+
+    private class MinMax
+    {
+        public float min;
+        public float max;
+
+        public MinMax()
+        {
+        }
+
+        public MinMax(float min, float max)
+        {
+            this.min = min;
+            this.max = max;
+        }
+
+        public void Reset()
+        {
+            min = 0;
+            max = 0;
+        }
     }
 }

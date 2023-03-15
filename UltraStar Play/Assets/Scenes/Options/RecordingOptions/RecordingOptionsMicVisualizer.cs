@@ -24,6 +24,8 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
+    private readonly float[] emptySamplesArray = new float[2];
+    
     private void Start()
     {
         micPitchTracker.PitchEventStream
@@ -66,7 +68,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         bool isAboveThreshold = AbstractAudioSamplesAnalyzer.IsAboveNoiseSuppressionThreshold(micData, 0, micData.Length, micProfile.NoiseSuppression);
         float[] displayData = isAboveThreshold
             ? micData
-            : new float[micData.Length];
+            : emptySamplesArray;
 
         audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(displayData);
     }
