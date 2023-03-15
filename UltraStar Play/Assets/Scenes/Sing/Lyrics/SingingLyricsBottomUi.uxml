@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SingingLyricsCurrentSentenceUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsCurrentSentenceUi.uxml?fileID=9197481963319205126&amp;guid=8251f2f38ed387e4f904e833ae4d638a&amp;type=3#SingingLyricsCurrentSentenceUi" />
     <ui:Template name="SingingLyricsNextSentenceUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsNextSentenceUi.uxml?fileID=9197481963319205126&amp;guid=75abf6635c0d518429223405a8e9d658&amp;type=3#SingingLyricsNextSentenceUi" />
-    <Style src="project://database/Packages/playshared/Runtime/StyleSheets/CommonStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#CommonStyles" />
+    <Style src="project://database/Packages/playsharedui/Runtime/StyleSheets/CommonStyles.uss?fileID=7433441132597879392&amp;guid=fbd390f23a7ea9f4ba95eaeb258fced3&amp;type=3#CommonStyles" />
     <ui:VisualElement name="lyricsContainer" class="lyricsContainer">
         <ui:VisualElement name="contentContainer" content-container="true" style="width: 100%;" />
         <ui:Instance template="SingingLyricsCurrentSentenceUi" name="SingingLyricsCurrentSentenceUi" style="width: 100%;" />

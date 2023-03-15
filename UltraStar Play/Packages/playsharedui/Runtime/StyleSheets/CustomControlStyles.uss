@@ -342,23 +342,23 @@ AccordionItem.expanded #toggleAccordionItemContentIcon {
 }
 
 .materialIcon {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIcons-Regular%20SDF.asset?fileID=11400000&guid=962c0e3031e352e49a518053a5f34649&type=2#MaterialIcons-Regular SDF');
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/MaterialIcons-Regular%20SDF.asset?fileID=11400000&guid=962c0e3031e352e49a518053a5f34649&type=2#MaterialIcons-Regular SDF');
 }
 
 .materialIcon.outlined {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsOutlined-Regular%20SDF.asset?fileID=11400000&guid=42a22443bbf3a394db82f24ef7c78983&type=2#MaterialIconsOutlined-Regular SDF');
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/MaterialIconsOutlined-Regular%20SDF.asset?fileID=11400000&guid=42a22443bbf3a394db82f24ef7c78983&type=2#MaterialIconsOutlined-Regular SDF');
 }
 
 .materialIcon.rounded {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/MaterialIconsRound-Regular%20SDF.asset?fileID=11400000&guid=9f10fb0b7decc69479216194a434f924&type=2#MaterialIconsRound-Regular SDF');
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/MaterialIconsRound-Regular%20SDF.asset?fileID=11400000&guid=9f10fb0b7decc69479216194a434f924&type=2#MaterialIconsRound-Regular SDF');
 }
 
 .bootstrapIcon {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/BootstrapIcons%20SDF.asset?fileID=11400000&guid=2273cbbf74fd5304da72d333c483c39a&type=2#BootstrapIcons SDF');
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/BootstrapIcons%20SDF.asset?fileID=11400000&guid=2273cbbf74fd5304da72d333c483c39a&type=2#BootstrapIcons SDF');
 }
 
 .featherIcon {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/Feather/Feather SDF.asset');
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Feather/Feather%20SDF.asset');
 }
 
 /**************************************************/
@@ -434,7 +434,7 @@ TextField.placeholderVisible #unity-text-input {
     background-color: var(--font-color);
     border-radius: 50%;
     transition: translate 0.5s, background-color 0.5s;
-    translate: 5 5%;
+    translate: 5% 5%;
 }
 
 .slide-toggle__input--checked {

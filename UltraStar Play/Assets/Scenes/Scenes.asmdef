@@ -13,6 +13,7 @@
         "Unity.TextMeshPro",
         "Unity.InputSystem",
         "playshared",
+        "playsharedui",
         "AndroidRuntimePermissions.Runtime"
     ],
     "includePlatforms": [],

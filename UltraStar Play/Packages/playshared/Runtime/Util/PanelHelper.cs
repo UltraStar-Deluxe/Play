@@ -19,7 +19,7 @@ public class PanelHelper
         : this(document.rootVisualElement.panel, document.panelSettings)
     {
     }
-
+    
     public PanelHelper(IPanel panel, PanelSettings panelSettings)
     {
         this.panel = panel;

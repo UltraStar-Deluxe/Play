@@ -1,6 +1,6 @@
 VisualElement
 {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/Inter/Inter-VariableFont_slnt,wght SDF.asset');
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/Inter-VariableFont_slnt,wght%20SDF.asset');
 }
 
 #background {

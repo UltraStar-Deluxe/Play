@@ -325,17 +325,17 @@
 }
 
 .unity-toggle > .unity-toggle__input:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
+    background-image: url('project://database/Packages/playsharedui/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
     height: 55%;
 }
 
 .unity-toggle > .unity-toggle__input:focus:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
+    background-image: url('project://database/Packages/playsharedui/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
     height: 55%;
 }
 
 .unity-toggle > .unity-toggle__input:hover:checked > .unity-toggle__checkmark {
-    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
+    background-image: url('project://database/Packages/playsharedui/Runtime/Graphics/Icons/checkmark.svg?fileID=7388822144124034973&guid=7b6efd742168dd14b839ca30a2dfba01&type=3#checkmark');
     height: 55%;
 }
 

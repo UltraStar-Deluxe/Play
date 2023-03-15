@@ -164,13 +164,13 @@
 
 .singingLyrics {
     /*-unity-font-style: bold;*/
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/Inter/static/Inter-ExtraBold SDF.asset');
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgba(32, 32, 32, 0.5);
 }
 
 .lyricsContainer #playerNameLabel {
-    -unity-font-definition: url('project://database/Packages/playshared/Runtime/Fonts/Inter/static/Inter-ExtraBold SDF.asset');
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgba(32, 32, 32, 0.2);
 }
