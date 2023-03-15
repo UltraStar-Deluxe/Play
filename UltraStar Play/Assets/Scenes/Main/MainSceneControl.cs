@@ -132,17 +132,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
         });
 
-        InitButtonDescription(startButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description));
-        InitButtonDescription(settingsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_settings_description));
-        InitButtonDescription(aboutButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_about_description));
-        InitButtonDescription(creditsButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_credits_description));
-        InitButtonDescription(quitButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_quit_description));
-        InitButtonDescription(createSongButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_newSong_description));
-        InitButtonDescription(partyButton, TranslationManager.GetTranslation(R.Messages.mainScene_button_description_noImplementation));
-
         UpdateVersionInfoText();
-
-        // sceneSubtitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_description);
 
         InitInputActions();
 
@@ -163,15 +153,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             .Subscribe(_ => OnBack());
     }
 
-    private void InitButtonDescription(Button button, string description)
-    {
-        // button.RegisterCallback<PointerEnterEvent>(_ => sceneSubtitle.text = description);
-        // button.RegisterCallback<FocusEvent>(_ => sceneSubtitle.text = description);
-    }
-
     public void UpdateTranslation()
     {
-        // sceneTitle.text = TranslationManager.GetTranslation(R.Messages.mainScene_title);
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
     }

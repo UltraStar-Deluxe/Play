@@ -180,18 +180,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
 
         // Create warning about missing microphones
-        string playerNameCsv = string.Join(", ", playerProfilesWithoutMic.Select(it => it.Name).ToList());
         if (!playerProfilesWithoutMic.IsNullOrEmpty())
         {
-            string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
-            string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
-                "playerNameCsv", playerNameCsv);
-
-            dialogControl = UiManager.Instance.CreateDialogControl(title);
-            dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
-            dialogControl.Message = message;
-
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
+            ShowMissingMicrophonesDialog(playerProfilesWithoutMic);
         }
 
         webcamControl.InitWebcam();
@@ -227,6 +218,28 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
+    }
+
+    private void ShowMissingMicrophonesDialog(List<PlayerProfile> playerProfilesWithoutMic)
+    {
+        if (dialogControl != null)
+        {
+            return;
+        }
+        
+        string playerNameCsv = playerProfilesWithoutMic
+            .Select(it => it.Name)
+            .ToList()
+            .JoinWith(", ");
+        string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
+        string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
+            "playerNameCsv", playerNameCsv);
+
+        dialogControl = UiManager.Instance.CreateDialogControl(title);
+        dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
+        dialogControl.Message = message;
+
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);   
     }
 
     public void OnDestroy()

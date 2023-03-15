@@ -17,7 +17,7 @@ public class ThemeFileSystemWatcher : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private ThemeManager themeManager;
     
-    private List<IDisposable> disposables = new();
+    private readonly List<IDisposable> disposables = new();
     
     protected override object GetInstance()
     {

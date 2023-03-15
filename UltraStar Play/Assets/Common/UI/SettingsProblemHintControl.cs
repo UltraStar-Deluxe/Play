@@ -165,9 +165,10 @@ public class SettingsProblemHintControl
 
     public void SetProblems(List<string> settingsProblems)
     {
-        bool hasIssues = !settingsProblems.IsNullOrEmpty();
+        bool oldHasIssues = this.hasIssues;
+        hasIssues = !settingsProblems.IsNullOrEmpty();
         if (hasIssues
-            && !this.hasIssues)
+            && !oldHasIssues)
         {
             visualElement.ShowByDisplay();
             LeanTween.value(GameObjectUtils.FindAnyGameObject(), 0, 1, 1f)
@@ -178,7 +179,7 @@ public class SettingsProblemHintControl
                 .setEaseSpring();
         }
         else if (!hasIssues
-                 && this.hasIssues)
+                 && oldHasIssues)
         {
             LeanTween.value(GameObjectUtils.FindAnyGameObject(), 1, 0, 0.3f)
                 .setOnUpdate(value =>
@@ -187,7 +188,6 @@ public class SettingsProblemHintControl
                 })
                 .setEaseLinear();
         }
-        this.hasIssues = hasIssues;
         
         tooltipControl.TooltipText = settingsProblems.JoinWith("\n\n");
     }

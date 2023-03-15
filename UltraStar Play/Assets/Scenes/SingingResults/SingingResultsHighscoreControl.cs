@@ -32,8 +32,6 @@ public class SingingResultsHighscoreControl : INeedInjection
     [Inject]
     private Injector injector;
     
-    private LabeledItemPickerControl<EDifficulty> difficultyPickerControl;
-
     private readonly int highscoreCount = 5;
     
     private bool isInitialized;
@@ -46,7 +44,7 @@ public class SingingResultsHighscoreControl : INeedInjection
         }
         isInitialized = true;
         
-        difficultyPickerControl = new LabeledItemPickerControl<EDifficulty>(difficultyPicker, EnumUtils.GetValuesAsList<EDifficulty>());
+        LabeledItemPickerControl<EDifficulty> difficultyPickerControl = new(difficultyPicker, EnumUtils.GetValuesAsList<EDifficulty>());
         difficultyPickerControl.GetLabelTextFunction = item => item.GetTranslatedName();
         difficultyPickerControl.Selection.Subscribe(item => ShowHighscores(item));
         difficultyPickerControl.SelectItem(sceneData.PlayerProfiles.FirstOrDefault().Difficulty);
@@ -58,9 +56,6 @@ public class SingingResultsHighscoreControl : INeedInjection
         LocalStatistic localStatistic = statistics.GetLocalStats(sceneData.SongMeta);
         List<SongStatistic> songStatistics = localStatistic?.StatsEntries?.SongStatistics?
             .Where(it => it.Difficulty == difficulty).ToList();
-        
-        // Test data
-        // songStatistics.Add(new SongStatistic("Some player & Other player", EDifficulty.Medium, 500, EScoreMode.CommonAverage));
         
         if (songStatistics.IsNullOrEmpty())
         {
@@ -83,7 +78,7 @@ public class SingingResultsHighscoreControl : INeedInjection
         VisualElement highscoreEntry = highscoreEntryUi.CloneTree().Children().FirstOrDefault();
         highscoreEntryList.Add(highscoreEntry);
 
-        SingingResultsHighscoreEntryControl entryControl = injector
+        injector
             .WithRootVisualElement(highscoreEntry)
             .WithBindingForInstance(songStatistic)
             .WithBinding(new Binding("entryIndex", new ExistingInstanceProvider<int>(index)))

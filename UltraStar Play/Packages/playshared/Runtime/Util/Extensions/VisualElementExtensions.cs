@@ -154,7 +154,6 @@ public static class VisualElementExtensions
             return;
         }
 
-        List<VisualElement> visualElementAndAncestors = new();
         List<ScrollView> ancestorScrollViews = visualElement
             .GetAncestors()
             .OfType<ScrollView>()

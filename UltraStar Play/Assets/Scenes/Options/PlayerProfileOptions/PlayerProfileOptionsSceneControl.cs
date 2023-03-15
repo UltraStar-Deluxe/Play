@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection
 {
     [InjectedInInspector]
     public VisualTreeAsset playerProfileListEntryAsset;
@@ -44,10 +44,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             
             ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
         });
-    }
-
-    public void UpdateTranslation()
-    {
     }
 
     private void UpdatePlayerProfileList()

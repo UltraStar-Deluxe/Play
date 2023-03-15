@@ -463,7 +463,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             return;
         }
-        // using DisposableStopwatch d = new("ApplyThemeSpecificStylesToVisualElements took <ms>");
         
         ThemeManager themeManager = Instance;
         if (themeManager != null)
@@ -507,7 +506,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ControlStyleConfig defaultControlStyleConfig = themeMeta.ThemeJson.defaultControl;
         
         // Scene specific elements
-        ApplyThemeSpecificStylesToVisualElements(root, themeMeta, GetCurrentScene());
+        ApplyThemeSpecificStylesToVisualElements(root, GetCurrentScene());
         
         // Basic font colors
         ApplyThemeStyleUtils.ApplyPrimaryFontColor(themeJson.primaryFontColor, root);
@@ -723,7 +722,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void ApplyThemeSpecificStylesToVisualElements(
         VisualElement root,
-        ThemeMeta themeMeta,
         EScene currentScene)
     {
         ThemeMeta currentThemeMeta = GetCurrentTheme();

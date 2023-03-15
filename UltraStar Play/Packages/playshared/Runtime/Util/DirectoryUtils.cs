@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-public class DirectoryUtils
+public static class DirectoryUtils
 {
     public static void CreateDirectory(string path)
     {

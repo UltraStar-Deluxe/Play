@@ -3,7 +3,7 @@ using UnityEngine;
 // Marker Interface
 public class CommonSceneObjects : MonoBehaviour
 {
-    public static CommonSceneObjects instance;
+    private static CommonSceneObjects instance;
     public static CommonSceneObjects Instance
     {
         get

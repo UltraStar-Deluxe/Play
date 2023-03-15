@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
     [InjectedInInspector]
     public VisualTreeAsset connectedClientListEntryAsset;
@@ -30,10 +30,6 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         serverSideConnectRequestManager.ClientConnectedEventStream
             .Subscribe(_ => UpdateConnectedClients())
             .AddTo(gameObject);
-    }
-
-    public void UpdateTranslation()
-    {
     }
 
     private void UpdateConnectedClients()

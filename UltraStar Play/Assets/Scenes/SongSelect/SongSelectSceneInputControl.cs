@@ -68,19 +68,12 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => songSelectSceneControl.CheckAudioAndStartSingScene());
         
         // Select controls
-        InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
-            .Subscribe(context => OnNavigate(context.ReadValue<Vector2>()));
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
             .Subscribe(OnScrollWheel);
         InputManager.GetInputAction(R.InputActions.usplay_nextSong).PerformedAsObservable()
             .Subscribe(_ => songRouletteControl.SelectNextSong());
         InputManager.GetInputAction(R.InputActions.usplay_previousSong).PerformedAsObservable()
             .Subscribe(_ => songRouletteControl.SelectPreviousSong());
-    }
-
-    private void OnNavigate(Vector2 direction)
-    {
-        // focusableNavigator.OnNavigate(direction);
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)

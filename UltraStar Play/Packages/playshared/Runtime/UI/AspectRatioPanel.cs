@@ -22,7 +22,7 @@ public class AspectRatioPanel : VisualElement
 		public override void Init( VisualElement visualElement, IUxmlAttributes attributes, CreationContext creationContext )
 		{
 			base.Init( visualElement, attributes, creationContext );
-			var element = visualElement as AspectRatioPanel;
+			AspectRatioPanel element = visualElement as AspectRatioPanel;
 			if (element != null)
 			{
 				element.AspectRatioX = Mathf.Max( 1, aspectRatioX.GetValueFromBag( attributes, creationContext ) );
@@ -65,10 +65,17 @@ public class AspectRatioPanel : VisualElement
 
 	void FitToParent()
 	{
-		if (parent == null) return;
-		var parentW = parent.resolvedStyle.width;
-		var parentH = parent.resolvedStyle.height;
-		if (float.IsNaN( parentW ) || float.IsNaN( parentH )) return;
+        if (parent == null)
+        {
+            return;
+        }
+		
+        float parentW = parent.resolvedStyle.width;
+		float parentH = parent.resolvedStyle.height;
+        if (float.IsNaN(parentW) || float.IsNaN(parentH))
+        {
+            return;
+        }
 
 		style.position = Position.Absolute;
 		style.left = 0;

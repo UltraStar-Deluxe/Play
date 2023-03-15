@@ -174,7 +174,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private void LoadOptionsScene(EScene scene)
     {
         UnloadLastOptionsScene();
-        loadedSceneRecipe = optionSceneRecipes.FirstOrDefault(it => it.scene == scene);;
+        loadedSceneRecipe = optionSceneRecipes.FirstOrDefault(it => it.scene == scene);
 
         // Set button style
         sceneToButtonMap[scene].SetActive(true);

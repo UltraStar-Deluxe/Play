@@ -66,47 +66,6 @@ public class AnchoredPopupControl
         VisualElementUtils.MoveVisualElementFullyInsideScreen(PopupElement, panelHelper);
     }
     
-    private Justify GetAnchorJustifyContent()
-    {
-        if (AnchorElement == null)
-        {
-            return Justify.FlexStart;
-        }
-        
-        switch (AnchorCorner)
-        {
-            case Corner2D.TopLeft:
-            case Corner2D.TopRight:
-                return Justify.FlexEnd;
-            case Corner2D.BottomLeft:
-            case Corner2D.BottomRight:
-                return Justify.FlexStart;
-        }
-
-        return Justify.FlexStart;
-    }
-
-    private Align GetAnchorAlignItems()
-    {
-        if (AnchorElement == null)
-        {
-            return Align.FlexStart;
-        }
-
-        switch (AnchorCorner)
-        {
-            case Corner2D.TopLeft:
-            case Corner2D.BottomLeft:
-                return Align.FlexStart;
-            case Corner2D.TopRight:
-            case Corner2D.BottomRight:
-                return Align.FlexEnd;
-        }
-
-        return Align.FlexStart;
-    }
-    
-    
     private Vector2 GetAnchorPosition()
     {
         if (AnchorElement == null)

@@ -185,7 +185,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         connectionThroubleshootingText.HideByDisplay();
         serverErrorResponseText.HideByDisplay();
         
-        toggleRecordingButton.RegisterCallbackButtonTriggered(ToggleRecording);
+        toggleRecordingButton.RegisterCallbackButtonTriggered(_ => ToggleRecording());
 
         clientNameTextField.value = settings.ClientName;
         clientNameTextField.RegisterCallback<NavigationSubmitEvent>(_ => OnClientNameTextFieldSubmit());
@@ -476,7 +476,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         }
     }
 
-    private void ToggleRecording(EventBase evt)
+    private void ToggleRecording()
     {
         if (micSampleRecorder.IsRecording.Value)
         {
