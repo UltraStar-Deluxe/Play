@@ -24,7 +24,7 @@ jobs:
           - 2022.2.4f1
         targetPlatform:
           # At the moment, tests are target platform independent. Thus only build one.
-          - StandaloneLinux64
+          - StandaloneWindows64
     steps:
       # Clone repo and restore cache
       - uses: actions/checkout@v2
