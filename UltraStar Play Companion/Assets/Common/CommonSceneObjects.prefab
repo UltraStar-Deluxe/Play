@@ -294,7 +294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   notificationOverlayUi: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0, type: 3}
   notificationUi: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59, type: 3}
-  messageDialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb, type: 3}
+  messageDialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7, type: 3}
   micWithNameUi: {fileID: 9197481963319205126, guid: 633a1b5f196ee2f45beba597ffda0b45, type: 3}
   songListEntryUi: {fileID: 9197481963319205126, guid: 2d49ee40abf3e004ab100df248a731db, type: 3}
   songQueueEntryUi: {fileID: 9197481963319205126, guid: 82a6470c46626074998301d3d1e10698, type: 3}
