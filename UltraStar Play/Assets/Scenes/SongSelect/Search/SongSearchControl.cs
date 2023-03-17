@@ -25,9 +25,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject(UxmlName = R.UxmlNames.searchPropertyButton)]
     private Button searchPropertyButton;
 
-    [Inject(UxmlName = R.UxmlNames.closeSearchPropertyDropdownButton)]
-    private Button closeSearchPropertyDropdownButton;
-
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownTitle)]
     private Label searchPropertyDropdownTitle;
 
@@ -57,10 +54,16 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     [Inject(UxmlName = R.UxmlNames.searchErrorIcon)]
     private VisualElement searchErrorIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownContainer)]
+    private VisualElement searchPropertyDropdownContainer;
 
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SongRouletteControl songRouletteControl;
+    
     [Inject]
     private SongSelectFilterControl songSelectFilterControl;
 
@@ -82,14 +85,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
         searchTextField.RegisterCallback<FocusEvent>(evt => UpdateSearchTextFieldHint());
-        searchTextField.RegisterCallback<BlurEvent>(evt => UpdateSearchTextFieldHint());
+        searchTextField.RegisterCallback<BlurEvent>(evt => UpdateSearchTextFieldHint(true));
         UpdateSearchTextFieldHint();
 
         searchErrorIcon.HideByDisplay();
-        searchErrorIconTooltipControl = new TooltipControl(searchErrorIcon);
+        searchErrorIconTooltipControl = new(searchErrorIcon);
 
         HideSearchPropertyDropdownOverlay();
-        searchPropertyButton.RegisterCallbackButtonTriggered(() =>
+        searchPropertyButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (IsSearchPropertyDropdownVisible)
             {
@@ -100,6 +103,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
                 ShowSearchPropertyDropdownOverlay();
             }
         });
+        VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(searchPropertyDropdownOverlay);
+
         songSelectFilterControl.FiltersChangedEventStream.Subscribe(_ =>
             searchPropertyButton.SetInClassList("filtersAreActive", songSelectFilterControl.IsAnyFilterActive));
 
@@ -108,8 +113,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             songSelectFilterControl.InitFilters();
         }
         
-        closeSearchPropertyDropdownButton.RegisterCallbackButtonTriggered(() => searchPropertyDropdownOverlay.HideByDisplay());
-
         RegisterToggleSearchPropertyCallback(artistPropertyContainer.Q<Toggle>(), ESearchProperty.Artist);
         RegisterToggleSearchPropertyCallback(titlePropertyContainer.Q<Toggle>(), ESearchProperty.Title);
         RegisterToggleSearchPropertyCallback(genrePropertyContainer.Q<Toggle>(), ESearchProperty.Genre);
@@ -118,29 +121,27 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         RegisterToggleSearchPropertyCallback(languagePropertyContainer.Q<Toggle>(), ESearchProperty.Language);
         RegisterToggleSearchPropertyCallback(lyricsPropertyContainer.Q<Toggle>(), ESearchProperty.Lyrics);
 
-        SearchChangedEventStream
-            .Where(evt => evt is SearchPropertyChangedEvent)
-            .Subscribe(evt => UpdateTextFieldHint());
+        new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
 
-        UpdateTextFieldHint();
+        songRouletteControl.SongListChangedEventStream.Subscribe(songList =>
+        {
+            if (songList.IsNullOrEmpty()
+                && !GetRawSearchText().IsNullOrEmpty())
+            {
+                searchTextField.AddToClassList("noSearchResults");
+            }
+            else
+            {
+                searchTextField.RemoveFromClassList("noSearchResults");
+            }
+        });
     }
 
-    private void UpdateSearchTextFieldHint()
+    private void UpdateSearchTextFieldHint(bool isBlurEvent = false)
     {
         searchTextFieldHint.SetVisibleByDisplay(
             GetRawSearchText().IsNullOrEmpty()
-            && searchTextField.focusController.focusedElement != searchTextField);
-    }
-
-    private void UpdateTextFieldHint()
-    {
-        List<string> searchPropertyStrings = searchProperties
-            .Select(it => GetTranslation(it))
-            .ToList();
-        searchPropertyStrings.Sort();
-        string hint = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchTextFieldHint,
-            "properties", string.Join(", ", searchPropertyStrings));
-        searchTextFieldHint.text = hint;
+            && (isBlurEvent || searchTextField.focusController.focusedElement != searchTextField));
     }
 
     private string GetTranslation(ESearchProperty searchProperty)
@@ -177,6 +178,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void HideSearchPropertyDropdownOverlay()
     {
         searchPropertyDropdownOverlay.HideByDisplay();
+        searchPropertyButton.Focus();
     }
 
     public List<SongMeta> GetFilteredSongMetas(List<SongMeta> songMetas)
@@ -377,6 +379,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         languagePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_language);
         lyricsPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
         yearPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_year);
-        UpdateTextFieldHint();
+        searchTextFieldHint.text = "What do you want to sing today?";
     }
 }

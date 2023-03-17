@@ -14,12 +14,6 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneControl singSceneControl;
 
-    [Inject(UxmlName = R.UxmlNames.commonScoreContainer)]
-    private VisualElement commonScoreContainer;
-
-    [Inject(UxmlName = R.UxmlNames.commonScoreLabel)]
-    private Label commonScoreLabel;
-
     [Inject(UxmlName = R.UxmlNames.commonScoreSentenceRatingContainer)]
     private VisualElement commonScoreSentenceRatingContainer;
 
@@ -37,16 +31,10 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
         {
             InitCommonScore();
         }
-        else
-        {
-            commonScoreContainer.HideByDisplay();
-        }
     }
 
     private void InitCommonScore()
     {
-        commonScoreContainer.ShowByDisplay();
-        commonScoreLabel.text = "0";
         ScoreControls.ForEach(scoreControl =>
         {
             scoreControl.SentenceScoreEventStream
@@ -69,6 +57,8 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
                 ShowSentenceRating(sentenceScoreEvent.SentenceRating);
             })
             .AddTo(singSceneControl.gameObject);
+        
+        UpdateCommonScoreLabel(false);
     }
 
     private void ShowSentenceRating(SentenceRating sentenceRating)
@@ -86,30 +76,9 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void UpdateCommonScoreLabel()
+    private void UpdateCommonScoreLabel(bool animate = true)
     {
         double commonScore = ScoreControls.Select(scoreControl => scoreControl.TotalScore).Average();
-        ShowTotalScore((int)commonScore);
-    }
-
-    private void ShowTotalScore(int score)
-    {
-        if (totalScoreAnimationId > 0)
-        {
-            LeanTween.cancel(singSceneControl.gameObject, totalScoreAnimationId);
-        }
-
-        if (!int.TryParse(commonScoreLabel.text, out int lastDisplayedScore)
-            || lastDisplayedScore < 0)
-        {
-            lastDisplayedScore = 0;
-        }
-        if (score < 0)
-        {
-            score = 0;
-        }
-        totalScoreAnimationId = LeanTween.value(singSceneControl.gameObject, lastDisplayedScore, score, 1f)
-            .setOnUpdate((float interpolatedScoreValue) => commonScoreLabel.text = interpolatedScoreValue.ToString("0"))
-            .id;
+        singSceneControl.PlayerControls.ForEach(playerControl => playerControl.PlayerUiControl.ShowTotalScore((int)commonScore, animate));
     }
 }

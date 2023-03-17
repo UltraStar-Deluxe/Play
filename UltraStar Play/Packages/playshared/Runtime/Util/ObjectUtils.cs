@@ -10,7 +10,20 @@ public static class ObjectUtils
         a = b;
         b = tmp;
     }
+    
+    public static T FirstNonDefault<T>(params T[] items)
+    {
+        foreach (T item in items)
+        {
+            if (!Equals(item, default(T)))
+            {
+                return item;
+            }
+        }
 
+        return default(T);
+    }
+    
     public static void AssertNotNull(object nullableReference, string paramName)
     {
         if (nullableReference == null)

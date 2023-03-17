@@ -1,15 +1,16 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="MicrophoneUi" src="project://database/Assets/Scenes/MainScene/MicrophoneUi.uxml?fileID=9197481963319205126&amp;guid=5f84f7bcc7710ee4fa080095d579c557&amp;type=3#MicrophoneUi" />
-    <ui:Template name="SongListUi" src="project://database/Assets/Scenes/MainScene/SongListUi.uxml?fileID=9197481963319205126&amp;guid=0485cb8517dc0464996e2aa2f6ea1e37&amp;type=3#SongListUi" />
+    <ui:Template name="MicrophoneUi" src="project://database/Assets/Scenes/MainScene/MicrophoneUi.uxml?fileID=9197481963319205126&amp;guid=14ed27d104da7494192ee6178d33cff0&amp;type=3#MicrophoneUi" />
+    <ui:Template name="SongListUi" src="project://database/Assets/Scenes/MainScene/SongListUi.uxml?fileID=9197481963319205126&amp;guid=9b4331b5c150ff542b64295ae2171737&amp;type=3#SongListUi" />
     <ui:Template name="SongDetailsUi" src="project://database/Assets/Scenes/MainScene/SongDetailsUi.uxml?fileID=9197481963319205126&amp;guid=3dbba0a02e822b44cb898f512e23a1c2&amp;type=3#SongDetailsUi" />
     <ui:Template name="InputSimulationUi" src="project://database/Assets/Scenes/MainScene/InputSimulationUi.uxml?fileID=9197481963319205126&amp;guid=8207c240e20c0e546b018010579d8422&amp;type=3#InputSimulationUi" />
-    <ui:Template name="MainSceneMenuUi" src="project://database/Assets/Scenes/MainScene/MenuUi.uxml?fileID=9197481963319205126&amp;guid=ada12ffedb0785e43aa19245961c4d1f&amp;type=3#MenuUi" />
-    <ui:Template name="GameRoundModifierDialogUi" src="project://database/Packages/playshared/Runtime/GameRounds/GameRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#GameRoundModifierDialogUi" />
-    <ui:VisualElement name="background" style="width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Common/Graphics/Backgrounds/[bg-main]blue_plain.jpg?fileID=21300000&amp;guid=4fd0c0cd5661e0b45aee082182ae1a93&amp;type=3#[bg-main]blue_plain&apos;); padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px;">
+    <ui:Template name="MainSceneMenuUi" src="project://database/Assets/Scenes/MainScene/MenuUi.uxml?fileID=9197481963319205126&amp;guid=e209a80ab6b65254998d5b9b11561416&amp;type=3#MenuUi" />
+    <ui:Template name="GameRoundModifierDialogUi" src="project://database/Packages/playsharedui/Runtime/UI/GameRounds/GameRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#GameRoundModifierDialogUi" />
+    <ui:VisualElement name="background" style="width: 100%; height: 100%; padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px;">
         <ui:VisualElement name="titleContainer" style="align-items: center; width: 100%; justify-content: flex-start; top: auto; flex-direction: row; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center; flex-grow: 1; justify-content: center;">
-                <ui:VisualElement name="titleAndDescription">
-                    <ui:Label text="UltraStar Play  Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold;" />
+                <ui:VisualElement name="titleAndDescription" style="flex-direction: row; align-items: center;">
+                    <ui:VisualElement name="logo" class="mr-2" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Logos/LogoSmall-512.png?fileID=2800000&amp;guid=f3ab5af68813c5446a5f5403af87b6c7&amp;type=3#LogoSmall-512&apos;); width: 48px; height: 48px; flex-shrink: 0;" />
+                    <ui:Label text="UltraStar Play  Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:Button display-tooltip-when-elided="true" name="showMenuButton" style="align-items: center; justify-content: center; width: 48px; height: 48px; flex-grow: 0; margin-left: 0; margin-right: 0; margin-top: 5px; margin-bottom: 5px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">

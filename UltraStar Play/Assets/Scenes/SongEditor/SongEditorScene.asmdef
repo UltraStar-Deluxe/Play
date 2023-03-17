@@ -12,6 +12,7 @@
         "Unity.TextMeshPro",
         "Unity.InputSystem",
         "playshared",
+        "playsharedui",
         "Vosk",
         "SpleeterSharp"
     ],

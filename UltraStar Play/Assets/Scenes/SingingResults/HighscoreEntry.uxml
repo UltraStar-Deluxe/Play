@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="highscoreEntryUiRoot" picking-mode="Ignore" style="width: auto; height: 40px; flex-direction: row; align-items: center; margin-bottom: 20px;">
+        <ui:Label text="1" name="posLabel" picking-mode="Ignore" />
+        <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" class="titleText" style="margin-right: 5px;" />
+        <MaterialIcon name="commonScoreIcon" icon="diversity_2" />
+        <ui:VisualElement name="rightSide" picking-mode="Ignore" style="flex-direction: row; justify-content: flex-end; flex-grow: 1; height: 100%; align-items: center;">
+            <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreLabel" picking-mode="Ignore" class="titleText" style="margin-right: 20px;" />
+            <ui:Label text="01.01.2020" display-tooltip-when-elided="true" name="dateLabel" picking-mode="Ignore" class="titleText" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

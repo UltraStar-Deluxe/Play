@@ -23,13 +23,14 @@ public class StatisticEntries
         SongStatistics.Remove(record);
     }
 
-    public List<SongStatistic> GetTopScores(int count)
+    public List<SongStatistic> GetTopScores(int count, EDifficulty difficulty)
     {
         if (SongStatistics.IsNullOrEmpty())
         {
             return new List<SongStatistic>();
         }
         return SongStatistics
+            .Where(it => it.Difficulty == difficulty)
             .Take(count)
             .ToList();
     }

@@ -105,7 +105,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             Debug.LogWarning("Cannot record mic samples using connected client");
             return;
         }
-
+        
         IsRecording.Value = true;
 
         // Check for microphone existence.
@@ -126,8 +126,11 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         // Code for low-latency Unity microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
         DestroyAudioClips();
-        micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName);
-
+        using DisposableStopwatch d = new("MicrophoneAdapter.Start took <ms>");
+        {
+            micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName);
+        }
+        
         if (!MicrophoneAdapter.UsePortAudio)
         {
             System.Diagnostics.Stopwatch stopwatch = new();

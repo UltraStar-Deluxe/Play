@@ -3,6 +3,7 @@ using UnityEngine;
 // This script must be placed next to a Camera component. Otherwise OnRenderImage is not called by Unity.
 public class BackgroundShaderControl : MonoBehaviour
 {
+    private static readonly int _ParticleTex = Shader.PropertyToID("_ParticleTex");
     private static readonly int _UiTex = Shader.PropertyToID("_UiTex");
     private static readonly int _TransitionTex = Shader.PropertyToID("_TransitionTex");
     private static readonly int _TransitionTime = Shader.PropertyToID("_TransitionTime");
@@ -24,18 +25,10 @@ public class BackgroundShaderControl : MonoBehaviour
         Shader.SetGlobalFloat(_TimeApplication, Time.time);
     }
 
-    /**
-     * Event function that Unity calls after a Camera has finished rendering, that allows you to modify the Camera's final image.
-     * Therefor, this script must be placed next to a Camera component.
-     */
-    private void OnRenderImage(RenderTexture src, RenderTexture dest)
-    {
-        Graphics.Blit(src, dest, material);
-    }
-
-    public void SetUiRenderTextures(RenderTexture uiRenderTexture, Texture transitionTexture)
+    public void SetUiRenderTextures(RenderTexture uiRenderTexture, RenderTexture particleRenderTexture, Texture transitionTexture)
     {
         material.SetTexture(_UiTex, uiRenderTexture);
+        material.SetTexture(_ParticleTex, particleRenderTexture);
         material.SetTexture(_TransitionTex, transitionTexture);
     }
 

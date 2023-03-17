@@ -214,6 +214,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private void GenerateSongMetasForAudioFiles(string generatedSongFolderAbsolutePath, List<string> audioFiles, List<SongMeta> existingSongMetas)
     {
+        // TODO: Make this optional
+        return;
+        
         List<string> existingSongMetaAudioFiles = existingSongMetas
             .Select(songMeta => Path.GetFullPath(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3)))
             .ToList();

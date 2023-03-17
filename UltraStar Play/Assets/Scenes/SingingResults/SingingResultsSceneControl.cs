@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ICSharpCode.SharpZipLib.Zip;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -29,32 +30,50 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     public SongPreviewControl songPreviewControl;
 
     [InjectedInInspector]
+    public VisualTreeAsset highscoreEntryUi;
+
+    [InjectedInInspector]
     public AudioSource crowdCheerAudioSource;
+    
+    [Inject(UxmlName = R.UxmlNames.artistLabel)]
+    private Label artistLabel;
 
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.sceneSubtitle)]
-    private Label songLabel;
-
-    [Inject(UxmlName = R.UxmlNames.playerResultsContainer)]
-    public VisualElement playerResultsContainer;
-
+    [Inject(UxmlName = R.UxmlNames.titleLabel)]
+    private Label titleLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.coverImage)]
+    private VisualElement coverImage;
+    
     [Inject(UxmlName = R.UxmlNames.onePlayerLayout)]
-    public VisualElement onePlayerLayout;
+    private VisualElement onePlayerLayout;
 
     [Inject(UxmlName = R.UxmlNames.twoPlayerLayout)]
-    public VisualElement twoPlayerLayout;
+    private VisualElement twoPlayerLayout;
 
     [Inject(UxmlName = R.UxmlNames.nPlayerLayout)]
-    public VisualElement nPlayerLayout;
+    private VisualElement nPlayerLayout;
 
     [Inject(UxmlName = R.UxmlNames.continueButton)]
-    public Button continueButton;
+    private Button continueButton;
 
-    [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
-    public Button hiddenContinueButton;
-
+    [Inject(UxmlName = R.UxmlNames.restartButton)]
+    private Button restartButton;
+    
+    [Inject(UxmlName = R.UxmlNames.background)]
+    private VisualElement background;
+    
+    [Inject(UxmlName = R.UxmlNames.showCurrentResultsButton)]
+    private ToggleButton showCurrentResultsButton;
+    
+    [Inject(UxmlName = R.UxmlNames.showHighscoreButton)]
+    private ToggleButton showHighscoreButton;
+    
+    [Inject(UxmlName = R.UxmlNames.playerResultsRoot)]
+    private VisualElement playerResultsRoot;
+    
+    [Inject(UxmlName = R.UxmlNames.highscoresRoot)]
+    private VisualElement highscoresRoot;
+    
     [Inject]
     private Statistics statistics;
 
@@ -66,9 +85,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     [Inject]
     private Settings settings;
-
-    [Inject]
-    private ThemeManager themeManager;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -87,6 +103,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
                                        && !HasPartyModeSceneData
                                        && statistics.HasHighscore(sceneData.SongMetas.LastOrDefault());
 
+    private readonly SingingResultsHighscoreControl highscoreControl = new();
+    
     public static SingingResultsSceneControl Instance
     {
         get
@@ -107,6 +125,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         injector.Inject(nextGameRoundUiControl);
         injector.Inject(teamResultsUiControl);
+        injector.Inject(highscoreControl);
 
         if (ShowHighScoresNext)
         {
@@ -115,9 +134,18 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     }
 
     private void Start()
-    {
-        hiddenContinueButton.RegisterCallbackButtonTriggered(() => Continue());
-        continueButton.RegisterCallbackButtonTriggered(() => Continue());
+    {      
+        TabGroupControl tabGroupControl = new();
+        tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
+        tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
+        tabGroupControl.ShowContainer(playerResultsRoot);
+        showCurrentResultsButton.SetActive(true);
+        showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
+        
+        restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
+        
+        background.RegisterCallback<PointerUpEvent>(evt => Continue());
+        continueButton.RegisterCallbackButtonTriggered(_ => Continue());
         continueButton.Focus();
 
         InitClickThoughToHiddenContinueButton();
@@ -133,6 +161,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         FillLayout();
     }
 
+    private void RestartSingScene()
+    {
+        SingSceneData singSceneData = SceneNavigator.GetSceneData(new SingSceneData());
+        singSceneData.SongMetas = sceneData.SongMetas;
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
+    }
+    
     private void KnockOutPartyTeams()
     {
         if (!HasPartyModeSceneData
@@ -170,18 +205,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void FillLayout()
     {
-        if (sceneData.IsMedley)
-        {
-            songLabel.text = TranslationManager.GetTranslation(R.Messages.score_total);
-        }
-        else
-        {
-            SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
-            string titleText = songMeta.Title.IsNullOrEmpty() ? "" : songMeta.Title;
-            string artistText = songMeta.Artist.IsNullOrEmpty() ? "" : " - " + songMeta.Artist;
-            songLabel.text = titleText + artistText;
-        }
-
+        SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
+        artistLabel.text = songMeta.Artist;
+        titleLabel.text = songMeta.Title;
+        SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, coverImage);
+        
         VisualElement selectedLayout = GetSelectedLayout();
         if (selectedLayout == nPlayerLayout)
         {
@@ -189,7 +217,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
 
         List<VisualElement> playerUis = selectedLayout
-            .Query<VisualElement>(R.UxmlNames.singingResultsPlayerUi)
+            .Query<VisualElement>(R.UxmlNames.singingResultsPlayerUiRoot)
             .ToList();
 
         singingResultsPlayerUiControls.Clear();
@@ -223,10 +251,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void PrepareNPlayerLayout()
     {
         int playerCount = sceneData.PlayerProfiles.Count;
+        
         // Add elements to "square similar" grid
         int columns = (int)Math.Sqrt(sceneData.PlayerProfiles.Count);
         int rows = (int)Math.Ceiling((float)playerCount / columns);
-        if (sceneData.PlayerProfiles.Count == 3)
+        if (playerCount == 3)
         {
             columns = 3;
             rows = 1;
@@ -236,6 +265,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         for (int column = 0; column < columns; column++)
         {
             VisualElement columnElement = new();
+            columnElement.name = "column";
+            columnElement.AddToClassList("singingResultsPlayerUiColumn");
             columnElement.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column);
             columnElement.style.height = new StyleLength(Length.Percent(100f));
             columnElement.style.width = new StyleLength(Length.Percent(100f / columns));
@@ -243,15 +274,14 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
             for (int row = 0; row < rows; row++)
             {
-                TemplateContainer templateContainer = nPlayerUi.CloneTree();
-                VisualElement playerUi = templateContainer.Children().FirstOrDefault();
-                playerUi.name = R.UxmlNames.singingResultsPlayerUi;
-                playerUi.style.marginBottom = new StyleLength(20);
-                playerUi.AddToClassList("singingResultUiSmall");
-                if (rows > 2)
+                VisualElement playerUi = nPlayerUi.CloneTree().Children().FirstOrDefault();
+                playerUi.style.height = new StyleLength(Length.Percent(100f / rows));
+                
+                for (int i = 1; i <= playerCount; i++)
                 {
-                    playerUi.AddToClassList("singingResultUiSmaller");
+                    playerUi.AddToClassList($"singingResultUi-{i}");
                 }
+                
                 if (rows > 3)
                 {
                     playerUi.AddToClassList("singingResultUiSmallest");
@@ -279,6 +309,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         foreach (VisualElement layout in layouts)
         {
             layout.SetVisibleByDisplay(layout == selectedLayout);
+            if (layout != selectedLayout
+                || layout == nPlayerLayout)
+            {
+                layout.Clear();
+            }
         }
     }
 
@@ -346,7 +381,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             && !teamResultsUiControl.IsVisibleByDisplay())
         {
             // Show team result
-            playerResultsContainer.HideByDisplay();
+            playerResultsRoot.HideByDisplay();
             teamResultsUiControl.ShowByDisplay();
 
             if (HasFinalTeamResults)
@@ -370,6 +405,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         bb.BindExistingInstance(SceneNavigator.GetSceneDataOrThrow<SingingResultsSceneData>());
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songPreviewControl);
+        bb.Bind(nameof(highscoreEntryUi)).ToExistingInstance(highscoreEntryUi);
         bb.BindExistingInstance(nextGameRoundUiControl);
         bb.BindExistingInstance(teamResultsUiControl);
         bb.Bind(nameof(teamResultUi)).ToExistingInstance(teamResultUi);
@@ -392,15 +428,19 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     public void UpdateTranslation()
     {
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.singingResultsScene_title);
+        singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
+        
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
+            //sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
         }
-        
-        singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
     }
 
+    private void OnDestroy()
+    {
+        singingResultsPlayerUiControls.ForEach(it => it.Dispose());
+    }
+    
     private void GivePartyModeTeamPoints()
     {
         if (!HasPartyModeSceneData)

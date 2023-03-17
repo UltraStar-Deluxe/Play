@@ -1,5 +1,6 @@
 ﻿using UniInject;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -38,6 +39,21 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
             printScreenSize = false;
             Debug.Log($"Screen size (inches): {ApplicationUtils.GetPhysicalDiagonalScreenSizeInInches()}, DPI: {Screen.dpi}");
         }
+        AddScreenSpecificStyleSheets();
+    }
+
+    protected override void OnEnableSingleton()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    
+    protected override void OnDisableSingleton()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
         AddScreenSpecificStyleSheets();
     }
 

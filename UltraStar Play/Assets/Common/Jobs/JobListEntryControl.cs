@@ -65,7 +65,7 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
             VisualElement.AddToClassList("childJob");
         }
 
-        cancelJobButton.RegisterCallbackButtonTriggered(() =>
+        cancelJobButton.RegisterCallbackButtonTriggered(_ =>
         {
             job.Cancel();
         });

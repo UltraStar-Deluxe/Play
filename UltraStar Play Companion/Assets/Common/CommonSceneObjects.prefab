@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 939539719115158085}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84c038ec799bea549b582079d30ad6b0, type: 3}
+  m_Script: {fileID: 11500000, guid: 8b65d6012d2f6c34992edf2ed455efff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   fps: 0
@@ -248,50 +248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cf057fbfdc05344289132cfeb9d5137, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &6628471474289411845
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3118876379510977718}
-  - component: {fileID: 4127730951173029495}
-  m_Layer: 0
-  m_Name: ApplyTranslationsOnSceneInjectionFinished
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3118876379510977718
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6628471474289411845}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7793846928896407034}
-  m_RootOrder: 9
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4127730951173029495
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6628471474289411845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e3eb005d367f354988932948bc73960, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7514437338033219311
 GameObject:
   m_ObjectHideFlags: 0
@@ -338,7 +294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   notificationOverlayUi: {fileID: 9197481963319205126, guid: 1b9e64f2bf87a1743adc6aced20186f0, type: 3}
   notificationUi: {fileID: 9197481963319205126, guid: 621e11db1bf96254eb113e663e4bcc59, type: 3}
-  messageDialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb, type: 3}
+  messageDialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7, type: 3}
   micWithNameUi: {fileID: 9197481963319205126, guid: 633a1b5f196ee2f45beba597ffda0b45, type: 3}
   songListEntryUi: {fileID: 9197481963319205126, guid: 2d49ee40abf3e004ab100df248a731db, type: 3}
   songQueueEntryUi: {fileID: 9197481963319205126, guid: 82a6470c46626074998301d3d1e10698, type: 3}
@@ -694,7 +650,6 @@ Transform:
   - {fileID: 7793846928700202826}
   - {fileID: 7793846928701339893}
   - {fileID: 4360400099301771181}
-  - {fileID: 3118876379510977718}
   - {fileID: 5970054433468432184}
   m_Father: {fileID: 0}
   m_RootOrder: 0
