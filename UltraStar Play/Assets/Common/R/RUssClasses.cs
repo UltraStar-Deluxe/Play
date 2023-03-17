@@ -11,7 +11,6 @@ public static partial class R
         public const string circle = "circle";
         public const string circleButton = "circleButton";
         public const string controlLabel = "controlLabel";
-        public const string controlLabel40Percent = "controlLabel40Percent";
         public const string controlMinWidth = "controlMinWidth";
         public const string controlWithLabelHorizontal = "controlWithLabelHorizontal";
         public const string controlWithLabelVertical = "controlWithLabelVertical";

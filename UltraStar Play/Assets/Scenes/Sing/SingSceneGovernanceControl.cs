@@ -51,6 +51,12 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private SongMeta songMeta;
     
     [Inject]
+    private Settings settings;
+    
+    [Inject]
+    private AudioSeparationManager audioSeparationManager;
+    
+    [Inject]
     private SingSceneControl singSceneControl;
     
     [Inject]
@@ -225,8 +231,36 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             () => singSceneControl.SkipToNextSingableNote());
         contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
             () => singSceneControl.FinishScene(false, false));
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
-            () => singSceneControl.OpenSongInEditor());
+        
+        if (!singSceneControl.HasPartyModeSceneData)
+        {
+            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+                () => singSceneControl.OpenSongInEditor());
+        }
+
+        contextMenuPopup.AddSeparator();
+
+        // Button to separate audio or slider to change vocals audio
+        if (SongMetaUtils.VocalsAudioResourceExists(singSceneControl.SongMeta)
+            && SongMetaUtils.InstrumentalAudioResourceExists(singSceneControl.SongMeta))
+        {
+            contextMenuPopup.AddVisualElement(new Label("Vocals Volume"));
+            Slider vocalsVolumeSlider = new();
+            vocalsVolumeSlider.lowValue = 0;
+            vocalsVolumeSlider.highValue = 100;
+            vocalsVolumeSlider.value = settings.AudioSettings.VocalsAudioVolumePercent;
+            vocalsVolumeSlider.RegisterValueChangedCallback(evt =>
+            {
+                settings.AudioSettings.VocalsAudioVolumePercent = (int)evt.newValue;
+            });
+
+            contextMenuPopup.AddVisualElement(vocalsVolumeSlider);
+        }
+        else
+        {
+            contextMenuPopup.AddButton("Separate audio",
+                () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta));
+        }
     }
 
     private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)

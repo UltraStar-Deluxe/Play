@@ -15,15 +15,6 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
     [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
     private ItemPicker scoreModePicker;
 
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.scoreModeContainer)]
-    private VisualElement scoreModeContainer;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
-    
     [Inject(UxmlName = R.UxmlNames.reduceAudioVolumeItemPicker)]
     private ItemPicker reduceAudioVolumeItemPicker;
     
@@ -52,11 +43,7 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
             () => settings.reducedAudioVolumePercent,
             newValue => settings.reducedAudioVolumePercent = (int)newValue);
 
-        backButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+        InitLanguageChooser();
     }
 
     public void UpdateTranslation()

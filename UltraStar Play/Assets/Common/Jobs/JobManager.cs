@@ -9,7 +9,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class JobManager : MonoBehaviour, INeedInjection
+public class JobManager : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void InitOnLoad()
@@ -34,6 +34,9 @@ public class JobManager : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private SceneNavigator sceneNavigator;
+    
     private VisualElement jobListElement;
     private Button toggleJobListButton;
 
@@ -42,9 +45,15 @@ public class JobManager : MonoBehaviour, INeedInjection
 
     private bool isJobListMinimized;
 
-    private void Start()
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         CreateJobListUi();
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => CreateJobListUi());
 
         // CreateDummyJobs();
         // StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(5f, () => CreateDummyJobs()));

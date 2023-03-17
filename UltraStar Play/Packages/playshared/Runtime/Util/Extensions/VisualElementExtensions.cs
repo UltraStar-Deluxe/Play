@@ -211,6 +211,11 @@ public static class VisualElementExtensions
         return listView.Q<VisualElement>(className: "unity-collection-view__item--selected");
     }
 
+    public static VisualElement GetRootVisualElement(this VisualElement visualElement)
+    {
+        return visualElement.GetParent(parent => parent.parent == null);
+    }
+    
     public static VisualElement GetParent(this VisualElement visualElement, Func<VisualElement, bool> condition=null)
     {
         VisualElement parent = visualElement.parent;

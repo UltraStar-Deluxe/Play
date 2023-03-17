@@ -91,6 +91,7 @@ public static partial class R_PlayShared
         public const string middleCenterText = "middleCenterText";
         public const string minimized = "minimized";
         public const string modalDialogContainer = "modalDialogContainer";
+        public const string multiline = "multiline";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";
         public const string noSearchResults = "noSearchResults";

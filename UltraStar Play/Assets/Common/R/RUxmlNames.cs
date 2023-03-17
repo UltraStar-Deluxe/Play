@@ -180,6 +180,7 @@ public static partial class R
         public const string fullscreenModePicker = "fullscreenModePicker";
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameOptionsButton = "gameOptionsButton";
+        public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
         public const string genrePropertyContainer = "genrePropertyContainer";
         public const string globalSettingsLabel = "globalSettingsLabel";
         public const string goldenNoteIndicator = "goldenNoteIndicator";
@@ -590,6 +591,7 @@ public static partial class R
         public const string selectFolderIcon = "selectFolderIcon";
         public const string selectionIndicator = "selectionIndicator";
         public const string selectRandomSongButton = "selectRandomSongButton";
+        public const string selectRandomSongIcon = "selectRandomSongIcon";
         public const string semanticVersionText = "semanticVersionText";
         public const string sentence = "sentence";
         public const string sentenceImage = "sentenceImage";
@@ -681,8 +683,8 @@ public static partial class R
         public const string songQueueOverlay = "songQueueOverlay";
         public const string songQueueTitle = "songQueueTitle";
         public const string songQueueUi = "songQueueUi";
+        public const string SongQueueUi = "SongQueueUi";
         public const string SongSelectEditPlaylistDialogUi = "SongSelectEditPlaylistDialogUi";
-        public const string SongSelectGameRoundOverlayUi = "SongSelectGameRoundOverlayUi";
         public const string songSelectionItemPicker = "songSelectionItemPicker";
         public const string songSelectionJokerCountItemPicker = "songSelectionJokerCountItemPicker";
         public const string songSelectionPlaylistItemPicker = "songSelectionPlaylistItemPicker";
@@ -724,10 +726,12 @@ public static partial class R
         public const string teamColumnsContainer = "teamColumnsContainer";
         public const string teamColumnUiRoot = "teamColumnUiRoot";
         public const string teamConfigUiRoot = "teamConfigUiRoot";
+        public const string teamLabel = "teamLabel";
         public const string teamNameLabel = "teamNameLabel";
         public const string teamNameTextField = "teamNameTextField";
         public const string TeamResultsTeamUi = "TeamResultsTeamUi";
         public const string teamResultsUi = "teamResultsUi";
+        public const string TeamResultsUi = "TeamResultsUi";
         public const string teamResultsUiRoot = "teamResultsUiRoot";
         public const string TeamResultTeamUi = "TeamResultTeamUi";
         public const string teamScoreLabel = "teamScoreLabel";
@@ -819,8 +823,6 @@ public static partial class R
         public const string viewMoreButton = "viewMoreButton";
         public const string virtualPiano = "virtualPiano";
         public const string vocalsAudioVolumeChooser = "vocalsAudioVolumeChooser";
-        public const string vocalsAudioVolumeContainer = "vocalsAudioVolumeContainer";
-        public const string vocalsAudioVolumeLabel = "vocalsAudioVolumeLabel";
         public const string voiceButtonRow = "voiceButtonRow";
         public const string voiceNameLabel = "voiceNameLabel";
         public const string volumeChooser = "volumeChooser";

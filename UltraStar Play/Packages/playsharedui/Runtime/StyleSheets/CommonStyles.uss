@@ -115,6 +115,8 @@ VisualElement
     font-size: var(--font-size-s);
 }
 
+TextField.multiline 
+
 .transparentBackgroundColor #unity-text-input {
     background-color: rgba(0, 0, 0, 0);
 }
@@ -137,17 +139,6 @@ VisualElement
     -unity-text-align: middle-left;
     width: 300px;
     font-size: var(--font-size);
-}
-
-.controlLabel40Percent {
-    -unity-text-align: middle-left;
-    width: 40%;
-    font-size: var(--font-size);
-}
-
-ItemPicker.controlLabel40Percent
-{
-    width: auto;
 }
 
 ItemPicker.controlLabel40Percent .itemPickerLabel {

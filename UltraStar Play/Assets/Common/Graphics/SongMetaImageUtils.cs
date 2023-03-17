@@ -42,6 +42,15 @@ public static class SongMetaImageUtils
     public static void SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
     {
         string uri = GetCoverOrBackgroundImageUri(songMeta);
+        if (uri.IsNullOrEmpty())
+        {
+            foreach (VisualElement visualElement in visualElements)
+            {
+                visualElement.style.backgroundImage = new StyleBackground();
+            }
+            return;
+        }
+        
         ImageManager.LoadSpriteFromUri(uri, loadedSprite =>
         {
             foreach (VisualElement visualElement in visualElements)

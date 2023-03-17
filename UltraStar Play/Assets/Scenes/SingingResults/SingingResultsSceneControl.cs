@@ -135,10 +135,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void Start()
     {      
-        background.RegisterCallback<PointerUpEvent>(evt => FinishScene());
-        continueButton.RegisterCallbackButtonTriggered(_ => FinishScene());
-        continueButton.Focus();
-
         TabGroupControl tabGroupControl = new();
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
@@ -148,6 +144,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         
         restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
         
+        background.RegisterCallback<PointerUpEvent>(evt => Continue());
         continueButton.RegisterCallbackButtonTriggered(_ => Continue());
         continueButton.Focus();
 
@@ -384,6 +381,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             && !teamResultsUiControl.IsVisibleByDisplay())
         {
             // Show team result
+            playerResultsRoot.HideByDisplay();
             teamResultsUiControl.ShowByDisplay();
 
             if (HasFinalTeamResults)

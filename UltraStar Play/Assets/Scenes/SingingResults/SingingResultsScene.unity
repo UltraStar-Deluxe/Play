@@ -154,6 +154,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCount: 2
+  partyModeTeams: 5
+  isLastPartyModeRound: 0
 --- !u!4 &1098903558
 Transform:
   m_ObjectHideFlags: 0
