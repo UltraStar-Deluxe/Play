@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -8,13 +10,10 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
+public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
+    [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
+    private ItemPicker scoreModePicker;
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
@@ -31,12 +30,14 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.passTheMicTimeItemPicker)]
     private ItemPicker passTheMicTimeItemPicker;
     
-    [Inject]
-    private Settings settings;
+    [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
+    private DropdownField languageDropdownField;
 
-    private void Start()
+    protected override void Start()
     {
-        new ScoreModeItemPickerControl(scoreModeContainer.Q<ItemPicker>())
+        base.Start();
+        
+        new ScoreModeItemPickerControl(scoreModePicker)
             .Bind(() => settings.GameSettings.ScoreMode,
                   newValue => settings.GameSettings.ScoreMode = newValue);
 
@@ -51,7 +52,7 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
             () => settings.reducedAudioVolumePercent,
             newValue => settings.reducedAudioVolumePercent = (int)newValue);
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
+        backButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
         backButton.Focus();
 
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
@@ -60,8 +61,35 @@ public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        scoreModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_game_title);
+        scoreModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
+    }
+    
+    private void InitLanguageChooser()
+    {
+        languageDropdownField.choices = translationManager.GetTranslatedLanguages()
+            .Select(languageEnum => languageEnum.ToString())
+            .ToList();
+        languageDropdownField.value = translationManager.currentLanguage.ToString();
+
+        languageDropdownField.RegisterValueChangedCallback(evt =>
+        {
+            if (Enum.TryParse(evt.newValue, out SystemLanguage newValue))
+            {
+                SetLanguage(newValue);
+            }
+        });
+    }
+
+    private void SetLanguage(SystemLanguage newValue)
+    {
+        if (settings.GameSettings.language == newValue
+            && translationManager.currentLanguage == newValue)
+        {
+            return;
+        }
+
+        settings.GameSettings.language = newValue;
+        translationManager.currentLanguage = settings.GameSettings.language;
+        translationManager.ReloadTranslationsAndUpdateScene();
     }
 }

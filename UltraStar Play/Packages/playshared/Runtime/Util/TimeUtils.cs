@@ -16,6 +16,18 @@ public static class TimeUtils
         return DateTimeOffset.Now.ToUnixTimeMilliseconds();
     }
 
+    public static bool IsDurationAboveThreshold(float unityStartTimeInSeconds, float thresholdInSeconds)
+    {
+        float durationInSeconds = Time.time - unityStartTimeInSeconds;
+        return durationInSeconds > thresholdInSeconds;
+    }
+    
+    public static bool IsDurationAboveThreshold(long unixStartTimeInMillis, long thresholdInMillis)
+    {
+        float durationInMillis = GetUnixTimeMilliseconds() - unixStartTimeInMillis;
+        return durationInMillis > thresholdInMillis;
+    }
+
     /**
      * Parses a duration like "0.5 s" and "1000ms" to a TimeSpan.
      */

@@ -21,17 +21,18 @@ public class InGameDebugConsoleManager : AbstractInGameDebugConsoleManager, INee
         base.Init();
 
         sceneNavigator.SceneChangedEventStream.Subscribe(_ =>
-        {
-            // The EventSystem may be disabled afterwards because of EventSystemOptInOnAndroid. Thus, update after a frame.
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
             {
-                if (debugLogManager.IsLogWindowVisible)
+                // The EventSystem may be disabled afterwards because of EventSystemOptInOnAndroid. Thus, update after a frame.
+                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
                 {
-                    EnableInGameDebugConsoleEventSystemIfNeeded();
-                }
-            }));
+                    if (debugLogManager.IsLogWindowVisible)
+                    {
+                        EnableInGameDebugConsoleEventSystemIfNeeded();
+                    }
+                }));
 
-            UpdateDebugLogPopupVisible();
-        });
+                UpdateDebugLogPopupVisible();
+            })
+            .AddTo(gameObject);
     }
 }

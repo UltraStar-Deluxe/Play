@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
+public class SongSelectFocusableNavigator : FocusableNavigator
 {
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
@@ -15,25 +16,32 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     [Inject]
     private SongRouletteControl songRouletteControl;
 
+    [Inject]
+    private SceneNavigator sceneNavigator;
+    
     [Inject(UxmlName = R.UxmlNames.topContent)]
     private VisualElement topContent;
 
-    [Inject(UxmlName = R.UxmlNames.menuButton)]
-    private VisualElement menuButton;
-
     private void Awake()
     {
-        // Disable default FocusableNavigator
-        FindObjectsOfType<FocusableNavigator>()
-            .Where(it => it != this)
-            .ForEach(it => it.gameObject.SetActive(false));
+        SetOtherFocusableNavigatorsActive(false);
     }
 
-    public override void Start()
+    private void SetOtherFocusableNavigatorsActive(bool value)
     {
-        base.Start();
+        FindObjectsOfType<FocusableNavigator>(true)
+            .Where(it => it != this)
+            .ForEach(it => it.gameObject.SetActive(value));
+    }
+
+    public override void OnInjectionFinished()
+    {
+        base.OnInjectionFinished();
         NoNavigationTargetFoundEventStream.Subscribe(evt => OnNoNavigationTargetFound(evt));
         NoSubmitTargetFoundEventStream.Subscribe(_ => OnNoSubmitTargetFound());
+        sceneNavigator.BeforeSceneChangeEventStream
+            .Subscribe(_ => SetOtherFocusableNavigatorsActive(true))
+            .AddTo(gameObject);
     }
 
     private void OnNoSubmitTargetFound()
@@ -47,7 +55,6 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
     public override void OnNavigate(Vector2 navigationDirection)
     {
         if (navigationDirection.y < 0
-            && FocusedVisualElement != menuButton
             && GetFocusableNavigatorRootVisualElement() == topContent)
         {
             FocusSongRoulette();
@@ -64,7 +71,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator, INeedInjection
             && GetFocusableNavigatorRootVisualElement(lastFocusedVisualElement) != null
             && !lastFocusedVisualElement.GetAncestors().Contains(topContent))
         {
-            FocusLastFocusedVisualElement();
+            TryFocusLastFocusedVisualElement();
             return;
         }
 

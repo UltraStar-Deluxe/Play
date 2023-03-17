@@ -202,7 +202,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
         CloseAskToUseJokerDialog();
         askToUseJokerControl = uiManager.CreateMessageDialog("Use Joker");
         askToUseJokerControl.Message = $"Use joker to change song?\nJokers left: {GetJokerCountTranslation()}";
-        askToUseJokerControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), () =>
+        askToUseJokerControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ =>
         {
             CloseAskToUseJokerDialog();
             RandomlySelectedSong = songMeta;
@@ -210,7 +210,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
             ReduceJokerCount();
             onYes?.Invoke();
         });
-        askToUseJokerControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), () =>
+        askToUseJokerControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ =>
         {
             CloseAskToUseJokerDialog();
             songRouletteControl.SelectSong(RandomlySelectedSong);

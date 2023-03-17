@@ -65,18 +65,29 @@ public static class GitUtils
 
     public static string GetCurrentCommitShortHash()
     {
-        return GetMasterBranchCommitShortHash();
-
         // TODO: running Git command to get the commit hash of the current branch fails with "fatal: unsafe repository ('/github/workspace' is owned by someone else)"
-        // string result = RunGitCommand("rev-parse --short --verify HEAD");
+        string commitHash = GetMasterBranchCommitShortHash(out string errorMessage);
+        if (!errorMessage.IsNullOrEmpty())
+        {
+            Debug.LogError(errorMessage);
+            Debug.Log("Failed to get commit hash from master branch, falling back to getting commit hash from current branch using git command.");
+            commitHash = DoGetCurrentCommitShortHash();
+        }
 
-        // Clean up whitespace around hash. (seems to just be the way this command returns :/ )
-        // commitShortHash = string.Join("", commitShortHash.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
-        // Debug.Log("Current commit short hash: " + commitShortHash);
-        // return commitShortHash;
+        return commitHash;
     }
 
-    private static string GetMasterBranchCommitShortHash()
+    private static string DoGetCurrentCommitShortHash()
+    {
+        string commitShortHash = RunGitCommand("rev-parse --short --verify HEAD");
+
+        // Clean up whitespace around hash. (seems to just be the way this command returns :/ )
+        commitShortHash = string.Join("", commitShortHash.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
+        Debug.Log("Current commit short hash: " + commitShortHash);
+        return commitShortHash;
+    }
+
+    private static string GetMasterBranchCommitShortHash(out string errorMessage)
     {
         string gitFolderPath = GetGitFolder();
         if (gitFolderPath.IsNullOrEmpty())
@@ -88,7 +99,8 @@ public static class GitUtils
         string commitHashFile = gitFolderPath + "/refs/heads/master";
         if (!File.Exists(commitHashFile))
         {
-            throw new BuildFailedException($"No file with commit hash found inside .git folder (tried file path: {commitHashFile})");
+            errorMessage = $"No file with commit hash found inside .git folder (tried file path: {commitHashFile})";
+            return "";
         }
 
         Debug.Log($"commitHashFile: {commitHashFile}");
@@ -96,6 +108,7 @@ public static class GitUtils
         Debug.Log($"commitHash: {commitHash}");
         string commitShortHash = commitHash[..8];
         Debug.Log($"commitShortHash: {commitShortHash}");
+        errorMessage = "";
         return commitShortHash;
     }
 

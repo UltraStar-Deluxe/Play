@@ -65,7 +65,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
         tabGroupControl.AddTabGroupButton(showSongSearchButton, songSearchContainer);
         tabGroupControl.AddTabGroupButton(showSongQueueButton, songQueueContainer);
         tabGroupControl.ShowContainer(songSearchContainer);
-        showSongQueueButton.RegisterCallbackButtonTriggered(() => UpdateSongQueue());
+        showSongQueueButton.RegisterCallbackButtonTriggered(_ => UpdateSongQueue());
         
         songListRequestor.SongListEventStream.Subscribe(evt => HandleSongListEvent(evt));
 
@@ -232,7 +232,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     {
         VisualElement songListEntry = songListEntryUi.CloneTreeAndGetFirstChild();
         songListEntry.Q<Label>(R.UxmlNames.songListEntryLabel).text = $"{songDto.Artist} - {songDto.Title}";
-        songListEntry.Q<Button>(R.UxmlNames.songListEntryButton).RegisterCallbackButtonTriggered(() => songDetailsControl.ShowSongDetails(songDto));
+        songListEntry.Q<Button>(R.UxmlNames.songListEntryButton).RegisterCallbackButtonTriggered(_ => songDetailsControl.ShowSongDetails(songDto));
         return songListEntry;
     }
 

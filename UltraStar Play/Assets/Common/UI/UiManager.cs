@@ -79,14 +79,15 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     }
 
     private Label DoCreateNotification(
-        string text,
-        params string[] additionalTextClasses)
+        string text)
     {
         VisualElement notificationOverlay = uiDocument.rootVisualElement.Q<VisualElement>("notificationOverlay");
         if (notificationOverlay == null)
         {
-            notificationOverlay = notificationOverlayUi.CloneTree().Children().First();
-            uiDocument.rootVisualElement.Add(notificationOverlay);
+            notificationOverlay = notificationOverlayUi.CloneTree()
+                .Children()
+                .First();
+            uiDocument.rootVisualElement.Children().First().Add(notificationOverlay);
         }
 
         TemplateContainer templateContainer = notificationUi.CloneTree();
@@ -107,10 +108,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     }
 
     public static Label CreateNotification(
-        string text,
-        params string[] additionalTextClasses)
+        string text)
     {
-        return Instance.DoCreateNotification(text, additionalTextClasses);
+        return Instance.DoCreateNotification(text);
     }
 
     public MessageDialogControl CreateMessageDialog(string dialogTitle)
@@ -126,19 +126,35 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         return messageDialogControl;
     }
 
-    public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
+    public MessageDialogControl CreateDialogControl(string dialogTitle)
     {
-        VisualElement helpDialog = messageDialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(helpDialog);
-        helpDialog.AddToClassList("wordWrap");
+        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
+        uiDocument.rootVisualElement.Add(dialogVisualElement);
+        dialogVisualElement.AddToClassList("wordWrap");
 
-        MessageDialogControl helpDialogControl = injector
-            .WithRootVisualElement(helpDialog)
+        MessageDialogControl dialogControl = injector
+            .WithRootVisualElement(dialogVisualElement)
             .CreateAndInject<MessageDialogControl>();
-        helpDialogControl.Title = dialogTitle;
+        dialogControl.Title = dialogTitle;
+
+        return dialogControl;
+    }
+    
+    public MessageDialogControl CreateHelpDialogControl(
+        string dialogTitle,
+        Dictionary<string, string> titleToContentMap)
+    {
+        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
+        uiDocument.rootVisualElement.Add(dialogVisualElement);
+        dialogVisualElement.AddToClassList("wordWrap");
+        
+        MessageDialogControl dialogControl = injector
+            .WithRootVisualElement(dialogVisualElement)
+            .CreateAndInject<MessageDialogControl>();
+        dialogControl.Title = dialogTitle;
 
         AccordionGroup accordionGroup = new();
-        helpDialogControl.AddVisualElement(accordionGroup);
+        dialogControl.AddVisualElement(accordionGroup);
             
         void AddChapter(string title, string content)
         {
@@ -150,11 +166,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
 
-        Button closeDialogButton = helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
-            onCloseHelp);
-        closeDialogButton.Focus();
-
-        return helpDialogControl;
+        return dialogControl;
     }
 
     public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)

@@ -69,7 +69,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         nameLabel.text = PlayerProfileName;
         teamLabel.HideByDisplay();
 
-        micButton.RegisterCallbackButtonTriggered(() => OpenMicSelectionDialog());
+        micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
         
         VoiceChooserControl = new(voiceChooser, new List<string>()
         {
@@ -102,7 +102,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
             .WithRootVisualElement(dialog)
             .CreateAndInject<MicSelectionDialogControl>();
         micSelectionDialogControl.Title = $"Select Microphone for {PlayerProfileName}";
-        micSelectionDialogControl.AddButton("OK", () => micSelectionDialogControl.CloseDialog());
+        micSelectionDialogControl.AddButton("OK", _ => micSelectionDialogControl.CloseDialog());
         micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ => OnMicSelectionDialogClosed());
         micSelectionDialogControl.MicProfiles = micProfiles;
         micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;

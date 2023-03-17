@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -26,58 +27,71 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.aboutText)]
     private TextField aboutText;
 
-    [Inject(UxmlName = R.UxmlNames.nextItemButton)]
-    private Button nextItemButton;
-
-    [Inject(UxmlName = R.UxmlNames.previousItemButton)]
-    private Button previousItemButton;
-
-    [Inject(UxmlName = R.UxmlNames.itemIndexLabel)]
-    private Label itemIndexLabel;
-
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
+    
+    [Inject(UxmlName = R.UxmlNames.aboutTextsScrollView)]
+    private ScrollView aboutTextsScrollView;
 
     private int selectedTextIndex;
 
+    private readonly List<ToggleButton> toggleButtons = new();
+    private ToggleButton lastActiveToggleButton;
+    
     private void Start()
     {
-        ShowAboutText(selectedTextIndex);
+        CreateAboutTextButtons();
+        ShowAboutText(textAssets.FirstOrDefault());
 
-        nextItemButton.RegisterCallbackButtonTriggered(() =>
-        {
-            selectedTextIndex++;
-            if (selectedTextIndex >= textAssets.Count)
-            {
-                selectedTextIndex = 0;
-            }
-            ShowAboutText(selectedTextIndex);
-        });
-        previousItemButton.RegisterCallbackButtonTriggered(() =>
-        {
-            selectedTextIndex--;
-            if (selectedTextIndex < 0)
-            {
-                selectedTextIndex = textAssets.Count - 1;
-            }
-            ShowAboutText(selectedTextIndex);
-        });
-        nextItemButton.Focus();
-
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.MainScene));
+        backButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.MainScene));
+        backButton.Focus();
+        
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.MainScene));
     }
 
-    private void ShowAboutText(int index)
+    private void CreateAboutTextButtons()
     {
-        aboutText.value = textAssets[index].text;
-        itemIndexLabel.text = $"{index + 1} / {textAssets.Count}";
+        aboutTextsScrollView.Clear();
+        toggleButtons.Clear();
+        textAssets.ForEach(CreateAboutTextButton);
+
+        ToggleButton firstToggleButton = toggleButtons.FirstOrDefault();
+        firstToggleButton.SetActive(true);
+        lastActiveToggleButton = firstToggleButton;
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(aboutTextsScrollView);
+    }
+
+    private void CreateAboutTextButton(TextAsset textAsset)
+    {
+        ToggleButton button = new();
+        button.AddToClassList("mb-2");
+        button.text = textAsset.name;
+        button.RegisterCallbackButtonTriggered(_ =>
+        {
+            ShowAboutText(textAsset);
+
+            if (lastActiveToggleButton != null)
+            {
+                lastActiveToggleButton.SetActive(false);
+            }
+            lastActiveToggleButton = button;
+            
+            button.SetActive(true);
+        });
+        aboutTextsScrollView.Add(button);
+
+        toggleButtons.Add(button);
+    }
+
+    private void ShowAboutText(TextAsset textAsset)
+    {
+        aboutText.value = textAsset.text;
     }
 
     public void UpdateTranslation()
     {
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.aboutScene_title);
     }
 }

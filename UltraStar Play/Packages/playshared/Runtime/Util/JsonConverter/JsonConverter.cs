@@ -13,6 +13,7 @@ public static class JsonConverter
     {
         fsSerializer newSerializer = new();
         newSerializer.AddConverter(new Color32Converter());
+        newSerializer.AddConverter(new GradientConfigConverter());
         return newSerializer;
     }
 
@@ -31,14 +32,15 @@ public static class JsonConverter
 
     public static T FromJson<T>(string json, bool assertSuccessWithoutWarnings = true) where T : new()
     {
-        if (json.IsNullOrEmpty())
+        fsData data = fsJsonParser.Parse(json);
+        T deserialized = new();
+        fsResult tryDeserialize = CreateSerializer()
+            .TryDeserialize<T>(data, ref deserialized);
+        if (assertSuccessWithoutWarnings)
         {
-            return default(T);
+            tryDeserialize.AssertSuccessWithoutWarnings();
         }
-
-        T newInstance = new();
-        FillFromJson(json, newInstance, assertSuccessWithoutWarnings);
-        return newInstance;
+        return deserialized;
     }
 
     public static void FillFromJson<T>(string json, T existingInstance, bool assertSuccessWithoutWarnings = true)

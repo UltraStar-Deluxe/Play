@@ -4,7 +4,10 @@ using ProTrans;
 using Serilog.Events;
 using UniInject;
 using UniRx;
+using ProTrans;
+using Serilog.Events;
 using UnityEngine;
+using Button = UnityEngine.UIElements.Button;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -39,6 +42,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject]
     private Settings settings;
     
+    [Inject]
+    private InGameDebugConsoleManager inGameDebugConsoleManager;
+    
     [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
     private Label semanticVersionText;
 
@@ -62,9 +68,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.clientNameTextField)]
     private TextField clientNameTextField;
-
-    [Inject(UxmlName = R.UxmlNames.visualizeAudioLabel)]
-    private Label visualizeAudioLabel;
 
     [Inject(UxmlName = R.UxmlNames.visualizeAudioToggle)]
     private Toggle visualizeAudioToggle;
@@ -152,21 +155,18 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.tabGroup)]
     private VisualElement tabGroup;
     
-    [Inject(UxmlName = R.UxmlNames.viewLogButton)]
-    private Button viewLogButton;
-    
-    [Inject(UxmlName = R.UxmlNames.copyLogButton)]
-    private Button copyLogButton;
-    
     [Inject]
     private Injector injector;
     
-    [Inject]
-    private InGameDebugConsoleManager inGameDebugConsoleManager;
+    [Inject(UxmlName = R.UxmlNames.viewLogButton)]
+    private Button viewLogButton;
     
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
 
+    [Inject(UxmlName = R.UxmlNames.copyLogButton)]
+    private Button copyLogButton;
+    
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
     private BoolPickerControl devModePickerControl;
@@ -206,7 +206,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         connectionThroubleshootingText.HideByDisplay();
         serverErrorResponseText.HideByDisplay();
         
-        toggleRecordingButton.RegisterCallbackButtonTriggered(ToggleRecording);
+        toggleRecordingButton.RegisterCallbackButtonTriggered(_ => ToggleRecording());
 
         clientNameTextField.value = settings.ClientName;
         clientNameTextField.RegisterCallback<NavigationSubmitEvent>(_ => OnClientNameTextFieldSubmit());
@@ -263,7 +263,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         tabGroupControl.AddTabGroupButton(showInputSimulationButton, inputSimulationContainer);
         tabGroupControl.ShowContainer(micViewContainer);
 
-        showSongViewButton.RegisterCallbackButtonTriggered(() =>
+        showSongViewButton.RegisterCallbackButtonTriggered(_ =>
         {
             micSampleRecorder.StopRecording();
             songListControl.Show();
@@ -303,13 +303,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
         // Show/hide menu overlay
         HideMenu();
-        showMenuButton.RegisterCallbackButtonTriggered(() => ShowMenu());
-        hiddenCloseMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
-        closeMenuButton.RegisterCallbackButtonTriggered(() => HideMenu());
+        showMenuButton.RegisterCallbackButtonTriggered(_ => ShowMenu());
+        hiddenCloseMenuButton.RegisterCallbackButtonTriggered(_ => HideMenu());
+        closeMenuButton.RegisterCallbackButtonTriggered(_ => HideMenu());
         
         // View and copy log
-        viewLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
-        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        viewLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
+        copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");
@@ -339,7 +339,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         recordingDeviceLabel.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
         languageLabel.text = TranslationManager.GetTranslation(R.Messages.language);
         devModeLabel.text = TranslationManager.GetTranslation(R.Messages.devMode);
-        visualizeAudioLabel.text = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
+        visualizeAudioToggle.label = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
         closeMenuButton.text = TranslationManager.GetTranslation(R.Messages.back);
 
         recordingDevicePickerControl.UpdateLabelText();

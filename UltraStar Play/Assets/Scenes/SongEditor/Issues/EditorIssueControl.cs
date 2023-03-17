@@ -24,14 +24,14 @@ public class EditorIssueControl : INeedInjection, IInjectionFinishedListener
     {
         if (SongIssue.Severity == ESongIssueSeverity.Warning)
         {
-            issueImage.AddToClassList("warning");
+            issueImage.AddToClassList("warningFontColor");
         }
         else if (SongIssue.Severity == ESongIssueSeverity.Error)
         {
-            issueImage.AddToClassList("error");
+            issueImage.AddToClassList("errorFontColor");
         }
 
-        tooltipControl = new TooltipControl(VisualElement);
+        tooltipControl = new(VisualElement);
         tooltipControl.TooltipText = SongIssue.Message;
     }
 }

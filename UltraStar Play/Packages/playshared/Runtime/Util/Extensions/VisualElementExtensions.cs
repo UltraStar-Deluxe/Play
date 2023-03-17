@@ -6,16 +6,16 @@ using UnityEngine.UIElements;
 
 public static class VisualElementExtensions
 {
-    public static void RegisterCallbackButtonTriggered(this Button button, Action callback)
+    public static void RegisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback)
     {
-        button.RegisterCallback<ClickEvent>(_ => callback());
-        button.RegisterCallback<NavigationSubmitEvent>(_ => callback());
+        button.RegisterCallback<ClickEvent>(callback);
+        button.RegisterCallback<NavigationSubmitEvent>(callback);
     }
 
-    public static void UnregisterCallbackButtonTriggered(this Button button, Action callback)
+    public static void UnregisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback)
     {
-        button.UnregisterCallback<ClickEvent>(_ => callback());
-        button.UnregisterCallback<NavigationSubmitEvent>(_ => callback());
+        button.UnregisterCallback<ClickEvent>(callback);
+        button.UnregisterCallback<NavigationSubmitEvent>(callback);
     }
 
     public static void AddToClassListIfNew(this VisualElement visualElement, params string[] newClasses)
@@ -51,7 +51,7 @@ public static class VisualElementExtensions
 
     public static bool IsVisibleByDisplay(this VisualElement visualElement)
     {
-        return visualElement.style.display != DisplayStyle.None;
+        return visualElement.resolvedStyle.display != DisplayStyle.None;
     }
 
     public static void SetVisibleByDisplay(this VisualElement visualElement, bool isVisible)
@@ -160,17 +160,11 @@ public static class VisualElementExtensions
             return;
         }
 
-        List<VisualElement> visualElementAndAncestors = new();
-        visualElementAndAncestors.Add(visualElement);
-        visualElementAndAncestors.AddRange(visualElement.GetAncestors());
-        visualElementAndAncestors.ForEach(ancestor =>
-        {
-            VisualElement parent = ancestor.parent;
-            if (parent is ScrollView scrollView)
-            {
-                scrollView.ScrollTo(ancestor);
-            }
-        });
+        List<ScrollView> ancestorScrollViews = visualElement
+            .GetAncestors()
+            .OfType<ScrollView>()
+            .ToList();
+        ancestorScrollViews.ForEach(scrollView => scrollView.ScrollTo(visualElement));
     }
 
     public static List<VisualElement> GetAncestors(this VisualElement visualElement)
@@ -190,6 +184,62 @@ public static class VisualElementExtensions
         return ancestors;
     }
 
+    public static void SetBorderColor(this VisualElement visualElement, Color color)
+    {
+        visualElement.style.borderLeftColor = color;
+        visualElement.style.borderRightColor = color;
+        visualElement.style.borderTopColor = color;
+        visualElement.style.borderBottomColor = color;
+    }
+    
+    public static void SetBorderWidth(this VisualElement visualElement, float value)
+    {
+        visualElement.style.borderLeftWidth = value;
+        visualElement.style.borderRightWidth = value;
+        visualElement.style.borderTopWidth = value;
+        visualElement.style.borderBottomWidth = value;
+    }
+
+    public static void SetSelectionAndScrollTo(this ListView listView, int index)
+    {
+        listView.SetSelection(index);
+        listView.ScrollToItem(index);
+    }
+    
+    public static VisualElement GetSelectedVisualElement(this ListView listView)
+    {
+        return listView.Q<VisualElement>(className: "unity-collection-view__item--selected");
+    }
+
+    public static VisualElement GetParent(this VisualElement visualElement, Func<VisualElement, bool> condition=null)
+    {
+        VisualElement parent = visualElement.parent;
+        while (parent != null)
+        {
+            if (condition == null
+                || condition(parent))
+            {
+                return parent;
+            }
+            parent = parent.parent;
+        }
+
+        return null;
+    }
+    
+    public static List<VisualElement> GetParents(VisualElement visualElement)
+    {
+        List<VisualElement> parents = new();
+        VisualElement parent = visualElement.parent;
+        while (parent != null)
+        {
+            parents.Add(parent);
+            parent = parent.parent;
+        }
+
+        return parents;
+    }
+    
     public static void RemoveTemplateContainers(this VisualElement visualElement)
     {
         visualElement
@@ -208,5 +258,6 @@ public static class VisualElementExtensions
     public static VisualElement CloneTreeAndGetFirstChild(this VisualTreeAsset visualTreeAsset)
     {
         return visualTreeAsset.CloneTree().Children().FirstOrDefault();
+
     }
 }

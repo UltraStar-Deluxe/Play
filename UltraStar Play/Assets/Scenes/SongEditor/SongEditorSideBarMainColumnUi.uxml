@@ -29,7 +29,7 @@
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleHelpButton">
                 <ui:Label text="Help" display-tooltip-when-elided="true" name="label" />
-                <MaterialIcon name="icon" icon="help_outline" class="rounded" style="bottom: 1px;" />
+                <MaterialIcon name="icon" icon="help_outline" class="rounded" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="openSongFolderButton">
                 <ui:Label text="Folder" display-tooltip-when-elided="true" name="label" />

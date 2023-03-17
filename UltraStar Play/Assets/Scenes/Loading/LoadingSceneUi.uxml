@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="background">
         <ui:VisualElement name="logoContainer" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center;">
-            <ui:VisualElement name="gameLogo" style="width: 50%; height: 50%; background-image: url(&apos;project://database/Assets/Scenes/Loading/UltraStarPlayLogo_2022_09.png?fileID=2800000&amp;guid=031fb3adf3099b840887ff7dc60c7ad2&amp;type=3#UltraStarPlayLogo_2022_09&apos;); -unity-background-scale-mode: scale-to-fit;" />
+            <ui:VisualElement name="logo" style="width: 50%; height: 50%; background-image: url(&apos;project://database/Assets/Scenes/Loading/UltraStarPlayLogo_2023_02.png?fileID=2800000&amp;guid=09b1a89e71bf9c447b3ecae7f999395e&amp;type=3#UltraStarPlayLogo_2023_02&apos;); -unity-background-scale-mode: scale-to-fit;" />
         </ui:VisualElement>
         <ui:VisualElement name="padding" class="optionsSceneMainContainer">
             <ui:VisualElement name="labelContainer" style="width: 100%; flex-grow: 1; flex-direction: column-reverse;">
