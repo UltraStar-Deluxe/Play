@@ -21,6 +21,10 @@ public class Statistics
 
     public LocalStatistic GetLocalStats(SongMeta songMeta)
     {
+        if (songMeta == null)
+        {
+            return null;
+        }
         LocalStatistics.TryGetValue(songMeta.SongHash, out LocalStatistic result);
         return result;
     }

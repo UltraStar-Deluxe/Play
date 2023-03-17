@@ -86,9 +86,9 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
         }
 
-        showVideoButton.RegisterCallbackButtonTriggered(() => ShowVideoImage());
-        showBackgroundButton.RegisterCallbackButtonTriggered(() => ShowBackgroundImage());
-        showCoverButton.RegisterCallbackButtonTriggered(() => ShowCoverImage());
+        showVideoButton.RegisterCallbackButtonTriggered(_ => ShowVideoImage());
+        showBackgroundButton.RegisterCallbackButtonTriggered(_ => ShowBackgroundImage());
+        showCoverButton.RegisterCallbackButtonTriggered(_ => ShowCoverImage());
 
         dragControl = injector
             .WithRootVisualElement(videoImage)

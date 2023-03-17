@@ -62,8 +62,8 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         partyModeSettings.ObserveEveryValueChanged(it => it.teamSettings.isFreeForAll)
             .Subscribe(_ => UpdateTeams());
 
-        addTeamButton.RegisterCallbackButtonTriggered(() => AddTeam());
-        addGuestButton.RegisterCallbackButtonTriggered(() => AddGuest());
+        addTeamButton.RegisterCallbackButtonTriggered(_ => AddTeam());
+        addGuestButton.RegisterCallbackButtonTriggered(_ => AddGuest());
         UpdateTeams();
     }
 
@@ -122,7 +122,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
         // Delete team
         Button deleteTeamButton = teamVisualElement.Q<Button>(R.UxmlNames.deleteTeamButton);
-        deleteTeamButton.RegisterCallbackButtonTriggered(() => DeleteTeam(team));
+        deleteTeamButton.RegisterCallbackButtonTriggered(_ => DeleteTeam(team));
         deleteTeamButton.SetEnabled(partyModeSettings.teamSettings.teams.Count > 1);
 
         // Sort player profiles
@@ -189,7 +189,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
                 () => playerProfile.Name,
                 newValue => playerProfile.Name = newValue);
             FieldBindingUtils.ResetValueOnBlurIfEmpty(guestNameTextField);
-            deleteGuestButton.RegisterCallbackButtonTriggered(() => DeleteGuestPlayer(team, playerProfile, playerVisualElement));
+            deleteGuestButton.RegisterCallbackButtonTriggered(_ => DeleteGuestPlayer(team, playerProfile, playerVisualElement));
         }
         else
         {
@@ -200,8 +200,8 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         Button leftButton = playerVisualElement.Q<Button>(R.UxmlNames.leftButton);
         Button rightButton = playerVisualElement.Q<Button>(R.UxmlNames.rightButton);
 
-        leftButton.RegisterCallbackButtonTriggered(() => MovePlayerToLeftTeam(team, playerProfile, isGuest));
-        rightButton.RegisterCallbackButtonTriggered(() => MovePlayerToRightTeam(team, playerProfile, isGuest));
+        leftButton.RegisterCallbackButtonTriggered(_ => MovePlayerToLeftTeam(team, playerProfile, isGuest));
+        rightButton.RegisterCallbackButtonTriggered(_ => MovePlayerToRightTeam(team, playerProfile, isGuest));
     }
 
     private void MovePlayerToRightTeam(PartyModeTeamSettings team, PlayerProfile playerProfile, bool isGuest)

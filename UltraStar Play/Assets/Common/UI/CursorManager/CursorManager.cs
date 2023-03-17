@@ -8,7 +8,7 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static CursorManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<CursorManager>();
 
-    private static readonly int cursorWidth = 64;
+    private static readonly int cursorWidth = 32;
     // hotSpot is the pixel coordinate in the texture where the actual cursor is measured.
     // Upper-left corner in the texture is coordinate (0,0).
     private static readonly Vector2 cursorTopLeftCorner = Vector2.zero;

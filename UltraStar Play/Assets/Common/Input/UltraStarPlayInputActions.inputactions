@@ -846,6 +846,17 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "",
+                    "id": "95d4fef6-ffed-4bd6-99e6-477020ade91b",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "randomSong",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "Ctrl+E",
                     "id": "9aaf14f1-f48a-4127-ab33-8c5f14b3f94b",
                     "path": "ButtonWithOneModifier",
@@ -877,17 +888,6 @@
                     "action": "openSongEditor",
                     "isComposite": false,
                     "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "3aee06e2-86e8-40cb-9655-cf88e960c878",
-                    "path": "<Gamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "openSongEditor",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 },
                 {
                     "name": "Ctrl+Tab",

@@ -7,10 +7,19 @@ using UnityEngine;
 
 public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        volumeBeforeMute = -1;
+    }
+    private static int volumeBeforeMute = -1;
+    
     public static VolumeControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VolumeControl>();
 
     [Inject]
     private Settings settings;
+    
+    public bool IsMuted => volumeBeforeMute >= 0;
 
     protected override object GetInstance()
     {
@@ -29,5 +38,19 @@ public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
     private void UpdateGeneralVolume()
     {
         AudioListener.volume = settings.AudioSettings.VolumePercent / 100.0f;
+    }
+
+    public void ToggleMuteAudio()
+    {
+        if (volumeBeforeMute >= 0)
+        {
+            settings.AudioSettings.VolumePercent = volumeBeforeMute;
+            volumeBeforeMute = -1;
+        }
+        else
+        {
+            volumeBeforeMute = settings.AudioSettings.VolumePercent;
+            settings.AudioSettings.VolumePercent = 0;
+        }
     }
 }

@@ -196,7 +196,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MusicPlaybackSpeed,
             newValue => SetMusicPlaybackSpeed(newValue),
             false);
-        resetMusicPlaybackSpeedButton.RegisterCallbackButtonTriggered(() =>
+        resetMusicPlaybackSpeedButton.RegisterCallbackButtonTriggered(_ =>
         {
             SetMusicPlaybackSpeed(1);
             musicPlaybackSpeedSlider.value = 1;
@@ -277,7 +277,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MidiPlaybackOffsetInMillis.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MidiPlaybackOffsetInMillis = newIntValue));
 
-        importMidiFileButton.RegisterCallbackButtonTriggered(() => importMidiFileDialogControl.OpenDialog());
+        importMidiFileButton.RegisterCallbackButtonTriggered(_ => importMidiFileDialogControl.OpenDialog());
 
         // Speech recognition
         Bind(speechRecognitionModelPathTextField,
@@ -315,7 +315,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(audioSeparationCommandTextField,
             () => settings.SongEditorSettings.AudioSeparationCommand,
             newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
-        audioSeparationButton.RegisterCallbackButtonTriggered(() => audioSeparationManager.ProcessSongMeta(songMeta));
+        audioSeparationButton.RegisterCallbackButtonTriggered(_ => audioSeparationManager.ProcessSongMeta(songMeta));
 
         // Show / hide VisualElements
         Bind(showLyricsAreaToggle,
