@@ -23,6 +23,10 @@
     margin: 0;
 }
 
+.unity-base-text-field.multiline > .unity-base-text-field__input {
+    height: auto;
+}
+
 .unity-base-text-field__input {
     --unity-cursor-color: var(--font-color-inverted);
     color: var(--font-color-inverted);

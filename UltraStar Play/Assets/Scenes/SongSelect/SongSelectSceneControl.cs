@@ -50,9 +50,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
-    [Inject(UxmlName = R.UxmlNames.inputLegend)]
-    private VisualElement inputLegend;
-
     [Inject(UxmlName = R.UxmlNames.songIndexLabel)]
     private Label songIndexLabel;
 
@@ -217,8 +214,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
     
-    public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; }
-
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
     {
@@ -261,6 +256,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                                         && PartyModeSettings.songSelectionSettings.songPoolPlaylist != null;
     public bool CanUseSongSelectionJoker => PartyModeSceneData.remainingJokerCount != 0;
 
+    public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
     private readonly GameRoundSettingsUiControl gameRoundSettingsUiControl = new();
@@ -322,7 +318,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         startButton.RegisterCallbackButtonTriggered(_ => AttemptStartSong());
         startButton.Focus();
 
-        quitSceneButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.MainScene));
+        quitSceneButton.RegisterCallbackButtonTriggered(_ => QuitSongSelect());
 
         songIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{SelectedSongIndex + 1}"));
 

@@ -96,9 +96,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     [Inject(UxmlName = R.UxmlNames.playerUiContainer)]
     private VisualElement playerUiContainer;
 
-    [Inject(UxmlName = R.UxmlNames.inputLegend)]
-    private VisualElement inputLegend;
-
     [Inject(UxmlClass = R.UssClasses.playerInfoUiList)]
     private List<VisualElement> playerInfoUiLists;
     
@@ -183,6 +180,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         injector.Inject(countdownControl);
         injector.Inject(medleyControl);
         injector.Inject(audioFadeInControl);
+        injector.Inject(modifierControl);
     }
 
     private void Start()
@@ -923,90 +921,35 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private void UpdateInputLegend()
     {
-        inputLegend.Query<Label>()
-            .Where(label => label is not FontIcon)
-            .ForEach(label => label.RemoveFromHierarchy());
-
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-            TranslationManager.GetTranslation(R.Messages.back),
-            inputLegend);
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor,
-            TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
-            inputLegend);
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_restartSong,
-            TranslationManager.GetTranslation(R.Messages.action_restart),
-            inputLegend);
-
-        if (inputManager.InputDeviceEnum == EInputDevice.Touch)
-        {
-            inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-                TranslationManager.GetTranslation(R.Messages.continue_),
-                TranslationManager.GetTranslation(R.Messages.action_doubleTap))));
-            inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-                TranslationManager.GetTranslation(R.Messages.action_openContextMenu),
-                TranslationManager.GetTranslation(R.Messages.action_longPress))));
-        }
-        else
-        {
-            inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-                TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
-                TranslationManager.GetTranslation(R.Messages.action_navigateRight))));
-        }
-    }
-
-    public void CloseDialog()
-    {
-        if (dialogControl == null)
-        {
-            return;
-        }
-
-        dialogControl.CloseDialog();
-        dialogControl = null;
-    }
-
-    protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
-    {
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_togglePause),
-            () => TogglePlayPause());
-
-        webcamControl.AddToContextMenu(contextMenuPopup);
-        
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart),
-            () => Restart());
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
-            () => SkipToNextSingableNote());
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
-            () => FinishScene(false, false));
-        if (!HasPartyModeSceneData)
-        {
-            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
-            () => OpenSongInEditor());
-        }
-
-        contextMenuPopup.AddSeparator();
-
-        // Button to separate audio or slider to change vocals audio
-        if (SongMetaUtils.VocalsAudioResourceExists(SongMeta)
-            && SongMetaUtils.InstrumentalAudioResourceExists(SongMeta))
-        {
-            contextMenuPopup.AddVisualElement(new Label("Vocals Volume"));
-            Slider vocalsVolumeSlider = new();
-            vocalsVolumeSlider.lowValue = 0;
-            vocalsVolumeSlider.highValue = 100;
-            vocalsVolumeSlider.value = settings.AudioSettings.VocalsAudioVolumePercent;
-            vocalsVolumeSlider.RegisterValueChangedCallback(evt =>
-            {
-                settings.AudioSettings.VocalsAudioVolumePercent = (int)evt.newValue;
-            });
-
-            contextMenuPopup.AddVisualElement(vocalsVolumeSlider);
-        }
-        else
-        {
-            contextMenuPopup.AddButton("Separate audio",
-                () => audioSeparationManager.ProcessSongMeta(SongMeta));
-        }
+        // inputLegend.Query<Label>()
+        //     .Where(label => label is not FontIcon)
+        //     .ForEach(label => label.RemoveFromHierarchy());
+        //
+        // InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
+        //     TranslationManager.GetTranslation(R.Messages.back),
+        //     inputLegend);
+        // InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor,
+        //     TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+        //     inputLegend);
+        // InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_restartSong,
+        //     TranslationManager.GetTranslation(R.Messages.action_restart),
+        //     inputLegend);
+        //
+        // if (inputManager.InputDeviceEnum == EInputDevice.Touch)
+        // {
+        //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
+        //         TranslationManager.GetTranslation(R.Messages.continue_),
+        //         TranslationManager.GetTranslation(R.Messages.action_doubleTap))));
+        //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
+        //         TranslationManager.GetTranslation(R.Messages.action_openContextMenu),
+        //         TranslationManager.GetTranslation(R.Messages.action_longPress))));
+        // }
+        // else
+        // {
+        //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
+        //         TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
+        //         TranslationManager.GetTranslation(R.Messages.action_navigateRight))));
+        // }
     }
 
     public void FadeOutLyrics(Voice voice, float animTimeInSeconds)

@@ -1,8 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SongSelectScenePlayerEntryUi" src="project://database/Assets/Scenes/SongSelect/SongSelectScenePlayerEntryUi.uxml?fileID=9197481963319205126&amp;guid=2ed7369d5aa777249b1792e2c24f3011&amp;type=3#SongSelectScenePlayerEntryUi" />
-    <ui:Template name="SongSelectGameRoundOverlayUi" src="project://database/Packages/playsharedui/Runtime/UIDocuments/SongQueueUi.uxml?fileID=9197481963319205126&amp;guid=7e90fb1f4cdd0044a978248fba705341&amp;type=3#SongQueueUi" />
+    <ui:Template name="SongQueueUi" src="project://database/Packages/playsharedui/Runtime/UIDocuments/SongQueueUi.uxml?fileID=9197481963319205126&amp;guid=7e90fb1f4cdd0044a978248fba705341&amp;type=3#SongQueueUi" />
     <ui:Template name="SongSelectEditPlaylistDialogUi" src="project://database/Assets/Scenes/SongSelect/SongSelectEditPlaylistDialogUi.uxml?fileID=9197481963319205126&amp;guid=af37599eec0180945aa2d81a36e690b2&amp;type=3#SongSelectEditPlaylistDialogUi" />
     <ui:Template name="SongSelectSearchPropertyDialogUi" src="project://database/Assets/Scenes/SongSelect/SongSelectSearchPropertyDialogUi.uxml?fileID=9197481963319205126&amp;guid=44706470e03421f4e91963b292b3d176&amp;type=3#SongSelectSearchPropertyDialogUi" />
+    <ui:Template name="GameRoundModifierDialogUi" src="project://database/Packages/playshared/Runtime/GameRounds/GameRoundModifierDialogUi.uxml?fileID=9197481963319205126&amp;guid=880dc6db80bf20f4ca31b5dcaf892586&amp;type=3#GameRoundModifierDialogUi" />
     <ui:VisualElement name="background" style="width: 100%; height: 100%;">
         <ui:VisualElement name="topContent" style="flex-shrink: 0; flex-direction: row;">
             <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
@@ -14,9 +15,14 @@
                         <ui:Label text="Song Select" name="sceneTitle" class="titleText" style="-unity-font-style: bold; flex-shrink: 1; min-width: 120px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:Button display-tooltip-when-elided="true" name="toggleSongQueueOverlayButton" class="squareButton ml-auto">
-                    <MaterialIcon tabindex="-1" name="toggleSongQueueIcon" icon="list" />
-                </ui:Button>
+                <ui:VisualElement name="buttonRow" class="ml-auto mr-2">
+                    <ui:Button display-tooltip-when-elided="true" name="selectRandomSongButton" class="squareButton">
+                        <MaterialIcon tabindex="-1" name="selectRandomSongIcon" icon="casino" />
+                    </ui:Button>
+                    <ui:Button display-tooltip-when-elided="true" name="toggleSongQueueOverlayButton" class="squareButton ml-2">
+                        <MaterialIcon tabindex="-1" name="toggleSongQueueIcon" icon="list" />
+                    </ui:Button>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="centerContent" style="flex-grow: 1; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;">
@@ -113,6 +119,22 @@
                             </ui:VisualElement>
                         </ui:VisualElement>
                     </ui:VisualElement>
+                    <ui:VisualElement name="partySettingsContainer" class="smallerFont" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; margin-bottom: 5px; margin-top: 5px;">
+                        <ui:Label tabindex="-1" text="Party Settings" display-tooltip-when-elided="true" name="partySettingsTitleLabel" style="margin-left: auto; margin-right: auto;" />
+                        <ui:VisualElement name="finishConditionContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-left: 15px;">
+                            <ui:Label tabindex="-1" text="•" display-tooltip-when-elided="true" name="dot" style="position: absolute; left: -10px;" />
+                            <ui:Label tabindex="-1" text="Reach end of song" display-tooltip-when-elided="true" name="finishConditionDescription" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="unconditionalModifierConditionContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-left: 15px;">
+                            <ui:Label tabindex="-1" text="•" display-tooltip-when-elided="true" name="dot" style="position: absolute; left: -10px;" />
+                            <ui:Label tabindex="-1" text="Pass the mic, Short song" display-tooltip-when-elided="true" name="unconditionalModifierDescription" style="margin-top: auto; white-space: normal;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="conditionalModifierConditionContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; margin-left: 15px;">
+                            <ui:Label tabindex="-1" text="•" display-tooltip-when-elided="true" name="dot" style="position: absolute; left: -10px;" />
+                            <ui:Label tabindex="-1" text="&apos;Hide lyrics&apos; when score is between 1000 and 9000" display-tooltip-when-elided="true" name="conditionalModifierDescription" style="margin-top: auto; white-space: normal;" />
+                        </ui:VisualElement>
+                        <ChipsCombo name="modifierChipsCombo" label="Modifiers" style="flex-direction: column; align-items: stretch;" />
+                    </ui:VisualElement>
                     <ui:VisualElement scroll-deceleration-rate="0,135" elasticity="0,1" name="playerList" class="pr-2 flexWrapScrollView" style="align-items: flex-start; flex-wrap: wrap; flex-direction: row;">
                         <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
                         <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
@@ -122,7 +144,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="songQueueOverlay" class="overlay overlayBackground" style="max-width: 40%; justify-content: flex-start; align-items: stretch; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; width: auto; display: none;">
             <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center;" />
-            <ui:Instance template="SongSelectGameRoundOverlayUi" name="songQueueUi" picking-mode="Ignore" style="flex-grow: 1;" />
+            <ui:Instance template="SongQueueUi" name="songQueueUi" picking-mode="Ignore" style="flex-grow: 1;" />
             <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: space-between;">
                 <ui:Button text="Add" display-tooltip-when-elided="true" name="addToSongQueueAsNewButton" enable-rich-text="false" style="margin-right: 5px;" />
                 <ui:Button text="Add as Medley" display-tooltip-when-elided="true" name="addToSongQueueAsMedleyButton" enable-rich-text="false" />
@@ -157,6 +179,9 @@
                     <ui:Button text="Playlist-B" display-tooltip-when-elided="true" style="width: 100%;" />
                 </ui:ScrollView>
             </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="modifierDialogOverlay" class="overlay" style="background-color: rgba(0, 0, 0, 0); display: none;">
+            <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" class="overlayBackground roundCorners" style="max-height: 90%; max-width: 90%; min-width: 50%;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -14,6 +14,7 @@
                 <MaterialIcon tabindex="-1" name="noMicIcon" icon="mic_off" class="secondaryFontColor textOutline" style="display: none;" />
             </ui:Button>
         </ui:VisualElement>
+        <ui:Label tabindex="-1" text="Team Red" display-tooltip-when-elided="true" name="teamLabel" focusable="false" class="smallFont" style="-unity-text-align: upper-center;" />
         <ui:Button text="P1" display-tooltip-when-elided="true" name="toggleVoiceButton" class="transparentButton smallerFont" style="height: auto;" />
     </ui:VisualElement>
 </ui:UXML>

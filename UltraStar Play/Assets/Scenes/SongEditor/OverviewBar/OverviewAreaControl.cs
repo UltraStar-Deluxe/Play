@@ -77,7 +77,8 @@ public class OverviewAreaControl : IInjectionFinishedListener
     {
         if (!songAudioPlayer.IsFullyLoaded
             // Must be an audio format. Getting all the samples does not work with video files.
-            || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3)))
+            || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3))
+            || !VisualElementUtils.HasGeometry(overviewArea))
         {
             return;
         }

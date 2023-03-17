@@ -20,9 +20,6 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(Key = nameof(messageDialogUi))]
     private VisualTreeAsset messageDialogUi;
     
-    [Inject(UxmlName = R.UxmlNames.dialogContainer)]
-    private VisualElement dialogContainer;
-    
     [Inject(UxmlName = R_PlayShared.UxmlNames.micButton)]
     private Button micButton;
     
@@ -124,6 +121,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micProgressBarRecordingControl.MicProfile = MicProfile;
 
         togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ => IsSelected.Value = !IsSelected.Value);
+        micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
         
         IsSelected.Subscribe(newValue =>
         {
@@ -212,26 +210,15 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
 
         VisualElement dialog = messageDialogUi.CloneTreeAndGetFirstChild();
-        dialogContainer.Add(dialog);
-        dialogContainer.ShowByDisplay();
-        
+        visualElement.GetRootVisualElement().Add(dialog);
+
         micSelectionDialogControl = injector
             .WithRootVisualElement(dialog)
             .CreateAndInject<MicSelectionDialogControl>();
         micSelectionDialogControl.Title = $"Select Microphone for {PlayerProfile.Name}";
-        micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ => OnMicSelectionDialogClosed());
+        micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ => micSelectionDialogControl = null);
         micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;
         micSelectionDialogControl.MicProfiles = micProfiles;
-    }
-
-    private void OnMicSelectionDialogClosed()
-    {
-        if (micSelectionDialogControl == null)
-        {
-            return;
-        }
-        micSelectionDialogControl = null;
-        dialogContainer.HideByDisplay();
     }
     
     public void SetSelected(bool newValue, bool force)
@@ -243,7 +230,6 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             return;
         }
 
-        Debug.Log($"Select player profile '{PlayerProfile.Name}': {newValue}");
         PlayerProfile.IsSelected = newValue;
         selectedChangedEventStream.OnNext(newValue);
     }
