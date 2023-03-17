@@ -12,12 +12,7 @@ public class SongRating
     public static readonly SongRating LeadSinger = new(ESongRating.LeadSinger, 7500, R.Messages.rating_song_leadSinger);
     public static readonly SongRating Superstar = new(ESongRating.Superstar, 8500, R.Messages.rating_song_superStar);
     public static readonly SongRating Ultrastar = new(ESongRating.Ultrastar, 9000, R.Messages.rating_song_ultraStar);
-
-    public enum ESongRating
-    {
-        ToneDeaf = 0, Amateur = 1, Wannabe = 2, Hopeful = 3, RisingStar = 4, LeadSinger = 5, Superstar = 6, Ultrastar = 7
-    }
-
+    
     private readonly string i18nCode;
     public ESongRating EnumValue { get; private set; }
     public double ScoreThreshold { get; private set; }
@@ -29,8 +24,6 @@ public class SongRating
             return TranslationManager.GetTranslation(i18nCode);
         }
     }
-
-    public Color BackgroundColor { get; private set; }
 
     private static List<SongRating> values;
     public static List<SongRating> Values

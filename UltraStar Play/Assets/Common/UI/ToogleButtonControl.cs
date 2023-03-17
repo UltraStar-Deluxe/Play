@@ -37,7 +37,7 @@ public class ToogleButtonControl
         this.offIcon = offIcon;
         IsOn = initialIsOn;
 
-        button.RegisterCallbackButtonTriggered(() =>
+        button.RegisterCallbackButtonTriggered(_ =>
         {
             bool oldValue = IsOn;
             bool newValue = !IsOn;

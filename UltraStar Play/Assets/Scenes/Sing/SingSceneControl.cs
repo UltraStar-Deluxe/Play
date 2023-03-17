@@ -34,13 +34,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public VisualTreeAsset playerUi;
 
     [InjectedInInspector]
+    public VisualTreeAsset playerInfoUi;
+
+    [InjectedInInspector]
     public VisualTreeAsset sentenceRatingUi;
 
     [InjectedInInspector]
     public VisualTreeAsset noteUi;
-
-    [InjectedInInspector]
-    public VisualTreeAsset dialogUi;
 
     [InjectedInInspector]
     public VisualTreeAsset perfectEffectStarUi;
@@ -96,15 +96,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     [Inject(UxmlName = R.UxmlNames.playerUiContainer)]
     private VisualElement playerUiContainer;
 
-    [Inject(UxmlName = R.UxmlNames.pauseOverlay)]
-    private VisualElement pauseOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.doubleClickToTogglePauseElement)]
-    private VisualElement doubleClickToTogglePauseElement;
-
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
+    [Inject(UxmlClass = R.UssClasses.playerInfoUiList)]
+    private List<VisualElement> playerInfoUiLists;
+    
     [Inject]
     private UIDocument uiDocument;
 
@@ -159,9 +156,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private readonly TimeBarControl timeBarControl = new();
 
     private MessageDialogControl dialogControl;
-    public bool IsDialogOpen => dialogControl != null;
 
-    private readonly ContextMenuControl contextMenuControl = new();
+    private readonly SingSceneGovernanceControl singSceneGovernanceControl = new();
     private readonly CommonScoreControl commonScoreControl = new();
     private readonly SingSceneCountdownControl countdownControl = new();
     private readonly SingSceneAudioFadeInControl audioFadeInControl = new();
@@ -187,12 +183,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         injector.Inject(countdownControl);
         injector.Inject(medleyControl);
         injector.Inject(audioFadeInControl);
-
-        // Register ContextMenu
-        injector
-            .WithRootVisualElement(doubleClickToTogglePauseElement)
-            .Inject(contextMenuControl);
-        contextMenuControl.FillContextMenuAction = FillContextMenu;
     }
 
     private void Start()
@@ -202,10 +192,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         startTimeInSeconds = Time.time;
 
-        pauseOverlay.HideByDisplay();
-        new DoubleClickControl(doubleClickToTogglePauseElement).DoublePointerDownEventStream
-            .Subscribe(_ => TogglePlayPause());
-
+        injector.Inject(singSceneGovernanceControl);
+        
         // Prepare player UI layout (depends on player count)
         PreparePlayerUiLayout();
 
@@ -242,9 +230,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         // Create warning about missing microphones
-        if (!sceneData.IsMedley || sceneData.MedleySongIndex == 0)
+        if (!playerProfilesWithoutMic.IsNullOrEmpty())
         {
-            CreateWarningAboutMissingMicrophonesIfNeeded(playerProfilesWithoutMic);
+            ShowMissingMicrophonesDialog(playerProfilesWithoutMic);
         }
 
         webcamControl.InitWebcam();
@@ -275,64 +263,39 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         // Update TimeBar every second
-        if (sceneData.IsMedley)
+        StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
         {
-            StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
-            {
-                timeBarControl?.UpdateTimeValueLabel(
-                    songAudioPlayer.PositionInSongInMillis - medleyControl.MedleyStartWithCountdownInMillis,
-                    medleyControl.MedleyDurationWithCountdownInMillis);
-            }));
-        }
-        else
-        {
-            StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
-            {
-                timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
-            }));
-        }
-
-        // Start medley if needed
-        if (sceneData.IsMedley)
-        {
-            medleyControl.StartCurrentMedleySong();
-        }
-
-        // Handle party mode
-        injector.Inject(modifierControl);
+            timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
+        }));
     }
 
-    private void CreateWarningAboutMissingMicrophonesIfNeeded(List<PlayerProfile> playerProfilesWithoutMic)
+    private void ShowMissingMicrophonesDialog(List<PlayerProfile> playerProfilesWithoutMic)
     {
-        string playerNameCsv = string.Join(", ", playerProfilesWithoutMic.Select(it => it.Name).ToList());
-        if (!playerProfilesWithoutMic.IsNullOrEmpty())
+        if (dialogControl != null)
         {
-            string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
-            string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
-                "playerNameCsv", playerNameCsv);
-
-            VisualElement visualElement = dialogUi.CloneTree();
-            visualElement.AddToClassList("overlay");
-            background.Add(visualElement);
-
-            dialogControl = injector
-                .WithRootVisualElement(visualElement)
-                .CreateAndInject<MessageDialogControl>();
-            dialogControl.Title = title;
-            dialogControl.Message = message;
-            dialogControl.DialogTitleImage.ShowByDisplay();
-            dialogControl.DialogTitleImage.AddToClassList(R.UssClasses.warning);
-            Button okButton = dialogControl.AddButton("OK", CloseDialog);
-            okButton.Focus();
-
-            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+            return;
         }
+        
+        string playerNameCsv = playerProfilesWithoutMic
+            .Select(it => it.Name)
+            .ToList()
+            .JoinWith(", ");
+        string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
+        string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
+            "playerNameCsv", playerNameCsv);
+
+        dialogControl = UiManager.Instance.CreateDialogControl(title);
+        dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
+        dialogControl.Message = message;
+
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);   
     }
 
     public void OnDestroy()
     {
-        webcamControl.Stop();
-        audioFadeInControl.Dispose();
+        webcamControl?.Stop();
+        singSceneGovernanceControl?.Dispose();
+        audioFadeInControl?.Dispose();
     }
     
     private void InitDummySingers()
@@ -361,6 +324,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
             .ToList()
             .ForEach(it => it.RemoveFromHierarchy());
+        playerInfoUiLists.ForEach(playerInfoUiList => playerInfoUiList.Clear());
         if (playerCount <= 1)
         {
             // Add empty VisualElement as spacer. Otherwise the player UI would take all the available space.
@@ -423,7 +387,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
         else
         {
-            topLyricsContainer.HideByDisplay();
+            if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 8)
+            {
+                // Do not show lyrics at the top, but show player info UI.
+                topLyricsContainer.Q<VisualElement>(R.UxmlNames.currentSentenceContainer).HideByDisplay();
+                topLyricsContainer.Q<VisualElement>(R.UxmlNames.nextSentenceContainer).HideByDisplay();
+            }
+            else
+            {
+                topLyricsContainer.HideByDisplay();
+            }
             bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, PlayerControls[0]);
         }
     }
@@ -511,6 +484,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 statistics.RecordSongStarted(SongMeta);
             }
         }
+        
+        singSceneGovernanceControl.Update();
 
         if (sceneData.IsMedley)
         {
@@ -801,6 +776,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         playerControlInjector.AddBindingForInstance(voice);
         playerControlInjector.AddBindingForInstance(micProfile);
         playerControlInjector.AddBindingForInstance(playerControlInjector, RebindingBehavior.Ignore);
+        playerControlInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(playerIndex)));
         playerControlInjector.Inject(playerControl);
 
         PlayerControls.Add(playerControl);
@@ -857,13 +833,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         if (songAudioPlayer.IsPlaying)
         {
-            pauseOverlay.ShowByDisplay();
             songAudioPlayer.PauseAudio();
             PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         }
         else
         {
-            pauseOverlay.HideByDisplay();
             songAudioPlayer.PlayAudio();
             PlayerControls.ForEach(playerControl =>
             {
@@ -913,6 +887,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         bb.BindExistingInstance(SongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(webcamControl);
+        bb.BindExistingInstance(singSceneGovernanceControl);
         bb.BindExistingInstance(singSceneFinisher);
         bb.BindExistingInstance(countdownControl);
         bb.BindExistingInstance(medleyControl);
@@ -920,6 +896,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         bb.BindExistingInstance(modifierControl);
         bb.BindExistingInstance(alternativeAudioPlayer);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
+        bb.Bind(nameof(playerInfoUi)).ToExistingInstance(playerInfoUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
         bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);
         bb.Bind(nameof(perfectEffectStarUi)).ToExistingInstance(perfectEffectStarUi);

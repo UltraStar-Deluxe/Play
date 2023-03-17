@@ -5,6 +5,8 @@ using SimpleHttpServerForUnity;
 using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 {
@@ -13,6 +15,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         BindingBuilder bb = new();
         bb.BindExistingInstance(ApplicationManager.Instance);
         bb.BindExistingInstance(SceneNavigator.Instance);
+        bb.BindExistingInstance(SceneRecipeManager.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
         bb.BindExistingInstance(SongMetaManager.Instance);
         bb.BindExistingInstance(CursorManager.Instance);
@@ -23,6 +26,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(UltraStarPlayTranslationManager.Instance);
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
         bb.BindExistingInstance(WebCamManager.Instance);
+        bb.BindExistingInstance(DontDestroyOnLoadManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
         bb.BindExistingInstance(StatsManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
@@ -35,6 +39,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SongQueueManager.Instance);
         bb.BindExistingInstance(JobManager.Instance);   bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
+        bb.BindExistingInstance(GlobalInputControl.Instance);
+        bb.BindExistingInstance(VolumeControl.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
         bb.BindExistingInstance(HttpServer.Instance as UltraStarPlayHttpServer);
@@ -44,9 +50,9 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         EventSystem eventSystem = GameObjectUtils.FindComponentWithTag<EventSystem>("EventSystem");
         bb.BindExistingInstance(eventSystem);
 
-        // Lazy binding of UIDocument, because it does not exist in every scene (yet)
-        bb.BindExistingInstanceLazy(() => UIDocumentUtils.FindUIDocumentOrThrow());
-        bb.BindExistingInstanceLazy(() => new PanelHelper(UIDocumentUtils.FindUIDocumentOrThrow()));
+        UIDocument uiDocument = UIDocumentUtils.FindUIDocumentOrThrow();
+        bb.BindExistingInstance(uiDocument);
+        bb.BindExistingInstance(new PanelHelper(uiDocument));
 
         // Lazy binding of settings, because they are not needed in every scene and loading the settings takes time.
         bb.Bind(typeof(ISettings)).ToExistingInstance(() => SettingsManager.Instance.Settings);

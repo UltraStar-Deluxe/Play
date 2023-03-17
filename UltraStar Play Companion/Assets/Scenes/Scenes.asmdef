@@ -9,7 +9,8 @@
         "com.achimmihca.protrans",
         "com.achimmihca.uniinject",
         "Unity.InputSystem",
-        "playshared"
+        "playshared",
+        "playsharedui"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

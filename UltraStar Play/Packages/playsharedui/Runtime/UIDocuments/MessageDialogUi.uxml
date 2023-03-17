@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="overlay" class="modalDialogContainer overlay">
+        <ui:VisualElement name="dialogContent" class="focusableNavigatorRoot staticPanel" style="position: absolute; border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; justify-content: flex-start; align-items: center; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; min-width: 350px; min-height: 100px; max-width: 90%; max-height: 90%;">
+            <ui:VisualElement name="dialogTitleImageAndTextContainer" style="width: 100%; flex-direction: row; justify-content: flex-start; align-items: center; border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; flex-shrink: 0;">
+                <ui:VisualElement name="dialogTitleImage" class="dialogTitleImage warning" style="display: none;" />
+                <MaterialIcon name="dialogTitleMaterialIcon" style="display: none;" />
+                <ui:Label text="Dialog Title" name="dialogTitle" class="dialogTitle" style="flex-grow: 1;" />
+                <ui:Button display-tooltip-when-elided="true" name="defaultCloseDialogButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
+                    <MaterialIcon tabindex="-1" picking-mode="Ignore" name="closeIcon" icon="close" style="font-size: 20px;" />
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%;">
+                <ui:VisualElement name="dialogMessageContainer" style="align-items: center; justify-content: center; flex-grow: 1;">
+                    <ui:Label text="Lorem ipsum dolor sit amet, vix et essent equidem delenit. Vix offendit instructior interpretaris ex. Sed ei tollit referrentur definitionem, aeque gloriatur mea cu. Conceptam consetetur qui id, at eos enim indoctum suscipiantur. Sit ad omnes facilis conclusionemque, et sed salutandi concludaturque, nec quot hendrerit in. Lorem ipsum dolor sit amet, vix et essent equidem delenit. Vix offendit instructior interpretaris ex. Sed ei tollit referrentur definitionem, aeque gloriatur mea cu. Conceptam consetetur qui id, at eos enim indoctum suscipiantur. Sit ad omnes facilis conclusionemque, et sed salutandi concludaturque, nec q&#10;uot hendrerit in.&#10;" name="dialogMessage" class="dialogMessage" style="white-space: normal; top: 5px;" />
+                </ui:VisualElement>
+            </ui:ScrollView>
+            <ui:VisualElement name="dialogButtonContainer" style="flex-direction: row; justify-content: center; width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; align-items: center; flex-shrink: 0;">
+                <ui:Button text="OK" name="dummyButton" class="dialogButton" style="display: none;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

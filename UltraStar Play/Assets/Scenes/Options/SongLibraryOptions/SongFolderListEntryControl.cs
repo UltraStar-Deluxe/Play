@@ -85,7 +85,7 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
             textField.value = initialPath.Substring(androidDrivePath.Value.Length);
             UpdateDriveButton();
-            driveButton.RegisterCallbackButtonTriggered(() => ToggleAndroidDrivePath());
+            driveButton.RegisterCallbackButtonTriggered(_ => ToggleAndroidDrivePath());
         }
         else
         {
@@ -96,8 +96,8 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
         if (PlatformUtils.IsStandalone)
         {
-            selectFolderButton.RegisterCallbackButtonTriggered(() => OpenSelectFolderDialog());
-            openSongFolderButton.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(FullPath));
+            selectFolderButton.RegisterCallbackButtonTriggered(_ => OpenSelectFolderDialog());
+            openSongFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(FullPath));
         }
         else
         {
@@ -105,7 +105,7 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
             openSongFolderButton.HideByDisplay();
         }
 
-        deleteButton.RegisterCallbackButtonTriggered(() => deleteEventStream.OnNext(true));
+        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
         textField.RegisterValueChangedCallback(evt =>
         {
             CheckPathIsValid();

@@ -60,7 +60,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
         InputManager.GetInputAction(R.InputActions.usplay_enter).PerformedAsObservable()
             .Subscribe(_ => StartCoroutine(FinishAfterDelay()));
-        hiddenContinueButton.RegisterCallbackButtonTriggered(() => StartCoroutine(FinishAfterDelay()));
+        hiddenContinueButton.RegisterCallbackButtonTriggered(_ => StartCoroutine(FinishAfterDelay()));
 
         // Keep mobile devices from turning off the screen while the game is running.
         Screen.sleepTimeout = (int)0f;
@@ -92,7 +92,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             }
         }
 
-        FinishScene();
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () => FinishScene()));
     }
 
     private void ShowGeneralErrorMessage()
@@ -102,8 +102,8 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         unexpectedErrorLabel.text = TranslationManager.GetTranslation(R.Messages.loadingScene_unexpectedErrorMessage,
             "path", ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath));
         viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
-        viewMoreButton.RegisterCallbackButtonTriggered(() => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_logFiles)));
-        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_logFiles)));
+        copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");

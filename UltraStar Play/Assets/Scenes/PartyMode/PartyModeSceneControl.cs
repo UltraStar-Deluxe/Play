@@ -80,8 +80,8 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
 
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
-        continueButton.RegisterCallbackButtonTriggered(() => OnContinue());
+        backButton.RegisterCallbackButtonTriggered(_ => OnBack());
+        continueButton.RegisterCallbackButtonTriggered(_ => OnContinue());
 
         configPart.Subscribe(_ => UpdateConfigPart());
         UpdateConfigPart();

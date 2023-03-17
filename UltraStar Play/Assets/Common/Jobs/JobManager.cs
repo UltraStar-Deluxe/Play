@@ -182,7 +182,7 @@ public class JobManager : MonoBehaviour, INeedInjection
             .ForEach(visualElement => visualElement.RemoveFromHierarchy());
 
         toggleJobListButton = jobListElement.Q<Button>(R.UxmlNames.toggleJobListButton);
-        toggleJobListButton.RegisterCallbackButtonTriggered(() => ToggleJobListMinimized());
+        toggleJobListButton.RegisterCallbackButtonTriggered(_ => ToggleJobListMinimized());
 
         jobListElement.HideByDisplay();
         if (isJobListMinimized)

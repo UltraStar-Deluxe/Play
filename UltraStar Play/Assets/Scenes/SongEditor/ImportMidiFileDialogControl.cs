@@ -99,8 +99,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         injector.Inject(midiFileImporter);
         
-        closeImportMidiDialogButton.RegisterCallbackButtonTriggered(() => CloseDialog());
-        previewMidiTrackAndChannelButton.RegisterCallbackButtonTriggered(() =>
+        closeImportMidiDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
+        previewMidiTrackAndChannelButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (midiManager.IsPlayingMidiFile)
             {
@@ -111,12 +111,12 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
                 StartPreview();
             }
         });
-        importMidiFileDialogButton.RegisterCallbackButtonTriggered(() =>
+        importMidiFileDialogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ImportMidiFile();
             CloseDialog();
         });
-        VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(importMidiFileDialogOverlay, CloseDialog);
+        VisualElementUtils.RegisterDirectClickCallback(importMidiFileDialogOverlay, CloseDialog);
 
         midiTrackIndexPickerControl = new(midiTrackIndexPicker, new List<TrackAndChannel>());
         midiTrackIndexPickerControl.AutoSmallFont = false;

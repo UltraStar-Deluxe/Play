@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="editPlaylistDialog" class="roundCorners focusableNavigatorRoot" style="background-color: rgba(32, 32, 32, 0.88); width: 400px; height: auto; padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px;">
+        <ui:Label text="Create Playlist" display-tooltip-when-elided="true" name="editPlaylistDialogTitle" style="padding-left: 5px;" />
+        <ui:TextField picking-mode="Ignore" text="Playlist Name" name="playlistNameTextField" style="margin-left: 0; margin-right: 0; margin-top: 10px; margin-bottom: 0;" />
+        <ui:VisualElement name="buttonRow" style="flex-direction: row; justify-content: space-around; margin-top: 10px;">
+            <ui:Button text="Delete" display-tooltip-when-elided="true" name="deletePlaylistButton" class="controlMinWidth" />
+            <ui:Button text="Confirm Delete" display-tooltip-when-elided="true" name="confirmDeletePlaylistButton" class="wideControl controlMinWidth" style="display: none;" />
+            <ui:Button text="Cancel" display-tooltip-when-elided="true" name="cancelDeletePlaylistButton" class="controlMinWidth" style="display: none;" />
+            <ui:Button text="Continue" display-tooltip-when-elided="true" name="submitEditPlaylistButton" class="controlMinWidth" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

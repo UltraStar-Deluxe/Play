@@ -27,8 +27,8 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
         takeWebCamImageButton = ItemPicker.Q<Button>(R.UxmlNames.takeWebCamImageButton);
         removeWebCamImageButton = ItemPicker.Q<Button>(R.UxmlNames.removeWebCamImageButton);
 
-        takeWebCamImageButton.RegisterCallbackButtonTriggered(() => TakeWebCamImage());
-        removeWebCamImageButton.RegisterCallbackButtonTriggered(() => RemoveWebCamImage());
+        takeWebCamImageButton.RegisterCallbackButtonTriggered(_ => TakeWebCamImage());
+        removeWebCamImageButton.RegisterCallbackButtonTriggered(_ => RemoveWebCamImage());
 
         // The initial value might have be set in the base constructor, where the uiManager was not defined yet.
         // The the image must be updated now.

@@ -45,6 +45,7 @@ public static partial class R
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
+        public const string logo = "logo";
         public const string lyricsAccordionItem = "lyricsAccordionItem";
         public const string lyricsLabel = "lyricsLabel";
         public const string MainSceneMenuUi = "MainSceneMenuUi";

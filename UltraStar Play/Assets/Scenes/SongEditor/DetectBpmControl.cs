@@ -10,7 +10,7 @@ public class DetectBpmControl
 
     public DetectBpmControl(Button button, Label label)
     {
-        button.RegisterCallbackButtonTriggered(() =>
+        button.RegisterCallbackButtonTriggered(_ =>
         {
             // Automatically reset the counter after a very long delay
             if (Time.time - lastClickTime > 2)

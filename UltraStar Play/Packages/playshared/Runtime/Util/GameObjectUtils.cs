@@ -106,4 +106,10 @@ public static class GameObjectUtils
         selfInstance.transform.SetParent(null);
         GameObject.DontDestroyOnLoad(selfInstance.gameObject);
     }
+
+    public static GameObject FindAnyGameObject()
+    {
+        // Every GameObject has a Transform component.
+        return GameObject.FindObjectOfType<Transform>().gameObject;
+    }
 }

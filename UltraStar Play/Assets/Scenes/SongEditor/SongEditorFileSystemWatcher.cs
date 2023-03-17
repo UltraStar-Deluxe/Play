@@ -137,19 +137,8 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
 
     private void CreateFileSystemWatcher(string filter, FileSystemEventHandler fileSystemEventHandler)
     {
-        FileSystemWatcher fileSystemWatcher = new(FolderPath, filter);
+        FileSystemWatcher fileSystemWatcher = FileSystemWatcherUtils.CreateFileSystemWatcher(FolderPath, filter, fileSystemEventHandler);
         disposables.Add(fileSystemWatcher);
-
-        fileSystemWatcher.Changed += fileSystemEventHandler;
-        fileSystemWatcher.Created += fileSystemEventHandler;
-        // Handle the other RenamedEventArgs also by using the fileSystemEventHandler
-        fileSystemWatcher.Renamed += (sender, evt) => fileSystemEventHandler.Invoke(sender, evt);
-        fileSystemWatcher.NotifyFilter = NotifyFilters.FileName
-                                         | NotifyFilters.DirectoryName
-                                         | NotifyFilters.LastWrite
-                                         | NotifyFilters.CreationTime;
-        fileSystemWatcher.IncludeSubdirectories = false;
-        fileSystemWatcher.EnableRaisingEvents = true;
     }
 
     private void OnVideoFileChanged(object sender, FileSystemEventArgs e)

@@ -97,9 +97,9 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.Permissions.Subscribe(permissions => OnPermissionsChanged(permissions));
         
         HideSongDetails();
-        backButton.RegisterCallbackButtonTriggered(() => HideSongDetails());
-        favoriteButton.RegisterCallbackButtonTriggered(() => ToggleFavorite());
-        enqueueButton.RegisterCallbackButtonTriggered(() => EnqueueSong());
+        backButton.RegisterCallbackButtonTriggered(_ => HideSongDetails());
+        favoriteButton.RegisterCallbackButtonTriggered(_ => ToggleFavorite());
+        enqueueButton.RegisterCallbackButtonTriggered(_ => EnqueueSong());
 
         lyricsAccordionItem.ContentVisible = false;
         enqueueSettingsAccordionItem.ContentVisible = false;

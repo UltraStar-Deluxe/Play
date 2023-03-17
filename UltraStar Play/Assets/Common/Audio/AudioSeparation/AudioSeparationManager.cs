@@ -52,7 +52,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // Create job to show in UI
         if (audioSeparationJob == null)
         {
-            audioSeparationJob = new Job($"Audio separation of '{Path.GetFileName(songMeta.Mp3)}'");
+            audioSeparationJob = new Job($"Vocals separation of '{Path.GetFileName(songMeta.Mp3)}'");
             jobManager.AddJob(audioSeparationJob);
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
@@ -99,8 +99,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     {
         if (audioSeparationProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing audio separation");
-            return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing audio separation"));
+            UiManager.CreateNotification("Already performing vocals separation");
+            return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing vocals separation"));
         }
 
         return Observable.Create<AudioSeparationResult>(o =>

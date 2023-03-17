@@ -1,25 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background">
-        <ui:VisualElement class="optionsSceneMainContainer" style="align-items: stretch;">
-            <ui:VisualElement name="topRow" class="optionsSceneTopRow">
-                <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
-                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <MaterialIcon name="titleImage" icon="sports_esports" />
-                        <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Game Options" name="sceneTitle" class="titleText" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="scoreModeContainer" class="optionsLabelAndItemPicker" style="margin-bottom: 10px;">
-                <ui:Label text="Score" name="Label" class="controlLabel40Percent" />
-                <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="ItemPicker" />
-            </ui:VisualElement>
-            <ItemPicker name="passTheMicTimeItemPicker" label="&apos;Pass the mic&apos; time" min-value="10" max-value="60" step-value="5" class="controlLabel40Percent" style="margin-bottom: 10px;" />
-            <ItemPicker name="reduceAudioVolumeItemPicker" label="&apos;Reduce audio&apos; volume" min-value="0" max-value="10" class="controlLabel40Percent" style="margin-bottom: 10px;" />
-            <ui:VisualElement style="flex-grow: 1; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
-            </ui:VisualElement>
-        </ui:VisualElement>
+    <ui:VisualElement name="loadedOptionsRoot">
+        <ui:DropdownField label="Language" index="-1" choices="a, b, c, d" name="languageDropdownField" class="mb-3" />
+        <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="scoreModePicker" label="Score" />
+        <ItemPicker name="passTheMicTimeItemPicker" label="&apos;Pass the mic&apos; time" min-value="10" max-value="60" step-value="5" style="margin-bottom: 10px;" />
+        <ItemPicker name="reduceAudioVolumeItemPicker" label="&apos;Reduce audio&apos; volume" min-value="0" max-value="10" style="margin-bottom: 10px;" />
     </ui:VisualElement>
 </ui:UXML>

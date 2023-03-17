@@ -241,6 +241,6 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     private void RegisterCallbackToSendSimulationInputRequest(Button uiButton, string keyboardButton)
     {
-        uiButton.RegisterCallbackButtonTriggered(() => SendSimulateInputRequest(keyboardButton));
+        uiButton.RegisterCallbackButtonTriggered(_ => SendSimulateInputRequest(keyboardButton));
     }
 }
