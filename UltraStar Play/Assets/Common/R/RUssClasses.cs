@@ -80,7 +80,6 @@ public static partial class R
         public const string optionsSceneTitleAndImageContainer = "optionsSceneTitleAndImageContainer";
         public const string optionsSceneTitleContainer = "optionsSceneTitleContainer";
         public const string optionsSceneTopRow = "optionsSceneTopRow";
-        public const string outline = "outline";
         public const string outlineOnFocus = "outlineOnFocus";
         public const string overlay = "overlay";
         public const string overlayBackground = "overlayBackground";
