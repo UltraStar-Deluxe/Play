@@ -1,0 +1,331 @@
+VisualElement
+{
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/Inter-VariableFont_slnt,wght%20SDF.asset');
+}
+
+#background {
+    width: 100%;
+    height: 100%;
+}
+
+#buttonRow {
+    flex-direction: row;
+}
+
+#row {
+    flex-direction: row;
+}
+
+.circle
+{
+    border-radius: 50%;
+}
+
+.fullMinHeightUnityContentContainer #unity-content-container {
+    min-height: 100%;
+}
+
+.centerVerticalByMargin {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.ellipsis {
+    text-overflow: ellipsis;
+    -unity-text-overflow-position: end;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.outline {
+    border-color: var(--font-color);
+    border-width: 1px;
+}
+
+.overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+}
+
+.overlayBackground {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.circleButton {
+    width: var(--round-button-size);
+    height: var(--round-button-size);
+    border-radius: var(--round-button-size);
+}
+
+.squareButton {
+    width: var(--control-height);
+    padding: 5px;
+}
+
+.dangerButton {
+    background-color: var(--control-danger);
+}
+
+.dangerButton:hover {
+    background-color: var(--control-danger-accent1);
+}
+
+.dangerButton:focus {
+    background-color: var(--control-danger-accent1);
+}
+
+.roundCorners {
+    border-radius: 5px;
+}
+
+.transparentBackgroundColor {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.transparentBackgroundColor:hover {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.transparentBackgroundColor:focus {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.textFieldHint {
+    position: absolute;
+    left: 10px;
+    color: var(--font-color-inverted);
+    -unity-font-style: italic;
+    font-size: var(--font-size-s);
+}
+
+.transparentBackgroundColor #unity-text-input {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.middleCenterText {
+    -unity-text-align: middle-center;
+}
+
+/*.flexWrapScrollView .unity-scroll-view--vertical > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroll-view__content-viewport > .unity-scroll-view__content-container  {*/
+.flexWrapScrollView #unity-content-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.controlMinWidth {
+    min-width: var(--control-width);
+}
+
+.controlLabel {
+    -unity-text-align: middle-left;
+    width: 300px;
+    font-size: var(--font-size);
+}
+
+.titleImage {
+    -unity-background-scale-mode: scale-to-fit;
+    width: var(--font-size-xl);
+    height: var(--font-size-xl);
+    margin-right: 10px;
+}
+
+.titleText {
+    font-size: var(--font-size-xl);
+}
+
+.titleSubText {
+    font-size: var(--font-size);
+    color: rgb(180, 229, 255);
+}
+
+#dummyButton {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.wideControl {
+    width: var(--control-width-large);
+}
+
+.wideControl {
+    width: var(--control-width-large);
+}
+
+.noBackground TextInput {
+    background-color: rgba(0, 0, 0, 0);
+    color: var(--font-color);
+    border-width: 0;
+}
+
+.iconImage {
+    -unity-background-scale-mode: scale-to-fit;
+    width: var(--font-size-xl);
+    height: var(--font-size-xl);
+}
+
+.iconImageTextSized {
+    -unity-background-scale-mode: scale-to-fit;
+    width: var(--font-size);
+    height: var(--font-size);
+}
+
+.smallFont TextInput {
+    font-size: var(--font-size-s);
+}
+
+.smallFont .unity-text-element {
+    font-size: var(--font-size-s);
+}
+
+Button.smallFont {
+    font-size: var(--font-size-s);
+}
+
+ToggleButton.smallFont {
+    font-size: var(--font-size-s);
+}
+
+Button.smallerFont {
+    font-size: var(--font-size-xs);
+}
+
+ToggleButton.smallerFont {
+    font-size: var(--font-size-xs);
+}
+
+ItemPicker.smallFont Label {
+    font-size: var(--font-size-s);
+}
+
+.xxlFont Label {
+    font-size: var(--font-size-xxl);
+}
+
+Label.xxlFont {
+    font-size: var(--font-size-xxl);
+}
+
+.largerFont Label {
+    font-size: var(--font-size-xl);
+}
+
+Label.largerFont {
+    font-size: var(--font-size-xl);
+}
+
+.largeFont Label {
+    font-size: var(--font-size-l);
+}
+
+Label.largeFont {
+    font-size: var(--font-size-l);
+}
+
+.smallFont Label {
+    font-size: var(--font-size-s);
+}
+
+Label.smallFont {
+    font-size: var(--font-size-s);
+}
+
+.smallerFont Label {
+    font-size: var(--font-size-xs);
+}
+
+Label.smallerFont {
+    font-size: var(--font-size-xs);
+}
+
+.tinyFont Label {
+    font-size: var(--font-size-xxs);
+}
+
+Label.tinyFont {
+    font-size: var(--font-size-xxs);
+}
+
+Button.tinyFont {
+    font-size: var(--font-size-xxs);
+}
+
+#notificationLabel.error {
+    color: var(--font-color-error);
+}
+
+.fontColor {
+    color: var(--font-color);
+    -unity-background-image-tint-color: var(--font-color);
+}
+
+.secondaryFontColor {
+    color: var(--font-color-secondary);
+    -unity-background-image-tint-color: var(--font-color-secondary);
+}
+
+.warningFontColor {
+    color: var(--font-color-warning);
+    -unity-background-image-tint-color: var(--font-color-warning);
+}
+
+.errorFontColor {
+    color: var(--font-color-error);
+    -unity-background-image-tint-color: var(--font-color-error);
+}
+
+.smallControl {
+    max-height: var(--control-height-small);
+}
+
+.smallControl.unity-toggle {
+    max-width: var(--control-height-small);
+}
+
+.marginBottomSmall {
+    margin-bottom: 10px;
+}
+
+.marginBottomSmaller {
+    margin-bottom: 5px;
+}
+
+.outlineOnFocus:focus {
+    border-color: var(--font-color);
+    border-width: 1px;
+}
+
+.textOutline {
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(64, 64, 64, 0.5);
+}
+
+.textShadow {
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+#titleImageAndText #titleImage {
+    margin-right: 10px;
+}
+
+.settingsProblemHintIcon {
+    margin-left: auto;
+}
+
+.wordWrap {
+    white-space: normal;
+}
+
+.wordWrap Label {
+    white-space: normal;
+}
+
+.backgroundTransition {
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.staticPanel {
+    background-color: #344054;
+}

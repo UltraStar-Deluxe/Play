@@ -4,15 +4,14 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
-    private readonly Dictionary<ESongEditorLayer, SongEditorEnumLayer> layerEnumToLayerMap = CreateLayerEnumToLayerMap();
-    private readonly Dictionary<string, SongEditorVoiceLayer> voiceNameToLayerMap = CreateVoiceNameToLayerMap();
+    private Dictionary<ESongEditorLayer, SongEditorEnumLayer> layerEnumToLayerMap;
+    private Dictionary<string, SongEditorVoiceLayer> voiceNameToLayerMap;
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -23,12 +22,19 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private ThemeManager themeManager;
+    
     private readonly Subject<LayerChangedEvent> layerChangedEventStream = new();
     public IObservable<LayerChangedEvent> LayerChangedEventStream => layerChangedEventStream;
 
+    private Dictionary<string, Color32> songEditorLayerNameToColor;
+
     public void OnSceneInjectionFinished()
     {
-        songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+        songEditorLayerNameToColor = themeManager.GetSongEditorLayerColors();
+        layerEnumToLayerMap = CreateLayerEnumToLayerMap();
+        voiceNameToLayerMap = CreateVoiceNameToLayerMap();songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
@@ -170,7 +176,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return new List<SongEditorVoiceLayer>(voiceNameToLayerMap.Values);
     }
 
-    private static Dictionary<string,SongEditorVoiceLayer> CreateVoiceNameToLayerMap()
+    private Dictionary<string,SongEditorVoiceLayer> CreateVoiceNameToLayerMap()
     {
         Dictionary<string, SongEditorVoiceLayer> result = new();
         List<string> voiceNames = new() { Voice.firstVoiceName, Voice.secondVoiceName };
@@ -178,13 +184,13 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         {
             result.Add(voiceName, new SongEditorVoiceLayer(voiceName));
         }
-        result[Voice.firstVoiceName].Color = Colors.CreateColor("#2ecc71");
-        result[Voice.secondVoiceName].Color = Colors.CreateColor("#9b59b6");
+        result[Voice.firstVoiceName].Color =  GetSongEditorLayerColor(Voice.firstVoiceName);
+        result[Voice.secondVoiceName].Color =  GetSongEditorLayerColor(Voice.secondVoiceName);
 
         return result;
     }
 
-    private static Dictionary<ESongEditorLayer, SongEditorEnumLayer> CreateLayerEnumToLayerMap()
+    private Dictionary<ESongEditorLayer, SongEditorEnumLayer> CreateLayerEnumToLayerMap()
     {
         Dictionary<ESongEditorLayer, SongEditorEnumLayer> result = new();
         List<ESongEditorLayer> layerEnums = EnumUtils.GetValuesAsList<ESongEditorLayer>();
@@ -192,12 +198,10 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         {
             result.Add(layerEnum, new SongEditorEnumLayer(layerEnum));
         }
-        result[ESongEditorLayer.MicRecording].Color = Colors.CreateColor("#1D67C2", 200);
-        result[ESongEditorLayer.ButtonRecording].Color = Colors.CreateColor("#138BBA", 200);
-        result[ESongEditorLayer.CopyPaste].Color = Colors.CreateColor("#F08080", 200);
-        result[ESongEditorLayer.MidiFile].Color = Colors.CreateColor("#0F9799", 200);
 
         result[ESongEditorLayer.CopyPaste].IsEditable = false;
+
+        result.ForEach(entry => entry.Value.Color = GetSongEditorLayerColor(entry.Key));
 
         return result;
     }
@@ -339,5 +343,19 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         {
             SetVoiceLayerEditable(voiceLayer.VoiceName, newValue);
         }
+    }
+    
+    private Color32 GetSongEditorLayerColor(ESongEditorLayer songEditorLayerEnum)
+    {
+        return songEditorLayerNameToColor
+            .FirstOrDefault(entry => string.Equals(entry.Key, songEditorLayerEnum.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            .Value;
+    }
+    
+    private Color32 GetSongEditorLayerColor(string voiceName)
+    {
+        return songEditorLayerNameToColor
+            .FirstOrDefault(entry => string.Equals(entry.Key, voiceName, StringComparison.InvariantCultureIgnoreCase))
+            .Value;
     }
 }

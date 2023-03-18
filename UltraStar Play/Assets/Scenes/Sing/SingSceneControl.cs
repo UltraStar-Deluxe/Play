@@ -37,13 +37,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     public VisualTreeAsset playerUi;
 
     [InjectedInInspector]
+    public VisualTreeAsset playerInfoUi;
+
+    [InjectedInInspector]
     public VisualTreeAsset sentenceRatingUi;
 
     [InjectedInInspector]
     public VisualTreeAsset noteUi;
-
-    [InjectedInInspector]
-    public VisualTreeAsset dialogUi;
 
     [InjectedInInspector]
     public VisualTreeAsset perfectEffectStarUi;
@@ -93,20 +93,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     [Inject(UxmlName = R.UxmlNames.playerUiContainer)]
     private VisualElement playerUiContainer;
 
-    [Inject(UxmlName = R.UxmlNames.pauseOverlay)]
-    private VisualElement pauseOverlay;
-
-    [Inject(UxmlName = R.UxmlNames.doubleClickToTogglePauseElement)]
-    private VisualElement doubleClickToTogglePauseElement;
-
     [Inject(UxmlName = R.UxmlNames.inputLegend)]
     private VisualElement inputLegend;
 
+    [Inject(UxmlClass = R.UssClasses.playerInfoUiList)]
+    private List<VisualElement> playerInfoUiLists;
+    
     [Inject]
     private UIDocument uiDocument;
-
-    [Inject]
-    private ThemeManager themeManager;
 
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
@@ -128,10 +122,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     private TimeBarControl timeBarControl;
 
     private MessageDialogControl dialogControl;
-    public bool IsDialogOpen => dialogControl != null;
 
-    private ContextMenuControl contextMenuControl;
     private CommonScoreControl commonScoreControl;
+    private readonly SingSceneGovernanceControl singSceneGovernanceControl = new();
 
     public bool IsCommonScore => settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
                                  && sceneData.SelectedPlayerProfiles.Count >= 2;
@@ -150,10 +143,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
 
         startTimeInSeconds = Time.time;
 
-        pauseOverlay.HideByDisplay();
-        new DoubleClickControl(doubleClickToTogglePauseElement).DoublePointerDownEventStream
-            .Subscribe(_ => TogglePlayPause());
-
+        injector.Inject(singSceneGovernanceControl);
+        
         // Prepare player UI layout (depends on player count)
         PreparePlayerUiLayout();
 
@@ -189,28 +180,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
 
         // Create warning about missing microphones
-        string playerNameCsv = string.Join(", ", playerProfilesWithoutMic.Select(it => it.Name).ToList());
         if (!playerProfilesWithoutMic.IsNullOrEmpty())
         {
-            string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
-            string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
-                "playerNameCsv", playerNameCsv);
-
-            VisualElement visualElement = dialogUi.CloneTree();
-            visualElement.AddToClassList("overlay");
-            background.Add(visualElement);
-
-            dialogControl = injector
-                .WithRootVisualElement(visualElement)
-                .CreateAndInject<MessageDialogControl>();
-            dialogControl.Title = title;
-            dialogControl.Message = message;
-            dialogControl.DialogTitleImage.ShowByDisplay();
-            dialogControl.DialogTitleImage.AddToClassList(R.UssClasses.warning);
-            Button okButton = dialogControl.AddButton("OK", CloseDialog);
-            okButton.Focus();
-
-            themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+            ShowMissingMicrophonesDialog(playerProfilesWithoutMic);
         }
 
         webcamControl.InitWebcam();
@@ -223,12 +195,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         // Input legend (in pause overlay)
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
-
-        // Register ContextMenu
-        contextMenuControl = injector
-            .WithRootVisualElement(doubleClickToTogglePauseElement)
-            .CreateAndInject<ContextMenuControl>();
-        contextMenuControl.FillContextMenuAction = FillContextMenu;
 
         // Automatically start recording on companion apps
         PlayerControls.ForEach(playerControl =>
@@ -254,9 +220,32 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }));
     }
 
+    private void ShowMissingMicrophonesDialog(List<PlayerProfile> playerProfilesWithoutMic)
+    {
+        if (dialogControl != null)
+        {
+            return;
+        }
+        
+        string playerNameCsv = playerProfilesWithoutMic
+            .Select(it => it.Name)
+            .ToList()
+            .JoinWith(", ");
+        string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
+        string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
+            "playerNameCsv", playerNameCsv);
+
+        dialogControl = UiManager.Instance.CreateDialogControl(title);
+        dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
+        dialogControl.Message = message;
+
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);   
+    }
+
     public void OnDestroy()
     {
         webcamControl.Stop();
+        singSceneGovernanceControl?.Dispose();
     }
 
     private void InitDummySingers()
@@ -285,6 +274,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
             .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
             .ToList()
             .ForEach(it => it.RemoveFromHierarchy());
+        playerInfoUiLists.ForEach(playerInfoUiList => playerInfoUiList.Clear());
         if (playerCount <= 1)
         {
             // Add empty VisualElement as spacer. Otherwise the player UI would take all the available space.
@@ -347,7 +337,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         }
         else
         {
-            topLyricsContainer.HideByDisplay();
+            if (sceneData.SelectedPlayerProfiles.Count > 8)
+            {
+                // Do not show lyrics at the top, but show player info UI.
+                topLyricsContainer.Q<VisualElement>(R.UxmlNames.currentSentenceContainer).HideByDisplay();
+                topLyricsContainer.Q<VisualElement>(R.UxmlNames.nextSentenceContainer).HideByDisplay();
+            }
+            else
+            {
+                topLyricsContainer.HideByDisplay();
+            }
             bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, PlayerControls[0]);
         }
     }
@@ -446,6 +445,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                 statistics.RecordSongStarted(SongMeta);
             }
         }
+        
+        singSceneGovernanceControl.Update();
     }
 
     public void SkipToNextSingableNote()
@@ -641,6 +642,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         playerControlInjector.AddBindingForInstance(voice);
         playerControlInjector.AddBindingForInstance(micProfile);
         playerControlInjector.AddBindingForInstance(playerControlInjector, RebindingBehavior.Ignore);
+        playerControlInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(playerIndex)));
         playerControlInjector.Inject(playerControl);
 
         PlayerControls.Add(playerControl);
@@ -697,13 +699,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
     {
         if (songAudioPlayer.IsPlaying)
         {
-            pauseOverlay.ShowByDisplay();
             songAudioPlayer.PauseAudio();
             PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
         }
         else
         {
-            pauseOverlay.HideByDisplay();
             songAudioPlayer.PlayAudio();
             PlayerControls.ForEach(playerControl =>
             {
@@ -753,7 +753,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
         bb.BindExistingInstance(loadedSceneData.SelectedSongMeta);
         bb.BindExistingInstance(songAudioPlayer);
         bb.BindExistingInstance(songVideoPlayer);
+        bb.BindExistingInstance(webcamControl);
+        bb.BindExistingInstance(singSceneGovernanceControl);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
+        bb.Bind(nameof(playerInfoUi)).ToExistingInstance(playerInfoUi);
         bb.Bind(nameof(sentenceRatingUi)).ToExistingInstance(sentenceRatingUi);
         bb.Bind(nameof(noteUi)).ToExistingInstance(noteUi);
         bb.Bind(nameof(perfectEffectStarUi)).ToExistingInstance(perfectEffectStarUi);
@@ -809,33 +812,5 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder
                 TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
                 TranslationManager.GetTranslation(R.Messages.action_navigateRight))));
         }
-    }
-
-    public void CloseDialog()
-    {
-        if (dialogControl == null)
-        {
-            return;
-        }
-
-        dialogControl.CloseDialog();
-        dialogControl = null;
-    }
-
-    protected void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
-    {
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_togglePause),
-            () => TogglePlayPause());
-
-        webcamControl.AddToContextMenu(contextMenuPopup);
-        
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_restart),
-            () => Restart());
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
-            () => SkipToNextSingableNote());
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_exitSong),
-            () => FinishScene(false));
-        contextMenuPopup.AddItem(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
-            () => OpenSongInEditor());
     }
 }

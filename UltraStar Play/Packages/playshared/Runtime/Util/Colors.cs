@@ -5,6 +5,9 @@ using UnityEngine;
 // List of CSS colors at W3Schools: https://www.w3schools.com/cssref/css_colors.asp
 public static class Colors
 {
+    public static readonly Color32 clearBlack = CreateColor("#00000000");
+    public static readonly Color32 clearWhite = CreateColor("#FFFFFF00");
+
     public static readonly Color32 aliceBlue = CreateColor("#F0F8FF");
     public static readonly Color32 antiqueWhite = CreateColor("#FAEBD7");
     public static readonly Color32 aqua = CreateColor("#00FFFF");
@@ -214,5 +217,15 @@ public static class Colors
         {
             throw new ArgumentException($"Cannot create Color32 for {originalHexColor}", e);
         }
+    }
+    
+    public static Color HsvOffset(Color inputColor, float hueOffset, float saturationOffset, float valueOffset)
+    {
+        float h, s, v;
+        Color.RGBToHSV(inputColor, out h, out s, out v);
+        h += hueOffset;
+        s += saturationOffset;
+        v += valueOffset;
+        return Color.HSVToRGB(h, s, v);
     }
 }

@@ -12,7 +12,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
+public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITranslator, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new() { 0, 5, 10, 15, 20, 25, 30 };
@@ -30,16 +30,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     private UiManager uiManager;
 
     [Inject]
-    private Settings settings;
-
-    [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
-
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
 
     [Inject]
     private UIDocument uiDocument;
@@ -47,41 +38,35 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject]
     private Injector injector;
 
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
+    [Inject]
+    private ThemeManager themeManager;
 
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
+    [Inject(UxmlName = R.UxmlNames.devicePicker)]
+    private ItemPicker devicePicker;
 
-    [Inject(UxmlName = R.UxmlNames.deviceContainer)]
-    private VisualElement deviceContainer;
+    [Inject(UxmlName = R.UxmlNames.amplificationPicker)]
+    private ItemPicker amplificationPicker;
 
-    [Inject(UxmlName = R.UxmlNames.amplificationContainer)]
-    private VisualElement amplificationContainer;
+    [Inject(UxmlName = R.UxmlNames.noiseSuppressionPicker)]
+    private ItemPicker noiseSuppressionPicker;
 
-    [Inject(UxmlName = R.UxmlNames.noiseSuppressionContainer)]
-    private VisualElement noiseSuppressionContainer;
+    [Inject(UxmlName = R.UxmlNames.delayPicker)]
+    private ItemPicker delayPicker;
 
-    [Inject(UxmlName = R.UxmlNames.delayContainer)]
-    private VisualElement delayContainer;
+    [Inject(UxmlName = R.UxmlNames.colorPicker)]
+    private ItemPicker colorPicker;
 
-    [Inject(UxmlName = R.UxmlNames.colorContainer)]
-    private VisualElement colorContainer;
+    [Inject(UxmlName = R.UxmlNames.sampleRatePicker)]
+    private ItemPicker sampleRatePicker;
 
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
-    private Toggle enabledToggle;
-
-    [Inject(UxmlName = R.UxmlNames.enabledLabel)]
-    private Label enabledLabel;
+    private SlideToggle enabledToggle;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedLabel)]
     private Label notConnectedLabel;
-
-    [Inject(UxmlName = R.UxmlNames.sampleRateContainer)]
-    private VisualElement sampleRateContainer;
 
     [Inject(UxmlName = R.UxmlNames.deleteButton)]
     private Button deleteButton;
@@ -95,17 +80,15 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     [Inject(UxmlName = R.UxmlNames.calibrateDelayButton)]
     private Button calibrateDelayButton;
 
-    [Inject(UxmlName = R.UxmlNames.helpButton)]
-    private Button helpButton;
-
+    [Inject(UxmlName = R.UxmlNames.recordingDeviceInactiveOverlay)]
+    private VisualElement recordingDeviceInactiveOverlay;
+    
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
     private LabeledItemPickerControl<int> noiseSuppressionPickerControl;
     private NumberPickerControl delayPickerControl;
     private ColorPickerControl colorPickerControl;
-
-    private MessageDialogControl helpDialogControl;
 
     private MicProfile SelectedMicProfile => devicePickerControl.SelectedItem;
 
@@ -114,11 +97,13 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
     private readonly Subject<BeatPitchEvent> connectedClientBeatPitchEventStream = new();
     public IObservable<BeatPitchEvent> ConnectedClientBeatPitchEventStream => connectedClientBeatPitchEventStream;
 
-    private void Start()
+    protected override void Start()
     {
-        new AutoFitLabelControl(deviceContainer.Q<ItemPicker>().ItemLabel, 10, 15);
+        base.Start();
         
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(deviceContainer.Q<ItemPicker>(), CreateMicProfiles());
+        new AutoFitLabelControl(devicePicker.ItemLabel, 10, 15);
+        
+        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, CreateMicProfiles());
         devicePickerControl.AutoSmallFont = false;
         devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
         if (!TryReSelectLastMicProfile())
@@ -128,19 +113,18 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         devicePickerControl.Selection
             .Subscribe(micProfile => settings.LastMicProfileNameInRecordingOptionsScene = micProfile?.Name);
 
-        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationContainer.Q<ItemPicker>(), amplificationItems);
+        amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems);
         amplificationPickerControl.GetLabelTextFunction = item => item + " %";
-        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionContainer.Q<ItemPicker>(), noiseSuppressionItems);
+        noiseSuppressionPickerControl = new LabeledItemPickerControl<int>(noiseSuppressionPicker, noiseSuppressionItems);
         noiseSuppressionPickerControl.GetLabelTextFunction = item => item + " %";
-        delayPickerControl = new NumberPickerControl(delayContainer.Q<ItemPicker>());
+        delayPickerControl = new NumberPickerControl(delayPicker);
         delayPickerControl.GetLabelTextFunction = item => item + " ms";
-        colorPickerControl = new ColorPickerControl(colorContainer.Q<ItemPicker>(), GetColorItems());
-        sampleRatePickerControl = new SampleRatePickerControl(sampleRateContainer.Q<ItemPicker>());
+        colorPickerControl = new ColorPickerControl(colorPicker, themeManager.GetMicrophoneColors());
+        sampleRatePickerControl = new SampleRatePickerControl(sampleRatePicker);
         sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
-        deleteButton.RegisterCallbackButtonTriggered(() => DeleteSelectedRecordingDevice());
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-
+        deleteButton.RegisterCallbackButtonTriggered(_ => DeleteSelectedRecordingDevice());
+        
         devicePickerControl.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
         amplificationPickerControl.Selection.Subscribe(newValue =>
         {
@@ -184,13 +168,7 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             .Subscribe(UpdateMicProfileNames)
             .AddTo(gameObject);
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => OnBack());
-
-        calibrateDelayButton.RegisterCallbackButtonTriggered(() => calibrateMicDelayControl.StartCalibration());
+        calibrateDelayButton.RegisterCallbackButtonTriggered(_ => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
             .Subscribe(calibrationResult =>
             {
@@ -206,18 +184,6 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
                         TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
                 }
             });
-    }
-
-    private void OnBack()
-    {
-        if (helpDialogControl != null)
-        {
-            CloseHelp();
-        }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.OptionsScene);
-        }
     }
 
     private void Update()
@@ -275,6 +241,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         {
             settings.MicProfiles.AddIfNotContains(SelectedMicProfile);
         }
+        
+        UpdateRecordingDeviceInactiveOverlay();
     }
 
     private IConnectedClientHandler GetConnectedClientHandler()
@@ -309,7 +277,8 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         sampleRatePickerControl.TrySelectItem(micProfile.SampleRate);
 
         enabledToggle.value = micProfile.IsEnabled;
-
+        UpdateRecordingDeviceInactiveOverlay();
+        
         if (micProfile.IsConnected(serverSideConnectRequestManager))
         {
             notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
@@ -327,6 +296,13 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
         UpdateSampleRateLabel();
         InitPitchDetectionFromConnectionClient();
+    }
+
+    private void UpdateRecordingDeviceInactiveOverlay()
+    {
+        recordingDeviceInactiveOverlay.style.backgroundColor = enabledToggle.value
+            ? new StyleColor(Color.clear)
+            : new StyleColor(new Color(0, 0, 0, 0.5f));
     }
 
     private void DeleteSelectedRecordingDevice()
@@ -349,15 +325,12 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
 
     public void UpdateTranslation()
     {
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
         deleteButton.text = TranslationManager.GetTranslation(R.Messages.delete);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
-        enabledLabel.text = TranslationManager.GetTranslation(R.Messages.options_useForSinging);
-        colorContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_color);
-        delayContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_delay);
-        amplificationContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_amplification);
-        noiseSuppressionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
-        sampleRateContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
+        colorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_color);
+        delayPicker.Label = TranslationManager.GetTranslation(R.Messages.options_delay);
+        amplificationPicker.Label = TranslationManager.GetTranslation(R.Messages.options_amplification);
+        noiseSuppressionPicker.Label = TranslationManager.GetTranslation(R.Messages.options_noiseSuppression);
+        sampleRatePicker.Label = TranslationManager.GetTranslation(R.Messages.options_sampleRate);
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
         calibrateDelayButton.text = TranslationManager.GetTranslation(R.Messages.options_delay_calibrate);
         notConnectedLabel.text = TranslationManager.GetTranslation(R.Messages.options_deviceNotConnected);
@@ -422,13 +395,9 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
         }
     }
 
-    private void ShowHelp()
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
     {
-        if (helpDialogControl != null)
-        {
-            return;
-        }
-
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_micDelay_title),
@@ -442,40 +411,12 @@ public class RecordingOptionsSceneControl : MonoBehaviour, INeedInjection, ITran
             { TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate_title),
                 TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_sampleRate) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_recording_helpDialog_title),
-            titleToContentMap,
-            CloseHelp);
+            titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
-    }
-
-    private void CloseHelp()
-    {
-        if (helpDialogControl == null)
-        {
-            return;
-        }
-        helpDialogControl.CloseDialog();
-        helpDialogControl = null;
-        helpButton.Focus();
-    }
-
-    private List<Color32> GetColorItems()
-    {
-        return new List<Color32>
-        {
-            Colors.CreateColor("#0AFF99"),
-            Colors.CreateColor("#FFD300"),
-            Colors.CreateColor("#FF8700"),
-            Colors.CreateColor("#FF0000"),
-            Colors.CreateColor("#FDFCDC"),
-            Colors.CreateColor("#B392AC"),
-            Colors.CreateColor("#BE0AFF"),
-            Colors.CreateColor("#580AFF"),
-            Colors.CreateColor("#147DF5"),
-            Colors.CreateColor("#0AEFFF"),
-        };
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToConfigureMicsAndSpeaker)));
+        return helpDialogControl;
     }
 
     private void InitPitchDetectionFromConnectionClient()

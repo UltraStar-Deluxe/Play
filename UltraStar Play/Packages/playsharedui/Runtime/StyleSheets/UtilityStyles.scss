@@ -1,0 +1,99 @@
+﻿/*
+ * Utility styles that mimic Bootstrap's spacing ( https://getbootstrap.com/docs/5.0/utilities/spacing/ ).
+ * This file is generated using Sass. See the corresponding .scss file.
+ */
+
+// In Bootstrap the value is 1rem, which is about 16px with usual font size.
+$spacer: 16;
+
+$sizes: (
+    0: $spacer * 0px,
+    1: $spacer * 0.25px,
+    2: $spacer * 0.5px,
+    3: $spacer * 1px,
+    4: $spacer * 1.5px,
+    5: $spacer * 3px,
+    "auto": auto,
+);
+
+$properties: ("m": margin, "p": padding);
+@each $propertyShortName, $propertyLongName in $properties {
+    @each $sizeName, $size in $sizes {
+        /*
+         * #{$propertyLongName} - #{$sizeName} - #{$size}
+         */
+        .#{$propertyShortName}-#{$sizeName} {
+            #{$propertyLongName}-left: #{$size};
+            #{$propertyLongName}-right: #{$size};
+            #{$propertyLongName}-top: #{$size};
+            #{$propertyLongName}-bottom: #{$size};
+        }
+        
+        .#{$propertyShortName}l-#{$sizeName} {
+            #{$propertyLongName}-left: #{$size};
+        }
+        
+        .#{$propertyShortName}r-#{$sizeName} {
+            #{$propertyLongName}-right: #{$size};
+        }
+        
+        .#{$propertyShortName}t-#{$sizeName} {
+            #{$propertyLongName}-top: #{$size};
+        }
+        
+        .#{$propertyShortName}b-#{$sizeName} {
+            #{$propertyLongName}-bottom: #{$size};
+        }
+        
+        .#{$propertyShortName}x-#{$sizeName} {
+            #{$propertyLongName}-left: #{$size};
+            #{$propertyLongName}-right: #{$size};
+        }
+        
+        .#{$propertyShortName}y-#{$sizeName} {
+            #{$propertyLongName}-top: #{$size};
+            #{$propertyLongName}-bottom: #{$size};
+        }
+    }
+}
+
+/* Horizontal and vertical lists */
+@each $propertyShortName, $propertyLongName in $properties {
+    @each $sizeName, $size in $sizes {
+        /*
+         * child - #{$propertyLongName} - #{$sizeName} - #{$size}
+         */
+        .child-#{$propertyShortName}-#{$sizeName} > * {
+            #{$propertyLongName}-left: #{$size};
+            #{$propertyLongName}-right: #{$size};
+            #{$propertyLongName}-top: #{$size};
+            #{$propertyLongName}-bottom: #{$size};
+        }
+
+        .child-#{$propertyShortName}l-#{$sizeName} > * {
+            #{$propertyLongName}-left: #{$size};
+        }
+
+        .child-#{$propertyShortName}r-#{$sizeName} > * {
+            #{$propertyLongName}-right: #{$size};
+        }
+
+        .child-#{$propertyShortName}t-#{$sizeName} > * {
+            #{$propertyLongName}-top: #{$size};
+        }
+
+        .child-#{$propertyShortName}b-#{$sizeName} > * {
+            #{$propertyLongName}-bottom: #{$size};
+        }
+
+        .child-#{$propertyShortName}x-#{$sizeName} > * {
+            #{$propertyLongName}-left: #{$size};
+            #{$propertyLongName}-right: #{$size};
+        }
+
+        .child-#{$propertyShortName}y-#{$sizeName} > * {
+            #{$propertyLongName}-top: #{$size};
+            #{$propertyLongName}-bottom: #{$size};
+        }
+    }
+}

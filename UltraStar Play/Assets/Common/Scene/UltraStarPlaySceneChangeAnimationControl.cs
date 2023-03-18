@@ -3,7 +3,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection, ISceneInjectionFinishedListener
+public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection
 {
     public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
@@ -12,6 +12,15 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     {
         get
         {
+            if (uiCopyRenderTexture != null
+                && (uiCopyRenderTexture.width != Screen.width
+                    || uiCopyRenderTexture.height != Screen.height))
+            {
+                Debug.Log("Recreate uiCopyRenderTexture because of screen size change.");
+                Destroy(uiCopyRenderTexture);
+                uiCopyRenderTexture = null;
+            }
+            
             if (uiCopyRenderTexture == null)
             {
                 uiCopyRenderTexture = new RenderTexture(Screen.width, Screen.height, 24);
@@ -40,13 +49,11 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         return Instance;
     }
 
-    public void OnSceneInjectionFinished()
+    protected override void StartSingleton()
     {
-        if (this != Instance)
-        {
-            return;
-        }
-
+        sceneNavigator.SceneChangedEventStream
+            .Subscribe(_ => UpdateSceneTexturesAndTransition())
+            .AddTo(gameObject);
         UpdateSceneTexturesAndTransition();
     }
 
@@ -97,19 +104,19 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         LeanTween.value(gameObject, 0, 1, sceneChangeAnimationTimeInSeconds)
             .setOnStart(() =>
             {
-                themeManager.BackgroundShaderControl.SetTransitionAnimationEnabled(true);
+                themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
             })
             .setOnUpdate((float animTimePercent) =>
             {
                 // Scale and fade out the snapshot of the old UIDocument.
                 // Handled by the background shader to get correct premultiplied
                 // blending and avoid the one-frame flicker issue.
-                themeManager.BackgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
+                themeManager.backgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
             })
             .setEaseInSine()
             .setOnComplete(() =>
             {
-                themeManager.BackgroundShaderControl.SetTransitionAnimationEnabled(false);
+                themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
             });
     }
 

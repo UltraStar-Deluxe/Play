@@ -3,17 +3,24 @@
 // Each line is preceded by a comment describing its function.
 // When files are linked, PNG and JPG formats are accepted.
 {
-    // The color of the main texts displayed over buttons.
-    "fontColorButtons": "#E5E5E5",
-    // The color of the main texts displayed over the background.
-    "fontColorLabels": "#E5E5E5",
-    // The color of all the texts, over buttons and backgrounds.
-    // If set, the values defined for "fontColorLabels" and "fontColorButtons"
-    // will be ignored.
-    "fontColor": "#E5E5E5",
+    // See below for the content of control style.
+    // Not all controls need to be specified.
+    // The defaultControl style will be used as fallback if needed.
 
-    // The main color of the buttons, e.g. the buttons in the main menu
-    "buttonMainColor": "#3399D8",
+    "defaultControl": {...},
+    "transparentButton": {...},
+    "textOnlyButton": {...},
+    "lightButton": {...},
+    "dangerButton": {...},
+    "toggle": {...},
+    "staticPanel": {...},
+    "dynamicPanel": {...},
+        
+    // Font (and icon) colors
+    "primaryFontColor": "#F0F0F0",
+    "secondaryFontColor": "#C0C0C0",
+    "warningFontColor":  "#FEC84B",
+    "errorFontColor": "#F97066",
 
     // This group defines the dynamic background parameters.
     "dynamicBackground": {
@@ -81,5 +88,73 @@
         "leadSinger": "icons/theme name/rating_5.png",
         "superstar": "icons/theme name/rating_6.png",
         "ultrastar": "icons/theme name/rating_7.png"
+    },
+
+    // Custom background music.
+    "backgroundMusic": "music/my-background-music.mp3",
+    
+    // Defines the colors for the rating after each phrase.
+    "phraseRatingColors": {
+      "perfect": "#00FF00",
+      "great": "#006600",
+      "good": "#FF00FF",
+      "notBad": "#0000FF",
+      "bad": "#FF0000",
+    },
+
+    // Defines available colors for recording devices
+    "microphoneColors": [
+        "#FF0000",
+        "#00FF00",
+        "#0000FF",
+    ],
+    
+    // Defines colors for the song editor
+    "songEditorLayerColors": {
+      "P1": "#ccbbaa",
+      "P2": "#aabbff",
+      "MicRecording": "#FF0000",
+      "ButtonRecording": "#00FF00",
+      "CopyPaste": "#FF00FF",
+      "MidiFile": "#FFFF00",
     }
+}
+
+// Each control style (e.g. "defaultControl", "transparentButton") can contain
+// the properties fontColor, backgroundColor or backgroundGradient or backgroundImage, borderColor
+// for each of the states normal, hover, focus, active, disabled.
+// Colors are in the form #RRGGBBAA where AA is optional
+// Gradients are similar to CSS linear-gradient, namely <angle>, <start-color>, <end-color>
+// where <angle> is optional.
+// Paths can be absolute or relative. Relative paths are interpreted relative to the theme file.
+{
+    fontColor: "...",
+    hoverFontColor: "...",
+    focusFontColor: "...",
+    activeFontColor: "...",
+    disabledFontColor: "...",
+
+    backgroundColor: "..."
+    hoverBackgroundColor: "..."
+    focusBackgroundColor: "..."
+    activeBackgroundColor: "..."
+    disabledBackgroundColor: "..."
+    
+    backgroundGradient: "45deg, #101828, #475467"
+    hoverBackgroundGradient: "..."
+    focusBackgroundGradient: "..."
+    activeBackgroundGradient: "..."
+    disabledBackgroundGradient: "..."
+    
+    borderColor: "..."
+    hoverBorderColor: "..."
+    focusBorderColor: "..."
+    activeBorderColor: "..."
+    disabledBorderColor: "..."
+
+    backgroundImage: "..."
+    hoverBackgroundImage: "..."
+    focusBackgroundImage: "..."
+    activeBackgroundImage: "..."
+    disabledBackgroundImage: "..."
 }

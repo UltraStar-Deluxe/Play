@@ -1,0 +1,599 @@
+/**************************************************/
+/* MAIN SCENE */
+/**************************************************/
+
+.mainSceneButton {
+    width: 150px;
+    height: 60px;
+}
+
+/**************************************************/
+/* SONG SELECT SCENE */
+/**************************************************/
+.songSelectLyricsPreview {
+    width: 100%;
+    white-space: normal;
+    max-width: 400px;
+}
+
+#playerImage {
+    transition: -unity-background-image-tint-color 0.5s;
+}
+
+#searchTextField #unity-text-input {
+    height: 100%;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+#searchTextField.noSearchResults {
+    border-color: red;
+    border-width: 2px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+#songMenuOverlay Button {
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.characterQuickJumpCharacterButton {
+    font-size: var(--font-size-xxs);
+}
+
+.characterQuickJumpCharacter {
+    background-color: rgba(32, 32, 32, 0.5);
+    width: 20px;
+    height: 100%;
+    border-radius: 10px;
+    font-size: 10px;
+    -unity-text-align: middle-center;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+#playlistChooser.unity-base-popup-field {
+    background-color: rgba(0, 0, 0, 0);
+    height: var(--control-height);
+    -unity-text-align: middle-left;
+}
+
+#playlistChooser.unity-base-popup-field .unity-base-popup-field__input {
+    background-color: rgba(0, 0, 0, 0);
+    padding: 0 5px;
+    border-width: 0;
+}
+
+#playlistChooserDropdownOverlay Button {
+    margin-bottom: 5px;
+}
+
+#characterContainer .unity-scroll-view__content-and-vertical-scroll-container {
+    height: 100%;
+}
+
+#characterContainer .unity-scroll-view__content-container {
+    height: 100%;
+    padding: 0;
+}
+
+.songDetailOverlayLabel {
+    width: 100%;
+    font-size: var(--font-size-s);
+    white-space: normal;
+}
+
+.searchPropertyContainer {
+    margin-bottom: 10px;
+}
+
+#searchErrorIcon {
+    position: absolute;
+    top: auto;
+    bottom: 100%;
+}
+
+#toggleFavoriteButton MaterialIcon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    font-size: 48px;
+}
+
+/**************************************************/
+/* SING SCENE */
+/**************************************************/
+.singSceneContextMenu {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-width: 0;
+    border-radius: 10px;
+}
+
+.singSceneContextMenu .unity-button {
+    background-color: rgba(32, 32, 32, 0);
+}
+
+.singSceneContextMenu .unity-button:hover {
+    background-color: rgba(64, 64, 64, 1);
+}
+
+#governanceOverlay {
+    transition: opacity 0.3s;
+}
+
+#playerInfoUiList > * {
+    margin-right: 16px;
+}
+
+#topLyricsContainer .lyricsContainer {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#bottomLyricsContainer .lyricsContainer {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#playerScoreProgressBar {
+    width: 140%;
+    height: 140%;
+    --track-color: #f2f4f7;
+    --progress-color: #2e8418;
+    --border-size: 8;
+    border-radius: 50%;
+}
+
+#playerImageBorder {
+    border-radius: 50%;
+    border-color: #2e8418;
+    border-width: 3%;
+    /* for perfect circle: width and height = 100% + (4 * border-width%) */ 
+    width: 112%;
+    height: 112%;
+}
+
+.lyricsContainer {
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 5px;
+}
+
+.singingLyrics {
+    /*-unity-font-style: bold;*/
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(32, 32, 32, 0.5);
+}
+
+.lyricsContainer #playerNameLabel {
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(32, 32, 32, 0.2);
+}
+
+.playerScoreLabel {
+    -unity-font-style: bold;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5)
+}
+
+.currentLyrics {
+    font-size: var(--font-size-xl);
+    margin-bottom: 5px;
+}
+
+.nextLyrics {
+    font-size: var(--font-size);
+}
+
+.currentNoteLyrics {
+    color: var(--control-color);
+}
+
+.previousNoteLyrics {
+    color: var(--control-color);
+}
+
+#positionBeforeLyricsIndicator {
+    width: 20px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    color: rgb(66, 163, 231);
+    margin-left: -25px;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#timeBar {
+    padding: 0;
+}
+
+.innerTimeBarSentenceEntryContainer {
+    background-color: #344054;
+    border-radius: 4px;
+}
+
+#timeBarPositionIndicator {
+    background-color: var(--font-color);
+    width: 8px;
+    height: 100%;
+    border-radius: 4px;
+}
+
+#root.singScenePlayerUi {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#sentenceRatingContainer {
+    position: absolute;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+}
+
+#root.singScenePlayerUiSmall {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#playerInfoContainer #playerImage {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+}
+
+.singScenePlayerUi.singScenePlayerUiSmall #playerInfoContainer #playerImage {
+    display: none;
+}
+
+#leadingPlayerIcon {
+    position: absolute;
+    bottom: 80%;
+    width: var(--font-size-xxl);
+    height: var(--font-size-xxl);
+    flex-shrink: 0;
+    background-image: url('project://database/Assets/Common/Graphics/Icons/LeadingPlayerCrown.svg?fileID=7388822144124034973&guid=8f8cd0bf8e4776546b467068aacdf098&type=3#LeadingPlayerCrown');
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.singScenePlayerUi.singScenePlayerUiSmall #leadingPlayerIcon {
+    flex-shrink: 0;
+    width: var(--font-size);
+    height: var(--font-size);
+}
+
+.scrollingNoteStreamSentenceSeparator {
+    height: 100%;
+    width: 1px;
+    background-color: rgba(92, 92, 92, 0.5);
+}
+
+#targetNoteImage {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#targetNoteImage.goldenNote {
+    background-color: rgba(255, 215, 0, 0.4);
+}
+
+/**************************************************/
+/* SINGING RESULTS SCENE */
+/**************************************************/
+#scoreValue {
+    min-width: 45px;
+    -unity-text-align: middle-right;
+}
+
+.singingResultsPlayerUiColumn {
+    align-items: flex-end;
+}
+
+#noHighscoresLabel {
+    width: 100%;
+    -unity-text-align: middle-center;
+    -unity-font-style: italic;
+    margin-top: 16px;
+}
+
+#newHighscoreContainer {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 16px;
+    background-color: #ECFDF3;
+    padding: 2px;
+}
+
+#newHighscoreContainer > * {
+    color: #027A48;
+}
+
+#newHighscoreLabel {
+    -unity-font-style: bold-and-italic;
+}
+
+#scoreIcon {
+    margin-right: 8px;
+    border-radius: 50%;
+}
+
+#scoreIcon > #musicNoteIcon {
+    font-size: 12px;
+}
+
+#normalNoteScore > #scoreIcon {
+    background-color: #12B76A;
+}
+
+#goldenNoteScore > #scoreIcon {
+    background-color: #F79009;
+}
+
+#phraseBonusScore > #scoreIcon {
+    background-color: #F04438;
+}
+
+#totalScore > #scoreIcon {
+    visibility: hidden;
+}
+
+.scoreRow {
+    padding: 5px;
+}
+
+#singingResultsScoresContainer {
+    height: 50%;
+    width: 100%;
+    flex-shrink: 1;
+}
+
+#singingResultsPlayerUiRoot {
+    max-width: 250px;
+    max-height: 250px;
+}
+
+#playerScoreProgressBar.singingResults {
+    min-width: 30px;
+    min-height: 30px;
+    --border-size: 24;
+}
+
+#singingResultsPlayerUiRoot AspectRatioPanel {
+    min-width: 30px;
+    min-height: 30px;
+}
+
+.singingResultUi-3 #playerInfoContainer {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+#singingResultsPlayerUiRoot.singingResultUi-3 {
+    padding: 8px;
+    margin-bottom: 16px;
+    max-width: 250px;
+}
+
+.singingResultUi-3 #playerScoreProgressBar {
+    --border-size: 16;
+}
+
+.singingResultUi-3 Label {
+    font-size: var(--font-size-s);
+}
+
+.singingResultUi-3 #ratingLabel {
+    visibility: hidden;
+}
+
+.singingResultUi-4 #topContainer {
+    flex-direction: row;
+}
+.singingResultUi-4 #topContainer > * {
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.singingResultUi-4 #bottomContainer {
+    display: none;
+}
+
+.singingResultUi-5 #scoreIcon {
+    display: none;
+}
+
+#singingResultsPlayerUiRoot.singingResultUi-3 {
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    max-width: 250px;
+}
+
+#highscoreEntryUiRoot #posLabel {
+    background-color: #12B76A;
+    border-radius: 50%;
+    font-size: 20px;
+    width: 32;
+    height: 32;
+    margin-right: 16px;
+    -unity-text-align: middle-center;
+}
+
+/**************************************************/
+/* OPTIONS SCENES */
+/**************************************************/
+
+.inactiveOverlay {
+    transition: background-color 0.5s;
+}
+
+#playerProfileEntryContent {
+    border-color: var(--font-color);
+}
+
+#playerProfileImagePicker #previousItemButton {
+    width: 25px;
+}
+
+#playerProfileImagePicker #nextItemButton {
+    width: 25px;
+}
+
+.optionsOverviewButtonRow {
+    width: 100%;
+    height: 25%;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.optionsOverviewButton {
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: 10px;
+}
+
+.optionsOverviewButton > .fontIcon {
+    min-width: 40px;
+}
+
+.optionsLabelAndItemPicker {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.optionsLabelAndItemPicker ItemPicker {
+    flex-grow: 1;
+}
+
+.optionsSceneMainContainer {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+.optionsSceneTopRow {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    height: var(--control-height);
+    margin-bottom: 10px;
+}
+
+.optionsSceneTitleContainer {
+    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-shrink: 1;
+}
+
+.optionsSceneTitleAndImageContainer {
+    flex-direction: row;
+    align-items: center;
+}
+
+.songArchiveUrlButton {
+    -unity-text-align: middle-left;
+    height: auto;
+    width: 100%;
+    white-space: normal;
+}
+
+.songLibraryNoSongsButton {
+    width: 150px;
+    margin-bottom: 8px;
+}
+
+.songArchiveInfoLabel {
+    font-size: var(--font-size-s);
+    margin-bottom: 15px;
+    white-space: normal;
+}
+
+.songIssueSongMetaTitle {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: var(--font-size-s);
+    white-space: normal;
+    border-bottom-color: var(--font-color);
+    border-bottom-width: 1px;
+}
+
+.songIssueMessage {
+    font-size: var(--font-size-s);
+    white-space: normal;
+}
+
+#loadedSceneTitle {
+    font-size: var(--font-size-l);
+}
+
+#loadedOptionsRoot > DropdownField > .unity-base-field__label {
+    width: 300px;
+}
+
+#loadedOptionsRoot > ItemPicker {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+#loadedOptionsRoot > ScrollView > ItemPicker {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+/**************************************************/
+/* ABOUT SCENE */
+/**************************************************/
+#aboutTextsScrollView ToggleButton {
+    justify-content: flex-start;
+    -unity-text-align: middle-left;
+}
+
+/**************************************************/
+/* CREDITS SCENES */
+/**************************************************/
+
+.creditsEntryCharacter {
+    font-size: var(--font-size-xxl);
+    -unity-font-style: bold;
+    text-shadow: 1px 1px 0 rgb(0, 0, 0);
+}
+
+.creditsGoldBanner {
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.creditsRegularBanner {
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 20px;
+    padding-bottom: 40px;
+}

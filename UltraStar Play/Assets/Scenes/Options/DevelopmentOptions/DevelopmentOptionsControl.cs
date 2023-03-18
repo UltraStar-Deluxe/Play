@@ -12,43 +12,31 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
+public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
 {
-    [Inject]
-    private SceneNavigator sceneNavigator;
+    [Inject(UxmlName = R.UxmlNames.showFpsPicker)]
+    private ItemPicker showFpsPicker;
 
-    [Inject]
-    private TranslationManager translationManager;
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
+    private ItemPicker pitchDetectionAlgorithmPicker;
 
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
+    [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNotePicker)]
+    private ItemPicker analyzeBeatsWithoutTargetNotePicker;
 
-    [Inject(UxmlName = R.UxmlNames.showFpsContainer)]
-    private VisualElement showFpsContainer;
+    [Inject(UxmlName = R.UxmlNames.disableDynamicThemesPicker)]
+    private ItemPicker disableDynamicThemesPicker;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmContainer)]
-    private VisualElement pitchDetectionAlgorithmContainer;
+    [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidPicker)]
+    private ItemPicker customEventSystemOptInOnAndroidPicker;
 
-    [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNoteContainer)]
-    private VisualElement analyzeBeatsWithoutTargetNoteContainer;
-
-    [Inject(UxmlName = R.UxmlNames.disableDynamicThemesContainer)]
-    private VisualElement disableDynamicThemesContainer;
-
-    [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidContainer)]
-    private VisualElement customEventSystemOptInOnAndroidContainer;
-
-    [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorContainer)]
-    private VisualElement useUniversalCharsetDetectorContainer;
+    [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorPicker)]
+    private ItemPicker useUniversalCharsetDetectorPicker;
 
     [Inject(UxmlName = R.UxmlNames.ipAddressLabel)]
     private Label ipAddressLabel;
 
     [Inject(UxmlName = R.UxmlNames.httpServerPortLabel)]
     private Label httpServerPortLabel;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject(UxmlName = R.UxmlNames.showLogButton)]
     private Button showLogButton;
@@ -58,9 +46,6 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
-
-    [Inject]
-    private Settings settings;
 
     [Inject]
     private ThemeManager themeManager;
@@ -82,21 +67,23 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
 
     private NetworkConfigControl networkConfigControl;
 
-    private void Start()
+    protected override void Start()
     {
-        new BoolPickerControl(showFpsContainer.Q<ItemPicker>())
+        base.Start();
+        
+        new BoolPickerControl(showFpsPicker)
             .Bind(() => settings.DeveloperSettings.showFps,
                   newValue => settings.DeveloperSettings.showFps = newValue);
 
-        new PitchDetectionAlgorithmPicker(pitchDetectionAlgorithmContainer.Q<ItemPicker>())
+        new PitchDetectionAlgorithmPicker(pitchDetectionAlgorithmPicker)
             .Bind(() => settings.AudioSettings.pitchDetectionAlgorithm,
                 newValue => settings.AudioSettings.pitchDetectionAlgorithm = newValue);
 
-        new BoolPickerControl(analyzeBeatsWithoutTargetNoteContainer.Q<ItemPicker>())
+        new BoolPickerControl(analyzeBeatsWithoutTargetNotePicker)
             .Bind(() => settings.GraphicSettings.analyzeBeatsWithoutTargetNote,
                 newValue => settings.GraphicSettings.analyzeBeatsWithoutTargetNote = newValue);
 
-        new BoolPickerControl(disableDynamicThemesContainer.Q<ItemPicker>())
+        new BoolPickerControl(disableDynamicThemesPicker)
             .Bind(() => settings.DeveloperSettings.disableDynamicThemes,
                 disableDynamicThemes =>
                 {
@@ -107,11 +94,11 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
                     settings.DeveloperSettings.disableDynamicThemes = disableDynamicThemes;
                 });
 
-        new BoolPickerControl(useUniversalCharsetDetectorContainer.Q<ItemPicker>())
+        new BoolPickerControl(useUniversalCharsetDetectorPicker)
                     .Bind(() => settings.DeveloperSettings.useUniversalCharsetDetector,
                         newValue => settings.DeveloperSettings.useUniversalCharsetDetector = newValue);
 
-        new BoolPickerControl(customEventSystemOptInOnAndroidContainer.Q<ItemPicker>())
+        new BoolPickerControl(customEventSystemOptInOnAndroidPicker)
             .Bind(() => settings.DeveloperSettings.enableEventSystemOnAndroid,
                 newValue =>
                 {
@@ -136,12 +123,9 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
             httpServerPortLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
         }
 
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => OnBack());
-
         // View and copy log
-        showLogButton.RegisterCallbackButtonTriggered(() => inGameDebugConsoleManager.ShowConsole());
-        copyLogButton.RegisterCallbackButtonTriggered(() =>
+        showLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
+        copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
             ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");
@@ -150,38 +134,27 @@ public class DevelopmentOptionsControl : MonoBehaviour, INeedInjection, ITransla
         // Open persistent data path
         if (PlatformUtils.IsStandalone)
         {
-            openPersistentDataPathButton.RegisterCallbackButtonTriggered(() => ApplicationUtils.OpenDirectory(Application.persistentDataPath));
+            openPersistentDataPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(Application.persistentDataPath));
         }
         else
         {
             openPersistentDataPathButton.HideByDisplay();
         }
         
-        // Back button
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
-        backButton.Focus();
-
         // Network config
         networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
     }
 
     private void RestartScene()
     {
-        sceneNavigator.LoadScene(EScene.DevelopmentOptionsScene);
-    }
-
-    private void OnBack()
-    {
-        sceneNavigator.LoadScene(EScene.OptionsScene);
+        sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.DevelopmentOptionsScene));
     }
 
     public void UpdateTranslation()
     {
-        showFpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_showFps);
-        pitchDetectionAlgorithmContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
-        analyzeBeatsWithoutTargetNoteContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_development_title);
+        showFpsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showFps);
+        pitchDetectionAlgorithmPicker.Label = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
+        analyzeBeatsWithoutTargetNotePicker.Label = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
     }
 
     public List<IBinding> GetBindings()

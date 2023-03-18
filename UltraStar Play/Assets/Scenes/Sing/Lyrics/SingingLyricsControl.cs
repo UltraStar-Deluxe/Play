@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -11,6 +12,8 @@ using UnityEngine.UIElements;
 public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 {
     private const float SpaceWidthInPx = 8;
+    private const float MinFontSize = 4;
+    private const float MaxFontSizeIterations = 20;
 
     public Sentence CurrentSentence { get; private set; }
     public List<Note> SortedNotes { get; private set; } = new();
@@ -33,6 +36,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private ThemeManager themeManager;
+    
     private Sentence previousSentence;
     private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new();
 
@@ -47,6 +53,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
+        
+        themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
+            positionBeforeLyricsIndicator.style.color = new StyleColor(color));
     }
 
     public void Update(double positionInSongInMillis)
@@ -131,16 +140,25 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             {
                 label.AddToClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
+                
+                themeManager.GetCurrentTheme().ThemeJson.previousNoteLyricsColor.IfNotDefault(color =>
+                    label.style.color = new StyleColor(color));
             }
             else if (i == currentNoteIndex)
             {
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.AddToClassList(R.UssClasses.currentNoteLyrics);
+                
+                themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
+                    label.style.color = new StyleColor(color));
             }
             else
             {
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
+                
+                themeManager.GetCurrentTheme().ThemeJson.lyricsColor.IfNotDefault(color =>
+                    label.style.color = new StyleColor(color));
             }
         }
     }
@@ -159,6 +177,63 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             SortedNotes = new List<Note>();
         }
         FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence);
+        UpdateFontSize(currentSentenceContainer);
+    }
+
+    private void UpdateFontSize(VisualElement visualElement)
+    {
+        // When the first label is ready, update the font size of all labels.
+        Label firstLabel = visualElement.Q<Label>();
+        if (firstLabel == null)
+        {
+            return;
+        }
+        
+        firstLabel.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+        {
+            DoUpdateFontSize(visualElement);
+        });
+    }
+    
+    /**
+     * Reduces the font size until all labels fit in the container
+     */
+    private void DoUpdateFontSize(VisualElement visualElement)
+    {
+        List<Label> labels = visualElement.Query<Label>().ToList();
+        if (labels.IsNullOrEmpty())
+        {
+            Debug.Log("No labels");
+            return;
+        }
+        
+        float GetTotalLabelWidth()
+        {
+            return labels.Select(label =>
+            {
+                Vector2 preferredSize = label.MeasureTextSize(label.text,
+                    0, VisualElement.MeasureMode.Undefined,
+                    0, VisualElement.MeasureMode.Undefined);
+                return preferredSize.x;
+            }).Sum();
+        }
+
+        float fontSize = labels.FirstOrDefault().resolvedStyle.fontSize;
+        float containerWidth = visualElement.contentRect.width;
+        for (int iteration = 0; iteration < MaxFontSizeIterations; iteration++)
+        {
+            float totalLabelWidth = GetTotalLabelWidth();
+            if (totalLabelWidth > containerWidth)
+            {
+                if (fontSize <= MinFontSize)
+                {
+                    Debug.Log("Font size too small");
+                    return;
+                }
+                fontSize -= 1;
+                labels.ForEach(label => label.style.fontSize = fontSize);
+            }
+        }
     }
 
     private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence)
@@ -215,14 +290,19 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.AddToClassList(R.UssClasses.nextLyrics);
             }
 
+            themeManager.GetCurrentTheme().ThemeJson.lyricsColor.IfNotDefault(color =>
+                label.style.color = new StyleColor(color));
+            themeManager.GetCurrentTheme().ThemeJson.lyricsOutlineColor.IfNotDefault(color =>
+                label.style.unityTextOutlineColor = new StyleColor(color));
+            
             visualElement.Add(label);
-
         });
     }
 
     private void SetNextSentence(Sentence sentence)
     {
         FillContainerWithSentenceText(nextSentenceContainer, sentence);
+        UpdateFontSize(nextSentenceContainer);
     }
 
     private static bool IsItalicDisplayText(ENoteType type)

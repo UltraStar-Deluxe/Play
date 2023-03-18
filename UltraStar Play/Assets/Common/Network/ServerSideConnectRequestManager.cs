@@ -51,8 +51,6 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             return;
         }
 
-        GameObjectUtils.SetTopLevelGameObjectAndDontDestroyOnLoad(gameObject);
-
         serverUdpClient = !settings.OwnHost.IsNullOrEmpty()
             ? new UdpClient(new IPEndPoint(IPAddress.Parse(settings.OwnHost), settings.UdpPortOnServer))
             : new UdpClient(settings.UdpPortOnServer);

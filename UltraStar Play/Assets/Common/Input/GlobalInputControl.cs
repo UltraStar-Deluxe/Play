@@ -3,20 +3,22 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class GlobalInputControl : MonoBehaviour, INeedInjection
+public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        volumeBeforeMute = -1;
-    }
-
-    private static int volumeBeforeMute = -1;
+    public static GlobalInputControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<GlobalInputControl>();
 
     [Inject]
     private Settings settings;
 
-    protected void Start()
+    [Inject]
+    private VolumeControl volumeControl;
+    
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         // Toggle full-screen mode via F11
         InputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
@@ -25,6 +27,19 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
         // Mute / unmute audio via F12
         InputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
             .Subscribe(_ => ToggleMuteAudio());
+    }
+
+    private void ToggleMuteAudio()
+    {
+        volumeControl.ToggleMuteAudio();
+        if (volumeControl.IsMuted)
+        {
+            UiManager.CreateNotification("Mute");
+        }
+        else
+        {
+            UiManager.CreateNotification("Unmute");
+        }
     }
 
     private void ToggleFullscreen()
@@ -38,21 +53,5 @@ public class GlobalInputControl : MonoBehaviour, INeedInjection
                 settings.GraphicSettings.fullScreenMode = Screen.fullScreenMode;
                 Debug.Log("New full-screen mode " + settings.GraphicSettings.fullScreenMode);
             }));
-    }
-
-    public void ToggleMuteAudio()
-    {
-        if (volumeBeforeMute >= 0)
-        {
-            settings.AudioSettings.VolumePercent = volumeBeforeMute;
-            volumeBeforeMute = -1;
-            UiManager.CreateNotification("Unmute");
-        }
-        else
-        {
-            volumeBeforeMute = settings.AudioSettings.VolumePercent;
-            settings.AudioSettings.VolumePercent = 0;
-            UiManager.CreateNotification("Mute");
-        }
     }
 }

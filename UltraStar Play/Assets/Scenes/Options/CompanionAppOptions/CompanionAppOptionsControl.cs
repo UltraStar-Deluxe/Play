@@ -8,22 +8,10 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class CompanionAppOptionsControl : MonoBehaviour, INeedInjection, ITranslator
+public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
     [InjectedInInspector]
     public VisualTreeAsset connectedClientListEntryAsset;
-
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject(UxmlName = R.UxmlNames.connectedClientCountLabel)]
     private Label connectedClientCountLabel;
@@ -32,29 +20,16 @@ public class CompanionAppOptionsControl : MonoBehaviour, INeedInjection, ITransl
     private ScrollView connectedClientList;
 
     [Inject]
-    private Settings settings;
-
-    [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         UpdateConnectedClients();
         serverSideConnectRequestManager.ClientConnectedEventStream
             .Subscribe(_ => UpdateConnectedClients())
             .AddTo(gameObject);
-
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
-    }
-
-    public void UpdateTranslation()
-    {
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_companionApp_title);
     }
 
     private void UpdateConnectedClients()

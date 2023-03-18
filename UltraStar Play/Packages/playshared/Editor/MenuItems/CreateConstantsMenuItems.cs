@@ -61,22 +61,22 @@ public static class CreateConstantsMenuItems
         uxmlNamesList.Sort();
 
         string classCode = CreateClassCode(className, subClassName, uxmlNamesList, null, true);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
+        FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
-    
+
     public static void CreateConstantsForUxmlNamesInPlayShared()
     {
         string className = "R_PlayShared";
         string subClassName = "UxmlNames";
-        string targetPath = $"Packages/playshared/Runtime/R/{className + subClassName}.cs";
-        if (!Directory.Exists(Path.GetDirectoryName(targetPath)))
+        string targetPath = $"Packages/playsharedui/Runtime/R/{className + subClassName}.cs";
+        string targetDirectory = Path.GetDirectoryName(targetPath);
+        if (!Directory.Exists(targetDirectory))
         {
             // The PlayShared folder only exists in the main game project.
             return;
         }
 
-        List<string> uxmlFiles = GetFilesInFolder("Packages/playshared/Runtime", "*.uxml")
+        List<string> uxmlFiles = GetFilesInFolder("Packages/playsharedui/Runtime", "*.uxml")
             .ToList();
 
         HashSet<string> uxmlNames = new();
@@ -85,8 +85,7 @@ public static class CreateConstantsMenuItems
         uxmlNamesList.Sort();
 
         string classCode = CreateClassCode(className, subClassName, uxmlNamesList, null, true);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
+        FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
     
     public static void CreateConstantsForUssClasses()
@@ -113,24 +112,24 @@ public static class CreateConstantsMenuItems
         ussClassesList.Sort();
 
         string classCode = CreateClassCode(className, subClassName, ussClassesList, null, true);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
+        FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
     
     public static void CreateConstantsForUssClassesInPlayShared()
     {
         string className = "R_PlayShared";
         string subClassName = "UssClasses";
-        string targetPath = $"Packages/playshared/Runtime/R/{className + subClassName}.cs";
-        if (!Directory.Exists(Path.GetDirectoryName(targetPath)))
+        string targetPath = $"Packages/playsharedui/Runtime/R/{className + subClassName}.cs";
+        string targetDirectory = Path.GetDirectoryName(targetPath);
+        if (!Directory.Exists(targetDirectory))
         {
             // The PlayShared folder only exists in the main game project.
             return;
         }
 
-        List<string> uxmlFiles = GetFilesInFolder("Packages/playshared/Runtime", "*.uxml")
+        List<string> uxmlFiles = GetFilesInFolder("Packages/playsharedui/Runtime", "*.uxml")
             .ToList();
-        List<string> ussFiles = GetFilesInFolder("Packages/playshared/Runtime", "*.uss")
+        List<string> ussFiles = GetFilesInFolder("Packages/playsharedui/Runtime", "*.uss")
             .ToList();
 
         HashSet<string> ussClassesHashSet = new();
@@ -140,8 +139,7 @@ public static class CreateConstantsMenuItems
         ussClassesList.Sort();
 
         string classCode = CreateClassCode(className, subClassName, ussClassesList, null, true);
-        File.WriteAllText(targetPath, classCode, Encoding.UTF8);
-        Debug.Log("Generated file " + targetPath);
+        FileUtils.WriteAllTextIfChanged(targetPath, classCode);
     }
     
     private static IEnumerable<string> FindUxmlNames(string uxmlFile)
@@ -197,13 +195,19 @@ public static class CreateConstantsMenuItems
 
     private static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
     {
-        List<string> result = new();
-        foreach (string fileExtension in fileExtensions)
+        return DirectoryUtils.GetFilesInFolder(folderPath, fileExtensions)
+            .Where(file => !IsFileIgnored(file))
+            .ToList();
+    }
+
+    private static bool IsFileIgnored(string file)
+    {
+        if (Path.GetFileName(file) == "UtilityStyles.uss")
         {
-            string[] files = Directory.GetFiles(folderPath, fileExtension, SearchOption.AllDirectories);
-            result.AddRange(files);
+            return true;
         }
-        return result.Distinct().ToList();
+
+        return false;
     }
 
     private static string CreateClassCode(string className, string subClassName, List<string> constantValues, List<string> fieldNames = null, bool useConst = false)

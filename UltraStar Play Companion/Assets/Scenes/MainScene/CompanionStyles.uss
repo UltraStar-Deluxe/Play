@@ -4,13 +4,17 @@
 }
 
 .stopRecordingButton {
-    background-color: rgb(224, 0, 0);
+    background-color: #dc3545;
 }
 
 .stopRecordingButton:hover {
-    background-color: rgb(255, 0, 0);
+    background-color: #F2452E;
 }
 
 .stopRecordingButton:focus {
-    background-color: rgb(255, 0, 0);
+    background-color: #F2452E;
+}
+
+#background {
+    background-image: url('project://database/Assets/Common/Graphics/Backgrounds/CompanionAppBg.jpg'); 
 }

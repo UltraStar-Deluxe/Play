@@ -1,28 +1,15 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background">
-        <ui:VisualElement class="optionsSceneMainContainer">
-            <ui:VisualElement name="topRow" class="optionsSceneTopRow">
-                <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer">
-                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <MaterialIcon icon="people" name="titleImage" />
-                        <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Player Profiles" name="sceneTitle" class="titleText" />
-                        </ui:VisualElement>
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="songListContainer" style="width: 100%; flex-grow: 1; margin-bottom: 20px; height: 50%;">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="profileList" class="outline roundCorners" style="height: 100%;" />
-                <ui:Button name="addButton" class="middleCenterText roundButton outline" style="position: absolute; bottom: 20px; right: 30px; font-size: 30px;">
-                    <MaterialIcon name="addIcon" icon="add" />
-                </ui:Button>
-            </ui:VisualElement>
-            <ui:VisualElement name="bottomButtonRow" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end; flex-direction: row;">
-                <ui:Button name="helpButton" class="squareButton" style="margin-right: 5px; flex-direction: row;">
-                    <MaterialIcon name="helpIcon" icon="help_outline" picking-mode="Ignore" />
-                </ui:Button>
-                <ui:Button text="Back" name="backButton" class="controlMinWidth" />
-            </ui:VisualElement>
+    <ui:Template name="PlayerProfileListEntryUi" src="project://database/Assets/Scenes/Options/PlayerProfileOptions/PlayerProfileListEntryUi.uxml?fileID=9197481963319205126&amp;guid=02348618f8cffba42864c8979a4bd8ba&amp;type=3#PlayerProfileListEntryUi" />
+    <ui:VisualElement name="loadedOptionsRoot">
+        <ui:VisualElement name="songListContainer" style="flex-grow: 1; min-height: 200px;">
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" vertical-scroller-visibility="AlwaysVisible" name="playerProfileList" class="roundCorners mb-3 flexWrapScrollView">
+                <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+                <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+                <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
+            </ui:ScrollView>
+            <ui:Button name="addButton" class="middleCenterText circleButton lightButton" style="font-size: 30px; align-self: center; bottom: 0;">
+                <MaterialIcon name="addIcon" icon="add" />
+            </ui:Button>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

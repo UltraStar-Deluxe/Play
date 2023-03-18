@@ -21,6 +21,7 @@
     "com.yasirkula.androidruntimepermissions": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git",
     "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.5.8",
     "playshared": "file:../../UltraStar Play/Packages/playshared",
+    "playsharedui": "file:../../UltraStar Play/Packages/playsharedui",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

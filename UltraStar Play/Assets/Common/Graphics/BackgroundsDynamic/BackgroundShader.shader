@@ -2,7 +2,7 @@ Shader "UltraStar Play/Background Shader"
 {
     Properties
     {
-        [NoScaleOffset][HideInInspector] _MainTex ("Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _ParticleTex ("Particle Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _UiTex ("UI Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _TransitionTex ("Transition Texture", 2D) = "white" {}
         [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "gray" {}
@@ -52,7 +52,7 @@ Shader "UltraStar Play/Background Shader"
             half _Gradient;
             half _EnableGradientAnimation;
 
-            sampler2D _MainTex;
+            sampler2D _ParticleTex;
             sampler2D _UiTex;
             sampler2D _TransitionTex;
             sampler2D _ColorRampTex;
@@ -197,7 +197,7 @@ Shader "UltraStar Play/Background Shader"
                 #endif
 
                 // Gather the grayscale version of the background scene with particles, etc.
-                half sceneGrayscale = tex2D(_MainTex, input.texcoord0.xy).r;
+                half sceneGrayscale = tex2D(_ParticleTex, input.texcoord0.xy).r;
                 // and remap colors using the selected gradient texture
                 half coords =  lerp(gradient, 1 - gradient, sceneGrayscale);
                 half3 color = tex2Dgrad(_ColorRampTex, coords.xx + frac(_TimeApplication.xx * _ColorRampScrolling), 0, 0).rgb;

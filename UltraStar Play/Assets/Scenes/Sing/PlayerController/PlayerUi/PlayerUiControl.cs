@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -11,11 +12,14 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 {
     private const int LineCount = 10;
 
-    [Inject(Key = Injector.RootVisualElementInjectionKey)]
-    public VisualElement RootVisualElement { get; private set; }
-
     [Inject]
     private PlayerScoreControl playerScoreControl;
+    
+    [Inject]
+    private ThemeManager themeManager;
+    
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    public VisualElement RootVisualElement { get; private set; }
 
     [Inject(Optional = true)]
     private MicProfile micProfile;
@@ -29,24 +33,27 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject(UxmlName = R.UxmlNames.playerScoreContainer)]
-    private VisualElement playerScoreContainer;
-
     [Inject(UxmlName = R.UxmlNames.playerScoreLabel)]
     private Label playerScoreLabel;
 
-    [Inject(UxmlName = R.UxmlNames.micDisconnectedContainer)]
-    private VisualElement micDisconnectedContainer;
+    [Inject(UxmlName = R.UxmlNames.micDisconnectedIcon)]
+    private VisualElement micDisconnectedIcon;
 
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
 
+    [Inject(UxmlName = R.UxmlNames.playerImageBorder)]
+    private VisualElement playerImageBorder;
+    
     [Inject(UxmlName = R.UxmlNames.playerNameLabel)]
     private Label playerNameLabel;
 
     [Inject(UxmlName = R.UxmlNames.leadingPlayerIcon)]
     private VisualElement leadingPlayerIcon;
 
+    [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
+    private RadialProgressBar playerScoreProgressBar;
+    
     [Inject]
     private Settings settings;
 
@@ -67,7 +74,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private int totalScoreAnimationId;
     private int micDisconnectedAnimationId;
     private int leadingPlayerIconAnimationId;
-
+    private Dictionary<ESentenceRating, Color32> sentenceRatingColors;
+    
     public void OnInjectionFinished()
     {
         InitPlayerNameAndImage();
@@ -83,10 +91,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 ShowTotalScore(playerScoreControl.TotalScore);
                 ShowSentenceRating(sentenceScoreEvent.SentenceRating, sentenceRatingContainer);
             });
-        }
-        else
-        {
-            playerScoreContainer.HideByDisplay();
         }
 
         // Show an effect for perfectly sung notes
@@ -117,6 +121,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .Subscribe(xs => CreatePerfectSentenceEffect());
 
         ChangeLayoutByPlayerCount();
+
+        sentenceRatingColors = themeManager.GetSentenceRatingColors();
     }
 
     private void InitPlayerNameAndImage()
@@ -131,6 +137,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             // because it is neither associated with a score nor with lyrics.
             playerNameLabel.HideByDisplay();
             playerImage.HideByDisplay();
+            playerScoreProgressBar.HideByDisplay();
             return;
         }
 
@@ -139,7 +146,24 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .CreateAndInject<PlayerProfileImageControl>();
         if (micProfile != null)
         {
-            playerScoreContainer.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+            playerScoreProgressBar.ShowByDisplay();
+            playerScoreProgressBar.ShowByVisibility();
+            playerScoreProgressBar.progressColor = micProfile.Color;
+            playerImageBorder.SetBorderColor(micProfile.Color);
+        }
+        else
+        {
+            playerScoreProgressBar.HideByVisibility();
+            playerImageBorder.HideByVisibility();
+        }
+
+        if (!settings.GraphicSettings.showPlayerNames)
+        {
+            playerNameLabel.HideByDisplay();
+        }
+        if (!settings.GraphicSettings.showScoreNumbers)
+        {
+            playerScoreLabel.HideByDisplay();
         }
     }
 
@@ -176,13 +200,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void HideMicDisconnectedInfo()
     {
-        micDisconnectedContainer.HideByVisibility();
+        micDisconnectedIcon.HideByVisibility();
     }
 
     private void ShowMicDisconnectedInfo()
     {
-        micDisconnectedContainer.ShowByVisibility();
-        micDisconnectedContainer.Q<Label>().text = "Mic Disconnected";
+        micDisconnectedIcon.ShowByVisibility();
 
         // Bouncy size animation
         if (micDisconnectedAnimationId > 0)
@@ -191,10 +214,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         Vector3 from = Vector3.one * 0.5f;
-        micDisconnectedContainer.style.scale = new StyleScale(new Scale(from));
+        micDisconnectedIcon.style.scale = new StyleScale(new Scale(from));
         micDisconnectedAnimationId = LeanTween.value(singSceneControl.gameObject, from, Vector3.one, 0.5f)
             .setEaseSpring()
-            .setOnUpdate(s => micDisconnectedContainer.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))))
+            .setOnUpdate(s => micDisconnectedIcon.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))))
             .id;
     }
 
@@ -208,21 +231,26 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
         visualElement.Q<Label>().text = sentenceRating.Text;
-        visualElement.style.unityBackgroundImageTintColor = sentenceRating.BackgroundColor;
-        visualElement.style.right = 0;
+        visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         parentContainer.Add(visualElement);
 
-        // Animate moving upwards, then destroy
-        float visualElementHeight = 30;
-        visualElement.style.top = visualElementHeight;
-        LeanTween.value(singSceneControl.gameObject, visualElementHeight, 0, 1f)
+        // Animate movement, then destroy
+        void SetPosition(float value)
+        {
+            visualElement.style.bottom = new StyleLength(new Length(value, LengthUnit.Percent));
+        }
+        
+        float fromValue = 100;
+        float untilValue = 0;
+        SetPosition(fromValue);
+        LeanTween.value(singSceneControl.gameObject, fromValue, untilValue, 1f)
             .setEaseInSine()
-            .setOnUpdate(interpolatedTop => visualElement.style.top = interpolatedTop)
+            .setOnUpdate(interpolatedValue => SetPosition(interpolatedValue))
             .setOnComplete(visualElement.RemoveFromHierarchy);
         return visualElement;
     }
 
-    private void ShowTotalScore(int score)
+    public void ShowTotalScore(int score, bool animate = true)
     {
         if (settings.GameSettings.ScoreMode == EScoreMode.None)
         {
@@ -243,9 +271,22 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             score = 0;
         }
-        totalScoreAnimationId = LeanTween.value(singSceneControl.gameObject, lastDisplayedScore, score, 1f)
-            .setOnUpdate((float interpolatedScoreValue) => playerScoreLabel.text = interpolatedScoreValue.ToString("0"))
-            .id;
+
+        if (animate)
+        {
+            totalScoreAnimationId = LeanTween.value(singSceneControl.gameObject, lastDisplayedScore, score, 1f)
+                .setOnUpdate((float interpolatedScoreValue) =>
+                {
+                    playerScoreLabel.text = interpolatedScoreValue.ToString("0");
+                    playerScoreProgressBar.progress = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+                })
+                .id;
+        }
+        else
+        {
+            playerScoreLabel.text = score.ToString("0");
+            playerScoreProgressBar.progress = (float)(100.0 * score / PlayerScoreControl.maxScore);
+        }
     }
 
     private void CreatePerfectSentenceEffect()

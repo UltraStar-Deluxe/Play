@@ -152,7 +152,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MusicPlaybackSpeed,
             newValue => SetMusicPlaybackSpeed(newValue),
             false);
-        resetMusicPlaybackSpeedButton.RegisterCallbackButtonTriggered(() =>
+        resetMusicPlaybackSpeedButton.RegisterCallbackButtonTriggered(_ =>
         {
             SetMusicPlaybackSpeed(1);
             musicPlaybackSpeedSlider.value = 1;
@@ -219,7 +219,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MidiPlaybackOffsetInMillis.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MidiPlaybackOffsetInMillis = newIntValue));
 
-        importMidiFileButton.RegisterCallbackButtonTriggered(() => CreateImportMidiFileDialog());
+        importMidiFileButton.RegisterCallbackButtonTriggered(_ => CreateImportMidiFileDialog());
 
         // Show / hide VisualElements
         Bind(showLyricsAreaToggle,

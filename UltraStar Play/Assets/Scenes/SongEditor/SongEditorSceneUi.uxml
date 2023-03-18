@@ -27,8 +27,8 @@
                 <ui:VisualElement name="noteAreaSelectionFrame" picking-mode="Ignore" style="background-color: rgba(21, 88, 219, 0.5); position: absolute; display: none;" />
                 <ui:VisualElement name="noteAreaPositionInSongIndicator" picking-mode="Ignore" style="width: 1px; height: 100%; background-color: rgb(200, 33, 33); position: absolute; left: 100px;" />
                 <ui:VisualElement name="mitPitchIndicatorContainer" picking-mode="Ignore" style="width: 100%; height: 100%;">
-                    <MaterialIcon name="micPitchOutOfRangeIndicatorTop" icon="mic" class="error" style="position: absolute; top: 5px;" />
-                    <MaterialIcon name="micPitchOutOfRangeIndicatorBottom" icon="mic" class="error" style="position: absolute; bottom: 5px;" />
+                    <MaterialIcon name="micPitchOutOfRangeIndicatorTop" icon="mic" class="errorFontColor" style="position: absolute; top: 5px;" />
+                    <MaterialIcon name="micPitchOutOfRangeIndicatorBottom" icon="mic" class="errorFontColor" style="position: absolute; bottom: 5px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: auto;">

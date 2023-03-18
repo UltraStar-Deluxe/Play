@@ -27,6 +27,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     [Inject]
     public PlayerProfile PlayerProfile { get; private set; }
 
+    [Inject(Key = nameof(playerProfileIndex))]
+    private int playerProfileIndex;
+    
     [Inject(Optional = true)]
     public MicProfile MicProfile { get; private set; }
 
@@ -35,7 +38,25 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     [Inject(Key = nameof(playerUi))]
     private VisualTreeAsset playerUi;
+    
+    [Inject(Key = nameof(playerInfoUi))]
+    private VisualTreeAsset playerInfoUi;
+    
+    [Inject(UxmlName = R.UxmlNames.playerInfoUiListBottomLeft)]
+    private VisualElement playerInfoUiListBottomLeft;
+    
+    [Inject(UxmlName = R.UxmlNames.playerInfoUiListBottomRight)]
+    private VisualElement playerInfoUiListBottomRight;
+    
+    [Inject(UxmlName = R.UxmlNames.playerInfoUiListTopLeft)]
+    private VisualElement playerInfoUiListTopLeft;
+    
+    [Inject(UxmlName = R.UxmlNames.playerInfoUiListTopRight)]
+    private VisualElement playerInfoUiListTopRight;
 
+    [Inject]
+    private SingSceneData sceneData;
+    
     private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new();
     public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
 
@@ -63,11 +84,20 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         SortedSentences = Voice.Sentences.ToList();
         SortedSentences.Sort(Sentence.comparerByStartBeat);
 
-        // Inject all children
+        // Create UI
         VisualElement playerUiVisualElement = playerUi.CloneTree().Children().First();
-        Injector playerUiControlInjector = UniInjectUtils.CreateInjector(childrenInjector);
-        playerUiControlInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, playerUiVisualElement);
-        playerUiControlInjector.AddBindingForInstance(playerUiControlInjector);
+        playerUiVisualElement.userData = this;
+        VisualElement playerInfoUiVisualElement = playerInfoUi.CloneTree().Children().First();
+        playerInfoUiVisualElement.userData = this;
+        AddPlayerInfoUiToUiDocument(playerInfoUiVisualElement);
+        
+        // Inject all children.
+        // The injector hierarchy is searched from the bottom up.
+        // Thus, we can create an injection hierarchy with elements that are not necessarily in the same VisualElement hierarchy.
+        Injector playerUiControlInjector = childrenInjector.CreateChildInjector()
+            .WithRootVisualElement(playerInfoUiVisualElement)
+            .CreateChildInjector()
+            .WithRootVisualElement(playerUiVisualElement);
         playerUiControlInjector.Inject(PlayerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {
@@ -77,6 +107,56 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             }
         }
         SetDisplaySentenceIndex(0);
+    }
+
+    private void AddPlayerInfoUiToUiDocument(VisualElement playerInfoUiVisualElement)
+    {
+        bool hasTopPlayerInfoUiRow = (sceneData.SelectedPlayerProfiles.Count > 1 
+                                      && sceneData.PlayerProfileToVoiceNameMap.Values
+                                          .Distinct()
+                                          .Count() > 1) 
+                                     || sceneData.SelectedPlayerProfiles.Count > 8;
+        
+        int voiceIndex = songMeta.GetVoices().IndexOf(Voice);
+        if (hasTopPlayerInfoUiRow
+            && voiceIndex <= 0)
+        {
+            // Prefer position near the top lyrics
+            Debug.Log("Prefer top");
+            List<VisualElement> playerInfoUiLists = new()
+            {
+                playerInfoUiListTopLeft,
+                playerInfoUiListTopRight,
+                playerInfoUiListBottomLeft,
+                playerInfoUiListBottomRight,
+            };
+
+            AddPlayerInfoUiToFreePlayerInfoUiList(playerInfoUiVisualElement, playerInfoUiLists);
+        }
+        else
+        {
+            // Prefer position near the bottom lyrics
+            Debug.Log("Prefer bottom");
+            List<VisualElement> playerInfoUiLists = new()
+            {
+                playerInfoUiListBottomLeft,
+                playerInfoUiListBottomRight,
+                playerInfoUiListTopLeft,
+                playerInfoUiListTopRight,
+            };
+
+            AddPlayerInfoUiToFreePlayerInfoUiList(playerInfoUiVisualElement, playerInfoUiLists);
+        }
+    }
+
+    private void AddPlayerInfoUiToFreePlayerInfoUiList(VisualElement playerInfoUiVisualElement, List<VisualElement> playerInfoUiLists)
+    {
+        VisualElement playerInfoUiList = playerInfoUiLists.FirstOrDefault(it => it.childCount < 4);
+        if (playerInfoUiList == null)
+        {
+            playerInfoUiList = playerInfoUiLists.LastOrDefault();
+        }
+        playerInfoUiList.Add(playerInfoUiVisualElement);
     }
 
     public void UpdateUi()

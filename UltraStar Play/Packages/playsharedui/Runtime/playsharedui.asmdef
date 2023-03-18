@@ -1,0 +1,26 @@
+{
+    "name": "playsharedui",
+    "rootNamespace": "",
+    "references": [
+        "playshared",
+        "Unity.InputSystem",
+        "Serilog",
+        "Plugins",
+        "UniRx",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.protrans",
+        "com.achimmihca.primeinputactions",
+        "com.achimmihca.simplehttpserverforunity",
+        "com.achimmihca.utfunknownunity",
+        "IngameDebugConsole.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

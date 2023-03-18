@@ -10,7 +10,8 @@
         "com.achimmihca.primeinputactions",
         "Unity.TextMeshPro",
         "Unity.InputSystem",
-        "playshared"
+        "playshared",
+        "playsharedui"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -37,11 +37,7 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack()
     {
-        if (singSceneControl.IsDialogOpen)
-        {
-            singSceneControl.CloseDialog();
-        }
-        else if (!songAudioPlayer.IsPlaying)
+        if (!songAudioPlayer.IsPlaying)
         {
             singSceneControl.TogglePlayPause();
         }

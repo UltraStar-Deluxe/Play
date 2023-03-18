@@ -1,28 +1,30 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background" style="width: 100%; height: 100%;">
-        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 50px; padding-bottom: 20px; width: 100%;">
-            <ui:VisualElement name="topRow" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
-                <ui:VisualElement name="titleContainer" style="align-items: flex-start; width: 40%;">
-                    <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center;">
-                        <MaterialIcon name="titleImage" icon="info_outline" />
-                        <ui:VisualElement name="backIcon" class="iconImage" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
-                        <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="About" name="sceneTitle" class="titleText" />
-                            <ui:Label text="UltraStar Play" name="sceneTitle" class="titleSubText" style="width: auto;" />
-                        </ui:VisualElement>
+    <ui:VisualElement name="background" class="px-4 pb-4 pt-2" style="align-items: flex-start;">
+        <ui:VisualElement name="row" class="pb-2" style="justify-content: flex-start; align-items: center; width: 100%;">
+            <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer" style="width: auto;">
+                <ui:Button name="backButton" class="circleButton transparentButton mr-2">
+                    <MaterialIcon icon="arrow_back" name="image" />
+                </ui:Button>
+                <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
+                    <ui:VisualElement name="titleAndDescription">
+                        <ui:Label text="About" name="sceneTitle" class="titleText" style="-unity-font-style: bold; flex-shrink: 1; min-width: 120px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:Button text="&lt;" name="previousItemButton" />
-                <ui:Label text="1 / 2" name="itemIndexLabel" class="middleCenterText" style="font-size: 18px;" />
-                <ui:Button text="&gt;" name="nextItemButton" />
             </ui:VisualElement>
-            <ui:VisualElement name="centerContent" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; background-color: rgba(0, 0, 0, 0.25);">
+        </ui:VisualElement>
+        <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="aboutTextsScrollView" vertical-scroller-visibility="AlwaysVisible" class="mr-3" style="min-width: 25%;">
+                <ToggleButton name="aboutUSPlayButton" class="toggleButton mb-2">
+                    <ui:Label text="UltraStar Play" name="label" />
+                </ToggleButton>
+                <ToggleButton name="songsOptionsButton" class="toggleButton mb-2">
+                    <ui:Label text="Licenses" name="label" />
+                </ToggleButton>
+            </ui:ScrollView>
+            <ui:VisualElement name="centerContent" style="flex-grow: 1;">
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" focusable="true" style="flex-grow: 1; height: 400px;">
                     <ui:TextField picking-mode="Ignore" text="This is the about text&#10;on multiple lines." name="aboutText" readonly="true" multiline="true" class="noBackground smallFont" style="padding-left: 10px; padding-right: 10px; padding-top: 10px; padding-bottom: 10px; white-space: normal; height: auto;" />
                 </ui:ScrollView>
-            </ui:VisualElement>
-            <ui:VisualElement name="bottomContent" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: flex-end;">
-                <ui:Button name="backButton" value="This is the about text on multiple lines." text="Back" class="controlMinWidth" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

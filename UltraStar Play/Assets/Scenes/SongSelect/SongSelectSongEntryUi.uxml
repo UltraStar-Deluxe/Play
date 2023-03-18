@@ -1,28 +1,23 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="songEntryUiRoot" class="roundCorners" style="width: 100%; height: 100%; position: absolute; background-color: rgb(6, 170, 233); max-height: 200px; max-width: 150px;">
-        <ui:VisualElement name="songImageOuter" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-and-crop; flex-grow: 10;">
-            <ui:VisualElement name="songImageInner" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-to-fit; flex-grow: 1; display: none;" />
-            <ui:VisualElement name="songPreviewVideoImage" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; background-image: url(&apos;project://database/Assets/Scenes/SongSelect/SongSelectVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=363c6948b86eebc4daacef28984654ff&amp;type=2#SongSelectVideoRenderTexture&apos;);" />
-            <ui:VisualElement name="songPreviewBackgroundImage" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="songInfo" picking-mode="Ignore" style="height: 25%; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 0; flex-shrink: 0; min-height: 50px; flex-grow: 1;">
-            <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="ellipsis smallFont" style="-unity-font-style: bold; margin-bottom: 5px; max-height: 33px;" />
-            <ui:Label text="Some very very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" class="ellipsis smallFont" style="width: 90%; flex-grow: 1; white-space: normal; max-height: 66%;" />
-            <ui:VisualElement name="titleRow" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; align-items: center;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="iconBar" picking-mode="Ignore" style="position: absolute; flex-shrink: 0; right: 5px; top: 5px; align-items: center;">
-            <MaterialIcon name="songEntryFavoriteIcon" icon="favorite" class="smallFont" />
-            <ui:VisualElement name="songEntryDuetIcon" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=21300000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="songMenuOverlay" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; background-color: rgba(32, 32, 32, 0.88); display: none;">
-            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="songMenuOverlayScrollView" style="width: 100%; height: 100%; align-items: center; padding-left: 5px; padding-top: 5px; padding-bottom: 5px;">
-                <ui:Button text="Sing" display-tooltip-when-elided="true" name="singThisSongButton" />
-                <ui:VisualElement name="modifyPlaylistButtonContainer" />
-                <ui:Button text="Editor" display-tooltip-when-elided="true" name="openSongEditorButton" />
-                <ui:Button text="Reload" display-tooltip-when-elided="true" name="reloadSongButton" />
-                <ui:Button text="Open Folder" display-tooltip-when-elided="true" name="openSongFolderButton" />
-                <ui:Button text="Back" display-tooltip-when-elided="true" name="closeSongOverlayButton" />
-            </ui:ScrollView>
+    <ui:VisualElement name="songEntryUiRoot" class="roundCorners" style="height: 66px; padding-right: 4px; padding-top: 4px; padding-bottom: 4px;">
+        <ui:VisualElement name="row" class="listItem dynamicPanel backgroundTransition" style="background-color: rgb(6, 170, 233); border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; overflow: hidden;">
+            <ui:VisualElement name="songImageOuter" picking-mode="Ignore" class="mr-2" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-and-crop; flex-shrink: 0; min-width: 20px; min-height: 20px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; height: 58px; width: 58px;">
+                <ui:VisualElement name="songImageInner" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); -unity-background-scale-mode: scale-to-fit; flex-grow: 1; display: none;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="songInfoContainer" picking-mode="Ignore" style="min-height: 50px; flex-grow: 1;">
+                <ui:Label text="Some very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" style="white-space: normal; -unity-font-style: bold;" />
+                <ui:Label text="Some very very long artist name" display-tooltip-when-elided="true" name="songArtist" picking-mode="Ignore" class="smallFont secondaryFontColor" />
+                <ui:VisualElement name="titleRow" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; align-items: center;" />
+                <ui:VisualElement name="iconBar" picking-mode="Ignore" class="mt-auto" style="flex-shrink: 0; align-items: center; flex-direction: row;">
+                    <MaterialIcon name="songEntryFavoriteIcon" icon="favorite" class="smallFont fontColor" />
+                    <ui:VisualElement name="songEntryDuetIcon" picking-mode="Ignore" class="fontColor" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/DuetIcon.png?fileID=2800000&amp;guid=ecea42b89d4de5f42a25fd1a598b26a1&amp;type=3#DuetIcon&apos;); width: 12px; height: 12px; flex-shrink: 0; display: flex; -unity-background-scale-mode: scale-to-fit;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="column" style="justify-content: center; flex-shrink: 0;">
+                <ui:Button display-tooltip-when-elided="true" name="openSongMenuButton" class="squareButton transparentBackgroundColor">
+                    <MaterialIcon tabindex="-1" picking-mode="Ignore" name="openSongMenuIcon" icon="more_vert" style="font-size: 18px;" />
+                </ui:Button>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

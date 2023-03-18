@@ -1,4 +1,5 @@
-﻿using UnityEditor.Build;
+﻿using UnityEngine;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
 public class CreateConstantsBuildPreprocessor : IPreprocessBuildWithReport
@@ -7,6 +8,7 @@ public class CreateConstantsBuildPreprocessor : IPreprocessBuildWithReport
 
     public void OnPreprocessBuild(BuildReport report)
     {
+        Debug.Log("CreateConstantsBuildPreprocessor - OnPreprocessBuild");
         CreateConstantsMenuItems.CreateAllConstants();
     }
 }

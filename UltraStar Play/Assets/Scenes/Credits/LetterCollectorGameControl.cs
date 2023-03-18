@@ -95,7 +95,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
         creditsCategoryEntries = JsonConverter.FromJson<List<CreditsCategoryEntry>>(creditsEntriesTextAsset.text);
         SelectNextCategoryEntry();
 
-        skipButton.RegisterCallbackButtonTriggered(() => forceFadeOut = true);
+        skipButton.RegisterCallbackButtonTriggered(_ => forceFadeOut = true);
     }
 
     private void SelectNextCategoryEntry()

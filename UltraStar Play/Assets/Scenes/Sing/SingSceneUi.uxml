@@ -1,43 +1,73 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="SingingLyricsUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsUi.uxml?fileID=9197481963319205126&amp;guid=3b914bf71af2e4748a4d38d046a11420&amp;type=3#SingingLyricsUi" />
+    <ui:Template name="SingingLyricsTopUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsTopUi.uxml?fileID=9197481963319205126&amp;guid=e18d38c5ebc9c0e479d9ee9fa4ee4481&amp;type=3#SingingLyricsTopUi" />
+    <ui:Template name="PlayerInfoUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerInfoUi.uxml?fileID=9197481963319205126&amp;guid=063c379bdb2070f438a6d361949a732d&amp;type=3#PlayerInfoUi" />
     <ui:Template name="PlayerUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PlayerUi.uxml?fileID=9197481963319205126&amp;guid=9b1872cb139c5e34f94035c97230fb5b&amp;type=3#PlayerUi" />
-    <ui:Template name="SentenceRatingUi" src="project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/SentenceRatingUi.uxml?fileID=9197481963319205126&amp;guid=fc5ccc90fb3478b49bea1f39b1e6bcce&amp;type=3#SentenceRatingUi" />
+    <ui:Template name="SingingLyricsUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsBottomUi.uxml?fileID=9197481963319205126&amp;guid=3b914bf71af2e4748a4d38d046a11420&amp;type=3#SingingLyricsBottomUi" />
     <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/UIDocuments/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
     <ui:VisualElement name="background">
         <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
         <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none;" />
-        <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; height: 100%; position: absolute;">
+        <ui:VisualElement name="webcamRenderContainerParent" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; height: 100%; position: absolute;">
             <ui:Image name="webcamRenderContainer" style="flex-grow: 1; background-color: rgb(0, 0, 0); display: none;" />
         </ui:VisualElement>
-        <ui:Instance template="SingingLyricsUi" name="topLyricsContainer" style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; overflow: hidden;" />
-        <ui:VisualElement name="commonScoreContainer" style="flex-direction: row; justify-content: flex-end; align-items: center;">
-            <ui:VisualElement name="commonScoreContainerBackground" style="justify-content: center; align-items: flex-end; border-top-left-radius: 5px; border-bottom-left-radius: 0; border-top-right-radius: 5px; padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 2px; background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[sing]scoreBg.png?fileID=21300000&amp;guid=3c265bba4c7dfec43a0a3b5410a7c558&amp;type=3#[sing]scoreBg&apos;); -unity-background-image-tint-color: rgb(125, 198, 233); width: 120px;">
-                <ui:Label text="99999" display-tooltip-when-elided="true" name="commonScoreLabel" style="-unity-font-style: bold; text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5); -unity-text-align: middle-left; align-items: center; justify-content: center;" />
+        <ui:Instance template="SingingLyricsTopUi" name="topLyricsContainer">
+            <ui:VisualElement name="playerInfoUiListParentTop" style="width: 100%; flex-direction: row; padding-top: 2px; padding-left: 40px; padding-right: 20px;">
+                <ui:VisualElement name="playerInfoUiListTopLeft" class="playerInfoUiList" style="background-color: rgba(0, 0, 0, 0); justify-content: flex-start; align-items: flex-start; max-height: 1px; flex-direction: row;">
+                    <ui:Instance template="PlayerInfoUi" name="PlayerInfoUi" />
+                </ui:VisualElement>
+                <ui:VisualElement name="playerInfoUiListTopRight" class="playerInfoUiList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-items: flex-start; max-height: 1px; margin-left: auto;">
+                    <ui:Instance template="PlayerInfoUi" name="PlayerInfoUi" />
+                </ui:VisualElement>
             </ui:VisualElement>
-        </ui:VisualElement>
+        </ui:Instance>
         <ui:VisualElement name="playerUiContainer" style="width: 100%; flex-grow: 1;">
             <ui:VisualElement name="spacer" style="flex-grow: 1;" />
             <ui:Instance template="PlayerUi" name="playerUi" style="flex-grow: 1;" />
-            <ui:VisualElement name="commonScoreSentenceRatingContainer" style="position: absolute; width: 100%; height: 100%; align-items: flex-end; justify-content: flex-start;">
-                <ui:Instance template="SentenceRatingUi" name="SentenceRatingUi" />
+        </ui:VisualElement>
+        <ui:Instance template="SingingLyricsUi" name="bottomLyricsContainer" style="border-top-left-radius: 10px; border-top-right-radius: 10px;">
+            <ui:VisualElement name="commonScoreSentenceRatingContainer" class="overlay" style="height: 50px; bottom: 100%; align-items: center;" />
+            <ui:VisualElement name="playerInfoUiListParentBottom" style="width: 100%; padding-bottom: 2px; padding-left: 40px; flex-direction: row; padding-right: 20px;">
+                <ui:VisualElement name="playerInfoUiListBottomLeft" class="playerInfoUiList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-items: flex-end; max-height: 1px;">
+                    <ui:Instance template="PlayerInfoUi" name="PlayerInfoUi" />
+                </ui:VisualElement>
+                <ui:VisualElement name="playerInfoUiListBottomRight" class="playerInfoUiList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-start; align-items: flex-end; max-height: 1px; margin-left: auto;">
+                    <ui:Instance template="PlayerInfoUi" name="PlayerInfoUi" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:Instance>
+        <ui:VisualElement name="governanceOverlay" style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: flex-start;">
+            <ui:VisualElement name="centerControls" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; justify-content: center; align-items: center;">
+                <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" class="circle overlay" style="width: 70px; height: 70px;">
+                    <MaterialIcon tabindex="-1" icon="pause" name="pauseIcon" picking-mode="Ignore" style="font-size: 48px;" />
+                    <MaterialIcon tabindex="-1" icon="play_arrow" name="playIcon" picking-mode="Ignore" style="font-size: 48px; display: none;" />
+                </ui:Button>
+                <ui:VisualElement name="songInfoContainer" picking-mode="Ignore" style="align-items: center; bottom: 20%; position: absolute;">
+                    <ui:Label tabindex="-1" text="Some Title" display-tooltip-when-elided="true" name="titleLabel" picking-mode="Ignore" class="textShadow" style="-unity-font-style: bold; font-size: 24px;" />
+                    <ui:Label tabindex="-1" text="Some Artist" display-tooltip-when-elided="true" name="artistLabel" picking-mode="Ignore" class="textShadow" style="-unity-font-style: bold; font-size: 14px;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="bottomControlsContainer" style="width: 100%; align-items: center;">
+                <ui:VisualElement name="inputLegend" picking-mode="Ignore" class="smallerFont inputLegendBar" style="bottom: 0; width: 100%; flex-wrap: wrap; display: none;">
+                    <ui:Instance template="InputDeviceIconContainer" name="inputDeviceIconTemplate" style="position: absolute; left: 10px; height: 100%;" />
+                    <ui:Label text="Back: Escape" display-tooltip-when-elided="true" name="inputLegendLabel" class="inputLegendLabel" />
+                </ui:VisualElement>
+                <ui:VisualElement name="row" class="p-1" style="background-color: rgba(0, 0, 0, 0); width: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="toggleMuteButton" class="transparentBackgroundColor">
+                        <MaterialIcon tabindex="-1" icon="volume_off" name="muteIcon" picking-mode="Ignore" />
+                        <MaterialIcon tabindex="-1" icon="volume_up" name="unmuteIcon" picking-mode="Ignore" style="display: none;" />
+                    </ui:Button>
+                    <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex; flex-grow: 1; align-items: center;">
+                        <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1" style="min-width: 30px;" />
+                        <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; justify-content: center; height: 5px;">
+                            <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
+                            <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:Button display-tooltip-when-elided="true" name="openControlsMenuButton" class="transparentBackgroundColor">
+                        <MaterialIcon tabindex="-1" icon="settings" name="settingsIcon" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Instance template="SingingLyricsUi" name="bottomLyricsContainer" style="overflow: hidden; border-top-left-radius: 10px; border-top-right-radius: 10px;" />
-        <ui:VisualElement name="timeBar" class="tinyFont timeBar" style="flex-direction: row; display: flex;">
-            <ui:Label text="Time" display-tooltip-when-elided="true" name="timeLabel" />
-            <ui:VisualElement name="innerTimeBar" style="flex-grow: 1; margin-left: 15px; margin-right: 15px; margin-top: 3px; margin-bottom: 2px;">
-                <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
-                <ui:VisualElement name="timeBarPositionIndicator" style="height: 100%; width: 4px; background-color: rgb(0, 0, 0); position: absolute;" />
-            </ui:VisualElement>
-            <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" />
-        </ui:VisualElement>
-        <ui:VisualElement name="pauseOverlay" style="position: absolute; width: 100%; height: 100%; display: none; align-items: center; justify-content: flex-start; background-color: rgba(0, 0, 0, 0.5);">
-            <ui:Label text="Pause" display-tooltip-when-elided="true" name="pauseOverlayTitle" picking-mode="Ignore" class="textOutline" style="-unity-font-style: bold-and-italic; font-size: 48px; width: 100%; height: 100%; position: absolute; -unity-text-align: middle-center;" />
-            <ui:VisualElement name="inputLegend" picking-mode="Ignore" class="smallerFont inputLegendBar" style="bottom: 0; width: 100%; position: absolute; flex-wrap: wrap;">
-                <ui:Instance template="InputDeviceIconContainer" name="inputDeviceIconTemplate" style="position: absolute; left: 10px; height: 100%;" />
-                <ui:Label text="Back: Escape" display-tooltip-when-elided="true" name="inputLegendLabel" class="inputLegendLabel" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="doubleClickToTogglePauseElement" style="position: absolute; width: 100%; height: 100%; right: 0; left: 0;" />
     </ui:VisualElement>
 </ui:UXML>

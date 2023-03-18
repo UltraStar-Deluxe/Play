@@ -3,16 +3,19 @@
     "rootNamespace": "",
     "references": [
         "Unity.InputSystem",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
         "Serilog",
         "Plugins",
         "UniRx",
+        "IngameDebugConsole.Runtime",
         "com.achimmihca.uniinject",
         "com.achimmihca.protrans",
         "com.achimmihca.primeinputactions",
         "com.achimmihca.simplehttpserverforunity",
         "com.achimmihca.scenechangeanimations",
         "playshared",
-        "IngameDebugConsole.Runtime"
+        "playsharedui"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

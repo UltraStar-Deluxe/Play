@@ -9,7 +9,7 @@ using UniRx;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NewVersionAvailableDialogControl : AbstractDialogControl, IInjectionFinishedListener, ITranslator
+public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInjectionFinishedListener, ITranslator
 {
     [Inject(UxmlName = R.UxmlNames.dialogTitle)]
     private Label dialogTitle;
@@ -35,43 +35,42 @@ public class NewVersionAvailableDialogControl : AbstractDialogControl, IInjectio
 
     private readonly VisualElement parentVisualElement;
 
-    private readonly List<IDisposable> disposables = new();
-
     public NewVersionAvailableDialogControl(VisualElement dialogRootVisualElement,
         VisualElement parentVisualElement,
         Dictionary<string, string> remoteVersionProperties)
     {
-        this.dialogRootVisualElement = dialogRootVisualElement;
+        this.DialogRootVisualElement = dialogRootVisualElement;
         this.parentVisualElement = parentVisualElement;
         remoteVersionProperties.TryGetValue("release", out remoteRelease);
         remoteVersionProperties.TryGetValue("name", out releaseName);
         remoteVersionProperties.TryGetValue("website_link", out websiteLink);
     }
 
-    public void OnInjectionFinished()
+    public override void OnInjectionFinished()
     {
-        // Add callbacks to buttons
-        ignoreThisVersionButton.RegisterCallbackButtonTriggered(() =>
+        base.OnInjectionFinished();
+
+        ignoreThisVersionButton.RegisterCallbackButtonTriggered(_ =>
         {
             settings.IgnoredReleases.AddIfNotContains(remoteRelease);
             CloseDialog();
         });
 
-        ignoreAllFutureVersionsButton.RegisterCallbackButtonTriggered(() =>
+        ignoreAllFutureVersionsButton.RegisterCallbackButtonTriggered(_ =>
         {
             settings.IgnoredReleases.Clear();
             settings.IgnoredReleases.Add("all");
             CloseDialog();
         });
 
-        closeButton.RegisterCallbackButtonTriggered(() =>
+        closeButton.RegisterCallbackButtonTriggered(_ =>
         {
             CloseDialog();
         });
 
         UpdateTranslation();
 
-        parentVisualElement.Add(dialogRootVisualElement);
+        parentVisualElement.Add(DialogRootVisualElement);
 
         closeButton.Focus();
     }

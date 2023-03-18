@@ -15,6 +15,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         BindingBuilder bb = new();
         bb.BindExistingInstance(ApplicationManager.Instance);
         bb.BindExistingInstance(SceneNavigator.Instance);
+        bb.BindExistingInstance(SceneRecipeManager.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
         bb.BindExistingInstance(SongMetaManager.Instance);
         bb.BindExistingInstance(CursorManager.Instance);
@@ -24,6 +25,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(TranslationManager.Instance);
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
         bb.BindExistingInstance(WebCamManager.Instance);
+        bb.BindExistingInstance(DontDestroyOnLoadManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
         bb.BindExistingInstance(StatsManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
@@ -31,6 +33,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);
+        bb.BindExistingInstance(GlobalInputControl.Instance);
+        bb.BindExistingInstance(VolumeControl.Instance);
         bb.Bind(typeof(UltraStarPlayInputManager)).ToExistingInstance(UltraStarPlayInputManager.Instance);
         bb.BindExistingInstance(HttpServer.Instance);
         bb.BindExistingInstance(HttpServer.Instance as UltraStarPlayHttpServer);
@@ -54,11 +58,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
     private static UIDocument GetUiDocument()
     {
-        GameObject uiDocGameObject = GameObject.FindWithTag("UIDocument");
-        if (uiDocGameObject != null)
-        {
-            return uiDocGameObject.GetComponent<UIDocument>();
-        }
-        return null;
+        return UIDocumentUtils.FindUIDocumentOrThrow();
     }
 }

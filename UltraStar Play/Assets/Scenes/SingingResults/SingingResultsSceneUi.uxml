@@ -1,36 +1,53 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="SingingResultsPlayerUi" src="project://database/Assets/Scenes/SingingResults/SingingResultsPlayerUi.uxml?fileID=9197481963319205126&amp;guid=0f11bceaf8c280f499a9b5a0ee6b3b3e&amp;type=3#SingingResultsPlayerUi" />
-    <ui:Template name="SingingResultsPlayerUiAlternative" src="project://database/Assets/Scenes/SingingResults/SingingResultsPlayerUiAlternative.uxml?fileID=9197481963319205126&amp;guid=128bebf04d7e37e4799d2c7c8c5eee7a&amp;type=3#SingingResultsPlayerUiAlternative" />
-    <ui:VisualElement name="background" style="width: 100%; height: 100%;">
-        <ui:Button display-tooltip-when-elided="true" name="hiddenContinueButton" style="position: absolute; width: 100%; height: 100%; background-color: rgba(66, 163, 231, 0);" />
-        <ui:VisualElement picking-mode="Ignore" style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 50px; padding-right: 50px; padding-top: 10px; padding-bottom: 10px; width: 100%;">
-            <ui:VisualElement name="topRow" picking-mode="Ignore" style="flex-direction: row; align-items: center; justify-content: space-between; width: 100%; padding-bottom: 10px;">
-                <ui:VisualElement name="titleContainer" picking-mode="Ignore" style="align-items: flex-start; width: 40%;">
-                    <ui:VisualElement name="titleImageAndText" picking-mode="Ignore" style="flex-direction: row; align-items: center;">
-                        <MaterialIcon name="titleImage" icon="auto_awesome" />
-                        <ui:VisualElement name="titleAndDescription" picking-mode="Ignore">
-                            <ui:Label text="Song Scores" name="sceneTitle" class="titleText" />
-                            <ui:Label text="Some Song - Some Artist" name="sceneSubtitle" class="titleSubText" style="width: auto;" />
-                        </ui:VisualElement>
+    <ui:VisualElement name="background" class="p-3" style="width: 100%; height: 100%; padding-left: 6px;">
+        <ui:VisualElement name="row" style="flex-grow: 1;">
+            <ui:VisualElement name="column" picking-mode="Ignore" class="mr-4 child-mb-3" style="max-width: 33%;">
+                <ui:VisualElement name="songInfoContainer" style="padding-left: 10px;">
+                    <ui:VisualElement name="coverImage" class="mb-3" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/NoCover.jpg?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); height: 150px; -unity-background-scale-mode: scale-to-fit; width: 150px;" />
+                    <ui:Label text="Some Title" name="titleLabel" style="-unity-font-style: bold; font-size: 20px; white-space: normal;" />
+                    <ui:Label text="Some Artist" name="artistLabel" class="secondaryFontColor" style="-unity-font-style: normal; font-size: 14px; white-space: normal;" />
+                </ui:VisualElement>
+                <ToggleButton text="Your Results" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
+                <ToggleButton text="Highscores" display-tooltip-when-elided="true" name="showHighscoreButton" style="-unity-text-align: middle-left;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="playerResultsRoot" style="flex-grow: 1; justify-content: center; height: 100%;">
+                    <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="display: flex; flex-grow: 1; align-items: center;">
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="twoPlayerLayout" picking-mode="Ignore" style="margin-top: 20px; margin-bottom: 20px; flex-direction: row; flex-grow: 1; display: none; justify-content: center;">
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="nPlayerLayout" picking-mode="Ignore" style="flex-grow: 1; margin-top: 20px; margin-bottom: 20px; display: none; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center;">
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 1; justify-content: center; width: 100%;">
-                <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="width: 100%; margin-top: 20px; margin-bottom: 20px; height: 50%; display: flex; align-items: center; flex-grow: 1;">
-                    <ui:VisualElement style="width: 70%;">
-                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" style="height: 100%; width: 100%;" />
-                    </ui:VisualElement>
+                <ui:VisualElement name="highscoresRoot" style="flex-grow: 1; justify-content: flex-start; align-items: center; height: 100%; display: none;">
+                    <ItemPicker name="difficultyPicker" style="width: 50%;" />
+                    <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="highscoreEntryList" style="width: 100%; flex-grow: 1;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="twoPlayerLayout" picking-mode="Ignore" style="width: 100%; margin-top: 20px; margin-bottom: 20px; height: 80%; flex-direction: row; display: flex;">
-                    <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" style="height: 100%; width: 50%; flex-grow: 1;" />
-                    <ui:Instance template="SingingResultsPlayerUiAlternative" name="singingResultsPlayerUi" picking-mode="Ignore" style="width: 50%; flex-grow: 1;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="nPlayerLayout" picking-mode="Ignore" style="width: 100%; flex-grow: 1; margin-top: 20px; margin-bottom: 20px; height: auto; display: none; flex-direction: row;" />
             </ui:VisualElement>
-            <ui:VisualElement name="bottomContent" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: center; flex-direction: row; flex-shrink: 0;">
-                <ui:Button name="restartButton" value="This is the about text on multiple lines." text="Restart" class="wideControl" style="white-space: nowrap; margin-right: 5px;" />
-                <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" style="white-space: nowrap;" />
-            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="buttonRow" picking-mode="Ignore" style="flex-grow: 0; width: 100%; justify-content: flex-end; align-items: center; flex-direction: row; flex-shrink: 0; margin-top: auto; padding-left: 10px;">
+            <ui:Button name="restartButton" value="This is the about text on multiple lines." text="Replay" class="wideControl" style="white-space: nowrap; margin-right: auto;" />
+            <ui:Button name="continueButton" value="This is the about text on multiple lines." text="Continue" class="wideControl" style="white-space: nowrap;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

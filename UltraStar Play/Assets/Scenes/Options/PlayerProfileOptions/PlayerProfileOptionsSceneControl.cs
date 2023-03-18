@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -9,36 +10,16 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection
 {
     [InjectedInInspector]
     public VisualTreeAsset playerProfileListEntryAsset;
 
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.profileList)]
-    private ScrollView profileList;
+    [Inject(UxmlName = R.UxmlNames.playerProfileList)]
+    private ScrollView playerProfileList;
 
     [Inject(UxmlName = R.UxmlNames.addButton)]
     private Button addButton;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
-
-    [Inject(UxmlName = R.UxmlNames.helpButton)]
-    private Button helpButton;
-
-    private MessageDialogControl helpDialogControl;
-
-    [Inject]
-    private Settings settings;
 
     [Inject]
     private UiManager uiManager;
@@ -46,105 +27,91 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
     [Inject]
     private WebCamManager webCamManager;
 
-    [Inject]
-    private ThemeManager themeManager;
-
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         UpdatePlayerProfileList();
-        settings.ObserveEveryValueChanged(s => s.PlayerProfiles)
-            .Subscribe(onNext => UpdatePlayerProfileList())
-            .AddTo(gameObject);
 
-        addButton.RegisterCallbackButtonTriggered(() =>
+        addButton.RegisterCallbackButtonTriggered(_ =>
         {
             settings.PlayerProfiles.Add(new PlayerProfile());
-            UpdatePlayerProfileList();
+            CreatePlayerProfileEntry(settings.PlayerProfiles.FirstOrDefault(), settings.PlayerProfiles.Count - 1);
 
             // Focus on the name of the newly added player to directly allow changing its name
-            TextField nameTextField = profileList[profileList.childCount-1].Q<TextField>("nameTextField");
+            TextField nameTextField = playerProfileList[playerProfileList.childCount-1].Q<TextField>("nameTextField");
             nameTextField.Focus();
+            
+            ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
         });
-
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-
-        backButton.RegisterCallbackButtonTriggered(() => OnBack());
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
-            .Subscribe(_ => OnBack());
-    }
-
-    private void OnBack()
-    {
-        if (helpDialogControl != null)
-        {
-            CloseHelp();
-        }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.OptionsScene);
-        }
-    }
-
-    public void UpdateTranslation()
-    {
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_playerProfiles_title);
     }
 
     private void UpdatePlayerProfileList()
     {
-        profileList.Clear();
+        playerProfileList.Clear();
         int index = 0;
         settings.PlayerProfiles.ForEach(playerProfile =>
         {
-            profileList.Add(CreatePlayerProfileEntry(playerProfile, index));
+            CreatePlayerProfileEntry(playerProfile, index);
             index++;
         });
 
-        themeManager.ApplyThemeSpecificStylesToVisualElementsInScene();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
     }
 
-    private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
+    private void UpdatePlayerProfileInactiveOverlay(PlayerProfile playerProfile, VisualElement playerProfileInactiveOverlay)
     {
-        VisualElement result = playerProfileListEntryAsset.CloneTree();
+        playerProfileInactiveOverlay.ShowByDisplay();
+        if (playerProfile.IsEnabled)
+        {
+            playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(Colors.clearBlack);
+        }
+        else
+        {
+            playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.5f));
+        }
+    }
+    
+    private void CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
+    {
+        VisualElement visualElement = playerProfileListEntryAsset.CloneTree().Children().FirstOrDefault();
 
-        Button deleteButton = result.Q<Button>(R.UxmlNames.deleteButton);
-        deleteButton.RegisterCallbackButtonTriggered(() =>
-            {
-                settings.PlayerProfiles.RemoveAt(indexInList);
-                UpdatePlayerProfileList();
-                backButton.Focus();
-            });
+        VisualElement playerProfileInactiveOverlay = visualElement.Q<VisualElement>(R.UxmlNames.playerProfileInactiveOverlay);
 
-        TextField nameTextField = result.Q<TextField>(R.UxmlNames.nameTextField);
+        Button deleteButton = visualElement.Q<Button>(R.UxmlNames.deleteButton);
+        deleteButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            settings.PlayerProfiles.RemoveAt(indexInList);
+            visualElement.RemoveFromHierarchy();
+        });
+
+        TextField nameTextField = visualElement.Q<TextField>(R.UxmlNames.nameTextField);
         nameTextField.value = playerProfile.Name;
         nameTextField.RegisterValueChangedCallback(evt => playerProfile.Name = evt.newValue);
 
-        Toggle enabledToggle = result.Q<Toggle>(R.UxmlNames.enabledToggle);
+        SlideToggle enabledToggle = visualElement.Q<SlideToggle>(R.UxmlNames.enabledToggle);
         enabledToggle.value = playerProfile.IsEnabled;
-        enabledToggle.RegisterValueChangedCallback(evt => playerProfile.IsEnabled = evt.newValue);
-        result.Q<Label>(R.UxmlNames.enabledLabel).text = TranslationManager.GetTranslation(R.Messages.active);
+        enabledToggle.RegisterValueChangedCallback(evt =>
+        {
+            playerProfile.IsEnabled = evt.newValue;
+            UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
+        });
+        UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
 
-        new PlayerProfileImagePickerControl(result.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
+        new PlayerProfileImagePickerControl(visualElement.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
             .Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
-        new DifficultyPicker(result.Q<ItemPicker>(R.UxmlNames.difficultyPicker))
+        new DifficultyPicker(visualElement.Q<ItemPicker>(R.UxmlNames.difficultyPicker))
             .Bind(() => playerProfile.Difficulty,
                 newValue => playerProfile.Difficulty = newValue);
 
-        return result;
+        playerProfileList.Add(visualElement);
     }
 
-    private void ShowHelp()
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
     {
-        if (helpDialogControl != null)
-        {
-            return;
-        }
-
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
@@ -157,20 +124,11 @@ public class PlayerProfileOptionsSceneControl : MonoBehaviour, INeedInjection, I
                 TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
                     "path", ApplicationUtils.ReplacePathsWithDisplayString(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder())) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
-            titleToContentMap,
-            CloseHelp);
-    }
-
-    private void CloseHelp()
-    {
-        if (helpDialogControl == null)
-        {
-            return;
-        }
-        helpDialogControl.CloseDialog();
-        helpDialogControl = null;
-        helpButton.Focus();
+            titleToContentMap);
+        helpDialogControl.AddButton("Images Folder",
+            _ => ApplicationUtils.OpenDirectory(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder()));
+        return helpDialogControl;
     }
 }

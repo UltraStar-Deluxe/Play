@@ -129,15 +129,15 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         
         if (PlatformUtils.IsStandalone)
         {
-            openSongFolderButton.RegisterCallbackButtonTriggered(() => SongMetaUtils.OpenDirectory(songMeta));
+            openSongFolderButton.RegisterCallbackButtonTriggered(_ => SongMetaUtils.OpenDirectory(songMeta));
         }
         else
         {
             openSongFolderButton.HideByDisplay();
         }
 
-        togglePlaybackButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.ToggleAudioPlayPause());
-        toggleRecordingButton.RegisterCallbackButtonTriggered(() =>
+        togglePlaybackButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ToggleAudioPlayPause());
+        toggleRecordingButton.RegisterCallbackButtonTriggered(_ =>
         {
             songEditorNoteRecorder.IsRecordingEnabled = !songEditorNoteRecorder.IsRecordingEnabled;
             if (songEditorNoteRecorder.IsRecordingEnabled)
@@ -149,10 +149,10 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
                 toggleRecordingButton.RemoveFromClassList("recording");
             }
         });
-        undoButton.RegisterCallbackButtonTriggered(() => historyManager.Undo());
-        redoButton.RegisterCallbackButtonTriggered(() => historyManager.Redo());
-        exitSceneButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.ReturnToLastScene());
-        saveButton.RegisterCallbackButtonTriggered(() => songEditorSceneControl.SaveSong());
+        undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
+        redoButton.RegisterCallbackButtonTriggered(_ => historyManager.Redo());
+        exitSceneButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ReturnToLastScene());
+        saveButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.SaveSong());
 
         // Hide save button if AutoSave is enabled
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AutoSave)
@@ -172,7 +172,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         issueAnalyzerControl.IssuesEventStream
             .Subscribe(issues => UpdateIssueSideBar(issues));
 
-        toggleSideBarSizeButton.RegisterCallbackButtonTriggered(() =>
+        toggleSideBarSizeButton.RegisterCallbackButtonTriggered(_ =>
             settings.SongEditorSettings.SmallLeftSideBar = !settings.SongEditorSettings.SmallLeftSideBar);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.SmallLeftSideBar)
             .Subscribe(newValue =>
@@ -236,7 +236,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
         double issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
         int issueStartPositionInSeconds = (int)(issueStartPositionInMillis / 1000);
-        visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(() => GoToIssue(issue));
+        visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(_ => GoToIssue(issue));
         visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).text = issue.Message;
         visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).text = $"({issueStartPositionInSeconds}s)";
         visualElement.Q<VisualElement>(R.UxmlNames.issueImage).style.unityBackgroundImageTintColor = SongIssueUtils.GetColorForIssue(issue);

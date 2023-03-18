@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -52,6 +53,21 @@ public static class AnimationUtils
         if (visualElement.parent != null)
         {
             visualElement.parent.Remove(visualElement);
+        }
+    }
+    
+    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement, GradientConfig fromGradientConfig, GradientConfig toGradientConfig, float animTimeInSeconds)
+    {
+        List<GradientConfig> gradientConfigs = GradientManager.GetGradientConfigsForTransition(fromGradientConfig, toGradientConfig, animTimeInSeconds);
+        return TransitionBackgroundImageGradientCoroutine(visualElement, gradientConfigs, animTimeInSeconds);
+    }
+    
+    public static IEnumerator TransitionBackgroundImageGradientCoroutine(VisualElement visualElement, List<GradientConfig> gradientConfigs, float animTimeInSeconds)
+    {
+        foreach (GradientConfig gradientConfig in gradientConfigs)
+        {
+            visualElement.style.backgroundImage = GradientManager.GetGradientTexture(gradientConfig);
+            yield return new WaitForSeconds(animTimeInSeconds / gradientConfigs.Count);
         }
     }
 }

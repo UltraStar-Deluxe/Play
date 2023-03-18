@@ -1,6 +1,0 @@
-@import url("unity-theme://default");
-@import url("/Packages/PlayShared/Runtime/StyleSheets/CommonStyleVariables.uss");
-@import url("/Packages/PlayShared/Runtime/StyleSheets/UnityControlStyles.uss");
-@import url("/Packages/PlayShared/Runtime/StyleSheets/CustomControlStyles.uss");
-@import url("/Packages/PlayShared/Runtime/StyleSheets/CommonStyles.uss");
-@import url("/Packages/PlayShared/Runtime/StyleSheets/SceneSpecificStyles.uss");

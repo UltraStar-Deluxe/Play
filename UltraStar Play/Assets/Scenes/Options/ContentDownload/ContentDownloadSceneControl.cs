@@ -7,10 +7,8 @@ using System.Text;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.Zip;
-using PrimeInputActions;
 using ProTrans;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -19,7 +17,7 @@ using static ThreadPool;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [InjectedInInspector]
     public TextAsset songArchiveEntryTextAsset;
@@ -29,18 +27,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     [Inject]
     private UIDocument uiDocument;
-
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    [Inject]
-    private TranslationManager translationManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
 
     [Inject(UxmlName = R.UxmlNames.statusLabel)]
     private Label statusLabel;
@@ -66,14 +52,8 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
     private Button urlChooserButton;
 
-    [Inject(UxmlName = R.UxmlNames.helpButton)]
-    private Button helpButton;
-
     [Inject]
     private SettingsManager settingsManager;
-    
-    [Inject]
-    private Settings settings;
     
     [Inject]
     private SongMetaManager songMetaManager;
@@ -96,46 +76,27 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     // This string caches new log lines for other threads.
     private string newLogText;
 
-    private MessageDialogControl helpDialogControl;
-
     private int extractedEntryCount;
+    private bool hasFileSize;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+
         songArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(songArchiveEntryTextAsset.text);
 
         statusLabel.text = "";
         SelectSongArchiveUrl(songArchiveEntries[0].Url);
 
-        startDownloadButton.RegisterCallbackButtonTriggered(() => StartDownload());
-        cancelDownloadButton.RegisterCallbackButtonTriggered(() => CancelDownload());
+        startDownloadButton.RegisterCallbackButtonTriggered(_ => StartDownload());
+        cancelDownloadButton.RegisterCallbackButtonTriggered(_ => CancelDownload());
         downloadPath.RegisterValueChangedCallback(evt => FetchFileSize());
         if (!DownloadUrl.IsNullOrEmpty())
         {
             FetchFileSize();
         }
-
-        helpButton.RegisterCallbackButtonTriggered(() => ShowHelp());
-
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene));
-        backButton.Focus();
-
-        urlChooserButton.RegisterCallbackButtonTriggered(() => ShowUrlChooserDialog());
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => OnBack());
-    }
-
-    private void OnBack()
-    {
-        if (helpDialogControl != null)
-        {
-            CloseHelp();
-        }
-        else
-        {
-            sceneNavigator.LoadScene(EScene.SongLibraryOptionsScene);
-        }
+        
+        urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
     }
 
     private void ShowUrlChooserDialog()
@@ -154,27 +115,26 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         urlChooserDialogControl.Title = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
 
-        Button closeDialogButton = urlChooserDialogControl.AddButton(
-            TranslationManager.GetTranslation(R.Messages.close), () => CloseUrlChooserDialog());
-        closeDialogButton.Focus();
-
         // Create a button in the dialog for every archive URL
         songArchiveEntries.ForEach(songArchiveEntry =>
         {
             Button songArchiveUrlButton = new();
+            songArchiveUrlButton.AddToClassList("songArchiveUrlButton");
             songArchiveUrlButton.text = songArchiveEntry.Url;
-            songArchiveUrlButton.RegisterCallbackButtonTriggered(() =>
+            songArchiveUrlButton.RegisterCallbackButtonTriggered(_ =>
             {
                 SelectSongArchiveUrl(songArchiveEntry.Url);
                 CloseUrlChooserDialog();
             });
-            songArchiveUrlButton.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+            songArchiveUrlButton.style.height = new StyleLength(StyleKeyword.Auto);
             urlChooserDialogControl.AddVisualElement(songArchiveUrlButton);
 
             Label songArchiveInfoLabel = new(songArchiveEntry.Description);
             songArchiveInfoLabel.AddToClassList("songArchiveInfoLabel");
             urlChooserDialogControl.AddVisualElement(songArchiveInfoLabel);
         });
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialog);
     }
 
     private void CloseUrlChooserDialog()
@@ -186,7 +146,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         urlChooserDialogControl.CloseDialog();
         urlChooserDialogControl = null;
-        backButton.Focus();
     }
 
     private void SelectSongArchiveUrl(string url)
@@ -199,8 +158,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
         urlLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
         startDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_startDownloadButton);
         cancelDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_cancelDownloadButton);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_title);
     }
 
     void Update()
@@ -303,10 +260,17 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
             && downloadRequest.downloadHandler != null
             && !downloadRequest.downloadHandler.isDone)
         {
-            float progress;
+            string progressText;
             try
             {
-                progress = downloadRequest.downloadProgress;
+                if (hasFileSize)
+                {
+                    progressText = Math.Round(downloadRequest.downloadProgress * 100) + "%";
+                }
+                else
+                {
+                    progressText = ByteSizeUtils.GetHumanReadableByteSize((long)downloadRequest.downloadedBytes);
+                }
             }
             catch (Exception ex)
             {
@@ -315,7 +279,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
                 statusLabel.text = "?";
                 yield break;
             }
-            string progressText = Math.Round(progress * 100) + "%";
+
             statusLabel.text = progressText;
             yield return new WaitForSeconds(0.1f);
         }
@@ -337,11 +301,6 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     private void AddToUiLog(string message)
     {
         newLogText += message + "\n";
-    }
-
-    public void UpdateFileSize()
-    {
-        StartCoroutine(FileSizeUpdateAsync(DownloadUrl));
     }
 
     private IEnumerator FileSizeUpdateAsync(string url)
@@ -374,15 +333,8 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
             else
             {
                 long size = Convert.ToInt64(contentLength);
-                long kiloByte = size / 1024;
-                if (kiloByte > 1024)
-                {
-                    fileSize.text = Math.Round((double)kiloByte / 1024) + " MB";
-                }
-                else
-                {
-                    fileSize.text = Math.Round((double)kiloByte) + " KB";
-                }
+                fileSize.text = ByteSizeUtils.GetHumanReadableByteSize(size);
+                hasFileSize = true;
             }
         }
     }
@@ -402,7 +354,7 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         AddToDebugAndUiLog("Preparing to unpack the downloaded song package.");
         string songsPath = ApplicationManager.PersistentSongsPath();
-        PoolHandle handle = ThreadPool.QueueUserWorkItem(poolHandle =>
+        PoolHandle handle = QueueUserWorkItem(poolHandle =>
         {
             if (archivePath.ToLowerInvariant().EndsWith("tar"))
             {
@@ -563,24 +515,22 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
     private void ResetFileSizeText()
     {
         fileSize.text = "??? KB";
+        hasFileSize = false;
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
+        
         if (downloadRequest != null)
         {
             downloadRequest.Dispose();
         }
     }
 
-
-    private void ShowHelp()
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
     {
-        if (helpDialogControl != null)
-        {
-            return;
-        }
-
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_demoSongPackage_title),
@@ -590,22 +540,11 @@ public class ContentDownloadSceneControl : MonoBehaviour, INeedInjection, ITrans
             { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads_title),
                 TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads) },
         };
-        helpDialogControl = uiManager.CreateHelpDialogControl(
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_title),
-            titleToContentMap,
-            CloseHelp);
+            titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            () => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToDownloadSongs)));
-    }
-
-    private void CloseHelp()
-    {
-        if (helpDialogControl == null)
-        {
-            return;
-        }
-        helpDialogControl.CloseDialog();
-        helpDialogControl = null;
-        helpButton.Focus();
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToDownloadSongs)));
+        return helpDialogControl;
     }
 }

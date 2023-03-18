@@ -17,4 +17,6 @@ public class GraphicSettings
     public bool analyzeBeatsWithoutTargetNote = true;
     public string themeName = ThemeManager.DefaultThemeName;
     public bool AnimateSceneChange { get; set; } = true;
+    public bool showPlayerNames;
+    public bool showScoreNumbers;
 }

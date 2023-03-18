@@ -1,0 +1,45 @@
+{
+    "defaultControl": {
+        "fontColor": "#E5E5E5",
+        "backgroundColor": "#3399D8",
+        "hoverBackgroundColor": "#2E72F0",
+        "focusBackgroundColor": "#2E72F0",
+        "activeBackgroundColor": "#2C3CE6",
+        "focusBorderColor": "#3399D8",
+    },
+
+    "transparentButton": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#20202030",
+        "focusBackgroundColor": "#20202040",
+        "activeBackgroundColor": "#40404040",
+    },
+
+    "dynamicPanel": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#1D2939",
+        "focusBackgroundColor": "#1D2939",
+        "activeBackgroundColor": "#1D2939"
+    },
+
+    "staticPanel": {
+        "backgroundGradient": "24deg, #233043, #344054",
+    },
+    
+    "primaryFontColor": "#F0F0F0",
+    "secondaryFontColor": "#CCCCCC",
+    
+    "sceneTransitionAnimationTime": "250ms",
+    "dynamicBackground": {
+        "gradientRampFile": "gradients/blue.png",
+        "gradientType": "Radial",
+        "gradientScale": 1.7,
+        "gradientSmoothness": 2.0,
+        "gradientAngle": 0.0,
+        "gradientAnimation": false,
+        "gradientAnimSpeed": 1.0,
+        "gradientAnimAmplitude": 0.1,
+        "particleFile": "particles/star.png",
+        "particleOpacity": 0.2
+    }
+}

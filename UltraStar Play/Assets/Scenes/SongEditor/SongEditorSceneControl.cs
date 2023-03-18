@@ -165,7 +165,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             })
             .AddTo(gameObject);
 
-        sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => DoAutoSaveIfEnabled());
+        sceneNavigator.BeforeSceneChangeEventStream
+            .Subscribe(_ => DoAutoSaveIfEnabled())
+            .AddTo(gameObject);
     }
 
     private void RegisterAutoSaveEvent()

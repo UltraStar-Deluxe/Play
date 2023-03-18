@@ -23,11 +23,10 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public VisualTreeAsset playerEntryUi;
 
-    [Inject(UxmlName = R.UxmlNames.playerScrollView)]
-    public VisualElement playerScrollView;
+    [Inject(UxmlName = R.UxmlNames.playerList)]
+    private VisualElement playerList;
 
     private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new();
-    public List<SongSelectPlayerEntryControl> PlayerEntryControlControls => playerEntryControls;
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
@@ -77,7 +76,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private void UpdateListEntries()
     {
         // Remove old entries
-        playerScrollView.Clear();
+        playerList.Clear();
         playerEntryControls.Clear();
 
         // Create new entries
@@ -87,20 +86,22 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         {
             CreateListEntry(playerProfile);
         }
+        UpdateVoiceSelection();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerList);
     }
 
     private void CreateListEntry(PlayerProfile playerProfile)
     {
         VisualElement playerEntryVisualElement = playerEntryUi.CloneTree().Children().FirstOrDefault();
-        playerScrollView.Add(playerEntryVisualElement);
+        playerList.Add(playerEntryVisualElement);
 
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)
             .CreateAndInject<SongSelectPlayerEntryControl>();
         listEntryControl.Init(playerProfile);
 
-        listEntryControl.EnabledToggle.RegisterValueChangedCallback(evt => OnSelectionStatusChanged(listEntryControl, evt.newValue));
-        listEntryControl.SetSelected(playerProfile.IsSelected);
+        listEntryControl.IsSelected.Value = playerProfile.IsSelected;
+        listEntryControl.IsSelected.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));
 
         playerEntryControls.Add(listEntryControl);
     }
@@ -175,7 +176,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     public List<PlayerProfile> GetSelectedPlayerProfiles()
     {
         List<PlayerProfile> result = playerEntryControls
-            .Where(it => it.IsSelected)
+            .Where(it => it.IsSelected.Value)
             .Select(it => it.PlayerProfile)
             .ToList();
         return result;
@@ -186,7 +187,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         Dictionary<PlayerProfile, MicProfile> result = new();
         playerEntryControls.ForEach(entry =>
         {
-            if (entry.IsSelected && entry.MicProfile != null)
+            if (entry.IsSelected.Value && entry.MicProfile != null)
             {
                 result.Add(entry.PlayerProfile, entry.MicProfile);
             }
@@ -199,10 +200,10 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         Dictionary<PlayerProfile,string> selectedPlayerProfileToVoiceNameMap = new();
         playerEntryControls.ForEach(entry =>
         {
-            if (entry.IsSelected)
+            if (entry.IsSelected.Value)
             {
-                string voiceName = entry.Voice != null
-                    ? entry.Voice.Name
+                string voiceName = !entry.VoiceName.IsNullOrEmpty()
+                    ? entry.VoiceName
                     : Voice.soloVoiceName;
                 selectedPlayerProfileToVoiceNameMap.Add(entry.PlayerProfile, voiceName);
             }
@@ -216,9 +217,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         // First deactivate the selected ones to make their mics available for others.
         playerEntryControls.ForEach(entry =>
         {
-            if (entry.IsSelected)
+            if (entry.IsSelected.Value)
             {
-                entry.SetSelected(false);
+                entry.IsSelected.Value = false;
             }
             else
             {
@@ -229,7 +230,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         // Because others have been deselected, they will be assigned free mics if any.
         foreach (SongSelectPlayerEntryControl entry in deselectedEntries)
         {
-            entry.SetSelected(true);
+            entry.IsSelected.Value = true;
         }
     }
 
@@ -260,7 +261,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
                     // Select the mic for this player
                     entry.MicProfile = lastUsedMicProfile;
                 }
-                else if (entry.IsSelected
+                else if (entry.IsSelected.Value
                          && entry.MicProfile == lastUsedMicProfile)
                 {
                     // Deselect lastUsedMicProfile from other player.
@@ -274,9 +275,10 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         // Remember the currently assigned microphones
         lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
+        playerEntryControls.ForEach(control => control.Dispose());
     }
 
-    public void HideVoiceSelection()
+    private void HideVoiceSelection()
     {
         playerEntryControls.ForEach(entry =>
         {
@@ -284,13 +286,28 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         });
     }
 
-    public void ShowVoiceSelection(SongMeta selectedSong)
+    private void ShowVoiceSelection(SongMeta songMeta)
     {
         int voiceIndex = 0;
         playerEntryControls.ForEach(entry =>
         {
-            entry.ShowVoiceSelection(selectedSong, voiceIndex);
-            voiceIndex = (voiceIndex + 1) % selectedSong.VoiceNames.Count;
+            entry.ShowVoiceSelection(songMeta, voiceIndex);
+            voiceIndex = (voiceIndex + 1) % songMeta.VoiceNames.Count;
         });
+    }
+    
+    public void UpdateVoiceSelection()
+    {
+        SongMeta selectedSong = songRouletteControl.Selection.Value.SongMeta;
+        bool hasMultipleVoices = selectedSong != null
+            && selectedSong.VoiceNames.Count > 1;
+        if (hasMultipleVoices)
+        {
+            ShowVoiceSelection(selectedSong);
+        }
+        else
+        {
+            HideVoiceSelection();
+        }
     }
 }

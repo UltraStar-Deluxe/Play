@@ -1,0 +1,476 @@
+/**************************************************/
+/* BUTTONS */
+/**************************************************/
+ToggleButton {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+ToggleButton.active {
+    background-color: var(--control-color-accent2);
+}
+
+.textOnlyButton:hover {
+    color: var(--control-color-accent1);
+}
+
+.textOnlyButton:focus {
+    color: var(--control-color-accent2);
+}
+
+.transparentButton {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.transparentButton:hover {
+    background-color: rgba(92, 92, 92, 0.3);
+}
+
+.transparentButton:focus {
+    background-color: rgba(92, 92, 92, 0.3);
+}
+
+.lightButton .unity-label {
+    color: rgb(16, 24, 40);
+}
+
+.lightButton {
+    background-color: rgb(249, 245, 255);
+    color: rgb(16, 24, 40);
+}
+
+.lightButton:hover {
+    background-color: rgba(249, 245, 255, 0.5);
+}
+
+.lightButton:focus {
+    background-color: rgba(249, 245, 255, 0.5);
+}
+/**************************************************/
+/* ITEM PICKER */
+/**************************************************/
+
+ItemPicker {
+    height: var(--control-height);
+    min-width: var(--control-height-small);
+    flex-direction: row;
+    align-items: center;
+}
+
+.itemPickerContent {
+    flex-direction: row;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.controlWithLabelHorizontal .controlLabel {
+    margin-right: auto;
+    width: 40%;
+}
+
+.controlWithLabelVertical {
+    height: auto;
+    align-items: stretch;
+}
+
+.controlWithLabelVertical .unity-text-field__input {
+    height: var(--control-height);
+}
+
+.itemPickerControlsRow {
+    border-radius: 5px;
+    background-color: var(--control-color);
+}
+
+.itemPickerItemLabel {
+    -unity-background-scale-mode: scale-to-fit;
+    white-space: normal;
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 100%;
+    min-width: var(--control-height-small);
+    min-height: var(--control-height-small);
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    -unity-text-align: middle-center;
+}
+
+.itemPickerButton {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 40px;
+    height: 100%;
+    min-width: var(--control-height-small);
+    min-height: var(--control-height-small);
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.itemPickerPreviousItemButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.itemPickerNextItemButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/**************************************************/
+/* DIALOG */
+/**************************************************/
+
+.dialogTitle {
+    font-size: var(--font-size-l);
+}
+
+.dialogMessage {
+    font-size: var(--font-size);
+}
+
+.dialogTitleImage {
+    -unity-background-scale-mode: scale-to-fit;
+    width: var(--font-size-l);
+    height: var(--font-size-l);
+    margin-right: 10px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.dialogButton {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#dialogButtonContainer Button {
+    margin-right: 5px;
+    min-width: var(--control-width);
+}
+
+.dialogTextButton {
+    height: auto;
+    width: auto;
+    color: rgb(6, 170, 233);
+}
+
+.dialogTextButton:hover {
+    color: rgb(0, 102, 156);
+}
+
+.dialogTextButton:focus {
+    color: rgb(125, 198, 233);
+}
+
+.modalDialogContainer {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.dialogBackground {
+    background-color: rgb(14, 28, 42);
+}
+
+/**************************************************/
+/* COMBO BOX */
+/**************************************************/
+
+.comboBoxTextField {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.comboBoxTextField #unity-text-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.comboBoxButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/**************************************************/
+/* CONTEXT MENU */
+/**************************************************/
+
+.contextMenuSeparator {
+    height: 1px;
+    background-color: rgb(92, 92, 92);
+}
+
+.contextMenu {
+    background-color: rgb(64, 64, 64);
+    padding: 2px;
+}
+
+.contextMenu Button {
+    background-color: rgb(64, 64, 64);
+}
+
+.contextMenu Button:hover {
+    background-color: rgb(92, 92, 92);
+}
+
+.contextMenu Button:focus {
+    background-color: rgb(92, 92, 92);
+}
+
+/**************************************************/
+/* TOOLTIP */
+/**************************************************/
+
+.tooltip {
+    font-size: var(--font-size-s);
+    -unity-font-style: bold;
+    padding: 5px;
+    background-color: rgb(60, 63, 65);
+    border-color: rgb(50, 50, 50);
+    border-width: 1px;
+}
+
+/**************************************************/
+/* BUTTON GROUP */
+/**************************************************/
+ButtonGroup {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+ButtonGroup > .unity-button {
+    border-radius: 0;
+    flex-grow: 1;
+}
+
+ButtonGroup.vertical > .unity-button {
+    margin-bottom: 1px;
+}
+
+ButtonGroup.vertical > .unity-button.firstChild {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+ButtonGroup.vertical > .unity-button.lastChild {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-bottom: 0;
+}
+
+ButtonGroup.horizontal > .unity-button {
+    margin-right: 1px;
+}
+
+ButtonGroup.horizontal > .unity-button.firstChild {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+ButtonGroup.horizontal > .unity-button.lastChild {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-right: 0;
+}
+
+/**************************************************/
+/* ACCORDION */
+/**************************************************/
+AccordionGroup {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+AccordionGroup > AccordionItem {
+    margin-bottom: 1px;
+}
+
+AccordionGroup > AccordionItem.firstChild {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+AccordionGroup > AccordionItem.lastChild {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-bottom: 0;
+}
+
+#accordionItemRoot {
+    width: 100%;
+    border-width: 0;
+}
+
+#accordionItemContent {
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: hidden;
+    transition: height 0.3s;
+}
+
+#toggleAccordionItemContentButton.unity-button {
+    border-radius: 0;
+}
+
+#toggleAccordionItemContentIcon {
+    transition: rotate 0.3s;
+}
+
+AccordionItem.expanded #toggleAccordionItemContentIcon {
+    transform-origin: 50% 50%;
+    rotate: -180deg;
+}
+
+/**************************************************/
+/* FONT ICONS */
+/**************************************************/
+.fontIcon {
+    font-size: var(--font-icon-size);
+    -unity-font-style: normal;
+}
+
+.fontIcon.tinyFont {
+    font-size: var(--font-size-xxs);
+}
+
+.fontIcon.smallerFont {
+    font-size: var(--font-size-xs);
+}
+
+.fontIcon.smallFont {
+    font-size: var(--font-size-s);
+}
+
+.materialIcon {
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/MaterialIcons-Regular%20SDF.asset?fileID=11400000&guid=962c0e3031e352e49a518053a5f34649&type=2#MaterialIcons-Regular SDF');
+}
+
+.materialIcon.outlined {
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/MaterialIconsOutlined-Regular%20SDF.asset?fileID=11400000&guid=42a22443bbf3a394db82f24ef7c78983&type=2#MaterialIconsOutlined-Regular SDF');
+}
+
+.materialIcon.rounded {
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/MaterialIconsRound-Regular%20SDF.asset?fileID=11400000&guid=9f10fb0b7decc69479216194a434f924&type=2#MaterialIconsRound-Regular SDF');
+}
+
+.bootstrapIcon {
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/BootstrapIcons%20SDF.asset?fileID=11400000&guid=2273cbbf74fd5304da72d333c483c39a&type=2#BootstrapIcons SDF');
+}
+
+.featherIcon {
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Feather/Feather%20SDF.asset');
+}
+
+/**************************************************/
+/* TEXT FIELD PLACEHOLDER */
+/**************************************************/
+
+TextField.placeholderVisible {
+    -unity-font-style: italic;
+}
+
+TextField.placeholderVisible #unity-text-input {
+    font-size: var(--font-size-xs);
+}
+
+/**************************************************/
+/* INPUT LEGEND */
+/**************************************************/
+
+.inputLegendLabel {
+    width: 20%;
+    -unity-text-align: middle-center;
+}
+
+.inputLegendBar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 5px 50px;
+    background-color: rgba(32, 32, 32, 0.88);
+}
+
+#inputDeviceIconContainer {
+    height: 90%;
+    width: 20px;
+}
+
+#inputDeviceIconContainer .unity-label {
+    height: 100%;
+    width: 100%;
+    font-size: 20px;
+}
+
+#menuOverlay .inputLegendLabel {
+    width: 100%;
+    -unity-text-align: middle-left;
+}
+
+/**************************************************/
+/* SLIDE TOGGLE */
+/**************************************************/
+.slide-toggle {
+    width: var(--control-height-double);
+    height: var(--control-height);
+    margin: 0;
+    padding: 0;
+}
+
+.slide-toggle__input {
+    background-color: var(--control-color);
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    overflow: visible;
+    border-width: 1px;
+    border-color: var(--control-color-accent1);
+    transition: background-color 0.5s;
+}
+
+.slide-toggle__input-knob {
+    position: absolute;
+    height: 90%;
+    width: 45%;
+    background-color: var(--font-color);
+    border-radius: 50%;
+    transition: translate 0.5s, background-color 0.5s;
+    translate: 5% 5%;
+}
+
+.slide-toggle__input--checked {
+    background-color: rgb(0, 156, 10);
+}
+
+.slide-toggle__input--checked > .slide-toggle__input-knob {
+    translate: 105% 5%;
+}
+
+/**************************************************/
+ */
+/* RADIAL PROGRESS BAR */
+/**************************************************/
+.radial-progress-bar {
+    min-width: 18px;
+    min-height: 18px;
+    --track-color: #f2f4f7;
+    --progress-color: #2e8418;
+    --border-size: 6;
+}
+
+.radial-progress-bar__label {
+    -unity-text-align: middle-left;
+    color: var(--percentage-color);
+}
+
+/**************************************************/
+/* FPS LABEL */
+/**************************************************/
+
+.fpsLabel {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    font-size: var(--font-size-xs);
+    -unity-text-align: middle-center;
+    padding: 10px;
+}

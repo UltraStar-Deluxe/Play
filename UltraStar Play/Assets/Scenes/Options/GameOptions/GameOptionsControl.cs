@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -8,43 +10,56 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class GameOptionsControl : MonoBehaviour, INeedInjection, ITranslator
+public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
-    [Inject]
-    private SceneNavigator sceneNavigator;
+    [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
+    private ItemPicker scoreModePicker;
 
-    [Inject]
-    private TranslationManager translationManager;
-
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
-
-    [Inject(UxmlName = R.UxmlNames.scoreModeContainer)]
-    private VisualElement scoreModeContainer;
-
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
-
-    [Inject]
-    private Settings settings;
-
-    private void Start()
+    [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
+    private DropdownField languageDropdownField;
+    
+    protected override void Start()
     {
-        new ScoreModeItemPickerControl(scoreModeContainer.Q<ItemPicker>())
+        base.Start();
+        
+        new ScoreModeItemPickerControl(scoreModePicker)
             .Bind(() => settings.GameSettings.ScoreMode,
                   newValue => settings.GameSettings.ScoreMode = newValue);
 
-        backButton.RegisterCallbackButtonTriggered(() => sceneNavigator.LoadScene(EScene.OptionsScene));
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+        InitLanguageChooser();
     }
 
     public void UpdateTranslation()
     {
-        scoreModeContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_game_title);
+        scoreModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
+    }
+    
+    private void InitLanguageChooser()
+    {
+        languageDropdownField.choices = translationManager.GetTranslatedLanguages()
+            .Select(languageEnum => languageEnum.ToString())
+            .ToList();
+        languageDropdownField.value = translationManager.currentLanguage.ToString();
+
+        languageDropdownField.RegisterValueChangedCallback(evt =>
+        {
+            if (Enum.TryParse(evt.newValue, out SystemLanguage newValue))
+            {
+                SetLanguage(newValue);
+            }
+        });
+    }
+
+    private void SetLanguage(SystemLanguage newValue)
+    {
+        if (settings.GameSettings.language == newValue
+            && translationManager.currentLanguage == newValue)
+        {
+            return;
+        }
+
+        settings.GameSettings.language = newValue;
+        translationManager.currentLanguage = settings.GameSettings.language;
+        translationManager.ReloadTranslationsAndUpdateScene();
     }
 }

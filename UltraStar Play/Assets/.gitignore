@@ -1,3 +1,6 @@
+ExtractedStyles.uss
+ExtractedStyles.uss.meta
+
 Plugins/LeanTween/
 Plugins/LeanTween.meta
 
@@ -44,3 +47,6 @@ Plugins/Jokenizer.Net.meta
 
 Plugins/DynamicQueryable/
 Plugins/DynamicQueryable.meta
+
+JMO Assets/
+JMO Assets.meta

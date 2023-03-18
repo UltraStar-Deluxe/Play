@@ -128,19 +128,35 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public MessageDialogControl CreateHelpDialogControl(string dialogTitle, Dictionary<string, string> titleToContentMap, Action onCloseHelp)
+    public MessageDialogControl CreateDialogControl(string dialogTitle)
     {
-        VisualElement helpDialog = dialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(helpDialog);
-        helpDialog.AddToClassList("wordWrap");
+        VisualElement dialogVisualElement = dialogUi.CloneTree().Children().FirstOrDefault();
+        uiDocument.rootVisualElement.Add(dialogVisualElement);
+        dialogVisualElement.AddToClassList("wordWrap");
 
-        MessageDialogControl helpDialogControl = injector
-            .WithRootVisualElement(helpDialog)
+        MessageDialogControl dialogControl = injector
+            .WithRootVisualElement(dialogVisualElement)
             .CreateAndInject<MessageDialogControl>();
-        helpDialogControl.Title = dialogTitle;
+        dialogControl.Title = dialogTitle;
+
+        return dialogControl;
+    }
+    
+    public MessageDialogControl CreateHelpDialogControl(
+        string dialogTitle,
+        Dictionary<string, string> titleToContentMap)
+    {
+        VisualElement dialogVisualElement = dialogUi.CloneTree().Children().FirstOrDefault();
+        uiDocument.rootVisualElement.Add(dialogVisualElement);
+        dialogVisualElement.AddToClassList("wordWrap");
+        
+        MessageDialogControl dialogControl = injector
+            .WithRootVisualElement(dialogVisualElement)
+            .CreateAndInject<MessageDialogControl>();
+        dialogControl.Title = dialogTitle;
 
         AccordionGroup accordionGroup = new();
-        helpDialogControl.AddVisualElement(accordionGroup);
+        dialogControl.AddVisualElement(accordionGroup);
             
         void AddChapter(string title, string content)
         {
@@ -152,11 +168,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection
 
         titleToContentMap.ForEach(entry => AddChapter(entry.Key, entry.Value));
 
-        Button closeDialogButton = helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
-            onCloseHelp);
-        closeDialogButton.Focus();
-
-        return helpDialogControl;
+        return dialogControl;
     }
 
     public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)

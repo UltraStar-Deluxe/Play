@@ -12,9 +12,6 @@ public class TimeBarControl : INeedInjection
     [Inject(UxmlName = R.UxmlNames.timeBarPositionIndicator)]
     private VisualElement timeBarPositionIndicator;
 
-    [Inject(UxmlName = R.UxmlNames.timeLabel)]
-    private Label timeLabel;
-
     [Inject(UxmlName = R.UxmlNames.timeValueLabel)]
     private Label timeValueLabel;
 
@@ -31,7 +28,7 @@ public class TimeBarControl : INeedInjection
     public void UpdatePositionIndicator(double positionInSongInMillis, double durationOfSongInMillis)
     {
         float positionInPercent = (float)(100 * positionInSongInMillis / durationOfSongInMillis);
-        timeBarPositionIndicator.style.left = new StyleLength(new Length(positionInPercent, LengthUnit.Percent));
+        timeBarPositionIndicator.style.width = new StyleLength(new Length(positionInPercent, LengthUnit.Percent));
     }
 
     public void UpdateTimeBarRectangles(SongMeta songMeta, List<PlayerControl> playerControls, double durationOfSongInMillis)

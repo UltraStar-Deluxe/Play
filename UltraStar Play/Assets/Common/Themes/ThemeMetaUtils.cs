@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UnityEngine;
 
 public static class ThemeMetaUtils
 {
@@ -14,7 +15,9 @@ public static class ThemeMetaUtils
 
     public static string GetAbsoluteFilePath(ThemeMeta themeMeta, string path)
     {
-        if (PathUtils.IsAbsolutePath(path))
+        if (WebRequestUtils.IsHttpOrHttpsUri(path)
+            || WebRequestUtils.IsNetworkPath(path)
+            || PathUtils.IsAbsolutePath(path))
         {
             return path;
         }
@@ -22,16 +25,40 @@ public static class ThemeMetaUtils
         return $"{Path.GetDirectoryName(themeMeta.AbsoluteFilePath)}/{path}";
     }
 
-    public static bool HasStaticBackground(ThemeMeta themeMeta, Settings settings)
+    public static bool HasStaticBackground(ThemeMeta themeMeta, Settings settings, EScene scene)
     {
+        if (scene is EScene.SingScene)
+        {
+            // No theme background in sing scene
+            return false;
+        }
+        
+        StaticBackgroundJson staticBackgroundJson = GetStaticBackgroundJsonForScene(themeMeta, scene);
         return !settings.DeveloperSettings.disableDynamicThemes
-               && themeMeta.ThemeJson.staticBackground != null
-               && !themeMeta.ThemeJson.staticBackground.imagePath.IsNullOrEmpty();
+               && (staticBackgroundJson != null
+                   && !staticBackgroundJson.imagePath.IsNullOrEmpty());
     }
 
-    public static bool HasDynamicBackground(ThemeMeta themeMeta, Settings settings)
+    public static StaticBackgroundJson GetStaticBackgroundJsonForScene(ThemeMeta themeMeta, EScene scene)
     {
+        if (themeMeta.ThemeJson.sceneSpecificStaticBackgrounds != null
+            && themeMeta.ThemeJson.sceneSpecificStaticBackgrounds.TryGetValue(scene.ToString(), out StaticBackgroundJson staticBackgroundJson))
+        {
+            return staticBackgroundJson;
+        }
+        
+        return themeMeta.ThemeJson.staticBackground;
+    }
+
+    public static bool HasDynamicBackground(ThemeMeta themeMeta, Settings settings, EScene scene)
+    {
+        if (scene is EScene.SingScene)
+        {
+            // No theme background in sing scene
+            return false;
+        }
+        
         return !settings.DeveloperSettings.disableDynamicThemes
-                && !HasStaticBackground(themeMeta, settings);
+                && themeMeta.ThemeJson.dynamicBackground != null;
     }
 }

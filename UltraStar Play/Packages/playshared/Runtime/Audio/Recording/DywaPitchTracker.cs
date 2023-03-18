@@ -28,6 +28,9 @@
  THE SOFTWARE.
 */
 
+using System.Collections.Generic;
+using UnityEngine;
+
 public class DywaPitchTracker
 {
     private float prevPitch;
@@ -39,6 +42,8 @@ public class DywaPitchTracker
     public int DifferenceLevelsN { get; set; } = 3;
     public float MaximaThresholdRatio { get; set; } = 0.75f;
     public int SampleRateHz { get; set; } = 44100;
+
+    private readonly Dictionary<int, WorkingBuffers> sampleCountToWorkingBuffers = new();
 
     public DywaPitchTracker()
     {
@@ -205,17 +210,26 @@ public class DywaPitchTracker
         // must be a power of 2
         samplecount = FloorPowerOf2(samplecount);
 
+        // Prepare sample buffers.
+        // Only instantiate working buffers once per sample count to avoid GC.
+        if (!sampleCountToWorkingBuffers.TryGetValue(samplecount, out WorkingBuffers workingBuffers))
+        {
+            workingBuffers = new(samplecount);
+            sampleCountToWorkingBuffers[samplecount] = workingBuffers;
+        }
+
+        float[] sam = workingBuffers.sam;
+        int[] distances = workingBuffers.distances;
+        int[] mins = workingBuffers.mins;
+        int[] maxs = workingBuffers.maxs;
+        
         // copy samples into sam
-        float[] sam = new float[samplecount];
         for (int index = 0; index < samplecount; index++)
         {
             sam[index] = samples[index + startsample];
         }
         int curSamNb = samplecount;
 
-        int[] distances = new int[samplecount];
-        int[] mins = new int[samplecount];
-        int[] maxs = new int[samplecount];
         int nbMins, nbMaxs;
 
         float ampltitudeThreshold;
@@ -588,5 +602,21 @@ cleanup:
         }
 
         return pitch;
+    }
+    
+    private class WorkingBuffers
+    {
+        public readonly float[] sam;
+        public readonly int[] distances;
+        public readonly int[] mins;
+        public readonly int[] maxs;
+
+        public WorkingBuffers(int size)
+        {
+            sam = new float[size];
+            distances = new int[size];
+            mins = new int[size];
+            maxs = new int[size];
+        }
     }
 }

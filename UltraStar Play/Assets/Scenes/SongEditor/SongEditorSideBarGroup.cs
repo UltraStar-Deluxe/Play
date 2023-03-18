@@ -45,7 +45,9 @@ public class SongEditorSideBarGroup : VisualElement
         }
         visualTreeAsset.CloneTree(this);
 
-        contentContainer = this.Q<VisualElement>("groupContainer");
+        VisualElement groupContainer = this.Q<VisualElement>("groupContainer");
+        groupContainer.AddToClassList("songEditorSideBarGroupContentContainer");
+        contentContainer = groupContainer;
         labelElement = this.Q<Label>("groupTitle");
         Label = "Group Title";
     }

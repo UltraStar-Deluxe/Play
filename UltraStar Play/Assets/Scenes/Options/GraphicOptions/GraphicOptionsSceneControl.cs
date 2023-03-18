@@ -9,70 +9,54 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class GraphicOptionsSceneControl : MonoBehaviour, INeedInjection, ITranslator
+public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
-    [Inject]
-    private SceneNavigator sceneNavigator;
+    [Inject(UxmlName = R.UxmlNames.resolutionPicker)]
+    private ItemPicker resolutionPicker;
 
-    [Inject]
-    private TranslationManager translationManager;
+    [Inject(UxmlName = R.UxmlNames.targetFpsPicker)]
+    private ItemPicker targetFpsPicker;
 
-    [Inject(UxmlName = R.UxmlNames.sceneTitle)]
-    private Label sceneTitle;
+    [Inject(UxmlName = R.UxmlNames.fullscreenModePicker)]
+    private ItemPicker fullscreenModePicker;
 
-    [Inject(UxmlName = R.UxmlNames.backButton)]
-    private Button backButton;
-
-    [Inject(UxmlName = R.UxmlNames.resolutionContainer)]
-    private VisualElement resolutionContainer;
-
-    [Inject(UxmlName = R.UxmlNames.fpsContainer)]
-    private VisualElement fpsContainer;
-
-    [Inject(UxmlName = R.UxmlNames.fullscreenContainer)]
-    private VisualElement fullscreenContainer;
-
-    [Inject]
-    private Settings settings;
-
-    private void Start()
+    [Inject(UxmlName = R.UxmlNames.applyResolutionButton)]
+    private Button applyResolutionButton;
+    
+    ScreenResolution lastScreenResolution;
+    FullScreenMode lastFullscreenMode;
+    
+    protected override void Start()
     {
+        base.Start();
+
+        lastScreenResolution = settings.GraphicSettings.resolution;
+        lastFullscreenMode = settings.GraphicSettings.fullScreenMode;
+        
+        applyResolutionButton.RegisterCallbackButtonTriggered(_ => ApplyGraphicSettings());
+        
         if (PlatformUtils.IsStandalone)
         {
-            new ScreenResolutionPickerControl(resolutionContainer.Q<ItemPicker>(), settings);
-            new FullscreenModePickerControl(fullscreenContainer.Q<ItemPicker>(), settings, gameObject);
+            new ScreenResolutionPickerControl(resolutionPicker, settings);
+            new FullscreenModePickerControl(fullscreenModePicker, settings, gameObject);
         }
         else
         {
-            resolutionContainer.HideByDisplay();
-            fullscreenContainer.HideByDisplay();
+            resolutionPicker.HideByDisplay();
+            fullscreenModePicker.HideByDisplay();
         }
 
         List<int> fpsOptions = new() { 30, 60 };
-        new LabeledItemPickerControl<int>(fpsContainer.Q<ItemPicker>(), fpsOptions)
+        new LabeledItemPickerControl<int>(targetFpsPicker, fpsOptions)
             .Bind(() => settings.GraphicSettings.targetFps,
                 newValue => settings.GraphicSettings.targetFps = newValue);
-
-        backButton.RegisterCallbackButtonTriggered(() => ApplyGraphicSettingsAndExitScene());
-        backButton.Focus();
-
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => ApplyGraphicSettingsAndExitScene());
     }
 
     public void UpdateTranslation()
     {
-        resolutionContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_resolution);
-        fpsContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_targetFps);
-        fullscreenContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);
-        backButton.text = TranslationManager.GetTranslation(R.Messages.back);
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options_graphics_title);
-    }
-
-    private void ApplyGraphicSettingsAndExitScene()
-    {
-        ApplyGraphicSettings();
-        sceneNavigator.LoadScene(EScene.OptionsScene);
+        resolutionPicker.Label = TranslationManager.GetTranslation(R.Messages.options_resolution);
+        targetFpsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_targetFps);
+        fullscreenModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);
     }
 
     private void ApplyGraphicSettings()
@@ -86,9 +70,19 @@ public class GraphicOptionsSceneControl : MonoBehaviour, INeedInjection, ITransl
         FullScreenMode fullScreenMode = settings.GraphicSettings.fullScreenMode;
         if (res.Width > 0
             && res.Height > 0
-            && res.RefreshRate > 0)
+            && res.RefreshRate > 0
+            
+            && (res.Width != lastScreenResolution.Width
+                || res.Height != lastScreenResolution.Height
+                || res.RefreshRate != lastScreenResolution.RefreshRate
+                || fullScreenMode != lastFullscreenMode) )
         {
             Screen.SetResolution(res.Width, res.Height, fullScreenMode, res.RefreshRate);
+            
+            // Reload scene.
+            // The RenderTextures (UI, scene transition) are recreated when the Screen resolution does not match anymore.
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
+                () => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.OptionsGraphicsScene))));
         }
         else
         {

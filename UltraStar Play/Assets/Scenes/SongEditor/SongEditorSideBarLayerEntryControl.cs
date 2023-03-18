@@ -41,7 +41,7 @@ public class SongEditorSideBarLayerEntryControl : INeedInjection, IInjectionFini
         layerColorElement.style.backgroundColor = layerManager.GetLayerColor(layer);
         layerNameLabel.text = layer.GetDisplayName();
         selectAllNotesOfLayerButton.RegisterCallbackButtonTriggered(
-            () => selectionControl.SetSelection(layerManager.GetLayerNotes(layer)));
+            _ => selectionControl.SetSelection(layerManager.GetLayerNotes(layer)));
 
         // IsVisible
         layerVisibleToggleButtonControl = new ToogleButtonControl(layerVisibleButton,

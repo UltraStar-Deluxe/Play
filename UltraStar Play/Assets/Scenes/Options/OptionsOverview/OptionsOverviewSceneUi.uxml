@@ -1,83 +1,82 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="background">
-        <ui:VisualElement class="optionsSceneMainContainer">
-            <ui:VisualElement name="topRow" class="optionsSceneTopRow" style="justify-content: space-between;">
-                <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer" style="width: 50%;">
-                    <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
-                        <MaterialIcon name="titleImage" icon="handyman" />
-                        <ui:VisualElement name="titleAndDescription">
-                            <ui:Label text="Options" name="sceneTitle" class="titleText" />
-                        </ui:VisualElement>
+    <ui:VisualElement name="background" class="px-4 pb-4 pt-2" style="align-items: flex-start;">
+        <ui:VisualElement name="row" class="pb-2" style="justify-content: flex-start; align-items: center; width: 100%;">
+            <ui:VisualElement name="titleContainer" class="optionsSceneTitleContainer" style="width: auto;">
+                <ui:Button name="backButton" class="circleButton mr-2 transparentButton">
+                    <MaterialIcon icon="arrow_back" name="image" />
+                </ui:Button>
+                <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
+                    <ui:VisualElement name="titleAndDescription">
+                        <ui:Label text="Settings" name="sceneTitle" class="titleText" style="-unity-font-style: bold; flex-shrink: 1; min-width: 120px;" />
                     </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement name="languageContainer" style="flex-direction: row; align-items: center; justify-content: flex-end; flex-grow: 1;">
-                    <ItemPicker name="languageChooser" style="flex-grow: 1;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement style="width: 100%; flex-grow: 1; justify-content: center;">
-                <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow">
-                    <ui:Button name="gameOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="sports_esports" name="image" />
-                        <ui:Label text="Game" name="label" />
-                    </ui:Button>
-                    <ui:VisualElement name="songOptionsButtonContainer" style="background-color: rgba(0, 0, 0, 0);">
-                        <ui:Button name="songsOptionsButton" class="optionsOverviewButton">
-                            <MaterialIcon icon="music_note" name="image" />
-                            <ui:Label text="Songs" name="label" />
-                        </ui:Button>
-                        <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                    </ui:VisualElement>
-                    <ui:Button name="graphicsOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="desktop_windows" name="image" />
-                        <ui:Label text="Graphics" name="label" />
-                    </ui:Button>
-                    <ui:Button name="soundOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="campaign" name="image" />
-                        <ui:Label text="Sound" name="label" />
-                    </ui:Button>
-                </ui:VisualElement>
-                <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow">
-                    <ui:VisualElement name="recordingOptionsButtonContainer" style="background-color: rgba(0, 0, 0, 0);">
-                        <ui:Button name="recordingOptionsButton" class="optionsOverviewButton">
-                            <MaterialIcon icon="mic" name="image" />
-                            <ui:Label text="Recording" name="label" />
-                        </ui:Button>
-                        <MaterialIcon name="recordingSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                    </ui:VisualElement>
-                    <ui:VisualElement name="profileOptionsButtonContainer" style="background-color: rgba(0, 0, 0, 0);">
-                        <ui:Button name="profileOptionsButton" class="optionsOverviewButton">
-                            <MaterialIcon icon="people" name="image" />
-                            <ui:Label text="Players" name="label" />
-                        </ui:Button>
-                        <MaterialIcon name="playerProfileSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
-                    </ui:VisualElement>
-                    <ui:Button name="designOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="filter_b_and_w" name="image" />
-                        <ui:Label text="Design" name="label" />
-                    </ui:Button>
-                    <ui:Button name="internetOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="cloud" name="image" />
-                        <ui:Label text="Internet" name="label" />
-                    </ui:Button>
-                </ui:VisualElement>
-                <ui:VisualElement name="buttonContainer" class="optionsOverviewButtonRow">
-                    <ui:Button name="webcamOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="videocam" name="image" />
-                        <ui:Label text="Webcam" name="label" />
-                    </ui:Button>
-                    <ui:Button name="appOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="phonelink_setup" name="image" />
-                        <ui:Label text="Apps" name="label" />
-                    </ui:Button>
-                    <ui:Button name="developerOptionsButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="bug_report" name="image" />
-                        <ui:Label text="Developer" name="label" />
-                    </ui:Button>
-                    <ui:Button name="backButton" class="optionsOverviewButton">
-                        <MaterialIcon icon="arrow_back" name="image" />
-                        <ui:Label text="Back" name="label" />
-                    </ui:Button>
-                </ui:VisualElement>
+            <ui:Label text="Loaded Scene" name="loadedSceneTitle" style="-unity-font-style: bold; margin-left: 20px;" />
+            <ui:VisualElement name="topButtonRow" class="ml-auto" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                <ui:Button display-tooltip-when-elided="true" name="issuesButton" class="squareButton mr-2">
+                    <MaterialIcon tabindex="-1" name="issuesIcon" icon="warning" class="rounded" />
+                </ui:Button>
+                <ui:Button display-tooltip-when-elided="true" name="helpButton" class="squareButton">
+                    <MaterialIcon tabindex="-1" name="helpIcon" icon="help_outline" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+            <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="optionsSceneScrollView" vertical-scroller-visibility="AlwaysVisible" class="mr-3" style="min-width: 25%;">
+                <ToggleButton name="gameOptionsButton" class="optionsOverviewButton toggleButton">
+                    <MaterialIcon icon="sports_esports" name="image" />
+                    <ui:Label text="Game" name="label" />
+                </ToggleButton>
+                <ToggleButton name="profileOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="people" name="image" />
+                    <ui:Label text="Players" name="label" />
+                    <MaterialIcon name="playerProfileSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
+                </ToggleButton>
+                <ToggleButton name="recordingOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="mic" name="image" />
+                    <ui:Label text="Recording" name="label" />
+                    <MaterialIcon name="recordingSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
+                </ToggleButton>
+                <ToggleButton name="songsOptionsButton" class="optionsOverviewButton toggleButton">
+                    <MaterialIcon icon="music_note" name="image" />
+                    <ui:Label text="Songs" name="label" />
+                    <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
+                </ToggleButton>
+                <ToggleButton name="contentDownloadButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="cloud_download" name="image" />
+                    <ui:Label text="Download" name="label" />
+                </ToggleButton>
+                <ToggleButton name="designOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="filter_b_and_w" name="image" />
+                    <ui:Label text="Design" name="label" />
+                </ToggleButton>
+                <ToggleButton name="graphicsOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="desktop_windows" name="image" />
+                    <ui:Label text="Graphics" name="label" />
+                </ToggleButton>
+                <ToggleButton name="soundOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="campaign" name="image" />
+                    <ui:Label text="Sound" name="label" />
+                </ToggleButton>
+                <ToggleButton name="internetOptionsButton" class="optionsOverviewButton" style="display: none;">
+                    <MaterialIcon icon="cloud" name="image" />
+                    <ui:Label text="Internet" name="label" />
+                </ToggleButton>
+                <ToggleButton name="webcamOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="videocam" name="image" />
+                    <ui:Label text="Webcam" name="label" />
+                </ToggleButton>
+                <ToggleButton name="appOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="phonelink_setup" name="image" />
+                    <ui:Label text="Apps" name="label" />
+                </ToggleButton>
+                <ToggleButton name="developerOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="bug_report" name="image" />
+                    <ui:Label text="Developer" name="label" />
+                </ToggleButton>
+            </ui:ScrollView>
+            <ui:VisualElement name="loadedSceneContainer" style="flex-grow: 1;">
+                <ui:VisualElement name="loadedSceneContent" style="flex-grow: 1;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

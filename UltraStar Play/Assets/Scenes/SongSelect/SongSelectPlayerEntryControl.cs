@@ -1,24 +1,43 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
-public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener
+public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    [Inject(Key = nameof(micPitchTrackerPrefab))]
+    private MicPitchTracker micPitchTrackerPrefab;
+    
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     private VisualElement visualElement;
 
     [Inject(UxmlName = R.UxmlNames.micIcon)]
     private VisualElement micIcon;
 
+    [Inject(UxmlName = R.UxmlNames.noMicIcon)]
+    private VisualElement noMicIcon;
+    
     [Inject(UxmlName = R.UxmlNames.nameLabel)]
     private Label nameLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.playerImage)]
+    private VisualElement playerImage;
 
-    [Inject(UxmlName = R.UxmlNames.enabledToggle)]
-    public Toggle EnabledToggle { get; private set; }
-
-    private LabeledItemPickerControl<Voice> voiceChooserControl;
-
+    [Inject(UxmlName = R.UxmlNames.togglePlayerSelectedButton)]
+    private Button togglePlayerSelectedButton;
+    
+    [Inject(UxmlName = R.UxmlNames.toggleVoiceButton)]
+    private Button toggleVoiceButton;
+    
+    [Inject]
+    private Injector injector;
+    
+    [Inject]
+    private Settings settings;
+    
     // The PlayerProfile is set in Init and must not be null.
     public PlayerProfile PlayerProfile { get; private set; }
 
@@ -35,63 +54,148 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             micProfile = value;
             if (micProfile == null)
             {
-                micIcon.HideByVisibility();
+                micIcon.HideByDisplay();
+                noMicIcon.ShowByDisplay();
             }
             else
             {
-                micIcon.ShowByVisibility();
+                micIcon.ShowByDisplay();
+                noMicIcon.HideByDisplay();
+                micIcon.style.color = new StyleColor(micProfile.Color);
                 micIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
             }
+
+            UpdateMicPitchTracker();
+            micProgressBarRecordingControl.MicProfile = MicProfile;
         }
     }
 
-    public Voice Voice => voiceChooserControl.ItemPicker.IsVisibleByDisplay()
-        ? voiceChooserControl.Selection.Value
+    private readonly ReactiveProperty<string> selectedVoiceName = new(Voice.firstVoiceName);
+    public string VoiceName => toggleVoiceButton.IsVisibleByDisplay()
+        ? selectedVoiceName.Value
         : null;
 
-    public bool IsSelected
-    {
-        get
-        {
-            return EnabledToggle.value;
-        }
-    }
+    private MicPitchTracker micPitchTracker;
+
+    private readonly MicProgressBarRecordingControl micProgressBarRecordingControl = new();
+
+    public ReactiveProperty<bool> IsSelected {get; private set; } = new(false);
+
+    private Dictionary<string, string> voiceNames;
 
     public void OnInjectionFinished()
     {
-        voiceChooserControl = new LabeledItemPickerControl<Voice>(visualElement.Q<ItemPicker>(R.UxmlNames.voiceChooser), new List<Voice>());
-        voiceChooserControl.GetLabelTextFunction = voice => voice != null
-            ? voice.Name
-            : "";
+        InitVoiceSelection();
+
+        InitMicPitchTracker();
+
+        injector.Inject(micProgressBarRecordingControl);
+        micProgressBarRecordingControl.MicProfile = MicProfile;
+
+        togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ => IsSelected.Value = !IsSelected.Value);
+        
+        IsSelected.Subscribe(newValue =>
+        {
+            if (newValue)
+            {
+                playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+                noMicIcon.ShowByVisibility();
+            }
+            else
+            {
+                playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
+                noMicIcon.HideByVisibility();
+            }
+        });
     }
 
-    public void SetSelected(bool newIsSelected)
+    private void InitVoiceSelection()
     {
-        EnabledToggle.value = newIsSelected;
+        selectedVoiceName.Subscribe(_ => UpdateToggleVoiceButtonText());
+        toggleVoiceButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            selectedVoiceName.Value = selectedVoiceName.Value == Voice.firstVoiceName
+                ? Voice.secondVoiceName
+                : Voice.firstVoiceName;
+        });
+    }
+
+    private void UpdateToggleVoiceButtonText()
+    {
+        if (!voiceNames.IsNullOrEmpty()
+            && voiceNames.ContainsKey(selectedVoiceName.Value))
+        {
+            toggleVoiceButton.text = voiceNames[selectedVoiceName.Value];
+        }
+        else
+        {
+            toggleVoiceButton.text = selectedVoiceName.Value;
+        }
     }
 
     public void Init(PlayerProfile playerProfile)
     {
         this.PlayerProfile = playerProfile;
         nameLabel.text = playerProfile.Name;
+        injector.WithRootVisualElement(playerImage)
+            .WithBindingForInstance(playerProfile)
+            .CreateAndInject<PlayerProfileImageControl>();
         MicProfile = null;
     }
 
     public void HideVoiceSelection()
     {
-        voiceChooserControl.SelectItem(null);
-        voiceChooserControl.ItemPicker.HideByDisplay();
+        toggleVoiceButton.HideByDisplay();
     }
 
     public void ShowVoiceSelection(SongMeta selectedSong, int selectedVoiceIndex)
     {
-        voiceChooserControl.Items = selectedSong.GetVoices()
-            .ToList();
-        voiceChooserControl.ItemPicker.ShowByDisplay();
-        voiceChooserControl.SelectItem(voiceChooserControl.Items[selectedVoiceIndex]);
+        voiceNames = selectedSong.VoiceNames;
+        toggleVoiceButton.ShowByDisplay();
+        UpdateToggleVoiceButtonText();
+        selectedVoiceName.Value = selectedVoiceIndex == 0
+            ? Voice.firstVoiceName
+            : Voice.secondVoiceName;
+    }
 
-        voiceChooserControl.GetLabelTextFunction = voice => voice != null
-            ? selectedSong.VoiceNames[voice.Name]
-            : "";
+    private void InitMicPitchTracker()
+    {
+        micPitchTracker = GameObject.Instantiate(micPitchTrackerPrefab);
+        injector.InjectAllComponentsInChildren(micPitchTracker);
+        micPitchTracker.MicProfile = micProfile;
+        UpdateMicPitchTracker();
+    }
+    
+    private void UpdateMicPitchTracker()
+    {
+        if (micPitchTracker == null)
+        {
+            return;
+        }
+        
+        micPitchTracker.MicProfile = micProfile;
+        if (micProfile == null
+            || micProfile.IsInputFromConnectedClient
+            || !settings.SongSelectSettings.micTestActive)
+        {
+            if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
+            {
+                micPitchTracker.MicSampleRecorder.StopRecording();
+            }
+        }
+        else if (micProfile != null
+                 && !micProfile.IsInputFromConnectedClient
+                 && settings.SongSelectSettings.micTestActive)
+        {
+            if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
+            {
+                micPitchTracker.MicSampleRecorder.StartRecording();
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        GameObject.Destroy(micPitchTracker);
     }
 }

@@ -1,49 +1,56 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement style="width: 100%; height: 100%; flex-direction: row; align-items: flex-start; justify-content: space-between;">
-        <ui:VisualElement name="column" picking-mode="Ignore" style="width: 60%; height: 100%; flex-direction: column; align-items: center; flex-grow: 1; justify-content: space-between; flex-shrink: 2;">
-            <ui:VisualElement name="row" picking-mode="Ignore" style="flex-direction: row; justify-content: space-around; flex-grow: 1;">
-                <ui:VisualElement name="playerImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/DummyPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#DummyPlayerProfileImage&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; flex-grow: 1;" />
-                <ui:VisualElement picking-mode="Ignore" style="flex-grow: 1;">
-                    <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; flex-grow: 1;" />
-                    <ui:Label text="Tone Deaf" display-tooltip-when-elided="true" name="ratingLabel" picking-mode="Ignore" style="-unity-text-align: upper-center;" />
+    <ui:VisualElement name="singingResultsPlayerUiRoot" style="width: 100%; height: 100%; align-items: flex-start; justify-content: space-between; flex-direction: row; flex-grow: 1;">
+        <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); height: 100%;">
+            <ui:VisualElement name="topContainer" style="flex-grow: 1; align-items: center;">
+                <ui:VisualElement name="playerInfoContainer" style="justify-content: center; align-items: center; flex-grow: 1; width: 100%; min-height: 50%;">
+                    <AspectRatioPanel aspect-ratio-x="1" aspect-ratio-y="1" style="flex-grow: 1; align-items: center; justify-content: center; height: 100%; width: 100%;">
+                        <RadialProgressBar progress="80" name="playerScoreProgressBar" show-label="false" class="overlay singingResults" style="width: 100%; height: 100%;" />
+                        <ui:VisualElement name="playerImage" class="circle" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit; width: 80%; height: 80%;" />
+                        <ui:VisualElement picking-mode="Ignore" name="ratingIconAndText" style="position: absolute; height: 100%; left: 50%; bottom: 33%; width: 100%; align-items: center;">
+                            <ui:Label text="Tone Deaf" display-tooltip-when-elided="true" name="ratingLabel" picking-mode="Ignore" style="-unity-text-align: upper-center;" />
+                            <ui:VisualElement name="ratingImage" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Icons/ScoreRatingIcons/[score]rating_0.png?fileID=21300000&amp;guid=5deb6694a398abc4ab780d5d83778900&amp;type=3#[score]rating_0&apos;); align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit; width: 50%; height: 50%;" />
+                        </ui:VisualElement>
+                    </AspectRatioPanel>
+                </ui:VisualElement>
+                <ui:VisualElement name="playerNameAndTotalScoreContainer" style="background-color: rgba(0, 0, 0, 0);">
+                    <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" style="-unity-text-align: upper-center;" />
+                    <ui:Label text="99999" display-tooltip-when-elided="true" name="totalScoreLabel" picking-mode="Ignore" class="largerFont" style="-unity-text-align: upper-center; -unity-font-style: bold; min-width: 85px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="singingResultsScoresContainer" picking-mode="Ignore">
-                <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" class="titleText" style="width: 100%;" />
-                <ui:VisualElement name="normalNoteScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
-                    <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[score]bar_box_dark.png?fileID=2800000&amp;guid=3c60a383906a7be40b5f4fb58e2cfe59&amp;type=3#[score]bar_box_dark&apos;);" />
-                    <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; margin-left: 10px; flex-wrap: wrap; padding-bottom: 2px;">
-                        <ui:Label text="Notes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" style="height: 100%;" />
-                        <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
+            <ui:VisualElement name="bottomContainer" style="flex-shrink: 2;">
+                <ui:VisualElement name="singingResultsScoresContainer" picking-mode="Ignore" style="height: auto;">
+                    <ui:VisualElement name="normalNoteScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
+                        <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="align-items: center; justify-content: center;">
+                            <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap; padding-bottom: 2px;">
+                            <ui:Label text="Notes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" style="height: 100%;" />
+                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="goldenNoteScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
+                        <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="align-items: center; justify-content: center;">
+                            <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap;">
+                            <ui:Label text="Golden Notes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" />
+                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="phraseBonusScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
+                        <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="align-items: center; justify-content: center;">
+                            <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap;">
+                            <ui:Label text="Phrase Bonus" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" />
+                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="newHighscoreContainer" style="align-items: center;">
+                        <MaterialIcon tabindex="-1" icon="star_outline" name="newHighscoreIcon" class="mr-2 ignoreTheme" style="font-size: 28px;" />
+                        <ui:Label tabindex="-1" text="New High Score" display-tooltip-when-elided="true" name="newHighscoreLabel" class="ignoreTheme" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="goldenNoteScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
-                    <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[score]bar_box_light.png?fileID=2800000&amp;guid=9b791fd7a45687e4691d4da40c122f8a&amp;type=3#[score]bar_box_light&apos;);" />
-                    <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; margin-left: 10px; flex-wrap: wrap;">
-                        <ui:Label text="Golden Notes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" />
-                        <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-                <ui:VisualElement name="phraseBonusScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
-                    <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[score]bar_box_lightest.png?fileID=2800000&amp;guid=219491d07d3deb247b6ca9d7d9394eb1&amp;type=3#[score]bar_box_lightest&apos;);" />
-                    <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; margin-left: 10px; flex-wrap: wrap;">
-                        <ui:Label text="Phrase Bonus" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" />
-                        <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:VisualElement name="totalScore" style="flex-direction: row; justify-content: space-between; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; padding-top: 5px; width: 100%;">
-                <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[sing]p.png?fileID=2800000&amp;guid=f8442e207ea2a3f4bbeb74789d94cfbf&amp;type=3#[sing]p&apos;);" />
-                <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; margin-left: 20px;">
-                    <ui:Label text="Total" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" />
-                    <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="column" picking-mode="Ignore" style="height: 100%; flex-grow: 2; width: 10%; flex-shrink: 1; padding-left: 20px; padding-right: 10px;">
-            <ui:VisualElement name="scoreBar" picking-mode="Ignore" style="height: 100%; flex-grow: 1;">
-                <ui:VisualElement name="emptyScoreBar" picking-mode="Ignore" style="height: 96%; flex-grow: 0; background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[score]glass_box.png?fileID=21300000&amp;guid=ef4f1927ea9837c4794d0cc13280d088&amp;type=3#[score]glass_box&apos;); width: 100%;" />
-                <ui:VisualElement name="filledScoreBar" picking-mode="Ignore" style="background-image: url(&apos;project://database/Assets/Common/Graphics/Shapes/[score]endcap.png?fileID=21300000&amp;guid=2cf4b5832641ba44eb2240332f340bdd&amp;type=3#[score]endcap&apos;); position: absolute; bottom: 0; -unity-background-scale-mode: stretch-to-fill; height: 5%; width: 100%;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
