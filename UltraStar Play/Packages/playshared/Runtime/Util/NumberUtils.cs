@@ -150,4 +150,19 @@ public static class NumberUtils
         }
         return result;
     }
+    
+    public static List<float> CreateFloatList(float startValueInclusive, float endValueInclusive, float stepValue = 1)
+    {
+        if (stepValue <= 0)
+        {
+            throw new ArgumentException("Step value must be positive");
+        }
+
+        List<float> result = new();
+        for (float i = startValueInclusive; i <= endValueInclusive; i += stepValue)
+        {
+            result.Add(i);
+        }
+        return result;
+    }
 }
