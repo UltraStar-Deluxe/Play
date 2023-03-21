@@ -597,3 +597,13 @@
     padding-top: 20px;
     padding-bottom: 40px;
 }
+
+/**************************************************/
+/* PARTY MODE SCENES */
+/**************************************************/
+
+.playerProfilePlaceholder {
+    height: var(--control-height);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

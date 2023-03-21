@@ -22,9 +22,6 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     [InjectedInInspector]
     public VisualTreeAsset teamColumnPlayerUi;
 
-    [InjectedInInspector]
-    public VisualTreeAsset roundUi;
-
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -46,8 +43,8 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
     [Inject]
     private PlaylistManager playlistManager;
 
-    [Inject(UxmlName = R.UxmlNames.partyModeTeamConfigUi)]
-    private VisualElement partyModeTeamConfigUi;
+    [Inject(UxmlName = R.UxmlNames.partyModeTeamsConfigUi)]
+    private VisualElement partyModeTeamsConfigUi;
 
     [Inject(UxmlName = R.UxmlNames.partyModeSongSelectionConfigUi)]
     private VisualElement partyModeSongSelectionConfigUi;
@@ -60,16 +57,11 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
-    
-    [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
-    private VisualElement modifierDialogOverlay;
 
     private PartyModeSettings PartyModeSettings => sceneData.PartyModeSettings;
     
-    private readonly ReactiveProperty<EPartyModeConfigPart> configPart = new(EPartyModeConfigPart.Teams);
     private readonly PartyModeTeamConfigControl teamConfigControl = new();
     private readonly PartyModeSongSelectionConfigControl songSelectionConfigControl = new();
-    private readonly GameRoundModifierDialogControl modifierDialogControl = new();
 
     public void OnInjectionFinished()
     {
@@ -82,16 +74,11 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
         backButton.RegisterCallbackButtonTriggered(_ => OnBack());
         continueButton.RegisterCallbackButtonTriggered(_ => OnContinue());
-
-        configPart.Subscribe(_ => UpdateConfigPart());
-        UpdateConfigPart();
+        continueButton.Focus();
 
         // Inject child controls
-        injector.WithRootVisualElement(modifierDialogOverlay)
-            .Inject(modifierDialogControl);
         injector.Inject(teamConfigControl);
         injector.Inject(songSelectionConfigControl);
-        // injector.Inject(roundsConfigControl);
     }
 
     private void InitPartyModeSettings()
@@ -121,85 +108,37 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         PartyModeSettings.songSelectionSettings.songPoolPlaylist = UltraStarAllSongsPlaylist.Instance;
     }
 
-    private void UpdateConfigPart()
-    {
-        VisualElement GetCurrentConfigPartVisualElement()
-        {
-            switch (configPart.Value)
-            {
-                case EPartyModeConfigPart.Teams:
-                    return partyModeTeamConfigUi;
-                case EPartyModeConfigPart.SongSelection:
-                    return partyModeSongSelectionConfigUi;
-            }
-
-            throw new ArgumentException($"Unhandled config part {configPart.Value}");
-        }
-
-        // Show only the current config part UI
-        List<VisualElement> configUis = new List<VisualElement>
-        {
-            partyModeTeamConfigUi,
-            partyModeSongSelectionConfigUi,
-        };
-        configUis.ForEach(configUi => configUi.HideByDisplay());
-        GetCurrentConfigPartVisualElement().ShowByDisplay();
-
-        // Update the scene title
-        sceneTitle.text = $"Party Mode - {StringUtils.ToTitleCase(configPart.Value.ToString())}";
-    }
-
     private void OnBack()
     {
-        if (modifierDialogControl.IsVisible)
-        {
-            modifierDialogControl.CloseDialog();
-        }
-        // else if (roundsConfigControl.IsSavePresetDialogOpen)
-        // {
-            // roundsConfigControl.CloseSavePresetDialog();
-        // }
-        else if (configPart.Value == EPartyModeConfigPart.Teams)
-        {
-            sceneNavigator.LoadScene(EScene.MainScene);
-        }
-        else if (configPart.Value == EPartyModeConfigPart.SongSelection)
-        {
-            configPart.Value = EPartyModeConfigPart.Teams;
-        }
+        sceneNavigator.LoadScene(EScene.MainScene);
 	}
 
     private void OnContinue()
     {
-        if (configPart.Value == EPartyModeConfigPart.Teams)
+        string errorMessage;
+        
+        errorMessage = GetSongSelectionConfigErrorMessage();
+        if (!errorMessage.IsNullOrEmpty())
         {
-            string errorMessage = GetTeamsConfigErrorMessage();
-            if (!errorMessage.IsNullOrEmpty())
-            {
-                UiManager.CreateNotification(errorMessage);
-                return;
-            }
-
-            configPart.Value = EPartyModeConfigPart.SongSelection;
+            UiManager.CreateNotification(errorMessage);
+            return;
         }
-        else if (configPart.Value == EPartyModeConfigPart.SongSelection)
+        
+        errorMessage = GetTeamsConfigErrorMessage();
+        if (!errorMessage.IsNullOrEmpty())
         {
-            string errorMessage = GetSongSelectionConfigErrorMessage();
-            if (!errorMessage.IsNullOrEmpty())
-            {
-                UiManager.CreateNotification(errorMessage);
-                return;
-            }
-
-            errorMessage = GetRoundsConfigErrorMessage();
-            if (!errorMessage.IsNullOrEmpty())
-            {
-                UiManager.CreateNotification(errorMessage);
-                return;
-            }
-
-            FinishScene();
+            UiManager.CreateNotification(errorMessage);
+            return;
         }
+
+        errorMessage = GetRoundsConfigErrorMessage();
+        if (!errorMessage.IsNullOrEmpty())
+        {
+            UiManager.CreateNotification(errorMessage);
+            return;
+        }
+
+        FinishScene();
     }
 
     private void FinishScene()
@@ -339,12 +278,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         bb.BindExistingInstance(SceneNavigator.GetSceneData(CreateDefaultPartyModeSceneData()));
         bb.BindExistingInstance(teamConfigControl);
         bb.BindExistingInstance(songSelectionConfigControl);
-        // bb.BindExistingInstance(roundsConfigControl);
-        bb.BindExistingInstance(modifierDialogControl);
         bb.Bind(nameof(valueInputDialogUi)).ToExistingInstance(valueInputDialogUi);
         bb.Bind(nameof(teamColumnUi)).ToExistingInstance(teamColumnUi);
         bb.Bind(nameof(teamColumnPlayerUi)).ToExistingInstance(teamColumnPlayerUi);
-        bb.Bind(nameof(roundUi)).ToExistingInstance(roundUi);
         return bb.GetBindings();
     }
 
