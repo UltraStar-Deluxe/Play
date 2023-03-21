@@ -380,3 +380,9 @@ Toggle.smallControl {
 .medleyWithPrevious #playerEntryList {
     display: none;
 }
+
+#vfxOverlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
