@@ -24,6 +24,9 @@ public static class MidiUtils
     private static Dictionary<int, string> midiNoteToAbsoluteName = CreateMidiNoteToAbsoluteNameMap();
     private static readonly Dictionary<string, int> absoluteNameToMidiNote = CreateAbsoluteNameToMidiNoteMap();
 
+    private static readonly float[] singableHalftoneFrequencies = PrecalculateHalftoneFrequencies(SingableNoteMin, SingableNoteRange);
+    private static float log10Of2 = Mathf.Log10(2);
+    
     private static Dictionary<int, string> CreateMidiNoteToAbsoluteNameMap()
     {
         Dictionary<int, string> result = new();
@@ -190,5 +193,31 @@ public static class MidiUtils
     public static int GetMidiNotePitch(int ultraStarTxtPitch)
     {
         return ultraStarTxtPitch + 60;
+    }
+    
+    public static int GetMidiNoteForFrequency(float frequency)
+    {
+        int bestHalftoneIndex = -1;
+        float bestFrequencyDifference = float.MaxValue;
+        for (int i = 0; i < singableHalftoneFrequencies.Length; i++)
+        {
+            float frequencyDifference = Mathf.Abs(singableHalftoneFrequencies[i] - frequency);
+            if (frequencyDifference < bestFrequencyDifference)
+            {
+                bestFrequencyDifference = frequencyDifference;
+                bestHalftoneIndex = i;
+            }
+        }
+        return MidiUtils.SingableNoteMin + bestHalftoneIndex;
+    }
+    
+    public static float CalculateFrequency(int midiNote)
+    {
+        return 440 * Mathf.Pow(2, (midiNote - 69) / 12f);
+    }
+    
+    public static float CalculateMidiNote(float frequency)
+    {
+        return 12 * (Mathf.Log10(frequency / 220f) / log10Of2) + 57;
     }
 }
