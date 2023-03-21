@@ -89,7 +89,16 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         themePickerControl.GetLabelTextFunction = themeMeta => ThemeMetaUtils.GetDisplayName(themeMeta);
         themePickerControl.Bind(
             () => themeManager.GetCurrentTheme(),
-            newValue => themeManager.SetCurrentTheme(newValue));
+            newValue => ChangeTheme(newValue));
+    }
+
+    private void ChangeTheme(ThemeMeta themeMeta)
+    {
+        if (themeManager.GetCurrentTheme() == themeMeta)
+        {
+            return;
+        }
+        themeManager.SetCurrentTheme(themeMeta);
     }
 
     public void UpdateTranslation()
