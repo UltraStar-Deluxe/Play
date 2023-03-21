@@ -49,6 +49,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
+    public VisualElement PlayerImage => playerImage;
 
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;

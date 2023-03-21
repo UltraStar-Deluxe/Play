@@ -54,6 +54,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;
     
+    [Inject(UxmlName = R.UxmlNames.noteContainer)]
+    protected VisualElement noteContainer;
+    
     [Inject]
     private Settings settings;
 
@@ -298,6 +301,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private void CreatePerfectSentenceEffect()
     {
         noteDisplayer.CreatePerfectSentenceEffect();
+        VfxManager.CreateParticleSystem(EParticleEffect.ShinyItemLoop, playerImage.worldBound.center, 0.2f);        
     }
 
     private void CreatePerfectNoteEffect(Note perfectNote)

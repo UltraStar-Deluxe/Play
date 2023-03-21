@@ -3,7 +3,29 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - UIDocument
+  - InputManager
+  - DontDestroyOnLoadManager
+  - TranslationManager
+  - SceneInjectionManager
+  - EventSystem
+  - UiManager
+  - SceneChangeAnimationControl
+  - AudioManager
+  - PlaylistManager
+  - SceneNavigator
+  - SettingsManager
+  - ThemeManager
+  - ServerSideConnectRequestManager
+  - CursorManager
+  - ApplicationManager
+  - SongMetaManager
+  - MidiManager
+  - StatsManager
+  - StyleSheetControl
+  - ContextMenuPopupManager
+  - FxTemporaire
   layers:
   - Default
   - TransparentFX
@@ -11,8 +33,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - VfxForeground
+  - VfxBackground
   - 
   - 
   - 

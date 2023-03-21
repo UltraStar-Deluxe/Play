@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ICSharpCode.SharpZipLib.Zip;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -96,6 +95,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private SingingResultsSceneData sceneData;
     
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
+    private readonly List<GameObject> particleSystems = new();
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
 
@@ -139,8 +139,15 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.ShowContainer(playerResultsRoot);
-        showCurrentResultsButton.SetActive(true);
-        showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
+        showCurrentResultsButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            particleSystems.ForEach(it => it.SetActive(true));
+        });
+        showHighscoreButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            particleSystems.ForEach(it => it.SetActive(false));
+            highscoreControl.Init();
+        });
         
         restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
         
@@ -159,6 +166,27 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         ActivateLayout();
         FillLayout();
+
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => InitVfx()));
+    }
+
+    private void InitVfx()
+    {
+        List<PlayerProfile> unusedPlayerProfiles = sceneData.PlayerProfiles.ToList();
+        List<PlayerProfile> firstPlayers = GetTopPlayers(unusedPlayerProfiles);
+        singingResultsPlayerUiControls
+            .Where(it => firstPlayers.Contains(it.PlayerProfile)
+                && sceneData.GetPlayerScores(it.PlayerProfile).TotalScore > 0)
+            .ForEach(it =>
+            {
+                GameObject newParticleSystem = VfxManager.CreateParticleSystem(
+                    EParticleEffect.LightGlowALoop,
+                    it.PlayerImage.worldBound.center,
+                    0.4f,
+                    true,
+                    true);
+                particleSystems.Add(newParticleSystem);
+            });
     }
 
     private void RestartSingScene()
