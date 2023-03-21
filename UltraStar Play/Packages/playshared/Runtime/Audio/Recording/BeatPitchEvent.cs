@@ -7,4 +7,9 @@ public class BeatPitchEvent : PitchEvent
     {
         Beat = beat;
     }
+    
+    public override string ToString()
+    {
+        return $"BeatPitchEvent(Beat: {Beat}, MidiNote: {MidiNote}, Frequency: {Frequency})";
+    }
 }
