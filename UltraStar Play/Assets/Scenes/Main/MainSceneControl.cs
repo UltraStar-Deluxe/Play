@@ -217,6 +217,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => CloseQuitGameDialog());
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(quitGameDialogControl.DialogRootVisualElement);
     }
 
     public void OpenNewSongDialog()
