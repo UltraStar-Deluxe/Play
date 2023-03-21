@@ -133,7 +133,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             {
                 if (dto is BeatPitchEventDto beatPitchEventDto)
                 {
-                    HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+                    HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency));
                 }
             })
             .AddTo(gameObject);
@@ -321,13 +321,14 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, pitchEvent.Beat);
         Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, pitchEvent.Beat, true, false);
         int midiNote = pitchEvent.MidiNote;
+        float frequency = pitchEvent.Frequency;
         if (midiNote < 0)
         {
             FirePitchEvent(null, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
         }
         else
         {
-            FirePitchEvent(new PitchEvent(midiNote), pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
+            FirePitchEvent(new PitchEvent(midiNote, frequency), pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
         }
     }
 

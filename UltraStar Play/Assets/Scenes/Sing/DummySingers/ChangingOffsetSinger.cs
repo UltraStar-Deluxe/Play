@@ -26,6 +26,7 @@ public class ChangingOffsetSinger : AbstractDummySinger
 
         int dummyMidiNote = noteAtBeat.MidiNote + noteOffset;
         int dummyMidiNoteInSingableNoteRange = (dummyMidiNote % 12) + (5 * 12);
-        return new BeatPitchEvent(dummyMidiNoteInSingableNoteRange, beat);
+        float frequency = 0;
+        return new BeatPitchEvent(dummyMidiNoteInSingableNoteRange, beat, frequency);
     }
 }

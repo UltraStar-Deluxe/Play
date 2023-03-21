@@ -73,4 +73,29 @@ public class MidiUtilsTests
         // Shortest signed distance from D to A -> -5
         Assert.AreEqual(-5, MidiUtils.GetRelativePitchDistanceSigned(74, 45));
     }
+
+    [Test]
+    public void MidiNoteToFrequencyTest()
+    {
+        // Midi note 69 = A4 = 440 Hz
+        Assert.AreEqual(440, MidiUtils.CalculateFrequency(69));
+        // Midi note 81 = A5 = 1760 Hz
+        Assert.AreEqual(880, MidiUtils.CalculateFrequency(81));
+        // Midi note 93 = A6 = 1760 Hz
+        Assert.AreEqual(1760, MidiUtils.CalculateFrequency(93));
+    }
+    
+    [Test]
+    public void FrequencyToMidiNoteTest()
+    {
+        // Midi note 69 = A4 = 440 Hz
+        Assert.AreEqual(69, MidiUtils.CalculateMidiNote(440));
+        // Midi note 81 = A5 = 1760 Hz
+        Assert.AreEqual(81, MidiUtils.CalculateMidiNote(880));
+        // Midi note 93 = A6 = 1760 Hz
+        Assert.AreEqual(93, MidiUtils.CalculateMidiNote(1760));
+        
+        // Between A4 and A#4
+        Assert.True(MidiUtils.CalculateMidiNote(450) is > 69 and < 70);
+    }
 }
