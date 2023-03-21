@@ -498,7 +498,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
-    public void SkipToNextSingableNote()
+    public void SkipToNextSingableNoteOrEndOfSong()
     {
         if (sceneData.IsMedley)
         {
@@ -512,17 +512,25 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .Select(nextSingableNote => nextSingableNote.StartBeat);
         if (nextSingableNotes.Count() <= 0)
         {
+            SkipToEndOfSong();
             return;
         }
         int nextStartBeat = nextSingableNotes.Min();
 
         // For debugging, go fast to next lyrics. In production, give the player some time to prepare.
-        double offsetInMillis = Application.isEditor ? 500 : 1500;
+        double offsetInMillis = Application.isEditor ? 500 : 2000;
         double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - offsetInMillis;
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
         {
             SkipToPositionInSong(targetPositionInMillis);
         }
+    }
+
+    private void SkipToEndOfSong()
+    {
+        double targetPositionInSong = songAudioPlayer.DurationOfSongInMillis - 2000;
+        targetPositionInSong = NumberUtils.Limit(targetPositionInSong, 0, songAudioPlayer.DurationOfSongInMillis);
+        SkipToPositionInSong(targetPositionInSong);
     }
 
     public void SkipToPositionInSong(double positionInSongInMillis)
