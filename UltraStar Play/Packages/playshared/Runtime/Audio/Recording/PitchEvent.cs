@@ -8,4 +8,9 @@ public class PitchEvent
         MidiNote = midiNote;
         Frequency = frequency;
     }
+
+    public override string ToString()
+    {
+        return $"PitchEvent(MidiNote: {MidiNote}, Frequency: {Frequency})";
+    }
 }

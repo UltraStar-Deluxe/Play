@@ -38,6 +38,19 @@ public class MidiUtilsTests
     }
 
     [Test]
+    public void GetRelativePitchTest()
+    {
+        // A4 -> A at midi note 9
+        Assert.AreEqual(9, MidiUtils.GetRelativePitch(69));
+        
+        // C5 -> C at midi note 0
+        Assert.AreEqual(0, MidiUtils.GetRelativePitch(72));
+        
+        // Fraction of a midi note
+        Assert.AreEqual(9.25, MidiUtils.GetRelativePitch(69.25f));
+    }
+    
+    [Test]
     public void GetRelativePitchDistanceTest()
     {
         // The distance must be computed on relative notes, i.e., the pitch must be taken modulo 12.
@@ -48,6 +61,9 @@ public class MidiUtilsTests
         // Shortest distance via 1, 0, 11, 10 = 4
         Assert.AreEqual(4, MidiUtils.GetRelativePitchDistance(2, 10));
 
+        // Shortest distance with fraction via 1, 0, 11, 10 = 4.25
+        Assert.AreEqual(4.25, MidiUtils.GetRelativePitchDistance(2.25f, 10));
+        
         // No distance
         Assert.AreEqual(0, MidiUtils.GetRelativePitchDistanceSigned(5, 5));
         // Shortest signed distance from F to A -> 4
