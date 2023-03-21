@@ -56,6 +56,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         vfxElement = new Image();
         vfxElement.name = "vfxOverlay";
         vfxElement.image = vfxCamera.targetTexture;
+        vfxElement.pickingMode = PickingMode.Ignore;
         uiDocument.rootVisualElement.Add(vfxElement);
     }
 
