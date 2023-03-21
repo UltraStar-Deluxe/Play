@@ -780,18 +780,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         isDropdownMenuOpened = true;
     }
 
-    public float GetSceneChangeAnimationTimeInSeconds()
-    {
-        string sceneChangeAnimationTimeString = GetCurrentTheme().ThemeJson.sceneTransitionAnimationTime;
-        if (!sceneChangeAnimationTimeString.IsNullOrEmpty()
-            && TimeUtils.TryParseDuration(sceneChangeAnimationTimeString, out long parsedDurationInMilliseconds))
-        {
-            return parsedDurationInMilliseconds / 1000f;
-        }
-
-        return DefaultSceneChangeAnimationTimeInSeconds;
-    }
-
     public IReadOnlyCollection<Sprite> GetSprites()
     {
         return loadedSprites;

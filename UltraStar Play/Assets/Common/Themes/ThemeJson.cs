@@ -41,9 +41,4 @@ public class ThemeJson
     public Color32 lyricsOutlineColor;
     public Color32 currentNoteLyricsColor;
     public Color32 previousNoteLyricsColor;
-
-    /**
-     * Time with unit for scene transition, e.g. "0.5s" or "200 ms".
-     */
-    public string sceneTransitionAnimationTime;
 }

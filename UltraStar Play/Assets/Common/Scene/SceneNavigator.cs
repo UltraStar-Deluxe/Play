@@ -58,7 +58,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
             stopwatch.Stop();
             if (logSceneChangeDuration)
             {
-                Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms");
+                Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms (including animation)");
             }
         }).AddTo(gameObject);
     }
@@ -84,7 +84,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
         beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));
 
-        if (settings.GraphicSettings.AnimateSceneChange)
+        if (SettingsUtils.ShouldAnimateSceneChange(settings))
         {
             sceneChangeAnimationControl.AnimateChangeToScene(
                 () => DoChangeScene(currentScene, scene),

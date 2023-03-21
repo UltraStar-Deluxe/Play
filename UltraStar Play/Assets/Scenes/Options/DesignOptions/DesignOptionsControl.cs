@@ -35,9 +35,12 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.imageAsCursorPicker)]
     private ItemPicker imageAsCursorPicker;
 
-    [Inject(UxmlName = R.UxmlNames.animateSceneChangePicker)]
-    private ItemPicker animateSceneChangePicker;
+    [Inject(UxmlName = R.UxmlNames.sceneChangeAnimationPicker)]
+    private ItemPicker sceneChangeAnimationPicker;
 
+    [Inject(UxmlName = R.UxmlNames.sceneChangeDurationPicker)]
+    private ItemPicker sceneChangeDurationPicker;
+    
     [Inject(UxmlName = R.UxmlNames.showPlayerNamePicker)]
     private ItemPicker showPlayerNamePicker;
     
@@ -71,10 +74,15 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             .Bind(() => settings.GraphicSettings.useImageAsCursor,
                 newValue => settings.GraphicSettings.useImageAsCursor = newValue);
 
-        new BoolPickerControl(animateSceneChangePicker)
-            .Bind(() => settings.GraphicSettings.AnimateSceneChange,
-                newValue => settings.GraphicSettings.AnimateSceneChange = newValue);
+        new LabeledItemPickerControl<ESceneChangeAnimation>(sceneChangeAnimationPicker, EnumUtils.GetValuesAsList<ESceneChangeAnimation>())
+            .Bind(() => settings.GraphicSettings.sceneChangeAnimation,
+                newValue => settings.GraphicSettings.sceneChangeAnimation = newValue);
 
+        LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.55f, 0.05f));
+        sceneChangeDurationPickerControl.Bind(() => settings.GraphicSettings.sceneChangeDurationInSeconds,
+                newValue => settings.GraphicSettings.sceneChangeDurationInSeconds = newValue);
+        sceneChangeDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
+        
         new BoolPickerControl(showPlayerNamePicker)
             .Bind(() => settings.GraphicSettings.showPlayerNames,
                 newValue => settings.GraphicSettings.showPlayerNames = newValue);

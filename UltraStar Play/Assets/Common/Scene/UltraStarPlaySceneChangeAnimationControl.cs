@@ -2,6 +2,7 @@ using System;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehaviour, INeedInjection
 {
@@ -44,6 +45,9 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     [Inject]
     private ThemeManager themeManager;
 
+    [Inject]
+    private UIDocument uiDocument;
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -52,16 +56,27 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     protected override void StartSingleton()
     {
         sceneNavigator.SceneChangedEventStream
-            .Subscribe(_ => UpdateSceneTexturesAndTransition())
+            .Subscribe(_ => OnSceneChanged())
             .AddTo(gameObject);
         UpdateSceneTexturesAndTransition();
     }
 
+    private void OnSceneChanged()
+    {
+        UpdateSceneTexturesAndTransition();
+
+        if (SettingsUtils.ShouldAnimateSceneChange(settings)
+            && settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
+        {
+            GetBackgroundVisualElement().style.opacity = 0;
+        }
+    }
+    
     private void UpdateSceneTexturesAndTransition()
     {
         themeManager.UpdateSceneTextures(UiCopyRenderTexture);
 
-        if (settings.GraphicSettings.AnimateSceneChange)
+        if (SettingsUtils.ShouldAnimateSceneChange(settings))
         {
             animateAction?.Invoke();
         }
@@ -69,26 +84,43 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
     public void AnimateChangeToScene(Action doLoadSceneAction, Action doAnimateAction)
     {
-        // Take "screenshot" of "old" scene.
-        if (themeManager.UiRenderTexture == null)
-        {
-            Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
-        }
-        else if (UiCopyRenderTexture == null)
-        {
-            Debug.LogWarning($"UiCopyRenderTexture is null. Not animating scene transition.");
-        }
-        else
-        {
-            Graphics.CopyTexture(themeManager.UiRenderTexture, UiCopyRenderTexture);
-        }
         animateAction = doAnimateAction;
-        doLoadSceneAction();
-    }
+        
+        if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            // Take "screenshot" of "old" scene.
+            if (themeManager.UiRenderTexture == null)
+            {
+                Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
+            }
+            else if (UiCopyRenderTexture == null)
+            {
+                Debug.LogWarning($"UiCopyRenderTexture is null. Not animating scene transition.");
+            }
+            else
+            {
+                Graphics.CopyTexture(themeManager.UiRenderTexture, UiCopyRenderTexture);
+            }
+        }
 
-    public void ClearAnimation()
-    {
-        animateAction = null;
+        if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            doLoadSceneAction();
+        }
+        else if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
+        {
+            float animationTimeInSeconds = settings.GraphicSettings.sceneChangeDurationInSeconds;
+            if (animationTimeInSeconds <= 0)
+            {
+                doLoadSceneAction();
+                return;
+            }
+
+            VisualElement background = GetBackgroundVisualElement();
+            LeanTween.value(gameObject, 1, 0, animationTimeInSeconds)
+                .setOnUpdate((float interpolatedValue) => background.style.opacity = interpolatedValue)
+                .setOnComplete(() => doLoadSceneAction());
+        }
     }
 
     public void StartSceneChangeAnimation(EScene currentScene, EScene nextScene)
@@ -100,28 +132,42 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             PlaySceneChangeAnimationSound();
         }
 
-        float sceneChangeAnimationTimeInSeconds = themeManager.GetSceneChangeAnimationTimeInSeconds();
-        if (sceneChangeAnimationTimeInSeconds <= 0)
+        float animationTimeInSeconds = settings.GraphicSettings.sceneChangeDurationInSeconds;
+        if (animationTimeInSeconds <= 0)
         {
             return;
         }
 
-        LeanTween.value(gameObject, 0, 1, sceneChangeAnimationTimeInSeconds)
+        VisualElement background = GetBackgroundVisualElement();
+        LeanTween.value(gameObject, 0, 1, animationTimeInSeconds)
             .setOnStart(() =>
             {
-                themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
+                if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+                {
+                    themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
+                }
             })
-            .setOnUpdate((float animTimePercent) =>
+            .setOnUpdate((float interpolatedValue) =>
             {
-                // Scale and fade out the snapshot of the old UIDocument.
-                // Handled by the background shader to get correct premultiplied
-                // blending and avoid the one-frame flicker issue.
-                themeManager.backgroundShaderControl.SetTransitionAnimationTime(animTimePercent);
+                if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+                {
+                    // Scale and fade out the snapshot of the old UIDocument.
+                    // Handled by the background shader to get correct premultiplied
+                    // blending and avoid the one-frame flicker issue.
+                    themeManager.backgroundShaderControl.SetTransitionAnimationTime(interpolatedValue);
+                }
+                else if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
+                {
+                    background.style.opacity = interpolatedValue;
+                }
             })
             .setEaseInSine()
             .setOnComplete(() =>
             {
-                themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
+                if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+                {
+                    themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
+                }
             });
     }
 
@@ -137,5 +183,10 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     private void OnDestroy()
     {
         Destroy(uiCopyRenderTexture);
+    }
+
+    private VisualElement GetBackgroundVisualElement()
+    {
+        return uiDocument.rootVisualElement.Q(R.UxmlNames.background);
     }
 }

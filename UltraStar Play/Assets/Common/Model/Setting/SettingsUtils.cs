@@ -46,4 +46,9 @@ public static class SettingsUtils
         return settings.MicProfiles.FirstOrDefault(micProfile => micProfile.Name == profileName
                                                                  && micProfile.ChannelIndex == channelIndex);
     }
+
+    public static bool ShouldAnimateSceneChange(Settings settings)
+    {
+        return settings.GraphicSettings.sceneChangeDurationInSeconds > 0;
+    }
 }
