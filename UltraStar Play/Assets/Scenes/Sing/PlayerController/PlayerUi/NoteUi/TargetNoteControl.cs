@@ -43,6 +43,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     private VisualElement effectsContainer;
 
     private readonly List<StarParticleControl> starControls = new();
+    private readonly List<GameObject> particleSystems = new();
 
     public void OnInjectionFinished()
     {
@@ -138,48 +139,10 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void CreatePerfectNoteEffect()
     {
-        CreatePerfectStar();
-    }
-
-    private void CreatePerfectStar()
-    {
-        VisualElement star = perfectEffectStarUi.CloneTree().Children().First();
-        star.style.position = new StyleEnum<Position>(Position.Absolute);
-        effectsContainer.Add(star);
-
-        StarParticleControl starControl = injector
-            .WithRootVisualElement(star)
-            .CreateAndInject<StarParticleControl>();
-        starControl.VisualElementToFollow = VisualElement;
-
-        star.style.marginLeft = -25;
-        float xPercent = VisualElement.style.left.value.value + VisualElement.style.width.value.value;
-        float yPercent = VisualElement.style.top.value.value - VisualElement.style.height.value.value / 4f;
-        Vector2 pos = new(xPercent, yPercent);
-        starControl.SetPosition(pos);
-        starControl.Rotation = Random.Range(0, 360);
-
-        Vector2 startScale = Vector2.zero;
-        Vector2 endScale = Vector2.one * 0.8f;
-        starControl.SetScale(startScale);
-
-        // Rotate a little bit
-        starControl.RotationVelocityInDegreesPerSecond = 60;
-
-        // Animate to full size, then animate to zero size, then remove.
-        float animationTime = 1.5f;
-        LeanTween.value(singSceneControl.gameObject, startScale, endScale, animationTime / 2f)
-            .setEaseOutSine()
-            .setOnUpdate((Vector2 s) => starControl.SetScale(s))
-            .setOnComplete(() =>
-            {
-                LeanTween.value(singSceneControl.gameObject, endScale, startScale, animationTime / 2f)
-                    .setEaseOutSine()
-                    .setOnUpdate((Vector2 s) => starControl.SetScale(s))
-                    .setOnComplete(() => RemoveStarControl(starControl));
-            });
-
-        starControls.Add(starControl);
+        particleSystems.Add(
+            VfxManager.CreateParticleSystem(EParticleEffect.FireworksEffect2D_SingleYellowStar,
+                new Vector2(VisualElement.worldBound.xMax, VisualElement.worldBound.yMin),
+                0.1f));
     }
 
     private void RemoveStarControl(StarParticleControl starControl)
@@ -192,5 +155,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     {
         VisualElement.RemoveFromHierarchy();
         starControls.ToList().ForEach(starControl => RemoveStarControl(starControl));
+        particleSystems.ForEach(it => GameObject.Destroy(it));
+        particleSystems.Clear();
     }
 }
