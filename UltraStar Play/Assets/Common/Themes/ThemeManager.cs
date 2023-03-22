@@ -816,6 +816,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         return new List<Color32>
         {
+            Colors.CreateColor("#9E77ED"),
             Colors.CreateColor("#CDF564"),
             Colors.CreateColor("#FF4633"),
             Colors.CreateColor("#519BF6"),
