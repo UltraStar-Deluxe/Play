@@ -1,9 +1,0 @@
-UltraStar Play is a free and open source singing game with integrated song editor.
-The game plays an audio file, displays lyrics, notes, and optionally a background video or image, while the players sing along to earn points.
-
-We love to receive contributions from our community — you!
-Get involved, add styles, ideas, translations, features, and bug reports on GitHub.
-Make UltraStar Play YOUR GAME as well!
-
-https://ultrastar-play.com
-https://github.com/UltraStar-Deluxe/Play
