@@ -338,14 +338,6 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         recordedNoteToRecordedNoteControlsMap.AddInsideList(recordedNote, noteControl);
     }
 
-    public void CreatePerfectSentenceEffect()
-    {
-        for (int i = 0; i < 50; i++)
-        {
-            CreatePerfectSentenceStar();
-        }
-    }
-
     protected void CreatePerfectSentenceStar()
     {
         VisualElement star = perfectEffectStarUi.CloneTree().Children().First();
