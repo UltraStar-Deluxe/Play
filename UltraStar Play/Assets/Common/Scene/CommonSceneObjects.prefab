@@ -6670,6 +6670,9 @@ MonoBehaviour:
   - effectEnum: 12
     prefab: {fileID: 8964558945536655527, guid: 490b12cd66f2f5648ae070df60bbca2a,
       type: 3}
+  - effectEnum: 14
+    prefab: {fileID: 7855248794439244013, guid: d6d4bc6e65bcc524182721db0afff229,
+      type: 3}
   - effectEnum: 13
     prefab: {fileID: 7855248794439244013, guid: 1cbfbf7b877b013419febc692ba16002,
       type: 3}
