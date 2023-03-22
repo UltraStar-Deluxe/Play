@@ -149,21 +149,21 @@
 }
 
 #playerScoreProgressBar {
-    width: 140%;
-    height: 140%;
-    --track-color: #f2f4f7;
+    width: 150%;
+    height: 150%;
+    --track-color: rgba(242, 244, 247, 0);
     --progress-color: #2e8418;
-    --border-size: 8;
+    --border-size: 16;
     border-radius: 50%;
 }
 
 #playerImageBorder {
     border-radius: 50%;
     border-color: #2e8418;
-    border-width: 3%;
+    border-width: 8%;
     /* for perfect circle: width and height = 100% + (4 * border-width%) */ 
-    width: 112%;
-    height: 112%;
+    width: 120%;
+    height: 120%;
 }
 
 .lyricsContainer {
