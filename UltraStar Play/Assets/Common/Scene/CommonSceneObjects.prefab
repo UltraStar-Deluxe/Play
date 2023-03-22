@@ -6639,9 +6639,9 @@ MonoBehaviour:
   backgroundVfxCamera: {fileID: 7160861839740726714}
   foregroundVfxLayer: 6
   backgroundVfxLayer: 7
-  testParticleEffect: 5
+  testParticleEffect: 12
   testParticleScale: 0.5
-  testParticleIsBackground: 1
+  testParticleIsBackground: 0
   particleRecipes:
   - effectEnum: 1
     prefab: {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7,
@@ -6663,6 +6663,15 @@ MonoBehaviour:
       type: 3}
   - effectEnum: 8
     prefab: {fileID: 9157105887711914197, guid: c4f829cb7dd4b864caf8832ec5b1ee55,
+      type: 3}
+  - effectEnum: 9
+    prefab: {fileID: 8964558945536655527, guid: 490b12cd66f2f5648ae070df60bbca2a,
+      type: 3}
+  - effectEnum: 12
+    prefab: {fileID: 8964558945536655527, guid: 490b12cd66f2f5648ae070df60bbca2a,
+      type: 3}
+  - effectEnum: 13
+    prefab: {fileID: 7855248794439244013, guid: 1cbfbf7b877b013419febc692ba16002,
       type: 3}
 --- !u!1 &4760730431951538787
 GameObject:
@@ -8318,7 +8327,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Value

@@ -136,7 +136,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 
     private void Update()
     {
-        if (Keyboard.current.leftAltKey.wasPressedThisFrame)
+        if (Keyboard.current.rightCtrlKey.wasPressedThisFrame)
         {
             CreateParticleSystem(testParticleEffect, new Vector2(400, 300), testParticleScale, false, testParticleIsBackground);
         }
