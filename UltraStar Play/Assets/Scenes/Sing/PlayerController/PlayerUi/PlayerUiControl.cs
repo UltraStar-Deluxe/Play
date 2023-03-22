@@ -300,7 +300,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void CreatePerfectSentenceEffect()
     {
-        noteDisplayer.CreatePerfectSentenceEffect();
+        EParticleEffect noteAreaEffect = RandomUtils.RandomOfItems(
+            EParticleEffect.FireworksEffect2D_Firework5_BlueStar,
+            EParticleEffect.FireworksEffect2D_Firework6_YellowStar);
+        VfxManager.CreateParticleSystem(noteAreaEffect, noteContainer.worldBound.center, 0.4f);
+        
         VfxManager.CreateParticleSystem(EParticleEffect.ShinyItemLoop, playerImage.worldBound.center, 0.2f);        
     }
 

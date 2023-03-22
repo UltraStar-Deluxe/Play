@@ -1,8 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class RandomUtils
 {
+    public static T RandomOfItems<T>(params T[] values)
+    {
+        return RandomOf(values.ToList());
+    }
+    
     public static T RandomOf<T>(IReadOnlyList<T> values)
     {
         if (values.IsNullOrEmpty())
