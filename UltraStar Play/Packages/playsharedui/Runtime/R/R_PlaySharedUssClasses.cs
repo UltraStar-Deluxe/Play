@@ -108,6 +108,7 @@ public static partial class R_PlayShared
         public const string overlayBackground = "overlayBackground";
         public const string overlayDialog = "overlayDialog";
         public const string placeholderVisible = "placeholderVisible";
+        public const string playerProfilePlaceholder = "playerProfilePlaceholder";
         public const string playerScoreLabel = "playerScoreLabel";
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string radial_progress_bar = "radial-progress-bar";

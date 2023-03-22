@@ -1,0 +1,5 @@
+Melody Mania is a fun singing game with custom songs and integrated song editor.
+
+It is a commercial fork of open source project UltraStar Play to finance further developments and to bring even more sing-along fun to live.
+
+https://melodymania.org
