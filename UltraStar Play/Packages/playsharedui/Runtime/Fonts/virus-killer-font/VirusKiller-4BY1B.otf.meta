@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: ef399c82bba508f49a06992f66fe2f15
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Virus Killer
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 50dc9114f845a1d4d8eae2d5d8483cb3, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
