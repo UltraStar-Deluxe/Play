@@ -52,7 +52,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
         if (Note.IsGolden)
         {
-            image.AddToClassList("goldenNote");
+            VisualElement.AddToClassList("goldenNote");
         }
 
         SetStyleByMicProfile();
