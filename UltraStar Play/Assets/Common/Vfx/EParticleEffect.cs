@@ -7,4 +7,7 @@
     LightGlowALoop = 6,
     ShinyItemLoop = 7,
     MagicPoof = 8,
+    StarExplosion_ToonProjectiles_Hit5 = 9,
+    FireworksEffect2D_Firework5_BlueStar = 12,
+    FireworksEffect2D_Firework6_YellowStar = 13,
 }
