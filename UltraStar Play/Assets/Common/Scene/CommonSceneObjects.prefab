@@ -6676,6 +6676,9 @@ MonoBehaviour:
   - effectEnum: 13
     prefab: {fileID: 7855248794439244013, guid: 1cbfbf7b877b013419febc692ba16002,
       type: 3}
+  - effectEnum: 15
+    prefab: {fileID: 8912687312815757345, guid: 7f53080e3299b6e42ac423c121c69668,
+      type: 3}
 --- !u!1 &4760730431951538787
 GameObject:
   m_ObjectHideFlags: 0

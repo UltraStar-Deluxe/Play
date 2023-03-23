@@ -42,9 +42,6 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.effectsContainer)]
     private VisualElement effectsContainer;
 
-    private readonly List<StarParticleControl> starControls = new();
-    private readonly List<GameObject> particleSystems = new();
-
     public void OnInjectionFinished()
     {
         targetNote.ShowByDisplay();
@@ -53,19 +50,10 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         if (Note.IsGolden)
         {
             VisualElement.AddToClassList("goldenNote");
+            VisualElement.RegisterHasGeometryCallbackOneShot(_ => CreateGoldenNoteParticleEffect());
         }
 
         SetStyleByMicProfile();
-    }
-
-    public void Update()
-    {
-        if (Note.IsGolden)
-        {
-            CreateGoldenNoteEffect();
-        }
-
-        starControls.ForEach(starControl => starControl.Update());
     }
 
     private void SetStyleByMicProfile()
@@ -90,77 +78,45 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         image.style.borderRightColor = finalColor;
     }
 
-    private void CreateGoldenNoteEffect()
+    private void CreateGoldenNoteParticleEffect()
     {
-        // Create several particles. Longer notes require more particles because they have more space to fill.
-        int targetStarCount = Mathf.Max(6, (int)VisualElement.contentRect.width / 5);
-        if (starControls.Count < targetStarCount)
+        int maxParticles = 1 + (int)(VisualElement.worldBound.width / 8f);
+        VfxManager.CreateParticleEffect(new ParticleEffectConfig()
         {
-            CreateGoldenStar();
-        }
-    }
-
-    private void CreateGoldenStar()
-    {
-        VisualElement star = goldenNoteStarUi.CloneTree().Children().First();
-        star.style.position = new StyleEnum<Position>(Position.Absolute);
-        effectsContainer.Add(star);
-
-        StarParticleControl starControl = injector
-            .WithRootVisualElement(star)
-            .CreateAndInject<StarParticleControl>();
-        starControl.VisualElementToFollow = VisualElement;
-
-        float noteWidth = VisualElement.style.width.value.value;
-        float noteHeight = VisualElement.style.height.value.value;
-        float xPercent = VisualElement.style.left.value.value + Random.Range(0, noteWidth);
-        float yPercent = VisualElement.style.top.value.value + Random.Range(noteHeight * 0.9f, 0);
-        Vector2 pos = new(xPercent, yPercent);
-        starControl.SetPosition(pos);
-        starControl.Rotation = Random.Range(0, 360);
-
-        Vector2 startScale = Vector2.zero;
-        starControl.SetScale(startScale);
-
-        // Rotate a little bit
-        starControl.RotationVelocityInDegreesPerSecond = 60;
-
-        // Animate to full size, stay there a while, then remove.
-        LeanTween.value(singSceneControl.gameObject, startScale, Vector2.one * Random.Range(0.25f, 0.5f), Random.Range(0.5f, 1f))
-            .setOnUpdate((Vector2 s) => starControl.SetScale(s))
-            .setOnComplete(() =>
-            {
-                LeanTween.value(singSceneControl.gameObject, 0, 0, Random.Range(1f, 4f))
-                    .setOnComplete(() => RemoveStarControl(starControl));
-            });
-
-        starControls.Add(starControl);
+            particleEffect = EParticleEffect.GoldenNoteEffect,
+            panelPos = VisualElement.worldBound.center,
+            loop = true,
+            scale = 0.2f,
+            target = VisualElement,
+            destroyWithTarget = true,
+            moveWithTargetPanelPosProducer = () => VisualElement.worldBound.center,
+            scaleBoxShapeWithTargetFactor = 0.02f,
+            // A large note needs more particles
+            maxParticles = maxParticles ,
+            rateOverTime = 1 + maxParticles / 2,
+        });
     }
 
     public void CreatePerfectNoteEffect()
     {
-        particleSystems.Add(
-            VfxManager.CreateParticleEffect(new ParticleEffectConfig()
-                {
-                    particleEffect = EParticleEffect.FireworksEffect2D_SingleYellowStar,
-                    panelPos = new Vector2(VisualElement.worldBound.xMax, VisualElement.worldBound.yMin),
-                    scale = 0.1f,
-                    target = VisualElement,
-                    moveWithTargetPanelPosProducer = () => new Vector2(VisualElement.worldBound.xMax, VisualElement.worldBound.yMin),
-                }));
-    }
-
-    private void RemoveStarControl(StarParticleControl starControl)
-    {
-        starControl.VisualElement.RemoveFromHierarchy();
-        starControls.Remove(starControl);
+        VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+        {
+            particleEffect = EParticleEffect.FireworksEffect2D_SingleYellowStar,
+            panelPos = new Vector2(VisualElement.worldBound.xMax, VisualElement.worldBound.yMin),
+            scale = 0.1f,
+            target = VisualElement,
+            destroyWithTarget = true,
+            moveWithTargetPanelPosProducer = () => new Vector2(VisualElement.worldBound.xMax, VisualElement.worldBound.yMin),
+        });
     }
 
     public void Dispose()
     {
         VisualElement.RemoveFromHierarchy();
-        starControls.ToList().ForEach(starControl => RemoveStarControl(starControl));
-        particleSystems.ForEach(it => GameObject.Destroy(it));
-        particleSystems.Clear();
+    }
+
+    public void Update()
+    {
+        // Nothing to do
     }
 }
