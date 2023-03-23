@@ -17,6 +17,9 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.targetNote)]
     private VisualElement targetNoteVisualElement;
 
+    [Inject(UxmlName = R.UxmlNames.targetNoteLabel)]
+    private VisualElement targetNoteLabel;
+    
     [Inject(UxmlName = R.UxmlNames.recordedNote)]
     private VisualElement recordedNoteVisualElement;
 
@@ -58,6 +61,7 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         targetNoteVisualElement.HideByDisplay();
+        targetNoteLabel.HideByDisplay();
         recordedNoteVisualElement.ShowByDisplay();
 
         if (micProfile != null)
