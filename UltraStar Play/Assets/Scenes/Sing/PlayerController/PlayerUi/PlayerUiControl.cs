@@ -244,22 +244,19 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
-        visualElement.Q<Label>().text = sentenceRating.Text;
-        visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
+        Label label = visualElement.Q<Label>();
+        label.text = sentenceRating.Text;
+        label.style.color = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
+        // visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         parentContainer.Add(visualElement);
-
-        // Animate movement, then destroy
-        void SetPosition(float value)
-        {
-            visualElement.style.bottom = new StyleLength(new Length(value, LengthUnit.Percent));
-        }
         
-        float fromValue = 100;
-        float untilValue = 0;
-        SetPosition(fromValue);
-        LeanTween.value(singSceneControl.gameObject, fromValue, untilValue, 1f)
-            .setEaseInSine()
-            .setOnUpdate(interpolatedValue => SetPosition(interpolatedValue))
+        visualElement.style.scale = Vector2.zero;
+        LeanTween.value(singSceneControl.gameObject, 0, 1, 0.5f)
+            .setEaseSpring()
+            .setOnUpdate(interpolatedValue => visualElement.style.scale = new Vector2(interpolatedValue, interpolatedValue));
+
+        LeanTween.value(singSceneControl.gameObject, 0, 120, 1.5f)
+            .setOnUpdate(interpolatedValue => visualElement.style.bottom = new StyleLength(Length.Percent(interpolatedValue)))
             .setOnComplete(visualElement.RemoveFromHierarchy);
         return visualElement;
     }
