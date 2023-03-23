@@ -10,9 +10,10 @@ public class ParticleEffectConfig
     public bool isBackground;
     
     public VisualElement target;
-    public Vector2 referenceTargetSize;
-    public Vector3 referenceParticleSystemScale;
     public float scale;
+    public float scaleBoxShapeWithTargetFactor;
+    public int maxParticles;
+    public int rateOverTime;
 
     public Func<Vector2> moveWithTargetPanelPosProducer; 
     public bool hideAndShowWithTarget;

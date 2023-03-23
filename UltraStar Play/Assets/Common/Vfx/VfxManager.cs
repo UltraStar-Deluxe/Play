@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UniInject;
 using UniRx;
@@ -17,6 +18,12 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
     
     [InjectedInInspector]
     public Camera backgroundVfxCamera;
+    
+    // Tip: with a z coordinate near the rendered canvas,
+    // the scene view camera in isometric mode renders similar to the game view.
+    // Can be useful to check particle effects in the scene view (e.g. the shape of the particle system).
+    [InjectedInInspector]
+    public float particleZ = 19.99f;
     
     [InjectedInInspector]
     public int foregroundVfxLayer = 1;
@@ -82,7 +89,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                 && (backgroundVfxRenderTexture.width != Screen.width
                     || backgroundVfxRenderTexture.height != Screen.height))
             {
-                Debug.Log("Recreate foregroundVfxRenderTexture because of screen size change.");
+                Debug.Log("Recreate backgroundVfxRenderTexture because of screen size change.");
                 Destroy(backgroundVfxRenderTexture);
                 backgroundVfxRenderTexture = null;
             }
@@ -169,7 +176,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         backgroundVfxElement.AddToClassList("overlay");
         backgroundVfxElement.image = backgroundVfxCamera.targetTexture;
         backgroundVfxElement.pickingMode = PickingMode.Ignore;
-        uiDocument.rootVisualElement.Q(R.UxmlNames.background).AddAsFirstChild(backgroundVfxElement);
+        uiDocument.rootVisualElement.Q(R.UxmlNames.background)?.AddAsFirstChild(backgroundVfxElement);
     }
 
     public static GameObject CreateParticleEffect(ParticleEffectConfig particleEffectConfig)
@@ -198,19 +205,57 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
             Quaternion.identity,
             newParent);
 
-        UpdateParticleEffectLoop(particleEffectConfig, particleSystemInstance);
-        UpdateParticleEffectScale(particleEffectConfig.scale, particleSystemInstance);
+        UpdateParticleEffectMainModule(particleSystemInstance,
+            mainModule => mainModule.loop = particleEffectConfig.loop);
+        
         UpdateParticleEffectLayer(particleEffectConfig, particleSystemInstance);
 
+        Vector3 scale = new Vector3(particleEffectConfig.scale, particleEffectConfig.scale, particleEffectConfig.scale);
+        UpdateParticleEffectScale(scale, particleSystemInstance);
+
+        if (particleEffectConfig.maxParticles > 0)
+        {
+            UpdateParticleEffectMainModule(particleSystemInstance,
+                mainModule => mainModule.maxParticles = particleEffectConfig.maxParticles);
+        }
+        
+        if (particleEffectConfig.rateOverTime > 0)
+        {
+            UpdateParticleEffectEmissionModule(particleSystemInstance,
+                emissionModule => emissionModule.rateOverTime = particleEffectConfig.rateOverTime);
+        }
+
+        DoUpdateParticleSystemWithTarget(particleEffectConfig, particleSystemInstance);
+        
         RegisterTargetCallbacks(particleEffectConfig, particleSystemInstance);
         
         return particleSystemInstance;
     }
 
+    private void UpdateParticleEffectEmissionModule(GameObject particleSystemInstance, Action<ParticleSystem.EmissionModule> callback)
+    {
+        particleSystemInstance
+            .GetComponentsInChildren<ParticleSystem>()
+            .ForEach(localParticleSystem =>
+            {
+                callback(localParticleSystem.emission);
+            });
+    }
+    
+    private void UpdateParticleEffectMainModule(GameObject particleSystemInstance, Action<ParticleSystem.MainModule> callback)
+    {
+        particleSystemInstance
+            .GetComponentsInChildren<ParticleSystem>()
+            .ForEach(localParticleSystem =>
+            {
+                callback(localParticleSystem.main);
+            });
+    }
+
     private Vector3 GetWorldPos(Vector2 panelPos)
     {
         Vector2 screenPos = panelHelper.PanelToScreen(panelPos);
-        Vector3 worldPos = foregroundVfxCamera.ScreenToWorldPoint(screenPos.WithZ(10f));
+        Vector3 worldPos = foregroundVfxCamera.ScreenToWorldPoint(screenPos.WithZ(particleZ));
         return worldPos;
     }
     
@@ -221,11 +266,6 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-
-        bool scaleWithTarget = particleEffectConfig.referenceTargetSize.x > 0
-                               && particleEffectConfig.referenceTargetSize.y > 0 
-                               && particleEffectConfig.referenceParticleSystemScale.x > 0
-                               && particleEffectConfig.referenceParticleSystemScale.y > 0;
 
         void OnDetachFromPanel(DetachFromPanelEvent evt)
         {
@@ -250,31 +290,8 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
             {
                 return;
             }
-            
-            if (particleEffectConfig.hideAndShowWithTarget)
-            {
-                bool isTargetVisible = target.IsVisibleByDisplay()
-                                       && target.IsVisibleByVisibility()
-                                       && target.resolvedStyle.width > 0
-                                       && target.resolvedStyle.height > 0;
-                particleSystemInstance.SetActive(isTargetVisible);
-            }
-            
-            if (particleEffectConfig.moveWithTargetPanelPosProducer != null)
-            {
-                Vector2 panelPos = particleEffectConfig.moveWithTargetPanelPosProducer();
-                particleSystemInstance.transform.position = GetWorldPos(panelPos);
-            }
 
-            if (scaleWithTarget)
-            {
-                float targetScaleX = target.worldBound.width / particleEffectConfig.referenceTargetSize.x;
-                // float targetScaleY = target.worldBound.height / particleEffectConfig.referenceTargetSize.y;
-                float particleScaleX = particleEffectConfig.referenceTargetSize.x * targetScaleX;
-                // float particleScaleY = particleEffectConfig.referenceTargetSize.y * targetScaleY;
-                
-                UpdateParticleEffectScale(particleScaleX, particleSystemInstance);
-            }
+            DoUpdateParticleSystemWithTarget(particleEffectConfig, particleSystemInstance);
         }
         
         if (particleEffectConfig.destroyWithTarget)
@@ -284,21 +301,47 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 
         if (particleEffectConfig.hideAndShowWithTarget
             || particleEffectConfig.moveWithTargetPanelPosProducer != null
-            || scaleWithTarget)
+            || particleEffectConfig.scaleBoxShapeWithTargetFactor > 0)
         {
             target.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
     }
-    
-    private void UpdateParticleEffectLoop(ParticleEffectConfig particleEffectConfig, GameObject particleSystemInstance)
+
+    private void DoUpdateParticleSystemWithTarget(ParticleEffectConfig particleEffectConfig, GameObject particleSystemInstance)
     {
-        particleSystemInstance
-            .GetComponentsInChildren<ParticleSystem>()
-            .ForEach(particleSystem =>
-            {
-                ParticleSystem.MainModule main = particleSystem.main;
-                main.loop = particleEffectConfig.loop;
-            });
+        VisualElement target = particleEffectConfig.target;
+        if (particleEffectConfig.hideAndShowWithTarget)
+        {
+            bool isTargetVisible = target.IsVisibleByDisplay()
+                                   && target.IsVisibleByVisibility()
+                                   && target.resolvedStyle.width > 0
+                                   && target.resolvedStyle.height > 0;
+            particleSystemInstance.SetActive(isTargetVisible);
+        }
+            
+        if (particleEffectConfig.moveWithTargetPanelPosProducer != null)
+        {
+            Vector2 panelPos = particleEffectConfig.moveWithTargetPanelPosProducer();
+            particleSystemInstance.transform.position = GetWorldPos(panelPos);
+        }
+
+        if (particleEffectConfig.scaleBoxShapeWithTargetFactor > 0)
+        {
+            UpdateParticleEffectBoxShape(particleEffectConfig, particleSystemInstance);
+        }
+    }
+
+    private void UpdateParticleEffectBoxShape(ParticleEffectConfig particleEffectConfig, GameObject particleSystemInstance)
+    {
+        VisualElement target = particleEffectConfig.target;
+        if (target == null)
+        {
+            return;
+        }
+        
+        ParticleSystem particleSystemComponent = particleSystemInstance.GetComponent<ParticleSystem>();
+        ParticleSystem.ShapeModule shape = particleSystemComponent.shape;
+        shape.scale = particleEffectConfig.scaleBoxShapeWithTargetFactor * target.worldBound.size;
     }
 
     private void UpdateParticleEffectLayer(ParticleEffectConfig particleEffectConfig, GameObject particleSystemInstance)
@@ -312,24 +355,24 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
             .ForEach(child => child.gameObject.layer = vfxLayer);
     }
 
-    private void UpdateParticleEffectScale(float scale, GameObject particleEffectInstance)
+    private void UpdateParticleEffectScale(Vector3 scale, GameObject particleEffectInstance)
     {
-        if (scale <= 0)
+        if (scale == Vector3.zero)
         {
             return;
         }
 
         particleEffectInstance
             .GetComponentsInChildren<ParticleSystem>()
-            .ForEach(particleSystem =>
+            .ForEach(localParticleSystem =>
             {
-                ParticleSystem.MainModule main = particleSystem.main;
+                ParticleSystem.MainModule main = localParticleSystem.main;
                 // Scale with parents
                 main.scalingMode = ParticleSystemScalingMode.Hierarchy;
                 // Scale gravity
-                main.gravityModifierMultiplier *= scale;
+                main.gravityModifierMultiplier *= scale.magnitude;
             });
-        particleEffectInstance.transform.localScale = new Vector3(scale, scale, scale);
+        particleEffectInstance.transform.localScale = scale;
     }
 
     private void InitParticleEffectToPrefabMap()
