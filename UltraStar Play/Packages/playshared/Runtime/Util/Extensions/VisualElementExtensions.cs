@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GluonGui.WorkspaceWindow.Views.WorkspaceExplorer.Explorer;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -136,6 +137,21 @@ public static class VisualElementExtensions
         visualElement.RegisterCallback<TEventType>(RunCallbackIfNotDoneYet, useTrickleDown);
     }
 
+    public static void RegisterHasGeometryCallbackOneShot(this VisualElement visualElement, EventCallback<GeometryChangedEvent> callback)
+    {
+        void OnGeometryChanged(GeometryChangedEvent evt)
+        {
+            if (!float.IsNaN(visualElement.worldBound.width)
+                && !float.IsNaN(visualElement.worldBound.height))
+            {
+                callback(evt);
+                visualElement.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            }
+        }
+
+        visualElement.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+    }
+    
     public static void SetBackgroundImageAlpha(this VisualElement visualElement, float newAlpha)
     {
         Color lastColor = visualElement.resolvedStyle.unityBackgroundImageTintColor;
