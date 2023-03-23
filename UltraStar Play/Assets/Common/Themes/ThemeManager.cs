@@ -16,7 +16,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public const string DefaultThemeName = "default_dark";
     private const string ThemeFolderName = "Themes";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
-
+    private readonly Color defaultGoldenColor = Colors.CreateColor("#DACD4A");
+    
     public static ThemeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeManager>();
 
     [InjectedInInspector]
@@ -891,5 +892,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private EScene GetCurrentScene()
     {
         return sceneRecipeManager.GetCurrentScene();
+    }
+
+    public Color GetGoldenColor()
+    {
+        return GetCurrentTheme().ThemeJson.goldenColor
+            .OrIfDefault(defaultGoldenColor);
     }
 }

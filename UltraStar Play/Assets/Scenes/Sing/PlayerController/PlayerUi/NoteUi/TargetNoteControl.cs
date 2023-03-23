@@ -35,6 +35,9 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private SingSceneControl singSceneControl;
+    
+    [Inject]
+    private ThemeManager themeManager;
 
     [Inject]
     private Injector injector;
@@ -63,13 +66,14 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        Color color = micProfile.Color;
+        Color color = Note.IsGolden 
+            ? themeManager.GetGoldenColor()
+            : micProfile.Color;
 
         // Make freestyle and rap notes transparent
         Color finalColor = Note.Type is ENoteType.Freestyle or ENoteType.Rap or ENoteType.RapGolden
             ? color.WithAlpha(0.3f)
             : color;
-
 
         image.style.unityBackgroundImageTintColor = finalColor;
         image.style.borderTopColor = finalColor;

@@ -41,4 +41,5 @@ public class ThemeJson
     public Color32 lyricsOutlineColor;
     public Color32 currentNoteLyricsColor;
     public Color32 previousNoteLyricsColor;
+    public Color32 goldenColor;
 }
