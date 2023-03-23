@@ -140,9 +140,14 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     public void CreatePerfectNoteEffect()
     {
         particleSystems.Add(
-            VfxManager.CreateParticleSystem(EParticleEffect.FireworksEffect2D_SingleYellowStar,
-                new Vector2(VisualElement.worldBound.xMax, VisualElement.worldBound.yMin),
-                0.1f));
+            VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+                {
+                    particleEffect = EParticleEffect.FireworksEffect2D_SingleYellowStar,
+                    panelPos = new Vector2(VisualElement.worldBound.xMax, VisualElement.worldBound.yMin),
+                    scale = 0.1f,
+                    target = VisualElement,
+                    moveWithTargetPanelPosProducer = () => new Vector2(VisualElement.worldBound.xMax, VisualElement.worldBound.yMin),
+                }));
     }
 
     private void RemoveStarControl(StarParticleControl starControl)

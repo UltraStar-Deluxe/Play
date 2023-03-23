@@ -95,7 +95,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private SingingResultsSceneData sceneData;
     
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
-    private readonly List<GameObject> particleSystems = new();
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
 
@@ -139,15 +138,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.ShowContainer(playerResultsRoot);
-        showCurrentResultsButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            particleSystems.ForEach(it => it.SetActive(true));
-        });
-        showHighscoreButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            particleSystems.ForEach(it => it.SetActive(false));
-            highscoreControl.Init();
-        });
+        showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
         
         restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
         
@@ -179,13 +170,16 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
                 && sceneData.GetPlayerScores(it.PlayerProfile).TotalScore > 0)
             .ForEach(it =>
             {
-                GameObject newParticleSystem = VfxManager.CreateParticleSystem(
-                    EParticleEffect.LightGlowALoop,
-                    it.PlayerImage.worldBound.center,
-                    0.4f,
-                    true,
-                    true);
-                particleSystems.Add(newParticleSystem);
+                VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+                {
+                    particleEffect = EParticleEffect.LightGlowALoop,
+                    panelPos = it.PlayerImage.worldBound.center,
+                    scale = 0.4f,
+                    loop = true,
+                    isBackground = true,
+                    target = it.PlayerImage,
+                    hideAndShowWithTarget = true,
+                });
             });
     }
 
