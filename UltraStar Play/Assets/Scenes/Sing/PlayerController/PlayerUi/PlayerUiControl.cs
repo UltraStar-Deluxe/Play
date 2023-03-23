@@ -238,7 +238,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public VisualElement ShowSentenceRating(SentenceRating sentenceRating, VisualElement parentContainer)
     {
         if (settings.GameSettings.ScoreMode == EScoreMode.None
-            || sentenceRating == SentenceRating.bad)
+            || sentenceRating.PercentageThreshold <= SentenceRating.notBad.PercentageThreshold)
         {
             return null;
         }
