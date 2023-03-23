@@ -6637,6 +6637,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   foregroundVfxCamera: {fileID: 6830617286739440681}
   backgroundVfxCamera: {fileID: 7160861839740726714}
+  particleZ: 19.99
   foregroundVfxLayer: 6
   backgroundVfxLayer: 7
   testParticleEffect: 12
@@ -6675,6 +6676,9 @@ MonoBehaviour:
       type: 3}
   - effectEnum: 13
     prefab: {fileID: 7855248794439244013, guid: 1cbfbf7b877b013419febc692ba16002,
+      type: 3}
+  - effectEnum: 16
+    prefab: {fileID: 1429954232896169633, guid: 83036083a4ebcd34f98131bd3cf6f4d2,
       type: 3}
   - effectEnum: 15
     prefab: {fileID: 8912687312815757345, guid: 7f53080e3299b6e42ac423c121c69668,
