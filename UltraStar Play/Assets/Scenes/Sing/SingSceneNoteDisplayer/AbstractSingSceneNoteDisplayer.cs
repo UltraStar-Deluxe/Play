@@ -399,6 +399,11 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         return new Vector2(yStart, yEnd);
     }
 
+    public virtual float GetXInPercent(double positionInSongInMillis)
+    {
+        return 0;
+    }
+    
     protected void UpdateRecordedNoteControlEndBeat(RecordedNoteControl recordedNoteControl)
     {
         recordedNoteControl.EndBeat = recordedNoteControl.StartBeat + (recordedNoteControl.LifeTimeInSeconds * beatsPerSecond);
