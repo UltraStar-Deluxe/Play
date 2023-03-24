@@ -15,9 +15,6 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
     [Inject(UxmlName = R.UxmlNames.continueButton)]
     private Button continueButton;
 
-    [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
-    private Button hiddenContinueButton;
-
     [Inject(UxmlName = R.UxmlNames.nextDifficultyButton)]
     private Button nextDifficultyButton;
 
@@ -63,16 +60,8 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
     private void Start()
     {
         continueButton.RegisterCallbackButtonTriggered(_ => FinishScene());
-        hiddenContinueButton.RegisterCallbackButtonTriggered(_ => FinishScene());
         nextDifficultyButton.RegisterCallbackButtonTriggered(_ => ShowNextDifficulty(1));
         ShowHighscores(sceneData.SongMeta, sceneData.Difficulty);
-
-        // Click through to hiddenContinueButton
-        uiDocument.rootVisualElement.Query<VisualElement>()
-            .ToList()
-            .ForEach(visualElement => visualElement.pickingMode = visualElement is Button
-                ? PickingMode.Position
-                : PickingMode.Ignore);
 
         continueButton.Focus();
     }

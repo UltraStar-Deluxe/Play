@@ -64,11 +64,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [Inject(UxmlName = R.UxmlNames.showCurrentResultsButton)]
     private ToggleButton showCurrentResultsButton;
     
+    [Inject(UxmlName = R.UxmlNames.showTeamResultsButton)]
+    private ToggleButton showTeamResultsButton;
+    
     [Inject(UxmlName = R.UxmlNames.showHighscoreButton)]
     private ToggleButton showHighscoreButton;
     
     [Inject(UxmlName = R.UxmlNames.playerResultsRoot)]
     private VisualElement playerResultsRoot;
+    
+    [Inject(UxmlName = R.UxmlNames.teamResultsUi)]
+    private VisualElement teamResultsUi;
     
     [Inject(UxmlName = R.UxmlNames.highscoresRoot)]
     private VisualElement highscoresRoot;
@@ -137,16 +143,25 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         TabGroupControl tabGroupControl = new();
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
+        tabGroupControl.AddTabGroupButton(showTeamResultsButton, teamResultsUi);
         tabGroupControl.ShowContainer(playerResultsRoot);
         showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
+
+        if (!HasPartyModeSceneData)
+        {
+            showTeamResultsButton.HideByDisplay();
+        }
         
         restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
         
-        background.RegisterCallback<PointerUpEvent>(evt => Continue());
+        background.RegisterCallback<PointerUpEvent>(evt =>
+        {
+            Debug.Log("Background clicked");
+            Continue();
+        });
+        
         continueButton.RegisterCallbackButtonTriggered(_ => Continue());
         continueButton.Focus();
-
-        InitClickThoughToHiddenContinueButton();
 
         songAudioPlayer.Init(sceneData.SongMetas.LastOrDefault());
 
@@ -159,6 +174,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         FillLayout();
 
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => InitVfx()));
+        
+        InitClickThoughToBackground();
     }
 
     private void InitVfx()
@@ -205,9 +222,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
     }
 
-    private void InitClickThoughToHiddenContinueButton()
+    private void InitClickThoughToBackground()
     {
-        uiDocument.rootVisualElement.Query<VisualElement>()
+        background.Query<VisualElement>()
             .ForEach(visualElement =>
             {
                 visualElement.pickingMode = visualElement is Button
@@ -216,7 +233,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             });
 
         // Reset scroll views. Otherwise they do not work.
-        uiDocument.rootVisualElement.Query<ScrollView>()
+        background.Query<ScrollView>()
             .ForEach(scrollView =>
             {
                 scrollView.pickingMode = PickingMode.Position;

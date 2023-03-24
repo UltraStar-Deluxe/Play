@@ -11,6 +11,7 @@
                     <ui:Label text="Some Artist" name="artistLabel" class="secondaryFontColor" style="-unity-font-style: normal; font-size: 14px; white-space: normal;" />
                 </ui:VisualElement>
                 <ToggleButton text="Your Results" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
+                <ToggleButton text="Team Results" display-tooltip-when-elided="true" name="showTeamResultsButton" style="-unity-text-align: middle-left;" />
                 <ToggleButton text="Highscores" display-tooltip-when-elided="true" name="showHighscoreButton" style="-unity-text-align: middle-left;" />
             </ui:VisualElement>
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
