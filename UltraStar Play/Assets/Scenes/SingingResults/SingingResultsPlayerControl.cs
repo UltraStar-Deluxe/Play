@@ -124,12 +124,12 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         // Score bar (animated)
         if (micProfile != null)
         {
-            playerScoreProgressBar.progressColor = micProfile.Color;
+            playerScoreProgressBar.ProgressColor = micProfile.Color;
         }
 
         float playerScoreFactor = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
         animationId = LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, animationTimeInSeconds)
-            .setOnUpdate(interpolatedValue => playerScoreProgressBar.progress = interpolatedValue)
+            .setOnUpdate(interpolatedValue => playerScoreProgressBar.ProgressInPercent = interpolatedValue)
             .setEaseOutSine()
             .id;
 
