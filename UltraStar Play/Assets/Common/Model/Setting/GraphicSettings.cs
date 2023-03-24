@@ -1,6 +1,6 @@
-﻿
-using System;
+﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class GraphicSettings
@@ -20,4 +20,6 @@ public class GraphicSettings
     public ESceneChangeAnimation sceneChangeAnimation = ESceneChangeAnimation.Zoom;
     public bool showPlayerNames;
     public bool showScoreNumbers;
+    public bool animatedBackground;
+    public int bokehBackgroundIndex = 1;
 }

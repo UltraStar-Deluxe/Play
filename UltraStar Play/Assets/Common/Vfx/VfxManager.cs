@@ -225,6 +225,12 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                 emissionModule => emissionModule.rateOverTime = particleEffectConfig.rateOverTime);
         }
 
+        if (particleEffectConfig.simulationSpeed > 0)
+        {
+            UpdateParticleEffectMainModule(particleSystemInstance,
+                mainModule => mainModule.simulationSpeed = particleEffectConfig.simulationSpeed);
+        }
+        
         DoUpdateParticleSystemWithTarget(particleEffectConfig, particleSystemInstance);
         
         RegisterTargetCallbacks(particleEffectConfig, particleSystemInstance);

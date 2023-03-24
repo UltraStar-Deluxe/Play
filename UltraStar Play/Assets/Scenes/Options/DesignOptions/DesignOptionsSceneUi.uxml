@@ -2,6 +2,8 @@
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; height: 10%; flex-grow: 1; margin-bottom: 20px;">
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="themePicker" label="Theme" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animatedBackgroundItemPicker" label="Animated Background" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="bokehBackgroundItemPicker" label="Background Lights" />
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="noteDisplayModePicker" label="Note Display Mode" />
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="lyricsOnNotesPicker" label="Show Lyrics on Notes" />
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="staticLyricsPicker" label="Show Static Lyrics" />

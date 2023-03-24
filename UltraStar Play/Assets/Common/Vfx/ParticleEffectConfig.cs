@@ -11,6 +11,7 @@ public class ParticleEffectConfig
     
     public VisualElement target;
     public float scale;
+    public float simulationSpeed;
     public float scaleBoxShapeWithTargetFactor;
     public int maxParticles;
     public int rateOverTime;
