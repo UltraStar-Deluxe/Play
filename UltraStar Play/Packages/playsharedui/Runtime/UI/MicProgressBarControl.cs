@@ -22,10 +22,10 @@ public class MicProgressBarControl : INeedInjection, IInjectionFinishedListener
 
     public float ProgressBarValue
     {
-        get => micProgressBar.value;
+        get => micProgressBar.ProgressInPercent;
         set
         {
-            micProgressBar.value = value;
+            micProgressBar.Value = value;
             micProgressBar.SetVisibleByDisplay(value > 0);
 
             if (value >= micProgressBar.highValue)
@@ -48,6 +48,6 @@ public class MicProgressBarControl : INeedInjection, IInjectionFinishedListener
             micProgressBar.HideByDisplay();
             return;
         }
-        micProgressBar.progressColor = MicProfile.Color;
+        micProgressBar.ProgressColor = MicProfile.Color;
     }
 }

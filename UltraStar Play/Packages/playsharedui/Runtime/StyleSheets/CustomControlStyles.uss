@@ -575,6 +575,7 @@ TextField.placeholderVisible #unity-text-input {
     --track-color: #f2f4f7;
     --progress-color: #2e8418;
     --border-size: 6;
+    --round-line-cap: true;
 }
 
 .radial-progress-bar__label {
