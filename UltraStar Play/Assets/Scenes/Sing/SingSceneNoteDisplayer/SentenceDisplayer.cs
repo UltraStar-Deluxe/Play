@@ -65,6 +65,21 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 
         base.DisplayRecordedNote(recordedNote);
     }
+    
+    public override float GetXInPercent(double positionInSongInMillis)
+    {
+        if (currentSentence == null)
+        {
+            return 0;
+        }
+        
+        int sentenceStartBeat = currentSentence.MinBeat;
+        int sentenceLengthInBeat = currentSentence.LengthInBeats;
+        double sentenceStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentenceStartBeat);
+        double sentenceLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * sentenceLengthInBeat;
+        double xPercent = (float)(positionInSongInMillis - sentenceStartInMillis - micProfile.DelayInMillis) / sentenceLengthInMillis;
+        return (float)xPercent;
+    }
 
     protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
     {

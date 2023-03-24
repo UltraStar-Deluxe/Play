@@ -84,11 +84,17 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private int fadeOutAnimationId;
     
     private Dictionary<ESentenceRating, Color32> sentenceRatingColors;
+
+    private readonly PlayerPitchIndicatorControl playerPitchIndicatorControl = new();
     
     public void OnInjectionFinished()
     {
         InitPlayerNameAndImage();
         InitNoteDisplayer(LineCount);
+
+        injector
+            .WithBindingForInstance(noteDisplayer)
+            .Inject(playerPitchIndicatorControl);
 
         // Show rating and score after each sentence
         if (singSceneControl.IsIndividualScore)
@@ -162,7 +168,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             playerScoreProgressBar.ShowByDisplay();
             playerScoreProgressBar.ShowByVisibility();
-            playerScoreProgressBar.progressColor = micProfile.Color;
+            playerScoreProgressBar.ProgressColor = micProfile.Color;
             playerImageBorder.SetBorderColor(micProfile.Color);
         }
         else
@@ -192,6 +198,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public void Update()
     {
         noteDisplayer.Update();
+        playerPitchIndicatorControl.Update();
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -289,14 +296,14 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 .setOnUpdate((float interpolatedScoreValue) =>
                 {
                     playerScoreLabel.text = interpolatedScoreValue.ToString("0");
-                    playerScoreProgressBar.progress = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+                    playerScoreProgressBar.ProgressInPercent = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
                 })
                 .id;
         }
         else
         {
             playerScoreLabel.text = score.ToString("0");
-            playerScoreProgressBar.progress = (float)(100.0 * score / PlayerScoreControl.maxScore);
+            playerScoreProgressBar.ProgressInPercent = (float)(100.0 * score / PlayerScoreControl.maxScore);
         }
     }
 
