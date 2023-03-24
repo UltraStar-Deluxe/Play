@@ -4,6 +4,7 @@ using System.Linq;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -124,6 +125,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     public bool HasFinalTeamResults => PartyModeUtils.IsFinalRound(PartyModeSceneData);
 
     private readonly TabGroupControl tabGroupControl = new();
+
+    private bool initializedTeamResultsParticleEffects;
     
     public void OnInjectionFinished()
     {
@@ -146,6 +149,15 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.AddTabGroupButton(showTeamResultsButton, teamResultsUi);
         tabGroupControl.ShowContainer(playerResultsRoot);
+
+        tabGroupControl.ContainerBecameVisibleEventStream.Subscribe(container =>
+        {
+            if (container == teamResultsUi)
+            {
+                OnShowTeamResults();
+            }
+        });
+        
         showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
 
         if (!HasPartyModeSceneData)
@@ -177,6 +189,46 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => InitVfx()));
         
         InitClickThoughToBackground();
+    }
+
+    private void OnShowTeamResults()
+    {
+        if (!HasFinalTeamResults)
+        {
+            return;
+        }
+
+        // Play audio clip
+        crowdCheerAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
+        crowdCheerAudioSource.Play();
+        
+        // Create particle effect
+        if (!initializedTeamResultsParticleEffects)
+        {
+            initializedTeamResultsParticleEffects = true;
+            VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+            {
+                particleEffect = EParticleEffect.Confetti_1,
+                loop = true,
+                scale = 0.14f,
+                // top-center in panel reference resolution
+                panelPos = new Vector2(400, -10),
+                isBackground = true,
+                target = teamResultsUi,
+                hideAndShowWithTarget = true,
+            });
+            
+            VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+            {
+                particleEffect = EParticleEffect.Confetti_2,
+                loop = true,
+                scale = 0.7f,
+                panelPos = new Vector2(0, 0),
+                isBackground = true,
+                target = teamResultsUi,
+                hideAndShowWithTarget = true,
+            });
+        }
     }
 
     private void InitVfx()
@@ -422,13 +474,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         {
             // Show team result
             tabGroupControl.ShowContainer(teamResultsUi);
-
-            if (HasFinalTeamResults)
-            {
-                // Play audio clip
-                crowdCheerAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
-                crowdCheerAudioSource.Play();
-            }
         }
         else
         {

@@ -13,4 +13,6 @@
     FireworksEffect2D_SingleYellowStar = 14,
     GoldenNoteEffect = 15,
     HitMiscA = 16,
+    Confetti_1 = 17,
+    Confetti_2 = 18,
 }
