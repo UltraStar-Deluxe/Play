@@ -7,6 +7,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     [Range(1, 16)]
     public int playerCount = 1;
 
+    [Range(0, 8)]
     public int partyModeTeams = 5;
 
     public bool isLastPartyModeRound;
