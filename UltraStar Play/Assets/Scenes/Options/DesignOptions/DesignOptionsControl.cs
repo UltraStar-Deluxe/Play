@@ -1,13 +1,7 @@
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http.Headers;
-using PrimeInputActions;
 using ProTrans;
 using UniInject;
-using UniRx;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -47,8 +41,17 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.showScoreNumberPicker)]
     private ItemPicker showScoreNumberPicker;
     
+    [Inject(UxmlName = R.UxmlNames.animatedBackgroundItemPicker)]
+    private ItemPicker animatedBackgroundItemPicker;
+    
+    [Inject(UxmlName = R.UxmlNames.bokehBackgroundItemPicker)]
+    private ItemPicker bokehBackgroundItemPicker;
+    
     [Inject]
     private UiManager uiManager;
+    
+    [Inject]
+    private BokehBackgroundManager bokehBackgroundManager;
 
     protected override void Start()
     {
@@ -90,6 +93,14 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         new BoolPickerControl(showScoreNumberPicker)
             .Bind(() => settings.GraphicSettings.showScoreNumbers,
                 newValue => settings.GraphicSettings.showScoreNumbers = newValue);
+        
+        new BoolPickerControl(animatedBackgroundItemPicker)
+            .Bind(() => settings.GraphicSettings.animatedBackground,
+                newValue => settings.GraphicSettings.animatedBackground = newValue);
+        
+        new LabeledItemPickerControl<int>(bokehBackgroundItemPicker, NumberUtils.CreateIntList(0, bokehBackgroundManager.BokehBackgroundCount - 1))
+            .Bind(() => settings.GraphicSettings.bokehBackgroundIndex,
+                newValue => settings.GraphicSettings.bokehBackgroundIndex = newValue);
         
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();

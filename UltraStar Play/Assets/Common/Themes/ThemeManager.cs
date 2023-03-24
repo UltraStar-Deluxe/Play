@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -120,6 +121,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedThemesFolder());
         ImageManager.AddSpriteHolder(this);
+
+        settings.ObserveEveryValueChanged(it => it.GraphicSettings.animatedBackground)
+            .Subscribe(animatedBackground => backgroundShaderControl.SetSimpleBackgroundEnabled(!animatedBackground));
     }
 
     protected void LateUpdate()
