@@ -31,11 +31,11 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
     [Inject(UxmlName = R.UxmlNames.teamList)]
     private VisualElement teamList;
 
-    [Inject(UxmlName = R.UxmlNames.freeForAllToggle)]
-    private Toggle freeForAllToggle;
+    [Inject(UxmlName = R.UxmlNames.freeForAllItemPicker)]
+    private ItemPicker freeForAllItemPicker;
 
-    [Inject(UxmlName = R.UxmlNames.knockOutTournamentToggle)]
-    private Toggle knockOutTournamentToggle;
+    [Inject(UxmlName = R.UxmlNames.knockOutTournamentItemPicker)]
+    private ItemPicker knockOutTournamentItemPicker;
 
     [Inject(UxmlName = R.UxmlNames.addTeamButton)]
     private Button addTeamButton;
@@ -54,13 +54,13 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     public void OnInjectionFinished()
     {
-        FieldBindingUtils.Bind(gameObject, freeForAllToggle,
-            () => partyModeSettings.teamSettings.isFreeForAll,
-            newValue => partyModeSettings.teamSettings.isFreeForAll = newValue);
+        new BoolPickerControl(freeForAllItemPicker)
+            .Bind(() => partyModeSettings.teamSettings.isFreeForAll,
+                newValue => partyModeSettings.teamSettings.isFreeForAll = newValue);
 
-        FieldBindingUtils.Bind(gameObject, knockOutTournamentToggle,
-            () => partyModeSettings.teamSettings.isKnockOutTournament,
-            newValue => partyModeSettings.teamSettings.isKnockOutTournament = newValue);
+        new BoolPickerControl(knockOutTournamentItemPicker)
+            .Bind(() => partyModeSettings.teamSettings.isKnockOutTournament, 
+                newValue => partyModeSettings.teamSettings.isKnockOutTournament = newValue);
 
         partyModeSettings.ObserveEveryValueChanged(it => it.teamSettings.isFreeForAll)
             .Subscribe(_ => UpdateTeams());

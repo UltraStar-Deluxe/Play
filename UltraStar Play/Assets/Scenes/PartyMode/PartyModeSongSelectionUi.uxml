@@ -4,7 +4,7 @@
         <ItemPicker name="songSelectionItemPicker" label="Song Selection" wrap-around="true" class="controlWithLabelHorizontal" style="align-items: center; margin-bottom: 5px;" />
         <ItemPicker name="songSelectionPlaylistItemPicker" label="Playlist" wrap-around="true" class="controlWithLabelHorizontal" style="margin-bottom: 5px;" />
         <ItemPicker name="songSelectionJokerCountItemPicker" label="Jokers" wrap-around="true" class="controlWithLabelHorizontal mb-2" style="margin-bottom: 5px;" />
-        <ui:Toggle label="Knock-out tournament" name="knockOutTournamentToggle" class="mb-2" />
-        <ui:Toggle label="Free-for-all" name="freeForAllToggle" />
+        <ItemPicker name="knockOutTournamentItemPicker" label="Knock-out&#10;tournament" wrap-around="true" class="controlWithLabelHorizontal mb-2" style="margin-bottom: 5px;" />
+        <ItemPicker name="freeForAllItemPicker" label="Free-for-all" wrap-around="true" class="controlWithLabelHorizontal mb-2" style="margin-bottom: 5px;" />
     </ui:VisualElement>
 </ui:UXML>
