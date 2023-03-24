@@ -289,6 +289,22 @@
 /**************************************************/
 /* SINGING RESULTS SCENE */
 /**************************************************/
+.teamResultLabel {
+    font-size: 32px;
+}
+
+#otherTeamsScrollView .teamResultLabel {
+    font-size: 18px;
+}
+
+#otherTeamsScrollView
+{
+    width: 60%;
+}
+#otherTeamsScrollView.intermediateTeamResults {
+    width: 80%;
+}
+
 #scoreValue {
     min-width: 45px;
     -unity-text-align: middle-right;

@@ -23,10 +23,15 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.thirdTeamUi)]
     private VisualElement thirdTeamUi;
-
+    
     [Inject(UxmlName = R.UxmlNames.otherTeamsScrollView)]
     private ScrollView otherTeamsScrollView;
 
+    [Inject(UxmlName = R.UxmlNames.firstPlaceTrophyImage)]
+    private VisualElement firstPlaceTrophyImage;
+
+    private bool isVfxInitialized;
+    
     public void OnInjectionFinished()
     {
         HideByDisplay();
@@ -59,7 +64,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
             return -aScore.CompareTo(bScore);
         });
 
-        otherTeamsScrollView.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+        otherTeamsScrollView.AddToClassList("intermediateTeamResults");
         otherTeamsScrollView.Clear();
         otherTeams.ForEach(team =>
         {
@@ -94,12 +99,17 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
 
         // Add other teams to scroll view
         otherTeamsScrollView.Clear();
+        otherTeamsScrollView.SetVisibleByDisplay(!otherTeams.IsNullOrEmpty());
+        
         otherTeams.ForEach(team =>
         {
             VisualElement teamUi = teamResultUi.CloneTreeAndGetFirstChild();
+            teamUi.AddToClassList("mb-2");
             otherTeamsScrollView.Add(teamUi);
             FillTeamResultUi(-1, teamUi, new List<PartyModeTeamSettings> { team });
         });
+        
+        firstTeamUi.RegisterHasGeometryCallbackOneShot(_ => InitVfx());
     }
 
     private void FillTeamResultUi(int place, VisualElement teamUi, List<PartyModeTeamSettings> teams)
@@ -111,7 +121,6 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         teamUi.ShowByDisplay();
-        VisualElement trophyIcon = teamUi.Q<VisualElement>(R.UxmlNames.trophyIcon);
         Label teamNameLabel = teamUi.Q<Label>(R.UxmlNames.teamNameLabel);
         Label teamScoreLabel = teamUi.Q<Label>(R.UxmlNames.teamScoreLabel);
         VisualElement labelContainer = teamUi.Q<VisualElement>(R.UxmlNames.labelContainer);
@@ -127,17 +136,8 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         int score = PartyModeUtils.GetTeamScore(singingResultsSceneControl.PartyModeSceneData, teams.FirstOrDefault());
         teamScoreLabel.text = score.ToString();
 
-        labelContainer.style.backgroundColor = GetPlaceColor(place);
-        if (place is 1 or 2 or 3)
-        {
-            trophyIcon.ShowByDisplay();
-            trophyIcon.ShowByVisibility();
-            trophyIcon.style.color = new StyleColor(GetPlaceColor(place));
-        }
-        else
-        {
-            trophyIcon.HideByVisibility();
-        }
+        // labelContainer.style.backgroundColor = GetPlaceColor(place);
+        labelContainer.style.unityBackgroundImageTintColor = GetPlaceColor(place);
     }
 
     private Color GetPlaceColor(int place)
@@ -151,9 +151,25 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         };
     }
 
-    public void ShowByDisplay()
+    private void InitVfx()
     {
-        teamResultsUi.ShowByDisplay();
+        if (isVfxInitialized)
+        {
+            return;
+        }
+        isVfxInitialized = true;
+        
+        // Create particle effect for first place
+        VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+        {
+            particleEffect = EParticleEffect.LightGlowALoop,
+            panelPos = firstPlaceTrophyImage.worldBound.center,
+            scale = 0.4f,
+            loop = true,
+            isBackground = true,
+            target = firstPlaceTrophyImage,
+            hideAndShowWithTarget = true,
+        });
     }
 
     public void HideByDisplay()
