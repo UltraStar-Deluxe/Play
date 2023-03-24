@@ -289,6 +289,13 @@
 /**************************************************/
 /* SINGING RESULTS SCENE */
 /**************************************************/
+#knockOutLabel {
+    font-size: 32px;
+    rotate: 24deg;
+    color: #dc143c;
+    -unity-font-style: bold;
+}
+
 .teamResultLabel {
     font-size: 32px;
 }
@@ -301,6 +308,7 @@
 {
     width: 60%;
 }
+
 #otherTeamsScrollView.intermediateTeamResults {
     width: 80%;
 }
