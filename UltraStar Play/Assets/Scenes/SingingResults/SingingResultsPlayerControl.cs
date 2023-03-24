@@ -56,9 +56,6 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.newHighscoreContainer)]
     private VisualElement newHighscoreContainer;
-    
-    [Inject(UxmlName = R.UxmlNames.knockOutLabelOverlay)]
-    private VisualElement knockOutLabelOverlay;
 
     [Inject]
     private SongRating songRating;
@@ -132,8 +129,6 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setOnUpdate(interpolatedValue => playerScoreProgressBar.ProgressInPercent = interpolatedValue)
             .setEaseOutSine()
             .id;
-
-        knockOutLabelOverlay.HideByDisplay();
 
         UpdateTranslation();
     }
@@ -230,10 +225,5 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     public void Dispose()
     {
         LeanTween.cancel(animationId);
-    }
-    
-    public void ShowKnockedOutLabel()
-    {
-        knockOutLabelOverlay.ShowByDisplay();
     }
 }
