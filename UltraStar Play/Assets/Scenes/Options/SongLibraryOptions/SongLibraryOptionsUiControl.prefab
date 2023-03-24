@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songFolderListEntryAsset: {fileID: 9197481963319205126, guid: 93410e816f6baad4ea324850e317c505,
     type: 3}
-  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+  dialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7,
     type: 3}
   songIssueSongEntryUi: {fileID: 9197481963319205126, guid: 33b4d2b81a89e494992915bb6adc668e,
     type: 3}
