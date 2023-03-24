@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="teamColumnPlayerUiRoot" style="justify-content: flex-start; align-items: center; flex-direction: row; margin-top: 5px; margin-bottom: 5px; width: 100%;">
+    <ui:VisualElement name="teamColumnPlayerUiRoot" class="focusableNavigatorPriorityParent" style="justify-content: flex-start; align-items: center; flex-direction: row; margin-top: 5px; margin-bottom: 5px; width: 100%;">
         <ui:Button display-tooltip-when-elided="true" name="leftButton" class="transparentButton">
             <MaterialIcon tabindex="-1" icon="chevron_left" name="leftArrow" picking-mode="Ignore" />
         </ui:Button>
