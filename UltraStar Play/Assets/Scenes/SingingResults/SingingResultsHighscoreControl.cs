@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using ProTrans;
 using UniInject;
-using UniRx;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -14,8 +11,14 @@ public class SingingResultsHighscoreControl : INeedInjection
     [Inject(Key = nameof(highscoreEntryUi))]
     private VisualTreeAsset highscoreEntryUi;
     
-    [Inject(UxmlName = R.UxmlNames.difficultyPicker)]
-    private ItemPicker difficultyPicker;
+    [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
+    private Button previousDifficultyButton;
+    
+    [Inject(UxmlName = R.UxmlNames.currentDifficultyLabel)]
+    private Label currentDifficultyLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.nextDifficultyButton)]
+    private Button nextDifficultyButton;
     
     [Inject(UxmlName = R.UxmlNames.highscoreEntryList)]
     private VisualElement highscoreEntryList;
@@ -35,6 +38,8 @@ public class SingingResultsHighscoreControl : INeedInjection
     private readonly int highscoreCount = 5;
     
     private bool isInitialized;
+
+    private EDifficulty currentDifficulty;
     
     public void Init()
     {
@@ -43,19 +48,35 @@ public class SingingResultsHighscoreControl : INeedInjection
             return;
         }
         isInitialized = true;
-        
-        LabeledItemPickerControl<EDifficulty> difficultyPickerControl = new(difficultyPicker, EnumUtils.GetValuesAsList<EDifficulty>());
-        difficultyPickerControl.GetLabelTextFunction = item => item.GetTranslatedName();
-        difficultyPickerControl.Selection.Subscribe(item => ShowHighscores(item));
-        difficultyPickerControl.SelectItem(sceneData.PlayerProfiles.FirstOrDefault().Difficulty);
+
+        currentDifficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
+        nextDifficultyButton.RegisterCallbackButtonTriggered(_ => ChangeDifficulty(1));
+        previousDifficultyButton.RegisterCallbackButtonTriggered(_ => ChangeDifficulty(-1));
+        UpdateHighscores();
     }
-    
-    private void ShowHighscores(EDifficulty difficulty)
+
+    private void ChangeDifficulty(int direction)
     {
+        List<EDifficulty> difficulties = EnumUtils.GetValuesAsList<EDifficulty>();
+        if (direction < 0)
+        {
+            currentDifficulty = difficulties.GetElementBefore(currentDifficulty, true);
+        }
+        else if (direction > 0)
+        {
+            currentDifficulty = difficulties.GetElementAfter(currentDifficulty, true);
+        }
+        UpdateHighscores();
+    }
+
+    private void UpdateHighscores()
+    {
+        currentDifficultyLabel.text = currentDifficulty.GetTranslatedName();
+
         highscoreEntryList.Clear();
         LocalStatistic localStatistic = statistics.GetLocalStats(sceneData.SongMetas.LastOrDefault());
         List<SongStatistic> songStatistics = localStatistic?.StatsEntries?.SongStatistics?
-            .Where(it => it.Difficulty == difficulty).ToList();
+            .Where(it => it.Difficulty == currentDifficulty).ToList();
         
         if (songStatistics.IsNullOrEmpty())
         {

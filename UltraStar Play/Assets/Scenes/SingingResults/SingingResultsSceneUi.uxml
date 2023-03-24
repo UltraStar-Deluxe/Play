@@ -42,8 +42,16 @@
                         <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="highscoresRoot" style="flex-grow: 1; justify-content: flex-start; align-items: center; height: 100%; display: none;">
-                    <ItemPicker name="difficultyPicker" style="width: 50%;" />
+                <ui:VisualElement name="highscoresRoot" style="flex-grow: 1; justify-content: flex-start; align-items: center; height: 100%; display: flex;">
+                    <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0);">
+                        <ui:Button display-tooltip-when-elided="true" name="previousDifficultyButton" class="squareButton transparentButton">
+                            <MaterialIcon tabindex="-1" name="previousItemIcon" icon="chevron_left" />
+                        </ui:Button>
+                        <ui:Label tabindex="-1" text="Medium" display-tooltip-when-elided="true" name="currentDifficultyLabel" class="titleText mx-2 textShadow" style="-unity-text-align: middle-center; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;); min-width: 150px;" />
+                        <ui:Button display-tooltip-when-elided="true" name="nextDifficultyButton" class="squareButton transparentButton">
+                            <MaterialIcon tabindex="-1" name="nextItemIcon" icon="chevron_right" />
+                        </ui:Button>
+                    </ui:VisualElement>
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="highscoreEntryList" style="width: 100%; flex-grow: 1;" />
                 </ui:VisualElement>
                 <ui:Instance template="TeamResultsUi" name="teamResultsUi" class="overlay" style="align-self: flex-end; width: 90%; display: none;" />
