@@ -123,6 +123,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
     public bool HasFinalTeamResults => PartyModeUtils.IsFinalRound(PartyModeSceneData);
 
+    private readonly TabGroupControl tabGroupControl = new();
+    
     public void OnInjectionFinished()
     {
         GivePartyModeTeamPoints();
@@ -140,7 +142,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void Start()
     {      
-        TabGroupControl tabGroupControl = new();
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.AddTabGroupButton(showTeamResultsButton, teamResultsUi);
@@ -420,8 +421,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             && !teamResultsUiControl.IsVisibleByDisplay())
         {
             // Show team result
-            playerResultsRoot.HideByDisplay();
-            teamResultsUiControl.ShowByDisplay();
+            tabGroupControl.ShowContainer(teamResultsUi);
 
             if (HasFinalTeamResults)
             {
