@@ -6685,6 +6685,10 @@ MonoBehaviour:
   - effectEnum: 15
     prefab: {fileID: 8912687312815757345, guid: 7f53080e3299b6e42ac423c121c69668,
       type: 3}
+  - effectEnum: 17
+    prefab: {fileID: 1192747361093344, guid: aff6a710ec8f92c40a014dd9e63452bf, type: 3}
+  - effectEnum: 18
+    prefab: {fileID: 1181904839995218, guid: da3641b8950cf8e47acbcfa22869b53e, type: 3}
 --- !u!1 &4282200778323342461
 GameObject:
   m_ObjectHideFlags: 0
@@ -6735,10 +6739,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bokehBackgroundParent: {fileID: 4282200778323342461}
-  settings:
-    isShowOnlyDuetsFilterActive: 0
-    reducedAudioVolumePercent: 1
-    passTheMicTimeInSeconds: 20
 --- !u!1 &4760730431951538787
 GameObject:
   m_ObjectHideFlags: 0
