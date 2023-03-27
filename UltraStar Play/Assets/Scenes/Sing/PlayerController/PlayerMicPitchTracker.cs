@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CircularBuffer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -46,7 +45,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     private SingSceneMedleyControl medleyControl;
 
     // The rounding distance of the PlayerProfile
-    private int roundingDistance;
+    private float roundingDistance;
 
     private int recordingSentenceIndex;
     public int BeatToAnalyze { get; private set; }
@@ -87,7 +86,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             return;
         }
 
-        roundingDistance = playerProfile.Difficulty.GetRoundingDistance();
+        roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
         micSampleRecorder.MicProfile = micProfile;
         if (micProfile.IsInputFromConnectedClient)
         {
@@ -133,7 +132,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             {
                 if (dto is BeatPitchEventDto beatPitchEventDto)
                 {
-                    HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+                    HandlePitchEventFromConnectedClient(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency));
                 }
             })
             .AddTo(gameObject);
@@ -321,13 +320,14 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, pitchEvent.Beat);
         Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, pitchEvent.Beat, true, false);
         int midiNote = pitchEvent.MidiNote;
+        float frequency = pitchEvent.Frequency;
         if (midiNote < 0)
         {
             FirePitchEvent(null, pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
         }
         else
         {
-            FirePitchEvent(new PitchEvent(midiNote), pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
+            FirePitchEvent(new PitchEvent(midiNote, frequency), pitchEvent.Beat, noteAtBeat, sentenceAtBeat);
         }
     }
 
@@ -337,8 +337,9 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             ? pitchEvent.MidiNote
             : -1;
         int roundedRecordedMidiNote = pitchEvent != null
-            ? GetRoundedMidiNoteForRecordedMidiNote(noteAtBeat, pitchEvent.MidiNote)
+            ? GetRoundedMidiNoteForRecordedMidiNote(noteAtBeat, pitchEvent.MidiNote, pitchEvent.Frequency)
             : -1;
+
         int roundedMidiNoteAfterJoker = ApplyJokerRule(pitchEvent, roundedRecordedMidiNote, noteAtBeat);
 
         beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, sentenceAtBeat, recordedMidiNote, roundedMidiNoteAfterJoker));
@@ -423,6 +424,13 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private void SetRecordingSentence(int sentenceIndex)
     {
+        if (sentenceIndex == 0
+            && settings.GraphicSettings.showPitchIndicator)
+        {
+            // Start with very first beat, possibly before the lyrics start to update the pitch indicator.
+            BeatToAnalyze = (int)BpmUtils.MillisecondInSongToBeat(songMeta, 0);
+        }
+        
         RecordingSentence = playerControl.GetSentence(sentenceIndex);
         if (RecordingSentence == null)
         {
@@ -432,7 +440,16 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
         currentAndUpcomingNotesInRecordingSentence = SongMetaUtils.GetSortedNotes(RecordingSentence);
 
-        BeatToAnalyze = RecordingSentence.MinBeat;
+        if (settings.GraphicSettings.showPitchIndicator)
+        {
+            // Analyze all beats to update pitch indicator.
+            BeatToAnalyze++;
+        }
+        else
+        {
+            // Don't analyze until the next sentence is reached
+            BeatToAnalyze = RecordingSentence.MinBeat;
+        }
     }
 
     void OnDisable()
@@ -443,19 +460,19 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
     }
 
-    private int GetRoundedMidiNoteForRecordedMidiNote(Note targetNote, int recordedMidiNote)
+    private int GetRoundedMidiNoteForRecordedMidiNote(Note targetNote, int recordedMidiNote, float recordedFrequency)
     {
         if (targetNote == null)
         {
             return recordedMidiNote;
         }
 
-        if (targetNote.Type == ENoteType.Rap || targetNote.Type == ENoteType.RapGolden)
+        if (targetNote.Type is ENoteType.Rap or ENoteType.RapGolden)
         {
             // Rap notes accept any noise as correct note.
             return targetNote.MidiNote;
         }
-        else if (recordedMidiNote < MidiUtils.SingableNoteMin || recordedMidiNote > MidiUtils.SingableNoteMax)
+        else if (recordedMidiNote is < MidiUtils.SingableNoteMin or > MidiUtils.SingableNoteMax)
         {
             // The pitch detection can fail, which is the case when the detected pitch is outside of the singable note range.
             // In this case, just assume that the player was singing correctly and round to the target note.
@@ -464,21 +481,30 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         else
         {
             // Round recorded note if it is close to the target note.
-            return GetRoundedMidiNote(recordedMidiNote, targetNote.MidiNote, roundingDistance);
+            return GetRoundedMidiNote(recordedMidiNote, recordedFrequency, targetNote.MidiNote, roundingDistance);
         }
     }
 
-    private int GetRoundedMidiNote(int recordedMidiNote, int targetMidiNote, int roundingDistance)
+    private int GetRoundedMidiNote(int recordedMidiNote, float recordedFrequency, int targetMidiNote, float roundingDistance)
     {
-        int distance = MidiUtils.GetRelativePitchDistance(recordedMidiNote, targetMidiNote);
-        if (distance <= roundingDistance)
+        float exactMidiNote = recordedMidiNote;
+        
+        // Check if rounding a fraction of a midi note is possible and needed.
+        if (recordedFrequency > 0)
         {
-            return targetMidiNote;
+            // It is possible.
+            float roundingDistanceDecimal = roundingDistance - Mathf.Floor(roundingDistance);
+            if (roundingDistanceDecimal > 0)
+            {
+                // It is needed.
+                exactMidiNote = MidiUtils.CalculateMidiNote(recordedFrequency);
+            }
         }
-        else
-        {
-            return recordedMidiNote;
-        }
+        
+        float distance = MidiUtils.GetRelativePitchDistance(exactMidiNote, targetMidiNote);
+        return distance <= roundingDistance
+            ? targetMidiNote
+            : recordedMidiNote;
     }
 
     public void SkipToBeat(double currentBeat)

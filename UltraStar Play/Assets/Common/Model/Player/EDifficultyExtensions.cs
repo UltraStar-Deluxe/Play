@@ -21,13 +21,13 @@ public static class EDifficultyExtensions
         }
     }
 
-    public static int GetRoundingDistance(this EDifficulty difficulty)
+    public static float GetRoundingDistanceInMidiNotes(this EDifficulty difficulty)
     {
         switch (difficulty)
         {
             case EDifficulty.Easy: return 2;
             case EDifficulty.Medium: return 1;
-            case EDifficulty.Hard: return 0;
+            case EDifficulty.Hard: return 0.5f;
             default:
                 throw new UnityException("Unhandled difficulty: " + difficulty);
         }

@@ -38,6 +38,19 @@ public class MidiUtilsTests
     }
 
     [Test]
+    public void GetRelativePitchTest()
+    {
+        // A4 -> A at midi note 9
+        Assert.AreEqual(9, MidiUtils.GetRelativePitch(69));
+        
+        // C5 -> C at midi note 0
+        Assert.AreEqual(0, MidiUtils.GetRelativePitch(72));
+        
+        // Fraction of a midi note
+        Assert.AreEqual(9.25, MidiUtils.GetRelativePitch(69.25f));
+    }
+    
+    [Test]
     public void GetRelativePitchDistanceTest()
     {
         // The distance must be computed on relative notes, i.e., the pitch must be taken modulo 12.
@@ -48,6 +61,9 @@ public class MidiUtilsTests
         // Shortest distance via 1, 0, 11, 10 = 4
         Assert.AreEqual(4, MidiUtils.GetRelativePitchDistance(2, 10));
 
+        // Shortest distance with fraction via 1, 0, 11, 10 = 4.25
+        Assert.AreEqual(4.25, MidiUtils.GetRelativePitchDistance(2.25f, 10));
+        
         // No distance
         Assert.AreEqual(0, MidiUtils.GetRelativePitchDistanceSigned(5, 5));
         // Shortest signed distance from F to A -> 4
@@ -72,5 +88,30 @@ public class MidiUtilsTests
         Assert.AreEqual(5, MidiUtils.GetRelativePitchDistanceSigned(45, 74));
         // Shortest signed distance from D to A -> -5
         Assert.AreEqual(-5, MidiUtils.GetRelativePitchDistanceSigned(74, 45));
+    }
+
+    [Test]
+    public void MidiNoteToFrequencyTest()
+    {
+        // Midi note 69 = A4 = 440 Hz
+        Assert.AreEqual(440, MidiUtils.CalculateFrequency(69));
+        // Midi note 81 = A5 = 1760 Hz
+        Assert.AreEqual(880, MidiUtils.CalculateFrequency(81));
+        // Midi note 93 = A6 = 1760 Hz
+        Assert.AreEqual(1760, MidiUtils.CalculateFrequency(93));
+    }
+    
+    [Test]
+    public void FrequencyToMidiNoteTest()
+    {
+        // Midi note 69 = A4 = 440 Hz
+        Assert.AreEqual(69, MidiUtils.CalculateMidiNote(440));
+        // Midi note 81 = A5 = 1760 Hz
+        Assert.AreEqual(81, MidiUtils.CalculateMidiNote(880));
+        // Midi note 93 = A6 = 1760 Hz
+        Assert.AreEqual(93, MidiUtils.CalculateMidiNote(1760));
+        
+        // Between A4 and A#4
+        Assert.True(MidiUtils.CalculateMidiNote(450) is > 69 and < 70);
     }
 }

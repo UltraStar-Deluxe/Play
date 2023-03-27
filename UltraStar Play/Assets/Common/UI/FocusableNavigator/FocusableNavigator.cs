@@ -190,23 +190,30 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
         
-        ScrollView parentScrollView = focusedVisualElement.GetFirstAncestorOfType<ScrollView>();
-        if (parentScrollView != null
-            && TryNavigateScrollView(parentScrollView, focusedVisualElement, navigationDirection))
+        VisualElement parentVisualElement = focusedVisualElement.GetParent(parent => parent.ClassListContains(R.UssClasses.focusableNavigatorPriorityParent));
+        if (parentVisualElement != null
+            && TryNavigateInVisualElement(parentVisualElement, focusedVisualElement, navigationDirection))
         {
             return;
         }
         
+        ScrollView parentScrollView = focusedVisualElement.GetFirstAncestorOfType<ScrollView>();
+        if (parentScrollView != null
+            && TryNavigateInVisualElement(parentScrollView, focusedVisualElement, navigationDirection))
+        {
+            return;
+        }
+
         NavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection);
     }
 
-    private bool TryNavigateScrollView(
-        ScrollView scrollView,
+    private bool TryNavigateInVisualElement(
+        VisualElement visualElement,
         VisualElement focusedVisualElement,
         Vector2 navigationDirection)
     {
         // Try to navigate within the ScrollView
-        List<VisualElement> focusableVisualElements = GetFocusableVisualElementsInDescendants(scrollView);
+        List<VisualElement> focusableVisualElements = GetFocusableVisualElementsInDescendants(visualElement);
         return TryNavigateToBestMatchingNavigationTarget(focusedVisualElement, navigationDirection, focusableVisualElements);
     }
 

@@ -28,6 +28,11 @@
 
     "primaryFontColor": "#F0F0F0",
     "secondaryFontColor": "#CCCCCC",
+
+    "staticBackground": {
+        "imagePath": "backgrounds/black-10percent.png",
+        "scaleMode": "StretchToFill",
+    },
     
     "dynamicBackground": {
         "gradientRampFile": "gradients/ocean.png",

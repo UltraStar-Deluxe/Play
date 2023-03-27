@@ -30,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7583283495337431743
 MonoBehaviour:
@@ -46,5 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songArchiveEntryTextAsset: {fileID: 4900000, guid: 1cb54a3a8160c184c813ffe7ada6b8eb,
     type: 3}
-  dialogUi: {fileID: 9197481963319205126, guid: 6337eef17d5e96d40b0f3b1e177876fb,
+  dialogUi: {fileID: 9197481963319205126, guid: 9dd0037eeddfcb64ab006c7c01edb4e7,
     type: 3}

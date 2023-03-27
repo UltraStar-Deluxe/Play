@@ -17,10 +17,10 @@ public class SingSceneInputControl : MonoBehaviour, INeedInjection
     private void Start()
     {
         InputManager.GetInputAction(R.InputActions.usplay_skipToNextLyrics).PerformedAsObservable()
-            .Subscribe(_ => singSceneControl.SkipToNextSingableNote());
+            .Subscribe(_ => singSceneControl.SkipToNextSingableNoteOrEndOfSong());
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
             .Where(context => context.ReadValue<Vector2>().x > 0)
-            .Subscribe(_ => singSceneControl.SkipToNextSingableNote());
+            .Subscribe(_ => singSceneControl.SkipToNextSingableNoteOrEndOfSong());
         
         InputManager.GetInputAction(R.InputActions.usplay_openSongEditor).PerformedAsObservable()
             .Subscribe(_ => singSceneControl.OpenSongInEditor());

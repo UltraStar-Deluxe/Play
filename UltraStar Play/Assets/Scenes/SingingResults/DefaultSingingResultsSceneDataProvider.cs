@@ -7,9 +7,11 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     [Range(1, 16)]
     public int playerCount = 1;
 
+    [Range(0, 8)]
     public int partyModeTeams = 5;
 
     public bool isLastPartyModeRound;
+    public bool isKnockOutTournament;
     
     public SceneData GetDefaultSceneData()
     {
@@ -83,6 +85,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     {
         PartyModeSettings partyModeSettings = new();
         partyModeSettings.roundCount = 2;
+        partyModeSettings.teamSettings.isKnockOutTournament = isKnockOutTournament;
         
         void AddTeams()
         {

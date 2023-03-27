@@ -24,9 +24,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     public TextAsset versionPropertiesTextAsset;
 
     [InjectedInInspector]
-    public VisualTreeAsset quitGameDialogUi;
-
-    [InjectedInInspector]
     public VisualTreeAsset newSongDialogUi;
 
     [InjectedInInspector]
@@ -91,6 +88,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     
     [Inject]
     private ThemeManager themeManager;
+
+    [Inject]
+    private UiManager uiManager;
 
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
@@ -211,20 +211,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             return;
         }
 
-        VisualElement visualElement = quitGameDialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(visualElement);
-
-        quitGameDialogControl = injector
-            .WithRootVisualElement(visualElement)
-            .CreateAndInject<MessageDialogControl>();
+        quitGameDialogControl = uiManager.CreateDialogControl(TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title));
         quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
-        quitGameDialogControl.Title = TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title);
         quitGameDialogControl.Message = $"\n{TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message)}\n";
 
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => CloseQuitGameDialog());
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
-
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(visualElement);
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(quitGameDialogControl.DialogRootVisualElement);
     }
 
     public void OpenNewSongDialog()

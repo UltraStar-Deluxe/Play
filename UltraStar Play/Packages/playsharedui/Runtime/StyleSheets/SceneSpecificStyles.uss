@@ -106,6 +106,16 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+#targetNoteImage {
+    background-image: url('project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/NoteBackground.png');
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#noteUiRoot.goldenNote #targetNoteImage {
+    background-image: url('project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/GoldenNoteBackground.png');
+    background-color: rgba(255, 215, 0, 0.4);
+}
+
 .singSceneContextMenu {
     background-color: rgba(0, 0, 0, 0.8);
     border-width: 0;
@@ -139,21 +149,21 @@
 }
 
 #playerScoreProgressBar {
-    width: 140%;
-    height: 140%;
-    --track-color: #f2f4f7;
+    width: 150%;
+    height: 150%;
+    --track-color: rgba(242, 244, 247, 0);
     --progress-color: #2e8418;
-    --border-size: 8;
+    --border-size: 16;
     border-radius: 50%;
 }
 
 #playerImageBorder {
     border-radius: 50%;
     border-color: #2e8418;
-    border-width: 3%;
+    border-width: 8%;
     /* for perfect circle: width and height = 100% + (4 * border-width%) */ 
-    width: 112%;
-    height: 112%;
+    width: 120%;
+    height: 120%;
 }
 
 .lyricsContainer {
@@ -276,17 +286,33 @@
     background-color: rgba(92, 92, 92, 0.5);
 }
 
-#targetNoteImage {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-#targetNoteImage.goldenNote {
-    background-color: rgba(255, 215, 0, 0.4);
-}
-
 /**************************************************/
 /* SINGING RESULTS SCENE */
 /**************************************************/
+#knockOutLabel {
+    font-size: 32px;
+    rotate: 24deg;
+    color: #dc143c;
+    -unity-font-style: bold;
+}
+
+.teamResultLabel {
+    font-size: 32px;
+}
+
+#otherTeamsScrollView .teamResultLabel {
+    font-size: 18px;
+}
+
+#otherTeamsScrollView
+{
+    width: 60%;
+}
+
+#otherTeamsScrollView.intermediateTeamResults {
+    width: 80%;
+}
+
 #scoreValue {
     min-width: 45px;
     -unity-text-align: middle-right;
@@ -596,4 +622,14 @@
     padding-right: 50px;
     padding-top: 20px;
     padding-bottom: 40px;
+}
+
+/**************************************************/
+/* PARTY MODE SCENES */
+/**************************************************/
+
+.playerProfilePlaceholder {
+    height: var(--control-height);
+    margin-top: 5px;
+    margin-bottom: 5px;
 }

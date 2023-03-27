@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2014392098247252168
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2014392098247252170}
+  - component: {fileID: 2014392098247252173}
+  m_Layer: 0
+  m_Name: PartyModeSceneControl
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2014392098247252170
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014392098247252168}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 674.847, y: 414.4233, z: -284.79755}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2014392098247252173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014392098247252168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0765e1ad962d9a42abe8545c780de91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  valueInputDialogUi: {fileID: 9197481963319205126, guid: 0d374fac569eff64b9de8e9306202e43,
+    type: 3}
+  teamColumnUi: {fileID: 9197481963319205126, guid: 1372ae0a2e4e4904d907d6afc58462ff,
+    type: 3}
+  teamColumnPlayerUi: {fileID: 9197481963319205126, guid: 2b8c5e1f85d2b1d4390343734d5b3ffc,
+    type: 3}
+  roundUi: {fileID: 9197481963319205126, guid: f26838f73618ff842b8ee24e797eb4bb, type: 3}
