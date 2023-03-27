@@ -1,7 +1,9 @@
-﻿using CircularBuffer;
-using CSharpSynth.Midi;
-using CSharpSynth.Sequencer;
-using CSharpSynth.Synthesis;
+﻿using System.IO;
+using AudioSynthesis.Bank;
+using AudioSynthesis.Midi;
+using AudioSynthesis.Sequencer;
+using AudioSynthesis.Synthesis;
+using CircularBuffer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -9,32 +11,25 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-// An AudioSource is needed although it is not directly referenced.
-// Furthermore, the AudioSource must have "Play on Awake" set to true.
+// For OnAudioFilterRead to work as expected, an AudioSource is needed although it is not directly referenced.
 [RequireComponent(typeof(AudioSource))]
 public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static MidiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MidiManager>();
 
-    // The sound bank (or CSharpSynth) can only handle a specific sample rate of 44100 Hz. With 44800 Hz, the sound is distorted.
-    public static readonly int midiStreamSampleRateHz = 44100;
     // MIDI sound is generated for 1 channel (mono).
-    public static readonly int midiStreamChannelCount = 1;
-
-    [Range(0, 2)] // Piano 0, 1 or 2
-    public int midiInstrument;
+    public static readonly int midiSynthesizerChannelCount = 1;
 
     // Factor to amplify the generated midi samples.
     public float midiGain = 1f;
 
     // The txt file describing the instruments of the sound bank. Must be in a Resources folder.
-    private readonly string bankFilePath = "GM Bank - Piano/GM Bank - Piano";
+    // private readonly string bankFilePath = "Soundfonts/Yamaha_YPT_220_soundfont_studio_version.sf2";
+    private readonly string bankFilePath = "Soundfonts/MuseScore_General.sf2";
     private readonly int bufferSize = 1024;
     // "volume" for the midi events.
     [Range(0, 127)]
     private int midiVelocity;
-    // Output sample rate of the device. The value is fetched from Unity.
-    private int outputSampleRateHz;
 
     [Inject]
     private Settings settings;
@@ -46,17 +41,17 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     private float[] newSampleBuffer;
     private CircularBuffer<float> availableSynthesizerSamples;
     private CircularBuffer<float> availableOutputSamples;
-    private MidiSequencer midiSequencer;
-    private StreamSynthesizer midiStreamSynthesizer;
+    private MidiFileSequencer midiSequencer;
+    private Synthesizer midiSynthesizer;
+    private PatchBank bank;
 
-    // Fields to counter-check the output device sample rate that Unity uses (48000 Hz).
-    [ReadOnly]
-    public int audioFilterReadSampleRateHz;
-    private int audioFilterReadSampleCounter;
-    private float audioFilterReadSecondsCounter;
+    private int audioFilterReadSampleRate;
+    private CircularBuffer<float> availableSingleChannelOutputSamples;
 
     private bool isInitialized;
-    
+    private bool loop;
+    private AudioSource audioSource;
+
     public bool IsPlayingMidiFile { get; private set; }
 
     protected override object GetInstance()
@@ -66,7 +61,9 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void AwakeSingleton()
     {
-        outputSampleRateHz = UnityEngine.AudioSettings.outputSampleRate;
+        audioSource = GetComponent<AudioSource>();
+        audioFilterReadSampleRate = UnityEngine.AudioSettings.outputSampleRate;
+        availableSingleChannelOutputSamples = new CircularBuffer<float>(audioFilterReadSampleRate);
     }
 
     protected override void StartSingleton()
@@ -79,19 +76,15 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
         midiGain = settings.SongEditorSettings.MidiGain;
         settings.SongEditorSettings.ObserveEveryValueChanged(it => it.MidiGain)
-            .Subscribe(newMidiGain => midiGain = newMidiGain)
+            .Subscribe(newMidiGain =>
+            {
+                midiGain = newMidiGain;
+                if (midiSynthesizer != null)
+                {
+                    midiSynthesizer.MixGain = newMidiGain;
+                }
+            })
             .AddTo(gameObject);
-    }
-
-    private void Update()
-    {
-        audioFilterReadSecondsCounter += Time.deltaTime;
-        if (audioFilterReadSecondsCounter > 1)
-        {
-            audioFilterReadSampleRateHz = (int)((double)audioFilterReadSampleCounter / audioFilterReadSecondsCounter);
-            audioFilterReadSecondsCounter = 0;
-            audioFilterReadSampleCounter = 0;
-        }
     }
 
     public void InitIfNotDoneYet()
@@ -101,13 +94,16 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        midiStreamSynthesizer = new StreamSynthesizer(midiStreamSampleRateHz, midiStreamChannelCount, bufferSize, 16);
-        newSampleBuffer = new float[bufferSize * midiStreamChannelCount];
-        availableSynthesizerSamples = new CircularBuffer<float>(midiStreamSampleRateHz / 10);
-        availableOutputSamples = new CircularBuffer<float>(outputSampleRateHz / 10);
+        midiSynthesizer = new Synthesizer(audioFilterReadSampleRate, midiSynthesizerChannelCount, bufferSize, 16);
+        newSampleBuffer = new float[bufferSize * midiSynthesizerChannelCount];
+        midiSynthesizer.MixGain = midiGain;
 
-        midiStreamSynthesizer.LoadBank(bankFilePath);
-        midiSequencer = new MidiSequencer(midiStreamSynthesizer);
+        bank = new PatchBank(bankFilePath);
+        midiSynthesizer.UnloadBank();
+        midiSynthesizer.LoadBank(bank);
+        midiSequencer = new MidiFileSequencer(midiSynthesizer);
+
+        audioSource.Play();
 
         isInitialized = true;
     }
@@ -117,7 +113,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         InitIfNotDoneYet();
         
         StopAllMidiNotes();
-        midiSequencer.LoadMidi(midiFile, false);
+        midiSequencer.LoadMidi(midiFile);
         midiSequencer.Play();
         IsPlayingMidiFile = true;
     }
@@ -129,39 +125,40 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         
-        midiSequencer.Stop(true);
+        midiSequencer.Stop();
         IsPlayingMidiFile = false;
     }
     
     public void PlayMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOn(0, midiNote, midiVelocity, midiInstrument);
+        midiSynthesizer.NoteOn(0, midiNote, midiVelocity);
     }
 
     public void PlayMidiNoteForDuration(int midiNote, float durationInSeconds)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOn(0, midiNote, midiVelocity, midiInstrument);
+        midiSynthesizer.NoteOn(0, midiNote, midiVelocity);
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
     }
 
     public void StopMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOff(0, midiNote);
+        midiSynthesizer.NoteOff(0, midiNote);
     }
 
     public void StopAllMidiNotes(bool immediate = true)
     {
         InitIfNotDoneYet();
-        midiStreamSynthesizer.NoteOffAll(immediate);
+        midiSynthesizer.NoteOffAll(immediate);
     }
 
     public MidiFile LoadMidiFile(string path)
     {
         InitIfNotDoneYet();
-        MidiFile midiFile = midiSequencer.LoadMidiFromFile(path, false);
+        byte[] midiFileBytes = File.ReadAllBytes(path);
+        MidiFile midiFile = new MidiFile(midiFileBytes);
         return midiFile;
     }
 
@@ -179,82 +176,51 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     //	(it turns red if the filter is taking up too much time, so the mixer will starv audio data). 
     //	Also note, that OnAudioFilterRead is called on a different thread from the main thread (namely the audio thread) 
     //	so calling into many Unity functions from this function is not allowed ( a warning will show up ). 	
-    void OnAudioFilterRead(float[] data, int outputChannelCount)
+    private void OnAudioFilterRead(float[] data, int outputChannelCount)
     {
         if (!isInitialized)
         {
             return;
         }
 
-        // Statistics to find the actually used sample rate
-        audioFilterReadSampleCounter += (data.Length / outputChannelCount);
+        FillOutputBuffer(data, outputChannelCount);
+    }
 
+    private void FillOutputBuffer(float[] data, int outputChannelCount)
+    {
+        if (data == null)
+        {
+            return;
+        }
+            
         // Synthesize new samples from the Midi instrument until there is enough to fill the data array.
         int neededSingleChannelSamples = data.Length / outputChannelCount;
-        if (availableOutputSamples.Count < neededSingleChannelSamples)
+        if (neededSingleChannelSamples >= availableSingleChannelOutputSamples.Capacity)
         {
-            FillAvailableSampleBuffers();
+            Debug.LogWarning($"available sample capacity is too small. Samples needed: {neededSingleChannelSamples}, capacity: {availableSingleChannelOutputSamples.Capacity}");
+            neededSingleChannelSamples = availableSingleChannelOutputSamples.Capacity - 1;
+        }
+        while (availableSingleChannelOutputSamples.Count < neededSingleChannelSamples)
+        {
+            midiSequencer.FillMidiEventQueue(loop);
+            midiSynthesizer.GetNext();
+            for (int i = 0; i < midiSynthesizer.WorkingBuffer.Length; i++)
+            {
+                availableSingleChannelOutputSamples.PushBack(midiSynthesizer.WorkingBuffer[i]);
+            }
         }
 
         // The Midi stream is generated in mono (1 channel).
         // These samples are written to every channel of the output data array.
-        for (int sampleIndex = 0; sampleIndex < data.Length; sampleIndex += outputChannelCount)
+        for (int outputSampleIndex = 0; outputSampleIndex < data.Length && !availableSingleChannelOutputSamples.IsEmpty; outputSampleIndex += outputChannelCount)
         {
-            float sampleValue = availableOutputSamples.Front() * midiGain;
-            availableOutputSamples.PopFront();
+            float sampleValue = availableSingleChannelOutputSamples.Front();
+            availableSingleChannelOutputSamples.PopFront();
 
             for (int outputChannelIndex = 0; outputChannelIndex < outputChannelCount; outputChannelIndex++)
             {
-                data[sampleIndex + outputChannelIndex] = sampleValue;
+                data[outputSampleIndex + outputChannelIndex] = sampleValue;
             }
-        }
-    }
-
-    private void FillAvailableSampleBuffers()
-    {
-        // Synthesize midi samples (in midi synthesizer's sample rate).
-        SynthesizeMidiSamples();
-        // Resample the data for the output device sample rate.
-        ReSampleAndFill(availableSynthesizerSamples,
-            availableOutputSamples,
-            midiStreamSampleRateHz,
-            outputSampleRateHz,
-            availableOutputSamples.Capacity / 2);
-    }
-
-    private void SynthesizeMidiSamples()
-    {
-        while (availableSynthesizerSamples.Count < availableSynthesizerSamples.Capacity / 2)
-        {
-            midiStreamSynthesizer.GetNext(newSampleBuffer);
-            for (int i = 0; i < newSampleBuffer.Length; i++)
-            {
-                availableSynthesizerSamples.PushBack(newSampleBuffer[i]);
-            }
-        }
-    }
-
-    private void ReSampleAndFill(CircularBuffer<float> source, CircularBuffer<float> destination, int sourceSampleRate, int destinationSampleRate, int sampleCountToResample)
-    {
-        destination.PushBack(source[0]);
-        float ratio = (float)(sourceSampleRate - 1) / (float)(destinationSampleRate - 1);
-        int usedSourceSamples = 0;
-        for (int i = 1; i < sampleCountToResample; i++)
-        {
-            // Interpolate sample using neighboring indexes
-            float sourceIndexFloat = (float)i * ratio;
-            int sourceIndexInt = (int)sourceIndexFloat;
-            float sourceIndexDifference = sourceIndexFloat - (float)sourceIndexInt;
-            float sourceSampleDifference = source[sourceIndexInt + 1] - source[sourceIndexInt];
-            float interpolatedSample = source[sourceIndexInt] + sourceSampleDifference * sourceIndexDifference;
-
-            destination.PushBack(interpolatedSample);
-            usedSourceSamples = sourceIndexInt;
-        }
-        // Remove used samples from source
-        for (int i = 0; i < usedSourceSamples; i++)
-        {
-            source.PopFront();
         }
     }
 }

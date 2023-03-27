@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CSharpSynth.Midi;
+using AudioSynthesis.Midi;
 using UniInject;
 using UnityEngine;
 
@@ -89,22 +89,20 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         
         followingNotes.Sort(Note.comparerByStartBeat);
         Note firstNote = followingNotes.FirstOrDefault();
-        double firstNoteStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, firstNote.StartBeat);
+        double firstNoteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, firstNote.StartBeat);
         double distanceToFirstNoteStartInMillis = firstNoteStartInMillis - songAudioPlayer.PositionInSongInMillis;
         distanceToFirstNoteStartInMillis += settings.SongEditorSettings.MidiPlaybackOffsetInMillis;
         
-        Debug.Log($"distanceToFirstNoteStartInMillis before {distanceToFirstNoteStartInMillis}");
         if (distanceToFirstNoteStartInMillis < 0)
         {
             distanceToFirstNoteStartInMillis = 0;
         }
-        Debug.Log($"distanceToFirstNoteStartInMillis after {distanceToFirstNoteStartInMillis}");
         
         MidiFile midiFile = MidiFileUtils.CreateMidiFile(
             songMeta,
             followingNotes,
             (byte)settings.SongEditorSettings.MidiVelocity);
-        MidiFileUtils.SetFirstDeltaTimeTo(midiFile, (uint)distanceToFirstNoteStartInMillis);
+        MidiFileUtils.SetFirstDeltaTimeTo(midiFile, 0, (int)distanceToFirstNoteStartInMillis);
         midiManager.PlayMidiFile(midiFile);
         
         isPlaying = true;

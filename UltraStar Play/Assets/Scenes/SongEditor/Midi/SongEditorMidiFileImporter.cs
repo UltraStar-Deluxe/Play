@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CSharpSynth.Midi;
-using PrimeInputActions;
+using AudioSynthesis.Midi;
+using AudioSynthesis.Midi.Event;
 using UniInject;
 using UnityEngine;
 
@@ -168,158 +168,158 @@ public class SongEditorMidiFileImporter : INeedInjection
         bool importWithLyrics)
     {
         List<Note> loadedNotes = new();
-        Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
-        
-        void LoadNotesFromTrack(MidiTrack track)
-        {
-            List<MidiEvent> midiEventsOfChannel = track.MidiEvents
-                .Where(midiEvent => midiEvent.channel == channelIndex)
-                .ToList();
-            if (midiEventsOfChannel.IsNullOrEmpty())
-            {
-                throw new UltraStarPlayException($"No midi event in channel {channelIndex}");
-            }
-            
-            midiEventsOfChannel.ForEach(midiEvent =>
-            {
-                if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On)
-                {
-                    HandleStartOfNote(midiEvent, midiPitchToNoteUnderConstruction);
-                }
-
-                if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_Off)
-                {
-                    HandleEndOfNote(midiEvent, midiPitchToNoteUnderConstruction, loadedNotes);
-                }
-            });
-        }
-
-        void LoadLyricsFromTrack(MidiTrack track)
-        {
-            List<Note> notesWithoutText = loadedNotes
-                .Where(note => note.Text.IsNullOrEmpty())
-                .ToList();
-
-            List<MidiEvent> lyricsEvents = MidiFileUtils.GetLyricsEvents(track);
-            if (lyricsEvents.IsNullOrEmpty())
-            {
-                return;
-            }
-            
-            lyricsEvents.ForEach(midiEvent =>
-            {
-                string midiEventLyrics = MidiFileUtils.GetLyrics(midiEvent);
-                if (midiEventLyrics.IsNullOrEmpty())
-                {
-                    return;
-                }
-
-                int deltaTimeInMillis = MidiFileUtils.GetDeltaTimeInMillis(midiEvent);
-                int beat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
-                Note correspondingNote = notesWithoutText.FirstOrDefault(note => SongMetaUtils.IsBeatInNote(note, beat));
-                if (correspondingNote != null)
-                {
-                    notesWithoutText.Remove(correspondingNote);
-                    correspondingNote.SetText(midiEventLyrics);
-                }
-                else
-                {
-                    // Find best matching note within a tolerance.
-                    Note bestMatch = notesWithoutText.FindMinElement(note => Math.Abs(note.StartBeat - beat));
-                    if (bestMatch != null)
-                    {
-                        double distanceInMillis = Math.Abs(bestMatch.StartBeat - beat) * BpmUtils.MillisecondsPerBeat(songMeta);
-                        if (distanceInMillis < 1000)
-                        {
-                            notesWithoutText.Remove(bestMatch);
-                            bestMatch.SetText(midiEventLyrics);
-                        }
-                    }
-                }
-            });
-
-            // Normalize text on notes.
-            Note lastNote = null;
-            foreach (Note note in loadedNotes)
-            {
-                if (note.Text.Contains("\n"))
-                {
-                    note.SetText(note.Text.Replace("\n", ""));
-                }
-                
-                if (lastNote != null
-                    && note.Text.StartsWith(" ")
-                    && !lastNote.Text.EndsWith(" "))
-                {
-                    lastNote.SetText(lastNote.Text + " ");
-                    note.SetText(note.Text.Substring(1));
-                }
-                
-                lastNote = note;
-            }
-        }
-        
-        if (trackIndex < midiFile.Tracks.Length)
-        {
-            MidiTrack track = midiFile.Tracks[trackIndex];
-            LoadNotesFromTrack(track);
-            if (loadedNotes.IsNullOrEmpty())
-            {
-                throw new UltraStarPlayException($"No notes found in channel {channelIndex} of track {trackIndex}");
-            }
-
-            if (importWithLyrics)
-            {
-                LoadLyricsFromTrack(track);
-            }
-        }
-        else
-        {
-            throw new UltraStarPlayException($"No track with index {trackIndex}");
-        }
-
-        Debug.Log("Loaded notes from midi file: " + loadedNotes.Count);
+        // Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
+        //
+        // void LoadNotesFromTrack(MidiTrack track)
+        // {
+        //     List<MidiEvent> midiEventsOfChannel = track.MidiEvents
+        //         .Where(midiEvent => midiEvent.channel == channelIndex)
+        //         .ToList();
+        //     if (midiEventsOfChannel.IsNullOrEmpty())
+        //     {
+        //         throw new UltraStarPlayException($"No midi event in channel {channelIndex}");
+        //     }
+        //     
+        //     midiEventsOfChannel.ForEach(midiEvent =>
+        //     {
+        //         if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On)
+        //         {
+        //             HandleStartOfNote(midiEvent, midiPitchToNoteUnderConstruction);
+        //         }
+        //
+        //         if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_Off)
+        //         {
+        //             HandleEndOfNote(midiEvent, midiPitchToNoteUnderConstruction, loadedNotes);
+        //         }
+        //     });
+        // }
+        //
+        // void LoadLyricsFromTrack(MidiTrack track)
+        // {
+        //     List<Note> notesWithoutText = loadedNotes
+        //         .Where(note => note.Text.IsNullOrEmpty())
+        //         .ToList();
+        //
+        //     List<MidiEvent> lyricsEvents = MidiFileUtils.GetLyricsEvents(track);
+        //     if (lyricsEvents.IsNullOrEmpty())
+        //     {
+        //         return;
+        //     }
+        //     
+        //     lyricsEvents.ForEach(midiEvent =>
+        //     {
+        //         string midiEventLyrics = MidiFileUtils.GetLyrics(midiEvent);
+        //         if (midiEventLyrics.IsNullOrEmpty())
+        //         {
+        //             return;
+        //         }
+        //
+        //         int deltaTimeInMillis = MidiFileUtils.GetDeltaTimeInMillis(midiEvent);
+        //         int beat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
+        //         Note correspondingNote = notesWithoutText.FirstOrDefault(note => SongMetaUtils.IsBeatInNote(note, beat));
+        //         if (correspondingNote != null)
+        //         {
+        //             notesWithoutText.Remove(correspondingNote);
+        //             correspondingNote.SetText(midiEventLyrics);
+        //         }
+        //         else
+        //         {
+        //             // Find best matching note within a tolerance.
+        //             Note bestMatch = notesWithoutText.FindMinElement(note => Math.Abs(note.StartBeat - beat));
+        //             if (bestMatch != null)
+        //             {
+        //                 double distanceInMillis = Math.Abs(bestMatch.StartBeat - beat) * BpmUtils.MillisecondsPerBeat(songMeta);
+        //                 if (distanceInMillis < 1000)
+        //                 {
+        //                     notesWithoutText.Remove(bestMatch);
+        //                     bestMatch.SetText(midiEventLyrics);
+        //                 }
+        //             }
+        //         }
+        //     });
+        //
+        //     // Normalize text on notes.
+        //     Note lastNote = null;
+        //     foreach (Note note in loadedNotes)
+        //     {
+        //         if (note.Text.Contains("\n"))
+        //         {
+        //             note.SetText(note.Text.Replace("\n", ""));
+        //         }
+        //         
+        //         if (lastNote != null
+        //             && note.Text.StartsWith(" ")
+        //             && !lastNote.Text.EndsWith(" "))
+        //         {
+        //             lastNote.SetText(lastNote.Text + " ");
+        //             note.SetText(note.Text.Substring(1));
+        //         }
+        //         
+        //         lastNote = note;
+        //     }
+        // }
+        //
+        // if (trackIndex < midiFile.Tracks.Length)
+        // {
+        //     MidiTrack track = midiFile.Tracks[trackIndex];
+        //     LoadNotesFromTrack(track);
+        //     if (loadedNotes.IsNullOrEmpty())
+        //     {
+        //         throw new UltraStarPlayException($"No notes found in channel {channelIndex} of track {trackIndex}");
+        //     }
+        //
+        //     if (importWithLyrics)
+        //     {
+        //         LoadLyricsFromTrack(track);
+        //     }
+        // }
+        // else
+        // {
+        //     throw new UltraStarPlayException($"No track with index {trackIndex}");
+        // }
+        //
+        // Debug.Log("Loaded notes from midi file: " + loadedNotes.Count);
         return loadedNotes;
     }
 
     private void HandleEndOfNote(MidiEvent midiEvent, Dictionary<int, Note> midiPitchToNoteUnderConstruction, List<Note> loadedNotes)
     {
-        int midiPitch = midiEvent.parameter1;
-        int deltaTimeInMillis = MidiFileUtils.GetDeltaTimeInMillis(midiEvent);
-        int endBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
-        if (midiPitchToNoteUnderConstruction.TryGetValue(midiPitch, out Note existingNote))
-        {
-            if (endBeat > existingNote.StartBeat)
-            {
-                existingNote.SetEndBeat(endBeat);
-                loadedNotes.Add(existingNote);
-            }
-            else
-            {
-                Debug.LogWarning($"End beat {endBeat} is not after start beat {existingNote.StartBeat}. Skipping this note.");
-            }
-            midiPitchToNoteUnderConstruction.Remove(midiPitch);
-        }
-        else
-        {
-            Debug.LogWarning($"No Note for pitch {MidiUtils.GetAbsoluteName(midiPitch)} is being constructed. Ignoring this Note_Off event at {deltaTimeInMillis} ms.");
-        }
+        // int midiPitch = midiEvent.parameter1;
+        // int deltaTimeInMillis = MidiFileUtils.GetDeltaTimeInMillis(midiEvent);
+        // int endBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
+        // if (midiPitchToNoteUnderConstruction.TryGetValue(midiPitch, out Note existingNote))
+        // {
+        //     if (endBeat > existingNote.StartBeat)
+        //     {
+        //         existingNote.SetEndBeat(endBeat);
+        //         loadedNotes.Add(existingNote);
+        //     }
+        //     else
+        //     {
+        //         Debug.LogWarning($"End beat {endBeat} is not after start beat {existingNote.StartBeat}. Skipping this note.");
+        //     }
+        //     midiPitchToNoteUnderConstruction.Remove(midiPitch);
+        // }
+        // else
+        // {
+        //     Debug.LogWarning($"No Note for pitch {MidiUtils.GetAbsoluteName(midiPitch)} is being constructed. Ignoring this Note_Off event at {deltaTimeInMillis} ms.");
+        // }
     }
 
     private void HandleStartOfNote(MidiEvent midiEvent, Dictionary<int, Note> midiPitchToNoteUnderConstruction)
     {
-        int midiPitch = midiEvent.parameter1;
-        int deltaTimeInMillis = MidiFileUtils.GetDeltaTimeInMillis(midiEvent);
-        Note newNote = new();
-        int startBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
-        newNote.SetStartAndEndBeat(startBeat, startBeat);
-        newNote.SetMidiNote(midiPitch);
-
-        if (midiPitchToNoteUnderConstruction.ContainsKey(midiPitch))
-        {
-            Debug.LogWarning($"A Note with pitch {midiPitch} started but did not end before the next. The note will be ignored.");
-        }
-
-        midiPitchToNoteUnderConstruction[midiPitch] = newNote;
+        // int midiPitch = midiEvent.parameter1;
+        // int deltaTimeInMillis = MidiFileUtils.GetDeltaTimeInMillis(midiEvent);
+        // Note newNote = new();
+        // int startBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
+        // newNote.SetStartAndEndBeat(startBeat, startBeat);
+        // newNote.SetMidiNote(midiPitch);
+        //
+        // if (midiPitchToNoteUnderConstruction.ContainsKey(midiPitch))
+        // {
+        //     Debug.LogWarning($"A Note with pitch {midiPitch} started but did not end before the next. The note will be ignored.");
+        // }
+        //
+        // midiPitchToNoteUnderConstruction[midiPitch] = newNote;
     }
 }
