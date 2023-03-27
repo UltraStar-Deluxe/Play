@@ -91,6 +91,11 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
     }
 
+    public override float GetXInPercent(double positionInSongInMillis)
+    {
+        return PitchIndicatorXPercent;
+    }
+    
     protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
     {
         // The VerticalPitchIndicator's position is the position where recording happens.

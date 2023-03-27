@@ -52,6 +52,7 @@ public class DelayedPerfectSinger : PerfectSinger
         int midiNote = noteAtBeat != null
             ? noteAtBeat.MidiNote
             : 60;
-        return new BeatPitchEvent(midiNote + offset, beat);
+        float frequency = 0;
+        return new BeatPitchEvent(midiNote + offset, beat, frequency);
     }
 }

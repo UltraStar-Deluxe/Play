@@ -124,57 +124,79 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1194741001
-GameObject:
+--- !u!1001 &1134877423
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1194741003}
-  - component: {fileID: 1194741004}
-  m_Layer: 0
-  m_Name: PartyModeSceneControl
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1194741003
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1194741001}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 674.847, y: 414.4233, z: -284.79755}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1194741004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1194741001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0765e1ad962d9a42abe8545c780de91, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  valueInputDialogUi: {fileID: 9197481963319205126, guid: 0d374fac569eff64b9de8e9306202e43,
-    type: 3}
-  teamColumnUi: {fileID: 9197481963319205126, guid: 1372ae0a2e4e4904d907d6afc58462ff,
-    type: 3}
-  teamColumnPlayerUi: {fileID: 9197481963319205126, guid: 2b8c5e1f85d2b1d4390343734d5b3ffc,
-    type: 3}
-  roundUi: {fileID: 9197481963319205126, guid: f26838f73618ff842b8ee24e797eb4bb, type: 3}
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2014392098247252168, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_Name
+      value: PartyModeSceneControl
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 674.847
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 414.4233
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -284.79755
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2014392098247252170, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f1ae2e8f1bdf4c74a8a4f62173a5fa1a, type: 3}
 --- !u!1 &1203774096
 GameObject:
   m_ObjectHideFlags: 0

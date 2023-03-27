@@ -44,16 +44,22 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
             Selection.Value = playlist.OrIfNull(new UltraStarAllSongsPlaylist());
         });
 
+        settings.ObserveEveryValueChanged(it => it.SongSelectSettings.playlistName)
+            .Subscribe(newPlaylistName =>
+            {
+                if (playlistDropdownField.value != newPlaylistName)
+                {
+                    playlistDropdownField.value = newPlaylistName;
+                }
+            });
+        
         playlistManager.PlaylistChangeEventStream
             .Subscribe(_ => InitItems());
     }
 
     private void InitItems()
     {
-        items = new List<IPlaylist>();
-        items.Add(UltraStarAllSongsPlaylist.Instance);
-        items.Add(playlistManager.FavoritesPlaylist);
-        items.AddRange(playlistManager.Playlists.Where(playlist => playlist != playlistManager.FavoritesPlaylist));
+        items = playlistManager.GetPlaylists(true, true);
 
         // Initial selection
         IPlaylist newSelection;

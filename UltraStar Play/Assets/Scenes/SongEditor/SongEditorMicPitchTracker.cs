@@ -79,7 +79,8 @@ public class SongEditorMicPitchTracker : AbstractMicPitchTracker
         else
         {
             int shiftedMidiNote = pitchEvent.MidiNote + (songEditorSettings.SongEditorSettings.MicOctaveOffset * 12);
-            pitchEventStream.OnNext(new BeatPitchEvent(shiftedMidiNote, beat));
+            float frequency = pitchEvent.Frequency;
+            pitchEventStream.OnNext(new BeatPitchEvent(shiftedMidiNote, beat, frequency));
         }
     }
 }

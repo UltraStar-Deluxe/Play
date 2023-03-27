@@ -49,15 +49,13 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
+    public VisualElement PlayerImage => playerImage;
 
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;
 
     [Inject(UxmlName = R.UxmlNames.newHighscoreContainer)]
     private VisualElement newHighscoreContainer;
-    
-    [Inject(UxmlName = R.UxmlNames.knockOutLabelOverlay)]
-    private VisualElement knockOutLabelOverlay;
 
     [Inject]
     private SongRating songRating;
@@ -123,16 +121,14 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         // Score bar (animated)
         if (micProfile != null)
         {
-            playerScoreProgressBar.progressColor = micProfile.Color;
+            playerScoreProgressBar.ProgressColor = micProfile.Color;
         }
 
         float playerScoreFactor = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
         animationId = LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, animationTimeInSeconds)
-            .setOnUpdate(interpolatedValue => playerScoreProgressBar.progress = interpolatedValue)
+            .setOnUpdate(interpolatedValue => playerScoreProgressBar.ProgressInPercent = interpolatedValue)
             .setEaseOutSine()
             .id;
-
-        knockOutLabelOverlay.HideByDisplay();
 
         UpdateTranslation();
     }
@@ -229,10 +225,5 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     public void Dispose()
     {
         LeanTween.cancel(animationId);
-    }
-    
-    public void ShowKnockedOutLabel()
-    {
-        knockOutLabelOverlay.ShowByDisplay();
     }
 }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ICSharpCode.SharpZipLib.Zip;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -65,11 +65,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [Inject(UxmlName = R.UxmlNames.showCurrentResultsButton)]
     private ToggleButton showCurrentResultsButton;
     
+    [Inject(UxmlName = R.UxmlNames.showTeamResultsButton)]
+    private ToggleButton showTeamResultsButton;
+    
     [Inject(UxmlName = R.UxmlNames.showHighscoreButton)]
     private ToggleButton showHighscoreButton;
     
     [Inject(UxmlName = R.UxmlNames.playerResultsRoot)]
     private VisualElement playerResultsRoot;
+    
+    [Inject(UxmlName = R.UxmlNames.teamResultsUi)]
+    private VisualElement teamResultsUi;
     
     [Inject(UxmlName = R.UxmlNames.highscoresRoot)]
     private VisualElement highscoresRoot;
@@ -118,6 +124,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
     public bool HasFinalTeamResults => PartyModeUtils.IsFinalRound(PartyModeSceneData);
 
+    private readonly TabGroupControl tabGroupControl = new();
+
+    private bool initializedTeamResultsParticleEffects;
+    
     public void OnInjectionFinished()
     {
         GivePartyModeTeamPoints();
@@ -135,20 +145,36 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void Start()
     {      
-        TabGroupControl tabGroupControl = new();
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
+        tabGroupControl.AddTabGroupButton(showTeamResultsButton, teamResultsUi);
         tabGroupControl.ShowContainer(playerResultsRoot);
-        showCurrentResultsButton.SetActive(true);
+
+        tabGroupControl.ContainerBecameVisibleEventStream.Subscribe(container =>
+        {
+            if (container == teamResultsUi)
+            {
+                OnShowTeamResults();
+            }
+        });
+        
         showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
+
+        if (!HasPartyModeSceneData)
+        {
+            showTeamResultsButton.HideByDisplay();
+        }
         
         restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
         
-        background.RegisterCallback<PointerUpEvent>(evt => Continue());
+        background.RegisterCallback<PointerUpEvent>(evt =>
+        {
+            Debug.Log("Background clicked");
+            Continue();
+        });
+        
         continueButton.RegisterCallbackButtonTriggered(_ => Continue());
         continueButton.Focus();
-
-        InitClickThoughToHiddenContinueButton();
 
         songAudioPlayer.Init(sceneData.SongMetas.LastOrDefault());
 
@@ -159,6 +185,72 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         ActivateLayout();
         FillLayout();
+
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => InitVfx()));
+        
+        InitClickThoughToBackground();
+    }
+
+    private void OnShowTeamResults()
+    {
+        if (!HasFinalTeamResults)
+        {
+            return;
+        }
+
+        // Play audio clip
+        crowdCheerAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
+        crowdCheerAudioSource.Play();
+        
+        // Create particle effect
+        if (!initializedTeamResultsParticleEffects)
+        {
+            initializedTeamResultsParticleEffects = true;
+            VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+            {
+                particleEffect = EParticleEffect.Confetti_1,
+                loop = true,
+                scale = 0.14f,
+                // top-center in panel reference resolution
+                panelPos = new Vector2(400, -10),
+                isBackground = true,
+                target = teamResultsUi,
+                hideAndShowWithTarget = true,
+            });
+            
+            VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+            {
+                particleEffect = EParticleEffect.Confetti_2,
+                loop = true,
+                scale = 0.7f,
+                panelPos = new Vector2(0, 0),
+                isBackground = true,
+                target = teamResultsUi,
+                hideAndShowWithTarget = true,
+            });
+        }
+    }
+
+    private void InitVfx()
+    {
+        List<PlayerProfile> unusedPlayerProfiles = sceneData.PlayerProfiles.ToList();
+        List<PlayerProfile> firstPlayers = GetTopPlayers(unusedPlayerProfiles);
+        singingResultsPlayerUiControls
+            .Where(it => firstPlayers.Contains(it.PlayerProfile)
+                && sceneData.GetPlayerScores(it.PlayerProfile).TotalScore > 0)
+            .ForEach(it =>
+            {
+                VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+                {
+                    particleEffect = EParticleEffect.LightGlowALoop,
+                    panelPos = it.PlayerImage.worldBound.center,
+                    scale = 0.4f,
+                    loop = true,
+                    isBackground = true,
+                    target = it.PlayerImage,
+                    hideAndShowWithTarget = true,
+                });
+            });
     }
 
     private void RestartSingScene()
@@ -183,9 +275,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
     }
 
-    private void InitClickThoughToHiddenContinueButton()
+    private void InitClickThoughToBackground()
     {
-        uiDocument.rootVisualElement.Query<VisualElement>()
+        background.Query<VisualElement>()
             .ForEach(visualElement =>
             {
                 visualElement.pickingMode = visualElement is Button
@@ -194,7 +286,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             });
 
         // Reset scroll views. Otherwise they do not work.
-        uiDocument.rootVisualElement.Query<ScrollView>()
+        background.Query<ScrollView>()
             .ForEach(scrollView =>
             {
                 scrollView.pickingMode = PickingMode.Position;
@@ -381,15 +473,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             && !teamResultsUiControl.IsVisibleByDisplay())
         {
             // Show team result
-            playerResultsRoot.HideByDisplay();
-            teamResultsUiControl.ShowByDisplay();
-
-            if (HasFinalTeamResults)
-            {
-                // Play audio clip
-                crowdCheerAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
-                crowdCheerAudioSource.Play();
-            }
+            tabGroupControl.ShowContainer(teamResultsUi);
         }
         else
         {

@@ -8,7 +8,8 @@ public class PerfectSinger : AbstractDummySinger
         Note noteAtBeat = GetNoteAtBeat(beat);
         if (noteAtBeat != null)
         {
-            return new BeatPitchEvent(noteAtBeat.MidiNote + offset, beat);
+            float frequency = 0;
+            return new BeatPitchEvent(noteAtBeat.MidiNote + offset, beat, frequency);
         }
 
         return null;

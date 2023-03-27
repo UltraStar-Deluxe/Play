@@ -239,7 +239,6 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         {
             label.text = "";
         }
-        label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => UpdateNoteLabelFontSize(label));
 
         targetNoteEntryContainer.Add(visualElement);
         UpdateNotePosition(visualElement, note.MidiNote, note.StartBeat, note.EndBeat);
@@ -247,20 +246,6 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         noteToTargetNoteControl[note] = targetNoteControl;
 
         return targetNoteControl;
-    }
-
-    private void UpdateNoteLabelFontSize(Label label)
-    {
-        // Update font size
-        if (label == null
-            || label.text.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        float noteHeightPx = noteHeightPercent * targetNoteEntryContainer.resolvedStyle.height;
-        float textHeight = NumberUtils.Limit(noteHeightPx + 2, 8, 12);
-        label.style.fontSize = new StyleLength(new Length(textHeight, LengthUnit.Pixel));
     }
 
     public string GetDisplayText(Note note)
@@ -336,14 +321,6 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         UpdateNotePosition(visualElement, midiNote, noteControl.StartBeat, noteControl.EndBeat);
 
         recordedNoteToRecordedNoteControlsMap.AddInsideList(recordedNote, noteControl);
-    }
-
-    public void CreatePerfectSentenceEffect()
-    {
-        for (int i = 0; i < 50; i++)
-        {
-            CreatePerfectSentenceStar();
-        }
     }
 
     protected void CreatePerfectSentenceStar()
@@ -422,6 +399,11 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         return new Vector2(yStart, yEnd);
     }
 
+    public virtual float GetXInPercent(double positionInSongInMillis)
+    {
+        return 0;
+    }
+    
     protected void UpdateRecordedNoteControlEndBeat(RecordedNoteControl recordedNoteControl)
     {
         recordedNoteControl.EndBeat = recordedNoteControl.StartBeat + (recordedNoteControl.LifeTimeInSeconds * beatsPerSecond);

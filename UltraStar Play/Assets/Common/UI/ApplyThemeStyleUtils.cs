@@ -219,14 +219,10 @@ public static class ApplyThemeStyleUtils
         {
             visualElement.style.color = new StyleColor(color);
             visualElement.Query<Label>()
-                .ForEach(label =>
-                {
-                    if (IsIgnoredVisualElement(label))
-                    {
-                        return;
-                    }
-                    label.style.color = new StyleColor(color);
-                });
+                .Where(label => !label.ClassListContains("warningFontColor")
+                                && !label.ClassListContains("errorFontColor")
+                                && !IsIgnoredVisualElement(label))
+                .ForEach(label => label.style.color = new StyleColor(color));
         });
     }
 

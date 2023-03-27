@@ -7,7 +7,7 @@ public class UltraStarPlaylist : IPlaylist
     public string FilePath { get; private set; }
 
     public string FileName => Path.GetFileNameWithoutExtension(FilePath);
-    public string Name
+    public virtual string Name
     {
         get
         {

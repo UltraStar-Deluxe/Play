@@ -152,7 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04e8e8353cf7d75419d03321d0098a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Dare Master
+  isMedley: 0
+  defaultSongName: Code Monkey
   defaultSongNamePasteBin: 'Summer Wine
 
     Me And My Broken Heart
@@ -614,11 +615,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1084258562426466081, guid: 0f35eb07433348d4abddb4095d2d1e17,
-        type: 3}
-      propertyPath: m_TargetCamera
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 3706478735755504748, guid: 0f35eb07433348d4abddb4095d2d1e17,
         type: 3}
       propertyPath: m_Name

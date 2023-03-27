@@ -30,17 +30,17 @@
                 <ToggleButton name="profileOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="people" name="image" />
                     <ui:Label text="Players" name="label" />
-                    <MaterialIcon name="playerProfileSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
+                    <MaterialIcon name="playerProfileSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon warningFontColor" />
                 </ToggleButton>
                 <ToggleButton name="recordingOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="mic" name="image" />
                     <ui:Label text="Recording" name="label" />
-                    <MaterialIcon name="recordingSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
+                    <MaterialIcon name="recordingSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon warningFontColor" />
                 </ToggleButton>
                 <ToggleButton name="songsOptionsButton" class="optionsOverviewButton toggleButton">
                     <MaterialIcon icon="music_note" name="image" />
                     <ui:Label text="Songs" name="label" />
-                    <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon" />
+                    <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon warningFontColor" />
                 </ToggleButton>
                 <ToggleButton name="contentDownloadButton" class="optionsOverviewButton">
                     <MaterialIcon icon="cloud_download" name="image" />

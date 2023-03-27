@@ -228,7 +228,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart),
             () => singSceneControl.Restart());
         contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
-            () => singSceneControl.SkipToNextSingableNote());
+            () => singSceneControl.SkipToNextSingableNoteOrEndOfSong());
         contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
             () => singSceneControl.FinishScene(false, false));
         

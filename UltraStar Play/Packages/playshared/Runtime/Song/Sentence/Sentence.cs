@@ -27,6 +27,9 @@ public class Sentence : ISerializationCallbackReceiver
     // ExtendedMaxBeat is equal to Math.Max(MaxBeat, LinebreakBeat)
     public int ExtendedMaxBeat { get; private set; }
 
+    public int LengthInBeats => MaxBeat - MinBeat;
+    public int ExtendedLengthInBeats => ExtendedMaxBeat - MinBeat;
+    
     public Sentence()
     {
     }

@@ -520,7 +520,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             {
                 if (dto is BeatPitchEventDto beatPitchEventDto)
                 {
-                    connectedClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat));
+                    connectedClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency));
                 }
             })
             .AddTo(gameObject);

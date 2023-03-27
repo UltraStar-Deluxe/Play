@@ -54,6 +54,7 @@ public static partial class R_PlayShared
         public const string featherIcon = "featherIcon";
         public const string firstChild = "firstChild";
         public const string flexWrapScrollView = "flexWrapScrollView";
+        public const string focusableNavigatorPriorityParent = "focusableNavigatorPriorityParent";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fontColor = "fontColor";
         public const string fontIcon = "fontIcon";
@@ -68,6 +69,7 @@ public static partial class R_PlayShared
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
+        public const string intermediateTeamResults = "intermediateTeamResults";
         public const string itemPickerButton = "itemPickerButton";
         public const string itemPickerContent = "itemPickerContent";
         public const string itemPickerControlsRow = "itemPickerControlsRow";
@@ -108,7 +110,9 @@ public static partial class R_PlayShared
         public const string overlayBackground = "overlayBackground";
         public const string overlayDialog = "overlayDialog";
         public const string placeholderVisible = "placeholderVisible";
+        public const string playerProfilePlaceholder = "playerProfilePlaceholder";
         public const string playerScoreLabel = "playerScoreLabel";
+        public const string png = "png";
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string radial_progress_bar = "radial-progress-bar";
         public const string radial_progress_bar__label = "radial-progress-bar__label";
@@ -145,6 +149,7 @@ public static partial class R_PlayShared
         public const string squareButton = "squareButton";
         public const string staticPanel = "staticPanel";
         public const string svg = "svg";
+        public const string teamResultLabel = "teamResultLabel";
         public const string textFieldHint = "textFieldHint";
         public const string textOnlyButton = "textOnlyButton";
         public const string textOutline = "textOutline";

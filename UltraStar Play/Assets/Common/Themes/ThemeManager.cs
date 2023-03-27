@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,7 +17,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public const string DefaultThemeName = "default_dark";
     private const string ThemeFolderName = "Themes";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
-
+    private readonly Color defaultGoldenColor = Colors.CreateColor("#DACD4A");
+    
     public static ThemeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeManager>();
 
     [InjectedInInspector]
@@ -119,6 +121,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedThemesFolder());
         ImageManager.AddSpriteHolder(this);
+
+        settings.ObserveEveryValueChanged(it => it.GraphicSettings.animatedBackground)
+            .Subscribe(animatedBackground => backgroundShaderControl.SetSimpleBackgroundEnabled(!animatedBackground));
     }
 
     protected void LateUpdate()
@@ -780,18 +785,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         isDropdownMenuOpened = true;
     }
 
-    public float GetSceneChangeAnimationTimeInSeconds()
-    {
-        string sceneChangeAnimationTimeString = GetCurrentTheme().ThemeJson.sceneTransitionAnimationTime;
-        if (!sceneChangeAnimationTimeString.IsNullOrEmpty()
-            && TimeUtils.TryParseDuration(sceneChangeAnimationTimeString, out long parsedDurationInMilliseconds))
-        {
-            return parsedDurationInMilliseconds / 1000f;
-        }
-
-        return DefaultSceneChangeAnimationTimeInSeconds;
-    }
-
     public IReadOnlyCollection<Sprite> GetSprites()
     {
         return loadedSprites;
@@ -828,6 +821,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         return new List<Color32>
         {
+            Colors.CreateColor("#9E77ED"),
             Colors.CreateColor("#CDF564"),
             Colors.CreateColor("#FF4633"),
             Colors.CreateColor("#519BF6"),
@@ -847,8 +841,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             { ESentenceRating.Perfect, Colors.CreateColor("#3AFF4EAF")},
             { ESentenceRating.Great, Colors.CreateColor("#20CF327F")},
-            { ESentenceRating.Good, Colors.CreateColor("#E7B41C7F")},
-            { ESentenceRating.NotBad, Colors.CreateColor("#44ABDC7F")},
+            { ESentenceRating.Good, Colors.CreateColor("#44ABDC7F")},
+            { ESentenceRating.NotBad, Colors.CreateColor("#E7B41C7F")},
             { ESentenceRating.Bad, Colors.CreateColor("#961CE77F")},
         };
     
@@ -902,5 +896,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private EScene GetCurrentScene()
     {
         return sceneRecipeManager.GetCurrentScene();
+    }
+
+    public Color GetGoldenColor()
+    {
+        return GetCurrentTheme().ThemeJson.goldenColor
+            .OrIfDefault(defaultGoldenColor);
     }
 }

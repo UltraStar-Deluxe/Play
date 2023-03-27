@@ -54,6 +54,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;
     
+    [Inject(UxmlName = R.UxmlNames.noteContainer)]
+    protected VisualElement noteContainer;
+    
     [Inject]
     private Settings settings;
 
@@ -81,11 +84,17 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private int fadeOutAnimationId;
     
     private Dictionary<ESentenceRating, Color32> sentenceRatingColors;
+
+    private readonly PlayerPitchIndicatorControl playerPitchIndicatorControl = new();
     
     public void OnInjectionFinished()
     {
         InitPlayerNameAndImage();
         InitNoteDisplayer(LineCount);
+
+        injector
+            .WithBindingForInstance(noteDisplayer)
+            .Inject(playerPitchIndicatorControl);
 
         // Show rating and score after each sentence
         if (singSceneControl.IsIndividualScore)
@@ -124,8 +133,13 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             // All elements (i.e. the currently finished and its predecessor) must have been "perfect"
             .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.perfect))
             // Create an effect for these.
-            .Subscribe(xs => CreatePerfectSentenceEffect());
+            .Subscribe(xs => CreateMultiplePerfectSentenceEffect());
 
+        // Single perfect sentence effect
+        playerScoreControl.SentenceScoreEventStream
+            .Where(x => x.SentenceRating == SentenceRating.perfect)
+            .Subscribe(xs => CreateSinglePerfectSentenceEffect());
+        
         ChangeLayoutByPlayerCount();
 
         sentenceRatingColors = themeManager.GetSentenceRatingColors();
@@ -154,7 +168,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             playerScoreProgressBar.ShowByDisplay();
             playerScoreProgressBar.ShowByVisibility();
-            playerScoreProgressBar.progressColor = micProfile.Color;
+            playerScoreProgressBar.ProgressColor = micProfile.Color;
             playerImageBorder.SetBorderColor(micProfile.Color);
         }
         else
@@ -184,6 +198,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public void Update()
     {
         noteDisplayer.Update();
+        playerPitchIndicatorControl.Update();
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -230,28 +245,25 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     public VisualElement ShowSentenceRating(SentenceRating sentenceRating, VisualElement parentContainer)
     {
         if (settings.GameSettings.ScoreMode == EScoreMode.None
-            || sentenceRating == SentenceRating.bad)
+            || sentenceRating.PercentageThreshold <= SentenceRating.notBad.PercentageThreshold)
         {
             return null;
         }
 
         VisualElement visualElement = sentenceRatingUi.CloneTree().Children().First();
-        visualElement.Q<Label>().text = sentenceRating.Text;
-        visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
+        Label label = visualElement.Q<Label>();
+        label.text = sentenceRating.Text;
+        label.style.color = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
+        // visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         parentContainer.Add(visualElement);
-
-        // Animate movement, then destroy
-        void SetPosition(float value)
-        {
-            visualElement.style.bottom = new StyleLength(new Length(value, LengthUnit.Percent));
-        }
         
-        float fromValue = 100;
-        float untilValue = 0;
-        SetPosition(fromValue);
-        LeanTween.value(singSceneControl.gameObject, fromValue, untilValue, 1f)
-            .setEaseInSine()
-            .setOnUpdate(interpolatedValue => SetPosition(interpolatedValue))
+        visualElement.style.scale = Vector2.zero;
+        LeanTween.value(singSceneControl.gameObject, 0, 1, 0.5f)
+            .setEaseSpring()
+            .setOnUpdate(interpolatedValue => visualElement.style.scale = new Vector2(interpolatedValue, interpolatedValue));
+
+        LeanTween.value(singSceneControl.gameObject, 0, 120, 1.5f)
+            .setOnUpdate(interpolatedValue => visualElement.style.bottom = new StyleLength(Length.Percent(interpolatedValue)))
             .setOnComplete(visualElement.RemoveFromHierarchy);
         return visualElement;
     }
@@ -284,22 +296,40 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 .setOnUpdate((float interpolatedScoreValue) =>
                 {
                     playerScoreLabel.text = interpolatedScoreValue.ToString("0");
-                    playerScoreProgressBar.progress = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+                    playerScoreProgressBar.ProgressInPercent = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
                 })
                 .id;
         }
         else
         {
             playerScoreLabel.text = score.ToString("0");
-            playerScoreProgressBar.progress = (float)(100.0 * score / PlayerScoreControl.maxScore);
+            playerScoreProgressBar.ProgressInPercent = (float)(100.0 * score / PlayerScoreControl.maxScore);
         }
     }
 
-    private void CreatePerfectSentenceEffect()
+    private void CreateMultiplePerfectSentenceEffect()
     {
-        noteDisplayer.CreatePerfectSentenceEffect();
+        EParticleEffect noteAreaEffect = RandomUtils.RandomOfItems(
+            EParticleEffect.FireworksEffect2D_Firework5_BlueStar,
+            EParticleEffect.FireworksEffect2D_Firework6_YellowStar);
+        VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+        {
+            particleEffect = noteAreaEffect,
+            panelPos = noteContainer.worldBound.center,
+            scale = 0.4f,
+        });
     }
 
+    private void CreateSinglePerfectSentenceEffect()
+    {
+        VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+        {
+            particleEffect = EParticleEffect.ShinyItemLoop,
+            panelPos = playerImage.worldBound.center,
+            scale = 0.2f,
+        });
+    }
+    
     private void CreatePerfectNoteEffect(Note perfectNote)
     {
         noteDisplayer.CreatePerfectNoteEffect(perfectNote);

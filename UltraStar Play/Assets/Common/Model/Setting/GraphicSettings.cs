@@ -1,6 +1,6 @@
-﻿
-using System;
+﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class GraphicSettings
@@ -16,7 +16,10 @@ public class GraphicSettings
     public bool showStaticLyrics = true;
     public bool analyzeBeatsWithoutTargetNote = true;
     public string themeName = ThemeManager.DefaultThemeName;
-    public bool AnimateSceneChange { get; set; } = true;
+    public float sceneChangeDurationInSeconds = 0.25f;
+    public ESceneChangeAnimation sceneChangeAnimation = ESceneChangeAnimation.Zoom;
     public bool showPlayerNames;
     public bool showScoreNumbers;
+    public bool animatedBackground;
+    public int backgroundLightIndex = 1;
 }

@@ -55,6 +55,11 @@ public static class ApplicationUtils
 #endif
     }
 
+    public static Vector2 GetScreenSize()
+    {
+        return new Vector2(Screen.width, Screen.height);
+    }
+    
     public static ScreenResolution GetScreenResolution()
     {
         // Screen.currentResolution in window mode returns the size of the desktop, not of the Unity application.
@@ -65,7 +70,7 @@ public static class ApplicationUtils
 
     public static Vector2 GetScreenSizeInPanelCoordinates(PanelHelper panelHelper)
     {
-        return panelHelper.ScreenToPanel(new Vector2(Screen.width, Screen.height));
+        return panelHelper.GetScreenSizeInPanelCoordinates();
     }
 
     public static bool IsSupportedAudioFormat(string fileExtension)

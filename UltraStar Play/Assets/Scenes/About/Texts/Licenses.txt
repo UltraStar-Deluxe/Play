@@ -1,12 +1,14 @@
-UltraStar Play is an open source project.
-Its original assets and code are under MIT license.
+Melody Mania uses third-party assets, code and libraries under various licenses.
 
-However, UltraStar Play uses third-party assets, code and libraries under different licenses.
 This includes the Unity platform and related assets under the terms of Unity Technologies (https://unity3d.com/legal).
-Further, UltraStar Play includes software of the following projects, without claim on completeness:
+
+Further, Melody Mania includes software of the following projects, without claim on completeness:
 
 MIT License
 -----------
+- UltraStar Play
+    - https://github.com/UltraStar-Deluxe/Play
+
 - CSharpSynthForUnity
     - https://github.com/UltraStar-Deluxe/CSharpSynthForUnity
 

@@ -7,12 +7,10 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
     private readonly int maxSampleLength;
 
     private readonly DywaPitchTracker dywaPitchTracker;
-    private readonly float[] halftoneFrequencies;
 
     public DywaAudioSamplesAnalyzer(int sampleRateHz, int maxSampleLength)
     {
         this.maxSampleLength = maxSampleLength;
-        halftoneFrequencies = MidiUtils.PrecalculateHalftoneFrequencies(MidiUtils.SingableNoteMin, MidiUtils.SingableNoteRange);
 
         // Create and configure Dynamic Wavelet Pitch Tracker.
         dywaPitchTracker = new DywaPitchTracker();
@@ -72,23 +70,7 @@ public class DywaAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
             return null;
         }
 
-        int midiNote = GetMidiNoteForFrequency(frequency);
-        return new PitchEvent(midiNote);
-    }
-
-    private int GetMidiNoteForFrequency(float frequency)
-    {
-        int bestHalftoneIndex = -1;
-        float bestFrequencyDifference = float.MaxValue;
-        for (int i = 0; i < halftoneFrequencies.Length; i++)
-        {
-            float frequencyDifference = Mathf.Abs(halftoneFrequencies[i] - frequency);
-            if (frequencyDifference < bestFrequencyDifference)
-            {
-                bestFrequencyDifference = frequencyDifference;
-                bestHalftoneIndex = i;
-            }
-        }
-        return MidiUtils.SingableNoteMin + bestHalftoneIndex;
+        int midiNote = MidiUtils.GetMidiNoteForFrequency(frequency);
+        return new PitchEvent(midiNote, frequency);
     }
 }

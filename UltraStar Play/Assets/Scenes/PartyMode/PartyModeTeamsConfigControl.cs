@@ -28,14 +28,14 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
     [Inject]
     private GameObject gameObject;
 
-    [Inject(UxmlName = R.UxmlNames.teamsScrollView)]
-    private VisualElement teamsScrollView;
+    [Inject(UxmlName = R.UxmlNames.teamList)]
+    private VisualElement teamList;
 
-    [Inject(UxmlName = R.UxmlNames.freeForAllToggle)]
-    private Toggle freeForAllToggle;
+    [Inject(UxmlName = R.UxmlNames.freeForAllItemPicker)]
+    private ItemPicker freeForAllItemPicker;
 
-    [Inject(UxmlName = R.UxmlNames.knockOutTournamentToggle)]
-    private Toggle knockOutTournamentToggle;
+    [Inject(UxmlName = R.UxmlNames.knockOutTournamentItemPicker)]
+    private ItemPicker knockOutTournamentItemPicker;
 
     [Inject(UxmlName = R.UxmlNames.addTeamButton)]
     private Button addTeamButton;
@@ -45,19 +45,22 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     [Inject(UxmlName = R.UxmlNames.teamColumnsContainer)]
     private VisualElement teamColumnsContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.teamConfigUiRoot)]
+    private VisualElement teamConfigUiRoot;
 
     private Dictionary<PartyModeTeamSettings, VisualElement> teamToVisualElement = new();
     private Dictionary<PlayerProfile, VisualElement> playerToVisualElement = new();
 
     public void OnInjectionFinished()
     {
-        FieldBindingUtils.Bind(gameObject, freeForAllToggle,
-            () => partyModeSettings.teamSettings.isFreeForAll,
-            newValue => partyModeSettings.teamSettings.isFreeForAll = newValue);
+        new BoolPickerControl(freeForAllItemPicker)
+            .Bind(() => partyModeSettings.teamSettings.isFreeForAll,
+                newValue => partyModeSettings.teamSettings.isFreeForAll = newValue);
 
-        FieldBindingUtils.Bind(gameObject, knockOutTournamentToggle,
-            () => partyModeSettings.teamSettings.isKnockOutTournament,
-            newValue => partyModeSettings.teamSettings.isKnockOutTournament = newValue);
+        new BoolPickerControl(knockOutTournamentItemPicker)
+            .Bind(() => partyModeSettings.teamSettings.isKnockOutTournament, 
+                newValue => partyModeSettings.teamSettings.isKnockOutTournament = newValue);
 
         partyModeSettings.ObserveEveryValueChanged(it => it.teamSettings.isFreeForAll)
             .Subscribe(_ => UpdateTeams());
@@ -99,12 +102,14 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     private void UpdateTeams()
     {
-        teamsScrollView.SetVisibleByDisplay(!partyModeSettings.teamSettings.isFreeForAll);
+        teamConfigUiRoot.SetVisibleByDisplay(!partyModeSettings.teamSettings.isFreeForAll);
         teamColumnsContainer.Clear();
         teamToVisualElement.Clear();
         playerToVisualElement.Clear();
 
         partyModeSettings.teamSettings.teams.ForEach(team => CreateTeamUi(team));
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(teamList);
     }
 
     private void CreateTeamUi(PartyModeTeamSettings team)
@@ -200,8 +205,20 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         Button leftButton = playerVisualElement.Q<Button>(R.UxmlNames.leftButton);
         Button rightButton = playerVisualElement.Q<Button>(R.UxmlNames.rightButton);
 
-        leftButton.RegisterCallbackButtonTriggered(_ => MovePlayerToLeftTeam(team, playerProfile, isGuest));
-        rightButton.RegisterCallbackButtonTriggered(_ => MovePlayerToRightTeam(team, playerProfile, isGuest));
+        leftButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            MovePlayerToLeftTeam(team, playerProfile, isGuest);
+            // Focus new button
+            playerToVisualElement[playerProfile]?.Q<Button>(R.UxmlNames.leftButton)?.Focus();
+
+        });
+        rightButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            MovePlayerToRightTeam(team, playerProfile, isGuest);
+            // Focus new button
+            playerToVisualElement[playerProfile]?.Q<Button>(R.UxmlNames.rightButton)?.Focus();
+            
+        });
     }
 
     private void MovePlayerToRightTeam(PartyModeTeamSettings team, PlayerProfile playerProfile, bool isGuest)

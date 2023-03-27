@@ -849,6 +849,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         selectedSongTitle.text = "";
         duetIcon.HideByVisibility();
         UpdateFavoriteIcon();
+        UpdateSongStatistics(null);
     }
 
     public void SelectRandomSong()
