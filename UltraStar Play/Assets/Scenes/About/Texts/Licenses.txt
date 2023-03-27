@@ -11,8 +11,8 @@ See https://opensource.org/license/MIT/
 - UltraStar Play
     - https://github.com/UltraStar-Deluxe/Play
 
-- CSharpSynthForUnity
-    - https://github.com/UltraStar-Deluxe/CSharpSynthForUnity
+- CSharpSynthForUnity2.0
+    - https://github.com/KNCarnage/CSharpSynthForUnity2.0
 
 - DynamicQueryable
     - https://github.com/umutozel/DynamicQueryable
