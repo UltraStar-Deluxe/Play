@@ -34,7 +34,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(VfxManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(UnityWebRequestManager.Instance);
-        bb.BindExistingInstance(BokehBackgroundManager.Instance);
+        bb.BindExistingInstance(BackgroundLightManager.Instance);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);

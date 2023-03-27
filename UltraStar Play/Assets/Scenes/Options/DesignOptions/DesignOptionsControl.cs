@@ -44,14 +44,14 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.animatedBackgroundItemPicker)]
     private ItemPicker animatedBackgroundItemPicker;
     
-    [Inject(UxmlName = R.UxmlNames.bokehBackgroundItemPicker)]
-    private ItemPicker bokehBackgroundItemPicker;
+    [Inject(UxmlName = R.UxmlNames.backgroundLightItemPicker)]
+    private ItemPicker backgroundLightItemPicker;
     
     [Inject]
     private UiManager uiManager;
     
     [Inject]
-    private BokehBackgroundManager bokehBackgroundManager;
+    private BackgroundLightManager backgroundLightManager;
 
     protected override void Start()
     {
@@ -98,9 +98,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             .Bind(() => settings.GraphicSettings.animatedBackground,
                 newValue => settings.GraphicSettings.animatedBackground = newValue);
         
-        new LabeledItemPickerControl<int>(bokehBackgroundItemPicker, NumberUtils.CreateIntList(0, bokehBackgroundManager.BokehBackgroundCount))
-            .Bind(() => settings.GraphicSettings.bokehBackgroundIndex,
-                newValue => settings.GraphicSettings.bokehBackgroundIndex = newValue);
+        new LabeledItemPickerControl<int>(backgroundLightItemPicker, NumberUtils.CreateIntList(0, backgroundLightManager.BackgroundLightInstancesCount))
+            .Bind(() => settings.GraphicSettings.backgroundLightIndex,
+                newValue => settings.GraphicSettings.backgroundLightIndex = newValue);
         
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
