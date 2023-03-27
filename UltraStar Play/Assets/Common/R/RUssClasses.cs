@@ -30,12 +30,14 @@ public static partial class R
         public const string errorFontColor = "errorFontColor";
         public const string flexWrapScrollView = "flexWrapScrollView";
         public const string focusableNavigatorIgnore = "focusableNavigatorIgnore";
+        public const string focusableNavigatorPriorityParent = "focusableNavigatorPriorityParent";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fontColor = "fontColor";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
         public const string gridLine = "gridLine";
         public const string horizontalGridLine = "horizontalGridLine";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
+        public const string hyperlink = "hyperlink";
         public const string icon = "icon";
         public const string iconImage = "iconImage";
         public const string ignoreTheme = "ignoreTheme";
@@ -66,6 +68,7 @@ public static partial class R
         public const string mr_3 = "mr-3";
         public const string mr_4 = "mr-4";
         public const string mt_3 = "mt-3";
+        public const string mt_4 = "mt-4";
         public const string mt_auto = "mt-auto";
         public const string multiline = "multiline";
         public const string mx_2 = "mx-2";
@@ -85,7 +88,6 @@ public static partial class R
         public const string overlayBackground = "overlayBackground";
         public const string overlayDialog = "overlayDialog";
         public const string p_1 = "p-1";
-        public const string p_3 = "p-3";
         public const string p_5 = "p-5";
         public const string panel = "panel";
         public const string pb_2 = "pb-2";
@@ -98,9 +100,11 @@ public static partial class R
         public const string pt_2 = "pt-2";
         public const string px_4 = "px-4";
         public const string py_1 = "py-1";
+        public const string py_2 = "py-2";
         public const string recording = "recording";
         public const string roundCorners = "roundCorners";
         public const string rounded = "rounded";
+        public const string roundedbox = "roundedbox";
         public const string scoreRow = "scoreRow";
         public const string searchPropertyContainer = "searchPropertyContainer";
         public const string secondaryFontColor = "secondaryFontColor";
@@ -121,6 +125,7 @@ public static partial class R
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
         public const string squareButton = "squareButton";
         public const string staticPanel = "staticPanel";
+        public const string teamResultLabel = "teamResultLabel";
         public const string textColorTint = "textColorTint";
         public const string textFieldHint = "textFieldHint";
         public const string textOutline = "textOutline";
