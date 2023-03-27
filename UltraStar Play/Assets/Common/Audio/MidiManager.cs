@@ -24,8 +24,8 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     public float midiGain = 1f;
 
     // The txt file describing the instruments of the sound bank. Must be in a Resources folder.
-    // private readonly string bankFilePath = "Soundfonts/Yamaha_YPT_220_soundfont_studio_version.sf2";
     private readonly string bankFilePath = "Soundfonts/MuseScore_General.sf2";
+    // private readonly string bankFilePath = "Soundfonts/Yamaha_YPT_220_soundfont_studio_version.sf2";
     private readonly int bufferSize = 1024;
     // "volume" for the midi events.
     [Range(0, 127)]
@@ -93,6 +93,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
+        using DisposableStopwatch d = new DisposableStopwatch("Initialize MidiManager took <ms>");
 
         midiSynthesizer = new Synthesizer(audioFilterReadSampleRate, midiSynthesizerChannelCount, bufferSize, 16);
         newSampleBuffer = new float[bufferSize * midiSynthesizerChannelCount];
@@ -126,6 +127,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         }
         
         midiSequencer.Stop();
+        midiSequencer.ResetMidi();
         IsPlayingMidiFile = false;
     }
     
@@ -157,9 +159,13 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     public MidiFile LoadMidiFile(string path)
     {
         InitIfNotDoneYet();
-        byte[] midiFileBytes = File.ReadAllBytes(path);
-        MidiFile midiFile = new MidiFile(midiFileBytes);
-        return midiFile;
+        
+        using (new DisposableStopwatch($"Loading MIDI file '{path}' took <ms>"))
+        {
+            byte[] midiFileBytes = File.ReadAllBytes(path);
+            MidiFile midiFile = new MidiFile(midiFileBytes);
+            return midiFile;
+        }
     }
 
     // See http://unity3d.com/support/documentation/ScriptReference/MonoBehaviour.OnAudioFilterRead.html for reference code
