@@ -13,7 +13,10 @@ using UniRx;
 public class BokehBackgroundManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static BokehBackgroundManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BokehBackgroundManager>();
-    
+
+    [InjectedInInspector]
+    public RenderTexture bokehBackgroundRenderTexture;
+        
     [InjectedInInspector]
     public GameObject bokehBackgroundParent;
 
@@ -36,10 +39,20 @@ public class BokehBackgroundManager : AbstractSingletonBehaviour, INeedInjection
 
     private void SetBokehBackgroundActive(int index)
     {
+        if (index <= 0)
+        {
+            RenderTextureUtils.Clear(bokehBackgroundRenderTexture);
+            foreach (Transform child in bokehBackgroundParent.transform)
+            {
+                child.gameObject.SetActive(false);
+            }
+            return;
+        }
+
         int iteration = 0;
         foreach (Transform child in bokehBackgroundParent.transform)
         {
-            child.gameObject.SetActive(iteration == index);
+            child.gameObject.SetActive(iteration == (index- 1));
             iteration++;
         }
     }

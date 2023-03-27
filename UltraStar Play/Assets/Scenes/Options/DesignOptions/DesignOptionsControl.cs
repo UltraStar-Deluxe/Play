@@ -98,7 +98,7 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             .Bind(() => settings.GraphicSettings.animatedBackground,
                 newValue => settings.GraphicSettings.animatedBackground = newValue);
         
-        new LabeledItemPickerControl<int>(bokehBackgroundItemPicker, NumberUtils.CreateIntList(0, bokehBackgroundManager.BokehBackgroundCount - 1))
+        new LabeledItemPickerControl<int>(bokehBackgroundItemPicker, NumberUtils.CreateIntList(0, bokehBackgroundManager.BokehBackgroundCount))
             .Bind(() => settings.GraphicSettings.bokehBackgroundIndex,
                 newValue => settings.GraphicSettings.bokehBackgroundIndex = newValue);
         
