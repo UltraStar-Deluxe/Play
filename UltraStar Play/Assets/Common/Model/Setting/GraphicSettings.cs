@@ -21,5 +21,5 @@ public class GraphicSettings
     public bool showPlayerNames;
     public bool showScoreNumbers;
     public bool animatedBackground;
-    public int bokehBackgroundIndex = 1;
+    public int backgroundLightIndex = 1;
 }

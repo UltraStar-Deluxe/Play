@@ -6771,7 +6771,7 @@ GameObject:
   - component: {fileID: 7086012024249579662}
   - component: {fileID: 880683781346573580}
   m_Layer: 0
-  m_Name: BokehBackgrounds
+  m_Name: BackgroundLights
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6806,9 +6806,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d1bfead975967349a5a00ddcd10eda0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bokehBackgroundRenderTexture: {fileID: 8400000, guid: 29796eae10b449a4fbae71c0b5f2959f,
+  backgroundLightRenderTexture: {fileID: 8400000, guid: 29796eae10b449a4fbae71c0b5f2959f,
     type: 2}
-  bokehBackgroundParent: {fileID: 7911092659538429188}
+  backgroundLightInstancesParent: {fileID: 7911092659538429188}
 --- !u!1 &4760730431951538787
 GameObject:
   m_ObjectHideFlags: 0
@@ -7843,7 +7843,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3317958610338434365}
   m_Layer: 0
-  m_Name: BokehBackgroundPrefabInstances
+  m_Name: BackgroundLightsPrefabInstances
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8760,7 +8760,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Value
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11452418, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: enablePopup
@@ -8780,7 +8780,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22400762, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.000061035156
       objectReference: {fileID: 0}
     - target: {fileID: 22426080, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchorMax.x
