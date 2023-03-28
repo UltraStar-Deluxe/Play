@@ -25,10 +25,11 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     // Factor to amplify the generated midi samples.
     public float midiGain = 1f;
 
-    private readonly string defaultBankFilePath = "Soundfonts/MuseScore_General.sf2";
-    // private readonly string defaultBankFilePath = "Soundfonts/Yamaha_YPT_220_soundfont_studio_version.sf2";
+    [InjectedInInspector]
+    public TextAsset defaultSoundfontAsset;
     
     private readonly int bufferSize = 1024;
+
     // "volume" for the midi events.
     [Range(0, 127)]
     private int midiVelocity;
@@ -117,7 +118,8 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
                 UiManager.CreateNotification(message);
                 Debug.LogWarning(message);
             }
-            bank = new PatchBank(defaultBankFilePath);
+            
+            bank = new PatchBank(new TextAssetSoundfontResource(defaultSoundfontAsset));
         }
         
         midiSynthesizer.UnloadBank();
@@ -275,51 +277,6 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             {
                 data[outputSampleIndex + outputChannelIndex] = sampleValue;
             }
-        }
-    }
-    
-    private class FileSystemSoundfontResource : IResource
-    {
-        private readonly string path;
-    
-        public FileSystemSoundfontResource(string path)
-        {
-            this.path = path;
-        }
-
-        public bool ReadAllowed()
-        {
-            return true;
-        }
-
-        public bool WriteAllowed()
-        {
-            return false;
-        }
-
-        public bool DeleteAllowed()
-        {
-            return false;
-        }
-
-        public string GetName()
-        {
-            return Path.GetFileName(path);
-        }
-
-        public Stream OpenResourceForRead()
-        {
-            return File.OpenRead(path);
-        }
-
-        public Stream OpenResourceForWrite()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void DeleteResource()
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

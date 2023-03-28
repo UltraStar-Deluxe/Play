@@ -1,6 +1,9 @@
 ExtractedStyles.uss
 ExtractedStyles.uss.meta
 
+################################
+## Plugins
+
 Plugins/LeanTween/
 Plugins/LeanTween.meta
 
@@ -48,9 +51,6 @@ Plugins/Jokenizer.Net.meta
 Plugins/DynamicQueryable/
 Plugins/DynamicQueryable.meta
 
-JMO Assets/
-JMO Assets.meta
-
 Plugins/Vosk/
 Plugins/Vosk.meta
 
@@ -59,3 +59,23 @@ Plugins/SpleeterSharp.meta
 
 Plugins/UnityStandaloneFileBrowser/
 Plugins/UnityStandaloneFileBrowser.meta
+
+Plugins/Soundfonts/MuseScore_General.sf2.bytes
+Plugins/Soundfonts.meta
+
+########################################
+## Third-party assets
+Background Bokeh VFX/
+Background Bokeh VFX.meta
+
+CartoonVFX9X/
+CartoonVFX9X.meta
+
+Confetti FX Pro/
+Confetti FX Pro.meta
+
+Hovl Studio/
+Hovl Studio.meta
+
+JMO Assets/
+JMO Assets.meta
