@@ -7285,9 +7285,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d973b629cee9ea644a4ec87bd50e2aaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  midiInstrument: 1
   midiGain: 1
-  audioFilterReadSampleRateHz: 0
+  defaultSoundfontAsset: {fileID: 4900000, guid: 690449332ab7ce94898435bd09ec8fb5,
+    type: 3}
 --- !u!82 &8801158838415278696
 AudioSource:
   m_ObjectHideFlags: 0
