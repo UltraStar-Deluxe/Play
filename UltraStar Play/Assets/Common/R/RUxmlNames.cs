@@ -713,6 +713,7 @@ public static partial class R
         public const string songsOptionsButton = "songsOptionsButton";
         public const string songTitle = "songTitle";
         public const string songVideoImage = "songVideoImage";
+        public const string soundfontPathTextField = "soundfontPathTextField";
         public const string soundOptionsButton = "soundOptionsButton";
         public const string space = "space";
         public const string spacer = "spacer";
@@ -754,6 +755,7 @@ public static partial class R
         public const string TeamResultTeamUi = "TeamResultTeamUi";
         public const string teamScoreLabel = "teamScoreLabel";
         public const string teamUiRoot = "teamUiRoot";
+        public const string testSoundfontButton = "testSoundfontButton";
         public const string text = "text";
         public const string textFieldContainer = "textFieldContainer";
         public const string themePicker = "themePicker";
