@@ -5,5 +5,7 @@
         <ItemPicker name="backgroundMusicVolumeChooser" label="Background Music Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
         <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="vocalsAudioVolumeChooser" label="Vocals Volume" />
         <ItemPicker name="animateSceneChangeVolumePicker" label="Scene Transition Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
+        <ui:TextField picking-mode="Ignore" label="Soundfont (.sf2)" name="soundfontPathTextField" is-delayed="true" />
+        <ui:Button text="Test Soundfont" display-tooltip-when-elided="true" name="testSoundfontButton" style="align-self: flex-end;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -587,6 +587,14 @@
     height: auto;
 }
 
+#loadedOptionsRoot > TextField {
+    margin-bottom: 16px;
+}
+
+#loadedOptionsRoot > TextField > .unity-base-text-field__label {
+    width: 300px;
+}
+
 #loadedOptionsRoot > ScrollView > ItemPicker {
     margin-bottom: 16px;
     height: auto;

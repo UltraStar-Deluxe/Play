@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using AudioSynthesis;
 using AudioSynthesis.Bank;
+using AudioSynthesis.Bank.Patches;
 using AudioSynthesis.Midi;
 using AudioSynthesis.Sequencer;
 using AudioSynthesis.Synthesis;
@@ -23,9 +25,9 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     // Factor to amplify the generated midi samples.
     public float midiGain = 1f;
 
-    // The txt file describing the instruments of the sound bank. Must be in a Resources folder.
-    private readonly string bankFilePath = "Soundfonts/MuseScore_General.sf2";
-    // private readonly string bankFilePath = "Soundfonts/Yamaha_YPT_220_soundfont_studio_version.sf2";
+    private readonly string defaultBankFilePath = "Soundfonts/MuseScore_General.sf2";
+    // private readonly string defaultBankFilePath = "Soundfonts/Yamaha_YPT_220_soundfont_studio_version.sf2";
+    
     private readonly int bufferSize = 1024;
     // "volume" for the midi events.
     [Range(0, 127)]
@@ -85,6 +87,10 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
                 }
             })
             .AddTo(gameObject);
+
+        settings.ObserveEveryValueChanged(it => it.AudioSettings.soundfontPath)
+            .Subscribe(newValue => OnSoundfontPathChanged())
+            .AddTo(gameObject);
     }
 
     public void InitIfNotDoneYet()
@@ -99,7 +105,21 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         newSampleBuffer = new float[bufferSize * midiSynthesizerChannelCount];
         midiSynthesizer.MixGain = midiGain;
 
-        bank = new PatchBank(bankFilePath);
+        if (FileUtils.Exists(settings.AudioSettings.soundfontPath))
+        {
+            bank = new PatchBank(new FileSystemSoundfontResource(settings.AudioSettings.soundfontPath));
+        }
+        else
+        {
+            if (!settings.AudioSettings.soundfontPath.IsNullOrEmpty())
+            {
+                string message = $"Soundfont file does not exist: {settings.AudioSettings.soundfontPath}";
+                UiManager.CreateNotification(message);
+                Debug.LogWarning(message);
+            }
+            bank = new PatchBank(defaultBankFilePath);
+        }
+        
         midiSynthesizer.UnloadBank();
         midiSynthesizer.LoadBank(bank);
         midiSequencer = new MidiFileSequencer(midiSynthesizer);
@@ -109,9 +129,37 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         isInitialized = true;
     }
 
+    private void OnSoundfontPathChanged()
+    {
+        if (!isInitialized)
+        {
+            return;
+        }
+        Debug.Log("MidiManager - unloading soundfont because soundfont path changed");
+        
+        // Unload everything
+        audioSource.Stop();
+        midiSequencer.Stop();
+        midiSequencer.UnloadMidi();
+        midiSynthesizer.UnloadBank();
+        isInitialized = false;
+    }
+    
     public void PlayMidiFile(MidiFile midiFile)
     {
         InitIfNotDoneYet();
+
+        if (IsPlayingMidiFile)
+        {
+            StopMidiFile();
+            midiSequencer.UnloadMidi();
+        }
+
+        if (midiSequencer.IsMidiLoaded)
+        {
+            midiSequencer.UnloadMidi();
+        }
+            
         
         StopAllMidiNotes();
         midiSequencer.LoadMidi(midiFile);
@@ -227,6 +275,51 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             {
                 data[outputSampleIndex + outputChannelIndex] = sampleValue;
             }
+        }
+    }
+    
+    private class FileSystemSoundfontResource : IResource
+    {
+        private readonly string path;
+    
+        public FileSystemSoundfontResource(string path)
+        {
+            this.path = path;
+        }
+
+        public bool ReadAllowed()
+        {
+            return true;
+        }
+
+        public bool WriteAllowed()
+        {
+            return false;
+        }
+
+        public bool DeleteAllowed()
+        {
+            return false;
+        }
+
+        public string GetName()
+        {
+            return Path.GetFileName(path);
+        }
+
+        public Stream OpenResourceForRead()
+        {
+            return File.OpenRead(path);
+        }
+
+        public Stream OpenResourceForWrite()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void DeleteResource()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
