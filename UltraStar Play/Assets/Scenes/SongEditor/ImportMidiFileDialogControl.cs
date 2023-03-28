@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using CSharpSynth.Midi;
+using AudioSynthesis.Midi;
+using AudioSynthesis.Midi.Event;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -173,9 +173,15 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             int trackIndex = midiTrackIndexPickerControl.SelectedItem.trackIndex;
             int channelIndex = midiTrackIndexPickerControl.SelectedItem.channelIndex;
             MidiFile midiFileCopy = midiManager.LoadMidiFile(MidiFilePath);
-            List<Note> loadNotesFromMidiFile = midiFileImporter.LoadNotesFromMidiFile(midiFileCopy, trackIndex, channelIndex, true);
+            
+            MidiFileUtils.CalculateMidiEventTimesInMillis(
+                midiFileCopy,
+                out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
+                out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
+
+            List<Note> loadNotesFromMidiFile = midiFileImporter.LoadNotesFromMidiFile(midiFileCopy, trackIndex, channelIndex, false, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
             MidiFile previewMidiFile = MidiFileUtils.CreateMidiFile(songMeta, loadNotesFromMidiFile, (byte)settings.SongEditorSettings.MidiVelocity);
-            MidiFileUtils.SetFirstDeltaTimeTo(previewMidiFile, 0);
+            MidiFileUtils.SetFirstDeltaTimeTo(previewMidiFile, 0, 0);
             midiManager.PlayMidiFile(previewMidiFile);
         }
         catch (Exception e)
@@ -304,9 +310,28 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
     private TrackAndChannel FindBestMatchingTrackAndChannel(List<TrackAndChannel> trackAndChannels)
     {
+        // TODO: Bad performance
+        
         if (trackAndChannels.IsNullOrEmpty())
         {
             return null;
+        }
+        
+        using DisposableStopwatch d = new DisposableStopwatch("FindBestMatchingTrackAndChannel took <ms>");
+        
+        MidiFileUtils.CalculateMidiEventTimesInMillis(
+            midiFile,
+            out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
+            out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
+
+        int GetAbsoluteDeltaTimeInMillis(MidiEvent midiEvent)
+        {
+            if (midiEventToAbsoluteDeltaTimeInMillis.TryGetValue(midiEvent, out int absoluteDeltaTimeInMillis))
+            {
+                return absoluteDeltaTimeInMillis;
+            }
+
+            return 0;
         }
         
         int FindTrackIndexWithLongestLyrics()
@@ -343,7 +368,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             return trackAndChannels.FirstOrDefault();
         }
 
-        double GetMidiEventAbsoluteTimeDistance(MidiEvent a, MidiEvent b, Dictionary<MidiEvent, uint> midiEventToAbsoluteTime)
+        double GetMidiEventAbsoluteTimeDistance(MidiEvent a, MidiEvent b)
         {
             if (a == null
                 && b == null)
@@ -353,15 +378,15 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
             if (a == null)
             {
-                return midiEventToAbsoluteTime[b];
+                return GetAbsoluteDeltaTimeInMillis(b);
             }
 
             if (b == null)
             {
-                return midiEventToAbsoluteTime[a];
+                return GetAbsoluteDeltaTimeInMillis(a);
             }
             
-            return Mathf.Abs((int)midiEventToAbsoluteTime[a] - midiEventToAbsoluteTime[b]);
+            return Mathf.Abs(GetAbsoluteDeltaTimeInMillis(a) - GetAbsoluteDeltaTimeInMillis(b));
         }
         
         int FindChannelIndexWithBestMatchingNotes()
@@ -383,39 +408,38 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             // For each channel, calculate difference to lyrics events. Return the channel with smallest difference.
             MidiTrack bestTrack = midiFile.Tracks[bestTrackIndex];
             List<MidiEvent> lyricsEvents = MidiFileUtils.GetLyricsEvents(bestTrack);
-            Dictionary<MidiEvent, uint> midiEventToAbsoluteTime = MidiFileUtils.GetMidiEventToAbsoluteTime(bestTrack);
             
             Dictionary<int, double> channelIndexToDistance = new();
             foreach (int channelIndex in channelIndexes)
             {
                 List<MidiEvent> noteEventsOfChannel = bestTrack.MidiEvents
-                    .Where(midiEvent => midiEvent.channel == (byte)channelIndex
-                                        && midiEvent.midiChannelEvent
-                                            is MidiHelper.MidiChannelEvent.Note_On)
+                    .Where(midiEvent => midiEvent.Channel == (byte)channelIndex
+                                        && midiEvent.TryGetMidiEventTypeEnum(out MidiEventTypeEnum midiEventTypeEnum)
+                                            && midiEventTypeEnum == MidiEventTypeEnum.NoteOn)
                     .ToList();
-
+            
                 double distanceOfChannel = 0;
                 foreach (MidiEvent lyricsEvent in lyricsEvents)
                 {
                     MidiEvent closestNoteOfLyricsEvent = noteEventsOfChannel.FindMinElement(noteEvent =>
-                        GetMidiEventAbsoluteTimeDistance(lyricsEvent, noteEvent, midiEventToAbsoluteTime));
+                        GetMidiEventAbsoluteTimeDistance(lyricsEvent, noteEvent));
                     if (closestNoteOfLyricsEvent == null)
                     {
                         // Add unmatched lyrics event to distance.
-                        distanceOfChannel += midiEventToAbsoluteTime[lyricsEvent];
+                        distanceOfChannel += GetAbsoluteDeltaTimeInMillis(lyricsEvent);
                     }
-
+            
                     noteEventsOfChannel.Remove(closestNoteOfLyricsEvent);
-                    double distanceOfNote = GetMidiEventAbsoluteTimeDistance(lyricsEvent, closestNoteOfLyricsEvent, midiEventToAbsoluteTime);
+                    double distanceOfNote = GetMidiEventAbsoluteTimeDistance(lyricsEvent, closestNoteOfLyricsEvent);
                     distanceOfChannel += distanceOfNote;
                 }
-
+            
                 // Add unmatched notes to distance
-                distanceOfChannel += noteEventsOfChannel.Sum(noteEvent => midiEventToAbsoluteTime[noteEvent]);
+                distanceOfChannel += noteEventsOfChannel.Sum(noteEvent => GetAbsoluteDeltaTimeInMillis(noteEvent));
                 
                 channelIndexToDistance[channelIndex] = distanceOfChannel;
             }
-
+            
             int channelIndexWithSmallestDistance = channelIndexToDistance.FindMinElement(entry => entry.Value).Key;
             return channelIndexWithSmallestDistance;
         }

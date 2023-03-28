@@ -15,4 +15,6 @@ public class AudioSettings
     public int SceneChangeSoundVolumePercent { get; set; } = 50;
 
     public EPitchDetectionAlgorithm pitchDetectionAlgorithm = EPitchDetectionAlgorithm.Dywa;
+
+    public string soundfontPath = "";
 }

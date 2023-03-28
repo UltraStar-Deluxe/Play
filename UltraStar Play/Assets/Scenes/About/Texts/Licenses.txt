@@ -6,11 +6,13 @@ Further, Melody Mania includes software of the following projects, without claim
 
 MIT License
 -----------
+See https://opensource.org/license/MIT/
+
 - UltraStar Play
     - https://github.com/UltraStar-Deluxe/Play
 
-- CSharpSynthForUnity
-    - https://github.com/UltraStar-Deluxe/CSharpSynthForUnity
+- CSharpSynthForUnity2.0
+    - https://github.com/KNCarnage/CSharpSynthForUnity2.0
 
 - DynamicQueryable
     - https://github.com/umutozel/DynamicQueryable
@@ -39,8 +41,13 @@ MIT License
 - Unity Test Runner (GitHub Actions, not included in build)
     - https://github.com/game-ci/unity-test-runner
 
+- Soundfont "MuseScore_General.sf2"
+    - https://musescore.org/en/handbook/3/soundfonts-and-sfz-files
+    
 Apache License 2.0
 ------------------
+See https://www.apache.org/licenses/LICENSE-2.0.html
+
 - Material Design Icons
     - https://fonts.google.com/icons
 
@@ -52,7 +59,16 @@ Apache License 2.0
 
 Mozilla Public License
 ----------------------
+See https://www.mozilla.org/en-US/MPL/1.1 respectively https://www.mozilla.org/en-US/MPL/2.0
+
 - UTF-Unknown, based on Mozilla Universal Charset Detector
     - https://github.com/achimmihca/UTF-Unknown-Unity (MPL 2.0)
     - https://github.com/CharsetDetector/UTF-unknown  (MPL 1.1)
     - https://github.com/errepi/ude (MPL 1.1)
+
+Creative Commons Attribution 3.0 Unported
+-----------------------------------------
+See https://creativecommons.org/licenses/by/3.0/
+
+- Soundfont "Yamaha_YPT_220_soundfont_studio_version.sf2" by glassesglasses8
+    - https://musical-artifacts.com/artifacts/2573

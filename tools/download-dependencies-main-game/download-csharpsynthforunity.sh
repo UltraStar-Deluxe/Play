@@ -10,14 +10,12 @@ cd CSharpSynthForUnity
 
 echo "Cloning CSharpSynthForUnity from remote..."
 git init
-git remote add origin https://github.com/UltraStar-Deluxe/CSharpSynthForUnity.git
+git remote add origin https://github.com/KNCarnage/CSharpSynthForUnity2.0.git
 git config core.sparsecheckout true
-echo "Assets/Resources/GM Bank - Piano/*" >> .git/info/sparse-checkout
 echo "Assets/ThirdParty/*" >> .git/info/sparse-checkout
-# UltraStar-Play-subset is a dedicated branch for the UltraStar Play project
-git pull --depth=100 origin UltraStar-Play-subset
-# Commit from 6 February 2023: 082f7acba885a4e620e6c7f490666059befdd932
-git checkout 082f7acba885a4e620e6c7f490666059befdd932
+git pull --depth=100 origin main
+# Commit from 21 February 2023: 806bce0820d2611f804066e06e1cd3842439addd
+git checkout 806bce0820d2611f804066e06e1cd3842439addd
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v Assets/* ./

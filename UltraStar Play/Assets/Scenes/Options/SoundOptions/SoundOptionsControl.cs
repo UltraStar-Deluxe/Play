@@ -1,15 +1,22 @@
+using AudioSynthesis.Midi;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityMidi;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
 public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
+    private static readonly string streamingAssetsMidiTestFile = "Midi/fur-elise-beginning.mid";
+    
+    [Inject]
+    private MidiManager midiManager;
+    
     [Inject]
     private UIDocument uiDoc;
 
@@ -28,6 +35,12 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
     [Inject(UxmlName = R.UxmlNames.animateSceneChangeVolumePicker)]
     private ItemPicker animateSceneChangeVolumePicker;
 
+    [Inject(UxmlName = R.UxmlNames.soundfontPathTextField)]
+    private TextField soundfontPathTextField;
+
+    [Inject(UxmlName = R.UxmlNames.testSoundfontButton)]
+    private Button testSoundfontButton;
+    
     protected override void Start()
     {
         base.Start();
@@ -62,8 +75,20 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
         vocalsAudioVolumePickerControl.Bind(() => settings.AudioSettings.VocalsAudioVolumePercent,
             newValue => settings.AudioSettings.VocalsAudioVolumePercent = (int)newValue);
 
+        FieldBindingUtils.Bind(gameObject,
+            soundfontPathTextField,
+            () => settings.AudioSettings.soundfontPath,
+            newValue => settings.AudioSettings.soundfontPath = newValue);
+        
+        testSoundfontButton.RegisterCallbackButtonTriggered(_ => TestSoundfont());
+        
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
             .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
+    }
+
+    private void TestSoundfont()
+    {
+        midiManager.PlayMidiFile(new MidiFile(new StreamingAssetResource(streamingAssetsMidiTestFile)));
     }
 
     public void UpdateTranslation()

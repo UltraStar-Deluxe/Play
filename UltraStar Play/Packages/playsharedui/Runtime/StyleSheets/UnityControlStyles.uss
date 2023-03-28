@@ -17,10 +17,15 @@
 /* TEXT FIELD */
 /**************************************************/
 
+.unity-base-text-field {
+    margin: 0;
+}
+
 .unity-base-text-field > .unity-base-text-field__input {
     height: var(--control-height);
     -unity-text-align: middle-left;
     margin: 0;
+    overflow: hidden;
 }
 
 .unity-base-text-field.multiline > .unity-base-text-field__input {
