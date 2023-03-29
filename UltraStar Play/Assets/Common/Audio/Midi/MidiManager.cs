@@ -215,7 +215,11 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
     public void StopAllMidiNotes(bool immediate = true)
     {
-        InitIfNotDoneYet();
+        if (!isInitialized)
+        {
+            return;
+        }
+
         onAudioFilterReadMidiSamplesGenerator.NoteOffAll(immediate);
         isPlayingMidiNote = false;
         stopMidiNoteTimeMillis = TimeUtils.GetUnixTimeMilliseconds();
