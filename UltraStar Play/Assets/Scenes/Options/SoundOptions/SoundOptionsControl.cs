@@ -88,7 +88,7 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
 
     private void TestSoundfont()
     {
-        midiManager.PlayMidiFile(new MidiFile(new StreamingAssetResource(streamingAssetsMidiTestFile)));
+        midiManager.PlayMidiFile(new MidiFile(new StreamingAssetsSoundfontResource(streamingAssetsMidiTestFile)));
     }
 
     public void UpdateTranslation()
