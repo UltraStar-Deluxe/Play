@@ -32,4 +32,9 @@ public static class DirectoryUtils
         string potentialSubDirectoryFullName = new DirectoryInfo(potentialSubDirectory).FullName;
         return potentialSubDirectoryFullName.StartsWith(potentialAncestorDirectoryFullName);
     }
+
+    public static bool Exists(string directory)
+    {
+        return !directory.IsNullOrEmpty() && Directory.Exists(directory);
+    }
 }
