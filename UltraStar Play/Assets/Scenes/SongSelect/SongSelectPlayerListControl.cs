@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -186,10 +187,33 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         }
         else
         {
+            // Try to assign a mic with matching name for the player. This could be a mic from the Companion App.
             List<MicProfile> unusedMicProfiles = FindUnusedMicProfiles();
-            if (!unusedMicProfiles.IsNullOrEmpty())
+            if (unusedMicProfiles.IsNullOrEmpty())
             {
-                listEntryControl.MicProfile = unusedMicProfiles[0];
+                return;
+            }
+
+            // Prefer MicProfile with same name as player
+            MicProfile micProfileWithMatchingName = unusedMicProfiles.FirstOrDefault(unusedMicProfile =>
+                string.Equals(unusedMicProfile.Name, listEntryControl.PlayerProfile.Name, StringComparison.InvariantCultureIgnoreCase));
+            if (micProfileWithMatchingName != null)
+            {
+                listEntryControl.MicProfile = micProfileWithMatchingName;
+                return;
+            }
+            
+            // Ignore mic profiles that match other player names
+            HashSet<string> playerNames = playerEntryControls
+                .Select(otherPlayerEntryControl => otherPlayerEntryControl.PlayerProfile.Name)
+                .ToHashSet();
+            List<MicProfile> unusedMicProfilesNotMatchingAnyPlayerName = unusedMicProfiles
+                .Where(unusedMicProfile => !playerNames.Contains(unusedMicProfile.Name))
+                .ToList();
+
+            if (!unusedMicProfilesNotMatchingAnyPlayerName.IsNullOrEmpty())
+            {
+                listEntryControl.MicProfile = unusedMicProfilesNotMatchingAnyPlayerName.FirstOrDefault();
             }
         }
     }
