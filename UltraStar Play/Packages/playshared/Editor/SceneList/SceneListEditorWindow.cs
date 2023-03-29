@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -21,6 +23,9 @@ public class SceneListEditorWindow : EditorWindow
         "Hovl Studio",
         "JMO Assets"
     };
+
+    private string fileNameRegEx = "";
+    private string lastFilterText = "";
     
     [MenuItem("Window/Scene List")]
     public static void ShowWindow()
@@ -31,7 +36,7 @@ public class SceneListEditorWindow : EditorWindow
 
     private void Awake()
     {
-        scenePaths = FindScenePaths(sortAlphabetically);
+        UpdateScenePaths();
     }
 
     void OnGUI()
@@ -40,6 +45,7 @@ public class SceneListEditorWindow : EditorWindow
         {
             scenePaths = FindScenePaths(sortAlphabetically);
         }
+        fileNameRegEx = GUILayout.TextField(fileNameRegEx);
         sortAlphabetically = GUILayout.Toggle(sortAlphabetically, "Sort alphabetically");
         GUILayout.Label("---");
 
@@ -51,8 +57,20 @@ public class SceneListEditorWindow : EditorWindow
         {
             DrawSceneButtons();
         }
+
+        if (lastFilterText != fileNameRegEx)
+        {
+            UpdateScenePaths();
+        }
+
+        lastFilterText = fileNameRegEx;
     }
 
+    private void UpdateScenePaths()
+    {
+        scenePaths = FindScenePaths(sortAlphabetically);
+    }
+    
     private void DrawSceneButtons()
     {
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
@@ -72,13 +90,25 @@ public class SceneListEditorWindow : EditorWindow
         string normalizedPath = path.Replace("\\", "/");
         return ignoredFolderNames.AnyMatch(ignoredFolderName => normalizedPath.Contains($"/{ignoredFolderName}/"));
     }
+
+    private bool HasMatchingFileName(string path)
+    {
+        if (fileNameRegEx.IsNullOrEmpty())
+        {
+            return true;
+        }
+        
+        string fileName = Path.GetFileNameWithoutExtension(path);
+        return Regex.IsMatch(fileName, fileNameRegEx, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+    }
     
     private List<string> FindScenePaths(bool sortAlphabetically)
     {
         string assetsFolder = "Assets";
-        string[] files = Directory.GetFiles(assetsFolder, "*.unity", SearchOption.AllDirectories);
-        List<string> result = files
-            .Where(file => !IsIgnored(file))
+        string[] paths = Directory.GetFiles(assetsFolder, "*.unity", SearchOption.AllDirectories);
+        List<string> result = paths
+            .Where(path => !IsIgnored(path))
+            .Where(path => HasMatchingFileName(path))
             .ToList();
         if (sortAlphabetically)
         {
