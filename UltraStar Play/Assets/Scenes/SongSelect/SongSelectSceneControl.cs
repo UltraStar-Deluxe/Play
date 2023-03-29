@@ -858,7 +858,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songRouletteControl.SelectSong(randomSongMeta);
     }
 
-    private void CheckAudioAndShowPlayerSelectOverlay()
+    private void CheckAudioThenStartSingScene()
     {
         if (SelectedSong == null)
         {
@@ -879,12 +879,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songAudioPlayer.Init(SelectedSong);
         if (!songAudioPlayer.IsPartiallyLoaded)
         {
-            string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\nPlease use a supported format.";
+            string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\n" +
+                             $"Please use one of the formats {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}.";
             Debug.Log(message);
             UiManager.CreateNotification(message);
             return;
         }
 
+        // Check that any player is selected
+        if (playerListControl.GetSelectedPlayerProfiles().IsNullOrEmpty())
+        {
+            UiManager.CreateNotification(TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
+            return;
+        }
+        
         // Start the sing scene or show the player select overlay.
         StartSingScene();
     }
@@ -900,7 +908,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             {
                 partyModeControl.OpenAskToUseJokerDialog(
                     songRouletteControl.SelectedSongEntryControl.SongMeta,
-                    () => CheckAudioAndShowPlayerSelectOverlay());
+                    () => CheckAudioThenStartSingScene());
             }
             else
             {
@@ -911,7 +919,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        CheckAudioAndShowPlayerSelectOverlay();
+        CheckAudioThenStartSingScene();
     }
 
     public void StartSongEditorScene()
