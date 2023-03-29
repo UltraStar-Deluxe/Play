@@ -208,7 +208,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             PlayerControl playerControl = CreatePlayerControl(playerProfile, micProfile, i);
 
             if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<PlayerScoreControlData> scoreDatas)
-                && sceneData.MedleySongIndex < scoreDatas.Count)
+                && sceneData.MedleySongIndex < scoreDatas.Count
+                && sceneData.MedleySongIndex >= 0)
             {
                 playerControl.PlayerScoreControl.ScoreData = scoreDatas[sceneData.MedleySongIndex];
             }
