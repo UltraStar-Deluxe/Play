@@ -23,14 +23,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     [Inject(UxmlName = R.UxmlNames.pauseIcon)]
     private VisualElement pauseIcon;
     
-    [Inject(UxmlName = R.UxmlNames.toggleMuteButton)]
-    private Button toggleMuteButton;
-    
-    [Inject(UxmlName = R.UxmlNames.muteIcon)]
-    private VisualElement muteIcon;
-    
-    [Inject(UxmlName = R.UxmlNames.unmuteIcon)]
-    private VisualElement unmuteIcon;
+    [Inject(UxmlName = R.UxmlNames.volumeSlider)]
+    private SliderInt volumeSlider;
     
     [Inject(UxmlName = R.UxmlNames.openControlsMenuButton)]
     private Button openControlsMenuButton;
@@ -102,11 +96,21 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             contextMenuControl.OpenContextMenu(Vector2.zero);
         });
         
-        toggleMuteButton.RegisterCallbackButtonTriggered(_ =>
+        volumeSlider.RegisterValueChangedCallback(evt =>
         {
-            ToggleMute();
+            if (settings.AudioSettings.VolumePercent != evt.newValue)
+            {
+                settings.AudioSettings.VolumePercent = evt.newValue;
+            }
         });
-        UpdateMuteIcon();
+        settings.ObserveEveryValueChanged(it => it.AudioSettings.VolumePercent)
+            .Subscribe(newValue =>
+            {
+                if (volumeSlider.value != newValue)
+                {
+                    volumeSlider.value = newValue;
+                }
+            });
         
         togglePlaybackButton.RegisterCallbackButtonTriggered(_ => TogglePlayPause());
         governanceOverlay.RegisterCallback<PointerDownEvent>(evt =>
@@ -207,18 +211,6 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     {
         playIcon.SetVisibleByDisplay(!songAudioPlayer.IsPlaying);
         pauseIcon.SetVisibleByDisplay(songAudioPlayer.IsPlaying);
-    }
-
-    private void ToggleMute()
-    {
-        volumeControl.ToggleMuteAudio();
-        UpdateMuteIcon();
-    }
-
-    private void UpdateMuteIcon()
-    {
-        muteIcon.SetVisibleByDisplay(volumeControl.IsMuted);
-        unmuteIcon.SetVisibleByDisplay(!volumeControl.IsMuted);
     }
 
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
