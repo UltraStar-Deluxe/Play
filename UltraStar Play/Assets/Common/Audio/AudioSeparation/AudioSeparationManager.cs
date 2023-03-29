@@ -47,6 +47,15 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
     public IObservable<AudioSeparationResult> ProcessSongMeta(SongMeta songMeta, Job audioSeparationJob = null)
     {
+        string audioUri = SongMetaUtils.GetAudioUri(songMeta);
+        string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
+        if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
+        {
+            UiManager.CreateNotification($"Vocals separation not supported for {fileExtension} files.\n" +
+                                         $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv()}");
+            return Observable.Empty<AudioSeparationResult>();
+        }
+        
         string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
 
         // Create job to show in UI
@@ -56,7 +65,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             jobManager.AddJob(audioSeparationJob);
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+
+        AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
 

@@ -425,16 +425,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private void FinishScene()
     {
-        if (ShowHighScoresNext)
-        {
-            // Go to highscore scene
-            HighscoreSceneData highscoreSceneData = new();
-            highscoreSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
-            highscoreSceneData.Difficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
-            highscoreSceneData.partyModeSceneData = PartyModeSceneData;
-            sceneNavigator.LoadScene(EScene.HighscoreScene, highscoreSceneData);
-        }
-        else if (HasPartyModeSceneData && HasFinalTeamResults)
+        if (HasPartyModeSceneData && HasFinalTeamResults)
         {
             // Go to party mode config
             sceneNavigator.LoadScene(EScene.PartyModeScene);

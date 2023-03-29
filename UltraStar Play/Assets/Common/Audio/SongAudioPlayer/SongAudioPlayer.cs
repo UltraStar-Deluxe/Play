@@ -20,6 +20,8 @@ public class SongAudioPlayer : MonoBehaviour
     private readonly LazyFromComponent<VideoPlayer> videoPlayerLazy = new(ctx => ctx.GetComponentInChildren<VideoPlayer>());
     private VideoPlayer VideoPlayer => videoPlayerLazy.GetValue(this);
 
+    private MidiManager MidiManager => MidiManager.Instance;
+    
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
 
@@ -253,6 +255,10 @@ public class SongAudioPlayer : MonoBehaviour
             // Load video file
             LoadAsVideo(audioUri);
         }
+        else if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
+        {
+            LoadMidiAsAudio(audioUri);
+        }
         else
         {
             // Load audio file
@@ -269,6 +275,21 @@ public class SongAudioPlayer : MonoBehaviour
         AudioPlayer.clip = null;
         
         DurationOfSongInMillis = 0;
+    }
+    
+    private void LoadMidiAsAudio(string uri)
+    {
+        AudioClip audioClip = MidiManager.CreateAudioClip(uri);
+        if (audioClip == null)
+        {
+            Debug.LogError($"Failed to load audio clip from MIDI file {uri}");
+            AudioPlayer.Stop();
+            return;
+        }
+        
+        AudioPlayer.clip = audioClip;
+        DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
+        loadedEventStream.OnNext(true);
     }
     
     private void LoadAsAudio(string audioUri)

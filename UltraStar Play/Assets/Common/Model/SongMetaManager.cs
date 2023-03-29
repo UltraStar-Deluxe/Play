@@ -215,7 +215,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private void GenerateSongMetasForAudioFiles(string generatedSongFolderAbsolutePath, List<string> audioFiles, List<SongMeta> existingSongMetas)
     {
         // TODO: Make this optional
-        return;
+        // return;
         
         List<string> existingSongMetaAudioFiles = existingSongMetas
             .Select(songMeta => Path.GetFullPath(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3)))
@@ -248,6 +248,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         // TODO: use https://github.com/WestHillApps/UniBpmAnalyzer to analyze bpm
+        // TODO: use https://github.com/Zeugma440/atldotnet to read meta tags.
         float bpm = 300;
 
         string absoluteSongMetaFilePath = GetAbsoluteSongMetaFilePathForAudioFile(generatedSongFolderAbsolutePath, audioFile);
@@ -255,6 +256,14 @@ public class SongMetaManager : AbstractSingletonBehaviour
         string songMetaDirectory = Path.GetDirectoryName(absoluteSongMetaFilePath);
         Dictionary<string, string> voiceNames = new();
         SongMeta songMeta = new(songMetaDirectory, songMetaFileName, "", artist, bpm, audioFile, title, voiceNames, Encoding.UTF8);
+
+        // Load lyrics and notes from MIDI file
+        string fileExtension = Path.GetExtension(new Uri(audioFile).LocalPath);
+        if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
+        {
+            songMeta.onPostProcessLoadedVoices = () => MidiToSongMetaUtils.FillSongMetaWithMidiLyricsAndNotes(songMeta);
+        }
+        
         Debug.Log("Generated SongMeta: " + songMeta);
         return songMeta;
     }

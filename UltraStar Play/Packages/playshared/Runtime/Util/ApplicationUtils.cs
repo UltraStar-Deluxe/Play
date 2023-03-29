@@ -10,12 +10,29 @@ public static class ApplicationUtils
 {
     public const string GeneratedFolderName = "Generated";
 
+    public static readonly IReadOnlyList<string> supportedMidiFiles = new List<string>
+    {
+        "mid",
+        "midi",
+        "kar",
+    };
+    
     public static readonly IReadOnlyList<string> supportedAudioFiles = new List<string>
     {
         "mp3",
         "ogg",
         "wav"
-    };
+    }.Union(supportedMidiFiles).ToList();
+
+    public static readonly IReadOnlyList<string> supportedVocalsSeparationAudioFiles = new List<string>
+    {
+        "wav",
+        "mp3",
+        "ogg",
+        "m4a",
+        "wma",
+        "flac",
+    }.Intersect(supportedAudioFiles).ToList();
 
     public static readonly IReadOnlyList<string> supportedVideoFiles = new List<string>
     {
@@ -85,6 +102,18 @@ public static class ApplicationUtils
         return supportedVideoFiles.Contains(fileExtension);
     }
 
+    public static bool IsSupportedMidiFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return supportedMidiFiles.Contains(fileExtension);
+    }
+    
+    public static bool IsSupportedVocalsSeparationAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return supportedVocalsSeparationAudioFiles.Contains(fileExtension);
+    }
+    
     private static string NormalizeFileExtension(string fileExtension)
     {
         if (fileExtension == null)

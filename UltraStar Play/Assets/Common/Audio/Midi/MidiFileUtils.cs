@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AudioSynthesis.Midi;
 using AudioSynthesis.Midi.Event;
@@ -7,6 +8,16 @@ using UnityEngine;
 
 public static class MidiFileUtils
 {
+    public static MidiFile LoadMidiFile(string path)
+    {
+        using (new DisposableStopwatch($"Loading MIDI file '{path}' took <ms>"))
+        {
+            byte[] midiFileBytes = File.ReadAllBytes(path);
+            MidiFile midiFile = new MidiFile(midiFileBytes);
+            return midiFile;
+        }
+    }
+
     public static List<int> GetTrackIndexes(MidiFile midiFile)
     {
         if (midiFile == null)
@@ -44,6 +55,22 @@ public static class MidiFileUtils
             .ToList();
     }
 
+    public static List<TrackAndChannel> GetTracksAndChannels(MidiFile midiFile)
+    {
+        List<TrackAndChannel> trackAndChannels = new();
+        List<int> trackIndexes = GetTrackIndexes(midiFile);
+        trackIndexes.ForEach(trackIndex =>
+        {
+            MidiTrack track = midiFile.Tracks[trackIndex];
+            List<int> channelIndexes = GetChannelIndexes(track, true);
+            channelIndexes.ForEach(channelIndex =>
+            {
+                trackAndChannels.Add(new (trackIndex, channelIndex));
+            });
+        });
+        return trackAndChannels;
+    }
+    
     public static List<MidiEvent> GetLyricsEvents(MidiTrack track)
     {
         List<MidiEvent> lyricsEvents = track.MidiEvents

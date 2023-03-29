@@ -173,6 +173,8 @@ public class SongMeta
 
     public bool FailedToLoadVoices { get; private set; }
 
+    public Action onPostProcessLoadedVoices;
+    
     private readonly Dictionary<string, string> unknownHeaderEntries = new();
     public IReadOnlyDictionary<string, string> UnknownHeaderEntries
     {
@@ -232,12 +234,7 @@ public class SongMeta
             // When there is an Exception, then this field is not reset.
             FailedToLoadVoices = true;
 
-            string path = Directory + Path.DirectorySeparatorChar + FileName;
-            using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
-            {
-                VoicesBuilder voicesBuilder = new(path, Encoding, Relative, false);
-                voices = new List<Voice>(voicesBuilder.GetVoices());
-            }
+            DoLoadVoices();
 
             FailedToLoadVoices = false;
         }
@@ -265,7 +262,19 @@ public class SongMeta
         voices.Remove(voice);
         voiceNames.Remove(voice.Name);
     }
-
+    
+    private void DoLoadVoices()
+    {
+        string path = Directory + Path.DirectorySeparatorChar + FileName;
+        using (new DisposableStopwatch($"Loading voices of {path} took <millis> ms"))
+        {
+            VoicesBuilder voicesBuilder = new(path, Encoding, Relative, false);
+            voices = new List<Voice>(voicesBuilder.GetVoices());
+        }
+        
+        onPostProcessLoadedVoices?.Invoke();
+    }
+    
     public void SetUnknownHeaderEntry(string key, string value)
     {
         unknownHeaderEntries[key] = value;
