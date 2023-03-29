@@ -17,6 +17,7 @@ public static partial class R
         public const string addToSongQueueAsMedleyButton = "addToSongQueueAsMedleyButton";
         public const string addToSongQueueAsNewButton = "addToSongQueueAsNewButton";
         public const string adjustFollowingNotesToggle = "adjustFollowingNotesToggle";
+        public const string advancedSearchAccordionItem = "advancedSearchAccordionItem";
         public const string allCharactersContainer = "allCharactersContainer";
         public const string amplificationPicker = "amplificationPicker";
         public const string analyzeBeatsWithoutTargetNotePicker = "analyzeBeatsWithoutTargetNotePicker";
@@ -28,7 +29,7 @@ public static partial class R
         public const string appOptionsButton = "appOptionsButton";
         public const string artistInputContainer = "artistInputContainer";
         public const string artistLabel = "artistLabel";
-        public const string artistPropertyContainer = "artistPropertyContainer";
+        public const string artistPropertyToggle = "artistPropertyToggle";
         public const string artistTextField = "artistTextField";
         public const string assignToPlayerPicker = "assignToPlayerPicker";
         public const string audioSeparationButton = "audioSeparationButton";
@@ -164,7 +165,7 @@ public static partial class R
         public const string durationLabel = "durationLabel";
         public const string easyDifficultyButton = "easyDifficultyButton";
         public const string editingGroup = "editingGroup";
-        public const string editionPropertyContainer = "editionPropertyContainer";
+        public const string editionPropertyToggle = "editionPropertyToggle";
         public const string editLyricsPopup = "editLyricsPopup";
         public const string editLyricsPopupTextField = "editLyricsPopupTextField";
         public const string editPlaylistButton = "editPlaylistButton";
@@ -178,9 +179,8 @@ public static partial class R
         public const string entryContainer = "entryContainer";
         public const string exitSceneButton = "exitSceneButton";
         public const string favoriteIcon = "favoriteIcon";
-        public const string filterContainer = "filterContainer";
-        public const string filterLabel = "filterLabel";
         public const string filterListContainer = "filterListContainer";
+        public const string filtersAccordionItem = "filtersAccordionItem";
         public const string finishConditionContainer = "finishConditionContainer";
         public const string finishConditionDescription = "finishConditionDescription";
         public const string firstPlaceTrophyImage = "firstPlaceTrophyImage";
@@ -190,7 +190,7 @@ public static partial class R
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
-        public const string genrePropertyContainer = "genrePropertyContainer";
+        public const string genrePropertyToggle = "genrePropertyToggle";
         public const string globalSettingsLabel = "globalSettingsLabel";
         public const string goldenNoteIndicator = "goldenNoteIndicator";
         public const string goldenNoteScore = "goldenNoteScore";
@@ -275,7 +275,7 @@ public static partial class R
         public const string labelContainer = "labelContainer";
         public const string labels = "labels";
         public const string languageDropdownField = "languageDropdownField";
-        public const string languagePropertyContainer = "languagePropertyContainer";
+        public const string languagePropertyToggle = "languagePropertyToggle";
         public const string layerColor = "layerColor";
         public const string layerEditableButton = "layerEditableButton";
         public const string layerEditableIcon = "layerEditableIcon";
@@ -316,7 +316,7 @@ public static partial class R
         public const string lyricsIcon = "lyricsIcon";
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsOnNotesPicker = "lyricsOnNotesPicker";
-        public const string lyricsPropertyContainer = "lyricsPropertyContainer";
+        public const string lyricsPropertyToggle = "lyricsPropertyToggle";
         public const string lyricsScrollView = "lyricsScrollView";
         public const string main = "main";
         public const string mediumDifficultyButton = "mediumDifficultyButton";
@@ -358,7 +358,6 @@ public static partial class R
         public const string musicNoteIcon = "musicNoteIcon";
         public const string musicPlaybackSpeedSlider = "musicPlaybackSpeedSlider";
         public const string musicVolumeSlider = "musicVolumeSlider";
-        public const string muteIcon = "muteIcon";
         public const string nameCharacterContainer = "nameCharacterContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
@@ -581,13 +580,14 @@ public static partial class R
         public const string scoreValue = "scoreValue";
         public const string scrollView = "scrollView";
         public const string ScrollView = "ScrollView";
+        public const string searchAudioFilesWithoutSongMetaPicker = "searchAudioFilesWithoutSongMetaPicker";
         public const string searchBarContainer = "searchBarContainer";
         public const string searchErrorIcon = "searchErrorIcon";
         public const string searchIcon = "searchIcon";
+        public const string searchPropertyAccordionItem = "searchPropertyAccordionItem";
         public const string searchPropertyButton = "searchPropertyButton";
         public const string searchPropertyDropdownContainer = "searchPropertyDropdownContainer";
         public const string searchPropertyDropdownOverlay = "searchPropertyDropdownOverlay";
-        public const string searchPropertyDropdownTitle = "searchPropertyDropdownTitle";
         public const string searchPropertyScrollView = "searchPropertyScrollView";
         public const string searchTextField = "searchTextField";
         public const string searchTextFieldHint = "searchTextFieldHint";
@@ -639,7 +639,6 @@ public static partial class R
         public const string showPlayerNamePicker = "showPlayerNamePicker";
         public const string showScoreNumberPicker = "showScoreNumberPicker";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
-        public const string showSearchExpressionInfoContainer = "showSearchExpressionInfoContainer";
         public const string showSearchExpressionInfoTitle = "showSearchExpressionInfoTitle";
         public const string showStatusBarToggle = "showStatusBarToggle";
         public const string showTeamResultsButton = "showTeamResultsButton";
@@ -760,8 +759,9 @@ public static partial class R
         public const string textFieldContainer = "textFieldContainer";
         public const string themePicker = "themePicker";
         public const string thirdTeamUi = "thirdTeamUi";
-        public const string timeBar = "timeBar";
+        public const string timeBarAndLabelContainer = "timeBarAndLabelContainer";
         public const string timeBarPositionIndicator = "timeBarPositionIndicator";
+        public const string timeBars = "timeBars";
         public const string timeValueLabel = "timeValueLabel";
         public const string title = "title";
         public const string titleAndDescription = "titleAndDescription";
@@ -771,7 +771,7 @@ public static partial class R
         public const string titleImageAndText = "titleImageAndText";
         public const string titleInputContainer = "titleInputContainer";
         public const string titleLabel = "titleLabel";
-        public const string titlePropertyContainer = "titlePropertyContainer";
+        public const string titlePropertyToggle = "titlePropertyToggle";
         public const string titleRow = "titleRow";
         public const string titleTextField = "titleTextField";
         public const string toggleCoopModeButton = "toggleCoopModeButton";
@@ -784,10 +784,10 @@ public static partial class R
         public const string toggleLayersButton = "toggleLayersButton";
         public const string toggleMicCheckButton = "toggleMicCheckButton";
         public const string toggleMicCheckButtonLabel = "toggleMicCheckButtonLabel";
-        public const string toggleMuteButton = "toggleMuteButton";
         public const string togglePlaybackButton = "togglePlaybackButton";
         public const string togglePlayerSelectedButton = "togglePlayerSelectedButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
+        public const string toggles = "toggles";
         public const string toggleSettingsButton = "toggleSettingsButton";
         public const string toggleSideBarSizeButton = "toggleSideBarSizeButton";
         public const string toggleSingingOptionsButton = "toggleSingingOptionsButton";
@@ -816,7 +816,6 @@ public static partial class R
         public const string undoButton = "undoButton";
         public const string unexpectedErrorContainer = "unexpectedErrorContainer";
         public const string unexpectedErrorLabel = "unexpectedErrorLabel";
-        public const string unmuteIcon = "unmuteIcon";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlChooserComboContainer = "urlChooserComboContainer";
         public const string urlContainer = "urlContainer";
@@ -832,6 +831,8 @@ public static partial class R
         public const string verticalGrid = "verticalGrid";
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
         public const string verticalGridLineContainer = "verticalGridLineContainer";
+        public const string verticalSeparator = "verticalSeparator";
+        public const string vfxEnabledPicker = "vfxEnabledPicker";
         public const string videoArea = "videoArea";
         public const string videoAreaContent = "videoAreaContent";
         public const string videoAreaLabel = "videoAreaLabel";
@@ -845,6 +846,9 @@ public static partial class R
         public const string voiceButtonRow = "voiceButtonRow";
         public const string voiceNameLabel = "voiceNameLabel";
         public const string volumeChooser = "volumeChooser";
+        public const string volumeIcon = "volumeIcon";
+        public const string volumeSlider = "volumeSlider";
+        public const string volumeSliderContainer = "volumeSliderContainer";
         public const string warningContainer = "warningContainer";
         public const string warningIcon = "warningIcon";
         public const string warningLabel = "warningLabel";
@@ -853,6 +857,6 @@ public static partial class R
         public const string webcamRenderContainer = "webcamRenderContainer";
         public const string webcamRenderContainerParent = "webcamRenderContainerParent";
         public const string wideIcon = "wideIcon";
-        public const string yearPropertyContainer = "yearPropertyContainer";
+        public const string yearPropertyToggle = "yearPropertyToggle";
     }
 }

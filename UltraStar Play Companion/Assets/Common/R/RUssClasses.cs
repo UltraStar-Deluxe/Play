@@ -4,7 +4,9 @@ public static partial class R
     public static class UssClasses
     {
         public const string jpg = "jpg";
-        public const string mr_2 = "mr-2";
+        public const string ml_3 = "ml-3";
+        public const string mr_3 = "mr-3";
+        public const string mr_auto = "mr-auto";
         public const string onlyVisibleWhenConnected = "onlyVisibleWhenConnected";
         public const string onlyVisibleWhenDevModeEnabled = "onlyVisibleWhenDevModeEnabled";
         public const string onlyVisibleWhenNotConnected = "onlyVisibleWhenNotConnected";
