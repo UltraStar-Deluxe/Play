@@ -13,6 +13,15 @@ public class SceneListEditorWindow : EditorWindow
     private Vector2 scrollPos;
     private bool sortAlphabetically;
 
+    private static readonly List<string> ignoredFolderNames = new List<string>
+    {
+        "Background Bokeh VFX",
+        "CartoonVFX9X",
+        "Confetti FX Pro",
+        "Hovl Studio",
+        "JMO Assets"
+    };
+    
     [MenuItem("Window/Scene List")]
     public static void ShowWindow()
     {
@@ -58,11 +67,19 @@ public class SceneListEditorWindow : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
+    private bool IsIgnored(string path)
+    {
+        string normalizedPath = path.Replace("\\", "/");
+        return ignoredFolderNames.AnyMatch(ignoredFolderName => normalizedPath.Contains($"/{ignoredFolderName}/"));
+    }
+    
     private List<string> FindScenePaths(bool sortAlphabetically)
     {
         string assetsFolder = "Assets";
         string[] files = Directory.GetFiles(assetsFolder, "*.unity", SearchOption.AllDirectories);
-        List<string> result = files.ToList();
+        List<string> result = files
+            .Where(file => !IsIgnored(file))
+            .ToList();
         if (sortAlphabetically)
         {
             result.Sort(new PathNameComparer());
