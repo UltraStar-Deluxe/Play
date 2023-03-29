@@ -55,6 +55,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     [Inject(UxmlName = R.UxmlNames.continueButton)]
     private Button continueButton;
+    
+    [Inject(UxmlName = R.UxmlNames.quitButton)]
+    private Button quitButton;
 
     [Inject(UxmlName = R.UxmlNames.restartButton)]
     private Button restartButton;
@@ -183,6 +186,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         songPreviewControl.VideoFadeInDurationInSeconds = 2;
         songPreviewControl.StartSongPreview(sceneData.SongMetas.LastOrDefault());
 
+        if (songQueueManager.IsSongQueueEmpty)
+        {
+            quitButton.HideByDisplay();
+        }
+        else
+        {
+            // Show button to go to song select, even if there are more rounds to play
+            quitButton.ShowByDisplay();
+            quitButton.RegisterCallbackButtonTriggered(_ => GoToSongSelectScene());
+        }
+        
         ActivateLayout();
         FillLayout();
 
@@ -429,33 +443,39 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         {
             // Go to party mode config
             sceneNavigator.LoadScene(EScene.PartyModeScene);
+            return;
         }
-        else if (!songQueueManager.IsSongQueueEmpty)
+        
+        if (HasPartyModeSceneData)
+        {
+            // Increase party round index
+            PartyModeSceneData.currentRoundIndex++;
+        }
+        
+        if (!songQueueManager.IsSongQueueEmpty)
         {
             // Start next game round
-            if (HasPartyModeSceneData)
-            {
-                // Increase party round index
-                PartyModeSceneData.currentRoundIndex++;
-            }
-
-            SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
-            sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
+            GoToSingScene();
         }
         else
         {
             // Go to song select scene
-            if (HasPartyModeSceneData)
-            {
-                // Increase party round index
-                PartyModeSceneData.currentRoundIndex++;
-            }
-
-            SongSelectSceneData songSelectSceneData = new();
-            songSelectSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
-            songSelectSceneData.partyModeSceneData = sceneData.partyModeSceneData;
-            sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
+            GoToSongSelectScene();
         }
+    }
+
+    private void GoToSingScene()
+    {
+        SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
+    }
+
+    private void GoToSongSelectScene()
+    {
+        SongSelectSceneData songSelectSceneData = new();
+        songSelectSceneData.SongMeta = sceneData.SongMetas.LastOrDefault();
+        songSelectSceneData.partyModeSceneData = sceneData.partyModeSceneData;
+        sceneNavigator.LoadScene(EScene.SongSelectScene, songSelectSceneData);
     }
 
     public void Continue()
