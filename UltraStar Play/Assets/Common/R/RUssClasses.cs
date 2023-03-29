@@ -67,6 +67,7 @@ public static partial class R
         public const string mr_2 = "mr-2";
         public const string mr_3 = "mr-3";
         public const string mr_4 = "mr-4";
+        public const string mt_2 = "mt-2";
         public const string mt_3 = "mt-3";
         public const string mt_4 = "mt-4";
         public const string mt_auto = "mt-auto";
@@ -106,7 +107,6 @@ public static partial class R
         public const string rounded = "rounded";
         public const string roundedbox = "roundedbox";
         public const string scoreRow = "scoreRow";
-        public const string searchPropertyContainer = "searchPropertyContainer";
         public const string secondaryFontColor = "secondaryFontColor";
         public const string secondarySideBarPanel = "secondarySideBarPanel";
         public const string secondarySideBarTitle = "secondarySideBarTitle";
@@ -140,6 +140,7 @@ public static partial class R
         public const string transparentBackgroundColor = "transparentBackgroundColor";
         public const string transparentButton = "transparentButton";
         public const string unity_base_field = "unity-base-field";
+        public const string unity_base_slider__horizontal = "unity-base-slider--horizontal";
         public const string unity_button = "unity-button";
         public const string unity_toggle = "unity-toggle";
         public const string verticalGridLine = "verticalGridLine";

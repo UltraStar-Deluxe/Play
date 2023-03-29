@@ -9,6 +9,8 @@ using UnityEngine.UIElements;
 
 public class DefaultFocusableNavigator : FocusableNavigator
 {
+    public static DefaultFocusableNavigator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<DefaultFocusableNavigator>();
+    
 	public override void OnInjectionFinished() {
         if (!gameObject.activeInHierarchy)
         {

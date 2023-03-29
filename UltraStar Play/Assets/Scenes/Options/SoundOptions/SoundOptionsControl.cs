@@ -81,14 +81,11 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
             newValue => settings.AudioSettings.soundfontPath = newValue);
         
         testSoundfontButton.RegisterCallbackButtonTriggered(_ => TestSoundfont());
-        
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(5)
-            .Subscribe(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
     }
 
     private void TestSoundfont()
     {
-        midiManager.PlayMidiFile(new MidiFile(new StreamingAssetResource(streamingAssetsMidiTestFile)));
+        midiManager.PlayMidiFile(new MidiFile(new StreamingAssetsSoundfontResource(streamingAssetsMidiTestFile)));
     }
 
     public void UpdateTranslation()

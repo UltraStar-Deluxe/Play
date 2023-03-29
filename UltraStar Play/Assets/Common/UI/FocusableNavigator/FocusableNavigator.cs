@@ -414,6 +414,21 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
+    public void RemoveCustomNavigationTarget(
+        VisualElement startVisualElement,
+        Vector2 navigationDirection,
+        bool alsoAddOppositeDirection = false)
+    {
+        CustomNavigationTarget customNavigationTarget = customNavigationTargets
+            .FirstOrDefault(it => it.StartVisualElement == startVisualElement && it.NavigationDirection == navigationDirection);
+        customNavigationTargets.Remove(customNavigationTarget);
+
+        if (alsoAddOppositeDirection)
+        {
+            RemoveCustomNavigationTarget(startVisualElement, -navigationDirection, false);
+        }
+    }
+
     private static float GetVisualElementDistance(VisualElement visualElementA, VisualElement visualElementB)
     {
         float RectangleDistance(Rect rectA, Rect rectB)

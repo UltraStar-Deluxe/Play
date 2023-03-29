@@ -21,6 +21,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private static List<SongIssue> SongErrors => allSongIssues.Where(songIssue => songIssue.Severity == ESongIssueSeverity.Error).ToList();
     private static List<SongIssue> SongWarnings => allSongIssues.Where(songIssue => songIssue.Severity == ESongIssueSeverity.Warning).ToList();
 
+    private static Dictionary<string, List<string>> directoryToImageFiles = new();
+    private static List<string> imageFileExtensionPatterns;
+    
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
@@ -214,8 +217,10 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private void GenerateSongMetasForAudioFiles(string generatedSongFolderAbsolutePath, List<string> audioFiles, List<SongMeta> existingSongMetas)
     {
-        // TODO: Make this optional
-        // return;
+        if (!Settings.GameSettings.searchAudioFilesWithoutSongMeta)
+        {
+            return;
+        }
         
         List<string> existingSongMetaAudioFiles = existingSongMetas
             .Select(songMeta => Path.GetFullPath(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3)))
@@ -251,12 +256,25 @@ public class SongMetaManager : AbstractSingletonBehaviour
         // TODO: use https://github.com/Zeugma440/atldotnet to read meta tags.
         float bpm = 300;
 
-        string absoluteSongMetaFilePath = GetAbsoluteSongMetaFilePathForAudioFile(generatedSongFolderAbsolutePath, audioFile);
+        string audioFileDirectory = Path.GetDirectoryName(audioFile);
+        string absoluteSongMetaFilePath = GetAbsoluteGeneratedSongMetaFilePathForAudioFile(generatedSongFolderAbsolutePath, audioFile);
         string songMetaFileName = Path.GetFileName(absoluteSongMetaFilePath);
         string songMetaDirectory = Path.GetDirectoryName(absoluteSongMetaFilePath);
         Dictionary<string, string> voiceNames = new();
         SongMeta songMeta = new(songMetaDirectory, songMetaFileName, "", artist, bpm, audioFile, title, voiceNames, Encoding.UTF8);
 
+        if (songMeta.Cover.IsNullOrEmpty()
+            && TryFindCoverImageInSameFolder(audioFileDirectory, out string coverImage))
+        {
+            songMeta.Cover = coverImage;
+        }
+        
+        if (songMeta.Background.IsNullOrEmpty()
+            && TryFindBackgroundImageInSameFolder(audioFileDirectory, out string backgroundImage))
+        {
+            songMeta.Background = backgroundImage;
+        }
+        
         // Load lyrics and notes from MIDI file
         string fileExtension = Path.GetExtension(new Uri(audioFile).LocalPath);
         if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
@@ -268,7 +286,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         return songMeta;
     }
 
-    public static string GetAbsoluteSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
+    public static string GetAbsoluteGeneratedSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
     {
         return ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, audioFile) + "/song-info.txt";
     }
@@ -375,6 +393,19 @@ public class SongMetaManager : AbstractSingletonBehaviour
             if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
             {
                 // No issues or only warnings, thus ok.
+                
+                if (newSongMeta.Cover.IsNullOrEmpty()
+                    && TryFindCoverImageInSameFolder(newSongMeta.Directory, out string coverImage))
+                {
+                    newSongMeta.Cover = Path.GetFileName(coverImage);
+                }
+                
+                if (newSongMeta.Background.IsNullOrEmpty()
+                    && TryFindCoverImageInSameFolder(newSongMeta.Directory, out string backgroundImage))
+                {
+                    newSongMeta.Background = Path.GetFileName(backgroundImage);
+                }
+                
                 songMeta = newSongMeta;
                 return true;
             }
@@ -391,6 +422,69 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         songMeta = null;
         return false;
+    }
+
+    private bool TryFindImagesFiles(string folder, out List<string> imageFiles)
+    {
+        if (!DirectoryUtils.Exists(folder))
+        {
+            imageFiles = null;
+            return false;
+        }
+
+        if (!directoryToImageFiles.TryGetValue(folder, out imageFiles))
+        {
+            imageFiles = ScanForImageFiles(new List<string>() { folder });
+            directoryToImageFiles[folder] = imageFiles;
+        }
+
+        return !imageFiles.IsNullOrEmpty();
+    }
+    
+    private bool TryFindCoverImageInSameFolder(string folder, out string imageFile)
+    {
+        if (!TryFindImagesFiles(folder, out List<string> imageFiles))
+        {
+            imageFile = "";
+            return false;
+        }
+        
+        // Prefer image files that have "cover" or similar in their name.
+        List<string> searchTerms = new List<string>() { "cover", "front", "album", "co" };
+        imageFile = imageFiles
+            .FirstOrDefault(imageFile => searchTerms.AnyMatch(searchTerm =>
+                imageFile.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
+            .OrIfNull(imageFiles.FirstOrDefault());
+        return true;
+    }
+    
+    private bool TryFindBackgroundImageInSameFolder(string folder, out string imageFile)
+    {
+        if (!TryFindImagesFiles(folder, out List<string> imageFiles))
+        {
+            imageFile = "";
+            return false;
+        }
+        
+        // Prefer image files that have "background" or similar in their name.
+        List<string> searchTerms = new List<string>() { "background", "back", "bg" };
+        imageFile = imageFiles
+            .FirstOrDefault(imageFile => searchTerms.AnyMatch(searchTerm =>
+                imageFile.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
+            .OrIfNull(imageFiles.FirstOrDefault());
+        return true;
+    }
+
+    private List<string> ScanForImageFiles(List<string> folders)
+    {
+        if (imageFileExtensionPatterns == null)
+        {
+            imageFileExtensionPatterns = ApplicationUtils.supportedImageFiles
+                .Select(fileExtension => "*." + fileExtension)
+                .ToList();
+        }
+        
+        return ScanForFiles(folders, imageFileExtensionPatterns);
     }
 
     public void SaveSong(SongMeta songMeta, bool isAutoSave)

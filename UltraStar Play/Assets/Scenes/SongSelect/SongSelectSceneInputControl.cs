@@ -29,9 +29,15 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
     private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;
+
+    private bool isPointerOverSongList;
     
     void Start()
     {
+        songListView.RegisterCallback<PointerEnterEvent>(_ => isPointerOverSongList = true, TrickleDown.TrickleDown);
+        songListView.RegisterCallback<PointerLeaveEvent>(_ => isPointerOverSongList = false, TrickleDown.TrickleDown);
+        songListView.ReleaseMouse();
+            
         // Toggle song is favorite
         InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).PerformedAsObservable()
             .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() == 0)
@@ -90,6 +96,11 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
+        if (!isPointerOverSongList)
+        {
+            return;
+        }
+        
         if (context.ReadValue<Vector2>().y < 0) 
         {
             songRouletteControl.SelectNextSong();

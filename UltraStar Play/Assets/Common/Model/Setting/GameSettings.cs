@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class GameSettings
 {
     public SystemLanguage language = SystemLanguage.English;
     public List<string> songDirs = new();
+    public bool searchAudioFilesWithoutSongMeta = true;
     public EScoreMode ScoreMode { get; set; } = EScoreMode.Individual;
     public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
     public string CommonScoreNameSeparator { get; set; } = " & ";

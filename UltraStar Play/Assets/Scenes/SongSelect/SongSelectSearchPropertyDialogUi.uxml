@@ -12,47 +12,30 @@
         </ui:VisualElement>
         <ui:Label text="Order" display-tooltip-when-elided="true" name="orderChooserTitle" class="smallFont" style="margin-bottom: 5px;" />
         <ui:EnumField choices="Order by Title, Order by Artist" name="songOrderDropdownField" type="ESongOrder, Common" class="roundCorners mb-3" style="flex-grow: 1;" />
-        <ui:Label text="Search in" display-tooltip-when-elided="true" name="searchPropertyDropdownTitle" class="smallFont" style="margin-bottom: 5px;" />
-        <ui:VisualElement name="artistPropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
-            <ui:Toggle />
-            <ui:Label text="Artist" display-tooltip-when-elided="true" style="margin-right: 5px;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="titlePropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
-            <ui:Toggle />
-            <ui:Label text="Title" display-tooltip-when-elided="true" style="margin-right: 5px;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="genrePropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
-            <ui:Toggle />
-            <ui:Label text="Genre" display-tooltip-when-elided="true" style="margin-right: 5px;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="yearPropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
-            <ui:Toggle />
-            <ui:Label text="Year" display-tooltip-when-elided="true" style="margin-right: 5px;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="languagePropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
-            <ui:Toggle />
-            <ui:Label text="Language" display-tooltip-when-elided="true" style="margin-right: 5px;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="editionPropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
-            <ui:Toggle />
-            <ui:Label text="Edition" display-tooltip-when-elided="true" style="margin-right: 5px;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="lyricsPropertyContainer" class="searchPropertyContainer" style="flex-direction: row-reverse; align-items: center;">
-            <ui:Toggle />
-            <ui:Label text="Lyrics" display-tooltip-when-elided="true" style="margin-right: 5px;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="filterContainer" style="align-items: flex-end;">
-            <ui:Label text="Filter by:" display-tooltip-when-elided="true" name="filterLabel" class="smallFont" style="margin-bottom: 5px; margin-right: auto;" />
-            <ui:Toggle label="Duet" name="showOnlyDuetsToggle" />
-            <ui:VisualElement name="filterListContainer" style="width: 100%; align-items: flex-end;" />
-        </ui:VisualElement>
-        <ui:VisualElement name="showSearchExpressionInfoContainer" style="align-items: flex-start;">
-            <ui:Label text="Advanced search available" display-tooltip-when-elided="true" name="showSearchExpressionInfoTitle" class="smallFont" style="margin-bottom: 5px;" />
-            <ui:VisualElement style="align-items: auto; width: 100%;">
-                <ui:Button display-tooltip-when-elided="true" name="showSearchExpressionInfoButton" class="squareButton" style="width: auto; height: auto;">
-                    <MaterialIcon name="helpIcon" icon="help_outline" />
-                </ui:Button>
-            </ui:VisualElement>
-        </ui:VisualElement>
+        <AccordionGroup>
+            <AccordionItem label="Search In" name="searchPropertyAccordionItem" content-visible="false">
+                <ui:VisualElement name="toggles" class="child-mb-2" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                    <ui:Toggle name="artistPropertyToggle" label="Artist" class="mt-2" />
+                    <ui:Toggle name="titlePropertyToggle" label="Title" />
+                    <ui:Toggle name="genrePropertyToggle" label="Genre" />
+                    <ui:Toggle name="yearPropertyToggle" label="Year" />
+                    <ui:Toggle name="languagePropertyToggle" label="Language" />
+                    <ui:Toggle name="editionPropertyToggle" label="Edition" />
+                    <ui:Toggle name="lyricsPropertyToggle" label="Lyrics" />
+                </ui:VisualElement>
+            </AccordionItem>
+            <AccordionItem name="filtersAccordionItem" label="Filter By" content-visible="false">
+                <ui:Toggle label="Duet" name="showOnlyDuetsToggle" class="mb-2 mt-2" />
+                <ui:VisualElement name="filterListContainer" class="child-mb-2" style="width: 100%; align-items: stretch;" />
+            </AccordionItem>
+            <AccordionItem name="advancedSearchAccordionItem" label="Advanced Search" content-visible="false">
+                <ui:Label text="Advanced search available" display-tooltip-when-elided="true" name="showSearchExpressionInfoTitle" class="smallFont" style="margin-bottom: 5px;" />
+                <ui:VisualElement style="align-items: auto; width: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="showSearchExpressionInfoButton" class="squareButton" style="width: auto; height: auto;">
+                        <MaterialIcon name="helpIcon" icon="help_outline" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </AccordionItem>
+        </AccordionGroup>
     </ui:ScrollView>
 </ui:UXML>

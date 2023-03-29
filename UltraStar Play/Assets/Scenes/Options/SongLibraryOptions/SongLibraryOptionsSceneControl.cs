@@ -331,5 +331,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         settings.GameSettings.songDirs = settings.GameSettings.songDirs
             .Distinct()
             .ToList();
+
+        songMetaManager.ReloadSongMetas();
     }
 }

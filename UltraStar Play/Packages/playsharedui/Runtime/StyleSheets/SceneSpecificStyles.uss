@@ -10,6 +10,10 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+.searchFilterLabel {
+    align-self: flex-end;
+}
+
 .songSelectLyricsPreview {
     width: 100%;
     white-space: normal;

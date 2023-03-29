@@ -58,7 +58,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
             stopwatch.Stop();
             if (logSceneChangeDuration)
             {
-                Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms (including animation)");
+                Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms (including animation if fade in/out transition is used)");
             }
         }).AddTo(gameObject);
     }

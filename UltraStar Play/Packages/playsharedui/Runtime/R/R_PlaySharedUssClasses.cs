@@ -120,6 +120,7 @@ public static partial class R_PlayShared
         public const string roundedCorners = "roundedCorners";
         public const string scoreRow = "scoreRow";
         public const string scrollingNoteStreamSentenceSeparator = "scrollingNoteStreamSentenceSeparator";
+        public const string searchFilterLabel = "searchFilterLabel";
         public const string searchPropertyContainer = "searchPropertyContainer";
         public const string secondaryFontColor = "secondaryFontColor";
         public const string settingsProblemHintIcon = "settingsProblemHintIcon";
