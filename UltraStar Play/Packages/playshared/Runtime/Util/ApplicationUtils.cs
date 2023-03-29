@@ -10,6 +10,13 @@ public static class ApplicationUtils
 {
     public const string GeneratedFolderName = "Generated";
 
+    public static readonly IReadOnlyList<string> supportedImageFiles = new List<string>
+    {
+        "png",
+        "jpg",
+        "jpeg",
+    };
+
     public static readonly IReadOnlyList<string> supportedMidiFiles = new List<string>
     {
         "mid",
