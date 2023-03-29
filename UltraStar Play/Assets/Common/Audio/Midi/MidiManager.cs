@@ -132,7 +132,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (existingInstance == null)
         {
-            return new MidiSamplesGenerator(audioFilterReadSampleRate, patchBank, settings.SongEditorSettings.MidiGain);
+            return new MidiSamplesGenerator(audioFilterReadSampleRate, patchBank, settings.SongEditorSettings.MidiGain, true);
         }
         else
         {

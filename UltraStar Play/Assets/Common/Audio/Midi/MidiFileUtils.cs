@@ -55,6 +55,22 @@ public static class MidiFileUtils
             .ToList();
     }
 
+    public static List<TrackAndChannel> GetTracksAndChannels(MidiFile midiFile)
+    {
+        List<TrackAndChannel> trackAndChannels = new();
+        List<int> trackIndexes = GetTrackIndexes(midiFile);
+        trackIndexes.ForEach(trackIndex =>
+        {
+            MidiTrack track = midiFile.Tracks[trackIndex];
+            List<int> channelIndexes = GetChannelIndexes(track, true);
+            channelIndexes.ForEach(channelIndex =>
+            {
+                trackAndChannels.Add(new (trackIndex, channelIndex));
+            });
+        });
+        return trackAndChannels;
+    }
+    
     public static List<MidiEvent> GetLyricsEvents(MidiTrack track)
     {
         List<MidiEvent> lyricsEvents = track.MidiEvents

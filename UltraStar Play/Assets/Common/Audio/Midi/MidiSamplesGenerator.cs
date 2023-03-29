@@ -28,7 +28,7 @@ public class MidiSamplesGenerator
 
     private CircularBuffer<float> availableSingleChannelOutputSamples;
 
-    public MidiSamplesGenerator(int sampleRate, PatchBank patchBank, float gain = 0.75f)
+    public MidiSamplesGenerator(int sampleRate, PatchBank patchBank, float gain = 0.75f, bool loop = false)
     {
         availableSingleChannelOutputSamples = new CircularBuffer<float>(sampleRate);
 
@@ -37,6 +37,7 @@ public class MidiSamplesGenerator
         midiSynthesizer.LoadBank(patchBank);
         midiSequencer = new MidiFileSequencer(midiSynthesizer);
         Gain = gain;
+        Loop = loop;
     }
     
     public void FillOutputBuffer(float[] data, int outputChannelCount)
