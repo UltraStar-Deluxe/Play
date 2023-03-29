@@ -15,7 +15,8 @@ public static class AudioUtils
 
     private static AudioClip LoadAudio(string uri, bool streamAudio)
     {
-        using UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(new Uri(uri), AudioType.UNKNOWN);
+        Uri uriHandle = new Uri(uri);
+        using UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uriHandle, AudioType.UNKNOWN);
         DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
         downloadHandler.streamAudio = streamAudio;
 
@@ -34,7 +35,10 @@ public static class AudioUtils
             return null;
         }
 
-        return downloadHandler.audioClip;
+        AudioClip audioClip = downloadHandler.audioClip;
+        string fileName = Path.GetFileName(uriHandle.LocalPath);
+        audioClip.name = $"Audio file '{fileName}'";
+        return audioClip;
     }
 
     public static float[] ToMonoAudioSamples(float[] originalSamples, int channelCount)

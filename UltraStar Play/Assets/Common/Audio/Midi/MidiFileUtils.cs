@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AudioSynthesis.Midi;
 using AudioSynthesis.Midi.Event;
@@ -7,6 +8,16 @@ using UnityEngine;
 
 public static class MidiFileUtils
 {
+    public static MidiFile LoadMidiFile(string path)
+    {
+        using (new DisposableStopwatch($"Loading MIDI file '{path}' took <ms>"))
+        {
+            byte[] midiFileBytes = File.ReadAllBytes(path);
+            MidiFile midiFile = new MidiFile(midiFileBytes);
+            return midiFile;
+        }
+    }
+
     public static List<int> GetTrackIndexes(MidiFile midiFile)
     {
         if (midiFile == null)

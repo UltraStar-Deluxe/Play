@@ -172,7 +172,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         {
             int trackIndex = midiTrackIndexPickerControl.SelectedItem.trackIndex;
             int channelIndex = midiTrackIndexPickerControl.SelectedItem.channelIndex;
-            MidiFile midiFileCopy = midiManager.LoadMidiFile(MidiFilePath);
+            MidiFile midiFileCopy = MidiFileUtils.LoadMidiFile(MidiFilePath);
             
             MidiFileUtils.CalculateMidiEventTimesInMillis(
                 midiFileCopy,
@@ -243,7 +243,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         try
         {
-            midiFile = midiFileImporter.LoadMidiFile(MidiFilePath);
+            midiFile = MidiFileUtils.LoadMidiFile(MidiFilePath);
         }
         catch (Exception e)
         {

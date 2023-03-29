@@ -47,7 +47,7 @@ public class SongEditorMidiFileImporter : INeedInjection
             return;
         }
 
-        MidiFile midiFile = midiManager.LoadMidiFile(midiFilePath);
+        MidiFile midiFile = MidiFileUtils.LoadMidiFile(midiFilePath);
         
         MidiFileUtils.CalculateMidiEventTimesInMillis(
             midiFile,
@@ -146,11 +146,6 @@ public class SongEditorMidiFileImporter : INeedInjection
         });
     }
 
-    public MidiFile LoadMidiFile(string filePath)
-    {
-        return midiManager.LoadMidiFile(filePath);
-    }
-    
     private void ShiftNotesToPlaybackPosition(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())

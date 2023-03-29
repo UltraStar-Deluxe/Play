@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -101,6 +102,13 @@ public class OverviewAreaControl : IInjectionFinishedListener
                 return;
             }
 
+            string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
+            if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
+            {
+                // Cannot draw audio wave form of MIDI file.
+                return;
+            }
+            
             // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
             AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
             audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);
