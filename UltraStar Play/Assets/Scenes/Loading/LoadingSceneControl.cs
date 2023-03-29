@@ -92,6 +92,8 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             }
         }
 
+        MidiManager.Instance.InitIfNotDoneYet();
+        
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () => FinishScene()));
     }
 
