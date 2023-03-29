@@ -25,32 +25,29 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject(UxmlName = R.UxmlNames.searchPropertyButton)]
     private Button searchPropertyButton;
 
-    [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownTitle)]
-    private Label searchPropertyDropdownTitle;
-
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
 
-    [Inject(UxmlName = R.UxmlNames.artistPropertyContainer)]
-    private VisualElement artistPropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.artistPropertyToggle)]
+    private Toggle artistPropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.titlePropertyContainer)]
-    private VisualElement titlePropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.titlePropertyToggle)]
+    private Toggle titlePropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.genrePropertyContainer)]
-    private VisualElement genrePropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.genrePropertyToggle)]
+    private Toggle genrePropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.yearPropertyContainer)]
-    private VisualElement yearPropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.yearPropertyToggle)]
+    private Toggle yearPropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.editionPropertyContainer)]
-    private VisualElement editionPropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.editionPropertyToggle)]
+    private Toggle editionPropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.languagePropertyContainer)]
-    private VisualElement languagePropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.languagePropertyToggle)]
+    private Toggle languagePropertyToggle;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsPropertyContainer)]
-    private VisualElement lyricsPropertyContainer;
+    [Inject(UxmlName = R.UxmlNames.lyricsPropertyToggle)]
+    private Toggle lyricsPropertyToggle;
 
     [Inject(UxmlName = R.UxmlNames.searchErrorIcon)]
     private VisualElement searchErrorIcon;
@@ -113,13 +110,13 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             songSelectFilterControl.InitFilters();
         }
         
-        RegisterToggleSearchPropertyCallback(artistPropertyContainer.Q<Toggle>(), ESearchProperty.Artist);
-        RegisterToggleSearchPropertyCallback(titlePropertyContainer.Q<Toggle>(), ESearchProperty.Title);
-        RegisterToggleSearchPropertyCallback(genrePropertyContainer.Q<Toggle>(), ESearchProperty.Genre);
-        RegisterToggleSearchPropertyCallback(yearPropertyContainer.Q<Toggle>(), ESearchProperty.Year);
-        RegisterToggleSearchPropertyCallback(editionPropertyContainer.Q<Toggle>(), ESearchProperty.Edition);
-        RegisterToggleSearchPropertyCallback(languagePropertyContainer.Q<Toggle>(), ESearchProperty.Language);
-        RegisterToggleSearchPropertyCallback(lyricsPropertyContainer.Q<Toggle>(), ESearchProperty.Lyrics);
+        RegisterToggleSearchPropertyCallback(artistPropertyToggle, ESearchProperty.Artist);
+        RegisterToggleSearchPropertyCallback(titlePropertyToggle, ESearchProperty.Title);
+        RegisterToggleSearchPropertyCallback(genrePropertyToggle, ESearchProperty.Genre);
+        RegisterToggleSearchPropertyCallback(yearPropertyToggle, ESearchProperty.Year);
+        RegisterToggleSearchPropertyCallback(editionPropertyToggle, ESearchProperty.Edition);
+        RegisterToggleSearchPropertyCallback(languagePropertyToggle, ESearchProperty.Language);
+        RegisterToggleSearchPropertyCallback(lyricsPropertyToggle, ESearchProperty.Lyrics);
 
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
 
@@ -170,9 +167,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void ShowSearchPropertyDropdownOverlay()
     {
         searchPropertyDropdownOverlay.ShowByDisplay();
-        artistPropertyContainer.Q<Toggle>().Focus();
-
-        songSelectFilterControl.InitFilters();
+        artistPropertyToggle.Q<Toggle>().Focus();
     }
 
     public void HideSearchPropertyDropdownOverlay()
@@ -371,14 +366,13 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     public void UpdateTranslation()
     {
-        searchPropertyDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchPropertyDropdownTitle);
-        artistPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_artist);
-        titlePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_title);
-        editionPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_edition);
-        genrePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_genre);
-        languagePropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_language);
-        lyricsPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
-        yearPropertyContainer.Q<Label>().text = TranslationManager.GetTranslation(R.Messages.songProperty_year);
+        artistPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_artist);
+        titlePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_title);
+        editionPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_edition);
+        genrePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_genre);
+        languagePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_language);
+        lyricsPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
+        yearPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_year);
         searchTextFieldHint.text = "What do you want to sing today?";
     }
 }

@@ -19,6 +19,9 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     [Inject(UxmlName = R.UxmlNames.showOnlyDuetsToggle)]
     private Toggle showOnlyDuetsToggle;
     
+    [Inject(UxmlName = R.UxmlNames.filtersAccordionItem)]
+    private AccordionItem filtersAccordionItem;
+    
     private bool isInitialized;
 
     private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => settings.activeSearchPropertyFilters;
@@ -36,6 +39,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             settings.isShowOnlyDuetsFilterActive = evt.newValue;
             filtersChangedEventStream.OnNext(true);
         });
+
+        filtersAccordionItem.AfterContentVisibleChangedEventStream.Subscribe(_ => InitFilters());
     }
     
     public void InitFilters()
@@ -122,6 +127,10 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         
         searchProperties.ForEach(searchProperty => FillFilterList(searchProperty));
         
+        filtersAccordionItem.UpdateTargetHeight();
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(filterListContainer);
+        
         filtersChangedEventStream.OnNext(true);
     }
 
@@ -135,10 +144,12 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             .ToList();
 
         Label propertyLabel = new(StringUtils.ToTitleCase(searchProperty.ToString()));
+        propertyLabel.AddToClassList("searchFilterLabel");
         filterListContainer.Add(propertyLabel);
         foreach (string value in values)
         {
             Toggle filterToggle = new(value);
+            filterToggle.AddToClassList("searchFilterToggle");
             filterListContainer.Add(filterToggle);
     
             SearchPropertyFilter searchPropertyFilter = new()

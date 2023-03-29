@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class AccordionItem : VisualElement
@@ -47,7 +49,13 @@ public class AccordionItem : VisualElement
     }
     
     public override VisualElement contentContainer => ContentElement;
+
+    private readonly Subject<bool> beforeContentVisibleChangedEventStream = new();
+    public IObservable<bool> BeforeContentVisibleChangedEventStream => beforeContentVisibleChangedEventStream;
     
+    private readonly Subject<bool> afterContentVisibleChangedEventStream = new();
+    public IObservable<bool> AfterContentVisibleChangedEventStream => afterContentVisibleChangedEventStream;
+
     private Label TitleElement { get; set; }
     private Button ToggleContentButton { get; set; }
     private VisualElement ContentElement { get; set; }
@@ -97,6 +105,8 @@ public class AccordionItem : VisualElement
             {
                 ContentElement.style.height = targetContentHeight;
             }
+            
+            afterContentVisibleChangedEventStream.OnNext(ContentVisible);
         });
 
         Title = title;
@@ -132,6 +142,8 @@ public class AccordionItem : VisualElement
             return;
         }
         
+        beforeContentVisibleChangedEventStream.OnNext(true);
+        
         this.AddToClassList("expanded");
         if (targetContentHeight >= 0)
         {
@@ -151,6 +163,8 @@ public class AccordionItem : VisualElement
             return;
         }
 
+        beforeContentVisibleChangedEventStream.OnNext(false);
+        
         this.RemoveFromClassList("expanded");
         if (targetContentHeight >= 0)
         {
