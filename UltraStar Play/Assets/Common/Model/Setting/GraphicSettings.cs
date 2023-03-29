@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [Serializable]
 public class GraphicSettings
@@ -22,4 +21,5 @@ public class GraphicSettings
     public bool showScoreNumbers;
     public bool animatedBackground;
     public int backgroundLightIndex = 1;
+    public bool enableVfx = true;
 }

@@ -47,6 +47,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.backgroundLightItemPicker)]
     private ItemPicker backgroundLightItemPicker;
     
+    [Inject(UxmlName = R.UxmlNames.vfxEnabledPicker)]
+    private ItemPicker vfxEnabledPicker;
+
     [Inject]
     private UiManager uiManager;
     
@@ -80,6 +83,10 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         new LabeledItemPickerControl<ESceneChangeAnimation>(sceneChangeAnimationPicker, EnumUtils.GetValuesAsList<ESceneChangeAnimation>())
             .Bind(() => settings.GraphicSettings.sceneChangeAnimation,
                 newValue => settings.GraphicSettings.sceneChangeAnimation = newValue);
+
+        new BoolPickerControl(vfxEnabledPicker)
+            .Bind(() => settings.GraphicSettings.enableVfx, 
+                newValue => settings.GraphicSettings.enableVfx = newValue);
 
         LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.55f, 0.05f));
         sceneChangeDurationPickerControl.Bind(() => settings.GraphicSettings.sceneChangeDurationInSeconds,

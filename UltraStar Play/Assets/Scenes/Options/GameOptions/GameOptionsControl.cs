@@ -24,6 +24,9 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
     [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
     private DropdownField languageDropdownField;
 
+    [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaPicker)]
+    private ItemPicker searchAudioFilesWithoutSongMetaPicker;
+
     protected override void Start()
     {
         base.Start();
@@ -31,6 +34,10 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
         new ScoreModeItemPickerControl(scoreModePicker)
             .Bind(() => settings.GameSettings.ScoreMode,
                   newValue => settings.GameSettings.ScoreMode = newValue);
+
+        new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
+            .Bind(() => settings.GameSettings.searchAudioFilesWithoutSongMeta,
+                newValue => settings.GameSettings.searchAudioFilesWithoutSongMeta = newValue);
 
         NumberPickerControl passTheMicTimeItemPickerControl = new NumberPickerControl(passTheMicTimeItemPicker, 20);
         passTheMicTimeItemPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";

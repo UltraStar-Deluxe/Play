@@ -52,6 +52,9 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private PanelHelper panelHelper;
     
+    [Inject]
+    private Settings settings;
+    
     private Image foregroundVfxElement;
     private Image backgroundVfxElement;
 
@@ -179,22 +182,27 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         uiDocument.rootVisualElement.Q(R.UxmlNames.background)?.AddAsFirstChild(backgroundVfxElement);
     }
 
-    public static GameObject CreateParticleEffect(ParticleEffectConfig particleEffectConfig)
+    public static void CreateParticleEffect(ParticleEffectConfig particleEffectConfig)
     {
         VfxManager vfxManager = Instance;
         if (vfxManager == null)
         {
-            return null;
-        }
-        return vfxManager.DoCreateParticleEffect(particleEffectConfig);
+            return;
+        } 
+        vfxManager.DoCreateParticleEffect(particleEffectConfig);
     }
     
-    private GameObject DoCreateParticleEffect(ParticleEffectConfig particleEffectConfig)
+    private void DoCreateParticleEffect(ParticleEffectConfig particleEffectConfig)
     {
+        if (!settings.GraphicSettings.enableVfx)
+        {
+            return;
+        }
+        
         if (!particleEffectToPrefabMap.TryGetValue(particleEffectConfig.particleEffect, out GameObject particleSystemPrefab)
             || particleSystemPrefab == null)
         {
-            return null;
+            return;
         }
         
         Transform newParent = particleEffectConfig.isBackground
@@ -234,8 +242,6 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         DoUpdateParticleSystemWithTarget(particleEffectConfig, particleSystemInstance);
         
         RegisterTargetCallbacks(particleEffectConfig, particleSystemInstance);
-        
-        return particleSystemInstance;
     }
 
     private void UpdateParticleEffectEmissionModule(GameObject particleSystemInstance, Action<ParticleSystem.EmissionModule> callback)
