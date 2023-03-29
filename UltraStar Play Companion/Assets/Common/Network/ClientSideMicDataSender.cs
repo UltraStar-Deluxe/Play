@@ -122,10 +122,9 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         for (int beat = firstNextBeatToAnalyze; beat <= currentBeatConsideringMicDelay; beat++)
         {
             PitchEvent pitchEvent = AnalyzeMicSamplesOfBeat(recordingEvent, beat, estimatedPositionInSongInMillis);
-            int midiNote = pitchEvent != null
-                ? pitchEvent.MidiNote
-                : -1;
-            beatPitchEvents.Add(new BeatPitchEvent(midiNote, beat));
+            int midiNote = pitchEvent?.MidiNote ?? -1;
+            float frequency = pitchEvent?.Frequency ?? -1;
+            beatPitchEvents.Add(new BeatPitchEvent(midiNote, beat, frequency));
 
             loopCount++;
             if (loopCount > maxLoopCount)
@@ -137,7 +136,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
         // Send all events int one message
         List<BeatPitchEventDto> beatPitchEventDtos = beatPitchEvents
-            .Select(it => new BeatPitchEventDto(it.MidiNote, it.Beat))
+            .Select(it => new BeatPitchEventDto(it.MidiNote, it.Beat, it.Frequency))
             .ToList();
         if (beatPitchEventDtos.Count > 3)
         {
@@ -157,10 +156,9 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             settings.MicProfile.AmplificationMultiplier,
             settings.MicProfile.NoiseSuppression);
 
-        int midiNote = pitchEvent != null
-            ? pitchEvent.MidiNote
-            : -1;
-        BeatPitchEventDto beatPitchEventDto = new(midiNote, -1);
+        int midiNote = pitchEvent?.MidiNote ?? -1;
+        float frequency = pitchEvent?.Frequency ?? -1;
+        BeatPitchEventDto beatPitchEventDto = new(midiNote, -1, frequency);
         SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDto));
     }
 
