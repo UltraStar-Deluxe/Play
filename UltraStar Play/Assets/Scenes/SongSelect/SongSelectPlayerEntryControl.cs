@@ -47,6 +47,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject]
     private Settings settings;
     
+    [Inject]
+    private FocusableNavigator focusableNavigator;
+    
     // The PlayerProfile is set in Init and must not be null.
     public PlayerProfile PlayerProfile { get; private set; }
 
@@ -122,6 +125,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
         togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ => IsSelected.Value = !IsSelected.Value);
         micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
+        
+        focusableNavigator.AddCustomNavigationTarget(micButton, Vector2.left, togglePlayerSelectedButton, true);
         
         IsSelected.Subscribe(newValue =>
         {
@@ -288,5 +293,6 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     public void Dispose()
     {
         GameObject.Destroy(micPitchTracker);
+        focusableNavigator.RemoveCustomNavigationTarget(micButton, Vector2.left, true);
     }
 }
