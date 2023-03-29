@@ -17,17 +17,9 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static MidiManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MidiManager>();
 
-    // MIDI sound is generated for 1 channel (mono).
-    public static readonly int midiSynthesizerChannelCount = 1;
-
-    // Factor to amplify the generated midi samples.
-    public float midiGain = 1f;
-
     [InjectedInInspector]
     public TextAsset defaultSoundfontAsset;
     
-    private readonly int bufferSize = 1024;
-
     // "volume" for the midi events.
     [Range(0, 127)]
     private int midiVelocity;
@@ -38,15 +30,11 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    private MidiFileSequencer midiSequencer;
-    private Synthesizer midiSynthesizer;
-    private PatchBank bank;
+    private PatchBank patchBank;
 
     private int audioFilterReadSampleRate;
-    private CircularBuffer<float> availableSingleChannelOutputSamples;
 
     private bool isInitialized;
-    private bool loop;
     private AudioSource audioSource;
 
     public bool IsPlayingMidiFile { get; private set; }
@@ -55,6 +43,9 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
     private AudioClip midiAudioClip;
     private bool ignoreInitialOnAudioClipSetPositionCallback;
+    
+    private MidiSamplesGenerator onAudioFilterReadMidiSamplesGenerator;
+    private MidiSamplesGenerator audioClipMidiSamplesGenerator;
 
     protected override object GetInstance()
     {
@@ -65,7 +56,6 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     {
         audioSource = GetComponent<AudioSource>();
         audioFilterReadSampleRate = UnityEngine.AudioSettings.outputSampleRate;
-        availableSingleChannelOutputSamples = new CircularBuffer<float>(audioFilterReadSampleRate);
     }
 
     protected override void StartSingleton()
@@ -76,14 +66,16 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             .Subscribe(newMidiVelocity => midiVelocity = newMidiVelocity)
             .AddTo(gameObject);
 
-        midiGain = settings.SongEditorSettings.MidiGain;
         settings.SongEditorSettings.ObserveEveryValueChanged(it => it.MidiGain)
             .Subscribe(newMidiGain =>
             {
-                midiGain = newMidiGain;
-                if (midiSynthesizer != null)
+                if (onAudioFilterReadMidiSamplesGenerator != null)
                 {
-                    midiSynthesizer.MixGain = newMidiGain;
+                    onAudioFilterReadMidiSamplesGenerator.Gain = newMidiGain;
+                }
+                if (audioClipMidiSamplesGenerator != null)
+                {
+                    audioClipMidiSamplesGenerator.Gain = newMidiGain;
                 }
             })
             .AddTo(gameObject);
@@ -92,7 +84,12 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             .Subscribe(newValue => OnSoundfontPathChanged())
             .AddTo(gameObject);
 
-        sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => DestroyAudioClip());
+        sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ =>
+        {
+            StopMidiFile();
+            StopAllMidiNotes();
+            DestroyMidiAudioClip();
+        });
     }
 
     public void InitIfNotDoneYet()
@@ -103,12 +100,20 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         }
         using DisposableStopwatch d = new DisposableStopwatch("Initialize MidiManager took <ms>");
 
-        midiSynthesizer = new Synthesizer(audioFilterReadSampleRate, midiSynthesizerChannelCount, bufferSize, 16);
-        midiSynthesizer.MixGain = midiGain;
+        InitPatchBank();
+        onAudioFilterReadMidiSamplesGenerator = CreateOrUpdateMidiSamplesGenerator(audioClipMidiSamplesGenerator);
+        audioClipMidiSamplesGenerator = CreateOrUpdateMidiSamplesGenerator(audioClipMidiSamplesGenerator);
+        
+        audioSource.Play();
 
+        isInitialized = true;
+    }
+
+    private void InitPatchBank()
+    {
         if (FileUtils.Exists(settings.AudioSettings.soundfontPath))
         {
-            bank = new PatchBank(new FileSystemSoundfontResource(settings.AudioSettings.soundfontPath));
+            patchBank = new PatchBank(new FileSystemSoundfontResource(settings.AudioSettings.soundfontPath));
         }
         else
         {
@@ -119,16 +124,22 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.LogWarning(message);
             }
             
-            bank = new PatchBank(new TextAssetSoundfontResource(defaultSoundfontAsset));
+            patchBank = new PatchBank(new TextAssetSoundfontResource(defaultSoundfontAsset));
         }
-        
-        midiSynthesizer.UnloadBank();
-        midiSynthesizer.LoadBank(bank);
-        midiSequencer = new MidiFileSequencer(midiSynthesizer);
+    }
 
-        audioSource.Play();
-
-        isInitialized = true;
+    private MidiSamplesGenerator CreateOrUpdateMidiSamplesGenerator(MidiSamplesGenerator existingInstance)
+    {
+        if (existingInstance == null)
+        {
+            return new MidiSamplesGenerator(audioFilterReadSampleRate, patchBank, settings.SongEditorSettings.MidiGain);
+        }
+        else
+        {
+            existingInstance.LoadBank(patchBank);
+            existingInstance.Gain = settings.SongEditorSettings.MidiGain;
+            return existingInstance;
+        }
     }
 
     private void OnSoundfontPathChanged()
@@ -141,9 +152,10 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         
         // Unload everything
         audioSource.Stop();
-        midiSequencer.Stop();
-        midiSequencer.UnloadMidi();
-        midiSynthesizer.UnloadBank();
+        onAudioFilterReadMidiSamplesGenerator?.UnloadMidi();
+        onAudioFilterReadMidiSamplesGenerator?.UnloadBank();
+        audioClipMidiSamplesGenerator?.UnloadMidi();
+        audioClipMidiSamplesGenerator?.UnloadBank();
         isInitialized = false;
     }
     
@@ -151,28 +163,16 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     {
         InitIfNotDoneYet();
 
-        UnloadMidiFile();
-        
-        midiSequencer.LoadMidi(midiFile);
-        midiSequencer.Play();
-        IsPlayingMidiFile = true;
-    }
-
-    private void UnloadMidiFile()
-    {
-        if (midiSequencer.IsMidiLoaded)
+        if (onAudioFilterReadMidiSamplesGenerator.IsMidiLoaded)
         {
-            midiSequencer.Stop();
-            midiSequencer.ResetMidi();
-            midiSequencer.UnloadMidi();
+            onAudioFilterReadMidiSamplesGenerator.UnloadMidi();
         }
         IsPlayingMidiFile = false;
         
         StopAllMidiNotes();
         
-        availableSingleChannelOutputSamples?.Clear();
-        
-        DestroyAudioClip();
+        onAudioFilterReadMidiSamplesGenerator.LoadMidi(midiFile);
+        IsPlayingMidiFile = true;
     }
 
     public void StopMidiFile()
@@ -182,8 +182,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         
-        midiSequencer.Stop();
-        midiSequencer.ResetMidi();
+        onAudioFilterReadMidiSamplesGenerator.Stop();
         IsPlayingMidiFile = false;
     }
     
@@ -191,13 +190,13 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     {
         InitIfNotDoneYet();
         isPlayingMidiNote = true;
-        midiSynthesizer.NoteOn(0, midiNote, midiVelocity);
+        onAudioFilterReadMidiSamplesGenerator.NoteOn(0, midiNote, midiVelocity);
     }
 
     public void PlayMidiNoteForDuration(int midiNote, float durationInSeconds)
     {
         InitIfNotDoneYet();
-        midiSynthesizer.NoteOn(0, midiNote, midiVelocity);
+        onAudioFilterReadMidiSamplesGenerator.NoteOn(0, midiNote, midiVelocity);
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
     }
 
@@ -209,7 +208,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         }
         
         InitIfNotDoneYet();
-        midiSynthesizer.NoteOff(0, midiNote);
+        onAudioFilterReadMidiSamplesGenerator.NoteOff(0, midiNote);
         isPlayingMidiNote = false;
         stopMidiNoteTimeMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
@@ -217,7 +216,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     public void StopAllMidiNotes(bool immediate = true)
     {
         InitIfNotDoneYet();
-        midiSynthesizer.NoteOffAll(immediate);
+        onAudioFilterReadMidiSamplesGenerator.NoteOffAll(immediate);
         isPlayingMidiNote = false;
         stopMidiNoteTimeMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
@@ -238,8 +237,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     //	so calling into many Unity functions from this function is not allowed ( a warning will show up ). 	
     private void OnAudioFilterRead(float[] data, int outputChannelCount)
     {
-        if (!isInitialized
-            || midiAudioClip != null)
+        if (!isInitialized)
         {
             return;
         }
@@ -248,50 +246,14 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             || isPlayingMidiNote
             || TimeUtils.GetUnixTimeMilliseconds() - stopMidiNoteTimeMillis < 2000)
         {
-            FillOutputBuffer(data, outputChannelCount);
+            onAudioFilterReadMidiSamplesGenerator.FillOutputBuffer(data, outputChannelCount);
         }
     }
 
-    private void FillOutputBuffer(float[] data, int outputChannelCount)
-    {
-        if (data == null)
-        {
-            return;
-        }
-        
-        // Synthesize new samples from the Midi instrument until there is enough to fill the data array.
-        int neededSingleChannelSamples = data.Length / outputChannelCount;
-        if (neededSingleChannelSamples >= availableSingleChannelOutputSamples.Capacity)
-        {
-            Debug.LogWarning($"available sample capacity is too small. Samples needed: {neededSingleChannelSamples}, capacity: {availableSingleChannelOutputSamples.Capacity}");
-            neededSingleChannelSamples = availableSingleChannelOutputSamples.Capacity - 1;
-        }
-        while (availableSingleChannelOutputSamples.Count < neededSingleChannelSamples)
-        {
-            midiSequencer.FillMidiEventQueue(loop);
-            midiSynthesizer.GetNext();
-            for (int i = 0; i < midiSynthesizer.WorkingBuffer.Length; i++)
-            {
-                availableSingleChannelOutputSamples.PushBack(midiSynthesizer.WorkingBuffer[i]);
-            }
-        }
-
-        // The Midi stream is generated in mono (1 channel).
-        // These samples are written to every channel of the output data array.
-        for (int outputSampleIndex = 0; outputSampleIndex < data.Length && !availableSingleChannelOutputSamples.IsEmpty; outputSampleIndex += outputChannelCount)
-        {
-            float sampleValue = availableSingleChannelOutputSamples.Front();
-            availableSingleChannelOutputSamples.PopFront();
-
-            for (int outputChannelIndex = 0; outputChannelIndex < outputChannelCount; outputChannelIndex++)
-            {
-                data[outputSampleIndex + outputChannelIndex] = sampleValue;
-            }
-        }
-    }
-    
     public AudioClip CreateAudioClip(string midiFilePath)
     {
+        DestroyMidiAudioClip();
+        
         if (!FileUtils.Exists(midiFilePath))
         {
             Debug.LogError($"MIDI file does not exist: {midiFilePath}");
@@ -300,10 +262,8 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
         // This MIDI file will synthesize samples for the AudioClip.
         InitIfNotDoneYet();
-        UnloadMidiFile();
         MidiFile midiFile = MidiFileUtils.LoadMidiFile(midiFilePath);
-        midiSequencer.LoadMidi(midiFile);
-        midiSequencer.Play();
+        audioClipMidiSamplesGenerator.LoadMidi(midiFile);
 
         using (new DisposableStopwatch($"Creating AudioClip from MIDI file '{midiFilePath}' took <ms>"))
         {
@@ -316,7 +276,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             
             midiAudioClip = AudioClip.Create($"MIDI file '{Path.GetFileName(midiFilePath)}'",
                 audioClipLengthInSamples,
-                midiSynthesizerChannelCount,
+                MidiSamplesGenerator.MidiSynthesizerChannelCount,
                 audioClipSampleRate,
                 true,
                 OnAudioClipRead,
@@ -326,11 +286,11 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public void DestroyAudioClip()
+    public void DestroyMidiAudioClip()
     {
         if (midiAudioClip != null)
         {
-            Debug.Log("DestroyAudioClip");
+            Debug.Log("Destroy AudioClip of MIDI file");
             Destroy(midiAudioClip);
             midiAudioClip = null;
         }
@@ -338,7 +298,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     
     private void OnAudioClipRead(float[] data)
     {
-        FillOutputBuffer(data, midiSynthesizerChannelCount);
+        audioClipMidiSamplesGenerator.FillOutputBuffer(data, MidiSamplesGenerator.MidiSynthesizerChannelCount);
     }
 
     private void OnAudioClipSetPosition(int positionInSamples)
@@ -350,6 +310,6 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         
-        midiSequencer.SeekSampleTime(positionInSamples);
+        audioClipMidiSamplesGenerator.SeekSampleTime(positionInSamples);
     }
 }
