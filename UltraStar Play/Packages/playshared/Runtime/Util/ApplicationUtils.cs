@@ -79,6 +79,11 @@ public static class ApplicationUtils
 #endif
     }
 
+    public static string GetPersistentDataPath(string pathInPersistentDataFolder)
+    {
+        return Application.persistentDataPath + "/" + pathInPersistentDataFolder;
+    }
+    
     public static Vector2 GetScreenSize()
     {
         return new Vector2(Screen.width, Screen.height);
