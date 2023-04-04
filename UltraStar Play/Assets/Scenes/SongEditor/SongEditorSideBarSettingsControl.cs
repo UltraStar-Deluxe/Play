@@ -300,7 +300,22 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(audioSeparationCommandTextField,
             () => settings.SongEditorSettings.AudioSeparationCommand,
             newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
-        audioSeparationButton.RegisterCallbackButtonTriggered(_ => audioSeparationManager.ProcessSongMeta(songMeta));
+        audioSeparationButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
+                && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
+            {
+                UiManager.CreateNotification("Vocals and instrumental audio already exists");
+                return;
+            }
+            audioSeparationManager.ProcessSongMeta(songMeta);
+            audioSeparationButton.SetEnabled(false);
+        });
+        if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
+            && SongMetaUtils.InstrumentalAudioResourceExists(songMeta))
+        {
+            audioSeparationButton.SetEnabled(false);
+        }
 
         // Show / hide VisualElements
         Bind(showLyricsAreaToggle,

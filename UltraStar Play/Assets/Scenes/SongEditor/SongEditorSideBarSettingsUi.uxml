@@ -32,8 +32,7 @@
             <ItemPicker name="pitchDetectionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio Source" class="controlWithLabelVertical" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="audioSeparationGroup" label="Audio Separation">
-            <ui:TextField value="python -m spleeter" text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
-            <ui:Button text="Extract Vocals Audio" display-tooltip-when-elided="true" name="audioSeparationButton" />
+            <ui:TextField value="python -m spleeter" text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Command" class="smallControl" style="flex-grow: 1; flex-direction: column;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="buttonRecordingGroup" label="Button Tapping">
             <ui:TextField picking-mode="Ignore" value="N" text="N" name="buttonRecordingButtonTextField" is-delayed="true" label="Button for tapping" style="flex-direction: column;" />
