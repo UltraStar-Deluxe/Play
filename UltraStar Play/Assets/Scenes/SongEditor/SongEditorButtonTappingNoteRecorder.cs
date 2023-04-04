@@ -86,7 +86,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
                 .ToList();
             if (pressedKeysDisplayNames.Contains(settings.SongEditorSettings.ButtonDisplayNameForButtonRecording.ToUpperInvariant()))
             {
-                RecordNote(settings.SongEditorSettings.MidiNoteForButtonRecording,
+                RecordNote(settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                     currentBeat,
                     ESongEditorLayer.ButtonRecording);
             }

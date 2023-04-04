@@ -97,7 +97,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         int lengthInBeats = maxBeat - minBeat;
 
         contextMenu.AddSeparator();
-        contextMenu.AddButton("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
+        contextMenu.AddButton("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
         contextMenu.AddButton("Pitch detection", () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource));
     }
 

@@ -50,7 +50,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int minBeat = SongMetaUtils.MinBeat(selectedNotes);
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
         double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
-        Job speechRecognitionJob = new("Speech recognition to set lyrics");
+        Job speechRecognitionJob = new("Speech recognition");
         jobManager.AddJob(speechRecognitionJob);
         speechRecognitionJob.EstimatedTotalDurationInMillis =
             SpeechRecognitionUtils.GetEstimatedSpeechRecognitionDurationInMillis(lengthInMillis);
@@ -134,7 +134,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 null,
                 speechRecognizer,
                 continuous,
-                settings.SongEditorSettings.MidiNoteForSpeechRecognition,
+                settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
                 offsetInBeats)
             .CatchIgnore((Exception ex) =>
@@ -202,7 +202,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 JobManager.CreateAndAddJob("Speech Recognition"),
                 speechRecognizer,
                 continuous,
-                settings.SongEditorSettings.MidiNoteForSpeechRecognition,
+                settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
                 startBeat)
             .CatchIgnore((Exception ex) =>

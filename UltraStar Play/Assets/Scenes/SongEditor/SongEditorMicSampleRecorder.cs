@@ -174,19 +174,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         int offsetInBeats = (int)BpmUtils.MillisecondInSongToBeat(songMeta, offsetInMillis);
         
         Debug.Log($"Analyzing speech from second {fromIndex / SampleRate} to second {toIndex / SampleRate} (length: {(lengthInSamples) / SampleRate} seconds)");
-        speechRecognitionAction.CreateNotesFromSpeechRecognition(RecordingBuffer, fromIndex, toIndex, SampleRate, 2, true, speechRecognitionParameters, speechRecognizer, true, offsetInBeats)
-            .Subscribe(createdNotes =>
-            {
-                if (createdNotes.IsNullOrEmpty()
-                    || !settings.SongEditorSettings.pitchDetectionWhenRecording
-                    || !SongMetaUtils.VocalsAudioResourceExists(songMeta))
-                {
-                    return;
-                }
-                
-                // Move to analyzed pitch
-                pitchDetectionAction.MoveNotesToDetectedPitch(createdNotes, true, ESongEditorSamplesSource.Vocals);
-            });
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(RecordingBuffer, fromIndex, toIndex, SampleRate, 2, true, speechRecognitionParameters, speechRecognizer, true, offsetInBeats);
     }
 
     private void UpdateRecordingStartIndex()

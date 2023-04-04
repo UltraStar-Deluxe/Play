@@ -12,13 +12,11 @@ public class SongEditorSettings
 
     // Recording in SongEditorScene
     public MicProfile MicProfile { get; set; }
-    public int MicOctaveOffset { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
     public bool IsRecordingEnabled { get; set; }
-    public int MidiNoteForButtonRecording { get; set; } = MidiUtils.MidiNoteConcertPitch;
+    public int DefaultPitchForCreatedNotes { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
     public bool speechRecognitionWhenRecording = true;
-    public bool pitchDetectionWhenRecording = true;
 
     public bool AdjustFollowingNotes { get; set; }
 
@@ -46,7 +44,6 @@ public class SongEditorSettings
     // Speech recognition
     public string SpeechRecognitionModelPath { get; set; } = "";
     public string SpeechRecognitionPhrases { get; set; } = "";
-    public int MidiNoteForSpeechRecognition { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public ESongEditorSamplesSource SpeechRecognitionSamplesSource { get; set; } = ESongEditorSamplesSource.Recording;
 
     // Pitch detection

@@ -33,24 +33,18 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
 
-    [Inject(UxmlName = R.UxmlNames.micOctaveOffsetTextField)]
-    private TextField micOctaveOffsetTextField;
-
     [Inject(UxmlName = R.UxmlNames.micDelayTextField)]
     private TextField micDelayTextField;
 
     [Inject(UxmlName = R.UxmlNames.speechRecognitionWhenRecordingToggle)]
     private Toggle speechRecognitionWhenRecordingToggle;
 
-    [Inject(UxmlName = R.UxmlNames.pitchDetectionWhenRecordingToggle)]
-    private Toggle pitchDetectionWhenRecordingToggle;
-
-    [Inject(UxmlName = R.UxmlNames.recordSamplesInsteadOfNotesToggle)]
-    private Toggle recordSamplesInsteadOfNotesToggle;
-
     [Inject(UxmlName = R.UxmlNames.buttonRecordingPitchTextField)]
     private TextField buttonRecordingPitchTextField;
 
+    [Inject(UxmlName = R.UxmlNames.micRecordingPitchTextField)]
+    private TextField micRecordingPitchTextField;
+    
     [Inject(UxmlName = R.UxmlNames.buttonRecordingButtonTextField)]
     private TextField buttonRecordingButtonTextField;
 
@@ -110,9 +104,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.speechRecognitionPhrasesTextField)]
     private TextField speechRecognitionPhrasesTextField;
-
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionPitchTextField)]
-    private TextField speechRecognitionPitchTextField;
 
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmItemPicker)]
     private ItemPicker pitchDetectionAlgorithmItemPicker;
@@ -227,9 +218,16 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.MicProfile = newValue);
         new AutoFitLabelControl(micDeviceItemPickerControl.ItemPicker.ItemLabel, 8, 15);
         
-        Bind(micOctaveOffsetTextField,
-            () => settings.SongEditorSettings.MicOctaveOffset.ToString(),
-            newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MicOctaveOffset = newIntValue));
+        Bind(micRecordingPitchTextField,
+            () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
+            newValue =>
+            {
+                if (MidiUtils.TryParseMidiNoteName(newValue, out int newMidiNote))
+                {
+                    settings.SongEditorSettings.DefaultPitchForCreatedNotes = newMidiNote;
+                }
+            });
+        
         Bind(micDelayTextField,
             () => settings.SongEditorSettings.MicDelayInMillis.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MicDelayInMillis = newIntValue));
@@ -239,19 +237,14 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.speechRecognitionWhenRecording,
             newValue => settings.SongEditorSettings.speechRecognitionWhenRecording = newValue);
 
-        // Move created notes to analyzed pitch
-        Bind(pitchDetectionWhenRecordingToggle,
-            () => settings.SongEditorSettings.pitchDetectionWhenRecording,
-            newValue => settings.SongEditorSettings.pitchDetectionWhenRecording = newValue);
-
         // Button recording settings
         Bind(buttonRecordingPitchTextField,
-            () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.MidiNoteForButtonRecording),
+            () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
             newValue =>
             {
                 if (MidiUtils.TryParseMidiNoteName(newValue, out int newMidiNote))
                 {
-                    settings.SongEditorSettings.MidiNoteForButtonRecording = newMidiNote;
+                    settings.SongEditorSettings.DefaultPitchForCreatedNotes = newMidiNote;
                 }
             });
         Bind(buttonRecordingButtonTextField,
@@ -281,15 +274,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(speechRecognitionPhrasesTextField,
             () => settings.SongEditorSettings.SpeechRecognitionPhrases,
             newValue => settings.SongEditorSettings.SpeechRecognitionPhrases = newValue);
-        Bind(speechRecognitionPitchTextField,
-            () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.MidiNoteForSpeechRecognition),
-            newValue =>
-            {
-                if (MidiUtils.TryParseMidiNoteName(newValue, out int newMidiNote))
-                {
-                    settings.SongEditorSettings.MidiNoteForSpeechRecognition = newMidiNote;
-                }
-            });
+        
         if (PlatformUtils.IsStandalone)
         {
             selectModelPathButton.RegisterCallbackButtonTriggered(_ =>

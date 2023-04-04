@@ -119,7 +119,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         speechRecognitionJob,
                         speechRecognizer,
                         false,
-                        settings.SongEditorSettings.MidiNoteForSpeechRecognition,
+                        settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                         songMeta,
                         0)
                     .CatchIgnore((Exception ex) =>
