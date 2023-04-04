@@ -27,12 +27,12 @@
             <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" label="Words to recognize" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;" />
             <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="speechRecognitionPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio Source" class="controlWithLabelVertical" />
-            <ui:Button text="Analyze Speech" display-tooltip-when-elided="true" name="doSpeechRecognitionButton" style="width: 100%;" />
+            <ui:Button text="Analyze Speech&#10;in Selection" display-tooltip-when-elided="true" name="doSpeechRecognitionButton" style="width: 100%;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="pitchDetectionGroup" label="Pitch Detection">
             <ItemPicker no-previous-button="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" label="Algorithm" class="smallControl controlWithLabelVertical" style="max-height: none;" />
             <ItemPicker name="pitchDetectionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio Source" class="controlWithLabelVertical" />
-            <ui:Button text="Detect Pitch" display-tooltip-when-elided="true" name="doPitchDetectionButton" style="width: 100%;" />
+            <ui:Button text="Detect Pitch&#10;in Selection" display-tooltip-when-elided="true" name="doPitchDetectionButton" style="width: 100%;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="audioSeparationGroup" label="Audio Separation">
             <ui:TextField value="python -m spleeter" text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Command" class="smallControl" style="flex-grow: 1; flex-direction: column;" />

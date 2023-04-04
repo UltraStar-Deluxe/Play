@@ -210,12 +210,24 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     {
         SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
         VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
-        speechRecognitionAction.CreateNotesFromSpeechRecognition(0, (int)songAudioPlayer.DurationOfSongInBeats, settings.SongEditorSettings.SpeechRecognitionSamplesSource, 2, true, speechRecognitionParameters, speechRecognizer, false);
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(
+            NoteAreaSelectionDragListener.LastSelectionRect.MinBeat,
+            NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats,
+            settings.SongEditorSettings.SpeechRecognitionSamplesSource,
+            2,
+            true,
+            speechRecognitionParameters,
+            speechRecognizer,
+            false);
     }
 
     private void DoDetectPitch()
     {
-        pitchDetectionAction.CreateNotesForDetectedPitch(0, (int)songAudioPlayer.DurationOfSongInBeats, settings.SongEditorSettings.PitchDetectionSamplesSource, true);
+        pitchDetectionAction.CreateNotesForDetectedPitch(
+            NoteAreaSelectionDragListener.LastSelectionRect.MinBeat,
+            NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats,
+            settings.SongEditorSettings.PitchDetectionSamplesSource,
+            true);
     }
 
     private void UpdateRecordingButton()
