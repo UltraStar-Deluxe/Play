@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -105,14 +106,22 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                     speechRecognitionModelPath,
                     SpeechRecognitionUtils.GetSpeechRecognitionPhrases(settings.SongEditorSettings.SpeechRecognitionPhrases));
 
+                VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+
+                float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
+
                 SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
-                        songMeta,
-                        vocalsAudioClip,
+                        monoAudioSamples,
                         0,
-                        lengthInBeats,
+                        monoAudioSamples.Length - 1,
+                        vocalsAudioClip.frequency,
                         speechRecognitionParameters,
+                        speechRecognitionJob,
+                        speechRecognizer,
+                        false,
                         settings.SongEditorSettings.MidiNoteForSpeechRecognition,
-                        speechRecognitionJob)
+                        songMeta,
+                        0)
                     .CatchIgnore((Exception ex) =>
                     {
                         Debug.LogError(ex);

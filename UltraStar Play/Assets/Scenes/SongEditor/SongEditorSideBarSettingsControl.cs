@@ -36,8 +36,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.micDelayTextField)]
     private TextField micDelayTextField;
 
-    [Inject(UxmlName = R.UxmlNames.detectSpeechAfterRecordingToggle)]
-    private Toggle detectSpeechAfterRecordingToggle;
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionWhenRecordingToggle)]
+    private Toggle speechRecognitionWhenRecordingToggle;
+
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionWhenRecordingToggle)]
+    private Toggle pitchDetectionWhenRecordingToggle;
 
     [Inject(UxmlName = R.UxmlNames.recordSamplesInsteadOfNotesToggle)]
     private Toggle recordSamplesInsteadOfNotesToggle;
@@ -229,9 +232,14 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MicDelayInMillis = newIntValue));
 
         // Record notes or audio
-        Bind(detectSpeechAfterRecordingToggle,
-            () => settings.SongEditorSettings.DetectSpeechAfterRecording,
-            newValue => settings.SongEditorSettings.DetectSpeechAfterRecording = newValue);
+        Bind(speechRecognitionWhenRecordingToggle,
+            () => settings.SongEditorSettings.speechRecognitionWhenRecording,
+            newValue => settings.SongEditorSettings.speechRecognitionWhenRecording = newValue);
+
+        // Move created notes to analyzed pitch
+        Bind(pitchDetectionWhenRecordingToggle,
+            () => settings.SongEditorSettings.pitchDetectionWhenRecording,
+            newValue => settings.SongEditorSettings.pitchDetectionWhenRecording = newValue);
 
         // Button recording settings
         Bind(buttonRecordingPitchTextField,

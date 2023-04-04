@@ -16,7 +16,8 @@
         "playshared",
         "playsharedui",
         "AndroidRuntimePermissions.Runtime",
-        "UnityStandaloneFileBrowser"
+        "UnityStandaloneFileBrowser",
+        "Vosk"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -17,7 +17,8 @@ public class SongEditorSettings
     public bool IsRecordingEnabled { get; set; }
     public int MidiNoteForButtonRecording { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
-    public bool DetectSpeechAfterRecording { get; set; } = true;
+    public bool speechRecognitionWhenRecording = true;
+    public bool pitchDetectionWhenRecording = true;
 
     public bool AdjustFollowingNotes { get; set; }
 

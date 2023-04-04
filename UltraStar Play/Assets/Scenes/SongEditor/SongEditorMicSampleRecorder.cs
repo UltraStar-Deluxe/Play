@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -40,12 +41,18 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
     
+    [Inject]
+    private PitchDetectionAction pitchDetectionAction;
+    
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private MicSampleRecorder micSampleRecorder;
     
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
+    [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
+    
     private AudioWaveFormVisualization recordedAudioWaveFormVisualization;
 
     private AudioClip audioClip;
@@ -61,33 +68,37 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     public bool HasRecordedAudio { get; private set; }
 
     public float[] RecordingBuffer { get; private set; }
+    private int recordingIndex;
     private int recordingStartIndex;
-    private int speechRecognitionStartBeat;
 
     private readonly Subject<bool> recordedSamplesChangedEventStream = new Subject<bool>();
     public IObservable<bool> RecordedSamplesChangedEventStream => recordedSamplesChangedEventStream;
 
     private int SampleRate => micSampleRecorder.FinalSampleRate.Value;
 
+    private bool areLastNonAnalyzedSamplesAboveThreshold;
+    private int analyzeStartIndex;
+
+    private bool speechRecognizerDirty;
+    private SpeechRecognitionParameters speechRecognitionParameters;
+    private VoskRecognizer speechRecognizer;
+    
     public void OnInjectionFinished()
     {
         InitMicSampleRecorder();
-        micSampleRecorder.RecordingEventStream.Subscribe(OnRecordingEvent);
+        micSampleRecorder.RecordingEventStream.Subscribe(RecordSamples);
 
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(evt =>
         {
             UpdateRecordingStartIndex();
-            UpdateSpeechRecognitionStartBeat();
         });
         songAudioPlayer.JumpForwardInSongEventStream.Subscribe(evt =>
         {
             UpdateRecordingStartIndex();
-            UpdateSpeechRecognitionStartBeat();
         });
         songAudioPlayer.JumpBackInSongEventStream.Subscribe(evt =>
         {
             UpdateRecordingStartIndex();
-            UpdateSpeechRecognitionStartBeat();
         });
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(evt =>
         {
@@ -110,6 +121,15 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
                     DrawRecordedSamplesWaveForm();
                 }
             });
+        
+        RecordedSamplesChangedEventStream.Buffer(new TimeSpan(0, 0, 0, 0, 1000))
+            .Subscribe(events =>
+            {
+                if (events.Count > 0)
+                {
+                    DoSpeechRecognitionForNewlyRecordedSamples();
+                }
+            });
 
         // Load recorded samples from cache
         if (songMetaToRecordedAudioSamples.ContainsKey(songMeta))
@@ -129,28 +149,51 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
 
     private void DoSpeechRecognitionForNewlyRecordedSamples()
     {
-        if (!settings.SongEditorSettings.DetectSpeechAfterRecording
-            || !settings.SongEditorSettings.IsRecordingEnabled)
+        if (!settings.SongEditorSettings.speechRecognitionWhenRecording
+            || !settings.SongEditorSettings.IsRecordingEnabled
+            || !HasRecordedAudio
+            || SpeechRecognitionUtils.IsSpeechRecognitionRunning)
         {
             return;
         }
 
-        int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
-        int lengthInBeats = currentBeat - speechRecognitionStartBeat;
-        Debug.Log($"Analyzing speech from beat {speechRecognitionStartBeat} to beat {currentBeat} (length: {lengthInBeats} beats)");
-        speechRecognitionAction.CreateNotesFromSpeechRecognition(speechRecognitionStartBeat, lengthInBeats, ESongEditorSamplesSource.Recording, 2, true);
+        if (speechRecognizerDirty)
+        {
+            speechRecognizerDirty = false;
+            InitSpeechRecognizer();
+        }
 
-        UpdateSpeechRecognitionStartBeat();
+        int micDelayInSamples = GetMicDelayInSamples();
+        int fromIndex = analyzeStartIndex - micDelayInSamples;
+        int toIndex = recordingIndex - micDelayInSamples - 1;
+        int lengthInSamples = toIndex - fromIndex;
+        analyzeStartIndex = recordingIndex;
+
+        double offsetInMillis = ((double)recordingStartIndex / SampleRate) * 1000.0;
+        int offsetInBeats = (int)BpmUtils.MillisecondInSongToBeat(songMeta, offsetInMillis);
+        Debug.Log("offsetInBeats: " + offsetInBeats);
+        
+        Debug.Log($"Analyzing speech from second {fromIndex / SampleRate} to second {toIndex / SampleRate} (length: {(lengthInSamples) / SampleRate} seconds)");
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(RecordingBuffer, fromIndex, toIndex, SampleRate, 2, true, speechRecognitionParameters, speechRecognizer, true, offsetInBeats)
+            .Subscribe(createdNotes =>
+            {
+                if (createdNotes.IsNullOrEmpty()
+                    || !settings.SongEditorSettings.pitchDetectionWhenRecording
+                    || !SongMetaUtils.VocalsAudioResourceExists(songMeta))
+                {
+                    return;
+                }
+                
+                // Move to analyzed pitch
+                pitchDetectionAction.MoveNotesToDetectedPitch(createdNotes, true, ESongEditorSamplesSource.Vocals);
+            });
     }
 
     private void UpdateRecordingStartIndex()
     {
         recordingStartIndex = (int)Math.Floor(songAudioPlayer.PositionInSongInSeconds * SampleRate);
-    }
-
-    private void UpdateSpeechRecognitionStartBeat()
-    {
-        speechRecognitionStartBeat = (int)songAudioPlayer.GetCurrentBeat(true);
+        recordingIndex = recordingStartIndex;
+        analyzeStartIndex = recordingIndex;
     }
 
     private void FillAudioClipWithRecordingBuffer()
@@ -162,11 +205,6 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         }
 
         audioClip.SetData(RecordingBuffer, 0);
-    }
-
-    private void OnRecordingEvent(RecordingEvent recordingEvent)
-    {
-        RecordSamples(recordingEvent);
     }
 
     private void DrawRecordedSamplesWaveForm()
@@ -187,7 +225,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         InitRecordingBufferIfNeeded();
 
         // Copy samples from mic buffer to recording buffer
-        int micDelayInSamples = (int)(micSampleRecorder.MicProfile.DelayInMillis / 1000.0 * SampleRate);
+        int micDelayInSamples = GetMicDelayInSamples();
         
         // bool isAboveNoiseSuppressionThreshold = AbstractAudioSamplesAnalyzer.IsAboveNoiseSuppressionThreshold(
         //     recordingEvent.MicSamples,
@@ -197,22 +235,27 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         
         for (int i = 0; i < recordingEvent.NewSampleCount; i++)
         {
-            int sampleIndexInRecordingBuffer = recordingStartIndex + i - micDelayInSamples;
+            int sampleIndexInRecordingBuffer = recordingIndex + i - micDelayInSamples;
             if (sampleIndexInRecordingBuffer > 0
                 && sampleIndexInRecordingBuffer < RecordingBuffer.Length)
             {
                 float recordedSampleValue = recordingEvent.MicSamples[recordingEvent.NewSamplesStartIndex + i];
                 
                 RecordingBuffer[sampleIndexInRecordingBuffer] = recordedSampleValue;
-                // RecordingBuffer[sampleIndexInRecordingBuffer] = isAboveNoiseSuppressionThreshold
-                //     ? recordedSampleValue
-                //     : 0;
+                
+                areLastNonAnalyzedSamplesAboveThreshold = areLastNonAnalyzedSamplesAboveThreshold
+                                                          || recordedSampleValue > 0.1f;
             }
         }
-        recordingStartIndex += recordingEvent.NewSampleCount;
+        recordingIndex += recordingEvent.NewSampleCount;
 
         HasRecordedAudio = true;
         recordedSamplesChangedEventStream.OnNext(true);
+    }
+
+    private int GetMicDelayInSamples()
+    {
+        return (int)(micSampleRecorder.MicProfile.DelayInMillis / 1000.0 * SampleRate);
     }
 
     private void InitAudioClipIfNeeded()
@@ -326,7 +369,14 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         }
         else if (shouldBeRecoding && !micSampleRecorder.IsRecording.Value)
         {
+            speechRecognizerDirty = true;
             micSampleRecorder.StartRecording();
         }
+    }
+
+    private void InitSpeechRecognizer()
+    {
+        speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters();
+        speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
     }
 }

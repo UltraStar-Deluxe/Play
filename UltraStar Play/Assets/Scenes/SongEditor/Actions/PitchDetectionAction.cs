@@ -30,9 +30,9 @@ public class PitchDetectionAction : AbstractAudioClipAction
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
-    public void MoveNotesToDetectedPitch(List<Note> notes, bool notify)
+    public void MoveNotesToDetectedPitch(List<Note> notes, bool notify, ESongEditorSamplesSource samplesSource)
     {
-        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.PitchDetectionSamplesSource);
+        AudioClip audioClip = GetAudioClip(samplesSource);
         if (audioClip == null)
         {
             return;

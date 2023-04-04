@@ -19,13 +19,14 @@
             <ui:TextField picking-mode="Ignore" value="A#4" text="1" name="micOctaveOffsetTextField" is-delayed="true" label="Mic octave offset" style="flex-direction: column;" />
             <ui:TextField picking-mode="Ignore" value="300" text="300" name="micDelayTextField" is-delayed="true" label="Mic delay (ms)" style="flex-direction: column;" />
             <ui:Toggle name="recordSamplesInsteadOfNotesToggle" label="Record Samples" display="none" style="display: none;" />
+            <ui:Toggle name="speechRecognitionWhenRecordingToggle" label="Speech Recognition" />
+            <ui:Toggle name="pitchDetectionWhenRecordingToggle" label="Pitch Detection" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="speechRecognitionGroup" label="Speech Recognition">
             <ui:TextField value="vosk-model-small-en-us-0.15" text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" label="Model Folder" class="smallControl" style="flex-grow: 1; flex-direction: column;" />
-            <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 100px;" />
+            <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" label="Words to recognize" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;" />
             <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="speechRecognitionPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio Source" class="controlWithLabelVertical" />
-            <ui:Toggle name="detectSpeechAfterRecordingToggle" label="Detect speech&#10;after recording" style="display: none;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="pitchDetectionGroup" label="Pitch Detection">
             <ItemPicker no-previous-button="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" label="Algorithm" class="smallControl controlWithLabelVertical" style="max-height: none;" />

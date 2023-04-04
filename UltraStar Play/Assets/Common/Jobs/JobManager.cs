@@ -79,6 +79,13 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         UpdateJobListPosition();
     }
 
+    public static Job CreateAndAddJob(string title)
+    {
+        Job job = new(title);
+        Instance.AddJob(job);
+        return job;
+    }
+    
     public void AddJob(Job job)
     {
         if (jobToJobControl.ContainsKey(job))

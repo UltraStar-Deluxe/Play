@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -18,6 +19,9 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
 
     [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
+
+    [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
 
     [Inject]
     private PitchDetectionAction pitchDetectionAction;
@@ -48,7 +52,12 @@ public class EditorSentenceContextMenuControl : ContextMenuControl
         contextMenu.AddButton("Edit lyrics", () => sentenceControl.StartEditingLyrics());
         contextMenu.AddSeparator();
         contextMenu.AddButton("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(sentenceControl.Sentence.Notes.ToList(), true));
-        contextMenu.AddButton("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, extendedSentenceLengthInBeats, settings.SongEditorSettings.SpeechRecognitionSamplesSource, 2, true));
+        contextMenu.AddButton("Speech recognition to create notes", () =>
+        {
+            SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters();
+            VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+            speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, extendedSentenceLengthInBeats, settings.SongEditorSettings.SpeechRecognitionSamplesSource, 2, true, speechRecognitionParameters, speechRecognizer, false);
+        });
         contextMenu.AddButton("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
         contextMenu.AddSeparator();
         contextMenu.AddButton("Delete", () => deleteSentencesAction.ExecuteAndNotify(selectedSentences));
