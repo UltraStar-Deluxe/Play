@@ -39,7 +39,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
-    public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, bool notify)
+    public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, ESongEditorSamplesSource samplesSource, bool notify)
     {
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
         if (audioClip == null)
@@ -61,7 +61,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         Action<double> onProgress = progressInPercent =>
             speechRecognitionJob.EstimatedCurrentProgressInPercent = progressInPercent;
 
-        SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters();
+        SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters(samplesSource);
 
         VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
 
@@ -232,9 +232,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         return createNotesObservable;
     }
     
-    public SpeechRecognitionParameters CreateSpeechRecognizerParameters()
+    public SpeechRecognitionParameters CreateSpeechRecognizerParameters(ESongEditorSamplesSource samplesSource)
     {
-        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        AudioClip audioClip = GetAudioClip(samplesSource);
         return new SpeechRecognitionParameters(
             audioClip.frequency,
             GetSpeechRecognitionModelPath(),

@@ -5,6 +5,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Vosk;
 
 public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListener
 {
@@ -20,6 +21,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
 
+    [Inject(UxmlName = R.UxmlNames.doPitchDetectionButton)]
+    private Button doPitchDetectionButton;
+    
+    [Inject(UxmlName = R.UxmlNames.doSpeechRecognitionButton)]
+    private Button doSpeechRecognitionButton;
+    
     [Inject(UxmlName = R.UxmlNames.undoButton)]
     private Button undoButton;
 
@@ -110,6 +117,15 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject]
     private GameObject gameObject;
 
+    [Inject]
+    private PitchDetectionAction pitchDetectionAction;
+    
+    [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+    
+    [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
+    
     private readonly TabGroupControl sideBarTabGroupControl = new();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
     private readonly SongEditorSideBarLayersControl sideBarLayersControl = new();
@@ -143,6 +159,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             UpdateRecordingButton();
         });
         UpdateRecordingButton();
+        
+        doPitchDetectionButton.RegisterCallbackButtonTriggered(_ => DoDetectPitch());
+        doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
         
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(_ => historyManager.Redo());
@@ -185,6 +204,18 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(_ => UpdatePlayPauseIcon());
 
         InitTabGroup();
+    }
+
+    private void DoSpeechRecognition()
+    {
+        SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(0, (int)songAudioPlayer.DurationOfSongInBeats, settings.SongEditorSettings.SpeechRecognitionSamplesSource, 2, true, speechRecognitionParameters, speechRecognizer, false);
+    }
+
+    private void DoDetectPitch()
+    {
+        pitchDetectionAction.CreateNotesForDetectedPitch(0, (int)songAudioPlayer.DurationOfSongInBeats, settings.SongEditorSettings.PitchDetectionSamplesSource, true);
     }
 
     private void UpdateRecordingButton()

@@ -144,6 +144,7 @@ public class SongAudioPlayer : MonoBehaviour
 
     public double DurationOfSongInMillis { get; private set; }
     public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
+    public double DurationOfSongInBeats => BpmUtils.MillisecondInSongToBeat(SongMeta, DurationOfSongInMillis);
 
     /**
      * Position in the song from 0 (start of song) to 1 (end of song).

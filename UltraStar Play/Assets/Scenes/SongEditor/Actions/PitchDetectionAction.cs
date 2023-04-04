@@ -52,9 +52,9 @@ public class PitchDetectionAction : AbstractAudioClipAction
             });
     }
 
-    public void CreateNotesForDetectedPitch(int startBeat, int lengthInBeats, bool notify)
+    public void CreateNotesForDetectedPitch(int startBeat, int lengthInBeats, ESongEditorSamplesSource samplesSource, bool notify)
     {
-        AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.PitchDetectionSamplesSource);
+        AudioClip audioClip = GetAudioClip(samplesSource);
         if (audioClip == null)
         {
             return;
@@ -70,7 +70,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
 
-        Job pitchDetectionJob = new("Pitch detection to create notes");
+        Job pitchDetectionJob = new("Pitch detection");
         jobManager.AddJob(pitchDetectionJob);
         pitchDetectionJob.SetStatus(EJobStatus.Running);
         pitchDetectionJob.EstimatedTotalDurationInMillis = PitchDetectionUtils.GetEstimatedPitchDetectionDurationInMillis(songMeta, lengthInBeats);

@@ -376,7 +376,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
 
     private void InitSpeechRecognizer()
     {
-        speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters();
+        speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(ESongEditorSamplesSource.Recording);
         speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
     }
 }

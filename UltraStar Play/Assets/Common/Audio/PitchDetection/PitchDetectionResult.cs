@@ -24,6 +24,14 @@ public class PitchDetectionResult
 
         beatToMidiNote[beat] = midiNote;
     }
+    
+    public void AddRange(int startBeat, int lengthInBeats, int midiNote)
+    {
+        for (int i = 0; i < lengthInBeats; i++)
+        {
+            Add(startBeat + i, midiNote);
+        }
+    }
 
     public bool TryGetMidiNote(int beat, out int midiNote)
     {
