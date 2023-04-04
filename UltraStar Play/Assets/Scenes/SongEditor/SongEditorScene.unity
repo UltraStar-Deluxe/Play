@@ -446,7 +446,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &29095450
 MonoBehaviour:
@@ -730,9 +730,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &476015178
+--- !u!1 &524897705
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -740,54 +740,130 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 476015182}
-  - component: {fileID: 476015181}
-  - component: {fileID: 476015180}
-  - component: {fileID: 476015179}
+  - component: {fileID: 524897707}
+  - component: {fileID: 524897706}
+  - component: {fileID: 524897708}
   m_Layer: 0
-  m_Name: SongEditorMicPitchTracker
+  m_Name: SongEditorSceneControl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &476015179
+--- !u!114 &524897706
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476015178}
+  m_GameObject: {fileID: 524897705}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70b58b149df97eb4fb419870c129388e, type: 3}
+  m_Script: {fileID: 11500000, guid: 06a8d7203429bb2498842dab7573df6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  halftoneContinuationBias: 0.1
---- !u!114 &476015180
+  issueSideBarEntryUi: {fileID: 9197481963319205126, guid: b207eaf7fa785bc44974a629c740fc6f,
+    type: 3}
+  songPropertySideBarEntryUi: {fileID: 9197481963319205126, guid: 28cf70480fb615744b82f78ba7d7ad51,
+    type: 3}
+  songEditorLayerSideBarEntryUi: {fileID: 9197481963319205126, guid: f7331bd5e668dc44c902112067f71395,
+    type: 3}
+  valueInputDialogUi: {fileID: 9197481963319205126, guid: 0d374fac569eff64b9de8e9306202e43,
+    type: 3}
+  songAudioPlayer: {fileID: 156093416}
+  songVideoPlayer: {fileID: 7185040230624864619}
+  selectionControl: {fileID: 1965697893}
+  editorNoteDisplayer: {fileID: 191584246}
+  historyManager: {fileID: 1903150256}
+  songEditorLayerManager: {fileID: 29095450}
+  songEditorCopyPasteManager: {fileID: 1171513817}
+  songEditorSceneInputControl: {fileID: 182898102}
+  songEditorAlternativeAudioPlayer: {fileID: 1897508174}
+  songEditorMicSampleRecorder: {fileID: 1527616032}
+--- !u!4 &524897707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524897705}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 468.93408, y: 293.58505, z: -45.125}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &524897708
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476015178}
+  m_GameObject: {fileID: 524897705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb219b23cdf4b314f94a27bca3cc8012, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &937279932
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 937279933}
+  - component: {fileID: 937279935}
+  - component: {fileID: 937279934}
+  m_Layer: 0
+  m_Name: MicSampleRecorder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &937279933
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937279932}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1527616031}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &937279934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937279932}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a42a4bc532d84a4483bac5e1df02248, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!82 &476015181
+--- !u!82 &937279935
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476015178}
+  m_GameObject: {fileID: 937279932}
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 0
+  m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -872,97 +948,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!4 &476015182
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476015178}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1171.1528, y: 901.9784, z: 7.1899414}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &524897705
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 524897707}
-  - component: {fileID: 524897706}
-  - component: {fileID: 524897708}
-  m_Layer: 0
-  m_Name: SongEditorSceneControl
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &524897706
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 524897705}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06a8d7203429bb2498842dab7573df6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  issueSideBarEntryUi: {fileID: 9197481963319205126, guid: b207eaf7fa785bc44974a629c740fc6f,
-    type: 3}
-  songPropertySideBarEntryUi: {fileID: 9197481963319205126, guid: 28cf70480fb615744b82f78ba7d7ad51,
-    type: 3}
-  songEditorLayerSideBarEntryUi: {fileID: 9197481963319205126, guid: f7331bd5e668dc44c902112067f71395,
-    type: 3}
-  valueInputDialogUi: {fileID: 9197481963319205126, guid: 0d374fac569eff64b9de8e9306202e43,
-    type: 3}
-  songAudioPlayer: {fileID: 156093416}
-  songVideoPlayer: {fileID: 7185040230624864619}
-  songEditorNoteRecorder: {fileID: 1231934095}
-  selectionControl: {fileID: 1965697893}
-  editorNoteDisplayer: {fileID: 191584246}
-  songEditorMicPitchTracker: {fileID: 476015179}
-  historyManager: {fileID: 1903150256}
-  songEditorLayerManager: {fileID: 29095450}
-  songEditorCopyPasteManager: {fileID: 1171513817}
-  songEditorSceneInputControl: {fileID: 182898102}
-  songEditorAlternativeAudioPlayer: {fileID: 0}
---- !u!4 &524897707
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 524897705}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 468.93408, y: 293.58505, z: -45.125}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &524897708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 524897705}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb219b23cdf4b314f94a27bca3cc8012, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1017761439
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,7 +990,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 18
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1114308739
 GameObject:
@@ -1049,7 +1034,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1171513816
 GameObject:
@@ -1093,9 +1078,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1231934093
+--- !u!1 &1527616030
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1103,40 +1088,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1231934094}
-  - component: {fileID: 1231934095}
+  - component: {fileID: 1527616031}
+  - component: {fileID: 1527616032}
   m_Layer: 0
-  m_Name: SongEditorNoteRecorder
+  m_Name: SongEditorMicSampleRecorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1231934094
+--- !u!4 &1527616031
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1231934093}
+  m_GameObject: {fileID: 1527616030}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 589.52203, y: 278.6619, z: -530.5}
+  m_LocalPosition: {x: 2230.1235, y: 356.77222, z: -139.3342}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 937279933}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1231934095
+--- !u!114 &1527616032
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1231934093}
+  m_GameObject: {fileID: 1527616030}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bc012f15e2e63047869bca666496e0a, type: 3}
+  m_Script: {fileID: 11500000, guid: d396abbe535135d4886a8d085f2d849f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1601488500
@@ -1150,7 +1136,7 @@ PrefabInstance:
     - target: {fileID: 7650755054248871620, guid: b6d86aaa88ec3d7479a2f42f735481a1,
         type: 3}
       propertyPath: m_RootOrder
-      value: 11
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 7650755054248871620, guid: b6d86aaa88ec3d7479a2f42f735481a1,
         type: 3}
@@ -1311,7 +1297,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 19
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1793447546
 GameObject:
@@ -1355,7 +1341,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1840638616
 GameObject:
@@ -1496,7 +1482,7 @@ GameObject:
   - component: {fileID: 1897508173}
   - component: {fileID: 1897508174}
   m_Layer: 0
-  m_Name: RecordedAudioPlayer
+  m_Name: SongEditorAlternativeAudioPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1516,7 +1502,7 @@ Transform:
   m_Children:
   - {fileID: 1840638617}
   m_Father: {fileID: 0}
-  m_RootOrder: 20
+  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1897508174
 MonoBehaviour:
@@ -1650,7 +1636,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1965697893
 MonoBehaviour:
@@ -1710,7 +1696,7 @@ Transform:
   m_Children:
   - {fileID: 7185040232010439210}
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!328 &7185040232010439205
 VideoPlayer:

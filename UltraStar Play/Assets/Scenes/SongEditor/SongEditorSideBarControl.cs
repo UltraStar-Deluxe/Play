@@ -99,9 +99,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private SongEditorHistoryManager historyManager;
 
     [Inject]
-    private SongEditorNoteRecorder songEditorNoteRecorder;
-
-    [Inject]
     private SongEditorIssueAnalyzerControl issueAnalyzerControl;
 
     [Inject]
@@ -142,16 +139,11 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         togglePlaybackButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ToggleAudioPlayPause());
         toggleRecordingButton.RegisterCallbackButtonTriggered(_ =>
         {
-            songEditorNoteRecorder.IsRecordingEnabled = !songEditorNoteRecorder.IsRecordingEnabled;
-            if (songEditorNoteRecorder.IsRecordingEnabled)
-            {
-                toggleRecordingButton.AddToClassList("recording");
-            }
-            else
-            {
-                toggleRecordingButton.RemoveFromClassList("recording");
-            }
+            settings.SongEditorSettings.IsRecordingEnabled = !settings.SongEditorSettings.IsRecordingEnabled;
+            UpdateRecordingButton();
         });
+        UpdateRecordingButton();
+        
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(_ => historyManager.Redo());
         exitSceneButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ReturnToLastScene());
@@ -193,6 +185,18 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(_ => UpdatePlayPauseIcon());
 
         InitTabGroup();
+    }
+
+    private void UpdateRecordingButton()
+    {
+        if (settings.SongEditorSettings.IsRecordingEnabled)
+        {
+            toggleRecordingButton.AddToClassList("recording");
+        }
+        else
+        {
+            toggleRecordingButton.RemoveFromClassList("recording");
+        }
     }
 
     private void UpdatePlayPauseIcon()

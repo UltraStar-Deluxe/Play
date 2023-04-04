@@ -21,7 +21,7 @@
             <ui:Toggle name="recordSamplesInsteadOfNotesToggle" label="Record Samples" display="none" style="display: none;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="speechRecognitionGroup" label="Speech Recognition">
-            <ui:TextField value="vosk-model-small-en-us-0.15" text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
+            <ui:TextField value="vosk-model-small-en-us-0.15" text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" label="Model Folder" class="smallControl" style="flex-grow: 1; flex-direction: column;" />
             <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 100px;" />
             <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="speechRecognitionPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio Source" class="controlWithLabelVertical" />

@@ -14,9 +14,9 @@ public class SongEditorSettings
     public MicProfile MicProfile { get; set; }
     public int MicOctaveOffset { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
+    public bool IsRecordingEnabled { get; set; }
     public int MidiNoteForButtonRecording { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
-    public bool RecordSamplesInsteadOfNotes { get; set; } = true;
     public bool DetectSpeechAfterRecording { get; set; } = true;
 
     public bool AdjustFollowingNotes { get; set; }

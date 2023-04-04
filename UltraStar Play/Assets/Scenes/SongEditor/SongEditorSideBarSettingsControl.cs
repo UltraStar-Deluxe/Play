@@ -229,10 +229,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MicDelayInMillis = newIntValue));
 
         // Record notes or audio
-        Bind(recordSamplesInsteadOfNotesToggle,
-            () => settings.SongEditorSettings.RecordSamplesInsteadOfNotes,
-            newValue => settings.SongEditorSettings.RecordSamplesInsteadOfNotes = newValue);
-
         Bind(detectSpeechAfterRecordingToggle,
             () => settings.SongEditorSettings.DetectSpeechAfterRecording,
             newValue => settings.SongEditorSettings.DetectSpeechAfterRecording = newValue);

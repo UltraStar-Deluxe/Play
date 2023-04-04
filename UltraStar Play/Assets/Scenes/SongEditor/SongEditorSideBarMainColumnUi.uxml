@@ -9,7 +9,7 @@
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton">
                 <ui:Label text="Record" display-tooltip-when-elided="true" name="label" />
-                <MaterialIcon name="icon" icon="fiber_manual_record" />
+                <MaterialIcon name="icon" icon="mic" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleIssuesButton">
                 <ui:Label text="Issues" display-tooltip-when-elided="true" name="label" />

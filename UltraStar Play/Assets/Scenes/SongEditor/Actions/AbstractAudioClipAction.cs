@@ -20,18 +20,18 @@ public class AbstractAudioClipAction : INeedInjection
     protected UiManager uiManager;
 
     [Inject]
-    protected SongEditorSampleRecorderControl songEditorSampleRecorderControl;
+    protected SongEditorMicSampleRecorder songEditorMicSampleRecorder;
 
     protected AudioClip GetAudioClip(ESongEditorSamplesSource samplesSource)
     {
         if (samplesSource == ESongEditorSamplesSource.Recording)
         {
-            if (!songEditorSampleRecorderControl.HasRecordedAudio)
+            if (!songEditorMicSampleRecorder.HasRecordedAudio)
             {
                 UiManager.CreateNotification("No recorded audio found. Use a microphone to record audio first.");
                 return null;
             }
-            return songEditorSampleRecorderControl.AudioClip;
+            return songEditorMicSampleRecorder.AudioClip;
         }
         else if (samplesSource == ESongEditorSamplesSource.Vocals)
         {

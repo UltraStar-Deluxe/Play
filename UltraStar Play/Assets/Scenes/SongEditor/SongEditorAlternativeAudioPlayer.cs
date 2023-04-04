@@ -17,7 +17,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private SongEditorSampleRecorderControl sampleRecorderControl;
+    private SongEditorMicSampleRecorder micSampleRecorder;
 
     [Inject]
     private UiManager uiManager;
@@ -108,7 +108,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     {
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording)
         {
-            return sampleRecorderControl.AudioClip;
+            return micSampleRecorder.AudioClip;
         }
 
         string audioClipUri;
@@ -144,7 +144,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     private bool CanPlayAudio(out string errorMessage)
     {
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.Recording
-            && !sampleRecorderControl.HasRecordedAudio)
+            && !micSampleRecorder.HasRecordedAudio)
         {
             errorMessage = "Cannot play recorded audio. Use a microphone to record audio first.";
             return false;
