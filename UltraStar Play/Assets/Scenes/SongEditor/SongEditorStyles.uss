@@ -1,6 +1,6 @@
 #songEditorRoot {
     --font-color: rgb(208, 208, 208);
-    --font-color-secondary: #A8A8A8;
+    --font-color-secondary: rgb(168, 168, 168);
     --font-color-inverted: rgb(64, 64, 64);
     --control-color: rgb(88, 88, 88);
     --control-color-accent1: rgb(103, 103, 103);
@@ -171,11 +171,7 @@ Button.selected:hover {
 }
 
 .unity-base-field:focus .unity-base-field__label {
-    color: var(--text-color);
-}
-
-SongEditorSideBarGroup .unity-toggle {
-    margin-bottom: 10px;
+    color: var(--font-color);
 }
 
 .secondarySideBarPanel {
@@ -196,14 +192,14 @@ SongEditorSideBarGroup .unity-toggle {
     font-size: var(--font-size-s);
     -unity-font-style: bold;
     -unity-text-align: middle-center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .inputLegendLabel {
     width: 100%;
     -unity-text-align: middle-left;
     white-space: normal;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-size: var(--font-size-xs);
 }
 
@@ -214,7 +210,7 @@ SongEditorSideBarGroup .unity-toggle {
     min-height: 50px;
     border-radius: 5px;
     padding: 2px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .songEditorSettingsGroupTitle {
@@ -260,6 +256,18 @@ ScrollView #unity-content-container {
 
 SongEditorSideBarGroup {
     flex-shrink: 0;
+}
+
+SongEditorSideBarGroup .unity-toggle {
+    margin-bottom: 8px;
+}
+
+SongEditorSideBarGroup .unity-text-field {
+    margin-bottom: 8px;
+}
+
+SongEditorSideBarGroup .unity-base-slider {
+    margin-bottom: 8px;
 }
 
 SongEditorSideBarGroup > .unity-base-field {

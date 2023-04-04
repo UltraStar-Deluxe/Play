@@ -234,7 +234,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         micDeviceItemPickerControl.Bind(
             () => settings.SongEditorSettings.MicProfile,
             newValue => settings.SongEditorSettings.MicProfile = newValue);
-
+        new AutoFitLabelControl(micDeviceItemPickerControl.ItemPicker.ItemLabel, 8, 15);
+        
         Bind(micOctaveOffsetTextField,
             () => settings.SongEditorSettings.MicOctaveOffset.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MicOctaveOffset = newIntValue));
@@ -311,7 +312,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)
             .Bind(() => settings.SongEditorSettings.PitchDetectionAlgorithm,
                 newValue => settings.SongEditorSettings.PitchDetectionAlgorithm = newValue);
-
+        new AutoFitLabelControl(pitchDetectionAlgorithmItemPicker.ItemLabel, 8, 15);
+        
         pitchDetectionAudioItemPickerControl = new(pitchDetectionAudioPicker, EnumUtils.GetValuesAsList<ESongEditorSamplesSource>());
         pitchDetectionAudioItemPickerControl.Bind(
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
