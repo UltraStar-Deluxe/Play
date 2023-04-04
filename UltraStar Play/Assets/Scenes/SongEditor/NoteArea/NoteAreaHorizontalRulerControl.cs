@@ -13,7 +13,10 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     [Inject]
     private SongMeta songMeta;
-
+    
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+    
     [Inject]
     private NoteAreaControl noteAreaControl;
 
@@ -58,6 +61,16 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.TimeLabelFormat)
             .Subscribe(_ => UpdateLabelTexts())
             .AddTo(gameObject);
+
+        songMetaChangeEventStream.Subscribe(evt =>
+        {
+            if (evt is SongPropertyChangedEvent songPropertyChangedEvent
+                && songPropertyChangedEvent.SongProperty == ESongProperty.Gap)
+            {
+                UpdateLines();
+                UpdateLabels();
+            }
+        });
     }
 
     private void UpdateLabelTexts()

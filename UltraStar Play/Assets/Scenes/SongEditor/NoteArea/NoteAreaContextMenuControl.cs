@@ -90,7 +90,11 @@ public class NoteAreaContextMenuControl : ContextMenuControl
         if (selectedNotes.Count == 0)
         {
             contextMenu.AddSeparator();
-            contextMenu.AddButton("Set Gap to playback position", () => setMusicGapAction.ExecuteAndNotify());
+            contextMenu.AddButton("Set GAP", () =>
+            {
+                double positionInSongInMillis = noteAreaControl.ScreenPixelPositionToMillis(contextMenu.Position.x);
+                setMusicGapAction.ExecuteAndNotify(positionInSongInMillis);
+            });
         }
     }
 }
