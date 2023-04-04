@@ -23,7 +23,8 @@
             <ui:Toggle name="pitchDetectionWhenRecordingToggle" label="Pitch Detection" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="speechRecognitionGroup" label="Speech Recognition">
-            <ui:TextField value="vosk-model-small-en-us-0.15" text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" label="Model Folder" class="smallControl" style="flex-grow: 1; flex-direction: column;" />
+            <ui:TextField value="vosk-model-small-en-us-0.15" text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" label="Model Path" class="smallControl" style="flex-grow: 1; flex-direction: column;" />
+            <ui:Button text="Change Model Path" display-tooltip-when-elided="true" name="selectModelPathButton" />
             <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" label="Words to recognize" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;" />
             <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="speechRecognitionPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio Source" class="controlWithLabelVertical" />

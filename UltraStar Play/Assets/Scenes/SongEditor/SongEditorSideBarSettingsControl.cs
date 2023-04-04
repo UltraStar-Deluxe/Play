@@ -26,6 +26,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.resetMusicPlaybackSpeedButton)]
     private Button resetMusicPlaybackSpeedButton;
+    
+    [Inject(UxmlName = R.UxmlNames.selectModelPathButton)]
+    private Button selectModelPathButton;
 
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
@@ -287,6 +290,23 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                     settings.SongEditorSettings.MidiNoteForSpeechRecognition = newMidiNote;
                 }
             });
+        if (PlatformUtils.IsStandalone)
+        {
+            selectModelPathButton.RegisterCallbackButtonTriggered(_ =>
+            {
+                string selectedFolder = FileSystemDialogUtils.OpenFolderDialog("Select Speech Recognition Model", speechRecognitionModelPathTextField.value);
+                if (selectedFolder.IsNullOrEmpty())
+                {
+                    return;
+                }
+
+                speechRecognitionModelPathTextField.value = selectedFolder;
+            });
+        }
+        else
+        {
+            selectModelPathButton.HideByDisplay();
+        }
 
         speechRecognitionAudioItemPickerControl = new(speechRecognitionAudioPicker, EnumUtils.GetValuesAsList<ESongEditorSamplesSource>());
         speechRecognitionAudioItemPickerControl.Bind(

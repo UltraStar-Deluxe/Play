@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using PrimeInputActions;
 using ProTrans;
 using SFB;
 using UniInject;
@@ -117,17 +118,13 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
     private void OpenSelectFolderDialog()
     {
-#if UNITY_STANDALONE
-        string[] selectedFolders = StandaloneFileBrowser.OpenFolderPanel("Open song folder", FullPath, false);
-        if (selectedFolders.IsNullOrEmpty()
-            || !Directory.Exists(selectedFolders.FirstOrDefault()))
+        string selectedFolder = FileSystemDialogUtils.OpenFolderDialog("Open song folder", FullPath);
+        if (selectedFolder.IsNullOrEmpty())
         {
             return;
         }
 
-        textField.value = selectedFolders.FirstOrDefault()
-            .Replace("\\", "/");
-#endif
+        textField.value = selectedFolder;
     }
 
     private void UpdateDriveButton()
