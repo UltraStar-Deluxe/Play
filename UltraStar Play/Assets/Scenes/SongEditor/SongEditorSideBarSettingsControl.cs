@@ -27,9 +27,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.resetMusicPlaybackSpeedButton)]
     private Button resetMusicPlaybackSpeedButton;
 
-    [Inject(UxmlName = R.UxmlNames.recordingSourceItemPicker)]
-    private ItemPicker recordingSourceItemPicker;
-
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
 
@@ -98,12 +95,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.lyricsArea)]
     private VisualElement lyricsArea;
-
-    [Inject(UxmlName = R.UxmlNames.micRecordingContainer)]
-    private VisualElement micRecordingContainer;
-
-    [Inject(UxmlName = R.UxmlNames.buttonRecordingContainer)]
-    private VisualElement buttonRecordingContainer;
 
     [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
     private Button importMidiFileButton;
@@ -213,12 +204,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.PlaybackSamplesSource,
             newValue => settings.SongEditorSettings.PlaybackSamplesSource = newValue);
 
-        // Recording settings
-        recordingSourceItemPickerControl = new(recordingSourceItemPicker, EnumUtils.GetValuesAsList<ESongEditorRecordingSource>());
-        recordingSourceItemPickerControl.Bind(
-            () => settings.SongEditorSettings.RecordingSource,
-            newValue => settings.SongEditorSettings.RecordingSource = newValue);
-
         // Mic recording settings
         List<MicProfile> micProfiles = settings.MicProfiles;
         List<MicProfile> enabledAndConnectedMicProfiles = micProfiles
@@ -265,10 +250,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(buttonRecordingButtonTextField,
             () => settings.SongEditorSettings.ButtonDisplayNameForButtonRecording,
             newValue => settings.SongEditorSettings.ButtonDisplayNameForButtonRecording = newValue);
-
-        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.RecordingSource)
-            .Subscribe(_ => UpdateRecordingSettingsVisibility())
-            .AddTo(gameObject);
 
         // MIDI settings
         Bind(midiNotePlayAlongToggle,
@@ -374,15 +355,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         new LabeledItemPickerControl<ESongEditorPitchLabelFormat>(pitchLabelFormatPicker, EnumUtils.GetValuesAsList<ESongEditorPitchLabelFormat>())
             .Bind(() => settings.SongEditorSettings.PitchLabelFormat,
                 newValue => settings.SongEditorSettings.PitchLabelFormat = newValue);
-    }
-
-    private void UpdateRecordingSettingsVisibility()
-    {
-        bool micRecordingSettingsVisible = settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.Microphone;
-        micRecordingContainer.SetVisibleByDisplay(micRecordingSettingsVisible);
-
-        bool buttonRecordingSettingsVisible = settings.SongEditorSettings.RecordingSource == ESongEditorRecordingSource.KeyboardButton;
-        buttonRecordingContainer.SetVisibleByDisplay(buttonRecordingSettingsVisible);
     }
 
     private void SetMusicPlaybackSpeed(float newValue)

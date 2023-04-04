@@ -4,8 +4,8 @@
         <ui:Label text="Settings" display-tooltip-when-elided="true" name="settingsTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold; display: flex;" />
         <SongEditorSideBarGroup name="editingGroup" label="Editing">
             <ui:Toggle name="adjustFollowingNotesToggle" label="Adjust Following Notes" />
-            <ui:Toggle name="autoSaveToggle" label="Auto Save" />
             <ui:Toggle name="syncLyricsAreaToggle" label="Synchronize position&#10;with lyrics cursor&#10;" />
+            <ui:Toggle name="autoSaveToggle" label="Auto Save" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="musicGroup" label="Music">
             <ui:Toggle name="goToLastPlaybackPositionToggle" label="Jump back on pause&#10;" />
@@ -14,25 +14,18 @@
             <ui:Button text="Reset Playback Speed" display-tooltip-when-elided="true" name="resetMusicPlaybackSpeedButton" />
             <ItemPicker name="playbackAudioPicker" no-previous-button="true" wrapAround="true" label="Playback Audio" class="controlWithLabelVertical" />
         </SongEditorSideBarGroup>
-        <SongEditorSideBarGroup name="recordingGroup" label="Recording">
-            <ItemPicker no-previous-button="true" name="recordingSourceItemPicker" wrap-around="true" label="Source" class="controlWithLabelVertical" style="flex-direction: column;" />
-            <ui:VisualElement name="micRecordingContainer">
-                <ItemPicker no-previous-button="true" name="micDeviceItemPicker" wrap-around="true" label="Microphone" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
-                <ui:TextField picking-mode="Ignore" value="A#4" text="1" name="micOctaveOffsetTextField" is-delayed="true" label="Mic octave offset" style="flex-direction: column;" />
-                <ui:TextField picking-mode="Ignore" value="300" text="300" name="micDelayTextField" is-delayed="true" label="Mic delay (ms)" style="flex-direction: column;" />
-                <ui:Toggle name="recordSamplesInsteadOfNotesToggle" label="Record Samples" />
-            </ui:VisualElement>
-            <ui:VisualElement name="buttonRecordingContainer">
-                <ui:TextField picking-mode="Ignore" value="N" text="N" name="buttonRecordingButtonTextField" is-delayed="true" label="Button for recording" style="flex-direction: column;" />
-                <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="buttonRecordingPitchTextField" is-delayed="true" label="Button recording pitch" style="flex-direction: column;" />
-            </ui:VisualElement>
+        <SongEditorSideBarGroup name="micRecordingGroup" label="Recording">
+            <ItemPicker no-previous-button="true" name="micDeviceItemPicker" wrap-around="true" label="Microphone" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
+            <ui:TextField picking-mode="Ignore" value="A#4" text="1" name="micOctaveOffsetTextField" is-delayed="true" label="Mic octave offset" style="flex-direction: column;" />
+            <ui:TextField picking-mode="Ignore" value="300" text="300" name="micDelayTextField" is-delayed="true" label="Mic delay (ms)" style="flex-direction: column;" />
+            <ui:Toggle name="recordSamplesInsteadOfNotesToggle" label="Record Samples" display="none" style="display: none;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="speechRecognitionGroup" label="Speech Recognition">
             <ui:TextField value="vosk-model-small-en-us-0.15" text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 100px;" />
             <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="speechRecognitionPitchTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio Source" class="controlWithLabelVertical" />
-            <ui:Toggle name="detectSpeechAfterRecordingToggle" label="Detect speech&#10;after recording" />
+            <ui:Toggle name="detectSpeechAfterRecordingToggle" label="Detect speech&#10;after recording" style="display: none;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="pitchDetectionGroup" label="Pitch Detection">
             <ItemPicker no-previous-button="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" label="Algorithm" class="smallControl controlWithLabelVertical" style="max-height: none;" />
@@ -41,6 +34,10 @@
         <SongEditorSideBarGroup name="audioSeparationGroup" label="Audio Separation">
             <ui:TextField value="python -m spleeter" text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" class="smallControl" style="flex-grow: 1;" />
             <ui:Button text="Extract Vocals Audio" display-tooltip-when-elided="true" name="audioSeparationButton" />
+        </SongEditorSideBarGroup>
+        <SongEditorSideBarGroup name="buttonRecordingGroup" label="Button Tapping">
+            <ui:TextField picking-mode="Ignore" value="N" text="N" name="buttonRecordingButtonTextField" is-delayed="true" label="Button for tapping" style="flex-direction: column;" />
+            <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="buttonRecordingPitchTextField" is-delayed="true" label="Button tapping pitch" style="flex-direction: column;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="midiGroup" label="MIDI">
             <ui:Toggle name="midiNotePlayAlongToggle" label="Play MIDI sounds" />

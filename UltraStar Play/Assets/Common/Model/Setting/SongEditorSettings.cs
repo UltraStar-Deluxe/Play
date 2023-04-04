@@ -11,7 +11,6 @@ public class SongEditorSettings
     public bool GoToLastPlaybackPosition { get; set; } = true;
 
     // Recording in SongEditorScene
-    public ESongEditorRecordingSource RecordingSource { get; set; }
     public MicProfile MicProfile { get; set; }
     public int MicOctaveOffset { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
