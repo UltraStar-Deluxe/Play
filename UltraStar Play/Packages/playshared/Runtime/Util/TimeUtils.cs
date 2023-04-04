@@ -102,12 +102,4 @@ public static class TimeUtils
         TimeSpan timeSpan = new(0, 0, 0, 0, (int)durationInMilliseconds);
         return $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}";
     }
-    
-    public static string GetMinutesAndSecondsAndShortMillisDurationString(double durationInMilliseconds)
-    {
-        TimeSpan timeSpan = new(0, 0, 0, 0, (int)durationInMilliseconds);
-        
-        double millisFraction = timeSpan.Milliseconds / 1000.0;
-        return $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}{millisFraction.ToStringInvariantCulture(".0")}";
-    }
 }

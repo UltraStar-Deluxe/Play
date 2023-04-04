@@ -200,7 +200,11 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             case ESongEditorTimeLabelFormat.Beats:
                 return beat.ToString();
             case ESongEditorTimeLabelFormat.Seconds:
-                return TimeUtils.GetMinutesAndSecondsAndShortMillisDurationString(beatPosInMillis);
+                TimeSpan timeSpan = new(0, 0, 0, 0, (int)beatPosInMillis);
+                double millisFraction = timeSpan.Milliseconds / 1000.0;
+                return timeSpan.TotalMinutes > 0
+                    ? $"{timeSpan.Seconds}{millisFraction.ToStringInvariantCulture(".0")}"
+                    : $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}{millisFraction.ToStringInvariantCulture(".0")}";
             default:
                 return "";
         }
