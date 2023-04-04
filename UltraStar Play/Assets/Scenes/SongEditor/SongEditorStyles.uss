@@ -258,6 +258,10 @@ ScrollView #unity-content-container {
     height: 100%;
 }
 
+SongEditorSideBarGroup {
+    flex-shrink: 0;
+}
+
 SongEditorSideBarGroup > .unity-base-field {
     margin-bottom: 8px;
 }
