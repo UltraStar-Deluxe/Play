@@ -169,9 +169,9 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         int lengthInSamples = toIndex - fromIndex;
         analyzeStartIndex = recordingIndex;
 
-        double offsetInMillis = ((double)recordingStartIndex / SampleRate) * 1000.0;
+        int recordingStartIndexConsideringMicDelay = recordingStartIndex - micDelayInSamples;
+        double offsetInMillis = ((double)recordingStartIndexConsideringMicDelay / SampleRate) * 1000.0;
         int offsetInBeats = (int)BpmUtils.MillisecondInSongToBeat(songMeta, offsetInMillis);
-        Debug.Log("offsetInBeats: " + offsetInBeats);
         
         Debug.Log($"Analyzing speech from second {fromIndex / SampleRate} to second {toIndex / SampleRate} (length: {(lengthInSamples) / SampleRate} seconds)");
         speechRecognitionAction.CreateNotesFromSpeechRecognition(RecordingBuffer, fromIndex, toIndex, SampleRate, 2, true, speechRecognitionParameters, speechRecognizer, true, offsetInBeats)
