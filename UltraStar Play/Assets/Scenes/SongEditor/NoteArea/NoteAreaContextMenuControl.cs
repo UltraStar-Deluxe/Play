@@ -34,10 +34,16 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     [Inject]
     private NoteAreaDragControl noteAreaDragControl;
 
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
+    
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
         FillContextMenuAction = FillContextMenu;
+        ShouldOpenContextMenu = () =>
+            editorNoteDisplayer.EditorNoteControls.AllMatch(noteControl => !noteControl.IsPointerOver)
+            && editorNoteDisplayer.EditorSentenceControls.AllMatch(sentenceControl => !sentenceControl.IsPointerOver);
     }
 
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
