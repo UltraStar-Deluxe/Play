@@ -872,6 +872,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             { "ButtonRecording", Colors.CreateColor("#138BBA")},
             { "CopyPaste", Colors.CreateColor("#F08080")},
             { "MidiFile", Colors.CreateColor("#0F9799")},
+            { "PitchDetection", Colors.CreateColor("#ADBBE0", 200)},
+            { "SpeechRecognition", Colors.CreateColor("#D4A994", 200)},
         };
 
         Dictionary<string, Color32> layerNameToColor = GetCurrentTheme()?.ThemeJson?.songEditorLayerColors;
