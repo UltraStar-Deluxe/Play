@@ -57,6 +57,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     private float videoGapAtDragStart;
 
     private GeneralDragControl dragControl;
+    private ContextMenuControl videoImageContextMenuControl;
 
     public void OnInjectionFinished()
     {
@@ -97,6 +98,16 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
         videoImage.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
         videoImage.RegisterCallback<PointerLeaveEvent>(evt => cursorManager.SetDefaultCursor());
+        
+        videoImageContextMenuControl = injector
+            .WithRootVisualElement(videoImage)
+            .CreateAndInject<ContextMenuControl>();
+        videoImageContextMenuControl.FillContextMenuAction = FillVideoImageContextMenu;
+    }
+
+    private void FillVideoImageContextMenu(ContextMenuPopupControl contextMenu)
+    {
+        contextMenu.AddButton("Reset VideoGap", () => setVideoGapAction.ExecuteAndNotify(0));
     }
 
     private void ShowVideoImage()

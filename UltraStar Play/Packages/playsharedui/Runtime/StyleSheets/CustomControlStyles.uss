@@ -81,6 +81,7 @@ ItemPicker {
 }
 
 .controlWithLabelVertical {
+    flex-direction: column;
     height: auto;
     align-items: stretch;
 }
