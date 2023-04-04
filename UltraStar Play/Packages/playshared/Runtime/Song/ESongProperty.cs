@@ -15,5 +15,7 @@
     VideoGap,
     PreviewStart,
     PreviewEnd,
+    VocalsAudio,
+    InstrumentalAudio,
     Other,
 }
