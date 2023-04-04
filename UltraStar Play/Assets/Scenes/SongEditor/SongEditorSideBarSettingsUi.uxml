@@ -61,5 +61,9 @@
             <ui:TextField picking-mode="Ignore" value="2" text="2" name="gridSizeTextField" label="Grid size" style="flex-direction: column;" />
             <ui:TextField picking-mode="Ignore" value="4" text="4" name="sentenceLineSizeTextField" label="Phrase separator size" style="flex-direction: column;" />
         </SongEditorSideBarGroup>
+        <SongEditorSideBarGroup name="labelsGroup" label="Labels">
+            <ItemPicker name="timeLabelFormatPicker" no-previous-button="true" wrapAround="true" label="Time Labels" class="controlWithLabelVertical" />
+            <ItemPicker name="pitchLabelFormatPicker" no-previous-button="true" wrapAround="true" label="Pitch Labels" class="controlWithLabelVertical" />
+        </SongEditorSideBarGroup>
     </ui:ScrollView>
 </ui:UXML>

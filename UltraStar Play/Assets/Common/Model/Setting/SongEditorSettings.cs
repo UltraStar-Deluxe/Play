@@ -37,7 +37,9 @@ public class SongEditorSettings
     public bool SmallLeftSideBar { get; set; }
     public bool ShowControlHints { get; set; } = true;
     public bool ShowNotePitchLabel { get; set; } = true;
-
+    public ESongEditorTimeLabelFormat TimeLabelFormat { get; set; } = ESongEditorTimeLabelFormat.Beats;
+    public ESongEditorPitchLabelFormat PitchLabelFormat { get; set; } = ESongEditorPitchLabelFormat.Notes;
+    
     public float GridSizeInPx { get; set; } = 1;
     public float SentenceLineSizeInPx { get; set; } = 2;
 

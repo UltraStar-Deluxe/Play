@@ -657,17 +657,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfac381e8120d2d41b8da847760356a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Code Monkey
-  defaultSongNamePasteBin: 'Summer Wine
+  defaultSongName: Some Title
+  defaultSongNamePasteBin: 'Code Monkey
+
+    Summer Wine
 
     EmptyTitle
 
-    Me And My Broken Heart
+    Me
+    And My Broken Heart
 
-    Somewhere
-    Over The Rainbow (Wonderful World)
+    Somewhere Over The Rainbow (Wonderful World)
 
-    Marry You
+    Marry
+    You
 
     Hakuna matata'
 --- !u!4 &321425754

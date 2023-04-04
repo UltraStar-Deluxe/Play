@@ -178,10 +178,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             .AddTo(gameObject);
 
         settings.SongEditorSettings
-            .ObserveEveryValueChanged(it => it.ShowNotePitchLabel)
+            .ObserveEveryValueChanged(it => it.TimeLabelFormat)
             .Subscribe(_ => UpdateNotesAndSentences())
             .AddTo(gameObject);
-
+        
         songEditorLayerManager.LayerChangedEventStream
             .Subscribe(evt =>
             {

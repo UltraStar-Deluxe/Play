@@ -135,6 +135,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAudioPicker)]
     private ItemPicker pitchDetectionAudioPicker;
 
+    [Inject(UxmlName = R.UxmlNames.timeLabelFormatPicker)]
+    private ItemPicker timeLabelFormatPicker;
+    
+    [Inject(UxmlName = R.UxmlNames.pitchLabelFormatPicker)]
+    private ItemPicker pitchLabelFormatPicker;
+    
     [Inject]
     private SongMeta songMeta;
 
@@ -357,6 +363,15 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(sentenceLineSizeTextField,
             () => settings.SongEditorSettings.SentenceLineSizeInPx.ToString(CultureInfo.InvariantCulture),
             newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.SentenceLineSizeInPx = newFloatValue));
+        
+        // Labels
+        new LabeledItemPickerControl<ESongEditorTimeLabelFormat>(timeLabelFormatPicker, EnumUtils.GetValuesAsList<ESongEditorTimeLabelFormat>())
+            .Bind(() => settings.SongEditorSettings.TimeLabelFormat,
+                newValue => settings.SongEditorSettings.TimeLabelFormat = newValue);
+        
+        new LabeledItemPickerControl<ESongEditorPitchLabelFormat>(pitchLabelFormatPicker, EnumUtils.GetValuesAsList<ESongEditorPitchLabelFormat>())
+            .Bind(() => settings.SongEditorSettings.PitchLabelFormat,
+                newValue => settings.SongEditorSettings.PitchLabelFormat = newValue);
     }
 
     private void UpdateRecordingSettingsVisibility()
