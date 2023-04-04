@@ -103,8 +103,7 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
 
     private void UpdateDurationLabel()
     {
-        TimeSpan timeSpan = new(0, 0, 0, 0, (int)job.CurrentDurationInMillis);
-        jobDurationLabel.text = $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}";;
+        jobDurationLabel.text = TimeUtils.GetMinutesAndSecondsDurationString(job.CurrentDurationInMillis);
     }
 
     private void UpdateProgressBar()
