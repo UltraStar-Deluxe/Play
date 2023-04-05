@@ -53,7 +53,9 @@ public static class ImageManager
 
         // Find VisualElements that use this sprite. Update them with a new sprite.
         List<VisualElement> visualElementsUsingTheSprite = uiDocument.rootVisualElement.Query<VisualElement>()
-            .Where(visualElement => visualElement.style.backgroundImage == new StyleBackground(cachedSprite.Sprite))
+            .Where(visualElement => visualElement != null
+                                    && visualElement.style.backgroundImage != null
+                                    && visualElement.style.backgroundImage == new StyleBackground(cachedSprite.Sprite))
             .ToList();
 
         // Remove from cache before reloading.
@@ -112,7 +114,7 @@ public static class ImageManager
         spriteHolders.ForEach(spriteHolder => usedSprites.AddRange(spriteHolder.GetSprites()));
 
         // Iterate over all sprites in VisualElements in the scene and remember them as still in use.
-        UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
+        UIDocument uiDocument = UIDocumentUtils.FindUIDocumentOrThrow();
         if (uiDocument != null)
         {
             uiDocument.rootVisualElement
