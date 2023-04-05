@@ -60,8 +60,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.midiNotePlayAlongToggle)]
     private Toggle midiNotePlayAlongToggle;
 
-    [Inject(UxmlName = R.UxmlNames.showLyricsAreaToggle)]
-    private Toggle showLyricsAreaToggle;
+    [Inject(UxmlName = R.UxmlNames.showRightSideBarToggle)]
+    private Toggle showRightSideBarToggle;
 
     [Inject(UxmlName = R.UxmlNames.showStatusBarToggle)]
     private Toggle showStatusBarToggle;
@@ -93,8 +93,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.virtualPiano)]
     private VisualElement virtualPiano;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsArea)]
-    private VisualElement lyricsArea;
+    [Inject(UxmlName = R.UxmlNames.rightSideBar)]
+    private VisualElement rightSideBar;
 
     [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
     private Button importMidiFileButton;
@@ -337,9 +337,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         }
 
         // Show / hide VisualElements
-        Bind(showLyricsAreaToggle,
-            () => settings.SongEditorSettings.ShowLyricsArea,
-            newValue => settings.SongEditorSettings.ShowLyricsArea = newValue);
+        Bind(showRightSideBarToggle,
+            () => settings.SongEditorSettings.ShowRightSideBar,
+            newValue => settings.SongEditorSettings.ShowRightSideBar = newValue);
         Bind(showStatusBarToggle,
             () => settings.SongEditorSettings.ShowStatusBar,
             newValue => settings.SongEditorSettings.ShowStatusBar = newValue);
@@ -356,8 +356,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.ShowNotePitchLabel,
             newValue => settings.SongEditorSettings.ShowNotePitchLabel = newValue);
 
-        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowLyricsArea)
-            .Subscribe(newValue => lyricsArea.SetVisibleByDisplay(newValue))
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowRightSideBar)
+            .Subscribe(newValue => rightSideBar.SetVisibleByDisplay(newValue))
             .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowStatusBar)
             .Subscribe(newValue => statusBar.SetVisibleByDisplay(newValue))

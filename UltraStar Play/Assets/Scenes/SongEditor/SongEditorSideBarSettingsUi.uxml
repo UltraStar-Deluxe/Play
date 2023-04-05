@@ -47,7 +47,7 @@
             <ui:Button text="Import MIDI File" display-tooltip-when-elided="true" name="importMidiFileButton" style="width: 100%;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="layoutGroup" label="Layout">
-            <ui:Toggle name="showLyricsAreaToggle" label="Show lyrics" />
+            <ui:Toggle name="showRightSideBarToggle" label="Show right side" />
             <ui:Toggle name="showVideoAreaToggle" label="Show preview" />
             <ui:Toggle name="showVirtualPianoToggle" label="Show virtual piano" />
             <ui:Toggle name="showStatusBarToggle" label="Show status bar" />
