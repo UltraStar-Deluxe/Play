@@ -98,8 +98,11 @@ public static class MidiFileUtils
 
     public static List<MidiEvent> GetLyricsEvents(MidiFile midiFile)
     {
-        int trackIndex = FindTrackIndexWithLongestLyrics(midiFile);
-        MidiTrack track = midiFile.Tracks[trackIndex];
+        MidiTrack track = FindTrackWithLongestLyrics(midiFile);
+        if (track == null)
+        {
+            return new List<MidiEvent>();
+        }
         return GetLyricsEvents(track);
     }
     
@@ -144,23 +147,22 @@ public static class MidiFileUtils
         return (midiEvent as MetaTextEvent).Text;
     }
     
-    public static int FindTrackIndexWithLongestLyrics(MidiFile midiFile)
+    public static MidiTrack FindTrackWithLongestLyrics(MidiFile midiFile)
     {
-        List<TrackAndChannel> tracksAndChannels = GetTracksAndChannels(midiFile);
-        int trackIndexWithLongestLyrics = tracksAndChannels.FirstOrDefault().trackIndex;
         int longestLyricsEventCount = 0;
-        foreach (TrackAndChannel trackAndChannel in tracksAndChannels)
+        MidiTrack longestLyricsTrack = null;
+        foreach (MidiTrack midiTrack in midiFile.Tracks)
         {
-            MidiTrack midiTrack = midiFile.Tracks[trackAndChannel.trackIndex];
-            int lyricsEventCount = midiTrack.MidiEvents.Count(midiEvent => midiEvent is MetaTextEvent mte);
-            if (lyricsEventCount > longestLyricsEventCount)
+            int lyricsEventCount = midiTrack.MidiEvents.Count(midiEvent => midiEvent is MetaTextEvent);
+            if (longestLyricsTrack == null
+                || lyricsEventCount > longestLyricsEventCount)
             {
-                trackIndexWithLongestLyrics = trackAndChannel.trackIndex;
                 longestLyricsEventCount = lyricsEventCount;
+                longestLyricsTrack = midiTrack;
             }
         }
-
-        return trackIndexWithLongestLyrics;
+        
+        return longestLyricsTrack;
     }
 
     public static string GetLyrics(List<MidiEvent> lyricsEvents)

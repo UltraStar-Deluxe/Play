@@ -413,12 +413,12 @@ public static class MidiToSongMetaUtils
         
         using DisposableStopwatch d = new("FindBestMatchingTrackAndChannel took <ms>");
         
-        int bestTrackIndex = MidiFileUtils.FindTrackIndexWithLongestLyrics(midiFile);
-        if (bestTrackIndex < 0)
+        MidiTrack bestTrack = MidiFileUtils.FindTrackWithLongestLyrics(midiFile);
+        if (bestTrack == null)
         {
             return trackAndChannels.FirstOrDefault();
         }
-        MidiTrack bestTrack = midiFile.Tracks[bestTrackIndex];
+        int bestTrackIndex = midiFile.Tracks.IndexOf(bestTrack);
         
         int bestChannelIndex = FindChannelIndexWithBestMatchingNotesForLyricsEvents(bestTrack, lyricsEvents, midiEventToAbsoluteDeltaTimeInMillis);
         if (bestChannelIndex < 0)
