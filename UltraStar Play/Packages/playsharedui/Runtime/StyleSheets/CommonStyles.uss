@@ -115,8 +115,6 @@ VisualElement
     font-size: var(--font-size-s);
 }
 
-TextField.multiline 
-
 .transparentBackgroundColor #unity-text-input {
     background-color: rgba(0, 0, 0, 0);
 }
