@@ -12,24 +12,28 @@
                 <ui:Label tabindex="-1" text="File not found" display-tooltip-when-elided="true" name="midiFileIssueLabel" />
             </ui:VisualElement>
             <ui:VisualElement name="midiImportSettingsContainer" style="background-color: rgba(0, 0, 0, 0); align-items: stretch;">
+                <ui:VisualElement name="midiImportLyricsContainer" style="background-color: rgba(0, 0, 0, 0);">
+                    <ui:Toggle label="Import lyrics" name="importMidiLyricsToggle" value="true" class="mb-2" />
+                    <ui:TextField picking-mode="Ignore" value="La li lu" name="midiLyricsTextField" readonly="true" is-delayed="true" multiline="true" class="controlWithLabelVertical multiline" style="flex-direction: column; margin-bottom: 5px; height: 80px;" />
+                    <ui:Label tabindex="-1" text="Best match: track 0, channel 0" display-tooltip-when-elided="true" name="bestMatchnigTrackAndChannelLabel" class="smallerFont" />
+                </ui:VisualElement>
+                <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="midiTrackAndChannelContainer" class="mb-2" style="background-color: rgba(0, 0, 0, 0);">
-                    <ui:Label tabindex="-1" text="Track" display-tooltip-when-elided="true" name="midiImportTrackSettingsLabel" />
-                    <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                        <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="trackAndChannelDropdownField" style="flex-grow: 1;" />
+                    <ui:Toggle label="Import notes" name="importMidiNotesToggle" value="false" class="mb-2" />
+                    <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-items: center;">
+                        <ui:VisualElement name="growingContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                            <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="trackAndChannelDropdownField" />
+                        </ui:VisualElement>
                         <ui:Button display-tooltip-when-elided="true" name="previewMidiTrackAndChannelButton" class="squareButton ml-2" style="align-self: flex-end;">
                             <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="play_arrow" name="startMidiPreviewIcon" class="startPreviewIcon" />
                             <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="pause" name="stopMidiPreviewIcon" class="startPreviewIcon" style="position: absolute;" />
                         </ui:Button>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="midiImportAssignToPlayerContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                    <ItemPicker name="assignToPlayerPicker" label="Assign To Player" class="controlWithLabelVertical" />
-                </ui:VisualElement>
                 <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="background-color: rgba(0, 0, 0, 0);" />
-                <ui:VisualElement name="midiImportLyricsContainer" style="background-color: rgba(0, 0, 0, 0);">
-                    <ui:Toggle label="Import lyrics" name="importWithLyricsToggle" class="mb-2" />
-                    <ui:TextField picking-mode="Ignore" value="La li lu" name="midiLyricsTextField" readonly="true" is-delayed="true" multiline="true" class="controlWithLabelVertical multiline" style="flex-direction: column; margin-bottom: 5px; height: 80px;" />
-                    <ui:Label tabindex="-1" text="Best match: track 0, channel 0" display-tooltip-when-elided="true" name="bestMatchnigTrackAndChannelLabel" class="smallerFont" />
+                <ui:VisualElement name="midiImportAssignToPlayerContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                    <ui:Toggle label="Assign to player" name="assignToPlayerToggle" value="false" class="mb-2" />
+                    <ui:DropdownField index="0" choices="P1, P2" name="assignToPlayerDropdownField" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:ScrollView>

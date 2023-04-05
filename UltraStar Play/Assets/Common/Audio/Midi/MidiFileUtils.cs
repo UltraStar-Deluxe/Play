@@ -40,7 +40,7 @@ public static class MidiFileUtils
             midiEvents = midiEvents
                 .Where(midiEvent =>
                 {
-                    if (midiEvent.TryGetMidiEventTypeEnum(out MidiEventTypeEnum midiEventTypeEnum))
+                    if (midiEvent.TryGetMidiEventTypeEnumFast(out MidiEventTypeEnum midiEventTypeEnum))
                     {
                         return midiEventTypeEnum == MidiEventTypeEnum.NoteOn;
                     }
@@ -91,6 +91,18 @@ public static class MidiFileUtils
         return actualLyricsEvents;
     }
 
+    public static string GetLyrics(MidiFile midiFile)
+    {
+        return GetLyrics(GetLyricsEvents(midiFile));
+    }
+
+    public static List<MidiEvent> GetLyricsEvents(MidiFile midiFile)
+    {
+        int trackIndex = FindTrackIndexWithLongestLyrics(midiFile);
+        MidiTrack track = midiFile.Tracks[trackIndex];
+        return GetLyricsEvents(track);
+    }
+    
     public static string GetLyrics(MidiEvent midiEvent)
     {
         MetaTextEvent metaTextEvent = midiEvent as MetaTextEvent;
@@ -105,32 +117,31 @@ public static class MidiFileUtils
             .Replace("/", "\n")
             .Replace("\\", "\n");
     }
-    
-    public static string GetLyrics(MidiTrack track)
+
+    public static int FindTrackIndexWithLongestLyrics(MidiFile midiFile)
     {
-        List<MidiEvent> lyricsEvents = GetLyricsEvents(track);
+        List<TrackAndChannel> tracksAndChannels = GetTracksAndChannels(midiFile);
+        int trackIndexWithLongestLyrics = tracksAndChannels.FirstOrDefault().trackIndex;
+        int longestLyricsEventCount = 0;
+        foreach (TrackAndChannel trackAndChannel in tracksAndChannels)
+        {
+            MidiTrack midiTrack = midiFile.Tracks[trackAndChannel.trackIndex];
+            int lyricsEventCount = midiTrack.MidiEvents.Count(midiEvent => midiEvent is MetaTextEvent mte);
+            if (lyricsEventCount > longestLyricsEventCount)
+            {
+                trackIndexWithLongestLyrics = trackAndChannel.trackIndex;
+                longestLyricsEventCount = lyricsEventCount;
+            }
+        }
+
+        return trackIndexWithLongestLyrics;
+    }
+
+    public static string GetLyrics(List<MidiEvent> lyricsEvents)
+    {
         return lyricsEvents
             .Select(midiEvent => GetLyrics(midiEvent))
             .JoinWith("");
-    }
-    
-    public static Dictionary<MidiEvent, int> GetMidiEventToAbsoluteTime(MidiTrack track)
-    {
-        Dictionary<int, int> channelIndexToTime = new();
-        Dictionary<MidiEvent, int> midiEventToTime = new();
-        foreach (MidiEvent midiEvent in track.MidiEvents)
-        {
-            if (!channelIndexToTime.ContainsKey(midiEvent.Channel))
-            {
-                channelIndexToTime[midiEvent.Channel] = 0;
-            }
-        
-            channelIndexToTime[midiEvent.Channel] += midiEvent.DeltaTime;
-            
-            midiEventToTime[midiEvent] = channelIndexToTime[midiEvent.Channel];
-        }
-        
-        return midiEventToTime;
     }
     
     public static void SetFirstDeltaTimeTo(MidiFile midiFile, int trackIndex, int newDeltaTime)
@@ -138,7 +149,7 @@ public static class MidiFileUtils
         // Set delta time of fist note 0 to to start immediately.
         MidiTrack midiTrack = midiFile.Tracks[trackIndex];
         MidiEvent firstNoteOnEvent = midiTrack.MidiEvents.FirstOrDefault(midiEvent =>
-            midiEvent.TryGetMidiEventTypeEnum(out MidiEventTypeEnum midiEventTypeEnum)
+            midiEvent.TryGetMidiEventTypeEnumFast(out MidiEventTypeEnum midiEventTypeEnum)
             && midiEventTypeEnum is MidiEventTypeEnum.NoteOn);
         if (firstNoteOnEvent != null)
         {
