@@ -20,6 +20,9 @@ public class SongEditorMidiFileImporter : INeedInjection
 
     [Inject]
     private SongEditorLayerManager layerManager;
+    
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
     private Settings settings;
@@ -47,6 +50,10 @@ public class SongEditorMidiFileImporter : INeedInjection
             return;
         }
 
+        // Remove old notes
+        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.MidiFile);
+        layerManager.ClearEnumLayer(ESongEditorLayer.MidiFile);
+        
         MidiFile midiFile = MidiFileUtils.LoadMidiFile(midiFilePath);
         
         MidiFileUtils.CalculateMidiEventTimesInMillis(

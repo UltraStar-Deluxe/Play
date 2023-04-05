@@ -1,30 +1,35 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="importMidiFileDialogRoot" style="background-color: rgba(0, 0, 0, 0); padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1">
-            <ui:VisualElement name="row" style="justify-content: space-around;">
+            <ui:VisualElement name="row" class="mb-2" style="justify-content: space-around;">
                 <ui:TextField picking-mode="Ignore" label="Path" value="C:/MyFile.mid" name="midiFilePathTextField" is-delayed="true" class="controlWithLabelVertical" style="flex-direction: column; flex-grow: 1;" />
                 <ui:Button display-tooltip-when-elided="true" name="selectMidiFileButton" class="squareButton comboBoxButton" style="align-self: flex-end;">
                     <MaterialIcon tabindex="-1" picking-mode="Ignore" name="openFileIcon" icon="audio_file" />
                 </ui:Button>
             </ui:VisualElement>
-            <ui:VisualElement name="midiFileIssueContainer" style="background-color: rgba(0, 0, 0, 0); align-items: center; flex-direction: row; justify-content: center;">
+            <ui:VisualElement name="midiFileIssueContainer" class="mb-2" style="background-color: rgba(0, 0, 0, 0); align-items: center; flex-direction: row; justify-content: center;">
                 <MaterialIcon tabindex="-1" icon="warning" name="warningIcon" class="warning" style="margin-right: 5px;" />
                 <ui:Label tabindex="-1" text="File not found" display-tooltip-when-elided="true" name="midiFileIssueLabel" />
             </ui:VisualElement>
-            <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
             <ui:VisualElement name="midiImportSettingsContainer" style="background-color: rgba(0, 0, 0, 0); align-items: stretch;">
-                <ui:VisualElement name="midiTrackAndChannelContainer" style="background-color: rgba(0, 0, 0, 0);">
-                    <ItemPicker label="Track" name="midiTrackIndexPicker" wrap-around="true" class="controlWithLabelHorizontal" style="margin-bottom: 5px; height: auto;" />
-                    <ui:Button text="Preview" display-tooltip-when-elided="true" name="previewMidiTrackAndChannelButton" style="width: 60%; align-self: flex-end;" />
+                <ui:VisualElement name="midiTrackAndChannelContainer" class="mb-2" style="background-color: rgba(0, 0, 0, 0);">
+                    <ui:Label tabindex="-1" text="Track" display-tooltip-when-elided="true" name="midiImportTrackSettingsLabel" />
+                    <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                        <ui:DropdownField index="-1" choices="System.Collections.Generic.List`1[System.String]" name="trackAndChannelDropdownField" style="flex-grow: 1;" />
+                        <ui:Button display-tooltip-when-elided="true" name="previewMidiTrackAndChannelButton" class="squareButton ml-2" style="align-self: flex-end;">
+                            <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="play_arrow" name="startMidiPreviewIcon" class="startPreviewIcon" />
+                            <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="pause" name="stopMidiPreviewIcon" class="startPreviewIcon" style="position: absolute;" />
+                        </ui:Button>
+                    </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
-                <ui:VisualElement name="midiImportLyricsContainer" style="background-color: rgba(0, 0, 0, 0);">
-                    <ui:Toggle label="Import with lyrics" name="importWithLyricsToggle" />
-                    <ui:TextField picking-mode="Ignore" value="La li lu" name="midiLyricsTextField" readonly="true" is-delayed="true" multiline="true" class="controlWithLabelVertical" style="flex-direction: column; margin-bottom: 5px; height: 80px;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
                 <ui:VisualElement name="midiImportAssignToPlayerContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                    <ItemPicker name="assignToPlayerPicker" label="Assign To Player" class="controlWithLabelHorizontal" style="align-items: center; margin-bottom: 5px;" />
+                    <ItemPicker name="assignToPlayerPicker" label="Assign To Player" class="controlWithLabelVertical" />
+                </ui:VisualElement>
+                <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="background-color: rgba(0, 0, 0, 0);" />
+                <ui:VisualElement name="midiImportLyricsContainer" style="background-color: rgba(0, 0, 0, 0);">
+                    <ui:Toggle label="Import lyrics" name="importWithLyricsToggle" class="mb-2" />
+                    <ui:TextField picking-mode="Ignore" value="La li lu" name="midiLyricsTextField" readonly="true" is-delayed="true" multiline="true" class="controlWithLabelVertical multiline" style="flex-direction: column; margin-bottom: 5px; height: 80px;" />
+                    <ui:Label tabindex="-1" text="Best match: track 0, channel 0" display-tooltip-when-elided="true" name="bestMatchnigTrackAndChannelLabel" class="smallerFont" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:ScrollView>
