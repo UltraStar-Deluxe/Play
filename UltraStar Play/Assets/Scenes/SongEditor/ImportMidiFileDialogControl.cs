@@ -139,7 +139,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         VisualElementUtils.RegisterDirectClickCallback(importMidiFileDialogOverlay, CloseDialog);
         
         midiTrackIndexPickerControl = new(trackAndChannelDropdownField, new List<TrackAndChannel>(), null,
-            trackAndChannel => trackAndChannel.ToString());
+            trackAndChannel => GetDisplayName(trackAndChannel));
         midiTrackIndexPickerControl.Selection.Subscribe(_ =>
         {
             bool wasPlaying = midiManager.IsPlayingMidiFile;
@@ -167,6 +167,30 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         CloseDialog();
     }
 
+    private string GetDisplayName(TrackAndChannel trackAndChannel)
+    {
+        MidiTrack track = midiFile.Tracks[trackAndChannel.trackIndex];
+        string sequenceOrTrackName = MidiFileUtils.GetSequenceOrTrackName(track);
+        string instrumentName = MidiFileUtils.GetInstrumentName(track, trackAndChannel.channelIndex);
+        if (!sequenceOrTrackName.IsNullOrEmpty()
+            && !instrumentName.IsNullOrEmpty())
+        {
+            return $"{trackAndChannel} ({sequenceOrTrackName}, {instrumentName})";
+        }
+        else if (!sequenceOrTrackName.IsNullOrEmpty())
+        {
+            return $"{trackAndChannel} ({sequenceOrTrackName})";
+        }
+        else if (!instrumentName.IsNullOrEmpty())
+        {
+            return $"{trackAndChannel} ({instrumentName})";
+        }
+        else
+        {
+            return $"{trackAndChannel}";
+        }
+    }
+    
     private string GetDisplayName(EVoice voice)
     {
         if (voice is EVoice.P1)

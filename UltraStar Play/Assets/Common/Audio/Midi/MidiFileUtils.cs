@@ -118,6 +118,32 @@ public static class MidiFileUtils
             .Replace("\\", "\n");
     }
 
+    public static string GetSequenceOrTrackName(MidiTrack midiTrack)
+    {
+        MidiEvent midiEvent = midiTrack.MidiEvents.FirstOrDefault(midiEvent => midiEvent.Channel < 0 
+                                                                               && midiEvent is MetaTextEvent 
+                                                                               && midiEvent.TryGetMetaEventTypeEnum(out MetaEventTypeEnum metaEventTypeEnum) 
+                                                                               && metaEventTypeEnum is MetaEventTypeEnum.SequenceOrTrackName);
+        if (midiEvent == null)
+        {
+            return "";
+        }
+        return (midiEvent as MetaTextEvent).Text;
+    }
+    
+    public static string GetInstrumentName(MidiTrack midiTrack, int channelIndex)
+    {
+        MidiEvent midiEvent = midiTrack.MidiEvents.FirstOrDefault(midiEvent => (midiEvent.Channel < 0 || midiEvent.Channel == channelIndex) 
+                                                                               && midiEvent is MetaTextEvent 
+                                                                               && midiEvent.TryGetMetaEventTypeEnum(out MetaEventTypeEnum metaEventTypeEnum) 
+                                                                               && metaEventTypeEnum is MetaEventTypeEnum.InstrumentName);
+        if (midiEvent == null)
+        {
+            return "";
+        }
+        return (midiEvent as MetaTextEvent).Text;
+    }
+    
     public static int FindTrackIndexWithLongestLyrics(MidiFile midiFile)
     {
         List<TrackAndChannel> tracksAndChannels = GetTracksAndChannels(midiFile);
