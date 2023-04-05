@@ -33,8 +33,8 @@
                     <MaterialIcon name="micPitchOutOfRangeIndicatorBottom" icon="mic" class="errorFontColor" style="position: absolute; bottom: 5px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="rightSideBar" style="height: 100%; max-width: 24%; width: auto;">
-                <ui:VisualElement name="lyricsArea" class="panel" style="width: 180px; border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
+            <ui:VisualElement name="rightSideBar" style="height: 100%; min-width: 150px; max-width: 450px; width: 25%;">
+                <ui:VisualElement name="lyricsArea" class="panel" style="border-top-width: 0; border-right-width: 0; flex-grow: 1; height: auto;">
                     <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" class="fullMinHeightUnityContentContainer" style="width: 100%; height: auto; flex-grow: 1;">
                         <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " value="Lorem ipsum dolor sit " class="smallFont multiline" style="flex-shrink: 1; flex-grow: 1; white-space: normal;" />
                     </ui:ScrollView>
@@ -43,7 +43,7 @@
                         <ui:Button text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" class="squareButton" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; width: 180px; height: 90px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">
+                <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; height: 90px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">
                     <ui:VisualElement name="videoAreaContent" picking-mode="Ignore" style="flex-grow: 1; width: auto; height: 100%; justify-content: center; align-items: center;">
                         <MaterialIcon name="noVideoImage" icon="ondemand_video" style="position: absolute; font-size: 75px;" />
                         <ui:VisualElement name="videoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/SongEditor/SongEditorVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=bf60a74eb1fe6674da4c7faa6c1099a8&amp;type=2#SongEditorVideoRenderTexture&apos;); -unity-background-scale-mode: scale-to-fit;" />
@@ -67,6 +67,7 @@
                         </ui:Button>
                     </ui:VisualElement>
                 </ui:VisualElement>
+                <ui:VisualElement name="dragToChangeWidthArea" style="position: absolute; height: 100%; width: 4px; left: 0; top: 0; background-color: rgba(0, 0, 0, 0);" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="overviewArea" class="panel" style="height: 20px; width: 100%; align-items: center; border-right-width: 0; border-left-width: 0; flex-shrink: 0;">

@@ -77,6 +77,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
     private VisualElement editLyricsPopup;
 
+    [Inject(UxmlName = R.UxmlNames.rightSideBar)]
+    private VisualElement rightSideBar;
+
     [Inject]
     private ApplicationManager applicationManager;
     
@@ -117,6 +120,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(sideBarControl);
         injector.Inject(issueAnalyzerControl);
         injector.Inject(statusBarControl);
+        injector
+            .WithRootVisualElement(rightSideBar)
+            .CreateAndInject<DragToChangeRightSideBarWidthControl>();
     }
 
     private void Start()
