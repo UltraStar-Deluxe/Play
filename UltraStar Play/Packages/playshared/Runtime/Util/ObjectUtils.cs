@@ -31,4 +31,16 @@ public static class ObjectUtils
             throw new ArgumentNullException(paramName);
         }
     }
+
+    public static string NullableToString(object obj, string nullValueResult)
+    {
+        if (obj == null)
+        {
+            return nullValueResult;
+        }
+        else
+        {
+            return obj.ToString();
+        }
+    }
 }
