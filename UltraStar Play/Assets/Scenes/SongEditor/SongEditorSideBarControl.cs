@@ -208,6 +208,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void DoSpeechRecognition()
     {
+        if (NoteAreaSelectionDragListener.LastSelectionRect == null
+            || NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats <= 0)
+        {
+            return;
+        }
+        
         SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
         VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
@@ -223,6 +229,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void DoDetectPitch()
     {
+        if (NoteAreaSelectionDragListener.LastSelectionRect == null
+            || NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats <= 0)
+        {
+            return;
+        }
+        
         pitchDetectionAction.CreateNotesForDetectedPitch(
             NoteAreaSelectionDragListener.LastSelectionRect.MinBeat,
             NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats,

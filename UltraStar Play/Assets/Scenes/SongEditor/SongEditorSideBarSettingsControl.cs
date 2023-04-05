@@ -129,6 +129,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.pitchLabelFormatPicker)]
     private ItemPicker pitchLabelFormatPicker;
     
+    [Inject(UxmlName = R.UxmlNames.settingsSideBarContainer)]
+    private VisualElement settingsSideBarContainer;
+    
     [Inject]
     private SongMeta songMeta;
 
@@ -166,6 +169,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     {
         injector.Inject(importMidiFileDialogControl);
 
+        // Fold all AccordionItems
+        settingsSideBarContainer.Query<AccordionItem>().ForEach(it => it.HideAccordionContent());
+        
         // Editing settings
         Bind(adjustFollowingNotesToggle,
             () => settings.SongEditorSettings.AdjustFollowingNotes,

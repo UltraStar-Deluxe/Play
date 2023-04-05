@@ -203,21 +203,6 @@ Button.selected:hover {
     font-size: var(--font-size-xs);
 }
 
-.songEditorSettingsGroup {
-    border-color: var(--font-color);
-    border-top-width: 1px;
-    width: 100%;
-    min-height: 50px;
-    border-radius: 5px;
-    padding: 2px;
-    margin-bottom: 8px;
-}
-
-.songEditorSettingsGroupTitle {
-    -unity-text-align: upper-center;
-    -unity-font-style: bold;
-}
-
 ScrollView #unity-content-container {
     padding-right: 2px;
     padding-bottom: 2px;
