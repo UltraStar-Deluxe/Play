@@ -53,6 +53,9 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.importMidiFileDialogButton)]
     private Button importMidiFileDialogButton;
     
+    [Inject(UxmlName = R.UxmlNames.selectMidiFileButton)]
+    private Button selectMidiFileButton;
+    
     [Inject]
     private MidiManager midiManager;
 
@@ -140,8 +143,30 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         midiAssignToPlayerPickerControl.SelectItem(-1);
 
         midiFilePathTextField.RegisterValueChangedCallback(evt => UpdateControls());
+
+        if (PlatformUtils.IsStandalone)
+        {
+            selectMidiFileButton.RegisterCallbackButtonTriggered(_ => OpenMidiFileDialog());
+        }
+        else
+        {
+            selectMidiFileButton.HideByDisplay();
+        }
         
         CloseDialog();
+    }
+
+    private void OpenMidiFileDialog()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Midi File",
+            songMeta.Directory,
+            FileSystemDialogUtils.CreateExtensionFilters("Midi Files", ApplicationUtils.supportedMidiFiles),
+            () => MidiFilePath,
+            newValue =>
+            {
+                MidiFilePath = newValue;
+            });
     }
 
     private void StopPreview()

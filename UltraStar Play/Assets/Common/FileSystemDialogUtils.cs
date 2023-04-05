@@ -1,8 +1,43 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using SFB;
 
 public static class FileSystemDialogUtils
 {
+    public static ExtensionFilter[] CreateExtensionFilters(string filterName, params string[] extensions)
+    {
+        return new ExtensionFilter[] { new ExtensionFilter(filterName, extensions) };
+    }
+    
+    public static ExtensionFilter[] CreateExtensionFilters(string filterName, IEnumerable<string> extensions)
+    {
+        return CreateExtensionFilters(filterName, extensions.ToArray());
+    }
+    
+    public static void OpenFileDialogToSetPath(
+        string dialogTitle,
+        string fallbackDirectory,
+        ExtensionFilter[] extensionFilters,
+        Func<string> getter,
+        Action<string> setter)
+    {
+        string oldValue = getter();
+        string directory = FileUtils.Exists(oldValue)
+            ? Path.GetDirectoryName(oldValue)
+            : fallbackDirectory;
+        if (!DirectoryUtils.Exists(directory))
+        {
+            directory = "";
+        }
+        string selectedPath = OpenFileDialog(dialogTitle, directory, extensionFilters);
+        if (!selectedPath.IsNullOrEmpty())
+        {
+            setter(selectedPath);
+        }
+    }
+    
     public static string OpenFolderDialog(string title, string directory)
     {
 #if UNITY_STANDALONE

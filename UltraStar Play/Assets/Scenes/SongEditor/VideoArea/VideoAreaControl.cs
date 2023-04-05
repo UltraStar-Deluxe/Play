@@ -111,11 +111,10 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void OpenDialogToSetCoverImage()
     {
-        ExtensionFilter[] imageExtensionFilters = new ExtensionFilter[] { new ExtensionFilter("Image Files", ApplicationUtils.supportedImageFiles.ToArray()) };
-        OpenDialogToSetFilePath(
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Cover Image",
             songMeta.Directory,
-            imageExtensionFilters,
+            FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
             () => songMeta.Cover,
             newValue =>
             {
@@ -126,11 +125,10 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     
     private void OpenDialogToSetBackgroundImage()
     {
-        ExtensionFilter[] imageExtensionFilters = new ExtensionFilter[] { new ExtensionFilter("Image Files", ApplicationUtils.supportedImageFiles.ToArray()) };
-        OpenDialogToSetFilePath(
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Background Image",
             songMeta.Directory,
-            imageExtensionFilters,
+            FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
             () => songMeta.Background,
             newValue =>
             {
@@ -141,11 +139,10 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void OpenDialogToSetVideo()
     {
-        ExtensionFilter[] videoExtensionFilters = new ExtensionFilter[] { new ExtensionFilter("Video Files", ApplicationUtils.supportedVideoFiles.ToArray()) };
-        OpenDialogToSetFilePath(
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Video",
             songMeta.Directory,
-            videoExtensionFilters,
+            FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.supportedVideoFiles),
             () => songMeta.Video,
             newValue =>
             {
@@ -184,23 +181,6 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         CursorManager.SetCursorForVisualElement(visualElement, ECursor.Hand);
     }
 
-    private void OpenDialogToSetFilePath(string dialogTitle, string fallbackDirectory, ExtensionFilter[] extensionFilters, Func<string> getter, Action<string> setter)
-    {
-        string oldValue = getter();
-        string directory = FileUtils.Exists(oldValue)
-            ? Path.GetDirectoryName(oldValue)
-            : fallbackDirectory;
-        if (!DirectoryUtils.Exists(directory))
-        {
-            directory = "";
-        }
-        string selectedPath = FileSystemDialogUtils.OpenFileDialog(dialogTitle, directory, extensionFilters);
-        if (!selectedPath.IsNullOrEmpty())
-        {
-            setter(selectedPath);
-        }
-    }
-    
     private void FillVideoImageContextMenu(ContextMenuPopupControl contextMenu)
     {
         contextMenu.AddButton("Reset VideoGap", () => setVideoGapAction.ExecuteAndNotify(0));
