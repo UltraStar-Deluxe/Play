@@ -17,9 +17,17 @@ public class DropdownFieldControl<T>
         set
         {
             items = value;
-            dropdownField.choices = items
-                .Select(item => itemToString(item))
-                .ToList();
+            if (items.IsNullOrEmpty())
+            {
+                dropdownField.choices = new();
+            }
+            else
+            {
+                dropdownField.choices = items
+                    .Select(item => itemToString(item))
+                    .ToList();
+            }
+            
             if (items.IsNullOrEmpty()
                 || !items.Contains(SelectedItem))
             {
@@ -34,10 +42,10 @@ public class DropdownFieldControl<T>
     public DropdownFieldControl(DropdownField dropdownField, List<T> items, T initialSelection,
         Func<T, string> itemToString)
     {
-        this.dropdownField = dropdownField;
+        this.dropdownField = dropdownField ?? throw new ArgumentNullException(nameof(dropdownField));
+        this.itemToString = itemToString ?? throw new ArgumentNullException(nameof(itemToString));
+        this.Selection = new ReactiveProperty<T>(initialSelection);
         this.Items = items;
-        this.itemToString = itemToString;
-        Selection = new ReactiveProperty<T>(initialSelection);
 
         this.dropdownField.choices = items
             .Select(item => this.itemToString(item))
@@ -67,9 +75,9 @@ public class DropdownFieldControl<T>
                     this.dropdownField.value = null;
                 }
             }
-            else if (newValue.ToString() != dropdownField.value)
+            else if (this.itemToString(newValue) != dropdownField.value)
             {
-                dropdownField.value = newValue.ToString();
+                dropdownField.value = this.itemToString(newValue);
             }
         });
     }
