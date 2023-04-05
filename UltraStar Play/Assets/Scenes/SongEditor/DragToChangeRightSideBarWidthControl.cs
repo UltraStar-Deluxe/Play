@@ -6,13 +6,9 @@ using UnityEngine.UIElements;
 
 public class DragToChangeRightSideBarWidthControl : GeneralDragControl, IDragListener<GeneralDragEvent>
 {
-    [Inject]
-    private CursorManager cursorManager;
-    
     [Inject(UxmlName = R.UxmlNames.dragToChangeWidthArea)]
     private VisualElement dragToChangeWidthArea;
 
-    private bool isPointerOverDragToChangeWidthArea;
     private bool canChangeWidth;
 
     public override void OnInjectionFinished()
@@ -23,28 +19,14 @@ public class DragToChangeRightSideBarWidthControl : GeneralDragControl, IDragLis
         
         dragToChangeWidthArea.RegisterCallback<PointerEnterEvent>(evt =>
         {
-            isPointerOverDragToChangeWidthArea = true;
             canChangeWidth = !IsPointerDown;
-            UpdateCursor();
         });
         dragToChangeWidthArea.RegisterCallback<PointerLeaveEvent>(evt =>
         {
-            isPointerOverDragToChangeWidthArea = false;
             canChangeWidth = canChangeWidth && IsPointerDown;
-            UpdateCursor();
         });
-    }
 
-    private void UpdateCursor()
-    {
-        if (isPointerOverDragToChangeWidthArea)
-        {
-            cursorManager.SetCursorHorizontal();
-        }
-        else
-        {
-            cursorManager.SetDefaultCursor();
-        }
+        CursorManager.SetCursorForVisualElement(dragToChangeWidthArea, ECursor.ArrowsLeftRight);
     }
 
     public void OnBeginDrag(GeneralDragEvent dragEvent)
@@ -69,7 +51,6 @@ public class DragToChangeRightSideBarWidthControl : GeneralDragControl, IDragLis
     {
         base.OnPointerUp(evt);
         canChangeWidth = false;
-        UpdateCursor();
     }
 
     public new bool IsCanceled()

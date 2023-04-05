@@ -11,14 +11,36 @@ public static class FileSystemDialogUtils
             directory = "";
         }
         
-        string[] selectedFolders = StandaloneFileBrowser.OpenFolderPanel(title, directory, false);
-        if (selectedFolders.IsNullOrEmpty()
-            || !DirectoryUtils.Exists(selectedFolders.FirstOrDefault()))
+        string[] selectedPaths = StandaloneFileBrowser.OpenFolderPanel(title, directory, false);
+        if (selectedPaths.IsNullOrEmpty()
+            || !DirectoryUtils.Exists(selectedPaths.FirstOrDefault()))
         {
             return "";
         }
 
-        return selectedFolders.FirstOrDefault()
+        return selectedPaths.FirstOrDefault()
+            .Replace("\\", "/");
+#else
+        return "";
+#endif
+    }
+    
+    public static string OpenFileDialog(string title, string directory, ExtensionFilter[] extensionFilters)
+    {
+#if UNITY_STANDALONE
+        if (!DirectoryUtils.Exists(directory))
+        {
+            directory = "";
+        }
+        
+        string[] selectedPaths = StandaloneFileBrowser.OpenFilePanel(title, directory, extensionFilters, false);
+        if (selectedPaths.IsNullOrEmpty()
+            || !FileUtils.Exists(selectedPaths.FirstOrDefault()))
+        {
+            return "";
+        }
+
+        return selectedPaths.FirstOrDefault()
             .Replace("\\", "/");
 #else
         return "";

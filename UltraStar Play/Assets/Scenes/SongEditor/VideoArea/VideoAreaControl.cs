@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using SFB;
 using UniInject;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -76,16 +78,30 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         }
 
         // Init cover and background image
-        if (!songMeta.Background.IsNullOrEmpty())
-        {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta), sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
-        }
+        UpdateCoverAndBackgroundImage();
 
-        // Init cover and background image
-        if (!songMeta.Cover.IsNullOrEmpty())
-        {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
-        }
+        // Change cover and background via file dialog
+        ExtensionFilter[] imageExtensionFilters = new ExtensionFilter[] { new ExtensionFilter("Image Files", "png", "jpg", "jpeg") };
+        RegisterCallbackToSetFilePath(songCoverImage,
+            "Select Cover Image",
+            songMeta.Directory,
+            imageExtensionFilters,
+            () => songMeta.Cover,
+            newValue =>
+            {
+                songMeta.Cover = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                UpdateCoverAndBackgroundImage();
+            });
+        RegisterCallbackToSetFilePath(songBackgroundImage,
+            "Select Background Image",
+            songMeta.Directory,
+            imageExtensionFilters,
+            () => songMeta.Background,
+            newValue =>
+            {
+                songMeta.Background = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                UpdateCoverAndBackgroundImage();
+            });
 
         showVideoButton.RegisterCallbackButtonTriggered(_ => ShowVideoImage());
         showBackgroundButton.RegisterCallbackButtonTriggered(_ => ShowBackgroundImage());
@@ -103,6 +119,45 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             .WithRootVisualElement(videoImage)
             .CreateAndInject<ContextMenuControl>();
         videoImageContextMenuControl.FillContextMenuAction = FillVideoImageContextMenu;
+    }
+
+    private void UpdateCoverAndBackgroundImage()
+    {
+        if (SongMetaUtils.BackgroundResourceExists(songMeta))
+        {
+            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta), sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
+        }
+        
+        if (SongMetaUtils.CoverResourceExists(songMeta))
+        {
+            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
+        }
+    }
+
+    private void RegisterCallbackToSetFilePath(VisualElement visualElement, string dialogTitle, string fallbackDirectory, ExtensionFilter[] extensionFilters, Func<string> getter, Action<string> setter)
+    {
+        if (!PlatformUtils.IsStandalone)
+        {
+            return;
+        }
+        
+        visualElement.RegisterCallback<PointerDownEvent>(_ =>
+        {
+            string oldValue = getter();
+            string directory = FileUtils.Exists(oldValue)
+                ? Path.GetDirectoryName(oldValue)
+                : fallbackDirectory;
+            if (!DirectoryUtils.Exists(directory))
+            {
+                directory = "";
+            }
+            string selectedPath = FileSystemDialogUtils.OpenFileDialog(dialogTitle, directory, extensionFilters);
+            if (!selectedPath.IsNullOrEmpty())
+            {
+                setter(selectedPath);
+            }
+        });
+        CursorManager.SetCursorForVisualElement(visualElement, ECursor.Hand);
     }
 
     private void FillVideoImageContextMenu(ContextMenuPopupControl contextMenu)
