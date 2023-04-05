@@ -97,8 +97,11 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         int lengthInBeats = maxBeat - minBeat;
 
         contextMenu.AddSeparator();
-        contextMenu.AddButton("Speech recognition", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
-        contextMenu.AddButton("Pitch detection", () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource));
+        
+        contextMenu.AddButton($"Speech recognition on {settings.SongEditorSettings.SpeechRecognitionSamplesSource} audio",
+            () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
+        contextMenu.AddButton($"Pitch detection on {settings.SongEditorSettings.PitchDetectionSamplesSource} audio",
+            () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource));
     }
 
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)

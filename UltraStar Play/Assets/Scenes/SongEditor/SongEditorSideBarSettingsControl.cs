@@ -299,7 +299,14 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             selectModelPathButton.HideByDisplay();
         }
 
-        speechRecognitionAudioItemPickerControl = new(speechRecognitionAudioPicker, EnumUtils.GetValuesAsList<ESongEditorSamplesSource>());
+        List<ESongEditorSamplesSource> speechAndPitchAnalysisSampleSources = new List<ESongEditorSamplesSource>
+        {
+            ESongEditorSamplesSource.OriginalMusic,
+            ESongEditorSamplesSource.Vocals,
+            ESongEditorSamplesSource.Recording,
+        };
+
+        speechRecognitionAudioItemPickerControl = new(speechRecognitionAudioPicker, speechAndPitchAnalysisSampleSources);
         speechRecognitionAudioItemPickerControl.Bind(
             () => settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             newValue => settings.SongEditorSettings.SpeechRecognitionSamplesSource = newValue);
@@ -310,7 +317,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 newValue => settings.SongEditorSettings.PitchDetectionAlgorithm = newValue);
         new AutoFitLabelControl(pitchDetectionAlgorithmItemPicker.ItemLabel, 8, 15);
         
-        pitchDetectionAudioItemPickerControl = new(pitchDetectionAudioPicker, EnumUtils.GetValuesAsList<ESongEditorSamplesSource>());
+        pitchDetectionAudioItemPickerControl = new(pitchDetectionAudioPicker, speechAndPitchAnalysisSampleSources);
         pitchDetectionAudioItemPickerControl.Bind(
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
             newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
