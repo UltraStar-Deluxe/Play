@@ -339,11 +339,10 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     {
         ClearSideBar(helpSideBarContainer);
 
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-            TranslationManager.GetTranslation(R.Messages.back),
-            helpSideBarContainer);
-
         List<InputActionInfo> inputActionInfos = new();
+        
+        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, TranslationManager.GetTranslation(R.Messages.back)));
+
         if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)
         {
             inputActionInfos.Add(new InputActionInfo("Zoom Horizontal", "Ctrl+Mouse Wheel"));
@@ -370,7 +369,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
                 TranslationManager.GetTranslation(R.Messages.action_longPress)));
         }
 
-        inputActionInfos.ForEach(inputActionInfo => helpSideBarContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo)));
+        inputActionInfos.ForEach(inputActionInfo =>
+            helpSideBarContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo, true)));
     }
 
     private void ClearSideBar(VisualElement visualElement)
