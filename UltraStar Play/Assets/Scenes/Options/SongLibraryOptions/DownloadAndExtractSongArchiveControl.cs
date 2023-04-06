@@ -65,16 +65,18 @@ public class DownloadAndExtractSongArchiveControl
         fileDownloadControl.BeforeDestroyEventStream.Subscribe(_ => fileDownloadControl = null);
         fileDownloadControl.IsDoneWithoutError.Subscribe(newValue =>
         {
-            if (!newValue)
+            if (newValue)
             {
-                return;
+                StartExtractArchive(targetPath);
             }
-            StartExtractArchive(targetPath);
         });
         fileDownloadControl.HasError.Subscribe(newValue =>
         {
-            HasError.Value = HasError.Value || newValue;
-            IsDone.Value = true;
+            if (newValue)
+            {
+                HasError.Value = true;
+                IsDone.Value = true;
+            }
         });
         fileDownloadControl.ProgressEventStream.Subscribe(evt => downloadProgressEventStream.OnNext(evt));
         fileDownloadControl.SendWebRequest();
@@ -95,8 +97,20 @@ public class DownloadAndExtractSongArchiveControl
         string targetFolder = ApplicationUtils.GetPersistentDataPath("Songs");
         extractArchiveControl = ExtractArchiveControl.Create(archivePath, targetFolder, parentTransform);
         extractArchiveControl.BeforeDestroyEventStream.Subscribe(_ => extractArchiveControl = null);
-        extractArchiveControl.IsDone.Subscribe(_ => IsDone.Value = true);
-        extractArchiveControl.HasError.Subscribe(newValue => HasError.Value = HasError.Value || newValue);
+        extractArchiveControl.IsDone.Subscribe(newValue =>
+        {
+            if (newValue)
+            {
+                IsDone.Value = true;
+            }
+        });
+        extractArchiveControl.HasError.Subscribe(newValue =>
+        {
+            if (newValue)
+            {
+                HasError.Value = true;
+            }
+        });
         extractArchiveControl.ProgressEventStream.Subscribe(evt => extractProgressEventStream.OnNext(evt));
         extractArchiveControl.StartExtractArchive();
     }
@@ -105,7 +119,7 @@ public class DownloadAndExtractSongArchiveControl
     {
         if (fileDownloadControl != null)
         {
-            fileDownloadControl.AbortWebRequest();
+            fileDownloadControl.Cancel();
         }
         else if (extractArchiveControl != null)
         {

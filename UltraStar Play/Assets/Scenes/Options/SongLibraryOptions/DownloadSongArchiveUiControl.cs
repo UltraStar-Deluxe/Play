@@ -12,18 +12,24 @@ using UnityEngine.UIElements;
 
 public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedListener
 {
+    [Inject(Key = Injector.RootVisualElementInjectionKey)]
+    public VisualElement VisualElement { get; private set; }
+    
     [Inject(UxmlName = R.UxmlNames.statusLabel)]
     private Label statusLabel;
 
     [Inject(UxmlName = R.UxmlNames.urlTextField)]
     private TextField urlTextField;
 
-    [Inject(UxmlName = R.UxmlNames.startButton)]
-    private Button startDownloadButton;
+    [Inject(UxmlName = R.UxmlNames.toggleStartAndCancelButton)]
+    private Button toggleStartAndCancelButton;
 
-    [Inject(UxmlName = R.UxmlNames.cancelButton)]
-    private Button cancelDownloadButton;
-
+    [Inject(UxmlName = R.UxmlNames.startIcon)]
+    private VisualElement startIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.cancelIcon)]
+    private VisualElement cancelIcon;
+    
     [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
     private Button urlChooserButton;
 
@@ -48,6 +54,8 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     private DownloadAndExtractSongArchiveControl downloadAndExtractSongArchiveControl;
     
+    public ReactiveProperty<bool> IsDoneWithoutError { get; private set; } = new();
+    
     private List<SongArchiveEntry> songArchiveEntries = new();
     public List<SongArchiveEntry> SongArchiveEntries
     {
@@ -62,11 +70,25 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
     public void OnInjectionFinished()
     {
         statusLabel.text = "";
-        startDownloadButton.RegisterCallbackButtonTriggered(_ => StartDownload());
-        cancelDownloadButton.RegisterCallbackButtonTriggered(_ => CancelDownload());
+        urlTextField.value = "";
         new TextFieldHintControl(urlTextField);
-        
         urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
+        toggleStartAndCancelButton.RegisterCallbackButtonTriggered(_ => ToggleStartAndCancel());
+        startIcon.ShowByDisplay();
+        cancelIcon.HideByDisplay();
+    }
+
+    private void ToggleStartAndCancel()
+    {
+        if (downloadAndExtractSongArchiveControl == null
+            || downloadAndExtractSongArchiveControl.IsDone.Value)
+        {
+            StartDownload();
+        }
+        else
+        {
+            CancelDownload();
+        }
     }
 
     private void StartDownload()
@@ -78,6 +100,9 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
             return;
         }
         
+        startIcon.HideByDisplay();
+        cancelIcon.ShowByDisplay();
+        
         downloadAndExtractSongArchiveControl = new(DownloadUrl, gameObject.transform);
         downloadAndExtractSongArchiveControl.HasError.ObserveOnMainThread()
             .Subscribe(newValue =>
@@ -87,11 +112,21 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
                     SetErrorStatus();
                 }
             });
+        downloadAndExtractSongArchiveControl.IsDone.ObserveOnMainThread()
+            .Subscribe(newValue =>
+            {
+                if (newValue)
+                {
+                    startIcon.ShowByDisplay();
+                    cancelIcon.HideByDisplay();
+                }
+            });
         downloadAndExtractSongArchiveControl.IsDoneWithoutError.ObserveOnMainThread()
             .Subscribe(newValue =>
             {
                 if (newValue)
                 {
+                    IsDoneWithoutError.Value = true;
                     SetFinishedStatus();
                 }
             });

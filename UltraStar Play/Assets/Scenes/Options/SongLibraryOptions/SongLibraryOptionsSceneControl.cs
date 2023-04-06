@@ -5,6 +5,7 @@ using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 #if UNITY_ANDROID
     using UnityEngine.Android;
@@ -16,13 +17,19 @@ using UnityEngine.UIElements;
 public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     [InjectedInInspector]
-    public VisualTreeAsset songFolderListEntryAsset;
+    public VisualTreeAsset songFolderListEntryUi;
 
+    [InjectedInInspector]
+    public VisualTreeAsset downloadSongArchiveUi;
+    
     [InjectedInInspector]
     public VisualTreeAsset dialogUi;
 
     [InjectedInInspector]
     public VisualTreeAsset songIssueSongEntryUi;
+
+    [InjectedInInspector]
+    public TextAsset songArchiveEntryTextAsset;
 
     [Inject]
     private UIDocument uiDocument;
@@ -30,12 +37,15 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject]
     private UiManager uiManager;
 
-    [Inject(UxmlName = R.UxmlNames.songList)]
-    private ScrollView songList;
+    [Inject(UxmlName = R.UxmlNames.songFolderList)]
+    private ScrollView songFolderList;
 
-    [Inject(UxmlName = R.UxmlNames.addButton)]
-    private Button addButton;
+    [Inject(UxmlName = R.UxmlNames.addSongFolderButton)]
+    private Button addSongFolderButton;
 
+    [Inject(UxmlName = R.UxmlNames.downloadSongArchiveButton)]
+    private Button downloadSongArchiveButton;
+    
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintContainer)]
     private VisualElement androidSongFolderHintContainer;
 
@@ -55,7 +65,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private OptionsOverviewSceneControl optionsOverviewSceneControl;
     
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
-
+    private readonly List<DownloadSongArchiveUiControl> downloadSongArchiveUiControls = new();
+    
     protected override void Start()
     {
         base.Start();
@@ -72,7 +83,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .Subscribe(onNext => UpdateSongFolderList())
             .AddTo(gameObject);
 
-        addButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
+        addSongFolderButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
+        downloadSongArchiveButton.RegisterCallbackButtonTriggered(_ => CreateDownloadSongArchiveUiControl());
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -88,6 +100,34 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 #else
         androidSongFolderHintContainer.HideByDisplay();
 #endif
+    }
+
+    private void CreateDownloadSongArchiveUiControl()
+    {
+        VisualElement visualElement = downloadSongArchiveUi.CloneTreeAndGetFirstChild();
+
+        DownloadSongArchiveUiControl downloadSongArchiveUiControl = injector
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<DownloadSongArchiveUiControl>();
+        downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(songArchiveEntryTextAsset.text);
+
+        downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
+        {
+            if (newValue)
+            {
+                downloadSongArchiveUiControls.Remove(downloadSongArchiveUiControl);
+                
+                // Fade out the download UI, then remove it
+                LeanTween
+                    .value(gameObject, visualElement.resolvedStyle.opacity, 0, 1f)
+                    .setOnUpdate(interpolatedValue => visualElement.style.opacity = interpolatedValue)
+                    .setOnComplete(_ => visualElement.RemoveFromHierarchy());
+            }
+        });
+        
+        downloadSongArchiveUiControls.Add(downloadSongArchiveUiControl);
+
+        UpdateSongFolderList();
     }
 
     private void AddNewSongFolder()
@@ -131,6 +171,13 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
+            
+            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_demoSongPackage_title),
+                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_demoSongPackage) },
+            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_archiveDownload_title),
+                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_archiveDownload) },
+            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads_title),
+                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads) },
         };
         if (PlatformUtils.IsAndroid)
         {
@@ -257,7 +304,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     private void UpdateSongFolderList()
     {
-        songList.Clear();
+        songFolderList.Clear();
         songFolderListEntryControls.Clear();
         if (settings.GameSettings.songDirs.IsNullOrEmpty())
         {
@@ -266,21 +313,21 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             noSongsFoundLabel.style.whiteSpace = WhiteSpace.Normal;
             noSongsFoundLabel.style.marginTop = 10;
             noSongsFoundLabel.style.marginBottom = 5;
-            songList.Add(noSongsFoundLabel);
+            songFolderList.Add(noSongsFoundLabel);
 
             Button downloadSongsButton = new();
             downloadSongsButton.text = "Download songs";
             downloadSongsButton.AddToClassList("mx-auto");
             downloadSongsButton.AddToClassList("songLibraryNoSongsButton");
             downloadSongsButton.RegisterCallbackButtonTriggered(_ => optionsOverviewSceneControl.LoadScene(EScene.ContentDownloadScene));
-            songList.Add(downloadSongsButton);
+            songFolderList.Add(downloadSongsButton);
             
             Button viewMoreButton = new();
             viewMoreButton.AddToClassList("mx-auto");
             viewMoreButton.AddToClassList("songLibraryNoSongsButton");
             viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
             viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
-            songList.Add(viewMoreButton);
+            songFolderList.Add(viewMoreButton);
         }
         else
         {
@@ -291,12 +338,18 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 index++;
             });
         }
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songList);
+        
+        downloadSongArchiveUiControls.ForEach(downloadSongArchiveUiControl =>
+        {
+            songFolderList.Add(downloadSongArchiveUiControl.VisualElement);
+        });
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songFolderList);
     }
 
     private void CreateSongFolderEntryControl(string path, int indexInList)
     {
-        VisualElement visualElement = songFolderListEntryAsset.CloneTree();
+        VisualElement visualElement = songFolderListEntryUi.CloneTree();
         SongFolderListEntryControl songFolderListEntryControl = injector
             .WithRootVisualElement(visualElement)
             .WithBinding(new Binding("initialPath", new ExistingInstanceProvider<string>(path)))
@@ -315,7 +368,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         });
 
         songFolderListEntryControls.Add(songFolderListEntryControl);
-        songList.Add(visualElement);
+        songFolderList.Add(visualElement);
     }
 
     protected override void OnDestroy()

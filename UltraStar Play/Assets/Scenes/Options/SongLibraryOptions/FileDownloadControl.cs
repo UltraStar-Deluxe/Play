@@ -44,9 +44,10 @@ public class FileDownloadControl : MonoBehaviour
         WebRequest.SendWebRequest();
     }
 
-    public void AbortWebRequest()
+    public void Cancel()
     {
         WebRequest.Abort();
+        Destroy(gameObject);
     }
     
     private void Init()

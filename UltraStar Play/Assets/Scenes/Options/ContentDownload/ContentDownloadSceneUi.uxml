@@ -1,22 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="DownloadSongArchiveUi" src="project://database/Assets/Scenes/Options/SongLibraryOptions/DownloadSongArchiveUi.uxml?fileID=9197481963319205126&amp;guid=6f8fb1255ae023549a9481afddc45980&amp;type=3#DownloadSongArchiveUi" />
     <ui:VisualElement name="background">
-        <ui:VisualElement name="urlContainer" class="mb-2" style="flex-direction: row; align-items: flex-start;">
-            <ui:VisualElement name="urlChooserComboContainer" style="flex-direction: row; flex-grow: 1;">
-                <ui:TextField picking-mode="Ignore" text="http://my-url.com/my-file.zip" name="urlTextField" style="width: auto; flex-grow: 1; flex-shrink: 1; align-items: center;">
-                    <ui:Label tabindex="-1" text="Archive URL" display-tooltip-when-elided="true" name="urlTextFieldHint" class="textFieldHint" />
-                </ui:TextField>
-                <ui:Button name="urlChooserButton" class="squareButton" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0;">
-                    <MaterialIcon name="dropDownIcon" icon="arrow_drop_down" />
-                </ui:Button>
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="downloadControlsContainer" class="mb-2" style="width: 100%; flex-direction: row; justify-content: space-between; align-items: center;">
-            <ui:Label text="Not Started" display-tooltip-when-elided="true" name="statusLabel" style="border-right-width: 20px; width: 20%; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset?fileID=11400000&amp;guid=9c5ee68429ab94b45a2e23f4a735885c&amp;type=2#RobotoMono-Medium SDF&apos;);" />
-            <ui:VisualElement name="buttonContainer" style="flex-direction: row; flex-grow: 1; justify-content: flex-end;">
-                <ui:Button text="Start Download" display-tooltip-when-elided="true" name="startButton" class="controlMinWidth" style="width: 200px; margin-right: 5px;" />
-                <ui:Button text="Cancel Download" display-tooltip-when-elided="true" name="cancelButton" class="controlMinWidth" style="width: 200px;" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <AccordionGroup name="downloadDetailsAccordionGroup" />
+        <ui:Instance template="DownloadSongArchiveUi" name="DownloadSongArchiveUi" />
     </ui:VisualElement>
 </ui:UXML>
