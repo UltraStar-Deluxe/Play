@@ -1,6 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="DownloadSongArchiveUi" src="project://database/Assets/Scenes/Options/SongLibraryOptions/DownloadSongArchiveUi.uxml?fileID=9197481963319205126&amp;guid=6f8fb1255ae023549a9481afddc45980&amp;type=3#DownloadSongArchiveUi" />
-    <ui:VisualElement name="background">
-        <ui:Instance template="DownloadSongArchiveUi" name="DownloadSongArchiveUi" />
-    </ui:VisualElement>
-</ui:UXML>

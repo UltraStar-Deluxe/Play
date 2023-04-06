@@ -5,7 +5,6 @@ using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 #if UNITY_ANDROID
     using UnityEngine.Android;
@@ -117,11 +116,19 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             {
                 downloadSongArchiveUiControls.Remove(downloadSongArchiveUiControl);
                 
+                // Add new song folder if needed
+                string targetFolder = downloadSongArchiveUiControl.TargetFolder;
+                if (!targetFolder.IsNullOrEmpty()
+                    && !settings.GameSettings.songDirs.Contains(targetFolder))
+                {
+                    settings.GameSettings.songDirs.Add(targetFolder);
+                }
+                
                 // Fade out the download UI, then remove it
                 LeanTween
                     .value(gameObject, visualElement.resolvedStyle.opacity, 0, 1f)
                     .setOnUpdate(interpolatedValue => visualElement.style.opacity = interpolatedValue)
-                    .setOnComplete(_ => visualElement.RemoveFromHierarchy());
+                    .setOnComplete(_ => UpdateSongFolderList());
             }
         });
         
@@ -306,7 +313,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     {
         songFolderList.Clear();
         songFolderListEntryControls.Clear();
-        if (settings.GameSettings.songDirs.IsNullOrEmpty())
+        if (settings.GameSettings.songDirs.IsNullOrEmpty()
+            && downloadSongArchiveUiControls.IsNullOrEmpty())
         {
             Label noSongsFoundLabel = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
             noSongsFoundLabel.AddToClassList("mx-auto");
@@ -314,20 +322,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             noSongsFoundLabel.style.marginTop = 10;
             noSongsFoundLabel.style.marginBottom = 5;
             songFolderList.Add(noSongsFoundLabel);
-
-            Button downloadSongsButton = new();
-            downloadSongsButton.text = "Download songs";
-            downloadSongsButton.AddToClassList("mx-auto");
-            downloadSongsButton.AddToClassList("songLibraryNoSongsButton");
-            downloadSongsButton.RegisterCallbackButtonTriggered(_ => optionsOverviewSceneControl.LoadScene(EScene.ContentDownloadScene));
-            songFolderList.Add(downloadSongsButton);
-            
-            Button viewMoreButton = new();
-            viewMoreButton.AddToClassList("mx-auto");
-            viewMoreButton.AddToClassList("songLibraryNoSongsButton");
-            viewMoreButton.text = TranslationManager.GetTranslation(R.Messages.viewMore);
-            viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
-            songFolderList.Add(viewMoreButton);
         }
         else
         {

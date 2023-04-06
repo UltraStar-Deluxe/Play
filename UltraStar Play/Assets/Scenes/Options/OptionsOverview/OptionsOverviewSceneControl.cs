@@ -28,9 +28,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.loadedSceneTitle)]
     private Label loadedSceneTitle;
     
-    [Inject(UxmlName = R.UxmlNames.contentDownloadButton)]
-    private ToggleButton contentDownloadButton;
-    
     [Inject(UxmlName = R.UxmlNames.gameOptionsButton)]
     private ToggleButton gameOptionsButton;
 
@@ -287,7 +284,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private void UpdateSceneToNameMap()
     {
         sceneToShortNameMap.Clear();
-        sceneToShortNameMap.Add(EScene.ContentDownloadScene, TranslationManager.GetTranslation(R.Messages.options_downloadSongs_title));
         sceneToShortNameMap.Add(EScene.OptionsGameScene, TranslationManager.GetTranslation(R.Messages.options_game_button));
         sceneToShortNameMap.Add(EScene.SongLibraryOptionsScene, TranslationManager.GetTranslation(R.Messages.options_songLibrary_button));
         sceneToShortNameMap.Add(EScene.OptionsSoundScene, TranslationManager.GetTranslation(R.Messages.options_sound_button));
@@ -301,7 +297,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToShortNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_button));
         
         sceneToLongNameMap.Clear();
-        sceneToLongNameMap.Add(EScene.ContentDownloadScene, TranslationManager.GetTranslation(R.Messages.options_downloadSongs_title));
         sceneToLongNameMap.Add(EScene.OptionsGameScene, TranslationManager.GetTranslation(R.Messages.options_game_title));
         sceneToLongNameMap.Add(EScene.SongLibraryOptionsScene, TranslationManager.GetTranslation(R.Messages.options_songLibrary_title));
         sceneToLongNameMap.Add(EScene.OptionsSoundScene, TranslationManager.GetTranslation(R.Messages.options_sound_title));
@@ -317,7 +312,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     
     private void UpdateSceneToButtonMap()
     {
-        sceneToButtonMap.Add(EScene.ContentDownloadScene, contentDownloadButton);
         sceneToButtonMap.Add(EScene.OptionsGameScene, gameOptionsButton);
         sceneToButtonMap.Add(EScene.SongLibraryOptionsScene, songsOptionsButton);
         sceneToButtonMap.Add(EScene.OptionsGraphicsScene, graphicsOptionsButton);

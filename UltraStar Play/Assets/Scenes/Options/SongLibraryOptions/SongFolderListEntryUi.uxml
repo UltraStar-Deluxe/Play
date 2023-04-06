@@ -3,7 +3,7 @@
         <ui:VisualElement name="row" style="flex-direction: row; width: auto; justify-content: space-between; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
             <ui:VisualElement name="textFieldContainer" style="flex-grow: 1; flex-direction: row;">
                 <ui:Button text="Internal Storage" display-tooltip-when-elided="true" name="driveButton" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" />
-                <ui:TextField picking-mode="Ignore" text="C:\Songs" name="pathTextField" mask-character="*" password="false" style="flex-grow: 1;" />
+                <ui:TextField picking-mode="Ignore" text="C:\Songs" name="pathTextField" mask-character="*" password="false" style="flex-grow: 1; flex-shrink: 1;" />
                 <ui:Button name="selectFolderButton" class="squareButton ml-1">
                     <MaterialIcon name="selectFolderIcon" icon="folder_open" />
                 </ui:Button>

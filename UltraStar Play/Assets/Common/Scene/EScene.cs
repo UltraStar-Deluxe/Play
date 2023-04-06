@@ -18,7 +18,6 @@
     OptionsSoundScene = 6,
     RecordingOptionsScene = 14,
     PlayerProfileSetupScene = 7,
-    ContentDownloadScene = 15,
     ThemeOptionsScene = 16,
     NetworkOptionsScene = 17,
     DevelopmentOptionsScene = 18,

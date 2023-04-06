@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
+using PrimeInputActions;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,14 +11,19 @@ public class DownloadAndExtractSongArchiveControl
     private readonly string url;
     private readonly Transform parentTransform;
     
+    public string TargetFolder => extractArchiveControl != null
+        ? extractArchiveControl.TargetFolder
+        : "";
+    
     private bool wasDownloadStarted;
     private FileDownloadControl fileDownloadControl;
     private ExtractArchiveControl extractArchiveControl;
     
     public ReactiveProperty<bool> IsDone { get; private set; } = new();
-    public ReactiveProperty<bool> HasError { get; private set; } = new();
-    public ReactiveProperty<bool> IsDoneWithoutError { get; private set; } = new();
-    public ReactiveProperty<bool> IsDoneOrHasError { get; private set; } = new();
+    public ReactiveProperty<string> ErrorMessage { get; private set; } = new();
+    public IObservable<bool> HasError => ErrorMessage.Select(errorMessage => !errorMessage.IsNullOrEmpty());
+    public IObservable<bool> IsDoneOrHasError => IsDone.CombineLatest(HasError, (isDone, hasError) => isDone || hasError);
+    public IObservable<bool> IsDoneWithoutError => IsDone.CombineLatest(HasError, (isDone, hasError) => isDone && !hasError);
     
     private readonly Subject<FileDownloadControl.DownloadProgressEvent> downloadProgressEventStream = new();
     public IObservable<FileDownloadControl.DownloadProgressEvent> DownloadProgressEventStream => downloadProgressEventStream;
@@ -33,17 +40,6 @@ public class DownloadAndExtractSongArchiveControl
         
         this.url = url;
         this.parentTransform = parentTransform;
-
-        IsDone.Subscribe(newValue =>
-        {
-            IsDoneOrHasError.Value = IsDone.Value || HasError.Value;
-            IsDoneWithoutError.Value = IsDone.Value && !HasError.Value;
-        });
-        HasError.Subscribe(newValue =>
-        {
-            IsDoneOrHasError.Value = IsDone.Value || HasError.Value;
-            IsDoneWithoutError.Value = IsDone.Value && !HasError.Value;
-        });
     }
     
     public void Start()
@@ -70,11 +66,11 @@ public class DownloadAndExtractSongArchiveControl
                 StartExtractArchive(targetPath);
             }
         });
-        fileDownloadControl.HasError.Subscribe(newValue =>
+        fileDownloadControl.ErrorMessage.Subscribe(newValue =>
         {
-            if (newValue)
+            if (!newValue.IsNullOrEmpty())
             {
-                HasError.Value = true;
+                ErrorMessage.Value = newValue;
                 IsDone.Value = true;
             }
         });
@@ -94,7 +90,7 @@ public class DownloadAndExtractSongArchiveControl
             throw new FileNotFoundException(archivePath);
         }
 
-        string targetFolder = ApplicationUtils.GetPersistentDataPath("Songs");
+        string targetFolder = GetArchiveTargetFolder();
         extractArchiveControl = ExtractArchiveControl.Create(archivePath, targetFolder, parentTransform);
         extractArchiveControl.BeforeDestroyEventStream.Subscribe(_ => extractArchiveControl = null);
         extractArchiveControl.IsDone.Subscribe(newValue =>
@@ -104,17 +100,35 @@ public class DownloadAndExtractSongArchiveControl
                 IsDone.Value = true;
             }
         });
-        extractArchiveControl.HasError.Subscribe(newValue =>
+        extractArchiveControl.ErrorMessage.Subscribe(newValue =>
         {
-            if (newValue)
+            if (!newValue.IsNullOrEmpty())
             {
-                HasError.Value = true;
+                ErrorMessage.Value = newValue;
+                IsDone.Value = true;
             }
         });
         extractArchiveControl.ProgressEventStream.Subscribe(evt => extractProgressEventStream.OnNext(evt));
         extractArchiveControl.StartExtractArchive();
     }
-    
+
+    private string GetArchiveTargetFolder()
+    {
+        Uri uri = new Uri(url);
+        string extractedArchiveName = $"{uri.Host}{uri.PathAndQuery}";
+        if (extractedArchiveName.Contains("?"))
+        {
+            extractedArchiveName = extractedArchiveName.Substring(0, extractedArchiveName.IndexOf("?", StringComparison.InvariantCulture));
+        }
+        if (extractedArchiveName.StartsWith("/"))
+        {
+            extractedArchiveName = extractedArchiveName.Substring(1);
+        }
+        extractedArchiveName = Regex.Replace(extractedArchiveName, @"\W", "_");
+        
+        return ApplicationUtils.GetPersistentDataPath($"Songs/{extractedArchiveName}");
+    }
+
     public void Cancel()
     {
         if (fileDownloadControl != null)

@@ -10,7 +10,7 @@
             <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: center;">
                 <ui:Button display-tooltip-when-elided="true" name="addSongFolderButton" style="flex-direction: row;">
                     <MaterialIcon tabindex="-1" name="addSongFolderIcon" icon="create_new_folder" class="mx-2" style="font-size: 24px;" />
-                    <ui:Label tabindex="-1" text="Import Local Songs" display-tooltip-when-elided="true" name="downloadSongsButtonLabel" />
+                    <ui:Label tabindex="-1" text="Add Song Folder" display-tooltip-when-elided="true" name="downloadSongsButtonLabel" />
                 </ui:Button>
                 <ui:Button display-tooltip-when-elided="true" name="downloadSongArchiveButton" class="ml-2" style="flex-direction: row;">
                     <MaterialIcon tabindex="-1" name="downloadSongArchiveIcon" icon="cloud_download" class="mx-2" style="font-size: 24px;" />

@@ -3,7 +3,7 @@
         <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
             <ui:VisualElement name="textFieldContainer" style="flex-grow: 1; flex-direction: row;">
                 <ui:TextField picking-mode="Ignore" text="C:\Songs" name="urlTextField" mask-character="*" password="false" style="flex-grow: 1; align-items: center;">
-                    <ui:Label tabindex="-1" text="Song Archive URL" display-tooltip-when-elided="true" class="textFieldHint" />
+                    <ui:Label tabindex="-1" text="Song Archive URL" display-tooltip-when-elided="true" name="urlTextFieldHint" class="textFieldHint secondaryFontColor" />
                 </ui:TextField>
                 <ui:Button name="urlChooserButton" class="squareButton comboBoxButton">
                     <MaterialIcon name="selectFolderIcon" icon="arrow_drop_down" />
@@ -14,7 +14,7 @@
                 <MaterialIcon tabindex="-1" picking-mode="Ignore" icon="cancel" name="cancelIcon" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:Label text="Not Started" display-tooltip-when-elided="true" name="statusLabel" style="-unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset?fileID=11400000&amp;guid=9c5ee68429ab94b45a2e23f4a735885c&amp;type=2#RobotoMono-Medium SDF&apos;);" />
+        <ui:Label text="Click the button to start the download" display-tooltip-when-elided="true" name="statusLabel" style="-unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset?fileID=11400000&amp;guid=9c5ee68429ab94b45a2e23f4a735885c&amp;type=2#RobotoMono-Medium SDF&apos;);" />
         <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
     </ui:VisualElement>
 </ui:UXML>

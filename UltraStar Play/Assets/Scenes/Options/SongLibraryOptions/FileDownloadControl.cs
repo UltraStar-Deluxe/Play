@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using ProTrans;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -18,9 +19,10 @@ public class FileDownloadControl : MonoBehaviour
     public IObservable<bool> BeforeDestroyEventStream => beforeDestroyEventStream;
     
     public ReactiveProperty<bool> IsDone { get; private set; } = new();
-    public ReactiveProperty<bool> HasError { get; private set; } = new();
-    public ReactiveProperty<bool> IsDoneOrHasError { get; private set; } = new();
-    public ReactiveProperty<bool> IsDoneWithoutError { get; private set; } = new();
+    public ReactiveProperty<string> ErrorMessage { get; private set; } = new();
+    public IObservable<bool> HasError => ErrorMessage.Select(errorMessage => !errorMessage.IsNullOrEmpty());
+    public IObservable<bool> IsDoneOrHasError => IsDone.CombineLatest(HasError, (isDone, hasError) => isDone || hasError);
+    public IObservable<bool> IsDoneWithoutError => IsDone.CombineLatest(HasError, (isDone, hasError) => isDone && !hasError);
 
     private bool isInitialized;
     
@@ -59,17 +61,6 @@ public class FileDownloadControl : MonoBehaviour
         
         isInitialized = true;
         
-        IsDone.Subscribe(newValue =>
-        {
-            IsDoneOrHasError.Value = IsDone.Value || HasError.Value;
-            IsDoneWithoutError.Value = IsDone.Value && !HasError.Value;
-        });
-        HasError.Subscribe(newValue =>
-        {
-            IsDoneOrHasError.Value = IsDone.Value || HasError.Value;
-            IsDoneWithoutError.Value = IsDone.Value && !HasError.Value;
-        });
-        
         FetchFileSize();
     }
 
@@ -82,7 +73,7 @@ public class FileDownloadControl : MonoBehaviour
         
         UpdateReactiveProperties();
         
-        if (IsDoneOrHasError.Value)
+        if (IsDone.Value || !ErrorMessage.Value.IsNullOrEmpty())
         {
             Destroy(gameObject);
         }
@@ -104,6 +95,7 @@ public class FileDownloadControl : MonoBehaviour
         {
             Debug.LogError($"Error fetching size of {uri}: {request.error}");
             FinalDownloadSizeInBytes.Value = 0;
+            ErrorMessage.Value = request.error;
         }
         else
         {
@@ -121,14 +113,13 @@ public class FileDownloadControl : MonoBehaviour
 
     private void UpdateReactiveProperties()
     {
-        progressEventStream.OnNext(new DownloadProgressEvent(WebRequest.downloadedBytes, FinalDownloadSizeInBytes.Value));
-
-        HasError.Value = WebRequest.result
-            is UnityWebRequest.Result.ConnectionError
-            or UnityWebRequest.Result.ProtocolError
-            or UnityWebRequest.Result.DataProcessingError;
-        
+        ErrorMessage.Value = WebRequest.error;
         IsDone.Value = WebRequest.isDone;
+
+        if (ErrorMessage.Value.IsNullOrEmpty())
+        {
+            progressEventStream.OnNext(new DownloadProgressEvent(WebRequest.downloadedBytes, FinalDownloadSizeInBytes.Value));
+        }
     }
     
     private void OnDestroy()
@@ -139,7 +130,7 @@ public class FileDownloadControl : MonoBehaviour
         // If the request was not finished yet, then it is now aborted and thus not successful.
         if (!IsDone.Value)
         {
-            HasError.Value = true;
+            ErrorMessage.Value = "Canceled";
         }
         IsDone.Value = true;
     }

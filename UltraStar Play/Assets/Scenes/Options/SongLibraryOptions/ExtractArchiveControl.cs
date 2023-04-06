@@ -15,9 +15,10 @@ public class ExtractArchiveControl : MonoBehaviour
     public string TargetFolder { get; private set; }
 
     public ReactiveProperty<bool> IsDone { get; private set; } = new();
-    public ReactiveProperty<bool> HasError { get; private set; } = new();
-    public ReactiveProperty<bool> IsDoneWithoutError { get; private set; } = new();
-    public ReactiveProperty<bool> IsDoneOrHasError { get; private set; } = new();
+    public ReactiveProperty<string> ErrorMessage { get; private set; } = new();
+    public IObservable<bool> HasError => ErrorMessage.Select(errorMessage => !errorMessage.IsNullOrEmpty());
+    public IObservable<bool> IsDoneOrHasError => IsDone.CombineLatest(HasError, (isDone, hasError) => isDone || hasError);
+    public IObservable<bool> IsDoneWithoutError => IsDone.CombineLatest(HasError, (isDone, hasError) => isDone && !hasError);
 
     private long totalZipEntryCount;
     private long extractedZipEntryCount;
@@ -45,22 +46,7 @@ public class ExtractArchiveControl : MonoBehaviour
         ExtractArchiveControl extractArchiveControl = gameObject.AddComponent<ExtractArchiveControl>();
         extractArchiveControl.ArchivePath = archivePath;
         extractArchiveControl.TargetFolder = targetFolder;
-        extractArchiveControl.Init();
         return extractArchiveControl;
-    }
-
-    private void Init()
-    {
-        IsDone.Subscribe(newValue =>
-        {
-            IsDoneOrHasError.Value = IsDone.Value || HasError.Value;
-            IsDoneWithoutError.Value = IsDone.Value && !HasError.Value;
-        });
-        HasError.Subscribe(newValue =>
-        {
-            IsDoneOrHasError.Value = IsDone.Value || HasError.Value;
-            IsDoneWithoutError.Value = IsDone.Value && !HasError.Value;
-        });
     }
 
     public void StartExtractArchive()
@@ -96,14 +82,18 @@ public class ExtractArchiveControl : MonoBehaviour
             {
                 ExtractZipArchive();
             }
-            progressEventStream.OnNext(new ExtractArchiveProgressEvent(totalZipEntryCount, totalZipEntryCount));
+
+            if (ErrorMessage.Value.IsNullOrEmpty())
+            {
+                progressEventStream.OnNext(new ExtractArchiveProgressEvent(totalZipEntryCount, totalZipEntryCount));
+            }
             IsDone.Value = true;
         }
         catch (Exception e)
         {
             Debug.LogException(e);
             Debug.LogError($"Failed to extract archive '{ArchivePath}': {e.Message}");
-            HasError.Value = true;
+            ErrorMessage.Value = e.Message;
         }
     }
     
@@ -144,7 +134,10 @@ public class ExtractArchiveControl : MonoBehaviour
         StreamUtils.Copy(zipEntryStream, targetFileStream, buffer);
         
         extractedZipEntryCount++;
-        progressEventStream.OnNext(new ExtractArchiveProgressEvent(extractedZipEntryCount, totalZipEntryCount));
+        if (ErrorMessage.Value.IsNullOrEmpty())
+        {
+            progressEventStream.OnNext(new ExtractArchiveProgressEvent(extractedZipEntryCount, totalZipEntryCount));
+        }
     }
 
     private void ExtractTarArchive()
@@ -160,7 +153,10 @@ public class ExtractArchiveControl : MonoBehaviour
     private void OnExtractTarArchiveProgress(TarArchive archive, TarEntry entry, string message)
     {
         extractedTarFileEntrySizeInBytes += entry.Size;
-        progressEventStream.OnNext(new ExtractArchiveProgressEvent(extractedTarFileEntrySizeInBytes, totalTarFileSizeInBytes));
+        if (ErrorMessage.Value.IsNullOrEmpty())
+        {
+            progressEventStream.OnNext(new ExtractArchiveProgressEvent(extractedTarFileEntrySizeInBytes, totalTarFileSizeInBytes));
+        }
     }
 
     private void Update()
@@ -170,7 +166,7 @@ public class ExtractArchiveControl : MonoBehaviour
             return;
         }
 
-        if (IsDoneOrHasError.Value)
+        if (IsDone.Value || !ErrorMessage.Value.IsNullOrEmpty())
         {
             Destroy(gameObject);
         }
