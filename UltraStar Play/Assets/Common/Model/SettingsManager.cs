@@ -131,34 +131,24 @@ public class SettingsManager : AbstractSingletonBehaviour
         }
 #endif
 
-        // Try to select the first mic for singing.
         try
         {
-            MicProfile defaultMicProfile = CreateDefaultMicProfile();
-            if (defaultMicProfile != null)
-            {
-                settings.MicProfiles.Add(defaultMicProfile);
-            }
+            ThemeManager themeManager = ThemeManager.Instance;
+            ThemeJson defaultThemeJson = themeManager.GetDefaultTheme().ThemeJson;
+            List<Color32> micProfileColors = themeManager.GetMicrophoneColors(defaultThemeJson);
+            
+            List<IConnectedClientHandler> connectedClientHandlers = new List<IConnectedClientHandler>();
+            List<MicProfile> persistedMicProfiles = new();
+            
+            defaultSettings.MicProfiles = MicProfileUtils.CreateMicProfiles(persistedMicProfiles, micProfileColors, connectedClientHandlers);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            Debug.LogError("Failed to create initial recording device profile.");
-            Debug.LogError(ex);
+            Debug.LogException(e);
+            Debug.LogError("Failed to create initial mic profiles");
         }
-
+        
         return defaultSettings;
-    }
-
-    private MicProfile CreateDefaultMicProfile()
-    {
-        if (Microphone.devices.Length <= 0)
-        {
-            return null;
-        }
-
-        MicProfile result = new(Microphone.devices.FirstOrDefault());
-        result.IsEnabled = true;
-        return result;
     }
 
     private void OverwriteSettingsWithCommandLineArguments()

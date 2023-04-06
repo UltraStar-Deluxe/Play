@@ -811,9 +811,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         uiDocument.rootVisualElement.style.backgroundImage = new StyleBackground();
     }
 
-    public List<Color32> GetMicrophoneColors()
+    public List<Color32> GetMicrophoneColors(ThemeJson themeJson = null)
     {
-        List<Color32> themeMicrophoneColors = GetCurrentTheme()?.ThemeJson?.microphoneColors;
+        if (themeJson == null)
+        {
+            themeJson = GetCurrentTheme()?.ThemeJson;
+        }
+        
+        List<Color32> themeMicrophoneColors = themeJson?.microphoneColors;
         if (!themeMicrophoneColors.IsNullOrEmpty())
         {
             return themeMicrophoneColors;
