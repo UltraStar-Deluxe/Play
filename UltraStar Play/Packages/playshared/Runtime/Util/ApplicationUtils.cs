@@ -10,6 +10,11 @@ public static class ApplicationUtils
 {
     public const string GeneratedFolderName = "Generated";
 
+    public static readonly IReadOnlyList<string> supportedSoundfontFiles = new List<string>
+    {
+        "sf2",
+    };
+    
     public static readonly IReadOnlyList<string> supportedImageFiles = new List<string>
     {
         "png",

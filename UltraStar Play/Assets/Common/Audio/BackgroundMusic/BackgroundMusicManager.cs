@@ -42,6 +42,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource backgroundMusicAudioSource;
+    public AudioSource BackgroundMusicAudioSource => backgroundMusicAudioSource;
 
     [Inject]
     private Settings settings;
