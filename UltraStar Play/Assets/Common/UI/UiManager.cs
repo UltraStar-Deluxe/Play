@@ -159,7 +159,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         void AddChapter(string title, string content)
         {
             AccordionItem accordionItem = new(title);
-            accordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
             accordionItem.Add(new Label(content));
             accordionGroup.Add(accordionItem);
         }

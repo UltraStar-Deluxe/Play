@@ -211,12 +211,10 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         issuesDialogControl.AddVisualElement(accordionGroup);
         
         AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
-        errorsAccordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
         accordionGroup.Add(errorsAccordionItem);
         FillWithSongIssues(errorsAccordionItem, songMetaManager.GetSongErrors());
 
         AccordionItem warningsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings));
-        warningsAccordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
         accordionGroup.Add(warningsAccordionItem);
         FillWithSongIssues(warningsAccordionItem, songMetaManager.GetSongWarnings());
 
