@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
     <ui:VisualElement name="leftSideBarMainColumn" class="panel smallFont leftSideBar" style="border-left-width: 0; border-top-width: 0; border-bottom-width: 0; justify-content: space-between;">
-        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" horizontal-scroller-visibility="Hidden" style="height: 100%;">
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="scrollView" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="height: 100%;">
             <ui:Button display-tooltip-when-elided="true" name="togglePlaybackButton" style="justify-content: center;">
                 <ui:Label text="Play/Pause" display-tooltip-when-elided="true" name="label" />
                 <MaterialIcon name="playIcon" icon="play_arrow" />
@@ -9,7 +9,11 @@
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleRecordingButton">
                 <ui:Label text="Record" display-tooltip-when-elided="true" name="label" />
-                <MaterialIcon name="icon" icon="fiber_manual_record" />
+                <MaterialIcon name="icon" icon="mic" />
+            </ui:Button>
+            <ui:Button display-tooltip-when-elided="true" name="audioSeparationButton">
+                <ui:Label text="Split&#10;Audio" display-tooltip-when-elided="true" name="label" />
+                <MaterialIcon name="icon" icon="call_split" />
             </ui:Button>
             <ui:Button display-tooltip-when-elided="true" name="toggleIssuesButton">
                 <ui:Label text="Issues" display-tooltip-when-elided="true" name="label" />

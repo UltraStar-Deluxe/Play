@@ -43,7 +43,7 @@ VisualElement
 }
 
 .bottomLineSeparator {
-    border-color: var(--text-color);
+    border-color: var(--font-color);
     border-bottom-width: 1px;
     border-radius: 5px;
 }
@@ -114,8 +114,6 @@ VisualElement
     -unity-font-style: italic;
     font-size: var(--font-size-s);
 }
-
-TextField.multiline 
 
 .transparentBackgroundColor #unity-text-input {
     background-color: rgba(0, 0, 0, 0);

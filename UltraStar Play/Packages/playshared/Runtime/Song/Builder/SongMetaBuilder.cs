@@ -207,6 +207,21 @@ public static class SongMetaBuilder
                     case "medleyendbeat":
                         songMeta.MedleyEndBeat = ConvertToInt32(item.Value);
                         break;
+                    case "audio":
+                        songMeta.Mp3 = item.Value;
+                        break;
+                    case "vocalsaudio":
+                        songMeta.VocalsAudio = item.Value;
+                        break;
+                    case "instrumentalaudio":
+                        songMeta.InstrumentalAudio = item.Value;
+                        break;
+                    case "artist":
+                        songMeta.Artist = item.Value;
+                        break;
+                    case "title":
+                        songMeta.Title = item.Value;
+                        break;
                     default:
                         songMeta.SetUnknownHeaderEntry(item.Key, item.Value);
                         break;

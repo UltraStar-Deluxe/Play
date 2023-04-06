@@ -121,4 +121,9 @@ public static class PathUtils
     {
         return Path.GetFullPath(pathA) == Path.GetFullPath(pathB);
     }
+    
+    public static string MakeRelativePath(string relativeTo, string path)
+    {
+        return Path.GetRelativePath(relativeTo, path);
+    }
 }

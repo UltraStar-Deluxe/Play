@@ -33,16 +33,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public SongVideoPlayer songVideoPlayer;
 
     [InjectedInInspector]
-    public SongEditorNoteRecorder songEditorNoteRecorder;
-
-    [InjectedInInspector]
     public SongEditorSelectionControl selectionControl;
 
     [InjectedInInspector]
     public EditorNoteDisplayer editorNoteDisplayer;
-
-    [InjectedInInspector]
-    public SongEditorMicPitchTracker songEditorMicPitchTracker;
 
     [InjectedInInspector]
     public SongEditorHistoryManager historyManager;
@@ -59,6 +53,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [InjectedInInspector]
     public SongEditorAlternativeAudioPlayer songEditorAlternativeAudioPlayer;
 
+    [InjectedInInspector]
+    public SongEditorMicSampleRecorder songEditorMicSampleRecorder;
+    
     [Inject]
     private Injector injector;
 
@@ -79,6 +76,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [Inject(UxmlName = R.UxmlNames.editLyricsPopup)]
     private VisualElement editLyricsPopup;
+
+    [Inject(UxmlName = R.UxmlNames.rightSideBar)]
+    private VisualElement rightSideBar;
 
     [Inject]
     private ApplicationManager applicationManager;
@@ -103,7 +103,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorSideBarControl sideBarControl = new();
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
-    private readonly SongEditorSampleRecorderControl songEditorSampleRecorderControl = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
@@ -121,7 +120,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(sideBarControl);
         injector.Inject(issueAnalyzerControl);
         injector.Inject(statusBarControl);
-        injector.Inject(songEditorSampleRecorderControl);
+        injector
+            .WithRootVisualElement(rightSideBar)
+            .CreateAndInject<DragToChangeRightSideBarWidthControl>();
     }
 
     private void Start()
@@ -436,9 +437,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songVideoPlayer);
         bb.BindExistingInstance(noteAreaControl);
         bb.BindExistingInstance(songEditorLayerManager);
-        bb.BindExistingInstance(songEditorMicPitchTracker);
-        bb.BindExistingInstance(songEditorNoteRecorder);
-        bb.BindExistingInstance(songEditorSampleRecorderControl);
+        bb.BindExistingInstance(songEditorMicSampleRecorder);
         bb.BindExistingInstance(songEditorAlternativeAudioPlayer);
         bb.BindExistingInstance(selectionControl);
         bb.BindExistingInstance(lyricsAreaControl);

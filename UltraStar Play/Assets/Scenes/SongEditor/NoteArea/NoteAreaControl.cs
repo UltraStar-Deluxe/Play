@@ -165,7 +165,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public void Update()
     {
-        selectionDragListener.UpdateAutoScroll();
+        selectionDragListener.Update();
     }
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)

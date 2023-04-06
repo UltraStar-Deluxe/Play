@@ -201,12 +201,12 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
         // Fill buffer with raw sample data from microphone
         int currentSamplePosition = MicrophoneAdapter.GetPosition(MicProfile.Name);
-        MicrophoneAdapter.GetRecordedSamples(MicProfile.Name, MicProfile.ChannelIndex, micAudioClip, currentSamplePosition, MicSamples);
         if (currentSamplePosition == lastSamplePosition)
         {
             // No new samples yet (or all samples changed, which is unlikely because the buffer has a length of 1 second and FPS should be > 1).
             return;
         }
+        MicrophoneAdapter.GetRecordedSamples(MicProfile.Name, MicProfile.ChannelIndex, micAudioClip, currentSamplePosition, MicSamples);
 
         int newSamplesCount = GetNewSampleCountInCircularBuffer(lastSamplePosition, currentSamplePosition, MicSamples.Length);
         NotifyListeners(newSamplesCount);

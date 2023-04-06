@@ -34,6 +34,9 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
     protected PanelHelper panelHelper;
 
+    protected bool IsPointerOver { get; private set; }
+    protected bool IsPointerDown { get; private set; }
+    
     private readonly List<IDisposable> disposables = new();
 
     public IReadOnlyCollection<int> ButtonFilter { get; set; } = new List<int> { 0, 1, 2 };
@@ -41,6 +44,8 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     public virtual void OnInjectionFinished()
     {
         this.panelHelper = new PanelHelper(uiDocument);
+        targetVisualElement.RegisterCallback<PointerEnterEvent>(OnPointerEnter, TrickleDown.TrickleDown);
+        targetVisualElement.RegisterCallback<PointerLeaveEvent>(OnPointerLeave, TrickleDown.TrickleDown);
         targetVisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
         // Drag gesture may leave the target visual element. Thus, listen on the rootVisualElement for the pointer events.
         uiDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(OnPointerMove, TrickleDown.TrickleDown);
@@ -55,6 +60,16 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
                 InputManager.GetInputAction("usplay/back").CancelNotifyForThisFrame();
             })
             .AddTo(gameObject));
+    }
+
+    private void OnPointerEnter(PointerEnterEvent evt)
+    {
+        IsPointerOver = true;
+    }
+    
+    private void OnPointerLeave(PointerLeaveEvent evt)
+    {
+        IsPointerOver = false;
     }
 
     protected abstract EVENT CreateDragEventStart(DragControlPointerEvent eventData);
@@ -80,6 +95,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
 
         dragControlPointerDownEvent = new DragControlPointerEvent(evt);
         DragState.Value = EDragState.WaitingForDistanceThreshold;
+        IsPointerDown = true;
     }
 
     protected virtual void OnPointerMove(IPointerEvent evt)
@@ -112,6 +128,7 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
         }
 
         DragState.Value = EDragState.WaitingForPointerDown;
+        IsPointerDown = false;
     }
 
     protected virtual void OnBeginDrag(DragControlPointerEvent eventData)

@@ -4,7 +4,6 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
@@ -178,10 +177,10 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             .AddTo(gameObject);
 
         settings.SongEditorSettings
-            .ObserveEveryValueChanged(it => it.ShowNotePitchLabel)
+            .ObserveEveryValueChanged(it => it.TimeLabelFormat)
             .Subscribe(_ => UpdateNotesAndSentences())
             .AddTo(gameObject);
-
+        
         songEditorLayerManager.LayerChangedEventStream
             .Subscribe(evt =>
             {

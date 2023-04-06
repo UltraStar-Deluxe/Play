@@ -109,12 +109,12 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (!songMeta.Cover.IsNullOrEmpty())
+        if (SongMetaUtils.CoverResourceExists(songMeta))
         {
             ImageManager.ReloadImage(SongMetaUtils.GetCoverUri(songMeta), uiDocument);
         }
 
-        if (!songMeta.Background.IsNullOrEmpty())
+        if (SongMetaUtils.BackgroundResourceExists(songMeta))
         {
             ImageManager.ReloadImage(SongMetaUtils.GetBackgroundUri(songMeta), uiDocument);
         }

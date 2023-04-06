@@ -79,4 +79,10 @@ public class ObjectPool<T>
     {
         new List<T>(usedObjects).ForEach(obj => AddFreeObject(obj));
     }
+
+    public void ForEach(Action<T> action)
+    {
+        usedObjects.ForEach(action);
+        freeObjects.ForEach(action);
+    }
 }

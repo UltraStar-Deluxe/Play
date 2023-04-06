@@ -104,14 +104,21 @@ public static class PitchDetectionUtils
                 {
                     pitchDetectionProcessCount++;
                     PitchDetectionResult pitchDetectionResult = new();
+                    
                     int endBeatExclusive = startBeat + lengthInBeats;
-                    for (int beat = startBeat; beat < endBeatExclusive; beat++)
+                    
+                    int singlePitchDetectionLengthInMillis = 100;
+                    int singlePitchDetectionLengthInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, singlePitchDetectionLengthInMillis);
+                    singlePitchDetectionLengthInBeats = NumberUtils.Limit(singlePitchDetectionLengthInBeats, 1, int.MaxValue);
+                    
+                    for (int beat = startBeat; beat < endBeatExclusive; beat += singlePitchDetectionLengthInBeats)
                     {
                         int offsetInBeats = beat - startBeat;
-                        PitchEvent pitchEvent = AnalyzeBeat(
+                        PitchEvent pitchEvent = AnalyzeBeats(
                             songMeta,
                             audioSamplesForPitchDetection,
                             offsetInBeats,
+                            singlePitchDetectionLengthInBeats,
                             sampleRate,
                             audioSamplesAnalyzer);
                         if (pitchEvent == null)
@@ -119,7 +126,7 @@ public static class PitchDetectionUtils
                             continue;
                         }
 
-                        pitchDetectionResult.Add(beat, pitchEvent.MidiNote);
+                        pitchDetectionResult.AddRange(beat, lengthInBeats, pitchEvent.MidiNote);
                     }
 
                     if (audioSamplesAnalyzer is DywaAudioSamplesAnalyzer dywaAudioSamplesAnalyzer)
@@ -145,16 +152,18 @@ public static class PitchDetectionUtils
         });
     }
 
-    private static PitchEvent AnalyzeBeat(
+    private static PitchEvent AnalyzeBeats(
         SongMeta songMeta,
         float[] samplesMono,
         int sampleOffsetInBeats,
+        int lengthInBeats,
         int sampleRate,
         IAudioSamplesAnalyzer audioSamplesAnalyzer)
     {
         int samplesPerBeat = (int)BpmUtils.GetSamplesPerBeat(songMeta, sampleRate);
+        int lengthInSamples = samplesPerBeat * lengthInBeats;
         int startIndexInclusive = sampleOffsetInBeats * samplesPerBeat;
-        int endIndexExclusive = startIndexInclusive + samplesPerBeat;
+        int endIndexExclusive = startIndexInclusive + lengthInSamples;
         PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(samplesMono, startIndexInclusive, endIndexExclusive, 1, 0);
         return pitchEvent;
     }

@@ -96,4 +96,10 @@ public static class TimeUtils
 
         return "";
     }
+    
+    public static string GetMinutesAndSecondsDurationString(double durationInMilliseconds)
+    {
+        TimeSpan timeSpan = new(0, 0, 0, 0, (int)durationInMilliseconds);
+        return $"{(int)timeSpan.TotalMinutes}:{timeSpan.Seconds:00}";
+    }
 }

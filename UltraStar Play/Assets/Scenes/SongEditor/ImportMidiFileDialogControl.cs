@@ -32,8 +32,17 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.midiFileIssueLabel)]
     private Label midiFileIssueLabel;
     
-    [Inject(UxmlName = R.UxmlNames.midiTrackIndexPicker)]
-    private ItemPicker midiTrackIndexPicker;
+    [Inject(UxmlName = R.UxmlNames.trackAndChannelDropdownField)]
+    private DropdownField trackAndChannelDropdownField;
+    
+    [Inject(UxmlName = R.UxmlNames.bestMatchnigTrackAndChannelLabel)]
+    private Label bestMatchnigTrackAndChannelLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.startMidiPreviewIcon)]
+    private VisualElement startMidiPreviewIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.stopMidiPreviewIcon)]
+    private VisualElement stopMidiPreviewIcon;
     
     [Inject(UxmlName = R.UxmlNames.previewMidiTrackAndChannelButton)]
     private Button previewMidiTrackAndChannelButton;
@@ -41,11 +50,17 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.midiLyricsTextField)]
     private TextField midiLyricsTextField;
     
-    [Inject(UxmlName = R.UxmlNames.importWithLyricsToggle)]
-    private Toggle importWithLyricsToggle;
+    [Inject(UxmlName = R.UxmlNames.importMidiLyricsToggle)]
+    private Toggle importMidiLyricsToggle;
     
-    [Inject(UxmlName = R.UxmlNames.assignToPlayerPicker)]
-    private ItemPicker assignToPlayerPicker;
+    [Inject(UxmlName = R.UxmlNames.importMidiNotesToggle)]
+    private Toggle importMidiNotesToggle;
+    
+    [Inject(UxmlName = R.UxmlNames.assignToPlayerToggle)]
+    private Toggle assignToPlayerToggle;
+    
+    [Inject(UxmlName = R.UxmlNames.assignToPlayerDropdownField)]
+    private DropdownField assignToPlayerDropdownField;
     
     [Inject(UxmlName = R.UxmlNames.closeImportMidiDialogButton)]
     private Button closeImportMidiDialogButton;
@@ -53,13 +68,16 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.importMidiFileDialogButton)]
     private Button importMidiFileDialogButton;
     
+    [Inject(UxmlName = R.UxmlNames.selectMidiFileButton)]
+    private Button selectMidiFileButton;
+    
     [Inject]
     private MidiManager midiManager;
 
     private readonly SongEditorMidiFileImporter midiFileImporter = new();
 
-    private LabeledItemPickerControl<TrackAndChannel> midiTrackIndexPickerControl;
-    private LabeledItemPickerControl<int> midiAssignToPlayerPickerControl;
+    private DropdownFieldControl<TrackAndChannel> midiTrackIndexPickerControl;
+    private DropdownFieldControl<EVoice> midiAssignToPlayerPickerControl;
 
     private MidiFile midiFile;
     private MidiTrack SelectedTrack
@@ -99,6 +117,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         injector.Inject(midiFileImporter);
         
+        stopMidiPreviewIcon.HideByDisplay();
+        
         closeImportMidiDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         previewMidiTrackAndChannelButton.RegisterCallbackButtonTriggered(_ =>
         {
@@ -117,31 +137,87 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             CloseDialog();
         });
         VisualElementUtils.RegisterDirectClickCallback(importMidiFileDialogOverlay, CloseDialog);
-
-        midiTrackIndexPickerControl = new(midiTrackIndexPicker, new List<TrackAndChannel>());
-        midiTrackIndexPickerControl.AutoSmallFont = false;
+        
+        midiTrackIndexPickerControl = new(trackAndChannelDropdownField, new List<TrackAndChannel>(), null,
+            trackAndChannel => GetDisplayName(trackAndChannel));
         midiTrackIndexPickerControl.Selection.Subscribe(_ =>
         {
+            bool wasPlaying = midiManager.IsPlayingMidiFile;
             StopPreview();
-            UpdateMidiLyrics();
-        });
-        new AutoFitLabelControl(midiTrackIndexPicker.ItemLabel);
-        
-        midiAssignToPlayerPickerControl = new(assignToPlayerPicker, new List<int> { -1, 0, 1 });
-        midiAssignToPlayerPickerControl.GetLabelTextFunction = newValue =>
-        {
-            return newValue switch
+            if (wasPlaying)
             {
-                0 => "Player 01",
-                1 => "Player 02",
-                _ => "None"
-            };
-        };
-        midiAssignToPlayerPickerControl.SelectItem(-1);
+                StartPreview();
+            }
+        });
+
+        midiAssignToPlayerPickerControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoice>(), EVoice.P1, voice => GetDisplayName(voice));
+        midiAssignToPlayerPickerControl.SetSelection(EVoice.P1);
 
         midiFilePathTextField.RegisterValueChangedCallback(evt => UpdateControls());
+
+        if (PlatformUtils.IsStandalone)
+        {
+            selectMidiFileButton.RegisterCallbackButtonTriggered(_ => OpenMidiFileDialog());
+        }
+        else
+        {
+            selectMidiFileButton.HideByDisplay();
+        }
         
         CloseDialog();
+    }
+
+    private string GetDisplayName(TrackAndChannel trackAndChannel)
+    {
+        MidiTrack track = midiFile.Tracks[trackAndChannel.trackIndex];
+        string sequenceOrTrackName = MidiFileUtils.GetSequenceOrTrackName(track);
+        string instrumentName = MidiFileUtils.GetInstrumentName(track, trackAndChannel.channelIndex);
+        if (!sequenceOrTrackName.IsNullOrEmpty()
+            && !instrumentName.IsNullOrEmpty())
+        {
+            return $"{trackAndChannel} ({sequenceOrTrackName}, {instrumentName})";
+        }
+        else if (!sequenceOrTrackName.IsNullOrEmpty())
+        {
+            return $"{trackAndChannel} ({sequenceOrTrackName})";
+        }
+        else if (!instrumentName.IsNullOrEmpty())
+        {
+            return $"{trackAndChannel} ({instrumentName})";
+        }
+        else
+        {
+            return $"{trackAndChannel}";
+        }
+    }
+    
+    private string GetDisplayName(EVoice voice)
+    {
+        if (voice is EVoice.P1)
+        {
+            return "Player 01";
+        }
+        else if (voice is EVoice.P2)
+        {
+            return "Player 02";
+        }
+        else
+        {
+            return ObjectUtils.NullableToString(voice, "-");
+        }
+    }
+
+    private void OpenMidiFileDialog()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Midi File",
+            songMeta.Directory,
+            FileSystemDialogUtils.CreateExtensionFilters("Midi Files", ApplicationUtils.supportedMidiFiles),
+            () => MidiFilePath,
+            newValue =>
+            {
+                MidiFilePath = newValue;
+            });
     }
 
     private void StopPreview()
@@ -151,9 +227,10 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             return;
         }
         
-        previewMidiTrackAndChannelButton.text = "Start Preview";
-        Debug.Log("Stopping preview of midi file");
+        startMidiPreviewIcon.ShowByDisplay();
+        stopMidiPreviewIcon.HideByDisplay();
         
+        Debug.Log("Stopping preview of midi file");
         midiManager.StopMidiFile();
     }
 
@@ -165,9 +242,10 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        previewMidiTrackAndChannelButton.text = "Stop Preview";
-        Debug.Log("Starting preview of midi file");
+        startMidiPreviewIcon.HideByDisplay();
+        stopMidiPreviewIcon.ShowByDisplay();
         
+        Debug.Log("Starting preview of midi file");
         try
         {
             int trackIndex = midiTrackIndexPickerControl.SelectedItem.trackIndex;
@@ -179,7 +257,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
                 out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
                 out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
 
-            List<Note> loadNotesFromMidiFile = MidiToSongMetaUtils.LoadNotesFromMidiFile(songMeta, midiFileCopy, trackIndex, channelIndex, false, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
+            List<Note> loadNotesFromMidiFile = MidiToSongMetaUtils.LoadNotesFromMidiFile(songMeta, midiFileCopy, trackIndex, channelIndex, false, true, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
             MidiFile previewMidiFile = MidiFileUtils.CreateMidiFile(songMeta, loadNotesFromMidiFile, (byte)settings.SongEditorSettings.MidiVelocity);
             MidiFileUtils.SetFirstDeltaTimeTo(previewMidiFile, 0, 0);
             midiManager.PlayMidiFile(previewMidiFile);
@@ -201,13 +279,15 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         }
 
         StopPreview();
-        
+
         string voiceName = null;
-        if (midiAssignToPlayerPickerControl.SelectedItem == 0)
+        if (assignToPlayerToggle.value
+            && midiAssignToPlayerPickerControl.SelectedItem is EVoice.P1)
         {
             voiceName = Voice.firstVoiceName;
         }
-        else if (midiAssignToPlayerPickerControl.SelectedItem == 1)
+        else if (assignToPlayerToggle.value
+                 && midiAssignToPlayerPickerControl.SelectedItem is EVoice.P2)
         {
             voiceName = Voice.secondVoiceName;
         }
@@ -216,7 +296,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             midiFilePathTextField.value,
             midiTrackIndexPickerControl.SelectedItem.trackIndex,
             midiTrackIndexPickerControl.SelectedItem.channelIndex,
-            importWithLyricsToggle.value,
+            importMidiLyricsToggle.value,
+            importMidiNotesToggle.value,
             voiceName);
     }
     
@@ -261,16 +342,22 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         if (SelectedTrack == null)
         {
             midiLyricsTextField.value = "";
-            importWithLyricsToggle.SetEnabled(false);
+            importMidiLyricsToggle.SetEnabled(false);
             return;
         }
 
-        string lyrics = MidiFileUtils.GetLyrics(SelectedTrack);
-        midiLyricsTextField.value = lyrics.IsNullOrEmpty()
-            ? "No lyrics found"
-            : lyrics;
-        importWithLyricsToggle.SetEnabled(!lyrics.IsNullOrEmpty());
-        importWithLyricsToggle.value = !lyrics.IsNullOrEmpty();
+        string lyrics = MidiFileUtils.GetLyrics(midiFile);
+        if (lyrics.IsNullOrEmpty())
+        {
+            midiLyricsTextField.value = "No lyrics found";
+            bestMatchnigTrackAndChannelLabel.text = "";
+        }
+        else
+        {
+            midiLyricsTextField.value = lyrics;
+        }
+        importMidiLyricsToggle.SetEnabled(!lyrics.IsNullOrEmpty());
+        importMidiLyricsToggle.value = !lyrics.IsNullOrEmpty();
     }
 
     private void SetErrorMessage(string errorMessage)
@@ -284,17 +371,24 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     private void UpdateTrackIndexPicker()
     {
         List<TrackAndChannel> trackAndChannels = MidiFileUtils.GetTracksAndChannels(midiFile);
-        
         midiTrackIndexPickerControl.Items = trackAndChannels;
         
-        TrackAndChannel bestMatchingTrackAndChannel = MidiToSongMetaUtils.FindBestMatchingLyricsTrackAndChannel(midiFile, trackAndChannels);
+        MidiFileUtils.CalculateMidiEventTimesInMillis(
+            midiFile,
+            out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
+            out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
+
+        List<MidiEvent> lyricsEvents = MidiFileUtils.GetLyricsEvents(midiFile);
+        TrackAndChannel bestMatchingTrackAndChannel = MidiToSongMetaUtils.FindTrackAndChannelWithBestMatchingNotesForLyricsEvents(midiFile, lyricsEvents, trackAndChannels, midiEventToAbsoluteDeltaTimeInMillis);
         if (bestMatchingTrackAndChannel != null)
         {
-            midiTrackIndexPickerControl.SelectItem(bestMatchingTrackAndChannel);
+            bestMatchnigTrackAndChannelLabel.text = $"Best matching notes: track {bestMatchingTrackAndChannel}";
+            midiTrackIndexPickerControl.SetSelection(bestMatchingTrackAndChannel);
         }
         else
         {
-            midiTrackIndexPickerControl.SelectItem(trackAndChannels.FirstOrDefault());
+            bestMatchnigTrackAndChannelLabel.text = $"";
+            midiTrackIndexPickerControl.SetSelection(trackAndChannels.FirstOrDefault());
         }
     }
 

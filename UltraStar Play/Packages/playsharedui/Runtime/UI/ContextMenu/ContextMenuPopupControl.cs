@@ -37,6 +37,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     private readonly GameObject gameObject;
     private readonly Vector2 position;
+    public Vector2 Position => position;
 
     private IDisposable closeContextMenuDisposable;
 
@@ -46,9 +47,6 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     private readonly Subject<bool> contextMenuClosedEventStream = new();
     public IObservable<bool> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
-    private Keyboard keyboard;
-    private Mouse mouse;
-    
     public ContextMenuPopupControl(GameObject gameObject, Vector2 position)
     {
         this.gameObject = gameObject;
@@ -57,8 +55,6 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     public void OnInjectionFinished()
     {
-        keyboard = Keyboard.current;
-        mouse = Mouse.current;
         panelHelper = new PanelHelper(uiDocument);
         visualElement = contextMenuPopupManager.contextMenuUi.CloneTree().Children().First();
         visualElement.style.left = position.x;

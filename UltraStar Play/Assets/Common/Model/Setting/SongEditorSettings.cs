@@ -11,14 +11,12 @@ public class SongEditorSettings
     public bool GoToLastPlaybackPosition { get; set; } = true;
 
     // Recording in SongEditorScene
-    public ESongEditorRecordingSource RecordingSource { get; set; }
     public MicProfile MicProfile { get; set; }
-    public int MicOctaveOffset { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
-    public int MidiNoteForButtonRecording { get; set; } = MidiUtils.MidiNoteConcertPitch;
+    public bool IsRecordingEnabled { get; set; }
+    public int DefaultPitchForCreatedNotes { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
-    public bool RecordSamplesInsteadOfNotes { get; set; } = true;
-    public bool DetectSpeechAfterRecording { get; set; } = true;
+    public bool speechRecognitionWhenRecording = true;
 
     public bool AdjustFollowingNotes { get; set; }
 
@@ -30,26 +28,27 @@ public class SongEditorSettings
     public int MidiPlaybackOffsetInMillis { get; set; }
     public string LastMidiFilePath { get; set; } = "";
 
-    public bool ShowLyricsArea { get; set; } = true;
+    public bool ShowRightSideBar { get; set; } = true;
     public bool ShowVideoArea { get; set; } = true;
     public bool ShowStatusBar { get; set; } = true;
     public bool ShowVirtualPianoArea { get; set; } = true;
     public bool SmallLeftSideBar { get; set; }
     public bool ShowControlHints { get; set; } = true;
     public bool ShowNotePitchLabel { get; set; } = true;
-
+    public ESongEditorTimeLabelFormat TimeLabelFormat { get; set; } = ESongEditorTimeLabelFormat.Beats;
+    public ESongEditorPitchLabelFormat PitchLabelFormat { get; set; } = ESongEditorPitchLabelFormat.Notes;
+    
     public float GridSizeInPx { get; set; } = 1;
     public float SentenceLineSizeInPx { get; set; } = 2;
 
     // Speech recognition
     public string SpeechRecognitionModelPath { get; set; } = "";
     public string SpeechRecognitionPhrases { get; set; } = "";
-    public int MidiNoteForSpeechRecognition { get; set; } = MidiUtils.MidiNoteConcertPitch;
-    public ESongEditorSamplesSource SpeechRecognitionSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
+    public ESongEditorSamplesSource SpeechRecognitionSamplesSource { get; set; } = ESongEditorSamplesSource.Recording;
 
     // Pitch detection
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
-    public ESongEditorSamplesSource PitchDetectionSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
+    public ESongEditorSamplesSource PitchDetectionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
 
     // Audio separation
     public string AudioSeparationCommand { get; set; } = "python -m spleeter";

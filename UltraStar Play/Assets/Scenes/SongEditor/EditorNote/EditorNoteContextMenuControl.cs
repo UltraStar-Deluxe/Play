@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -46,6 +47,9 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
 
+    [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
+    
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
@@ -93,10 +97,11 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         int lengthInBeats = maxBeat - minBeat;
 
         contextMenu.AddSeparator();
-        contextMenu.AddButton("Speech recognition to set lyrics", () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, true));
-        contextMenu.AddButton("Speech recognition to create notes", () => speechRecognitionAction.CreateNotesFromSpeechRecognition(minBeat, lengthInBeats, settings.SongEditorSettings.SpeechRecognitionSamplesSource, 2, true));
-        contextMenu.AddButton("Pitch detection", () => pitchDetectionAction.CreateNotesForDetectedPitch(minBeat, lengthInBeats, true));
-        contextMenu.AddButton("Move to detected pitch", () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true));
+        
+        contextMenu.AddButton($"Speech recognition on {settings.SongEditorSettings.SpeechRecognitionSamplesSource} audio",
+            () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
+        contextMenu.AddButton($"Pitch detection on {settings.SongEditorSettings.PitchDetectionSamplesSource} audio",
+            () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource));
     }
 
     private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)

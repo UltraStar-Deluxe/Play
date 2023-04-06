@@ -5,6 +5,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Vosk;
 
 public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListener
 {
@@ -20,6 +21,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
 
+    [Inject(UxmlName = R.UxmlNames.doPitchDetectionButton)]
+    private Button doPitchDetectionButton;
+    
+    [Inject(UxmlName = R.UxmlNames.doSpeechRecognitionButton)]
+    private Button doSpeechRecognitionButton;
+    
     [Inject(UxmlName = R.UxmlNames.undoButton)]
     private Button undoButton;
 
@@ -99,9 +106,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     private SongEditorHistoryManager historyManager;
 
     [Inject]
-    private SongEditorNoteRecorder songEditorNoteRecorder;
-
-    [Inject]
     private SongEditorIssueAnalyzerControl issueAnalyzerControl;
 
     [Inject]
@@ -113,6 +117,15 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject]
     private GameObject gameObject;
 
+    [Inject]
+    private PitchDetectionAction pitchDetectionAction;
+    
+    [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+    
+    [Inject]
+    private SpeechRecognitionManager speechRecognitionManager;
+    
     private readonly TabGroupControl sideBarTabGroupControl = new();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
     private readonly SongEditorSideBarLayersControl sideBarLayersControl = new();
@@ -142,16 +155,14 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         togglePlaybackButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ToggleAudioPlayPause());
         toggleRecordingButton.RegisterCallbackButtonTriggered(_ =>
         {
-            songEditorNoteRecorder.IsRecordingEnabled = !songEditorNoteRecorder.IsRecordingEnabled;
-            if (songEditorNoteRecorder.IsRecordingEnabled)
-            {
-                toggleRecordingButton.AddToClassList("recording");
-            }
-            else
-            {
-                toggleRecordingButton.RemoveFromClassList("recording");
-            }
+            settings.SongEditorSettings.IsRecordingEnabled = !settings.SongEditorSettings.IsRecordingEnabled;
+            UpdateRecordingButton();
         });
+        UpdateRecordingButton();
+        
+        doPitchDetectionButton.RegisterCallbackButtonTriggered(_ => DoDetectPitch());
+        doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
+        
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(_ => historyManager.Redo());
         exitSceneButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ReturnToLastScene());
@@ -193,6 +204,54 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(_ => UpdatePlayPauseIcon());
 
         InitTabGroup();
+    }
+
+    private void DoSpeechRecognition()
+    {
+        if (NoteAreaSelectionDragListener.LastSelectionRect == null
+            || NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats <= 0)
+        {
+            return;
+        }
+        
+        SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
+        VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(
+            NoteAreaSelectionDragListener.LastSelectionRect.MinBeat,
+            NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats,
+            settings.SongEditorSettings.SpeechRecognitionSamplesSource,
+            2,
+            true,
+            speechRecognitionParameters,
+            speechRecognizer,
+            false);
+    }
+
+    private void DoDetectPitch()
+    {
+        if (NoteAreaSelectionDragListener.LastSelectionRect == null
+            || NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats <= 0)
+        {
+            return;
+        }
+        
+        pitchDetectionAction.CreateNotesForDetectedPitch(
+            NoteAreaSelectionDragListener.LastSelectionRect.MinBeat,
+            NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats,
+            settings.SongEditorSettings.PitchDetectionSamplesSource,
+            true);
+    }
+
+    private void UpdateRecordingButton()
+    {
+        if (settings.SongEditorSettings.IsRecordingEnabled)
+        {
+            toggleRecordingButton.AddToClassList("recording");
+        }
+        else
+        {
+            toggleRecordingButton.RemoveFromClassList("recording");
+        }
     }
 
     private void UpdatePlayPauseIcon()
@@ -280,11 +339,10 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     {
         ClearSideBar(helpSideBarContainer);
 
-        InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-            TranslationManager.GetTranslation(R.Messages.back),
-            helpSideBarContainer);
-
         List<InputActionInfo> inputActionInfos = new();
+        
+        inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, TranslationManager.GetTranslation(R.Messages.back)));
+
         if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)
         {
             inputActionInfos.Add(new InputActionInfo("Zoom Horizontal", "Ctrl+Mouse Wheel"));
@@ -311,7 +369,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
                 TranslationManager.GetTranslation(R.Messages.action_longPress)));
         }
 
-        inputActionInfos.ForEach(inputActionInfo => helpSideBarContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo)));
+        inputActionInfos.ForEach(inputActionInfo =>
+            helpSideBarContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo, true)));
     }
 
     private void ClearSideBar(VisualElement visualElement)

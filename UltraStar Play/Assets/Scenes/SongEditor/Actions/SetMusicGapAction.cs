@@ -1,4 +1,5 @@
 ﻿using UniInject;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -15,15 +16,20 @@ public class SetMusicGapAction : INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
-    public void Execute()
+    [Inject]
+    private NoteAreaControl noteAreaControl;
+
+    [Inject]
+    private PanelHelper panelHelper;
+    
+    public void Execute(double positionInSongInMillis)
     {
-        double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
         songMeta.Gap = (float)positionInSongInMillis;
     }
 
-    public void ExecuteAndNotify()
+    public void ExecuteAndNotify(double positionInSongInMillis)
     {
-        Execute();
+        Execute(positionInSongInMillis);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Gap));
     }
 }

@@ -3,11 +3,10 @@
 /**************************************************/
 .horizontalSeparatorLine {
     width: 100%;
-    border-color: var(--text-color);
+    border-color: var(--font-color);
     border-bottom-width: 1px;
-    border-radius: 5px;
     height: 10px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 /**************************************************/
@@ -81,6 +80,7 @@ ItemPicker {
 }
 
 .controlWithLabelVertical {
+    flex-direction: column;
     height: auto;
     align-items: stretch;
 }
@@ -193,7 +193,7 @@ ChipsCombo {
 
 .chipsComboListSeparator {
     width: 100%;
-    border-color: var(--text-color);
+    border-color: var(--font-color);
     border-bottom-width: 1px;
     padding-top: 2px;
     margin-bottom: 2px;

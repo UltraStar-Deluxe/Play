@@ -594,4 +594,10 @@ public static class SongMetaUtils
         int maxBeat = MaxBeat(allNotes);
         return minBeat + ((maxBeat - minBeat) / 2);
     }
+
+    public static string GetRelativePath(SongMeta songMeta, string path)
+    {
+        string relativePath = PathUtils.MakeRelativePath(songMeta.Directory, path);
+        return relativePath;
+    }
 }

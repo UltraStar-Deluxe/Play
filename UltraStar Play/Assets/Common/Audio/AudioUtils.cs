@@ -67,12 +67,13 @@ public static class AudioUtils
         return monoSamples;
     }
 
-    public static short[] ToShortSampleArray(float[] floatSampleArray)
+    public static short[] ToShortSampleArray(float[] floatSampleArray, int startIndex, int endIndex)
     {
-        short[] shortSampleArray = new short[floatSampleArray.Length];
-        for (int i = 0; i < floatSampleArray.Length; i++)
+        int lengthInSamples = endIndex - startIndex;
+        short[] shortSampleArray = new short[lengthInSamples];
+        for (int i = 0; i < lengthInSamples; i++)
         {
-            shortSampleArray[i] = (short)Math.Floor(floatSampleArray[i] * short.MaxValue);
+            shortSampleArray[i] = (short)Math.Floor(floatSampleArray[i + startIndex] * short.MaxValue);
         }
 
         return shortSampleArray;
@@ -109,5 +110,39 @@ public static class AudioUtils
         {
             return samplesStereo;
         }
+    }
+    
+    public static float[] GetSamplesOfBeatRangeFromAudioClip(
+        SongMeta songMeta,
+        AudioClip audioClip,
+        int startBeat,
+        int lengthInBeats,
+        bool convertToMono)
+    {
+        using DisposableStopwatch ds = new("GetSamplesOfBeatRangeFromAudioClip took <ms>");
+
+        if (lengthInBeats <= 0)
+        {
+            return null;
+        }
+
+        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, startBeat);
+        double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
+        double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
+
+        float[] monoAudioSamples = GetAudioSamples(startBeatInMillis, lengthInMillis, audioClip, convertToMono);
+        return monoAudioSamples;
+    }
+
+    public static float[] GetSamples(float[] samples, int startIndex, int endIndex)
+    {
+        int lengthInSamples = endIndex - startIndex;
+        float[] result = new float[endIndex- startIndex];
+        for (int i = 0; i < lengthInSamples; i++)
+        {
+            result[i] = samples[startIndex + i];
+        }
+
+        return result;
     }
 }

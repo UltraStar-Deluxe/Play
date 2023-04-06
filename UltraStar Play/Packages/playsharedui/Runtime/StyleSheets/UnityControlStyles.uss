@@ -28,6 +28,10 @@
     overflow: hidden;
 }
 
+.unity-base-text-field.multiline .unity-text-element--inner-input-field-component {
+    -unity-text-align: upper-left;
+}
+
 .unity-base-text-field.multiline > .unity-base-text-field__input {
     height: auto;
 }

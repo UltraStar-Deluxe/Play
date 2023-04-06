@@ -39,19 +39,41 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
     {
         horizontalGrid.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            UpdateMidiNoteLabels();
+            UpdateLabels();
 
             if (settings.SongEditorSettings.GridSizeInPx > 0)
             {
-                UpdateMidiNoteLines();
+                UpdateLines();
             }
         });
 
         noteAreaControl.ViewportEventStream.Subscribe(OnViewportChanged);
 
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInPx)
-            .Subscribe(_ => UpdateMidiNoteLines())
+            .Subscribe(_ => UpdateLines())
             .AddTo(gameObject);
+        
+        settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.PitchLabelFormat)
+            .Subscribe(_ => UpdateLabelTexts())
+            .AddTo(gameObject);
+    }
+
+    private void UpdateLabelTexts()
+    {
+        if (labels.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        labels.ForEach(label =>
+        {
+            if (label == null)
+            {
+                return;
+            }
+            int midiNote = (int)label.userData;
+            label.text = GetLabelText(midiNote);
+        });
     }
 
     private void OnViewportChanged(ViewportEvent viewportEvent)
@@ -65,13 +87,13 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
             || lastViewportEvent.Y != viewportEvent.Y
             || lastViewportEvent.Height != viewportEvent.Height)
         {
-            UpdateMidiNoteLabels();
-            UpdateMidiNoteLines();
+            UpdateLabels();
+            UpdateLines();
         }
         lastViewportEvent = viewportEvent;
     }
 
-    private void UpdateMidiNoteLines()
+    private void UpdateLines()
     {
         horizontalGridLineContainer.Clear();
 
@@ -91,7 +113,7 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    private void UpdateMidiNoteLabels()
+    private void UpdateLabels()
     {
         int minMidiNote = noteAreaControl.MinMidiNoteInCurrentViewport;
         int maxMidiNote = noteAreaControl.MaxMidiNoteInCurrentViewport;
@@ -137,14 +159,25 @@ public class NoteAreaVerticalRulerControl : INeedInjection, IInjectionFinishedLi
         label.style.unityTextAlign = new StyleEnum<TextAnchor>(TextAnchor.MiddleCenter);
         label.style.left = 0;
 
-        string midiNoteName = MidiUtils.GetAbsoluteName(midiNote);
-        label.text = midiNoteName;
+        label.text = GetLabelText(midiNote);
+        label.userData = midiNote;
 
         UpdateMidiNoteLabelPosition(label, midiNote);
 
         horizontalGridLabelContainer.Add(label);
 
         return label;
+    }
+
+    private string GetLabelText(int midiNote)
+    {
+        switch (settings.SongEditorSettings.PitchLabelFormat)
+        {
+            case ESongEditorPitchLabelFormat.Notes:
+                return MidiUtils.GetAbsoluteName(midiNote);
+            default:
+                return "";
+        }
     }
 
     private void UpdateMidiNoteLabelPosition(Label label, int midiNote)

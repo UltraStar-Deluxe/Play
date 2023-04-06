@@ -13,6 +13,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     private static readonly Vector2 popupOffset = new(2, 2);
 
     public Action<ContextMenuPopupControl> FillContextMenuAction { get; set; }
+    public Func<bool> ShouldOpenContextMenu { get; set; }
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     protected VisualElement targetVisualElement;
@@ -99,7 +100,8 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
 
     public void OpenContextMenu(Vector2 position)
     {
-        if (FillContextMenuAction == null)
+        if (FillContextMenuAction == null
+            || (ShouldOpenContextMenu != null && !ShouldOpenContextMenu()))
         {
             return;
         }

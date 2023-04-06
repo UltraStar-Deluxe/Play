@@ -130,7 +130,15 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             TranslationManager.GetTranslation(R.Messages.songProperty_year),
             PropertyUtils.CreateStringGetterFromUintGetter(() => songMeta.Year, true),
             PropertyUtils.CreateStringSetterFromUintSetter(newValue => songMeta.Year = newValue));
-
+        CreateSongPropertiesInputControl(ESongProperty.VocalsAudio,
+            "Vocals Audio",
+            () => songMeta.VocalsAudio,
+            newValue => songMeta.VocalsAudio = newValue);
+        CreateSongPropertiesInputControl(ESongProperty.InstrumentalAudio,
+            "Instrumental Audio",
+            () => songMeta.InstrumentalAudio,
+            newValue => songMeta.InstrumentalAudio = newValue);
+        
         songMeta.UnknownHeaderEntries.ForEach(entry =>
         {
             CreateSongPropertiesInputControl(ESongProperty.Other,

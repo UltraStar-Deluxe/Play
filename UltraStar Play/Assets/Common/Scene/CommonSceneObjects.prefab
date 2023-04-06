@@ -6576,6 +6576,7 @@ MonoBehaviour:
   grabCursorTexture: {fileID: 2800000, guid: 428256a582aeb554e980f46c5db242f3, type: 3}
   musicNoteCursorTexture: {fileID: 2800000, guid: a96fe1e3491d4304bbf63ba28e72caa6,
     type: 3}
+  handCursorTexture: {fileID: 2800000, guid: caf0bc361c397b34f93f38e01091f3ed, type: 3}
 --- !u!1 &3509143782135001065
 GameObject:
   m_ObjectHideFlags: 0
@@ -7285,7 +7286,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d973b629cee9ea644a4ec87bd50e2aaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  midiGain: 1
   defaultSoundfontAsset: {fileID: 4900000, guid: 690449332ab7ce94898435bd09ec8fb5,
     type: 3}
 --- !u!82 &8801158838415278696

@@ -35,4 +35,4 @@ MonoBehaviour:
     m_FollowingCharacters: {fileID: 0}
     m_UseModernHangulLineBreakingRules: 0
   m_UseModernHangulLineBreakingRules: 0
-  m_DisplayWarnings: 0
+  m_DisplayWarnings: 1

@@ -185,13 +185,13 @@ public static class CollectionExtensions
     public static T FindMinElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
     {
         T minElement = default(T);
-        float minDistance = -1;
+        float minValue = float.MaxValue;
         foreach (T element in enumerable)
         {
-            float currentDistance = valueFunction(element);
-            if (minDistance < 0 || currentDistance < minDistance)
+            float currentValue = valueFunction(element);
+            if (currentValue < minValue)
             {
-                minDistance = currentDistance;
+                minValue = currentValue;
                 minElement = element;
             }
         }
@@ -201,13 +201,13 @@ public static class CollectionExtensions
     public static T FindMinElement<T>(this IEnumerable<T> enumerable, Func<T, double> valueFunction)
     {
         T minElement = default(T);
-        double minDistance = -1;
+        double minValue = double.MaxValue;
         foreach (T element in enumerable)
         {
-            double currentDistance = valueFunction(element);
-            if (minDistance < 0 || currentDistance < minDistance)
+            double currentValue = valueFunction(element);
+            if (currentValue < minValue)
             {
-                minDistance = currentDistance;
+                minValue = currentValue;
                 minElement = element;
             }
         }
@@ -217,13 +217,13 @@ public static class CollectionExtensions
     public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
     {
         T maxElement = default(T);
-        float maxDistance = -1;
+        float maxValue = float.MinValue;
         foreach (T element in enumerable)
         {
-            float currentDistance = valueFunction(element);
-            if (maxDistance < 0 || currentDistance > maxDistance)
+            float currentValue = valueFunction(element);
+            if (currentValue > maxValue)
             {
-                maxDistance = currentDistance;
+                maxValue = currentValue;
                 maxElement = element;
             }
         }
@@ -233,13 +233,13 @@ public static class CollectionExtensions
     public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, double> valueFunction)
     {
         T maxElement = default(T);
-        double maxDistance = -1;
+        double maxValue = double.MinValue;
         foreach (T element in enumerable)
         {
-            double currentDistance = valueFunction(element);
-            if (maxDistance < 0 || currentDistance > maxDistance)
+            double currentValue = valueFunction(element);
+            if (currentValue > maxValue)
             {
-                maxDistance = currentDistance;
+                maxValue = currentValue;
                 maxElement = element;
             }
         }

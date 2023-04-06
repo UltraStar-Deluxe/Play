@@ -18,7 +18,8 @@
         "playshared",
         "playsharedui",
         "Vosk",
-        "SpleeterSharp"
+        "SpleeterSharp",
+        "UnityStandaloneFileBrowser"
 
     ],
     "includePlatforms": [],

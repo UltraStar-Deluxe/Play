@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using SFB;
 using UniInject;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -28,6 +31,9 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private SongVideoPlayer songVideoPlayer;
 
     [Inject(UxmlName = R.UxmlNames.videoAreaLabel)]
     private Label videoAreaLabel;
@@ -57,35 +63,34 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     private float videoGapAtDragStart;
 
     private GeneralDragControl dragControl;
+    private ContextMenuControl videoImageContextMenuControl;
 
     public void OnInjectionFinished()
     {
         videoAreaLabel.HideByDisplay();
-        if (!songMeta.Video.IsNullOrEmpty())
+        if (SongMetaUtils.VideoResourceExists(songMeta))
         {
             ShowVideoImage();
         }
-        else if (!songMeta.Cover.IsNullOrEmpty())
+        else if (SongMetaUtils.CoverResourceExists(songMeta))
         {
             ShowCoverImage();
         }
-        else if (!songMeta.Background.IsNullOrEmpty())
+        else if (SongMetaUtils.BackgroundResourceExists(songMeta))
         {
             ShowBackgroundImage();
         }
 
         // Init cover and background image
-        if (!songMeta.Background.IsNullOrEmpty())
-        {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta), sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
-        }
+        UpdateCoverAndBackgroundImage();
 
-        // Init cover and background image
-        if (!songMeta.Cover.IsNullOrEmpty())
-        {
-            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
-        }
+        // Change cover and background via file dialog
+        RegisterCallbackToSetFilePath(songCoverImage, () => OpenDialogToSetCoverImage());
+        RegisterCallbackToSetFilePath(songBackgroundImage, () => OpenDialogToSetBackgroundImage());
 
+        // Change video via file dialog
+        RegisterCallbackToSetFilePath(noVideoImage, () => OpenDialogToSetVideo());
+        
         showVideoButton.RegisterCallbackButtonTriggered(_ => ShowVideoImage());
         showBackgroundButton.RegisterCallbackButtonTriggered(_ => ShowBackgroundImage());
         showCoverButton.RegisterCallbackButtonTriggered(_ => ShowCoverImage());
@@ -97,12 +102,95 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
         videoImage.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
         videoImage.RegisterCallback<PointerLeaveEvent>(evt => cursorManager.SetDefaultCursor());
+        
+        videoImageContextMenuControl = injector
+            .WithRootVisualElement(videoImage)
+            .CreateAndInject<ContextMenuControl>();
+        videoImageContextMenuControl.FillContextMenuAction = FillVideoImageContextMenu;
+    }
+
+    private void OpenDialogToSetCoverImage()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Cover Image",
+            songMeta.Directory,
+            FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
+            () => songMeta.Cover,
+            newValue =>
+            {
+                songMeta.Cover = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                UpdateCoverAndBackgroundImage();
+            });
+    }
+    
+    private void OpenDialogToSetBackgroundImage()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Background Image",
+            songMeta.Directory,
+            FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
+            () => songMeta.Background,
+            newValue =>
+            {
+                songMeta.Background = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                UpdateCoverAndBackgroundImage();
+            });
+    }
+
+    private void OpenDialogToSetVideo()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Video",
+            songMeta.Directory,
+            FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.supportedVideoFiles),
+            () => songMeta.Video,
+            newValue =>
+            {
+                songMeta.Video = SongMetaUtils.GetRelativePath(songMeta, newValue);
+                UpdateVideo();
+                ShowVideoImage();
+            });
+    }
+    
+    private void UpdateVideo()
+    {
+        songVideoPlayer.SongMeta = songMeta;
+    }
+
+    private void UpdateCoverAndBackgroundImage()
+    {
+        if (SongMetaUtils.BackgroundResourceExists(songMeta))
+        {
+            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta), sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
+        }
+        
+        if (SongMetaUtils.CoverResourceExists(songMeta))
+        {
+            ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
+        }
+    }
+
+    private void RegisterCallbackToSetFilePath(VisualElement visualElement, Action callback)
+    {
+        if (!PlatformUtils.IsStandalone)
+        {
+            return;
+        }
+        
+        visualElement.RegisterCallback<PointerDownEvent>(_ => callback());
+        CursorManager.SetCursorForVisualElement(visualElement, ECursor.Hand);
+    }
+
+    private void FillVideoImageContextMenu(ContextMenuPopupControl contextMenu)
+    {
+        contextMenu.AddButton("Reset VideoGap", () => setVideoGapAction.ExecuteAndNotify(0));
+        contextMenu.AddButton("Change Video", () => OpenDialogToSetVideo());
     }
 
     private void ShowVideoImage()
     {
-        noVideoImage.ShowByDisplay();
-        videoImage.ShowByDisplay();
+        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta));
+        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta));
         songBackgroundImage.HideByDisplay();
         songCoverImage.HideByDisplay();
     }

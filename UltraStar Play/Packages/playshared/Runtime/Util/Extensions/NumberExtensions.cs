@@ -19,8 +19,8 @@ public static class NumberExtensions
         return value.ToString(format, CultureInfo.InvariantCulture);
     }
     
-    public static string ToStringInvariantCulture(this double value)
+    public static string ToStringInvariantCulture(this double value, string format="0.00")
     {
-        return value.ToString(CultureInfo.InvariantCulture);
+        return value.ToString(format, CultureInfo.InvariantCulture);
     }
 }

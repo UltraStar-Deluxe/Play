@@ -20,6 +20,9 @@ public class SongEditorMidiFileImporter : INeedInjection
 
     [Inject]
     private SongEditorLayerManager layerManager;
+    
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
     private Settings settings;
@@ -37,9 +40,16 @@ public class SongEditorMidiFileImporter : INeedInjection
         string midiFilePath,
         int trackIndex,
         int channelIndex,
-        bool importWithLyrics,
+        bool importLyrics,
+        bool importNotes,
         string voiceName)
     {
+        if (!importLyrics
+            && !importNotes)
+        {
+            return;
+        }
+        
         if (!File.Exists(midiFilePath))
         {
             Debug.Log($"File does not exist: {midiFilePath}");
@@ -47,13 +57,11 @@ public class SongEditorMidiFileImporter : INeedInjection
             return;
         }
 
+        // Remove old notes
+        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.MidiFile);
+        layerManager.ClearEnumLayer(ESongEditorLayer.MidiFile);
+        
         MidiFile midiFile = MidiFileUtils.LoadMidiFile(midiFilePath);
-        
-        MidiFileUtils.CalculateMidiEventTimesInMillis(
-            midiFile,
-            out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
-            out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
-        
         if (midiFile == null)
         {
             throw new UnityException("Loading midi file failed.");
@@ -61,7 +69,12 @@ public class SongEditorMidiFileImporter : INeedInjection
         
         try
         {
-            List<Note> loadedNotes = MidiToSongMetaUtils.LoadNotesFromMidiFile(songMeta, midiFile, trackIndex, channelIndex, importWithLyrics, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
+            MidiFileUtils.CalculateMidiEventTimesInMillis(
+                midiFile,
+                out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
+                out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
+            
+            List<Note> loadedNotes = MidiToSongMetaUtils.LoadNotesFromMidiFile(songMeta, midiFile, trackIndex, channelIndex, importLyrics, importNotes, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
             
             if (voiceName == null)
             {
