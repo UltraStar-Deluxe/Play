@@ -113,19 +113,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         return Instance.DoCreateNotification(text);
     }
 
-    public MessageDialogControl CreateMessageDialog(string dialogTitle)
-    {
-        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(dialogVisualElement);
-
-        MessageDialogControl messageDialogControl = injector
-            .WithRootVisualElement(dialogVisualElement)
-            .CreateAndInject<MessageDialogControl>();
-        messageDialogControl.Title = dialogTitle;
-
-        return messageDialogControl;
-    }
-
     public MessageDialogControl CreateDialogControl(string dialogTitle)
     {
         VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
