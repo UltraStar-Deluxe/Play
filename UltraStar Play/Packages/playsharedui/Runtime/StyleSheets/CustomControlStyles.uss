@@ -452,18 +452,6 @@ AccordionItem.expanded #toggleAccordionItemContentIcon {
 }
 
 /**************************************************/
-/* TEXT FIELD PLACEHOLDER */
-/**************************************************/
-
-TextField.placeholderVisible {
-    -unity-font-style: italic;
-}
-
-TextField.placeholderVisible #unity-text-input {
-    font-size: var(--font-size-xs);
-}
-
-/**************************************************/
 /* INPUT LEGEND */
 /**************************************************/
 
