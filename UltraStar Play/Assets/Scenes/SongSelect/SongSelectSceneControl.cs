@@ -854,7 +854,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void SelectRandomSong()
     {
-        SongMeta randomSongMeta = RandomUtils.RandomOf(songRouletteControl.Songs);
+        List<SongMeta> availableSongMetas = songRouletteControl.Songs
+            .Except(new List<SongMeta> { SelectedSong })
+            .ToList();
+        SongMeta randomSongMeta = RandomUtils.RandomOf(availableSongMetas);
+        if (randomSongMeta == null)
+        {
+            return;
+        }
         songRouletteControl.SelectSong(randomSongMeta);
     }
 
