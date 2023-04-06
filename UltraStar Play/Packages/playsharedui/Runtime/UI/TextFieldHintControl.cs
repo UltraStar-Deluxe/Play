@@ -50,6 +50,8 @@ public class TextFieldHintControl
     private void UpdateHintLabel(bool isBlurEvent = false)
     {
         hintLabel.SetVisibleByDisplay(textField.value.IsNullOrEmpty()
-            && (isBlurEvent || textField.focusController.focusedElement != textField));
+            && (isBlurEvent ||
+                (textField.focusController != null
+                 && textField.focusController.focusedElement != textField)));
     }
 }
