@@ -14,8 +14,11 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     private MicPitchTracker micPitchTracker;
 
     [Inject(UxmlName = R.UxmlNames.noteLabel)]
-    private Label currentNoteLabel;
+    private Label noteLabel;
 
+    [Inject(UxmlName = R.UxmlNames.pitchIndicator)]
+    private VisualElement pitchIndicator;
+    
     [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
 
@@ -90,12 +93,15 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         // Show the note that has been detected
         if (pitchEvent != null && pitchEvent.MidiNote > 0)
         {
-            currentNoteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
+            noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
                 "value", MidiUtils.GetAbsoluteName(pitchEvent.MidiNote));
+
+            float midiNoteFactor = ((float)pitchEvent.MidiNote - MidiUtils.SingableNoteMin) / (MidiUtils.SingableNoteRange);
+            pitchIndicator.style.top = new StyleLength(Length.Percent(100 - (100 * midiNoteFactor)));
         }
         else
         {
-            currentNoteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
+            noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note,
                 "value", "?");
         }
     }
