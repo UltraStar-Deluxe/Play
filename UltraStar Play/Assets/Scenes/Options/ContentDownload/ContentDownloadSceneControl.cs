@@ -9,6 +9,7 @@ using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.Zip;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -31,17 +32,11 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     [Inject(UxmlName = R.UxmlNames.statusLabel)]
     private Label statusLabel;
 
-    [Inject(UxmlName = R.UxmlNames.outputTextField)]
-    private TextField logText;
-
     [Inject(UxmlName = R.UxmlNames.urlLabel)]
     private Label urlLabel;
 
     [Inject(UxmlName = R.UxmlNames.urlTextField)]
     private TextField downloadPath;
-
-    [Inject(UxmlName = R.UxmlNames.sizeLabel)]
-    private Label fileSize;
 
     [Inject(UxmlName = R.UxmlNames.startButton)]
     private Button startDownloadButton;
@@ -72,12 +67,11 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
     private List<SongArchiveEntry> songArchiveEntries = new();
 
-    // The Ui log may only be filled from the main thread.
-    // This string caches new log lines for other threads.
-    private string newLogText;
-
-    private int extractedEntryCount;
-    private bool hasFileSize;
+    private readonly ReactiveProperty<long> downloadSizeInBytes = new();
+    private bool HasDownloadSize => downloadSizeInBytes.Value > 0;
+    
+    private readonly ReactiveProperty<long> extractedEntryCount = new();
+    private readonly ReactiveProperty<long> totalEntryCount = new();
 
     protected override void Start()
     {
@@ -112,8 +106,8 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         urlChooserDialogControl = injector
             .WithRootVisualElement(dialog)
             .CreateAndInject<MessageDialogControl>();
-
         urlChooserDialogControl.Title = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
+        urlChooserDialogControl.DialogClosedEventStream.Subscribe(_ => urlChooserDialogControl = null);
 
         // Create a button in the dialog for every archive URL
         songArchiveEntries.ForEach(songArchiveEntry =>
@@ -124,7 +118,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             songArchiveUrlButton.RegisterCallbackButtonTriggered(_ =>
             {
                 SelectSongArchiveUrl(songArchiveEntry.Url);
-                CloseUrlChooserDialog();
+                urlChooserDialogControl?.CloseDialog();
             });
             songArchiveUrlButton.style.height = new StyleLength(StyleKeyword.Auto);
             urlChooserDialogControl.AddVisualElement(songArchiveUrlButton);
@@ -135,17 +129,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         });
         
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialog);
-    }
-
-    private void CloseUrlChooserDialog()
-    {
-        if (urlChooserDialogControl == null)
-        {
-            return;
-        }
-
-        urlChooserDialogControl.CloseDialog();
-        urlChooserDialogControl = null;
     }
 
     private void SelectSongArchiveUrl(string url)
@@ -168,12 +151,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             Debug.Log("Disposing downloadRequest");
             downloadRequest.Dispose();
             downloadRequest = null;
-        }
-
-        if (!newLogText.IsNullOrEmpty())
-        {
-            logText.value = newLogText + logText.value;
-            newLogText = "";
         }
     }
 
@@ -203,7 +180,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         {
             Debug.Log("Aborting download");
             downloadRequest.Abort();
-            AddToUiLog("Canceled download");
             SetCanceledStatus();
         }
     }
@@ -218,7 +194,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         if (downloadRequest != null
             && !downloadRequest.isDone)
         {
-            AddToUiLog("Download in progress. Cancel the other download first.");
             yield break;
         }
 
@@ -228,7 +203,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         }
 
         Debug.Log($"Started download: {url}");
-        AddToUiLog($"Started download");
 
         string targetPath = GetDownloadTargetPath(url);
         DownloadHandler downloadHandler = CreateDownloadHandler(targetPath);
@@ -244,12 +218,10 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
                                       or UnityWebRequest.Result.ProtocolError })
         {
             Debug.LogError($"Error downloading {url}: {downloadRequest.error}");
-            AddToUiLog("Error downloading the requested file");
         }
         else if (downloadRequest != null)
         {
             statusLabel.text = "100%";
-            AddToUiLog($"Download saved to {targetPath}. {downloadRequest.error}");
             UnpackArchive(targetPath);
         }
     }
@@ -263,7 +235,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             string progressText;
             try
             {
-                if (hasFileSize)
+                if (HasDownloadSize)
                 {
                     progressText = Math.Round(downloadRequest.downloadProgress * 100) + "%";
                 }
@@ -275,7 +247,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                AddToUiLog(ex.Message);
                 statusLabel.text = "?";
                 yield break;
             }
@@ -295,12 +266,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         {
             Debug.Log(message);
         }
-        AddToUiLog(message);
-    }
-
-    private void AddToUiLog(string message)
-    {
-        newLogText += message + "\n";
     }
 
     private IEnumerator FileSizeUpdateAsync(string url)
@@ -308,7 +273,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         if (url.IsNullOrEmpty())
         {
             // Do not continue with the coroutine
-            ResetFileSizeText();
+            ResetDownloadSize();
             yield break;
         }
 
@@ -320,21 +285,18 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
             or UnityWebRequest.Result.ProtocolError)
         {
             Debug.LogError($"Error fetching size: {request.error}");
-            AddToUiLog($"Error fetching size: {request.error}");
-            ResetFileSizeText();
+            ResetDownloadSize();
         }
         else
         {
             string contentLength = request.GetResponseHeader("Content-Length");
             if (contentLength.IsNullOrEmpty())
             {
-                ResetFileSizeText();
+                ResetDownloadSize();
             }
             else
             {
-                long size = Convert.ToInt64(contentLength);
-                fileSize.text = ByteSizeUtils.GetHumanReadableByteSize(size);
-                hasFileSize = true;
+                downloadSizeInBytes.Value = Convert.ToInt64(contentLength);
             }
         }
     }
@@ -372,7 +334,8 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     {
         using Stream archiveStream = File.OpenRead(archivePath);
         using ZipFile zipFile = new(archiveStream);
-        extractedEntryCount = 0;
+        totalEntryCount.Value = zipFile.Count;
+        extractedEntryCount.Value = 0;
 
         try
         {
@@ -407,7 +370,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         using Stream zipEntryStream = zipFile.GetInputStream(zipEntry);
         using FileStream targetFileStream = File.Create(targetFilePath);
         StreamUtils.Copy(zipEntryStream, targetFileStream, buffer);
-        extractedEntryCount++;
+        extractedEntryCount.Value++;
     }
 
     private void ExtractTarArchive(string archivePath, string targetFolder, PoolHandle poolHandle)
@@ -440,7 +403,14 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
         string GetStatusLabelProgress(string prefix)
         {
-            return prefix + (extractedEntryCount > 0 ? $" {extractedEntryCount}" : "");
+            if (extractedEntryCount.Value <= 0
+                || totalEntryCount.Value <= 0)
+            {
+                return prefix;
+            }
+
+            float progressInPercent = 100 * (float)extractedEntryCount.Value / totalEntryCount.Value;
+            return $"{prefix} {progressInPercent:0} %";
         }
 
         while (handle != null && !handle.done)
@@ -512,10 +482,9 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_canceled);
     }
 
-    private void ResetFileSizeText()
+    private void ResetDownloadSize()
     {
-        fileSize.text = "??? KB";
-        hasFileSize = false;
+        downloadSizeInBytes.Value = 0;
     }
 
     protected override void OnDestroy()
