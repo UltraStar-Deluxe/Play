@@ -9,8 +9,8 @@
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="downloadControlsContainer" class="mb-2" style="width: 100%; flex-direction: row; justify-content: space-between; align-items: flex-end;">
-            <ui:Label text="Not Started" display-tooltip-when-elided="true" name="statusLabel" style="border-right-width: 20px; width: 20%;" />
+        <ui:VisualElement name="downloadControlsContainer" class="mb-2" style="width: 100%; flex-direction: row; justify-content: space-between; align-items: center;">
+            <ui:Label text="Not Started" display-tooltip-when-elided="true" name="statusLabel" style="border-right-width: 20px; width: 20%; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset?fileID=11400000&amp;guid=9c5ee68429ab94b45a2e23f4a735885c&amp;type=2#RobotoMono-Medium SDF&apos;);" />
             <ui:VisualElement name="buttonContainer" style="flex-direction: row; flex-grow: 1; justify-content: flex-end;">
                 <ui:Button text="Start Download" display-tooltip-when-elided="true" name="startButton" class="controlMinWidth" style="width: 200px; margin-right: 5px;" />
                 <ui:Button text="Cancel Download" display-tooltip-when-elided="true" name="cancelButton" class="controlMinWidth" style="width: 200px;" />

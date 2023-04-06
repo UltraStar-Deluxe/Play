@@ -158,4 +158,19 @@ public class FileDownloadControl : MonoBehaviour
                 : 0.0;
         }
     }
+
+    public static UnityWebRequest CreateDownloadRequest(string url, string targetPath)
+    {
+        DownloadHandler downloadHandler = CreateDownloadHandler(targetPath);
+        UnityWebRequest webRequest = UnityWebRequest.Get(url);
+        webRequest.downloadHandler = downloadHandler;
+        return webRequest;
+    }
+    
+    public static DownloadHandler CreateDownloadHandler(string targetPath)
+    {
+        DownloadHandlerFile downloadHandler = new(targetPath);
+        downloadHandler.removeFileOnAbort = true;
+        return downloadHandler;
+    }
 }

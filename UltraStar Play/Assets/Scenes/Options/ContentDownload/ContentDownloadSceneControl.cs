@@ -62,9 +62,8 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
     private string DownloadUrl => downloadPath.value.Trim();
 
-    private FileDownloadControl fileDownloadControl;
-    private ExtractArchiveControl extractArchiveControl;
-
+    private DownloadAndExtractSongArchiveControl downloadAndExtractSongArchiveControl;
+    
     private List<SongArchiveEntry> songArchiveEntries = new();
 
     protected override void Start()
@@ -80,6 +79,44 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         cancelDownloadButton.RegisterCallbackButtonTriggered(_ => CancelDownload());
 
         urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
+    }
+
+    private void StartDownload()
+    {
+        if (downloadAndExtractSongArchiveControl != null
+            && !downloadAndExtractSongArchiveControl.IsDone.Value)
+        {
+            UiManager.CreateNotification("Download still in progress");
+            return;
+        }
+        
+        downloadAndExtractSongArchiveControl = new(DownloadUrl, gameObject.transform);
+        downloadAndExtractSongArchiveControl.HasError.ObserveOnMainThread()
+            .Subscribe(newValue =>
+            {
+                if (newValue)
+                {
+                    SetErrorStatus();
+                }
+            });
+        downloadAndExtractSongArchiveControl.IsDoneWithoutError.ObserveOnMainThread()
+            .Subscribe(newValue =>
+            {
+                if (newValue)
+                {
+                    SetFinishedStatus();
+                }
+            });
+        downloadAndExtractSongArchiveControl.DownloadProgressEventStream.ObserveOnMainThread()
+            .Subscribe(evt => UpdateDownloadProgressText(evt));
+        downloadAndExtractSongArchiveControl.ExtractProgressEventStream.ObserveOnMainThread()
+            .Subscribe(evt => UpdateExtractArchiveProgressText(evt));
+        downloadAndExtractSongArchiveControl.Start();
+    }
+    
+    private void CancelDownload()
+    {
+        downloadAndExtractSongArchiveControl?.Cancel();
     }
 
     private void ShowUrlChooserDialog()
@@ -131,107 +168,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         startDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_startDownloadButton);
         cancelDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_cancelDownloadButton);
     }
-
-    private string GetDownloadTargetPath(string url)
-    {
-        Uri uri = new(url);
-        string filename = Path.GetFileName(uri.LocalPath);
-        string targetPath = ApplicationManager.PersistentTempPath() + "/" + filename;
-        return targetPath;
-    }
-
-    private DownloadHandler CreateDownloadHandler(string targetPath)
-    {
-        DownloadHandlerFile downloadHandler = new(targetPath);
-        downloadHandler.removeFileOnAbort = true;
-        return downloadHandler;
-    }
-
-    private void StartDownload()
-    {
-        string url = DownloadUrl;
-        
-        try
-        {
-            if (fileDownloadControl != null)
-            {
-                throw new Exception("Downloading file still in progress");
-            }
-            
-            if (extractArchiveControl != null)
-            {
-                throw new Exception("Extracting archive still in progress");
-            }
-            
-            if (DownloadUrl.IsNullOrEmpty())
-            {
-                throw new Exception("URL must not be empty");
-            }
-            
-            string targetPath = GetDownloadTargetPath(url);
-            UnityWebRequest webRequest = CreateDownloadRequest(url, targetPath);
-            fileDownloadControl = FileDownloadControl.Create(webRequest, gameObject.transform);
-            fileDownloadControl.BeforeDestroyEventStream.ObserveOnMainThread().Subscribe(_ => fileDownloadControl = null);
-            fileDownloadControl.IsDoneWithoutError.ObserveOnMainThread().Subscribe(newValue =>
-            {
-                if (!newValue)
-                {
-                    return;
-                }
-                StartExtractArchive(targetPath);
-            });
-            fileDownloadControl.HasError.ObserveOnMainThread().Subscribe(_ => SetErrorStatus());
-            fileDownloadControl.ProgressEventStream.ObserveOnMainThread().Subscribe(evt => UpdateDownloadProgressText(evt));
-            fileDownloadControl.SendWebRequest();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            UiManager.CreateNotification($"Download failed: {e.Message}");
-        }
-    }
-
-    private void StartExtractArchive(string archivePath)
-    {
-        if (extractArchiveControl != null)
-        {
-            throw new Exception("Extracting archive still in progress");
-        }
-            
-        if (!FileUtils.Exists(archivePath))
-        {
-            throw new FileNotFoundException(archivePath);
-        }
-
-        string targetFolder = ApplicationUtils.GetPersistentDataPath("Songs");
-        extractArchiveControl = ExtractArchiveControl.Create(archivePath, targetFolder, gameObject.transform);
-        extractArchiveControl.BeforeDestroyEventStream.ObserveOnMainThread().Subscribe(_ => extractArchiveControl = null);
-        extractArchiveControl.IsDoneWithoutError.ObserveOnMainThread().Subscribe(_ => SetFinishedStatus());
-        extractArchiveControl.HasError.ObserveOnMainThread().Subscribe(_ => SetErrorStatus());
-        extractArchiveControl.ProgressEventStream.ObserveOnMainThread().Subscribe(evt => UpdateExtractArchiveProgressText(evt));
-        extractArchiveControl.StartExtractArchive();
-    }
-
-    private void CancelDownload()
-    {
-        if (fileDownloadControl == null)
-        {
-            return;
-        }
-
-        Debug.Log("Aborting download");
-        fileDownloadControl.AbortWebRequest();
-        SetCanceledStatus();
-    }
-
-    private UnityWebRequest CreateDownloadRequest(string url, string targetPath)
-    {
-        DownloadHandler downloadHandler = CreateDownloadHandler(targetPath);
-        UnityWebRequest webRequest = UnityWebRequest.Get(url);
-        webRequest.downloadHandler = downloadHandler;
-        return webRequest;
-    }
-
+    
     private void SetFinishedStatus()
     {
         statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_finished);
@@ -249,28 +186,34 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     
     private void UpdateDownloadProgressText(FileDownloadControl.DownloadProgressEvent evt)
     {
-        if (evt.FinalDownloadSizeInBytes > 0)
+        ByteSizeUtils.TryGetHumanReadableByteSize((long)evt.DownloadedByteCount, out double size, out string unit);
+        if (unit is "B" or "KB" or "MB")
         {
-            statusLabel.text = $"{Math.Round(evt.DownloadProgressInPercent):0} %";
+            // No digits after comma needed
+            statusLabel.text = $"{size:0} {unit}";
         }
         else
         {
-            ByteSizeUtils.TryGetHumanReadableByteSize((long)evt.DownloadedByteCount, out double size, out string unit);
-            if (unit is "B" or "KB" or "MB")
-            {
-                // No digits after comma needed
-                statusLabel.text = $"{size:0} {unit}";
-            }
-            else
-            {
-                statusLabel.text = $"{size:0.00} {unit}";
-            }
+            statusLabel.text = $"{size:0.00} {unit}";
+        }
+
+        if (evt.FinalDownloadSizeInBytes > 0)
+        {
+            // Also show download progress in percent
+            statusLabel.text += $" ({Math.Round(evt.DownloadProgressInPercent):0} %)";
         }
     }
 
     private void UpdateExtractArchiveProgressText(ExtractArchiveControl.ExtractArchiveProgressEvent evt)
     {
-        statusLabel.text = $"{Math.Round(evt.ProgressInPercent):0} %";
+        if (evt.ProgressInPercent >= 100)
+        {
+            SetFinishedStatus();
+        }
+        else
+        {
+            statusLabel.text = $"{Math.Round(evt.ProgressInPercent):0} %";
+        }
     }
     
     public override bool HasHelpDialog => true;

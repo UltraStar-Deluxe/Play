@@ -192,4 +192,9 @@ public class ExtractArchiveControl : MonoBehaviour
                 : 0.0;
         }
     }
+
+    public void Cancel()
+    {
+        Destroy(gameObject);   
+    }
 }
