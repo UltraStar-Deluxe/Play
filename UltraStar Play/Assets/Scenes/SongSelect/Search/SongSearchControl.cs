@@ -78,12 +78,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         searchProperties = new HashSet<ESearchProperty>(settings.SongSelectSettings.searchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
-            UpdateSearchTextFieldHint();
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
-        searchTextField.RegisterCallback<FocusEvent>(evt => UpdateSearchTextFieldHint());
-        searchTextField.RegisterCallback<BlurEvent>(evt => UpdateSearchTextFieldHint(true));
-        UpdateSearchTextFieldHint();
+        new TextFieldHintControl(searchTextFieldHint);
 
         searchErrorIcon.HideByDisplay();
         searchErrorIconTooltipControl = new(searchErrorIcon);
@@ -132,13 +129,6 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
                 searchTextField.RemoveFromClassList("noSearchResults");
             }
         });
-    }
-
-    private void UpdateSearchTextFieldHint(bool isBlurEvent = false)
-    {
-        searchTextFieldHint.SetVisibleByDisplay(
-            GetRawSearchText().IsNullOrEmpty()
-            && (isBlurEvent || searchTextField.focusController.focusedElement != searchTextField));
     }
 
     private string GetTranslation(ESearchProperty searchProperty)
