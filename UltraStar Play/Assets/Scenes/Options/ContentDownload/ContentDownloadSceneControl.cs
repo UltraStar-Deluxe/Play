@@ -13,7 +13,6 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
-using static ThreadPool;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -63,15 +62,10 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
     private string DownloadUrl => downloadPath.value.Trim();
 
-    private UnityWebRequest downloadRequest;
+    private FileDownloadControl fileDownloadControl;
+    private ExtractArchiveControl extractArchiveControl;
 
     private List<SongArchiveEntry> songArchiveEntries = new();
-
-    private readonly ReactiveProperty<long> downloadSizeInBytes = new();
-    private bool HasDownloadSize => downloadSizeInBytes.Value > 0;
-    
-    private readonly ReactiveProperty<long> extractedEntryCount = new();
-    private readonly ReactiveProperty<long> totalEntryCount = new();
 
     protected override void Start()
     {
@@ -84,12 +78,7 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
         startDownloadButton.RegisterCallbackButtonTriggered(_ => StartDownload());
         cancelDownloadButton.RegisterCallbackButtonTriggered(_ => CancelDownload());
-        downloadPath.RegisterValueChangedCallback(evt => FetchFileSize());
-        if (!DownloadUrl.IsNullOrEmpty())
-        {
-            FetchFileSize();
-        }
-        
+
         urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
     }
 
@@ -143,17 +132,6 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
         cancelDownloadButton.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_cancelDownloadButton);
     }
 
-    void Update()
-    {
-        if (downloadRequest != null
-            && (downloadRequest.isDone || !downloadRequest.error.IsNullOrEmpty()))
-        {
-            Debug.Log("Disposing downloadRequest");
-            downloadRequest.Dispose();
-            downloadRequest = null;
-        }
-    }
-
     private string GetDownloadTargetPath(string url)
     {
         Uri uri = new(url);
@@ -171,300 +149,87 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
 
     private void StartDownload()
     {
-        StartCoroutine(DownloadFileAsync(DownloadUrl));
+        string url = DownloadUrl;
+        
+        try
+        {
+            if (fileDownloadControl != null)
+            {
+                throw new Exception("Downloading file still in progress");
+            }
+            
+            if (extractArchiveControl != null)
+            {
+                throw new Exception("Extracting archive still in progress");
+            }
+            
+            if (DownloadUrl.IsNullOrEmpty())
+            {
+                throw new Exception("URL must not be empty");
+            }
+            
+            string targetPath = GetDownloadTargetPath(url);
+            UnityWebRequest webRequest = CreateDownloadRequest(url, targetPath);
+            fileDownloadControl = FileDownloadControl.Create(webRequest, gameObject.transform);
+            fileDownloadControl.BeforeDestroyEventStream.ObserveOnMainThread().Subscribe(_ => fileDownloadControl = null);
+            fileDownloadControl.IsDoneWithoutError.ObserveOnMainThread().Subscribe(newValue =>
+            {
+                if (!newValue)
+                {
+                    return;
+                }
+                StartExtractArchive(targetPath);
+            });
+            fileDownloadControl.HasError.ObserveOnMainThread().Subscribe(_ => SetErrorStatus());
+            fileDownloadControl.ProgressEventStream.ObserveOnMainThread().Subscribe(evt => UpdateDownloadProgressText(evt));
+            fileDownloadControl.SendWebRequest();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            UiManager.CreateNotification($"Download failed: {e.Message}");
+        }
+    }
+
+    private void StartExtractArchive(string archivePath)
+    {
+        if (extractArchiveControl != null)
+        {
+            throw new Exception("Extracting archive still in progress");
+        }
+            
+        if (!FileUtils.Exists(archivePath))
+        {
+            throw new FileNotFoundException(archivePath);
+        }
+
+        string targetFolder = ApplicationUtils.GetPersistentDataPath("Songs");
+        extractArchiveControl = ExtractArchiveControl.Create(archivePath, targetFolder, gameObject.transform);
+        extractArchiveControl.BeforeDestroyEventStream.ObserveOnMainThread().Subscribe(_ => extractArchiveControl = null);
+        extractArchiveControl.IsDoneWithoutError.ObserveOnMainThread().Subscribe(_ => SetFinishedStatus());
+        extractArchiveControl.HasError.ObserveOnMainThread().Subscribe(_ => SetErrorStatus());
+        extractArchiveControl.ProgressEventStream.ObserveOnMainThread().Subscribe(evt => UpdateExtractArchiveProgressText(evt));
+        extractArchiveControl.StartExtractArchive();
     }
 
     private void CancelDownload()
     {
-        if (downloadRequest != null && !downloadRequest.isDone)
+        if (fileDownloadControl == null)
         {
-            Debug.Log("Aborting download");
-            downloadRequest.Abort();
-            SetCanceledStatus();
+            return;
         }
+
+        Debug.Log("Aborting download");
+        fileDownloadControl.AbortWebRequest();
+        SetCanceledStatus();
     }
 
-    private void FetchFileSize()
+    private UnityWebRequest CreateDownloadRequest(string url, string targetPath)
     {
-        StartCoroutine(FileSizeUpdateAsync(DownloadUrl));
-    }
-
-    private IEnumerator DownloadFileAsync(string url)
-    {
-        if (downloadRequest != null
-            && !downloadRequest.isDone)
-        {
-            yield break;
-        }
-
-        if (url.IsNullOrEmpty())
-        {
-            yield break;
-        }
-
-        Debug.Log($"Started download: {url}");
-
-        string targetPath = GetDownloadTargetPath(url);
         DownloadHandler downloadHandler = CreateDownloadHandler(targetPath);
-
-        downloadRequest = UnityWebRequest.Get(url);
-        downloadRequest.downloadHandler = downloadHandler;
-
-        StartCoroutine(TrackProgressAsync());
-
-        yield return downloadRequest?.SendWebRequest();
-
-        if (downloadRequest is { result: UnityWebRequest.Result.ConnectionError
-                                      or UnityWebRequest.Result.ProtocolError })
-        {
-            Debug.LogError($"Error downloading {url}: {downloadRequest.error}");
-        }
-        else if (downloadRequest != null)
-        {
-            statusLabel.text = "100%";
-            UnpackArchive(targetPath);
-        }
-    }
-
-    private IEnumerator TrackProgressAsync()
-    {
-        while (downloadRequest != null
-            && downloadRequest.downloadHandler != null
-            && !downloadRequest.downloadHandler.isDone)
-        {
-            string progressText;
-            try
-            {
-                if (HasDownloadSize)
-                {
-                    progressText = Math.Round(downloadRequest.downloadProgress * 100) + "%";
-                }
-                else
-                {
-                    progressText = ByteSizeUtils.GetHumanReadableByteSize((long)downloadRequest.downloadedBytes);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                statusLabel.text = "?";
-                yield break;
-            }
-
-            statusLabel.text = progressText;
-            yield return new WaitForSeconds(0.1f);
-        }
-    }
-
-    private void AddToDebugAndUiLog(string message, bool isError = false)
-    {
-        if (isError)
-        {
-            Debug.LogError(message);
-        }
-        else
-        {
-            Debug.Log(message);
-        }
-    }
-
-    private IEnumerator FileSizeUpdateAsync(string url)
-    {
-        if (url.IsNullOrEmpty())
-        {
-            // Do not continue with the coroutine
-            ResetDownloadSize();
-            yield break;
-        }
-
-        using UnityWebRequest request = UnityWebRequest.Head(url);
-        yield return request.SendWebRequest();
-
-        if (request.result
-            is UnityWebRequest.Result.ConnectionError
-            or UnityWebRequest.Result.ProtocolError)
-        {
-            Debug.LogError($"Error fetching size: {request.error}");
-            ResetDownloadSize();
-        }
-        else
-        {
-            string contentLength = request.GetResponseHeader("Content-Length");
-            if (contentLength.IsNullOrEmpty())
-            {
-                ResetDownloadSize();
-            }
-            else
-            {
-                downloadSizeInBytes.Value = Convert.ToInt64(contentLength);
-            }
-        }
-    }
-
-    private void UnpackArchive(string archivePath)
-    {
-        if (downloadRequest == null)
-        {
-            return;
-        }
-
-        if (!File.Exists(archivePath))
-        {
-            AddToDebugAndUiLog("Can not unpack file because it does not exist on the storage! Did the download fail?", true);
-            return;
-        }
-
-        AddToDebugAndUiLog("Preparing to unpack the downloaded song package.");
-        string songsPath = ApplicationManager.PersistentSongsPath();
-        PoolHandle handle = QueueUserWorkItem(poolHandle =>
-        {
-            if (archivePath.ToLowerInvariant().EndsWith("tar"))
-            {
-                ExtractTarArchive(archivePath, songsPath, poolHandle);
-            }
-            else if (archivePath.ToLowerInvariant().EndsWith("zip"))
-            {
-                ExtractZipArchive(archivePath, songsPath, poolHandle);
-            }
-        });
-        StartCoroutine(TrackUnpackAsync(handle, archivePath, songsPath));
-    }
-
-    private void ExtractZipArchive(string archivePath, string targetFolder, PoolHandle poolHandle)
-    {
-        using Stream archiveStream = File.OpenRead(archivePath);
-        using ZipFile zipFile = new(archiveStream);
-        totalEntryCount.Value = zipFile.Count;
-        extractedEntryCount.Value = 0;
-
-        try
-        {
-            foreach (ZipEntry entry in zipFile)
-            {
-                ExtractZipEntry(zipFile, entry, targetFolder);
-            }
-
-            poolHandle.done = true;
-        }
-        catch (Exception ex)
-        {
-            AddToDebugAndUiLog($"Unpacking failed: {ex.Message}");
-            SetErrorStatus();
-        }
-    }
-
-    private void ExtractZipEntry(ZipFile zipFile, ZipEntry zipEntry, string targetFolder)
-    {
-        string entryPath = zipEntry.Name;
-        if (!zipEntry.IsFile)
-        {
-            string targetSubFolder = targetFolder + "/" + zipEntry.Name;
-            Directory.CreateDirectory(targetSubFolder);
-            return;
-        }
-
-        Debug.Log($"Extracting {entryPath}");
-        string targetFilePath = targetFolder + "/" + entryPath;
-
-        byte[] buffer = new byte[4096];
-        using Stream zipEntryStream = zipFile.GetInputStream(zipEntry);
-        using FileStream targetFileStream = File.Create(targetFilePath);
-        StreamUtils.Copy(zipEntryStream, targetFileStream, buffer);
-        extractedEntryCount.Value++;
-    }
-
-    private void ExtractTarArchive(string archivePath, string targetFolder, PoolHandle poolHandle)
-    {
-        using Stream archiveStream = File.OpenRead(archivePath);
-        using TarArchive archive = TarArchive.CreateInputTarArchive(archiveStream, Encoding.UTF8);
-
-        try
-        {
-            archive.ExtractContents(targetFolder);
-            poolHandle.done = true;
-        }
-        catch (Exception ex)
-        {
-            AddToDebugAndUiLog($"Unpacking failed: {ex.Message}");
-            SetErrorStatus();
-        }
-    }
-
-    private IEnumerator TrackUnpackAsync(PoolHandle handle, string archivePath, string songsPath)
-    {
-        if (downloadRequest == null)
-        {
-            yield break;
-        }
-
-        string progress1 = "Unpacking file.  ";
-        string progress2 = "Unpacking file.. ";
-        string progress3 = "Unpacking file...";
-
-        string GetStatusLabelProgress(string prefix)
-        {
-            if (extractedEntryCount.Value <= 0
-                || totalEntryCount.Value <= 0)
-            {
-                return prefix;
-            }
-
-            float progressInPercent = 100 * (float)extractedEntryCount.Value / totalEntryCount.Value;
-            return $"{prefix} {progressInPercent:0} %";
-        }
-
-        while (handle != null && !handle.done)
-        {
-            statusLabel.text = GetStatusLabelProgress(progress1);
-            yield return new WaitForSeconds(0.5f);
-            if (handle == null || handle.done)
-            {
-                break;
-            }
-            statusLabel.text = GetStatusLabelProgress(progress2);
-            yield return new WaitForSeconds(0.5f);
-            if (handle == null || handle.done)
-            {
-                break;
-            }
-            statusLabel.text = GetStatusLabelProgress(progress3);
-            yield return new WaitForSeconds(0.5f);
-        }
-
-        if (handle == null)
-        {
-            AddToDebugAndUiLog($"Unpacking the song package failed. Handle was null for {archivePath}.", true);
-            statusLabel.text = "Failed. Handle was null";
-
-        }
-        else if (handle.done)
-        {
-            AddToDebugAndUiLog($"Finished unpacking the song package to {songsPath}");
-            SetFinishedStatus();
-            downloadPath.value = "";
-            List<string> songDirs = settings.GameSettings.songDirs;
-            if (!songDirs.Contains(songsPath))
-            {
-                songDirs.Add(songsPath);
-                settingsManager.Save();
-            }
-            // Reload SongMetas if they had been loaded already.
-            if (SongMetaManager.IsSongScanFinished)
-            {
-                Debug.Log("Rescan songs after successful download.");
-                SongMetaManager.ResetSongMetas();
-                songMetaManager.ScanFilesIfNotDoneYet();
-            }
-        }
-        else
-        {
-            AddToDebugAndUiLog($"Unpacking the song package failed with an unknown error. Please check the log. File: {archivePath}", true);
-            statusLabel.text = "Failed";
-        }
-        if (File.Exists(archivePath))
-        {
-            File.Delete(archivePath);
-        }
+        UnityWebRequest webRequest = UnityWebRequest.Get(url);
+        webRequest.downloadHandler = downloadHandler;
+        return webRequest;
     }
 
     private void SetFinishedStatus()
@@ -481,22 +246,33 @@ public class ContentDownloadSceneControl : AbstractOptionsSceneControl, INeedInj
     {
         statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_canceled);
     }
-
-    private void ResetDownloadSize()
+    
+    private void UpdateDownloadProgressText(FileDownloadControl.DownloadProgressEvent evt)
     {
-        downloadSizeInBytes.Value = 0;
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        
-        if (downloadRequest != null)
+        if (evt.FinalDownloadSizeInBytes > 0)
         {
-            downloadRequest.Dispose();
+            statusLabel.text = $"{Math.Round(evt.DownloadProgressInPercent):0} %";
+        }
+        else
+        {
+            ByteSizeUtils.TryGetHumanReadableByteSize((long)evt.DownloadedByteCount, out double size, out string unit);
+            if (unit is "B" or "KB" or "MB")
+            {
+                // No digits after comma needed
+                statusLabel.text = $"{size:0} {unit}";
+            }
+            else
+            {
+                statusLabel.text = $"{size:0.00} {unit}";
+            }
         }
     }
 
+    private void UpdateExtractArchiveProgressText(ExtractArchiveControl.ExtractArchiveProgressEvent evt)
+    {
+        statusLabel.text = $"{Math.Round(evt.ProgressInPercent):0} %";
+    }
+    
     public override bool HasHelpDialog => true;
     public override MessageDialogControl CreateHelpDialogControl()
     {
