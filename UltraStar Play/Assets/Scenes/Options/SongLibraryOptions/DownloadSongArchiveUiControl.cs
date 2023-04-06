@@ -99,6 +99,11 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     private void StartDownload()
     {
+        if (urlTextField.value.IsNullOrEmpty())
+        {
+            return;
+        }
+        
         if (downloadAndExtractSongArchiveControl != null
             && !downloadAndExtractSongArchiveControl.IsDone.Value)
         {
