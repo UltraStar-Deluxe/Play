@@ -76,7 +76,7 @@ public static class ImageManager
 
         void DoCacheSpriteThenOnSuccess(Texture2D loadedTexture)
         {
-            Sprite sprite = Sprite.Create(loadedTexture, new Rect(0, 0, loadedTexture.width, loadedTexture.height), new Vector2(0.5f, 0.5f));
+            Sprite sprite = Sprite.Create(loadedTexture, new Rect(0, 0, loadedTexture.width, loadedTexture.height), new Vector2(0.5f, 0.5f), 100f, 0u,  SpriteMeshType.FullRect);
             AddSpriteToCache(sprite, uri);
             onSuccess(sprite);
         }
