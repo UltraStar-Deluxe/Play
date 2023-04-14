@@ -2,9 +2,9 @@
     <ui:Template name="TeamResultsTeamUi" src="project://database/Assets/Scenes/SingingResults/TeamResultsTeamUi.uxml?fileID=9197481963319205126&amp;guid=714ec31c3ce3711439bf40d845ea1e51&amp;type=3#TeamResultsTeamUi" />
     <ui:VisualElement name="teamResultsUiRoot" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: column; align-items: flex-end; justify-content: center;">
         <ui:VisualElement name="topThreeContainer" style="background-color: rgba(0, 0, 0, 0); width: 100%; align-items: flex-end;">
-            <ui:VisualElement name="firstTeamUi" class="mb-3" style="background-color: rgba(0, 0, 0, 0); flex-direction: row-reverse; align-items: center; width: 95%; right: 10px;">
+            <ui:VisualElement name="firstTeamUi" class="mb-3" style="background-color: rgba(0, 0, 0, 0); flex-direction: row-reverse; align-items: center; width: 98%; right: 10px;">
                 <ui:Instance template="TeamResultsTeamUi" />
-                <ui:VisualElement name="firstPlaceTrophyImage" style="height: 120%; width: 64px; background-image: url(&apos;project://database/Assets/Common/Graphics/TrophyAndMedals/achievement-1293132.png?fileID=2800000&amp;guid=4db43464270c46d4ab714095c00f90a8&amp;type=3#achievement-1293132&apos;); -unity-background-scale-mode: scale-to-fit; flex-shrink: 0;" />
+                <ui:VisualElement name="firstPlaceTrophyImage" style="height: 120%; width: 80px; background-image: url(&apos;project://database/Assets/Common/Graphics/TrophyAndMedals/emoji_u1f3c6.png?fileID=2800000&amp;guid=0dd302e1c119b924c957327f63f76d94&amp;type=3#emoji_u1f3c6&apos;); -unity-background-scale-mode: scale-to-fit;" />
             </ui:VisualElement>
             <ui:VisualElement name="secondTeamUi" class="mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 90%; margin-right: 20px; flex-direction: row-reverse;">
                 <ui:Instance template="TeamResultsTeamUi" />

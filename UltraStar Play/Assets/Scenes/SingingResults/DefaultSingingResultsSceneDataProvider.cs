@@ -10,6 +10,8 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     [Range(0, 8)]
     public int partyModeTeams = 5;
 
+    public Vector2 scoreRange = new Vector2(2000, 8000);
+    
     public bool isLastPartyModeRound;
     public bool isKnockOutTournament;
     
@@ -18,14 +20,40 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         SingingResultsSceneData data = new();
 
         SongMetaManager.Instance.WaitUntilSongScanFinished();
+
+        Settings settings = SettingsManager.Instance.Settings;
+
         data.SongMetas = new List<SongMeta> { SongMetaManager.Instance.GetFirstSongMeta() };
         data.SongDurationInMillis = 120 * 1000;
 
+        List<PlayerProfile> settingsPlayerProfiles = settings.PlayerProfiles;
+        for (int i = 0; i < playerCount && i < settingsPlayerProfiles.Count; i++)
+        {
+            PlayerProfile playerProfile = settingsPlayerProfiles[i];
+            data.AddPlayerScores(playerProfile, CreatePlayerScoreData());
+            
+            if (settings.MicProfiles.Count > i)
+            {
+                data.PlayerProfileToMicProfileMap[playerProfile] = settings.MicProfiles[i];
+            }
+        }
+
+        if (partyModeTeams > 0)
+        {
+            data.partyModeSceneData = CreatePartyModeSceneData();
+        }
+        return data;
+    }
+
+    private PlayerScoreControlData CreatePlayerScoreData()
+    {
         PlayerScoreControlData playerScoreData = new();
-        playerScoreData.TotalScore = 6500;
-        playerScoreData.NormalNotesTotalScore = 4000;
-        playerScoreData.GoldenNotesTotalScore = 2000;
-        playerScoreData.PerfectSentenceBonusTotalScore = 500;
+        playerScoreData.NormalNotesTotalScore = (int)Random.Range(scoreRange.x / 3, scoreRange.y / 3);
+        playerScoreData.GoldenNotesTotalScore = (int)Random.Range(scoreRange.x / 3, scoreRange.y / 3);
+        playerScoreData.PerfectSentenceBonusTotalScore = (int)Random.Range(scoreRange.x / 3, scoreRange.y / 3);
+        playerScoreData.TotalScore = playerScoreData.NormalNotesTotalScore
+                                     + playerScoreData.GoldenNotesTotalScore
+                                     + playerScoreData.PerfectSentenceBonusTotalScore;
 
         playerScoreData.NormalNoteLengthTotal = 80;
         playerScoreData.GoldenNoteLengthTotal = 20;
@@ -43,21 +71,8 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence1, CreateSentenceScore(sentence1, 3000));
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence2, CreateSentenceScore(sentence2, 5000));
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence3, CreateSentenceScore(sentence3, 6500));
-
-        List<PlayerProfile> settingsPlayerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
-        PlayerProfile playerProfile = settingsPlayerProfiles[0];
-        data.PlayerProfileToMicProfileMap[playerProfile] = SettingsManager.Instance.Settings.MicProfiles.FirstOrDefault();
-        data.AddPlayerScores(playerProfile, playerScoreData);
-        for (int i = 1; i < playerCount && i < settingsPlayerProfiles.Count; i++)
-        {
-            data.AddPlayerScores(settingsPlayerProfiles[i], playerScoreData);
-        }
-
-        if (partyModeTeams > 0)
-        {
-            data.partyModeSceneData = CreatePartyModeSceneData();
-        }
-        return data;
+        
+        return playerScoreData;
     }
 
     private PartyModeSceneData CreatePartyModeSceneData()
