@@ -41,7 +41,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
-
+    
+    [Inject(UxmlName = R.UxmlNames.playerImageContainer)]
+    private VisualElement playerImageContainer;
+    
     [Inject(UxmlName = R.UxmlNames.playerImageBorder)]
     private VisualElement playerImageBorder;
     
@@ -155,9 +158,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             // No need to show a player image and name
             // because it is neither associated with a score nor with lyrics.
-            playerNameLabel.HideByDisplay();
-            playerImage.HideByDisplay();
-            playerScoreProgressBar.HideByDisplay();
+            playerImageContainer.HideByDisplay();
             return;
         }
 

@@ -45,6 +45,8 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
             return;
         }
 
+        ItemPicker.ItemLabel.SetBorderRadius(Length.Percent(50));
+        
         if (imagePath == PlayerProfile.WebcamImagePath
             && webCamManager != null)
         {

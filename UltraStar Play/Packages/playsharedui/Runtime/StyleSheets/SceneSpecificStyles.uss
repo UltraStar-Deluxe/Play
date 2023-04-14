@@ -21,7 +21,7 @@
 }
 
 #playerImage {
-    transition: -unity-background-image-tint-color 0.5s;
+    transition: -unity-background-image-tint-color 0.5s, background-color 0.3s;
 }
 
 #searchTextField #unity-text-input {
@@ -153,21 +153,22 @@
 }
 
 #playerScoreProgressBar {
-    width: 150%;
-    height: 150%;
+    width: 125%;
+    height: 125%;
     --track-color: rgba(242, 244, 247, 0);
     --progress-color: #2e8418;
-    --border-size: 16;
+    --border-size: 10;
     border-radius: 50%;
 }
 
 #playerImageBorder {
+    display: none;
     border-radius: 50%;
     border-color: #2e8418;
-    border-width: 8%;
+    border-width: 5%;
     /* for perfect circle: width and height = 100% + (4 * border-width%) */ 
-    width: 120%;
-    height: 120%;
+    width: 112%;
+    height: 112%;
 }
 
 .lyricsContainer {
@@ -260,8 +261,8 @@
 
 #playerInfoContainer #playerImage {
     flex-shrink: 0;
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
 }
 
 .singScenePlayerUi.singScenePlayerUiSmall #playerInfoContainer #playerImage {

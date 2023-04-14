@@ -10,6 +10,15 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
 {
     [Inject(Optional = true)]
     private MicProfile micProfile;
+    public MicProfile MicProfile
+    {
+        get => micProfile;
+        set
+        {
+            micProfile = value;
+            UpdatePlayerProfileImage();
+        }
+    }
 
     [Inject(Optional = true)]
     private PlayerProfile playerProfile;
@@ -47,6 +56,8 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
             return;
         }
 
+        UpdatePlayerImageBackgroundColor();
+
         if (playerProfile.ImagePath == PlayerProfile.WebcamImagePath)
         {
             int playerProfileIndex = settings.PlayerProfiles.IndexOf(playerProfile);
@@ -55,12 +66,25 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
             {
                 image.style.backgroundImage = new StyleBackground(loadedSprite);
             });
-            return;
         }
-
-        uiManager.LoadPlayerProfileImage(playerProfile.ImagePath, loadedSprite =>
+        else
         {
-            image.style.backgroundImage = new StyleBackground(loadedSprite);
-        });
+            uiManager.LoadPlayerProfileImage(playerProfile.ImagePath, loadedSprite =>
+            {
+                image.style.backgroundImage = new StyleBackground(loadedSprite);
+            });
+        }
+    }
+
+    private void UpdatePlayerImageBackgroundColor()
+    {
+        if (micProfile != null)
+        {
+            image.style.backgroundColor = new StyleColor(micProfile.Color);
+        }
+        else
+        {
+            image.style.backgroundColor = new StyleColor(Color.clear);
+        }
     }
 }
