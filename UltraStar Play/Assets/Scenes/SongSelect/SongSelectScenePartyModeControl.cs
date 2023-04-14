@@ -200,7 +200,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     public void OpenAskToUseJokerDialog(SongMeta songMeta, Action onYes = null)
     {
         CloseAskToUseJokerDialog();
-        askToUseJokerControl = uiManager.CreateMessageDialog("Use Joker");
+        askToUseJokerControl = uiManager.CreateDialogControl("Use Joker");
         askToUseJokerControl.Message = $"Use joker to change song?\nJokers left: {GetJokerCountTranslation()}";
         askToUseJokerControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ =>
         {

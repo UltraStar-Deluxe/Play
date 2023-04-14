@@ -26,7 +26,7 @@ public class MicWithNameControl : INeedInjection, IInjectionFinishedListener, ID
     public void OnInjectionFinished()
     {
         micButton.RegisterCallbackButtonTriggered(_ => OnMicSelected?.Invoke(MicProfile));
-        nameLabel.text = MicProfile.Name;
+        nameLabel.text = MicProfile.GetDisplayNameWithChannel();
         nameLabel.RegisterCallback<ClickEvent>(evt => OnMicSelected?.Invoke(MicProfile));
         micIcon.style.unityBackgroundImageTintColor = new StyleColor(MicProfile.Color);
         micIcon.style.unityBackgroundImageTintColor = new StyleColor(MicProfile.Color);

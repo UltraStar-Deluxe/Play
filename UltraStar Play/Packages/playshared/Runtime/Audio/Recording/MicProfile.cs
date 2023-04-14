@@ -14,7 +14,7 @@ public class MicProfile
     public Color32 Color { get; set; } = Colors.crimson;
     public int Amplification { get; set; }
     public int NoiseSuppression { get; set; } = 5;
-    public bool IsEnabled { get; set; }
+    public bool IsEnabled { get; set; } = true;
     public int DelayInMillis { get; set; } = 300;
     public int SampleRate { get; set; }
 
@@ -46,5 +46,10 @@ public class MicProfile
         DelayInMillis = other.DelayInMillis;
         SampleRate = other.SampleRate;
         ConnectedClientId = other.ConnectedClientId;
+    }
+
+    public override string ToString()
+    {
+        return this.GetDisplayNameWithChannel();
     }
 }

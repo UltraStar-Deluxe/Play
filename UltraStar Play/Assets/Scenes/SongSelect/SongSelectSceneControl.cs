@@ -181,11 +181,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
-    [Inject(UxmlName = R.UxmlNames.downloadSongsButton)]
-    private Button downloadSongsButton;
-
-    [Inject(UxmlName = R.UxmlNames.addSongFolderButton)]
-    private Button addSongFolderButton;
+    [Inject(UxmlName = R.UxmlNames.importSongsButton)]
+    private Button importSongsButton;
 
     [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
     private Button showSearchExpressionInfoButton;
@@ -349,8 +346,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songAudioPlayer.LoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
 
-        downloadSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.ContentDownloadScene)));
-        addSongFolderButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
+        importSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
 
         // Show options in popup
         singingOptionsDropdownOverlay.HideByDisplay();
@@ -854,7 +850,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void SelectRandomSong()
     {
-        SongMeta randomSongMeta = RandomUtils.RandomOf(songRouletteControl.Songs);
+        List<SongMeta> availableSongMetas = songRouletteControl.Songs
+            .Except(new List<SongMeta> { SelectedSong })
+            .ToList();
+        SongMeta randomSongMeta = RandomUtils.RandomOf(availableSongMetas);
+        if (randomSongMeta == null)
+        {
+            return;
+        }
         songRouletteControl.SelectSong(randomSongMeta);
     }
 

@@ -180,7 +180,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         SyncVideoPlayPause(songAudioPlayer.PositionInSongInMillis);
         if (videoPlayer.isPlaying || forceImmediateSync)
         {
-            SyncVideoWithMusic(songAudioPlayer.PositionInSongInMillis, forceImmediateSync);
+            SyncVideoWithMusic(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis, forceImmediateSync);
         }
     }
 
@@ -213,7 +213,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         if ((!songAudioPlayerIsPlaying && videoPlayer.isPlaying)
             || (videoPlayer.length > 0
-                && (videoPlayer.length * 1000) <= songAudioPlayer.PositionInSongInMillis))
+                && videoPlayer.length <= songAudioPlayer.PositionInSongInSeconds
+                && !videoPlayer.isLooping))
         {
             videoPlayer.Pause();
         }
@@ -223,7 +224,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public void SyncVideoWithMusic(double positionInSongInMillis, bool forceImmediateSync)
+    public void SyncVideoWithMusic(double positionInSongInMillis, double durationOfSongInMillis, bool forceImmediateSync)
     {
         if (!HasLoadedVideo || IsWaitingForVideoGap(positionInSongInMillis)
             || (!forceImmediateSync && nextSyncTimeInSeconds > Time.time))
@@ -231,15 +232,26 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
+        // Loop short videos
+        double durationOfSongInSeconds = durationOfSongInMillis / 1000;
+        videoPlayer.isLooping = videoPlayer.length < durationOfSongInSeconds / 2;
+        
         // Both, the smooth sync and immediate sync need some time.
-        nextSyncTimeInSeconds = Time.time + 0.5f;
+        nextSyncTimeInSeconds = Time.time + 1;
 
         double targetPositionInVideoInSeconds = SongMeta.VideoGap + positionInSongInMillis / 1000;
+        if (videoPlayer.isLooping)
+        {
+            targetPositionInVideoInSeconds %= videoPlayer.length;
+        }
+
+        Debug.Log("targetPositionInVideoInSeconds: " + targetPositionInVideoInSeconds);
+        
         double timeDifferenceInSeconds = targetPositionInVideoInSeconds - videoPlayer.time;
 
         // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
         // A big mismatch is corrected immediately.
-        if (forceImmediateSync || Math.Abs(timeDifferenceInSeconds) > 2)
+        if (forceImmediateSync || Math.Abs(timeDifferenceInSeconds) > 3)
         {
             // Correct the mismatch immediately.
             videoPlayer.time = targetPositionInVideoInSeconds;

@@ -112,13 +112,21 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         
         devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, CreateMicProfiles());
         devicePickerControl.AutoSmallFont = false;
-        devicePickerControl.GetLabelTextFunction = item => item != null ? item.Name : "";
+        devicePickerControl.GetLabelTextFunction = item => item != null ? item.GetDisplayNameWithChannel() : "";
         if (!TryReSelectLastMicProfile())
         {
             devicePickerControl.Selection.Value = devicePickerControl.Items[0];
         }
-        devicePickerControl.Selection
-            .Subscribe(micProfile => settings.LastMicProfileNameInRecordingOptionsScene = micProfile?.Name);
+        devicePickerControl.Selection.Subscribe(micProfile =>
+            {
+                if (micProfile == null)
+                {
+                    return;
+                }
+
+                settings.LastMicProfileNameInRecordingOptionsScene = micProfile.Name;
+                settings.LastMicProfileChannelIndexInRecordingOptionsScene = micProfile.ChannelIndex;
+            });
 
         amplificationPickerControl = new LabeledItemPickerControl<int>(amplificationPicker, amplificationItems);
         amplificationPickerControl.GetLabelTextFunction = item => item + " %";
@@ -239,7 +247,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             // Try to restore selection
             if (lastMicProfile != null)
             {
-                MicProfile matchingMicProfile = devicePickerControl.Items.FirstOrDefault(micProfile => micProfile.Name == lastMicProfile.Name);
+                MicProfile matchingMicProfile = devicePickerControl.Items.FirstOrDefault(micProfile =>
+                    micProfile.Name == lastMicProfile.Name
+                    && micProfile.ChannelIndex == lastMicProfile.ChannelIndex);
                 if (matchingMicProfile != null)
                 {
                     nextSelectedMicProfile = matchingMicProfile;
@@ -287,7 +297,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         }
 
         MicProfile lastMicProfile = devicePickerControl.Items
-            .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene);
+            .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene 
+                                          && micProfile.ChannelIndex == settings.LastMicProfileChannelIndexInRecordingOptionsScene);
         if (lastMicProfile == null)
         {
             return false;
@@ -401,55 +412,10 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     private List<MicProfile> CreateMicProfiles()
     {
-        // Create list of connected and loaded microphones without duplicates.
-        // A loaded microphone might have been created with hardware that is not connected now.
-
-        // PortAudio returns too many recording devices. Thus, explicitly use the Unity API here to get available recording device names.
-        List<string> connectedMicNames = Microphone.devices.ToList();
-        List<MicProfile> loadedMicProfiles = settings.MicProfiles;
-        List<MicProfile> micProfiles = new(loadedMicProfiles);
-        List<IConnectedClientHandler> connectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
-
-        // Create mic profiles for connected microphones that are not yet in the list
-        foreach (string connectedMicName in connectedMicNames)
-        {
-            try
-            {
-                MicrophoneAdapter.GetDeviceCaps(connectedMicName, out int minSampleRate, out int maxSampleRate, out int channelCount);
-                for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
-                {
-                    bool alreadyInList = micProfiles.AnyMatch(it =>
-                        it.Name == connectedMicName
-                        && it.ChannelIndex == channelIndex
-                        && !it.IsInputFromConnectedClient);
-                    if (!alreadyInList)
-                    {
-                        MicProfile micProfile = new(connectedMicName, channelIndex);
-                        micProfiles.Add(micProfile);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError(ex);
-                continue;
-            }
-        }
-
-        // Create mic profiles for connected companion apps that are not yet in the list
-        foreach (IConnectedClientHandler connectedClientHandler in connectedClientHandlers)
-        {
-            bool alreadyInList = micProfiles.AnyMatch(it => it.ConnectedClientId == connectedClientHandler.ClientId && it.IsInputFromConnectedClient);
-            if (!alreadyInList)
-            {
-                MicProfile micProfile = new(connectedClientHandler.ClientName, 0, connectedClientHandler.ClientId);
-                micProfiles.Add(micProfile);
-            }
-        }
-
-        micProfiles.Sort(MicProfile.compareByName);
-
-        return micProfiles;
+        return MicProfileUtils.CreateMicProfiles(
+            settings.MicProfiles,
+            themeManager.GetMicrophoneColors(),
+            serverSideConnectRequestManager.GetAllConnectedClientHandlers());
     }
 
     public void UpdateMicProfileNames(ClientConnectionEvent clientConnectionEvent)

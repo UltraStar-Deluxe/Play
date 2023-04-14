@@ -18,6 +18,9 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
     private MidiManager midiManager;
     
     [Inject]
+    private BackgroundMusicManager backgroundMusicManager;
+    
+    [Inject]
     private UIDocument uiDoc;
 
     [Inject(UxmlName = R.UxmlNames.backgroundMusicVolumeChooser)]
@@ -40,6 +43,9 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
 
     [Inject(UxmlName = R.UxmlNames.testSoundfontButton)]
     private Button testSoundfontButton;
+    
+    [Inject(UxmlName = R.UxmlNames.selectSoundfontButton)]
+    private Button selectSoundfontButton;
     
     protected override void Start()
     {
@@ -79,13 +85,40 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
             soundfontPathTextField,
             () => settings.AudioSettings.soundfontPath,
             newValue => settings.AudioSettings.soundfontPath = newValue);
+        new TextFieldHintControl(soundfontPathTextField);
         
         testSoundfontButton.RegisterCallbackButtonTriggered(_ => TestSoundfont());
+        selectSoundfontButton.RegisterCallbackButtonTriggered(_ => OpenSoundfontDialog());
+    }
+
+    private void OpenSoundfontDialog()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Soundfont File",
+            "",
+            FileSystemDialogUtils.CreateExtensionFilters("Soundfont files", ApplicationUtils.supportedSoundfontFiles),
+            () => soundfontPathTextField.value,
+            newValue =>
+            {
+                soundfontPathTextField.value = newValue;
+            });
     }
 
     private void TestSoundfont()
     {
-        midiManager.PlayMidiFile(new MidiFile(new StreamingAssetsSoundfontResource(streamingAssetsMidiTestFile)));
+        backgroundMusicManager.BackgroundMusicAudioSource.mute = true;
+        MidiFile demoMidiFile = new MidiFile(new StreamingAssetsSoundfontResource(streamingAssetsMidiTestFile));
+        midiManager.PlayMidiFile(demoMidiFile);
+
+        float demoMidiFileDurationInSeconds = 4;
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(demoMidiFileDurationInSeconds,
+            () => backgroundMusicManager.BackgroundMusicAudioSource.mute = false));
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        backgroundMusicManager.BackgroundMusicAudioSource.mute = false;
     }
 
     public void UpdateTranslation()

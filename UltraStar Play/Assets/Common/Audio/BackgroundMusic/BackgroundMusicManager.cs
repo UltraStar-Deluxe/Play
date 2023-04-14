@@ -1,12 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UnityEngine.SceneManagement;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -42,6 +37,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private AudioSource backgroundMusicAudioSource;
+    public AudioSource BackgroundMusicAudioSource => backgroundMusicAudioSource;
 
     [Inject]
     private Settings settings;
@@ -100,6 +96,8 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.Log($"Did not play background music for {timeInSecondsWithoutBackgroundMusic} seconds. Restarting it from the beginning.");
                 backgroundMusicAudioSource.Stop();
             }
+
+            backgroundMusicAudioSource.loop = true;
             backgroundMusicAudioSource.Play();
         }
         else if (!ShouldPlayBackgroundMusic

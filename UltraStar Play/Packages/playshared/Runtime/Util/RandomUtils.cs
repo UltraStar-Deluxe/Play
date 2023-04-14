@@ -32,4 +32,12 @@ public static class RandomUtils
         }
         return result;
     }
+    
+    public static Color32 RandomColor()
+    {
+        int r = Random.Range(0, 255);
+        int g = Random.Range(0, 255);
+        int b = Random.Range(0, 255);
+        return new Color32((byte)r, (byte)g, (byte)b, 255);
+    }
 }

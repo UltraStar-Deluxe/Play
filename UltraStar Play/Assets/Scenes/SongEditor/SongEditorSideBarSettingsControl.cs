@@ -213,7 +213,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
             .ToList();
         micDeviceItemPickerControl = new(micDeviceItemPicker, enabledAndConnectedMicProfiles);
-        micDeviceItemPickerControl.GetLabelTextFunction = micProfile => micProfile != null ? micProfile.Name : "";
+        micDeviceItemPickerControl.GetLabelTextFunction = micProfile => micProfile != null ? micProfile.GetDisplayNameWithChannel() : "";
         if (settings.SongEditorSettings.MicProfile == null
             || !settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager))
         {

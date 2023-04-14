@@ -113,19 +113,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         return Instance.DoCreateNotification(text);
     }
 
-    public MessageDialogControl CreateMessageDialog(string dialogTitle)
-    {
-        VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
-        uiDocument.rootVisualElement.Add(dialogVisualElement);
-
-        MessageDialogControl messageDialogControl = injector
-            .WithRootVisualElement(dialogVisualElement)
-            .CreateAndInject<MessageDialogControl>();
-        messageDialogControl.Title = dialogTitle;
-
-        return messageDialogControl;
-    }
-
     public MessageDialogControl CreateDialogControl(string dialogTitle)
     {
         VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
@@ -159,7 +146,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         void AddChapter(string title, string content)
         {
             AccordionItem accordionItem = new(title);
-            accordionItem.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
             accordionItem.Add(new Label(content));
             accordionGroup.Add(accordionItem);
         }

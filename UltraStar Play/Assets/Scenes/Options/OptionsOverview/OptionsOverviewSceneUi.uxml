@@ -42,10 +42,6 @@
                     <ui:Label text="Songs" name="label" />
                     <MaterialIcon name="songSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon warningFontColor" />
                 </ToggleButton>
-                <ToggleButton name="contentDownloadButton" class="optionsOverviewButton">
-                    <MaterialIcon icon="cloud_download" name="image" />
-                    <ui:Label text="Download" name="label" />
-                </ToggleButton>
                 <ToggleButton name="designOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="filter_b_and_w" name="image" />
                     <ui:Label text="Design" name="label" />

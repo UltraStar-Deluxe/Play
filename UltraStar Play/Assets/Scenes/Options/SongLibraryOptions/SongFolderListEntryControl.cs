@@ -109,11 +109,19 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
         textField.RegisterValueChangedCallback(evt =>
         {
+            UpdateButtons();
             CheckPathIsValid();
             valueChangedEventStream.OnNext(FullPath);
         });
         androidDrivePath.Subscribe(_ => valueChangedEventStream.OnNext(FullPath));
+        UpdateButtons();
         CheckPathIsValid();
+    }
+
+    private void UpdateButtons()
+    {
+        openSongFolderButton.SetEnabled(!FullPath.IsNullOrEmpty() 
+                                        && DirectoryUtils.Exists(FullPath));
     }
 
     private void OpenSelectFolderDialog()
