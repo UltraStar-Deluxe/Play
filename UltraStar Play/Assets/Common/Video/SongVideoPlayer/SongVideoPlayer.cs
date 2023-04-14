@@ -245,8 +245,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             targetPositionInVideoInSeconds %= videoPlayer.length;
         }
 
-        Debug.Log("targetPositionInVideoInSeconds: " + targetPositionInVideoInSeconds);
-        
         double timeDifferenceInSeconds = targetPositionInVideoInSeconds - videoPlayer.time;
 
         // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
