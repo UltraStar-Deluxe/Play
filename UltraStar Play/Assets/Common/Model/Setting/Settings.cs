@@ -10,7 +10,7 @@ public class Settings : ISettings
     public GameSettings GameSettings { get; set; } = new();
     public GraphicSettings GraphicSettings { get; set; } = new();
     public AudioSettings AudioSettings { get; set; } = new();
-    public List<PlayerProfile> PlayerProfiles { get; set; } = CreateDefaultPlayerProfiles();
+    public List<PlayerProfile> PlayerProfiles { get; set; } = new();
     public List<MicProfile> MicProfiles { get; set; } = new();
     public string LastMicProfileNameInRecordingOptionsScene { get; set; }
     public int LastMicProfileChannelIndexInRecordingOptionsScene { get; set; }
@@ -58,13 +58,5 @@ public class Settings : ISettings
     {
         get { return DeveloperSettings.showFps; }
         set { DeveloperSettings.showFps = value; }
-    }
-    
-    private static List<PlayerProfile> CreateDefaultPlayerProfiles()
-    {
-        List<PlayerProfile> result = new();
-        result.Add(new PlayerProfile("Player01", EDifficulty.Medium, "Silhouette01.png"));
-        result.Add(new PlayerProfile("Player02", EDifficulty.Easy, "Silhouette02.png"));
-        return result;
     }
 }

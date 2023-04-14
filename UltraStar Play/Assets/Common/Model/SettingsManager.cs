@@ -131,6 +131,11 @@ public class SettingsManager : AbstractSingletonBehaviour
         }
 #endif
 
+        // Add player profiles
+        defaultSettings.PlayerProfiles.Add(new PlayerProfile("Player01", EDifficulty.Medium, "01-UltraStar-chan/ultrastar-chan-f-closeup.png"));
+        defaultSettings.PlayerProfiles.Add(new PlayerProfile("Player02", EDifficulty.Medium, "01-UltraStar-chan/ultrastar-chan-m-closeup.png"));
+        
+        // Add mic profiles
         try
         {
             ThemeManager themeManager = ThemeManager.Instance;
@@ -147,7 +152,7 @@ public class SettingsManager : AbstractSingletonBehaviour
             Debug.LogException(e);
             Debug.LogError("Failed to create initial mic profiles");
         }
-        
+
         return defaultSettings;
     }
 
