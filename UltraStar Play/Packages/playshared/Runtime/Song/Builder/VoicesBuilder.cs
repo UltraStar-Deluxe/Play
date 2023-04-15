@@ -55,6 +55,12 @@ public class VoicesBuilder
 
     private void ParseLine(string line, uint lineNumber)
     {
+        if (line.IsNullOrEmpty())
+        {
+            LogLineWarning(lineNumber, "Empty line");
+            return;
+        }
+        
         switch (line[0])
         {
             case '#':
