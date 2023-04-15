@@ -153,13 +153,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMedley: 0
-  defaultSongName: Code Monkey
-  defaultSongNamePasteBin: 'Summer Wine
+  playerCount: 1
+  defaultSongName: Sonic Rainboom VIP
+  defaultSongNamePasteBin: 'Sonic Rainboom VIP
 
-    Me And My Broken Heart
+    Summer Wine
 
-    Somewhere
-    Over The Rainbow (Wonderful World)
+    Me And My Broken
+    Heart
+
+    Somewhere Over The Rainbow (Wonderful World)
 
     Marry You
 
