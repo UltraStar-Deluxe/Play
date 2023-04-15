@@ -57,8 +57,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;
     
+    [Inject(UxmlName = R.UxmlNames.nextPlayerNameLabel)]
+    private Label nextPlayerNameLabel;
+    
     [Inject(UxmlName = R.UxmlNames.noteContainer)]
-    protected VisualElement noteContainer;
+    private VisualElement noteContainer;
     
     [Inject]
     private Settings settings;
@@ -78,7 +81,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private AbstractSingSceneNoteDisplayer noteDisplayer;
 
     private PlayerProfile nextPlayerProfile;
-    private PlayerProfileImageControl playerProfileImageControl;
     private float displayNextPlayerProfileTimeInSeconds;
     
     private int totalScoreAnimationId;
@@ -88,7 +90,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     
     private Dictionary<ESentenceRating, Color32> sentenceRatingColors;
 
+    private readonly PlayerProfileImageControl playerProfileImageControl = new();
     private readonly PlayerPitchIndicatorControl playerPitchIndicatorControl = new();
+    
+    private float setNextPlayerProfileAnimTimeInSeconds = 1.5f;
     
     public void OnInjectionFinished()
     {
@@ -130,6 +135,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 .AddTo(singSceneControl);
         }
 
+        nextPlayerNameLabel.HideByDisplay();
+
         // Create effect when there are at least two perfect sentences in a row.
         // Therefor, consider the currently finished sentence and its predecessor.
         playerScoreControl.SentenceScoreEventStream.Buffer(2, 1)
@@ -164,7 +171,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         playerNameLabel.text = playerProfile.Name;
         injector.WithRootVisualElement(playerImage)
-            .CreateAndInject<PlayerProfileImageControl>();
+            .Inject(playerProfileImageControl);
         if (micProfile != null)
         {
             playerScoreProgressBar.ShowByDisplay();
@@ -200,6 +207,28 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     {
         noteDisplayer.Update();
         playerPitchIndicatorControl.Update();
+        UpdateNextPlayerProfileLabel();
+    }
+    
+    private void UpdateNextPlayerProfileLabel()
+    {
+        if (nextPlayerProfile == null)
+        {
+            nextPlayerNameLabel.HideByDisplay();
+            return;
+        }
+
+        nextPlayerNameLabel.ShowByDisplay();
+        string newText = $"Next: {nextPlayerProfile.Name}";
+        if (newText != nextPlayerNameLabel.text)
+        {
+            if (micProfile != null)
+            {
+                nextPlayerNameLabel.style.color = new StyleColor(micProfile.Color);
+            }
+            nextPlayerNameLabel.text = newText;
+            AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, nextPlayerNameLabel, setNextPlayerProfileAnimTimeInSeconds);
+        }
     }
 
     private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
@@ -427,9 +456,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         playerProfileImageControl.PlayerProfile = newCurrentPlayerProfile;
 
         // Highlight the change with an animation
-        float animTimeInSeconds = 1.5f;
-        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerNameLabel, animTimeInSeconds);
-        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerImage, animTimeInSeconds);
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerNameLabel, setNextPlayerProfileAnimTimeInSeconds);
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerImage, setNextPlayerProfileAnimTimeInSeconds);
     }
 
     public void SetNextPlayerProfile(PlayerProfile newNextPlayerProfile)
