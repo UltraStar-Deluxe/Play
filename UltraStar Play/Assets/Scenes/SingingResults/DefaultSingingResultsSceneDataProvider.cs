@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
@@ -9,6 +8,8 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
 
     [Range(0, 8)]
     public int partyModeTeams = 5;
+
+    public string songTitle;
 
     public Vector2 scoreRange = new Vector2(2000, 8000);
     
@@ -23,7 +24,14 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
 
         Settings settings = SettingsManager.Instance.Settings;
 
-        data.SongMetas = new List<SongMeta> { SongMetaManager.Instance.GetFirstSongMeta() };
+        SongMeta songMeta = SongMetaManager.Instance.GetSongMetaByTitle(songTitle);
+        if (songMeta == null)
+        {
+            Debug.LogError($"Did not find song meta with title: {songTitle}, using first found song instead.");
+            songMeta = SongMetaManager.Instance.GetFirstSongMeta();
+        }
+        
+        data.SongMetas = new List<SongMeta> { songMeta };
         data.SongDurationInMillis = 120 * 1000;
 
         List<PlayerProfile> settingsPlayerProfiles = settings.PlayerProfiles;
@@ -87,10 +95,10 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         }
 
         // Give team points
-        for (int i = 1; i <= partyModeTeams && i < partyModeSceneData.PartyModeSettings.teamSettings.teams.Count; i++)
+        for (int i = 0; i <= partyModeTeams && i < partyModeSceneData.PartyModeSettings.teamSettings.teams.Count; i++)
         {
             PartyModeTeamSettings teamSettings = partyModeSceneData.PartyModeSettings.teamSettings.teams[i];
-            partyModeSceneData.teamToScoreMap[teamSettings] = i;
+            partyModeSceneData.teamToScoreMap[teamSettings] = (i + 2);
         }
 
         return partyModeSceneData;
@@ -109,7 +117,23 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
                 PlayerProfile guestPlayerProfile = new($"Guest 0{i}", EDifficulty.Medium);
 
                 PartyModeTeamSettings teamSettings = new();
-                teamSettings.name = $"Team 0{i}";
+                if (i == 1)
+                {
+                    teamSettings.name = "Sonic Sensations";
+                }
+                else if (i == 2)
+                {
+                    teamSettings.name = "Dazzling Divas";
+                }
+                else if (i == 3)
+                {
+                    teamSettings.name = "Hyper Harmonics";
+                }
+                else
+                {
+                    teamSettings.name = $"Team 0{i}";
+                }
+                
                 teamSettings.guestPlayerProfiles = new List<PlayerProfile> { guestPlayerProfile };
                 partyModeSettings.teamSettings.teams.Add(teamSettings);
             }
