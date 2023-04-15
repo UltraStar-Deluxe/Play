@@ -110,6 +110,10 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+.scrollingNoteStreamSentenceSeparator {
+    display: none;
+}
+
 #targetNoteImage {
     background-image: url('project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/NoteUi/NoteBackground.png');
     background-color: rgba(0, 0, 0, 0);
