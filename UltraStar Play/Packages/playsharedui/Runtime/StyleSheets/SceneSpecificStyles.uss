@@ -182,10 +182,11 @@
 }
 
 .singingLyrics {
-    /*-unity-font-style: bold;*/
+    font-size: 14px;
     -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(32, 32, 32, 0.5);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    /*-unity-text-outline-width: 1px;*/
+    /*-unity-text-outline-color: rgba(32, 32, 32, 0.5);*/
 }
 
 .lyricsContainer #playerNameLabel {
