@@ -58,6 +58,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     protected double beatsPerSecond;
 
+    protected readonly List<TargetNoteControl> targetNoteControls = new();
     protected readonly Dictionary<Note, TargetNoteControl> noteToTargetNoteControl = new();
     protected readonly Dictionary<RecordedNote, List<RecordedNoteControl>> recordedNoteToRecordedNoteControlsMap = new();
 
@@ -79,7 +80,19 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     private int fadeOutAnimationId;
 
-    protected abstract void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
+    private readonly HashSet<Label> initializedNoteLabelWidth = new();
+
+    protected abstract Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
+
+    protected void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    {
+        Rect notePositionInPercent = GetNotePositionInPercent(visualElement, midiNote, noteStartBeat, noteEndBeat);
+        visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
+        visualElement.style.width = new StyleLength(new Length(notePositionInPercent.width, LengthUnit.Percent));
+        visualElement.style.height = new StyleLength(new Length(notePositionInPercent.height, LengthUnit.Percent));
+        visualElement.style.left = new StyleLength(new Length(notePositionInPercent.xMin, LengthUnit.Percent));
+        visualElement.style.top = new StyleLength(new Length(notePositionInPercent.yMin, LengthUnit.Percent));
+    }
 
     public virtual void OnInjectionFinished()
     {
@@ -105,8 +118,11 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     public virtual void Update()
     {
         // Update notes
-        noteToTargetNoteControl.Values
-            .ForEach(targetNoteControl => UpdateTargetNoteControl(targetNoteControl));
+        for (int i = 0; i < targetNoteControls.Count; i++)
+        {
+            TargetNoteControl targetNoteControl = targetNoteControls[i];
+            UpdateTargetNoteControl(targetNoteControl, i);
+        }
         recordedNoteToRecordedNoteControlsMap.Values
             .ForEach(recordedNoteControls => recordedNoteControls
                 .ForEach(recordedNoteControl => UpdateRecordedNoteControl(recordedNoteControl)));
@@ -115,9 +131,27 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         starControls.ForEach(starControl => starControl.Update());
     }
 
-    protected virtual void UpdateTargetNoteControl(TargetNoteControl targetNoteControl)
+    protected abstract void UpdateTargetNoteControl(TargetNoteControl targetNoteControl, int indexInList);
+
+    protected void UpdateTargetNoteLabelWith(TargetNoteControl targetNoteControl, int indexInList)
     {
-        targetNoteControl.Update();
+        if (initializedNoteLabelWidth.Contains(targetNoteControl.Label))
+        {
+            return;
+        }
+
+        TargetNoteControl nextTargetNoteControl = targetNoteControls.ElementAtOrDefault(indexInList + 1);
+        if (targetNoteControl.Label.IsVisibleByDisplay()
+            && nextTargetNoteControl != null
+            && targetNoteControl.Note.MidiNote == nextTargetNoteControl.Note.MidiNote)
+        {
+            initializedNoteLabelWidth.Add(targetNoteControl.Label);
+
+            // Width of label until start of following note
+            Rect notePositionInPercent = GetNotePositionInPercent(targetNoteControl.Label, 60, targetNoteControl.Note.StartBeat, nextTargetNoteControl.Note.StartBeat);
+            targetNoteControl.Label.style.width = Length.Percent(notePositionInPercent.width);
+            targetNoteControl.Label.RegisterHasGeometryCallbackOneShot(_ => targetNoteControl.UpdateLabelFontSize());
+        }
     }
 
     protected virtual void UpdateRecordedNoteControl(RecordedNoteControl recordedNoteControl)
@@ -238,12 +272,14 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         else
         {
             label.text = "";
+            label.HideByDisplay();
         }
 
         targetNoteEntryContainer.Add(visualElement);
-        UpdateNotePosition(visualElement, note.MidiNote, note.StartBeat, note.EndBeat);
+        UpdateTargetNoteControl(targetNoteControl, -1);
 
         noteToTargetNoteControl[note] = targetNoteControl;
+        targetNoteControls.Add(targetNoteControl);
 
         return targetNoteControl;
     }
@@ -416,6 +452,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     protected virtual void RemoveTargetNote(TargetNoteControl targetNoteControl)
     {
         noteToTargetNoteControl.Remove(targetNoteControl.Note);
+        targetNoteControls.Remove(targetNoteControl);
         targetNoteControl.Dispose();
     }
 

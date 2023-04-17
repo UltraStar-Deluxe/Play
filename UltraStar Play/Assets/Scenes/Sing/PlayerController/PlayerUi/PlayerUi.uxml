@@ -7,6 +7,7 @@
                 <ui:Instance template="NoteUi" name="noteEntry" style="position: absolute; top: 20px; width: 200px; height: 20px;" />
                 <ui:Instance template="NoteUi" name="noteEntry" style="position: absolute; top: 60px; width: 400px; height: 40px;" />
             </ui:VisualElement>
+            <ui:VisualElement name="targetNoteLyricsContainer" class="overlay" style="height: 150%; top: -25%; overflow: hidden;" />
             <ui:VisualElement name="recordedNoteEntryContainer" style="width: 100%; position: absolute; height: 100%; overflow: hidden;" />
             <ui:VisualElement name="effectsContainer" style="width: 100%; position: absolute; height: 100%; overflow: hidden;" />
             <ui:VisualElement name="playerPitchIndicator" style="width: 32px; height: 32px; position: absolute;">

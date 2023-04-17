@@ -221,9 +221,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         {
             return labels.Select(label =>
             {
-                Vector2 preferredSize = label.MeasureTextSize(label.text,
-                    0, VisualElement.MeasureMode.Undefined,
-                    0, VisualElement.MeasureMode.Undefined);
+                Vector2 preferredSize = label.GetPreferredTextSize();
                 return preferredSize.x;
             }).Sum();
         }

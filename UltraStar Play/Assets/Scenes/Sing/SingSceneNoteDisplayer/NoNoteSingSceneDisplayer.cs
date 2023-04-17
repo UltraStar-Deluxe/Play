@@ -21,8 +21,13 @@ public class NoNoteSingSceneDisplayer : AbstractSingSceneNoteDisplayer
         lyricsContainer.HideByDisplay();
     }
 
-    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override void UpdateTargetNoteControl(TargetNoteControl targetNoteControl, int indexInList)
     {
         // Do nothing.
+    }
+
+    protected override Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    {
+        return Rect.zero;
     }
 }
