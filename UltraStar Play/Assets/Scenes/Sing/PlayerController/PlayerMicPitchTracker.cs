@@ -93,6 +93,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     public void InitPitchDetection()
     {
+        if (micProfile == null)
+        {
+            return;
+        }
+        
         if (micProfile.IsInputFromConnectedClient)
         {
             InitPitchDetectionFromConnectedClient();
