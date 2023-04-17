@@ -158,28 +158,28 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                 string playlistName = playlist.Name;
                 if (playlistManager.HasSongEntry(playlist, songMeta))
                 {
-                    contextMenuPopup.AddButton($"Remove from '{playlistName}'",
+                    contextMenuPopup.AddButton($"Remove from '{playlistName}'", "favorite_border",
                         () => playlistManager.RemoveSongFromPlaylist(ultraStarPlaylist, songMeta));
                 }
                 else
                 {
-                    contextMenuPopup.AddButton($"Add to '{playlistName}'",
+                    contextMenuPopup.AddButton($"Add to '{playlistName}'", "favorite",
                         () => playlistManager.AddSongToPlaylist(ultraStarPlaylist, songMeta));
                 }
             });
 
         // Open song editor / song folder
-        contextMenuPopup.AddButton("Open Editor",
+        contextMenuPopup.AddButton("Open Editor", "edit",
             () => songSelectSceneControl.StartSongEditorScene());
         if (PlatformUtils.IsStandalone)
         {
-            contextMenuPopup.AddButton("Open Folder",
+            contextMenuPopup.AddButton("Open Folder", "open_in_new",
                 () => SongMetaUtils.OpenDirectory(SongMeta));
-            contextMenuPopup.AddButton("Reload Song",
+            contextMenuPopup.AddButton("Reload Song", "replay",
                 () => songMetaManager.ReloadSong(SongMeta));
         }
         
-        contextMenuPopup.AddButton("Recreate Song",
+        contextMenuPopup.AddButton("Recreate Song", "replay_circle_filled",
             () =>
             {
                 if (SongMeta != null)
@@ -188,7 +188,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                 }
             });
         
-        contextMenuPopup.AddButton("Vocals Separation",
+        contextMenuPopup.AddButton("Vocals Separation", "call_split",
             () =>
             {
                 if (SongMeta != null)
