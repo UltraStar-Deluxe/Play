@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ProTrans;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
@@ -25,6 +26,9 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
 
     [Inject]
     private Injector injector;
+
+    [Inject]
+    private UiManager uiManager;
 
     private readonly List<ConnectedClientListEntryControl> connectedClientListEntryControls = new();
     
@@ -61,5 +65,23 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
             .CreateAndInject<ConnectedClientListEntryControl>();
         connectedClientListEntryControls.Add(control);
         return visualElement;
+    }
+
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
+    {
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_features_title),
+                TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_features) },
+            { TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_install_title),
+                TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_install) },
+        };
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_title),
+            titleToContentMap);
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToCompanionApp)));
+        return helpDialogControl;
     }
 }
