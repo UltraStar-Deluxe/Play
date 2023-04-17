@@ -15,6 +15,8 @@ using UnityEngine.UIElements;
 
 public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
+    private static readonly string songArchiveInfoJsonUrl = "https://melodymania.org/downloads/song-archives-info.json";
+    
     [InjectedInInspector]
     public VisualTreeAsset songFolderListEntryUi;
 
@@ -26,9 +28,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     [InjectedInInspector]
     public VisualTreeAsset songIssueSongEntryUi;
-
-    [InjectedInInspector]
-    public TextAsset songArchiveEntryTextAsset;
 
     [Inject]
     private UIDocument uiDocument;
@@ -108,7 +107,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         DownloadSongArchiveUiControl downloadSongArchiveUiControl = injector
             .WithRootVisualElement(visualElement)
             .CreateAndInject<DownloadSongArchiveUiControl>();
-        downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(songArchiveEntryTextAsset.text);
+
+        StartCoroutine(WebRequestUtils.LoadTextFromUri(songArchiveInfoJsonUrl,
+            json => downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(json)));
 
         downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
         {

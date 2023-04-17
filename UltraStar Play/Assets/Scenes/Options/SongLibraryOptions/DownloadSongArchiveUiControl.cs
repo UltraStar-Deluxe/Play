@@ -66,7 +66,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         set
         {
             songArchiveEntries = value;
-            SelectSongArchiveUrl(songArchiveEntries.FirstOrDefault().Url);
+            SelectSongArchiveUrl(songArchiveEntries.FirstOrDefault().url);
         }
     }
     
@@ -170,16 +170,17 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         {
             Button songArchiveUrlButton = new();
             songArchiveUrlButton.AddToClassList("songArchiveUrlButton");
-            songArchiveUrlButton.text = songArchiveEntry.Url;
+            songArchiveUrlButton.text = songArchiveEntry.name;
             songArchiveUrlButton.RegisterCallbackButtonTriggered(_ =>
             {
-                SelectSongArchiveUrl(songArchiveEntry.Url);
+                SelectSongArchiveUrl(songArchiveEntry.url);
                 urlChooserDialogControl?.CloseDialog();
             });
             songArchiveUrlButton.style.height = new StyleLength(StyleKeyword.Auto);
             urlChooserDialogControl.AddVisualElement(songArchiveUrlButton);
 
-            Label songArchiveInfoLabel = new(songArchiveEntry.Description);
+            string infoText = songArchiveEntry.description + "\n" + songArchiveEntry.url;
+            Label songArchiveInfoLabel = new(infoText);
             songArchiveInfoLabel.AddToClassList("songArchiveInfoLabel");
             urlChooserDialogControl.AddVisualElement(songArchiveInfoLabel);
         });
