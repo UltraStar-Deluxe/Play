@@ -288,14 +288,21 @@ ChipsCombo {
     padding: 2px;
 }
 
-.contextMenu Label {
+.contextMenu > Label {
     padding-left: 5px;
     padding-right: 5px;
+    font-size: var(--font-size-s);
+}
+
+.contextMenu .unity-base-field {
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: var(--font-size-s);
 }
 
 .contextMenu Button {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 0px;
+    padding-right: 0px;
     background-color: rgb(64, 64, 64);
 }
 
