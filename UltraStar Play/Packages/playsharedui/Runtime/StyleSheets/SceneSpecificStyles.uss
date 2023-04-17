@@ -615,6 +615,7 @@
 .aboutTextField {
     font-size: var(--font-size-s);
     white-space: normal;
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/RobotoMono-VariableFont_wght%20SDF.asset');
 }
 
 #aboutTextsScrollView ToggleButton {
