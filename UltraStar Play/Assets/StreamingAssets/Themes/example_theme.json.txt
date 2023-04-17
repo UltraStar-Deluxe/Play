@@ -1,9 +1,16 @@
-// This is an example theme file describing each of the available properties to
-// create custom themes.
-// Each line is preceded by a comment describing its function.
+// This is an example theme file describing the available properties to create custom themes.
+// Each property is preceded by a comment describing its function.
+
+// ## Theme File Format
+// A theme file must be properly formatted JSON, file extension .json or .jsonc, line comments are allowed.
+// This example file is named .json.txt such that it is not mistaken for an actual theme file.
+
+// ## File Paths
 // Paths can be absolute or relative. Relative paths are interpreted relative to the theme file.
 // Supported image formats: png, jpg
 // Supported audio formats: ogg, mp3
+
+// ## Example JSON
 {
     // See below for the content of control style.
     // Not all controls need to be specified.
@@ -79,6 +86,15 @@
         "scaleMode": "ScaleAndCrop",
     },
 
+    // Overwrite the default background image for a specific scene.
+    // Available scene names can be found here: https://github.com/UltraStar-Deluxe/Play/blob/master/UltraStar%20Play/Assets/Common/Scene/EScene.cs
+    "sceneSpecificStaticBackgrounds": {
+        "MainScene": {
+            "imagePath": "backgrounds/vinyl.png",
+            "scaleMode": "ScaleAndCrop",
+        }
+    },
+    
     // Defines the paths to custom icons for the song rating emojis.
     // If not set, default icons will be used.
     "songRatingIcons": {
