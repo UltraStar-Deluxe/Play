@@ -465,6 +465,10 @@
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
+#permissionsContainer .unity-toggle__label {
+    min-width: 50;
+    margin-right: 8px;
+}
 
 .inactiveOverlay {
     transition: background-color 0.5s;

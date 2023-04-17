@@ -1,9 +1,8 @@
+using System;
 using System.Collections.Generic;
-using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
-using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
@@ -42,8 +41,9 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     private void UpdateConnectedClients()
     {
         connectedClientList.Clear();
-        serverSideConnectRequestManager.GetAllConnectedClientHandlers()
-            .ForEach(clientHandler =>
+        List<IConnectedClientHandler> allConnectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
+        allConnectedClientHandlers.Sort((a, b) => string.Compare(a.ClientName, b.ClientName, StringComparison.InvariantCultureIgnoreCase));
+        allConnectedClientHandlers.ForEach(clientHandler =>
             {
                 connectedClientList.Add(CreateClientEntry(clientHandler));
             });
