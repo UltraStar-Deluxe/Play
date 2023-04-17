@@ -612,6 +612,11 @@
 /**************************************************/
 /* ABOUT SCENE */
 /**************************************************/
+.aboutTextField {
+    font-size: var(--font-size-s);
+    white-space: normal;
+}
+
 #aboutTextsScrollView ToggleButton {
     justify-content: flex-start;
     -unity-text-align: middle-left;

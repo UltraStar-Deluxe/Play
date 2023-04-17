@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
@@ -24,8 +25,8 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
 
-    [Inject(UxmlName = R.UxmlNames.aboutText)]
-    private TextField aboutText;
+    [Inject(UxmlName = R.UxmlNames.aboutTextScrollView)]
+    private ScrollView aboutTextScrollView;
 
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
@@ -41,7 +42,9 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     private void Start()
     {
         CreateAboutTextButtons();
-        ShowAboutText(textAssets.FirstOrDefault());
+
+        TextAsset initialAboutTextAsset = textAssets.FirstOrDefault();
+        ShowAboutText(initialAboutTextAsset.name, initialAboutTextAsset.text);
 
         backButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.MainScene));
         backButton.Focus();
@@ -70,7 +73,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         button.text = textAsset.name;
         button.RegisterCallbackButtonTriggered(_ =>
         {
-            ShowAboutText(textAsset);
+            ShowAboutText(textAsset.name, textAsset.text);
 
             if (lastActiveToggleButton != null)
             {
@@ -85,9 +88,36 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         toggleButtons.Add(button);
     }
 
-    private void ShowAboutText(TextAsset textAsset)
+    private void ShowAboutText(string title, string text)
     {
-        aboutText.value = textAsset.text;
+        aboutTextScrollView.Clear();
+        
+        // A Unity label has a maximum length. So the text needs to be split into multiple labels.
+        // Otherwise there is a warning message: "Generated text will be truncated because it exceeds 49152 vertices"
+        // Split text into parts of 10000 characters.
+        int maxCharactersPerLabel = 10000;
+        int numberOfLabels = 1 + (text.Length / 10000);
+        if (numberOfLabels > 1)
+        {
+            Debug.Log($"Splitting about text '{title}' into {numberOfLabels} labels.");
+        }
+        
+        string[] textParts = new string[numberOfLabels];
+        for (int i = 0; i < numberOfLabels; i++)
+        {
+            int startIndex = i * maxCharactersPerLabel;
+            int length = Math.Min(maxCharactersPerLabel, text.Length - startIndex);
+            textParts[i] = text.Substring(startIndex, length);
+            
+            TextField textField = new TextField();
+            textField.isReadOnly = true;
+            textField.pickingMode = PickingMode.Ignore;
+            textField.AddToClassList("multiline");
+            textField.AddToClassList("noBackground");
+            textField.AddToClassList("aboutText");
+            textField.value = textParts[i];
+            aboutTextScrollView.Add(textField);
+        }
     }
 
     public void UpdateTranslation()
