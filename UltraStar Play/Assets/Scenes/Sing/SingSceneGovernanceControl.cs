@@ -75,6 +75,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
+
+    private bool fillAppearanceContextMenu;
     
     public void OnInjectionFinished()
     {
@@ -215,26 +217,53 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
-        webcamControl.AddToContextMenu(contextMenuPopup);
-        
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
+        if (fillAppearanceContextMenu)
+        {
+            fillAppearanceContextMenu = false;
+            FillAppearanceContextMenu(contextMenuPopup);
+        }
+        else
+        {
+            FillRegularContextMenu(contextMenuPopup);
+        }
+    }
+
+    private void FillAppearanceContextMenu(ContextMenuPopupControl contextMenuPopup)
+    {
+        if (webcamControl.WebcamsAvailable())
+        {
+            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_webcamOnOff), "photo_camera",
+                () => webcamControl.ToggleWebcam());
+        }
+    }
+
+    private void FillRegularContextMenu(ContextMenuPopupControl contextMenuPopup)
+    {
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics), "skip_next",
             () => singSceneControl.SkipToNextSingableNoteOrEndOfSong());
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart),
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart), "replay",
             () => singSceneControl.Restart());
-        contextMenuPopup.AddButton("Attribution",
-            () =>
-            {
-                singSceneControl.Pause();
-                ShowSongInfoDialog();
-            });
+        
+        contextMenuPopup.AddButton("Appearance", "filter_b_and_w", () =>
+        {
+            fillAppearanceContextMenu = true;
+            contextMenuPopup.CloseContextMenu();
+            contextMenuControl.OpenContextMenu(Vector2.zero);
+        });
+        
+        contextMenuPopup.AddButton("Attribution", "info_outline", () =>
+        {
+            singSceneControl.Pause();
+            ShowSongInfoDialog();
+        });
         
         if (!singSceneControl.HasPartyModeSceneData)
         {
-            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor), "edit", 
                 () => singSceneControl.OpenSongInEditor());
         }
-        
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
+
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong), "logout", 
             () => singSceneControl.FinishScene(false, false));
 
         contextMenuPopup.AddSeparator();
@@ -257,7 +286,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         }
         else
         {
-            contextMenuPopup.AddButton("Separate audio",
+            contextMenuPopup.AddButton("Separate audio", "call_split", 
                 () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta));
         }
     }
