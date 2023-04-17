@@ -128,4 +128,18 @@ public static class VisualElementUtils
         }
         return visualTreeAsset.CloneTree().Children().FirstOrDefault();
     }
+
+    public static Rect WorldBoundToLocalBound(Label visualElement, Rect worldRect)
+    {
+        if (visualElement.parent == null)
+        {
+            return worldRect;
+        }
+        
+        Rect parentWorldRect = visualElement.parent.worldBound;
+        return new Rect(worldRect.x - parentWorldRect.x,
+            worldRect.y - parentWorldRect.y,
+            worldRect.width,
+            worldRect.height);
+    }
 }

@@ -286,6 +286,16 @@ public static class VisualElementExtensions
     public static VisualElement CloneTreeAndGetFirstChild(this VisualTreeAsset visualTreeAsset)
     {
         return visualTreeAsset.CloneTree().Children().FirstOrDefault();
+    }
 
+    public static Vector2 GetPreferredTextSize(this Label label, string text = null)
+    {
+        if (text == null)
+        {
+            text = label.text;
+        }
+        return label.MeasureTextSize(label.text,
+            0, VisualElement.MeasureMode.Undefined,
+            0, VisualElement.MeasureMode.Undefined);
     }
 }
