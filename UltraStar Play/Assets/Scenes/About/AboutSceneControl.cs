@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using PrimeInputActions;
 using ProTrans;
+using Truncon.Collections;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -13,8 +16,16 @@ using UnityEngine.UIElements;
 
 public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
-    [InjectedInInspector]
-    public List<TextAsset> textAssets;
+    private static readonly OrderedDictionary<string, string> aboutTextFilesInStreamingAssets = new()
+    {
+        { "Melody Mania", "AboutAndLicenseTexts/Melody-Mania.txt" },
+        { "Licenses", "AboutAndLicenseTexts/Licenses.txt" },
+        { "MIT License", "AboutAndLicenseTexts/MIT-License.txt" },
+        { "APL 2.0", "AboutAndLicenseTexts/APL-2.0.txt" },
+        { "MPL 1.1", "AboutAndLicenseTexts/MPL-1.1.txt" },
+        { "MPL 2.0", "AboutAndLicenseTexts/MPL-2.0.txt" },
+        { "BGM", "AboutAndLicenseTexts/BGM.txt" },
+    };
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -43,8 +54,8 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     {
         CreateAboutTextButtons();
 
-        TextAsset initialAboutTextAsset = textAssets.FirstOrDefault();
-        ShowAboutText(initialAboutTextAsset.name, initialAboutTextAsset.text);
+        KeyValuePair<string,string> initialAboutTextEntry = aboutTextFilesInStreamingAssets.FirstOrDefault();
+        ShowAboutText(initialAboutTextEntry.Key, LoadAboutText(initialAboutTextEntry.Value));
 
         backButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.MainScene));
         backButton.Focus();
@@ -57,7 +68,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     {
         aboutTextsScrollView.Clear();
         toggleButtons.Clear();
-        textAssets.ForEach(CreateAboutTextButton);
+        aboutTextFilesInStreamingAssets.ForEach(CreateAboutTextButton);
 
         ToggleButton firstToggleButton = toggleButtons.FirstOrDefault();
         firstToggleButton.SetActive(true);
@@ -66,14 +77,14 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(aboutTextsScrollView);
     }
 
-    private void CreateAboutTextButton(TextAsset textAsset)
+    private void CreateAboutTextButton(KeyValuePair<string, string> aboutTextEntry)
     {
         ToggleButton button = new();
         button.AddToClassList("mb-2");
-        button.text = textAsset.name;
+        button.text = aboutTextEntry.Key;
         button.RegisterCallbackButtonTriggered(_ =>
         {
-            ShowAboutText(textAsset.name, textAsset.text);
+            ShowAboutText(aboutTextEntry.Key, LoadAboutText(aboutTextEntry.Value));
 
             if (lastActiveToggleButton != null)
             {
@@ -88,6 +99,17 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         toggleButtons.Add(button);
     }
 
+    private string LoadAboutText(string filePathInStreamingAssets)
+    {
+        string fullPath = ApplicationUtils.GetStreamingAssetsPath(filePathInStreamingAssets);
+        if (!FileUtils.Exists(fullPath))
+        {
+            Debug.LogError($"About text not found: {fullPath}");
+            return "";
+        }
+        return File.ReadAllText(fullPath);
+    }
+    
     private void ShowAboutText(string title, string text)
     {
         aboutTextScrollView.Clear();
@@ -114,7 +136,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
             textField.pickingMode = PickingMode.Ignore;
             textField.AddToClassList("multiline");
             textField.AddToClassList("noBackground");
-            textField.AddToClassList("aboutText");
+            textField.AddToClassList("aboutTextField");
             textField.value = textParts[i];
             aboutTextScrollView.Add(textField);
         }
