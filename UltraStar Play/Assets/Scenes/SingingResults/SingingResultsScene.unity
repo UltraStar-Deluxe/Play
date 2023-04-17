@@ -155,7 +155,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCount: 2
   partyModeTeams: 5
-  isLastPartyModeRound: 0
+  scoreRange: {x: 2000, y: 8000}
+  isLastPartyModeRound: 1
+  isKnockOutTournament: 0
 --- !u!4 &1098903558
 Transform:
   m_ObjectHideFlags: 0

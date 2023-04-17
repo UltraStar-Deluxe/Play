@@ -545,4 +545,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
             .Select(id => GetSongMetaById(id))
             .ToList();
     }
+
+    public SongMeta GetSongMetaByTitle(string title)
+    {
+        return allSongMetas.FirstOrDefault(songMeta => songMeta.Title == title);
+    }
 }

@@ -147,10 +147,16 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         {
             return false;
         }
-        
-        return localStatistic.StatsEntries
+
+        SongStatistic songStatistic = localStatistic.StatsEntries
             .GetTopScores(1, PlayerProfile.Difficulty)
-            .FirstOrDefault().Score == playerScoreData.TotalScore;
+            .FirstOrDefault();
+        if (songStatistic == null)
+        {
+            return false;
+        }
+        
+        return songStatistic.Score == playerScoreData.TotalScore;
     }
 
     private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)

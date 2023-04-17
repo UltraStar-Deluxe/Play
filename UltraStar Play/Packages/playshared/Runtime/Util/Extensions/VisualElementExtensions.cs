@@ -207,12 +207,20 @@ public static class VisualElementExtensions
         visualElement.style.borderBottomColor = color;
     }
     
-    public static void SetBorderWidth(this VisualElement visualElement, float value)
+    public static void SetBorderWidth(this VisualElement visualElement, StyleFloat value)
     {
         visualElement.style.borderLeftWidth = value;
         visualElement.style.borderRightWidth = value;
         visualElement.style.borderTopWidth = value;
         visualElement.style.borderBottomWidth = value;
+    }
+    
+    public static void SetBorderRadius(this VisualElement visualElement, StyleLength value)
+    {
+        visualElement.style.borderTopLeftRadius = value;
+        visualElement.style.borderTopRightRadius = value;
+        visualElement.style.borderBottomLeftRadius = value;
+        visualElement.style.borderBottomRightRadius = value;
     }
 
     public static void SetSelectionAndScrollTo(this ListView listView, int index)

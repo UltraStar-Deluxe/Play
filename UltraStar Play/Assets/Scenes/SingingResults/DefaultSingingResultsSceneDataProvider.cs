@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSceneDataProvider
@@ -10,6 +9,10 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     [Range(0, 8)]
     public int partyModeTeams = 5;
 
+    public string songTitle;
+
+    public Vector2 scoreRange = new Vector2(2000, 8000);
+    
     public bool isLastPartyModeRound;
     public bool isKnockOutTournament;
     
@@ -18,14 +21,47 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         SingingResultsSceneData data = new();
 
         SongMetaManager.Instance.WaitUntilSongScanFinished();
-        data.SongMetas = new List<SongMeta> { SongMetaManager.Instance.GetFirstSongMeta() };
+
+        Settings settings = SettingsManager.Instance.Settings;
+
+        SongMeta songMeta = SongMetaManager.Instance.GetSongMetaByTitle(songTitle);
+        if (songMeta == null)
+        {
+            Debug.LogError($"Did not find song meta with title: {songTitle}, using first found song instead.");
+            songMeta = SongMetaManager.Instance.GetFirstSongMeta();
+        }
+        
+        data.SongMetas = new List<SongMeta> { songMeta };
         data.SongDurationInMillis = 120 * 1000;
 
+        List<PlayerProfile> settingsPlayerProfiles = settings.PlayerProfiles;
+        for (int i = 0; i < playerCount && i < settingsPlayerProfiles.Count; i++)
+        {
+            PlayerProfile playerProfile = settingsPlayerProfiles[i];
+            data.AddPlayerScores(playerProfile, CreatePlayerScoreData());
+            
+            if (settings.MicProfiles.Count > i)
+            {
+                data.PlayerProfileToMicProfileMap[playerProfile] = settings.MicProfiles[i];
+            }
+        }
+
+        if (partyModeTeams > 0)
+        {
+            data.partyModeSceneData = CreatePartyModeSceneData();
+        }
+        return data;
+    }
+
+    private PlayerScoreControlData CreatePlayerScoreData()
+    {
         PlayerScoreControlData playerScoreData = new();
-        playerScoreData.TotalScore = 6500;
-        playerScoreData.NormalNotesTotalScore = 4000;
-        playerScoreData.GoldenNotesTotalScore = 2000;
-        playerScoreData.PerfectSentenceBonusTotalScore = 500;
+        playerScoreData.NormalNotesTotalScore = (int)Random.Range(scoreRange.x / 3, scoreRange.y / 3);
+        playerScoreData.GoldenNotesTotalScore = (int)Random.Range(scoreRange.x / 3, scoreRange.y / 3);
+        playerScoreData.PerfectSentenceBonusTotalScore = (int)Random.Range(scoreRange.x / 3, scoreRange.y / 3);
+        playerScoreData.TotalScore = playerScoreData.NormalNotesTotalScore
+                                     + playerScoreData.GoldenNotesTotalScore
+                                     + playerScoreData.PerfectSentenceBonusTotalScore;
 
         playerScoreData.NormalNoteLengthTotal = 80;
         playerScoreData.GoldenNoteLengthTotal = 20;
@@ -43,21 +79,8 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence1, CreateSentenceScore(sentence1, 3000));
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence2, CreateSentenceScore(sentence2, 5000));
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence3, CreateSentenceScore(sentence3, 6500));
-
-        List<PlayerProfile> settingsPlayerProfiles = SettingsManager.Instance.Settings.PlayerProfiles;
-        PlayerProfile playerProfile = settingsPlayerProfiles[0];
-        data.PlayerProfileToMicProfileMap[playerProfile] = SettingsManager.Instance.Settings.MicProfiles.FirstOrDefault();
-        data.AddPlayerScores(playerProfile, playerScoreData);
-        for (int i = 1; i < playerCount && i < settingsPlayerProfiles.Count; i++)
-        {
-            data.AddPlayerScores(settingsPlayerProfiles[i], playerScoreData);
-        }
-
-        if (partyModeTeams > 0)
-        {
-            data.partyModeSceneData = CreatePartyModeSceneData();
-        }
-        return data;
+        
+        return playerScoreData;
     }
 
     private PartyModeSceneData CreatePartyModeSceneData()
@@ -72,10 +95,10 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         }
 
         // Give team points
-        for (int i = 1; i <= partyModeTeams && i < partyModeSceneData.PartyModeSettings.teamSettings.teams.Count; i++)
+        for (int i = 0; i <= partyModeTeams && i < partyModeSceneData.PartyModeSettings.teamSettings.teams.Count; i++)
         {
             PartyModeTeamSettings teamSettings = partyModeSceneData.PartyModeSettings.teamSettings.teams[i];
-            partyModeSceneData.teamToScoreMap[teamSettings] = i;
+            partyModeSceneData.teamToScoreMap[teamSettings] = (i + 2);
         }
 
         return partyModeSceneData;
@@ -94,7 +117,23 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
                 PlayerProfile guestPlayerProfile = new($"Guest 0{i}", EDifficulty.Medium);
 
                 PartyModeTeamSettings teamSettings = new();
-                teamSettings.name = $"Team 0{i}";
+                if (i == 1)
+                {
+                    teamSettings.name = "Sonic Sensations";
+                }
+                else if (i == 2)
+                {
+                    teamSettings.name = "Dazzling Divas";
+                }
+                else if (i == 3)
+                {
+                    teamSettings.name = "Hyper Harmonics";
+                }
+                else
+                {
+                    teamSettings.name = $"Team 0{i}";
+                }
+                
                 teamSettings.guestPlayerProfiles = new List<PlayerProfile> { guestPlayerProfile };
                 partyModeSettings.teamSettings.teams.Add(teamSettings);
             }

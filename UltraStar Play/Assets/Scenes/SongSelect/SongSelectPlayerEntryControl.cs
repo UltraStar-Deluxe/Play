@@ -87,7 +87,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             }
 
             UpdateMicPitchTracker();
-            micProgressBarRecordingControl.MicProfile = MicProfile;
+            micProgressBarRecordingControl.MicProfile = micProfile;
+            playerProfileImageControl.MicProfile = micProfile;
         }
     }
 
@@ -105,6 +106,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private Dictionary<string, string> voiceNames;
 
     private MicSelectionDialogControl micSelectionDialogControl;
+    private readonly PlayerProfileImageControl playerProfileImageControl = new();
     
     private readonly Subject<bool> selectedChangedEventStream = new();
     public IObservable<bool> SelectedChangedEventStream => selectedChangedEventStream;
@@ -178,7 +180,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         nameLabel.text = playerProfile.Name;
         injector.WithRootVisualElement(playerImage)
             .WithBindingForInstance(playerProfile)
-            .CreateAndInject<PlayerProfileImageControl>();
+            .Inject(playerProfileImageControl);
         MicProfile = null;
 
         nameLabel.text = PlayerProfile.Name;

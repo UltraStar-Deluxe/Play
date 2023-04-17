@@ -9,7 +9,8 @@
         </ui:VisualElement>
         <ui:VisualElement name="playerNameContainer" style="margin-left: 10px; margin-right: 10px;">
             <ui:Label text="99999" name="playerScoreLabel" class="playerScoreLabel ellipsis" style="flex-shrink: 1; width: 70px;" />
-            <ui:Label text="Player 01" name="playerNameLabel" class="largeFont ellipsis" style="flex-shrink: 1;" />
+            <ui:Label text="Player 01" name="playerNameLabel" class="largeFont ellipsis textShadow" style="flex-shrink: 1; -unity-font-style: bold;" />
+            <ui:Label text="Player 01" name="nextPlayerNameLabel" class="ellipsis textShadow" style="flex-shrink: 1; -unity-font-style: bold-and-italic; overflow: visible;" />
         </ui:VisualElement>
         <ui:VisualElement name="sentenceRatingContainer" />
     </ui:VisualElement>
