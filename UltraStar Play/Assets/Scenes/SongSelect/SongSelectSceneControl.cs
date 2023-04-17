@@ -548,6 +548,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
         }
         
+        // Add attribution and license info
+        AccordionItem attributionAccordionItem = new("Attribution");
+        attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(SelectedSong));
+        lyricsDialogControl.AddVisualElement(attributionAccordionItem);
+        
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(lyricsDialogControl.DialogRootVisualElement);
     }
     

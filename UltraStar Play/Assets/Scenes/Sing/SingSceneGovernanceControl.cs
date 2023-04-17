@@ -217,18 +217,25 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     {
         webcamControl.AddToContextMenu(contextMenuPopup);
         
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart),
-            () => singSceneControl.Restart());
         contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
             () => singSceneControl.SkipToNextSingableNoteOrEndOfSong());
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
-            () => singSceneControl.FinishScene(false, false));
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart),
+            () => singSceneControl.Restart());
+        contextMenuPopup.AddButton("Attribution",
+            () =>
+            {
+                singSceneControl.Pause();
+                ShowSongInfoDialog();
+            });
         
         if (!singSceneControl.HasPartyModeSceneData)
         {
             contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
                 () => singSceneControl.OpenSongInEditor());
         }
+        
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
+            () => singSceneControl.FinishScene(false, false));
 
         contextMenuPopup.AddSeparator();
 
@@ -253,6 +260,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             contextMenuPopup.AddButton("Separate audio",
                 () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta));
         }
+    }
+
+    private void ShowSongInfoDialog()
+    {
+        MessageDialogControl messageDialogControl = UiManager.Instance.CreateDialogControl("Attribution");
+        messageDialogControl.AddVisualElement(AttributionUtils.CreateAttributionVisualElement(songMeta));
+        messageDialogControl.AddButton("Close", _ => messageDialogControl.CloseDialog());
     }
 
     private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)

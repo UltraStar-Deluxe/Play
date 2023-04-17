@@ -846,21 +846,41 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         return voiceNames[voiceIndex];
     }
 
+    public void Pause()
+    {
+        if (IsPaused)
+        {
+            return;
+        }
+        
+        songAudioPlayer.PauseAudio();
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+    }
+    
+    public void Unpause()
+    {
+        if (!IsPaused)
+        {
+            return;
+        }
+        
+        songAudioPlayer.PlayAudio();
+        PlayerControls.ForEach(playerControl =>
+        {
+            playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
+            playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
+        });
+    }
+    
     public void TogglePlayPause()
     {
         if (songAudioPlayer.IsPlaying)
         {
-            songAudioPlayer.PauseAudio();
-            PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+            Pause();
         }
         else
         {
-            songAudioPlayer.PlayAudio();
-            PlayerControls.ForEach(playerControl =>
-            {
-                playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
-                playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
-            });
+            Unpause();
         }
     }
 

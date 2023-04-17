@@ -277,7 +277,14 @@ public class SongMeta
     
     public void SetUnknownHeaderEntry(string key, string value)
     {
-        unknownHeaderEntries[key] = value;
+        unknownHeaderEntries[key.ToLowerInvariant()] = value;
+    }
+    
+    public string GetUnknownHeaderEntry(string key)
+    {
+        return unknownHeaderEntries.TryGetValue(key.ToLowerInvariant(), out string value)
+            ? value
+            : null;
     }
 
     public override string ToString()

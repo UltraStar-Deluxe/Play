@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -599,5 +600,61 @@ public static class SongMetaUtils
     {
         string relativePath = PathUtils.MakeRelativePath(songMeta.Directory, path);
         return relativePath;
+    }
+    
+    public static string GetAttributionText(SongMeta selectedSong)
+    {
+        string GetAttributionText(string title, string author, string license, string source)
+        {
+            List<string> parts = new List<string>();
+            if (!author.IsNullOrEmpty())
+            {
+                parts.Add(author);
+            }
+            if (!license.IsNullOrEmpty())
+            {
+                parts.Add($"License: {license}");
+            }
+            if (!source.IsNullOrEmpty())
+            {
+                parts.Add($"Source: {source}");
+            }
+            
+            if (parts.IsNullOrEmpty())
+            {
+                return "";
+            }
+
+            return parts.ToCsv("\n   ", $"• {title}: ", "");
+        }
+        
+        string audioAuthor = selectedSong.GetUnknownHeaderEntry($"AUDIOAUTHOR");
+        if (audioAuthor.IsNullOrEmpty())
+        {
+            audioAuthor = selectedSong.Artist;
+        }
+        
+        string audioLicense = selectedSong.GetUnknownHeaderEntry($"AUDIOLICENSE");
+        string audioSource = selectedSong.GetUnknownHeaderEntry($"AUDIOSOURCE");
+        
+        string backgroundAuthor = selectedSong.GetUnknownHeaderEntry($"BACKGROUNDAUTHOR");
+        string backgroundLicense = selectedSong.GetUnknownHeaderEntry($"BACKGROUNDLICENSE");
+        string backgroundSource = selectedSong.GetUnknownHeaderEntry($"BACKGROUNDSOURCE");
+        
+        string coverAuthor = selectedSong.GetUnknownHeaderEntry($"COVERAUTHOR");
+        string coverLicense = selectedSong.GetUnknownHeaderEntry($"COVERLICENSE");
+        string coverSource = selectedSong.GetUnknownHeaderEntry($"COVERSOURCE");
+        
+        string videoAuthor = selectedSong.GetUnknownHeaderEntry($"VIDEOAUTHOR");
+        string videoLicense = selectedSong.GetUnknownHeaderEntry($"VIDEOLICENSE");
+        string videoSource = selectedSong.GetUnknownHeaderEntry($"VIDEOSOURCE");
+        
+        return new List<string>()
+        {
+            GetAttributionText("Audio", audioAuthor, audioLicense, audioSource),
+            GetAttributionText("Video", videoAuthor, videoLicense, videoSource),
+            GetAttributionText("Background", backgroundAuthor, backgroundLicense, backgroundSource),
+            GetAttributionText("Cover", coverAuthor, coverLicense, coverSource),
+        }.Where(it => !it.IsNullOrEmpty()).ToCsv("\n", "", "");
     }
 }
