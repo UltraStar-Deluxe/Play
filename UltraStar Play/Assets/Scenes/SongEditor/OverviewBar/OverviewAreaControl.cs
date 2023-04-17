@@ -36,6 +36,9 @@ public class OverviewAreaControl : IInjectionFinishedListener
     [Inject]
     private AudioManager audioManager;
 
+    [Inject]
+    private Settings settings;
+    
     private OverviewAreaPositionInSongIndicatorControl positionInSongIndicatorControl;
     private OverviewAreaViewportIndicatorControl viewportIndicatorControl;
     private OverviewAreaNoteVisualizer noteVisualizer;
@@ -63,6 +66,11 @@ public class OverviewAreaControl : IInjectionFinishedListener
             .CreateAndInject<OverviewAreaIssueVisualizer>();
 
         // Create the audio waveform image.
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource).Subscribe(_ =>
+        {
+            UpdateAudioWaveForm();
+        });
+        
         songAudioPlayer.LoadedEventStream.Subscribe(_ =>
         {
             UpdateAudioWaveForm();
@@ -95,7 +103,13 @@ public class OverviewAreaControl : IInjectionFinishedListener
 
         using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
         {
-            string audioUri = SongMetaUtils.GetAudioUri(songMeta);
+            string audioUri = GetAudioUri(settings.SongEditorSettings.PlaybackSamplesSource);
+            if (audioUri.IsNullOrEmpty())
+            {
+                Debug.LogWarning($"No {settings.SongEditorSettings.PlaybackSamplesSource} audio found. Split the audio first. Using original music instead.");
+                audioUri = GetAudioUri(ESongEditorSamplesSource.OriginalMusic);
+            }
+            
             if (!SongMetaUtils.AudioResourceExists(songMeta))
             {
                 Debug.Log($"Audio file resource does not exist {audioUri}");
@@ -112,6 +126,19 @@ public class OverviewAreaControl : IInjectionFinishedListener
             // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
             AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
             audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);
+        }
+    }
+
+    private string GetAudioUri(ESongEditorSamplesSource samplesSource)
+    {
+        switch (samplesSource)
+        {
+            case ESongEditorSamplesSource.Instrumental:
+                return SongMetaUtils.GetInstrumentalAudioUri(songMeta);
+            case ESongEditorSamplesSource.Vocals:
+                return SongMetaUtils.GetVocalsAudioUri(songMeta);
+            default:
+                return SongMetaUtils.GetAudioUri(songMeta);
         }
     }
 
