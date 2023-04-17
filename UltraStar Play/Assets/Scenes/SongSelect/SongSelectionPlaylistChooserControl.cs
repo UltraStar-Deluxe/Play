@@ -28,14 +28,11 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
 
     public void OnInjectionFinished()
     {
-        InitItems();
+        UpdateItems();
 
         // Update settings
         Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = newPlaylist.Name);
 
-        playlistDropdownField.choices = items
-            .Select(playlist => playlist.Name)
-            .ToList();
         playlistDropdownField.value = items.FirstOrDefault().Name;
         playlistDropdownField.RegisterValueChangedCallback(evt =>
         {
@@ -54,12 +51,16 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
             });
         
         playlistManager.PlaylistChangeEventStream
-            .Subscribe(_ => InitItems());
+            .Subscribe(_ => UpdateItems());
     }
 
-    private void InitItems()
+    private void UpdateItems()
     {
         items = playlistManager.GetPlaylists(true, true);
+
+        playlistDropdownField.choices = items
+            .Select(playlist => playlist.Name)
+            .ToList();
 
         // Initial selection
         IPlaylist newSelection;
