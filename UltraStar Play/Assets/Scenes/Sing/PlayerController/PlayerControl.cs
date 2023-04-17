@@ -122,7 +122,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             && voiceIndex <= 0)
         {
             // Prefer position near the top lyrics
-            Debug.Log("Prefer top");
             List<VisualElement> playerInfoUiLists = new()
             {
                 playerInfoUiListTopLeft,
@@ -136,7 +135,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         else
         {
             // Prefer position near the bottom lyrics
-            Debug.Log("Prefer bottom");
             List<VisualElement> playerInfoUiLists = new()
             {
                 playerInfoUiListBottomLeft,
