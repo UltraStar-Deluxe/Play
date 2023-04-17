@@ -10,11 +10,8 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
-    [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
-    private ItemPicker scoreModePicker;
-
     [Inject(UxmlName = R.UxmlNames.reduceAudioVolumeItemPicker)]
     private ItemPicker reduceAudioVolumeItemPicker;
     
@@ -24,21 +21,10 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
     [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
     private DropdownField languageDropdownField;
 
-    [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaPicker)]
-    private ItemPicker searchAudioFilesWithoutSongMetaPicker;
-
     protected override void Start()
     {
         base.Start();
         
-        new ScoreModeItemPickerControl(scoreModePicker)
-            .Bind(() => settings.GameSettings.ScoreMode,
-                  newValue => settings.GameSettings.ScoreMode = newValue);
-
-        new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
-            .Bind(() => settings.GameSettings.searchAudioFilesWithoutSongMeta,
-                newValue => settings.GameSettings.searchAudioFilesWithoutSongMeta = newValue);
-
         NumberPickerControl passTheMicTimeItemPickerControl = new NumberPickerControl(passTheMicTimeItemPicker, 20);
         passTheMicTimeItemPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
         passTheMicTimeItemPickerControl.Bind(
@@ -53,11 +39,6 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection, I
         InitLanguageChooser();
     }
 
-    public void UpdateTranslation()
-    {
-        scoreModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
-    }
-    
     private void InitLanguageChooser()
     {
         languageDropdownField.choices = translationManager.GetTranslatedLanguages()

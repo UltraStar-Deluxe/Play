@@ -56,26 +56,35 @@ public class DownloadAndExtractSongArchiveControl
         }
         
         string targetPath = GetDownloadTargetPath(url);
-        UnityWebRequest webRequest = FileDownloadControl.CreateDownloadRequest(url, targetPath);
-        fileDownloadControl = FileDownloadControl.Create(webRequest, parentTransform);
-        fileDownloadControl.BeforeDestroyEventStream.Subscribe(_ => fileDownloadControl = null);
-        fileDownloadControl.IsDoneWithoutError.Subscribe(newValue =>
+
+        try
         {
-            if (newValue)
+            UnityWebRequest webRequest = FileDownloadControl.CreateDownloadRequest(url, targetPath);
+            fileDownloadControl = FileDownloadControl.Create(webRequest, parentTransform);
+            fileDownloadControl.BeforeDestroyEventStream.Subscribe(_ => fileDownloadControl = null);
+            fileDownloadControl.IsDoneWithoutError.Subscribe(newValue =>
             {
-                StartExtractArchive(targetPath);
-            }
-        });
-        fileDownloadControl.ErrorMessage.Subscribe(newValue =>
+                if (newValue)
+                {
+                    StartExtractArchive(targetPath);
+                }
+            });
+            fileDownloadControl.ErrorMessage.Subscribe(newValue =>
+            {
+                if (!newValue.IsNullOrEmpty())
+                {
+                    ErrorMessage.Value = newValue;
+                    IsDone.Value = true;
+                }
+            });
+            fileDownloadControl.ProgressEventStream.Subscribe(evt => downloadProgressEventStream.OnNext(evt));
+            fileDownloadControl.SendWebRequest();
+        }
+        catch (Exception ex)
         {
-            if (!newValue.IsNullOrEmpty())
-            {
-                ErrorMessage.Value = newValue;
-                IsDone.Value = true;
-            }
-        });
-        fileDownloadControl.ProgressEventStream.Subscribe(evt => downloadProgressEventStream.OnNext(evt));
-        fileDownloadControl.SendWebRequest();
+            ErrorMessage.Value = ex.Message;
+            IsDone.Value = true;
+        }
     }
     
     private void StartExtractArchive(string archivePath)

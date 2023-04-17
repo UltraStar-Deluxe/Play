@@ -34,6 +34,9 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
     private Button urlChooserButton;
 
+    [Inject(UxmlName = R.UxmlNames.deleteButton)]
+    private Button deleteButton;
+    
     [Inject]
     private SettingsManager settingsManager;
     
@@ -69,7 +72,10 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
             SelectSongArchiveUrl(songArchiveEntries.FirstOrDefault().url);
         }
     }
-    
+
+    private readonly Subject<bool> deleteEventStream = new();
+    public IObservable<bool> DeleteEventStream => deleteEventStream;
+
     public void OnInjectionFinished()
     {
         urlTextField.value = "";
@@ -78,6 +84,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         statusLabel.text = "Click the button to start the download";
         
         urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
+        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
         
         toggleStartAndCancelButton.RegisterCallbackButtonTriggered(_ => ToggleStartAndCancel());
         startIcon.ShowByDisplay();
@@ -148,7 +155,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         downloadAndExtractSongArchiveControl.Start();
     }
     
-    private void CancelDownload()
+    public void CancelDownload()
     {
         downloadAndExtractSongArchiveControl?.Cancel();
         SetCanceledStatus();

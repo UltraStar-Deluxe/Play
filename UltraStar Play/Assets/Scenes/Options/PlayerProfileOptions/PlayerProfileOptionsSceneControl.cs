@@ -116,8 +116,6 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         {
             { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
                 TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile) },
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_difficulty_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_difficulty) },
             { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages_title),
                 TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages) },
             { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages_title),
