@@ -173,6 +173,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private bool hasFinishedScene;
 
+    private float startMicrophoneDelayInSeconds = 0.5f;
+    
     public void OnInjectionFinished()
     {
         injector.Inject(timeBarControl);
@@ -239,7 +241,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Associate LyricsDisplayer with one of the (duet) players
         InitSingingLyricsControls();
 
-        StartAudioPlayback();
+        // Start the audio when microphones are ready.
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds, () =>
+        {
+            StartAudioPlayback();
+        }));
         StartVideoOrShowBackgroundImage();
 
         // Input legend (in pause overlay)
@@ -787,6 +793,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         playerControlInjector.Inject(playerControl);
 
         PlayerControls.Add(playerControl);
+
+        // Start microphone after a short delay. Otherwise the scene transition is not smooth.
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds,
+            () => playerControl.PlayerMicPitchTracker.InitPitchDetection()));
 
         AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, playerIndex);
 

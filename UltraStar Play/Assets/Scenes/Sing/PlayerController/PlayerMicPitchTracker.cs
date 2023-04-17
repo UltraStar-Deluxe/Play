@@ -88,6 +88,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
         micSampleRecorder.MicProfile = micProfile;
+        beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
+    }
+
+    public void InitPitchDetection()
+    {
         if (micProfile.IsInputFromConnectedClient)
         {
             InitPitchDetectionFromConnectedClient();
@@ -105,10 +110,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         {
             InitPitchDetectionFromLocalMicrophone();
         }
-
-        beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
     }
-
+    
     private void InitPitchDetectionFromLocalMicrophone()
     {
         micSampleRecorder.StartRecording();
