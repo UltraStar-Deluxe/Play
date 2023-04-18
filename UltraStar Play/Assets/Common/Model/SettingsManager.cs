@@ -104,17 +104,18 @@ public class SettingsManager : AbstractSingletonBehaviour
             }
             OverwriteSettingsWithCommandLineArguments();
 
-            // TODO: Store non-persistent settings in dedicated data structure.
             ResetNonPersistentSettings();
         }
     }
 
     private void ResetNonPersistentSettings()
     {
+        // TODO: Store non-persistent settings in dedicated data structure.
         settings.SongSelectSettings.playlistName = "";
         settings.SongSelectSettings.micTestActive = false;
         settings.activeSearchPropertyFilters = new();
         settings.isShowOnlyDuetsFilterActive = false;
+        settings.GameRoundSettings = new();
     }
 
     private Settings CreateDefaultSettings()
