@@ -309,6 +309,10 @@ Button.tinyFont {
     -unity-background-image-tint-color: var(--font-color-error);
 }
 
+.fontColorBorder {
+    border-color: var(--font-color);
+}
+
 Toggle.smallControl {
     max-height: none;
 }
@@ -365,14 +369,6 @@ Toggle.smallControl {
 
 .staticPanel {
     background-color: #344054;
-}
-
-.medleyWithNext {
-    border-bottom-width: 0;
-}
-
-.medleyWithPrevious {
-    border-top-width: 0;
 }
 
 .medleyWithPrevious #playerEntryList {
