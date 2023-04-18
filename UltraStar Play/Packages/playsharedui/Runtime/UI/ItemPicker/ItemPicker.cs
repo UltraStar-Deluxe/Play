@@ -72,6 +72,11 @@ public class ItemPicker : VisualElement
 
     private object control;
 
+    public ItemPicker(string label) : this()
+    {
+        Label = label;
+    }
+    
     public ItemPicker()
     {
         // Load UXML and add as child element
