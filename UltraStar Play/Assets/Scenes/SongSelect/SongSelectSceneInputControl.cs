@@ -121,12 +121,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneControl.SubmitSearch();
         }
-        else if (songSelectSceneControl.IsPlaylistActive()
-                 && (!songSelectSceneControl.HasPartyModeSceneData
-                     || songSelectSceneControl.PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Manual))
-        {
-            songSelectSceneControl.ResetPlaylistSelection();
-        }
         else
         {
             songSelectSceneControl.QuitSongSelect();
