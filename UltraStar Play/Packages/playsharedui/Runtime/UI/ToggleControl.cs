@@ -1,46 +1,29 @@
 ﻿using System;
+using UniRx;
 
 public class ToggleControl
 {
     private readonly Action onBecomeTrue;
     private readonly Action onBecomeFalse;
     
-    private bool state;
-    public bool State
-    {
-        get => state;
-        set
-        {
-            if (state == value)
-            {
-                return;
-            }
+    public ReactiveProperty<bool> State { get; private set; }
 
-            state = value;
-            InvokeState();
-        }
-    }
-
-    public ToggleControl(bool initialState, Action onBecomeTrue, Action onBecomeFalse, bool invokeInitialState = true)
+    public ToggleControl(bool initialState, Action onBecomeTrue, Action onBecomeFalse)
     {
         this.onBecomeTrue = onBecomeTrue;
         this.onBecomeFalse = onBecomeFalse;
-        state = initialState;
-
-        if (invokeInitialState)
-        {
-            InvokeState();
-        }
+        State = new(initialState);
+        State.Subscribe(_ => InvokeState());
     }
 
     public void ToggleState()
     {
-        State = !State;
+        State.Value = !State.Value;
     }
 
     private void InvokeState()
     {
-        if (state)
+        if (State.Value)
         {
             onBecomeTrue?.Invoke();
         }

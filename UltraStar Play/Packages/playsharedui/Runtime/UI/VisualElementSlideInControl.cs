@@ -1,4 +1,5 @@
 ﻿using System;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,17 +14,13 @@ public class VisualElementSlideInControl
     private Vector2 ResolvedStyleSize => new Vector2(visualElement.resolvedStyle.width, visualElement.resolvedStyle.height);
     private Vector2 lastSize;
     
-    public bool Visible
-    {
-        get => toggleControl.State;
-        set => toggleControl.State = value;
-    }
+    public ReactiveProperty<bool> Visible => toggleControl.State;
 
     public VisualElementSlideInControl(VisualElement visualElement, ESide2D side, bool initiallyVisible)
     {
         this.visualElement = visualElement;
         this.side = side;
-        toggleControl = new ToggleControl(initiallyVisible, SliderIn, SlideOut);
+        toggleControl = new ToggleControl(initiallyVisible, DoSliderIn, DoSlideOut);
 
         this.visualElement.RegisterCallback<GeometryChangedEvent>(evt =>
         {
@@ -32,11 +29,11 @@ public class VisualElementSlideInControl
                 isInitialized = true;
                 if (initiallyVisible)
                 {
-                    SliderIn();
+                    DoSliderIn();
                 }
                 else
                 {
-                    SlideOut();
+                    DoSlideOut();
                 }
 
                 lastSize = ResolvedStyleSize;
@@ -50,6 +47,16 @@ public class VisualElementSlideInControl
         });
     }
 
+    public void SlideIn()
+    {
+        Visible.Value = true;
+    }
+    
+    public void SlideOut()
+    {
+        Visible.Value = false;
+    }
+    
     private void UpdatePositionWithoutTransition()
     {
         // No animation is done when the units change. Here, we change from unit "auto" to unit "px".
@@ -70,17 +77,17 @@ public class VisualElementSlideInControl
             visualElement.style.bottom = new StyleLength(StyleKeyword.Auto);
         }
         
-        if (Visible)
+        if (Visible.Value)
         {
-            SliderIn();
+            DoSliderIn();
         }
         else
         {
-            SlideOut();
+            DoSlideOut();
         }
     }
 
-    private void SlideOut()
+    private void DoSlideOut()
     {
         if (side == ESide2D.Right)
         {
@@ -100,7 +107,7 @@ public class VisualElementSlideInControl
         }
     }
 
-    private void SliderIn()
+    private void DoSliderIn()
     {
         if (side == ESide2D.Right)
         {
@@ -122,6 +129,6 @@ public class VisualElementSlideInControl
 
     public void ToggleVisible()
     {
-        Visible = !Visible;
+        toggleControl.ToggleState();
     }
 }
