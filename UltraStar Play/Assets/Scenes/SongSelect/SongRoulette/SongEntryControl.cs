@@ -167,7 +167,16 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                         () => playlistManager.AddSongToPlaylist(ultraStarPlaylist, songMeta));
                 }
             });
-
+        
+        contextMenuPopup.AddButton("Enqueue", "playlist_add",
+            () =>
+            {
+                if (SongMeta != null)
+                {
+                    songSelectSceneControl.AddCurrentSongToSongQueue();
+                }
+            });
+        
         // Open song editor / song folder
         contextMenuPopup.AddButton("Open Editor", "edit",
             () => songSelectSceneControl.StartSongEditorScene());
@@ -178,15 +187,15 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
             contextMenuPopup.AddButton("Reload Song", "replay",
                 () => songMetaManager.ReloadSong(SongMeta));
         }
-        
-        contextMenuPopup.AddButton("Recreate Song", "replay_circle_filled",
-            () =>
-            {
-                if (SongMeta != null)
-                {
-                    createSingAlongSongControl.CreateSingAlongSong(SongMeta);
-                }
-            });
+
+        // contextMenuPopup.AddButton("Recreate Song", "replay_circle_filled",
+        //     () =>
+        //     {
+        //         if (SongMeta != null)
+        //         {
+        //             createSingAlongSongControl.CreateSingAlongSong(SongMeta);
+        //         }
+        //     });
         
         contextMenuPopup.AddButton("Vocals Separation", "call_split",
             () =>
