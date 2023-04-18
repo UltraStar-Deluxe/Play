@@ -39,8 +39,11 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
     {
         settings.ObserveEveryValueChanged(it => it.GraphicSettings.showPitchIndicator)
             .Subscribe(_ => playerPitchIndicator.SetVisibleByDisplay(IsPitchIndicatorVisible));
-        
-        pitchIndicatorIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+
+        if (micProfile != null)
+        {
+            pitchIndicatorIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+        }
         playerMicPitchTracker.BeatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzedEvent(evt));
         UpdatePitchIndicatorPosition(MidiUtils.MidiNoteConcertPitch);
     }
