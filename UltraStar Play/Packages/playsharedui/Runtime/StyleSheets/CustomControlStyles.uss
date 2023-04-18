@@ -65,7 +65,7 @@ ItemPicker {
     height: var(--control-height);
     min-width: var(--control-height-small);
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
 }
 
 .itemPickerContent {
@@ -288,10 +288,27 @@ ChipsCombo {
     padding: 2px;
 }
 
+.contextMenu > Toggle {
+    margin-bottom: 4px;
+}
+
 .contextMenu > Label {
     padding-left: 5px;
     padding-right: 5px;
     font-size: var(--font-size-s);
+}
+
+.contextMenu > ItemPicker {
+    flex-direction: column;
+    width: auto;
+    height: auto;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 4px;
+}
+
+.contextMenu > ItemPicker > #itemPickerLabel {
+    width: auto;
 }
 
 .contextMenu .unity-base-field {

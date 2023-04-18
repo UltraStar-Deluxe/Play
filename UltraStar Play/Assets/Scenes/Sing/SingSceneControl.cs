@@ -365,8 +365,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (PlayerControls.IsNullOrEmpty()
             || !settings.GraphicSettings.showStaticLyrics)
         {
-            topLyricsContainer.HideByDisplay();
-            bottomLyricsContainer.HideByDisplay();
+            uiDocument.rootVisualElement.Query<VisualElement>(null, R.UssClasses.singingLyricsSentenceUi)
+                .ForEach(singingLyricsSentenceUi => singingLyricsSentenceUi.HideByDisplay());
             return;
         }
 

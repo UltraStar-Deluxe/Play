@@ -56,21 +56,30 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
         return WebCamTexture.devices.Length > 0;
     }
 
-    public void ToggleWebcam()
+    public void SetUseAsBackgroundInSingScene(bool newValue)
     {
-        bool displayWebcam = !webcamRenderContainer.IsVisibleByDisplay();
-        if (displayWebcam)
+        if (settings.WebcamSettings.UseAsBackgroundInSingScene == newValue)
         {
-            Log.Logger.Information("Webcam activated: {webcamname}", webcamTexture.deviceName);
+            return;
+        }
+
+        settings.WebcamSettings.UseAsBackgroundInSingScene = newValue;
+        if (newValue)
+        {
             Play();
+            Log.Logger.Information("Webcam activated: {webcamname}", webcamTexture.deviceName);
+            webcamRenderContainer.ShowByDisplay();
         }
         else
         {
-            Log.Logger.Information("Webcam deactivated: {webcamname}", webcamTexture.deviceName);
             Stop();
+            Log.Logger.Information("Webcam deactivated: {webcamname}", webcamTexture.deviceName);
+            webcamRenderContainer.HideByDisplay();
         }
-
-        webcamRenderContainer.SetVisibleByDisplay(displayWebcam);
-        settings.WebcamSettings.UseAsBackgroundInSingScene = displayWebcam;
+    }
+    
+    public void ToggleUseAsBackgroundInSingScene()
+    {
+        SetUseAsBackgroundInSingScene(!settings.WebcamSettings.UseAsBackgroundInSingScene);
     }
 }

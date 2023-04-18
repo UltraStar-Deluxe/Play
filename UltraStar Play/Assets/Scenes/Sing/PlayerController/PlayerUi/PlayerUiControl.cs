@@ -185,14 +185,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             playerImageBorder.HideByVisibility();
         }
 
-        if (!settings.GraphicSettings.showPlayerNames)
-        {
-            playerNameLabel.HideByDisplay();
-        }
-        if (!settings.GraphicSettings.showScoreNumbers)
-        {
-            playerScoreLabel.HideByDisplay();
-        }
+        settings.ObserveEveryValueChanged(it => it.GraphicSettings.showPlayerNames)
+            .Subscribe(newValue => playerNameLabel.SetVisibleByDisplay(newValue));
+        
+        settings.ObserveEveryValueChanged(it => it.GraphicSettings.showScoreNumbers)
+            .Subscribe(newValue => playerScoreLabel.SetVisibleByDisplay(newValue));
     }
 
     private void ChangeLayoutByPlayerCount()

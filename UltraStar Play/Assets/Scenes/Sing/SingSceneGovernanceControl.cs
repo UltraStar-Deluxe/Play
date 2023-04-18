@@ -230,11 +230,55 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     private void FillAppearanceContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
+        ItemPicker noteDisplayModePicker = new("Note Display Mode¹");
+        contextMenuPopup.AddVisualElement(noteDisplayModePicker);
+        new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
+            .Bind(() => settings.GraphicSettings.noteDisplayMode,
+                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
+        
+        Toggle showLyricsOnNotesToggle = new("Lyrics on Notes¹");
+        contextMenuPopup.AddVisualElement(showLyricsOnNotesToggle);
+        FieldBindingUtils.Bind(showLyricsOnNotesToggle,
+            () => settings.GraphicSettings.showLyricsOnNotes,
+            newValue => settings.GraphicSettings.showLyricsOnNotes = newValue);
+        
+        Toggle showStaticLyricsToggle = new("Lyrics Box¹");
+        contextMenuPopup.AddVisualElement(showStaticLyricsToggle);
+        FieldBindingUtils.Bind(showStaticLyricsToggle,
+            () => settings.GraphicSettings.showStaticLyrics,
+            newValue => settings.GraphicSettings.showStaticLyrics = newValue);
+        
+        Toggle showPitchIndicatorToggle = new("Pitch Arrow");
+        contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
+        FieldBindingUtils.Bind(showPitchIndicatorToggle,
+            () => settings.GraphicSettings.showPitchIndicator,
+                newValue => settings.GraphicSettings.showPitchIndicator = newValue);
+        
+        Toggle showPlayerNamesToggle = new("Player Names");
+        contextMenuPopup.AddVisualElement(showPlayerNamesToggle);
+        FieldBindingUtils.Bind(showPlayerNamesToggle,
+            () => settings.GraphicSettings.showPlayerNames,
+            newValue => settings.GraphicSettings.showPlayerNames = newValue);
+        
+        Toggle showScoreNumbers = new("Player Score");
+        contextMenuPopup.AddVisualElement(showScoreNumbers);
+        FieldBindingUtils.Bind(showScoreNumbers,
+            () => settings.GraphicSettings.showScoreNumbers,
+            newValue => settings.GraphicSettings.showScoreNumbers = newValue);
+        
         if (webcamControl.WebcamsAvailable())
         {
-            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_webcamOnOff), "photo_camera",
-                () => webcamControl.ToggleWebcam());
+            Toggle webcamToggle = new("Webcam");
+            contextMenuPopup.AddVisualElement(webcamToggle);
+            FieldBindingUtils.Bind(webcamToggle,
+                () => settings.WebcamSettings.UseAsBackgroundInSingScene,
+                newValue => webcamControl.SetUseAsBackgroundInSingScene(newValue));
         }
+        
+        contextMenuPopup.AddSeparator();
+        contextMenuPopup.AddVisualElement(new Label("¹ Requires restart"));
+        contextMenuPopup.AddButton("Restart Now", "replay",
+            () => singSceneControl.Restart());
     }
 
     private void FillRegularContextMenu(ContextMenuPopupControl contextMenuPopup)
