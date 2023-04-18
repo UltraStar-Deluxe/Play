@@ -38,6 +38,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [InjectedInInspector]
     public MicPitchTracker micPitchTrackerPrefab;
     
+    [InjectedInInspector]
+    public Sprite defaultSongImage;
+    
     [Inject]
     private UiManager uiManager;
 
@@ -396,6 +399,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             })
             .AddTo(gameObject);
 
+        songQueueOverlay.ShowByDisplay();
         VisualElementSlideInControl songQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
         toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ => songQueueSlideInControl.ToggleVisible());
         closeSongQueueButton.RegisterCallbackButtonTriggered(_ => songQueueSlideInControl.Visible = false);
@@ -506,12 +510,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     public void AddCurrentSongToSongQueue()
     {
+        if (SelectedSong == null)
+        {
+            return;
+        }
+        
         SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings();
         songQueueManager.AddSongQueueEntry(songQueueEntryDto);
     }
 
     public void AddCurrentSongToSongQueueAsMedley()
     {
+        if (SelectedSong == null)
+        {
+            return;
+        }
+        
         if (songQueueManager.IsSongQueueEmpty)
         {
             // Cannot create medley with previous song when song queue is empty.
@@ -870,6 +884,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         selectedSongArtist.text = "";
         selectedSongTitle.text = "";
+        songIndexLabel.text = "";
+        selectedSongImageOuter.style.backgroundImage = new StyleBackground(defaultSongImage);
+        selectedSongImageInner.style.backgroundImage = new StyleBackground(defaultSongImage);
         duetIcon.HideByVisibility();
         UpdateFavoriteIcon();
         UpdateSongStatistics(null);

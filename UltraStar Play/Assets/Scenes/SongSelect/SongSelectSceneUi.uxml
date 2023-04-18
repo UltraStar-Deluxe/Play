@@ -37,7 +37,8 @@
                             <ui:Label text="quick-search-text" display-tooltip-when-elided="true" name="fuzzySearchTextLabel" picking-mode="Ignore" class="pr-3 secondaryFontColor smallFont" style="position: absolute; -unity-text-align: middle-right; width: 100%; display: flex; height: 100%; justify-content: center;" />
                         </ui:TextField>
                         <ui:Button display-tooltip-when-elided="true" name="searchPropertyButton" class="squareButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; overflow: visible;">
-                            <BootstrapIcon tabindex="-1" name="searchIcon" icon="funnel-fill" picking-mode="Ignore" style="position: absolute; font-size: 20px;" />
+                            <MaterialIcon tabindex="-1" name="filterInactiveIcon" icon="filter_alt_off" picking-mode="Ignore" style="position: absolute;" />
+                            <MaterialIcon tabindex="-1" name="filterActiveIcon" icon="filter_alt" picking-mode="Ignore" class="warningFontColor" style="position: absolute; display: none;" />
                             <MaterialIcon name="searchErrorIcon" icon="warning" class="rounded warningFontColor" />
                         </ui:Button>
                     </ui:VisualElement>
@@ -141,7 +142,7 @@
                 </ui:ScrollView>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel" style="max-width: 40%; justify-content: flex-start; align-items: stretch; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; width: auto; display: flex; right: 0;">
+        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel" style="max-width: 40%; justify-content: flex-start; align-items: stretch; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; width: auto; display: none; right: 0;">
             <ui:VisualElement name="row">
                 <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
                 <ui:Button display-tooltip-when-elided="true" name="closeSongQueueButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">

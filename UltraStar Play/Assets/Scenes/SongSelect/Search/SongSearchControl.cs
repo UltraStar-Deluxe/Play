@@ -24,7 +24,13 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     [Inject(UxmlName = R.UxmlNames.searchPropertyButton)]
     private Button searchPropertyButton;
+    
+    [Inject(UxmlName = R.UxmlNames.filterActiveIcon)]
+    private VisualElement filterActiveIcon;
 
+    [Inject(UxmlName = R.UxmlNames.filterInactiveIcon)]
+    private VisualElement filterInactiveIcon;
+    
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
 
@@ -63,6 +69,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     
     [Inject]
     private SongSelectFilterControl songSelectFilterControl;
+    
+    [Inject]
+    private PlaylistManager playlistManager;
 
     private TooltipControl searchErrorIconTooltipControl;
 
@@ -98,9 +107,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             }
         });
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(searchPropertyDropdownOverlay);
-
-        songSelectFilterControl.FiltersChangedEventStream.Subscribe(_ =>
-            searchPropertyButton.SetInClassList("filtersAreActive", songSelectFilterControl.IsAnyFilterActive));
+        
+        filterActiveIcon.HideByDisplay();
+        settings.ObserveEveryValueChanged(it => it.SongSelectSettings.playlistName)
+            .Subscribe(_ => UpdateFilterActiveIcon());
+        playlistManager.PlaylistChangeEventStream
+            .Subscribe(_ => UpdateFilterActiveIcon());
+        songSelectFilterControl.FiltersChangedEventStream
+            .Subscribe(_ => UpdateFilterActiveIcon());
 
         if (!settings.activeSearchPropertyFilters.IsNullOrEmpty())
         {
@@ -129,6 +143,17 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
                 searchTextField.RemoveFromClassList("noSearchResults");
             }
         });
+    }
+
+    private void UpdateFilterActiveIcon()
+    {
+        IPlaylist activePlaylist = playlistManager.GetPlaylistByName(settings.SongSelectSettings.playlistName);
+        bool isAnyFilterOrPlaylistActive = songSelectFilterControl.IsAnyFilterActive
+                                           || (activePlaylist != null &&
+                                               activePlaylist is not UltraStarAllSongsPlaylist);
+                
+        filterActiveIcon.SetVisibleByDisplay(isAnyFilterOrPlaylistActive);
+        filterInactiveIcon.SetVisibleByDisplay(!isAnyFilterOrPlaylistActive);
     }
 
     private string GetTranslation(ESearchProperty searchProperty)
