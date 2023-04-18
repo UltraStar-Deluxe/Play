@@ -121,6 +121,14 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songSelectSceneControl.SubmitSearch();
         }
+        else if (songSelectSceneControl.SongQueueSlideInControl.Visible.Value)
+        {
+            songSelectSceneControl.SongQueueSlideInControl.SlideOut();
+        }
+        else if (songSelectSceneControl.ModifiersOverlaySlideInControl.Visible.Value)
+        {
+            songSelectSceneControl.ModifiersOverlaySlideInControl.SlideOut();
+        }
         else
         {
             songSelectSceneControl.QuitSongSelect();

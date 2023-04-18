@@ -26,7 +26,9 @@
             <ui:Button display-tooltip-when-elided="true" name="randomizeModifiersButton" class="squareButton" style="margin-right: 10px;">
                 <MaterialIcon tabindex="-1" icon="casino" name="randomizeIcon" />
             </ui:Button>
-            <ui:Button display-tooltip-when-elided="true" name="resetModifiersButton" text="Reset" class="controlMinWidth" style="margin-right: 10px;" />
+            <ui:Button display-tooltip-when-elided="true" name="resetModifiersButton" class="squareButton" style="margin-right: 10px;">
+                <MaterialIcon tabindex="-1" name="rsetIcon" icon="replay" />
+            </ui:Button>
             <ui:Button text="OK" display-tooltip-when-elided="true" name="closeModifierDialogButton" class="controlMinWidth" style="margin-right: 10px;" />
         </ui:VisualElement>
     </ui:VisualElement>

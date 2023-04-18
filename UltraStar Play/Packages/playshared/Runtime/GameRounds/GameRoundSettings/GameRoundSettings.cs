@@ -17,6 +17,15 @@ public class GameRoundSettings
         .Except(UnconditionalModifiers)
         .ToHashSet();
 
+    public bool AnyModifierOrFinishConditionActive
+    {
+        get
+        {
+            return finishConditionSettings.condition != EGameRoundFinishCondition.ReachEndOfSong
+                || !modifiers.IsNullOrEmpty();
+        }
+    }
+
     public GameRoundSettings()
     {
     }

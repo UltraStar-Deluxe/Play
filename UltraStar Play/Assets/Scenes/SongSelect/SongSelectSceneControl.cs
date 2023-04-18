@@ -226,6 +226,18 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.toggleModifiersOverlayButton)]
     private Button toggleModifiersOverlayButton;
 
+    [Inject(UxmlName = R.UxmlNames.modifiersActiveIcon)]
+    private VisualElement modifiersActiveIcon;
+    
+    [Inject(UxmlName = R.UxmlNames.hiddenHideSongQueueOverlayArea)]
+    private VisualElement hiddenHideSongQueueOverlayArea;
+    
+    [Inject(UxmlName = R.UxmlNames.hiddenHideModifiersOverlayArea)]
+    private VisualElement hiddenHideModifiersOverlayArea;
+    
+    [Inject(UxmlName = R.UxmlNames.modifiersInactiveIcon)]
+    private VisualElement modifiersInactiveIcon;
+    
     [Inject(UxmlName = R.UxmlNames.closeModifiersOverlayButton)]
     private Button closeModifiersOverlayButton;
     
@@ -280,6 +292,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private readonly GameRoundModifierDialogControl modifierDialogControl = new();
     private readonly SongQueueUiControl songQueueUiControl = new();
     private readonly SongSelectFilterControl songSelectFilterControl = new();
+
+    public VisualElementSlideInControl SongQueueSlideInControl { get; private set; }
+    public VisualElementSlideInControl ModifiersOverlaySlideInControl { get; private set; }
 
     public void OnInjectionFinished()
     {
@@ -391,26 +406,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         songQueueLengthContainer.HideByDisplay();
         songQueueManager.SongQueueChangedEventStream
-            .Subscribe(_ =>
-            {
-                string newSongQueueLengthAsString = SongQueueManager.SongQueueLength.ToString();
-                if (songQueueLengthLabel.text != newSongQueueLengthAsString)
-                {
-                    songQueueLengthContainer.SetVisibleByDisplay(SongQueueManager.SongQueueLength > 0);
-                    songQueueLengthLabel.text = newSongQueueLengthAsString;
-                    LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
-                        .setEaseOutBounce()
-                        .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
-                }
-                songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
-            })
+            .Subscribe(_ => UpdateSongQueue())
             .AddTo(gameObject);
+        UpdateSongQueue();
 
         // Song queue overlay
         songQueueOverlay.ShowByDisplay();
-        VisualElementSlideInControl songQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
-        toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ => songQueueSlideInControl.ToggleVisible());
-        closeSongQueueButton.RegisterCallbackButtonTriggered(_ => songQueueSlideInControl.Visible = false);
+        SongQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
+        toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ => SongQueueSlideInControl.ToggleVisible());
+        closeSongQueueButton.RegisterCallbackButtonTriggered(_ => SongQueueSlideInControl.SlideOut());
         addToSongQueueAsNewButton.RegisterCallbackButtonTriggered(_ => AddCurrentSongToSongQueue());
         addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddCurrentSongToSongQueueAsMedley());
         songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
@@ -418,16 +422,49 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         
         // Modifier dialog overlay
         modifierDialogOverlay.ShowByDisplay();
-        VisualElementSlideInControl modifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
-        toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => modifiersOverlaySlideInControl.ToggleVisible());
-        closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => modifiersOverlaySlideInControl.Visible = false);
-        VisualElementUtils.RegisterDirectClickCallback(modifierDialogOverlay, () => modifiersOverlaySlideInControl.Visible = false);
+        ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
+        toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.ToggleVisible());
+        closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.SlideOut());
         
         // Init modifier dialog
         injector.WithRootVisualElement(modifierDialogOverlay)
             .Inject(modifierDialogControl);
         modifierDialogControl.OpenDialog(settings.GameRoundSettings);
         modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
+        
+        modifiersActiveIcon.HideByDisplay();
+        settings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
+            .Subscribe(_ => UpdateModifiersActiveIcon());
+        
+        // Hide slide-in controls with click outside
+        hiddenHideModifiersOverlayArea.HideByDisplay();
+        hiddenHideModifiersOverlayArea.RegisterCallback<PointerDownEvent>(_ => ModifiersOverlaySlideInControl.SlideOut());
+        ModifiersOverlaySlideInControl.Visible.Subscribe(newValue => hiddenHideModifiersOverlayArea.SetVisibleByDisplay(newValue));
+        
+        hiddenHideSongQueueOverlayArea.HideByDisplay();
+        hiddenHideSongQueueOverlayArea.RegisterCallback<PointerDownEvent>(_ => SongQueueSlideInControl.SlideOut());
+        SongQueueSlideInControl.Visible.Subscribe(newValue => hiddenHideSongQueueOverlayArea.SetVisibleByDisplay(newValue));
+    }
+
+    private void UpdateSongQueue()
+    {
+        string newSongQueueLengthAsString = SongQueueManager.SongQueueLength.ToString();
+        if (songQueueLengthLabel.text != newSongQueueLengthAsString)
+        {
+            songQueueLengthContainer.SetVisibleByDisplay(SongQueueManager.SongQueueLength > 0);
+            songQueueLengthLabel.text = newSongQueueLengthAsString;
+            LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
+                .setEaseOutBounce()
+                .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+        }
+        songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songQueueOverlay);
+    }
+
+    private void UpdateModifiersActiveIcon()
+    {
+        modifiersActiveIcon.SetVisibleByDisplay(settings.GameRoundSettings.AnyModifierOrFinishConditionActive);
+        modifiersInactiveIcon.SetVisibleByDisplay(!settings.GameRoundSettings.AnyModifierOrFinishConditionActive);
     }
 
     private void UpdateMicCheckButton()
