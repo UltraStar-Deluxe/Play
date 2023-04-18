@@ -19,8 +19,11 @@
                     <ui:Button display-tooltip-when-elided="true" name="selectRandomSongButton" class="squareButton">
                         <MaterialIcon tabindex="-1" name="selectRandomSongIcon" icon="casino" />
                     </ui:Button>
-                    <ui:Button display-tooltip-when-elided="true" name="toggleSongQueueOverlayButton" class="squareButton ml-2">
+                    <ui:Button display-tooltip-when-elided="true" name="toggleSongQueueOverlayButton" class="squareButton ml-2" style="overflow: visible;">
                         <MaterialIcon tabindex="-1" name="toggleSongQueueIcon" icon="list" />
+                        <ui:VisualElement name="songQueueLengthContainer" class="circle errorFontColor" style="flex-grow: 1; position: absolute; width: auto; left: -20%; bottom: -20%; align-items: center; justify-content: center; background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/SolidWhite.png?fileID=2800000&amp;guid=1114489c51530464392c602d5c9d094f&amp;type=3#SolidWhite&apos;); min-width: 14px; min-height: 14px;">
+                            <ui:Label tabindex="-1" text="9" display-tooltip-when-elided="true" name="songQueueLengthLabel" class="tinyFont" />
+                        </ui:VisualElement>
                     </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>

@@ -208,6 +208,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.toggleSongQueueOverlayButton)]
     private Button toggleSongQueueOverlayButton;
     
+    [Inject(UxmlName = R.UxmlNames.songQueueLengthContainer)]
+    private VisualElement songQueueLengthContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.songQueueLengthLabel)]
+    private Label songQueueLengthLabel;
+    
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
     
@@ -370,8 +376,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
         });
 
+        songQueueLengthContainer.HideByDisplay();
         songQueueManager.SongQueueChangedEventStream
-            .Subscribe(_ => songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries()));
+            .Subscribe(_ =>
+            {
+                string newSongQueueLengthAsString = SongQueueManager.SongQueueLength.ToString();
+                if (songQueueLengthLabel.text != newSongQueueLengthAsString)
+                {
+                    songQueueLengthContainer.SetVisibleByDisplay(SongQueueManager.SongQueueLength > 0);
+                    songQueueLengthLabel.text = newSongQueueLengthAsString;
+                    LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
+                        .setEaseOutBounce()
+                        .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+                }
+                songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
+            })
+            .AddTo(gameObject);
 
         toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ =>
         {
