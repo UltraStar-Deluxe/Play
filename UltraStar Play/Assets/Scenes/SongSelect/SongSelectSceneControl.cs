@@ -208,6 +208,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.toggleSongQueueOverlayButton)]
     private Button toggleSongQueueOverlayButton;
     
+    [Inject(UxmlName = R.UxmlNames.closeSongQueueButton)]
+    private Button closeSongQueueButton;
+    
     [Inject(UxmlName = R.UxmlNames.songQueueLengthContainer)]
     private VisualElement songQueueLengthContainer;
     
@@ -393,10 +396,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             })
             .AddTo(gameObject);
 
-        toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            songQueueOverlay.ToggleVisibleByDisplay();
-        });
+        VisualElementSlideInControl songQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
+        toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ => songQueueSlideInControl.ToggleVisible());
+        closeSongQueueButton.RegisterCallbackButtonTriggered(_ => songQueueSlideInControl.Visible = false);
         addToSongQueueAsNewButton.RegisterCallbackButtonTriggered(_ => AddCurrentSongToSongQueue());
         addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddCurrentSongToSongQueueAsMedley());
         songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
@@ -502,13 +504,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
     
-    private void AddCurrentSongToSongQueue()
+    public void AddCurrentSongToSongQueue()
     {
         SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings();
         songQueueManager.AddSongQueueEntry(songQueueEntryDto);
     }
 
-    private void AddCurrentSongToSongQueueAsMedley()
+    public void AddCurrentSongToSongQueueAsMedley()
     {
         if (songQueueManager.IsSongQueueEmpty)
         {

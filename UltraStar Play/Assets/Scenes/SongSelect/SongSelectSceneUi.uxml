@@ -141,8 +141,13 @@
                 </ui:ScrollView>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="songQueueOverlay" class="overlay overlayBackground" style="max-width: 40%; justify-content: flex-start; align-items: stretch; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; width: auto; display: none;">
-            <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center;" />
+        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel" style="max-width: 40%; justify-content: flex-start; align-items: stretch; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; width: auto; display: flex; right: 0;">
+            <ui:VisualElement name="row">
+                <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
+                <ui:Button display-tooltip-when-elided="true" name="closeSongQueueButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
+                    <MaterialIcon tabindex="-1" picking-mode="Ignore" name="closeIcon" icon="close" style="font-size: 20px;" />
+                </ui:Button>
+            </ui:VisualElement>
             <ui:Instance template="SongQueueUi" name="songQueueUi" picking-mode="Ignore" style="flex-grow: 1;" />
             <ui:VisualElement name="buttonRow" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: space-between;">
                 <ui:Button text="Add" display-tooltip-when-elided="true" name="addToSongQueueAsNewButton" enable-rich-text="false" style="margin-right: 5px;" />
