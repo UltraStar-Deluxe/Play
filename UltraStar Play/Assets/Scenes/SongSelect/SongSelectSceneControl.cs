@@ -223,6 +223,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
     
+    [Inject(UxmlName = R.UxmlNames.toggleModifiersOverlayButton)]
+    private Button toggleModifiersOverlayButton;
+
+    [Inject(UxmlName = R.UxmlNames.closeModifiersOverlayButton)]
+    private Button closeModifiersOverlayButton;
+    
+    [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
+    private VisualElement modifierDialogOverlay;
+    
     private SongSearchControl songSearchControl;
     public SongSearchControl SongSearchControl
     {
@@ -268,7 +277,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
     private readonly CreateSingAlongSongControl createSingAlongSongControl = new();
     private readonly SongSelectScenePartyModeControl partyModeControl = new();
-    private readonly GameRoundSettingsUiControl gameRoundSettingsUiControl = new();
+    private readonly GameRoundModifierDialogControl modifierDialogControl = new();
     private readonly SongQueueUiControl songQueueUiControl = new();
     private readonly SongSelectFilterControl songSelectFilterControl = new();
 
@@ -297,9 +306,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             partyModeControl.SelectRandomSong();
         }
-        
-        InitModifiersChipsComboControl();
-        
+
         InitDifficultyAndScoreMode();
 
         showLyricsButton.RegisterCallbackButtonTriggered(_ => ShowLyricsPopup());
@@ -399,6 +406,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             })
             .AddTo(gameObject);
 
+        // Song queue overlay
         songQueueOverlay.ShowByDisplay();
         VisualElementSlideInControl songQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
         toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ => songQueueSlideInControl.ToggleVisible());
@@ -407,6 +415,19 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddCurrentSongToSongQueueAsMedley());
         songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
         songQueueUiControl.OnDelete = songQueueEntryDto => songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
+        
+        // Modifier dialog overlay
+        modifierDialogOverlay.ShowByDisplay();
+        VisualElementSlideInControl modifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
+        toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => modifiersOverlaySlideInControl.ToggleVisible());
+        closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => modifiersOverlaySlideInControl.Visible = false);
+        VisualElementUtils.RegisterDirectClickCallback(modifierDialogOverlay, () => modifiersOverlaySlideInControl.Visible = false);
+        
+        // Init modifier dialog
+        injector.WithRootVisualElement(modifierDialogOverlay)
+            .Inject(modifierDialogControl);
+        modifierDialogControl.OpenDialog(settings.GameRoundSettings);
+        modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
     }
 
     private void UpdateMicCheckButton()
@@ -488,12 +509,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         noCoopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode != EScoreMode.CommonAverage);
     }
 
-    private void InitModifiersChipsComboControl()
-    {
-        injector.Inject(gameRoundSettingsUiControl);
-        gameRoundSettingsUiControl.GameRoundSettings = settings.GameRoundSettings;
-    }
-    
     public void QuitSongSelect()
     {
         if (HasPartyModeSceneData)

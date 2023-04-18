@@ -45,27 +45,6 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
 
-    [Inject(UxmlName = R.UxmlNames.partySettingsContainer)]
-    private VisualElement partySettingsContainer;
-
-    [Inject(UxmlName = R.UxmlNames.finishConditionContainer)]
-    private VisualElement finishConditionContainer;
-    
-    [Inject(UxmlName = R.UxmlNames.conditionalModifierConditionContainer)]
-    private VisualElement conditionalModifierConditionContainer;
-    
-    [Inject(UxmlName = R.UxmlNames.unconditionalModifierConditionContainer)]
-    private VisualElement unconditionalModifierConditionContainer;
-
-    [Inject(UxmlName = R.UxmlNames.finishConditionDescription)]
-    private Label finishConditionDescription;
-
-    [Inject(UxmlName = R.UxmlNames.conditionalModifierDescription)]
-    private Label conditionalModifierDescription;
-    
-    [Inject(UxmlName = R.UxmlNames.unconditionalModifierDescription)]
-    private Label unconditionalModifierDescription;
-
     public SongMeta RandomlySelectedSong { get; private set; }
 
     private MessageDialogControl askToUseJokerControl;
@@ -77,7 +56,6 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     private void UpdatePartyModeSettingsDescription()
     {
-        partySettingsContainer.SetVisibleByDisplay(songSelectSceneControl.HasPartyModeSceneData);
         if (!songSelectSceneControl.HasPartyModeSceneData)
         {
             return;
@@ -129,15 +107,6 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
             string modifierConditionDescription = GameRoundSettingsUtils.GetModifierConditionDescription(currentRoundSettings);
             return $"{modifierCsv} {modifierConditionDescription}";
         }
-
-        finishConditionDescription.text = GetFinishConditionDescription();
-        finishConditionContainer.SetVisibleByDisplay(!finishConditionDescription.text.IsNullOrEmpty());
-        
-        unconditionalModifierDescription.text = GetUnconditionalModifierDescription();
-        unconditionalModifierConditionContainer.SetVisibleByDisplay(!unconditionalModifierDescription.text.IsNullOrEmpty());
-        
-        conditionalModifierDescription.text = GetConditionalModifierDescription();
-        conditionalModifierConditionContainer.SetVisibleByDisplay(!conditionalModifierDescription.text.IsNullOrEmpty());
     }
 
     public void SelectRandomSong()
