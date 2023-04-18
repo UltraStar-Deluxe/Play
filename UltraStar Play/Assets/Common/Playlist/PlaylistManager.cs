@@ -367,6 +367,11 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         return allSongMetas.Where(songMeta => HasSongEntry(playlist, songMeta)).ToList();
     }
 
+    public IPlaylist GetPlaylistByName(string playlistName)
+    {
+        return playlists.FirstOrDefault(playlist => GetPlaylistName(playlist) == playlistName);
+    }
+    
     public List<IPlaylist> GetPlaylists(bool includeAllSongPlaylist, bool includeFavoritesPlaylist)
     {
         List<IPlaylist> result = new();
