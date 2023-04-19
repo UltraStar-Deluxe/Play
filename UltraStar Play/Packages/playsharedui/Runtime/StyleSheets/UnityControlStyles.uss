@@ -415,28 +415,44 @@
 
 .unity-base-slider--vertical {
     margin: 0;
+    min-width: 24px;
+}
+
+.unity-base-slider--vertical .unity-base-slider__input {
+    width: auto;
+    align-items: center;
+}
+
+.unity-base-slider--vertical .unity-base-slider__drag-container{
+    max-width: 24px;
 }
 
 .unity-base-slider--vertical .unity-base-slider__dragger {
     width: 10px;
     margin: 0;
-    left: 8px;
+    left: -5px;
     border-radius: 5px;
 }
 
 .unity-base-slider--horizontal
 {
     margin: 0;
+    min-width: 24px;
 }
 
 .unity-base-slider--horizontal .unity-base-slider__input {
     height: auto;
+    align-items: center;
+}
+
+.unity-base-slider--horizontal .unity-base-slider__drag-container{
+    max-height: 24px;
 }
 
 .unity-base-slider--horizontal .unity-base-slider__dragger {
     height: 10px;
     margin: 0;
-    top: 7px;
+    top: -5px;
     border-radius: 5px;
 }
 
