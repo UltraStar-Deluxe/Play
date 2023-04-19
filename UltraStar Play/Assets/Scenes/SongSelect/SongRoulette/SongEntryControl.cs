@@ -62,6 +62,9 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private Settings settings;
+    
     public string Name { get; set; }
 
     private bool ignoreNextClickEvent;
@@ -92,6 +95,8 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     
     private bool isInitialized;
 
+    private readonly SongSelectSongRatingIconControl songRatingIconControl = new();
+    
     public void OnInjectionFinished()
     {
         Init();
@@ -118,10 +123,15 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         }
         isInitialized = true;
 
+        injector.Inject(songRatingIconControl);
+        
         InitSongMenu();
 
         playlistManager.PlaylistChangeEventStream
             .Subscribe(evt => UpdateIcons());
+        
+        settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
+            .Subscribe(_ => UpdateIcons());
     }
     
     private void InitSongMenu()
@@ -261,9 +271,19 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
 
     private void UpdateIcons()
     {
+        if (songMeta == null)
+        {
+            favoriteIcon.HideByDisplay();
+            duetIcon.HideByDisplay();
+            notSavedYetIcon.HideByDisplay();
+            songRatingIconControl.HideSongRatingIcons();
+            return;
+        }
+        
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta));
         duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
         notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta));
+        songRatingIconControl.UpdateSongRatingIcons(songMeta, settings.GameSettings.Difficulty);
     }
 
     public void Dispose()

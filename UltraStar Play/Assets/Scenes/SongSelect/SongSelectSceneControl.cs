@@ -110,6 +110,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.noCoopIcon)]
     private VisualElement noCoopIcon;
     
+    [Inject(UxmlName = R.UxmlNames.songDetailsColumn)]
+    private VisualElement songDetailsColumn;
+    
     [Inject]
     private SongSelectSceneData sceneData;
 
@@ -253,7 +256,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         injector.Inject(songQueueUiControl);
         injector.Inject(songSelectFilterControl);
         injector.Inject(songSearchControl);
-        injector.Inject(songSelectSelectedSongDetailsControl);
+        injector
+            .WithRootVisualElement(songDetailsColumn)
+            .Inject(songSelectSelectedSongDetailsControl);
     }
     
     private void Start()

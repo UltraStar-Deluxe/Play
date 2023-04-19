@@ -35,6 +35,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     [Inject]
     private SongSelectPlayerListControl playerListControl;
     
+    [Inject]
+    private Injector injector;
+    
     [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
     private VisualElement localHighScoreContainer;
 
@@ -75,21 +78,34 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     private SongMeta SelectedSong => songSelectSceneControl.SelectedSong;
     
+    private readonly SongSelectSongRatingIconControl songRatingIconControl = new SongSelectSongRatingIconControl();
+    
     public void OnInjectionFinished()
     {
+        injector.Inject(songRatingIconControl);
+        
         showLyricsButton.RegisterCallbackButtonTriggered(_ => ShowLyricsPopup());
         
         toggleFavoriteButton.RegisterCallbackButtonTriggered(_ => songSelectSceneControl.ToggleSelectedSongIsFavorite());
         songIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{songSelectSceneControl.SelectedSongIndex + 1}"));
 
         playlistManager.PlaylistChangeEventStream
-            .Subscribe(_ => UpdateFavoriteIcon());
+            .Subscribe(_ => UpdateFavoriteIcon(null));
         songAudioPlayer.LoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
         settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
-            .Subscribe(_ => UpdateSongStatistics(songSelectSceneControl.SelectedSong));
+            .Subscribe(_ =>
+            {
+                UpdateSongStatistics(songSelectSceneControl.SelectedSong);
+                UpdateSongRatingIcons(songSelectSceneControl.SelectedSong);
+            });
     }
-    
+
+    private void UpdateSongRatingIcons(SongMeta selectedSong)
+    {
+        songRatingIconControl.UpdateSongRatingIcons(selectedSong, settings.GameSettings.Difficulty);
+    }
+
     private void ShowLyricsPopup()
     {
         if (lyricsDialogControl != null
@@ -140,13 +156,14 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         songIndexLabel.text = "";
         selectedSongImageOuter.style.backgroundImage = new StyleBackground(defaultSongImage);
         selectedSongImageInner.style.backgroundImage = new StyleBackground(defaultSongImage);
-        UpdateFavoriteIcon();
+        songRatingIconControl.HideSongRatingIcons();
+        UpdateFavoriteIcon(null);
         UpdateSongStatistics(null);
     }
 
-    private void UpdateFavoriteIcon()
+    private void UpdateFavoriteIcon(SongMeta songMeta)
     {
-        bool isFavorite = IsFavorite(songSelectSceneControl.SelectedSong);
+        bool isFavorite = IsFavorite(songMeta);
         favoriteIcon.SetVisibleByDisplay(isFavorite);
         noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
     }
@@ -177,14 +194,16 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         // Instead, the label is updated when the AudioClip has been loaded.
         durationLabel.text = "";
 
-        UpdateFavoriteIcon();
+        UpdateFavoriteIcon(selectedSong);
 
         UpdateSongStatistics(selectedSong);
+
+        UpdateSongRatingIcons(selectedSong);
 
         // Choose lyrics for duet song
         playerListControl.UpdateVoiceSelection();
     }
-    
+
     private void UpdateSongDurationLabel(double durationInMillis)
     {
         int min = (int)Math.Floor(durationInMillis / 1000 / 60);
@@ -210,7 +229,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     private void UpdateTopScoreLabels(List<int> topScores, VisualElement labelContainer)
     {
-        List<Label> labels = labelContainer.Query<Label>().ToList();
+        List<Label> labels = labelContainer.Query<Label>()
+            .Where(label => !label.ClassListContains(R_PlayShared.UssClasses.fontIcon))
+            .ToList();
         for (int i = 0; i < labels.Count; i++)
         {
             string scoreText = topScores.Count >= i + 1
