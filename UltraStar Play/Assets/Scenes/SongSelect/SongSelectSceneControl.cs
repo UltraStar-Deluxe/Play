@@ -738,15 +738,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         UpdateSongStatistics(selectedSong);
 
-        UpdateModifiersChipsCombo();
-
         // Choose lyrics for duet song
         playerListControl.UpdateVoiceSelection();
-    }
-
-    private void UpdateModifiersChipsCombo()
-    {
-        
     }
 
     private void UpdateSongDurationLabel(double durationInMillis)
