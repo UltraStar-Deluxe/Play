@@ -82,8 +82,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     private readonly Subject<SearchChangedEvent> searchChangedEventStream = new();
     public IObservable<SearchChangedEvent> SearchChangedEventStream => searchChangedEventStream;
 
+    private bool isInjectionFinished;
+    
     public void OnInjectionFinished()
     {
+        isInjectionFinished = true;
         searchProperties = new HashSet<ESearchProperty>(settings.SongSelectSettings.searchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
@@ -381,6 +384,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     public void UpdateTranslation()
     {
+        if (!isInjectionFinished)
+        {
+            return;
+        }
+        
         artistPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_artist);
         titlePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_title);
         editionPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_edition);
