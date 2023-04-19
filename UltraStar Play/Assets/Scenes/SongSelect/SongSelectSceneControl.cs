@@ -415,8 +415,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SongQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
         toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ => SongQueueSlideInControl.ToggleVisible());
         closeSongQueueButton.RegisterCallbackButtonTriggered(_ => SongQueueSlideInControl.SlideOut());
-        addToSongQueueAsNewButton.RegisterCallbackButtonTriggered(_ => AddCurrentSongToSongQueue());
-        addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddCurrentSongToSongQueueAsMedley());
+        addToSongQueueAsNewButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueue(SelectedSong));
+        addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueueAsMedley(SelectedSong));
         songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
         songQueueUiControl.OnDelete = songQueueEntryDto => songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
         
@@ -560,20 +560,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
     
-    public void AddCurrentSongToSongQueue()
+    public void AddSongToSongQueue(SongMeta songMeta)
     {
-        if (SelectedSong == null)
+        if (songMeta == null)
         {
             return;
         }
         
-        SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings();
+        SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings(songMeta);
         songQueueManager.AddSongQueueEntry(songQueueEntryDto);
     }
 
-    public void AddCurrentSongToSongQueueAsMedley()
+    public void AddSongToSongQueueAsMedley(SongMeta songMeta)
     {
-        if (SelectedSong == null)
+        if (songMeta == null)
         {
             return;
         }
@@ -584,7 +584,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
         
-        SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings();
+        SongQueueEntryDto songQueueEntryDto = CreateSongQueueEntryWithCurrentSettings(songMeta);
         if (songQueueEntryDto != null)
         {
             songQueueEntryDto.IsMedleyWithPreviousEntry = true;
@@ -592,10 +592,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    private SongQueueEntryDto CreateSongQueueEntryWithCurrentSettings()
+    private SongQueueEntryDto CreateSongQueueEntryWithCurrentSettings(SongMeta songMeta)
     {
         SongQueueEntryDto songQueueEntryDto = new();
-        songQueueEntryDto.SongDto = DtoConverter.ToDto(SelectedSong);
+        songQueueEntryDto.SongDto = DtoConverter.ToDto(songMeta);
         songQueueEntryDto.SingScenePlayerDataDto = DtoConverter.ToDto(CreateSingScenePlayerData());
         songQueueEntryDto.GameRoundSettings = new(settings.GameRoundSettings);
         return songQueueEntryDto;

@@ -185,7 +185,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
             {
                 if (SongMeta != null)
                 {
-                    songSelectSceneControl.AddCurrentSongToSongQueue();
+                    songSelectSceneControl.AddSongToSongQueue(SongMeta);
                 }
             });
         
