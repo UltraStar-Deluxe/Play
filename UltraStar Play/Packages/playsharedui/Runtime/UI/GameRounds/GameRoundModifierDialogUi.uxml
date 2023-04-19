@@ -3,7 +3,10 @@
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1">
             <ui:VisualElement name="finishConditionContainer" class="bottomLineSeparator" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ItemPicker name="finishConditionPicker" label="Finish Condition" class="controlWithLabelVertical" style="margin-bottom: 8px; width: 100%;" />
-                <ItemPicker name="finishConditionPointsPicker" style="flex-direction: row; margin-bottom: 8px;" />
+                <ui:VisualElement name="row">
+                    <ui:SliderInt picking-mode="Ignore" value="42" high-value="100" name="finishConditionPointsSlider" show-input-field="false" direction="Horizontal" style="flex-grow: 1;" />
+                    <ui:IntegerField value="42" name="finishConditionPointsTextField" is-delayed="true" class="ml-1" style="min-width: 100px;" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="unconditionalModifierContainer" class="bottomLineSeparator" style="background-color: rgba(0, 0, 0, 0); margin-bottom: 5px;">
                 <ui:Toggle label="Pass the Microphone" name="passTheMicToggle" value="false" style="margin-bottom: 8px; margin-top: 8px;" />
@@ -16,8 +19,10 @@
                 <ui:VisualElement name="conditionContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                     <ui:Label tabindex="-1" text="When" display-tooltip-when-elided="true" name="conditionTitleLabel" style="margin-bottom: 5px;" />
                     <ItemPicker name="modifierConditionPicker" class="controlWithLabelHorizontal" style="flex-direction: row; align-items: center; margin-bottom: 5px; width: 100%;" />
-                    <ItemPicker name="modifierConditionFromNumberPicker" class="controlWithLabelHorizontal" style="flex-direction: row; align-items: center; margin-bottom: 5px; margin-left: auto; width: 100%;" />
-                    <ItemPicker name="modifierConditionUntilNumberPicker" class="controlWithLabelHorizontal" style="flex-direction: row; align-items: center; margin-bottom: 5px; margin-left: auto; width: 100%;" />
+                    <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                        <ui:MinMaxSlider min-value="20" max-value="50" low-limit="0" high-limit="100" name="modifierConditionRangeSlider" style="flex-grow: 1;" />
+                        <ui:TextField picking-mode="Ignore" value="1000 - 9000" name="modifierConditionRangeTextField" is-delayed="true" class="ml-1" style="min-width: 100px;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:ScrollView>
