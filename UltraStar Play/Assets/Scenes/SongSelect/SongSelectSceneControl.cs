@@ -208,6 +208,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
     private VisualElement modifierDialogOverlay;
     
+    [Inject(UxmlName = R_PlayShared.UxmlNames.passTheMicToggle)]
+    private Toggle passTheMicToggle;
+    
     private readonly SongSearchControl songSearchControl = new();
 
     public SongMeta SelectedSong
@@ -370,6 +373,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
         toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.ToggleVisible());
         closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.SlideOut());
+
+        // Disable 'pass the mic' toggle if needed. It requires a team with at least 2 players
+        if (!HasPartyModeSceneData
+            || PartyModeSettings.teamSettings.teams.AllMatch(team =>
+                team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
+        {
+            passTheMicToggle.value = false;
+            passTheMicToggle.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue)
+                {
+                    UiManager.CreateNotification("'Pass the mic' requires a team with more than one player");
+                    StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => passTheMicToggle.value = false));
+                }
+            });
+        }
         
         // Init modifier dialog
         injector.WithRootVisualElement(modifierDialogOverlay)
