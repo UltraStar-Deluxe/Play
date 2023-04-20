@@ -114,6 +114,21 @@
     overflow: hidden;
 }
 
+#passTheMicProgressBar .unity-progress-bar__container {
+    height: 2px;
+    min-height: auto;
+    max-height: none;
+}
+
+#passTheMicProgressBar .unity-progress-bar__background {
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#passTheMicProgressBar .unity-progress-bar__progress {
+    margin: 0;
+}
+
 .scrollingNoteStreamSentenceSeparator {
     display: none;
 }
