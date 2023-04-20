@@ -199,6 +199,15 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                 }
             });
         
+        contextMenuPopup.AddButton("Enqueue Medley", "link",
+            () =>
+            {
+                if (SongMeta != null)
+                {
+                    songSelectSceneControl.AddSongToSongQueueAsMedley(SongMeta);
+                }
+            });
+        
         // Open song editor / song folder
         contextMenuPopup.AddButton("Open Editor", "edit",
             () => songSelectSceneControl.StartSongEditorScene());
