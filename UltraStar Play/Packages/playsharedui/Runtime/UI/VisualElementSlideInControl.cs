@@ -20,23 +20,15 @@ public class VisualElementSlideInControl
     {
         this.visualElement = visualElement;
         this.side = side;
-        toggleControl = new ToggleControl(initiallyVisible, DoSliderIn, DoSlideOut);
-
+        toggleControl = new ToggleControl(initiallyVisible, DoSlideIn, DoSlideOut);
+        
         this.visualElement.RegisterCallback<GeometryChangedEvent>(evt =>
         {
             if (!isInitialized)
             {
                 isInitialized = true;
-                if (initiallyVisible)
-                {
-                    DoSliderIn();
-                }
-                else
-                {
-                    DoSlideOut();
-                }
-
                 lastSize = ResolvedStyleSize;
+                UpdatePositionWithoutTransition();
             }
             else if (Math.Abs(lastSize.x - ResolvedStyleSize.x) > 1f
                      || Math.Abs(lastSize.y - ResolvedStyleSize.y) > 1f)
@@ -79,7 +71,7 @@ public class VisualElementSlideInControl
         
         if (Visible.Value)
         {
-            DoSliderIn();
+            DoSlideIn();
         }
         else
         {
@@ -107,7 +99,7 @@ public class VisualElementSlideInControl
         }
     }
 
-    private void DoSliderIn()
+    private void DoSlideIn()
     {
         if (side == ESide2D.Right)
         {
