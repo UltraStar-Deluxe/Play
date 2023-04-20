@@ -403,11 +403,33 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Hide slide-in controls with click outside
         hiddenHideModifiersOverlayArea.HideByDisplay();
         hiddenHideModifiersOverlayArea.RegisterCallback<PointerDownEvent>(_ => ModifiersOverlaySlideInControl.SlideOut());
-        ModifiersOverlaySlideInControl.Visible.Subscribe(newValue => hiddenHideModifiersOverlayArea.SetVisibleByDisplay(newValue));
+        ModifiersOverlaySlideInControl.Visible.Subscribe(newValue =>
+        {
+            hiddenHideModifiersOverlayArea.SetVisibleByDisplay(newValue);
+            if (newValue)
+            {
+                closeModifiersOverlayButton.Focus();
+            }
+            else if (VisualElementUtils.IsDescendantFocused(modifierDialogOverlay))
+            {
+                toggleModifiersOverlayButton.Focus();
+            }
+        });
         
         hiddenHideSongQueueOverlayArea.HideByDisplay();
         hiddenHideSongQueueOverlayArea.RegisterCallback<PointerDownEvent>(_ => SongQueueSlideInControl.SlideOut());
-        SongQueueSlideInControl.Visible.Subscribe(newValue => hiddenHideSongQueueOverlayArea.SetVisibleByDisplay(newValue));
+        SongQueueSlideInControl.Visible.Subscribe(newValue =>
+        {
+            hiddenHideSongQueueOverlayArea.SetVisibleByDisplay(newValue);
+            if (newValue)
+            {
+                closeSongQueueButton.Focus();
+            }
+            else if (VisualElementUtils.IsDescendantFocused(songQueueOverlay))
+            {
+                toggleSongQueueOverlayButton.Focus();
+            }
+        });
     }
 
     private void UpdateSongQueue()

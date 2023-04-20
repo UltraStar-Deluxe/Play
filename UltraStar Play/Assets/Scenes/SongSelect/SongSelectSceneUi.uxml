@@ -146,7 +146,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel p-1" style="max-width: 40%; justify-content: flex-start; align-items: stretch; width: auto; display: none; right: 0;">
+        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel p-1 focusableNavigatorRoot" style="max-width: 40%; justify-content: flex-start; align-items: stretch; width: auto; display: none; right: 0;">
             <ui:VisualElement name="row">
                 <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
                 <ui:Button display-tooltip-when-elided="true" name="closeSongQueueButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
@@ -170,7 +170,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="hiddenHideModifiersOverlayArea" class="overlay" style="flex-grow: 1; display: none;" />
         <ui:VisualElement name="modifierDialogOverlay" class="overlay absolutePositionTransition" style="display: none; right: 0; align-items: flex-end; width: auto; justify-content: space-around;">
-            <ui:VisualElement name="modifierDialogOverlayInnerContainer" class="staticPanel p-1" style="height: 100%; justify-content: space-around;">
+            <ui:VisualElement name="modifierDialogOverlayInnerContainer" class="staticPanel p-1 focusableNavigatorRoot" style="height: 100%; justify-content: space-around;">
                 <ui:VisualElement name="row">
                     <ui:Label tabindex="-1" text="Modifiers" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
                     <ui:Button display-tooltip-when-elided="true" name="closeModifiersOverlayButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
