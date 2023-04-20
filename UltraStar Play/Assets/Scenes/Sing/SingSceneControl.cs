@@ -242,10 +242,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         InitSingingLyricsControls();
 
         // Start the audio when microphones are ready.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds, () =>
+        if (sceneData.IsMedley)
         {
+            // No time to wait
             StartAudioPlayback();
-        }));
+        }
+        else
+        {
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds, 
+                () => StartAudioPlayback()));
+        }
         StartVideoOrShowBackgroundImage();
 
         // Input legend (in pause overlay)
@@ -272,6 +278,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
+        
+        // Start medley if needed
+        if (sceneData.IsMedley)
+        {
+            medleyControl.StartCurrentMedleySong();
+        }
     }
 
     private void ShowMissingMicrophonesDialog(List<PlayerProfile> playerProfilesWithoutMic)
@@ -542,14 +554,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void SkipToPositionInSong(double positionInSongInMillis)
     {
-        int nextBeatToScore = (int)Math.Max(CurrentBeat, sceneData.NextBeatToScore);
-        Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds, next beat to score is {nextBeatToScore}");
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+        int nextBeatToScore = (int)Math.Max(CurrentBeat, sceneData.NextBeatToScore);
         foreach (PlayerControl playerController in PlayerControls)
         {
             playerController.PlayerScoreControl.NextBeatToScore = nextBeatToScore;
             playerController.PlayerMicPitchTracker.SkipToBeat(CurrentBeat);
         }
+        Debug.Log($"Skipped forward to {positionInSongInMillis} milliseconds, next beat to score is {nextBeatToScore}");
     }
 
     public void Restart()
@@ -795,8 +807,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         PlayerControls.Add(playerControl);
 
         // Start microphone after a short delay. Otherwise the scene transition is not smooth.
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds,
-            () => playerControl.PlayerMicPitchTracker.InitPitchDetection()));
+        if (sceneData.IsMedley)
+        {
+            // No time to wait
+            playerControl.PlayerMicPitchTracker.InitPitchDetection();
+        }
+        else
+        {
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds,
+                () => playerControl.PlayerMicPitchTracker.InitPitchDetection()));
+        }
 
         AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, playerIndex);
 

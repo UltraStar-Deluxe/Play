@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UniInject;
+using UniRx;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -72,12 +73,28 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
+        if (!songAudioPlayer.IsFullyLoaded)
+        {
+            IDisposable songAudioLoadedDisposable = null;
+            songAudioLoadedDisposable = songAudioPlayer.LoadedEventStream.Subscribe(_ =>
+            {
+                DoStartCurrentMedleySong();
+                songAudioLoadedDisposable?.Dispose();
+            });
+            return;
+        }
+        
+        DoStartCurrentMedleySong();
+    }
+
+    private void DoStartCurrentMedleySong()
+    {
         Debug.Log($"Starting current medley song '{SongMetaUtils.GetArtistDashTitle(singSceneControl.SongMeta)}'");
         singSceneControl.SkipToPositionInSong(CalculateMedleyStartWithCountdownInMillis());
         countdownControl.StartCountdown(CountDownTimeInSeconds);
         audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds);
     }
-
+    
     private double CalculateMedleyStartWithCountdownInMillis()
     {
         if (!IsMedley)
