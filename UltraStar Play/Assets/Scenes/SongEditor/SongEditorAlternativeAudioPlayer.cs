@@ -54,6 +54,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
                 AudioSource.time = (float)songAudioPlayer.PositionInSongInSeconds;
             }
         });
+        songAudioPlayer.PlaybackSpeedChangedEventStream.Subscribe(newValue => AudioUtils.SetPitchWithPitchShifter(AudioSource, newValue));
     }
 
     private void Update()

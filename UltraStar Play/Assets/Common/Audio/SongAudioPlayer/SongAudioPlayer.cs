@@ -2,7 +2,6 @@
 using System.IO;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Experimental.Video;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour
@@ -33,6 +32,9 @@ public class SongAudioPlayer : MonoBehaviour
 
     private readonly Subject<double> positionInSongEventStream = new();
     public IObservable<double> PositionInSongEventStream => positionInSongEventStream;
+    
+    private readonly Subject<float> playbackSpeedChangedEventStream = new();
+    public IObservable<float> PlaybackSpeedChangedEventStream => playbackSpeedChangedEventStream;
 
     private readonly Subject<bool> loadedEventStream = new();
     public IObservable<bool> LoadedEventStream => loadedEventStream;
@@ -208,14 +210,14 @@ public class SongAudioPlayer : MonoBehaviour
                 newPlaybackSpeed = 1.5f;
             }
 
-            // Setting the pitch of an AudioPlayer will change tempo and pitch.
-            AudioPlayer.pitch = newPlaybackSpeed;
+            if (Math.Abs(newPlaybackSpeed - AudioPlayer.pitch) < 0.01f)
+            {
+                return;
+            }
+            
+            AudioUtils.SetPitchWithPitchShifter(AudioPlayer, newPlaybackSpeed);
 
-            // A Pitch Shifter effect on an AudioMixerGroup can be used to compensate the pitch change of the AudioPlayer,
-            // such that only the change of the tempo remains.
-            // See here for details: https://answers.unity.com/questions/25139/how-i-can-change-the-speed-of-a-song-or-sound.html
-            // See here for how the pitch value of the Pitch Shifter effect is made available for scripting: https://learn.unity.com/tutorial/audio-mixing#5c7f8528edbc2a002053b506
-            AudioPlayer.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - newPlaybackSpeed));
+            playbackSpeedChangedEventStream.OnNext(newPlaybackSpeed);
         }
     }
 
