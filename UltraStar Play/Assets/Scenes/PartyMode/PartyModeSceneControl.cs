@@ -143,6 +143,9 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
 
     private void FinishScene()
     {
+        // Select all enabled player profiles for singing
+        settings.PlayerProfiles.ForEach(playerProfile => playerProfile.IsSelected = playerProfile.IsEnabled);
+        
         // Reset scene data
         sceneData.teamToIsKnockedOutMap.Clear();
         sceneData.freeForAllPlayerToTeam.Clear();
