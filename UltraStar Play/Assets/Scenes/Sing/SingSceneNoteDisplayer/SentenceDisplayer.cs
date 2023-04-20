@@ -13,15 +13,11 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     [Inject]
     private PlayerControl playerControl;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsContainer)]
-    private VisualElement lyricsContainer;
-
     private Sentence currentSentence;
 
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
-        lyricsContainer.HideByDisplay();
         playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
         {
             DisplaySentence(enterSentenceEvent.Sentence);

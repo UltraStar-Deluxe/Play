@@ -19,9 +19,6 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     [Inject]
     private Voice voice;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsContainer)]
-    private VisualElement lyricsContainer;
-
     private List<Note> upcomingNotes = new();
     private List<Sentence> upcomingSentences = new();
 
@@ -122,8 +119,6 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             return null;
         }
 
-        // Hide dedicated lyrics bar in PlayerUi for now
-        lyricsContainer.HideByDisplay();
         return targetNoteControl;
     }
     
