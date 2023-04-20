@@ -6,6 +6,14 @@ using UnityEngine.UIElements;
 
 public static class VisualElementExtensions
 {
+    public static void SetValueIfChanged<T>(this BaseField<T> baseField, T newValue)
+    {
+        if (!Equals(baseField.value, newValue))
+        {
+            baseField.value = newValue;
+        }
+    }
+    
     public static void RegisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback)
     {
         button.RegisterCallback<ClickEvent>(callback);
