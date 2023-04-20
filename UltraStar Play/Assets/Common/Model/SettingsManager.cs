@@ -116,6 +116,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         settings.activeSearchPropertyFilters = new();
         settings.isShowOnlyDuetsFilterActive = false;
         settings.GameRoundSettings = new();
+        settings.SongEditorSettings.MusicPlaybackSpeed = 1;
     }
 
     private Settings CreateDefaultSettings()
