@@ -110,6 +110,10 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+#innerTimeBar {
+    overflow: hidden;
+}
+
 .scrollingNoteStreamSentenceSeparator {
     display: none;
 }
