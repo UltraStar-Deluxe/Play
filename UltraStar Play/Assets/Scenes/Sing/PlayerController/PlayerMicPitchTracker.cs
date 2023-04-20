@@ -119,6 +119,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     
     private void InitPitchDetectionFromLocalMicrophone()
     {
+        if (micProfile == null)
+        {
+            return;
+        }
+        
         micSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
