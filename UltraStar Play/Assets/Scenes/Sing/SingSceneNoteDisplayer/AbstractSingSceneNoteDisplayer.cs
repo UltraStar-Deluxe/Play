@@ -79,7 +79,9 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     private bool showPitchOfNotes;
 
     private int fadeOutAnimationId;
-
+    private readonly List<int> fadeOutLyricsOnNotesAnimationIds = new();
+    private readonly ReactiveProperty<float> lyricsOnNotesOpacity = new(1);
+    
     private readonly HashSet<Label> initializedNoteLabelWidth = new();
 
     protected abstract Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
@@ -113,6 +115,11 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         lineDisplayer = new LineDisplayer();
         lineDisplayer.LineColor = Color.grey;
         injector.Inject(lineDisplayer);
+
+        lyricsOnNotesOpacity.Subscribe(newValue =>
+        {
+            targetNoteControls.ForEach(targetNoteControl => targetNoteControl.Label.style.opacity = newValue);
+        });
     }
 
     public virtual void Update()
@@ -274,13 +281,14 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             label.text = "";
             label.HideByDisplay();
         }
+        label.style.opacity = lyricsOnNotesOpacity.Value;
 
         targetNoteEntryContainer.Add(visualElement);
         UpdateTargetNoteControl(targetNoteControl, -1);
 
         noteToTargetNoteControl[note] = targetNoteControl;
         targetNoteControls.Add(targetNoteControl);
-
+        
         return targetNoteControl;
     }
 
@@ -487,5 +495,23 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     {
         LeanTween.cancel(fadeOutAnimationId);
         fadeOutAnimationId = AnimationUtils.FadeInVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
+    }
+    
+    public void FadeOutLyricsOnNotes(float animTimeInSeconds)
+    {
+        LeanTweenUtils.CancelAndClear(fadeOutLyricsOnNotesAnimationIds);
+        fadeOutLyricsOnNotesAnimationIds.Add(LeanTween
+            .value(gameObject, lyricsOnNotesOpacity.Value, 0, animTimeInSeconds)
+            .setOnUpdate(interpolatedValue => lyricsOnNotesOpacity.Value = interpolatedValue)
+            .id);
+    }
+    
+    public void FadeInLyricsOnNotes(float animTimeInSeconds)
+    {
+        LeanTweenUtils.CancelAndClear(fadeOutLyricsOnNotesAnimationIds);
+        fadeOutLyricsOnNotesAnimationIds.Add(LeanTween
+            .value(gameObject, lyricsOnNotesOpacity.Value, 1, animTimeInSeconds)
+            .setOnUpdate(interpolatedValue => lyricsOnNotesOpacity.Value = interpolatedValue)
+            .id);
     }
 }

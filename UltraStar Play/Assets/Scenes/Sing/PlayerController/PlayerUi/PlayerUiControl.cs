@@ -77,8 +77,12 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private SingSceneData sceneData;
+    
+    [Inject]
+    private GameObject gameObject;
 
     private AbstractSingSceneNoteDisplayer noteDisplayer;
+    public AbstractSingSceneNoteDisplayer NoteDisplayer => noteDisplayer;
 
     private PlayerProfile nextPlayerProfile;
     private float displayNextPlayerProfileTimeInSeconds;
@@ -86,8 +90,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private int totalScoreAnimationId;
     private int micDisconnectedAnimationId;
     private int leadingPlayerIconAnimationId;
-    private int fadeOutAnimationId;
-    
+    private int fadeOutNotesAnimationId;
+
     private Dictionary<ESentenceRating, Color32> sentenceRatingColors;
 
     private readonly PlayerProfileImageControl playerProfileImageControl = new();
