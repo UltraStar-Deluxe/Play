@@ -110,6 +110,18 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+#countdownLabel
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-center;
+    font-size: 120;
+    color: var(--control-color);
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
 #innerTimeBar {
     overflow: hidden;
 }

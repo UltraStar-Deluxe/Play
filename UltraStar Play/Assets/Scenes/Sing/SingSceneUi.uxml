@@ -73,6 +73,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label tabindex="-1" text="9" display-tooltip-when-elided="true" name="countdownLabel" picking-mode="Ignore" style="position: absolute; display: none;" />
+        <ui:Label tabindex="-1" text="9" display-tooltip-when-elided="true" name="countdownLabel" picking-mode="Ignore" class="errorFontColor" style="position: absolute; display: none;" />
     </ui:VisualElement>
 </ui:UXML>
