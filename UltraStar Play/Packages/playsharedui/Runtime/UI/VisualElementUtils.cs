@@ -142,4 +142,11 @@ public static class VisualElementUtils
             worldRect.width,
             worldRect.height);
     }
+
+    public static bool IsDescendantFocused(VisualElement visualElement)
+    {
+        VisualElement focusedVisualElement = GetFocusedVisualElement(visualElement.focusController);
+        VisualElement matchingParentOfFocusedVisualElement = focusedVisualElement.GetParent(parent => parent == visualElement);
+        return matchingParentOfFocusedVisualElement != null;
+    }
 }
