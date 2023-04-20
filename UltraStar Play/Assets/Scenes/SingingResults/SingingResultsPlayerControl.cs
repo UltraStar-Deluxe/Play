@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ProTrans;
@@ -57,6 +58,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject(UxmlName = R.UxmlNames.newHighscoreContainer)]
     private VisualElement newHighscoreContainer;
 
+    [Inject(UxmlName = R.UxmlNames.songRatingStarIcon)]
+    private List<VisualElement> songRatingStarIcons;
+    
     [Inject]
     private SongRating songRating;
 
@@ -71,7 +75,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private readonly float animationTimeInSeconds = 1f;
 
-    private int animationId;
+    private readonly List<int> animationIds = new();
     
     public void OnInjectionFinished()
     {
@@ -117,7 +121,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(phraseBonusScoreContainer, interpolatedValue));
         LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.TotalScore, animationTimeInSeconds)
             .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
-
+        
         // Score bar (animated)
         if (micProfile != null)
         {
@@ -125,12 +129,37 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
 
         float playerScoreFactor = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
-        animationId = LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, animationTimeInSeconds)
+        animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, animationTimeInSeconds)
             .setOnUpdate(interpolatedValue => playerScoreProgressBar.ProgressInPercent = interpolatedValue)
             .setEaseOutSine()
-            .id;
+            .id);
 
+        // Stars (animated)
+        // AnimateStarRatingIcons();
+        
         UpdateTranslation();
+    }
+
+    private void AnimateStarRatingIcons()
+    {
+        songRatingStarIcons.ForEach(it => it.style.scale = Vector2.zero);
+        int starCount = SongSelectSongRatingIconControl.GetStarCount(playerScoreData.TotalScore);
+        
+        // Skip the center star if even number of stars visible
+        List<VisualElement> visibleStarIcons = starCount % 2 == 1
+            ? songRatingStarIcons.Take(starCount).ToList()
+            : songRatingStarIcons.Skip(1).Take(starCount).ToList();
+        
+        float starIconAnimationTimeInSeconds = animationTimeInSeconds;
+        for (int i = 0; i < visibleStarIcons.Count; i++)
+        {
+            VisualElement visibleStarIcon = visibleStarIcons[i];
+            animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 1, starIconAnimationTimeInSeconds)
+                .setDelay(i * starIconAnimationTimeInSeconds / 2)
+                .setOnUpdate(interpolatedValue => visibleStarIcon.style.scale = new Vector2(interpolatedValue, interpolatedValue))
+                .setEaseSpring()
+                .id);
+        }
     }
 
     private bool IsNewHighscore()
@@ -230,6 +259,6 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     public void Dispose()
     {
-        LeanTween.cancel(animationId);
+        LeanTweenUtils.CancelAndClear(animationIds);
     }
 }

@@ -35,10 +35,35 @@ public class SongSelectSongRatingIconControl : INeedInjection
         }
         
         int topScore = topScoreNumbers.FirstOrDefault();
-        int starCount = (int)Math.Ceiling(songRatingStarIcons.Count * ((double)topScore / PlayerScoreControl.maxScore));
+        int starCount = GetStarCount(topScore);
         for (int i = 0; i < songRatingStarIcons.Count; i++)
         {
             songRatingStarIcons[i].SetVisibleByDisplay(i < starCount);
         }
+    }
+
+    public static int GetStarCount(int score)
+    {
+        if (score > 9000)
+        {
+            return 5;
+        }
+        if (score > 8000)
+        {
+            return 4;
+        }
+        if (score > 7000)
+        {
+            return 3;
+        }
+        if (score > 5000)
+        {
+            return 2;
+        }
+        if (score > 3000)
+        {
+            return 1;
+        }
+        return 0;
     }
 }
