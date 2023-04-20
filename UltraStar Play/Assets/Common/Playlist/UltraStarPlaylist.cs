@@ -92,6 +92,11 @@ public class UltraStarPlaylist : IPlaylist
     
     public bool HasSongEntry(SongMeta songMeta)
     {
+        if (songMeta == null)
+        {
+            return false;
+        }
+        
         return HasSongEntry(songMeta.Artist, songMeta.Title);
     }
 
