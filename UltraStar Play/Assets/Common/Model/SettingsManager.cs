@@ -111,12 +111,15 @@ public class SettingsManager : AbstractSingletonBehaviour
     private void ResetNonPersistentSettings()
     {
         // TODO: Store non-persistent settings in dedicated data structure.
+        settings.GameRoundSettings = new();
+        
         settings.SongSelectSettings.playlistName = "";
         settings.SongSelectSettings.micTestActive = false;
         settings.activeSearchPropertyFilters = new();
         settings.isShowOnlyDuetsFilterActive = false;
-        settings.GameRoundSettings = new();
+        
         settings.SongEditorSettings.MusicPlaybackSpeed = 1;
+        settings.SongEditorSettings.IsRecordingEnabled = false;
     }
 
     private Settings CreateDefaultSettings()
