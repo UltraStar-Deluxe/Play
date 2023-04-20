@@ -269,4 +269,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             return distance;
         });
     }
+
+    public void Focus()
+    {
+        songListView.Focus();
+    }
 }

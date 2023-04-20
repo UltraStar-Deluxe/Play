@@ -302,7 +302,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
         startButton.RegisterCallbackButtonTriggered(_ => AttemptStartSong());
-        startButton.Focus();
+        songRouletteControl.Focus();
 
         quitSceneButton.RegisterCallbackButtonTriggered(_ => QuitSongSelect());
 
@@ -1040,7 +1040,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         selectedSongBeforeSearch = SelectedSong;
         songSearchControl.ResetSearchText();
-        startButton.Focus();
+        songRouletteControl.Focus();
     }
 
     private void UpdateInputLegend()
