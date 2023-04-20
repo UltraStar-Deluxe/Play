@@ -14,7 +14,7 @@
             <ui:Button text="Reset Playback Speed" display-tooltip-when-elided="true" name="resetMusicPlaybackSpeedButton" />
             <ItemPicker name="playbackAudioPicker" no-previous-button="true" wrapAround="true" label="Playback Audio" class="controlWithLabelVertical" />
         </SongEditorSideBarGroup>
-        <SongEditorSideBarGroup name="micRecordingGroup" label="Recording">
+        <SongEditorSideBarGroup name="micRecordingGroup" label="Microphone">
             <ItemPicker no-previous-button="true" name="micDeviceItemPicker" wrap-around="true" label="Microphone" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
             <ui:TextField picking-mode="Ignore" value="300" text="300" name="micDelayTextField" is-delayed="true" label="Mic delay (ms)" style="flex-direction: column;" />
             <ui:Toggle name="speechRecognitionWhenRecordingToggle" label="Speech recognition while recording" />
