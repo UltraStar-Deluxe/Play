@@ -66,7 +66,10 @@ public class RepeatedHoldInteraction : IInputInteraction
                 break;
 
             case InputActionPhase.Started:
-                if (!context.ControlIsActuated())
+                // ControlIsActuated can returns false although the is non-zero. Thus, check both.
+                Vector2 valueAsVector2 = context.ReadValue<Vector2>();
+                if (valueAsVector2 == Vector2.zero
+                    && !context.ControlIsActuated(PressPointOrDefault))
                 {
                     Cancel(ref context);
                 }

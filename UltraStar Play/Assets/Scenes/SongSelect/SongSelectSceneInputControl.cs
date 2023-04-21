@@ -21,6 +21,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private SceneNavigator sceneNavigator;
+    
+    [Inject]
+    private FocusableNavigator focusableNavigator;
 
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private VisualElement songListView;
@@ -37,6 +40,8 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     
     void Start()
     {
+        focusableNavigator.NoNavigationTargetFoundInListViewCallback = OnNoNavigationTargetFoundInListView;
+        
         songListView.RegisterCallback<PointerEnterEvent>(_ => isPointerOverSongList = true, TrickleDown.TrickleDown);
         songListView.RegisterCallback<PointerLeaveEvent>(_ => isPointerOverSongList = false, TrickleDown.TrickleDown);
         songListView.ReleaseMouse();
@@ -83,6 +88,19 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => songRouletteControl.SelectNextSong());
         InputManager.GetInputAction(R.InputActions.usplay_previousSong).PerformedAsObservable()
             .Subscribe(_ => songRouletteControl.SelectPreviousSong());
+    }
+
+    private bool OnNoNavigationTargetFoundInListView(NoNavigationTargetFoundEvent evt)
+    {
+        if (evt.FocusedVisualElement == songListView
+            && evt.NavigationDirection.y < 0
+            && songRouletteControl.Songs.Count > 1)
+        {
+            // Wrap selection, i.e. select first song
+            songRouletteControl.SelectSongByIndex(0);
+            return true;
+        }
+        return false;
     }
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
@@ -197,5 +215,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     {
         return !InputUtils.AnyKeyboardModifierPressed()
                && !songSearchControl.IsSearchTextFieldFocused();
+    }
+    
+    private void OnDestroy()
+    {
+        focusableNavigator.NoNavigationTargetFoundInListViewCallback = null;
     }
 }

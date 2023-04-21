@@ -43,6 +43,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private readonly List<CustomNavigationTarget> customNavigationTargets = new();
 
+    public Func<NoNavigationTargetFoundEvent, bool> NoNavigationTargetFoundInListViewCallback { get; set; }
+    
     public virtual void OnInjectionFinished()
     {
         if (!gameObject.activeInHierarchy)
@@ -252,6 +254,17 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             listView.SetSelectionAndScrollTo(selectedIndex + 1);
             TryFocusSelectedListViewItem(listView);
             return true;
+        }
+
+        if (NoNavigationTargetFoundInListViewCallback != null)
+        {
+            bool isHandled = NoNavigationTargetFoundInListViewCallback.Invoke(new NoNavigationTargetFoundEvent()
+            {
+                NavigationDirection = navigationDirection,
+                FocusedVisualElement = listView,
+                FocusableNavigatorRootVisualElement = GetFocusableNavigatorRootVisualElement(),
+            });
+            return isHandled;
         }
 
         return false;
