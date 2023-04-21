@@ -39,11 +39,11 @@
                         <ui:TextField multiline="true" name="lyricsAreaTextField" text="Lorem ipsum dolor sit " value="Lorem ipsum dolor sit " class="smallFont multiline" style="flex-shrink: 1; flex-grow: 1; white-space: normal;" />
                     </ui:ScrollView>
                     <ui:VisualElement name="lyricsAreaButtonRow" style="flex-direction: row; flex-shrink: 0;">
-                        <ui:Button display-tooltip-when-elided="true" name="toggleLyricsAreaEditModeButton" class="squareButton mr-1">
+                        <ToggleButton display-tooltip-when-elided="true" name="toggleLyricsAreaEditModeButton" class="squareButton mr-1">
                             <MaterialIcon tabindex="-1" name="toggleEditModeIcon" icon="edit" style="font-size: 18px;" />
-                        </ui:Button>
-                        <ui:Button text="P1" display-tooltip-when-elided="true" name="lyricsAreaVoice1Button" class="squareButton smallFont mr-1" />
-                        <ui:Button text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" class="squareButton smallFont" />
+                        </ToggleButton>
+                        <ToggleButton text="P1" display-tooltip-when-elided="true" name="lyricsAreaVoice1Button" class="squareButton smallFont mr-1" />
+                        <ToggleButton text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" class="squareButton smallFont" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; height: 90px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">

@@ -15,16 +15,16 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     private VisualElement lyricsArea;
 
     [Inject(UxmlName = R.UxmlNames.lyricsAreaVoice1Button)]
-    private Button lyricsAreaVoice1Button;
+    private ToggleButton lyricsAreaVoice1Button;
 
     [Inject(UxmlName = R.UxmlNames.lyricsAreaVoice2Button)]
-    private Button lyricsAreaVoice2Button;
+    private ToggleButton lyricsAreaVoice2Button;
 
     [Inject(UxmlName = R.UxmlNames.syncLyricsAreaToggle)]
     private Toggle syncLyricsAreaToggle;
 
     [Inject(UxmlName = R.UxmlNames.toggleLyricsAreaEditModeButton)]
-    private Button toggleLyricsAreaEditModeButton;
+    private ToggleButton toggleLyricsAreaEditModeButton;
     
     [Inject]
     private SongMeta songMeta;
@@ -137,10 +137,19 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             textField.SetValueWithoutNotify(visibleWhiteSpaceText);
         });
 
-        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(_ => Voice = songMeta.GetVoice(Voice.firstVoiceName));
-        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(_ => Voice = songMeta.GetVoice(Voice.secondVoiceName));
-
+        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(_ => TrySetVoice(Voice.firstVoiceName));
+        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(_ => TrySetVoice(Voice.secondVoiceName));
         UpdateVoiceButtons();
+    }
+
+    private void TrySetVoice(string voiceName)
+    {
+        Voice newVoice = songMeta.GetVoice(voiceName);
+        if (newVoice == null)
+        {
+            return;
+        }
+        Voice = newVoice;
     }
 
     private void ToggleEditMode()
@@ -148,6 +157,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         LyricsAreaMode newLyricsAreaMode = lyricsAreaMode == LyricsAreaMode.EditMode
             ? LyricsAreaMode.ViewMode
             : LyricsAreaMode.EditMode;
+        
+        toggleLyricsAreaEditModeButton.SetActive(newLyricsAreaMode == LyricsAreaMode.EditMode);
 
         if (newLyricsAreaMode == LyricsAreaMode.EditMode)
         {
@@ -212,29 +223,11 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateVoiceButtons()
     {
-        if (voice == null
-            || songMeta.GetVoices().Count <= 1)
-        {
-           lyricsAreaVoice1Button.HideByDisplay();
-           lyricsAreaVoice2Button.HideByDisplay();
-        }
-        else
-        {
-            lyricsAreaVoice1Button.ShowByDisplay();
-            lyricsAreaVoice2Button.ShowByDisplay();
-
-            if (voice.Name == Voice.soloVoiceName
-                || voice.Name == Voice.firstVoiceName)
-            {
-                lyricsAreaVoice1Button.AddToClassList("selected");
-                lyricsAreaVoice2Button.RemoveFromClassList("selected");
-            }
-            else if (voice.Name == Voice.secondVoiceName)
-            {
-                lyricsAreaVoice1Button.RemoveFromClassList("selected");
-                lyricsAreaVoice2Button.AddToClassList("selected");
-            }
-        }
+        int voiceCount = songMeta.GetVoices().Count;
+        lyricsAreaVoice1Button.SetEnabled(voiceCount >= 1);
+        lyricsAreaVoice2Button.SetEnabled(voiceCount >= 2);
+        lyricsAreaVoice1Button.SetActive(voice == songMeta.GetVoice(Voice.firstVoiceName));
+        lyricsAreaVoice2Button.SetActive(voice == songMeta.GetVoice(Voice.secondVoiceName));
     }
 
     public void UpdateLyrics()
