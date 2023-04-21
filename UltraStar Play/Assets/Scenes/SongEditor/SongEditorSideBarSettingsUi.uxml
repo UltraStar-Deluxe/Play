@@ -6,6 +6,7 @@
             <ui:Toggle name="adjustFollowingNotesToggle" label="Adjust Following Notes" />
             <ui:Toggle name="syncLyricsAreaToggle" label="Synchronize position&#10;with lyrics cursor&#10;" />
             <ui:Toggle name="autoSaveToggle" label="Auto Save" />
+            <ItemPicker no-previous-button="true" name="drawNoteLayerPicker" wrap-around="true" label="Draw Notes on Layer" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="musicGroup" label="Playback">
             <ui:Toggle name="goToLastPlaybackPositionToggle" label="Jump back on pause&#10;" />

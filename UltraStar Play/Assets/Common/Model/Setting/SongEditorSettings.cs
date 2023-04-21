@@ -10,6 +10,8 @@ public class SongEditorSettings
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
     public bool GoToLastPlaybackPosition { get; set; } = true;
 
+    public ESongEditorDrawNoteLayer drawNoteLayer;
+    
     // Recording in SongEditorScene
     public MicProfile MicProfile { get; set; }
     public int MicDelayInMillis { get; set; } = 450;

@@ -403,6 +403,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Play Selected Notes", "Ctrl+Space | 5 (Numpad)"));
             inputActionInfos.Add(new InputActionInfo("Toggle Play / Pause", "Space | Double Click"));
             inputActionInfos.Add(new InputActionInfo("Play MIDI Sound Of Note", "Ctrl+Click Note"));
+            inputActionInfos.Add(new InputActionInfo("Draw new Note", "Shift+Drag (no selection)"));
+            inputActionInfos.Add(new InputActionInfo("Extend Selection", "Shift+Drag (with existing selection)"));
+            inputActionInfos.Add(new InputActionInfo("Toggle Selection", "Ctrl+Drag"));
         }
         else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {

@@ -91,6 +91,14 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             CancelDrag();
             return;
         }
+        
+        // Check whether this is a drag gesture to draw notes, not to select notes
+        if (selectionControl.IsSelectionEmpty
+            && InputUtils.IsKeyboardShiftPressed())
+        {
+            CancelDrag();
+            return;
+        }
 
         noteAreaSelectionFrame.ShowByDisplay();
         lastNoteAreaSelectionFrame.ShowByDisplay();
