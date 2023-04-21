@@ -42,6 +42,8 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorSceneInputControl songEditorSceneInputControl;
 
+    private List<Note> lastCopiedNotes = new();
+    
     public List<Note> CopiedNotes
     {
         get
@@ -181,6 +183,9 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         selectionControl.SetSelection(pastedNotes);
 
         songMetaChangeEventStream.OnNext(new NotesPastedEvent());
+        
+        // Copy notes again to allow pasting multiple times.
+        CopyNotes(lastCopiedNotes);
     }
 
     public void CutSelectedNotes()
@@ -197,10 +202,15 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
     public void CopySelectedNotes()
     {
+        CopyNotes(selectionControl.GetSelectedNotes());
+    }
+    
+    private void CopyNotes(List<Note> notes)
+    {
         ClearCopiedNotes();
 
-        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-        selectedNotes.ForEach(note =>
+        lastCopiedNotes = notes.ToList();
+        notes.ForEach(note =>
         {
             layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer layer);
 
