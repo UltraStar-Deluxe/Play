@@ -115,8 +115,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         item.Name = songMeta.Artist + "-" + songMeta.Title;
         item.SongMeta = songMeta;
 
-        item.ClickEventStream.Subscribe(_ => OnSongButtonClicked(songMeta));
-
         songEntryControls.Add(item);
     }
 
@@ -270,5 +268,10 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             float distance = Mathf.Abs(x - targetPositionX);
             return distance;
         });
+    }
+
+    public void Focus()
+    {
+        songListView.Focus();
     }
 }

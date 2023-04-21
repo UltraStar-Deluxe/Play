@@ -9,7 +9,7 @@ public class ItemPicker : VisualElement
     public new class UxmlTraits : VisualElement.UxmlTraits
     {
         // Additional XML attributes
-        private readonly UxmlBoolAttributeDescription wrapAround = new() { name = "wrap-around", defaultValue = false};
+        private readonly UxmlBoolAttributeDescription wrapAround = new() { name = "wrap-around", defaultValue = true};
         private readonly UxmlDoubleAttributeDescription minValue = new() { name = "min-value", defaultValue = double.MinValue};
         private readonly UxmlDoubleAttributeDescription maxValue = new() { name = "max-value", defaultValue = double.MaxValue};
         private readonly UxmlDoubleAttributeDescription stepValue = new() { name = "step-value", defaultValue = 1};
@@ -34,7 +34,7 @@ public class ItemPicker : VisualElement
         }
     }
 
-    public bool WrapAround { get; set; }
+    public bool WrapAround { get; set; } = true;
     public double MinValue { get; set; }
     public double MaxValue { get; set; }
     public double StepValue { get; set; }
@@ -72,6 +72,11 @@ public class ItemPicker : VisualElement
 
     private object control;
 
+    public ItemPicker(string label) : this()
+    {
+        Label = label;
+    }
+    
     public ItemPicker()
     {
         // Load UXML and add as child element

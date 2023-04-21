@@ -3,13 +3,13 @@ using UnityEngine.UIElements;
 
 public class AutoFitLabelControl
 {
+    private const float AccuracyInPx = 2f;
+
     public float MinFontSizeInPx { get; set; }
     public float MaxFontSizeInPx { get; set; }
     public int MaxFontSizeIterations { get; set; } = 20;
 
     private readonly Label labelElement;
-
-    private float startFontSizeInPx = -1;
 
     public AutoFitLabelControl(Label labelElement, float minFontSizeInPx = 10, float maxFontSizeInPx = 50)
     {
@@ -22,39 +22,42 @@ public class AutoFitLabelControl
 
     public void UpdateFontSize()
     {
-        if (float.IsNaN(labelElement.contentRect.width)
-            || float.IsNaN(labelElement.contentRect.height))
+        SetBestFitFontSize(labelElement, MinFontSizeInPx, MaxFontSizeInPx, MaxFontSizeIterations);
+    }
+    
+    public static void SetBestFitFontSize(Label labelElement, float minFontSizeInPx, float maxFontSizeInPx, int maxFontSizeIterations)
+    {
+        Rect labelElementContentRect = labelElement.contentRect;
+        if (float.IsNaN(labelElementContentRect.width)
+            || float.IsNaN(labelElementContentRect.height)
+            || labelElementContentRect.width <= 0
+            || labelElementContentRect.height <= 0)
         {
             // Cannot calculate font size yet.
             return;
         }
-        
-        if (startFontSizeInPx < 0)
-        {
-            startFontSizeInPx = labelElement.resolvedStyle.fontSize;
-        }
 
         // Binary search on font size
         float lastFontSizeInPx = -1;
-        float fromFontSizeInPx = MinFontSizeInPx;
-        float untilFontSizeInPx = MaxFontSizeInPx;
+        float fromFontSizeInPx = minFontSizeInPx;
+        float untilFontSizeInPx = maxFontSizeInPx;
         float nextFontSizeInPx = labelElement.resolvedStyle.fontSize;
         
-        for (int i = 0; i < MaxFontSizeIterations; i++)
+        for (int i = 0; i < maxFontSizeIterations; i++)
         {
             Vector2 preferredSize = labelElement.MeasureTextSize(labelElement.text,
                 0, VisualElement.MeasureMode.Undefined,
                 0, VisualElement.MeasureMode.Undefined);
 
-            if (Mathf.Abs(preferredSize.x - labelElement.contentRect.width) < 1f
-                && Mathf.Abs(preferredSize.y - labelElement.contentRect.height) < 1f)
+            if (Mathf.Abs(preferredSize.x - labelElementContentRect.width) < AccuracyInPx
+                && Mathf.Abs(preferredSize.y - labelElementContentRect.height) < AccuracyInPx)
             {
                 // Font size is already good enough.
                 return;
             }
             
-            if (preferredSize.x > labelElement.contentRect.width
-                || preferredSize.y > labelElement.contentRect.height)
+            if (preferredSize.x > labelElementContentRect.width
+                || preferredSize.y > labelElementContentRect.height)
             {
                 // Text is too big, reduce font size
                 untilFontSizeInPx = nextFontSizeInPx;
@@ -67,7 +70,7 @@ public class AutoFitLabelControl
                 nextFontSizeInPx = fromFontSizeInPx + (untilFontSizeInPx - fromFontSizeInPx) / 2;
             }
 
-            nextFontSizeInPx = NumberUtils.Limit(nextFontSizeInPx, MinFontSizeInPx, MaxFontSizeInPx);
+            nextFontSizeInPx = NumberUtils.Limit(nextFontSizeInPx, minFontSizeInPx, maxFontSizeInPx);
             labelElement.style.fontSize = nextFontSizeInPx;
             
             if (lastFontSizeInPx >= 0

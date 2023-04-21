@@ -34,6 +34,9 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.urlChooserButton)]
     private Button urlChooserButton;
 
+    [Inject(UxmlName = R.UxmlNames.deleteButton)]
+    private Button deleteButton;
+    
     [Inject]
     private SettingsManager settingsManager;
     
@@ -66,10 +69,13 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         set
         {
             songArchiveEntries = value;
-            SelectSongArchiveUrl(songArchiveEntries.FirstOrDefault().Url);
+            SelectSongArchiveUrl(songArchiveEntries.FirstOrDefault().url);
         }
     }
-    
+
+    private readonly Subject<bool> deleteEventStream = new();
+    public IObservable<bool> DeleteEventStream => deleteEventStream;
+
     public void OnInjectionFinished()
     {
         urlTextField.value = "";
@@ -78,6 +84,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         statusLabel.text = "Click the button to start the download";
         
         urlChooserButton.RegisterCallbackButtonTriggered(_ => ShowUrlChooserDialog());
+        deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
         
         toggleStartAndCancelButton.RegisterCallbackButtonTriggered(_ => ToggleStartAndCancel());
         startIcon.ShowByDisplay();
@@ -148,7 +155,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         downloadAndExtractSongArchiveControl.Start();
     }
     
-    private void CancelDownload()
+    public void CancelDownload()
     {
         downloadAndExtractSongArchiveControl?.Cancel();
         SetCanceledStatus();
@@ -170,16 +177,17 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
         {
             Button songArchiveUrlButton = new();
             songArchiveUrlButton.AddToClassList("songArchiveUrlButton");
-            songArchiveUrlButton.text = songArchiveEntry.Url;
+            songArchiveUrlButton.text = songArchiveEntry.name;
             songArchiveUrlButton.RegisterCallbackButtonTriggered(_ =>
             {
-                SelectSongArchiveUrl(songArchiveEntry.Url);
+                SelectSongArchiveUrl(songArchiveEntry.url);
                 urlChooserDialogControl?.CloseDialog();
             });
             songArchiveUrlButton.style.height = new StyleLength(StyleKeyword.Auto);
             urlChooserDialogControl.AddVisualElement(songArchiveUrlButton);
 
-            Label songArchiveInfoLabel = new(songArchiveEntry.Description);
+            string infoText = songArchiveEntry.description + "\n" + songArchiveEntry.url;
+            Label songArchiveInfoLabel = new(infoText);
             songArchiveInfoLabel.AddToClassList("songArchiveInfoLabel");
             urlChooserDialogControl.AddVisualElement(songArchiveInfoLabel);
         });

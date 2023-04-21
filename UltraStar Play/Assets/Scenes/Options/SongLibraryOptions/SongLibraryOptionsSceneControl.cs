@@ -15,6 +15,8 @@ using UnityEngine.UIElements;
 
 public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
+    private static readonly string songArchiveInfoJsonUrl = "https://melodymania.org/downloads/song-archives-info.json";
+    
     [InjectedInInspector]
     public VisualTreeAsset songFolderListEntryUi;
 
@@ -27,9 +29,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [InjectedInInspector]
     public VisualTreeAsset songIssueSongEntryUi;
 
-    [InjectedInInspector]
-    public TextAsset songArchiveEntryTextAsset;
-
     [Inject]
     private UIDocument uiDocument;
 
@@ -37,7 +36,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private UiManager uiManager;
 
     [Inject(UxmlName = R.UxmlNames.songFolderList)]
-    private ScrollView songFolderList;
+    private VisualElement songFolderList;
 
     [Inject(UxmlName = R.UxmlNames.addSongFolderButton)]
     private Button addSongFolderButton;
@@ -63,6 +62,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject]
     private OptionsOverviewSceneControl optionsOverviewSceneControl;
     
+    [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaPicker)]
+    private ItemPicker searchAudioFilesWithoutSongMetaPicker;
+    
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
     private readonly List<DownloadSongArchiveUiControl> downloadSongArchiveUiControls = new();
     
@@ -84,6 +86,10 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         addSongFolderButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
         downloadSongArchiveButton.RegisterCallbackButtonTriggered(_ => CreateDownloadSongArchiveUiControl());
+
+        new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
+            .Bind(() => settings.GameSettings.searchAudioFilesWithoutSongMeta,
+                newValue => settings.GameSettings.searchAudioFilesWithoutSongMeta = newValue);
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -108,7 +114,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         DownloadSongArchiveUiControl downloadSongArchiveUiControl = injector
             .WithRootVisualElement(visualElement)
             .CreateAndInject<DownloadSongArchiveUiControl>();
-        downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(songArchiveEntryTextAsset.text);
+
+        StartCoroutine(WebRequestUtils.LoadTextFromUri(songArchiveInfoJsonUrl,
+            json => downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(json)));
 
         downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
         {
@@ -130,6 +138,13 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                     .setOnUpdate(interpolatedValue => visualElement.style.opacity = interpolatedValue)
                     .setOnComplete(_ => UpdateSongFolderList());
             }
+        });
+
+        downloadSongArchiveUiControl.DeleteEventStream.Subscribe(_ =>
+        {
+            downloadSongArchiveUiControls.Remove(downloadSongArchiveUiControl);
+            downloadSongArchiveUiControl.CancelDownload();
+            UpdateSongFolderList();
         });
         
         downloadSongArchiveUiControls.Add(downloadSongArchiveUiControl);
@@ -172,19 +187,14 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         {
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songFormatInfo) },
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_midiSongFormatInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_midiSongFormatInfo) },
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_addSongInfo) },
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
-            
-            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_demoSongPackage_title),
-                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_demoSongPackage) },
-            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_archiveDownload_title),
-                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_archiveDownload) },
-            { TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads_title),
-                TranslationManager.GetTranslation(R.Messages.contentDownloadScene_helpDialog_thirdPartyDownloads) },
         };
         if (PlatformUtils.IsAndroid)
         {

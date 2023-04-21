@@ -18,7 +18,8 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
     private VisualElement commonScoreSentenceRatingContainer;
 
     private IEnumerable<PlayerScoreControl> ScoreControls => singSceneControl.PlayerControls
-        .Select(playerControl => playerControl.PlayerScoreControl);
+        .Select(playerControl => playerControl.PlayerScoreControl)
+        .Where(scoreControl => scoreControl != null);
 
     private int totalScoreAnimationId;
 
@@ -78,7 +79,13 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateCommonScoreLabel(bool animate = true)
     {
-        double commonScore = ScoreControls.Select(scoreControl => scoreControl.TotalScore).Average();
+        double commonScore = 0;
+        List<int> scores = ScoreControls.Select(scoreControl => scoreControl.TotalScore).ToList();
+        if (!scores.IsNullOrEmpty())
+        {
+            commonScore = scores.Average();
+        }
+
         singSceneControl.PlayerControls.ForEach(playerControl => playerControl.PlayerUiControl.ShowTotalScore((int)commonScore, animate));
     }
 }

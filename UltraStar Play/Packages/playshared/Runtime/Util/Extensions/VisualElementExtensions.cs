@@ -6,6 +6,14 @@ using UnityEngine.UIElements;
 
 public static class VisualElementExtensions
 {
+    public static void SetValueIfChanged<T>(this BaseField<T> baseField, T newValue)
+    {
+        if (!Equals(baseField.value, newValue))
+        {
+            baseField.value = newValue;
+        }
+    }
+    
     public static void RegisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback)
     {
         button.RegisterCallback<ClickEvent>(callback);
@@ -286,6 +294,16 @@ public static class VisualElementExtensions
     public static VisualElement CloneTreeAndGetFirstChild(this VisualTreeAsset visualTreeAsset)
     {
         return visualTreeAsset.CloneTree().Children().FirstOrDefault();
+    }
 
+    public static Vector2 GetPreferredTextSize(this Label label, string text = null)
+    {
+        if (text == null)
+        {
+            text = label.text;
+        }
+        return label.MeasureTextSize(label.text,
+            0, VisualElement.MeasureMode.Undefined,
+            0, VisualElement.MeasureMode.Undefined);
     }
 }

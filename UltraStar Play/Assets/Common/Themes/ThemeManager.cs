@@ -16,6 +16,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
      */
     public const string DefaultThemeName = "default_dark";
     private const string ThemeFolderName = "Themes";
+    private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
     private readonly Color defaultGoldenColor = Colors.CreateColor("#DACD4A");
     
@@ -124,6 +125,25 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         settings.ObserveEveryValueChanged(it => it.GraphicSettings.animatedBackground)
             .Subscribe(animatedBackground => backgroundShaderControl.SetSimpleBackgroundEnabled(!animatedBackground));
+
+        CopyExampleThemeToUserDefinedThemesFolder();
+    }
+
+    private void CopyExampleThemeToUserDefinedThemesFolder()
+    {
+        string sourceExampleThemeFilePath = ApplicationUtils.GetStreamingAssetsPath(ExampleThemeFilePathInStreamingAssets);
+        if (!FileUtils.Exists(sourceExampleThemeFilePath))
+        {
+            return;
+        }
+        
+        string exampleThemeFileName = Path.GetFileName(ExampleThemeFilePathInStreamingAssets);
+        string targetExampleThemeFilePath = $"{GetAbsoluteUserDefinedThemesFolder()}/{exampleThemeFileName}";
+        if (!FileUtils.Exists(targetExampleThemeFilePath))
+        {
+            Debug.Log("Copy example theme to user defined themes folder.");
+            File.Copy(sourceExampleThemeFilePath, targetExampleThemeFilePath);
+        }
     }
 
     protected void LateUpdate()

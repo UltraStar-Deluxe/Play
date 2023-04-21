@@ -35,6 +35,34 @@ public static class WebRequestUtils
 
         onSuccess(downloadHandler.texture);
     }
+    
+    public static IEnumerator LoadTextFromUri(string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
+    {
+        using UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(uri));
+        webRequest.SendWebRequest();
+
+        while (!webRequest.isDone)
+        {
+            yield return null;
+        }
+
+        if (webRequest.result
+            is UnityWebRequest.Result.ConnectionError
+            or UnityWebRequest.Result.ProtocolError)
+        {
+            if (onFailure != null)
+            {
+                onFailure(webRequest);
+                yield break;
+            }
+
+            Debug.LogError("Error loading Texture2D from: " + uri);
+            Debug.LogError(webRequest.error);
+            yield break;
+        }
+
+        onSuccess(webRequest.downloadHandler.text);
+    }
 
     public static bool IsHttpOrHttpsUri(string uri)
     {

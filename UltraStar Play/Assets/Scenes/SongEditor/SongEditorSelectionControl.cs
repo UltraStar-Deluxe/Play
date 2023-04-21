@@ -37,6 +37,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     private readonly Subject<NoteSelectionChangeEvent> noteSelectionChangeEventStream = new();
     public IObservable<NoteSelectionChangeEvent> NoteSelectionChangeEventStream => noteSelectionChangeEventStream;
+    public bool IsSelectionEmpty => selectedNotes.IsNullOrEmpty();
 
     public List<Note> GetSelectedNotes()
     {

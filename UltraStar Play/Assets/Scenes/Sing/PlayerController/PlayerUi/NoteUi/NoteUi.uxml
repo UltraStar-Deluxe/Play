@@ -8,6 +8,6 @@
                 <ui:Label display-tooltip-when-elided="true" name="recordedNoteLabel" class="smallFont" style="text-shadow: 0 0 2px rgba(32, 32, 32, 0.5); -unity-font-style: bold;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <AutoFitLabel text="Some Very long note text" name="targetNoteLabel" min-font-size="4" max-font-size="14" class="smallFont singingLyrics" style="position: absolute; bottom: 100%; left: 8px; max-width: 100%; height: 60px; -unity-text-align: lower-left; width: 100%;" />
+        <ui:Label text="Some Very long note text" name="targetNoteLabel" min-font-size="4" max-font-size="14" class="singingLyrics" style="position: absolute; bottom: 100%; max-width: 100%; left: 4px; height: 60px; -unity-text-align: lower-left;" />
     </ui:VisualElement>
 </ui:UXML>

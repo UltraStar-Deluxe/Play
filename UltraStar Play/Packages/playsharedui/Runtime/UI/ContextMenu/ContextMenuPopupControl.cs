@@ -123,13 +123,18 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     public void AddButton(string text, Action action)
     {
+        AddButton(text, null, action);
+    }
+
+    public void AddButton(string text, string icon, Action action)
+    {
         VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuItemUi.CloneTree().Children().First();
-        ContextMenuItemControl contextMenuItemControl = new(text, action);
+        ContextMenuItemControl contextMenuItemControl = new(text, icon, action);
         contextMenuItemControl.ItemTriggeredEventStream.Subscribe(evt => CloseContextMenu());
         injector.WithRootVisualElement(contextMenuItemVisualElement).Inject(contextMenuItemControl);
         visualElement.Add(contextMenuItemVisualElement);
     }
-
+    
     public void CloseContextMenu()
     {
         closeContextMenuDisposable.Dispose();

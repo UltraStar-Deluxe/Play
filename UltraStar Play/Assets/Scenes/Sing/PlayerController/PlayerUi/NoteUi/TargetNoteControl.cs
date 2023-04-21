@@ -18,6 +18,9 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.targetNoteLabel)]
     public Label Label { get; private set; }
 
+    [Inject(UxmlName = R.UxmlNames.targetNoteLyricsContainer)]
+    protected VisualElement targetNoteLyricsContainer;
+
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
 
@@ -49,6 +52,11 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     {
         targetNote.ShowByDisplay();
         recordedNote.HideByDisplay();
+        
+        targetNoteLyricsContainer.Add(Label);
+        Label.HideByVisibility();
+        // new AutoFitLabelControl(Label, 4, 14);
+        VisualElement.RegisterCallback<GeometryChangedEvent>(_ => UpdateLabelPosition());
 
         if (Note.IsGolden)
         {
@@ -116,11 +124,49 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void Dispose()
     {
+        Label.RemoveFromHierarchy();
         VisualElement.RemoveFromHierarchy();
     }
 
     public void Update()
     {
         // Nothing to do
+    }
+
+    public void UpdateLabelFontSize()
+    {
+        if (!Label.IsVisibleByDisplay()
+            || Label.text.IsNullOrEmpty()
+            || !Label.IsVisibleByVisibility())
+        {
+            return;
+        }
+
+        AutoFitLabelControl.SetBestFitFontSize(Label, 4, 14, 20);
+    }
+    
+    public void UpdateLabelPosition()
+    {
+        if (!Label.IsVisibleByDisplay()
+            || Label.text.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        Label.SetVisibleByVisibility(VisualElement.IsVisibleByDisplay() && VisualElementUtils.HasGeometry(VisualElement));
+        if (!Label.IsVisibleByVisibility())
+        {
+            return;
+        }
+        
+        // The note label is in another VisualElement to be fully visible (not truncated by the parent).
+        // Thus, its position needs to be updated manually.
+        Label.style.position = new StyleEnum<Position>(Position.Absolute);
+        Rect visualElementWorldRect = VisualElement.worldBound;
+        Rect targetNoteLabelWorldRect = VisualElementUtils.WorldBoundToLocalBound(Label, visualElementWorldRect);
+        float preferredTextHeight = Label.GetPreferredTextSize().y;
+        float labelHeight = Mathf.Max(preferredTextHeight, Label.worldBound.height);
+        Label.style.top = targetNoteLabelWorldRect.yMin - labelHeight;
+        Label.style.left = targetNoteLabelWorldRect.xMin;
     }
 }

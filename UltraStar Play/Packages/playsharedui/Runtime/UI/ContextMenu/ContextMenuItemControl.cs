@@ -10,22 +10,36 @@ public class ContextMenuItemControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.contextMenuButton)]
     private Button button;
+    
+    [Inject(UxmlName = R_PlayShared.UxmlNames.contextMenuButtonIcon)]
+    private MaterialIcon iconElement;
 
     private readonly string text;
-
+    private readonly string icon;
     private readonly Action action;
 
     private readonly Subject<bool> itemTriggeredEventStream = new();
     public IObservable<bool> ItemTriggeredEventStream => itemTriggeredEventStream;
 
-    public ContextMenuItemControl(string text, Action action)
+    public ContextMenuItemControl(string text, string icon, Action action)
     {
         this.text = text;
+        this.icon = icon;
         this.action = action;
     }
 
     public void OnInjectionFinished()
     {
+        if (icon.IsNullOrEmpty())
+        {
+            iconElement.HideByDisplay();
+        }
+        else
+        {
+            iconElement.ShowByDisplay();
+            iconElement.Icon = icon;
+        }
+        
         label.text = text;
         button.RegisterCallbackButtonTriggered(_ =>
         {

@@ -88,6 +88,16 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
         micSampleRecorder.MicProfile = micProfile;
+        beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
+    }
+
+    public void InitPitchDetection()
+    {
+        if (micProfile == null)
+        {
+            return;
+        }
+        
         if (micProfile.IsInputFromConnectedClient)
         {
             InitPitchDetectionFromConnectedClient();
@@ -105,12 +115,15 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         {
             InitPitchDetectionFromLocalMicrophone();
         }
-
-        beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
     }
-
+    
     private void InitPitchDetectionFromLocalMicrophone()
     {
+        if (micProfile == null)
+        {
+            return;
+        }
+        
         micSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.

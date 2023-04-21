@@ -107,7 +107,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
         }
 
-        startButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.SongSelectScene));
+        startButton.RegisterCallbackButtonTriggered(_ => OpenSongSelectScene());
         startButton.Focus();
         partyButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.PartyModeScene));
         settingsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene));

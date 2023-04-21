@@ -59,7 +59,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(Optional = true)]
     private PartyModeTeamSettings partyModeTeamSettings;
     
-    [Inject(UxmlName = R_PlayShared.UxmlNames.teamLabel)]
+    [Inject(UxmlName = R.UxmlNames.teamLabel)]
     private Label teamLabel;
     
     // The MicProfile can be null to indicate that this player does not have a mic (yet).

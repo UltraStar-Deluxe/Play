@@ -19,9 +19,6 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     [Inject]
     private Voice voice;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsContainer)]
-    private VisualElement lyricsContainer;
-
     private List<Note> upcomingNotes = new();
     private List<Sentence> upcomingSentences = new();
 
@@ -72,12 +69,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         });
     }
 
-    protected override void UpdateTargetNoteControl(TargetNoteControl targetNoteControl)
+    protected override void UpdateTargetNoteControl(TargetNoteControl targetNoteControl, int indexInList)
     {
-        base.UpdateTargetNoteControl(targetNoteControl);
         UpdateNotePosition(targetNoteControl.VisualElement, targetNoteControl.Note.MidiNote, targetNoteControl.Note.StartBeat, targetNoteControl.Note.EndBeat);
-
-        UpdateNoteLyricsPosition(targetNoteControl);
+        UpdateTargetNoteLabelWith(targetNoteControl, indexInList);
     }
 
     protected override void UpdateRecordedNoteControl(RecordedNoteControl recordedNoteControl)
@@ -96,7 +91,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         return PitchIndicatorXPercent;
     }
     
-    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
     {
         // The VerticalPitchIndicator's position is the position where recording happens.
         // Thus, a note with startBeat == (currentBeat + micDelayInBeats) will have its left side drawn where the VerticalPitchIndicator is.
@@ -113,14 +108,9 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         yEndPercent *= 100;
         xStartPercent *= 100;
         xEndPercent *= 100;
-
-        visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
-        visualElement.style.left = new StyleLength(new Length(xStartPercent, LengthUnit.Percent));
-        visualElement.style.width = new StyleLength(new Length(xEndPercent - xStartPercent, LengthUnit.Percent));
-        visualElement.style.top = new StyleLength(new Length(yStartPercent, LengthUnit.Percent));
-        visualElement.style.height = new StyleLength(new Length(yEndPercent - yStartPercent, LengthUnit.Percent));
+        return new Rect(xStartPercent, yStartPercent, xEndPercent - xStartPercent, yEndPercent - yStartPercent);
     }
-
+    
     protected override TargetNoteControl CreateTargetNoteControl(Note note)
     {
         TargetNoteControl targetNoteControl = base.CreateTargetNoteControl(note);
@@ -129,55 +119,9 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             return null;
         }
 
-        // Hide dedicated lyrics bar in PlayerUi for now
-        lyricsContainer.HideByDisplay();
         return targetNoteControl;
     }
-
-    private void UpdateNoteLyricsPosition(TargetNoteControl targetNoteControl)
-    {
-        // Position lyrics. Width until next note, vertically centered on lyricsBar.
-        if (!noteToLyricsContainerLabel.TryGetValue(targetNoteControl.Note, out Label label))
-        {
-            return;
-        }
-
-        UpdateNotePosition(label, 60, targetNoteControl.Note.StartBeat, GetNoteStartBeatOfFollowingNote(targetNoteControl.Note));
-        label.style.position = new StyleEnum<Position>(Position.Absolute);
-        label.style.top = 5;
-        label.style.bottom = new StyleLength(StyleKeyword.Auto);
-    }
-
-    private static double GetNoteStartBeatOfFollowingNote(Note note)
-    {
-        Sentence sentence = note.Sentence;
-        if (sentence == null)
-        {
-            return note.EndBeat;
-        }
-
-        Note followingNote = sentence.Notes
-            .Where(otherNote => otherNote.StartBeat >= note.EndBeat)
-            .OrderBy(otherNote => otherNote.StartBeat)
-            .FirstOrDefault();
-        if (followingNote != null)
-        {
-            if (note.EndBeat == followingNote.StartBeat)
-            {
-                return note.EndBeat;
-            }
-            else
-            {
-                // Add a little bit spacing
-                return followingNote.StartBeat - 1;
-            }
-        }
-        else
-        {
-            return sentence.ExtendedMaxBeat;
-        }
-    }
-
+    
     private void CreateNotesInDisplayArea()
     {
         // Create UiNotes to fill the display area

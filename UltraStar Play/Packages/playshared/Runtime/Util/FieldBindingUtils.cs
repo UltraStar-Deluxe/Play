@@ -6,6 +6,11 @@ using UnityEngine.UIElements;
 
 public class FieldBindingUtils
 {
+    public static void Bind<T>(BaseField<T> baseField, Func<T> valueGetter, Action<T> valueSetter)
+    {
+        Bind(null, baseField, valueGetter, valueSetter, false);
+    }
+    
     public static void Bind<T>(GameObject gameObject, BaseField<T> baseField, Func<T> valueGetter, Action<T> valueSetter, bool observeValueGetter = true)
     {
         baseField.value = valueGetter();

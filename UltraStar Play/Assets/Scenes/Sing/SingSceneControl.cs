@@ -173,6 +173,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private bool hasFinishedScene;
 
+    private float startMicrophoneDelayInSeconds = 0.5f;
+    
     public void OnInjectionFinished()
     {
         injector.Inject(timeBarControl);
@@ -239,7 +241,17 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Associate LyricsDisplayer with one of the (duet) players
         InitSingingLyricsControls();
 
-        StartAudioPlayback();
+        // Start the audio when microphones are ready.
+        if (sceneData.IsMedley)
+        {
+            // No time to wait
+            StartAudioPlayback();
+        }
+        else
+        {
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds, 
+                () => StartAudioPlayback()));
+        }
         StartVideoOrShowBackgroundImage();
 
         // Input legend (in pause overlay)
@@ -266,6 +278,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
+        
+        // Start medley if needed
+        if (sceneData.IsMedley)
+        {
+            medleyControl.StartCurrentMedleySong();
+        }
     }
 
     private void ShowMissingMicrophonesDialog(List<PlayerProfile> playerProfilesWithoutMic)
@@ -359,8 +377,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (PlayerControls.IsNullOrEmpty()
             || !settings.GraphicSettings.showStaticLyrics)
         {
-            topLyricsContainer.HideByDisplay();
-            bottomLyricsContainer.HideByDisplay();
+            uiDocument.rootVisualElement.Query<VisualElement>(null, R.UssClasses.singingLyricsSentenceUi)
+                .ForEach(singingLyricsSentenceUi => singingLyricsSentenceUi.HideByDisplay());
             return;
         }
 
@@ -536,14 +554,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void SkipToPositionInSong(double positionInSongInMillis)
     {
-        int nextBeatToScore = (int)Math.Max(CurrentBeat, sceneData.NextBeatToScore);
-        Debug.Log($"Skipping forward to {positionInSongInMillis} milliseconds, next beat to score is {nextBeatToScore}");
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
+        int nextBeatToScore = (int)Math.Max(CurrentBeat, sceneData.NextBeatToScore);
         foreach (PlayerControl playerController in PlayerControls)
         {
             playerController.PlayerScoreControl.NextBeatToScore = nextBeatToScore;
             playerController.PlayerMicPitchTracker.SkipToBeat(CurrentBeat);
         }
+        Debug.Log($"Skipped forward to {positionInSongInMillis} milliseconds, next beat to score is {nextBeatToScore}");
     }
 
     public void Restart()
@@ -788,6 +806,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         PlayerControls.Add(playerControl);
 
+        // Start microphone after a short delay. Otherwise the scene transition is not smooth.
+        if (sceneData.IsMedley)
+        {
+            // No time to wait
+            playerControl.PlayerMicPitchTracker.InitPitchDetection();
+        }
+        else
+        {
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds,
+                () => playerControl.PlayerMicPitchTracker.InitPitchDetection()));
+        }
+
         AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, playerIndex);
 
         return playerControl;
@@ -836,21 +866,41 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         return voiceNames[voiceIndex];
     }
 
+    public void Pause()
+    {
+        if (IsPaused)
+        {
+            return;
+        }
+        
+        songAudioPlayer.PauseAudio();
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+    }
+    
+    public void Unpause()
+    {
+        if (!IsPaused)
+        {
+            return;
+        }
+        
+        songAudioPlayer.PlayAudio();
+        PlayerControls.ForEach(playerControl =>
+        {
+            playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
+            playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
+        });
+    }
+    
     public void TogglePlayPause()
     {
         if (songAudioPlayer.IsPlaying)
         {
-            songAudioPlayer.PauseAudio();
-            PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+            Pause();
         }
         else
         {
-            songAudioPlayer.PlayAudio();
-            PlayerControls.ForEach(playerControl =>
-            {
-                playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
-                playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
-            });
+            Unpause();
         }
     }
 

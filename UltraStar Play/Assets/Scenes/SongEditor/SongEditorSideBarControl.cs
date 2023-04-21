@@ -39,12 +39,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.saveButton)]
     private Button saveButton;
 
-    [Inject(UxmlName = R.UxmlNames.helpTitle)]
-    private VisualElement helpTitle;
-
-    [Inject(UxmlName = R.UxmlNames.helpSideBarContainer)]
-    private VisualElement helpSideBarContainer;
-
     [Inject(UxmlName = R.UxmlNames.toggleHelpButton)]
     private Button toggleHelpButton;
 
@@ -126,6 +120,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
     
+    [Inject]
+    private UiManager uiManager;
+    
     private readonly TabGroupControl sideBarTabGroupControl = new();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
     private readonly SongEditorSideBarLayersControl sideBarLayersControl = new();
@@ -134,6 +131,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     public bool IsAnySideBarContainerVisible => sideBarTabGroupControl.IsAnyContainerVisible;
 
     private IReadOnlyCollection<SongIssue> lastIssues;
+
+    private MessageDialogControl helpDialogControl;
+    private VisualElement inputLegendContainer;
 
     public void OnInjectionFinished()
     {
@@ -172,8 +172,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AutoSave)
             .Subscribe(autoSave => saveButton.SetVisibleByDisplay(!autoSave))
             .AddTo(gameObject);
-
-        UpdateInputLegend();
+        
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         issuesSideBarContainer.RegisterCallback<GeometryChangedEvent>(evt =>
@@ -198,12 +197,57 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         UpdateLeftSideBarClasses();
         UpdatePlayPauseIcon();
 
+        toggleHelpButton.RegisterCallbackButtonTriggered(_ => ShowSongEditorHelpDialog());
+        
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(_ => UpdatePlayPauseIcon());
         songAudioPlayer.PlaybackStoppedEventStream
             .Subscribe(_ => UpdatePlayPauseIcon());
 
         InitTabGroup();
+    }
+
+    private void ShowSongEditorHelpDialog()
+    {
+        if (helpDialogControl != null)
+        {
+            return;
+        }
+        
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_audioSeparation_title),
+                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_audioSeparation) },
+            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_pitchDetection_title),
+                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_pitchDetection) },
+            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_lyricsDictation_title),
+                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_lyricsDictation) },
+            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_buttonTapping_title),
+                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_buttonTapping) },
+            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_editingLyrics_title),
+                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_editingLyrics) },
+            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_layers_title),
+                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_layers) },
+        };
+        helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_title),
+            titleToContentMap);
+        helpDialogControl.DialogClosedEventStream.Subscribe(_ => helpDialogControl = null);
+
+        // Add controls info
+        inputLegendContainer = new();
+        UpdateInputLegend();
+        
+        AccordionItem controlsAccordionItem = new AccordionItem("Controls");
+        controlsAccordionItem.Add(inputLegendContainer);
+        helpDialogControl.DialogRootVisualElement.Q<AccordionGroup>().Add(controlsAccordionItem);
+        
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToSongEditor)));
+        helpDialogControl.AddButton("Video Tutorials",
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_songEditorVideoTutorials)));
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
     }
 
     private void DoSpeechRecognition()
@@ -323,7 +367,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     {
         sideBarTabGroupControl.AllowNoContainerVisible = true;
         sideBarTabGroupControl.AddTabGroupButton(toggleIssuesButton, issuesSideBarContainer);
-        sideBarTabGroupControl.AddTabGroupButton(toggleHelpButton, helpSideBarContainer);
         sideBarTabGroupControl.AddTabGroupButton(toggleSongPropertiesButton, sideBarSongPropertiesUi);
         sideBarTabGroupControl.AddTabGroupButton(toggleLayersButton, layersSideBarContainer);
         sideBarTabGroupControl.AddTabGroupButton(toggleSettingsButton, settingsSideBarContainer);
@@ -337,8 +380,11 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void UpdateInputLegend()
     {
-        ClearSideBar(helpSideBarContainer);
-
+        if (inputLegendContainer == null)
+        {
+            return;
+        }
+        
         List<InputActionInfo> inputActionInfos = new();
         
         inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, TranslationManager.GetTranslation(R.Messages.back)));
@@ -359,6 +405,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Play Selected Notes", "Ctrl+Space | 5 (Numpad)"));
             inputActionInfos.Add(new InputActionInfo("Toggle Play / Pause", "Space | Double Click"));
             inputActionInfos.Add(new InputActionInfo("Play MIDI Sound Of Note", "Ctrl+Click Note"));
+            inputActionInfos.Add(new InputActionInfo("Draw new Note", "Shift+Drag (no selection)"));
+            inputActionInfos.Add(new InputActionInfo("Extend Selection", "Shift+Drag (with existing selection)"));
+            inputActionInfos.Add(new InputActionInfo("Toggle Selection", "Ctrl+Drag"));
         }
         else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {
@@ -369,8 +418,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
                 TranslationManager.GetTranslation(R.Messages.action_longPress)));
         }
 
+        inputLegendContainer.Clear();
         inputActionInfos.ForEach(inputActionInfo =>
-            helpSideBarContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo, true)));
+            inputLegendContainer.Add(InputLegendControl.CreateInputActionInfoUi(inputActionInfo)));
     }
 
     private void ClearSideBar(VisualElement visualElement)

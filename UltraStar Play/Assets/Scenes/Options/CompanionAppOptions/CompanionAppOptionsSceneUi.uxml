@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ui:Label text="Connected Apps: 99" name="connectedClientCountLabel" />
+        <ui:Label text="Connected Apps: 99" name="connectedClientCountLabel" class="smallerFont secondaryFontColor" />
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="connectedClientList" style="width: 100%; min-height: 50px; flex-grow: 1; margin-bottom: 20px;" />
     </ui:VisualElement>
 </ui:UXML>

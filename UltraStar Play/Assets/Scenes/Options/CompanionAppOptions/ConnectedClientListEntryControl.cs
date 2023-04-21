@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UniInject;
 using UnityEngine.UIElements;
 
@@ -30,9 +31,16 @@ public class ConnectedClientListEntryControl : INeedInjection, IInjectionFinishe
         permissionsContainer.Clear();
         List<HttpApiPermission> givenPermissions = SettingsUtils.GetPermissions(settings, clientHandler.ClientId);
 
-        EnumUtils.GetValuesAsList<HttpApiPermission>().ForEach(permission =>
+        List<HttpApiPermission> permissions = new()
         {
-            Toggle permissionToggle = new(StringUtils.ToTitleCase(permission.ToString()));
+            HttpApiPermission.WriteSongQueue,
+            HttpApiPermission.WriteConfig,
+            HttpApiPermission.WriteInputSimulation,
+        };
+
+        permissions.ForEach(permission =>
+        {
+            Toggle permissionToggle = new(GetPermissionName(permission));
             permissionToggle.value = givenPermissions.Contains(permission);
             permissionToggle.RegisterValueChangedCallback(evt =>
             {
@@ -54,5 +62,20 @@ public class ConnectedClientListEntryControl : INeedInjection, IInjectionFinishe
             
             permissionsContainer.Add(permissionToggle);
         });
+    }
+
+    private string GetPermissionName(HttpApiPermission permission)
+    {
+        switch (permission)
+        {
+            case HttpApiPermission.WriteSongQueue:
+                return "Edit song queue";
+            case HttpApiPermission.WriteConfig:
+                return "Edit config";
+            case HttpApiPermission.WriteInputSimulation:
+                return "Simulate input";
+            default:
+                return StringUtils.ToTitleCase(permission.ToString());
+        }
     }
 }

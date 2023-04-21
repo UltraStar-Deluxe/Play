@@ -18,6 +18,7 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
 
     public static SongQueueManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongQueueManager>();
 
+    public static int SongQueueLength => songQueueEntryDtos.Count;
     private static readonly List<SongQueueEntryDto> songQueueEntryDtos = new();
 
     public bool IsSongQueueEmpty => GetSongQueueEntries().IsNullOrEmpty();

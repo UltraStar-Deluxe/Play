@@ -6,4 +6,5 @@
     ArrowsUpDown,
     MusicNote,
     Hand,
+    Pencil,
 }

@@ -50,7 +50,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     public Voice Voice => playerControl.Voice;
 
-    private int hideByOpacityAnimationId;
+    private readonly List<int> fadeOutLyricsAnimationIds = new();
 
     public void OnInjectionFinished()
     {
@@ -221,9 +221,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         {
             return labels.Select(label =>
             {
-                Vector2 preferredSize = label.MeasureTextSize(label.text,
-                    0, VisualElement.MeasureMode.Undefined,
-                    0, VisualElement.MeasureMode.Undefined);
+                Vector2 preferredSize = label.GetPreferredTextSize();
                 return preferredSize.x;
             }).Sum();
         }
@@ -333,13 +331,15 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     public void FadeOut(float animTimeInSeconds)
     {
-        LeanTween.cancel(hideByOpacityAnimationId);
-        hideByOpacityAnimationId = AnimationUtils.FadeOutVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
+        LeanTweenUtils.CancelAndClear(fadeOutLyricsAnimationIds);
+        fadeOutLyricsAnimationIds.Add(AnimationUtils.FadeOutVisualElement(gameObject, currentSentenceContainer, animTimeInSeconds));
+        fadeOutLyricsAnimationIds.Add(AnimationUtils.FadeOutVisualElement(gameObject, nextSentenceContainer, animTimeInSeconds));
     }
 
     public void FadeIn(float animTimeInSeconds)
     {
-        LeanTween.cancel(hideByOpacityAnimationId);
-        hideByOpacityAnimationId = AnimationUtils.FadeInVisualElement(gameObject, rootVisualElement, animTimeInSeconds);
+        LeanTweenUtils.CancelAndClear(fadeOutLyricsAnimationIds);
+        fadeOutLyricsAnimationIds.Add(AnimationUtils.FadeInVisualElement(gameObject, currentSentenceContainer, animTimeInSeconds));
+        fadeOutLyricsAnimationIds.Add(AnimationUtils.FadeInVisualElement(gameObject, nextSentenceContainer, animTimeInSeconds));
     }
 }

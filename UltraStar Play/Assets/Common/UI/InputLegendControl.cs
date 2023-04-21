@@ -28,7 +28,7 @@ public static class InputLegendControl
      *
      * Returns the created VisualElement or null.
      */
-    public static VisualElement AddInputActionInfo(string inputActionPath, string actionText, VisualElement targetVisualElement, bool actionTextFirst = false)
+    public static VisualElement AddInputActionInfo(string inputActionPath, string actionText, VisualElement targetVisualElement)
     {
         if (targetVisualElement == null)
         {
@@ -36,7 +36,7 @@ public static class InputLegendControl
         }
 
         InputActionInfo inputActionInfo = GetInputActionInfo(inputActionPath, actionText);
-        VisualElement inputActionInfoUi = CreateInputActionInfoUi(inputActionInfo, actionTextFirst);
+        VisualElement inputActionInfoUi = CreateInputActionInfoUi(inputActionInfo);
         targetVisualElement.Add(inputActionInfoUi);
         return inputActionInfoUi;
     }
@@ -77,13 +77,11 @@ public static class InputLegendControl
         }
     }
 
-    public static VisualElement CreateInputActionInfoUi(InputActionInfo entry, bool actionTextFirst = false)
+    public static VisualElement CreateInputActionInfoUi(InputActionInfo entry)
     {
         Label label = new();
         label.AddToClassList("inputLegendLabel");
-        label.text = actionTextFirst
-            ? $"{entry.ActionText}: {entry.InputText}"
-            : $"{entry.InputText}: {entry.ActionText}";
+        label.text = $"<b>{entry.ActionText}</b>: {entry.InputText}";
         return label;
     }
 

@@ -3,6 +3,11 @@ VisualElement
     -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/Inter-VariableFont_slnt,wght%20SDF.asset');
 }
 
+#logo {
+    background-image: url("project://database/Packages/playshared/Runtime/Graphics/Logos/LogoLarge-512.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
 #background {
     width: 100%;
     height: 100%;
@@ -309,6 +314,10 @@ Button.tinyFont {
     -unity-background-image-tint-color: var(--font-color-error);
 }
 
+.fontColorBorder {
+    border-color: var(--font-color);
+}
+
 Toggle.smallControl {
     max-height: none;
 }
@@ -367,14 +376,10 @@ Toggle.smallControl {
     background-color: #344054;
 }
 
-.medleyWithNext {
-    border-bottom-width: 0;
-}
-
-.medleyWithPrevious {
-    border-top-width: 0;
-}
-
 .medleyWithPrevious #playerEntryList {
     display: none;
+}
+
+.absolutePositionTransition {
+    transition: bottom 0.5s, top 0.5s, left 0.5s, right 0.5s;
 }

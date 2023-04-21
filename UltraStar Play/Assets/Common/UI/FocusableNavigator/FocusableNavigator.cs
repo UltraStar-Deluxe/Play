@@ -50,8 +50,9 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
-        if (eventSystem != null
-            && settings.DeveloperSettings.enableEventSystemOnAndroid)
+        if (!PlatformUtils.IsAndroid
+            || (eventSystem != null
+                && settings.DeveloperSettings.enableEventSystemOnAndroid))
         {
             eventSystem.sendNavigationEvents = false;
         }
@@ -108,7 +109,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnBack()
     {
-        if (!settings.DeveloperSettings.enableEventSystemOnAndroid)
+        if (PlatformUtils.IsAndroid
+            && !settings.DeveloperSettings.enableEventSystemOnAndroid)
         {
             return;
         }
@@ -122,7 +124,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnSubmit()
     {
-        if (!settings.DeveloperSettings.enableEventSystemOnAndroid)
+        if (PlatformUtils.IsAndroid
+            && !settings.DeveloperSettings.enableEventSystemOnAndroid)
         {
             return;
         }
@@ -146,7 +149,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnNavigate(Vector2 navigationDirection)
     {
-        if (!settings.DeveloperSettings.enableEventSystemOnAndroid)
+        if (PlatformUtils.IsAndroid
+            && !settings.DeveloperSettings.enableEventSystemOnAndroid)
         {
             return;
         }

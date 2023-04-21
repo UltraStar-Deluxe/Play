@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -31,11 +32,11 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionPicker)]
     private ItemPicker modifierConditionPicker;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionFromNumberPicker)]
-    private ItemPicker modifierConditionFromNumberPicker;
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionRangeSlider)]
+    private MinMaxSlider modifierConditionRangeSlider;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionUntilNumberPicker)]
-    private ItemPicker modifierConditionUntilNumberPicker;
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionRangeTextField)]
+    private TextField modifierConditionRangeTextField;
     
     [Inject(UxmlName = R_PlayShared.UxmlNames.closeModifierDialogButton)]
     private Button closeModifierDialogButton;
@@ -46,8 +47,11 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R_PlayShared.UxmlNames.finishConditionPicker)]
     private ItemPicker finishConditionPicker;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.finishConditionPointsPicker)]
-    private ItemPicker finishConditionPointsPicker;
+    [Inject(UxmlName = R_PlayShared.UxmlNames.finishConditionPointsSlider)]
+    private SliderInt finishConditionPointsSlider;
+    
+    [Inject(UxmlName = R_PlayShared.UxmlNames.finishConditionPointsTextField)]
+    private IntegerField finishConditionPointsTextField;
     
     [Inject(UxmlName = R_PlayShared.UxmlNames.resetModifiersButton)]
     private Button resetModifiersButton;
@@ -59,10 +63,8 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     private GameRoundSettings GameRoundSettings => gameRoundSettings;
 
     private LabeledItemPickerControl<EGameRoundModifierCondition> modifierConditionPickerControl;
-    private LabeledItemPickerControl<int> modifierConditionFromNumberPickerControl;
-    private LabeledItemPickerControl<int> modifierConditionUntilNumberPickerControl;
     private LabeledItemPickerControl<EGameRoundFinishCondition> finishConditionPickerControl;
-    private LabeledItemPickerControl<int> finishConditionPointsPickerControl;
+    private BaseFieldWithTextFieldControl<Vector2> modifierConditionRangeBaseFieldWithTextFieldControl;
     
     private readonly Subject<bool> dialogClosedEventStream = new();
     public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
@@ -97,17 +99,45 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     {
         // Finish condition
         finishConditionPickerControl = new(finishConditionPicker, EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
-        finishConditionPointsPickerControl = new(finishConditionPointsPicker, NumberUtils.CreateIntList(1000, 9000, 1000));
-        
+        finishConditionPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(item.ToString());
+        finishConditionPointsSlider.lowValue = 100;
+        finishConditionPointsSlider.highValue = 9900;
+        new SliderIntStepControl(finishConditionPointsSlider, 100);
+        new BaseFieldWithTextValueFieldControl<int>(finishConditionPointsSlider, finishConditionPointsTextField);
+
         // Modifiers
         UpdateGameRoundModifierToToggle();
         
         closeModifierDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         
         modifierConditionPickerControl = new(modifierConditionPicker, EnumUtils.GetValuesAsList<EGameRoundModifierCondition>());
-        modifierConditionFromNumberPickerControl = new(modifierConditionFromNumberPicker, new List<int> { 0 });
-        modifierConditionUntilNumberPickerControl = new(modifierConditionUntilNumberPicker, new List<int> { 0 });
-        
+        modifierConditionPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(item.ToString());
+        modifierConditionRangeBaseFieldWithTextFieldControl = new BaseFieldWithTextFieldControl<Vector2>(modifierConditionRangeSlider, modifierConditionRangeTextField,
+            newValue =>
+            {
+                if (modifierConditionPickerControl.SelectedItem == EGameRoundModifierCondition.TimeRange)
+                {
+                    return $"{(int)newValue.x}% - {(int)newValue.y}%";
+                }
+                else
+                {
+                    return $"{(int)newValue.x} - {(int)newValue.y}";
+                }
+            },
+            newText =>
+            {
+                string pattern = @"(?<fromValue>\d+)[\s\%]*-[\s\%]*(?<untilValue>\d+)[\s\%]*";
+                Match match = Regex.Match(newText, pattern);
+                if (match.Success)
+                {
+                    int fromValue = int.Parse(match.Groups["fromValue"].Value);
+                    int untilValue = int.Parse(match.Groups["untilValue"].Value);
+                    return new Vector2(fromValue, untilValue);
+                }
+
+                throw new ParseTextException($"Failed to parse {newText} into a range. Expected pattern: {pattern}");
+            });
+
         // Modifier enum toggles
         gameRoundModifierToToggle.ForEach(entry =>
         {
@@ -139,7 +169,7 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
                 UpdateControls();
             });
 
-        finishConditionPointsPickerControl.Bind(
+        FieldBindingUtils.Bind(finishConditionPointsSlider,
             () => GameRoundSettings.finishConditionSettings.points,
             newValue =>
             {
@@ -154,37 +184,21 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
             UpdateControls();
         });
 
-        // Modifier condition from
-        modifierConditionFromNumberPickerControl.Selection.Subscribe(newValue =>
+        // Modifier condition range
+        modifierConditionRangeSlider.RegisterValueChangedCallback(evt =>
         {
+            Vector2 newValue = evt.newValue;
             if (GameRoundSettings.modifierConditionSettings.condition
                 is EGameRoundModifierCondition.ScoreRange
                 or EGameRoundModifierCondition.PlayerAdvance)
             {
-                GameRoundSettings.modifierConditionSettings.scoreFrom = newValue;
-                UpdateControls();
+                GameRoundSettings.modifierConditionSettings.scoreFrom = (int)newValue.x;
+                GameRoundSettings.modifierConditionSettings.scoreUntil = (int)newValue.y;
             }
             else if (GameRoundSettings.modifierConditionSettings.condition is EGameRoundModifierCondition.TimeRange)
             {
-                GameRoundSettings.modifierConditionSettings.timeFrom = newValue;
-                UpdateControls();
-            }
-        });
-
-        // Modifier condition until
-        modifierConditionUntilNumberPickerControl.Selection.Subscribe(newValue =>
-        {
-            if (GameRoundSettings.modifierConditionSettings.condition
-                is EGameRoundModifierCondition.ScoreRange
-                or EGameRoundModifierCondition.PlayerAdvance)
-            {
-                GameRoundSettings.modifierConditionSettings.scoreUntil = newValue;
-                UpdateControls();
-            }
-            else if (GameRoundSettings.modifierConditionSettings.condition is EGameRoundModifierCondition.TimeRange)
-            {
-                GameRoundSettings.modifierConditionSettings.timeUntil = newValue;
-                UpdateControls();
+                GameRoundSettings.modifierConditionSettings.timeFrom = (int)newValue.x;
+                GameRoundSettings.modifierConditionSettings.timeUntil = (int)newValue.y;
             }
         });
     }
@@ -246,8 +260,9 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     {
         // Finish condition
         finishConditionPickerControl.SelectItem(GameRoundSettings.finishConditionSettings.condition);
-        finishConditionPointsPickerControl.SelectItem(GameRoundSettings.finishConditionSettings.points);
-        finishConditionPointsPickerControl.ItemPicker.SetVisibleByDisplay(GameRoundSettings.finishConditionSettings.condition != EGameRoundFinishCondition.ReachEndOfSong);
+        finishConditionPointsSlider.value = GameRoundSettings.finishConditionSettings.points;
+        finishConditionPointsSlider.SetVisibleByDisplay(GameRoundSettings.finishConditionSettings.condition != EGameRoundFinishCondition.ReachEndOfSong);
+        finishConditionPointsTextField.SetVisibleByDisplay(finishConditionPointsSlider.IsVisibleByDisplay());
     }
 
     private void UpdateModifierControls()
@@ -271,45 +286,29 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
             && GameRoundSettings.modifierConditionSettings.condition
                 is EGameRoundModifierCondition.ScoreRange
                 or EGameRoundModifierCondition.TimeRange;
-        modifierConditionFromNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionNumberPickersVisible
+        modifierConditionRangeSlider.SetVisibleByDisplay(modifierConditionNumberPickersVisible
             || (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.PlayerAdvance
                 && modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay()));
-        modifierConditionUntilNumberPickerControl.ItemPicker.SetVisibleByDisplay(modifierConditionNumberPickersVisible);
+        modifierConditionRangeTextField.SetVisibleByDisplay(modifierConditionNumberPickersVisible);
+        modifierConditionRangeBaseFieldWithTextFieldControl.UpdateTextField(modifierConditionRangeSlider.value);
 
-        List<int> modifierConditionValues = new();
         if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
         {
-            modifierConditionValues = NumberUtils.CreateIntList(0, 100, 10);
-            modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.timeFrom);
-            modifierConditionUntilNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.timeUntil);
-            modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
-            modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue} %";
+            modifierConditionRangeSlider.lowLimit = 0;
+            modifierConditionRangeSlider.highLimit = 100;
+            modifierConditionRangeSlider.value = new Vector2(
+                GameRoundSettings.modifierConditionSettings.timeFrom,
+                GameRoundSettings.modifierConditionSettings.timeUntil);
         }
         else if (GameRoundSettings.modifierConditionSettings.condition
             is EGameRoundModifierCondition.ScoreRange
             or EGameRoundModifierCondition.PlayerAdvance)
         {
-            modifierConditionValues = NumberUtils.CreateIntList(0, 10000, 1000);
-            modifierConditionFromNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.scoreFrom);
-            modifierConditionUntilNumberPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.scoreUntil);
-            modifierConditionFromNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue}";
-            modifierConditionUntilNumberPickerControl.GetLabelTextFunction = newValue => $"{newValue}";
-        }
-
-        if (!modifierConditionValues.IsNullOrEmpty())
-        {
-            modifierConditionFromNumberPickerControl.Items = modifierConditionValues;
-            if (!modifierConditionValues.Contains(modifierConditionFromNumberPickerControl.SelectedItem))
-            {
-                modifierConditionFromNumberPickerControl.SelectItem(modifierConditionValues.FirstOrDefault());
-            }
-
-            modifierConditionUntilNumberPickerControl.Items = modifierConditionValues;
-            if (!modifierConditionValues.Contains(modifierConditionUntilNumberPickerControl.SelectedItem)
-                || modifierConditionUntilNumberPickerControl.SelectedItem == modifierConditionFromNumberPickerControl.SelectedItem)
-            {
-                modifierConditionUntilNumberPickerControl.SelectItem(modifierConditionValues.LastOrDefault());
-            }
+            modifierConditionRangeSlider.lowLimit = 0;
+            modifierConditionRangeSlider.highLimit = 10000;
+            modifierConditionRangeSlider.value = new Vector2(
+                GameRoundSettings.modifierConditionSettings.scoreFrom,
+                GameRoundSettings.modifierConditionSettings.scoreUntil);
         }
     }
     

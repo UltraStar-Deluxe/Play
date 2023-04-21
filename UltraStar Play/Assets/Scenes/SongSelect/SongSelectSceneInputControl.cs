@@ -14,6 +14,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private SongSelectSceneControl songSelectSceneControl;
     
     [Inject]
+    private SongSearchControl songSearchControl;
+    
+    [Inject]
     private SongRouletteControl songRouletteControl;
 
     [Inject]
@@ -53,7 +56,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_search).PerformedAsObservable()
-            .Subscribe(_ => songSelectSceneControl.SongSearchControl.FocusSearchTextField());
+            .Subscribe(_ => songSearchControl.FocusSearchTextField());
         
         // Select random song
         InputManager.GetInputAction(R.InputActions.usplay_randomSong).PerformedAsObservable()
@@ -84,7 +87,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
     {
-        if (songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
+        if (songSearchControl.IsSearchTextFieldFocused())
         {
             songSelectSceneControl.SubmitSearch();
         }
@@ -113,19 +116,21 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnBack()
     {
-        if (songSelectSceneControl.SongSearchControl.IsSearchPropertyDropdownVisible)
+        if (songSearchControl.IsSearchPropertyDropdownVisible)
         {
-            songSelectSceneControl.SongSearchControl.HideSearchPropertyDropdownOverlay();
+            songSearchControl.HideSearchPropertyDropdownOverlay();
         }
-        else if (songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused())
+        else if (songSearchControl.IsSearchTextFieldFocused())
         {
             songSelectSceneControl.SubmitSearch();
         }
-        else if (songSelectSceneControl.IsPlaylistActive()
-                 && (!songSelectSceneControl.HasPartyModeSceneData
-                     || songSelectSceneControl.PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Manual))
+        else if (songSelectSceneControl.SongQueueSlideInControl.Visible.Value)
         {
-            songSelectSceneControl.ResetPlaylistSelection();
+            songSelectSceneControl.SongQueueSlideInControl.SlideOut();
+        }
+        else if (songSelectSceneControl.ModifiersOverlaySlideInControl.Visible.Value)
+        {
+            songSelectSceneControl.ModifiersOverlaySlideInControl.SlideOut();
         }
         else
         {
@@ -191,6 +196,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private bool IsFuzzySearchActive()
     {
         return !InputUtils.AnyKeyboardModifierPressed()
-               && !songSelectSceneControl.SongSearchControl.IsSearchTextFieldFocused();
+               && !songSearchControl.IsSearchTextFieldFocused();
     }
 }

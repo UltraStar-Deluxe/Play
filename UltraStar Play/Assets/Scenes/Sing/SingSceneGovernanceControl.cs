@@ -75,6 +75,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
+
+    private bool fillAppearanceContextMenu;
     
     public void OnInjectionFinished()
     {
@@ -215,20 +217,98 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
-        webcamControl.AddToContextMenu(contextMenuPopup);
+        if (fillAppearanceContextMenu)
+        {
+            fillAppearanceContextMenu = false;
+            FillAppearanceContextMenu(contextMenuPopup);
+        }
+        else
+        {
+            FillRegularContextMenu(contextMenuPopup);
+        }
+    }
+
+    private void FillAppearanceContextMenu(ContextMenuPopupControl contextMenuPopup)
+    {
+        ItemPicker noteDisplayModePicker = new("Note Display Mode¹");
+        contextMenuPopup.AddVisualElement(noteDisplayModePicker);
+        new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
+            .Bind(() => settings.GraphicSettings.noteDisplayMode,
+                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
         
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart),
+        Toggle showLyricsOnNotesToggle = new("Lyrics on Notes¹");
+        contextMenuPopup.AddVisualElement(showLyricsOnNotesToggle);
+        FieldBindingUtils.Bind(showLyricsOnNotesToggle,
+            () => settings.GraphicSettings.showLyricsOnNotes,
+            newValue => settings.GraphicSettings.showLyricsOnNotes = newValue);
+        
+        Toggle showStaticLyricsToggle = new("Lyrics Box¹");
+        contextMenuPopup.AddVisualElement(showStaticLyricsToggle);
+        FieldBindingUtils.Bind(showStaticLyricsToggle,
+            () => settings.GraphicSettings.showStaticLyrics,
+            newValue => settings.GraphicSettings.showStaticLyrics = newValue);
+        
+        Toggle showPitchIndicatorToggle = new("Pitch Arrow");
+        contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
+        FieldBindingUtils.Bind(showPitchIndicatorToggle,
+            () => settings.GraphicSettings.showPitchIndicator,
+                newValue => settings.GraphicSettings.showPitchIndicator = newValue);
+        
+        Toggle showPlayerNamesToggle = new("Player Names");
+        contextMenuPopup.AddVisualElement(showPlayerNamesToggle);
+        FieldBindingUtils.Bind(showPlayerNamesToggle,
+            () => settings.GraphicSettings.showPlayerNames,
+            newValue => settings.GraphicSettings.showPlayerNames = newValue);
+        
+        Toggle showScoreNumbers = new("Player Score");
+        contextMenuPopup.AddVisualElement(showScoreNumbers);
+        FieldBindingUtils.Bind(showScoreNumbers,
+            () => settings.GraphicSettings.showScoreNumbers,
+            newValue => settings.GraphicSettings.showScoreNumbers = newValue);
+        
+        if (webcamControl.WebcamsAvailable())
+        {
+            Toggle webcamToggle = new("Webcam");
+            contextMenuPopup.AddVisualElement(webcamToggle);
+            FieldBindingUtils.Bind(webcamToggle,
+                () => settings.WebcamSettings.UseAsBackgroundInSingScene,
+                newValue => webcamControl.SetUseAsBackgroundInSingScene(newValue));
+        }
+        
+        contextMenuPopup.AddSeparator();
+        contextMenuPopup.AddVisualElement(new Label("¹ Requires restart"));
+        contextMenuPopup.AddButton("Restart Now", "replay",
             () => singSceneControl.Restart());
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
+    }
+
+    private void FillRegularContextMenu(ContextMenuPopupControl contextMenuPopup)
+    {
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics), "skip_next",
             () => singSceneControl.SkipToNextSingableNoteOrEndOfSong());
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong),
-            () => singSceneControl.FinishScene(false, false));
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart), "replay",
+            () => singSceneControl.Restart());
+        
+        contextMenuPopup.AddButton("Appearance", "filter_b_and_w", () =>
+        {
+            fillAppearanceContextMenu = true;
+            contextMenuPopup.CloseContextMenu();
+            contextMenuControl.OpenContextMenu(Vector2.zero);
+        });
+        
+        contextMenuPopup.AddButton("Attribution", "info_outline", () =>
+        {
+            singSceneControl.Pause();
+            ShowSongInfoDialog();
+        });
         
         if (!singSceneControl.HasPartyModeSceneData)
         {
-            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor), "edit", 
                 () => singSceneControl.OpenSongInEditor());
         }
+
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong), "logout", 
+            () => singSceneControl.FinishScene(false, false));
 
         contextMenuPopup.AddSeparator();
 
@@ -250,9 +330,16 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         }
         else
         {
-            contextMenuPopup.AddButton("Separate audio",
+            contextMenuPopup.AddButton("Separate audio", "call_split", 
                 () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta));
         }
+    }
+
+    private void ShowSongInfoDialog()
+    {
+        MessageDialogControl messageDialogControl = UiManager.Instance.CreateDialogControl("Attribution");
+        messageDialogControl.AddVisualElement(AttributionUtils.CreateAttributionVisualElement(songMeta));
+        messageDialogControl.AddButton("Close", _ => messageDialogControl.CloseDialog());
     }
 
     private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)

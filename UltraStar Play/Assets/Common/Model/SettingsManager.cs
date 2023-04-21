@@ -29,7 +29,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             if (settings == null)
             {
-                Reload();
+                LoadSettings();
             }
             return settings;
         }
@@ -76,7 +76,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         clientIdsWithoutPermission.ForEach(clientId => Settings.HttpApiPermissions.Remove(clientId));
     }
 
-    private void Reload()
+    private void LoadSettings()
     {
         using (new DisposableStopwatch("Loading the settings took <millis> ms"))
         {
@@ -103,7 +103,23 @@ public class SettingsManager : AbstractSingletonBehaviour
                 settings = CreateDefaultSettings();
             }
             OverwriteSettingsWithCommandLineArguments();
+
+            ResetNonPersistentSettings();
         }
+    }
+
+    private void ResetNonPersistentSettings()
+    {
+        // TODO: Store non-persistent settings in dedicated data structure.
+        settings.GameRoundSettings = new();
+        
+        settings.SongSelectSettings.playlistName = "";
+        settings.SongSelectSettings.micTestActive = false;
+        settings.activeSearchPropertyFilters = new();
+        settings.isShowOnlyDuetsFilterActive = false;
+        
+        settings.SongEditorSettings.MusicPlaybackSpeed = 1;
+        settings.SongEditorSettings.IsRecordingEnabled = false;
     }
 
     private Settings CreateDefaultSettings()

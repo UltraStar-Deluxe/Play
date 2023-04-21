@@ -357,6 +357,8 @@ public static class ApplyThemeStyleUtils
                 .ForEach(label => label.style.color = new StyleColor(color));
             root.Query(null, R.UssClasses.fontColor)
                 .ForEach(visualElement => visualElement.style.unityBackgroundImageTintColor = new StyleColor(color));
+            root.Query(null, R_PlayShared.UssClasses.fontColorBorder)
+                .ForEach(visualElement => visualElement.SetBorderColor(color));
         });
     }
 

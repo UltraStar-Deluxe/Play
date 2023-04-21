@@ -92,6 +92,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public NoteAreaDragControl DragControl { get; private set; }
     private NoteAreaScrollingDragListener scrollingDragListener;
     private NoteAreaSelectionDragListener selectionDragListener;
+    private NoteAreaDrawNoteDragListener drawNoteDragListener;
     private ManipulateNotesDragListener manipulateNotesDragListener;
     private SongEditorMicPitchIndicatorControl micPitchIndicatorControl;
 
@@ -149,6 +150,11 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             .WithRootVisualElement(VisualElement)
             .WithBindingForInstance(DragControl)
             .CreateAndInject<NoteAreaSelectionDragListener>();
+
+        drawNoteDragListener = injector
+            .WithRootVisualElement(VisualElement)
+            .WithBindingForInstance(DragControl)
+            .CreateAndInject<NoteAreaDrawNoteDragListener>();
 
         manipulateNotesDragListener = injector
             .WithRootVisualElement(VisualElement)

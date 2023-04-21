@@ -11,8 +11,5 @@
         </ui:ScrollView>
         <ui:Instance template="SongEditorSideBarSongPropertiesUi" name="sideBarSongPropertiesUi" />
         <ui:Instance template="SongEditorSideBarSettingsUi" name="sideBarSettingsUi" />
-        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="helpSideBarContainer" class="secondarySideBarPanel" style="flex-grow: 1; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; display: flex;">
-            <ui:Label text="Song Editor Controls" display-tooltip-when-elided="true" name="helpTitle" class="secondarySideBarTitle" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
-        </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

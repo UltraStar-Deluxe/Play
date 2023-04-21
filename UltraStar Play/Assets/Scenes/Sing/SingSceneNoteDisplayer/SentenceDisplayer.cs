@@ -13,15 +13,11 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     [Inject]
     private PlayerControl playerControl;
 
-    [Inject(UxmlName = R.UxmlNames.lyricsContainer)]
-    private VisualElement lyricsContainer;
-
     private Sentence currentSentence;
 
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
-        lyricsContainer.HideByDisplay();
         playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
         {
             DisplaySentence(enterSentenceEvent.Sentence);
@@ -66,6 +62,12 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         base.DisplayRecordedNote(recordedNote);
     }
     
+    protected override void UpdateTargetNoteControl(TargetNoteControl targetNoteControl, int indexInList)
+    {
+        UpdateNotePosition(targetNoteControl.VisualElement, targetNoteControl.Note.MidiNote, targetNoteControl.Note.StartBeat, targetNoteControl.Note.EndBeat);
+        UpdateTargetNoteLabelWith(targetNoteControl, indexInList);
+    }
+
     public override float GetXInPercent(double positionInSongInMillis)
     {
         if (currentSentence == null)
@@ -81,7 +83,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         return (float)xPercent;
     }
 
-    protected override void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
     {
         int sentenceStartBeat = currentSentence.MinBeat;
         int sentenceEndBeat = currentSentence.MaxBeat;
@@ -97,11 +99,6 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         yEndPercent *= 100;
         xStartPercent *= 100;
         xEndPercent *= 100;
-
-        visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
-        visualElement.style.left = new StyleLength(new Length(xStartPercent, LengthUnit.Percent));
-        visualElement.style.width = new StyleLength(new Length(xEndPercent - xStartPercent, LengthUnit.Percent));
-        visualElement.style.top = new StyleLength(new Length(yStartPercent, LengthUnit.Percent));
-        visualElement.style.height = new StyleLength(new Length(yEndPercent - yStartPercent, LengthUnit.Percent));
+        return new Rect(xStartPercent, yStartPercent, xEndPercent - xStartPercent, yEndPercent - yStartPercent);
     }
 }

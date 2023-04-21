@@ -165,4 +165,22 @@ public static class NumberUtils
         }
         return result;
     }
+
+    public static int Towards(int current, int target, int step)
+    {
+        if (current == target
+            || Mathf.Abs(current - target) < step)
+        {
+            return target;
+        }
+        
+        if (current > target)
+        {
+            return current - step;
+        }
+        else
+        {
+            return current + step;
+        }
+    }
 }

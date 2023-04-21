@@ -37,13 +37,13 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
     
     public void OnInjectionFinished()
     {
-        if (!IsPitchIndicatorVisible)
-        {
-            playerPitchIndicator.HideByDisplay();
-            return;
-        }
+        settings.ObserveEveryValueChanged(it => it.GraphicSettings.showPitchIndicator)
+            .Subscribe(_ => playerPitchIndicator.SetVisibleByDisplay(IsPitchIndicatorVisible));
 
-        pitchIndicatorIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+        if (micProfile != null)
+        {
+            pitchIndicatorIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+        }
         playerMicPitchTracker.BeatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzedEvent(evt));
         UpdatePitchIndicatorPosition(MidiUtils.MidiNoteConcertPitch);
     }
@@ -63,6 +63,11 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
 
     private void UpdatePitchIndicatorPosition(int midiNote)
     {
+        if (!IsPitchIndicatorVisible)
+        {
+            return;
+        }
+        
         Vector2 yPosRangeFactor = noteDisplayer.GetYStartAndEndInPercentForMidiNote(midiNote);
         float height = 100f * (yPosRangeFactor.y - yPosRangeFactor.x);
         

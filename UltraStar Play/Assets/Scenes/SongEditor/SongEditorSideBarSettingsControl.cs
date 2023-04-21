@@ -33,6 +33,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
 
+    [Inject(UxmlName = R.UxmlNames.drawNoteLayerPicker)]
+    private ItemPicker drawNoteLayerPicker;
+    
     [Inject(UxmlName = R.UxmlNames.micDelayTextField)]
     private TextField micDelayTextField;
 
@@ -162,6 +165,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private LabeledItemPickerControl<ESongEditorSamplesSource> speechRecognitionAudioItemPickerControl;
     private LabeledItemPickerControl<ESongEditorSamplesSource> pitchDetectionAudioItemPickerControl;
     private LabeledItemPickerControl<ERecordNotesOrAudio> recordNotesOrAudioItemPickerControl;
+    private LabeledItemPickerControl<ESongEditorDrawNoteLayer> drawNoteLayerPickerControl;
 
     private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
     
@@ -190,6 +194,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.AudioSettings.VolumePercent,
             newValue => settings.AudioSettings.VolumePercent = (int) newValue);
 
+        drawNoteLayerPickerControl = new(drawNoteLayerPicker, EnumUtils.GetValuesAsList<ESongEditorDrawNoteLayer>());
+        drawNoteLayerPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
+        drawNoteLayerPickerControl.Bind(
+            () => settings.SongEditorSettings.drawNoteLayer,
+            newValue => settings.SongEditorSettings.drawNoteLayer = newValue);
+        
         // Playback speed
         songAudioPlayer.PlaybackSpeed = settings.SongEditorSettings.MusicPlaybackSpeed;
         Bind(musicPlaybackSpeedSlider,

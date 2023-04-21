@@ -190,6 +190,7 @@ public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListen
         if (modifier == EGameRoundModifier.HideLyrics)
         {
             singSceneControl.FadeOutLyrics(playerControl.Voice, AnimTimeInSeconds);
+            playerControl.PlayerUiControl.NoteDisplayer.FadeOutLyricsOnNotes(AnimTimeInSeconds);
         }
         else if (modifier == EGameRoundModifier.HideNotes)
         {
@@ -202,6 +203,7 @@ public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListen
         if (modifier == EGameRoundModifier.HideLyrics)
         {
             singSceneControl.FadeInLyrics(playerControl.Voice, AnimTimeInSeconds);
+            playerControl.PlayerUiControl.NoteDisplayer.FadeInLyricsOnNotes(AnimTimeInSeconds);
         }
         else if (modifier == EGameRoundModifier.HideNotes)
         {

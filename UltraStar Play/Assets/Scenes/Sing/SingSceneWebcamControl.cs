@@ -56,28 +56,30 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
         return WebCamTexture.devices.Length > 0;
     }
 
-    public void AddToContextMenu(ContextMenuPopupControl contextMenuPopup)
+    public void SetUseAsBackgroundInSingScene(bool newValue)
     {
-        if (WebcamsAvailable())
+        if (settings.WebcamSettings.UseAsBackgroundInSingScene == newValue)
         {
-            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_webcamOnOff),
-                () =>
-                {
-                    bool displayWebcam = !webcamRenderContainer.IsVisibleByDisplay();
-                    if (displayWebcam)
-                    {
-                        Log.Logger.Information("Webcam activated: {webcamname}", webcamTexture.deviceName);
-                        Play();
-                    }
-                    else
-                    {
-                        Log.Logger.Information("Webcam deactivated: {webcamname}", webcamTexture.deviceName);
-                        Stop();
-                    }
-
-                    webcamRenderContainer.SetVisibleByDisplay(displayWebcam);
-                    settings.WebcamSettings.UseAsBackgroundInSingScene = displayWebcam;
-                });
+            return;
         }
+
+        settings.WebcamSettings.UseAsBackgroundInSingScene = newValue;
+        if (newValue)
+        {
+            Play();
+            Log.Logger.Information("Webcam activated: {webcamname}", webcamTexture.deviceName);
+            webcamRenderContainer.ShowByDisplay();
+        }
+        else
+        {
+            Stop();
+            Log.Logger.Information("Webcam deactivated: {webcamname}", webcamTexture.deviceName);
+            webcamRenderContainer.HideByDisplay();
+        }
+    }
+    
+    public void ToggleUseAsBackgroundInSingScene()
+    {
+        SetUseAsBackgroundInSingScene(!settings.WebcamSettings.UseAsBackgroundInSingScene);
     }
 }

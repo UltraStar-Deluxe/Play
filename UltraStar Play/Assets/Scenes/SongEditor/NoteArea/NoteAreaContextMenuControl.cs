@@ -84,9 +84,6 @@ public class NoteAreaContextMenuControl : ContextMenuControl
             }
         }
         
-        contextMenu.AddSeparator();
-        contextMenu.AddButton("Add note", () => addNoteAction.ExecuteAndNotify(songMeta, beat, midiNote));
-
         if (selectedNotes.Count == 0)
         {
             contextMenu.AddSeparator();

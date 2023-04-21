@@ -110,6 +110,37 @@
 /**************************************************/
 /* SING SCENE */
 /**************************************************/
+#countdownLabel
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -unity-text-align: middle-center;
+    font-size: 120;
+    color: var(--control-color);
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+#innerTimeBar {
+    overflow: hidden;
+}
+
+#passTheMicProgressBar .unity-progress-bar__container {
+    height: 2px;
+    min-height: auto;
+    max-height: none;
+}
+
+#passTheMicProgressBar .unity-progress-bar__background {
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#passTheMicProgressBar .unity-progress-bar__progress {
+    margin: 0;
+}
+
 .scrollingNoteStreamSentenceSeparator {
     display: none;
 }
@@ -182,10 +213,11 @@
 }
 
 .singingLyrics {
-    /*-unity-font-style: bold;*/
+    font-size: 14px;
     -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset');
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(32, 32, 32, 0.5);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    /*-unity-text-outline-width: 1px;*/
+    /*-unity-text-outline-color: rgba(32, 32, 32, 0.5);*/
 }
 
 .lyricsContainer #playerNameLabel {
@@ -464,6 +496,10 @@
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
+#permissionsContainer .unity-toggle__label {
+    min-width: 50;
+    margin-right: 8px;
+}
 
 .inactiveOverlay {
     transition: background-color 0.5s;
@@ -612,6 +648,12 @@
 /**************************************************/
 /* ABOUT SCENE */
 /**************************************************/
+.aboutTextField {
+    font-size: var(--font-size-s);
+    white-space: normal;
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/RobotoMono-VariableFont_wght%20SDF.asset');
+}
+
 #aboutTextsScrollView ToggleButton {
     justify-content: flex-start;
     -unity-text-align: middle-left;
