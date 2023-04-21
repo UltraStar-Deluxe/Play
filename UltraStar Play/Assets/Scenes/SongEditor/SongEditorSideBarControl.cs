@@ -226,6 +226,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
                 TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_buttonTapping) },
             { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_editingLyrics_title),
                 TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_editingLyrics) },
+            { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_layers_title),
+                TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_layers) },
         };
         helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_title),
