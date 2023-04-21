@@ -6577,6 +6577,7 @@ MonoBehaviour:
   musicNoteCursorTexture: {fileID: 2800000, guid: a96fe1e3491d4304bbf63ba28e72caa6,
     type: 3}
   handCursorTexture: {fileID: 2800000, guid: caf0bc361c397b34f93f38e01091f3ed, type: 3}
+  pencilCursorTexture: {fileID: 2800000, guid: 5f57954425c7d404b9dfabf0a20d243d, type: 3}
 --- !u!1 &3509143782135001065
 GameObject:
   m_ObjectHideFlags: 0

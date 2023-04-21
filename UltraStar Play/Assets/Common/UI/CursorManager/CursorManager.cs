@@ -11,10 +11,12 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
     public static CursorManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<CursorManager>();
 
     private static readonly int cursorWidth = 32;
+    private static readonly int cursorHeight = 32;
     // hotSpot is the pixel coordinate in the texture where the actual cursor is measured.
     // Upper-left corner in the texture is coordinate (0,0).
     private static readonly Vector2 cursorTopLeftCorner = Vector2.zero;
-    private static readonly Vector2 cursorCenter = new(cursorWidth / 2f, cursorWidth / 2f);
+    private static readonly Vector2 cursorCenter = new(cursorWidth / 2f, cursorHeight / 2f);
+    private static readonly Vector2 lowerLeft = new(0, cursorHeight);
 
     [Inject]
     private SettingsManager settingsManager;
@@ -26,6 +28,7 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
     public Texture2D grabCursorTexture;
     public Texture2D musicNoteCursorTexture;
     public Texture2D handCursorTexture;
+    public Texture2D pencilCursorTexture;
 
     public ECursor CurrentCursor { get; private set; } = ECursor.Default;
 
@@ -86,6 +89,9 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
             case ECursor.Hand:
                 SetCursorHand();
                 break;
+            case ECursor.Pencil:
+                SetCursorPencil();
+                break;
             default:
                 Debug.LogWarning("Unkown cursor: " + cursor);
                 break;
@@ -138,6 +144,17 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
         SetCursor(handCursorTexture, cursorCenter, CursorMode.Auto);
     }
 
+    public void SetCursorPencil()
+    {
+        if (!UseImageAsCursor())
+        {
+            return;
+        }
+
+        CurrentCursor = ECursor.Pencil;
+        SetCursor(pencilCursorTexture, lowerLeft, CursorMode.Auto);
+    }
+    
     public void SetCursorVertical()
     {
         if (!UseImageAsCursor())
