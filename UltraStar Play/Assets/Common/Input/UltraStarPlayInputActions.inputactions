@@ -11,7 +11,7 @@
                     "id": "6380c5aa-aa8e-4142-aa56-2a22bbbdcf16",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": "RepeatedHold",
+                    "interactions": "RepeatedHold(initialPause=1)",
                     "initialStateCheck": true
                 },
                 {
