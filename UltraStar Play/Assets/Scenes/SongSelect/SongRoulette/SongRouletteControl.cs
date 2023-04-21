@@ -63,6 +63,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private void Start()
     {
+        songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.NoTrickleDown);
+        
         songListView.makeItem = () =>
         {
             VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
