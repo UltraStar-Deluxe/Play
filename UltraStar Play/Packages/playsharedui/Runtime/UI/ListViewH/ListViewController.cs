@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Decompiled with JetBrains decompiler
+// Assembly: UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// Unity 2022.2.4f1
+
+using System;
 using UnityEngine.UIElements;
 
 /// <summary>
@@ -21,7 +25,7 @@ public class ListViewController : BaseListViewController
             return this.listView.makeItem();
         if (this.listView.bindItem != null)
             throw new NotImplementedException("You must specify makeItem if bindItem is specified.");
-        return (VisualElement) new Label();
+        return (VisualElement)new Label();
     }
 
     protected override void BindItem(VisualElement element, int index)
@@ -30,7 +34,7 @@ public class ListViewController : BaseListViewController
         {
             if (this.listView.makeItem != null)
                 throw new NotImplementedException("You must specify bindItem if makeItem is specified.");
-            ((TextElement) element).text = this.listView.itemsSource[index]?.ToString() ?? "null";
+            ((TextElement)element).text = this.listView.itemsSource[index]?.ToString() ?? "null";
         }
         else
             this.listView.bindItem(element, index);

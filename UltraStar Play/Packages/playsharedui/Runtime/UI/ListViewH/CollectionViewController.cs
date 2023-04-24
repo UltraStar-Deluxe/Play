@@ -1,9 +1,6 @@
 ﻿// Decompiled with JetBrains decompiler
-// Type: UnityEngine.UIElements.CollectionViewController
 // Assembly: UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 0619D653-D2D9-4223-8C58-14F58DF39D69
-// Assembly location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.dll
-// XML documentation location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.xml
+// Unity 2022.2.4f1
 
 using System;
 using System.Collections;
@@ -12,12 +9,12 @@ using UnityEngine.Assertions;
 using UnityEngine.UIElements;
 
 /// <summary>
-  ///        <para>
-  /// Base collection view controller. View controllers are meant to take care of data virtualized by any BaseHorizontalCollectionView inheritor.
-  /// </para>
-  ///      </summary>
-  public abstract class CollectionViewController : IDisposable
-  {
+///        <para>
+/// Base collection view controller. View controllers are meant to take care of data virtualized by any BaseHorizontalCollectionView inheritor.
+/// </para>
+///      </summary>
+public abstract class CollectionViewController : IDisposable
+{
     private BaseHorizontalCollectionView m_View;
     private IList m_ItemsSource;
 
@@ -32,14 +29,14 @@ using UnityEngine.UIElements;
     ///      </summary>
     public virtual IList itemsSource
     {
-      get => this.m_ItemsSource;
-      set
-      {
-        if (this.m_ItemsSource == value)
-          return;
-        this.m_ItemsSource = value;
-        this.RaiseItemsSourceChanged();
-      }
+        get => this.m_ItemsSource;
+        set
+        {
+            if (this.m_ItemsSource == value)
+                return;
+            this.m_ItemsSource = value;
+            this.RaiseItemsSourceChanged();
+        }
     }
 
     /// <summary>
@@ -65,9 +62,9 @@ using UnityEngine.UIElements;
     /// <param name="collectionView">The view for this controller. Must not be null.</param>
     public void SetView(BaseHorizontalCollectionView collectionView)
     {
-      this.m_View = collectionView;
-      this.PrepareView();
-      Assert.IsNotNull<BaseHorizontalCollectionView>(this.m_View, "View must not be null.");
+        this.m_View = collectionView;
+        this.PrepareView();
+        Assert.IsNotNull<BaseHorizontalCollectionView>(this.m_View, "View must not be null.");
     }
 
     /// <summary>
@@ -86,9 +83,9 @@ using UnityEngine.UIElements;
     ///      </summary>
     public virtual void Dispose()
     {
-      this.itemsSourceChanged = (Action) null;
-      this.itemIndexChanged = (Action<int, int>) null;
-      this.m_View = (BaseHorizontalCollectionView) null;
+        this.itemsSourceChanged = (Action)null;
+        this.itemIndexChanged = (Action<int, int>)null;
+        this.m_View = (BaseHorizontalCollectionView)null;
     }
 
     /// <summary>
@@ -101,8 +98,8 @@ using UnityEngine.UIElements;
     /// </returns>
     public virtual int GetItemsCount()
     {
-      IList itemsSource = this.m_ItemsSource;
-      return itemsSource != null ? itemsSource.Count : 0;
+        IList itemsSource = this.m_ItemsSource;
+        return itemsSource != null ? itemsSource.Count : 0;
     }
 
     internal virtual int GetItemsMinCount() => this.GetItemsCount();
@@ -138,22 +135,27 @@ using UnityEngine.UIElements;
     /// <returns>
     ///   <para>The object in the source at this index.</para>
     /// </returns>
-    public virtual object GetItemForIndex(int index) => this.m_ItemsSource == null || index < 0 || index >= this.m_ItemsSource.Count ? (object) null : this.m_ItemsSource[index];
+    public virtual object GetItemForIndex(int index) =>
+        this.m_ItemsSource == null || index < 0 || index >= this.m_ItemsSource.Count
+            ? (object)null
+            : this.m_ItemsSource[index];
 
     internal virtual void InvokeMakeItem(ReusableCollectionItem reusableItem) => reusableItem.Init(this.MakeItem());
 
     internal virtual void InvokeBindItem(ReusableCollectionItem reusableItem, int index)
     {
-      this.BindItem(reusableItem.bindableElement, index);
-      reusableItem.SetSelected(this.m_View.selectedIndices.Contains<int>(index));
-      
-      // TODO: Implement
-      // reusableItem.rootElement.pseudoStates &= ~PseudoStates.Hover;
+        this.BindItem(reusableItem.bindableElement, index);
+        reusableItem.SetSelected(this.m_View.selectedIndices.Contains<int>(index));
+
+        // TODO: Implement
+        // reusableItem.rootElement.pseudoStates &= ~PseudoStates.Hover;
     }
 
-    internal virtual void InvokeUnbindItem(ReusableCollectionItem reusableItem, int index) => this.UnbindItem(reusableItem.bindableElement, index);
+    internal virtual void InvokeUnbindItem(ReusableCollectionItem reusableItem, int index) =>
+        this.UnbindItem(reusableItem.bindableElement, index);
 
-    internal virtual void InvokeDestroyItem(ReusableCollectionItem reusableItem) => this.DestroyItem(reusableItem.bindableElement);
+    internal virtual void InvokeDestroyItem(ReusableCollectionItem reusableItem) =>
+        this.DestroyItem(reusableItem.bindableElement);
 
     /// <summary>
     ///        <para>
@@ -198,10 +200,10 @@ using UnityEngine.UIElements;
     ///      </summary>
     protected void RaiseItemsSourceChanged()
     {
-      Action itemsSourceChanged = this.itemsSourceChanged;
-      if (itemsSourceChanged == null)
-        return;
-      itemsSourceChanged();
+        Action itemsSourceChanged = this.itemsSourceChanged;
+        if (itemsSourceChanged == null)
+            return;
+        itemsSourceChanged();
     }
 
     /// <summary>
@@ -213,9 +215,9 @@ using UnityEngine.UIElements;
     /// <param name="dstIndex">The destination index.</param>
     protected void RaiseItemIndexChanged(int srcIndex, int dstIndex)
     {
-      Action<int, int> itemIndexChanged = this.itemIndexChanged;
-      if (itemIndexChanged == null)
-        return;
-      itemIndexChanged(srcIndex, dstIndex);
+        Action<int, int> itemIndexChanged = this.itemIndexChanged;
+        if (itemIndexChanged == null)
+            return;
+        itemIndexChanged(srcIndex, dstIndex);
     }
-  }
+}

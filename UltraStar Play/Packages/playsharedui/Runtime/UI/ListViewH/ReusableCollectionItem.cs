@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Decompiled with JetBrains decompiler
+// Assembly: UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// Unity 2022.2.4f1
+
+using System;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
 

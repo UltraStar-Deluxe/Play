@@ -1,21 +1,18 @@
 // Decompiled with JetBrains decompiler
-// Type: UnityEngine.UIElements.ListView
 // Assembly: UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 0619D653-D2D9-4223-8C58-14F58DF39D69
-// Assembly location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.dll
-// XML documentation location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.xml
+// Unity 2022.2.4f1
 
 using System;
 using System.Collections;
 using UnityEngine.UIElements;
 
 /// <summary>
-  ///        <para>
-  /// A ListView is a horizontally scrollable area that links to, and displays, a list of items.
-  /// </para>
-  ///      </summary>
-  public class ListViewH : BaseListViewH
-  {
+///        <para>
+/// A ListView is a horizontally scrollable area that links to, and displays, a list of items.
+/// </para>
+///      </summary>
+public class ListViewH : BaseListViewH
+{
     private Func<VisualElement> m_MakeItem;
     private Action<VisualElement, int> m_BindItem;
 
@@ -26,14 +23,14 @@ using UnityEngine.UIElements;
     ///      </summary>
     public new Func<VisualElement> makeItem
     {
-      get => this.m_MakeItem;
-      set
-      {
-        if (!(value != this.m_MakeItem))
-          return;
-        this.m_MakeItem = value;
-        this.Rebuild();
-      }
+        get => this.m_MakeItem;
+        set
+        {
+            if (!(value != this.m_MakeItem))
+                return;
+            this.m_MakeItem = value;
+            this.Rebuild();
+        }
     }
 
     internal void SetMakeItemWithoutNotify(Func<VisualElement> func) => this.m_MakeItem = func;
@@ -45,14 +42,14 @@ using UnityEngine.UIElements;
     ///      </summary>
     public new Action<VisualElement, int> bindItem
     {
-      get => this.m_BindItem;
-      set
-      {
-        if (!(value != this.m_BindItem))
-          return;
-        this.m_BindItem = value;
-        this.RefreshItems();
-      }
+        get => this.m_BindItem;
+        set
+        {
+            if (!(value != this.m_BindItem))
+                return;
+            this.m_BindItem = value;
+            this.RefreshItems();
+        }
     }
 
     internal void SetBindItemWithoutNotify(Action<VisualElement, int> callback) => this.m_BindItem = callback;
@@ -71,7 +68,8 @@ using UnityEngine.UIElements;
     ///      </summary>
     public new Action<VisualElement> destroyItem { get; set; }
 
-    protected override CollectionViewController CreateViewController() => (CollectionViewController) new ListViewController();
+    protected override CollectionViewController CreateViewController() =>
+        (CollectionViewController)new ListViewController();
 
     /// <summary>
     ///        <para>
@@ -82,15 +80,15 @@ using UnityEngine.UIElements;
     public ListViewH() => this.AddToClassList(BaseListView.ussClassName);
 
     public ListViewH(
-      IList itemsSource,
-      float itemWidth = -1f,
-      Func<VisualElement> makeItem = null,
-      Action<VisualElement, int> bindItem = null)
-      : base(itemsSource, itemWidth)
+        IList itemsSource,
+        float itemWidth = -1f,
+        Func<VisualElement> makeItem = null,
+        Action<VisualElement, int> bindItem = null)
+        : base(itemsSource, itemWidth)
     {
-      this.AddToClassList(BaseListView.ussClassName);
-      this.makeItem = makeItem;
-      this.bindItem = bindItem;
+        this.AddToClassList(BaseListView.ussClassName);
+        this.makeItem = makeItem;
+        this.bindItem = bindItem;
     }
 
     /// <summary>
@@ -110,4 +108,4 @@ using UnityEngine.UIElements;
     public new class UxmlTraits : BaseListViewH.UxmlTraits
     {
     }
-  }
+}

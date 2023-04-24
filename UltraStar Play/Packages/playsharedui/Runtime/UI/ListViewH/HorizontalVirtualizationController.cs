@@ -1,9 +1,6 @@
 ﻿// Decompiled with JetBrains decompiler
-// Type: UnityEngine.UIElements.HorizontalVirtualizationController`1
 // Assembly: UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 0619D653-D2D9-4223-8C58-14F58DF39D69
-// Assembly location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.dll
-// XML documentation location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.xml
+// Unity 2022.2.4f1
 
 using System;
 using System.Collections.Generic;
@@ -34,7 +31,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
     internal int itemsCount => !this.m_CollectionView.sourceIncludesArraySize
         ? this.m_CollectionView.itemsSource.Count
         : this.m_CollectionView.itemsSource.Count - 1;
-    
+
     protected virtual bool VisibleItemPredicate(T i) =>
         i.rootElement.style.display == (StyleEnum<DisplayStyle>)DisplayStyle.Flex;
 
@@ -61,7 +58,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
         this.m_CollectionView = collectionView;
         this.m_ActiveItems = new List<T>();
         this.m_VisibleItemPredicateDelegate = new Func<T, bool>(this.VisibleItemPredicate);
-        
+
         // TODO: Implement
         // this.m_ScrollView.contentContainer.disableClipping = false;
     }
@@ -227,7 +224,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
                 this.m_EmptyRows = new VisualElement();
                 this.m_EmptyRows.AddToClassList(BaseHorizontalCollectionView.backgroundFillUssClassName);
             }
-            
+
             if (this.m_EmptyRows.parent == null)
                 this.m_ScrollView.contentViewport.Add(this.m_EmptyRows);
             float expectedItemWidth = this.GetExpectedItemWidth(-1);
@@ -239,7 +236,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
                     this.m_EmptyRows.Add(new VisualElement() { style = { flexShrink = (StyleFloat)0.0f } });
             }
 
-            
+
             // ISSUE: variable of a boxed type
             // TODO: Implement?
             // __Boxed<T> lastVisibleItem = (object)this.lastVisibleItem;

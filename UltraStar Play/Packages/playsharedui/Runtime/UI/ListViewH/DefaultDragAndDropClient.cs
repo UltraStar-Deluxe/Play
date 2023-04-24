@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿// Decompiled with JetBrains decompiler
+// Assembly: UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+// Unity 2022.2.4f1
+
+using System.Collections.Generic;
 using Object = UnityEngine.Object;
 
 public class DefaultDragAndDropClient : IDragAndDrop, IDragAndDropData
@@ -11,13 +15,17 @@ public class DefaultDragAndDropClient : IDragAndDrop, IDragAndDropData
 
     public void StartDrag(StartDragArgs args) => this.m_StartDragArgs = args;
 
-    public void AcceptDrag() => this.m_StartDragArgs = (StartDragArgs) null;
+    public void AcceptDrag() => this.m_StartDragArgs = (StartDragArgs)null;
 
     public void SetVisualMode(DragVisualMode visualMode)
     {
     }
 
-    public IDragAndDropData data => (IDragAndDropData) this;
+    public IDragAndDropData data => (IDragAndDropData)this;
 
-    public object GetGenericData(string key) => this.m_StartDragArgs == null ? (object) null : (this.m_StartDragArgs.genericData.ContainsKey((object) key) ? this.m_StartDragArgs.genericData[(object) key] : (object) null);
+    public object GetGenericData(string key) => this.m_StartDragArgs == null
+        ? (object)null
+        : (this.m_StartDragArgs.genericData.ContainsKey((object)key)
+            ? this.m_StartDragArgs.genericData[(object)key]
+            : (object)null);
 }

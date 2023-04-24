@@ -1,9 +1,6 @@
 ﻿// Decompiled with JetBrains decompiler
-// Type: UnityEngine.UIElements.BaseVerticalCollectionView
 // Assembly: UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 0619D653-D2D9-4223-8C58-14F58DF39D69
-// Assembly location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.dll
-// XML documentation location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.xml
+// Unity 2022.2.4f1
 
 using System;
 using System.Collections;
@@ -280,7 +277,8 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     internal IEnumerable<ReusableCollectionItem> activeItems => this.m_VirtualizationController?.activeItems ??
                                                                 (IEnumerable<ReusableCollectionItem>)
-                                                                new List<ReusableCollectionItem>(); //BaseHorizontalCollectionView.k_EmptyItems;
+                                                                new List<
+                                                                    ReusableCollectionItem>(); //BaseHorizontalCollectionView.k_EmptyItems;
 
     internal ScrollView scrollView => this.m_ScrollView;
 
@@ -297,7 +295,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     internal float ResolveItemWidth(float width = -1f)
     {
-        float scaledPixelsPerPoint = 1;// this.scaledPixelsPerPoint;
+        float scaledPixelsPerPoint = 1; // this.scaledPixelsPerPoint;
         width = (double)width < 0.0 ? this.fixedItemWidth : width;
         return Mathf.Round(width * scaledPixelsPerPoint) / scaledPixelsPerPoint;
     }
@@ -1089,7 +1087,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         foreach (int index in (IEnumerable<int>)indexes)
             this.AddToSelectionWithoutValidation(index);
         this.NotifyOfSelectionChange();
-        
+
         // TODO: Implement
         // this.SaveViewData();
     }
@@ -1123,7 +1121,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
             return;
         this.RemoveFromSelectionWithoutValidation(index);
         this.NotifyOfSelectionChange();
-        
+
         // TODO: Implement   
         // this.SaveViewData();
     }
@@ -1172,7 +1170,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
             this.AddToSelectionWithoutValidation(index);
         if (sendNotification)
             this.NotifyOfSelectionChange();
-        
+
         // TODO: Implement
         // this.SaveViewData();
     }
@@ -1250,10 +1248,10 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         base.ExecuteDefaultAction(evt);
         if (evt.eventTypeId == EventBase<PointerUpEvent>.TypeId())
             this.m_Dragger?.OnPointerUpEvent((PointerUpEvent)evt);
-        
+
         // TODO: Implement
         // else if (evt.eventTypeId == EventBase<FocusEvent>.TypeId())
-            // this.m_VirtualizationController?.OnFocus(evt.leafTarget as VisualElement);
+        // this.m_VirtualizationController?.OnFocus(evt.leafTarget as VisualElement);
         else if (evt.eventTypeId == EventBase<BlurEvent>.TypeId())
         {
             this.m_VirtualizationController?.OnBlur((evt as BlurEvent)?.relatedTarget as VisualElement);
