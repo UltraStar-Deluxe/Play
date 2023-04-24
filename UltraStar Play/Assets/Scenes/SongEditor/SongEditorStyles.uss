@@ -98,6 +98,7 @@ Button.selected:hover {
     background-color: rgb(60, 63, 65);
     border-color: rgb(50, 50, 50);
     border-width: 1px;
+    white-space: normal;
 }
 
 .leftSideBar {
