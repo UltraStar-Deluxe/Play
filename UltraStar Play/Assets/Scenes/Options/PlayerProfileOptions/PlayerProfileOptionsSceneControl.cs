@@ -81,7 +81,10 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         Button deleteButton = visualElement.Q<Button>(R.UxmlNames.deleteButton);
         deleteButton.RegisterCallbackButtonTriggered(_ =>
         {
-            settings.PlayerProfiles.RemoveAt(indexInList);
+            if (indexInList < settings.PlayerProfiles.Count)
+            {
+                settings.PlayerProfiles.RemoveAt(indexInList);
+            }
             visualElement.RemoveFromHierarchy();
         });
 
