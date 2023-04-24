@@ -24,7 +24,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private PlaylistManager playlistManager;
 
     [Inject(UxmlName = R.UxmlNames.songListView)]
-    private ListView songListView;
+    private ListViewH songListView;
     
     [Inject(UxmlName = R.UxmlNames.mediumDifficultyButton)]
     private Button mediumDifficultyButton;

@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 public static class ApplyThemeStyleUtils
 {
     private static readonly Dictionary<VisualElement, VisualElementData> visualElementToData = new();
-    private static readonly Dictionary<ListView, VisualElement> listViewToSelectedVisualElement = new();
+    private static readonly Dictionary<VisualElement, VisualElement> listViewToSelectedVisualElement = new();
     
     public static void ApplyControlStyles(VisualElement visualElement, VisualElement styleTarget, ControlStyleConfig controlStyleConfig)
     {
@@ -107,6 +107,17 @@ public static class ApplyThemeStyleUtils
             listView.selectionChanged += selectedObjects => OnListViewSelectionChanged(listView, selectedObjects);
         }
     }
+    
+    public static void UpdateStylesOnListViewSelectionChanged(ListViewH listView)
+    {
+        if (listView != null
+            && !listViewToSelectedVisualElement.ContainsKey(listView))
+        {
+            VisualElement initialSelectedVisualElement = listView.GetSelectedVisualElement();
+            listViewToSelectedVisualElement[listView] = initialSelectedVisualElement;
+            listView.selectionChanged += selectedObjects => OnListViewSelectionChanged(listView, selectedObjects);
+        }
+    }
 
     private static void OnListViewSelectionChanged(ListView listView, IEnumerable<object> selectedObjects)
     {
@@ -120,6 +131,18 @@ public static class ApplyThemeStyleUtils
         }
     }
 
+    private static void OnListViewSelectionChanged(ListViewH listView, IEnumerable<object> selectedObjects)
+    {
+        VisualElement oldSelectedVisualElement = listViewToSelectedVisualElement[listView];
+        SetListViewItemActive(listView, oldSelectedVisualElement, false);
+
+        VisualElement newSelectedVisualElement = listView.GetSelectedVisualElement();
+        if (newSelectedVisualElement != null)
+        {
+            SetListViewItemActive(listView, newSelectedVisualElement, true);
+        }
+    }
+    
     public static void SetListViewItemActive(ListView listView, VisualElement listItemAncestor, bool isActive)
     {
         if (listItemAncestor == null)
@@ -147,6 +170,33 @@ public static class ApplyThemeStyleUtils
         }
     }
 
+    public static void SetListViewItemActive(ListViewH listView, VisualElement listItemAncestor, bool isActive)
+    {
+        if (listItemAncestor == null)
+        {
+            return;
+        }
+        
+        VisualElement listItem = listItemAncestor.ClassListContains("listItem")
+            ? listItemAncestor
+            : listItemAncestor.Q(null, "listItem");
+        if (listItem != null
+            && visualElementToData.TryGetValue(listItem, out VisualElementData listItemData))
+        {
+            listItemData.isActive = isActive;
+            UpdateStyles(listItemData);
+        }
+
+        if (isActive)
+        {
+            listViewToSelectedVisualElement[listView] = listItemAncestor;
+        }
+        else if (listViewToSelectedVisualElement[listView] == listItemAncestor)
+        {
+            listViewToSelectedVisualElement[listView] = null;
+        }
+    }
+    
     private static void ApplyGradient(VisualElementData data, GradientConfig newGradientConfig)
     {
         VisualElement visualElement = data.styleTarget;
