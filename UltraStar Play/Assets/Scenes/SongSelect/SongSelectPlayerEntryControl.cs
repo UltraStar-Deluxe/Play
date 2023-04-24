@@ -62,6 +62,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.teamLabel)]
     private Label teamLabel;
     
+    [Inject(UxmlName = R.UxmlNames.voiceNameLabel)]
+    private Label voiceNameLabel;
+    
     // The MicProfile can be null to indicate that this player does not have a mic (yet).
     private MicProfile micProfile;
     public MicProfile MicProfile
@@ -166,11 +169,11 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         if (!voiceNames.IsNullOrEmpty()
             && voiceNames.ContainsKey(selectedVoiceName.Value))
         {
-            toggleVoiceButton.text = voiceNames[selectedVoiceName.Value];
+            voiceNameLabel.text = voiceNames[selectedVoiceName.Value];
         }
         else
         {
-            toggleVoiceButton.text = selectedVoiceName.Value;
+            voiceNameLabel.text = selectedVoiceName.Value;
         }
     }
 

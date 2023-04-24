@@ -26,9 +26,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private ListViewH songListView;
     
-    [Inject(UxmlName = R.UxmlNames.mediumDifficultyButton)]
-    private Button mediumDifficultyButton;
-    
     private List<SongMeta> songs = new();
     public IReadOnlyList<SongMeta> Songs => songs;
 
@@ -63,8 +60,12 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private void Start()
     {
-        songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.NoTrickleDown);
+        songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.TrickleDown);
         
+        // Hide scroll bars
+        songListView.Q<ScrollView>().horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+        songListView.Q<ScrollView>().verticalScrollerVisibility = ScrollerVisibility.Hidden;
+            
         songListView.makeItem = () =>
         {
             VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
@@ -116,7 +117,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             .CreateAndInject<SongEntryControl>();
         item.Name = songMeta.Artist + "-" + songMeta.Title;
         item.SongMeta = songMeta;
-
+        item.PointerDownOnSongImageEventStream.Subscribe(_ => OnSongButtonClicked(songMeta));
+            
         songEntryControls.Add(item);
     }
 

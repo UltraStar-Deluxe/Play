@@ -366,10 +366,6 @@
     display: none;
 }
 
-.unity-scroll-view #unity-content-container {
-    padding-bottom: 10px;
-}
-
 .unity-scroller--vertical {
     width: 12px;
 }

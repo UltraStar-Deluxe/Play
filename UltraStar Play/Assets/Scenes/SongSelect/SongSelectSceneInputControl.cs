@@ -113,11 +113,13 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
     {
+        VisualElement focusedElement = VisualElementUtils.GetFocusedVisualElement(songListView.focusController);
         if (songSearchControl.IsSearchTextFieldFocused())
         {
             songSelectSceneControl.SubmitSearch();
         }
-        else if (songListView.focusController.focusedElement == songListView)
+        else if (focusedElement?.GetFirstAncestorOfType<ListView>() != null
+                 || focusedElement?.GetFirstAncestorOfType<ListViewH>() != null)
         {
             songSelectSceneControl.AttemptStartSong();
         }
