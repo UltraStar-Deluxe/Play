@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 
 /// <summary>
 ///        <para>
-/// Base class for a list view, a vertically scrollable area that links to, and displays, a list of items.
+/// Base class for a list view, a horizontally scrollable area that links to, and displays, a list of items.
 /// </para>
 ///      </summary>
 public abstract class BaseListViewH : BaseHorizontalCollectionView
@@ -522,7 +522,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
 
     /// <summary>
     ///        <para>
-    /// Creates a BaseListView with all default properties. The BaseVerticalCollectionView.itemsSource
+    /// Creates a BaseListView with all default properties. The BaseHorizontalCollectionView.itemsSource
     /// must all be set for the BaseListView to function properly.
     /// </para>
     ///      </summary>
@@ -534,9 +534,9 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     /// </para>
     ///      </summary>
     /// <param name="itemsSource">The list of items to use as a data source.</param>
-    /// <param name="itemHeight">The height of each item, in pixels.</param>
-    public BaseListViewH(IList itemsSource, float itemHeight = -1f)
-        : base(itemsSource, itemHeight)
+    /// <param name="itemWidth">The width of each item, in pixels.</param>
+    public BaseListViewH(IList itemsSource, float itemWidth = -1f)
+        : base(itemsSource, itemWidth)
     {
         this.AddToClassList(BaseListView.ussClassName);
     }

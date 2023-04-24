@@ -53,7 +53,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
         protected set => this.serializedData.firstVisibleIndex = value;
     }
 
-    protected float lastHeight => this.m_CollectionView.lastHeight;
+    protected float lastWidth => this.m_CollectionView.LastWidth;
 
     protected HorizontalVirtualizationController(BaseHorizontalCollectionView collectionView)
         : base(collectionView.scrollView)
@@ -114,7 +114,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
                     recycledItem.index);
             recycledItem.isDragGhost = true;
             recycledItem.index = this.m_DraggedItem.index;
-            recycledItem.rootElement.style.maxHeight = (StyleLength)0.0f;
+            recycledItem.rootElement.style.maxWidth = (StyleLength)0.0f;
             recycledItem.rootElement.style.display = (StyleEnum<DisplayStyle>)DisplayStyle.Flex;
             recycledItem.bindableElement.style.display = (StyleEnum<DisplayStyle>)DisplayStyle.None;
         }
@@ -123,7 +123,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
             if (isDragGhost)
             {
                 recycledItem.isDragGhost = false;
-                recycledItem.rootElement.style.maxHeight = (StyleLength)StyleKeyword.Null;
+                recycledItem.rootElement.style.maxWidth = (StyleLength)StyleKeyword.Null;
                 recycledItem.bindableElement.style.display = (StyleEnum<DisplayStyle>)DisplayStyle.Flex;
             }
 
@@ -144,7 +144,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
                 bool enable = this.m_CollectionView.showAlternatingRowBackgrounds != AlternatingRowBackground.None &&
                               newIndex % 2 == 1;
                 recycledItem.rootElement.EnableInClassList(
-                    BaseVerticalCollectionView.itemAlternativeBackgroundUssClassName, enable);
+                    BaseHorizontalCollectionView.itemAlternativeBackgroundUssClassName, enable);
                 int index = recycledItem.index;
                 int idForIndex = this.m_CollectionView.viewController.GetIdForIndex(newIndex);
                 if (recycledItem.index != -1)
@@ -213,7 +213,7 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
     {
         float num1;
         if (this.m_CollectionView.showAlternatingRowBackgrounds != AlternatingRowBackground.All ||
-            (double)(num1 = this.m_ScrollView.contentViewport.resolvedStyle.height - this.GetExpectedContentHeight()) <=
+            (double)(num1 = this.m_ScrollView.contentViewport.resolvedStyle.width - this.GetExpectedContentWidth()) <=
             0.0)
         {
             this.m_EmptyRows?.RemoveFromHierarchy();
@@ -230,8 +230,8 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
             
             if (this.m_EmptyRows.parent == null)
                 this.m_ScrollView.contentViewport.Add(this.m_EmptyRows);
-            float expectedItemHeight = this.GetExpectedItemHeight(-1);
-            int num2 = Mathf.FloorToInt(num1 / expectedItemHeight) + 1;
+            float expectedItemWidth = this.GetExpectedItemWidth(-1);
+            int num2 = Mathf.FloorToInt(num1 / expectedItemWidth) + 1;
             if (num2 > this.m_EmptyRows.childCount)
             {
                 int num3 = num2 - this.m_EmptyRows.childCount;
@@ -251,8 +251,8 @@ internal abstract class HorizontalVirtualizationController<T> : CollectionVirtua
                 hierarchy = this.m_EmptyRows.hierarchy;
                 VisualElement visualElement = hierarchy[key];
                 ++num4;
-                visualElement.style.height = (StyleLength)expectedItemHeight;
-                visualElement.EnableInClassList(BaseVerticalCollectionView.itemAlternativeBackgroundUssClassName,
+                visualElement.style.width = (StyleLength)expectedItemWidth;
+                visualElement.EnableInClassList(BaseHorizontalCollectionView.itemAlternativeBackgroundUssClassName,
                     num4 % 2 == 1);
             }
         }

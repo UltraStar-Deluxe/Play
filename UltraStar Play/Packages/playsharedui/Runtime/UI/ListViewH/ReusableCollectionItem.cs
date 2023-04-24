@@ -31,13 +31,13 @@ public class ReusableCollectionItem
 
     public virtual void PreAttachElement()
     {
-        this.rootElement.AddToClassList(BaseVerticalCollectionView.itemUssClassName);
+        this.rootElement.AddToClassList(BaseHorizontalCollectionView.itemUssClassName);
         this.rootElement.RegisterCallback<GeometryChangedEvent>(this.m_GeometryChangedEventCallback);
     }
 
     public virtual void DetachElement()
     {
-        this.rootElement.RemoveFromClassList(BaseVerticalCollectionView.itemUssClassName);
+        this.rootElement.RemoveFromClassList(BaseHorizontalCollectionView.itemUssClassName);
         this.rootElement.UnregisterCallback<GeometryChangedEvent>(this.m_GeometryChangedEventCallback);
         this.rootElement?.RemoveFromHierarchy();
         this.SetSelected(false);
@@ -49,12 +49,12 @@ public class ReusableCollectionItem
     {
         if (selected)
         {
-            this.rootElement.AddToClassList(BaseVerticalCollectionView.itemSelectedVariantUssClassName);
+            this.rootElement.AddToClassList(BaseHorizontalCollectionView.itemSelectedVariantUssClassName);
             // this.rootElement.pseudoStates |= PseudoStates.Checked;
         }
         else
         {
-            this.rootElement.RemoveFromClassList(BaseVerticalCollectionView.itemSelectedVariantUssClassName);
+            this.rootElement.RemoveFromClassList(BaseHorizontalCollectionView.itemSelectedVariantUssClassName);
             // this.rootElement.pseudoStates &= ~PseudoStates.Checked;
         }
     }

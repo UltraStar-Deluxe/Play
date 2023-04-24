@@ -24,11 +24,11 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 {
     private SelectionType m_SelectionType;
     public static readonly List<ReusableCollectionItem> k_EmptyItems = new List<ReusableCollectionItem>();
-    private bool m_HorizontalScrollingEnabled;
+    private bool mVerticalScrollingEnabled;
     [SerializeField] private AlternatingRowBackground m_ShowAlternatingRowBackgrounds = AlternatingRowBackground.None;
-    internal static readonly int s_DefaultItemHeight = 22;
-    internal float m_FixedItemHeight = (float)22f; //BaseVerticalCollectionView.s_DefaultItemHeight;
-    internal bool m_ItemHeightIsInline;
+    internal static readonly int s_DefaultItemWidth = 22;
+    internal float m_FixedItemWidth = (float)BaseHorizontalCollectionView.s_DefaultItemWidth;
+    internal bool m_ItemWidthIsInline;
     private CollectionVirtualizationMethod m_VirtualizationMethod;
     private readonly ScrollView m_ScrollView;
     private CollectionViewController m_ViewController;
@@ -41,11 +41,11 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     [SerializeField] private readonly List<int> m_SelectedIds = new List<int>();
     private readonly List<int> m_SelectedIndices = new List<int>();
     private readonly List<object> m_SelectedItems = new List<object>();
-    private float m_LastHeight;
+    private float m_LastWidth;
     private bool m_IsRangeSelectionDirectionUp;
     private ListViewDragger m_Dragger;
-    internal const float ItemHeightUnset = -1f;
-    internal static CustomStyleProperty<int> s_ItemHeightProperty = new CustomStyleProperty<int>("--unity-item-height");
+    internal const float ItemWidthUnset = -1f;
+    internal static CustomStyleProperty<int> s_ItemWidthProperty = new CustomStyleProperty<int>("--unity-item-width");
     private Action<int, int> m_ItemIndexChangedCallback;
     private Action m_ItemsSourceChangedCallback;
 
@@ -61,14 +61,14 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// The USS class name for BaseVerticalCollectionView elements with a border.
     /// </para>
     ///      </summary>
-    public static readonly string borderUssClassName = BaseVerticalCollectionView.ussClassName + "--with-border";
+    public static readonly string borderUssClassName = BaseHorizontalCollectionView.ussClassName + "--with-border";
 
     /// <summary>
     ///        <para>
     /// The USS class name of item elements in BaseVerticalCollectionView elements.
     /// </para>
     ///      </summary>
-    public static readonly string itemUssClassName = BaseVerticalCollectionView.ussClassName + "__item";
+    public static readonly string itemUssClassName = BaseHorizontalCollectionView.ussClassName + "__item";
 
     /// <summary>
     ///        <para>
@@ -76,7 +76,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// </para>
     ///      </summary>
     public static readonly string dragHoverBarUssClassName =
-        BaseVerticalCollectionView.ussClassName + "__drag-hover-bar";
+        BaseHorizontalCollectionView.ussClassName + "__drag-hover-bar";
 
     /// <summary>
     ///        <para>
@@ -84,34 +84,34 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     /// </para>
     ///      </summary>
     public static readonly string itemDragHoverUssClassName =
-        BaseVerticalCollectionView.itemUssClassName + "--drag-hover";
+        BaseHorizontalCollectionView.itemUssClassName + "--drag-hover";
 
     /// <summary>
     ///        <para>
-    /// The USS class name of selected item elements in the BaseVerticalCollectionView.
+    /// The USS class name of selected item elements in the BaseHorizontalCollectionView.
     /// </para>
     ///      </summary>
     public static readonly string itemSelectedVariantUssClassName =
-        BaseVerticalCollectionView.itemUssClassName + "--selected";
+        BaseHorizontalCollectionView.itemUssClassName + "--selected";
 
     /// <summary>
     ///        <para>
-    /// The USS class name for odd rows in the BaseVerticalCollectionView.
+    /// The USS class name for odd rows in the BaseHorizontalCollectionView.
     /// </para>
     ///      </summary>
     public static readonly string itemAlternativeBackgroundUssClassName =
-        BaseVerticalCollectionView.itemUssClassName + "--alternative-background";
+        BaseHorizontalCollectionView.itemUssClassName + "--alternative-background";
 
     /// <summary>
     ///        <para>
-    /// The USS class name of the scroll view in the BaseVerticalCollectionView.
+    /// The USS class name of the scroll view in the BaseHorizontalCollectionView.
     /// </para>
     ///      </summary>
     public static readonly string listScrollViewUssClassName =
-        BaseVerticalCollectionView.ussClassName + "__scroll-view";
+        BaseHorizontalCollectionView.ussClassName + "__scroll-view";
 
     internal static readonly string backgroundFillUssClassName =
-        BaseVerticalCollectionView.ussClassName + "__background-fill";
+        BaseHorizontalCollectionView.ussClassName + "__background-fill";
 
     private Vector3 m_TouchDownPosition;
 
@@ -211,7 +211,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     /// <summary>
     ///        <para>
-    /// Returns the content container for the BaseVerticalCollectionView. Because the BaseVerticalCollectionView
+    /// Returns the content container for the BaseHorizontalCollectionView. Because the BaseVerticalCollectionView
     /// control automatically manages its content, this always returns null.
     /// </para>
     ///      </summary>
@@ -280,7 +280,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     internal IEnumerable<ReusableCollectionItem> activeItems => this.m_VirtualizationController?.activeItems ??
                                                                 (IEnumerable<ReusableCollectionItem>)
-                                                                new List<ReusableCollectionItem>(); //BaseVerticalCollectionView.k_EmptyItems;
+                                                                new List<ReusableCollectionItem>(); //BaseHorizontalCollectionView.k_EmptyItems;
 
     internal ScrollView scrollView => this.m_ScrollView;
 
@@ -295,19 +295,11 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     ///      </summary>
     public CollectionViewController viewController => this.m_ViewController;
 
-    /// <summary>
-    ///        <para>
-    /// The computed pixel-aligned height for the list elements.
-    /// </para>
-    ///      </summary>
-    [Obsolete("resolvedItemHeight is deprecated and will be removed from the API.", false)]
-    public float resolvedItemHeight => this.ResolveItemHeight();
-
-    internal float ResolveItemHeight(float height = -1f)
+    internal float ResolveItemWidth(float width = -1f)
     {
         float scaledPixelsPerPoint = 1;// this.scaledPixelsPerPoint;
-        height = (double)height < 0.0 ? this.fixedItemHeight : height;
-        return Mathf.Round(height * scaledPixelsPerPoint) / scaledPixelsPerPoint;
+        width = (double)width < 0.0 ? this.fixedItemWidth : width;
+        return Mathf.Round(width * scaledPixelsPerPoint) / scaledPixelsPerPoint;
     }
 
     /// <summary>
@@ -317,8 +309,8 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     ///      </summary>
     public bool showBorder
     {
-        get => this.m_ScrollView.ClassListContains(BaseVerticalCollectionView.borderUssClassName);
-        set => this.m_ScrollView.EnableInClassList(BaseVerticalCollectionView.borderUssClassName, value);
+        get => this.m_ScrollView.ClassListContains(BaseHorizontalCollectionView.borderUssClassName);
+        set => this.m_ScrollView.EnableInClassList(BaseHorizontalCollectionView.borderUssClassName, value);
     }
 
     /// <summary>
@@ -338,21 +330,21 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     /// <summary>
     ///        <para>
-    /// This property controls whether the collection view shows a horizontal scroll bar when its content
+    /// This property controls whether the collection view shows a vertical scroll bar when its content
     /// does not fit in the visible area.
     /// </para>
     ///      </summary>
-    public bool horizontalScrollingEnabled
+    public bool verticalScrollingEnabled
     {
-        get => this.m_HorizontalScrollingEnabled;
+        get => this.mVerticalScrollingEnabled;
         set
         {
-            if (this.m_HorizontalScrollingEnabled == value)
-                return;
-            this.m_HorizontalScrollingEnabled = value;
-            this.m_ScrollView.horizontalScrollerVisibility =
+            // if (this.mVerticalScrollingEnabled == value)
+            //     return;
+            this.mVerticalScrollingEnabled = value;
+            this.m_ScrollView.verticalScrollerVisibility =
                 value ? ScrollerVisibility.Auto : ScrollerVisibility.Hidden;
-            this.m_ScrollView.mode = value ? ScrollViewMode.VerticalAndHorizontal : ScrollViewMode.Vertical;
+            this.m_ScrollView.mode = value ? ScrollViewMode.VerticalAndHorizontal : ScrollViewMode.Horizontal;
         }
     }
 
@@ -396,38 +388,26 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     /// <summary>
     ///        <para>
-    /// The height of a single item in the list, in pixels.
+    /// The width of a single item in the list, in pixels.
     /// </para>
     ///      </summary>
-    [Obsolete("itemHeight is deprecated, use fixedItemHeight instead.", false)]
-    public int itemHeight
+    public float fixedItemWidth
     {
-        get => (int)this.fixedItemHeight;
-        set => this.fixedItemHeight = (float)value;
-    }
-
-    /// <summary>
-    ///        <para>
-    /// The height of a single item in the list, in pixels.
-    /// </para>
-    ///      </summary>
-    public float fixedItemHeight
-    {
-        get => this.m_FixedItemHeight;
+        get => this.m_FixedItemWidth;
         set
         {
             if ((double)value < 0.0)
-                throw new ArgumentOutOfRangeException(nameof(fixedItemHeight),
+                throw new ArgumentOutOfRangeException(nameof(fixedItemWidth),
                     "Value needs to be positive for virtualization.");
-            this.m_ItemHeightIsInline = true;
-            if ((double)Math.Abs(this.m_FixedItemHeight - value) <= 1.401298464324817E-45)
+            this.m_ItemWidthIsInline = true;
+            if ((double)Math.Abs(this.m_FixedItemWidth - value) <= 1.401298464324817E-45)
                 return;
-            this.m_FixedItemHeight = value;
+            this.m_FixedItemWidth = value;
             this.RefreshItems();
         }
     }
 
-    internal float lastHeight => this.m_LastHeight;
+    internal float LastWidth => this.m_LastWidth;
 
     private protected virtual void CreateVirtualizationController() =>
         this.CreateVirtualizationController<ReusableCollectionItem>();
@@ -443,11 +423,11 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     {
         switch (this.virtualizationMethod)
         {
-            case CollectionVirtualizationMethod.FixedHeight:
+            case CollectionVirtualizationMethod.Fixed:
                 this.m_VirtualizationController =
                     (CollectionVirtualizationController)new FixedWidthVirtualizationController<T>(this);
                 break;
-            case CollectionVirtualizationMethod.DynamicHeight:
+            case CollectionVirtualizationMethod.Dynamic:
                 throw new NotImplementedException("Dynamic not implemented");
                 // TODO: Implement
                 // this.m_VirtualizationController =
@@ -529,17 +509,17 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     /// <summary>
     ///        <para>
-    /// Creates a BaseVerticalCollectionView with all default properties.
-    /// The BaseVerticalCollectionView.itemsSource must all be set for the BaseVerticalCollectionView to function properly.
+    /// Creates a BaseHorizontalCollectionView with all default properties.
+    /// The BaseHorizontalCollectionView.itemsSource must all be set for the BaseHorizontalCollectionView to function properly.
     /// </para>
     ///      </summary>
     public BaseHorizontalCollectionView()
     {
-        this.AddToClassList(BaseVerticalCollectionView.ussClassName);
+        this.AddToClassList(BaseHorizontalCollectionView.ussClassName);
         this.selectionType = SelectionType.Single;
         this.m_ScrollView = new ScrollView();
-        this.m_ScrollView.AddToClassList(BaseVerticalCollectionView.listScrollViewUssClassName);
-        this.m_ScrollView.verticalScroller.valueChanged += (Action<float>)(v => this.OnScroll(new Vector2(0.0f, v)));
+        this.m_ScrollView.AddToClassList(BaseHorizontalCollectionView.listScrollViewUssClassName);
+        this.m_ScrollView.horizontalScroller.valueChanged += (Action<float>)(h => this.OnScroll(new Vector2(h, 0)));
         this.m_ScrollView.RegisterCallback<GeometryChangedEvent>(
             new EventCallback<GeometryChangedEvent>(this.OnSizeChanged));
         this.RegisterCallback<CustomStyleResolvedEvent>(
@@ -561,18 +541,18 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     /// <summary>
     ///        <para>
-    /// Constructs a BaseVerticalCollectionView, with all required properties provided.
+    /// Constructs a BaseHorizontalCollectionView, with all required properties provided.
     /// </para>
     ///      </summary>
     /// <param name="itemsSource">The list of items to use as a data source.</param>
-    /// <param name="itemHeight">The height of each item, in pixels. For &lt;c&gt;FixedHeight&lt;/c&gt; virtualization only.</param>
-    public BaseHorizontalCollectionView(IList itemsSource, float itemHeight = -1f)
+    /// <param name="itemWidth">The width of each item, in pixels. For &lt;c&gt;FixedWidth&lt;/c&gt; virtualization only.</param>
+    public BaseHorizontalCollectionView(IList itemsSource, float itemWidth = -1f)
         : this()
     {
-        if ((double)Math.Abs(itemHeight - -1f) > 1.401298464324817E-45)
+        if ((double)Math.Abs(itemWidth - -1f) > 1.401298464324817E-45)
         {
-            this.m_FixedItemHeight = itemHeight;
-            this.m_ItemHeightIsInline = true;
+            this.m_FixedItemWidth = itemWidth;
+            this.m_ItemWidthIsInline = true;
         }
 
         if (itemsSource == null)
@@ -584,15 +564,15 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         "makeItem and bindItem are now in ListView and TreeView directly, please use a constructor without these parameters.")]
     public BaseHorizontalCollectionView(
         IList itemsSource,
-        float itemHeight = -1f,
+        float itemWidth = -1f,
         Func<VisualElement> makeItem = null,
         Action<VisualElement, int> bindItem = null)
         : this()
     {
-        if ((double)Math.Abs(itemHeight - -1f) > 1.401298464324817E-45)
+        if ((double)Math.Abs(itemWidth - -1f) > 1.401298464324817E-45)
         {
-            this.m_FixedItemHeight = itemHeight;
-            this.m_ItemHeightIsInline = true;
+            this.m_FixedItemWidth = itemWidth;
+            this.m_ItemWidthIsInline = true;
         }
 
         this.itemsSource = itemsSource;
@@ -665,7 +645,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     ///      </summary>
     public void RefreshItems()
     {
-        using (new ProfilerMarker("BaseVerticalCollectionView.RefreshItems").Auto())
+        using (new ProfilerMarker("BaseHorizontalCollectionView.RefreshItems").Auto())
         {
             if (this.m_ViewController == null)
                 return;
@@ -685,7 +665,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     ///      </summary>
     public void Rebuild()
     {
-        using (new ProfilerMarker("BaseVerticalCollectionView.Rebuild").Auto())
+        using (new ProfilerMarker("BaseHorizontalCollectionView.Rebuild").Auto())
         {
             if (this.m_ViewController == null)
                 return;
@@ -717,9 +697,9 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         if (!this.HasValidDataAndBindings())
             return;
         Rect layout = this.m_ScrollView.layout;
-        this.m_LastHeight = layout.height;
+        this.m_LastWidth = layout.width;
         layout = this.m_ScrollView.layout;
-        if (float.IsNaN(layout.height))
+        if (float.IsNaN(layout.width))
             return;
         layout = this.m_ScrollView.layout;
         this.Resize(layout.size);
@@ -780,7 +760,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     private void Resize(Vector2 size)
     {
         this.virtualizationController.Resize(size);
-        this.m_LastHeight = size.y;
+        this.m_LastWidth = size.x;
         this.virtualizationController.UpdateBackground();
     }
 
@@ -1290,17 +1270,17 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     {
         if (!this.HasValidDataAndBindings())
             return;
-        double width1 = (double)evt.newRect.width;
+        double height1 = (double)evt.newRect.height;
         Rect rect = evt.oldRect;
-        double width2 = (double)rect.width;
+        double height2 = (double)rect.height;
         int num;
-        if (Mathf.Approximately((float)width1, (float)width2))
+        if (Mathf.Approximately((float)height1, (float)height2))
         {
             rect = evt.newRect;
-            double height1 = (double)rect.height;
+            double width1 = (double)rect.width;
             rect = evt.oldRect;
-            double height2 = (double)rect.height;
-            num = Mathf.Approximately((float)height1, (float)height2) ? 1 : 0;
+            double width2 = (double)rect.width;
+            num = Mathf.Approximately((float)width1, (float)width2) ? 1 : 0;
         }
         else
             num = 0;
@@ -1314,11 +1294,11 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     private void OnCustomStyleResolved(CustomStyleResolvedEvent e)
     {
         int num;
-        if (this.m_ItemHeightIsInline ||
-            !e.customStyle.TryGetValue(BaseHorizontalCollectionView.s_ItemHeightProperty, out num) ||
-            (double)Math.Abs(this.m_FixedItemHeight - (float)num) <= 1.401298464324817E-45)
+        if (this.m_ItemWidthIsInline ||
+            !e.customStyle.TryGetValue(BaseHorizontalCollectionView.s_ItemWidthProperty, out num) ||
+            (double)Math.Abs(this.m_FixedItemWidth - (float)num) <= 1.401298464324817E-45)
             return;
-        this.m_FixedItemHeight = (float)num;
+        this.m_FixedItemWidth = (float)num;
         this.RefreshItems();
     }
 
@@ -1330,12 +1310,12 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     /// <summary>
     ///        <para>
-    /// Defines UxmlTraits for the BaseVerticalCollectionView.
+    /// Defines UxmlTraits for the BaseHorizontalCollectionView.
     /// </para>
     ///      </summary>
     public new class UxmlTraits : BindableElement.UxmlTraits
     {
-        private readonly UxmlIntAttributeDescription m_FixedItemHeight;
+        private readonly UxmlIntAttributeDescription m_FixedItemWidth;
         private readonly UxmlEnumAttributeDescription<CollectionVirtualizationMethod> m_VirtualizationMethod;
         private readonly UxmlBoolAttributeDescription m_ShowBorder;
         private readonly UxmlEnumAttributeDescription<SelectionType> m_SelectionType;
@@ -1361,7 +1341,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
         /// <summary>
         ///        <para>
-        /// Initializes BaseVerticalCollectionView properties using values from the attribute bag.
+        /// Initializes BaseHorizontalCollectionView properties using values from the attribute bag.
         /// </para>
         ///      </summary>
         /// <param name="ve">The object to initialize.</param>
@@ -1371,30 +1351,30 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         {
             base.Init(ve, bag, cc);
             int num = 0;
-            BaseHorizontalCollectionView verticalCollectionView = (BaseHorizontalCollectionView)ve;
-            verticalCollectionView.reorderable = this.m_Reorderable.GetValueFromBag(bag, cc);
-            if (this.m_FixedItemHeight.TryGetValueFromBag(bag, cc, ref num))
-                verticalCollectionView.fixedItemHeight = (float)num;
-            verticalCollectionView.virtualizationMethod = this.m_VirtualizationMethod.GetValueFromBag(bag, cc);
-            verticalCollectionView.showBorder = this.m_ShowBorder.GetValueFromBag(bag, cc);
-            verticalCollectionView.selectionType = this.m_SelectionType.GetValueFromBag(bag, cc);
-            verticalCollectionView.showAlternatingRowBackgrounds =
+            BaseHorizontalCollectionView horizontalCollectionView = (BaseHorizontalCollectionView)ve;
+            horizontalCollectionView.reorderable = this.m_Reorderable.GetValueFromBag(bag, cc);
+            if (this.m_FixedItemWidth.TryGetValueFromBag(bag, cc, ref num))
+                horizontalCollectionView.fixedItemWidth = (float)num;
+            horizontalCollectionView.virtualizationMethod = this.m_VirtualizationMethod.GetValueFromBag(bag, cc);
+            horizontalCollectionView.showBorder = this.m_ShowBorder.GetValueFromBag(bag, cc);
+            horizontalCollectionView.selectionType = this.m_SelectionType.GetValueFromBag(bag, cc);
+            horizontalCollectionView.showAlternatingRowBackgrounds =
                 this.m_ShowAlternatingRowBackgrounds.GetValueFromBag(bag, cc);
-            verticalCollectionView.horizontalScrollingEnabled =
+            horizontalCollectionView.verticalScrollingEnabled =
                 this.m_HorizontalScrollingEnabled.GetValueFromBag(bag, cc);
         }
 
         public UxmlTraits()
         {
             UxmlIntAttributeDescription attributeDescription1 = new UxmlIntAttributeDescription();
-            attributeDescription1.name = "fixed-item-height";
-            attributeDescription1.obsoleteNames = (IEnumerable<string>)new string[1] { "itemHeight, item-height" };
-            attributeDescription1.defaultValue = BaseHorizontalCollectionView.s_DefaultItemHeight;
-            this.m_FixedItemHeight = attributeDescription1;
+            attributeDescription1.name = "fixed-item-width";
+            attributeDescription1.obsoleteNames = (IEnumerable<string>)new string[1] { "itemWidth, item-width" };
+            attributeDescription1.defaultValue = BaseHorizontalCollectionView.s_DefaultItemWidth;
+            this.m_FixedItemWidth = attributeDescription1;
             UxmlEnumAttributeDescription<CollectionVirtualizationMethod> attributeDescription2 =
                 new UxmlEnumAttributeDescription<CollectionVirtualizationMethod>();
             attributeDescription2.name = "virtualization-method";
-            attributeDescription2.defaultValue = CollectionVirtualizationMethod.FixedHeight;
+            attributeDescription2.defaultValue = CollectionVirtualizationMethod.Fixed;
             this.m_VirtualizationMethod = attributeDescription2;
             UxmlBoolAttributeDescription attributeDescription3 = new UxmlBoolAttributeDescription();
             attributeDescription3.name = "show-border";

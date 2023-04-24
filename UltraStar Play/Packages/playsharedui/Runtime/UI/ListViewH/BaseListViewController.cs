@@ -35,6 +35,8 @@ public abstract class BaseListViewController : CollectionViewController
       listItem.bindableElement.style.flexBasis = (StyleLength) StyleKeyword.Initial;
       listItem.bindableElement.style.marginTop = (StyleLength) 0.0f;
       listItem.bindableElement.style.marginBottom = (StyleLength) 0.0f;
+      listItem.bindableElement.style.marginLeft = (StyleLength) 0.0f;
+      listItem.bindableElement.style.marginRight = (StyleLength) 0.0f;
       listItem.bindableElement.style.flexGrow = (StyleFloat) 0.0f;
       listItem.bindableElement.style.flexShrink = (StyleFloat) 0.0f;
     }

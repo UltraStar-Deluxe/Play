@@ -29,9 +29,9 @@ public abstract class CollectionVirtualizationController
 
     public abstract int GetIndexFromPosition(Vector2 position);
 
-    public abstract float GetExpectedItemHeight(int index);
+    public abstract float GetExpectedItemWidth(int index);
 
-    public abstract float GetExpectedContentHeight();
+    public abstract float GetExpectedContentWidth();
 
     public abstract void OnFocus(VisualElement leafTarget);
 

@@ -6,6 +6,7 @@
 // XML documentation location: F:\Dev\Tools\Unity3D\UnityEditor\2022.2.4f1\Editor\Data\Managed\UnityEngine\UnityEngine.UIElementsModule.xml
 
 using System;
+using UnityEngine.Serialization;
 
 namespace UnityEngine.UIElements
 {
@@ -15,7 +16,7 @@ namespace UnityEngine.UIElements
         public Vector2 scrollOffset;
         public int firstVisibleIndex;
         public float contentPadding;
-        public float contentHeight;
+        public float contentWidth;
         public int anchoredItemIndex;
         public float anchorOffset;
     }

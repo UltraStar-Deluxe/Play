@@ -18,18 +18,13 @@ public class ListViewDragger : DragEventsProcessor
     private const int k_AutoScrollAreaSize = 5;
     private const int k_BetweenElementsAreaSize = 5;
     private const int k_PanSpeed = 20;
-    private const int k_DragHoverBarHeight = 2;
+    private const int k_DragHoverBarWidth = 2;
 
     protected BaseHorizontalCollectionView targetListView => this.m_Target as BaseHorizontalCollectionView;
 
     protected ScrollView targetScrollView => this.targetListView.scrollView;
 
     public ICollectionDragAndDropController dragAndDropController { get; set; }
-
-    public ListViewDragger(BaseVerticalCollectionView listView)
-      : base((VisualElement) listView)
-    {
-    }
 
     public ListViewDragger(BaseHorizontalCollectionView listView)
         : base((VisualElement) listView)
@@ -101,20 +96,20 @@ public class ListViewDragger : DragEventsProcessor
 
     internal void HandleDragAndScroll(Vector2 pointerPosition)
     {
-      bool flag1 = (double) pointerPosition.y < (double) this.targetScrollView.worldBound.yMin + 5.0;
-      bool flag2 = (double) pointerPosition.y > (double) this.targetScrollView.worldBound.yMax - 5.0;
+      bool flag1 = (double) pointerPosition.x < (double) this.targetScrollView.worldBound.yMin + 5.0;
+      bool flag2 = (double) pointerPosition.x > (double) this.targetScrollView.worldBound.yMax - 5.0;
       if (!(flag1 | flag2))
         return;
       Vector2 vector2 = this.targetScrollView.scrollOffset + (flag1 ? Vector2.down : Vector2.up) * 20f;
       ref Vector2 local = ref vector2;
-      double y = (double) vector2.y;
+      double x = (double) vector2.x;
       Rect worldBound = this.targetScrollView.contentContainer.worldBound;
-      double height1 = (double) worldBound.height;
+      double width1 = (double) worldBound.width;
       worldBound = this.targetScrollView.contentViewport.worldBound;
-      double height2 = (double) worldBound.height;
-      double max = (double) Mathf.Max(0.0f, (float) (height1 - height2));
-      double num = (double) Mathf.Clamp((float) y, 0.0f, (float) max);
-      local.y = (float) num;
+      double width2 = (double) worldBound.width;
+      double max = (double) Mathf.Max(0.0f, (float) (width1 - width2));
+      double num = (double) Mathf.Clamp((float) x, 0.0f, (float) max);
+      local.x = (float) num;
       this.targetScrollView.scrollOffset = vector2;
     }
 
@@ -125,7 +120,7 @@ public class ListViewDragger : DragEventsProcessor
       if (this.m_DragHoverBar == null)
       {
         this.m_DragHoverBar = new VisualElement();
-        this.m_DragHoverBar.AddToClassList(BaseVerticalCollectionView.dragHoverBarUssClassName);
+        this.m_DragHoverBar.AddToClassList(BaseHorizontalCollectionView.dragHoverBarUssClassName);
         this.m_DragHoverBar.style.width = (StyleLength) this.targetListView.localBound.width;
         this.m_DragHoverBar.style.visibility = (StyleEnum<Visibility>) Visibility.Hidden;
         this.m_DragHoverBar.pickingMode = PickingMode.Ignore;
@@ -137,7 +132,7 @@ public class ListViewDragger : DragEventsProcessor
       switch (dragPosition.dragAndDropPosition)
       {
         case DragAndDropPosition.OverItem:
-          dragPosition.recycledItem.rootElement.AddToClassList(BaseVerticalCollectionView.itemDragHoverUssClassName);
+          dragPosition.recycledItem.rootElement.AddToClassList(BaseHorizontalCollectionView.itemDragHoverUssClassName);
           break;
         case DragAndDropPosition.BetweenItems:
           if (dragPosition.insertAtIndex == 0)
@@ -232,9 +227,9 @@ public class ListViewDragger : DragEventsProcessor
       this.PlaceHoverBarAt(Mathf.Min(contentViewport.WorldToLocal(element.worldBound).yMax, contentViewport.localBound.yMax - 2f));
     }
 
-    private void PlaceHoverBarAt(float top)
+    private void PlaceHoverBarAt(float left)
     {
-      this.m_DragHoverBar.style.top = (StyleLength) top;
+      this.m_DragHoverBar.style.left = (StyleLength) left;
       this.m_DragHoverBar.style.visibility = (StyleEnum<Visibility>) Visibility.Visible;
     }
 
@@ -242,7 +237,7 @@ public class ListViewDragger : DragEventsProcessor
     {
       this.m_LastDragPosition = new ListViewDragger.DragPosition();
       foreach (ReusableCollectionItem activeItem in this.targetListView.activeItems)
-        activeItem.rootElement.RemoveFromClassList(BaseVerticalCollectionView.itemDragHoverUssClassName);
+        activeItem.rootElement.RemoveFromClassList(BaseHorizontalCollectionView.itemDragHoverUssClassName);
       if (this.m_DragHoverBar == null)
         return;
       this.m_DragHoverBar.style.visibility = (StyleEnum<Visibility>) Visibility.Hidden;

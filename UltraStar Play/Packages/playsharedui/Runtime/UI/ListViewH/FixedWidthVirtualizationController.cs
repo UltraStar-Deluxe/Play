@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 internal class FixedWidthVirtualizationController<T> : HorizontalVirtualizationController<T> where T : ReusableCollectionItem, new()
   {
-    private float resolvedItemHeight => this.m_CollectionView.ResolveItemHeight();
+    private float resolvedItemWidth => this.m_CollectionView.ResolveItemWidth();
 
     protected int itemsCount => !this.m_CollectionView.sourceIncludesArraySize ? this.m_CollectionView.itemsSource.Count : this.m_CollectionView.itemsSource.Count - 1;
     
@@ -15,53 +15,53 @@ internal class FixedWidthVirtualizationController<T> : HorizontalVirtualizationC
     {
     }
 
-    public override int GetIndexFromPosition(Vector2 position) => (int) ((double) position.y / (double) this.resolvedItemHeight);
+    public override int GetIndexFromPosition(Vector2 position) => (int) ((double) position.x / (double) this.resolvedItemWidth);
 
-    public override float GetExpectedItemHeight(int index) => this.resolvedItemHeight;
+    public override float GetExpectedItemWidth(int index) => this.resolvedItemWidth;
 
-    public override float GetExpectedContentHeight() => (float) this.itemsCount * this.resolvedItemHeight;
+    public override float GetExpectedContentWidth() => (float) this.itemsCount * this.resolvedItemWidth;
 
     public override void ScrollToItem(int index)
     {
       if (this.visibleItemCount == 0 || index < -1)
         return;
-      float resolvedItemHeight = this.resolvedItemHeight;
+      float resolvedItemWidth = this.resolvedItemWidth;
       if (index == -1)
       {
-        if (this.itemsCount < (int) ((double) this.lastHeight / (double) resolvedItemHeight))
+        if (this.itemsCount < (int) ((double) this.lastWidth / (double) resolvedItemWidth))
           this.m_ScrollView.scrollOffset = new Vector2(0.0f, 0.0f);
         else
-          this.m_ScrollView.scrollOffset = new Vector2(0.0f, (float) (this.itemsCount + 1) * resolvedItemHeight);
+          this.m_ScrollView.scrollOffset = new Vector2(0.0f, (float) (this.itemsCount + 1) * resolvedItemWidth);
       }
       else if (this.firstVisibleIndex >= index)
       {
-        this.m_ScrollView.scrollOffset = Vector2.up * (resolvedItemHeight * (float) index);
+        this.m_ScrollView.scrollOffset = Vector2.up * (resolvedItemWidth * (float) index);
       }
       else
       {
-        int num1 = (int) ((double) this.lastHeight / (double) resolvedItemHeight);
+        int num1 = (int) ((double) this.lastWidth / (double) resolvedItemWidth);
         if (index < this.firstVisibleIndex + num1)
           return;
         int num2 = index - num1 + 1;
-        float num3 = resolvedItemHeight - (this.lastHeight - (float) num1 * resolvedItemHeight);
-        this.m_ScrollView.scrollOffset = new Vector2(this.m_ScrollView.scrollOffset.x, resolvedItemHeight * (float) num2 + num3);
+        float num3 = resolvedItemWidth - (this.lastWidth - (float) num1 * resolvedItemWidth);
+        this.m_ScrollView.scrollOffset = new Vector2(resolvedItemWidth * (float) num2 + num3, this.m_ScrollView.scrollOffset.y);
       }
     }
 
     public override void Resize(Vector2 size)
     {
-      float resolvedItemHeight = this.resolvedItemHeight;
-      float expectedContentHeight = this.GetExpectedContentHeight();
-      this.m_ScrollView.contentContainer.style.height = (StyleLength) expectedContentHeight;
-      float num1 = Mathf.Max(0.0f, expectedContentHeight - this.m_ScrollView.contentViewport.layout.height);
-      float num2 = Mathf.Min(this.serializedData.scrollOffset.y, num1);
+      float resolvedItemWidth = this.resolvedItemWidth;
+      float expectedContentWidth = this.GetExpectedContentWidth();
+      this.m_ScrollView.contentContainer.style.width = (StyleLength) expectedContentWidth;
+      float num1 = Mathf.Max(0.0f, expectedContentWidth - this.m_ScrollView.contentViewport.layout.width);
+      float num2 = Mathf.Min(this.serializedData.scrollOffset.x, num1);
       
       // TODO: Implement without notify
       // this.m_ScrollView.verticalScroller.slider.SetHighValueWithoutNotify(num1);
-      this.m_ScrollView.verticalScroller.slider.highValue = num1;
+      this.m_ScrollView.horizontalScroller.slider.highValue = num1;
 
-      this.m_ScrollView.verticalScroller.slider.SetValueWithoutNotify(num2);
-      int a = (int) ((double) this.m_CollectionView.ResolveItemHeight(size.y) / (double) resolvedItemHeight);
+      this.m_ScrollView.horizontalScroller.slider.SetValueWithoutNotify(num2);
+      int a = (int) ((double) this.m_CollectionView.ResolveItemWidth(size.x) / (double) resolvedItemWidth);
       if (a > 0)
         a += 2;
       int num3 = Mathf.Min(a, this.itemsCount);
@@ -89,12 +89,12 @@ internal class FixedWidthVirtualizationController<T> : HorizontalVirtualizationC
 
     public override void OnScroll(Vector2 scrollOffset)
     {
-      float y = scrollOffset.y;
-      float resolvedItemHeight = this.resolvedItemHeight;
-      int num1 = (int) ((double) y / (double) resolvedItemHeight);
-      this.m_ScrollView.contentContainer.style.paddingTop = (StyleLength) ((float) num1 * resolvedItemHeight);
-      this.m_ScrollView.contentContainer.style.height = (StyleLength) ((float) this.itemsCount * resolvedItemHeight);
-      this.serializedData.scrollOffset.y = scrollOffset.y;
+      float x = scrollOffset.x;
+      float resolvedItemWidth = this.resolvedItemWidth;
+      int num1 = (int) ((double) x / (double) resolvedItemWidth);
+      this.m_ScrollView.contentContainer.style.paddingLeft = (StyleLength) ((float) num1 * resolvedItemWidth);
+      this.m_ScrollView.contentContainer.style.width = (StyleLength) ((float) this.itemsCount * resolvedItemWidth);
+      this.serializedData.scrollOffset.x = scrollOffset.x;
       if (num1 == this.firstVisibleIndex)
         return;
       this.firstVisibleIndex = num1;
@@ -147,15 +147,15 @@ internal class FixedWidthVirtualizationController<T> : HorizontalVirtualizationC
     internal override T GetOrMakeItemAtIndex(int activeItemIndex = -1, int scrollViewIndex = -1)
     {
       T orMakeItemAtIndex = base.GetOrMakeItemAtIndex(activeItemIndex, scrollViewIndex);
-      orMakeItemAtIndex.rootElement.style.height = (StyleLength) this.resolvedItemHeight;
+      orMakeItemAtIndex.rootElement.style.width = (StyleLength) this.resolvedItemWidth;
       return orMakeItemAtIndex;
     }
 
     internal override void EndDrag(int dropIndex)
     {
-      this.m_DraggedItem.rootElement.style.height = (StyleLength) this.resolvedItemHeight;
+      this.m_DraggedItem.rootElement.style.width = (StyleLength) this.resolvedItemWidth;
       if (this.firstVisibleIndex > this.m_DraggedItem.index)
-        this.m_ScrollView.verticalScroller.value = this.serializedData.scrollOffset.y - this.resolvedItemHeight;
+        this.m_ScrollView.horizontalScroller.value = this.serializedData.scrollOffset.x - this.resolvedItemWidth;
       base.EndDrag(dropIndex);
     }
   }

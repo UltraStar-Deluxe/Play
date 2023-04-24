@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 /// <summary>
   ///        <para>
-  /// A ListView is a vertically scrollable area that links to, and displays, a list of items.
+  /// A ListView is a horizontally scrollable area that links to, and displays, a list of items.
   /// </para>
   ///      </summary>
   public class ListViewH : BaseListViewH
@@ -83,10 +83,10 @@ using UnityEngine.UIElements;
 
     public ListViewH(
       IList itemsSource,
-      float itemHeight = -1f,
+      float itemWidth = -1f,
       Func<VisualElement> makeItem = null,
       Action<VisualElement, int> bindItem = null)
-      : base(itemsSource, itemHeight)
+      : base(itemsSource, itemWidth)
     {
       this.AddToClassList(BaseListView.ussClassName);
       this.makeItem = makeItem;

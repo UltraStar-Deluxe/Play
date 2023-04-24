@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 
 /// <summary>
   ///        <para>
-  /// Base collection view controller. View controllers are meant to take care of data virtualized by any BaseVerticalCollectionView inheritor.
+  /// Base collection view controller. View controllers are meant to take care of data virtualized by any BaseHorizontalCollectionView inheritor.
   /// </para>
   ///      </summary>
   public abstract class CollectionViewController : IDisposable
