@@ -73,6 +73,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject]
     private PlaylistManager playlistManager;
 
+    [Inject]
+    private SongSelectSceneInputControl songSelectSceneInputControl;
+
     private TooltipControl searchErrorIconTooltipControl;
 
     public bool IsSearchPropertyDropdownVisible => searchPropertyDropdownOverlay.IsVisibleByDisplay();
@@ -94,6 +97,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         });
         new TextFieldHintControl(searchTextFieldHint);
 
+        songSelectSceneInputControl.FuzzySearchText.Subscribe(newValue => searchTextFieldHint.SetVisibleByVisibility(newValue.IsNullOrEmpty()));
+        
         searchErrorIcon.HideByDisplay();
         searchErrorIconTooltipControl = new(searchErrorIcon);
 
