@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
-public abstract class BaseListViewController : CollectionViewController
+public abstract class BaseListViewHController : CollectionViewController
 {
     public event Action itemsSourceSizeChanged;
 
@@ -87,7 +87,7 @@ public abstract class BaseListViewController : CollectionViewController
         {
             if (this.itemsSource.IsFixedSize)
             {
-                this.itemsSource = (IList)BaseListViewController.AddToArray((Array)this.itemsSource, itemCount);
+                this.itemsSource = (IList)BaseListViewHController.AddToArray((Array)this.itemsSource, itemCount);
                 for (int index = 0; index < itemCount; ++index)
                     intList.Add(count + index);
             }
@@ -161,7 +161,7 @@ public abstract class BaseListViewController : CollectionViewController
         this.RaiseItemsRemoved((IEnumerable<int>)indices);
         if (this.itemsSource.IsFixedSize)
         {
-            this.itemsSource = (IList)BaseListViewController.RemoveFromArray((Array)this.itemsSource, indices);
+            this.itemsSource = (IList)BaseListViewHController.RemoveFromArray((Array)this.itemsSource, indices);
         }
         else
         {

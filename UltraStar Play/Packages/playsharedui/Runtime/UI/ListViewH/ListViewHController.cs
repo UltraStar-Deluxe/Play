@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 /// List view controller. View controllers of this type are meant to take care of data virtualized by any ListView inheritor.
 /// </para>
 ///      </summary>
-public class ListViewController : BaseListViewController
+public class ListViewHController : BaseListViewHController
 {
     /// <summary>
     ///        <para>

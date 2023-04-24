@@ -69,7 +69,7 @@ public class ListViewH : BaseListViewH
     public new Action<VisualElement> destroyItem { get; set; }
 
     protected override CollectionViewController CreateViewController() =>
-        (CollectionViewController)new ListViewController();
+        (CollectionViewController)new ListViewHController();
 
     /// <summary>
     ///        <para>

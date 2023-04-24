@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 public static class ExtensionMethods
 {
-    public static void RemoveItems(this BaseListViewController self, int itemCount)
+    public static void RemoveItems(this BaseListViewHController self, int itemCount)
     {
         if (itemCount <= 0)
             return;

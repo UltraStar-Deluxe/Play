@@ -301,9 +301,9 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
 
     public event Action<IEnumerable<int>> itemsRemoved;
 
-    private void AddItems(int itemCount) => this.viewController.AddItems(itemCount);
+    private void AddItems(int itemCount) => this.ViewHController.AddItems(itemCount);
 
-    private void RemoveItems(List<int> indices) => this.viewController.RemoveItems(indices);
+    private void RemoveItems(List<int> indices) => this.ViewHController.RemoveItems(indices);
 
     private void OnArraySizeFieldChanged(ChangeEvent<string> evt)
     {
@@ -316,16 +316,16 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
         }
         else
         {
-            int itemsCount = this.viewController.GetItemsCount();
-            if (itemsCount == 0 && result == this.viewController.GetItemsMinCount())
+            int itemsCount = this.ViewHController.GetItemsCount();
+            if (itemsCount == 0 && result == this.ViewHController.GetItemsMinCount())
                 return;
             if (result > itemsCount)
-                this.viewController.AddItems(result - itemsCount);
+                this.ViewHController.AddItems(result - itemsCount);
             else if (result < itemsCount)
-                this.viewController.RemoveItems(itemsCount - result);
+                this.ViewHController.RemoveItems(itemsCount - result);
             else if (result == 0)
             {
-                this.viewController.ClearItems();
+                this.ViewHController.ClearItems();
                 this.m_IsOverMultiEditLimit = false;
             }
 
@@ -338,7 +338,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
         if (!this.HasValidDataAndBindings() || this.m_ArraySizeField == null)
             return;
         if (!this.m_ArraySizeField.showMixedValue)
-            this.m_ArraySizeField.SetValueWithoutNotify(this.viewController.GetItemsMinCount().ToString());
+            this.m_ArraySizeField.SetValueWithoutNotify(this.ViewHController.GetItemsMinCount().ToString());
         this.footer?.SetEnabled(!this.m_IsOverMultiEditLimit);
     }
 
@@ -396,11 +396,11 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     {
         if (this.selectedIndices.Any<int>())
         {
-            this.viewController.RemoveItems(this.selectedIndices.ToList<int>());
+            this.ViewHController.RemoveItems(this.selectedIndices.ToList<int>());
             this.ClearSelection();
         }
         else if (this.itemsSource.Count > 0)
-            this.viewController.RemoveItem(this.itemsSource.Count - 1);
+            this.ViewHController.RemoveItem(this.itemsSource.Count - 1);
 
         if (!this.HasValidDataAndBindings() || this.m_ArraySizeField == null)
             return;
@@ -426,7 +426,7 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
     /// The view controller for this view, cast as a BaseListViewController.
     /// </para>
     ///      </summary>
-    public BaseListViewController viewController => base.viewController as BaseListViewController;
+    public BaseListViewHController ViewHController => base.viewController as BaseListViewHController;
 
     private protected override void CreateVirtualizationController() =>
         this.CreateVirtualizationController<ReusableListViewItem>();
@@ -445,19 +445,19 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
             this.m_ItemRemovedCallback = new Action<IEnumerable<int>>(this.OnItemsRemoved);
         if (this.m_ItemsSourceSizeChangedCallback == null)
             this.m_ItemsSourceSizeChangedCallback = new Action(this.OnItemsSourceSizeChanged);
-        if (this.viewController != null)
+        if (this.ViewHController != null)
         {
-            this.viewController.itemsAdded -= this.m_ItemAddedCallback;
-            this.viewController.itemsRemoved -= this.m_ItemRemovedCallback;
-            this.viewController.itemsSourceSizeChanged -= this.m_ItemsSourceSizeChangedCallback;
+            this.ViewHController.itemsAdded -= this.m_ItemAddedCallback;
+            this.ViewHController.itemsRemoved -= this.m_ItemRemovedCallback;
+            this.ViewHController.itemsSourceSizeChanged -= this.m_ItemsSourceSizeChangedCallback;
         }
 
         base.SetViewController(controller);
-        if (this.viewController == null)
+        if (this.ViewHController == null)
             return;
-        this.viewController.itemsAdded += this.m_ItemAddedCallback;
-        this.viewController.itemsRemoved += this.m_ItemRemovedCallback;
-        this.viewController.itemsSourceSizeChanged += this.m_ItemsSourceSizeChangedCallback;
+        this.ViewHController.itemsAdded += this.m_ItemAddedCallback;
+        this.ViewHController.itemsRemoved += this.m_ItemRemovedCallback;
+        this.ViewHController.itemsSourceSizeChanged += this.m_ItemsSourceSizeChangedCallback;
     }
 
     private void OnItemAdded(IEnumerable<int> indices)
@@ -506,8 +506,8 @@ public abstract class BaseListViewH : BaseHorizontalCollectionView
         }
     }
 
-    internal override ListViewDragger CreateDragger() => this.m_ReorderMode == ListViewReorderMode.Simple
-        ? new ListViewDragger((BaseHorizontalCollectionView)this)
+    internal override ListViewHDragger CreateDragger() => this.m_ReorderMode == ListViewReorderMode.Simple
+        ? new ListViewHDragger((BaseHorizontalCollectionView)this)
         : throw new NotImplementedException(
             "ListViewDraggerAnimated not implemented"); // (ListViewDragger) new ListViewDraggerAnimated((BaseHorizontalCollectionView) this);
 

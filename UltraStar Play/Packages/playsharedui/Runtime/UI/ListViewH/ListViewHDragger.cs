@@ -8,9 +8,9 @@ using System.Linq;
 using UnityEngine.UIElements;
 using UnityEngine;
 
-public class ListViewDragger : DragEventsProcessor
+public class ListViewHDragger : DragEventsProcessor
 {
-    private ListViewDragger.DragPosition m_LastDragPosition;
+    private ListViewHDragger.DragPosition m_LastDragPosition;
     private VisualElement m_DragHoverBar;
     private const int k_AutoScrollAreaSize = 5;
     private const int k_BetweenElementsAreaSize = 5;
@@ -23,7 +23,7 @@ public class ListViewDragger : DragEventsProcessor
 
     public ICollectionDragAndDropController dragAndDropController { get; set; }
 
-    public ListViewDragger(BaseHorizontalCollectionView listView)
+    public ListViewHDragger(BaseHorizontalCollectionView listView)
         : base((VisualElement)listView)
     {
     }
@@ -56,7 +56,7 @@ public class ListViewDragger : DragEventsProcessor
 
     protected internal override DragVisualMode UpdateDrag(Vector3 pointerPosition)
     {
-        ListViewDragger.DragPosition dragPosition = new ListViewDragger.DragPosition();
+        ListViewHDragger.DragPosition dragPosition = new ListViewHDragger.DragPosition();
         DragVisualMode visualMode = this.GetVisualMode(pointerPosition, ref dragPosition);
         if (visualMode == DragVisualMode.Rejected)
             this.ClearDragAndDropUI();
@@ -67,7 +67,7 @@ public class ListViewDragger : DragEventsProcessor
 
     private DragVisualMode GetVisualMode(
         Vector3 pointerPosition,
-        ref ListViewDragger.DragPosition dragPosition)
+        ref ListViewHDragger.DragPosition dragPosition)
     {
         if (this.dragAndDropController == null)
             return DragVisualMode.Rejected;
@@ -80,7 +80,7 @@ public class ListViewDragger : DragEventsProcessor
 
     protected internal override void OnDrop(Vector3 pointerPosition)
     {
-        ListViewDragger.DragPosition dragPosition = new ListViewDragger.DragPosition();
+        ListViewHDragger.DragPosition dragPosition = new ListViewHDragger.DragPosition();
         if (!this.TryGetDragPosition((Vector2)pointerPosition, ref dragPosition))
             return;
         ListDragAndDropArgs args = this.MakeDragAndDropArgs(dragPosition);
@@ -108,7 +108,7 @@ public class ListViewDragger : DragEventsProcessor
         this.targetScrollView.scrollOffset = vector2;
     }
 
-    protected void ApplyDragAndDropUI(ListViewDragger.DragPosition dragPosition)
+    protected void ApplyDragAndDropUI(ListViewHDragger.DragPosition dragPosition)
     {
         if (this.m_LastDragPosition.Equals(dragPosition))
             return;
@@ -169,7 +169,7 @@ public class ListViewDragger : DragEventsProcessor
 
     protected virtual bool TryGetDragPosition(
         Vector2 pointerPosition,
-        ref ListViewDragger.DragPosition dragPosition)
+        ref ListViewHDragger.DragPosition dragPosition)
     {
         ReusableCollectionItem recycledItem = this.GetRecycledItem((Vector3)pointerPosition);
         if (recycledItem != null)
@@ -215,7 +215,7 @@ public class ListViewDragger : DragEventsProcessor
         return true;
     }
 
-    private ListDragAndDropArgs MakeDragAndDropArgs(ListViewDragger.DragPosition dragPosition)
+    private ListDragAndDropArgs MakeDragAndDropArgs(ListViewHDragger.DragPosition dragPosition)
     {
         object obj = (object)null;
         ReusableCollectionItem recycledItem = dragPosition.recycledItem;
@@ -245,7 +245,7 @@ public class ListViewDragger : DragEventsProcessor
 
     protected override void ClearDragAndDropUI()
     {
-        this.m_LastDragPosition = new ListViewDragger.DragPosition();
+        this.m_LastDragPosition = new ListViewHDragger.DragPosition();
         foreach (ReusableCollectionItem activeItem in this.targetListView.activeItems)
             activeItem.rootElement.RemoveFromClassList(BaseHorizontalCollectionView.itemDragHoverUssClassName);
         if (this.m_DragHoverBar == null)
@@ -264,18 +264,18 @@ public class ListViewDragger : DragEventsProcessor
         return (ReusableCollectionItem)null;
     }
 
-    public struct DragPosition : IEquatable<ListViewDragger.DragPosition>
+    public struct DragPosition : IEquatable<ListViewHDragger.DragPosition>
     {
         public int insertAtIndex;
         public ReusableCollectionItem recycledItem;
         public DragAndDropPosition dragAndDropPosition;
 
-        public bool Equals(ListViewDragger.DragPosition other) => this.insertAtIndex == other.insertAtIndex &&
+        public bool Equals(ListViewHDragger.DragPosition other) => this.insertAtIndex == other.insertAtIndex &&
                                                                   object.Equals((object)this.recycledItem,
                                                                       (object)other.recycledItem) &&
                                                                   this.dragAndDropPosition == other.dragAndDropPosition;
 
-        public override bool Equals(object obj) => obj is ListViewDragger.DragPosition other && this.Equals(other);
+        public override bool Equals(object obj) => obj is ListViewHDragger.DragPosition other && this.Equals(other);
 
         public override int GetHashCode() =>
             (int)((DragAndDropPosition)((this.insertAtIndex * 397 ^

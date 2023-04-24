@@ -40,7 +40,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     private readonly List<object> m_SelectedItems = new List<object>();
     private float m_LastWidth;
     private bool m_IsRangeSelectionDirectionUp;
-    private ListViewDragger m_Dragger;
+    private ListViewHDragger mHDragger;
     internal const float ItemWidthUnset = -1f;
     internal static CustomStyleProperty<int> s_ItemWidthProperty = new CustomStyleProperty<int>("--unity-item-width");
     private Action<int, int> m_ItemIndexChangedCallback;
@@ -282,7 +282,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
 
     internal ScrollView scrollView => this.m_ScrollView;
 
-    internal ListViewDragger dragger => this.m_Dragger;
+    internal ListViewHDragger HDragger => this.mHDragger;
 
     internal CollectionVirtualizationController virtualizationController => this.GetOrCreateVirtualizationController();
 
@@ -479,19 +479,19 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         this.m_ViewController.itemsSourceChanged += this.m_ItemsSourceChangedCallback;
     }
 
-    internal virtual ListViewDragger CreateDragger() => new ListViewDragger(this);
+    internal virtual ListViewHDragger CreateDragger() => new ListViewHDragger(this);
 
     internal void InitializeDragAndDropController(bool enableReordering)
     {
-        if (this.m_Dragger != null)
+        if (this.mHDragger != null)
         {
-            this.m_Dragger.UnregisterCallbacksFromTarget(true);
-            this.m_Dragger.dragAndDropController = (ICollectionDragAndDropController)null;
-            this.m_Dragger = (ListViewDragger)null;
+            this.mHDragger.UnregisterCallbacksFromTarget(true);
+            this.mHDragger.dragAndDropController = (ICollectionDragAndDropController)null;
+            this.mHDragger = (ListViewHDragger)null;
         }
 
-        this.m_Dragger = this.CreateDragger();
-        this.m_Dragger.dragAndDropController = this.CreateDragAndDropController();
+        this.mHDragger = this.CreateDragger();
+        this.mHDragger.dragAndDropController = this.CreateDragAndDropController();
         // this.m_Dragger.dragAndDropController.enableReordering = enableReordering;
     }
 
@@ -500,9 +500,9 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     internal void SetDragAndDropController(
         ICollectionDragAndDropController dragAndDropController)
     {
-        if (this.m_Dragger == null)
-            this.m_Dragger = this.CreateDragger();
-        this.m_Dragger.dragAndDropController = dragAndDropController;
+        if (this.mHDragger == null)
+            this.mHDragger = this.CreateDragger();
+        this.mHDragger.dragAndDropController = dragAndDropController;
     }
 
     /// <summary>
@@ -1247,7 +1247,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     {
         base.ExecuteDefaultAction(evt);
         if (evt.eventTypeId == EventBase<PointerUpEvent>.TypeId())
-            this.m_Dragger?.OnPointerUpEvent((PointerUpEvent)evt);
+            this.mHDragger?.OnPointerUpEvent((PointerUpEvent)evt);
 
         // TODO: Implement
         // else if (evt.eventTypeId == EventBase<FocusEvent>.TypeId())
