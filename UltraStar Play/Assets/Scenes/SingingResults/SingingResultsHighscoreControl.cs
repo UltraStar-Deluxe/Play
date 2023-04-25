@@ -35,6 +35,9 @@ public class SingingResultsHighscoreControl : INeedInjection
     [Inject]
     private Injector injector;
     
+    [Inject]
+    private Settings settings;
+    
     private readonly int highscoreCount = 5;
     
     private bool isInitialized;
@@ -49,7 +52,9 @@ public class SingingResultsHighscoreControl : INeedInjection
         }
         isInitialized = true;
 
-        currentDifficulty = sceneData.PlayerProfiles.FirstOrDefault().Difficulty;
+        currentDifficulty = !sceneData.PlayerProfiles.IsNullOrEmpty()
+            ? sceneData.PlayerProfiles.FirstOrDefault().Difficulty
+            : settings.GameSettings.Difficulty;
         nextDifficultyButton.RegisterCallbackButtonTriggered(_ => ChangeDifficulty(1));
         previousDifficultyButton.RegisterCallbackButtonTriggered(_ => ChangeDifficulty(-1));
         UpdateHighscores();

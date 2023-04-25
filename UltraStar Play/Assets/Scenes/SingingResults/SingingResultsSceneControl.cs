@@ -110,8 +110,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     private bool ShowHighScoresNext => !sceneData.IsMedley
                                        && !HasPartyModeSceneData
-                                       && statistics.HasHighscore(sceneData.SongMetas.LastOrDefault());
+                                       && statistics.HasHighscore(sceneData.SongMetas.LastOrDefault())
+                                       && !OnlyShowHighscores;
 
+    private bool OnlyShowHighscores => sceneData.lastSceneData is SongSelectSceneData;
+    
     private readonly SingingResultsHighscoreControl highscoreControl = new();
     
     public static SingingResultsSceneControl Instance
@@ -133,8 +136,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     
     public void OnInjectionFinished()
     {
-        GivePartyModeTeamPoints();
-        KnockOutPartyTeams();
+        if (!OnlyShowHighscores)
+        {
+            GivePartyModeTeamPoints();
+            KnockOutPartyTeams();
+        }
 
         injector.Inject(nextGameRoundUiControl);
         injector.Inject(teamResultsUiControl);
@@ -151,6 +157,29 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.AddTabGroupButton(showTeamResultsButton, teamResultsUi);
+        
+        InitClickThoughToBackground();
+        background.RegisterCallback<PointerUpEvent>(evt => Continue());
+        
+        continueButton.RegisterCallbackButtonTriggered(_ => Continue());
+        continueButton.Focus();
+        
+        showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
+
+        InitSongDetails();
+        InitSongPreview();
+        
+        if (OnlyShowHighscores)
+        {
+            highscoreControl.Init();
+            tabGroupControl.ShowContainer(highscoresRoot);
+            showCurrentResultsButton.HideByDisplay();
+            restartButton.HideByDisplay();
+            showTeamResultsButton.HideByDisplay();
+            quitButton.HideByDisplay();
+            return;
+        }
+        
         tabGroupControl.ShowContainer(playerResultsRoot);
 
         tabGroupControl.ContainerBecameVisibleEventStream.Subscribe(container =>
@@ -161,8 +190,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             }
         });
         
-        showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
-
         if (!HasPartyModeSceneData)
         {
             showTeamResultsButton.HideByDisplay();
@@ -170,22 +197,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         
         restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
         
-        background.RegisterCallback<PointerUpEvent>(evt =>
-        {
-            Debug.Log("Background clicked");
-            Continue();
-        });
-        
-        continueButton.RegisterCallbackButtonTriggered(_ => Continue());
-        continueButton.Focus();
-
-        songAudioPlayer.Init(sceneData.SongMetas.LastOrDefault());
-
-        songPreviewControl.PreviewDelayInSeconds = 0;
-        songPreviewControl.AudioFadeInDurationInSeconds = 2;
-        songPreviewControl.VideoFadeInDurationInSeconds = 2;
-        songPreviewControl.StartSongPreview(sceneData.SongMetas.LastOrDefault());
-
         if (songQueueManager.IsSongQueueEmpty)
         {
             quitButton.HideByDisplay();
@@ -201,8 +212,15 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         FillLayout();
 
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => InitVfx()));
-        
-        InitClickThoughToBackground();
+    }
+
+    private void InitSongPreview()
+    {
+        songAudioPlayer.Init(sceneData.SongMetas.LastOrDefault());
+        songPreviewControl.PreviewDelayInSeconds = 0;
+        songPreviewControl.AudioFadeInDurationInSeconds = 2;
+        songPreviewControl.VideoFadeInDurationInSeconds = 2;
+        songPreviewControl.StartSongPreview(sceneData.SongMetas.LastOrDefault());
     }
 
     private void OnShowTeamResults()
@@ -309,13 +327,16 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             });
     }
 
-    private void FillLayout()
+    private void InitSongDetails()
     {
         SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
         artistLabel.text = songMeta.Artist;
         titleLabel.text = songMeta.Title;
         SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, coverImage);
-        
+    }
+    
+    private void FillLayout()
+    {
         VisualElement selectedLayout = GetSelectedLayout();
         if (selectedLayout == nPlayerLayout)
         {
