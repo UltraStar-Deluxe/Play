@@ -96,6 +96,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     [Inject(UxmlName = R.UxmlNames.playerUiContainer)]
     private VisualElement playerUiContainer;
 
+    [Inject(UxmlName = R.UxmlNames.songTimeProgressBar)]
+    private ProgressBar songTimeProgressBar;
+
     [Inject(UxmlClass = R.UssClasses.playerInfoUiList)]
     private List<VisualElement> playerInfoUiLists;
     
@@ -272,6 +275,16 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             // #START tag in txt file is in seconds (but #END is in milliseconds).
             SkipToPositionInSong(SongMeta.Start * 1000);
         }
+
+        // Progress bar to show time in song
+        songTimeProgressBar.value = 0;
+        songAudioPlayer.PositionInSongEventStream.Subscribe(_ =>
+        {
+            double progressInPercent = 100 * (songAudioPlayer.PositionInSongInMillis / songAudioPlayer.DurationOfSongInMillis);
+            songTimeProgressBar.value = (float) progressInPercent;
+        });
+        settings.ObserveEveryValueChanged(it => it.GraphicSettings.showSongProgress)
+            .Subscribe(newValue => songTimeProgressBar.SetVisibleByDisplay(newValue));
 
         // Update TimeBar every second
         StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>

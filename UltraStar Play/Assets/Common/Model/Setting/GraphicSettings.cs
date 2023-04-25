@@ -19,6 +19,7 @@ public class GraphicSettings
     public ESceneChangeAnimation sceneChangeAnimation = ESceneChangeAnimation.Zoom;
     public bool showPlayerNames;
     public bool showScoreNumbers;
+    public bool showSongProgress;
     public bool animatedBackground;
     public int backgroundLightIndex = 1;
     public bool enableVfx = true;

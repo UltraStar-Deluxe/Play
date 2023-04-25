@@ -248,13 +248,19 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             () => settings.GraphicSettings.showStaticLyrics,
             newValue => settings.GraphicSettings.showStaticLyrics = newValue);
         
+        Toggle showSongProgress = new("Progress");
+        contextMenuPopup.AddVisualElement(showSongProgress);
+        FieldBindingUtils.Bind(showSongProgress,
+            () => settings.GraphicSettings.showSongProgress,
+            newValue => settings.GraphicSettings.showSongProgress = newValue);
+        
         Toggle showPitchIndicatorToggle = new("Pitch Arrow");
         contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
         FieldBindingUtils.Bind(showPitchIndicatorToggle,
             () => settings.GraphicSettings.showPitchIndicator,
                 newValue => settings.GraphicSettings.showPitchIndicator = newValue);
         
-        Toggle showPlayerNamesToggle = new("Player Names");
+        Toggle showPlayerNamesToggle = new("Player Name");
         contextMenuPopup.AddVisualElement(showPlayerNamesToggle);
         FieldBindingUtils.Bind(showPlayerNamesToggle,
             () => settings.GraphicSettings.showPlayerNames,
