@@ -33,7 +33,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     public VisualTreeAsset highscoreEntryUi;
 
     [InjectedInInspector]
-    public AudioSource crowdCheerAudioSource;
+    public AudioClip teamResultsApplauseAudioClip;
+    
+    [InjectedInInspector]
+    public AudioClip singingResultsApplauseAudioClip;
     
     [Inject(UxmlName = R.UxmlNames.artistLabel)]
     private Label artistLabel;
@@ -179,6 +182,23 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             quitButton.HideByDisplay();
             return;
         }
+
+        InitSingingResults();
+    }
+
+    private void InitSingingResults()
+    {
+        // Play applause if there is any player with more than 1000 points.
+        bool shouldPlayApplause = sceneData.PlayerProfiles.AnyMatch(playerProfile =>
+        {
+            PlayerScoreControlData playerScoreControlData = sceneData.GetPlayerScores(playerProfile);
+            return playerScoreControlData != null
+                   && playerScoreControlData.TotalScore > 1000;
+        });
+        if (shouldPlayApplause)
+        {
+            AudioManager.PlaySoundEffect(singingResultsApplauseAudioClip);
+        }
         
         tabGroupControl.ShowContainer(playerResultsRoot);
 
@@ -230,9 +250,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             return;
         }
 
-        // Play audio clip
-        crowdCheerAudioSource.volume = NumberUtils.PercentToFactor(settings.AudioSettings.VolumePercent);
-        crowdCheerAudioSource.Play();
+        AudioManager.PlaySoundEffect(teamResultsApplauseAudioClip);
         
         // Create particle effect
         if (!initializedTeamResultsParticleEffects)
