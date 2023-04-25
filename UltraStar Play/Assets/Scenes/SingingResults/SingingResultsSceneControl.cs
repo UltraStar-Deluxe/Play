@@ -38,6 +38,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     [InjectedInInspector]
     public AudioClip singingResultsApplauseAudioClip;
     
+    [InjectedInInspector]
+    public AudioClip scoreBarAudioClip;
+    
     [Inject(UxmlName = R.UxmlNames.artistLabel)]
     private Label artistLabel;
 
@@ -199,7 +202,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         {
             AudioManager.PlaySoundEffect(singingResultsApplauseAudioClip);
         }
-        
+
+        // TODO: Good score bar sound effect?
+        // AudioManager.PlaySoundEffect(scoreBarAudioClip);
+
         tabGroupControl.ShowContainer(playerResultsRoot);
 
         tabGroupControl.ContainerBecameVisibleEventStream.Subscribe(container =>
@@ -288,19 +294,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         singingResultsPlayerUiControls
             .Where(it => firstPlayers.Contains(it.PlayerProfile)
                 && sceneData.GetPlayerScores(it.PlayerProfile).TotalScore > 0)
-            .ForEach(it =>
-            {
-                VfxManager.CreateParticleEffect(new ParticleEffectConfig()
-                {
-                    particleEffect = EParticleEffect.LightGlowALoop,
-                    panelPos = it.PlayerImage.worldBound.center,
-                    scale = 0.4f,
-                    loop = true,
-                    isBackground = true,
-                    target = it.PlayerImage,
-                    hideAndShowWithTarget = true,
-                });
-            });
+            .ForEach(it => it.InitTopScoreVfx());
     }
 
     private void RestartSingScene()

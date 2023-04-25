@@ -152,6 +152,7 @@ MonoBehaviour:
     type: 3}
   singingResultsApplauseAudioClip: {fileID: 8300000, guid: d4c9cc76bad3fd94c8abd4bdccfc4990,
     type: 3}
+  scoreBarAudioClip: {fileID: 8300000, guid: bc7e499f70d719642b1f6130793d76a4, type: 3}
 --- !u!1 &7174955934536027631
 GameObject:
   m_ObjectHideFlags: 0

@@ -50,7 +50,6 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
-    public VisualElement PlayerImage => playerImage;
 
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;
@@ -73,7 +72,12 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject]
     private ThemeManager themeManager;
 
-    private readonly float animationTimeInSeconds = 1f;
+    private readonly float bounceAnimTimeInSeconds = 1f;
+    private readonly float maxScoreAnimationTimeInSeconds = 5f;
+    private float NormalNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.NormalNotesTotalScore / PlayerScoreControl.maxScore);
+    private float GoldenNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.GoldenNoteLengthTotal / PlayerScoreControl.maxScore);
+    private float PerfectSentenceBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.PerfectSentenceBonusTotalScore / PlayerScoreControl.maxScore);
+    private float TotalScoreAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float) playerScoreData.TotalScore / PlayerScoreControl.maxScore);
 
     private readonly List<int> animationIds = new();
     
@@ -90,9 +94,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         {
             newHighscoreContainer.ShowByDisplay();
             // Bouncy size animation
-            LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, animationTimeInSeconds)
+            LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, bounceAnimTimeInSeconds)
                 .setEaseSpring()
-                .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+                .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))))
+                .setDelay(TotalScoreAnimTimeInSeconds);
         }
         else
         {
@@ -108,18 +113,32 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             }
 
             ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
-            AnimationUtils.BounceVisualElementSize(singingResultsSceneControl.gameObject, ratingImage, animationTimeInSeconds);
+            // Bouncy size animation
+            ratingLabel.style.scale = new StyleScale(new Scale(Vector3.zero));
+            ratingImage.style.scale = new StyleScale(new Scale(Vector3.zero));
+            LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one, Vector3.one * 0.5f, bounceAnimTimeInSeconds)
+                .setEasePunch()
+                .setOnUpdate(s =>
+                {
+                    Vector3 scale = new Vector3(s, s, 1);
+                    ratingLabel.style.scale = new StyleScale(new Scale(scale));
+                    ratingImage.style.scale = new StyleScale(new Scale(scale));
+                })
+                .setDelay(TotalScoreAnimTimeInSeconds);
         });
         ratingLabel.text = songRating.Text;
 
         // Score texts (animated)
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.NormalNotesTotalScore, animationTimeInSeconds)
+        ResetScoreRowLabelTexts();
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.NormalNotesTotalScore, NormalNoteAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(normalNoteScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.GoldenNotesTotalScore, animationTimeInSeconds)
-            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(goldenNoteScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.PerfectSentenceBonusTotalScore, animationTimeInSeconds)
-            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(phraseBonusScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.TotalScore, animationTimeInSeconds)
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.GoldenNotesTotalScore, GoldenNoteAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(goldenNoteScoreContainer, interpolatedValue))
+            .setDelay(NormalNoteAnimTimeInSeconds);
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.PerfectSentenceBonusTotalScore, PerfectSentenceBonusAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(phraseBonusScoreContainer, interpolatedValue))
+            .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds);
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.TotalScore, TotalScoreAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
         
         // Score bar (animated)
@@ -129,7 +148,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
 
         float playerScoreFactor = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
-        animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, animationTimeInSeconds)
+        animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, TotalScoreAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => playerScoreProgressBar.ProgressInPercent = interpolatedValue)
             .setEaseOutSine()
             .id);
@@ -138,6 +157,13 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         // AnimateStarRatingIcons();
         
         UpdateTranslation();
+    }
+
+    private void ResetScoreRowLabelTexts()
+    {
+        SetScoreRowLabelText(normalNoteScoreContainer, 0);
+        SetScoreRowLabelText(goldenNoteScoreContainer, 0);
+        SetScoreRowLabelText(phraseBonusScoreContainer, 0);
     }
 
     private void AnimateStarRatingIcons()
@@ -150,7 +176,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             ? songRatingStarIcons.Take(starCount).ToList()
             : songRatingStarIcons.Skip(1).Take(starCount).ToList();
         
-        float starIconAnimationTimeInSeconds = animationTimeInSeconds;
+        float starIconAnimationTimeInSeconds = TotalScoreAnimTimeInSeconds;
         for (int i = 0; i < visibleStarIcons.Count; i++)
         {
             VisualElement visibleStarIcon = visibleStarIcons[i];
@@ -260,5 +286,23 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     public void Dispose()
     {
         LeanTweenUtils.CancelAndClear(animationIds);
+    }
+
+    public void InitTopScoreVfx()
+    {
+        singingResultsSceneControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(TotalScoreAnimTimeInSeconds,
+            () =>
+            {
+                VfxManager.CreateParticleEffect(new ParticleEffectConfig()
+                {
+                    particleEffect = EParticleEffect.LightGlowALoop,
+                    panelPos = playerImage.worldBound.center,
+                    scale = 0.4f,
+                    loop = true,
+                    isBackground = true,
+                    target = playerImage,
+                    hideAndShowWithTarget = true,
+                });
+            }));
     }
 }
