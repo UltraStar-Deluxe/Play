@@ -10,6 +10,28 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+#songEntryUiRoot {
+    
+}
+
+#innerSongEntryUi {
+    transition: top 0.3s, width 0.3s, height 0.3s;
+    top: 0;
+    width: 130px;
+    height: 130px;
+}
+
+#innerSongEntryUi #songImageOuter {
+    width: 130px;
+    height: 130px;
+}
+
+.unity-collection-view__item--selected #innerSongEntryUi {
+    top: -20px;
+    /*width: 150px;*/
+    /*height: 150px;*/
+}
+
 .searchFilterLabel {
     align-self: flex-end;
 }
@@ -96,8 +118,7 @@
 
 #searchErrorIcon {
     position: absolute;
-    top: auto;
-    bottom: 100%;
+    top: 100%;
 }
 
 #toggleFavoriteButton MaterialIcon {

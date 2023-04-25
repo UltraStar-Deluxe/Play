@@ -93,11 +93,19 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private bool OnNoNavigationTargetFoundInListView(NoNavigationTargetFoundEvent evt)
     {
         if (evt.FocusedVisualElement == songListView
-            && evt.NavigationDirection.y < 0
-            && songRouletteControl.Songs.Count > 1)
+            && evt.NavigationDirection.x > 0
+            && songRouletteControl.Songs.Count > 2)
         {
             // Wrap selection, i.e. select first song
             songRouletteControl.SelectSongByIndex(0);
+            return true;
+        }
+        else if (evt.FocusedVisualElement == songListView
+            && evt.NavigationDirection.x < 0
+            && songRouletteControl.Songs.Count > 2)
+        {
+            // Wrap selection, i.e. select first song
+            songRouletteControl.SelectSongByIndex(songRouletteControl.Songs.Count - 1);
             return true;
         }
         return false;
@@ -105,11 +113,13 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnSubmit(InputAction.CallbackContext callbackContext)
     {
+        VisualElement focusedElement = VisualElementUtils.GetFocusedVisualElement(songListView.focusController);
         if (songSearchControl.IsSearchTextFieldFocused())
         {
             songSelectSceneControl.SubmitSearch();
         }
-        else if (songListView.focusController.focusedElement == songListView)
+        else if (focusedElement?.GetFirstAncestorOfType<ListView>() != null
+                 || focusedElement?.GetFirstAncestorOfType<ListViewH>() != null)
         {
             songSelectSceneControl.AttemptStartSong();
         }

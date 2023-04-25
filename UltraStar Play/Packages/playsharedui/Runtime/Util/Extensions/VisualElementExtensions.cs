@@ -237,7 +237,18 @@ public static class VisualElementExtensions
         listView.ScrollToItem(index);
     }
     
+    public static void SetSelectionAndScrollTo(this ListViewH listView, int index)
+    {
+        listView.SetSelection(index);
+        listView.ScrollToItem(index);
+    }
+    
     public static VisualElement GetSelectedVisualElement(this ListView listView)
+    {
+        return listView.Q<VisualElement>(className: "unity-collection-view__item--selected");
+    }
+    
+    public static VisualElement GetSelectedVisualElement(this ListViewH listView)
     {
         return listView.Q<VisualElement>(className: "unity-collection-view__item--selected");
     }
@@ -249,6 +260,11 @@ public static class VisualElementExtensions
     
     public static VisualElement GetParent(this VisualElement visualElement, Func<VisualElement, bool> condition=null)
     {
+        if (visualElement == null)
+        {
+            return null;
+        }
+        
         VisualElement parent = visualElement.parent;
         while (parent != null)
         {

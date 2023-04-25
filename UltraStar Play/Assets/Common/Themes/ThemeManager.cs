@@ -621,6 +621,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         
         // ListViews
         root.Query<ListView>().ForEach(listView => ApplyThemeStyleUtils.UpdateStylesOnListViewSelectionChanged(listView));
+        root.Query<ListViewH>().ForEach(listView => ApplyThemeStyleUtils.UpdateStylesOnListViewSelectionChanged(listView));
         
         // Panels
         root.Query<VisualElement>(null, "dynamicPanel").ForEach(visualElement =>

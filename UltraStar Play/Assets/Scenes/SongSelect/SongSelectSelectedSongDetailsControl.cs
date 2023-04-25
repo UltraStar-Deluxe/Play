@@ -40,6 +40,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     
     [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
     private VisualElement localHighScoreContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.highscoresContainer)]
+    private VisualElement highscoresContainer;
 
     [Inject(UxmlName = R.UxmlNames.selectedSongArtist)]
     private Label selectedSongArtist;
@@ -49,12 +52,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     [Inject(UxmlName = R.UxmlNames.selectedSongImageOuter)]
     private VisualElement selectedSongImageOuter;
-
+    
     [Inject(UxmlName = R.UxmlNames.selectedSongImageInner)]
     private VisualElement selectedSongImageInner;
-    
-    [Inject(UxmlName = R.UxmlNames.showLyricsButton)]
-    private Button showLyricsButton;
     
     [Inject(UxmlName = R.UxmlNames.songIndexLabel)]
     private Label songIndexLabel;
@@ -65,17 +65,6 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     [Inject(UxmlName = R.UxmlNames.durationLabel)]
     private Label durationLabel;
     
-    [Inject(UxmlName = R.UxmlNames.noFavoriteIcon)]
-    private MaterialIcon noFavoriteIcon;
-
-    [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
-    private MaterialIcon favoriteIcon;
-
-    [Inject(UxmlName = R.UxmlNames.toggleFavoriteButton)]
-    private Button toggleFavoriteButton;
-
-    private MessageDialogControl lyricsDialogControl;
-
     private SongMeta SelectedSong => songSelectSceneControl.SelectedSong;
     
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new SongSelectSongRatingIconControl();
@@ -84,13 +73,8 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     {
         injector.Inject(songRatingIconControl);
         
-        showLyricsButton.RegisterCallbackButtonTriggered(_ => ShowLyricsPopup());
-        
-        toggleFavoriteButton.RegisterCallbackButtonTriggered(_ => songSelectSceneControl.ToggleSelectedSongIsFavorite());
         songIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{songSelectSceneControl.SelectedSongIndex + 1}"));
 
-        playlistManager.PlaylistChangeEventStream
-            .Subscribe(_ => UpdateFavoriteIcon(null));
         songAudioPlayer.LoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
         settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
@@ -106,49 +90,6 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         songRatingIconControl.UpdateSongRatingIcons(selectedSong, settings.GameSettings.Difficulty);
     }
 
-    private void ShowLyricsPopup()
-    {
-        if (lyricsDialogControl != null
-            || SelectedSong == null)
-        {
-            return;
-        }
-
-        lyricsDialogControl = uiManager.CreateDialogControl($"{SelectedSong.Title}");
-        lyricsDialogControl.DialogClosedEventStream.Subscribe(_ => lyricsDialogControl = null);
-        
-        Label CreateLyricsLabel(string lyrics)
-        {
-            Label lyricsLabel = new Label(lyrics);
-            lyricsLabel.enableRichText = true;
-            lyricsLabel.AddToClassList("songSelectLyricsPreview");
-            return lyricsLabel;
-        }
-        
-        if (SelectedSong.GetVoices().Count < 2)
-        {
-            string lyrics = SongMetaUtils.GetLyrics(SelectedSong, Voice.firstVoiceName);
-            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(lyrics));
-        }
-        else
-        {
-            string firstVoiceLyrics = $"<i><b>{SelectedSong.VoiceNames.FirstOrDefault().Value}</b></i>\n\n" 
-                                      + SongMetaUtils.GetLyrics(SelectedSong, Voice.firstVoiceName);
-            string secondVoiceLyrics = $"<i><b>{SelectedSong.VoiceNames.LastOrDefault().Value}</b></i>\n\n" 
-                                       + SongMetaUtils.GetLyrics(SelectedSong, Voice.secondVoiceName);
-            
-            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
-            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
-        }
-        
-        // Add attribution and license info
-        AccordionItem attributionAccordionItem = new("Attribution");
-        attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(SelectedSong));
-        lyricsDialogControl.AddVisualElement(attributionAccordionItem);
-        
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(lyricsDialogControl.DialogRootVisualElement);
-    }
-    
     private void SetEmptySongDetails()
     {
         selectedSongArtist.text = "";
@@ -157,17 +98,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         selectedSongImageOuter.style.backgroundImage = new StyleBackground(defaultSongImage);
         selectedSongImageInner.style.backgroundImage = new StyleBackground(defaultSongImage);
         songRatingIconControl.HideSongRatingIcons();
-        UpdateFavoriteIcon(null);
         UpdateSongStatistics(null);
     }
 
-    private void UpdateFavoriteIcon(SongMeta songMeta)
-    {
-        bool isFavorite = IsFavorite(songMeta);
-        favoriteIcon.SetVisibleByDisplay(isFavorite);
-        noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
-    }
-    
     private bool IsFavorite(SongMeta songMeta)
     {
         return songMeta != null
@@ -194,8 +127,6 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         // Instead, the label is updated when the AudioClip has been loaded.
         durationLabel.text = "";
 
-        UpdateFavoriteIcon(selectedSong);
-
         UpdateSongStatistics(selectedSong);
 
         UpdateSongRatingIcons(selectedSong);
@@ -220,10 +151,12 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
             List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
 
             UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);
+            highscoresContainer.SetVisibleByVisibility(!topScoreNumbers.IsNullOrEmpty());
         }
         else
         {
             UpdateTopScoreLabels(new List<int>(), localHighScoreContainer);
+            highscoresContainer.HideByVisibility();
         }
     }
 

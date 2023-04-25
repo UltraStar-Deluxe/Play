@@ -56,29 +56,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.fuzzySearchTextLabel)]
     private Label fuzzySearchTextLabel;
 
-    [Inject(UxmlName = R.UxmlNames.startButton)]
-    private Button startButton;
-
     [Inject(UxmlName = R.UxmlNames.quitSceneButton)]
     private Button quitSceneButton;
 
     [Inject(UxmlName = R.UxmlNames.songOrderDropdownField)]
     private EnumField songOrderDropdownField;
-
-    [Inject(UxmlName = R.UxmlNames.scoreModeLabel)]
-    private Label scoreModeLabel;
-
-    [Inject(UxmlName = R.UxmlNames.scoreModePicker)]
-    private ItemPicker scoreModePicker;
-
-    [Inject(UxmlName = R.UxmlNames.noteDisplayModeLabel)]
-    private Label noteDisplayModeLabel;
-
-    [Inject(UxmlName = R.UxmlNames.noteDisplayModePicker)]
-    private ItemPicker noteDisplayModePicker;
-
-    [Inject(UxmlName = R.UxmlNames.toggleSingingOptionsButton)]
-    private Button toggleSingingOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.playerList)]
     private VisualElement playerList;
@@ -89,18 +71,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.addToSongQueueAsMedleyButton)]
     private Button addToSongQueueAsMedleyButton;
     
-    [Inject(UxmlName = R.UxmlNames.noScoresButton)]
-    private ToggleButton noScoresButton;
-    
-    [Inject(UxmlName = R.UxmlNames.easyDifficultyButton)]
-    private ToggleButton easyDifficultyButton;
-    
-    [Inject(UxmlName = R.UxmlNames.mediumDifficultyButton)]
-    private ToggleButton mediumDifficultyButton;
-    
-    [Inject(UxmlName = R.UxmlNames.hardDifficultyButton)]
-    private ToggleButton hardDifficultyButton;
-    
     [Inject(UxmlName = R.UxmlNames.toggleCoopModeButton)]
     private Button toggleCoopModeButton;
     
@@ -109,9 +79,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     [Inject(UxmlName = R.UxmlNames.noCoopIcon)]
     private VisualElement noCoopIcon;
-    
-    [Inject(UxmlName = R.UxmlNames.songDetailsColumn)]
-    private VisualElement songDetailsColumn;
     
     [Inject]
     private SongSelectSceneData sceneData;
@@ -153,12 +120,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.showSearchExpressionInfoButton)]
     private Button showSearchExpressionInfoButton;
-    
-    [Inject(UxmlName = R.UxmlNames.singingOptionsDropdownOverlay)]
-    private VisualElement singingOptionsDropdownOverlay;
-    
-    [Inject(UxmlName = R.UxmlNames.singingOptionsDropdownContainer)]
-    private VisualElement singingOptionsDropdownContainer;
     
     [Inject(UxmlName = R.UxmlNames.toggleMicCheckButton)]
     private ToggleButton toggleMicCheckButton;
@@ -208,6 +169,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
     private VisualElement modifierDialogOverlay;
     
+    [Inject(UxmlName = R.UxmlNames.currentDifficultyLabel)]
+    private Label currentDifficultyLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.nextDifficultyButton)]
+    private Button nextDifficultyButton;
+    
+    [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
+    private Button previousDifficultyButton;
+    
     [Inject(UxmlName = R_PlayShared.UxmlNames.passTheMicToggle)]
     private Toggle passTheMicToggle;
     
@@ -230,6 +200,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     }
 
     private MessageDialogControl searchExpressionHelpDialogControl;
+    private MessageDialogControl lyricsDialogControl;
 
     public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
@@ -259,9 +230,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         injector.Inject(songQueueUiControl);
         injector.Inject(songSelectFilterControl);
         injector.Inject(songSearchControl);
-        injector
-            .WithRootVisualElement(songDetailsColumn)
-            .Inject(songSelectSelectedSongDetailsControl);
+        injector.Inject(songSelectSelectedSongDetailsControl);
     }
     
     private void Start()
@@ -301,7 +270,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
-        startButton.RegisterCallbackButtonTriggered(_ => AttemptStartSong());
         songRouletteControl.Focus();
 
         quitSceneButton.RegisterCallbackButtonTriggered(_ => QuitSongSelect());
@@ -329,23 +297,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         importSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
-
-        // Show options in popup
-        singingOptionsDropdownOverlay.HideByDisplay();
-        toggleSingingOptionsButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            singingOptionsDropdownOverlay.ToggleVisibleByDisplay();
-        });
-        VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(singingOptionsDropdownOverlay);
-        new AnchoredPopupControl(singingOptionsDropdownContainer, toggleSingingOptionsButton, Corner2D.TopRight);
-
-        // Init singing options
-        new ScoreModeItemPickerControl(scoreModePicker)
-            .Bind(() => settings.GameSettings.ScoreMode,
-                newValue => settings.GameSettings.ScoreMode = newValue);
-        new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
-            .Bind(() => settings.GraphicSettings.noteDisplayMode,
-                newValue => settings.GraphicSettings.noteDisplayMode = newValue);
 
         createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
         {
@@ -485,26 +436,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
             .Subscribe(newValue => settings.PlayerProfiles.ForEach(it => it.Difficulty = newValue));
 
-        GetDifficultyToButtonMap().ForEach(entry =>
-        {
-            entry.Value.RegisterCallbackButtonTriggered(_ =>
-            {
-                settings.GameSettings.Difficulty = entry.Key;
-                if (settings.GameSettings.ScoreMode == EScoreMode.None)
-                {
-                    settings.GameSettings.ScoreMode = EScoreMode.Individual;
-                }
-                UpdateDifficultyAndScoreModeButtons();
-            });
-        });
-        UpdateDifficultyAndScoreModeButtons();
+        nextDifficultyButton.RegisterCallbackButtonTriggered(_ => SetNextDifficulty());
+        previousDifficultyButton.RegisterCallbackButtonTriggered(_ => SetPreviousDifficulty());
         
-        noScoresButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            settings.GameSettings.ScoreMode = EScoreMode.None;
-            UpdateDifficultyAndScoreModeButtons();
-        });
-        
+        UpdateDifficultyAndScoreModeControls();
+
         toggleCoopModeButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage)
@@ -515,20 +451,87 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             {
                 settings.GameSettings.ScoreMode = EScoreMode.CommonAverage;
             }
-            UpdateDifficultyAndScoreModeButtons();
+            UpdateDifficultyAndScoreModeControls();
         });
     }
 
-    private void UpdateDifficultyAndScoreModeButtons()
+    private void SetPreviousDifficulty()
     {
-        GetDifficultyToButtonMap().ForEach(entry =>
+        if (settings.GameSettings.ScoreMode == EScoreMode.None)
         {
-            bool isSelectedDifficulty = settings.GameSettings.Difficulty == entry.Key;
-            entry.Value.SetActive(isSelectedDifficulty && settings.GameSettings.ScoreMode != EScoreMode.None);
-        });
-        noScoresButton.SetActive(settings.GameSettings.ScoreMode == EScoreMode.None);
+            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            SetDifficulty(EDifficulty.Hard);
+        }
+        else
+        {
+            switch (settings.GameSettings.Difficulty)
+            {
+                case EDifficulty.Easy:
+                    SetNoScoreMode();
+                    break;
+                case EDifficulty.Medium:
+                    SetDifficulty(EDifficulty.Easy);
+                    break;
+                case EDifficulty.Hard:
+                    SetDifficulty(EDifficulty.Medium);
+                    break;
+            }
+        }
+    }
+    
+    private void SetNextDifficulty()
+    {
+        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        {
+            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            SetDifficulty(EDifficulty.Easy);
+        }
+        else
+        {
+            switch (settings.GameSettings.Difficulty)
+            {
+                case EDifficulty.Easy:
+                    SetDifficulty(EDifficulty.Medium);
+                    break;
+                case EDifficulty.Medium:
+                    SetDifficulty(EDifficulty.Hard);
+                    break;
+                case EDifficulty.Hard:
+                    SetNoScoreMode();
+                    break;
+            }
+        }
+    }
+
+    private void SetNoScoreMode()
+    {
+        settings.GameSettings.ScoreMode = EScoreMode.None;
+        UpdateDifficultyAndScoreModeControls();
+    }
+    
+    private void SetDifficulty(EDifficulty difficulty)
+    {
+        settings.GameSettings.Difficulty = difficulty;
+        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        {
+            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+        }
+        UpdateDifficultyAndScoreModeControls();
+    }
+
+    private void UpdateDifficultyAndScoreModeControls()
+    {
         coopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode == EScoreMode.CommonAverage);
         noCoopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode != EScoreMode.CommonAverage);
+
+        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        {
+            currentDifficultyLabel.text = "No Scores";
+        }
+        else
+        {
+            currentDifficultyLabel.text = settings.GameSettings.Difficulty.ToString();
+        }
     }
 
     public void QuitSongSelect()
@@ -606,6 +609,53 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         searchExpressionHelpDialogControl.DialogClosedEventStream.Subscribe(_ => searchExpressionHelpDialogControl = null);
         
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(searchExpressionHelpDialogControl.DialogRootVisualElement);
+    }
+
+    public void ShowLyricsAndInfoPopup(SongMeta songMeta)
+    {
+        if (songMeta == null)
+        {
+            return;
+        }
+        
+        if (lyricsDialogControl != null)
+        {
+            lyricsDialogControl.CloseDialog();
+        }
+
+        lyricsDialogControl = uiManager.CreateDialogControl($"{songMeta.Title}");
+        lyricsDialogControl.DialogClosedEventStream.Subscribe(_ => lyricsDialogControl = null);
+        
+        Label CreateLyricsLabel(string lyrics)
+        {
+            Label lyricsLabel = new Label(lyrics);
+            lyricsLabel.enableRichText = true;
+            lyricsLabel.AddToClassList("songSelectLyricsPreview");
+            return lyricsLabel;
+        }
+        
+        if (songMeta.GetVoices().Count < 2)
+        {
+            string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
+            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(lyrics));
+        }
+        else
+        {
+            string firstVoiceLyrics = $"<i><b>{songMeta.VoiceNames.FirstOrDefault().Value}</b></i>\n\n" 
+                                      + SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
+            string secondVoiceLyrics = $"<i><b>{songMeta.VoiceNames.LastOrDefault().Value}</b></i>\n\n" 
+                                       + SongMetaUtils.GetLyrics(songMeta, Voice.secondVoiceName);
+            
+            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
+            lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
+        }
+        
+        // Add attribution and license info
+        AccordionItem attributionAccordionItem = new("Attribution");
+        attributionAccordionItem.Add(AttributionUtils.CreateAttributionVisualElement(songMeta));
+        lyricsDialogControl.AddVisualElement(attributionAccordionItem);
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(lyricsDialogControl.DialogRootVisualElement);
     }
 
     public void InitSongMetas()
@@ -1050,10 +1100,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
         }
 
-        startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
-        scoreModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_scoreMode);
-        noteDisplayModeLabel.text = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
-
         songSearchControl.UpdateTranslation();
         UpdateInputLegend();
     }
@@ -1098,16 +1144,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         //         TranslationManager.GetTranslation(R.Messages.action_openSongMenu),
         //         TranslationManager.GetTranslation(R.Messages.action_longPress))));
         // }
-    }
-
-    private Dictionary<EDifficulty, ToggleButton> GetDifficultyToButtonMap()
-    {
-        return new Dictionary<EDifficulty, ToggleButton>
-        {
-            { EDifficulty.Easy, easyDifficultyButton },
-            { EDifficulty.Medium, mediumDifficultyButton },
-            { EDifficulty.Hard, hardDifficultyButton },
-        };
     }
 
     public void ShowCannotUseJokerMessage()

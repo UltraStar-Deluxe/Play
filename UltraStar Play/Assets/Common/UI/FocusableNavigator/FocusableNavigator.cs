@@ -196,6 +196,19 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
         
+        if (focusedVisualElement is ListViewH listViewH
+            && TryNavigateListView(listViewH, navigationDirection))
+        {
+            return;
+        }
+        
+        ListViewH parentListViewH = focusedVisualElement.GetFirstAncestorOfType<ListViewH>();
+        if ((parentListViewH != null)
+            && TryNavigateListView(parentListViewH, navigationDirection))
+        {
+            return;
+        }
+        
         VisualElement parentVisualElement = focusedVisualElement.GetParent(parent => parent.ClassListContains(R.UssClasses.focusableNavigatorPriorityParent));
         if (parentVisualElement != null
             && TryNavigateInVisualElement(parentVisualElement, focusedVisualElement, navigationDirection))
@@ -270,6 +283,53 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         return false;
     }
 
+    private bool TryNavigateListView(
+        ListViewH listView,
+        Vector2 navigationDirection)
+    {
+        if (listView.itemsSource.Count == 0)
+        {
+            return false;
+        }
+        
+        int selectedIndex = listView.selectedIndex;
+        if (navigationDirection.x < 0
+            && selectedIndex > 0)
+        {
+            if (logFocusedVisualElements)
+            {
+                Debug.Log("Select previous item in ListView");
+            }
+            listView.SetSelectionAndScrollTo(selectedIndex - 1);
+            TryFocusSelectedListViewItem(listView);
+            return true;
+        }
+        else if (navigationDirection.x > 0
+                 && selectedIndex < listView.itemsSource.Count - 1)
+        {
+            if (logFocusedVisualElements)
+            {
+                Debug.Log("Select next item in ListView");
+            }
+            listView.SetSelectionAndScrollTo(selectedIndex + 1);
+            TryFocusSelectedListViewItem(listView);
+            return true;
+        }
+
+        if (NoNavigationTargetFoundInListViewCallback != null)
+        {
+            bool isHandled = NoNavigationTargetFoundInListViewCallback.Invoke(new NoNavigationTargetFoundEvent()
+            {
+                NavigationDirection = navigationDirection,
+                FocusedVisualElement = listView,
+                FocusableNavigatorRootVisualElement = GetFocusableNavigatorRootVisualElement(),
+            });
+            return isHandled;
+        }
+
+        return false;
+    }
+    
     private void TryFocusSelectedListViewItem(ListView listView)
     {
         VisualElement selectedVisualElement = listView.GetSelectedVisualElement();
@@ -290,6 +350,26 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
+    private void TryFocusSelectedListViewItem(ListViewH listView)
+    {
+        VisualElement selectedVisualElement = listView.GetSelectedVisualElement();
+        if (selectedVisualElement != null)
+        {
+            List<VisualElement> focusableVisualElements = GetFocusableVisualElementsInDescendants(selectedVisualElement);
+            if (focusableVisualElements.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            VisualElement firstFocusableVisualElement = focusableVisualElements[0];
+            if (logFocusedVisualElements)
+            {
+                Debug.Log($"Moving focus to first focusable VisualElement in selected ListView item: {firstFocusableVisualElement}");
+            }
+            firstFocusableVisualElement.Focus();
+        }
+    }
+    
     private void NavigateDropdownList(
         VisualElement focusedVisualElement,
         Vector2 navigationDirection)
@@ -384,14 +464,27 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             TryFocusSelectedListViewItem(focusedListView);
         }
+        
+        if (visualElement is ListViewH focusedListViewH)
+        {
+            TryFocusSelectedListViewItem(focusedListViewH);
+        }
 
         ListView parentListView = visualElement.GetFirstAncestorOfType<ListView>();
+        ListViewH parentListViewH = visualElement.GetFirstAncestorOfType<ListViewH>();
         if (parentListView != null)
         {
             parentListView.Focus();
             parentListView.ScrollToSelf();
             
             TryFocusSelectedListViewItem(parentListView);
+        }
+        else if (parentListViewH != null)
+        {
+            parentListViewH.Focus();
+            parentListViewH.ScrollToSelf();
+            
+            TryFocusSelectedListViewItem(parentListViewH);
         }
         else
         {

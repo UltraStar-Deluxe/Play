@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using PrimeInputActions;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -67,8 +63,6 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     
     public string Name { get; set; }
 
-    private bool ignoreNextClickEvent;
-
     private SongMeta songMeta;
     public SongMeta SongMeta
     {
@@ -92,7 +86,10 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     private ContextMenuControl contextMenuControl;
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
-    
+
+    private readonly Subject<bool> pointerDownOnSongImageEventStream = new();
+    public IObservable<bool> PointerDownOnSongImageEventStream => pointerDownOnSongImageEventStream;
+
     private bool isInitialized;
 
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new();
@@ -106,12 +103,14 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     private void RegisterCallbacks()
     {
         VisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        songImageOuter.RegisterCallback<PointerDownEvent>(OnPointerDownOnSongImage, TrickleDown.TrickleDown);
         openSongMenuButton.RegisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
     private void UnregisterCallbacks()
     {
         VisualElement.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        songImageOuter.UnregisterCallback<PointerDownEvent>(OnPointerDownOnSongImage, TrickleDown.TrickleDown);
         openSongMenuButton.UnregisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
@@ -144,17 +143,24 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         contextMenuControl.ContextMenuClosedEventStream.Subscribe(OnContextMenuClosed);
     }
 
+    private void OnPointerDownOnSongImage(PointerDownEvent evt)
+    {
+        // Open context menu on right click
+        if (evt.button == 0)
+        {
+            pointerDownOnSongImageEventStream.OnNext(true);
+        }
+    }
+    
     private void OnPointerDown(PointerDownEvent evt)
     {
         // Open context menu on right click
-        if (evt.button != 1
-            || isPopupMenuOpen
-            || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
+        if (evt.button == 1
+            && !isPopupMenuOpen
+            && TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
         {
-            return;
+            contextMenuControl.OpenContextMenu(evt.position);
         }
-
-        contextMenuControl.OpenContextMenu(evt.position);
     }
 
     private void OnOpenSongMenuButtonClicked(EventBase evt)
@@ -227,6 +233,15 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         //             createSingAlongSongControl.CreateSingAlongSong(SongMeta);
         //         }
         //     });
+        
+        contextMenuPopup.AddButton("Info", "lyrics",
+            () =>
+            {
+                if (SongMeta != null)
+                {
+                    songSelectSceneControl.ShowLyricsAndInfoPopup(SongMeta);
+                }
+            });
         
         contextMenuPopup.AddButton("Vocals Separation", "call_split",
             () =>
