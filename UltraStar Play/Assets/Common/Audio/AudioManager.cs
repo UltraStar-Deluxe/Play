@@ -48,11 +48,6 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
             .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f));
     }
 
-    private void Update()
-    {
-        Debug.Log(settings.AudioSettings.SfxVolumePercent);
-    }
-    
     public static void PlayOneSFX(AudioClip clip, Vector3 sfxPosition)
     {
         if (clip == null)
