@@ -58,6 +58,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     public SongEntryControl SelectedSongEntryControl => songEntryControls
         .FirstOrDefault(it => it.SongMeta == Selection.Value.SongMeta);
     
+    private bool isInitialized;
+    
     private void Start()
     {
         songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.TrickleDown);
@@ -102,6 +104,14 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             }
         };
         songListView.selectionChanged += OnSongListViewSelectionChanged;
+
+        isInitialized = true;
+        
+        // Populate the list with the songs that were set before the control was initialized.
+        if (!songs.IsNullOrEmpty())
+        {
+            SetSongs(songs);
+        }
     }
 
     private void OnSongListViewSelectionChanged(IEnumerable<object> selectedObjects)
@@ -127,6 +137,13 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         int lastSelectedSongIndex = NumberUtils.Limit(SelectedSongIndex, 0, songMetas.Count - 1);
         SongMeta lastSelectedSongMeta = Selection.Value.SongMeta;
         songs = new List<SongMeta>(songMetas);
+
+        if (!isInitialized)
+        {
+            // Remember these songs but do not populate the list yet.
+            return;
+        }
+        
         if (songs.Count > 0)
         {
             // Try to restore song selection
