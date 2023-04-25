@@ -48,7 +48,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
             .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f));
     }
 
-    public static void PlayOneSFX(AudioClip clip, Vector3 sfxPosition)
+    public static void PlaySoundEffect(AudioClip clip)
     {
         if (clip == null)
         {
@@ -63,7 +63,6 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         }
         
         GameObject sfxInstance = new GameObject($"Sfx '{clip.name}'");
-        sfxInstance.transform.position = sfxPosition;
 
         AudioSource source = sfxInstance.AddComponent<AudioSource>();
         source.clip = clip;
@@ -150,7 +149,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         if (audioManager == null)
             return;
 
-        PlayOneSFX(audioManager.defaultButtonSound, Vector3.zero);
+        PlaySoundEffect(audioManager.defaultButtonSound);
     }
 
     public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
