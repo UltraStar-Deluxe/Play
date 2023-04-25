@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using UniInject;
+using UniRx;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
 // Handles loading and caching of AudioClips.
 // Use this over AudioUtils because AudioUtils does not cache AudioClips.
-public class AudioManager : AbstractSingletonBehaviour
+public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -14,14 +19,143 @@ public class AudioManager : AbstractSingletonBehaviour
         ClearCache();
     }
 
+    private const string MusicAudioMixerName = "Music";
+    private const string SfxAudioMixerName = "Sfx";
+    private const string VolumeParameterName = "Volume";
+    
     private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
 
     public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
 
+    [InjectedInInspector]
+    public AudioMixer mainAudioMixer;
+
+    [InjectedInInspector]
+    public AudioClip defaultButtonSound;
+    
+    [Inject]
+    private Settings settings;
+    
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        settings.ObserveEveryValueChanged(it => it.AudioSettings.SfxVolumePercent)
+            .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f));
+    }
+
+    private void Update()
+    {
+        Debug.Log(settings.AudioSettings.SfxVolumePercent);
+    }
+    
+    public static void PlayOneSFX(AudioClip clip, Vector3 sfxPosition)
+    {
+        if (clip == null)
+        {
+            return;
+        }
+
+        AudioManager audioManager = Instance;
+        if (audioManager == null
+            || audioManager.settings.AudioSettings.SfxVolumePercent <= 0)
+        {
+            return;
+        }
+        
+        GameObject sfxInstance = new GameObject($"Sfx '{clip.name}'");
+        sfxInstance.transform.position = sfxPosition;
+
+        AudioSource source = sfxInstance.AddComponent<AudioSource>();
+        source.clip = clip;
+        source.Play();
+
+        // set the mixer group (e.g. music, sfx, etc.)
+        source.outputAudioMixerGroup = GetAudioMixerGroup(SfxAudioMixerName);
+
+        // destroy after clip length
+        Destroy(sfxInstance, clip.length);
+    }
+    
+    public static AudioMixerGroup GetAudioMixerGroup(string groupName)
+    {
+        AudioManager audioManager = Instance;
+
+        if (audioManager == null)
+            return null;
+
+        if (audioManager.mainAudioMixer == null)
+            return null;
+
+        AudioMixerGroup[] groups = audioManager.mainAudioMixer.FindMatchingGroups(groupName);
+
+        foreach (AudioMixerGroup match in groups)
+        {
+            if (match.ToString() == groupName)
+                return match;
+        }
+        return null;
+
+    }
+    // convert linear value between 0 and 1 to decibels
+    public static float GetDecibelValue(float linearValue)
+    {
+        // commonly used for linear to decibel conversion
+        float conversionFactor = 20f;
+
+        float decibelValue = (linearValue != 0) ? conversionFactor * Mathf.Log10(linearValue) : -144f;
+        return decibelValue;
+    }
+
+    // convert decibel value to a range between 0 and 1
+    public static float GetLinearValue(float decibelValue)
+    {
+        float conversionFactor = 20f;
+
+        return Mathf.Pow(10f, decibelValue / conversionFactor);
+
+    }
+
+    // converts linear value between 0 and 1 into decibels and sets AudioMixer level
+    public static void SetVolume(string groupName, float linearValue)
+    {
+        AudioManager audioManager = Instance;
+        if (audioManager == null)
+            return;
+
+        float decibelValue = GetDecibelValue(linearValue);
+        if (audioManager.mainAudioMixer != null)
+        {
+            audioManager.mainAudioMixer.SetFloat(groupName + VolumeParameterName, decibelValue);
+        }
+    }
+
+    // returns a value between 0 and 1 based on the AudioMixer's decibel value
+    public static float GetVolume(string groupName)
+    {
+        AudioManager audioManager = Instance;
+        if (audioManager == null)
+            return 0f;
+
+        float decibelValue = 0f;
+        if (audioManager.mainAudioMixer != null)
+        {
+            audioManager.mainAudioMixer.GetFloat(groupName, out decibelValue);
+        }
+        return GetLinearValue(decibelValue);
+    }
+    
+    public static void PlayDefaultButtonSound()
+    {
+        AudioManager audioManager = Instance;
+        if (audioManager == null)
+            return;
+
+        PlayOneSFX(audioManager.defaultButtonSound, Vector3.zero);
     }
 
     public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
@@ -67,7 +201,7 @@ public class AudioManager : AbstractSingletonBehaviour
         }
         audioClipCache.Clear();
     }
-
+    
     private AudioClip LoadAndCacheAudioClip(string uri, bool streamAudio)
     {
         AudioClip audioClip = AudioUtils.GetAudioClipUncached(uri, streamAudio);
@@ -138,7 +272,7 @@ public class AudioManager : AbstractSingletonBehaviour
             }
         }
 
-        private readonly System.Diagnostics.Stopwatch stopwatch;
+        private readonly Stopwatch stopwatch;
 
         public LoadingAudioClip(string path, DownloadHandlerAudioClip downloadHandler, Action<AudioClip> callback)
         {
@@ -146,7 +280,7 @@ public class AudioManager : AbstractSingletonBehaviour
             this.DownloadHandler = downloadHandler;
             this.Callbacks.Add(callback);
 
-            stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch = new Stopwatch();
             stopwatch.Start();
         }
 

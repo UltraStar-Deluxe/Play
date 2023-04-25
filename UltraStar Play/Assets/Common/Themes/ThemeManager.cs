@@ -5,6 +5,7 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
 
@@ -113,10 +114,15 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     [Inject]
     private UIDocument uiDocument;
+    
+    [Inject]
+    private SceneNavigator sceneNavigator;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private VideoPlayer backgroundVideoPlayer;
     
+    private HashSet<VisualElement> registeredSfxVisualElements = new();
+
     protected override object GetInstance()
     {
         return Instance;
@@ -130,7 +136,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         settings.ObserveEveryValueChanged(it => it.GraphicSettings.animatedBackground)
             .Subscribe(animatedBackground => backgroundShaderControl.SetSimpleBackgroundEnabled(!animatedBackground));
 
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
+        
         CopyExampleThemeToUserDefinedThemesFolder();
+    }
+
+    private void OnSceneChanged()
+    {
+        registeredSfxVisualElements.Clear();
     }
 
     private void CopyExampleThemeToUserDefinedThemesFolder()
@@ -589,6 +602,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, button);
             ApplyControlColorConfigToVisualElement(button, styleConfig);
+
+            RegisterDefaultButtonSfxCallback(button);
         });
 
         // ItemPickers
@@ -621,6 +636,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             VisualElement styleTarget = toggle.Q(null, "unity-toggle__input");
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, toggle);
             ApplyControlColorConfigToVisualElement(toggle, styleConfig, styleTarget);
+            
+            RegisterDefaultButtonSfxCallback(toggle);
         });
         
         // SlideToggle
@@ -691,6 +708,23 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             root.Query(null,ussClassName).ForEach(it => it.SetBorderColor(Colors.clearBlack));
         });
+    }
+
+    private void RegisterDefaultButtonSfxCallback(VisualElement visualElement)
+    {
+        if (registeredSfxVisualElements.Contains(visualElement))
+        {
+            return;
+        }
+
+        if (visualElement is Button button)
+        {
+            button.RegisterCallbackButtonTriggered(_ => AudioManager.PlayDefaultButtonSound());
+        }
+        else if (visualElement is Toggle toggle)
+        {
+            toggle.RegisterValueChangedCallback(_ => AudioManager.PlayDefaultButtonSound());
+        }
     }
 
     private bool IsIgnoredScene(EScene currentScene)
