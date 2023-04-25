@@ -21,11 +21,12 @@ public static class AnimationUtils
             .id;
     }
 
-    public static int BounceVisualElementSize(GameObject gameObject, VisualElement visualElement, float animTimeInSeconds)
+    public static int BounceVisualElementSize(GameObject gameObject, VisualElement visualElement, float animTimeInSeconds, float delayInSeconds = 0)
     {
-        return LeanTween.value(gameObject, Vector3.one * 0.75f, Vector3.one, animTimeInSeconds)
-            .setEaseSpring()
+        return LeanTween.value(gameObject, Vector3.one, Vector3.one * 0.75f, animTimeInSeconds)
+            .setEasePunch()
             .setOnUpdate(s => visualElement.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))))
+            .setDelay(delayInSeconds)
             .id;
     }
     
