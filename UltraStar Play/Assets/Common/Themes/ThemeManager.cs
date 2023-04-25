@@ -6,6 +6,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.Video;
 
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
@@ -113,6 +114,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     [Inject]
     private UIDocument uiDocument;
 
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    private VideoPlayer backgroundVideoPlayer;
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -234,9 +238,32 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ApplyThemeDynamicBackground(themeMeta);
     }
 
+    private Image GetOrCreateStaticBackgroundElement()
+    {
+        VisualElement rootVisualElement = uiDocument.rootVisualElement;
+        if (rootVisualElement == null)
+        {
+            return null;
+        }
+        
+        string backgroundElementName = "staticBackgroundElement";
+        Image backgroundElement = rootVisualElement.Q<Image>(backgroundElementName);
+        if (backgroundElement != null)
+        {
+            return backgroundElement;
+        }
+
+        backgroundElement = new Image();
+        backgroundElement.name = backgroundElementName;
+        backgroundElement.AddToClassList("overlay");
+        backgroundElement.AddToClassList("staticBackgroundElement");
+        rootVisualElement.AddAsFirstChild(backgroundElement);
+        return backgroundElement;
+    }
+    
     private void ApplyThemeStaticBackground(ThemeMeta themeMeta)
     {
-        VisualElement backgroundElement = uiDocument.rootVisualElement;
+        Image backgroundElement = GetOrCreateStaticBackgroundElement();
         if (backgroundElement == null)
         {
             return;
@@ -251,15 +278,33 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         
         StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForScene(themeMeta, currentScene);
         string absoluteFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
-        ImageManager.LoadSpriteFromUri(absoluteFilePath, loadedSprite =>
+
+        string fileExtension = Path.GetExtension(absoluteFilePath);
+        if (ApplicationUtils.IsSupportedVideoFormat(fileExtension))
         {
-            backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-            if (!staticBackgroundJson.scaleMode.IsNullOrEmpty()
-                && Enum.TryParse(staticBackgroundJson.scaleMode, out ScaleMode scaleMode))
+            string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteFilePath);
+            backgroundVideoPlayer.url = ApplicationUtils.GetVideoPlayerUri(uri);
+            backgroundVideoPlayer.Play();
+            backgroundVideoPlayer.playbackSpeed = staticBackgroundJson.playbackSpeed > 0
+                ? staticBackgroundJson.playbackSpeed
+                : 1;
+            backgroundElement.image = backgroundVideoPlayer.targetTexture;
+            backgroundElement.style.backgroundImage = null;
+            ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.scaleMode);
+        }
+        else
+        {
+            backgroundVideoPlayer.Stop();
+            backgroundVideoPlayer.url = "";
+            backgroundVideoPlayer.playbackSpeed = 1;
+            backgroundElement.image = null;
+            
+            ImageManager.LoadSpriteFromUri(absoluteFilePath, loadedSprite =>
             {
-                backgroundElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(scaleMode);
-            }
-        });
+                backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
+                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.scaleMode);
+            });
+        }
     }
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)

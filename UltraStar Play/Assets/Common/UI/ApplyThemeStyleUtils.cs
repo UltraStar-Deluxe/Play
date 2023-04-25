@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UniRx;
@@ -8,6 +9,17 @@ public static class ApplyThemeStyleUtils
 {
     private static readonly Dictionary<VisualElement, VisualElementData> visualElementToData = new();
     private static readonly Dictionary<VisualElement, VisualElement> listViewToSelectedVisualElement = new();
+
+    public static bool TryApplyScaleMode(VisualElement visualElement, string scaleModeAsString)
+    {
+        if (!scaleModeAsString.IsNullOrEmpty()
+            && Enum.TryParse(scaleModeAsString, out ScaleMode scaleMode))
+        {
+            visualElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(scaleMode);
+            return true;
+        }
+        return false;
+    }
     
     public static void ApplyControlStyles(VisualElement visualElement, VisualElement styleTarget, ControlStyleConfig controlStyleConfig)
     {

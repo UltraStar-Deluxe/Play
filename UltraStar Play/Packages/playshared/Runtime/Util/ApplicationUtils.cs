@@ -221,4 +221,17 @@ public static class ApplicationUtils
         // TODO: Build PortAudio for Linux and macOS and include the compiled libs in PortAudioForUnity.
         return PlatformUtils.IsWindows();
     }
+    
+    public static string GetVideoPlayerUri(string uri)
+    {
+        // Unity on Android MUST NOT use the file:// scheme for vp8/webm files.
+        // See https://forum.unity.com/threads/videoplayer-url-issue-with-vp8-webm-on-android-androidvideomedia-error-opening-extractor-10002.1255434/#post-7978743
+#if UNITY_ANDROID
+        if (uri.StartsWith("file://") && (uri.EndsWith(".vp8") || uri.EndsWith(".webm")))
+        {
+            return uri.Substring("file://".Length);
+        }
+#endif
+        return uri;
+    }
 }

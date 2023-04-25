@@ -78,15 +78,17 @@
         "uiShadowOffset": { "x": -16, "y": 10 }
     },
 
-    // This group defines the parameters for a static background image
+    // This group defines the parameters for a static background image or video
     "staticBackground": {
-        // Path to the image. Can be absolute or relative to the theme file
+        // Path to the image or video file. Can be absolute or relative to the theme file
         "imagePath": "backgrounds/open-sign-1836961_1920.jpg",
-        // Scale mode for the image. Can be one of 'StretchToFill', 'ScaleAndCrop', 'ScaleToFit'
+        // The scale mode defines how to scale the content to the screen. Can be one of 'StretchToFill', 'ScaleAndCrop', 'ScaleToFit'
         "scaleMode": "ScaleAndCrop",
+        // If a video file is used, defines its playback speed.
+        "playbackSpeed": 0.5,
     },
 
-    // Overwrite the default background image for a specific scene.
+    // Overwrite the default background image or video for a specific scene.
     // Available scene names can be found here: https://github.com/UltraStar-Deluxe/Play/blob/master/UltraStar%20Play/Assets/Common/Scene/EScene.cs
     "sceneSpecificStaticBackgrounds": {
         "MainScene": {
