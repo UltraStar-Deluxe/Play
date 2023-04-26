@@ -197,4 +197,14 @@ public static class InputUtils
                && rect.yMin <= pointerPositionInPanelCoordinates.y
                && pointerPositionInPanelCoordinates.y <= rect.yMax;
     }
+
+    public static bool IsPointerDown()
+    {
+        if (Pointer.current == null)
+        {
+            return false;
+        }
+
+        return Pointer.current.press.isPressed;
+    }
 }
