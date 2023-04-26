@@ -15,12 +15,12 @@
         "activeBackgroundColor": "#40404040",
     },
 
-    "dynamicPanel": {
-        "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#1D2939",
-        "focusBackgroundColor": "#1D2939",
-        "activeBackgroundColor": "#1D2939"
-    },
+   "dynamicPanel": {
+       "backgroundColor": "#23304300",
+       "hoverBackgroundColor": "#00a07e",
+       "focusBackgroundColor": "#00a07e",
+       "activeBackgroundColor": "#00a07e",
+   },
 
     "staticPanel": {
         "backgroundGradient": "24deg, #233043, #344054",

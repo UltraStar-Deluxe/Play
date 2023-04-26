@@ -16,7 +16,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     /**
      * Filename without extension of the theme that should be loaded by default
      */
-    public const string DefaultThemeName = "default_dark";
+    public const string DefaultThemeName = "ocean";
     private const string ThemeFolderName = "Themes";
     private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
