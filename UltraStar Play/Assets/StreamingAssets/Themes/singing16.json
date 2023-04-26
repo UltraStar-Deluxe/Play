@@ -33,9 +33,9 @@
 
     "dynamicPanel": {
         "backgroundColor": "#191919",
-        "hoverBackgroundColor": "#5b4fbd",
-        "focusBackgroundColor": "#5b4fbd",
-        "activeBackgroundColor": "#5b4fbd"
+        "hoverBackgroundColor": "#63616f",
+        "focusBackgroundColor": "#63616f",
+        "activeBackgroundColor": "#63616f",
     },
 
     "staticPanel": {
