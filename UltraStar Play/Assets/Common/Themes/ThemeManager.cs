@@ -296,11 +296,22 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (ApplicationUtils.IsSupportedVideoFormat(fileExtension))
         {
             string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteFilePath);
-            backgroundVideoPlayer.url = ApplicationUtils.GetVideoPlayerUri(uri);
-            backgroundVideoPlayer.Play();
-            backgroundVideoPlayer.playbackSpeed = staticBackgroundJson.playbackSpeed > 0
+            string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
+            if (backgroundVideoPlayer.url != videoPlayerUrl)
+            {
+                backgroundVideoPlayer.url = videoPlayerUrl;
+            }
+            if (!backgroundVideoPlayer.isPlaying)
+            {
+                backgroundVideoPlayer.Play();
+            }
+            float playbackSpeed = staticBackgroundJson.playbackSpeed > 0
                 ? staticBackgroundJson.playbackSpeed
                 : 1;
+            if (Math.Abs(backgroundVideoPlayer.playbackSpeed - playbackSpeed) > 0.01f)
+            {
+                backgroundVideoPlayer.playbackSpeed = playbackSpeed;
+            }
             backgroundElement.image = backgroundVideoPlayer.targetTexture;
             backgroundElement.style.backgroundImage = null;
             ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.scaleMode);
