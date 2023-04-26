@@ -3,6 +3,9 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
 
 public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 {
@@ -38,15 +41,34 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 
     private void Update()
     {
-        if (Application.isEditor
-            && Keyboard.current != null
-            && InputUtils.IsKeyboardAltPressed()
+        if (!Application.isEditor
+            || Keyboard.current == null)
+        {
+            return;
+        }
+        
+        if (InputUtils.IsKeyboardAltPressed()
             && Keyboard.current.rKey.wasReleasedThisFrame)
         {
+            RefreshAssetDatabase();
             ReloadCurrentScene();
+        }
+        
+        if (InputUtils.IsKeyboardControlPressed()
+            && Keyboard.current.rKey.wasReleasedThisFrame)
+        {
+            // Refresh assets even at runtime
+            RefreshAssetDatabase();
         }
     }
 
+    private void RefreshAssetDatabase()
+    {
+#if UNITY_EDITOR
+        AssetDatabase.Refresh();
+#endif
+    }
+    
     private void ReloadCurrentScene()
     {
         EScene currentScene = sceneRecipeManager.GetCurrentScene();
