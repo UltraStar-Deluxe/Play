@@ -11,19 +11,19 @@
 /* SONG SELECT SCENE */
 /**************************************************/
 #songEntryUiRoot {
-    
+    width: 150px;
 }
 
 #innerSongEntryUi {
     transition: top 0.3s, width 0.3s, height 0.3s;
     top: 0;
-    width: 130px;
-    height: 130px;
+    width: 142px;
+    height: 142px;
 }
 
 #innerSongEntryUi #songImageOuter {
-    width: 130px;
-    height: 130px;
+    width: 142px;
+    height: 142px;
 }
 
 .unity-collection-view__item--selected #innerSongEntryUi {
