@@ -74,12 +74,12 @@
     "lyricsContainerGradient": "#000000, #1E232B",
     
     "staticBackground": {
-        "imagePath": "backgrounds/semi-transparent-black.png",
+        "path": "backgrounds/semi-transparent-black.png",
         "scaleMode": "StretchToFill",
     },
     "sceneSpecificStaticBackgrounds": {
         "MainScene": {
-            "imagePath": "backgrounds/vinyl.png",
+            "path": "backgrounds/vinyl.png",
             "scaleMode": "ScaleAndCrop",
         }
     },

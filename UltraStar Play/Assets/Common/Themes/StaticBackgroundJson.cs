@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class StaticBackgroundJson
@@ -7,7 +8,7 @@ public class StaticBackgroundJson
     /**
      * Image or video file path
      */
-    public string imagePath;
+    public string path;
 
     /**
      * One of ScaleMode enum values.

@@ -81,7 +81,7 @@
     // This group defines the parameters for a static background image or video
     "staticBackground": {
         // Path to the image or video file. Can be absolute or relative to the theme file
-        "imagePath": "backgrounds/open-sign-1836961_1920.jpg",
+        "path": "backgrounds/open-sign-1836961_1920.jpg",
         // The scale mode defines how to scale the content to the screen. Can be one of 'StretchToFill', 'ScaleAndCrop', 'ScaleToFit'
         "scaleMode": "ScaleAndCrop",
         // If a video file is used, defines its playback speed.
@@ -92,7 +92,7 @@
     // Available scene names can be found here: https://github.com/UltraStar-Deluxe/Play/blob/master/UltraStar%20Play/Assets/Common/Scene/EScene.cs
     "sceneSpecificStaticBackgrounds": {
         "MainScene": {
-            "imagePath": "backgrounds/vinyl.png",
+            "path": "backgrounds/vinyl.png",
             "scaleMode": "ScaleAndCrop",
         }
     },
