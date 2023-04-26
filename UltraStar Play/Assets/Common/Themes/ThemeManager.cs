@@ -616,6 +616,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     controlsRow.style.backgroundColor = new StyleColor(backgroundColor);
                 });
                 
+                defaultControlStyleConfig.backgroundGradient.IfNotNull(backgroundGradient =>
+                {
+                    ApplyThemeStyleUtils.ApplyGradient(controlsRow, backgroundGradient);
+                });
+                
                 defaultControlStyleConfig.fontColor.IfNotDefault(fontColor =>
                 {
                     controlsRow.Query<Label>().ForEach(label =>

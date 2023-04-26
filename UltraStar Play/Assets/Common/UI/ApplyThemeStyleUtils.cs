@@ -222,7 +222,7 @@ public static class ApplyThemeStyleUtils
                 || !TimeUtils.IsDurationAboveThreshold(data.initTimeInSeconds, 0.1f))
             {
                 // Immediately apply the new gradient
-                visualElement.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(newGradientConfig));
+                ApplyGradient(visualElement, newGradientConfig);
             }
             else
             {
@@ -235,6 +235,18 @@ public static class ApplyThemeStyleUtils
             }
         }
         data.currentGradientConfig = newGradientConfig;
+    }
+
+    public static void ApplyGradient(VisualElement visualElement, GradientConfig newGradientConfig)
+    {
+        if (newGradientConfig == null)
+        {
+            visualElement.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+        }
+        else
+        {
+            visualElement.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(newGradientConfig));
+        }
     }
 
     private static void ApplyStyle(VisualElementData data,
