@@ -127,7 +127,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             .CreateAndInject<SongEntryControl>();
         item.Name = songMeta.Artist + "-" + songMeta.Title;
         item.SongMeta = songMeta;
-        item.PointerDownOnSongImageEventStream.Subscribe(_ => OnSongButtonClicked(songMeta));
+        item.ClickOnSongImageEventStream.Subscribe(_ => OnSongButtonClicked(songMeta));
             
         songEntryControls.Add(item);
     }
