@@ -240,7 +240,7 @@ public static class VisualElementExtensions
     public static void SetSelectionAndScrollTo(this ListViewH listView, int index)
     {
         listView.SetSelection(index);
-        listView.ScrollToItem(index);
+        // listView.ScrollToItem(index);
     }
     
     public static VisualElement GetSelectedVisualElement(this ListView listView)

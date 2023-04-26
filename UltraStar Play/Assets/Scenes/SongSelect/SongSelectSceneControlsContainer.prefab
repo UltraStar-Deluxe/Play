@@ -90,6 +90,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songEntryUi: {fileID: 9197481963319205126, guid: e1997eb384bb6554d805a53cd309ec16,
     type: 3}
+  dynamicListViewItemsSize: 1
 --- !u!1 &3983233235667187890
 GameObject:
   m_ObjectHideFlags: 0
@@ -363,6 +364,7 @@ MonoBehaviour:
   playerListControl: {fileID: 3983233236451143432}
   micPitchTrackerPrefab: {fileID: 4222735436031177209, guid: a7725a62aafd2eb4f8a94b6af1b6b044,
     type: 3}
+  defaultSongImage: {fileID: 0}
 --- !u!1 &3983233237005229558
 GameObject:
   m_ObjectHideFlags: 0
