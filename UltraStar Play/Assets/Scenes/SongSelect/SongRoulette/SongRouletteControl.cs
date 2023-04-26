@@ -105,6 +105,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         };
         songListView.selectionChanged += OnSongListViewSelectionChanged;
 
+        // songListView.Q<ScrollView>().ObserveEveryValueChanged(scrollView => scrollView.scrollOffset)
+        //     .Subscribe(_ => OnScrollOffsetChanged());
+        
         isInitialized = true;
         
         // Populate the list with the songs that were set before the control was initialized.
@@ -113,6 +116,23 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             SetSongs(songs);
         }
     }
+
+    // private void OnScrollOffsetChanged()
+    // {
+    //     UpdateListViewItemPositions();
+    // }
+    //
+    // private void UpdateListViewItemPositions()
+    // {
+    //     List<VisualElement> listViewItems = songListView.Query(null, "unity-collection-view__item").ToList();
+    //     float maxDistanceToCenter = songListView.worldBound.width / 2f;
+    //     float maxOffset = -50;
+    //     foreach (VisualElement listViewItem in listViewItems)
+    //     {
+    //         float horizontalDistanceToCenter = Mathf.Abs(listViewItem.worldBound.center.x - songListView.worldBound.center.x);
+    //         listViewItem.style.top = maxOffset * (horizontalDistanceToCenter / maxDistanceToCenter);
+    //     }
+    // }
 
     private void OnSongListViewSelectionChanged(IEnumerable<object> selectedObjects)
     {
