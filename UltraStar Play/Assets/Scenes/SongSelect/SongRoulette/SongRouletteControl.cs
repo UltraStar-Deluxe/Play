@@ -327,7 +327,12 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     private void SetSelectionAndScrollToSongIndex(int songIndex)
     {
-        songListView.SetSelectionAndScrollTo(songIndex + dummyScrollViewItemCountPerSide);
+        songListView.SetSelection(songIndex + dummyScrollViewItemCountPerSide);
+        
+        if (!dynamicListViewItemsSize)
+        {
+            songListView.ScrollToItem(songIndex + dummyScrollViewItemCountPerSide);
+        }
     }
     
     private int GetSongIndex(SongMeta songMeta)

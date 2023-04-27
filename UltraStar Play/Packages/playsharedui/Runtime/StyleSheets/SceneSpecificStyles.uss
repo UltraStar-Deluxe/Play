@@ -12,6 +12,10 @@
 /**************************************************/
 #songEntryUiRoot {
     width: 150px;
+    padding-top: 100px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
 }
 
 #innerSongEntryUi {
