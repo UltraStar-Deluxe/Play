@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine;
 
-public static class UltraStarPlayBuildTools
+public static class MainGameBuildTools
 {
-    private static readonly string appName = "UltraStar Play";
+    private static readonly string appName = "Melody Mania";
 
     [MenuItem("Tools/Build/Build for release (Windows, macOS, Linux, signed apk, signed app bundle)")]
     public static void BuildAllForRelease()
