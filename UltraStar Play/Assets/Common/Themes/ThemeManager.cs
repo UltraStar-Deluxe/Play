@@ -139,6 +139,27 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
         
         CopyExampleThemeToUserDefinedThemesFolder();
+
+        // Apply theme to context menu popups
+        ContextMenuControl.AnyContextMenuOpenedEventStream
+            .Subscribe(contextMenuPopupControl => ApplyThemeToContextMenuPopup(contextMenuPopupControl));
+    }
+
+    private void ApplyThemeToContextMenuPopup(ContextMenuPopupControl contextMenuPopupControl)
+    {
+        VisualElement root = contextMenuPopupControl.VisualElement;
+        ThemeJson themeJson = GetCurrentTheme()?.ThemeJson;
+        if (themeJson == null)
+        {
+            return;
+        }
+        
+        // Only apply font color
+        themeJson.primaryFontColor.IfNotDefault(color => 
+            root.Query().ForEach(element =>
+            {
+                element.style.color = new StyleColor(color);
+            }));
     }
 
     private void OnSceneChanged()
