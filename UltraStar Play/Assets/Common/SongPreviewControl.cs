@@ -10,10 +10,16 @@ using UnityEngine;
 
 public class SongPreviewControl : MonoBehaviour, INeedInjection
 {
-    public float PreviewDelayInSeconds { get; set; } = 1;
-    public float AudioFadeInDurationInSeconds { get; set; } = 5;
-    public float VideoFadeInDurationInSeconds { get; set; } = 2;
-
+    [InjectedInInspector]
+    public float previewDelayInSeconds = 0.5f;
+    
+    [InjectedInInspector]
+    public float audioFadeInDurationInSeconds = 5;
+    
+    [InjectedInInspector]
+    public float videoFadeInDurationInSeconds = 2;
+    
+    [InjectedInInspector]
     public bool stopOldImmediatelyOnStartNew;
     
     protected float fadeInStartTimeInSeconds;
@@ -84,7 +90,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             videoFadeInStartTimeInSeconds = Time.time;
         }
 
-        float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / VideoFadeInDurationInSeconds;
+        float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / videoFadeInDurationInSeconds;
         videoFadeInPercent = NumberUtils.Limit(videoFadeInPercent, 0, 1);
         if (songVideoPlayer.HasLoadedVideo)
         {
@@ -100,7 +106,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual float UpdateAudioFadeIn()
     {
-        float audioFadeInFactor = (Time.time - fadeInStartTimeInSeconds) / AudioFadeInDurationInSeconds;
+        float audioFadeInFactor = (Time.time - fadeInStartTimeInSeconds) / audioFadeInDurationInSeconds;
         audioFadeInFactor = NumberUtils.Limit(audioFadeInFactor, 0, 1);
         float maxVolume = GetFinalPreviewVolume();
         songAudioPlayer.VolumeFactor = audioFadeInFactor * maxVolume;
@@ -132,7 +138,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         currentPreviewSongMeta = songMeta;
         if (songMeta != null)
         {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(PreviewDelayInSeconds, () => DoStartSongPreview(songMeta)));
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(previewDelayInSeconds, () => DoStartSongPreview(songMeta)));
         }
     }
 
