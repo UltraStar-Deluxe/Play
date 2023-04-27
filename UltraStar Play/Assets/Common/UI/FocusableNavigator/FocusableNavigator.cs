@@ -613,7 +613,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                     or DoubleField
                     or MinMaxSlider
                     or RadioButton
-                    or ListView)
+                    or ListView
+                    or ListViewH)
             .Where(descendant => IsFocusableNow(descendant))
             .ToList();
         return descendants;
@@ -691,6 +692,14 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                && visualElement.enabledInHierarchy
                && visualElement.canGrabFocus
                && !visualElement.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
-               && visualElement.GetAncestors().AllMatch(ancestor => ancestor.IsVisibleByDisplay());
+               && visualElement.GetAncestors().AllMatch(ancestor =>
+               {
+                   return ancestor.IsVisibleByDisplay()
+                       && !float.IsNaN(ancestor.worldBound.center.x)
+                       && !float.IsNaN(ancestor.worldBound.center.y)
+                       && ancestor.enabledInHierarchy
+                       && !ancestor.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
+                       && !ancestor.ClassListContains(VisualElementSlideInControl.SlideOutClassName);
+               });
     }
 }

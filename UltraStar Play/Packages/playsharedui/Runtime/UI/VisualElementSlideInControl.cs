@@ -5,6 +5,9 @@ using UnityEngine.UIElements;
 
 public class VisualElementSlideInControl
 {
+    public const string SlideOutClassName = "visualElementSlideOut";
+    public const string SlideInClassName = "visualElementSlideIn";
+    
     private readonly VisualElement visualElement;
     private readonly ESide2D side;
     private readonly ToggleControl toggleControl;
@@ -81,6 +84,9 @@ public class VisualElementSlideInControl
 
     private void DoSlideOut()
     {
+        visualElement.RemoveFromClassList(SlideInClassName);
+        visualElement.AddToClassList(SlideOutClassName);
+        
         if (side == ESide2D.Right)
         {
             visualElement.style.right = -visualElement.resolvedStyle.width;
@@ -101,6 +107,9 @@ public class VisualElementSlideInControl
 
     private void DoSlideIn()
     {
+        visualElement.AddToClassList(SlideInClassName);
+        visualElement.RemoveFromClassList(SlideOutClassName);
+        
         if (side == ESide2D.Right)
         {
             visualElement.style.right = 0;
