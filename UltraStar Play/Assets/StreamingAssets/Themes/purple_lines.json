@@ -75,5 +75,6 @@
 
     "staticBackground": {
         "path": "videos/pixabay/linien-4967.mp4",
+        "scaleMode": "StretchToFill",
     },
 }
