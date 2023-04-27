@@ -59,9 +59,9 @@ public abstract class DragEventsProcessor
             new EventCallback<PointerCancelEvent>(this.OnPointerCancelEvent));
         this.m_Target.RegisterCallback<PointerCaptureOutEvent>(
             new EventCallback<PointerCaptureOutEvent>(this.OnPointerCapturedOut));
-        this.m_Target.RegisterCallback<DragUpdatedEvent>(new EventCallback<DragUpdatedEvent>(this.OnDragUpdate));
-        this.m_Target.RegisterCallback<DragPerformEvent>(new EventCallback<DragPerformEvent>(this.OnDragPerformEvent));
-        this.m_Target.RegisterCallback<DragExitedEvent>(new EventCallback<DragExitedEvent>(this.OnDragExitedEvent));
+        // this.m_Target.RegisterCallback<DragUpdatedEvent>(new EventCallback<DragUpdatedEvent>(this.OnDragUpdate));
+        // this.m_Target.RegisterCallback<DragPerformEvent>(new EventCallback<DragPerformEvent>(this.OnDragPerformEvent));
+        // this.m_Target.RegisterCallback<DragExitedEvent>(new EventCallback<DragExitedEvent>(this.OnDragExitedEvent));
     }
 
     private void UnregisterCallbacksFromTarget(DetachFromPanelEvent evt) => this.UnregisterCallbacksFromTarget();
@@ -81,10 +81,9 @@ public abstract class DragEventsProcessor
             new EventCallback<PointerCancelEvent>(this.OnPointerCancelEvent));
         this.m_Target.UnregisterCallback<PointerCaptureOutEvent>(
             new EventCallback<PointerCaptureOutEvent>(this.OnPointerCapturedOut));
-        this.m_Target.UnregisterCallback<DragUpdatedEvent>(new EventCallback<DragUpdatedEvent>(this.OnDragUpdate));
-        this.m_Target.UnregisterCallback<DragPerformEvent>(
-            new EventCallback<DragPerformEvent>(this.OnDragPerformEvent));
-        this.m_Target.UnregisterCallback<DragExitedEvent>(new EventCallback<DragExitedEvent>(this.OnDragExitedEvent));
+        // this.m_Target.UnregisterCallback<DragUpdatedEvent>(new EventCallback<DragUpdatedEvent>(this.OnDragUpdate));
+        // this.m_Target.UnregisterCallback<DragPerformEvent>(new EventCallback<DragPerformEvent>(this.OnDragPerformEvent));
+        // this.m_Target.UnregisterCallback<DragExitedEvent>(new EventCallback<DragExitedEvent>(this.OnDragExitedEvent));
         if (!unregisterPanelEvents)
             return;
         this.m_Target.UnregisterCallback<AttachToPanelEvent>(
@@ -152,29 +151,29 @@ public abstract class DragEventsProcessor
         this.m_DragState = DragEventsProcessor.DragState.None;
     }
 
-    private void OnDragExitedEvent(DragExitedEvent evt)
-    {
-        if (!this.useDragEvents)
-            return;
-        this.ClearDragAndDropUI();
-    }
-
-    private void OnDragPerformEvent(DragPerformEvent evt)
-    {
-        if (!this.useDragEvents)
-            return;
-        this.m_DragState = DragEventsProcessor.DragState.None;
-        this.OnDrop((Vector3)evt.mousePosition);
-        this.ClearDragAndDropUI();
-        DragAndDropUtility.dragAndDrop.AcceptDrag();
-    }
-
-    private void OnDragUpdate(DragUpdatedEvent evt)
-    {
-        if (!this.useDragEvents)
-            return;
-        DragAndDropUtility.dragAndDrop.SetVisualMode(this.UpdateDrag((Vector3)evt.mousePosition));
-    }
+    // private void OnDragExitedEvent(DragExitedEvent evt)
+    // {
+    //     if (!this.useDragEvents)
+    //         return;
+    //     this.ClearDragAndDropUI();
+    // }
+    //
+    // private void OnDragPerformEvent(DragPerformEvent evt)
+    // {
+    //     if (!this.useDragEvents)
+    //         return;
+    //     this.m_DragState = DragEventsProcessor.DragState.None;
+    //     this.OnDrop((Vector3)evt.mousePosition);
+    //     this.ClearDragAndDropUI();
+    //     DragAndDropUtility.dragAndDrop.AcceptDrag();
+    // }
+    //
+    // private void OnDragUpdate(DragUpdatedEvent evt)
+    // {
+    //     if (!this.useDragEvents)
+    //         return;
+    //     DragAndDropUtility.dragAndDrop.SetVisualMode(this.UpdateDrag((Vector3)evt.mousePosition));
+    // }
 
     private void OnPointerMoveEvent(PointerMoveEvent evt)
     {
