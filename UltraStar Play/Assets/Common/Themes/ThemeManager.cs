@@ -5,7 +5,9 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UIElements;
+using UnityEngine.Video;
 
 // Handles the loading, saving and application of themes for the app
 // This includes the background material shader values, background particle effects, and UIToolkit colors/styles
@@ -14,7 +16,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     /**
      * Filename without extension of the theme that should be loaded by default
      */
-    public const string DefaultThemeName = "default_dark";
+    public const string DefaultThemeName = "ocean";
     private const string ThemeFolderName = "Themes";
     private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
@@ -112,6 +114,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     [Inject]
     private UIDocument uiDocument;
+    
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    private VideoPlayer backgroundVideoPlayer;
+    
+    private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     protected override object GetInstance()
     {
@@ -126,7 +136,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         settings.ObserveEveryValueChanged(it => it.GraphicSettings.animatedBackground)
             .Subscribe(animatedBackground => backgroundShaderControl.SetSimpleBackgroundEnabled(!animatedBackground));
 
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
+        
         CopyExampleThemeToUserDefinedThemesFolder();
+    }
+
+    private void OnSceneChanged()
+    {
+        registeredSfxVisualElements.Clear();
     }
 
     private void CopyExampleThemeToUserDefinedThemesFolder()
@@ -234,9 +251,32 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ApplyThemeDynamicBackground(themeMeta);
     }
 
+    private Image GetOrCreateStaticBackgroundElement()
+    {
+        VisualElement rootVisualElement = uiDocument.rootVisualElement;
+        if (rootVisualElement == null)
+        {
+            return null;
+        }
+        
+        string backgroundElementName = "staticBackgroundElement";
+        Image backgroundElement = rootVisualElement.Q<Image>(backgroundElementName);
+        if (backgroundElement != null)
+        {
+            return backgroundElement;
+        }
+
+        backgroundElement = new Image();
+        backgroundElement.name = backgroundElementName;
+        backgroundElement.AddToClassList("overlay");
+        backgroundElement.AddToClassList("staticBackgroundElement");
+        rootVisualElement.AddAsFirstChild(backgroundElement);
+        return backgroundElement;
+    }
+    
     private void ApplyThemeStaticBackground(ThemeMeta themeMeta)
     {
-        VisualElement backgroundElement = uiDocument.rootVisualElement;
+        Image backgroundElement = GetOrCreateStaticBackgroundElement();
         if (backgroundElement == null)
         {
             return;
@@ -250,16 +290,45 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         
         StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForScene(themeMeta, currentScene);
-        string absoluteFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
-        ImageManager.LoadSpriteFromUri(absoluteFilePath, loadedSprite =>
+        string absoluteFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.path);
+
+        string fileExtension = Path.GetExtension(absoluteFilePath);
+        if (ApplicationUtils.IsSupportedVideoFormat(fileExtension))
         {
-            backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-            if (!staticBackgroundJson.scaleMode.IsNullOrEmpty()
-                && Enum.TryParse(staticBackgroundJson.scaleMode, out ScaleMode scaleMode))
+            string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteFilePath);
+            string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
+            if (backgroundVideoPlayer.url != videoPlayerUrl)
             {
-                backgroundElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(scaleMode);
+                backgroundVideoPlayer.url = videoPlayerUrl;
             }
-        });
+            if (!backgroundVideoPlayer.isPlaying)
+            {
+                backgroundVideoPlayer.Play();
+            }
+            float playbackSpeed = staticBackgroundJson.playbackSpeed > 0
+                ? staticBackgroundJson.playbackSpeed
+                : 1;
+            if (Math.Abs(backgroundVideoPlayer.playbackSpeed - playbackSpeed) > 0.01f)
+            {
+                backgroundVideoPlayer.playbackSpeed = playbackSpeed;
+            }
+            backgroundElement.image = backgroundVideoPlayer.targetTexture;
+            backgroundElement.style.backgroundImage = null;
+            ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.scaleMode);
+        }
+        else
+        {
+            backgroundVideoPlayer.Stop();
+            backgroundVideoPlayer.url = "";
+            backgroundVideoPlayer.playbackSpeed = 1;
+            backgroundElement.image = null;
+            
+            ImageManager.LoadSpriteFromUri(absoluteFilePath, loadedSprite =>
+            {
+                backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
+                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.scaleMode);
+            });
+        }
     }
 
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
@@ -544,6 +613,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, button);
             ApplyControlColorConfigToVisualElement(button, styleConfig);
+
+            RegisterDefaultButtonSfxCallback(button);
         });
 
         // ItemPickers
@@ -554,6 +625,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 defaultControlStyleConfig.backgroundColor.IfNotDefault(backgroundColor =>
                 {
                     controlsRow.style.backgroundColor = new StyleColor(backgroundColor);
+                });
+                
+                defaultControlStyleConfig.backgroundGradient.IfNotNull(backgroundGradient =>
+                {
+                    ApplyThemeStyleUtils.ApplyGradient(controlsRow, backgroundGradient);
                 });
                 
                 defaultControlStyleConfig.fontColor.IfNotDefault(fontColor =>
@@ -576,6 +652,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             VisualElement styleTarget = toggle.Q(null, "unity-toggle__input");
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, toggle);
             ApplyControlColorConfigToVisualElement(toggle, styleConfig, styleTarget);
+            
+            RegisterDefaultButtonSfxCallback(toggle);
         });
         
         // SlideToggle
@@ -646,6 +724,23 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             root.Query(null,ussClassName).ForEach(it => it.SetBorderColor(Colors.clearBlack));
         });
+    }
+
+    private void RegisterDefaultButtonSfxCallback(VisualElement visualElement)
+    {
+        if (registeredSfxVisualElements.Contains(visualElement))
+        {
+            return;
+        }
+
+        if (visualElement is Button button)
+        {
+            button.RegisterCallbackButtonTriggered(_ => AudioManager.PlayDefaultButtonSound());
+        }
+        else if (visualElement is Toggle toggle)
+        {
+            toggle.RegisterValueChangedCallback(_ => AudioManager.PlayDefaultButtonSound());
+        }
     }
 
     private bool IsIgnoredScene(EScene currentScene)

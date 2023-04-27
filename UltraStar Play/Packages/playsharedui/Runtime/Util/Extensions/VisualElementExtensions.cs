@@ -14,16 +14,16 @@ public static class VisualElementExtensions
         }
     }
     
-    public static void RegisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback)
+    public static void RegisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback, TrickleDown trickleDown = TrickleDown.NoTrickleDown)
     {
-        button.RegisterCallback<ClickEvent>(callback);
-        button.RegisterCallback<NavigationSubmitEvent>(callback);
+        button.RegisterCallback<ClickEvent>(callback, trickleDown);
+        button.RegisterCallback<NavigationSubmitEvent>(callback, trickleDown);
     }
 
-    public static void UnregisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback)
+    public static void UnregisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback, TrickleDown trickleDown = TrickleDown.NoTrickleDown)
     {
-        button.UnregisterCallback<ClickEvent>(callback);
-        button.UnregisterCallback<NavigationSubmitEvent>(callback);
+        button.UnregisterCallback<ClickEvent>(callback, trickleDown);
+        button.UnregisterCallback<NavigationSubmitEvent>(callback, trickleDown);
     }
 
     public static void AddToClassListIfNew(this VisualElement visualElement, params string[] newClasses)
@@ -240,7 +240,7 @@ public static class VisualElementExtensions
     public static void SetSelectionAndScrollTo(this ListViewH listView, int index)
     {
         listView.SetSelection(index);
-        listView.ScrollToItem(index);
+        // listView.ScrollToItem(index);
     }
     
     public static VisualElement GetSelectedVisualElement(this ListView listView)

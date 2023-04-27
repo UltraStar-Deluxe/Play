@@ -92,7 +92,7 @@
         <ui:VisualElement name="bottomRight" class="mr-3 mb-3" style="position: absolute; bottom: 0; right: 0; width: 200px;">
             <ui:VisualElement name="selectedSongInfo" picking-mode="Ignore" style="background-color: rgba(0, 0, 0, 0); flex-shrink: 0; margin-right: 12px;">
                 <ui:VisualElement name="highscoresContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-items: flex-end;">
-                    <ui:Label tabindex="-1" text="High Score" display-tooltip-when-elided="true" name="highscoreTitleLabel" class="smallFont ml-auto" style="-unity-font-style: bold;" />
+                    <ui:Button text="High Score" name="highscoreTitleButton" class="transparentButton" style="padding-right: 0; padding-left: 0; padding-top: 0; padding-bottom: 0; height: auto;" />
                     <ui:VisualElement name="localHighScoreContainer">
                         <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-items: center;">
                             <ui:VisualElement name="stars" class="mx-3" style="flex-direction: row; align-items: center;">

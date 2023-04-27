@@ -38,12 +38,21 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     [Inject]
     private Injector injector;
     
+    [Inject]
+    private SongSelectSceneData sceneData;
+    
+    [Inject]
+    private SceneNavigator sceneNavigator;
+    
     [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
     private VisualElement localHighScoreContainer;
     
     [Inject(UxmlName = R.UxmlNames.highscoresContainer)]
     private VisualElement highscoresContainer;
 
+    [Inject(UxmlName = R.UxmlNames.highscoreTitleButton)]
+    private Button highscoreTitleButton;
+    
     [Inject(UxmlName = R.UxmlNames.selectedSongArtist)]
     private Label selectedSongArtist;
 
@@ -75,6 +84,8 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         
         songIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{songSelectSceneControl.SelectedSongIndex + 1}"));
 
+        highscoreTitleButton.RegisterCallbackButtonTriggered(_ => OpenHighScoreScene());
+        
         songAudioPlayer.LoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
         settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
@@ -83,6 +94,17 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
                 UpdateSongStatistics(songSelectSceneControl.SelectedSong);
                 UpdateSongRatingIcons(songSelectSceneControl.SelectedSong);
             });
+    }
+
+    private void OpenHighScoreScene()
+    {
+        SingingResultsSceneData singingResultsSceneData = new()
+        {
+            SongMetas = new List<SongMeta> { SelectedSong },
+            partyModeSceneData = sceneData.partyModeSceneData,
+            lastSceneData = sceneData,
+        };
+        sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
 
     private void UpdateSongRatingIcons(SongMeta selectedSong)

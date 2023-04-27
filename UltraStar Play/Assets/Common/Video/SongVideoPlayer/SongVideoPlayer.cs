@@ -146,7 +146,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void LoadVideo(string uri)
     {
-        videoPlayer.url = GetVideoPlayerUri(uri);
+        videoPlayer.url = ApplicationUtils.GetVideoPlayerUri(uri);
         // The url is empty if loading the video failed.
         HasLoadedVideo = !videoPlayer.url.IsNullOrEmpty();
         // For now, only load the video. Starting it is done from the outside.
@@ -385,18 +385,5 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         RenderTexture.active = renderTexture;
         GL.Clear(true, true, Color.clear);
         RenderTexture.active = rt;
-    }
-
-    private static string GetVideoPlayerUri(string uri)
-    {
-        // Unity on Android MUST NOT use the file:// scheme for vp8/webm files.
-        // See https://forum.unity.com/threads/videoplayer-url-issue-with-vp8-webm-on-android-androidvideomedia-error-opening-extractor-10002.1255434/#post-7978743
-#if UNITY_ANDROID
-        if (uri.StartsWith("file://") && (uri.EndsWith(".vp8") || uri.EndsWith(".webm")))
-        {
-            return uri.Substring("file://".Length);
-        }
-#endif
-        return uri;
     }
 }

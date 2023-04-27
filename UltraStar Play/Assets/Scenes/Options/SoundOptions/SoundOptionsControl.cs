@@ -38,6 +38,9 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
     [Inject(UxmlName = R.UxmlNames.animateSceneChangeVolumePicker)]
     private ItemPicker animateSceneChangeVolumePicker;
 
+    [Inject(UxmlName = R.UxmlNames.sfxVolumeChooser)]
+    private ItemPicker sfxVolumeChooser;
+    
     [Inject(UxmlName = R.UxmlNames.soundfontPathTextField)]
     private TextField soundfontPathTextField;
 
@@ -76,6 +79,10 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
         PercentNumberPickerControl animateSceneChangeVolumePickerControl = new(animateSceneChangeVolumePicker);
         animateSceneChangeVolumePickerControl.Bind(() => settings.AudioSettings.SceneChangeSoundVolumePercent,
             newValue => settings.AudioSettings.SceneChangeSoundVolumePercent = (int)newValue);
+
+        PercentNumberPickerControl sfxVolumeChooserControl = new(sfxVolumeChooser);
+        sfxVolumeChooserControl.Bind(() => settings.AudioSettings.SfxVolumePercent,
+            newValue => settings.AudioSettings.SfxVolumePercent = (int)newValue);
 
         PercentNumberPickerControl vocalsAudioVolumePickerControl = new(vocalsAudioVolumeChooser);
         vocalsAudioVolumePickerControl.Bind(() => settings.AudioSettings.VocalsAudioVolumePercent,

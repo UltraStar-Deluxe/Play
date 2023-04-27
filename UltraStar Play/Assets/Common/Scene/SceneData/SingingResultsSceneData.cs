@@ -11,7 +11,8 @@ public class SingingResultsSceneData : SceneData
     public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
     private readonly Dictionary<PlayerProfile, PlayerScoreControlData> playerScoreMap = new();
     public PartyModeSceneData partyModeSceneData;
-
+    public SceneData lastSceneData;
+    
     public void AddPlayerScores(PlayerProfile profile, PlayerScoreControlData scoreData)
     {
         if (!PlayerProfiles.Contains(profile))

@@ -36,7 +36,7 @@ public static class ThemeMetaUtils
         StaticBackgroundJson staticBackgroundJson = GetStaticBackgroundJsonForScene(themeMeta, scene);
         return !settings.DeveloperSettings.disableDynamicThemes
                && (staticBackgroundJson != null
-                   && !staticBackgroundJson.imagePath.IsNullOrEmpty());
+                   && !staticBackgroundJson.path.IsNullOrEmpty());
     }
 
     public static StaticBackgroundJson GetStaticBackgroundJsonForScene(ThemeMeta themeMeta, EScene scene)

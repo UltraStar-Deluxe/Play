@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UniRx;
@@ -8,6 +9,17 @@ public static class ApplyThemeStyleUtils
 {
     private static readonly Dictionary<VisualElement, VisualElementData> visualElementToData = new();
     private static readonly Dictionary<VisualElement, VisualElement> listViewToSelectedVisualElement = new();
+
+    public static bool TryApplyScaleMode(VisualElement visualElement, string scaleModeAsString)
+    {
+        if (!scaleModeAsString.IsNullOrEmpty()
+            && Enum.TryParse(scaleModeAsString, out ScaleMode scaleMode))
+        {
+            visualElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(scaleMode);
+            return true;
+        }
+        return false;
+    }
     
     public static void ApplyControlStyles(VisualElement visualElement, VisualElement styleTarget, ControlStyleConfig controlStyleConfig)
     {
@@ -210,7 +222,7 @@ public static class ApplyThemeStyleUtils
                 || !TimeUtils.IsDurationAboveThreshold(data.initTimeInSeconds, 0.1f))
             {
                 // Immediately apply the new gradient
-                visualElement.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(newGradientConfig));
+                ApplyGradient(visualElement, newGradientConfig);
             }
             else
             {
@@ -223,6 +235,18 @@ public static class ApplyThemeStyleUtils
             }
         }
         data.currentGradientConfig = newGradientConfig;
+    }
+
+    public static void ApplyGradient(VisualElement visualElement, GradientConfig newGradientConfig)
+    {
+        if (newGradientConfig == null)
+        {
+            visualElement.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+        }
+        else
+        {
+            visualElement.style.backgroundImage = new StyleBackground(GradientManager.GetGradientTexture(newGradientConfig));
+        }
     }
 
     private static void ApplyStyle(VisualElementData data,

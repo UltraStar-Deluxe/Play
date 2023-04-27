@@ -1,0 +1,74 @@
+{
+    "defaultControl": {
+        "fontColor": "#fefefe",
+        "backgroundColor": "#18a298",
+        "backgroundGradient": "26.57deg, #18a298, #37d4ce",
+        "hoverBackgroundGradient": "26.57deg, #101828, #000000",
+        "focusBackgroundGradient": "26.57deg, #101828, #000000",
+        "activeBackgroundGradient": "26.57deg, #101828, #000000",
+        "borderColor": "#00000100",
+        "focusBorderColor": "#4F5B6F",
+    },
+
+    "transparentButton": {
+        "backgroundColor": "#00000100",
+        "hoverBackgroundColor": "#20202030",
+        "focusBackgroundColor": "#20202040",
+        "activeBackgroundColor": "#40404040",
+    },
+
+
+    "lightButton": {
+        "backgroundColor": "#F9FAFB",
+        "hoverBackgroundColor": "#344054",
+        "focusBackgroundColor": "#344054",
+        "activeBackgroundColor": "#404040dd",
+        "borderColor": "#00000100",
+
+        "fontColor": "#344054",
+        "hoverFontColor": "#F9FAFB",
+        "focusFontColor": "#F9FAFB",
+        "activeFontColor": "#F9FAFB"
+    },
+
+    "dynamicPanel": {
+        "backgroundColor": "#191919",
+        "hoverBackgroundColor": "#63616f",
+        "focusBackgroundColor": "#63616f",
+        "activeBackgroundColor": "#63616f",
+    },
+
+    "staticPanel": {
+        "backgroundGradient": "26.57deg, #2e2e2e, #2e2e2e",
+    },
+
+    "slideToggleOff": {
+        "backgroundColor": "#63616f",
+        "hoverBackgroundColor": "#344054",
+        "focusBackgroundColor": "#344054",
+        "activeBackgroundColor": "#344054",
+    },
+
+    "slideToggleOn": {
+        "backgroundColor": "#37d6d1",
+        "hoverBackgroundColor": "#14C472",
+        "focusBackgroundColor": "#0C7846",
+        "activeBackgroundColor": "#109E5C",
+    },
+
+    "primaryFontColor":  "#fffefe",
+    "secondaryFontColor": "#afaec7",
+    "warningFontColor":  "#FEC84B",
+    "errorFontColor": "#F97066",
+
+    "lyricsColor": "#2b2a2e",
+    "lyricsShadow": false,
+    "currentNoteLyricsColor": "#36bcb6",
+    "previousNoteLyricsColor": "#36bcb6",
+    "lyricsContainerGradient": "#dddbe3cc, #dddbe3cc",
+    
+    "staticBackground": {
+        "path": "backgrounds/singing16.png",
+        "scaleMode": "StretchToFill",
+    }
+}

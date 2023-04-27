@@ -63,8 +63,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
-        
-        themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
+
+        ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
+        currentThemeMeta.ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
             positionBeforeLyricsIndicator.style.color = new StyleColor(color));
     }
 
@@ -146,12 +147,13 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 continue;
             }
 
+            ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
             if (i < currentNoteIndex)
             {
                 label.AddToClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
                 
-                themeManager.GetCurrentTheme().ThemeJson.previousNoteLyricsColor.IfNotDefault(color =>
+                currentThemeMeta.ThemeJson.previousNoteLyricsColor.IfNotDefault(color =>
                     label.style.color = new StyleColor(color));
             }
             else if (i == currentNoteIndex)
@@ -159,7 +161,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.AddToClassList(R.UssClasses.currentNoteLyrics);
                 
-                themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
+                currentThemeMeta.ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
                     label.style.color = new StyleColor(color));
             }
             else
@@ -167,7 +169,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
                 
-                themeManager.GetCurrentTheme().ThemeJson.lyricsColor.IfNotDefault(color =>
+                currentThemeMeta.ThemeJson.lyricsColor.IfNotDefault(color =>
                     label.style.color = new StyleColor(color));
             }
         }
@@ -301,10 +303,15 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.AddToClassList(R.UssClasses.nextLyrics);
             }
 
-            themeManager.GetCurrentTheme().ThemeJson.lyricsColor.IfNotDefault(color =>
+            ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
+            currentThemeMeta.ThemeJson.lyricsColor.IfNotDefault(color =>
                 label.style.color = new StyleColor(color));
-            themeManager.GetCurrentTheme().ThemeJson.lyricsOutlineColor.IfNotDefault(color =>
+            currentThemeMeta.ThemeJson.lyricsOutlineColor.IfNotDefault(color =>
                 label.style.unityTextOutlineColor = new StyleColor(color));
+            if (!currentThemeMeta.ThemeJson.lyricsShadow)
+            {
+                label.style.textShadow = new StyleTextShadow();
+            }
             
             visualElement.Add(label);
         });

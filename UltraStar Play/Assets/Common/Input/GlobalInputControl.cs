@@ -2,6 +2,10 @@
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
 
 public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 {
@@ -12,6 +16,12 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private VolumeControl volumeControl;
+    
+    [Inject]
+    private SceneRecipeManager sceneRecipeManager;
+    
+    [Inject]
+    private SceneNavigator sceneNavigator;
     
     protected override object GetInstance()
     {
@@ -27,6 +37,43 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         // Mute / unmute audio via F12
         InputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
             .Subscribe(_ => ToggleMuteAudio());
+    }
+
+    private void Update()
+    {
+        if (!Application.isEditor
+            || Keyboard.current == null)
+        {
+            return;
+        }
+        
+        if (InputUtils.IsKeyboardAltPressed()
+            && Keyboard.current.rKey.wasReleasedThisFrame)
+        {
+            RefreshAssetDatabase();
+            ReloadCurrentScene();
+        }
+        
+        if (InputUtils.IsKeyboardControlPressed()
+            && Keyboard.current.rKey.wasReleasedThisFrame)
+        {
+            // Refresh assets even at runtime
+            RefreshAssetDatabase();
+        }
+    }
+
+    private void RefreshAssetDatabase()
+    {
+#if UNITY_EDITOR
+        AssetDatabase.Refresh();
+#endif
+    }
+    
+    private void ReloadCurrentScene()
+    {
+        EScene currentScene = sceneRecipeManager.GetCurrentScene();
+        Debug.Log($"Reloading scene: {currentScene}");
+        sceneNavigator.LoadScene(currentScene);
     }
 
     private void ToggleMuteAudio()

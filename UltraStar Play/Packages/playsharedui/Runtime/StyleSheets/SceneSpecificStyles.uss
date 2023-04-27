@@ -11,19 +11,23 @@
 /* SONG SELECT SCENE */
 /**************************************************/
 #songEntryUiRoot {
-    
+    width: 150px;
+    padding-top: 100px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
 }
 
 #innerSongEntryUi {
     transition: top 0.3s, width 0.3s, height 0.3s;
     top: 0;
-    width: 130px;
-    height: 130px;
+    width: 142px;
+    height: 142px;
 }
 
 #innerSongEntryUi #songImageOuter {
-    width: 130px;
-    height: 130px;
+    width: 142px;
+    height: 142px;
 }
 
 .unity-collection-view__item--selected #innerSongEntryUi {
@@ -147,18 +151,22 @@
     overflow: hidden;
 }
 
-#passTheMicProgressBar .unity-progress-bar__container {
+.singSceneOverlayProgressBar {
+    opacity: 0.5;
+}
+
+.singSceneOverlayProgressBar .unity-progress-bar__container {
     height: 2px;
     min-height: auto;
     max-height: none;
 }
 
-#passTheMicProgressBar .unity-progress-bar__background {
+.singSceneOverlayProgressBar .unity-progress-bar__background {
     border-width: 0;
     background-color: rgba(0, 0, 0, 0);
 }
 
-#passTheMicProgressBar .unity-progress-bar__progress {
+.singSceneOverlayProgressBar .unity-progress-bar__progress {
     margin: 0;
 }
 

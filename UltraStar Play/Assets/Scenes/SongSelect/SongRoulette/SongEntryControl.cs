@@ -87,12 +87,15 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
 
-    private readonly Subject<bool> pointerDownOnSongImageEventStream = new();
-    public IObservable<bool> PointerDownOnSongImageEventStream => pointerDownOnSongImageEventStream;
+    private readonly Subject<bool> clickOnSongImageEventStream = new();
+    public IObservable<bool> ClickOnSongImageEventStream => clickOnSongImageEventStream;
 
     private bool isInitialized;
 
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new();
+
+    private Vector2 pointerDownMousePosition;
+    private bool wasSelectedOnPointerDown;
     
     public void OnInjectionFinished()
     {
@@ -102,15 +105,17 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
 
     private void RegisterCallbacks()
     {
-        VisualElement.RegisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        VisualElement.RegisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
         songImageOuter.RegisterCallback<PointerDownEvent>(OnPointerDownOnSongImage, TrickleDown.TrickleDown);
+        songImageOuter.RegisterCallback<PointerUpEvent>(OnPointerUpOnSongImage, TrickleDown.TrickleDown);
         openSongMenuButton.RegisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
     private void UnregisterCallbacks()
     {
-        VisualElement.UnregisterCallback<PointerDownEvent>(OnPointerDown, TrickleDown.TrickleDown);
+        VisualElement.UnregisterCallback<PointerUpEvent>(OnPointerUp, TrickleDown.TrickleDown);
         songImageOuter.UnregisterCallback<PointerDownEvent>(OnPointerDownOnSongImage, TrickleDown.TrickleDown);
+        songImageOuter.UnregisterCallback<PointerUpEvent>(OnPointerUpOnSongImage, TrickleDown.TrickleDown);
         openSongMenuButton.UnregisterCallbackButtonTriggered(OnOpenSongMenuButtonClicked);
     }
 
@@ -145,14 +150,21 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
 
     private void OnPointerDownOnSongImage(PointerDownEvent evt)
     {
-        // Open context menu on right click
-        if (evt.button == 0)
+        pointerDownMousePosition = evt.position;
+        wasSelectedOnPointerDown = songRouletteControl.SelectedSongEntryControl == this;
+    }
+    
+    private void OnPointerUpOnSongImage(PointerUpEvent evt)
+    {
+        if (evt.button == 0
+            && Vector2.Distance(pointerDownMousePosition ,evt.position) < 5f
+            && wasSelectedOnPointerDown)
         {
-            pointerDownOnSongImageEventStream.OnNext(true);
+            clickOnSongImageEventStream.OnNext(true);
         }
     }
     
-    private void OnPointerDown(PointerDownEvent evt)
+    private void OnPointerUp(PointerUpEvent evt)
     {
         // Open context menu on right click
         if (evt.button == 1

@@ -13,6 +13,7 @@ public class AudioSettings
     public bool PlayRecordedAudio { get; set; }
 
     public int SceneChangeSoundVolumePercent { get; set; } = 50;
+    public int SfxVolumePercent { get; set; } = 50;
 
     public EPitchDetectionAlgorithm pitchDetectionAlgorithm = EPitchDetectionAlgorithm.Dywa;
 
