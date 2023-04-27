@@ -32,11 +32,23 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionPicker)]
     private ItemPicker modifierConditionPicker;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionRangeSlider)]
-    private MinMaxSlider modifierConditionRangeSlider;
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionScoreRangeSlider)]
+    private MinMaxSlider modifierConditionScoreRangeSlider;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionRangeTextField)]
-    private TextField modifierConditionRangeTextField;
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionScoreRangeTextField)]
+    private TextField modifierConditionScoreRangeTextField;
+    
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionTimeRangeSlider)]
+    private MinMaxSlider modifierConditionTimeRangeSlider;
+
+    [Inject(UxmlName = R_PlayShared.UxmlNames.modifierConditionTimeRangeTextField)]
+    private TextField modifierConditionTimeRangeTextField;
+    
+    [Inject(UxmlName = R_PlayShared.UxmlNames.playerAdvancePointsSlider)]
+    private SliderInt playerAdvancePointsSlider;
+
+    [Inject(UxmlName = R_PlayShared.UxmlNames.playerAdvancePointsTextField)]
+    private IntegerField playerAdvancePointsTextField;
     
     [Inject(UxmlName = R_PlayShared.UxmlNames.closeModifierDialogButton)]
     private Button closeModifierDialogButton;
@@ -64,7 +76,9 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
 
     private LabeledItemPickerControl<EGameRoundModifierCondition> modifierConditionPickerControl;
     private LabeledItemPickerControl<EGameRoundFinishCondition> finishConditionPickerControl;
-    private BaseFieldWithTextFieldControl<Vector2> modifierConditionRangeBaseFieldWithTextFieldControl;
+    private BaseFieldWithTextFieldControl<Vector2> modifierConditionScoreRangeBaseFieldWithTextFieldControl;
+    private BaseFieldWithTextFieldControl<Vector2> modifierConditionTimeRangeBaseFieldWithTextFieldControl;
+    private BaseFieldWithTextValueFieldControl<int> modifierConditionPlayerAdvanceBaseFieldWithTextValueFieldControl;
     
     private readonly Subject<bool> dialogClosedEventStream = new();
     public IObservable<bool> DialogClosedEventStream => dialogClosedEventStream;
@@ -112,32 +126,36 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         
         modifierConditionPickerControl = new(modifierConditionPicker, EnumUtils.GetValuesAsList<EGameRoundModifierCondition>());
         modifierConditionPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(item.ToString());
-        modifierConditionRangeBaseFieldWithTextFieldControl = new BaseFieldWithTextFieldControl<Vector2>(modifierConditionRangeSlider, modifierConditionRangeTextField,
+        modifierConditionScoreRangeBaseFieldWithTextFieldControl = new BaseFieldWithTextFieldControl<Vector2>(modifierConditionScoreRangeSlider, modifierConditionScoreRangeTextField,
             newValue =>
             {
-                if (modifierConditionPickerControl.SelectedItem == EGameRoundModifierCondition.TimeRange)
-                {
-                    return $"{(int)newValue.x}% - {(int)newValue.y}%";
-                }
-                else
-                {
-                    return $"{(int)newValue.x} - {(int)newValue.y}";
-                }
+                return $"{(int)newValue.x} - {(int)newValue.y}";
             },
             newText =>
             {
-                string pattern = @"(?<fromValue>\d+)[\s\%]*-[\s\%]*(?<untilValue>\d+)[\s\%]*";
-                Match match = Regex.Match(newText, pattern);
-                if (match.Success)
+                if (TryParseRange(newText, out Vector2 range))
                 {
-                    int fromValue = int.Parse(match.Groups["fromValue"].Value);
-                    int untilValue = int.Parse(match.Groups["untilValue"].Value);
-                    return new Vector2(fromValue, untilValue);
+                    return range;
                 }
-
-                throw new ParseTextException($"Failed to parse {newText} into a range. Expected pattern: {pattern}");
+                throw new ParseTextException($"Failed to parse {newText} into a range");
+            });
+        
+        modifierConditionTimeRangeBaseFieldWithTextFieldControl = new BaseFieldWithTextFieldControl<Vector2>(modifierConditionTimeRangeSlider, modifierConditionTimeRangeTextField,
+            newValue =>
+            {
+                return $"{(int)newValue.x}% - {(int)newValue.y}%";
+            },
+            newText =>
+            {
+                if (TryParseRange(newText, out Vector2 range))
+                {
+                    return range;
+                }
+                throw new ParseTextException($"Failed to parse {newText} into a range");
             });
 
+        modifierConditionPlayerAdvanceBaseFieldWithTextValueFieldControl = new BaseFieldWithTextValueFieldControl<int>(playerAdvancePointsSlider, playerAdvancePointsTextField); 
+        
         // Modifier enum toggles
         gameRoundModifierToToggle.ForEach(entry =>
         {
@@ -156,6 +174,22 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
                 UpdateControls();
             });
         });
+    }
+
+    private bool TryParseRange(string newText, out Vector2 range)
+    {
+        string pattern = @"(?<fromValue>\d+)[\s\%]*-[\s\%]*(?<untilValue>\d+)[\s\%]*";
+        Match match = Regex.Match(newText, pattern);
+        if (match.Success)
+        {
+            int fromValue = int.Parse(match.Groups["fromValue"].Value);
+            int untilValue = int.Parse(match.Groups["untilValue"].Value);
+            range = new Vector2(fromValue, untilValue);
+            return true;
+        }
+
+        range = Vector2.zero;
+        return false;
     }
 
     private void BindControls()
@@ -185,21 +219,23 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         });
 
         // Modifier condition range
-        modifierConditionRangeSlider.RegisterValueChangedCallback(evt =>
+        modifierConditionScoreRangeSlider.RegisterValueChangedCallback(evt =>
         {
             Vector2 newValue = evt.newValue;
-            if (GameRoundSettings.modifierConditionSettings.condition
-                is EGameRoundModifierCondition.ScoreRange
-                or EGameRoundModifierCondition.PlayerAdvance)
-            {
-                GameRoundSettings.modifierConditionSettings.scoreFrom = (int)newValue.x;
-                GameRoundSettings.modifierConditionSettings.scoreUntil = (int)newValue.y;
-            }
-            else if (GameRoundSettings.modifierConditionSettings.condition is EGameRoundModifierCondition.TimeRange)
-            {
-                GameRoundSettings.modifierConditionSettings.timeFrom = (int)newValue.x;
-                GameRoundSettings.modifierConditionSettings.timeUntil = (int)newValue.y;
-            }
+            GameRoundSettings.modifierConditionSettings.scoreFrom = (int)newValue.x;
+            GameRoundSettings.modifierConditionSettings.scoreUntil = (int)newValue.y;
+        });
+    
+        modifierConditionTimeRangeSlider.RegisterValueChangedCallback(evt =>
+        {
+            Vector2 newValue = evt.newValue;
+            GameRoundSettings.modifierConditionSettings.timeFrom = (int)newValue.x;
+            GameRoundSettings.modifierConditionSettings.timeUntil = (int)newValue.y;
+        });
+        
+        playerAdvancePointsSlider.RegisterValueChangedCallback(evt =>
+        {
+            GameRoundSettings.modifierConditionSettings.scoreFrom = evt.newValue;
         });
     }
 
@@ -281,35 +317,34 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         modifierConditionPickerControl.ItemPicker.SetVisibleByDisplay(conditionVisible);
         modifierConditionPickerControl.SelectItem(GameRoundSettings.modifierConditionSettings.condition);
 
-        // Modifier condition from/until
-        bool modifierConditionNumberPickersVisible = modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay()
-            && GameRoundSettings.modifierConditionSettings.condition
-                is EGameRoundModifierCondition.ScoreRange
-                or EGameRoundModifierCondition.TimeRange;
-        modifierConditionRangeSlider.SetVisibleByDisplay(modifierConditionNumberPickersVisible
-            || (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.PlayerAdvance
-                && modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay()));
-        modifierConditionRangeTextField.SetVisibleByDisplay(modifierConditionNumberPickersVisible);
-        modifierConditionRangeBaseFieldWithTextFieldControl.UpdateTextField(modifierConditionRangeSlider.value);
+        // Modifier condition from/until value
+        modifierConditionScoreRangeSlider.value = new Vector2(
+            GameRoundSettings.modifierConditionSettings.scoreFrom,
+            GameRoundSettings.modifierConditionSettings.scoreUntil);
+        
+        modifierConditionTimeRangeSlider.value = new Vector2(
+            GameRoundSettings.modifierConditionSettings.timeFrom,
+            GameRoundSettings.modifierConditionSettings.timeUntil);
+        
+        playerAdvancePointsSlider.value = GameRoundSettings.modifierConditionSettings.scoreFrom;
+        
+        // Modifier condition from/until visible
+        modifierConditionScoreRangeSlider.SetVisibleByDisplay(
+            GameRoundSettings.modifierConditionSettings.condition is EGameRoundModifierCondition.ScoreRange
+            && modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay());
+        modifierConditionScoreRangeTextField.SetVisibleByDisplay(modifierConditionScoreRangeSlider.IsVisibleByDisplay());
+        modifierConditionScoreRangeBaseFieldWithTextFieldControl.UpdateTextField(modifierConditionScoreRangeSlider.value);
 
-        if (GameRoundSettings.modifierConditionSettings.condition == EGameRoundModifierCondition.TimeRange)
-        {
-            modifierConditionRangeSlider.lowLimit = 0;
-            modifierConditionRangeSlider.highLimit = 100;
-            modifierConditionRangeSlider.value = new Vector2(
-                GameRoundSettings.modifierConditionSettings.timeFrom,
-                GameRoundSettings.modifierConditionSettings.timeUntil);
-        }
-        else if (GameRoundSettings.modifierConditionSettings.condition
-            is EGameRoundModifierCondition.ScoreRange
-            or EGameRoundModifierCondition.PlayerAdvance)
-        {
-            modifierConditionRangeSlider.lowLimit = 0;
-            modifierConditionRangeSlider.highLimit = 10000;
-            modifierConditionRangeSlider.value = new Vector2(
-                GameRoundSettings.modifierConditionSettings.scoreFrom,
-                GameRoundSettings.modifierConditionSettings.scoreUntil);
-        }
+        modifierConditionTimeRangeSlider.SetVisibleByDisplay(
+            GameRoundSettings.modifierConditionSettings.condition is EGameRoundModifierCondition.TimeRange
+            && modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay());
+        modifierConditionTimeRangeTextField.SetVisibleByDisplay(modifierConditionTimeRangeSlider.IsVisibleByDisplay());
+        modifierConditionTimeRangeBaseFieldWithTextFieldControl.UpdateTextField(modifierConditionTimeRangeSlider.value);
+        
+        playerAdvancePointsSlider.SetVisibleByDisplay(
+            GameRoundSettings.modifierConditionSettings.condition is EGameRoundModifierCondition.PlayerAdvance
+            && modifierConditionPickerControl.ItemPicker.IsVisibleByDisplay());
+        playerAdvancePointsTextField.SetVisibleByDisplay(playerAdvancePointsSlider.IsVisibleByDisplay());
     }
     
     public void CloseDialog()
