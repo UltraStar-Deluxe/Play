@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -69,6 +70,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     private bool isPointerDownOnListView;
 
+    private float lastPlaySongSelectSoundEffectTimeInSeconds;
+    
     private void Start()
     {
         songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.TrickleDown);
@@ -128,6 +131,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
         songListView.Q<ScrollView>().ObserveEveryValueChanged(scrollView => scrollView.scrollOffset)
             .Subscribe(_ => OnScrollOffsetChanged());
+
+        InitSongSelectSoundEffect();
         
         isInitialized = true;
         
@@ -136,6 +141,22 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         {
             SetSongs(songs);
         }
+    }
+
+    private void InitSongSelectSoundEffect()
+    {
+        Selection.Subscribe(_ => PlaySelectSongSoundEffect());
+    }
+
+    private void PlaySelectSongSoundEffect()
+    {
+        if (Time.time < lastPlaySongSelectSoundEffectTimeInSeconds + 0.1f)
+        {
+            return;
+        }
+
+        lastPlaySongSelectSoundEffectTimeInSeconds = Time.time;
+        AudioManager.PlaySongSelectSound();
     }
 
     private void Update()

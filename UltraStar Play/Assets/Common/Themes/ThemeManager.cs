@@ -735,11 +735,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         if (visualElement is Button button)
         {
-            button.RegisterCallbackButtonTriggered(_ => AudioManager.PlayDefaultButtonSound());
+            button.RegisterCallbackButtonTriggered(_ => AudioManager.PlayButtonSound());
         }
         else if (visualElement is Toggle toggle)
         {
-            toggle.RegisterValueChangedCallback(_ => AudioManager.PlayDefaultButtonSound());
+            toggle.RegisterValueChangedCallback(_ => AudioManager.PlayButtonSound());
         }
     }
 

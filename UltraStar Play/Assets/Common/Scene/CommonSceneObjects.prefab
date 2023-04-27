@@ -434,6 +434,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainAudioMixer: {fileID: 24100000, guid: ac794248e9b1e8a4195696f279f2d1cc, type: 2}
   defaultButtonSound: {fileID: 8300000, guid: 7122c3b387e21c742b5ab7d9bac5eaf9, type: 3}
+  songSelectSound: {fileID: 8300000, guid: 9d203794da8496d4f9e3c17af41c8969, type: 3}
 --- !u!1 &203766650306798725
 GameObject:
   m_ObjectHideFlags: 0
