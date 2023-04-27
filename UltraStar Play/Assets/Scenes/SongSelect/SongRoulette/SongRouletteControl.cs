@@ -422,6 +422,16 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         SelectSongByIndex(nextIndex);
     }
 
+    public void SelectVeryLastSong()
+    {
+        SelectSongByIndex(songs.Count - 1);
+    }
+    
+    public void SelectVeryFirstSong()
+    {
+        SelectSongByIndex(0);
+    }
+    
     public SongMeta GetSongAtIndex(int index)
     {
         if (songs.Count == 0)

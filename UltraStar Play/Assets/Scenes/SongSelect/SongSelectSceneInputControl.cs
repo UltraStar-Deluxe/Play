@@ -41,6 +41,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     void Start()
     {
         focusableNavigator.NoNavigationTargetFoundInListViewCallback = OnNoNavigationTargetFoundInListView;
+        focusableNavigator.BeforeNavigationInListViewCallback = OnBeforeNavigationInListView;
         
         songListView.RegisterCallback<PointerEnterEvent>(_ => isPointerOverSongList = true, TrickleDown.TrickleDown);
         songListView.RegisterCallback<PointerLeaveEvent>(_ => isPointerOverSongList = false, TrickleDown.TrickleDown);
@@ -88,6 +89,33 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => songRouletteControl.SelectNextSong());
         InputManager.GetInputAction(R.InputActions.usplay_previousSong).PerformedAsObservable()
             .Subscribe(_ => songRouletteControl.SelectPreviousSong());
+    }
+
+    private bool OnBeforeNavigationInListView(NavigationParameters navigationParameters)
+    {
+        if (navigationParameters.focusedVisualElement != songListView
+            || songRouletteControl.Selection.Value.SongMeta == null)
+        {
+            return false;
+        }
+
+        if (navigationParameters.navigationDirection.x < 0
+            && songRouletteControl.Selection.Value.SongIndex == 0)
+        {
+            // Wrap around: select last song
+            songRouletteControl.SelectVeryLastSong();
+            return true;
+        }
+        
+        if (navigationParameters.navigationDirection.x > 0
+            && songRouletteControl.Selection.Value.SongIndex == songRouletteControl.Songs.Count - 1)
+        {
+            // Wrap around: select last song
+            songRouletteControl.SelectVeryFirstSong();
+            return true;
+        }
+
+        return false;
     }
 
     private bool OnNoNavigationTargetFoundInListView(NoNavigationTargetFoundEvent evt)
@@ -230,5 +258,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private void OnDestroy()
     {
         focusableNavigator.NoNavigationTargetFoundInListViewCallback = null;
+        focusableNavigator.BeforeNavigationInListViewCallback = null;
     }
 }

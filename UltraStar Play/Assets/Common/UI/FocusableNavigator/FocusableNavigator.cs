@@ -44,6 +44,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     private readonly List<CustomNavigationTarget> customNavigationTargets = new();
 
     public Func<NoNavigationTargetFoundEvent, bool> NoNavigationTargetFoundInListViewCallback { get; set; }
+    public Func<NavigationParameters, bool> BeforeNavigationInListViewCallback { get; set; }
     
     public virtual void OnInjectionFinished()
     {
@@ -290,6 +291,19 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         if (listView.itemsSource.Count == 0)
         {
             return false;
+        }
+        
+        if (BeforeNavigationInListViewCallback != null)
+        {
+            bool isHandled = BeforeNavigationInListViewCallback(new NavigationParameters()
+            {
+                focusedVisualElement = listView,
+                navigationDirection = navigationDirection,
+            });
+            if (isHandled)
+            {
+                return true;
+            }
         }
         
         int selectedIndex = listView.selectedIndex;
