@@ -14,6 +14,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     public float AudioFadeInDurationInSeconds { get; set; } = 5;
     public float VideoFadeInDurationInSeconds { get; set; } = 2;
 
+    public bool stopOldImmediatelyOnStartNew;
+    
     protected float fadeInStartTimeInSeconds;
     protected float videoFadeInStartTimeInSeconds;
     protected bool isFadeInStarted;
@@ -113,7 +115,14 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        StopSongPreview();
+        if (stopOldImmediatelyOnStartNew)
+        {
+            StopSongPreview();
+        }
+        else
+        {
+            StopAllCoroutines();
+        }
 
         if (songMeta == currentPreviewSongMeta)
         {

@@ -119,6 +119,9 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         {
             return;
         }
+        songPreviewVideoImage.HideByDisplay();
+        songPreviewBackgroundImage.HideByDisplay();
+
         base.StartSongPreview(songMeta);
     }
 
