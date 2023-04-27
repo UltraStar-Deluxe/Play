@@ -111,9 +111,6 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private MicSelectionDialogControl micSelectionDialogControl;
     private readonly PlayerProfileImageControl playerProfileImageControl = new();
     
-    private readonly Subject<bool> selectedChangedEventStream = new();
-    public IObservable<bool> SelectedChangedEventStream => selectedChangedEventStream;
-
     private readonly Subject<MicSelectionDialogControl.MicProfileChangedEvent> micProfileChangedEventStream = new();
     public IObservable<MicSelectionDialogControl.MicProfileChangedEvent> MicProfileChangedEventStream => micProfileChangedEventStream;
 
@@ -145,6 +142,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
                 playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
                 noMicIcon.HideByVisibility();
             }
+            micButton.SetVisibleByDisplay(newValue);
 
             if (PlayerProfile != null)
             {
@@ -240,8 +238,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             return;
         }
 
-        PlayerProfile.IsSelected = newValue;
-        selectedChangedEventStream.OnNext(newValue);
+        IsSelected.Value = newValue;
     }
 
     public void HideVoiceSelection()
