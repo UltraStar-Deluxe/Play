@@ -36,6 +36,19 @@
     /*height: 150px;*/
 }
 
+#songEntryDarkOverlay {
+    background-color: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.unity-collection-view__item--selected #songEntryDarkOverlay {
+    opacity: 0;
+}
+
 .searchFilterLabel {
     align-self: flex-end;
 }
