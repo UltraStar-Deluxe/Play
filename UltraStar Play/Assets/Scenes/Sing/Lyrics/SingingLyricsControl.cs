@@ -64,11 +64,31 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
 
-        ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
-        currentThemeMeta.ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
-            positionBeforeLyricsIndicator.style.color = new StyleColor(color));
+        GetCurrentNoteLyricsColor().IfNotDefault(color => positionBeforeLyricsIndicator.style.color = new StyleColor(color));
     }
 
+    private Color32 GetPlayerControlColor()
+    {
+        if (playerControl != null
+            && playerControl.MicProfile != null)
+        {
+            return playerControl.MicProfile.Color;
+        }
+        return Colors.clearBlack;
+    }
+    
+    private Color32 GetCurrentNoteLyricsColor()
+    {
+        return themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor
+            .OrIfDefault(GetPlayerControlColor());
+    }
+
+    private Color32 GetPreviousNoteLyricsColor()
+    {
+        return themeManager.GetCurrentTheme().ThemeJson.previousNoteLyricsColor
+            .OrIfDefault(GetPlayerControlColor());
+    }
+    
     public void Update(double positionInSongInMillis)
     {
         UpdateNoteHighlighting(positionInSongInMillis);
@@ -161,16 +181,14 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.AddToClassList(R.UssClasses.currentNoteLyrics);
                 
-                currentThemeMeta.ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
-                    label.style.color = new StyleColor(color));
+                GetCurrentNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
             }
             else
             {
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
                 
-                currentThemeMeta.ThemeJson.lyricsColor.IfNotDefault(color =>
-                    label.style.color = new StyleColor(color));
+                GetPreviousNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
             }
         }
     }
@@ -188,7 +206,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         {
             SortedNotes = new List<Note>();
         }
-        FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence);
+        FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence, false);
         UpdateFontSize(currentSentenceContainer);
     }
 
@@ -246,7 +264,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence)
+    private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence, bool isNextSentence)
     {
         visualElement.Query<Label>()
             .ToList()
@@ -304,10 +322,19 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             }
 
             ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
-            currentThemeMeta.ThemeJson.lyricsColor.IfNotDefault(color =>
-                label.style.color = new StyleColor(color));
-            currentThemeMeta.ThemeJson.lyricsOutlineColor.IfNotDefault(color =>
-                label.style.unityTextOutlineColor = new StyleColor(color));
+            if (isNextSentence)
+            {
+                currentThemeMeta.ThemeJson.nextLyricsColor
+                    .OrIfDefault(currentThemeMeta.ThemeJson.lyricsColor)
+                    .IfNotDefault(color => label.style.color = new StyleColor(color));
+            }
+            else
+            {
+                currentThemeMeta.ThemeJson.lyricsColor
+                    .IfNotDefault(color => label.style.color = new StyleColor(color));
+            }
+            currentThemeMeta.ThemeJson.lyricsOutlineColor
+                .IfNotDefault(color => label.style.unityTextOutlineColor = new StyleColor(color));
             if (!currentThemeMeta.ThemeJson.lyricsShadow)
             {
                 label.style.textShadow = new StyleTextShadow();
@@ -319,7 +346,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void SetNextSentence(Sentence sentence)
     {
-        FillContainerWithSentenceText(nextSentenceContainer, sentence);
+        FillContainerWithSentenceText(nextSentenceContainer, sentence, true);
         UpdateFontSize(nextSentenceContainer);
     }
 

@@ -107,6 +107,12 @@ public static class ApplicationUtils
         return panelHelper.GetScreenSizeInPanelCoordinates();
     }
 
+    public static bool IsSupportedImageFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return supportedImageFiles.Contains(fileExtension);
+    }
+    
     public static bool IsSupportedAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);

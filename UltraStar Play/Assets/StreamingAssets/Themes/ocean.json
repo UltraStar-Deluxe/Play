@@ -30,8 +30,8 @@
     "secondaryFontColor": "#CCCCCC",
 
     "staticBackground": {
-        "path": "backgrounds/black-10percent.png",
-        "scaleMode": "StretchToFill",
+        "impagePath": "backgrounds/black-10percent.png",
+        "imageScaleMode": "StretchToFill",
     },
     
     "dynamicBackground": {

@@ -27,13 +27,13 @@
     },
 
     "staticBackground": {
-        "path": "backgrounds/black-10percent.png",
-        "scaleMode": "StretchToFill",
+        "imagePath": "backgrounds/black-10percent.png",
+        "imageScaleMode": "StretchToFill",
     },
     "sceneSpecificStaticBackgrounds": {
         "MainScene": {
-            "path": "backgrounds/fully-transparent.png",
-            "scaleMode": "ScaleAndCrop",
+            "imagePath": "backgrounds/fully-transparent.png",
+            "imageScaleMode": "ScaleAndCrop",
         }
     },
 

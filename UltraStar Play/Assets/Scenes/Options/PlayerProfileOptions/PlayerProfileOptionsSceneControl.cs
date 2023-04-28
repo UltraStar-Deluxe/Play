@@ -35,11 +35,13 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
         addButton.RegisterCallbackButtonTriggered(_ =>
         {
-            settings.PlayerProfiles.Add(new PlayerProfile());
-            CreatePlayerProfileEntry(settings.PlayerProfiles.FirstOrDefault(), settings.PlayerProfiles.Count - 1);
+            PlayerProfile newPlayerProfile = new PlayerProfile();
+            settings.PlayerProfiles.Add(newPlayerProfile);
+            VisualElement playerProfileEntryVisualElement = CreatePlayerProfileEntry(newPlayerProfile);
+            playerProfileEntryVisualElement.RegisterHasGeometryCallbackOneShot(_ => playerProfileEntryVisualElement.ScrollToSelf());
 
             // Focus on the name of the newly added player to directly allow changing its name
-            TextField nameTextField = playerProfileList[playerProfileList.childCount-1].Q<TextField>("nameTextField");
+            TextField nameTextField = playerProfileList[playerProfileList.childCount - 1].Q<TextField>("nameTextField");
             nameTextField.Focus();
             
             ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
@@ -49,12 +51,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     private void UpdatePlayerProfileList()
     {
         playerProfileList.Clear();
-        int index = 0;
-        settings.PlayerProfiles.ForEach(playerProfile =>
-        {
-            CreatePlayerProfileEntry(playerProfile, index);
-            index++;
-        });
+        settings.PlayerProfiles.ForEach(playerProfile => CreatePlayerProfileEntry(playerProfile));
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
     }
@@ -72,7 +69,13 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         }
     }
     
-    private void CreatePlayerProfileEntry(PlayerProfile playerProfile, int indexInList)
+    private int GetIndexInList(PlayerProfile playerProfile)
+    {
+        // Dynamically return index in list because the list can change while the scene is open.
+        return settings.PlayerProfiles.IndexOf(playerProfile);
+    }
+    
+    private VisualElement CreatePlayerProfileEntry(PlayerProfile playerProfile)
     {
         VisualElement visualElement = playerProfileListEntryAsset.CloneTree().Children().FirstOrDefault();
 
@@ -81,9 +84,9 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         Button deleteButton = visualElement.Q<Button>(R.UxmlNames.deleteButton);
         deleteButton.RegisterCallbackButtonTriggered(_ =>
         {
-            if (indexInList < settings.PlayerProfiles.Count)
+            if (GetIndexInList(playerProfile) < settings.PlayerProfiles.Count)
             {
-                settings.PlayerProfiles.RemoveAt(indexInList);
+                settings.PlayerProfiles.RemoveAt(GetIndexInList(playerProfile));
             }
             visualElement.RemoveFromHierarchy();
         });
@@ -101,7 +104,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         });
         UpdatePlayerProfileInactiveOverlay(playerProfile, playerProfileInactiveOverlay);
 
-        new PlayerProfileImagePickerControl(visualElement.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), indexInList, uiManager, webCamManager)
+        new PlayerProfileImagePickerControl(visualElement.Q<ItemPicker>(R.UxmlNames.playerProfileImagePicker), GetIndexInList(playerProfile), uiManager, webCamManager)
             .Bind(() => playerProfile.ImagePath,
                 newValue => playerProfile.ImagePath = newValue);
 
@@ -110,6 +113,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
                 newValue => playerProfile.Difficulty = newValue);
 
         playerProfileList.Add(visualElement);
+
+        return visualElement;
     }
 
     public override bool HasHelpDialog => true;

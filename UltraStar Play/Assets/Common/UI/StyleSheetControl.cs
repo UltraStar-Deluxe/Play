@@ -21,6 +21,9 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
     [InjectedInInspector]
     public StyleSheet largeScreenStyleSheet;
 
+    [InjectedInInspector]
+    public StyleSheet smallScreenStyleSheet;
+    
     [Inject]
     private UIDocument uiDocument;
 
@@ -64,9 +67,15 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
             // Unlikely DPI value. Do nothing.
         }
 
-        if (ApplicationUtils.IsLargeScreen())
+        if (ApplicationUtils.IsSmallScreen()
+            && smallScreenStyleSheet != null)
         {
-            uiDocument.rootVisualElement.styleSheets.Add(largeScreenStyleSheet);
+            uiDocument.rootVisualElement.styleSheets.Add(smallScreenStyleSheet);
+        }
+        else if (ApplicationUtils.IsLargeScreen()
+            && largeScreenStyleSheet != null)
+        {
+            // Large screen styles are the default. Thus, do nothing.
         }
     }
 }

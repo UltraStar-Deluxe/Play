@@ -30,6 +30,12 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
+        RegisterInputActions();
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => RegisterInputActions());
+    }
+
+    private void RegisterInputActions()
+    {
         // Toggle full-screen mode via F11
         InputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
             .Subscribe(_ => ToggleFullscreen());

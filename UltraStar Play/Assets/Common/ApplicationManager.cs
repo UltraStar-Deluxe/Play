@@ -19,6 +19,11 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
+    
+    private int lastScreenWidth;
+    private int lastScreenHeight;
+    private readonly Subject<Resolution> screenSizeChangedEventStream = new();
+    public IObservable<Resolution> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
 
     protected override object GetInstance()
     {
@@ -30,6 +35,8 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         targetFrameRate = settings.GraphicSettings.targetFps;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
+        lastScreenWidth = Screen.width;
+        lastScreenHeight = Screen.height;
 
         settings.ObserveEveryValueChanged(it => it.GraphicSettings.targetFps)
             .Subscribe(newValue => targetFrameRate = newValue);
@@ -39,9 +46,22 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     private void Update()
     {
+        if (this != Instance)
+        {
+            return;
+        }
+        
         if (Application.targetFrameRate != targetFrameRate)
         {
             Application.targetFrameRate = targetFrameRate;
+        }
+        
+        if (lastScreenHeight != Screen.height
+            || lastScreenWidth != Screen.width)
+        {
+            screenSizeChangedEventStream.OnNext(Screen.currentResolution);
+            lastScreenWidth = Screen.width;
+            lastScreenHeight = Screen.height;
         }
     }
 

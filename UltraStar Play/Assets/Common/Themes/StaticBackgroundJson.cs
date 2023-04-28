@@ -6,17 +6,27 @@ using UnityEngine.Serialization;
 public class StaticBackgroundJson
 {
     /**
-     * Image or video file path
+     * Image file path
      */
-    public string path;
+    public string imagePath;
 
     /**
-     * One of ScaleMode enum values.
+     * Video file path
      */
-    public string scaleMode;
+    public string videoPath;
+    
+    /**
+     * Defines how the image element is scaled to fit the screen. One of ScaleMode enum values.
+     */
+    public string imageScaleMode;
 
     /**
-     * If a video file is used, determines the playback speed for the video.
+     * Defines how the video element is scaled to fit the screen. One of ScaleMode enum values.
      */
-    public float playbackSpeed;
+    public string videoScaleMode;
+    
+    /**
+     * The playback speed for the video.
+     */
+    public float videoPlaybackSpeed;
 }

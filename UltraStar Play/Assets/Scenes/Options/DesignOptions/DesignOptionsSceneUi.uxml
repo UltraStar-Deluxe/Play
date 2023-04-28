@@ -8,12 +8,6 @@
             <ItemPicker name="vfxEnabledPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Visual Effects" />
             <ItemPicker name="sceneChangeAnimationPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Scene Transition" />
             <ItemPicker name="sceneChangeDurationPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Scene Transition Duration" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="noteDisplayModePicker" label="Note Display Mode" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="lyricsOnNotesPicker" label="Show Lyrics on Notes" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="staticLyricsPicker" label="Show Static Lyrics" />
-            <ItemPicker name="pitchIndicatorPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Show Pitch Indicator" />
-            <ItemPicker name="showPlayerNamePicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Show Player Names" />
-            <ItemPicker name="showScoreNumberPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Show Score Numbers" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

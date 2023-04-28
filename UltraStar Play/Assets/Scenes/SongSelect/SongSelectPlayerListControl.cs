@@ -121,8 +121,6 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
         listEntryControl.IsSelected.Value = playerProfile.IsSelected;
         listEntryControl.IsSelected.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));
-
-        listEntryControl.SelectedChangedEventStream.Subscribe(newValue => OnSelectionStatusChanged(listEntryControl, newValue));
         listEntryControl.SetSelected(playerProfile.IsSelected, false);
         listEntryControl.OnMicProfileSelected = newMicProfile =>
         {

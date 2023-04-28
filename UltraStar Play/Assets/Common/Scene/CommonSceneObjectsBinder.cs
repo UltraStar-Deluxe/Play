@@ -26,6 +26,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(UltraStarPlayTranslationManager.Instance);
         bb.BindExistingInstance(ContextMenuPopupManager.Instance);
         bb.BindExistingInstance(WebCamManager.Instance);
+        bb.BindExistingInstance(RenderTextureManager.Instance);
         bb.BindExistingInstance(DontDestroyOnLoadManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
         bb.BindExistingInstance(StatsManager.Instance);

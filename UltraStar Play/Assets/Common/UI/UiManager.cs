@@ -87,7 +87,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             notificationOverlay = notificationOverlayUi.CloneTree()
                 .Children()
                 .First();
-            uiDocument.rootVisualElement.Children().First().Add(notificationOverlay);
+            uiDocument.rootVisualElement.Add(notificationOverlay);
         }
 
         TemplateContainer templateContainer = notificationUi.CloneTree();

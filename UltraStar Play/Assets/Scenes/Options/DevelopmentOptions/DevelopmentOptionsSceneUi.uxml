@@ -15,7 +15,7 @@
             <ItemPicker name="analyzeBeatsWithoutTargetNotePicker" label="Analyze Beats Without Target Note" wrap-around="true" min-value="0" max-value="100" step-value="10" />
             <ItemPicker name="disableDynamicThemesPicker" label="Disable Dynamic Themes" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
             <ItemPicker name="useUniversalCharsetDetectorPicker" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings." wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
-            <ItemPicker name="customEventSystemOptInOnAndroidPicker" label="Use custom event system for input actions.&#10;This enables keyboard and gamepad control but can cause issues on Android" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
+            <ItemPicker name="customEventSystemOptInOnAndroidPicker" label="Use custom event system&#10;for input actions.&#10;This enables keyboard&#10;and gamepad control&#10;but can cause issues on Android" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
             <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" />
             <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" style="margin-bottom: 10px;" />
             <ui:VisualElement name="networkConfigContainer">

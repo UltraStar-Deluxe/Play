@@ -98,6 +98,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                     .Bind(() => settings.DeveloperSettings.useUniversalCharsetDetector,
                         newValue => settings.DeveloperSettings.useUniversalCharsetDetector = newValue);
 
+        customEventSystemOptInOnAndroidPicker.SetVisibleByDisplay(PlatformUtils.IsAndroid);
         new BoolPickerControl(customEventSystemOptInOnAndroidPicker)
             .Bind(() => settings.DeveloperSettings.enableEventSystemOnAndroid,
                 newValue =>

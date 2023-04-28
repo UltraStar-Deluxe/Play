@@ -12,6 +12,12 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
 {
     private static readonly Vector2 popupOffset = new(2, 2);
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        anyContextMenuOpenedEventStream = new();
+    }
+    
     public Action<ContextMenuPopupControl> FillContextMenuAction { get; set; }
     public Func<bool> ShouldOpenContextMenu { get; set; }
 
@@ -34,6 +40,9 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     private Vector2 pointerDownPosition;
 
     private readonly List<IDisposable> disposables = new();
+    
+    private static Subject<ContextMenuPopupControl> anyContextMenuOpenedEventStream = new();
+    public static Subject<ContextMenuPopupControl> AnyContextMenuOpenedEventStream => anyContextMenuOpenedEventStream;
     
     private readonly Subject<ContextMenuPopupControl> contextMenuOpenedEventStream = new();
     public IObservable<ContextMenuPopupControl> ContextMenuOpenedEventStream => contextMenuOpenedEventStream;
@@ -106,12 +115,13 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
             return;
         }
 
-        ContextMenuPopupControl contextMenuPopup = new(gameObject, position);
-        injector.Inject(contextMenuPopup);
-        FillContextMenuAction(contextMenuPopup);
+        ContextMenuPopupControl contextMenuPopupControl = new(gameObject, position);
+        injector.Inject(contextMenuPopupControl);
+        FillContextMenuAction(contextMenuPopupControl);
 
-        contextMenuPopup.ContextMenuClosedEventStream.Subscribe(_ => contextMenuClosedEventStream.OnNext(contextMenuPopup));
-        contextMenuOpenedEventStream.OnNext(contextMenuPopup);
+        contextMenuPopupControl.ContextMenuClosedEventStream.Subscribe(_ => contextMenuClosedEventStream.OnNext(contextMenuPopupControl));
+        contextMenuOpenedEventStream.OnNext(contextMenuPopupControl);
+        anyContextMenuOpenedEventStream.OnNext(contextMenuPopupControl);
     }
 
     public void Dispose()

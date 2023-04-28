@@ -34,6 +34,12 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
     [InjectedInInspector]
     public AudioClip defaultButtonSound;
     
+    [InjectedInInspector]
+    public AudioClip songSelectSound;
+    
+    [InjectedInInspector]
+    public AudioClip singingResultsRatingPopupSound;
+    
     [Inject]
     private Settings settings;
     
@@ -143,13 +149,31 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         return GetLinearValue(decibelValue);
     }
     
-    public static void PlayDefaultButtonSound()
+    public static void PlayButtonSound()
     {
         AudioManager audioManager = Instance;
         if (audioManager == null)
             return;
 
         PlaySoundEffect(audioManager.defaultButtonSound);
+    }
+    
+    public static void PlaySongSelectSound()
+    {
+        AudioManager audioManager = Instance;
+        if (audioManager == null)
+            return;
+
+        PlaySoundEffect(audioManager.songSelectSound);
+    }
+
+    public static void PlaySingingResultsRatingPopupSound()
+    {
+        AudioManager audioManager = Instance;
+        if (audioManager == null)
+            return;
+
+        PlaySoundEffect(audioManager.singingResultsRatingPopupSound);
     }
 
     public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)

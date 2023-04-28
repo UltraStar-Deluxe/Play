@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using PrimeInputActions;
 using ProTrans;
 using Serilog.Events;
@@ -14,6 +17,15 @@ using UnityEngine.UIElements;
 
 public class LoadingSceneControl : MonoBehaviour, INeedInjection
 {
+    [InjectedInInspector]
+    public int preloadSongCount = 10;
+    
+    [Inject]
+    private SongMetaManager songMetaManager;
+    
+    [Inject]
+    private AudioManager audioManager;
+    
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
     private Label unexpectedErrorLabel;
 
@@ -67,8 +79,8 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         // The SongMetas are loaded on access.
-        SongMetaManager.Instance.ScanFilesIfNotDoneYet();
-        Log.Logger.Information("started loading songs.");
+        songMetaManager.ScanFilesIfNotDoneYet();
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () => PreloadSongMedia()));
 
         // Extract StreamingAssets on Android from the JAR
         AndroidStreamingAssets.Extract();
@@ -94,7 +106,58 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         MidiManager.Instance.InitIfNotDoneYet();
         
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () => FinishScene()));
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () => FinishScene()));
+    }
+
+    private void PreloadSongMedia()
+    {
+        // Get first few songs metas to cache them
+        List<SongMeta> allSongMetas = songMetaManager.GetSongMetas().ToList();
+        Debug.Log($"Preloading song media. Total found song metas so far: {allSongMetas.Count}, preloading up to {preloadSongCount} songs");
+        List<SongMeta> songMetas = allSongMetas
+            .Take(preloadSongCount)
+            .ToList();
+        songMetas.ForEach(songMeta => PreloadSongMetaMedia(songMeta));
+    }
+
+    private void PreloadSongMetaMedia(SongMeta songMeta)
+    {
+        Debug.Log($"Preloading local media of song {songMeta}");
+        try
+        {
+            if (SongMetaUtils.AudioResourceExists(songMeta)
+                && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetAudioUri(songMeta))
+                && ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(SongMetaUtils.GetAudioUri(songMeta)))
+                && !ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(SongMetaUtils.GetAudioUri(songMeta))))
+            {
+                // Load as streaming audio
+                audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta));
+            }
+
+            if (SongMetaUtils.CoverResourceExists(songMeta)
+                && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetCoverUri(songMeta))
+                && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(SongMetaUtils.GetCoverUri(songMeta))))
+            {
+                ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), _ => { });
+            }
+
+            if (SongMetaUtils.BackgroundResourceExists(songMeta)
+                && !WebRequestUtils.IsHttpOrHttpsUri(SongMetaUtils.GetBackgroundUri(songMeta))
+                && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(SongMetaUtils.GetBackgroundUri(songMeta))))
+            {
+                ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta), _ => { });
+            }
+
+            // Video resource of the song does not need to be cached.
+            
+            // Parse whole file by reading the voices.
+            songMeta.GetVoices();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to preload media of song {songMeta}");
+            Debug.LogException(ex);
+        }
     }
 
     private void ShowGeneralErrorMessage()

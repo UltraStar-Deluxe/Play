@@ -569,6 +569,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         if (songQueueManager.IsSongQueueEmpty)
         {
             // Cannot create medley with previous song when song queue is empty.
+            AddSongToSongQueue(songMeta);
             return;
         }
         

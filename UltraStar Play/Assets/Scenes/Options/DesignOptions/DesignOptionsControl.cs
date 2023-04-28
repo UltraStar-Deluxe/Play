@@ -14,18 +14,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.themePicker)]
     private ItemPicker themePicker;
 
-    [Inject(UxmlName = R.UxmlNames.noteDisplayModePicker)]
-    private ItemPicker noteDisplayModePicker;
-
-    [Inject(UxmlName = R.UxmlNames.lyricsOnNotesPicker)]
-    private ItemPicker lyricsOnNotesPicker;
-
-    [Inject(UxmlName = R.UxmlNames.staticLyricsPicker)]
-    private ItemPicker staticLyricsPicker;
-
-    [Inject(UxmlName = R.UxmlNames.pitchIndicatorPicker)]
-    private ItemPicker pitchIndicatorPicker;
-
     [Inject(UxmlName = R.UxmlNames.imageAsCursorPicker)]
     private ItemPicker imageAsCursorPicker;
 
@@ -34,12 +22,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     [Inject(UxmlName = R.UxmlNames.sceneChangeDurationPicker)]
     private ItemPicker sceneChangeDurationPicker;
-    
-    [Inject(UxmlName = R.UxmlNames.showPlayerNamePicker)]
-    private ItemPicker showPlayerNamePicker;
-    
-    [Inject(UxmlName = R.UxmlNames.showScoreNumberPicker)]
-    private ItemPicker showScoreNumberPicker;
     
     [Inject(UxmlName = R.UxmlNames.animatedBackgroundItemPicker)]
     private ItemPicker animatedBackgroundItemPicker;
@@ -60,22 +42,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     {
         base.Start();
         
-        new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
-            .Bind(() => settings.GraphicSettings.noteDisplayMode,
-                newValue => settings.GraphicSettings.noteDisplayMode = newValue);
-
-        new BoolPickerControl(lyricsOnNotesPicker)
-            .Bind(() => settings.GraphicSettings.showLyricsOnNotes,
-                newValue => settings.GraphicSettings.showLyricsOnNotes = newValue);
-
-        new BoolPickerControl(staticLyricsPicker)
-            .Bind(() => settings.GraphicSettings.showStaticLyrics,
-                newValue => settings.GraphicSettings.showStaticLyrics = newValue);
-
-        new BoolPickerControl(pitchIndicatorPicker)
-            .Bind(() => settings.GraphicSettings.showPitchIndicator,
-                newValue => settings.GraphicSettings.showPitchIndicator = newValue);
-
         new BoolPickerControl(imageAsCursorPicker)
             .Bind(() => settings.GraphicSettings.useImageAsCursor,
                 newValue => settings.GraphicSettings.useImageAsCursor = newValue);
@@ -92,14 +58,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         sceneChangeDurationPickerControl.Bind(() => settings.GraphicSettings.sceneChangeDurationInSeconds,
                 newValue => settings.GraphicSettings.sceneChangeDurationInSeconds = newValue);
         sceneChangeDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
-        
-        new BoolPickerControl(showPlayerNamePicker)
-            .Bind(() => settings.GraphicSettings.showPlayerNames,
-                newValue => settings.GraphicSettings.showPlayerNames = newValue);
-        
-        new BoolPickerControl(showScoreNumberPicker)
-            .Bind(() => settings.GraphicSettings.showScoreNumbers,
-                newValue => settings.GraphicSettings.showScoreNumbers = newValue);
         
         new BoolPickerControl(animatedBackgroundItemPicker)
             .Bind(() => settings.GraphicSettings.animatedBackground,
@@ -130,10 +88,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     public void UpdateTranslation()
     {
         themePicker.Label = TranslationManager.GetTranslation(R.Messages.options_design_theme);
-        noteDisplayModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode);
-        staticLyricsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showStaticLyrics);
-        lyricsOnNotesPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showLyricsOnNotes);
-        pitchIndicatorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showPitchIndicator);
         imageAsCursorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
     }
 

@@ -16,6 +16,10 @@ public static class ApplyThemeStyleUtils
             && Enum.TryParse(scaleModeAsString, out ScaleMode scaleMode))
         {
             visualElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(scaleMode);
+            if (visualElement is Image image)
+            {
+                image.scaleMode = scaleMode;
+            }
             return true;
         }
         return false;

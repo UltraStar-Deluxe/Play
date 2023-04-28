@@ -3,17 +3,15 @@
 // Unity 2022.2.4f1
 
 using System;
+using UnityEngine;
 
-namespace UnityEngine.UIElements
+[Serializable]
+public class SerializedVirtualizationData
 {
-    [Serializable]
-    public class SerializedVirtualizationData
-    {
-        public Vector2 scrollOffset;
-        public int firstVisibleIndex;
-        public float contentPadding;
-        public float contentWidth;
-        public int anchoredItemIndex;
-        public float anchorOffset;
-    }
+    public Vector2 scrollOffset;
+    public int firstVisibleIndex;
+    public float contentPadding;
+    public float contentWidth;
+    public int anchoredItemIndex;
+    public float anchorOffset;
 }

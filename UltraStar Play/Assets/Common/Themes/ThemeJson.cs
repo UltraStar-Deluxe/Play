@@ -39,6 +39,7 @@ public class ThemeJson
     public GradientConfig lyricsContainerGradient;
     public bool lyricsShadow = true;
     public Color32 lyricsColor;
+    public Color32 nextLyricsColor;
     public Color32 lyricsOutlineColor;
     public Color32 currentNoteLyricsColor;
     public Color32 previousNoteLyricsColor;

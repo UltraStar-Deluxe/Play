@@ -13,6 +13,9 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static VfxManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VfxManager>();
 
+    public const string BackgroundVfxRenderTextureName = "VfxManager.ForegroundVfxRenderTexture";
+    public const string ForegroundVfxRenderTextureName = "VfxManager.ForegroundVfxRenderTexture";
+    
     [InjectedInInspector]
     public Camera foregroundVfxCamera;
     
@@ -55,57 +58,14 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
     
+    [Inject]
+    private RenderTextureManager renderTextureManager;
+    
     private Image foregroundVfxElement;
     private Image backgroundVfxElement;
 
     private Dictionary<EParticleEffect, GameObject> particleEffectToPrefabMap;
 
-    private RenderTexture foregroundVfxRenderTexture;
-    public RenderTexture ForegroundVfxRenderTexture
-    {
-        get
-        {
-            if (foregroundVfxRenderTexture != null
-                && (foregroundVfxRenderTexture.width != Screen.width
-                    || foregroundVfxRenderTexture.height != Screen.height))
-            {
-                Debug.Log("Recreate foregroundVfxRenderTexture because of screen size change.");
-                Destroy(foregroundVfxRenderTexture);
-                foregroundVfxRenderTexture = null;
-            }
-            
-            if (foregroundVfxRenderTexture == null)
-            {
-                foregroundVfxRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
-            }
-
-            return foregroundVfxRenderTexture;
-        }
-    }
-    
-    private RenderTexture backgroundVfxRenderTexture;
-    public RenderTexture BackgroundVfxRenderTexture
-    {
-        get
-        {
-            if (backgroundVfxRenderTexture != null
-                && (backgroundVfxRenderTexture.width != Screen.width
-                    || backgroundVfxRenderTexture.height != Screen.height))
-            {
-                Debug.Log("Recreate backgroundVfxRenderTexture because of screen size change.");
-                Destroy(backgroundVfxRenderTexture);
-                backgroundVfxRenderTexture = null;
-            }
-            
-            if (backgroundVfxRenderTexture == null)
-            {
-                backgroundVfxRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
-            }
-
-            return backgroundVfxRenderTexture;
-        }
-    }
-    
     protected override object GetInstance()
     {
         return Instance;
@@ -140,8 +100,10 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
     
     private void InitCameraTargetTextures()
     {
-        foregroundVfxCamera.targetTexture = ForegroundVfxRenderTexture;
-        backgroundVfxCamera.targetTexture = BackgroundVfxRenderTexture;
+        renderTextureManager.GetOrCreateScreenSizedRenderTexture(ForegroundVfxRenderTextureName,
+            foregroundRenderTexture => foregroundVfxCamera.targetTexture = foregroundRenderTexture);
+        renderTextureManager.GetOrCreateScreenSizedRenderTexture(BackgroundVfxRenderTextureName,
+                backgroundRenderTexture => backgroundVfxCamera.targetTexture = backgroundRenderTexture);
     }
 
     private void Update()
@@ -392,10 +354,5 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         particleEffectToPrefabMap = new();
         particleRecipes.ForEach(particleRecipe =>
             particleEffectToPrefabMap[particleRecipe.effectEnum] = particleRecipe.prefab);
-    }
-
-    protected override void OnDestroySingleton()
-    {
-        Destroy(foregroundVfxRenderTexture);
     }
 }

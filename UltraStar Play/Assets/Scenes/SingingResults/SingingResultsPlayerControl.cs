@@ -118,6 +118,13 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             ratingImage.style.scale = new StyleScale(new Scale(Vector3.zero));
             LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one, Vector3.one * 0.5f, bounceAnimTimeInSeconds)
                 .setEasePunch()
+                .setOnStart(() =>
+                {
+                    if (TotalScoreAnimTimeInSeconds > 0)
+                    {
+                        PlaySingingResultsRatingPopupSound();
+                    }
+                })
                 .setOnUpdate(s =>
                 {
                     Vector3 scale = new Vector3(s, s, 1);
@@ -157,6 +164,11 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         // AnimateStarRatingIcons();
         
         UpdateTranslation();
+    }
+
+    private void PlaySingingResultsRatingPopupSound()
+    {
+        AudioManager.PlaySingingResultsRatingPopupSound();
     }
 
     private void ResetScoreRowLabelTexts()

@@ -63,12 +63,10 @@
 
     "lyricsColor": "#2b2a2e",
     "lyricsShadow": false,
-    "currentNoteLyricsColor": "#36bcb6",
-    "previousNoteLyricsColor": "#36bcb6",
     "lyricsContainerGradient": "#dddbe3cc, #dddbe3cc",
     
     "staticBackground": {
-        "path": "backgrounds/singing16.png",
-        "scaleMode": "StretchToFill",
+        "imagePath": "backgrounds/singing16.png",
+        "imageScaleMode": "StretchToFill",
     }
 }
