@@ -8115,6 +8115,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   largeScreenStyleSheet: {fileID: 7433441132597879392, guid: 2e4c065aaef89214082b746b3a80b1bc,
     type: 3}
+  smallScreenStyleSheet: {fileID: 7433441132597879392, guid: 2b8d78e584304cd7887e60255fda0bcd,
+    type: 3}
 --- !u!1 &8513644677415362704
 GameObject:
   m_ObjectHideFlags: 0
