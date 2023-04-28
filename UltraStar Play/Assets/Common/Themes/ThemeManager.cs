@@ -165,6 +165,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private void OnSceneChanged()
     {
         registeredSfxVisualElements.Clear();
+        ApplyThemeBackground(GetCurrentTheme());
     }
 
     private void CopyExampleThemeToUserDefinedThemesFolder()
@@ -268,11 +269,16 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void ApplyThemeBackground(ThemeMeta themeMeta)
     {
-        ApplyThemeStaticBackground(themeMeta);
+        if (themeMeta == null)
+        {
+            return;
+        }
+        ApplyThemeStaticBackgroundImage(themeMeta);
+        ApplyThemeStaticBackgroundVideo(themeMeta);
         ApplyThemeDynamicBackground(themeMeta);
     }
 
-    private Image GetOrCreateStaticBackgroundElement()
+    private Image GetOrCreateStaticBackgroundElement(string name)
     {
         VisualElement rootVisualElement = uiDocument.rootVisualElement;
         if (rootVisualElement == null)
@@ -280,24 +286,23 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return null;
         }
         
-        string backgroundElementName = "staticBackgroundElement";
-        Image backgroundElement = rootVisualElement.Q<Image>(backgroundElementName);
+        Image backgroundElement = rootVisualElement.Q<Image>(name);
         if (backgroundElement != null)
         {
             return backgroundElement;
         }
 
         backgroundElement = new Image();
-        backgroundElement.name = backgroundElementName;
+        backgroundElement.name = name;
         backgroundElement.AddToClassList("overlay");
         backgroundElement.AddToClassList("staticBackgroundElement");
         rootVisualElement.AddAsFirstChild(backgroundElement);
         return backgroundElement;
     }
     
-    private void ApplyThemeStaticBackground(ThemeMeta themeMeta)
+    private void ApplyThemeStaticBackgroundImage(ThemeMeta themeMeta)
     {
-        Image backgroundElement = GetOrCreateStaticBackgroundElement();
+        Image backgroundElement = GetOrCreateStaticBackgroundElement("staticBackgroundImage");
         if (backgroundElement == null)
         {
             return;
@@ -311,12 +316,42 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         
         StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForScene(themeMeta, currentScene);
-        string absoluteFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.path);
-
-        string fileExtension = Path.GetExtension(absoluteFilePath);
-        if (ApplicationUtils.IsSupportedVideoFormat(fileExtension))
+        string absoluteImageFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
+        if (ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
         {
-            string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteFilePath);
+            ImageManager.LoadSpriteFromUri(absoluteImageFilePath, loadedSprite =>
+            {
+                backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
+                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.videoScaleMode);
+            });
+        }
+        else
+        {
+            backgroundElement.style.backgroundImage = null;
+        }
+    }
+    
+    private void ApplyThemeStaticBackgroundVideo(ThemeMeta themeMeta)
+    {
+        Image backgroundElement = GetOrCreateStaticBackgroundElement("staticBackgroundVideo");
+        if (backgroundElement == null)
+        {
+            return;
+        }
+
+        EScene currentScene = GetCurrentScene();
+        if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings, currentScene))
+        {
+            DisableStaticBackground();
+            return;
+        }
+        
+        StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForScene(themeMeta, currentScene);
+        string absoluteVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.videoPath);
+        if (!absoluteVideoFilePath.IsNullOrEmpty()
+            && ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(absoluteVideoFilePath)))
+        {
+            string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteVideoFilePath);
             string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
             if (backgroundVideoPlayer.url != videoPlayerUrl)
             {
@@ -326,8 +361,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             {
                 backgroundVideoPlayer.Play();
             }
-            float playbackSpeed = staticBackgroundJson.playbackSpeed > 0
-                ? staticBackgroundJson.playbackSpeed
+            float playbackSpeed = staticBackgroundJson.videoPlaybackSpeed > 0
+                ? staticBackgroundJson.videoPlaybackSpeed
                 : 1;
             if (Math.Abs(backgroundVideoPlayer.playbackSpeed - playbackSpeed) > 0.01f)
             {
@@ -335,7 +370,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             }
             backgroundElement.image = backgroundVideoPlayer.targetTexture;
             backgroundElement.style.backgroundImage = null;
-            ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.scaleMode);
+            ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.videoScaleMode);
         }
         else
         {
@@ -343,12 +378,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             backgroundVideoPlayer.url = "";
             backgroundVideoPlayer.playbackSpeed = 1;
             backgroundElement.image = null;
-            
-            ImageManager.LoadSpriteFromUri(absoluteFilePath, loadedSprite =>
-            {
-                backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.scaleMode);
-            });
         }
     }
 
@@ -615,9 +644,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         ThemeJson themeJson = themeMeta.ThemeJson;
         
-        ApplyThemeStaticBackground(themeMeta);
-
-
         ControlStyleConfig defaultControlStyleConfig = themeMeta.ThemeJson.defaultControl;
         
         // Scene specific elements
