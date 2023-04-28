@@ -91,6 +91,7 @@ MonoBehaviour:
   songEntryUi: {fileID: 9197481963319205126, guid: e1997eb384bb6554d805a53cd309ec16,
     type: 3}
   dynamicListViewItemsSize: 1
+  maxTransitionToSelectedItemTimeInSeconds: 0.66
 --- !u!1 &3983233235667187890
 GameObject:
   m_ObjectHideFlags: 0
@@ -273,6 +274,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3aa8d73fdeb0418da3f472b62be8da8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  previewDelayInSeconds: 0.5
+  audioFadeInDurationInSeconds: 5
+  videoFadeInDurationInSeconds: 2
+  stopOldImmediatelyOnStartNew: 0
 --- !u!1 &3983233236733248984
 GameObject:
   m_ObjectHideFlags: 0
