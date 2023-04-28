@@ -57,7 +57,7 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
             ? pitchEvent.Beat
             : fallbackBeat;
         Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat);
-        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat);
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat, true, false);
         playerControl.PlayerMicPitchTracker.FirePitchEvent(pitchEvent, beat, noteAtBeat, sentenceAtBeat);
     }
 
