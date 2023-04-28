@@ -188,7 +188,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         {
             SortedNotes = new List<Note>();
         }
-        FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence);
+        FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence, false);
         UpdateFontSize(currentSentenceContainer);
     }
 
@@ -246,7 +246,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence)
+    private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence, bool isNextSentence)
     {
         visualElement.Query<Label>()
             .ToList()
@@ -304,10 +304,19 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             }
 
             ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
-            currentThemeMeta.ThemeJson.lyricsColor.IfNotDefault(color =>
-                label.style.color = new StyleColor(color));
-            currentThemeMeta.ThemeJson.lyricsOutlineColor.IfNotDefault(color =>
-                label.style.unityTextOutlineColor = new StyleColor(color));
+            if (isNextSentence)
+            {
+                currentThemeMeta.ThemeJson.nextLyricsColor
+                    .OrIfDefault(currentThemeMeta.ThemeJson.lyricsColor)
+                    .IfNotDefault(color => label.style.color = new StyleColor(color));
+            }
+            else
+            {
+                currentThemeMeta.ThemeJson.lyricsColor
+                    .IfNotDefault(color => label.style.color = new StyleColor(color));
+            }
+            currentThemeMeta.ThemeJson.lyricsOutlineColor
+                .IfNotDefault(color => label.style.unityTextOutlineColor = new StyleColor(color));
             if (!currentThemeMeta.ThemeJson.lyricsShadow)
             {
                 label.style.textShadow = new StyleTextShadow();
@@ -319,7 +328,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void SetNextSentence(Sentence sentence)
     {
-        FillContainerWithSentenceText(nextSentenceContainer, sentence);
+        FillContainerWithSentenceText(nextSentenceContainer, sentence, true);
         UpdateFontSize(nextSentenceContainer);
     }
 
