@@ -64,11 +64,31 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
 
-        ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
-        currentThemeMeta.ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
-            positionBeforeLyricsIndicator.style.color = new StyleColor(color));
+        GetCurrentNoteLyricsColor().IfNotDefault(color => positionBeforeLyricsIndicator.style.color = new StyleColor(color));
     }
 
+    private Color32 GetPlayerControlColor()
+    {
+        if (playerControl != null
+            && playerControl.MicProfile != null)
+        {
+            return playerControl.MicProfile.Color;
+        }
+        return Colors.clearBlack;
+    }
+    
+    private Color32 GetCurrentNoteLyricsColor()
+    {
+        return themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor
+            .OrIfDefault(GetPlayerControlColor());
+    }
+
+    private Color32 GetPreviousNoteLyricsColor()
+    {
+        return themeManager.GetCurrentTheme().ThemeJson.previousNoteLyricsColor
+            .OrIfDefault(GetPlayerControlColor());
+    }
+    
     public void Update(double positionInSongInMillis)
     {
         UpdateNoteHighlighting(positionInSongInMillis);
@@ -161,16 +181,14 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.AddToClassList(R.UssClasses.currentNoteLyrics);
                 
-                currentThemeMeta.ThemeJson.currentNoteLyricsColor.IfNotDefault(color =>
-                    label.style.color = new StyleColor(color));
+                GetCurrentNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
             }
             else
             {
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
                 
-                currentThemeMeta.ThemeJson.lyricsColor.IfNotDefault(color =>
-                    label.style.color = new StyleColor(color));
+                GetPreviousNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
             }
         }
     }

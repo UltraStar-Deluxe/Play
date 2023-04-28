@@ -69,8 +69,6 @@
 
     "lyricsColor": "#FFFFFF",
     "lyricsOutlineColor": "#00000000",
-    "currentNoteLyricsColor": "#9E77ED",
-    "previousNoteLyricsColor": "#9E77ED",
     "lyricsContainerGradient": "#000000, #1E232B",
 
     "staticBackground": {
