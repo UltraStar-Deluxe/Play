@@ -26,7 +26,10 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             if (calculatedTotalScore > maxScore)
             {
                 Debug.LogWarning($"Total score is {calculatedTotalScore}, returning max score of {maxScore} instead. "
-                                 + $"(NormalNotesTotalScore: {NormalNotesTotalScore}, GoldenNotesTotalScore: {GoldenNotesTotalScore}, PerfectSentenceBonusTotalScore: {PerfectSentenceBonusTotalScore})");
+                                 + $"(NormalNotesTotalScore: {NormalNotesTotalScore}, GoldenNotesTotalScore: {GoldenNotesTotalScore}, PerfectSentenceBonusTotalScore: {PerfectSentenceBonusTotalScore}, "
+                                 + $"maxScoreForNormalNotes: {maxScoreForNormalNotes}, maxScoreForGoldenNotes: {maxScoreForGoldenNotes}, sum: {maxScoreForNormalNotes + maxScoreForGoldenNotes}, "
+                                 + $"NormalBeatData.PerfectAndGoodBeats: {ScoreData.NormalBeatData.PerfectAndGoodBeats}, GoldenBeatData.PerfectAndGoodBeats: {ScoreData.GoldenBeatData.PerfectAndGoodBeats}, "
+                                 + $"NormalNoteLengthTotal {ScoreData.NormalNoteLengthTotal}, GoldenNoteLengthTotal {ScoreData.GoldenNoteLengthTotal})");
                 return maxScore;
             }
 
@@ -117,6 +120,12 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public PlayerScoreControlData ScoreData { get; set; } = new();
 
+    private readonly HashSet<int> scoredBeats = new();
+    private readonly HashSet<int> normalNoteBeats = new();
+    private readonly HashSet<int> goldenNoteBeats = new();
+    private int firstBeatToScoreInclusive;
+    private int lastBeatToScoreExclusive;
+
     public void OnInjectionFinished()
     {
         UpdateMaxScores(voice.Sentences);
@@ -128,7 +137,9 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
     {
-        if (!medleyControl.IsBeatInMedleyRange(beatAnalyzedEvent.Beat))
+        if (beatAnalyzedEvent.Beat < firstBeatToScoreInclusive
+            || beatAnalyzedEvent.Beat >= lastBeatToScoreExclusive
+            || !medleyControl.IsBeatInMedleyRange(beatAnalyzedEvent.Beat))
         {
             return;
         }
@@ -146,9 +157,14 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
 
         Note analyzedNote = beatAnalyzedEvent.NoteAtBeat;
+        if (analyzedNote == null)
+        {
+            return;
+        }
 
         // Check if note was hit
-        if (MidiUtils.GetRelativePitch(beatAnalyzedEvent.RoundedRecordedMidiNote) != MidiUtils.GetRelativePitch(analyzedNote.MidiNote))
+        if (Math.Abs(MidiUtils.GetRelativePitch(beatAnalyzedEvent.RoundedRecordedMidiNote)
+                     - MidiUtils.GetRelativePitch(analyzedNote.MidiNote)) > 0.1f)
         {
             return;
         }
@@ -168,6 +184,20 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             ScoreData.SentenceToSentenceScoreMap.Add(analyzedSentence, sentenceScore);
         }
 
+        if (scoredBeats.Contains(beatAnalyzedEvent.Beat))
+        {
+            Debug.LogWarning($"Attempt to score beat multiple times: {beatAnalyzedEvent.Beat}");
+            return;
+        }
+        scoredBeats.Add(beatAnalyzedEvent.Beat);
+
+        if (!normalNoteBeats.Contains(beatAnalyzedEvent.Beat)
+            && !goldenNoteBeats.Contains(beatAnalyzedEvent.Beat))
+        {
+            Debug.LogWarning("Attempt to score a beat that is neither a normal nor golden note: " + beatAnalyzedEvent.Beat);
+            return;
+        }
+        
         if (IsPerfectHit(beatAnalyzedEvent))
         {
             ScoreData.GetBeatData(analyzedNote).IfNotNull(it => it.PerfectBeats++);
@@ -182,7 +212,8 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private bool IsPerfectHit(BeatAnalyzedEvent beatAnalyzedEvent)
     {
-        return MidiUtils.GetRelativePitch(beatAnalyzedEvent.NoteAtBeat.MidiNote) == MidiUtils.GetRelativePitch(beatAnalyzedEvent.RecordedMidiNote);
+        return Math.Abs(MidiUtils.GetRelativePitch(beatAnalyzedEvent.NoteAtBeat.MidiNote)
+                        - MidiUtils.GetRelativePitch(beatAnalyzedEvent.RecordedMidiNote)) < 0.1f;
     }
 
     private bool IsGoodHit(BeatAnalyzedEvent beatAnalyzedEvent)
@@ -301,6 +332,49 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
         // Remember the sentence count to calculate the points for a perfect sentence.
         ScoreData.TotalSentenceCount = sentences.Count;
+        
+        // Setup checks for the beats to be analyzed
+        PrepareBeatToBeAnalyzedChecks();
+    }
+
+    private void PrepareBeatToBeAnalyzedChecks()
+    {
+        firstBeatToScoreInclusive = int.MaxValue;
+        lastBeatToScoreExclusive = int.MinValue;
+        scoredBeats.Clear();
+        normalNoteBeats.Clear();
+        goldenNoteBeats.Clear();
+        voice.Sentences.SelectMany(s => s.Notes).ForEach(n =>
+        {
+            // Remember first and last beat to be analyzed
+            if (n.StartBeat < firstBeatToScoreInclusive)
+            {
+                firstBeatToScoreInclusive = n.StartBeat;
+            }
+            if (n.EndBeat > lastBeatToScoreExclusive)
+            {
+                lastBeatToScoreExclusive = n.EndBeat;
+            }
+            
+            // Remember the beats of the normal and golden notes to be analyzed
+            HashSet<int> hashSet = null;
+            if (n.IsNormal)
+            {
+                hashSet = normalNoteBeats;
+            }
+            if (n.IsGolden)
+            {
+                hashSet = goldenNoteBeats;
+            }
+            
+            if (hashSet != null)
+            {
+                for (int beatIndex = n.StartBeat; beatIndex < n.StartBeat + n.Length; beatIndex++)
+                {
+                    hashSet.Add(beatIndex);
+                }
+            }
+        });
     }
 
     private int GetNormalNoteLength(Sentence sentence)
