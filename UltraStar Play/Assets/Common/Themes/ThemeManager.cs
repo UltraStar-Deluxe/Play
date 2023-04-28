@@ -18,6 +18,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
      */
     public const string DefaultThemeName = "ocean";
     private const string ThemeFolderName = "Themes";
+    public const string UiRenderTextureName = "ThemeManager.UiRenderTexture";
+    public const string ParticleRenderTextureName = "ThemeManager.ParticleRenderTexture";
     private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
     private readonly Color defaultGoldenColor = Colors.CreateColor("#DACD4A");
@@ -51,52 +53,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private Material backgroundMaterialCopy;
     private Material particleMaterialCopy;
 
-    private RenderTexture uiRenderTexture;
-    public RenderTexture UiRenderTexture
-    {
-        get
-        {
-            if (uiRenderTexture != null
-                && (uiRenderTexture.width != Screen.width
-                    || uiRenderTexture.height != Screen.height))
-            {
-                Debug.Log("Recreate uiRenderTexture because of screen size change.");
-                Destroy(uiRenderTexture);
-                uiRenderTexture = null;
-            }
-            
-            if (uiRenderTexture == null)
-            {
-                uiRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
-            }
-
-            return uiRenderTexture;
-        }
-    }
-    
-    private RenderTexture particleRenderTexture;
-    public RenderTexture ParticleRenderTexture
-    {
-        get
-        {
-            if (particleRenderTexture != null
-                 && (particleRenderTexture.width != Screen.width
-                     || particleRenderTexture.height != Screen.height))
-            {
-                Debug.Log("Recreate particleRenderTexture because of screen size change.");
-                Destroy(particleRenderTexture);
-                particleRenderTexture = null;
-            }
-            
-            if (particleRenderTexture == null)
-            {
-                particleRenderTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
-            }
-
-            return particleRenderTexture;
-        }
-    }
-
     private readonly List<ThemeMeta> themeMetas = new();
 
     private readonly HashSet<VisualElement> alreadyProcessedVisualElements = new();
@@ -121,6 +77,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     private VideoPlayer backgroundVideoPlayer;
     
+    [Inject]
+    private RenderTextureManager renderTextureManager;
+
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     protected override object GetInstance()
@@ -211,12 +170,22 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (renderUiWithBackgroundShader)
         {
             // The UIDocument is rendered into a RenderTexture, which is then blended into the background shader.
-            backgroundParticlesCamera.targetTexture = ParticleRenderTexture;
-            uiDocument.panelSettings.targetTexture = UiRenderTexture;
-            backgroundShaderControl.SetUiRenderTextures(
-                UiRenderTexture,
-                ParticleRenderTexture,
-                transitionTexture);
+            renderTextureManager.GetOrCreateScreenSizedRenderTexture(ParticleRenderTextureName, 
+                particleRenderTexture =>
+                {
+                    backgroundParticlesCamera.targetTexture = particleRenderTexture;
+                });
+            renderTextureManager.GetOrCreateScreenSizedRenderTexture(UiRenderTextureName, 
+                uiRenderTexture =>
+                {
+                    RenderTexture particleRenderTexture = renderTextureManager.GetExistingScreenSizedRenderTexture(ParticleRenderTextureName);
+                    
+                    uiDocument.panelSettings.targetTexture = uiRenderTexture;
+                    backgroundShaderControl.SetUiRenderTextures(
+                        uiRenderTexture,
+                        particleRenderTexture,
+                        transitionTexture);
+                });
         }
         else
         {
@@ -510,7 +479,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         // Destroy all instantiated assets
-        Destroy(uiRenderTexture);
 
         if (backgroundMaterialCopy != null)
         {

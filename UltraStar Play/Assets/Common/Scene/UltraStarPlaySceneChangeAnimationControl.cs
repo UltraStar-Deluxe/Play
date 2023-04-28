@@ -8,28 +8,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 {
     public static UltraStarPlaySceneChangeAnimationControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<UltraStarPlaySceneChangeAnimationControl>();
 
-    private RenderTexture uiCopyRenderTexture;
-    public RenderTexture UiCopyRenderTexture
-    {
-        get
-        {
-            if (uiCopyRenderTexture != null
-                && (uiCopyRenderTexture.width != Screen.width
-                    || uiCopyRenderTexture.height != Screen.height))
-            {
-                Debug.Log("Recreate uiCopyRenderTexture because of screen size change.");
-                Destroy(uiCopyRenderTexture);
-                uiCopyRenderTexture = null;
-            }
-            
-            if (uiCopyRenderTexture == null)
-            {
-                uiCopyRenderTexture = new RenderTexture(Screen.width, Screen.height, 24);
-            }
-
-            return uiCopyRenderTexture;
-        }
-    }
+    private const string UiCopyRenderTextureName = "SceneChangeAnimationControl.UiCopyRenderTexture";
 
     private Action animateAction;
 
@@ -47,6 +26,9 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
     [Inject]
     private UIDocument uiDocument;
+    
+    [Inject]
+    private RenderTextureManager renderTextureManager;
     
     protected override object GetInstance()
     {
@@ -74,7 +56,8 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     
     private void UpdateSceneTexturesAndTransition()
     {
-        themeManager.UpdateSceneTextures(UiCopyRenderTexture);
+        renderTextureManager.GetOrCreateScreenSizedRenderTexture(UiCopyRenderTextureName,
+            renderTexture => themeManager.UpdateSceneTextures(renderTexture));
 
         if (SettingsUtils.ShouldAnimateSceneChange(settings))
         {
@@ -89,17 +72,20 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             // Take "screenshot" of "old" scene.
-            if (themeManager.UiRenderTexture == null)
+            RenderTexture uiRenderTexture = renderTextureManager.GetExistingScreenSizedRenderTexture(ThemeManager.UiRenderTextureName);
+            RenderTexture uiCopyRenderTexture = renderTextureManager.GetExistingScreenSizedRenderTexture(UiCopyRenderTextureName);
+            
+            if (uiRenderTexture == null)
             {
                 Debug.LogWarning($"uiRenderTexture of ThemeManager is null. Not animating scene transition.");
             }
-            else if (UiCopyRenderTexture == null)
+            else if (uiCopyRenderTexture == null)
             {
                 Debug.LogWarning($"UiCopyRenderTexture is null. Not animating scene transition.");
             }
             else
             {
-                Graphics.CopyTexture(themeManager.UiRenderTexture, UiCopyRenderTexture);
+                Graphics.CopyTexture(uiRenderTexture, uiCopyRenderTexture);
             }
         }
 
@@ -178,11 +164,6 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         {
             audioSource.Play();
         }
-    }
-
-    private void OnDestroy()
-    {
-        Destroy(uiCopyRenderTexture);
     }
 
     private VisualElement GetBackgroundVisualElement()
