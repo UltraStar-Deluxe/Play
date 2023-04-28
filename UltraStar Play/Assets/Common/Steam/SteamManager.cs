@@ -105,7 +105,9 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void OnDestroySingleton()
     {
+        Debug.Log("Shutting down SteamClient...");
         SteamClient.Shutdown();
+        Debug.Log("SteamClient shut down successfully");
         disconnectedFromSteamEventStream.OnNext(true);
     }
 }
