@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 
 public class SettingsManager : AbstractSingletonBehaviour
@@ -167,6 +168,21 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             Debug.LogException(e);
             Debug.LogError("Failed to create initial mic profiles");
+        }
+        
+        // Set first player profile name to Steam account name.
+        SteamManager steamManager = SteamManager.Instance;
+        if (steamManager.IsConnectedToSteam)
+        {
+            defaultSettings.PlayerProfiles.FirstOrDefault().Name = steamManager.PlayerName;
+        }
+        else
+        {
+            // Wait a little bit until connection to Steam has been established.
+            float startTimeInSeconds = Time.time;
+            steamManager.ConnectedToSteamEventStream
+                .Where(_ => Time.time - startTimeInSeconds < 10)
+                .Subscribe(_ => defaultSettings.PlayerProfiles.FirstOrDefault().Name = steamManager.PlayerName);
         }
 
         return defaultSettings;
