@@ -408,7 +408,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     public void SelectSong(SongMeta songMeta)
     {
-        if (songMeta == null)
+        if (songMeta == null
+            || songListViewScrollView == null)
         {
             return;
         }
