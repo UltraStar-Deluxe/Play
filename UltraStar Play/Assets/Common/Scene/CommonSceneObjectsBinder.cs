@@ -38,6 +38,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(BackgroundLightManager.Instance);
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
         bb.BindExistingInstance(SteamManager.Instance);
+        bb.BindExistingInstance(AchievementEventStream.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);

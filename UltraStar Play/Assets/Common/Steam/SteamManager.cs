@@ -1,14 +1,13 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Steamworks;
 using Steamworks.Data;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UnityEngine.Serialization;
+using UnityEngine.InputSystem;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -23,16 +22,23 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     public SteamId PlayerSteamId { get; private set; }
     public string PlayerName { get; private set; } = "";
 
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+    
+    public List<Achievement> Achievements => SteamUserStats.Achievements.ToList();
+    
+    private Subject<bool> connectedToSteamEventStream = new Subject<bool>();
+    public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
+
+    private Subject<bool> disconnectedFromSteamEventStream = new Subject<bool>();
+    public IObservable<bool> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
+
     private string playerSteamIdString;
     private List<Lobby> activeUnrankedLobbies;
     private List<Lobby> activeRankedLobbies;
     
-    private Subject<bool> connectedToSteamEventStream = new Subject<bool>();
-    public IObservable<bool> ConnectedToSteamEventStream => ConnectedToSteamEventStream;
+    private HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
 
-    private Subject<bool> disconnectedFromSteamEventStream = new Subject<bool>();
-    public IObservable<bool> DisconnectedFromSteamEventStream => DisconnectedFromSteamEventStream;
-    
     protected override object GetInstance()
     {
         return Instance;
@@ -66,6 +72,12 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
+        achievementEventStream.Subscribe(achievementId => TriggerAchievement(achievementId));
+        InitSteamClient();
+    }
+
+    private void InitSteamClient()
+    {
         try
         {
             Debug.Log("Initializing SteamClient");
@@ -90,7 +102,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             IsConnectedToSteam = false;
             playerSteamIdString = "NoSteamId";
             Debug.LogException(e);
-        }   
+        }
     }
 
     private void Update()
@@ -99,7 +111,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         SteamClient.RunCallbacks();
     }
 
@@ -109,5 +121,24 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         SteamClient.Shutdown();
         Debug.Log("SteamClient shut down successfully");
         disconnectedFromSteamEventStream.OnNext(true);
+    }
+
+    private void TriggerAchievement(AchievementId achievementId)
+    {
+        if (triggeredAchievementsSinceAppStart.Contains(achievementId))
+        {
+            return;
+        }
+        triggeredAchievementsSinceAppStart.Add(achievementId);
+        
+        if (!IsConnectedToSteam)
+        {
+            // Maybe next time
+            Debug.LogWarning($"Attempt to trigger {achievementId}, but not connected to SteamClient");
+            return;
+        }
+        
+        Achievement achievement = new(achievementId.Id);
+        achievement.Trigger();
     }
 }

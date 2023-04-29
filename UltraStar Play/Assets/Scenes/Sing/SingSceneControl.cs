@@ -111,6 +111,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     [Inject]
     private AudioSeparationManager audioSeparationManager;
 
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+    
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
     private PlayerControl lastLeadingPlayerControl;
@@ -634,6 +637,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             StartNextMedleySong();
             return;
+        }
+
+        if (isAfterEndOfSong)
+        {
+            achievementEventStream.OnNext(AchievementId.completeSong);
         }
 
         if (settings.GameSettings.ScoreMode == EScoreMode.None

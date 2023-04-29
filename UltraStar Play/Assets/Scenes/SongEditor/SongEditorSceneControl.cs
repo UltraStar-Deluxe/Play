@@ -83,6 +83,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [Inject]
     private ApplicationManager applicationManager;
     
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+
     private IDisposable autoSaveDisposable;
 
     private readonly SongMetaChangeEventStream songMetaChangeEventStream = new();
@@ -145,6 +148,21 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
 
         InitAutoSave();
+
+        InitSteamAchievement();
+    }
+
+    private void InitSteamAchievement()
+    {
+        songMetaChangeEventStream
+            .Subscribe(evt =>
+            {
+                if (evt is NotesChangedEvent)
+                {
+                    achievementEventStream.OnNext(AchievementId.editNotesInSongEditor);
+                }
+            })
+            .AddTo(gameObject);
     }
 
     private void OnDestroy()
