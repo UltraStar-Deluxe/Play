@@ -15,6 +15,9 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
     private SingSceneControl singSceneControl;
 
     [Inject]
+    private Settings settings;
+
+    [Inject]
     private SingSceneCountdownControl countdownControl;
 
     [Inject]
@@ -122,7 +125,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return songAudioPlayer.DurationOfSongInMillis;
         }
         SongMeta songMeta = singSceneControl.SongMeta;
-        int medleyEndBeat = SongMetaUtils.GetMedleyEndBeat(songMeta);
+        int medleyEndBeat = SongMetaUtils.GetMedleyEndBeat(songMeta, settings.GameSettings.defaultMedleyTargetDurationInSeconds);
         return BpmUtils.BeatToMillisecondsInSong(songMeta, medleyEndBeat);
     }
 
@@ -149,7 +152,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             return SongMetaUtils.MaxBeat(SongMetaUtils.GetAllNotes(singSceneControl.SongMeta));
         }
 
-        return SongMetaUtils.GetMedleyEndBeat(singSceneControl.SongMeta);
+        return SongMetaUtils.GetMedleyEndBeat(singSceneControl.SongMeta, settings.GameSettings.defaultMedleyTargetDurationInSeconds);
     }
 
     public bool IsNoteInMedleyRange(Note note)

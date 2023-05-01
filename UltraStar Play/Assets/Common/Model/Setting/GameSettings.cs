@@ -12,4 +12,5 @@ public class GameSettings
     public EScoreMode ScoreMode { get; set; } = EScoreMode.Individual;
     public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
     public string CommonScoreNameSeparator { get; set; } = " & ";
+    public int defaultMedleyTargetDurationInSeconds = 30;
 }

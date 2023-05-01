@@ -20,6 +20,9 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
     
     [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
     private DropdownField languageDropdownField;
+    
+    [Inject(UxmlName = R.UxmlNames.defaultMedleyTargetDurationPicker)]
+    private ItemPicker defaultMedleyTargetDurationPicker;
 
     protected override void Start()
     {
@@ -36,6 +39,12 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
             () => settings.reducedAudioVolumePercent,
             newValue => settings.reducedAudioVolumePercent = (int)newValue);
 
+        NumberPickerControl defaultMedleyDurationPickerControl = new NumberPickerControl(defaultMedleyTargetDurationPicker, 30);
+        defaultMedleyDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
+        defaultMedleyDurationPickerControl.Bind(
+            () => settings.GameSettings.defaultMedleyTargetDurationInSeconds,
+            newValue => settings.GameSettings.defaultMedleyTargetDurationInSeconds = (int)newValue);
+        
         InitLanguageChooser();
     }
 

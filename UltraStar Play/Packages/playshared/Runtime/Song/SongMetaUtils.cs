@@ -522,7 +522,7 @@ public static class SongMetaUtils
         }
     }
 
-    public static int GetMedleyEndBeat(SongMeta songMeta)
+    public static int GetMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
     {
         if (songMeta.MedleyEndBeat >= 0)
         {
@@ -530,7 +530,7 @@ public static class SongMetaUtils
         }
         else
         {
-            return GetDefaultMedleyEndBeat(songMeta);
+            return GetDefaultMedleyEndBeat(songMeta, targetDurationInSeconds);
         }
     }
 
@@ -554,12 +554,11 @@ public static class SongMetaUtils
         return sentencesBeforeMiddleBeat.LastOrDefault().MinBeat;
     }
 
-    private static int GetDefaultMedleyEndBeat(SongMeta songMeta)
+    private static int GetDefaultMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
     {
         // End the medley approx. 30 seconds afterward the start.
-        int targetDurationInMillis = 30000;
         int medleyStartBeta = GetMedleyStartBeat(songMeta);
-        int targetDurationInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetDurationInMillis);
+        int targetDurationInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetDurationInSeconds * 1000);
         int targetEndBeat = medleyStartBeta + targetDurationInBeats;
 
         List<Sentence> sentencesAfterMedleyStart = songMeta.GetVoice(Voice.firstVoiceName)
