@@ -8,6 +8,13 @@
     public static readonly AchievementId startMedleyWithAtLeastTwoSongs = new("START_MEDLEY_WITH_AT_LEAST_TWO_SONGS");
     public static readonly AchievementId pauseSingingAfterOneMinute = new("PAUSE_SINGING_AFTER_ONE_MINUTE");
     public static readonly AchievementId useWebcamInSingScene = new("USE_WEBCAM_IN_SING_SCENE");
+    public static readonly AchievementId disconnectCompanionAppWhenSinging = new("DISCONNECT_COMPANION_APP_WHEN_SINGING");
+    public static readonly AchievementId getMoreThan9000Points = new("GET_MORE_THAN_9000_POINTS");
+    public static readonly AchievementId showFinalTeamResults = new("SHOW_FINAL_TEAM_RESULTS");
+    public static readonly AchievementId watchCreditsWithoutSkipping = new("WATCH_CREDITS_WITHOUT_SKIPPING");
+    public static readonly AchievementId browseMoreThan100Songs = new("BROWSE_MORE_THAN_100_SONGS");
+    public static readonly AchievementId completeMoreThan10SongsInARow = new("COMPLETE_MORE_THAN_10_SONGS_IN_A_ROW");
+    public static readonly AchievementId getMoreThan10PerfectRatingsInASong = new("GET_MORE_THAN_10_PERFECT_RATINGS_IN_A_SONG");
 
     public string Id { get; private set; }
     

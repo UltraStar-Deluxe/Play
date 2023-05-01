@@ -27,6 +27,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        completedSongCountSinceAppStart = 0;
+    }
+    private static int completedSongCountSinceAppStart;
+    
     [InjectedInInspector]
     public PlayerControl playerControlPrefab;
 
@@ -671,13 +678,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         if (isAfterEndOfSong)
         {
-            // Trigger achievemnts
-            achievementEventStream.OnNext(AchievementId.completeSong);
-
-            if (settings.AudioSettings.VocalsAudioVolumePercent <= 0)
-            {
-                achievementEventStream.OnNext(AchievementId.completeSongWithVocalsVolumeZero);
-            }
+            TriggerAchievementsAfterEndOfSong();
         }
 
         if (settings.GameSettings.ScoreMode == EScoreMode.None
@@ -688,6 +689,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         else
         {
             FinishSceneToSingingResults(isAfterEndOfSong);
+        }
+    }
+
+    private void TriggerAchievementsAfterEndOfSong()
+    {
+        achievementEventStream.OnNext(AchievementId.completeSong);
+        
+        if (settings.AudioSettings.VocalsAudioVolumePercent <= 0)
+        {
+            achievementEventStream.OnNext(AchievementId.completeSongWithVocalsVolumeZero);
+        }
+        
+        completedSongCountSinceAppStart++;
+        if (completedSongCountSinceAppStart > 10)
+        {
+            achievementEventStream.OnNext(AchievementId.completeMoreThan10SongsInARow);
         }
     }
 

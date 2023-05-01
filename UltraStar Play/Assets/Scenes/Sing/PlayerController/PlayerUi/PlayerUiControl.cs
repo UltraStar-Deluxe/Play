@@ -81,6 +81,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private GameObject gameObject;
 
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+    
     private AbstractSingSceneNoteDisplayer noteDisplayer;
     public AbstractSingSceneNoteDisplayer NoteDisplayer => noteDisplayer;
 
@@ -247,6 +250,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         else
         {
             ShowMicDisconnectedInfo();
+            
+            // Trigger achievement
+            achievementEventStream.OnNext(AchievementId.disconnectCompanionAppWhenSinging);
         }
     }
 
