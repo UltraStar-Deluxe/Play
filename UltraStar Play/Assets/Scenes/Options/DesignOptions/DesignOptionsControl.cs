@@ -32,6 +32,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.vfxEnabledPicker)]
     private ItemPicker vfxEnabledPicker;
 
+    [Inject(UxmlName = R.UxmlNames.showScrollBarInSongSelectPicker)]
+    private ItemPicker showScrollBarInSongSelectPicker;
+    
     [Inject]
     private UiManager uiManager;
     
@@ -53,6 +56,10 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         new BoolPickerControl(vfxEnabledPicker)
             .Bind(() => settings.GraphicSettings.enableVfx, 
                 newValue => settings.GraphicSettings.enableVfx = newValue);
+
+        new BoolPickerControl(showScrollBarInSongSelectPicker)
+            .Bind(() => settings.GraphicSettings.showScrollBarInSongSelect, 
+                newValue => settings.GraphicSettings.showScrollBarInSongSelect = newValue);
 
         LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.55f, 0.05f));
         sceneChangeDurationPickerControl.Bind(() => settings.GraphicSettings.sceneChangeDurationInSeconds,

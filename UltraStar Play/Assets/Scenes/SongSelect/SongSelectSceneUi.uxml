@@ -62,20 +62,6 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="hiddenHideSongQueueOverlayArea" class="overlay" style="flex-grow: 1; display: none;" />
-        <ui:VisualElement name="songListContainer" picking-mode="Ignore" style="width: 100%; position: absolute; min-height: 33.33%;">
-            <ListViewH focusable="true" name="songListView" fixed-item-width="150" />
-            <ui:VisualElement name="noSongsFoundContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; display: none; align-items: stretch; justify-content: center;">
-                <MaterialIcon tabindex="-1" name="noSongsFoundIcon" icon="cloud_download" style="font-size: 64px;" />
-                <ui:Label text="You have no songs downloaded yet." display-tooltip-when-elided="true" name="noSongsFoundLabel" class="largerFont" style="white-space: normal; display: flex; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; -unity-font-style: bold;" />
-                <ui:Label text="Try adding some below" display-tooltip-when-elided="true" name="tryAddSongsLabel" class="my-3 secondaryFontColor" style="white-space: normal; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; width: 100%;" />
-                <ui:VisualElement name="noSongsFoundButtonContainer" class="smallFont child-mb-2" style="flex-direction: column; justify-content: center; align-items: stretch;">
-                    <ui:Button display-tooltip-when-elided="true" name="importSongsButton" style="flex-direction: row;">
-                        <MaterialIcon tabindex="-1" name="importSongsIcon" icon="create_new_folder" class="mx-2" style="font-size: 24px;" />
-                        <ui:Label tabindex="-1" text="Import Songs" display-tooltip-when-elided="true" name="importSongsLabel" />
-                    </ui:Button>
-                </ui:VisualElement>
-            </ui:VisualElement>
-        </ui:VisualElement>
         <ui:VisualElement name="bottomContent" picking-mode="Ignore" class="pb-2 px-4" style="background-color: rgba(0, 0, 0, 0); width: 100%; bottom: 0; position: absolute; flex-direction: row;">
             <ui:VisualElement name="bottomLeft" picking-mode="Ignore" class="pr-3" style="background-color: rgba(0, 0, 0, 0); justify-content: flex-end; flex-grow: 1;">
                 <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerList" mode="Horizontal" horizontal-scroller-visibility="AlwaysVisible" style="align-items: flex-end;">
@@ -115,6 +101,20 @@
                     <ui:Label tabindex="-1" text="Medium" display-tooltip-when-elided="true" name="currentDifficultyLabel" class="titleText" style="-unity-text-align: middle-center; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;); flex-grow: 1;" />
                     <ui:Button display-tooltip-when-elided="true" name="nextDifficultyButton" class="squareButton transparentButton">
                         <MaterialIcon tabindex="-1" name="nextItemIcon" icon="chevron_right" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="songListContainer" picking-mode="Ignore" style="width: 100%; position: absolute; min-height: 30%;">
+            <ListViewH focusable="true" name="songListView" fixed-item-width="150" />
+            <ui:VisualElement name="noSongsFoundContainer" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; display: none; align-items: stretch; justify-content: center;">
+                <MaterialIcon tabindex="-1" name="noSongsFoundIcon" icon="cloud_download" style="font-size: 64px;" />
+                <ui:Label text="You have no songs downloaded yet." display-tooltip-when-elided="true" name="noSongsFoundLabel" class="largerFont" style="white-space: normal; display: flex; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; -unity-font-style: bold;" />
+                <ui:Label text="Try adding some below" display-tooltip-when-elided="true" name="tryAddSongsLabel" class="my-3 secondaryFontColor" style="white-space: normal; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; width: 100%;" />
+                <ui:VisualElement name="noSongsFoundButtonContainer" class="smallFont child-mb-2" style="flex-direction: column; justify-content: center; align-items: stretch;">
+                    <ui:Button display-tooltip-when-elided="true" name="importSongsButton" style="flex-direction: row;">
+                        <MaterialIcon tabindex="-1" name="importSongsIcon" icon="create_new_folder" class="mx-2" style="font-size: 24px;" />
+                        <ui:Label tabindex="-1" text="Import Songs" display-tooltip-when-elided="true" name="importSongsLabel" />
                     </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>

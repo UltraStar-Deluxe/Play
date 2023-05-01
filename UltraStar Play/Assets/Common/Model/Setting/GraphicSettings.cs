@@ -23,4 +23,5 @@ public class GraphicSettings
     public bool animatedBackground;
     public int backgroundLightIndex = 1;
     public bool enableVfx = true;
+    public bool showScrollBarInSongSelect;
 }

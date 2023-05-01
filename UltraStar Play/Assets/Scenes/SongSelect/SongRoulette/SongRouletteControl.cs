@@ -81,15 +81,18 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private void Start()
     {
+        songListViewScrollView = songListView.Q<ScrollView>();
+        
         songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.TrickleDown);
         songListView.RegisterCallback<PointerDownEvent>(_ =>
         {
             isPointerDownOnListView = true;
-        });
+        }, TrickleDown.TrickleDown);
 
         // Hide scroll bars
-        songListViewScrollView = songListView.Q<ScrollView>();
-        songListViewScrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+        songListViewScrollView.horizontalScrollerVisibility = settings.GraphicSettings.showScrollBarInSongSelect
+            ? ScrollerVisibility.Auto
+            : ScrollerVisibility.Hidden;
         songListViewScrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
         songListView.makeItem = () =>
         {
