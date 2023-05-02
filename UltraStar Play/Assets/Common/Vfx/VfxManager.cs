@@ -13,7 +13,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static VfxManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VfxManager>();
 
-    public const string BackgroundVfxRenderTextureName = "VfxManager.ForegroundVfxRenderTexture";
+    public const string BackgroundVfxRenderTextureName = "VfxManager.BackgroundVfxRenderTexture";
     public const string ForegroundVfxRenderTextureName = "VfxManager.ForegroundVfxRenderTexture";
     
     [InjectedInInspector]
