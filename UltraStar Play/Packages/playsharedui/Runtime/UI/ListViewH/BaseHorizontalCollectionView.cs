@@ -39,6 +39,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     private readonly List<int> m_SelectedIndices = new List<int>();
     private readonly List<object> m_SelectedItems = new List<object>();
     private float m_LastWidth;
+    private float m_LastHeight;
     private bool m_IsRangeSelectionDirectionUp;
     private ListViewHDragger mHDragger;
     internal const float ItemWidthUnset = -1f;
@@ -696,6 +697,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
             return;
         Rect layout = this.m_ScrollView.layout;
         this.m_LastWidth = layout.width;
+        this.m_LastHeight = layout.height;
         layout = this.m_ScrollView.layout;
         if (float.IsNaN(layout.width))
             return;
@@ -759,6 +761,7 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
     {
         this.virtualizationController.Resize(size);
         this.m_LastWidth = size.x;
+        this.m_LastHeight = size.y;
         this.virtualizationController.UpdateBackground();
     }
 
@@ -1286,7 +1289,12 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         if (num != 0)
             return;
         rect = evt.newRect;
-        this.Resize(rect.size);
+        
+        if (Mathf.Abs(rect.size.x - m_LastWidth) > 0.01f
+            || Mathf.Abs(rect.size.y - m_LastHeight) > 0.01f)
+        {
+            this.Resize(rect.size);
+        }
     }
 
     private void OnCustomStyleResolved(CustomStyleResolvedEvent e)
