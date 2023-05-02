@@ -25,18 +25,17 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private AchievementEventStream achievementEventStream;
     
-    public List<Achievement> Achievements => SteamUserStats.Achievements.ToList();
-    
-    private Subject<bool> connectedToSteamEventStream = new Subject<bool>();
+    private readonly Dictionary<string, Achievement> achievementIdToAchievement = new();
+    private Subject<bool> connectedToSteamEventStream = new();
     public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
 
-    private Subject<bool> disconnectedFromSteamEventStream = new Subject<bool>();
+    private Subject<bool> disconnectedFromSteamEventStream = new();
     public IObservable<bool> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
 
     private string playerSteamIdString;
     private List<Lobby> activeUnrankedLobbies;
     private List<Lobby> activeRankedLobbies;
-    
+
     private HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
 
     protected override object GetInstance()
@@ -72,7 +71,9 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
-        achievementEventStream.Subscribe(achievementId => TriggerAchievement(achievementId));
+        achievementEventStream
+            .Subscribe(achievementId => TriggerAchievement(achievementId))
+            .AddTo(gameObject);
         InitSteamClient();
     }
 
@@ -80,13 +81,18 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     {
         try
         {
+            if (IsConnectedToSteam)
+            {
+                Debug.LogWarning("Already connected to Steam");
+                return;
+            }
+            
             Debug.Log("Initializing SteamClient");
             SteamClient.Init(MelodyManiaSteamAppId);
             if (!SteamClient.IsValid)
             {
                 throw new SteamException("Steam client not valid");
             }
-            
             PlayerName = SteamClient.Name;
             PlayerSteamId = SteamClient.SteamId;
             playerSteamIdString = PlayerSteamId.ToString();
@@ -94,6 +100,15 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             activeRankedLobbies = new List<Lobby>();
             IsConnectedToSteam = true;
             
+            bool requestCurrentStatsSuccess = SteamUserStats.RequestCurrentStats();
+            if (!requestCurrentStatsSuccess)
+            {
+                Debug.LogError("Connected to Steam but failed to request current stats");
+            }
+            
+            achievementIdToAchievement.Clear();
+            SteamUserStats.Achievements.ForEach(achievement => achievementIdToAchievement[achievement.Identifier] = achievement);
+
             connectedToSteamEventStream.OnNext(true);
             Debug.Log("Steam successfully initialized, PlayerName: " + PlayerName);
         }
@@ -130,7 +145,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         triggeredAchievementsSinceAppStart.Add(achievementId);
-        
+
         if (!IsConnectedToSteam)
         {
             // Maybe next time
@@ -138,7 +153,35 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         
-        Achievement achievement = new(achievementId.Id);
-        achievement.Trigger();
+        if (!TryGetAchievement(achievementId, out Achievement achievement))
+        {
+            Debug.LogError($"No achievement found for id: {achievementId.Id}");
+            return;
+        }
+
+        if (achievement.State)
+        {
+            Debug.Log($"Skipping already unlocked achievement {achievementId.Id}");
+            return;
+        }
+        
+        try
+        {
+            Debug.Log("Unlocking achievement: " + achievementId.Id);
+            bool success = achievement.Trigger();
+            if (!success)
+            {
+                Debug.LogWarning($"Failed to unlock achievement: {achievementId.Id}");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+    }
+
+    private bool TryGetAchievement(AchievementId achievementId, out Achievement achievement)
+    {
+        return achievementIdToAchievement.TryGetValue(achievementId.Id, out achievement);
     }
 }
