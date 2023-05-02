@@ -922,6 +922,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceNameOrPerformerName))
         {
+            if (voiceNameOrPerformerName == Voice.mergedVoiceName)
+            {
+                return Voice.mergedVoiceName;
+            }
+            
             // The given value could be "P1" / "P2" (i.e. a voiceName) or the performer's name (e.g. "Elvis").
             string matchingVoiceName = SongMeta.VoiceNames
                 .Where(entry => entry.Key == voiceNameOrPerformerName
@@ -1044,8 +1049,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private Voice GetVoice(PlayerProfile playerProfile)
     {
+        List<Voice> voices = SongMeta.GetVoices().ToList();
+        
         string voiceName = GetVoiceName(playerProfile);
-        IReadOnlyCollection<Voice> voices = SongMeta.GetVoices();
+        if (voiceName == Voice.mergedVoiceName)
+        {
+            return SongMetaUtils.CreateMergedVoice(voices);
+        }
+        
         Voice matchingVoice = voices.FirstOrDefault(it => Voice.VoiceNameEquals(it.Name, voiceName));
         if (matchingVoice != null)
         {
