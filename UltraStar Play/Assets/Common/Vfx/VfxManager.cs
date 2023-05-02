@@ -137,7 +137,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         uiDocument.rootVisualElement.Add(foregroundVfxElement);
         
         backgroundVfxElement = new Image();
-        backgroundVfxElement.name = "foregroundVfxElement";
+        backgroundVfxElement.name = "backgroundVfxElement";
         backgroundVfxElement.AddToClassList("overlay");
         backgroundVfxElement.image = backgroundVfxCamera.targetTexture;
         backgroundVfxElement.pickingMode = PickingMode.Ignore;
