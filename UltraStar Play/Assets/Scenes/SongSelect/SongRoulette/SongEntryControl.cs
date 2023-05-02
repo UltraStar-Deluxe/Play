@@ -169,7 +169,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         // Open context menu on right click
         if (evt.button == 1
             && !isPopupMenuOpen
-            && TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
+            && TimeUtils.IsDurationAboveThresholdInSeconds(popupMenuClosedTimeInSeconds, 0.1f))
         {
             contextMenuControl.OpenContextMenu(evt.position);
         }
@@ -178,7 +178,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     private void OnOpenSongMenuButtonClicked(EventBase evt)
     {
         if (isPopupMenuOpen
-            || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
+            || !TimeUtils.IsDurationAboveThresholdInSeconds(popupMenuClosedTimeInSeconds, 0.1f))
         {
             return;
         }

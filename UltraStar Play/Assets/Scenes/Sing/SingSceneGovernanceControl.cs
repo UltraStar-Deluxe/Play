@@ -90,7 +90,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         openControlsMenuButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (isPopupMenuOpen
-                || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
+                || !TimeUtils.IsDurationAboveThresholdInSeconds(popupMenuClosedTimeInSeconds, 0.1f))
             {
                 return;
             }
@@ -118,7 +118,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         governanceOverlay.RegisterCallback<PointerDownEvent>(evt =>
         {
             if (isPopupMenuOpen
-                || !TimeUtils.IsDurationAboveThreshold(popupMenuClosedTimeInSeconds, 0.1f))
+                || !TimeUtils.IsDurationAboveThresholdInSeconds(popupMenuClosedTimeInSeconds, 0.1f))
             {
                 return;
             }

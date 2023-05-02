@@ -223,7 +223,7 @@ public static class ApplyThemeStyleUtils
         else
         {
             if (data.currentGradientConfig == null
-                || !TimeUtils.IsDurationAboveThreshold(data.initTimeInSeconds, 0.1f))
+                || !TimeUtils.IsDurationAboveThresholdInSeconds(data.initTimeInSeconds, 0.1f))
             {
                 // Immediately apply the new gradient
                 ApplyGradient(visualElement, newGradientConfig);

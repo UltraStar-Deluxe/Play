@@ -29,6 +29,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private PlaylistManager playlistManager;
+    
+    [Inject]
+    private Settings settings;
 
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private ListViewH songListView;
@@ -219,23 +222,25 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             songListViewScrollView.scrollOffset = new Vector2(
                 interpolatedScrollOffsetX,
                 songListViewScrollView.scrollOffset.y);
+            Debug.Log($"songListViewScrollView.scrollOffset.x: {songListViewScrollView.scrollOffset.x}, interpolatedScrollOffsetX: " + interpolatedScrollOffsetX);
         }
-        else
+        else if (Mathf.Abs(songListViewScrollView.scrollOffset.x - targetScrollOffsetX) > 0.01f)
         {
+            Debug.Log($"songListViewScrollView.scrollOffset.x: {songListViewScrollView.scrollOffset.x}, targetScrollOffsetX: {targetScrollOffsetX}");
             songListViewScrollView.scrollOffset = new Vector2(
                 targetScrollOffsetX,
                 songListViewScrollView.scrollOffset.y);
         }
         
         // Fix ListView not creating items sometimes by triggering a scroll event (probably a Unity bug).
-        VisualElement selectedListViewItem = songListView.Q(null, "unity-collection-view__item--selected");
-        if (selectedListViewItem == null
-            && SelectedSongMeta != null)
-        {
-            songListViewScrollView.scrollOffset = new Vector2(
-                songListViewScrollView.scrollOffset.x + Random.Range(0, 2),
-                songListViewScrollView.scrollOffset.y);
-        }
+        // VisualElement selectedListViewItem = songListView.Q(null, "unity-collection-view__item--selected");
+        // if (selectedListViewItem == null
+        //     && SelectedSongMeta != null)
+        // {
+        //     songListViewScrollView.scrollOffset = new Vector2(
+        //         songListViewScrollView.scrollOffset.x + Random.Range(0, 2),
+        //         songListViewScrollView.scrollOffset.y);
+        // }
     }
 
     private void SelectListViewItemClosestToCenter()

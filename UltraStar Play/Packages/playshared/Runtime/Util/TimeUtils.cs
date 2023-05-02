@@ -16,13 +16,13 @@ public static class TimeUtils
         return DateTimeOffset.Now.ToUnixTimeMilliseconds();
     }
 
-    public static bool IsDurationAboveThreshold(float unityStartTimeInSeconds, float thresholdInSeconds)
+    public static bool IsDurationAboveThresholdInSeconds(float unityStartTimeInSeconds, float thresholdInSeconds)
     {
         float durationInSeconds = Time.time - unityStartTimeInSeconds;
         return durationInSeconds > thresholdInSeconds;
     }
     
-    public static bool IsDurationAboveThreshold(long unixStartTimeInMillis, long thresholdInMillis)
+    public static bool IsDurationAboveThresholdInMillis(long unixStartTimeInMillis, long thresholdInMillis)
     {
         float durationInMillis = GetUnixTimeMilliseconds() - unixStartTimeInMillis;
         return durationInMillis > thresholdInMillis;
