@@ -412,17 +412,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateMicCheckButton()
     {
-        toggleMicCheckButton.SetActive(nonPersistentSettings.micTestActive);
-        micCheckIcon.SetVisibleByDisplay(nonPersistentSettings.micTestActive);
-        noMicCheckIcon.SetVisibleByDisplay(!nonPersistentSettings.micTestActive);
+        toggleMicCheckButton.SetActive(nonPersistentSettings.MicTestActive.Value);
+        micCheckIcon.SetVisibleByDisplay(nonPersistentSettings.MicTestActive.Value);
+        noMicCheckIcon.SetVisibleByDisplay(!nonPersistentSettings.MicTestActive.Value);
     }
 
     private void ToggleMicCheckActive()
     {
-        nonPersistentSettings.micTestActive = !nonPersistentSettings.micTestActive;
+        nonPersistentSettings.MicTestActive.Value = !nonPersistentSettings.MicTestActive.Value;
         UpdateMicCheckButton();
         
-        if (nonPersistentSettings.micTestActive)
+        if (nonPersistentSettings.MicTestActive.Value)
         {
             FindObjectsOfType<MicSampleRecorder>()
                 .Where(it => it.MicProfile != null && !it.IsRecording.Value)

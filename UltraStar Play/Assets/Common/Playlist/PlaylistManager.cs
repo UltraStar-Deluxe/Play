@@ -283,9 +283,9 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         // Update settings
         if (nonPersistentSettings != null
-            && nonPersistentSettings.playlistName == oldName)
+            && nonPersistentSettings.PlaylistName.Value == oldName)
         {
-            nonPersistentSettings.playlistName = newName;
+            nonPersistentSettings.PlaylistName.Value = newName;
         }
 
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
@@ -318,9 +318,9 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         // Update settings
         if (nonPersistentSettings != null
-            && nonPersistentSettings.playlistName == oldName)
+            && nonPersistentSettings.PlaylistName.Value == oldName)
         {
-            nonPersistentSettings.playlistName = "";
+            nonPersistentSettings.PlaylistName.Value = "";
         }
 
         playlists.Remove(playlist);

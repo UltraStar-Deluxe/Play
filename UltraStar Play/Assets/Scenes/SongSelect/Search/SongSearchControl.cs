@@ -120,7 +120,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(searchPropertyDropdownOverlay);
         
         filterActiveIcon.HideByDisplay();
-        nonPersistentSettings.ObserveEveryValueChanged(it => it.playlistName)
+        nonPersistentSettings.PlaylistName
             .Subscribe(_ => UpdateFilterActiveIcon());
         playlistManager.PlaylistChangeEventStream
             .Subscribe(_ => UpdateFilterActiveIcon());
@@ -158,7 +158,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private void UpdateFilterActiveIcon()
     {
-        IPlaylist activePlaylist = playlistManager.GetPlaylistByName(nonPersistentSettings.playlistName);
+        IPlaylist activePlaylist = playlistManager.GetPlaylistByName(nonPersistentSettings.PlaylistName.Value);
         bool isAnyFilterOrPlaylistActive = songSelectFilterControl.IsAnyFilterActive
                                            || (activePlaylist != null &&
                                                activePlaylist is not UltraStarAllSongsPlaylist);

@@ -29,17 +29,17 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
     private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => nonPersistentSettings.activeSearchPropertyFilters;
     public bool IsAnyFilterActive => !nonPersistentSettings.activeSearchPropertyFilters.IsNullOrEmpty()
-        || nonPersistentSettings.isShowOnlyDuetsFilterActive;
+        || nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value;
     
     private readonly Subject<bool> filtersChangedEventStream = new();
     public IObservable<bool> FiltersChangedEventStream => filtersChangedEventStream;
     
     public void OnInjectionFinished()
     {
-        showOnlyDuetsToggle.value = nonPersistentSettings.isShowOnlyDuetsFilterActive;
+        showOnlyDuetsToggle.value = nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value;
         showOnlyDuetsToggle.RegisterValueChangedCallback(evt =>
         {
-            nonPersistentSettings.isShowOnlyDuetsFilterActive = evt.newValue;
+            nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value = evt.newValue;
             filtersChangedEventStream.OnNext(true);
         });
 
@@ -72,7 +72,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             return true;
         }
 
-        if (nonPersistentSettings.isShowOnlyDuetsFilterActive
+        if (nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value
             && songMeta.GetVoices().Count < 2)
         {
             return false;

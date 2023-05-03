@@ -204,9 +204,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.drawNoteLayer = newValue);
         
         // Playback speed
-        songAudioPlayer.PlaybackSpeed = nonPersistentSettings.SongEditorMusicPlaybackSpeed;
+        songAudioPlayer.PlaybackSpeed = nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value;
         Bind(musicPlaybackSpeedSlider,
-            () => nonPersistentSettings.SongEditorMusicPlaybackSpeed,
+            () => nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value,
             newValue => SetMusicPlaybackSpeed(newValue),
             false);
         resetMusicPlaybackSpeedButton.RegisterCallbackButtonTriggered(_ =>
@@ -416,7 +416,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValueRounded = 1;
         }
 
-        nonPersistentSettings.SongEditorMusicPlaybackSpeed = newValueRounded;
+        nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value = newValueRounded;
         songAudioPlayer.PlaybackSpeed = newValueRounded;
     }
 

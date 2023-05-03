@@ -153,7 +153,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     private void DoSpeechRecognitionForNewlyRecordedSamples()
     {
         if (!settings.SongEditorSettings.speechRecognitionWhenRecording
-            || !nonPersistentSettings.IsSongEditorRecordingEnabled
+            || !nonPersistentSettings.IsSongEditorRecordingEnabled.Value
             || !HasRecordedAudio
             || SpeechRecognitionUtils.IsSpeechRecognitionRunning)
         {
@@ -349,7 +349,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     
     private void StartOrStopRecording()
     {
-        bool shouldBeRecoding = nonPersistentSettings.IsSongEditorRecordingEnabled 
+        bool shouldBeRecoding = nonPersistentSettings.IsSongEditorRecordingEnabled.Value 
                                 && songAudioPlayer.IsPlaying
                                 && settings.SongEditorSettings.MicProfile != null
                                 && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager);

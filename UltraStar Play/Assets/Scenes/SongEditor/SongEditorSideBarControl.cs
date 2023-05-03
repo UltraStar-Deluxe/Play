@@ -158,7 +158,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         togglePlaybackButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ToggleAudioPlayPause());
         toggleRecordingButton.RegisterCallbackButtonTriggered(_ =>
         {
-            nonPersistentSettings.IsSongEditorRecordingEnabled = !nonPersistentSettings.IsSongEditorRecordingEnabled;
+            nonPersistentSettings.IsSongEditorRecordingEnabled.Value = !nonPersistentSettings.IsSongEditorRecordingEnabled.Value;
             UpdateRecordingButton();
         });
         UpdateRecordingButton();
@@ -291,7 +291,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void UpdateRecordingButton()
     {
-        if (nonPersistentSettings.IsSongEditorRecordingEnabled)
+        if (nonPersistentSettings.IsSongEditorRecordingEnabled.Value)
         {
             toggleRecordingButton.AddToClassList("recording");
         }
