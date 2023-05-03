@@ -47,7 +47,7 @@ public class Settings : ISettings
 
     // Song library settings
     public List<string> songDirs = new();
-    public bool searchAudioFilesWithoutSongMeta = true;
+    public bool searchAudioFilesWithoutSongMeta;
     
     // Theme settings
     public string themeName = ThemeManager.DefaultThemeName;
