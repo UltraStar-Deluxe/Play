@@ -74,7 +74,12 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     [Inject]
     private SongMeta songMeta;
 
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+
     private int displaySentenceIndex;
+
+    private int perfectSentenceCount;
 
     public void OnInjectionFinished()
     {
@@ -107,6 +112,23 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             }
         }
         SetDisplaySentenceIndex(0);
+
+        InitAchievements();
+    }
+
+    private void InitAchievements()
+    {
+        PlayerScoreControl.SentenceScoreEventStream.Subscribe(evt =>
+        {
+            if (evt.SentenceRating.EnumValue is ESentenceRating.Perfect)
+            {
+                perfectSentenceCount++;
+                if (perfectSentenceCount > 10)
+                {
+                    achievementEventStream.OnNext(AchievementId.getMoreThan10PerfectRatingsInASong);
+                }
+            }
+        });
     }
 
     private void AddPlayerInfoUiToUiDocument(VisualElement playerInfoUiVisualElement)

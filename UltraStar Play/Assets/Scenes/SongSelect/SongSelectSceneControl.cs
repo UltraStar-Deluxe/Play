@@ -81,6 +81,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private VisualElement noCoopIcon;
     
     [Inject]
+    private AchievementEventStream achievementEventStream;
+    
+    [Inject]
     private SongSelectSceneData sceneData;
 
     private List<SongMeta> songMetas;
@@ -665,6 +668,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
         noSongsFoundLabel.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
         noSongsFoundContainer.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
+
+        // Trigger achievement
+        if (songMetas.Count > 100)
+        {
+            achievementEventStream.OnNext(AchievementId.browseMoreThan100Songs);
+        }
     }
 
     private void Update()

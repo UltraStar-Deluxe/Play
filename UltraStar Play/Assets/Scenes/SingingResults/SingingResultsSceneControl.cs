@@ -110,6 +110,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 	[Inject]
     private SingingResultsSceneData sceneData;
     
+	[Inject]
+    private AchievementEventStream achievementEventStream;
+    
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
@@ -187,6 +190,17 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
 
         InitSingingResults();
+
+        TriggerAchievementsOnSingingResultsStart();
+    }
+
+    private void TriggerAchievementsOnSingingResultsStart()
+    {
+        if (sceneData.PlayerProfiles
+            .AnyMatch(playerProfile => sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000))
+        {
+            achievementEventStream.OnNext(AchievementId.getMoreThan9000Points);
+        }
     }
 
     private void InitSingingResults()
@@ -285,6 +299,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
                 hideAndShowWithTarget = true,
             });
         }
+        
+        // Trigger achievement
+        achievementEventStream.OnNext(AchievementId.showFinalTeamResults);
     }
 
     private void InitVfx()

@@ -27,6 +27,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        completedSongCountSinceAppStart = 0;
+    }
+    private static int completedSongCountSinceAppStart;
+    
     [InjectedInInspector]
     public PlayerControl playerControlPrefab;
 
@@ -111,6 +118,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     [Inject]
     private AudioSeparationManager audioSeparationManager;
 
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+    
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
     private PlayerControl lastLeadingPlayerControl;
@@ -296,6 +306,31 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (sceneData.IsMedley)
         {
             medleyControl.StartCurrentMedleySong();
+        }
+
+        TriggerAchievementsAtSongStart();
+    }
+
+    private void TriggerAchievementsAtSongStart()
+    {
+        // Two players with different lyrics
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Count == 2
+            && sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Values.Distinct().Count() > 1)
+        {
+            achievementEventStream.OnNext(AchievementId.startDuetWithDifferentLyrics);
+        }
+
+        if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 4)
+        {
+            achievementEventStream.OnNext(AchievementId.startSongWithFourOrMorePlayers);
+        }
+
+        // Medley with at least two entries
+        if (sceneData.IsMedley
+            && sceneData.MedleySongIndex >= 0
+            && sceneData.SongMetas.Count > 1)
+        {
+            achievementEventStream.OnNext(AchievementId.startMedleyWithAtLeastTwoSongs);
         }
     }
 
@@ -528,6 +563,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             countdownControl.Update(Time.deltaTime);
         }
+
+        if (settings.WebcamSettings.UseAsBackgroundInSingScene)
+        {
+            achievementEventStream.OnNext(AchievementId.useWebcamInSingScene);
+        }
     }
 
     public void SkipToNextSingableNoteOrEndOfSong()
@@ -636,6 +676,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
+        if (isAfterEndOfSong)
+        {
+            TriggerAchievementsAfterEndOfSong();
+        }
+
         if (settings.GameSettings.ScoreMode == EScoreMode.None
             && !HasPartyModeSceneData)
         {
@@ -644,6 +689,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         else
         {
             FinishSceneToSingingResults(isAfterEndOfSong);
+        }
+    }
+
+    private void TriggerAchievementsAfterEndOfSong()
+    {
+        achievementEventStream.OnNext(AchievementId.completeSong);
+        
+        if (settings.AudioSettings.VocalsAudioVolumePercent <= 0)
+        {
+            achievementEventStream.OnNext(AchievementId.completeSongWithVocalsVolumeZero);
+        }
+        
+        completedSongCountSinceAppStart++;
+        if (completedSongCountSinceAppStart > 10)
+        {
+            achievementEventStream.OnNext(AchievementId.completeMoreThan10SongsInARow);
         }
     }
 
@@ -888,6 +949,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         
         songAudioPlayer.PauseAudio();
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+        
+        // Trigger achievement
+        if (songAudioPlayer.PositionInSongInMillis > 60000)
+        {
+            achievementEventStream.OnNext(AchievementId.pauseSingingAfterOneMinute);
+        }
     }
     
     public void Unpause()

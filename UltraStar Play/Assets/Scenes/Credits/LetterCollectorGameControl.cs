@@ -63,6 +63,9 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
+    [Inject]
+    private AchievementEventStream achievementEventStream;
+    
     private int categoryIndex;
     private List<CreditsCategoryEntry> creditsCategoryEntries;
     private List<CreditsEntry> remainingCreditsEntries;
@@ -78,6 +81,8 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
 
     private Vector2 lastCreatedEntryControlPosition;
 
+    private bool wasSkipButtonClicked;
+    
     public void Start()
     {
         // Init UI
@@ -90,7 +95,11 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
         creditsCategoryEntries = JsonConverter.FromJson<List<CreditsCategoryEntry>>(creditsEntriesTextAsset.text);
         SelectNextCategoryEntry();
 
-        skipButton.RegisterCallbackButtonTriggered(_ => forceFadeOut = true);
+        skipButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            wasSkipButtonClicked = true;
+            forceFadeOut = true;
+        });
     }
 
     private void SelectNextCategoryEntry()
@@ -144,6 +153,12 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
             else
             {
                 StartFadeOut();
+                
+                // Trigger achievement for watching the credits without skipping
+                if (!wasSkipButtonClicked)
+                {
+                    achievementEventStream.OnNext(AchievementId.watchCreditsWithoutSkipping);
+                }
             }
         }
     }

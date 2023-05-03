@@ -20,14 +20,13 @@
         "Vosk",
         "SpleeterSharp",
         "UnityStandaloneFileBrowser"
-
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        ""
+        "Facepunch.Steamworks.Win64.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
