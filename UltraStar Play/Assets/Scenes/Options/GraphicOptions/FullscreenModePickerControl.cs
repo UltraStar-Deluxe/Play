@@ -17,7 +17,7 @@ public class FullscreenModePickerControl : LabeledItemPickerControl<FullScreenMo
         {
             Selection.Value = Screen.fullScreenMode;
             // The full-screen mode can change, e.g., via global keyboard shortcut. Thus, synchronize with the settings.
-            settings.GraphicSettings
+            settings
                 .ObserveEveryValueChanged(it => it.fullScreenMode)
                 .Subscribe(newFullScreenMode =>
                 {
@@ -29,6 +29,6 @@ public class FullscreenModePickerControl : LabeledItemPickerControl<FullScreenMo
                 })
                 .AddTo(gameObject);
         }
-        Selection.Subscribe(newValue => settings.GraphicSettings.fullScreenMode = newValue);
+        Selection.Subscribe(newValue => settings.fullScreenMode = newValue);
     }
 }

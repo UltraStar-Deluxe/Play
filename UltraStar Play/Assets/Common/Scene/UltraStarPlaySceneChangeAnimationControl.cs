@@ -48,7 +48,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         UpdateSceneTexturesAndTransition();
 
         if (SettingsUtils.ShouldAnimateSceneChange(settings)
-            && settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
+            && settings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
         {
             GetBackgroundVisualElement().style.opacity = 0;
         }
@@ -69,7 +69,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     {
         animateAction = doAnimateAction;
         
-        if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        if (settings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             // Take "screenshot" of "old" scene.
             RenderTexture uiRenderTexture = renderTextureManager.GetExistingScreenSizedRenderTexture(ThemeManager.UiRenderTextureName);
@@ -89,13 +89,13 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             }
         }
 
-        if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        if (settings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             doLoadSceneAction();
         }
-        else if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
+        else if (settings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
         {
-            float animationTimeInSeconds = settings.GraphicSettings.sceneChangeDurationInSeconds;
+            float animationTimeInSeconds = settings.sceneChangeDurationInSeconds;
             if (animationTimeInSeconds <= 0)
             {
                 doLoadSceneAction();
@@ -118,7 +118,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             PlaySceneChangeAnimationSound();
         }
 
-        float animationTimeInSeconds = settings.GraphicSettings.sceneChangeDurationInSeconds;
+        float animationTimeInSeconds = settings.sceneChangeDurationInSeconds;
         if (animationTimeInSeconds <= 0)
         {
             return;
@@ -128,21 +128,21 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         LeanTween.value(gameObject, 0, 1, animationTimeInSeconds)
             .setOnStart(() =>
             {
-                if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+                if (settings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
                 {
                     themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
                 }
             })
             .setOnUpdate((float interpolatedValue) =>
             {
-                if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+                if (settings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
                 {
                     // Scale and fade out the snapshot of the old UIDocument.
                     // Handled by the background shader to get correct premultiplied
                     // blending and avoid the one-frame flicker issue.
                     themeManager.backgroundShaderControl.SetTransitionAnimationTime(interpolatedValue);
                 }
-                else if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
+                else if (settings.sceneChangeAnimation is ESceneChangeAnimation.Fade)
                 {
                     background.style.opacity = interpolatedValue;
                 }
@@ -150,7 +150,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             .setEaseInSine()
             .setOnComplete(() =>
             {
-                if (settings.GraphicSettings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
+                if (settings.sceneChangeAnimation is ESceneChangeAnimation.Zoom)
                 {
                     themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
                 }
@@ -159,7 +159,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
     private void PlaySceneChangeAnimationSound()
     {
-        audioSource.volume = settings.AudioSettings.SceneChangeSoundVolumePercent / 100f;
+        audioSource.volume = settings.SceneChangeSoundVolumePercent / 100f;
         if (!audioSource.isPlaying)
         {
             audioSource.Play();

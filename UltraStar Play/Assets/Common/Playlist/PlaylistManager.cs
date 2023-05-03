@@ -107,7 +107,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         
         ScanPlaylistsInFolder(PlaylistFolder);
         
-        foreach (string songDir in SettingsManager.Instance.Settings.GameSettings.songDirs)
+        foreach (string songDir in SettingsManager.Instance.Settings.songDirs)
         {
             ScanPlaylistsInFolder(songDir);
         }
@@ -279,9 +279,9 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Update settings
-        if (settings.SongSelectSettings.playlistName == oldName)
+        if (settings.playlistName == oldName)
         {
-            settings.SongSelectSettings.playlistName = newName;
+            settings.playlistName = newName;
         }
 
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
@@ -313,9 +313,9 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Update settings
-        if (settings.SongSelectSettings.playlistName == oldName)
+        if (settings.playlistName == oldName)
         {
-            settings.SongSelectSettings.playlistName = "";
+            settings.playlistName = "";
         }
 
         playlists.Remove(playlist);

@@ -72,40 +72,40 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         base.Start();
         
         new BoolPickerControl(showFpsPicker)
-            .Bind(() => settings.DeveloperSettings.showFps,
-                  newValue => settings.DeveloperSettings.showFps = newValue);
+            .Bind(() => settings.ShowFps,
+                  newValue => settings.ShowFps = newValue);
 
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmPicker)
-            .Bind(() => settings.AudioSettings.pitchDetectionAlgorithm,
-                newValue => settings.AudioSettings.pitchDetectionAlgorithm = newValue);
+            .Bind(() => settings.PitchDetectionAlgorithm,
+                newValue => settings.PitchDetectionAlgorithm = newValue);
 
         new BoolPickerControl(analyzeBeatsWithoutTargetNotePicker)
-            .Bind(() => settings.GraphicSettings.analyzeBeatsWithoutTargetNote,
-                newValue => settings.GraphicSettings.analyzeBeatsWithoutTargetNote = newValue);
+            .Bind(() => settings.analyzeBeatsWithoutTargetNote,
+                newValue => settings.analyzeBeatsWithoutTargetNote = newValue);
 
         new BoolPickerControl(disableDynamicThemesPicker)
-            .Bind(() => settings.DeveloperSettings.disableDynamicThemes,
+            .Bind(() => settings.disableDynamicThemes,
                 disableDynamicThemes =>
                 {
                     if (disableDynamicThemes)
                     {
                         themeManager.SetCurrentTheme(themeManager.GetDefaultTheme());
                     }
-                    settings.DeveloperSettings.disableDynamicThemes = disableDynamicThemes;
+                    settings.disableDynamicThemes = disableDynamicThemes;
                 });
 
         new BoolPickerControl(useUniversalCharsetDetectorPicker)
-                    .Bind(() => settings.DeveloperSettings.useUniversalCharsetDetector,
-                        newValue => settings.DeveloperSettings.useUniversalCharsetDetector = newValue);
+                    .Bind(() => settings.useUniversalCharsetDetector,
+                        newValue => settings.useUniversalCharsetDetector = newValue);
 
         customEventSystemOptInOnAndroidPicker.SetVisibleByDisplay(PlatformUtils.IsAndroid);
         new BoolPickerControl(customEventSystemOptInOnAndroidPicker)
-            .Bind(() => settings.DeveloperSettings.enableEventSystemOnAndroid,
+            .Bind(() => settings.enableEventSystemOnAndroid,
                 newValue =>
                 {
-                    if (newValue != settings.DeveloperSettings.enableEventSystemOnAndroid)
+                    if (newValue != settings.enableEventSystemOnAndroid)
                     {
-                        settings.DeveloperSettings.enableEventSystemOnAndroid = newValue;
+                        settings.enableEventSystemOnAndroid = newValue;
                         RestartScene();
                     }
                 });

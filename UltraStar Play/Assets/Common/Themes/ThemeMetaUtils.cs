@@ -34,7 +34,7 @@ public static class ThemeMetaUtils
         }
         
         StaticBackgroundJson staticBackgroundJson = GetStaticBackgroundJsonForScene(themeMeta, scene);
-        return !settings.DeveloperSettings.disableDynamicThemes
+        return !settings.disableDynamicThemes
                && (staticBackgroundJson != null
                    && !staticBackgroundJson.imagePath.IsNullOrEmpty());
     }
@@ -58,7 +58,7 @@ public static class ThemeMetaUtils
             return false;
         }
         
-        return !settings.DeveloperSettings.disableDynamicThemes
+        return !settings.disableDynamicThemes
                 && themeMeta.ThemeJson.dynamicBackground != null;
     }
 }

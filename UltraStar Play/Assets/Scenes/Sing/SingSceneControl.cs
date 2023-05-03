@@ -174,11 +174,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private readonly SingSceneMedleyControl medleyControl = new();
     private readonly SingSceneModifierControl modifierControl = new();
 
-    public bool IsCommonScore => settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
+    public bool IsCommonScore => settings.ScoreMode == EScoreMode.CommonAverage
                                  && sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 2;
 
-    public bool IsIndividualScore => settings.GameSettings.ScoreMode == EScoreMode.Individual
-                                     || (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage
+    public bool IsIndividualScore => settings.ScoreMode == EScoreMode.Individual
+                                     || (settings.ScoreMode == EScoreMode.CommonAverage
                                          && sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count <= 1);
 
     private float startTimeInSeconds;
@@ -293,7 +293,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             double progressInPercent = 100 * (songAudioPlayer.PositionInSongInMillis / songAudioPlayer.DurationOfSongInMillis);
             songTimeProgressBar.value = (float) progressInPercent;
         });
-        settings.ObserveEveryValueChanged(it => it.GraphicSettings.showSongProgress)
+        settings.ObserveEveryValueChanged(it => it.showSongProgress)
             .Subscribe(newValue => songTimeProgressBar.SetVisibleByDisplay(newValue));
 
         // Update TimeBar every second
@@ -423,7 +423,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private void InitSingingLyricsControls()
     {
         if (PlayerControls.IsNullOrEmpty()
-            || !settings.GraphicSettings.showStaticLyrics)
+            || !settings.showStaticLyrics)
         {
             uiDocument.rootVisualElement.Query<VisualElement>(null, R.UssClasses.singingLyricsSentenceUi)
                 .ForEach(singingLyricsSentenceUi => singingLyricsSentenceUi.HideByDisplay());
@@ -564,7 +564,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             countdownControl.Update(Time.deltaTime);
         }
 
-        if (settings.WebcamSettings.UseAsBackgroundInSingScene)
+        if (settings.UseWebcamAsBackgroundInSingScene)
         {
             achievementEventStream.OnNext(AchievementId.useWebcamInSingScene);
         }
@@ -681,7 +681,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             TriggerAchievementsAfterEndOfSong();
         }
 
-        if (settings.GameSettings.ScoreMode == EScoreMode.None
+        if (settings.ScoreMode == EScoreMode.None
             && !HasPartyModeSceneData)
         {
             FinishSceneToSongSelect();
@@ -696,7 +696,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         achievementEventStream.OnNext(AchievementId.completeSong);
         
-        if (settings.AudioSettings.VocalsAudioVolumePercent <= 0)
+        if (settings.VocalsAudioVolumePercent <= 0)
         {
             achievementEventStream.OnNext(AchievementId.completeSongWithVocalsVolumeZero);
         }
@@ -772,7 +772,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 .ToList();
             string commonPlayerProfileName = PlayerControls
                 .Select(playerControl => playerControl.PlayerProfile.Name)
-                .JoinWith(settings.GameSettings.CommonScoreNameSeparator);
+                .JoinWith(settings.CommonScoreNameSeparator);
             EDifficulty easiestPlayerProfileDifficulty = PlayerControls
                 .FindMinElement(playerControl => (int)playerControl.PlayerProfile.Difficulty)
                 .PlayerProfile.Difficulty;

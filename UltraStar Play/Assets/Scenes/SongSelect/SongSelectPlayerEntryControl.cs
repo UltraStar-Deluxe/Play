@@ -287,7 +287,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micPitchTracker.MicProfile = micProfile;
         if (micProfile == null
             || micProfile.IsInputFromConnectedClient
-            || !settings.SongSelectSettings.micTestActive)
+            || !settings.micTestActive)
         {
             if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {
@@ -296,7 +296,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
         else if (micProfile != null
                  && !micProfile.IsInputFromConnectedClient
-                 && settings.SongSelectSettings.micTestActive)
+                 && settings.micTestActive)
         {
             if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {

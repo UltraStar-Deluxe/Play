@@ -93,7 +93,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         }, TrickleDown.TrickleDown);
 
         // Hide scroll bars
-        songListViewScrollView.horizontalScrollerVisibility = settings.GraphicSettings.showScrollBarInSongSelect
+        songListViewScrollView.horizontalScrollerVisibility = settings.showScrollBarInSongSelect
             ? ScrollerVisibility.Auto
             : ScrollerVisibility.Hidden;
         songListViewScrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;

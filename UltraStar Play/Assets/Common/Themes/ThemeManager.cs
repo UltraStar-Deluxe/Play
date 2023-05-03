@@ -94,7 +94,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedThemesFolder());
         ImageManager.AddSpriteHolder(this);
 
-        settings.ObserveEveryValueChanged(it => it.GraphicSettings.animatedBackground)
+        settings.ObserveEveryValueChanged(it => it.animatedBackground)
             .Subscribe(animatedBackground => backgroundShaderControl.SetSimpleBackgroundEnabled(!animatedBackground));
 
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
@@ -208,7 +208,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void LoadCurrentTheme()
     {
-        if (settings.DeveloperSettings.disableDynamicThemes)
+        if (settings.disableDynamicThemes)
         {
             DisableDynamicBackground();
             return;
@@ -497,13 +497,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     public void SetCurrentTheme(ThemeMeta themeMeta)
     {
-        settings.GraphicSettings.themeName = themeMeta.FileNameWithoutExtension;
+        settings.themeName = themeMeta.FileNameWithoutExtension;
         LoadCurrentTheme();
     }
 
     public ThemeMeta GetCurrentTheme()
     {
-        return GetThemeByName(settings.GraphicSettings.themeName);
+        return GetThemeByName(settings.themeName);
     }
 
     public ThemeMeta GetThemeByName(string themeName)
@@ -592,7 +592,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        if (settings.DeveloperSettings.disableDynamicThemes)
+        if (settings.disableDynamicThemes)
         {
             DisableDynamicBackground();
             return;

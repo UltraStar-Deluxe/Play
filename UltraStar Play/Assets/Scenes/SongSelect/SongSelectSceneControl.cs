@@ -258,11 +258,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         toggleMicCheckButton.RegisterCallbackButtonTriggered(_ => ToggleMicCheckActive());
         UpdateMicCheckButton();
         
-        songOrderDropdownField.value = settings.SongSelectSettings.songOrder;
+        songOrderDropdownField.value = settings.songOrder;
         songOrderDropdownField.RegisterValueChangedCallback(evt =>
         {
             Debug.Log($"New order: {evt.newValue}");
-            settings.SongSelectSettings.songOrder = (ESongOrder)evt.newValue;
+            settings.songOrder = (ESongOrder)evt.newValue;
             UpdateFilteredSongs();
         });
 
@@ -409,17 +409,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateMicCheckButton()
     {
-        toggleMicCheckButton.SetActive(settings.SongSelectSettings.micTestActive);
-        micCheckIcon.SetVisibleByDisplay(settings.SongSelectSettings.micTestActive);
-        noMicCheckIcon.SetVisibleByDisplay(!settings.SongSelectSettings.micTestActive);
+        toggleMicCheckButton.SetActive(settings.micTestActive);
+        micCheckIcon.SetVisibleByDisplay(settings.micTestActive);
+        noMicCheckIcon.SetVisibleByDisplay(!settings.micTestActive);
     }
 
     private void ToggleMicCheckActive()
     {
-        settings.SongSelectSettings.micTestActive = !settings.SongSelectSettings.micTestActive;
+        settings.micTestActive = !settings.micTestActive;
         UpdateMicCheckButton();
         
-        if (settings.SongSelectSettings.micTestActive)
+        if (settings.micTestActive)
         {
             FindObjectsOfType<MicSampleRecorder>()
                 .Where(it => it.MicProfile != null && !it.IsRecording.Value)
@@ -436,7 +436,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void InitDifficultyAndScoreMode()
     {
         // Set difficulty for all players
-        settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
+        settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(newValue => settings.PlayerProfiles.ForEach(it => it.Difficulty = newValue));
 
         nextDifficultyButton.RegisterCallbackButtonTriggered(_ => SetNextDifficulty());
@@ -446,13 +446,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         toggleCoopModeButton.RegisterCallbackButtonTriggered(_ =>
         {
-            if (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage)
+            if (settings.ScoreMode == EScoreMode.CommonAverage)
             {
-                settings.GameSettings.ScoreMode = EScoreMode.Individual;
+                settings.ScoreMode = EScoreMode.Individual;
             }
             else
             {
-                settings.GameSettings.ScoreMode = EScoreMode.CommonAverage;
+                settings.ScoreMode = EScoreMode.CommonAverage;
             }
             UpdateDifficultyAndScoreModeControls();
         });
@@ -460,14 +460,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void SetPreviousDifficulty()
     {
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None)
         {
-            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            settings.ScoreMode = EScoreMode.Individual;
             SetDifficulty(EDifficulty.Hard);
         }
         else
         {
-            switch (settings.GameSettings.Difficulty)
+            switch (settings.Difficulty)
             {
                 case EDifficulty.Easy:
                     SetNoScoreMode();
@@ -484,14 +484,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     private void SetNextDifficulty()
     {
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None)
         {
-            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            settings.ScoreMode = EScoreMode.Individual;
             SetDifficulty(EDifficulty.Easy);
         }
         else
         {
-            switch (settings.GameSettings.Difficulty)
+            switch (settings.Difficulty)
             {
                 case EDifficulty.Easy:
                     SetDifficulty(EDifficulty.Medium);
@@ -508,32 +508,32 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void SetNoScoreMode()
     {
-        settings.GameSettings.ScoreMode = EScoreMode.None;
+        settings.ScoreMode = EScoreMode.None;
         UpdateDifficultyAndScoreModeControls();
     }
     
     private void SetDifficulty(EDifficulty difficulty)
     {
-        settings.GameSettings.Difficulty = difficulty;
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        settings.Difficulty = difficulty;
+        if (settings.ScoreMode == EScoreMode.None)
         {
-            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            settings.ScoreMode = EScoreMode.Individual;
         }
         UpdateDifficultyAndScoreModeControls();
     }
 
     private void UpdateDifficultyAndScoreModeControls()
     {
-        coopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode == EScoreMode.CommonAverage);
-        noCoopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode != EScoreMode.CommonAverage);
+        coopIcon.SetVisibleByDisplay(settings.ScoreMode == EScoreMode.CommonAverage);
+        noCoopIcon.SetVisibleByDisplay(settings.ScoreMode != EScoreMode.CommonAverage);
 
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None)
         {
             currentDifficultyLabel.text = "No Scores";
         }
         else
         {
-            currentDifficultyLabel.text = settings.GameSettings.Difficulty.ToString();
+            currentDifficultyLabel.text = settings.Difficulty.ToString();
         }
     }
 

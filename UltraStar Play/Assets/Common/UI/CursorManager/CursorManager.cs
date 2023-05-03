@@ -44,7 +44,7 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        settingsManager.Settings.GraphicSettings
+        settingsManager.Settings
             .ObserveEveryValueChanged(it => it.useImageAsCursor)
             .Subscribe(newValue => SetDefaultCursor())
             .AddTo(gameObject);
@@ -179,7 +179,7 @@ public class CursorManager : AbstractSingletonBehaviour, INeedInjection
 
     private bool UseImageAsCursor()
     {
-        return settingsManager.Settings.GraphicSettings.useImageAsCursor;
+        return settingsManager.Settings.useImageAsCursor;
     }
 
     private static void SetCursor(Texture2D texture, Vector2 hotspot, CursorMode cursorMode)

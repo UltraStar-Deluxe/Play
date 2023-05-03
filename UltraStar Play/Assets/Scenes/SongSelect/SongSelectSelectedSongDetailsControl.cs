@@ -88,7 +88,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         
         songAudioPlayer.LoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
-        settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
+        settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(_ =>
             {
                 UpdateSongStatistics(songSelectSceneControl.SelectedSong);
@@ -109,7 +109,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     private void UpdateSongRatingIcons(SongMeta selectedSong)
     {
-        songRatingIconControl.UpdateSongRatingIcons(selectedSong, settings.GameSettings.Difficulty);
+        songRatingIconControl.UpdateSongRatingIcons(selectedSong, settings.Difficulty);
     }
 
     private void SetEmptySongDetails()
@@ -169,7 +169,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         LocalStatistic localStatistic = statistics.GetLocalStats(songMeta);
         if (localStatistic != null)
         {
-            List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(1, settings.GameSettings.Difficulty);
+            List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(1, settings.Difficulty);
             List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
 
             UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);

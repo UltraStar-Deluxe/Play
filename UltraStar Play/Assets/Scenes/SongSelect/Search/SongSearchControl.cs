@@ -90,7 +90,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void OnInjectionFinished()
     {
         isInjectionFinished = true;
-        searchProperties = new HashSet<ESearchProperty>(settings.SongSelectSettings.searchProperties);
+        searchProperties = new HashSet<ESearchProperty>(settings.searchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
@@ -117,7 +117,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(searchPropertyDropdownOverlay);
         
         filterActiveIcon.HideByDisplay();
-        settings.ObserveEveryValueChanged(it => it.SongSelectSettings.playlistName)
+        settings.ObserveEveryValueChanged(it => it.playlistName)
             .Subscribe(_ => UpdateFilterActiveIcon());
         playlistManager.PlaylistChangeEventStream
             .Subscribe(_ => UpdateFilterActiveIcon());
@@ -155,7 +155,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private void UpdateFilterActiveIcon()
     {
-        IPlaylist activePlaylist = playlistManager.GetPlaylistByName(settings.SongSelectSettings.playlistName);
+        IPlaylist activePlaylist = playlistManager.GetPlaylistByName(settings.playlistName);
         bool isAnyFilterOrPlaylistActive = songSelectFilterControl.IsAnyFilterActive
                                            || (activePlaylist != null &&
                                                activePlaylist is not UltraStarAllSongsPlaylist);
@@ -333,14 +333,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void AddSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Add(searchProperty);
-        settings.SongSelectSettings.searchProperties = searchProperties.ToList();
+        settings.searchProperties = searchProperties.ToList();
         searchChangedEventStream.OnNext(new SearchPropertyChangedEvent());
     }
 
     public void RemoveSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Remove(searchProperty);
-        settings.SongSelectSettings.searchProperties = searchProperties.ToList();
+        settings.searchProperties = searchProperties.ToList();
         searchChangedEventStream.OnNext(new SearchPropertyChangedEvent());
     }
 
@@ -357,7 +357,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private void RegisterToggleSearchPropertyCallback(Toggle toggle, ESearchProperty searchProperty)
     {
-        toggle.value = settings.SongSelectSettings.searchProperties.Contains(searchProperty);
+        toggle.value = settings.searchProperties.Contains(searchProperty);
         toggle.RegisterValueChangedCallback(evt =>
         {
             if (evt.newValue)

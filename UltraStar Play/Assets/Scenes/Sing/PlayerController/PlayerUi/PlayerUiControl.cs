@@ -166,9 +166,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     {
         HideLeadingPlayerIcon();
 
-        if (settings.GameSettings.ScoreMode == EScoreMode.None
-            && (settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.None
-                || settings.GraphicSettings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence))
+        if (settings.ScoreMode == EScoreMode.None
+            && (settings.noteDisplayMode == ENoteDisplayMode.None
+                || settings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence))
         {
             // No need to show a player image and name
             // because it is neither associated with a score nor with lyrics.
@@ -192,10 +192,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             playerImageBorder.HideByVisibility();
         }
 
-        settings.ObserveEveryValueChanged(it => it.GraphicSettings.showPlayerNames)
+        settings.ObserveEveryValueChanged(it => it.showPlayerNames)
             .Subscribe(newValue => playerNameLabel.SetVisibleByDisplay(newValue));
         
-        settings.ObserveEveryValueChanged(it => it.GraphicSettings.showScoreNumbers)
+        settings.ObserveEveryValueChanged(it => it.showScoreNumbers)
             .Subscribe(newValue => playerScoreLabel.SetVisibleByDisplay(newValue));
     }
 
@@ -281,7 +281,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     public VisualElement ShowSentenceRating(SentenceRating sentenceRating, VisualElement parentContainer)
     {
-        if (settings.GameSettings.ScoreMode == EScoreMode.None
+        if (settings.ScoreMode == EScoreMode.None
             || sentenceRating.PercentageThreshold <= SentenceRating.notBad.PercentageThreshold)
         {
             return null;
@@ -307,7 +307,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     public void ShowTotalScore(int score, bool animate = true)
     {
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None)
         {
             return;
         }
@@ -375,7 +375,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private void InitNoteDisplayer(int localLineCount)
     {
         // Find a suited note displayer
-        switch (settings.GraphicSettings.noteDisplayMode)
+        switch (settings.noteDisplayMode)
         {
             case ENoteDisplayMode.SentenceBySentence:
                 noteDisplayer = new SentenceDisplayer();
@@ -387,7 +387,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 noteDisplayer = new NoNoteSingSceneDisplayer();
                 break;
             default:
-                throw new UnityException("Did not find a suited NoteDisplayer for ENoteDisplayMode " + settings.GraphicSettings.noteDisplayMode);
+                throw new UnityException("Did not find a suited NoteDisplayer for ENoteDisplayMode " + settings.noteDisplayMode);
         }
 
         // Enable and initialize the selected note displayer

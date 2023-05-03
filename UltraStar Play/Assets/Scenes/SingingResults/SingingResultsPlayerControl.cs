@@ -225,7 +225,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
-        if (settings.DeveloperSettings.disableDynamicThemes
+        if (settings.disableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
             LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);

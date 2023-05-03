@@ -50,7 +50,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             initializedResolution = true;
             // GetCurrentAppResolution may only be called from Start() and Awake(). This is why it is done here.
-            Settings.GraphicSettings.resolution = ApplicationUtils.GetScreenResolution();
+            Settings.resolution = ApplicationUtils.GetScreenResolution();
         }
     }
 
@@ -114,8 +114,8 @@ public class SettingsManager : AbstractSingletonBehaviour
         // TODO: Store non-persistent settings in dedicated data structure.
         settings.GameRoundSettings = new();
         
-        settings.SongSelectSettings.playlistName = "";
-        settings.SongSelectSettings.micTestActive = false;
+        settings.playlistName = "";
+        settings.micTestActive = false;
         settings.activeSearchPropertyFilters = new();
         settings.isShowOnlyDuetsFilterActive = false;
         
@@ -138,7 +138,7 @@ public class SettingsManager : AbstractSingletonBehaviour
                     Directory.CreateDirectory(internalSongFolder);
                 }
 
-                defaultSettings.GameSettings.songDirs.Add(internalSongFolder);
+                defaultSettings.songDirs.Add(internalSongFolder);
             }
             catch (Exception ex)
             {

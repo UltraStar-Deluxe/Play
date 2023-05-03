@@ -55,7 +55,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
         if (!PlatformUtils.IsAndroid
             || (eventSystem != null
-                && settings.DeveloperSettings.enableEventSystemOnAndroid))
+                && settings.enableEventSystemOnAndroid))
         {
             eventSystem.sendNavigationEvents = false;
         }
@@ -113,7 +113,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     public virtual void OnBack()
     {
         if (PlatformUtils.IsAndroid
-            && !settings.DeveloperSettings.enableEventSystemOnAndroid)
+            && !settings.enableEventSystemOnAndroid)
         {
             return;
         }
@@ -128,7 +128,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     public virtual void OnSubmit()
     {
         if (PlatformUtils.IsAndroid
-            && !settings.DeveloperSettings.enableEventSystemOnAndroid)
+            && !settings.enableEventSystemOnAndroid)
         {
             return;
         }
@@ -153,7 +153,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     public virtual void OnNavigate(Vector2 navigationDirection)
     {
         if (PlatformUtils.IsAndroid
-            && !settings.DeveloperSettings.enableEventSystemOnAndroid)
+            && !settings.enableEventSystemOnAndroid)
         {
             return;
         }

@@ -36,11 +36,11 @@ public class SettingsProblemHintControl
     public static List<string> GetSongLibrarySettingsProblems(Settings settings, SongMetaManager songMetaManager)
     {
         List<string> result = new();
-        if (settings.GameSettings.songDirs.IsNullOrEmpty())
+        if (settings.songDirs.IsNullOrEmpty())
         {
             result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_noSongFolders));
         }
-        else if (settings.GameSettings.songDirs.AnyMatch(songDir => !Directory.Exists(songDir)))
+        else if (settings.songDirs.AnyMatch(songDir => !Directory.Exists(songDir)))
         {
             result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderDoesNotExist));
         }
@@ -53,17 +53,17 @@ public class SettingsProblemHintControl
         // Check song folders
         bool hasDuplicateFolder = false;
         bool hasDuplicateSubfolder = false;
-        foreach (string songFolder in settings.GameSettings.songDirs)
+        foreach (string songFolder in settings.songDirs)
         {
             if (!hasDuplicateFolder
-                && IsDuplicateFolder(songFolder, settings.GameSettings.songDirs))
+                && IsDuplicateFolder(songFolder, settings.songDirs))
             {
                 hasDuplicateFolder = true;
                 result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_duplicateSongFolders));
             }
 
             if (!hasDuplicateSubfolder
-                && IsSubfolderOfAnyOtherFolder(songFolder, settings.GameSettings.songDirs, out string _))
+                && IsSubfolderOfAnyOtherFolder(songFolder, settings.songDirs, out string _))
             {
                 hasDuplicateSubfolder = true;
                 result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderIsSubfolderOfOtherSongFolder));

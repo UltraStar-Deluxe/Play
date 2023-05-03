@@ -156,7 +156,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
     
     private void DoCreateParticleEffect(ParticleEffectConfig particleEffectConfig)
     {
-        if (!settings.GraphicSettings.enableVfx)
+        if (!settings.enableVfx)
         {
             return;
         }

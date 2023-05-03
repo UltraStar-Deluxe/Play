@@ -31,7 +31,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         UpdateItems();
 
         // Update settings
-        Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = newPlaylist.Name);
+        Selection.Subscribe(newPlaylist => settings.playlistName = newPlaylist.Name);
 
         playlistDropdownField.value = items.FirstOrDefault().Name;
         playlistDropdownField.RegisterValueChangedCallback(evt =>
@@ -41,7 +41,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
             Selection.Value = playlist.OrIfNull(new UltraStarAllSongsPlaylist());
         });
 
-        settings.ObserveEveryValueChanged(it => it.SongSelectSettings.playlistName)
+        settings.ObserveEveryValueChanged(it => it.playlistName)
             .Subscribe(newPlaylistName =>
             {
                 if (playlistDropdownField.value != newPlaylistName)
@@ -72,7 +72,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         {
             // Use last selected playlist or the first
             newSelection = items
-                .FirstOrDefault(playlist => playlistManager.GetPlaylistName(playlist) == settings.SongSelectSettings.playlistName)
+                .FirstOrDefault(playlist => playlistManager.GetPlaylistName(playlist) == settings.playlistName)
                 .OrIfNull(items.FirstOrDefault());
         }
         Selection.SetValueAndForceNotify(newSelection);

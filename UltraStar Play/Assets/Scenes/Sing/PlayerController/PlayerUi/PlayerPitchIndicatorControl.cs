@@ -31,13 +31,13 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
     
     private int lastMidiNote;
 
-    private bool IsPitchIndicatorVisible => settings.GraphicSettings.showPitchIndicator 
+    private bool IsPitchIndicatorVisible => settings.showPitchIndicator 
                                             && noteDisplayer is not NoNoteSingSceneDisplayer
                                             && micProfile != null;
     
     public void OnInjectionFinished()
     {
-        settings.ObserveEveryValueChanged(it => it.GraphicSettings.showPitchIndicator)
+        settings.ObserveEveryValueChanged(it => it.showPitchIndicator)
             .Subscribe(_ => playerPitchIndicator.SetVisibleByDisplay(IsPitchIndicatorVisible));
 
         if (micProfile != null)

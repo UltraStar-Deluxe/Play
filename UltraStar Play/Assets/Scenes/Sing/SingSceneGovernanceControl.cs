@@ -100,12 +100,12 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         
         volumeSlider.RegisterValueChangedCallback(evt =>
         {
-            if (settings.AudioSettings.VolumePercent != evt.newValue)
+            if (settings.VolumePercent != evt.newValue)
             {
-                settings.AudioSettings.VolumePercent = evt.newValue;
+                settings.VolumePercent = evt.newValue;
             }
         });
-        settings.ObserveEveryValueChanged(it => it.AudioSettings.VolumePercent)
+        settings.ObserveEveryValueChanged(it => it.VolumePercent)
             .Subscribe(newValue =>
             {
                 if (volumeSlider.value != newValue)
@@ -233,51 +233,51 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         ItemPicker noteDisplayModePicker = new("Note Display Mode¹");
         contextMenuPopup.AddVisualElement(noteDisplayModePicker);
         new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
-            .Bind(() => settings.GraphicSettings.noteDisplayMode,
-                 newValue => settings.GraphicSettings.noteDisplayMode = newValue);
+            .Bind(() => settings.noteDisplayMode,
+                 newValue => settings.noteDisplayMode = newValue);
         
         Toggle showLyricsOnNotesToggle = new("Lyrics on Notes¹");
         contextMenuPopup.AddVisualElement(showLyricsOnNotesToggle);
         FieldBindingUtils.Bind(showLyricsOnNotesToggle,
-            () => settings.GraphicSettings.showLyricsOnNotes,
-            newValue => settings.GraphicSettings.showLyricsOnNotes = newValue);
+            () => settings.showLyricsOnNotes,
+            newValue => settings.showLyricsOnNotes = newValue);
         
         Toggle showStaticLyricsToggle = new("Lyrics Box¹");
         contextMenuPopup.AddVisualElement(showStaticLyricsToggle);
         FieldBindingUtils.Bind(showStaticLyricsToggle,
-            () => settings.GraphicSettings.showStaticLyrics,
-            newValue => settings.GraphicSettings.showStaticLyrics = newValue);
+            () => settings.showStaticLyrics,
+            newValue => settings.showStaticLyrics = newValue);
         
         Toggle showSongProgress = new("Progress");
         contextMenuPopup.AddVisualElement(showSongProgress);
         FieldBindingUtils.Bind(showSongProgress,
-            () => settings.GraphicSettings.showSongProgress,
-            newValue => settings.GraphicSettings.showSongProgress = newValue);
+            () => settings.showSongProgress,
+            newValue => settings.showSongProgress = newValue);
         
         Toggle showPitchIndicatorToggle = new("Pitch Arrow");
         contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
         FieldBindingUtils.Bind(showPitchIndicatorToggle,
-            () => settings.GraphicSettings.showPitchIndicator,
-                newValue => settings.GraphicSettings.showPitchIndicator = newValue);
+            () => settings.showPitchIndicator,
+                newValue => settings.showPitchIndicator = newValue);
         
         Toggle showPlayerNamesToggle = new("Player Name");
         contextMenuPopup.AddVisualElement(showPlayerNamesToggle);
         FieldBindingUtils.Bind(showPlayerNamesToggle,
-            () => settings.GraphicSettings.showPlayerNames,
-            newValue => settings.GraphicSettings.showPlayerNames = newValue);
+            () => settings.showPlayerNames,
+            newValue => settings.showPlayerNames = newValue);
         
         Toggle showScoreNumbers = new("Player Score");
         contextMenuPopup.AddVisualElement(showScoreNumbers);
         FieldBindingUtils.Bind(showScoreNumbers,
-            () => settings.GraphicSettings.showScoreNumbers,
-            newValue => settings.GraphicSettings.showScoreNumbers = newValue);
+            () => settings.showScoreNumbers,
+            newValue => settings.showScoreNumbers = newValue);
         
         if (webcamControl.WebcamsAvailable())
         {
             Toggle webcamToggle = new("Webcam");
             contextMenuPopup.AddVisualElement(webcamToggle);
             FieldBindingUtils.Bind(webcamToggle,
-                () => settings.WebcamSettings.UseAsBackgroundInSingScene,
+                () => settings.UseWebcamAsBackgroundInSingScene,
                 newValue => webcamControl.SetUseAsBackgroundInSingScene(newValue));
         }
         
@@ -326,10 +326,10 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             Slider vocalsVolumeSlider = new();
             vocalsVolumeSlider.lowValue = 0;
             vocalsVolumeSlider.highValue = 100;
-            vocalsVolumeSlider.value = settings.AudioSettings.VocalsAudioVolumePercent;
+            vocalsVolumeSlider.value = settings.VocalsAudioVolumePercent;
             vocalsVolumeSlider.RegisterValueChangedCallback(evt =>
             {
-                settings.AudioSettings.VocalsAudioVolumePercent = (int)evt.newValue;
+                settings.VocalsAudioVolumePercent = (int)evt.newValue;
             });
 
             contextMenuPopup.AddVisualElement(vocalsVolumeSlider);

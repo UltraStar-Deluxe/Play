@@ -42,8 +42,8 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
         NumberPickerControl defaultMedleyDurationPickerControl = new NumberPickerControl(defaultMedleyTargetDurationPicker, 30);
         defaultMedleyDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
         defaultMedleyDurationPickerControl.Bind(
-            () => settings.GameSettings.defaultMedleyTargetDurationInSeconds,
-            newValue => settings.GameSettings.defaultMedleyTargetDurationInSeconds = (int)newValue);
+            () => settings.defaultMedleyTargetDurationInSeconds,
+            newValue => settings.defaultMedleyTargetDurationInSeconds = (int)newValue);
         
         InitLanguageChooser();
     }
@@ -66,14 +66,14 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
     private void SetLanguage(SystemLanguage newValue)
     {
-        if (settings.GameSettings.language == newValue
+        if (settings.Language == newValue
             && translationManager.currentLanguage == newValue)
         {
             return;
         }
 
-        settings.GameSettings.language = newValue;
-        translationManager.currentLanguage = settings.GameSettings.language;
+        settings.Language = newValue;
+        translationManager.currentLanguage = settings.Language;
         translationManager.ReloadTranslationsAndUpdateScene();
     }
 }
