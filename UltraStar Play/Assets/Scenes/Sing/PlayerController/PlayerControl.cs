@@ -123,7 +123,8 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             if (evt.SentenceRating.EnumValue is ESentenceRating.Perfect)
             {
                 perfectSentenceCount++;
-                if (perfectSentenceCount > 10)
+                if (perfectSentenceCount > 10
+                    && PlayerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard)
                 {
                     achievementEventStream.OnNext(AchievementId.getMoreThan10PerfectRatingsInASong);
                 }
