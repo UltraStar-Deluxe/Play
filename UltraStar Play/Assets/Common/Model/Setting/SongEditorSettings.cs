@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class SongEditorSettings
@@ -6,19 +7,17 @@ public class SongEditorSettings
     public bool AutoSave { get; set; } = true;
 
     public float MusicVolume { get; set; } = 1;
-    public float MusicPlaybackSpeed { get; set; } = 1;
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
     public bool GoToLastPlaybackPosition { get; set; } = true;
 
-    public ESongEditorDrawNoteLayer drawNoteLayer;
+    public ESongEditorDrawNoteLayer DrawNoteLayer { get; set; }
     
     // Recording in SongEditorScene
     public MicProfile MicProfile { get; set; }
     public int MicDelayInMillis { get; set; } = 450;
-    public bool IsRecordingEnabled { get; set; }
     public int DefaultPitchForCreatedNotes { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
-    public bool speechRecognitionWhenRecording = true;
+    public bool SpeechRecognitionWhenRecording { get; set; } = true;
 
     public bool AdjustFollowingNotes { get; set; }
 

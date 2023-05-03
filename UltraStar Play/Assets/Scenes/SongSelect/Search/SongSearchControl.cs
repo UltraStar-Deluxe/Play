@@ -15,7 +15,10 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 {
     [Inject]
     private Settings settings;
-
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+    
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
 
@@ -90,7 +93,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void OnInjectionFinished()
     {
         isInjectionFinished = true;
-        searchProperties = new HashSet<ESearchProperty>(settings.SongSelectSettings.searchProperties);
+        searchProperties = new HashSet<ESearchProperty>(settings.SearchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
@@ -117,14 +120,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(searchPropertyDropdownOverlay);
         
         filterActiveIcon.HideByDisplay();
-        settings.ObserveEveryValueChanged(it => it.SongSelectSettings.playlistName)
+        nonPersistentSettings.PlaylistName
             .Subscribe(_ => UpdateFilterActiveIcon());
         playlistManager.PlaylistChangeEventStream
             .Subscribe(_ => UpdateFilterActiveIcon());
         songSelectFilterControl.FiltersChangedEventStream
             .Subscribe(_ => UpdateFilterActiveIcon());
 
-        if (!settings.activeSearchPropertyFilters.IsNullOrEmpty())
+        if (!nonPersistentSettings.activeSearchPropertyFilters.IsNullOrEmpty())
         {
             songSelectFilterControl.InitFilters();
         }
@@ -155,7 +158,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private void UpdateFilterActiveIcon()
     {
-        IPlaylist activePlaylist = playlistManager.GetPlaylistByName(settings.SongSelectSettings.playlistName);
+        IPlaylist activePlaylist = playlistManager.GetPlaylistByName(nonPersistentSettings.PlaylistName.Value);
         bool isAnyFilterOrPlaylistActive = songSelectFilterControl.IsAnyFilterActive
                                            || (activePlaylist != null &&
                                                activePlaylist is not UltraStarAllSongsPlaylist);
@@ -333,14 +336,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void AddSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Add(searchProperty);
-        settings.SongSelectSettings.searchProperties = searchProperties.ToList();
+        settings.SearchProperties = searchProperties.ToList();
         searchChangedEventStream.OnNext(new SearchPropertyChangedEvent());
     }
 
     public void RemoveSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Remove(searchProperty);
-        settings.SongSelectSettings.searchProperties = searchProperties.ToList();
+        settings.SearchProperties = searchProperties.ToList();
         searchChangedEventStream.OnNext(new SearchPropertyChangedEvent());
     }
 
@@ -357,7 +360,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private void RegisterToggleSearchPropertyCallback(Toggle toggle, ESearchProperty searchProperty)
     {
-        toggle.value = settings.SongSelectSettings.searchProperties.Contains(searchProperty);
+        toggle.value = settings.SearchProperties.Contains(searchProperty);
         toggle.RegisterValueChangedCallback(evt =>
         {
             if (evt.newValue)

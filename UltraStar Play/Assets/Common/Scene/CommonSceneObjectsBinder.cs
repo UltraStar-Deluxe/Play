@@ -65,6 +65,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.Bind(typeof(ISettings)).ToExistingInstance(() => SettingsManager.Instance.Settings);
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings);
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings.PartyModeSettings);
+        bb.BindExistingInstanceLazy(() => SettingsManager.Instance.NonPersistentSettings);
         bb.BindExistingInstanceLazy(() => StatsManager.Instance.Statistics);
 
         return bb.GetBindings();

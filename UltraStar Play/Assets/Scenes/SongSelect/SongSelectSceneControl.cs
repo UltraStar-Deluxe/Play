@@ -105,6 +105,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private SongMetaManager songMetaManager;
@@ -209,9 +212,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
     public PartyModeSettings PartyModeSettings => PartyModeSceneData.PartyModeSettings;
     public bool IsPartyModeRandomSongSelection => HasPartyModeSceneData
-                                                  && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random;
+                                                  && PartyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random;
     public bool UsePartyModePlaylist => IsPartyModeRandomSongSelection
-                                        && PartyModeSettings.songSelectionSettings.songPoolPlaylist != null;
+                                        && PartyModeSettings.SongSelectionSettings.SongPoolPlaylist != null;
     public bool CanUseSongSelectionJoker => PartyModeSceneData.remainingJokerCount != 0;
 
     public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
@@ -248,7 +251,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         InitSongMetas();
 
         if (HasPartyModeSceneData
-            && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random)
+            && PartyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random)
         {
             partyModeControl.SelectRandomSong();
         }
@@ -258,11 +261,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         toggleMicCheckButton.RegisterCallbackButtonTriggered(_ => ToggleMicCheckActive());
         UpdateMicCheckButton();
         
-        songOrderDropdownField.value = settings.SongSelectSettings.songOrder;
+        songOrderDropdownField.value = settings.SongOrder;
         songOrderDropdownField.RegisterValueChangedCallback(evt =>
         {
             Debug.Log($"New order: {evt.newValue}");
-            settings.SongSelectSettings.songOrder = (ESongOrder)evt.newValue;
+            settings.SongOrder = (ESongOrder)evt.newValue;
             UpdateFilteredSongs();
         });
 
@@ -330,7 +333,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Disable 'pass the mic' toggle if needed. It requires a team with at least 2 players
         if (!HasPartyModeSceneData
-            || PartyModeSettings.teamSettings.teams.AllMatch(team =>
+            || PartyModeSettings.TeamSettings.Teams.AllMatch(team =>
                 team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
         {
             passTheMicToggle.value = false;
@@ -347,11 +350,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Init modifier dialog
         injector.WithRootVisualElement(modifierDialogOverlay)
             .Inject(modifierDialogControl);
-        modifierDialogControl.OpenDialog(settings.GameRoundSettings);
+        modifierDialogControl.OpenDialog(nonPersistentSettings.GameRoundSettings);
         modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
         
         modifiersActiveIcon.HideByDisplay();
-        settings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
+        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
             .Subscribe(_ => UpdateModifiersActiveIcon());
         
         // Hide slide-in controls with click outside
@@ -403,23 +406,23 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateModifiersActiveIcon()
     {
-        modifiersActiveIcon.SetVisibleByDisplay(settings.GameRoundSettings.AnyModifierOrFinishConditionActive);
-        modifiersInactiveIcon.SetVisibleByDisplay(!settings.GameRoundSettings.AnyModifierOrFinishConditionActive);
+        modifiersActiveIcon.SetVisibleByDisplay(nonPersistentSettings.GameRoundSettings.AnyModifierOrFinishConditionActive);
+        modifiersInactiveIcon.SetVisibleByDisplay(!nonPersistentSettings.GameRoundSettings.AnyModifierOrFinishConditionActive);
     }
 
     private void UpdateMicCheckButton()
     {
-        toggleMicCheckButton.SetActive(settings.SongSelectSettings.micTestActive);
-        micCheckIcon.SetVisibleByDisplay(settings.SongSelectSettings.micTestActive);
-        noMicCheckIcon.SetVisibleByDisplay(!settings.SongSelectSettings.micTestActive);
+        toggleMicCheckButton.SetActive(nonPersistentSettings.MicTestActive.Value);
+        micCheckIcon.SetVisibleByDisplay(nonPersistentSettings.MicTestActive.Value);
+        noMicCheckIcon.SetVisibleByDisplay(!nonPersistentSettings.MicTestActive.Value);
     }
 
     private void ToggleMicCheckActive()
     {
-        settings.SongSelectSettings.micTestActive = !settings.SongSelectSettings.micTestActive;
+        nonPersistentSettings.MicTestActive.Value = !nonPersistentSettings.MicTestActive.Value;
         UpdateMicCheckButton();
         
-        if (settings.SongSelectSettings.micTestActive)
+        if (nonPersistentSettings.MicTestActive.Value)
         {
             FindObjectsOfType<MicSampleRecorder>()
                 .Where(it => it.MicProfile != null && !it.IsRecording.Value)
@@ -436,7 +439,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void InitDifficultyAndScoreMode()
     {
         // Set difficulty for all players
-        settings.ObserveEveryValueChanged(it => it.GameSettings.Difficulty)
+        settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(newValue => settings.PlayerProfiles.ForEach(it => it.Difficulty = newValue));
 
         nextDifficultyButton.RegisterCallbackButtonTriggered(_ => SetNextDifficulty());
@@ -446,13 +449,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         toggleCoopModeButton.RegisterCallbackButtonTriggered(_ =>
         {
-            if (settings.GameSettings.ScoreMode == EScoreMode.CommonAverage)
+            if (settings.ScoreMode == EScoreMode.CommonAverage)
             {
-                settings.GameSettings.ScoreMode = EScoreMode.Individual;
+                settings.ScoreMode = EScoreMode.Individual;
             }
             else
             {
-                settings.GameSettings.ScoreMode = EScoreMode.CommonAverage;
+                settings.ScoreMode = EScoreMode.CommonAverage;
             }
             UpdateDifficultyAndScoreModeControls();
         });
@@ -460,14 +463,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void SetPreviousDifficulty()
     {
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None)
         {
-            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            settings.ScoreMode = EScoreMode.Individual;
             SetDifficulty(EDifficulty.Hard);
         }
         else
         {
-            switch (settings.GameSettings.Difficulty)
+            switch (settings.Difficulty)
             {
                 case EDifficulty.Easy:
                     SetNoScoreMode();
@@ -484,14 +487,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     private void SetNextDifficulty()
     {
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None)
         {
-            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            settings.ScoreMode = EScoreMode.Individual;
             SetDifficulty(EDifficulty.Easy);
         }
         else
         {
-            switch (settings.GameSettings.Difficulty)
+            switch (settings.Difficulty)
             {
                 case EDifficulty.Easy:
                     SetDifficulty(EDifficulty.Medium);
@@ -508,32 +511,32 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void SetNoScoreMode()
     {
-        settings.GameSettings.ScoreMode = EScoreMode.None;
+        settings.ScoreMode = EScoreMode.None;
         UpdateDifficultyAndScoreModeControls();
     }
     
     private void SetDifficulty(EDifficulty difficulty)
     {
-        settings.GameSettings.Difficulty = difficulty;
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        settings.Difficulty = difficulty;
+        if (settings.ScoreMode == EScoreMode.None)
         {
-            settings.GameSettings.ScoreMode = EScoreMode.Individual;
+            settings.ScoreMode = EScoreMode.Individual;
         }
         UpdateDifficultyAndScoreModeControls();
     }
 
     private void UpdateDifficultyAndScoreModeControls()
     {
-        coopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode == EScoreMode.CommonAverage);
-        noCoopIcon.SetVisibleByDisplay(settings.GameSettings.ScoreMode != EScoreMode.CommonAverage);
+        coopIcon.SetVisibleByDisplay(settings.ScoreMode == EScoreMode.CommonAverage);
+        noCoopIcon.SetVisibleByDisplay(settings.ScoreMode != EScoreMode.CommonAverage);
 
-        if (settings.GameSettings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None)
         {
             currentDifficultyLabel.text = "No Scores";
         }
         else
         {
-            currentDifficultyLabel.text = settings.GameSettings.Difficulty.ToString();
+            currentDifficultyLabel.text = settings.Difficulty.ToString();
         }
     }
 
@@ -589,7 +592,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SongQueueEntryDto songQueueEntryDto = new();
         songQueueEntryDto.SongDto = DtoConverter.ToDto(songMeta);
         songQueueEntryDto.SingScenePlayerDataDto = DtoConverter.ToDto(CreateSingScenePlayerData());
-        songQueueEntryDto.GameRoundSettings = new(settings.GameRoundSettings);
+        songQueueEntryDto.GameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
         return songQueueEntryDto;
     }
     
@@ -759,7 +762,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         singSceneData.SongMetas = new List<SongMeta> { SelectedSong };
         singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
         singSceneData.partyModeSceneData = sceneData.partyModeSceneData;
-        singSceneData.gameRoundSettings = new(settings.GameRoundSettings);
+        singSceneData.gameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
 
         if (singSceneData.gameRoundSettings != null
             && singSceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
@@ -1107,7 +1110,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
+            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
         }
 
         songSearchControl.UpdateTranslation();
@@ -1169,7 +1172,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 .Where(playerProfile => playerProfile.IsEnabled)
                 .ToList();
         }
-        else if (PartyModeSettings.teamSettings.isFreeForAll)
+        else if (PartyModeSettings.TeamSettings.IsFreeForAll)
         {
             // Select all players of all teams
             List<PlayerProfile> allPlayerProfiles = PartyModeUtils.GetAllPlayerProfiles(PartyModeSettings);
@@ -1183,7 +1186,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             // Select random player of each team
             List<PlayerProfile> result = new();
-            PartyModeSettings.teamSettings.teams
+            PartyModeSettings.TeamSettings.Teams
                 .Where(team => !PartyModeUtils.IsKnockedOut(PartyModeSceneData, team))
                 .ForEach(team =>
                 {

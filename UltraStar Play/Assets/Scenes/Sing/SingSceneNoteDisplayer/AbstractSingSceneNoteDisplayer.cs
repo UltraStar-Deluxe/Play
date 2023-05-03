@@ -264,11 +264,11 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
         Label label = targetNoteControl.Label;
         string pitchName = MidiUtils.GetAbsoluteName(note.MidiNote);
-        if (settings.GraphicSettings.showLyricsOnNotes && showPitchOfNotes)
+        if (settings.ShowLyricsOnNotes && showPitchOfNotes)
         {
             label.text = GetDisplayText(note) + " (" + pitchName + ")";
         }
-        else if (settings.GraphicSettings.showLyricsOnNotes)
+        else if (settings.ShowLyricsOnNotes)
         {
             label.text = GetDisplayText(note);
         }

@@ -20,6 +20,9 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
     
     [Inject(UxmlName = R.UxmlNames.languageDropdownField)]
     private DropdownField languageDropdownField;
+    
+    [Inject(UxmlName = R.UxmlNames.defaultMedleyTargetDurationPicker)]
+    private ItemPicker defaultMedleyTargetDurationPicker;
 
     protected override void Start()
     {
@@ -28,14 +31,20 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
         NumberPickerControl passTheMicTimeItemPickerControl = new NumberPickerControl(passTheMicTimeItemPicker, 20);
         passTheMicTimeItemPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
         passTheMicTimeItemPickerControl.Bind(
-            () => settings.passTheMicTimeInSeconds,
-            newValue => settings.passTheMicTimeInSeconds = (int)newValue);
+            () => settings.PassTheMicTimeInSeconds,
+            newValue => settings.PassTheMicTimeInSeconds = (int)newValue);
 
         NumberPickerControl reduceAudioVolumeItemPickerControl = new PercentNumberPickerControl(reduceAudioVolumeItemPicker, 2);
         reduceAudioVolumeItemPickerControl.Bind(
-            () => settings.reducedAudioVolumePercent,
-            newValue => settings.reducedAudioVolumePercent = (int)newValue);
+            () => settings.ReducedAudioVolumePercent,
+            newValue => settings.ReducedAudioVolumePercent = (int)newValue);
 
+        NumberPickerControl defaultMedleyDurationPickerControl = new NumberPickerControl(defaultMedleyTargetDurationPicker, 30);
+        defaultMedleyDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
+        defaultMedleyDurationPickerControl.Bind(
+            () => settings.DefaultMedleyTargetDurationInSeconds,
+            newValue => settings.DefaultMedleyTargetDurationInSeconds = (int)newValue);
+        
         InitLanguageChooser();
     }
 
@@ -57,14 +66,14 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
     private void SetLanguage(SystemLanguage newValue)
     {
-        if (settings.GameSettings.language == newValue
+        if (settings.Language == newValue
             && translationManager.currentLanguage == newValue)
         {
             return;
         }
 
-        settings.GameSettings.language = newValue;
-        translationManager.currentLanguage = settings.GameSettings.language;
+        settings.Language = newValue;
+        translationManager.currentLanguage = settings.Language;
         translationManager.ReloadTranslationsAndUpdateScene();
     }
 }

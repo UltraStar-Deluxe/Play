@@ -33,7 +33,7 @@ public class EventSystemOptInOnAndroid : MonoBehaviour, INeedInjection
     private void Start()
     {
         if (!PlatformUtils.IsAndroid
-            || settings.DeveloperSettings.enableEventSystemOnAndroid)
+            || settings.EnableEventSystemOnAndroid)
         {
             return;
         }

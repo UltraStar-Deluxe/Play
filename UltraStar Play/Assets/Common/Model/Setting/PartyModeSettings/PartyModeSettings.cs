@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class PartyModeSettings
 {
-    public PartyModeTeamsSettings teamSettings = new();
-    public PartyModeSongSelectionSettings songSelectionSettings = new();
+    public PartyModeTeamsSettings TeamSettings { get; set; } = new();
+    public PartyModeSongSelectionSettings SongSelectionSettings { get; set; } = new();
 
-    public List<PlayerProfile> guestPlayerProfiles = new();
-    public List<PartyModeRoundSettingsPreset> roundSettingsPresets = new();
+    public List<PlayerProfile> GuestPlayerProfiles { get; set; } = new();
+    public List<PartyModeRoundSettingsPreset> RoundSettingsPresets { get; set; } = new();
     
-    public int roundCount = 5;
+    public int RoundCount { get; set; } = 5;
 }

@@ -28,7 +28,7 @@ public class Color32Converter : fsConverter
             throw new InvalidOperationException("FullSerializer Internal Error -- Unexpected deserialization type");
         }
 
-        if (data.IsString == false)
+        if (!data.IsString)
         {
             return ParseColor32FromDataAsDictionary(data, ref instance);
         }

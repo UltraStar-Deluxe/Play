@@ -216,9 +216,10 @@ public static class SongMetaUtils
                && (beat < note.EndBeat || inclusiveEndBeat && note.EndBeat == beat);
     }
 
-    public static bool IsBeatInSentence(Sentence sentence, int beat)
+    public static bool IsBeatInSentence(Sentence sentence, int beat, bool inclusiveMinBeat = true, bool inclusiveMaxBeat = true)
     {
-        return sentence.MinBeat <= beat && beat <= sentence.ExtendedMaxBeat;
+        return (sentence.MinBeat < beat || inclusiveMinBeat && sentence.MinBeat == beat)
+               && (beat < sentence.ExtendedMaxBeat || inclusiveMaxBeat && beat == sentence.ExtendedMaxBeat);
     }
 
     public static Sentence FindExistingSentenceForNote(IEnumerable<Sentence> sentences, Note note)
@@ -522,7 +523,7 @@ public static class SongMetaUtils
         }
     }
 
-    public static int GetMedleyEndBeat(SongMeta songMeta)
+    public static int GetMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
     {
         if (songMeta.MedleyEndBeat >= 0)
         {
@@ -530,7 +531,7 @@ public static class SongMetaUtils
         }
         else
         {
-            return GetDefaultMedleyEndBeat(songMeta);
+            return GetDefaultMedleyEndBeat(songMeta, targetDurationInSeconds);
         }
     }
 
@@ -554,12 +555,11 @@ public static class SongMetaUtils
         return sentencesBeforeMiddleBeat.LastOrDefault().MinBeat;
     }
 
-    private static int GetDefaultMedleyEndBeat(SongMeta songMeta)
+    private static int GetDefaultMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
     {
         // End the medley approx. 30 seconds afterward the start.
-        int targetDurationInMillis = 30000;
         int medleyStartBeta = GetMedleyStartBeat(songMeta);
-        int targetDurationInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetDurationInMillis);
+        int targetDurationInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetDurationInSeconds * 1000);
         int targetEndBeat = medleyStartBeta + targetDurationInBeats;
 
         List<Sentence> sentencesAfterMedleyStart = songMeta.GetVoice(Voice.firstVoiceName)
@@ -656,5 +656,48 @@ public static class SongMetaUtils
             GetAttributionText("Background", backgroundAuthor, backgroundLicense, backgroundSource),
             GetAttributionText("Cover", coverAuthor, coverLicense, coverSource),
         }.Where(it => !it.IsNullOrEmpty()).ToCsv("\n", "", "");
+    }
+
+    public static Voice CreateMergedVoice(List<Voice> voices)
+    {
+        if (voices.Count <= 1)
+        {
+            return voices.FirstOrDefault();
+        }
+        
+        Voice mergedVoice = new();
+        foreach (Voice voice in voices.ToList())
+        {
+            foreach (Sentence newSentence in voice.Sentences.ToList())
+            {
+                // Add the sentence if there is none yet.
+                Sentence overlappingSentence = mergedVoice.Sentences
+                    .FirstOrDefault(existingSentence => IsBeatInSentence(existingSentence, newSentence.MinBeat, true, false) 
+                                                        || IsBeatInSentence(existingSentence, newSentence.MaxBeat, true, false));
+                if (overlappingSentence != null)
+                {
+                    Debug.Log($"{newSentence} overlaps with {overlappingSentence}");
+                }
+                
+                if (overlappingSentence == null)
+                {
+                    Sentence newSentenceClone = newSentence.CloneDeep();
+                    mergedVoice.AddSentence(newSentenceClone);
+                }
+            }
+        }
+        
+        // Minimize sentences to make sure that they do not overlap
+        foreach (Sentence mergedSentence in mergedVoice.Sentences)
+        {
+            mergedSentence.SetLinebreakBeat(0);
+        }
+
+        // Sort sentences
+        List<Sentence> sortedSentences = mergedVoice.Sentences.ToList();
+        sortedSentences.Sort(Sentence.comparerByStartBeat);
+        mergedVoice.SetSentences(sortedSentences);
+        
+        return mergedVoice;
     }
 }

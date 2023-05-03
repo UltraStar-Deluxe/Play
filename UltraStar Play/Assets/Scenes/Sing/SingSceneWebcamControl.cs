@@ -23,16 +23,16 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
 
     public void InitWebcam()
     {
-        webcamTexture = new WebCamTexture(settings.WebcamSettings.CurrentDeviceName);
+        webcamTexture = new WebCamTexture(settings.CurrentWebcamDeviceName);
         webcamRenderContainer.image = webcamTexture;
         if (WebcamsAvailable())
         {
-            if (settings.WebcamSettings.UseAsBackgroundInSingScene)
+            if (settings.UseWebcamAsBackgroundInSingScene)
             {
                 webcamTexture.Play();
             }
 
-            webcamRenderContainer.SetVisibleByDisplay(settings.WebcamSettings.UseAsBackgroundInSingScene);
+            webcamRenderContainer.SetVisibleByDisplay(settings.UseWebcamAsBackgroundInSingScene);
         }
     }
 
@@ -58,12 +58,12 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
 
     public void SetUseAsBackgroundInSingScene(bool newValue)
     {
-        if (settings.WebcamSettings.UseAsBackgroundInSingScene == newValue)
+        if (settings.UseWebcamAsBackgroundInSingScene == newValue)
         {
             return;
         }
 
-        settings.WebcamSettings.UseAsBackgroundInSingScene = newValue;
+        settings.UseWebcamAsBackgroundInSingScene = newValue;
         if (newValue)
         {
             Play();
@@ -80,6 +80,6 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
     
     public void ToggleUseAsBackgroundInSingScene()
     {
-        SetUseAsBackgroundInSingScene(!settings.WebcamSettings.UseAsBackgroundInSingScene);
+        SetUseAsBackgroundInSingScene(!settings.UseWebcamAsBackgroundInSingScene);
     }
 }

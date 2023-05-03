@@ -41,7 +41,7 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
         });
 
         // Choose next players
-        singSceneControl.PartyModeSettings.teamSettings.teams.ForEach(team => ChooseNextPlayer(team));
+        singSceneControl.PartyModeSettings.TeamSettings.Teams.ForEach(team => ChooseNextPlayer(team));
     }
 
     public void Update(float deltaTimeInSeconds)
@@ -52,10 +52,10 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
         }
 
         passTheMicTimeInSeconds += deltaTimeInSeconds;
-        if (passTheMicTimeInSeconds >= settings.passTheMicTimeInSeconds)
+        if (passTheMicTimeInSeconds >= settings.PassTheMicTimeInSeconds)
         {
-            passTheMicTimeInSeconds -= settings.passTheMicTimeInSeconds;
-            singSceneControl.PartyModeSettings.teamSettings.teams.ForEach(team => PassTheMicToNextPlayerInTeam(team));
+            passTheMicTimeInSeconds -= settings.PassTheMicTimeInSeconds;
+            singSceneControl.PartyModeSettings.TeamSettings.Teams.ForEach(team => PassTheMicToNextPlayerInTeam(team));
         }
 
         UpdateProgressBar();
@@ -63,7 +63,7 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
 
     private void UpdateProgressBar()
     {
-        passTheMicProgressBar.value = 100 * passTheMicTimeInSeconds / settings.passTheMicTimeInSeconds;
+        passTheMicProgressBar.value = 100 * passTheMicTimeInSeconds / settings.PassTheMicTimeInSeconds;
     }
 
     private void PassTheMicToNextPlayerInTeam(PartyModeTeamSettings team)

@@ -54,9 +54,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         Log.Logger.Information("loaded settings:" + jsonSettings);
 
         // Init song folders if none yet
-        if (settings.GameSettings.songDirs.IsNullOrEmpty())
+        if (settings.SongDirs.IsNullOrEmpty())
         {
-            settings.GameSettings.songDirs = CreateInitialSongFolders();
+            settings.SongDirs = CreateInitialSongFolders();
         }
 
         // The next scene should show up automatically.

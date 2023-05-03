@@ -234,4 +234,9 @@ public class Sentence : ISerializationCallbackReceiver
             return x.MinBeat.CompareTo(y.MinBeat);
         }
     }
+
+    public override string ToString()
+    {
+        return $"Sentence(MinBeat: {MinBeat}, MaxBeat: {MaxBeat}, Lyrics: {Notes.Select(note => note.Text).JoinWith("")})";
+    }
 }

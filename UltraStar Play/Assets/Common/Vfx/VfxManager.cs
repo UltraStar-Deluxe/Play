@@ -13,7 +13,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static VfxManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VfxManager>();
 
-    public const string BackgroundVfxRenderTextureName = "VfxManager.ForegroundVfxRenderTexture";
+    public const string BackgroundVfxRenderTextureName = "VfxManager.BackgroundVfxRenderTexture";
     public const string ForegroundVfxRenderTextureName = "VfxManager.ForegroundVfxRenderTexture";
     
     [InjectedInInspector]
@@ -137,7 +137,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         uiDocument.rootVisualElement.Add(foregroundVfxElement);
         
         backgroundVfxElement = new Image();
-        backgroundVfxElement.name = "foregroundVfxElement";
+        backgroundVfxElement.name = "backgroundVfxElement";
         backgroundVfxElement.AddToClassList("overlay");
         backgroundVfxElement.image = backgroundVfxCamera.targetTexture;
         backgroundVfxElement.pickingMode = PickingMode.Ignore;
@@ -156,7 +156,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
     
     private void DoCreateParticleEffect(ParticleEffectConfig particleEffectConfig)
     {
-        if (!settings.GraphicSettings.enableVfx)
+        if (!settings.EnableVfx)
         {
             return;
         }

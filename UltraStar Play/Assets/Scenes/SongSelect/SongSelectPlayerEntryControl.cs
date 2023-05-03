@@ -38,14 +38,17 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.togglePlayerSelectedButton)]
     private Button togglePlayerSelectedButton;
     
-    [Inject(UxmlName = R.UxmlNames.toggleVoiceButton)]
-    private Button toggleVoiceButton;
+    [Inject(UxmlName = R.UxmlNames.changeVoiceButton)]
+    private Button changeVoiceButton;
     
     [Inject]
     private Injector injector;
     
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
     
     [Inject]
     private FocusableNavigator focusableNavigator;
@@ -96,7 +99,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     }
 
     private readonly ReactiveProperty<string> selectedVoiceName = new(Voice.firstVoiceName);
-    public string VoiceName => toggleVoiceButton.IsVisibleByDisplay()
+    public string VoiceName => changeVoiceButton.IsVisibleByDisplay()
         ? selectedVoiceName.Value
         : null;
 
@@ -153,21 +156,34 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private void InitVoiceSelection()
     {
-        selectedVoiceName.Subscribe(_ => UpdateToggleVoiceButtonText());
-        toggleVoiceButton.RegisterCallbackButtonTriggered(_ =>
+        selectedVoiceName.Subscribe(_ => UpdateChangeVoiceButtonText());
+        changeVoiceButton.RegisterCallbackButtonTriggered(_ =>
         {
-            selectedVoiceName.Value = selectedVoiceName.Value == Voice.firstVoiceName
-                ? Voice.secondVoiceName
-                : Voice.firstVoiceName;
+            if (selectedVoiceName.Value == Voice.firstVoiceName)
+            {
+                selectedVoiceName.Value = Voice.secondVoiceName;
+            }
+            else if (selectedVoiceName.Value == Voice.secondVoiceName)
+            {
+                selectedVoiceName.Value = Voice.mergedVoiceName;
+            }
+            else
+            {
+                selectedVoiceName.Value = Voice.firstVoiceName;
+            }
         });
     }
 
-    private void UpdateToggleVoiceButtonText()
+    private void UpdateChangeVoiceButtonText()
     {
         if (!voiceNames.IsNullOrEmpty()
             && voiceNames.ContainsKey(selectedVoiceName.Value))
         {
             voiceNameLabel.text = voiceNames[selectedVoiceName.Value];
+        }
+        else if (selectedVoiceName.Value == Voice.mergedVoiceName)
+        {
+            voiceNameLabel.text = "Both";
         }
         else
         {
@@ -187,7 +203,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         nameLabel.text = PlayerProfile.Name;
         if (partyModeTeamSettings != null)
         {
-            if (songSelectSceneControl.PartyModeSettings.teamSettings.isFreeForAll)
+            if (songSelectSceneControl.PartyModeSettings.TeamSettings.IsFreeForAll)
             {
                 teamLabel.HideByDisplay();
             }    
@@ -243,14 +259,14 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     public void HideVoiceSelection()
     {
-        toggleVoiceButton.HideByDisplay();
+        changeVoiceButton.HideByDisplay();
     }
 
     public void ShowVoiceSelection(SongMeta selectedSong, int selectedVoiceIndex)
     {
         voiceNames = selectedSong.VoiceNames;
-        toggleVoiceButton.ShowByDisplay();
-        UpdateToggleVoiceButtonText();
+        changeVoiceButton.ShowByDisplay();
+        UpdateChangeVoiceButtonText();
         selectedVoiceName.Value = selectedVoiceIndex == 0
             ? Voice.firstVoiceName
             : Voice.secondVoiceName;
@@ -274,7 +290,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micPitchTracker.MicProfile = micProfile;
         if (micProfile == null
             || micProfile.IsInputFromConnectedClient
-            || !settings.SongSelectSettings.micTestActive)
+            || !nonPersistentSettings.MicTestActive.Value)
         {
             if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {
@@ -283,7 +299,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
         else if (micProfile != null
                  && !micProfile.IsInputFromConnectedClient
-                 && settings.SongSelectSettings.micTestActive)
+                 && nonPersistentSettings.MicTestActive.Value)
         {
             if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {

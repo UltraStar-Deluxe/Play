@@ -108,7 +108,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         File.WriteAllText(newSongTxtFile, txtFileContent);
 
         // Add song folder to settings if not done yet
-        List<string> songDirs = settings.GameSettings.songDirs;
+        List<string> songDirs = settings.SongDirs;
         if (!songDirs.Contains(songsPath))
         {
             songDirs.Add(songsPath);

@@ -219,11 +219,11 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         if (Directory.Exists(FullPath))
         {
             // Check this song folder is not already added, either directly or indirectly as subfolder.
-            if (SettingsProblemHintControl.IsDuplicateFolder(FullPath, settings.GameSettings.songDirs))
+            if (SettingsProblemHintControl.IsDuplicateFolder(FullPath, settings.SongDirs))
             {
                 ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_duplicate));
             }
-            else if (SettingsProblemHintControl.IsSubfolderOfAnyOtherFolder(FullPath, settings.GameSettings.songDirs, out string parentFolder))
+            else if (SettingsProblemHintControl.IsSubfolderOfAnyOtherFolder(FullPath, settings.SongDirs, out string parentFolder))
             {
                 ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_subfolderOfOtherFolder,
                     "parentFolder", parentFolder));

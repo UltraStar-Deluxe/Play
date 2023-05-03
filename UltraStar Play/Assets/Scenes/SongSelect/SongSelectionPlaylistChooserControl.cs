@@ -18,6 +18,9 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
@@ -31,7 +34,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         UpdateItems();
 
         // Update settings
-        Selection.Subscribe(newPlaylist => settings.SongSelectSettings.playlistName = newPlaylist.Name);
+        Selection.Subscribe(newPlaylist => nonPersistentSettings.PlaylistName.Value = newPlaylist.Name);
 
         playlistDropdownField.value = items.FirstOrDefault().Name;
         playlistDropdownField.RegisterValueChangedCallback(evt =>
@@ -41,7 +44,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
             Selection.Value = playlist.OrIfNull(new UltraStarAllSongsPlaylist());
         });
 
-        settings.ObserveEveryValueChanged(it => it.SongSelectSettings.playlistName)
+        nonPersistentSettings.PlaylistName
             .Subscribe(newPlaylistName =>
             {
                 if (playlistDropdownField.value != newPlaylistName)
@@ -66,13 +69,13 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         IPlaylist newSelection;
         if (songSelectSceneControl.UsePartyModePlaylist)
         {
-            newSelection = songSelectSceneControl.PartyModeSettings.songSelectionSettings.songPoolPlaylist;
+            newSelection = songSelectSceneControl.PartyModeSettings.SongSelectionSettings.SongPoolPlaylist;
         }
         else
         {
             // Use last selected playlist or the first
             newSelection = items
-                .FirstOrDefault(playlist => playlistManager.GetPlaylistName(playlist) == settings.SongSelectSettings.playlistName)
+                .FirstOrDefault(playlist => playlistManager.GetPlaylistName(playlist) == nonPersistentSettings.PlaylistName.Value)
                 .OrIfNull(items.FirstOrDefault());
         }
         Selection.SetValueAndForceNotify(newSelection);

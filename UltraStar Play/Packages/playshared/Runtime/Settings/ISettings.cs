@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using UniRx;
+using UnityEngine;
 
 public interface ISettings
 {
     public SystemLanguage Language { get; set; }
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
 
-    public bool ShowFps { get; }
+    public bool ShowFps { get; set; }
 
     /**
      * The UDP port on the server (e.g. Companion App) for initiating a connection.

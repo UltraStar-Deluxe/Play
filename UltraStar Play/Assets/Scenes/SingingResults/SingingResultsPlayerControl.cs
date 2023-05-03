@@ -90,18 +90,15 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         injector.WithRootVisualElement(playerImage)
             .CreateAndInject<PlayerProfileImageControl>();
 
+        newHighscoreContainer.HideByVisibility();
         if (IsNewHighscore())
         {
-            newHighscoreContainer.ShowByDisplay();
             // Bouncy size animation
             LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, bounceAnimTimeInSeconds)
                 .setEaseSpring()
+                .setOnStart(() => newHighscoreContainer.ShowByVisibility())
                 .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))))
                 .setDelay(TotalScoreAnimTimeInSeconds);
-        }
-        else
-        {
-            newHighscoreContainer.HideByDisplay();
         }
         
         // Song rating
@@ -195,7 +192,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 1, starIconAnimationTimeInSeconds)
                 .setDelay(i * starIconAnimationTimeInSeconds / 2)
                 .setOnUpdate(interpolatedValue => visibleStarIcon.style.scale = new Vector2(interpolatedValue, interpolatedValue))
-                .setEaseSpring()
+                .setEasePunch()
                 .id);
         }
     }
@@ -228,7 +225,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
-        if (settings.DeveloperSettings.disableDynamicThemes
+        if (settings.DisableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
             LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
@@ -246,7 +243,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private bool ShouldShowTeamName()
     {
         if (singingResultsSceneControl.HasPartyModeSceneData
-            && singingResultsSceneControl.PartyModeSettings.teamSettings.isFreeForAll)
+            && singingResultsSceneControl.PartyModeSettings.TeamSettings.IsFreeForAll)
         {
             return false;
         }

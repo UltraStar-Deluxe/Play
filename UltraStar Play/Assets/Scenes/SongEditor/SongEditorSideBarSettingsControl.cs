@@ -140,6 +140,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private GameObject gameObject;
@@ -191,19 +194,19 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.GoToLastPlaybackPosition = newValue);
 
         Bind(musicVolumeSlider,
-            () => settings.AudioSettings.VolumePercent,
-            newValue => settings.AudioSettings.VolumePercent = (int) newValue);
+            () => settings.VolumePercent,
+            newValue => settings.VolumePercent = (int) newValue);
 
         drawNoteLayerPickerControl = new(drawNoteLayerPicker, EnumUtils.GetValuesAsList<ESongEditorDrawNoteLayer>());
         drawNoteLayerPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
         drawNoteLayerPickerControl.Bind(
-            () => settings.SongEditorSettings.drawNoteLayer,
-            newValue => settings.SongEditorSettings.drawNoteLayer = newValue);
+            () => settings.SongEditorSettings.DrawNoteLayer,
+            newValue => settings.SongEditorSettings.DrawNoteLayer = newValue);
         
         // Playback speed
-        songAudioPlayer.PlaybackSpeed = settings.SongEditorSettings.MusicPlaybackSpeed;
+        songAudioPlayer.PlaybackSpeed = nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value;
         Bind(musicPlaybackSpeedSlider,
-            () => settings.SongEditorSettings.MusicPlaybackSpeed,
+            () => nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value,
             newValue => SetMusicPlaybackSpeed(newValue),
             false);
         resetMusicPlaybackSpeedButton.RegisterCallbackButtonTriggered(_ =>
@@ -250,8 +253,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         // Record notes or audio
         Bind(speechRecognitionWhenRecordingToggle,
-            () => settings.SongEditorSettings.speechRecognitionWhenRecording,
-            newValue => settings.SongEditorSettings.speechRecognitionWhenRecording = newValue);
+            () => settings.SongEditorSettings.SpeechRecognitionWhenRecording,
+            newValue => settings.SongEditorSettings.SpeechRecognitionWhenRecording = newValue);
 
         // Button recording settings
         Bind(buttonRecordingPitchTextField,
@@ -413,7 +416,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValueRounded = 1;
         }
 
-        settings.SongEditorSettings.MusicPlaybackSpeed = newValueRounded;
+        nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value = newValueRounded;
         songAudioPlayer.PlaybackSpeed = newValueRounded;
     }
 

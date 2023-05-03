@@ -55,7 +55,7 @@ public class WebCamManager : AbstractSingletonBehaviour, INeedInjection
 
     public WebCamDevice GetSelectedWebCamDevice()
     {
-        return GetWebCamDevices().FirstOrDefault(device => device.name == settings.WebcamSettings.CurrentDeviceName);
+        return GetWebCamDevices().FirstOrDefault(device => device.name == settings.CurrentWebcamDeviceName);
     }
 
     private void StopWebCam()

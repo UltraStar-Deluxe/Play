@@ -8,6 +8,7 @@
             <ItemPicker name="vfxEnabledPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Visual Effects" />
             <ItemPicker name="sceneChangeAnimationPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Scene Transition" />
             <ItemPicker name="sceneChangeDurationPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Scene Transition Duration" />
+            <ItemPicker name="showScrollBarInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Scroll Bar in Song Select" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

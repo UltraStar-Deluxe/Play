@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class PartyModeTeamsSettings
 {
-    public List<PartyModeTeamSettings> teams = new();
-    public bool isFreeForAll;
-    public bool isKnockOutTournament;
+    public List<PartyModeTeamSettings> Teams { get; set; } = new();
+    public bool IsFreeForAll { get; set; }
+    public bool IsKnockOutTournament { get; set; }
 }

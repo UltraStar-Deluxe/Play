@@ -24,6 +24,10 @@ public class SingingResultsSceneData : SceneData
 
     public PlayerScoreControlData GetPlayerScores(PlayerProfile playerProfile)
     {
+        if (playerProfile == null)
+        {
+            return null;
+        }
         return playerScoreMap[playerProfile];
     }
 }

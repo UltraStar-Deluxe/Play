@@ -35,6 +35,19 @@ public class SettingsManager : AbstractSingletonBehaviour
             return settings;
         }
     }
+    
+    private static NonPersistentSettings nonPersistentSettings;
+    public NonPersistentSettings NonPersistentSettings
+    {
+        get
+        {
+            if (nonPersistentSettings == null)
+            {
+                nonPersistentSettings = new();
+            }
+            return nonPersistentSettings;
+        }
+    }
 
     private static bool initializedResolution;
 
@@ -50,7 +63,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             initializedResolution = true;
             // GetCurrentAppResolution may only be called from Start() and Awake(). This is why it is done here.
-            Settings.GraphicSettings.resolution = ApplicationUtils.GetScreenResolution();
+            Settings.ScreenResolution = ApplicationUtils.GetScreenResolution();
         }
     }
 
@@ -99,28 +112,12 @@ public class SettingsManager : AbstractSingletonBehaviour
             {
                 string settingsCopyPath = GetSettingsPath().Replace(".json", "_crash.json");
                 File.WriteAllText(settingsCopyPath, fileContent);
-                Debug.LogError(ex);
+                Debug.LogException(ex);
                 Debug.LogError($"Failed to load settings from JSON. Using new default settings instead. You can find the original settings in {settingsCopyPath}. Original settings JSON: {fileContent}");
                 settings = CreateDefaultSettings();
             }
             OverwriteSettingsWithCommandLineArguments();
-
-            ResetNonPersistentSettings();
         }
-    }
-
-    private void ResetNonPersistentSettings()
-    {
-        // TODO: Store non-persistent settings in dedicated data structure.
-        settings.GameRoundSettings = new();
-        
-        settings.SongSelectSettings.playlistName = "";
-        settings.SongSelectSettings.micTestActive = false;
-        settings.activeSearchPropertyFilters = new();
-        settings.isShowOnlyDuetsFilterActive = false;
-        
-        settings.SongEditorSettings.MusicPlaybackSpeed = 1;
-        settings.SongEditorSettings.IsRecordingEnabled = false;
     }
 
     private Settings CreateDefaultSettings()
@@ -138,7 +135,7 @@ public class SettingsManager : AbstractSingletonBehaviour
                     Directory.CreateDirectory(internalSongFolder);
                 }
 
-                defaultSettings.GameSettings.songDirs.Add(internalSongFolder);
+                defaultSettings.songDirs.Add(internalSongFolder);
             }
             catch (Exception ex)
             {

@@ -201,12 +201,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             });
 
         // Play recorded audio
-        micPitchTracker.MicSampleRecorder.PlayRecordedAudio = settings.AudioSettings.PlayRecordedAudio;
+        micPitchTracker.MicSampleRecorder.PlayRecordedAudio = settings.PlayRecordedAudio;
         FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
-            () => settings.AudioSettings.PlayRecordedAudio,
+            () => settings.PlayRecordedAudio,
             newValue =>
             {
-                settings.AudioSettings.PlayRecordedAudio = newValue;
+                settings.PlayRecordedAudio = newValue;
                 micPitchTracker.MicSampleRecorder.PlayRecordedAudio = newValue;
             });
 
@@ -214,12 +214,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         if (ApplicationUtils.CanUsePortAudio())
         {
             FieldBindingUtils.Bind(gameObject, usePortAudioToggle,
-                () => settings.AudioSettings.PreferPortAudio,
+                () => settings.PreferPortAudio,
                 preferPortAudio =>
                 {
                     micPitchTracker.MicSampleRecorder.StopRecording();
 
-                    settings.AudioSettings.PreferPortAudio = preferPortAudio;
+                    settings.PreferPortAudio = preferPortAudio;
                     ApplicationUtils.SetUsePortAudio(preferPortAudio);
 
                     Debug.Log($"UsePortAudio: {MicrophoneAdapter.UsePortAudio}");

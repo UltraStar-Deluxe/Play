@@ -28,6 +28,9 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private GameObject gameObject;
@@ -149,8 +152,8 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
 
     private void DoSpeechRecognitionForNewlyRecordedSamples()
     {
-        if (!settings.SongEditorSettings.speechRecognitionWhenRecording
-            || !settings.SongEditorSettings.IsRecordingEnabled
+        if (!settings.SongEditorSettings.SpeechRecognitionWhenRecording
+            || !nonPersistentSettings.IsSongEditorRecordingEnabled.Value
             || !HasRecordedAudio
             || SpeechRecognitionUtils.IsSpeechRecognitionRunning)
         {
@@ -315,8 +318,8 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
             .Subscribe(_ => UpdateMicProfileAndStartOrStopRecording())
             .AddTo(gameObject);
         
-        settings.SongEditorSettings
-            .ObserveEveryValueChanged(it => it.IsRecordingEnabled)
+        nonPersistentSettings
+            .ObserveEveryValueChanged(it => it.IsSongEditorRecordingEnabled)
             .Subscribe(newValue => StartOrStopRecording())
             .AddTo(gameObject);
         songAudioPlayer
@@ -346,7 +349,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     
     private void StartOrStopRecording()
     {
-        bool shouldBeRecoding = settings.SongEditorSettings.IsRecordingEnabled 
+        bool shouldBeRecoding = nonPersistentSettings.IsSongEditorRecordingEnabled.Value 
                                 && songAudioPlayer.IsPlaying
                                 && settings.SongEditorSettings.MicProfile != null
                                 && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager);

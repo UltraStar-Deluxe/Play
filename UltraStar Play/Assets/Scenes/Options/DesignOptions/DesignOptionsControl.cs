@@ -32,6 +32,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.vfxEnabledPicker)]
     private ItemPicker vfxEnabledPicker;
 
+    [Inject(UxmlName = R.UxmlNames.showScrollBarInSongSelectPicker)]
+    private ItemPicker showScrollBarInSongSelectPicker;
+    
     [Inject]
     private UiManager uiManager;
     
@@ -43,29 +46,33 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         base.Start();
         
         new BoolPickerControl(imageAsCursorPicker)
-            .Bind(() => settings.GraphicSettings.useImageAsCursor,
-                newValue => settings.GraphicSettings.useImageAsCursor = newValue);
+            .Bind(() => settings.UseImageAsCursor,
+                newValue => settings.UseImageAsCursor = newValue);
 
         new LabeledItemPickerControl<ESceneChangeAnimation>(sceneChangeAnimationPicker, EnumUtils.GetValuesAsList<ESceneChangeAnimation>())
-            .Bind(() => settings.GraphicSettings.sceneChangeAnimation,
-                newValue => settings.GraphicSettings.sceneChangeAnimation = newValue);
+            .Bind(() => settings.SceneChangeAnimation,
+                newValue => settings.SceneChangeAnimation = newValue);
 
         new BoolPickerControl(vfxEnabledPicker)
-            .Bind(() => settings.GraphicSettings.enableVfx, 
-                newValue => settings.GraphicSettings.enableVfx = newValue);
+            .Bind(() => settings.EnableVfx, 
+                newValue => settings.EnableVfx = newValue);
+
+        new BoolPickerControl(showScrollBarInSongSelectPicker)
+            .Bind(() => settings.ShowScrollBarInSongSelect, 
+                newValue => settings.ShowScrollBarInSongSelect = newValue);
 
         LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.55f, 0.05f));
-        sceneChangeDurationPickerControl.Bind(() => settings.GraphicSettings.sceneChangeDurationInSeconds,
-                newValue => settings.GraphicSettings.sceneChangeDurationInSeconds = newValue);
+        sceneChangeDurationPickerControl.Bind(() => settings.SceneChangeDurationInSeconds,
+                newValue => settings.SceneChangeDurationInSeconds = newValue);
         sceneChangeDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
         
         new BoolPickerControl(animatedBackgroundItemPicker)
-            .Bind(() => settings.GraphicSettings.animatedBackground,
-                newValue => settings.GraphicSettings.animatedBackground = newValue);
+            .Bind(() => settings.AnimatedBackground,
+                newValue => settings.AnimatedBackground = newValue);
         
         new LabeledItemPickerControl<int>(backgroundLightItemPicker, NumberUtils.CreateIntList(0, backgroundLightManager.BackgroundLightInstancesCount))
-            .Bind(() => settings.GraphicSettings.backgroundLightIndex,
-                newValue => settings.GraphicSettings.backgroundLightIndex = newValue);
+            .Bind(() => settings.BackgroundLightIndex,
+                newValue => settings.BackgroundLightIndex = newValue);
         
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();

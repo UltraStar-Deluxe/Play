@@ -80,7 +80,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         songMetaManager.SongScanFinishedEventStream
             .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()));
 
-        settings.GameSettings.ObserveEveryValueChanged(gameSettings => gameSettings.songDirs)
+        settings.ObserveEveryValueChanged(gameSettings => gameSettings.SongDirs)
             .Subscribe(onNext => UpdateSongFolderList())
             .AddTo(gameObject);
 
@@ -88,8 +88,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         downloadSongArchiveButton.RegisterCallbackButtonTriggered(_ => CreateDownloadSongArchiveUiControl());
 
         new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
-            .Bind(() => settings.GameSettings.searchAudioFilesWithoutSongMeta,
-                newValue => settings.GameSettings.searchAudioFilesWithoutSongMeta = newValue);
+            .Bind(() => settings.SearchAudioFilesWithoutSongMeta,
+                newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -127,9 +127,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 // Add new song folder if needed
                 string targetFolder = downloadSongArchiveUiControl.TargetFolder;
                 if (!targetFolder.IsNullOrEmpty()
-                    && !settings.GameSettings.songDirs.Contains(targetFolder))
+                    && !settings.SongDirs.Contains(targetFolder))
                 {
-                    settings.GameSettings.songDirs.Add(targetFolder);
+                    settings.SongDirs.Add(targetFolder);
                 }
                 
                 // Fade out the download UI, then remove it
@@ -159,7 +159,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         {
             path = AndroidUtils.GetAppSpecificStorageAbsolutePath(false) + "/Songs";
         }
-        settings.GameSettings.songDirs.Add(path);
+        settings.SongDirs.Add(path);
         UpdateSongFolderList();
 
         RequestExternalStoragePermissionIfNeeded();
@@ -323,7 +323,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     {
         songFolderList.Clear();
         songFolderListEntryControls.Clear();
-        if (settings.GameSettings.songDirs.IsNullOrEmpty()
+        if (settings.SongDirs.IsNullOrEmpty()
             && downloadSongArchiveUiControls.IsNullOrEmpty())
         {
             Label noSongsFoundLabel = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_noSongFoldersFoundInfo));
@@ -336,7 +336,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         else
         {
             int index = 0;
-            settings.GameSettings.songDirs.ForEach(songDir =>
+            settings.SongDirs.ForEach(songDir =>
             {
                 CreateSongFolderEntryControl(songDir, index);
                 index++;
@@ -361,13 +361,13 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         songFolderListEntryControl.ValueChangedEventStream.Subscribe(newValue =>
         {
-            settings.GameSettings.songDirs[indexInList] = newValue;
+            settings.SongDirs[indexInList] = newValue;
 
             songFolderListEntryControls.ForEach(control => control.CheckPathIsValid());
         });
         songFolderListEntryControl.DeleteEventStream.Subscribe(_ =>
         {
-            settings.GameSettings.songDirs.RemoveAt(indexInList);
+            settings.SongDirs.RemoveAt(indexInList);
             UpdateSongFolderList();
         });
 
@@ -383,7 +383,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         issuesIcon.RemoveFromClassList("warning");
         
         // Remove duplicate song folders
-        settings.GameSettings.songDirs = settings.GameSettings.songDirs
+        settings.SongDirs = settings.SongDirs
             .Distinct()
             .ToList();
 

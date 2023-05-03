@@ -126,7 +126,7 @@ public class TeamResultsUiControl : INeedInjection, IInjectionFinishedListener
         VisualElement labelContainer = teamUi.Q<VisualElement>(R.UxmlNames.labelContainer);
 
         VisualElement knockOutOverlay = teamUi.Q<VisualElement>(R.UxmlNames.knockOutLabelOverlay);
-        bool knockOutOverlayVisible = singingResultsSceneControl.PartyModeSettings.teamSettings.isKnockOutTournament
+        bool knockOutOverlayVisible = singingResultsSceneControl.PartyModeSettings.TeamSettings.IsKnockOutTournament
                                       && !PartyModeUtils.IsFinalRound(singingResultsSceneControl.PartyModeSceneData)
                                       && teams.AllMatch(team => PartyModeUtils.IsKnockedOut(singingResultsSceneControl.PartyModeSceneData, team));
         knockOutOverlay.SetVisibleByDisplay(knockOutOverlayVisible);

@@ -54,7 +54,7 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="newHighscoreContainer" style="align-items: center;">
-                        <MaterialIcon tabindex="-1" icon="star_outline" name="newHighscoreIcon" class="mr-2 ignoreTheme" style="font-size: 28px;" />
+                        <MaterialIcon tabindex="-1" icon="star_outline" name="newHighscoreIcon" class="mr-2 ignoreTheme" style="font-size: 22px;" />
                         <ui:Label tabindex="-1" text="New High Score" display-tooltip-when-elided="true" name="newHighscoreLabel" class="ignoreTheme" />
                     </ui:VisualElement>
                 </ui:VisualElement>

@@ -86,6 +86,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private UltraStarPlayInputManager inputManager;
@@ -155,7 +158,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         togglePlaybackButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ToggleAudioPlayPause());
         toggleRecordingButton.RegisterCallbackButtonTriggered(_ =>
         {
-            settings.SongEditorSettings.IsRecordingEnabled = !settings.SongEditorSettings.IsRecordingEnabled;
+            nonPersistentSettings.IsSongEditorRecordingEnabled.Value = !nonPersistentSettings.IsSongEditorRecordingEnabled.Value;
             UpdateRecordingButton();
         });
         UpdateRecordingButton();
@@ -288,7 +291,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void UpdateRecordingButton()
     {
-        if (settings.SongEditorSettings.IsRecordingEnabled)
+        if (nonPersistentSettings.IsSongEditorRecordingEnabled.Value)
         {
             toggleRecordingButton.AddToClassList("recording");
         }

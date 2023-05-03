@@ -197,7 +197,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void TriggerAchievementsOnSingingResultsStart()
     {
         if (sceneData.PlayerProfiles
-            .AnyMatch(playerProfile => sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000))
+            .AnyMatch(playerProfile => playerProfile != null 
+                                       && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
+                                       && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000))
         {
             achievementEventStream.OnNext(AchievementId.getMoreThan9000Points);
         }
@@ -324,7 +326,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void KnockOutPartyTeams()
     {
         if (!HasPartyModeSceneData
-            || !PartyModeSettings.teamSettings.isKnockOutTournament)
+            || !PartyModeSettings.TeamSettings.IsKnockOutTournament)
         {
             return;
         }

@@ -42,18 +42,18 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
         // Round count
         NumberPickerControl roundCountItemPickerControl = new(roundCountItemPicker, 4);
         roundCountItemPickerControl.Bind(
-            () => partyModeSettings.roundCount,
-            newValue => partyModeSettings.roundCount = (int)newValue);
+            () => partyModeSettings.RoundCount,
+            newValue => partyModeSettings.RoundCount = (int)newValue);
 
         // Selection mode (random or manual)
         LabeledItemPickerControl<EPartyModeSongSelectionMode> songSelectionItemPickerControl =
             new(songSelectionItemPicker, EnumUtils.GetValuesAsList<EPartyModeSongSelectionMode>());
         songSelectionItemPickerControl.Bind(
-            () => partyModeSettings.songSelectionSettings.songSelectionMode,
+            () => partyModeSettings.SongSelectionSettings.SongSelectionMode,
             newValue =>
             {
                 UpdateControlsVisibility();
-                partyModeSettings.songSelectionSettings.songSelectionMode = newValue;
+                partyModeSettings.SongSelectionSettings.SongSelectionMode = newValue;
             });
 
         // Playlist
@@ -61,26 +61,26 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
         LabeledItemPickerControl<IPlaylist> playlistItemPickerControl = new(songSelectionPlaylistItemPicker, playlists);
         playlistItemPickerControl.GetLabelTextFunction = newValue => playlistManager.GetPlaylistName(newValue);
         playlistItemPickerControl.Bind(
-            () => partyModeSettings.songSelectionSettings.songPoolPlaylist,
-            newValue => partyModeSettings.songSelectionSettings.songPoolPlaylist = newValue);
+            () => partyModeSettings.SongSelectionSettings.SongPoolPlaylist,
+            newValue => partyModeSettings.SongSelectionSettings.SongPoolPlaylist = newValue);
 
         // Joker count
         LabeledItemPickerControl<int> jokerCountItemPickerControl =
             new(songSelectionJokerCountItemPicker, new List<int> { -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
         jokerCountItemPickerControl.GetLabelTextFunction = newValue => newValue >= 0 ? newValue.ToString() : "Unlimited";
         jokerCountItemPickerControl.Bind(
-            () => partyModeSettings.songSelectionSettings.jokerCount,
-            newValue => partyModeSettings.songSelectionSettings.jokerCount = newValue);
+            () => partyModeSettings.SongSelectionSettings.JokerCount,
+            newValue => partyModeSettings.SongSelectionSettings.JokerCount = newValue);
 
         // Only show the joker count for random song selection
         UpdateControlsVisibility();
-        partyModeSettings.ObserveEveryValueChanged(it => it.songSelectionSettings.songSelectionMode)
+        partyModeSettings.ObserveEveryValueChanged(it => it.SongSelectionSettings.SongSelectionMode)
             .Subscribe(_ => UpdateControlsVisibility());
     }
 
     private void UpdateControlsVisibility()
     {
-        songSelectionJokerCountItemPicker.SetVisibleByDisplay(partyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random);
-        songSelectionPlaylistItemPicker.SetVisibleByDisplay(partyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random);
+        songSelectionJokerCountItemPicker.SetVisibleByDisplay(partyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random);
+        songSelectionPlaylistItemPicker.SetVisibleByDisplay(partyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random);
     }
 }
