@@ -1,11 +1,28 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using UniRx;
-using UnityEditor.VersionControl;
 
 public class JsonConverterTests
 {
+    [Test]
+    public void FillReactivePropertyReferenceTest()
+    {
+        ReactivePropertyUserTypeHolder original = CreateReactivePropertyUserTypeHolder();
+
+        PlayerProfile observedPlayerProfileValue = null;
+        original.ReactivePropertyUserType.Subscribe(newValue => observedPlayerProfileValue = newValue);
+        
+        ReactiveProperty<PlayerProfile> originalReactiveProperty = original.ReactivePropertyUserType;
+        PlayerProfile originalPlayerProfile = original.ReactivePropertyUserType.Value;
+        string json = JsonConverter.ToJson(original);
+        
+        JsonConverter.FillFromJson(json, original);
+        ReactiveProperty<PlayerProfile> filledReactiveProperty = original.ReactivePropertyUserType;
+
+        Assert.AreSame(originalReactiveProperty, filledReactiveProperty);
+        Assert.AreEqual(observedPlayerProfileValue.Name, originalPlayerProfile.Name);
+    }
+
     [Test]
     public void SerializeReactivePropertyString()
     {

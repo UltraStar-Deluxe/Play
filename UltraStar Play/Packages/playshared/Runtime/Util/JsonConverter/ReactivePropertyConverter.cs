@@ -87,18 +87,11 @@ public class ReactivePropertyConverter : fsConverter
         if (instance == null)
         {
             throw new InvalidOperationException("Cannot deserialize, instance is null");
-            // ConstructorInfo constructorInfo = storageType.GetConstructor(
-            //     BindingFlags.Public | BindingFlags.Instance,
-            //     null,
-            //     null);
-            // instance = constructorInfo.Invoke(null);
         }
-        else
-        {
-            // Set the value via reflection
-            PropertyInfo propertyInfo = instance.GetType().GetProperty("Value");
-            propertyInfo.SetMethod.Invoke(instance, new object[] { deserializedValue });
-        }
+
+        // Set the value via reflection
+        PropertyInfo propertyInfo = instance.GetType().GetProperty("Value");
+        propertyInfo.SetMethod.Invoke(instance, new object[] { deserializedValue });
         return fsResult.Success;
     }
 }
