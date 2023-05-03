@@ -152,7 +152,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
 
     private void DoSpeechRecognitionForNewlyRecordedSamples()
     {
-        if (!settings.SongEditorSettings.speechRecognitionWhenRecording
+        if (!settings.SongEditorSettings.SpeechRecognitionWhenRecording
             || !nonPersistentSettings.IsSongEditorRecordingEnabled.Value
             || !HasRecordedAudio
             || SpeechRecognitionUtils.IsSpeechRecognitionRunning)

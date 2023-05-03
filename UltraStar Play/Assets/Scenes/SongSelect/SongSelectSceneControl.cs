@@ -212,9 +212,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
     public PartyModeSettings PartyModeSettings => PartyModeSceneData.PartyModeSettings;
     public bool IsPartyModeRandomSongSelection => HasPartyModeSceneData
-                                                  && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random;
+                                                  && PartyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random;
     public bool UsePartyModePlaylist => IsPartyModeRandomSongSelection
-                                        && PartyModeSettings.songSelectionSettings.songPoolPlaylist != null;
+                                        && PartyModeSettings.SongSelectionSettings.SongPoolPlaylist != null;
     public bool CanUseSongSelectionJoker => PartyModeSceneData.remainingJokerCount != 0;
 
     public SongSelectionPlaylistChooserControl SongSelectionPlaylistChooserControl { get; private set; } = new();
@@ -251,7 +251,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         InitSongMetas();
 
         if (HasPartyModeSceneData
-            && PartyModeSettings.songSelectionSettings.songSelectionMode == EPartyModeSongSelectionMode.Random)
+            && PartyModeSettings.SongSelectionSettings.SongSelectionMode == EPartyModeSongSelectionMode.Random)
         {
             partyModeControl.SelectRandomSong();
         }
@@ -261,11 +261,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         toggleMicCheckButton.RegisterCallbackButtonTriggered(_ => ToggleMicCheckActive());
         UpdateMicCheckButton();
         
-        songOrderDropdownField.value = settings.songOrder;
+        songOrderDropdownField.value = settings.SongOrder;
         songOrderDropdownField.RegisterValueChangedCallback(evt =>
         {
             Debug.Log($"New order: {evt.newValue}");
-            settings.songOrder = (ESongOrder)evt.newValue;
+            settings.SongOrder = (ESongOrder)evt.newValue;
             UpdateFilteredSongs();
         });
 
@@ -333,7 +333,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Disable 'pass the mic' toggle if needed. It requires a team with at least 2 players
         if (!HasPartyModeSceneData
-            || PartyModeSettings.teamSettings.teams.AllMatch(team =>
+            || PartyModeSettings.TeamSettings.Teams.AllMatch(team =>
                 team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
         {
             passTheMicToggle.value = false;
@@ -1110,7 +1110,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
+            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
         }
 
         songSearchControl.UpdateTranslation();
@@ -1172,7 +1172,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 .Where(playerProfile => playerProfile.IsEnabled)
                 .ToList();
         }
-        else if (PartyModeSettings.teamSettings.isFreeForAll)
+        else if (PartyModeSettings.TeamSettings.IsFreeForAll)
         {
             // Select all players of all teams
             List<PlayerProfile> allPlayerProfiles = PartyModeUtils.GetAllPlayerProfiles(PartyModeSettings);
@@ -1186,7 +1186,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             // Select random player of each team
             List<PlayerProfile> result = new();
-            PartyModeSettings.teamSettings.teams
+            PartyModeSettings.TeamSettings.Teams
                 .Where(team => !PartyModeUtils.IsKnockedOut(PartyModeSceneData, team))
                 .ForEach(team =>
                 {

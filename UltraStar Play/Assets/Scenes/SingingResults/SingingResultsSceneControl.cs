@@ -326,7 +326,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void KnockOutPartyTeams()
     {
         if (!HasPartyModeSceneData
-            || !PartyModeSettings.teamSettings.isKnockOutTournament)
+            || !PartyModeSettings.TeamSettings.IsKnockOutTournament)
         {
             return;
         }

@@ -80,18 +80,18 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 newValue => settings.PitchDetectionAlgorithm = newValue);
 
         new BoolPickerControl(analyzeBeatsWithoutTargetNotePicker)
-            .Bind(() => settings.analyzeBeatsWithoutTargetNote,
-                newValue => settings.analyzeBeatsWithoutTargetNote = newValue);
+            .Bind(() => settings.AnalyzeBeatsWithoutTargetNote,
+                newValue => settings.AnalyzeBeatsWithoutTargetNote = newValue);
 
         new BoolPickerControl(disableDynamicThemesPicker)
-            .Bind(() => settings.disableDynamicThemes,
+            .Bind(() => settings.DisableDynamicThemes,
                 disableDynamicThemes =>
                 {
                     if (disableDynamicThemes)
                     {
                         themeManager.SetCurrentTheme(themeManager.GetDefaultTheme());
                     }
-                    settings.disableDynamicThemes = disableDynamicThemes;
+                    settings.DisableDynamicThemes = disableDynamicThemes;
                 });
 
         new BoolPickerControl(useUniversalCharsetDetectorPicker)
@@ -100,12 +100,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         customEventSystemOptInOnAndroidPicker.SetVisibleByDisplay(PlatformUtils.IsAndroid);
         new BoolPickerControl(customEventSystemOptInOnAndroidPicker)
-            .Bind(() => settings.enableEventSystemOnAndroid,
+            .Bind(() => settings.EnableEventSystemOnAndroid,
                 newValue =>
                 {
-                    if (newValue != settings.enableEventSystemOnAndroid)
+                    if (newValue != settings.EnableEventSystemOnAndroid)
                     {
-                        settings.enableEventSystemOnAndroid = newValue;
+                        settings.EnableEventSystemOnAndroid = newValue;
                         RestartScene();
                     }
                 });

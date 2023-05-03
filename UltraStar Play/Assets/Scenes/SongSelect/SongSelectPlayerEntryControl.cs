@@ -203,7 +203,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         nameLabel.text = PlayerProfile.Name;
         if (partyModeTeamSettings != null)
         {
-            if (songSelectSceneControl.PartyModeSettings.teamSettings.isFreeForAll)
+            if (songSelectSceneControl.PartyModeSettings.TeamSettings.IsFreeForAll)
             {
                 teamLabel.HideByDisplay();
             }    

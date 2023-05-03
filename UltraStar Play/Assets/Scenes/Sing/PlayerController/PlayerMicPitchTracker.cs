@@ -396,13 +396,13 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         {
             Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
             if (currentOrUpcomingNote.StartBeat > BeatToAnalyze
-                && !settings.analyzeBeatsWithoutTargetNote)
+                && !settings.AnalyzeBeatsWithoutTargetNote)
             {
                 // Next beat to analyze is at the next note
                 BeatToAnalyze = currentOrUpcomingNote.StartBeat;
             }
         }
-        else if (settings.analyzeBeatsWithoutTargetNote
+        else if (settings.AnalyzeBeatsWithoutTargetNote
                  && BeatToAnalyze < RecordingSentence.MaxBeat)
         {
             BeatToAnalyze++;
@@ -438,7 +438,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     private void SetRecordingSentence(int sentenceIndex)
     {
         if (sentenceIndex == 0
-            && settings.showPitchIndicator)
+            && settings.ShowPitchIndicator)
         {
             // Start with very first beat, possibly before the lyrics start to update the pitch indicator.
             BeatToAnalyze = (int)BpmUtils.MillisecondInSongToBeat(songMeta, 0);
@@ -453,7 +453,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
         currentAndUpcomingNotesInRecordingSentence = SongMetaUtils.GetSortedNotes(RecordingSentence);
 
-        if (settings.showPitchIndicator)
+        if (settings.ShowPitchIndicator)
         {
             // Analyze all beats to update pitch indicator.
             BeatToAnalyze++;

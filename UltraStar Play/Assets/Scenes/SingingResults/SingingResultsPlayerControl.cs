@@ -225,7 +225,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
-        if (settings.disableDynamicThemes
+        if (settings.DisableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
             LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
@@ -243,7 +243,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private bool ShouldShowTeamName()
     {
         if (singingResultsSceneControl.HasPartyModeSceneData
-            && singingResultsSceneControl.PartyModeSettings.teamSettings.isFreeForAll)
+            && singingResultsSceneControl.PartyModeSettings.TeamSettings.IsFreeForAll)
         {
             return false;
         }

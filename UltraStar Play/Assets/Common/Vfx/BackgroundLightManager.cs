@@ -34,7 +34,7 @@ public class BackgroundLightManager : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         settings
-            .ObserveEveryValueChanged(it => it.backgroundLightIndex)
+            .ObserveEveryValueChanged(it => it.BackgroundLightIndex)
             .Subscribe(newValue => SetActiveBackgroundLight(newValue));
     }
 

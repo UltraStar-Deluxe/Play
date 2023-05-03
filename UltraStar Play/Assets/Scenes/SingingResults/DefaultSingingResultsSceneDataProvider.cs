@@ -91,13 +91,13 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         // Set round index to last round
         if (isLastPartyModeRound)
         {
-            partyModeSceneData.currentRoundIndex = partyModeSceneData.PartyModeSettings.roundCount - 1;
+            partyModeSceneData.currentRoundIndex = partyModeSceneData.PartyModeSettings.RoundCount - 1;
         }
 
         // Give team points
-        for (int i = 0; i <= partyModeTeams && i < partyModeSceneData.PartyModeSettings.teamSettings.teams.Count; i++)
+        for (int i = 0; i <= partyModeTeams && i < partyModeSceneData.PartyModeSettings.TeamSettings.Teams.Count; i++)
         {
-            PartyModeTeamSettings teamSettings = partyModeSceneData.PartyModeSettings.teamSettings.teams[i];
+            PartyModeTeamSettings teamSettings = partyModeSceneData.PartyModeSettings.TeamSettings.Teams[i];
             partyModeSceneData.teamToScoreMap[teamSettings] = (i + 2);
         }
 
@@ -107,8 +107,8 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     private PartyModeSettings CreatePartyModeSettings()
     {
         PartyModeSettings partyModeSettings = new();
-        partyModeSettings.roundCount = 2;
-        partyModeSettings.teamSettings.isKnockOutTournament = isKnockOutTournament;
+        partyModeSettings.RoundCount = 2;
+        partyModeSettings.TeamSettings.IsKnockOutTournament = isKnockOutTournament;
         
         void AddTeams()
         {
@@ -135,7 +135,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
                 }
                 
                 teamSettings.guestPlayerProfiles = new List<PlayerProfile> { guestPlayerProfile };
-                partyModeSettings.teamSettings.teams.Add(teamSettings);
+                partyModeSettings.TeamSettings.Teams.Add(teamSettings);
             }
         }
 

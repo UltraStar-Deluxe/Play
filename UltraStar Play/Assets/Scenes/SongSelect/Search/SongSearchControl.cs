@@ -93,7 +93,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void OnInjectionFinished()
     {
         isInjectionFinished = true;
-        searchProperties = new HashSet<ESearchProperty>(settings.searchProperties);
+        searchProperties = new HashSet<ESearchProperty>(settings.SearchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
         {
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
@@ -336,14 +336,14 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void AddSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Add(searchProperty);
-        settings.searchProperties = searchProperties.ToList();
+        settings.SearchProperties = searchProperties.ToList();
         searchChangedEventStream.OnNext(new SearchPropertyChangedEvent());
     }
 
     public void RemoveSearchProperty(ESearchProperty searchProperty)
     {
         searchProperties.Remove(searchProperty);
-        settings.searchProperties = searchProperties.ToList();
+        settings.SearchProperties = searchProperties.ToList();
         searchChangedEventStream.OnNext(new SearchPropertyChangedEvent());
     }
 
@@ -360,7 +360,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private void RegisterToggleSearchPropertyCallback(Toggle toggle, ESearchProperty searchProperty)
     {
-        toggle.value = settings.searchProperties.Contains(searchProperty);
+        toggle.value = settings.SearchProperties.Contains(searchProperty);
         toggle.RegisterValueChangedCallback(evt =>
         {
             if (evt.newValue)

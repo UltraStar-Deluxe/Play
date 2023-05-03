@@ -69,7 +69,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
         settings.ObserveEveryValueChanged(it => it.BackgroundMusicVolumePercent)
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);
-        settings.ObserveEveryValueChanged(it => it.themeName)
+        settings.ObserveEveryValueChanged(it => it.ThemeName)
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);
         sceneNavigator.SceneChangedEventStream

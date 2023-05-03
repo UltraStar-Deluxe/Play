@@ -167,8 +167,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         HideLeadingPlayerIcon();
 
         if (settings.ScoreMode == EScoreMode.None
-            && (settings.noteDisplayMode == ENoteDisplayMode.None
-                || settings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence))
+            && (settings.NoteDisplayMode == ENoteDisplayMode.None
+                || settings.NoteDisplayMode == ENoteDisplayMode.SentenceBySentence))
         {
             // No need to show a player image and name
             // because it is neither associated with a score nor with lyrics.
@@ -192,10 +192,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             playerImageBorder.HideByVisibility();
         }
 
-        settings.ObserveEveryValueChanged(it => it.showPlayerNames)
+        settings.ObserveEveryValueChanged(it => it.ShowPlayerNames)
             .Subscribe(newValue => playerNameLabel.SetVisibleByDisplay(newValue));
         
-        settings.ObserveEveryValueChanged(it => it.showScoreNumbers)
+        settings.ObserveEveryValueChanged(it => it.ShowScoreNumbers)
             .Subscribe(newValue => playerScoreLabel.SetVisibleByDisplay(newValue));
     }
 
@@ -375,7 +375,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private void InitNoteDisplayer(int localLineCount)
     {
         // Find a suited note displayer
-        switch (settings.noteDisplayMode)
+        switch (settings.NoteDisplayMode)
         {
             case ENoteDisplayMode.SentenceBySentence:
                 noteDisplayer = new SentenceDisplayer();
@@ -387,7 +387,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 noteDisplayer = new NoNoteSingSceneDisplayer();
                 break;
             default:
-                throw new UnityException("Did not find a suited NoteDisplayer for ENoteDisplayMode " + settings.noteDisplayMode);
+                throw new UnityException("Did not find a suited NoteDisplayer for ENoteDisplayMode " + settings.NoteDisplayMode);
         }
 
         // Enable and initialize the selected note displayer

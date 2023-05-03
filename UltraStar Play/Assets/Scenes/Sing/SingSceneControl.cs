@@ -293,7 +293,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             double progressInPercent = 100 * (songAudioPlayer.PositionInSongInMillis / songAudioPlayer.DurationOfSongInMillis);
             songTimeProgressBar.value = (float) progressInPercent;
         });
-        settings.ObserveEveryValueChanged(it => it.showSongProgress)
+        settings.ObserveEveryValueChanged(it => it.ShowSongProgress)
             .Subscribe(newValue => songTimeProgressBar.SetVisibleByDisplay(newValue));
 
         // Update TimeBar every second
@@ -423,7 +423,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private void InitSingingLyricsControls()
     {
         if (PlayerControls.IsNullOrEmpty()
-            || !settings.showStaticLyrics)
+            || !settings.ShowStaticLyrics)
         {
             uiDocument.rootVisualElement.Query<VisualElement>(null, R.UssClasses.singingLyricsSentenceUi)
                 .ForEach(singingLyricsSentenceUi => singingLyricsSentenceUi.HideByDisplay());

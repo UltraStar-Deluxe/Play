@@ -156,12 +156,12 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
                 "");
 
             layerManager.AddNoteToEnumLayer(ESongEditorLayer.ButtonRecording, noteUnderConstruction);
-            if (settings.SongEditorSettings.drawNoteLayer == ESongEditorDrawNoteLayer.P1)
+            if (settings.SongEditorSettings.DrawNoteLayer == ESongEditorDrawNoteLayer.P1)
             {
                 moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, new List<Note>() { noteUnderConstruction }, Voice.firstVoiceName, false);
                 editorNoteDisplayer.ReloadSentences();
             }
-            else if (settings.SongEditorSettings.drawNoteLayer == ESongEditorDrawNoteLayer.P2)
+            else if (settings.SongEditorSettings.DrawNoteLayer == ESongEditorDrawNoteLayer.P2)
             {
                 moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, new List<Note>() { noteUnderConstruction }, Voice.secondVoiceName, false);
                 editorNoteDisplayer.ReloadSentences();

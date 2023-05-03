@@ -98,14 +98,14 @@ public class SongMetaManager : AbstractSingletonBehaviour
         // Thus, use the static instance.
         if (lastSongDirs == null)
         {
-            lastSongDirs = new List<string>(Settings.songDirs);
+            lastSongDirs = new List<string>(Settings.SongDirs);
         }
 
         if (isSongScanFinished
-            && !lastSongDirs.SequenceEqual(Settings.songDirs))
+            && !lastSongDirs.SequenceEqual(Settings.SongDirs))
         {
             Debug.Log("SongDirs have changed since last scan. Start rescan.");
-            lastSongDirs = new List<string>(Settings.songDirs);
+            lastSongDirs = new List<string>(Settings.SongDirs);
             ResetSongMetas();
             ScanFilesIfNotDoneYet();
         }
@@ -182,13 +182,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
         lock (scanLock)
         {
             // Find all txt and audio files in configured song folders and the generated song folder
-            List<string> allSongFolders = SettingsManager.Instance.Settings.songDirs
+            List<string> allSongFolders = SettingsManager.Instance.Settings.SongDirs
                 .Union(new List<string> { generatedSongFolderAbsolutePath })
                 .ToList();
             txtFiles = ScanForFiles(allSongFolders, new List<string> { "*.txt" });
 
             // Only search for audio files in configured song folders, not in the generated song folder
-            audioFiles = ScanForFiles(SettingsManager.Instance.Settings.songDirs, GetAudioFileExtensionPatterns());
+            audioFiles = ScanForFiles(SettingsManager.Instance.Settings.SongDirs, GetAudioFileExtensionPatterns());
         }
 
         // Load the txt files in a background thread
@@ -217,7 +217,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private void GenerateSongMetasForAudioFiles(string generatedSongFolderAbsolutePath, List<string> audioFiles, List<SongMeta> existingSongMetas)
     {
-        if (!Settings.searchAudioFilesWithoutSongMeta)
+        if (!Settings.SearchAudioFilesWithoutSongMeta)
         {
             return;
         }

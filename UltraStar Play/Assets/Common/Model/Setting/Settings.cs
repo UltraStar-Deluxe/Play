@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class Settings : ISettings
@@ -45,36 +46,36 @@ public class Settings : ISettings
     public bool UseWebcamAsBackgroundInSingScene { get; set; }
 
     // Song library settings
-    public List<string> songDirs = new();
-    public bool searchAudioFilesWithoutSongMeta;
+    public List<string> SongDirs { get; set; } = new();
+    public bool SearchAudioFilesWithoutSongMeta { get; set; }
     
     // Theme settings
-    public string themeName = ThemeManager.DefaultThemeName;
-    public bool disableDynamicThemes;
+    public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
+    public bool DisableDynamicThemes { get; set; }
     // Screen.currentResolution may only be called from Start() and Awake(), thus use a dummy here.
-    public bool animatedBackground = true;
-    public int backgroundLightIndex = 1;
+    public bool AnimatedBackground { get; set; } = true;
+    public int BackgroundLightIndex { get; set; } = 1;
     
     // Design / presentation settings
-    public ESceneChangeAnimation sceneChangeAnimation = ESceneChangeAnimation.Zoom;
-    public float sceneChangeDurationInSeconds = 0.25f;
-    public bool useImageAsCursor = true;
-    public bool enableVfx = true;
-    public bool showScrollBarInSongSelect;
+    public ESceneChangeAnimation SceneChangeAnimation { get; set; } = ESceneChangeAnimation.Zoom;
+    public float SceneChangeDurationInSeconds { get; set; } = 0.25f;
+    public bool UseImageAsCursor { get; set; } = true;
+    public bool EnableVfx { get; set; } = true;
+    public bool ShowScrollBarInSongSelect { get; set; }
     
     // Sing scene settings
-    public ENoteDisplayMode noteDisplayMode = ENoteDisplayMode.SentenceBySentence;
-    public bool showStaticLyrics = true;
-    public bool showPitchIndicator;
-    public bool showLyricsOnNotes;
-    public bool showPlayerNames;
-    public bool showScoreNumbers;
-    public bool showSongProgress;
-    public bool analyzeBeatsWithoutTargetNote = true;
+    public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.SentenceBySentence;
+    public bool ShowStaticLyrics { get; set; } = true;
+    public bool ShowPitchIndicator { get; set; }
+    public bool ShowLyricsOnNotes { get; set; }
+    public bool ShowPlayerNames { get; set; }
+    public bool ShowScoreNumbers { get; set; }
+    public bool ShowSongProgress { get; set; }
+    public bool AnalyzeBeatsWithoutTargetNote { get; set; } = true;
 
     // Song select settings
-    public ESongOrder songOrder = ESongOrder.Artist;
-    public List<ESearchProperty> searchProperties = new()
+    public ESongOrder SongOrder { get; set; } = ESongOrder.Artist;
+    public List<ESearchProperty> SearchProperties { get; set; } = new()
     {
         ESearchProperty.Artist,
         ESearchProperty.Title,
@@ -89,7 +90,7 @@ public class Settings : ISettings
      * because of a Unity issue that can make the UI unusable on Android.
      * (see https://issuetracker.unity3d.com/issues/android-uitoolkit-buttons-cant-be-clicked-with-a-cursor-in-samsung-dex-when-using-eventsystem)
      */
-    public bool enableEventSystemOnAndroid;
+    public bool EnableEventSystemOnAndroid { get; set; }
 
     // The releases to be ignored when checking for updates.
     // When containing the string "all", then all releases will be ignored.

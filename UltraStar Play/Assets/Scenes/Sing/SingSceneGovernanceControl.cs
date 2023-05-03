@@ -233,44 +233,44 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         ItemPicker noteDisplayModePicker = new("Note Display Mode¹");
         contextMenuPopup.AddVisualElement(noteDisplayModePicker);
         new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
-            .Bind(() => settings.noteDisplayMode,
-                 newValue => settings.noteDisplayMode = newValue);
+            .Bind(() => settings.NoteDisplayMode,
+                 newValue => settings.NoteDisplayMode = newValue);
         
         Toggle showLyricsOnNotesToggle = new("Lyrics on Notes¹");
         contextMenuPopup.AddVisualElement(showLyricsOnNotesToggle);
         FieldBindingUtils.Bind(showLyricsOnNotesToggle,
-            () => settings.showLyricsOnNotes,
-            newValue => settings.showLyricsOnNotes = newValue);
+            () => settings.ShowLyricsOnNotes,
+            newValue => settings.ShowLyricsOnNotes = newValue);
         
         Toggle showStaticLyricsToggle = new("Lyrics Box¹");
         contextMenuPopup.AddVisualElement(showStaticLyricsToggle);
         FieldBindingUtils.Bind(showStaticLyricsToggle,
-            () => settings.showStaticLyrics,
-            newValue => settings.showStaticLyrics = newValue);
+            () => settings.ShowStaticLyrics,
+            newValue => settings.ShowStaticLyrics = newValue);
         
         Toggle showSongProgress = new("Progress");
         contextMenuPopup.AddVisualElement(showSongProgress);
         FieldBindingUtils.Bind(showSongProgress,
-            () => settings.showSongProgress,
-            newValue => settings.showSongProgress = newValue);
+            () => settings.ShowSongProgress,
+            newValue => settings.ShowSongProgress = newValue);
         
         Toggle showPitchIndicatorToggle = new("Pitch Arrow");
         contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
         FieldBindingUtils.Bind(showPitchIndicatorToggle,
-            () => settings.showPitchIndicator,
-                newValue => settings.showPitchIndicator = newValue);
+            () => settings.ShowPitchIndicator,
+                newValue => settings.ShowPitchIndicator = newValue);
         
         Toggle showPlayerNamesToggle = new("Player Name");
         contextMenuPopup.AddVisualElement(showPlayerNamesToggle);
         FieldBindingUtils.Bind(showPlayerNamesToggle,
-            () => settings.showPlayerNames,
-            newValue => settings.showPlayerNames = newValue);
+            () => settings.ShowPlayerNames,
+            newValue => settings.ShowPlayerNames = newValue);
         
         Toggle showScoreNumbers = new("Player Score");
         contextMenuPopup.AddVisualElement(showScoreNumbers);
         FieldBindingUtils.Bind(showScoreNumbers,
-            () => settings.showScoreNumbers,
-            newValue => settings.showScoreNumbers = newValue);
+            () => settings.ShowScoreNumbers,
+            newValue => settings.ShowScoreNumbers = newValue);
         
         if (webcamControl.WebcamsAvailable())
         {

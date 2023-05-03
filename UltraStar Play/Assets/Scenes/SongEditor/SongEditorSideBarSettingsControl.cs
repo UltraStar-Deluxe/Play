@@ -200,8 +200,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         drawNoteLayerPickerControl = new(drawNoteLayerPicker, EnumUtils.GetValuesAsList<ESongEditorDrawNoteLayer>());
         drawNoteLayerPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
         drawNoteLayerPickerControl.Bind(
-            () => settings.SongEditorSettings.drawNoteLayer,
-            newValue => settings.SongEditorSettings.drawNoteLayer = newValue);
+            () => settings.SongEditorSettings.DrawNoteLayer,
+            newValue => settings.SongEditorSettings.DrawNoteLayer = newValue);
         
         // Playback speed
         songAudioPlayer.PlaybackSpeed = nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value;
@@ -253,8 +253,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
         // Record notes or audio
         Bind(speechRecognitionWhenRecordingToggle,
-            () => settings.SongEditorSettings.speechRecognitionWhenRecording,
-            newValue => settings.SongEditorSettings.speechRecognitionWhenRecording = newValue);
+            () => settings.SongEditorSettings.SpeechRecognitionWhenRecording,
+            newValue => settings.SongEditorSettings.SpeechRecognitionWhenRecording = newValue);
 
         // Button recording settings
         Bind(buttonRecordingPitchTextField,

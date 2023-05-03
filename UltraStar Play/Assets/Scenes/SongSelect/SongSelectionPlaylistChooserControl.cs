@@ -69,7 +69,7 @@ public class SongSelectionPlaylistChooserControl : INeedInjection, IInjectionFin
         IPlaylist newSelection;
         if (songSelectSceneControl.UsePartyModePlaylist)
         {
-            newSelection = songSelectSceneControl.PartyModeSettings.songSelectionSettings.songPoolPlaylist;
+            newSelection = songSelectSceneControl.PartyModeSettings.SongSelectionSettings.SongPoolPlaylist;
         }
         else
         {

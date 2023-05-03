@@ -48,30 +48,30 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
 
         void FillTeams()
         {
-            partyModeSettings.teamSettings.isFreeForAll = isFreeForAll;
-            partyModeSettings.teamSettings.isKnockOutTournament = isKnockOutTournament;
-            partyModeSettings.teamSettings.teams = new();
+            partyModeSettings.TeamSettings.IsFreeForAll = isFreeForAll;
+            partyModeSettings.TeamSettings.IsKnockOutTournament = isKnockOutTournament;
+            partyModeSettings.TeamSettings.Teams = new();
 
             // Add first team with normal player profiles
             PartyModeTeamSettings firstTeam = new();
             firstTeam.name = "Team 01";
             firstTeam.playerProfiles = settings.PlayerProfiles.ToList();
-            partyModeSettings.teamSettings.teams.Add(firstTeam);
+            partyModeSettings.TeamSettings.Teams.Add(firstTeam);
 
             // Add second team with guest player profile
-            PlayerProfile guestPlayerProfile = settings.PartyModeSettings.guestPlayerProfiles.FirstOrDefault();
+            PlayerProfile guestPlayerProfile = settings.PartyModeSettings.GuestPlayerProfiles.FirstOrDefault();
             if (guestPlayerProfile != null)
             {
                 PartyModeTeamSettings secondTeam = new();
                 secondTeam.name = "Team 02";
                 secondTeam.guestPlayerProfiles = new List<PlayerProfile> { guestPlayerProfile };
-                partyModeSettings.teamSettings.teams.Add(secondTeam);
+                partyModeSettings.TeamSettings.Teams.Add(secondTeam);
             }
         }
 
         void FillSongSelection()
         {
-            partyModeSettings.songSelectionSettings = songSelectionSettings;
+            partyModeSettings.SongSelectionSettings = songSelectionSettings;
         }
 
         void FillRounds()
@@ -82,7 +82,7 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
             roundSettings.modifierConditionSettings = modifierConditionSettings;
             nonPersistentSettings.GameRoundSettings = roundSettings;
 
-            partyModeSettings.roundCount = 2;
+            partyModeSettings.RoundCount = 2;
         }
 
         FillTeams();

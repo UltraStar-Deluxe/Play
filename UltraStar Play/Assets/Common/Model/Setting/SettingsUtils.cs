@@ -49,6 +49,6 @@ public static class SettingsUtils
 
     public static bool ShouldAnimateSceneChange(Settings settings)
     {
-        return settings.sceneChangeDurationInSeconds > 0;
+        return settings.SceneChangeDurationInSeconds > 0;
     }
 }

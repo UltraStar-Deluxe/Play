@@ -110,7 +110,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         
         ScanPlaylistsInFolder(PlaylistFolder);
         
-        foreach (string songDir in SettingsManager.Instance.Settings.songDirs)
+        foreach (string songDir in SettingsManager.Instance.Settings.SongDirs)
         {
             ScanPlaylistsInFolder(songDir);
         }

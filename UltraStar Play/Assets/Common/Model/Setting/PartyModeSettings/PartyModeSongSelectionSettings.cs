@@ -3,7 +3,7 @@
 [Serializable]
 public class PartyModeSongSelectionSettings
 {
-    public EPartyModeSongSelectionMode songSelectionMode = EPartyModeSongSelectionMode.Manual;
-    public IPlaylist songPoolPlaylist = UltraStarAllSongsPlaylist.Instance;
-    public int jokerCount = 5;
+    public EPartyModeSongSelectionMode SongSelectionMode { get; set; } = EPartyModeSongSelectionMode.Manual;
+    public IPlaylist SongPoolPlaylist { get; set; } = UltraStarAllSongsPlaylist.Instance;
+    public int JokerCount { get; set; } = 5;
 }
