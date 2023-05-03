@@ -80,10 +80,6 @@ public class Settings : ISettings
         ESearchProperty.Artist,
         ESearchProperty.Title,
     };
-    public string playlistName = "";
-    public bool micTestActive;
-    public Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> activeSearchPropertyFilters = new();
-    public bool isShowOnlyDuetsFilterActive;
 
     // Technical settings
     public bool ShowFps { get; set; }
@@ -108,6 +104,5 @@ public class Settings : ISettings
     
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
-    public GameRoundSettings GameRoundSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();
 }

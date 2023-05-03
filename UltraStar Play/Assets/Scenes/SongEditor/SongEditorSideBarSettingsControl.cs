@@ -140,6 +140,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private GameObject gameObject;
@@ -201,9 +204,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.drawNoteLayer = newValue);
         
         // Playback speed
-        songAudioPlayer.PlaybackSpeed = settings.SongEditorSettings.MusicPlaybackSpeed;
+        songAudioPlayer.PlaybackSpeed = nonPersistentSettings.SongEditorMusicPlaybackSpeed;
         Bind(musicPlaybackSpeedSlider,
-            () => settings.SongEditorSettings.MusicPlaybackSpeed,
+            () => nonPersistentSettings.SongEditorMusicPlaybackSpeed,
             newValue => SetMusicPlaybackSpeed(newValue),
             false);
         resetMusicPlaybackSpeedButton.RegisterCallbackButtonTriggered(_ =>
@@ -413,7 +416,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValueRounded = 1;
         }
 
-        settings.SongEditorSettings.MusicPlaybackSpeed = newValueRounded;
+        nonPersistentSettings.SongEditorMusicPlaybackSpeed = newValueRounded;
         songAudioPlayer.PlaybackSpeed = newValueRounded;
     }
 

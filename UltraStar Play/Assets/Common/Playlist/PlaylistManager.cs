@@ -63,6 +63,9 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     protected override object GetInstance()
     {
@@ -279,9 +282,10 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Update settings
-        if (settings.playlistName == oldName)
+        if (nonPersistentSettings != null
+            && nonPersistentSettings.playlistName == oldName)
         {
-            settings.playlistName = newName;
+            nonPersistentSettings.playlistName = newName;
         }
 
         playlistChangeEventStream.OnNext(new PlaylistChangeEvent(playlist, null));
@@ -313,9 +317,10 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Update settings
-        if (settings.playlistName == oldName)
+        if (nonPersistentSettings != null
+            && nonPersistentSettings.playlistName == oldName)
         {
-            settings.playlistName = "";
+            nonPersistentSettings.playlistName = "";
         }
 
         playlists.Remove(playlist);

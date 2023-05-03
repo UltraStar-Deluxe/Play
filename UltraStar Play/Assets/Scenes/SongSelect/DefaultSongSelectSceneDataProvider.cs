@@ -43,6 +43,7 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
     private PartyModeSettings CreatePartyModeSettings()
     {
         Settings settings = SettingsManager.Instance.Settings;
+        NonPersistentSettings nonPersistentSettings = SettingsManager.Instance.NonPersistentSettings;
         PartyModeSettings partyModeSettings = new();
 
         void FillTeams()
@@ -79,7 +80,7 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
             roundSettings.modifiers = modifiers.ToHashSet();
             roundSettings.finishConditionSettings = finishConditionSettings;
             roundSettings.modifierConditionSettings = modifierConditionSettings;
-            settings.GameRoundSettings = roundSettings;
+            nonPersistentSettings.GameRoundSettings = roundSettings;
 
             partyModeSettings.roundCount = 2;
         }

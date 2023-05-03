@@ -105,6 +105,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private SongMetaManager songMetaManager;
@@ -347,11 +350,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Init modifier dialog
         injector.WithRootVisualElement(modifierDialogOverlay)
             .Inject(modifierDialogControl);
-        modifierDialogControl.OpenDialog(settings.GameRoundSettings);
+        modifierDialogControl.OpenDialog(nonPersistentSettings.GameRoundSettings);
         modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
         
         modifiersActiveIcon.HideByDisplay();
-        settings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
+        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
             .Subscribe(_ => UpdateModifiersActiveIcon());
         
         // Hide slide-in controls with click outside
@@ -403,23 +406,23 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateModifiersActiveIcon()
     {
-        modifiersActiveIcon.SetVisibleByDisplay(settings.GameRoundSettings.AnyModifierOrFinishConditionActive);
-        modifiersInactiveIcon.SetVisibleByDisplay(!settings.GameRoundSettings.AnyModifierOrFinishConditionActive);
+        modifiersActiveIcon.SetVisibleByDisplay(nonPersistentSettings.GameRoundSettings.AnyModifierOrFinishConditionActive);
+        modifiersInactiveIcon.SetVisibleByDisplay(!nonPersistentSettings.GameRoundSettings.AnyModifierOrFinishConditionActive);
     }
 
     private void UpdateMicCheckButton()
     {
-        toggleMicCheckButton.SetActive(settings.micTestActive);
-        micCheckIcon.SetVisibleByDisplay(settings.micTestActive);
-        noMicCheckIcon.SetVisibleByDisplay(!settings.micTestActive);
+        toggleMicCheckButton.SetActive(nonPersistentSettings.micTestActive);
+        micCheckIcon.SetVisibleByDisplay(nonPersistentSettings.micTestActive);
+        noMicCheckIcon.SetVisibleByDisplay(!nonPersistentSettings.micTestActive);
     }
 
     private void ToggleMicCheckActive()
     {
-        settings.micTestActive = !settings.micTestActive;
+        nonPersistentSettings.micTestActive = !nonPersistentSettings.micTestActive;
         UpdateMicCheckButton();
         
-        if (settings.micTestActive)
+        if (nonPersistentSettings.micTestActive)
         {
             FindObjectsOfType<MicSampleRecorder>()
                 .Where(it => it.MicProfile != null && !it.IsRecording.Value)
@@ -589,7 +592,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SongQueueEntryDto songQueueEntryDto = new();
         songQueueEntryDto.SongDto = DtoConverter.ToDto(songMeta);
         songQueueEntryDto.SingScenePlayerDataDto = DtoConverter.ToDto(CreateSingScenePlayerData());
-        songQueueEntryDto.GameRoundSettings = new(settings.GameRoundSettings);
+        songQueueEntryDto.GameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
         return songQueueEntryDto;
     }
     
@@ -759,7 +762,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         singSceneData.SongMetas = new List<SongMeta> { SelectedSong };
         singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
         singSceneData.partyModeSceneData = sceneData.partyModeSceneData;
-        singSceneData.gameRoundSettings = new(settings.GameRoundSettings);
+        singSceneData.gameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
 
         if (singSceneData.gameRoundSettings != null
             && singSceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))

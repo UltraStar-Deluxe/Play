@@ -35,6 +35,19 @@ public class SettingsManager : AbstractSingletonBehaviour
             return settings;
         }
     }
+    
+    private static NonPersistentSettings nonPersistentSettings;
+    public NonPersistentSettings NonPersistentSettings
+    {
+        get
+        {
+            if (nonPersistentSettings == null)
+            {
+                nonPersistentSettings = new();
+            }
+            return nonPersistentSettings;
+        }
+    }
 
     private static bool initializedResolution;
 
@@ -104,23 +117,7 @@ public class SettingsManager : AbstractSingletonBehaviour
                 settings = CreateDefaultSettings();
             }
             OverwriteSettingsWithCommandLineArguments();
-
-            ResetNonPersistentSettings();
         }
-    }
-
-    private void ResetNonPersistentSettings()
-    {
-        // TODO: Store non-persistent settings in dedicated data structure.
-        settings.GameRoundSettings = new();
-        
-        settings.playlistName = "";
-        settings.micTestActive = false;
-        settings.activeSearchPropertyFilters = new();
-        settings.isShowOnlyDuetsFilterActive = false;
-        
-        settings.SongEditorSettings.MusicPlaybackSpeed = 1;
-        settings.SongEditorSettings.IsRecordingEnabled = false;
     }
 
     private Settings CreateDefaultSettings()

@@ -13,6 +13,9 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     [Inject]
     private Settings settings;
     
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+    
     [Inject(UxmlName = R.UxmlNames.filterListContainer)]
     private VisualElement filterListContainer;
 
@@ -24,19 +27,19 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     
     private bool isInitialized;
 
-    private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => settings.activeSearchPropertyFilters;
-    public bool IsAnyFilterActive => !settings.activeSearchPropertyFilters.IsNullOrEmpty()
-        || settings.isShowOnlyDuetsFilterActive;
+    private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => nonPersistentSettings.activeSearchPropertyFilters;
+    public bool IsAnyFilterActive => !nonPersistentSettings.activeSearchPropertyFilters.IsNullOrEmpty()
+        || nonPersistentSettings.isShowOnlyDuetsFilterActive;
     
     private readonly Subject<bool> filtersChangedEventStream = new();
     public IObservable<bool> FiltersChangedEventStream => filtersChangedEventStream;
     
     public void OnInjectionFinished()
     {
-        showOnlyDuetsToggle.value = settings.isShowOnlyDuetsFilterActive;
+        showOnlyDuetsToggle.value = nonPersistentSettings.isShowOnlyDuetsFilterActive;
         showOnlyDuetsToggle.RegisterValueChangedCallback(evt =>
         {
-            settings.isShowOnlyDuetsFilterActive = evt.newValue;
+            nonPersistentSettings.isShowOnlyDuetsFilterActive = evt.newValue;
             filtersChangedEventStream.OnNext(true);
         });
 
@@ -69,7 +72,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             return true;
         }
 
-        if (settings.isShowOnlyDuetsFilterActive
+        if (nonPersistentSettings.isShowOnlyDuetsFilterActive
             && songMeta.GetVoices().Count < 2)
         {
             return false;
@@ -158,8 +161,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
                 value = value,
             };
 
-            if (settings.activeSearchPropertyFilters.ContainsKey(searchPropertyFilter.searchProperty)
-                && settings.activeSearchPropertyFilters[searchPropertyFilter.searchProperty].Contains(searchPropertyFilter))
+            if (nonPersistentSettings.activeSearchPropertyFilters.ContainsKey(searchPropertyFilter.searchProperty)
+                && nonPersistentSettings.activeSearchPropertyFilters[searchPropertyFilter.searchProperty].Contains(searchPropertyFilter))
             {
                 filterToggle.value = true;
                 EnableFilter(searchPropertyFilter);

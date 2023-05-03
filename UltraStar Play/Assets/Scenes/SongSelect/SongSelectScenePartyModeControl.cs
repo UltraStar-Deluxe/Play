@@ -41,6 +41,9 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject(UxmlName = R.UxmlNames.songQueueOverlay)]
     private VisualElement songQueueOverlay;
@@ -61,7 +64,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
             return;
         }
 
-        GameRoundSettings currentRoundSettings = settings.GameRoundSettings;
+        GameRoundSettings currentRoundSettings = nonPersistentSettings.GameRoundSettings;
         GameRoundFinishConditionSettings finishConditionSettings = currentRoundSettings.finishConditionSettings;
 
         string GetFinishConditionDescription()

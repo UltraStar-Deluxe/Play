@@ -48,6 +48,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private Settings settings;
     
     [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+    
+    [Inject]
     private FocusableNavigator focusableNavigator;
     
     // The PlayerProfile is set in Init and must not be null.
@@ -287,7 +290,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micPitchTracker.MicProfile = micProfile;
         if (micProfile == null
             || micProfile.IsInputFromConnectedClient
-            || !settings.micTestActive)
+            || !nonPersistentSettings.micTestActive)
         {
             if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {
@@ -296,7 +299,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
         else if (micProfile != null
                  && !micProfile.IsInputFromConnectedClient
-                 && settings.micTestActive)
+                 && nonPersistentSettings.micTestActive)
         {
             if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {
