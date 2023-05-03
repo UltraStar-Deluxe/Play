@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using FullSerializer;
 using UniRx;
-using UnityEngine;
 
 public class ReactivePropertyConverter : fsConverter
 {
@@ -39,6 +37,9 @@ public class ReactivePropertyConverter : fsConverter
             case long l:
                 serialized = new fsData(l);
                 break;
+            case Enum e:
+                serialized = new fsData(e.ToString());
+                break;
             default:
                 Type serializedValueType = storageType.GetGenericArguments()[0];
                 Serializer.TrySerialize(serializedValueType, currentValue, out serialized);
@@ -53,7 +54,14 @@ public class ReactivePropertyConverter : fsConverter
         object deserializedValue = null;
         if (data.IsString)
         {
-            deserializedValue = data.AsString;
+            if (deserializedValueType.IsEnum)
+            {
+                deserializedValue = Enum.Parse(deserializedValueType, data.AsString);
+            }
+            else
+            {
+                deserializedValue = data.AsString;
+            }
         }
         else if (data.IsBool)
         {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using UniRx;
+using UnityEngine;
 
 public class JsonConverterTests
 {
@@ -64,6 +65,27 @@ public class JsonConverterTests
         Assert.AreEqual(
             original.ReactivePropertyUserType.Value.Name,
             deserialized.ReactivePropertyUserType.Value.Name);
+    }
+    
+    [Test]
+    public void SerializeReactivePropertyEnum()
+    {
+        ReactivePropertyEnumHolder original = CreateReactivePropertyEnumHolder();
+        string json = JsonConverter.ToJson(original);
+        // Json contains the value, without serializing the whole property to json.
+        Assert.IsTrue(json.ToLowerInvariant().Contains("windowed")
+            && !json.ToLowerInvariant().Contains("value"),
+            "enum serialized to JSON with fields instead of only the value");
+    }
+    
+    [Test]
+    public void RoundTripReactivePropertyEnum()
+    {
+        ReactivePropertyEnumHolder original = CreateReactivePropertyEnumHolder();
+        string json = JsonConverter.ToJson(original);
+        ReactivePropertyEnumHolder deserialized = JsonConverter.FromJson<ReactivePropertyEnumHolder>(json);
+        Assert.NotNull(deserialized.ReactivePropertyEnum.Value, "deserialized enum is null");
+        Assert.AreEqual(deserialized.ReactivePropertyEnum.Value, FullScreenMode.Windowed);
     }
     
     [Test]
@@ -149,6 +171,13 @@ public class JsonConverterTests
         return result;
     }
     
+    private ReactivePropertyEnumHolder CreateReactivePropertyEnumHolder()
+    {
+        ReactivePropertyEnumHolder result = new();
+        result.ReactivePropertyEnum.Value = FullScreenMode.Windowed;
+        return result;
+    }
+    
     private class ReactivePropertyStringHolder
     {
         public ReactiveProperty<string> ReactivePropertyString { get; set; } = new();
@@ -167,5 +196,10 @@ public class JsonConverterTests
     private class ReactivePropertyUserTypeHolder
     {
         public ReactiveProperty<PlayerProfile> ReactivePropertyUserType { get; set; } = new();
+    }
+    
+    private class ReactivePropertyEnumHolder
+    {
+        public ReactiveProperty<FullScreenMode> ReactivePropertyEnum { get; set; } = new();
     }
 }
