@@ -21,6 +21,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public const string UiRenderTextureName = "ThemeManager.UiRenderTexture";
     public const string ParticleRenderTextureName = "ThemeManager.ParticleRenderTexture";
     private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
+    private const string StaticBackgroundVideoElementName = "staticBackgroundVideo";
+    private const string StaticBackgroundImageElementName = "staticBackgroundImage";
     private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
     private readonly Color defaultGoldenColor = Colors.CreateColor("#DACD4A");
     
@@ -247,40 +249,40 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ApplyThemeDynamicBackground(themeMeta);
     }
 
+    private Image GetExistingStaticBackgroundElement(string name)
+    {
+        Image backgroundElement = uiDocument.rootVisualElement.Q<Image>(name);
+        return backgroundElement;
+    }
+    
     private Image GetOrCreateStaticBackgroundElement(string name)
     {
-        VisualElement rootVisualElement = uiDocument.rootVisualElement;
-        if (rootVisualElement == null)
-        {
-            return null;
-        }
-        
-        Image backgroundElement = rootVisualElement.Q<Image>(name);
+        Image backgroundElement = GetExistingStaticBackgroundElement(name);
         if (backgroundElement != null)
         {
             return backgroundElement;
         }
-
+        
         backgroundElement = new Image();
         backgroundElement.name = name;
         backgroundElement.AddToClassList("overlay");
         backgroundElement.AddToClassList("staticBackgroundElement");
-        rootVisualElement.AddAsFirstChild(backgroundElement);
+        uiDocument.rootVisualElement.AddAsFirstChild(backgroundElement);
         return backgroundElement;
     }
     
     private void ApplyThemeStaticBackgroundImage(ThemeMeta themeMeta)
     {
-        Image backgroundElement = GetOrCreateStaticBackgroundElement("staticBackgroundImage");
-        if (backgroundElement == null)
-        {
-            return;
-        }
-
         EScene currentScene = GetCurrentScene();
         if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings, currentScene))
         {
             DisableStaticBackground();
+            return;
+        }
+        
+        Image backgroundElement = GetOrCreateStaticBackgroundElement(StaticBackgroundImageElementName);
+        if (backgroundElement == null)
+        {
             return;
         }
         
@@ -302,19 +304,19 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     
     private void ApplyThemeStaticBackgroundVideo(ThemeMeta themeMeta)
     {
-        Image backgroundElement = GetOrCreateStaticBackgroundElement("staticBackgroundVideo");
-        if (backgroundElement == null)
-        {
-            return;
-        }
-
         EScene currentScene = GetCurrentScene();
         if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings, currentScene))
         {
             DisableStaticBackground();
             return;
         }
-        
+
+        Image backgroundElement = GetOrCreateStaticBackgroundElement(StaticBackgroundVideoElementName);
+        if (backgroundElement == null)
+        {
+            return;
+        }
+
         StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForScene(themeMeta, currentScene);
         string absoluteVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.videoPath);
         if (!absoluteVideoFilePath.IsNullOrEmpty()
@@ -939,7 +941,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void DisableStaticBackground()
     {
-        uiDocument.rootVisualElement.style.backgroundImage = new StyleBackground();
+        Image backgroundVideoElement = GetExistingStaticBackgroundElement(StaticBackgroundVideoElementName);
+        if (backgroundVideoElement != null)
+        {
+            backgroundVideoElement.RemoveFromHierarchy();
+        }
+        
+        Image backgroundImageElement = GetExistingStaticBackgroundElement(StaticBackgroundImageElementName);
+        if (backgroundImageElement != null)
+        {
+            backgroundImageElement.RemoveFromHierarchy();
+        }
     }
 
     public List<Color32> GetMicrophoneColors(ThemeJson themeJson = null)
