@@ -14,6 +14,7 @@ public static class JsonConverter
         fsSerializer newSerializer = new();
         newSerializer.AddConverter(new Color32Converter());
         newSerializer.AddConverter(new GradientConfigConverter());
+        newSerializer.AddConverter(new ReactivePropertyConverter());
         return newSerializer;
     }
 
