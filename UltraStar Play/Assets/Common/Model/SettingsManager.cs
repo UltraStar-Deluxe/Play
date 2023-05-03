@@ -63,7 +63,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             initializedResolution = true;
             // GetCurrentAppResolution may only be called from Start() and Awake(). This is why it is done here.
-            Settings.resolution = ApplicationUtils.GetScreenResolution();
+            Settings.ScreenResolution.Value = ApplicationUtils.GetScreenResolution();
         }
     }
 
@@ -112,7 +112,7 @@ public class SettingsManager : AbstractSingletonBehaviour
             {
                 string settingsCopyPath = GetSettingsPath().Replace(".json", "_crash.json");
                 File.WriteAllText(settingsCopyPath, fileContent);
-                Debug.LogError(ex);
+                Debug.LogException(ex);
                 Debug.LogError($"Failed to load settings from JSON. Using new default settings instead. You can find the original settings in {settingsCopyPath}. Original settings JSON: {fileContent}");
                 settings = CreateDefaultSettings();
             }

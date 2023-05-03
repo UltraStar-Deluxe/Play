@@ -32,13 +32,13 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
-        targetFrameRate = settings.targetFps;
+        targetFrameRate = settings.TargetFps.Value;
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
         lastScreenWidth = Screen.width;
         lastScreenHeight = Screen.height;
 
-        settings.ObserveEveryValueChanged(it => it.targetFps)
+        settings.TargetFps
             .Subscribe(newValue => targetFrameRate = newValue);
             
         ApplicationUtils.SetUsePortAudio(settings.PreferPortAudio);

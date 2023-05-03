@@ -222,11 +222,11 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             songListViewScrollView.scrollOffset = new Vector2(
                 interpolatedScrollOffsetX,
                 songListViewScrollView.scrollOffset.y);
-            Debug.Log($"songListViewScrollView.scrollOffset.x: {songListViewScrollView.scrollOffset.x}, interpolatedScrollOffsetX: " + interpolatedScrollOffsetX);
+            // Debug.Log($"songListViewScrollView.scrollOffset.x: {songListViewScrollView.scrollOffset.x}, interpolatedScrollOffsetX: " + interpolatedScrollOffsetX);
         }
         else if (Mathf.Abs(songListViewScrollView.scrollOffset.x - targetScrollOffsetX) > 0.01f)
         {
-            Debug.Log($"songListViewScrollView.scrollOffset.x: {songListViewScrollView.scrollOffset.x}, targetScrollOffsetX: {targetScrollOffsetX}");
+            // Debug.Log($"songListViewScrollView.scrollOffset.x: {songListViewScrollView.scrollOffset.x}, targetScrollOffsetX: {targetScrollOffsetX}");
             songListViewScrollView.scrollOffset = new Vector2(
                 targetScrollOffsetX,
                 songListViewScrollView.scrollOffset.y);

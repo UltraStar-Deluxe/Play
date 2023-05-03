@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -8,9 +9,9 @@ using UnityEngine.Serialization;
 public class Settings : ISettings
 {
     // Graphics settings
-    public ScreenResolution resolution = new(1280, 720, 60);
-    public FullScreenMode fullScreenMode = FullScreenMode.Windowed;
-    public int targetFps = 30;
+    public ReactiveProperty<ScreenResolution> ScreenResolution { get; private set; } = new(new ScreenResolution(1280, 720, 60));
+    public ReactiveProperty<FullScreenMode> FullScreenMode { get; private set; } = new(UnityEngine.FullScreenMode.Windowed);
+    public ReactiveProperty<int> TargetFps { get; private set; } = new(30);
 
     // Audio settings
     public int PreviewVolumePercent { get; set; } = 50;
