@@ -73,7 +73,14 @@ public class ReactivePropertyConverter : fsConverter
         }
         else if (data.IsInt64)
         {
-            deserializedValue = data.AsInt64;
+            if (deserializedValueType == typeof(int))
+            {
+                deserializedValue = (int)data.AsInt64;
+            }
+            else
+            {
+                deserializedValue = data.AsInt64;
+            }
         }
         else if (data.IsList)
         {

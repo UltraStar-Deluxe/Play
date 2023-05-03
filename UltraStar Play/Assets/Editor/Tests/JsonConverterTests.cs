@@ -89,6 +89,15 @@ public class JsonConverterTests
     }
     
     [Test]
+    public void RoundTripReactivePropertyInt()
+    {
+        ReactivePropertyIntHolder original = CreateReactivePropertyIntHolder();
+        string json = JsonConverter.ToJson(original);
+        ReactivePropertyIntHolder deserialized = JsonConverter.FromJson<ReactivePropertyIntHolder>(json);
+        Assert.AreEqual(deserialized.ReactivePropertyInt.Value, 42);
+    }
+    
+    [Test]
     public void SerializeReactivePropertyList()
     {
         ReactivePropertyListHolder original = CreateReactivePropertyListHolder();
@@ -178,6 +187,13 @@ public class JsonConverterTests
         return result;
     }
     
+    private ReactivePropertyIntHolder CreateReactivePropertyIntHolder()
+    {
+        ReactivePropertyIntHolder result = new();
+        result.ReactivePropertyInt.Value = 42;
+        return result;
+    }
+    
     private class ReactivePropertyStringHolder
     {
         public ReactiveProperty<string> ReactivePropertyString { get; set; } = new();
@@ -201,5 +217,10 @@ public class JsonConverterTests
     private class ReactivePropertyEnumHolder
     {
         public ReactiveProperty<FullScreenMode> ReactivePropertyEnum { get; set; } = new();
+    }
+    
+    private class ReactivePropertyIntHolder
+    {
+        public ReactiveProperty<int> ReactivePropertyInt { get; set; } = new();
     }
 }
