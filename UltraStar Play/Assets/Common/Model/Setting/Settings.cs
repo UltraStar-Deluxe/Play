@@ -17,7 +17,7 @@ public class Settings : ISettings
     public int VolumePercent { get; set; } = 100;
     public int BackgroundMusicVolumePercent { get; set; } = 50;
     public int VocalsAudioVolumePercent { get; set; } = 100;
-    public bool PreferPortAudio { get; set; } = true;
+    public bool PreferPortAudio { get; set; }
     public bool PlayRecordedAudio { get; set; }
     public int SceneChangeSoundVolumePercent { get; set; } = 50;
     public int SfxVolumePercent { get; set; } = 50;
