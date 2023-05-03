@@ -72,12 +72,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         base.Start();
         
         new BoolPickerControl(showFpsPicker)
-            .Bind(() => settings.ShowFps.Value,
-                  newValue => settings.ShowFps.Value = newValue);
+            .Bind(() => settings.ShowFps,
+                  newValue => settings.ShowFps = newValue);
 
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmPicker)
-            .Bind(() => settings.PitchDetectionAlgorithm.Value,
-                newValue => settings.PitchDetectionAlgorithm.Value = newValue);
+            .Bind(() => settings.PitchDetectionAlgorithm,
+                newValue => settings.PitchDetectionAlgorithm = newValue);
 
         new BoolPickerControl(analyzeBeatsWithoutTargetNotePicker)
             .Bind(() => settings.analyzeBeatsWithoutTargetNote,
@@ -95,8 +95,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 });
 
         new BoolPickerControl(useUniversalCharsetDetectorPicker)
-                    .Bind(() => settings.UseUniversalCharsetDetector.Value,
-                        newValue => settings.UseUniversalCharsetDetector.Value = newValue);
+                    .Bind(() => settings.UseUniversalCharsetDetector,
+                        newValue => settings.UseUniversalCharsetDetector = newValue);
 
         customEventSystemOptInOnAndroidPicker.SetVisibleByDisplay(PlatformUtils.IsAndroid);
         new BoolPickerControl(customEventSystemOptInOnAndroidPicker)

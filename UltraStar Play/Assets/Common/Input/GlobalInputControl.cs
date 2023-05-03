@@ -103,8 +103,8 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
             () =>
             {
-                settings.FullScreenMode.Value = Screen.fullScreenMode;
-                Debug.Log("New full-screen mode " + settings.FullScreenMode.Value);
+                settings.FullScreenMode = Screen.fullScreenMode;
+                Debug.Log("New full-screen mode " + settings.FullScreenMode);
             }));
     }
 }

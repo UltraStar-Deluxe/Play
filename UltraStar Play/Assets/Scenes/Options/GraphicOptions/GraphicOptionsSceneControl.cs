@@ -30,8 +30,8 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
     {
         base.Start();
 
-        lastScreenResolution = settings.ScreenResolution.Value;
-        lastFullscreenMode = settings.FullScreenMode.Value;
+        lastScreenResolution = settings.ScreenResolution;
+        lastFullscreenMode = settings.FullScreenMode;
         
         applyResolutionButton.RegisterCallbackButtonTriggered(_ => ApplyGraphicSettings());
         
@@ -48,8 +48,8 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
 
         List<int> fpsOptions = new() { 30, 60 };
         new LabeledItemPickerControl<int>(targetFpsPicker, fpsOptions)
-            .Bind(() => settings.TargetFps.Value,
-                newValue => settings.TargetFps.Value = newValue);
+            .Bind(() => settings.TargetFps,
+                newValue => settings.TargetFps = newValue);
     }
 
     public void UpdateTranslation()
@@ -66,8 +66,8 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
             return;
         }
 
-        ScreenResolution res = settings.ScreenResolution.Value;
-        FullScreenMode fullScreenMode = settings.FullScreenMode.Value;
+        ScreenResolution res = settings.ScreenResolution;
+        FullScreenMode fullScreenMode = settings.FullScreenMode;
         if (res.Width > 0
             && res.Height > 0
             && res.RefreshRate > 0

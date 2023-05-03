@@ -80,7 +80,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             })
             .AddTo(gameObject);
 
-        settings.SoundfontPath
+        settings.ObserveEveryValueChanged(it => it.SoundfontPath)
             .Subscribe(newValue => OnSoundfontPathChanged())
             .AddTo(gameObject);
 
@@ -111,15 +111,15 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
 
     private void InitPatchBank()
     {
-        if (FileUtils.Exists(settings.SoundfontPath.Value))
+        if (FileUtils.Exists(settings.SoundfontPath))
         {
-            patchBank = new PatchBank(new FileSystemSoundfontResource(settings.SoundfontPath.Value));
+            patchBank = new PatchBank(new FileSystemSoundfontResource(settings.SoundfontPath));
         }
         else
         {
-            if (!settings.SoundfontPath.Value.IsNullOrEmpty())
+            if (!settings.SoundfontPath.IsNullOrEmpty())
             {
-                string message = $"Soundfont file does not exist: {settings.SoundfontPath.Value}";
+                string message = $"Soundfont file does not exist: {settings.SoundfontPath}";
                 UiManager.CreateNotification(message);
                 Debug.LogWarning(message);
             }

@@ -30,7 +30,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         {
             MicSampleRecorder.MicProfile = value;
             // The sample rate could have changed, which means a new analyzer is needed.
-            AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm.Value, MicSampleRecorder.FinalSampleRate.Value);
+            AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
         }
     }
 
@@ -58,8 +58,8 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
     {
         MicSampleRecorder.RecordingEventStream.Subscribe(recordingEvent => OnRecordingEvent(recordingEvent));
 
-        AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm.Value, MicSampleRecorder.FinalSampleRate.Value);
-        settings.PitchDetectionAlgorithm
+        AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
+        settings.ObserveEveryValueChanged(it => it.PitchDetectionAlgorithm)
             .Subscribe(OnPitchDetectionAlgorithmChanged)
             .AddTo(gameObject);
     }

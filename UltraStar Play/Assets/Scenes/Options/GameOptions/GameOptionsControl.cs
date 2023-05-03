@@ -31,19 +31,19 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
         NumberPickerControl passTheMicTimeItemPickerControl = new NumberPickerControl(passTheMicTimeItemPicker, 20);
         passTheMicTimeItemPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
         passTheMicTimeItemPickerControl.Bind(
-            () => settings.PassTheMicTimeInSeconds.Value,
-            newValue => settings.PassTheMicTimeInSeconds.Value = (int)newValue);
+            () => settings.PassTheMicTimeInSeconds,
+            newValue => settings.PassTheMicTimeInSeconds = (int)newValue);
 
         NumberPickerControl reduceAudioVolumeItemPickerControl = new PercentNumberPickerControl(reduceAudioVolumeItemPicker, 2);
         reduceAudioVolumeItemPickerControl.Bind(
-            () => settings.ReducedAudioVolumePercent.Value,
-            newValue => settings.ReducedAudioVolumePercent.Value = (int)newValue);
+            () => settings.ReducedAudioVolumePercent,
+            newValue => settings.ReducedAudioVolumePercent = (int)newValue);
 
         NumberPickerControl defaultMedleyDurationPickerControl = new NumberPickerControl(defaultMedleyTargetDurationPicker, 30);
         defaultMedleyDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue} s";
         defaultMedleyDurationPickerControl.Bind(
-            () => settings.DefaultMedleyTargetDurationInSeconds.Value,
-            newValue => settings.DefaultMedleyTargetDurationInSeconds.Value = (int)newValue);
+            () => settings.DefaultMedleyTargetDurationInSeconds,
+            newValue => settings.DefaultMedleyTargetDurationInSeconds = (int)newValue);
         
         InitLanguageChooser();
     }
@@ -66,14 +66,14 @@ public class GameOptionsControl : AbstractOptionsSceneControl, INeedInjection
 
     private void SetLanguage(SystemLanguage newValue)
     {
-        if (settings.Language.Value == newValue
+        if (settings.Language == newValue
             && translationManager.currentLanguage == newValue)
         {
             return;
         }
 
-        settings.Language.Value = newValue;
-        translationManager.currentLanguage = settings.Language.Value;
+        settings.Language = newValue;
+        translationManager.currentLanguage = settings.Language;
         translationManager.ReloadTranslationsAndUpdateScene();
     }
 }

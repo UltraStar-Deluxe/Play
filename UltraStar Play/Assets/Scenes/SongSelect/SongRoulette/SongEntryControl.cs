@@ -319,7 +319,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songMeta));
         duetIcon.SetVisibleByDisplay(songMeta.VoiceNames.Count > 1);
         notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta));
-        songRatingIconControl.UpdateSongRatingIcons(songMeta, settings.Difficulty.Value);
+        songRatingIconControl.UpdateSongRatingIcons(songMeta, settings.Difficulty);
     }
 
     public void Dispose()

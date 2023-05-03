@@ -29,27 +29,27 @@ public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         UpdateGeneralVolume();
-        settings.VolumePercent
+        settings.ObserveEveryValueChanged(it => it.VolumePercent)
             .Subscribe(newValue => UpdateGeneralVolume())
             .AddTo(gameObject);
     }
 
     private void UpdateGeneralVolume()
     {
-        AudioListener.volume = settings.VolumePercent.Value / 100.0f;
+        AudioListener.volume = settings.VolumePercent / 100.0f;
     }
 
     public void ToggleMuteAudio()
     {
         if (volumeBeforeMute >= 0)
         {
-            settings.VolumePercent.Value = volumeBeforeMute;
+            settings.VolumePercent = volumeBeforeMute;
             volumeBeforeMute = -1;
         }
         else
         {
-            volumeBeforeMute = settings.VolumePercent.Value;
-            settings.VolumePercent.Value = 0;
+            volumeBeforeMute = settings.VolumePercent;
+            settings.VolumePercent = 0;
         }
     }
 }

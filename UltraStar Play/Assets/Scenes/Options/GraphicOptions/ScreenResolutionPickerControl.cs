@@ -24,7 +24,7 @@ public class ScreenResolutionPickerControl : LabeledItemPickerControl<ScreenReso
                 Selection.Value = GetBestMatchingScreenResolution(currentScreenResolution);
             }
         }
-        Selection.Subscribe(newValue => settings.ScreenResolution.Value = newValue);
+        Selection.Subscribe(newValue => settings.ScreenResolution = newValue);
     }
 
     private ScreenResolution GetBestMatchingScreenResolution(ScreenResolution targetResolution)

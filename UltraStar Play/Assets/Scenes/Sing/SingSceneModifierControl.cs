@@ -151,7 +151,7 @@ public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListen
 
     private void ReduceAudio()
     {
-        ModifiedVolumePercent.Value = settings.ReducedAudioVolumePercent.Value;
+        ModifiedVolumePercent.Value = settings.ReducedAudioVolumePercent;
     }
 
     private void UpdatePlayerSpecificModifiers(PlayerControl playerControl)

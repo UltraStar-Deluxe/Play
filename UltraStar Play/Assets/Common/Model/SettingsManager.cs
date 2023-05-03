@@ -63,7 +63,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             initializedResolution = true;
             // GetCurrentAppResolution may only be called from Start() and Awake(). This is why it is done here.
-            Settings.ScreenResolution.Value = ApplicationUtils.GetScreenResolution();
+            Settings.ScreenResolution = ApplicationUtils.GetScreenResolution();
         }
     }
 

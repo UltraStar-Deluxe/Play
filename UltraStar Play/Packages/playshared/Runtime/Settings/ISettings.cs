@@ -3,26 +3,26 @@ using UnityEngine;
 
 public interface ISettings
 {
-    public ReactiveProperty<SystemLanguage> Language { get; }
-    public ReactiveProperty<EPitchDetectionAlgorithm> PitchDetectionAlgorithm { get; }
+    public SystemLanguage Language { get; set; }
+    public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
 
-    public ReactiveProperty<bool> ShowFps { get; }
+    public bool ShowFps { get; set; }
 
     /**
      * The UDP port on the server (e.g. Companion App) for initiating a connection.
      * Default value 34567.
      */
-    public ReactiveProperty<int> UdpPortOnServer { get; }
+    public int UdpPortOnServer { get; set; }
 
     /**
      * The port on the client (e.g. Companion App) for initiating a connection.
      * Default value 34568.
      */
-    public ReactiveProperty<int> UdpPortOnClient { get; }
+    public int UdpPortOnClient { get; set; }
 
     /**
      * The IP address of the device running this app.
      * May be empty to select an IP address automatically.
      */
-    public ReactiveProperty<string> OwnHost { get; }
+    public string OwnHost { get; set; }
 }
