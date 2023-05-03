@@ -43,6 +43,18 @@ public class JsonConverterTests
         ReactivePropertyStringHolder deserialized = JsonConverter.FromJson<ReactivePropertyStringHolder>(json);
         Assert.AreEqual(original.ReactivePropertyString.Value, deserialized.ReactivePropertyString.Value);
     }
+
+    // [Test]
+    // public void RoundTripNullValue()
+    // {
+    //     ReactivePropertyStringHolder original = CreateReactivePropertyStringHolder();
+    //     original.ReactivePropertyString = null;
+    //     string json = JsonConverter.ToJson(original);
+    //     ReactivePropertyStringHolder deserialized = JsonConverter.FromJson<ReactivePropertyStringHolder>(json);
+    //     // TODO: A null value always removes the ReactiveProperty instead of setting its value to null.
+    //     Assert.IsNotNull(deserialized.ReactivePropertyString, "Deserializing null value has removed the ReactiveProperty");
+    //     Assert.IsNull(deserialized.ReactivePropertyString.Value, "Deserialized null value but the ReactiveProperty has a value");
+    // }
     
     [Test]
     public void SerializeReactivePropertyUserType()
