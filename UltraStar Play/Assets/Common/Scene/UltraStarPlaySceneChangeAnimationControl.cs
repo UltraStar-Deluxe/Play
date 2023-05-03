@@ -159,7 +159,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
 
     private void PlaySceneChangeAnimationSound()
     {
-        audioSource.volume = settings.SceneChangeSoundVolumePercent / 100f;
+        audioSource.volume = settings.SceneChangeSoundVolumePercent.Value / 100f;
         if (!audioSource.isPlaying)
         {
             audioSource.Play();

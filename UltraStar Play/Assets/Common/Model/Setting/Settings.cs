@@ -14,15 +14,15 @@ public class Settings : ISettings
     public ReactiveProperty<int> TargetFps { get; private set; } = new(30);
 
     // Audio settings
-    public int PreviewVolumePercent { get; set; } = 50;
-    public int VolumePercent { get; set; } = 100;
-    public int BackgroundMusicVolumePercent { get; set; } = 50;
-    public int VocalsAudioVolumePercent { get; set; } = 100;
-    public bool PreferPortAudio { get; set; }
-    public bool PlayRecordedAudio { get; set; }
-    public int SceneChangeSoundVolumePercent { get; set; } = 50;
-    public int SfxVolumePercent { get; set; } = 50;
-    public string soundfontPath = "";
+    public ReactiveProperty<int> PreviewVolumePercent { get; private set; } = new( 50);
+    public ReactiveProperty<int> VolumePercent { get; private set; } = new(100);
+    public ReactiveProperty<int> BackgroundMusicVolumePercent { get; private set; } = new( 50);
+    public ReactiveProperty<int> VocalsAudioVolumePercent { get; private set; } = new(100);
+    public ReactiveProperty<int> SceneChangeSoundVolumePercent { get; private set; } = new( 50);
+    public ReactiveProperty<int> SfxVolumePercent { get; private set; } = new( 50);
+    public ReactiveProperty<bool> PreferPortAudio { get; private set; } = new();
+    public ReactiveProperty<bool> PlayRecordedAudio { get; private set; } = new();
+    public ReactiveProperty<string> SoundfontPath { get; private set; } = new("");
 
     // Game settings
     public SystemLanguage Language { get; set; } = SystemLanguage.English;

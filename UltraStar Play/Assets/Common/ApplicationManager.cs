@@ -41,7 +41,7 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         settings.TargetFps
             .Subscribe(newValue => targetFrameRate = newValue);
             
-        ApplicationUtils.SetUsePortAudio(settings.PreferPortAudio);
+        ApplicationUtils.SetUsePortAudio(settings.PreferPortAudio.Value);
     }
 
     private void Update()

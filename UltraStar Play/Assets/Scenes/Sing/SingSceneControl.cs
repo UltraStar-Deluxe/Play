@@ -696,7 +696,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         achievementEventStream.OnNext(AchievementId.completeSong);
         
-        if (settings.VocalsAudioVolumePercent <= 0)
+        if (settings.VocalsAudioVolumePercent.Value <= 0)
         {
             achievementEventStream.OnNext(AchievementId.completeSongWithVocalsVolumeZero);
         }

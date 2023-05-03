@@ -25,7 +25,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
     {
         get
         {
-            if (settings.BackgroundMusicVolumePercent <= 0)
+            if (settings.BackgroundMusicVolumePercent.Value <= 0)
             {
                 return false;
             }
@@ -66,7 +66,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         defaultBackgroundMusicAudioClip = backgroundMusicAudioSource.clip;
-        settings.ObserveEveryValueChanged(it => it.BackgroundMusicVolumePercent)
+        settings.BackgroundMusicVolumePercent
             .Subscribe(_ => UpdateBackgroundMusic())
             .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.themeName)
@@ -82,7 +82,7 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
         UpdateAudioClip();
 
         // Update volume
-        backgroundMusicAudioSource.volume = settings.BackgroundMusicVolumePercent / 100f;
+        backgroundMusicAudioSource.volume = settings.BackgroundMusicVolumePercent.Value / 100f;
 
         // Play or pause the music
         if (ShouldPlayBackgroundMusic

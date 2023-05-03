@@ -50,7 +50,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
-        settings.ObserveEveryValueChanged(it => it.SfxVolumePercent)
+        settings.SfxVolumePercent
             .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f));
     }
 
@@ -63,7 +63,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
         AudioManager audioManager = Instance;
         if (audioManager == null
-            || audioManager.settings.SfxVolumePercent <= 0)
+            || audioManager.settings.SfxVolumePercent.Value <= 0)
         {
             return;
         }

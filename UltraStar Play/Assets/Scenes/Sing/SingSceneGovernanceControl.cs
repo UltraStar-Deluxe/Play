@@ -100,12 +100,12 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         
         volumeSlider.RegisterValueChangedCallback(evt =>
         {
-            if (settings.VolumePercent != evt.newValue)
+            if (settings.VolumePercent.Value != evt.newValue)
             {
-                settings.VolumePercent = evt.newValue;
+                settings.VolumePercent.Value = evt.newValue;
             }
         });
-        settings.ObserveEveryValueChanged(it => it.VolumePercent)
+        settings.VolumePercent
             .Subscribe(newValue =>
             {
                 if (volumeSlider.value != newValue)
@@ -326,10 +326,10 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             Slider vocalsVolumeSlider = new();
             vocalsVolumeSlider.lowValue = 0;
             vocalsVolumeSlider.highValue = 100;
-            vocalsVolumeSlider.value = settings.VocalsAudioVolumePercent;
+            vocalsVolumeSlider.value = settings.VocalsAudioVolumePercent.Value;
             vocalsVolumeSlider.RegisterValueChangedCallback(evt =>
             {
-                settings.VocalsAudioVolumePercent = (int)evt.newValue;
+                settings.VocalsAudioVolumePercent.Value = (int)evt.newValue;
             });
 
             contextMenuPopup.AddVisualElement(vocalsVolumeSlider);
