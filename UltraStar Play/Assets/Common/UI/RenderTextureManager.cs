@@ -36,7 +36,7 @@ public class RenderTextureManager : AbstractSingletonBehaviour, INeedInjection
     {
         Debug.Log("Recreating screen sized RenderTextures because screen size changed.");
         Camera[] cameras = FindObjectsOfType<Camera>();
-        renderTextureConsumers.ForEach(consumer =>
+        renderTextureConsumers.ToList().ForEach(consumer =>
         {
             // A RenderTexture must not be destroyed when it is set as targetTexture of a camera.
             List<Camera> camerasUsingRenderTexture = cameras.Where(cam => cam.targetTexture == consumer.renderTexture).ToList();
