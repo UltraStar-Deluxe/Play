@@ -148,7 +148,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                                 songMeta,
                                 createdNotes,
                                 vocalsAudioClip,
-                                settings.PitchDetectionAlgorithm,
+                                settings.PitchDetectionAlgorithm.Value,
                                 pitchDetectionJob)
                             .CatchIgnore((Exception ex) =>
                             {

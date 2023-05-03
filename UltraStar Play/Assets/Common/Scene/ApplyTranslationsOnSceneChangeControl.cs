@@ -37,9 +37,9 @@ public class ApplyTranslationsOnSceneChangeControl : AbstractSingletonBehaviour,
     
     public void ApplyTranslations()
     {
-        if (translationManager.currentLanguage != settings.Language)
+        if (translationManager.currentLanguage != settings.Language.Value)
         {
-            translationManager.currentLanguage = settings.Language;
+            translationManager.currentLanguage = settings.Language.Value;
             translationManager.ReloadTranslationsAndUpdateScene();
         }
 

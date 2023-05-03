@@ -35,16 +35,16 @@ public class NetworkConfigControl : INeedInjection, IInjectionFinishedListener
     {
         // Update value when TextField changes
         BindTextField(udpPortOnServerTextField,
-            () => settings.UdpPortOnServer,
-            newStringValue => PropertyUtils.TrySetIntFromString(newStringValue, newIntValue => settings.UdpPortOnServer = newIntValue));
+            () => settings.UdpPortOnServer.Value,
+            newStringValue => PropertyUtils.TrySetIntFromString(newStringValue, newIntValue => settings.UdpPortOnServer.Value = newIntValue));
 
         BindTextField(udpPortOnClientTextField,
-            () => settings.UdpPortOnClient,
-            newStringValue => PropertyUtils.TrySetIntFromString(newStringValue, newIntValue => settings.UdpPortOnClient = newIntValue));
+            () => settings.UdpPortOnClient.Value,
+            newStringValue => PropertyUtils.TrySetIntFromString(newStringValue, newIntValue => settings.UdpPortOnClient.Value = newIntValue));
 
         BindTextField(ownHostTextField,
-            () => settings.OwnHost,
-            newStringValue => settings.OwnHost = newStringValue);
+            () => settings.OwnHost.Value,
+            newStringValue => settings.OwnHost.Value = newStringValue);
     }
 
     private void BindTextField(TextField textField, Func<object> valueGetter, Action<string> valueSetter)

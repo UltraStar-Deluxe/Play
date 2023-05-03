@@ -166,7 +166,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     {
         HideLeadingPlayerIcon();
 
-        if (settings.ScoreMode == EScoreMode.None
+        if (settings.ScoreMode.Value == EScoreMode.None
             && (settings.noteDisplayMode == ENoteDisplayMode.None
                 || settings.noteDisplayMode == ENoteDisplayMode.SentenceBySentence))
         {
@@ -281,7 +281,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     public VisualElement ShowSentenceRating(SentenceRating sentenceRating, VisualElement parentContainer)
     {
-        if (settings.ScoreMode == EScoreMode.None
+        if (settings.ScoreMode.Value == EScoreMode.None
             || sentenceRating.PercentageThreshold <= SentenceRating.notBad.PercentageThreshold)
         {
             return null;
@@ -307,7 +307,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     public void ShowTotalScore(int score, bool animate = true)
     {
-        if (settings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode.Value == EScoreMode.None)
         {
             return;
         }

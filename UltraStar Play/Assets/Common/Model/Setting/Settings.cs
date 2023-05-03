@@ -25,21 +25,21 @@ public class Settings : ISettings
     public ReactiveProperty<string> SoundfontPath { get; private set; } = new("");
 
     // Game settings
-    public SystemLanguage Language { get; set; } = SystemLanguage.English;
-    public EScoreMode ScoreMode { get; set; } = EScoreMode.Individual;
-    public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
-    public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
-    public string CommonScoreNameSeparator { get; set; } = " & ";
-    public int defaultMedleyTargetDurationInSeconds = 30;
-    public int reducedAudioVolumePercent = 1;
-    public float passTheMicTimeInSeconds = 20;
+    public ReactiveProperty<SystemLanguage> Language { get; private set; } = new(SystemLanguage.English);
+    public ReactiveProperty<EScoreMode> ScoreMode { get; private set; } = new(EScoreMode.Individual);
+    public ReactiveProperty<EDifficulty> Difficulty { get; private set; } = new(EDifficulty.Medium);
+    public ReactiveProperty<EPitchDetectionAlgorithm> PitchDetectionAlgorithm { get; private set; } = new(EPitchDetectionAlgorithm.Dywa);
+    public ReactiveProperty<string> CommonScoreNameSeparator { get; private set; } = new(" & ");
+    public ReactiveProperty<int> DefaultMedleyTargetDurationInSeconds { get; private set; } = new(30);
+    public ReactiveProperty<int> ReducedAudioVolumePercent { get; private set; } = new(1);
+    public ReactiveProperty<float> PassTheMicTimeInSeconds { get; private set; } = new(20);
     
     // Player profile settings
     public List<PlayerProfile> PlayerProfiles { get; set; } = new();
     
     // Recording device settings
     public List<MicProfile> MicProfiles { get; set; } = new();
-    public string LastMicProfileNameInRecordingOptionsScene { get; set; }
+    public string LastMicProfileNameInRecordingOptionsScene { get; set; } = "";
     public int LastMicProfileChannelIndexInRecordingOptionsScene { get; set; }
     
     // Webcam settings
@@ -83,8 +83,8 @@ public class Settings : ISettings
     };
 
     // Technical settings
-    public bool ShowFps { get; set; }
-    public bool useUniversalCharsetDetector = true;
+    public ReactiveProperty<bool> ShowFps { get; private set; } = new();
+    public ReactiveProperty<bool> UseUniversalCharsetDetector { get; private set; } = new(true);
 
     /**
      * Require explicit user action to use custom event system
@@ -95,15 +95,15 @@ public class Settings : ISettings
 
     // The releases to be ignored when checking for updates.
     // When containing the string "all", then all releases will be ignored.
-    public List<string> IgnoredReleases { get; set; } = new();
+    public List<string> IgnoredReleases { get; private set; } = new();
 
     // Companion App / REST API settings
-    public int UdpPortOnServer { get; set; } = 34567;
-    public int UdpPortOnClient { get; set; } = 34568;
-    public string OwnHost { get; set; }
-    public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
+    public ReactiveProperty<int> UdpPortOnServer { get; private set; } = new(34567);
+    public ReactiveProperty<int> UdpPortOnClient { get; private set; } = new(34568);
+    public ReactiveProperty<string> OwnHost { get; private set; } = new("");
+    public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; private set; } = new();
     
     // Other settings
-    public PartyModeSettings PartyModeSettings { get; set; } = new();
-    public SongEditorSettings SongEditorSettings { get; set; } = new();
+    public PartyModeSettings PartyModeSettings { get; private set; } = new();
+    public SongEditorSettings SongEditorSettings { get; private set; } = new();
 }

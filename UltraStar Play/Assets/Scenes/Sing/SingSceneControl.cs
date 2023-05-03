@@ -174,11 +174,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private readonly SingSceneMedleyControl medleyControl = new();
     private readonly SingSceneModifierControl modifierControl = new();
 
-    public bool IsCommonScore => settings.ScoreMode == EScoreMode.CommonAverage
+    public bool IsCommonScore => settings.ScoreMode.Value == EScoreMode.CommonAverage
                                  && sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 2;
 
-    public bool IsIndividualScore => settings.ScoreMode == EScoreMode.Individual
-                                     || (settings.ScoreMode == EScoreMode.CommonAverage
+    public bool IsIndividualScore => settings.ScoreMode.Value == EScoreMode.Individual
+                                     || (settings.ScoreMode.Value == EScoreMode.CommonAverage
                                          && sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count <= 1);
 
     private float startTimeInSeconds;
@@ -681,7 +681,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             TriggerAchievementsAfterEndOfSong();
         }
 
-        if (settings.ScoreMode == EScoreMode.None
+        if (settings.ScoreMode.Value == EScoreMode.None
             && !HasPartyModeSceneData)
         {
             FinishSceneToSongSelect();
@@ -772,7 +772,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 .ToList();
             string commonPlayerProfileName = PlayerControls
                 .Select(playerControl => playerControl.PlayerProfile.Name)
-                .JoinWith(settings.CommonScoreNameSeparator);
+                .JoinWith(settings.CommonScoreNameSeparator.Value);
             EDifficulty easiestPlayerProfileDifficulty = PlayerControls
                 .FindMinElement(playerControl => (int)playerControl.PlayerProfile.Difficulty)
                 .PlayerProfile.Difficulty;

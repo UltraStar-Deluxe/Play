@@ -52,9 +52,9 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
         }
 
         passTheMicTimeInSeconds += deltaTimeInSeconds;
-        if (passTheMicTimeInSeconds >= settings.passTheMicTimeInSeconds)
+        if (passTheMicTimeInSeconds >= settings.PassTheMicTimeInSeconds.Value)
         {
-            passTheMicTimeInSeconds -= settings.passTheMicTimeInSeconds;
+            passTheMicTimeInSeconds -= settings.PassTheMicTimeInSeconds.Value;
             singSceneControl.PartyModeSettings.teamSettings.teams.ForEach(team => PassTheMicToNextPlayerInTeam(team));
         }
 
@@ -63,7 +63,7 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
 
     private void UpdateProgressBar()
     {
-        passTheMicProgressBar.value = 100 * passTheMicTimeInSeconds / settings.passTheMicTimeInSeconds;
+        passTheMicProgressBar.value = 100 * passTheMicTimeInSeconds / settings.PassTheMicTimeInSeconds.Value;
     }
 
     private void PassTheMicToNextPlayerInTeam(PartyModeTeamSettings team)

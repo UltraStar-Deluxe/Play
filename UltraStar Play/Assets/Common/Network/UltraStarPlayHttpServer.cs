@@ -32,8 +32,8 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
         }
 
         Settings settings = SettingsManager.Instance.Settings;
-        host = !settings.OwnHost.IsNullOrEmpty()
-            ? settings.OwnHost
+        host = !settings.OwnHost.Value.IsNullOrEmpty()
+            ? settings.OwnHost.Value
             : IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
 
         NoEndpointFoundCallback = SendNoEndpointFound;

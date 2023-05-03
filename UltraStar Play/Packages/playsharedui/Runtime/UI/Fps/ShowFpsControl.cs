@@ -36,7 +36,7 @@ public class ShowFpsControl : MonoBehaviour, INeedInjection, IInjectionFinishedL
 
     public void OnInjectionFinished()
     {
-        settings.ObserveEveryValueChanged(it => it.ShowFps)
+        settings.ShowFps
             .Subscribe(_ => UpdateFpsLabelInstance());
         UpdateFpsLabelInstance();
     }
@@ -44,7 +44,7 @@ public class ShowFpsControl : MonoBehaviour, INeedInjection, IInjectionFinishedL
     private void UpdateFpsLabelInstance()
     {
         RemoveFpsLabel();
-        if (settings.ShowFps)
+        if (settings.ShowFps.Value)
         {
             CreateFpsLabel();
         }

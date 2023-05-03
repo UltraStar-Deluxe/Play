@@ -54,7 +54,7 @@ public class SingingResultsHighscoreControl : INeedInjection
 
         currentDifficulty = !sceneData.PlayerProfiles.IsNullOrEmpty()
             ? sceneData.PlayerProfiles.FirstOrDefault().Difficulty
-            : settings.Difficulty;
+            : settings.Difficulty.Value;
         nextDifficultyButton.RegisterCallbackButtonTriggered(_ => ChangeDifficulty(1));
         previousDifficultyButton.RegisterCallbackButtonTriggered(_ => ChangeDifficulty(-1));
         UpdateHighscores();

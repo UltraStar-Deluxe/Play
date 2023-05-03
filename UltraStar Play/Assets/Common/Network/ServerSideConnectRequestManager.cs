@@ -50,9 +50,9 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             return;
         }
 
-        serverUdpClient = !settings.OwnHost.IsNullOrEmpty()
-            ? new UdpClient(new IPEndPoint(IPAddress.Parse(settings.OwnHost), settings.UdpPortOnServer))
-            : new UdpClient(settings.UdpPortOnServer);
+        serverUdpClient = !settings.OwnHost.Value.IsNullOrEmpty()
+            ? new UdpClient(new IPEndPoint(IPAddress.Parse(settings.OwnHost.Value), settings.UdpPortOnServer.Value))
+            : new UdpClient(settings.UdpPortOnServer.Value);
 
         ThreadPool.QueueUserWorkItem(poolHandle =>
         {
