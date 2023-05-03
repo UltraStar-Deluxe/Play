@@ -98,6 +98,15 @@ public class JsonConverterTests
     }
     
     [Test]
+    public void RoundTripReactivePropertyFloat()
+    {
+        ReactivePropertyFloatHolder original = CreateReactivePropertyFloatHolder();
+        string json = JsonConverter.ToJson(original);
+        ReactivePropertyFloatHolder deserialized = JsonConverter.FromJson<ReactivePropertyFloatHolder>(json);
+        Assert.AreEqual(deserialized.ReactivePropertyFloat.Value, 42.5f);
+    }
+    
+    [Test]
     public void SerializeReactivePropertyList()
     {
         ReactivePropertyListHolder original = CreateReactivePropertyListHolder();
@@ -194,6 +203,13 @@ public class JsonConverterTests
         return result;
     }
     
+    private ReactivePropertyFloatHolder CreateReactivePropertyFloatHolder()
+    {
+        ReactivePropertyFloatHolder result = new();
+        result.ReactivePropertyFloat.Value = 42.5f;
+        return result;
+    }
+    
     private class ReactivePropertyStringHolder
     {
         public ReactiveProperty<string> ReactivePropertyString { get; set; } = new();
@@ -222,5 +238,10 @@ public class JsonConverterTests
     private class ReactivePropertyIntHolder
     {
         public ReactiveProperty<int> ReactivePropertyInt { get; set; } = new();
+    }
+    
+    private class ReactivePropertyFloatHolder
+    {
+        public ReactiveProperty<float> ReactivePropertyFloat { get; set; } = new();
     }
 }

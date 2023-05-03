@@ -69,7 +69,14 @@ public class ReactivePropertyConverter : fsConverter
         }
         else if (data.IsDouble)
         {
-            deserializedValue = data.AsDouble;
+            if (deserializedValueType == typeof(float))
+            {
+                deserializedValue = (float)data.AsDouble;
+            }
+            else
+            {
+                deserializedValue = data.AsDouble;
+            }
         }
         else if (data.IsInt64)
         {
