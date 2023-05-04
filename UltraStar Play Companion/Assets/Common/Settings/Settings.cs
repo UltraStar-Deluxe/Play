@@ -4,21 +4,19 @@ using UnityEngine;
 [Serializable]
 public class Settings : ISettings
 {
-    public string ClientName { get; set; } = "MyCompanionApp";
     /**
      * UUID that is generated on first start and identifies this device.
      */
     public string ClientId { get; private set; }
+    
+    public string ClientName { get; set; } = "MyCompanionApp";
 
+    public SystemLanguage Language { get; set; } = SystemLanguage.English;
     public MicProfile MicProfile { get; set; } = new MicProfile();
-
+    public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
     public int TargetFps { get; set; } = 30;
-    public bool ShowFps => IsDevModeEnabled;
     public bool ShowAudioWaveForm { get; set; } = true;
-
-    public GameSettings GameSettings { get; set; } = new GameSettings();
-    public AudioSettings AudioSettings { get; set; } = new AudioSettings();
-
+    public float MousePadSensitivity { get; set; } = 1;
     public bool IsDevModeEnabled { get; set; }
 
     public int UdpPortOnServer { get; set; } = 34567;
@@ -26,8 +24,6 @@ public class Settings : ISettings
     public string OwnHost { get; set; }
 
     public GameRoundSettings GameRoundSettings { get; set; } = new();
-    
-    public float mousePadSensitivity = 1;
     
     public void CreateAndSetClientId()
     {
@@ -41,16 +37,9 @@ public class Settings : ISettings
         MicProfile = newMicProfile;
     }
 
-    // TODO: flatten settings?
-    public SystemLanguage Language
+    public bool ShowFps
     {
-        get { return GameSettings.language; }
-        set { GameSettings.language = value; }
-    }
-
-    public EPitchDetectionAlgorithm PitchDetectionAlgorithm
-    {
-        get { return AudioSettings.pitchDetectionAlgorithm; }
-        set { AudioSettings.pitchDetectionAlgorithm = value; }
+        get => IsDevModeEnabled;
+        set => IsDevModeEnabled = value;
     }
 }

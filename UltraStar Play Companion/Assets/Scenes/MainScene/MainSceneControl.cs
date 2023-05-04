@@ -230,8 +230,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             audioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, audioWaveForm);
         });
         
-        mouseSensitivityFloatField.value = settings.mousePadSensitivity;
-        mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.mousePadSensitivity = evt.newValue);
+        mouseSensitivityFloatField.value = settings.MousePadSensitivity;
+        mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.MousePadSensitivity = evt.newValue);
         
         // Only show some controls when dev mode is enabled.
         UpdateDevModeControlsVisibility();
@@ -281,9 +281,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
         // Language
         languagePickerControl = new LabeledItemPickerControl<SystemLanguage>(languagePicker, translationManager.GetTranslatedLanguages());
-        languagePickerControl.SelectItem(settings.GameSettings.language);
-        languagePickerControl.Selection.Subscribe(newValue => settings.GameSettings.language = newValue);
-        settings.ObserveEveryValueChanged(it => it.GameSettings.language)
+        languagePickerControl.SelectItem(settings.Language);
+        languagePickerControl.Selection.Subscribe(newValue => settings.Language = newValue);
+        settings.ObserveEveryValueChanged(it => it.Language)
             .Subscribe(newValue =>
             {
                 translationManager.currentLanguage = newValue;

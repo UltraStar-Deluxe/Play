@@ -146,4 +146,20 @@ public class Voice : ISerializationCallbackReceiver
             ? firstVoiceName
             : voiceName;
     }
+
+    public static string GetNextVoiceName(string currentVoiceName)
+    {
+        if (currentVoiceName == Voice.firstVoiceName)
+        {
+            return Voice.secondVoiceName;
+        }
+        else if (currentVoiceName == Voice.secondVoiceName)
+        {
+            return Voice.mergedVoiceName;
+        }
+        else
+        {
+            return Voice.firstVoiceName;
+        }
+    }
 }

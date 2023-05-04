@@ -204,7 +204,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             scrollWheelAreaStartPos = evt.localPosition;
             mousePadAreaStartPos = evt.localPosition;
         }
-        Vector3 pointerDelta = (evt.localPosition - mousePadAreaStartPos) * settings.mousePadSensitivity;
+        Vector3 pointerDelta = (evt.localPosition - mousePadAreaStartPos) * settings.MousePadSensitivity;
         SendSimulateMouseDeltaRequest(new Vector2(pointerDelta.x, -pointerDelta.y));
         mousePadAreaStartPos = evt.localPosition;
     }

@@ -29,7 +29,7 @@ public class MicWithNameControl : INeedInjection, IInjectionFinishedListener, ID
         nameLabel.text = MicProfile.GetDisplayNameWithChannel();
         nameLabel.RegisterCallback<ClickEvent>(evt => OnMicSelected?.Invoke(MicProfile));
         micIcon.style.unityBackgroundImageTintColor = new StyleColor(MicProfile.Color);
-        micIcon.style.unityBackgroundImageTintColor = new StyleColor(MicProfile.Color);
+        micIcon.style.color = new StyleColor(MicProfile.Color);
         
         injector.Inject(MicProgressBarRecordingControl);
         MicProgressBarRecordingControl.MicProgressBarControl.OnProgressBarFilled = localMicProfile => OnMicSelected?.Invoke(localMicProfile);

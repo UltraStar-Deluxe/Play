@@ -131,7 +131,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()
     {
         return playerEntryControls
-            .Where(control => control.IsSelected)
+            .Where(control => control.IsSelected.Value)
             .ToList();
     }
     
@@ -325,6 +325,11 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 List<string> voiceNames = voiceNameToLyricsMap.Keys
                     .Select(voiceName => Voice.NormalizeVoiceName(voiceName))
                     .ToList();
+                if (voiceNames.Count > 1
+                    && !voiceNames.Contains(Voice.mergedVoiceName))
+                {
+                    voiceNames.Add(Voice.mergedVoiceName);
+                }
                 playerEntryControl.SetAvailableVoiceNames(voiceNames);
                 if (!voiceNames.IsNullOrEmpty())
                 {
@@ -332,15 +337,15 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
             }
 
-            playerEntryControl.SelectedToggle.RegisterValueChangedCallback(evt =>
+            playerEntryControl.IsSelected.Subscribe(newValue =>
             {
                 // Update mic profile.
-                if (evt.newValue
+                if (newValue
                     && playerEntryControl.MicProfile == null)
                 {
                     AssignUnusedMicProfile(playerEntryControl);
                 }
-                else if (!evt.newValue
+                else if (!newValue
                          && playerEntryControl.MicProfile != null)
                 {
                     playerEntryControl.MicProfile = null;
@@ -349,6 +354,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 UpdateEnqueueButton();
             });
 
+            playerEntryControl.SetSeparatorVisibleByDisplay(playerProfileIndex < playerProfileNames.Count - 1);
+            
             playerEntryControls.Add(playerEntryControl);
             playerProfileIndex++;
         });

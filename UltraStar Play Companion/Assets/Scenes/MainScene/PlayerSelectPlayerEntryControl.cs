@@ -33,15 +33,18 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R_PlayShared.UxmlNames.nameLabel)]
     private Label nameLabel;
     
-    [Inject(UxmlName = R_PlayShared.UxmlNames.teamLabel)]
+    [Inject(UxmlName = R.UxmlNames.teamLabel)]
     private Label teamLabel;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.voiceChooser)]
+    [Inject(UxmlName = R.UxmlNames.voiceChooser)]
     private ItemPicker voiceChooser;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.selectedToggle)]
-    public Toggle SelectedToggle { get; private set; }
+    [Inject(UxmlName = R.UxmlNames.selectedToggle)]
+    private Toggle selectedToggle;
     
+    [Inject(UxmlName = R.UxmlNames.horizontalSeparatorLine)]
+    private VisualElement horizontalSeparatorLine;
+
     private MicProfile micProfile;
     public MicProfile MicProfile
     {
@@ -56,7 +59,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         }
     }
 
-    public bool IsSelected => SelectedToggle.value;
+    public ReactiveProperty<bool> IsSelected { get; private set; } = new();
     
     public LabeledItemPickerControl<string> VoiceChooserControl { get; private set; }
 
@@ -69,15 +72,38 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         nameLabel.text = PlayerProfileName;
         teamLabel.HideByDisplay();
 
+        nameLabel.RegisterCallback<PointerDownEvent>(_ => ToggleSelected());
+        selectedToggle.RegisterValueChangedCallback(evt => IsSelected.Value = evt.newValue);
         micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
+        IsSelected.Subscribe(newValue => selectedToggle.value = newValue);
         
         VoiceChooserControl = new(voiceChooser, new List<string>()
         {
             Voice.firstVoiceName,
             Voice.secondVoiceName,
         });
+        VoiceChooserControl.GetLabelTextFunction = item =>
+        {
+            if (item == null)
+            {
+                return "";
+            }
+            else if (item == Voice.mergedVoiceName)
+            {
+                return "Both";
+            }
+            else
+            {
+                return item;
+            }
+        };
 
         UpdateMicIcon();
+    }
+
+    private void ToggleSelected()
+    {
+        IsSelected.Value = !IsSelected.Value;
     }
 
     private void OpenMicSelectionDialog()
@@ -123,6 +149,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         if (micProfile != null)
         {
             micIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
+            micIcon.style.color = new StyleColor(micProfile.Color);
             micIcon.ShowByVisibility();
         }
         else
@@ -138,5 +165,10 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         {
             VoiceChooserControl.ItemPicker.HideByDisplay();
         }
+    }
+    
+    public void SetSeparatorVisibleByDisplay(bool newValue)
+    {
+        horizontalSeparatorLine.SetVisibleByDisplay(newValue);
     }
 }

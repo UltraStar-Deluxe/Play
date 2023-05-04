@@ -159,18 +159,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         selectedVoiceName.Subscribe(_ => UpdateChangeVoiceButtonText());
         changeVoiceButton.RegisterCallbackButtonTriggered(_ =>
         {
-            if (selectedVoiceName.Value == Voice.firstVoiceName)
-            {
-                selectedVoiceName.Value = Voice.secondVoiceName;
-            }
-            else if (selectedVoiceName.Value == Voice.secondVoiceName)
-            {
-                selectedVoiceName.Value = Voice.mergedVoiceName;
-            }
-            else
-            {
-                selectedVoiceName.Value = Voice.firstVoiceName;
-            }
+            selectedVoiceName.Value = Voice.GetNextVoiceName(selectedVoiceName.Value);
         });
     }
 
