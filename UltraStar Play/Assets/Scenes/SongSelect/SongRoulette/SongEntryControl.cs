@@ -188,6 +188,16 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
+        // Start song
+        contextMenuPopup.AddButton("Start", "play_arrow",
+            () =>
+            {
+                if (SongMeta != null)
+                {
+                    songSelectSceneControl.AttemptStartSong(SongMeta);
+                }
+            });
+        
         // Add / remove from playlist
         playlistManager.Playlists
             .Where(playlist => playlist is UltraStarPlaylist

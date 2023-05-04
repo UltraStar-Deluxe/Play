@@ -80,7 +80,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
             .Subscribe(OnSubmit);
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => songSelectSceneControl.AttemptStartSong());
+            .Subscribe(_ => songSelectSceneControl.AttemptStartSelectedSong());
         
         // Select controls
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
@@ -149,7 +149,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         else if (focusedElement?.GetFirstAncestorOfType<ListView>() != null
                  || focusedElement?.GetFirstAncestorOfType<ListViewH>() != null)
         {
-            songSelectSceneControl.AttemptStartSong();
+            songSelectSceneControl.AttemptStartSelectedSong();
         }
     }
 
