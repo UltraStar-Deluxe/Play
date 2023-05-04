@@ -101,32 +101,25 @@ Button.selected:hover {
     white-space: normal;
 }
 
-.leftSideBar {
-    width: 80px;
+#leftSideBarMainColumn {
     height: 100%;
-    transition: width 0.5s;
+    align-items: flex-start;
 }
 
-.leftSideBar Button {
+#leftSideBarMainColumn Button {
     padding: 6px;
     margin-bottom: 5px;
     width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 }
 
-.leftSideBar Label {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -unity-text-align: middle-center;
+#leftSideBarMainColumn Label {
+    -unity-text-align: middle-left;
     -unity-background-scale-mode: scale-to-fit;
     -unity-background-image-tint-color: var(--font-color);
-}
-
-.leftSideBar MaterialIcon {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -unity-background-scale-mode: scale-to-fit;
+    white-space: normal;
 }
 
 #leftSideBarMainColumn.small {
@@ -147,24 +140,20 @@ Button.selected:hover {
     display: none;
 }
 
-#leftSideBarMainColumn.wide Label {
+#leftSideBarMainColumn.small #smallIcon {
     display: flex;
 }
 
-#leftSideBarMainColumn.small MaterialIcon#wideIcon {
+#leftSideBarMainColumn.wide #smallIcon {
     display: none;
 }
 
-#leftSideBarMainColumn.wide MaterialIcon#wideIcon {
-    display: flex;
-}
-
-#leftSideBarMainColumn.small MaterialIcon {
-    display: flex;
-}
-
-#leftSideBarMainColumn.wide MaterialIcon {
+#leftSideBarMainColumn.small #wideIcon {
     display: none;
+}
+
+#leftSideBarMainColumn.wide #wideIcon {
+    display: flex;
 }
 
 .unity-toggle {

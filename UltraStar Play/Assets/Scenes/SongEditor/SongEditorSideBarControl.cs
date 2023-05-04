@@ -303,10 +303,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void UpdatePlayPauseIcon()
     {
-        bool playIconVisible = settings.SongEditorSettings.SmallLeftSideBar
-                               && !songAudioPlayer.IsPlaying;
-        bool pauseIconVisible = settings.SongEditorSettings.SmallLeftSideBar
-                               && songAudioPlayer.IsPlaying;
+        bool playIconVisible = !songAudioPlayer.IsPlaying;
+        bool pauseIconVisible = songAudioPlayer.IsPlaying;
         playIcon.SetVisibleByDisplay(playIconVisible);
         pauseIcon.SetVisibleByDisplay(pauseIconVisible);
     }
