@@ -4,8 +4,8 @@
             <ui:VisualElement name="topContainer" style="flex-grow: 1; align-items: center;">
                 <ui:VisualElement name="playerInfoContainer" style="justify-content: center; align-items: center; flex-grow: 1; width: 100%; min-height: 50%;">
                     <AspectRatioPanel aspect-ratio-x="1" aspect-ratio-y="1" style="flex-grow: 1; align-items: center; justify-content: center; height: 100%; width: 100%;">
-                        <RadialProgressBar progress="80" name="playerScoreProgressBar" show-label="false" class="overlay singingResults" style="width: 100%; height: 100%;" />
-                        <ui:VisualElement name="playerImage" class="circle" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); align-items: center; -unity-background-scale-mode: scale-to-fit; width: 80%; height: 80%;" />
+                        <RadialProgressBar progress="80" name="playerScoreProgressBar" show-label="false" class="overlay singingResults" />
+                        <ui:VisualElement name="playerImage" class="circle singingResults" style="background-image: url(&apos;project://database/Assets/Common/Graphics/FallbackPlayerProfileImage.png?fileID=2800000&amp;guid=ca1ea05bb403d964db23aec1e46b7f70&amp;type=3#FallbackPlayerProfileImage&apos;); -unity-background-scale-mode: scale-to-fit;" />
                         <RadialChildLayouter name="starIcons" angle-offset="20" angle-high-value="180" class="overlay" style="background-color: rgba(0, 0, 0, 0); display: none;">
                             <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" style="font-size: 14px;" />
                             <MaterialIcon tabindex="-1" icon="star" name="songRatingStarIcon" style="font-size: 14px;" />
@@ -26,11 +26,11 @@
             </ui:VisualElement>
             <ui:VisualElement name="bottomContainer" style="flex-shrink: 2;">
                 <ui:VisualElement name="singingResultsScoresContainer" picking-mode="Ignore" style="height: auto;">
-                    <ui:VisualElement name="normalNoteScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
+                    <ui:VisualElement name="normalNoteScore" picking-mode="Ignore" class="scoreRow">
                         <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="align-items: center; justify-content: center;">
                             <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
                         </ui:VisualElement>
-                        <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap; padding-bottom: 2px;">
+                        <ui:VisualElement name="labels" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap; align-items: center;">
                             <ui:Label text="Notes" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" style="height: 100%;" />
                             <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" />
                         </ui:VisualElement>
