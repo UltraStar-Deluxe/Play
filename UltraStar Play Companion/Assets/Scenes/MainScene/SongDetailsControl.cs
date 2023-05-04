@@ -47,6 +47,9 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     [Inject(UxmlName = R.UxmlNames.enqueueButton)]
     private Button enqueueButton;
     
+    [Inject(UxmlName = R.UxmlNames.enqueueMedleyButton)]
+    private Button enqueueMedleyButton;
+    
     [Inject(UxmlName = R.UxmlNames.playersContainer)]
     private VisualElement playersContainer;
     
@@ -100,6 +103,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         backButton.RegisterCallbackButtonTriggered(_ => HideSongDetails());
         favoriteButton.RegisterCallbackButtonTriggered(_ => ToggleFavorite());
         enqueueButton.RegisterCallbackButtonTriggered(_ => EnqueueSong());
+        enqueueMedleyButton.RegisterCallbackButtonTriggered(_ => EnqueueSongAsMedley());
 
         lyricsAccordionItem.ContentVisible = false;
         enqueueSettingsAccordionItem.ContentVisible = false;
@@ -108,6 +112,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     private void OnPermissionsChanged(List<HttpApiPermission> permissions)
     {
         enqueueButton.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteSongQueue));
+        enqueueMedleyButton.SetVisibleByDisplay(enqueueButton.IsVisibleByDisplay());
         enqueueSettingsAccordionItem.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteSongQueue));
     }
     
@@ -121,13 +126,30 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             return;
         }
         
-        SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls);
+        SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls, false);
         string json = JsonConverter.ToJson(dto);
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
         
         HideSongDetails();
     }
-
+    
+    private void EnqueueSongAsMedley()
+    {
+        List<PlayerSelectPlayerEntryControl> selectedPlayerControls = GetSelectedPlayerControls();
+        if (selectedPlayerControls.IsNullOrEmpty())
+        {
+            Debug.LogError("Cannot enqueue song. No player profiles selected.");
+            UiManager.CreateNotification("Select a player first");
+            return;
+        }
+        
+        SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls, true);
+        string json = JsonConverter.ToJson(dto);
+        mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
+        
+        HideSongDetails();
+    }
+    
     public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()
     {
         return playerEntryControls
@@ -135,7 +157,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             .ToList();
     }
     
-    private SongQueueEntryDto CreateSongQueueEntryDto(List<PlayerSelectPlayerEntryControl> selectedPlayerControls)
+    private SongQueueEntryDto CreateSongQueueEntryDto(List<PlayerSelectPlayerEntryControl> selectedPlayerControls, bool isMedleyWithPreviousEntry)
     {
         SongQueueEntryDto dto = new();
         dto.SongDto = songDto;
@@ -143,7 +165,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         dto.SingScenePlayerDataDto.PlayerProfileNames = selectedPlayerControls
             .Select(control => control.PlayerProfileName)
             .ToList();
-
+        dto.IsMedleyWithPreviousEntry = isMedleyWithPreviousEntry;
+        
         dto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap = new Dictionary<string, MicProfileDto>();
         selectedPlayerControls.ForEach(control =>
         {
@@ -204,6 +227,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         songTitleLabel.text = songDto.Title;
 
         enqueueButton.SetEnabled(false);
+        enqueueMedleyButton.SetEnabled(enqueueButton.enabledInHierarchy);
         
         LoadSongDetails();
         LoadSongImage();
@@ -367,6 +391,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     private void UpdateEnqueueButton()
     {
         enqueueButton.SetEnabled(!GetSelectedPlayerControls().IsNullOrEmpty());
+        enqueueMedleyButton.SetEnabled(enqueueButton.enabledInHierarchy);
     }
 
     private void LoadSongImage()

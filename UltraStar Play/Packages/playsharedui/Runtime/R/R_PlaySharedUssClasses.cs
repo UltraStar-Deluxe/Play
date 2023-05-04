@@ -3,6 +3,8 @@ public static partial class R_PlayShared
 {
     public static class UssClasses
     {
+        public const string aboutTextField = "aboutTextField";
+        public const string absolutePositionTransition = "absolutePositionTransition";
         public const string accordionRoot = "accordionRoot";
         public const string active = "active";
         public const string asset = "asset";
@@ -57,6 +59,7 @@ public static partial class R_PlayShared
         public const string focusableNavigatorPriorityParent = "focusableNavigatorPriorityParent";
         public const string focusableNavigatorRoot = "focusableNavigatorRoot";
         public const string fontColor = "fontColor";
+        public const string fontColorBorder = "fontColorBorder";
         public const string fontIcon = "fontIcon";
         public const string fpsLabel = "fpsLabel";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
@@ -92,15 +95,15 @@ public static partial class R_PlayShared
         public const string medleyWithPrevious = "medleyWithPrevious";
         public const string middleCenterText = "middleCenterText";
         public const string minimized = "minimized";
+        public const string ml_1 = "ml-1";
         public const string modalDialogContainer = "modalDialogContainer";
-        public const string multiline = "multiline";
+        public const string mr_1 = "mr-1";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";
         public const string noSearchResults = "noSearchResults";
         public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
-        public const string optionsSceneMainContainer = "optionsSceneMainContainer";
         public const string optionsSceneTitleAndImageContainer = "optionsSceneTitleAndImageContainer";
         public const string optionsSceneTitleContainer = "optionsSceneTitleContainer";
         public const string optionsSceneTopRow = "optionsSceneTopRow";
@@ -109,7 +112,6 @@ public static partial class R_PlayShared
         public const string overlay = "overlay";
         public const string overlayBackground = "overlayBackground";
         public const string overlayDialog = "overlayDialog";
-        public const string placeholderVisible = "placeholderVisible";
         public const string playerProfilePlaceholder = "playerProfilePlaceholder";
         public const string playerScoreLabel = "playerScoreLabel";
         public const string png = "png";
@@ -117,7 +119,6 @@ public static partial class R_PlayShared
         public const string radial_progress_bar = "radial-progress-bar";
         public const string radial_progress_bar__label = "radial-progress-bar__label";
         public const string roundCorners = "roundCorners";
-        public const string roundedCorners = "roundedCorners";
         public const string scoreRow = "scoreRow";
         public const string scrollingNoteStreamSentenceSeparator = "scrollingNoteStreamSentenceSeparator";
         public const string searchFilterLabel = "searchFilterLabel";
@@ -131,6 +132,7 @@ public static partial class R_PlayShared
         public const string singingResultUi_4 = "singingResultUi-4";
         public const string singingResultUi_5 = "singingResultUi-5";
         public const string singSceneContextMenu = "singSceneContextMenu";
+        public const string singSceneOverlayProgressBar = "singSceneOverlayProgressBar";
         public const string singScenePlayerUi = "singScenePlayerUi";
         public const string singScenePlayerUiSmall = "singScenePlayerUiSmall";
         public const string slide_toggle = "slide-toggle";
@@ -196,7 +198,6 @@ public static partial class R_PlayShared
         public const string unity_scroller__low_button = "unity-scroller__low-button";
         public const string unity_scroller__horizontal = "unity-scroller--horizontal";
         public const string unity_scroller__vertical = "unity-scroller--vertical";
-        public const string unity_scroll_view = "unity-scroll-view";
         public const string unity_scroll_view__content_and_vertical_scroll_container = "unity-scroll-view__content-and-vertical-scroll-container";
         public const string unity_scroll_view__content_container = "unity-scroll-view__content-container";
         public const string unity_text_input = "unity-text-input";

@@ -23,9 +23,12 @@ public static partial class R
         public const string devModeLabel = "devModeLabel";
         public const string devModePicker = "devModePicker";
         public const string dialogContainer = "dialogContainer";
+        public const string enqueueAsMedleyIcons = "enqueueAsMedleyIcons";
         public const string enqueueButton = "enqueueButton";
+        public const string enqueueButtonContainer = "enqueueButtonContainer";
         public const string enqueueButtonLabel = "enqueueButtonLabel";
         public const string enqueueIcon = "enqueueIcon";
+        public const string enqueueMedleyButton = "enqueueMedleyButton";
         public const string enqueueSettingsAccordionItem = "enqueueSettingsAccordionItem";
         public const string EnqueueSongUi = "EnqueueSongUi";
         public const string favoriteButton = "favoriteButton";
@@ -35,6 +38,7 @@ public static partial class R
         public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
         public const string hiddenFavoriteIcon = "hiddenFavoriteIcon";
+        public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string icon = "icon";
         public const string infoContainer = "infoContainer";
         public const string inputSimulationContainer = "inputSimulationContainer";
@@ -42,6 +46,7 @@ public static partial class R
         public const string InputSimulationUi = "InputSimulationUi";
         public const string keyboardIcon = "keyboardIcon";
         public const string keyboardSimulationContainer = "keyboardSimulationContainer";
+        public const string labelContainer = "labelContainer";
         public const string languageContainer = "languageContainer";
         public const string languageLabel = "languageLabel";
         public const string languagePicker = "languagePicker";
@@ -49,11 +54,13 @@ public static partial class R
         public const string lyricsAccordionItem = "lyricsAccordionItem";
         public const string lyricsLabel = "lyricsLabel";
         public const string MainSceneMenuUi = "MainSceneMenuUi";
+        public const string medleyIcon = "medleyIcon";
         public const string menuIcon = "menuIcon";
         public const string menuOverlay = "menuOverlay";
         public const string menuOverlayContent = "menuOverlayContent";
         public const string menuOverlayScrollView = "menuOverlayScrollView";
         public const string menuUiRoot = "menuUiRoot";
+        public const string micButton = "micButton";
         public const string micIcon = "micIcon";
         public const string MicrophoneUi = "MicrophoneUi";
         public const string microphoneUiRoot = "microphoneUiRoot";
@@ -65,11 +72,13 @@ public static partial class R
         public const string mousePadArea = "mousePadArea";
         public const string mouseSensitivityFloatField = "mouseSensitivityFloatField";
         public const string mouseSimulationContainer = "mouseSimulationContainer";
+        public const string nameLabel = "nameLabel";
         public const string networkConfigContainer = "networkConfigContainer";
         public const string noFavoriteIcon = "noFavoriteIcon";
         public const string ownHostContainer = "ownHostContainer";
         public const string ownHostLabel = "ownHostLabel";
         public const string ownHostTextField = "ownHostTextField";
+        public const string playerEntry = "playerEntry";
         public const string playersContainer = "playersContainer";
         public const string playersContainerTitle = "playersContainerTitle";
         public const string PlayerSelectPlayerEntryUi = "PlayerSelectPlayerEntryUi";
@@ -82,6 +91,7 @@ public static partial class R
         public const string sceneTitle = "sceneTitle";
         public const string scrollWheelArea = "scrollWheelArea";
         public const string searchIcon = "searchIcon";
+        public const string selectedToggle = "selectedToggle";
         public const string semanticVersionText = "semanticVersionText";
         public const string serverErrorResponseText = "serverErrorResponseText";
         public const string showInputSimulationButton = "showInputSimulationButton";
@@ -130,6 +140,7 @@ public static partial class R
         public const string songQueueContainer = "songQueueContainer";
         public const string songQueueIcon = "songQueueIcon";
         public const string SongQueueOverlayUi = "SongQueueOverlayUi";
+        public const string songQueueTitle = "songQueueTitle";
         public const string SongQueueUi = "SongQueueUi";
         public const string songSearchContainer = "songSearchContainer";
         public const string songSearchHint = "songSearchHint";
@@ -140,6 +151,7 @@ public static partial class R
         public const string spacer = "spacer";
         public const string tabContentContainer = "tabContentContainer";
         public const string tabGroup = "tabGroup";
+        public const string teamLabel = "teamLabel";
         public const string titleAndDescription = "titleAndDescription";
         public const string titleContainer = "titleContainer";
         public const string titleImageAndText = "titleImageAndText";
@@ -157,5 +169,6 @@ public static partial class R
         public const string visualizeAudioLabel = "visualizeAudioLabel";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";
+        public const string voiceChooser = "voiceChooser";
     }
 }

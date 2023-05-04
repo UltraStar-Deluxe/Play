@@ -24,10 +24,19 @@
             <ui:Button display-tooltip-when-elided="true" name="backButton" style="height: auto;">
                 <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" picking-mode="Ignore" />
             </ui:Button>
-            <ui:Button display-tooltip-when-elided="true" name="enqueueButton" style="height: auto;">
-                <MaterialIcon tabindex="-1" icon="playlist_add" name="enqueueIcon" picking-mode="Ignore" />
-                <ui:Label tabindex="-1" text="Enqueue" display-tooltip-when-elided="true" name="enqueueButtonLabel" class="smallerFont" style="-unity-font-style: normal;" />
-            </ui:Button>
+            <ui:VisualElement name="enqueueButtonContainer" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                <ui:Button display-tooltip-when-elided="true" name="enqueueButton" style="height: auto;">
+                    <MaterialIcon tabindex="-1" icon="playlist_add" name="enqueueIcon" picking-mode="Ignore" />
+                    <ui:Label tabindex="-1" text="Enqueue" display-tooltip-when-elided="true" name="enqueueButtonLabel" class="smallerFont" style="-unity-font-style: normal;" />
+                </ui:Button>
+                <ui:Button display-tooltip-when-elided="true" name="enqueueMedleyButton" class="ml-2" style="height: auto;">
+                    <ui:VisualElement name="enqueueAsMedleyIcons" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
+                        <MaterialIcon tabindex="-1" icon="playlist_add" name="enqueueIcon" picking-mode="Ignore" />
+                        <MaterialIcon tabindex="-1" icon="link" name="medleyIcon" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label tabindex="-1" text="Enqueue Medley" display-tooltip-when-elided="true" name="enqueueButtonLabel" class="smallerFont" style="-unity-font-style: normal;" />
+                </ui:Button>
+            </ui:VisualElement>
             <ui:Button display-tooltip-when-elided="true" name="favoriteButton" style="height: auto;">
                 <MaterialIcon tabindex="-1" name="hiddenFavoriteIcon" icon="favorite" picking-mode="Ignore" style="visibility: hidden;" />
                 <MaterialIcon tabindex="-1" name="favoriteIcon" icon="favorite" picking-mode="Ignore" style="position: absolute;" />

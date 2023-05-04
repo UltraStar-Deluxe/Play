@@ -25,6 +25,7 @@ public static partial class R_PlayShared
         public const string container = "container";
         public const string contextMenu = "contextMenu";
         public const string contextMenuButton = "contextMenuButton";
+        public const string contextMenuButtonIcon = "contextMenuButtonIcon";
         public const string contextMenuItem = "contextMenuItem";
         public const string ContextMenuItemUi = "ContextMenuItemUi";
         public const string contextMenuLabel = "contextMenuLabel";
@@ -45,7 +46,8 @@ public static partial class R_PlayShared
         public const string dummyButton = "dummyButton";
         public const string finishConditionContainer = "finishConditionContainer";
         public const string finishConditionPicker = "finishConditionPicker";
-        public const string finishConditionPointsPicker = "finishConditionPointsPicker";
+        public const string finishConditionPointsSlider = "finishConditionPointsSlider";
+        public const string finishConditionPointsTextField = "finishConditionPointsTextField";
         public const string gameRoundPlayerEntryUiRoot = "gameRoundPlayerEntryUiRoot";
         public const string hideLyricsToggle = "hideLyricsToggle";
         public const string hideNotesToggle = "hideNotesToggle";
@@ -58,13 +60,16 @@ public static partial class R_PlayShared
         public const string itemPickerControlsRow = "itemPickerControlsRow";
         public const string itemPickerLabel = "itemPickerLabel";
         public const string labelContainer = "labelContainer";
+        public const string marginTopElement = "marginTopElement";
         public const string micButton = "micButton";
         public const string micIcon = "micIcon";
         public const string micProgressBar = "micProgressBar";
         public const string micWithNameUiRoot = "micWithNameUiRoot";
-        public const string modifierConditionFromNumberPicker = "modifierConditionFromNumberPicker";
         public const string modifierConditionPicker = "modifierConditionPicker";
-        public const string modifierConditionUntilNumberPicker = "modifierConditionUntilNumberPicker";
+        public const string modifierConditionScoreRangeSlider = "modifierConditionScoreRangeSlider";
+        public const string modifierConditionScoreRangeTextField = "modifierConditionScoreRangeTextField";
+        public const string modifierConditionTimeRangeSlider = "modifierConditionTimeRangeSlider";
+        public const string modifierConditionTimeRangeTextField = "modifierConditionTimeRangeTextField";
         public const string nameLabel = "nameLabel";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
@@ -73,7 +78,8 @@ public static partial class R_PlayShared
         public const string okButton = "okButton";
         public const string overlay = "overlay";
         public const string passTheMicToggle = "passTheMicToggle";
-        public const string playerEntry = "playerEntry";
+        public const string playerAdvancePointsSlider = "playerAdvancePointsSlider";
+        public const string playerAdvancePointsTextField = "playerAdvancePointsTextField";
         public const string playerEntryList = "playerEntryList";
         public const string previousItemButton = "previousItemButton";
         public const string previousItemIcon = "previousItemIcon";
@@ -83,7 +89,7 @@ public static partial class R_PlayShared
         public const string resetModifiersButton = "resetModifiersButton";
         public const string roundModifierDialogUiRoot = "roundModifierDialogUiRoot";
         public const string row = "row";
-        public const string selectedToggle = "selectedToggle";
+        public const string rsetIcon = "rsetIcon";
         public const string shortSongToggle = "shortSongToggle";
         public const string songArtist = "songArtist";
         public const string songInfo = "songInfo";
@@ -95,13 +101,12 @@ public static partial class R_PlayShared
         public const string SongSelectGameRoundPlayerEntryUi = "SongSelectGameRoundPlayerEntryUi";
         public const string SongSelectGameRoundUi = "SongSelectGameRoundUi";
         public const string songTitle = "songTitle";
-        public const string teamLabel = "teamLabel";
+        public const string spacer = "spacer";
         public const string toggleAccordionItemContentButton = "toggleAccordionItemContentButton";
         public const string toggleAccordionItemContentIcon = "toggleAccordionItemContentIcon";
         public const string toggleMedleyButton = "toggleMedleyButton";
         public const string unconditionalModifierContainer = "unconditionalModifierContainer";
         public const string validationWarningContainer = "validationWarningContainer";
         public const string valueTextField = "valueTextField";
-        public const string voiceChooser = "voiceChooser";
     }
 }
