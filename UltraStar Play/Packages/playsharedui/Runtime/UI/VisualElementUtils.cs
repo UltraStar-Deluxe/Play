@@ -155,11 +155,27 @@ public static class VisualElementUtils
         return matchingParentOfFocusedVisualElement != null;
     }
     
-    public static bool IsNonStyleKeywordValueSet(StyleLength styleLength)
+    public static bool IsNonStyleKeywordValueSet(StyleLength style)
     {
-        return styleLength != new StyleLength(StyleKeyword.Null)
-               && styleLength != new StyleLength(StyleKeyword.Auto)
-               && styleLength != new StyleLength(StyleKeyword.Initial)
-               && styleLength != new StyleLength(StyleKeyword.None);
+        return style != new StyleLength(StyleKeyword.Null)
+               && style != new StyleLength(StyleKeyword.Auto)
+               && style != new StyleLength(StyleKeyword.Initial)
+               && style != new StyleLength(StyleKeyword.None);
+    }
+    
+    public static bool IsNonStyleKeywordValueSet(StyleBackground style)
+    {
+        return style != new StyleBackground(StyleKeyword.Null)
+               && style != new StyleBackground(StyleKeyword.Auto)
+               && style != new StyleBackground(StyleKeyword.Initial)
+               && style != new StyleBackground(StyleKeyword.None);
+    }
+    
+    public static bool IsNonStyleKeywordValueSet(StyleColor style)
+    {
+        return style != new StyleColor(StyleKeyword.Null)
+               && style != new StyleColor(StyleKeyword.Auto)
+               && style != new StyleColor(StyleKeyword.Initial)
+               && style != new StyleColor(StyleKeyword.None);
     }
 }

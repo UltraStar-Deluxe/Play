@@ -15,6 +15,13 @@
         "hoverBackgroundColor": "#20202030",
         "focusBackgroundColor": "#20202040",
         "activeBackgroundColor": "#40404040",
+        "textShadow": {
+            "color": "#a0a0a0",
+            "offset": {
+                "x": 1,
+                "y": 1
+            },
+        }
     },
 
 
@@ -60,7 +67,14 @@
     "secondaryFontColor": "#afaec7",
     "warningFontColor":  "#FEC84B",
     "errorFontColor": "#F97066",
-
+    "noBackgroundInHierarchyTextShadow": {
+        "color": "#a0a0a0",
+        "offset": {
+            "x": 1,
+            "y": 1
+        },
+    },
+    
     "lyricsColor": "#2b2a2e",
     "lyricsShadow": false,
     "lyricsContainerGradient": "#dddbe3cc, #dddbe3cc",

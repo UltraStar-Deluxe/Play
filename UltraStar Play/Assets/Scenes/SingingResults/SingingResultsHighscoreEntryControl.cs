@@ -35,6 +35,7 @@ public class SingingResultsHighscoreEntryControl : INeedInjection, IInjectionFin
         playerNameLabel.text = songStatistic.PlayerName;
         scoreLabel.text = songStatistic.Score.ToString();
         dateLabel.text = songStatistic.DateTime.ToString("d", CultureInfo.CurrentUICulture);
-        commonScoreIcon.SetVisibleByDisplay(songStatistic.ScoreMode == EScoreMode.CommonAverage);
+        // commonScoreIcon.SetVisibleByDisplay(songStatistic.ScoreMode == EScoreMode.CommonAverage);
+        commonScoreIcon.HideByDisplay();
     }
 }

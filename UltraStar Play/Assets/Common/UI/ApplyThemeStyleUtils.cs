@@ -10,6 +10,12 @@ public static class ApplyThemeStyleUtils
     private static readonly Dictionary<VisualElement, VisualElementData> visualElementToData = new();
     private static readonly Dictionary<VisualElement, VisualElement> listViewToSelectedVisualElement = new();
 
+    public static void ClearCache()
+    {
+        visualElementToData.Clear();
+        listViewToSelectedVisualElement.Clear();
+    }
+
     public static bool TryApplyScaleMode(VisualElement visualElement, string scaleModeAsString)
     {
         if (!scaleModeAsString.IsNullOrEmpty()
@@ -258,7 +264,8 @@ public static class ApplyThemeStyleUtils
         Color32 borderColor,
         Color32 backgroundColor,
         GradientConfig backgroundGradient,
-        string backgroundImagePath)
+        string backgroundImagePath,
+        TextShadowConfig textShadowConfig)
     {
         VisualElement visualElement = data.styleTarget;
         if (IsIgnoredVisualElement(visualElement))
@@ -292,16 +299,26 @@ public static class ApplyThemeStyleUtils
             backgroundColor.IfNotDefault(color => visualElement.style.backgroundColor = new StyleColor(color));
         }
 
-        visualElement.SetBorderColor(borderColor);
-        fontColor.IfNotDefault(color =>
+        bool hasFontColor = !Equals(fontColor, default(Color32));
+        if (hasFontColor)
         {
-            visualElement.style.color = new StyleColor(color);
-            visualElement.Query<Label>()
-                .Where(label => !label.ClassListContains("warningFontColor")
-                                && !label.ClassListContains("errorFontColor")
-                                && !IsIgnoredVisualElement(label))
-                .ForEach(label => label.style.color = new StyleColor(color));
-        });
+            visualElement.style.color = new StyleColor(fontColor);
+        }
+        visualElement.Query<Label>()
+            .ForEach(label =>
+            {
+                ApplyTextShadow(label, textShadowConfig);
+
+                if (hasFontColor
+                    && !label.ClassListContains("warningFontColor")
+                    && !label.ClassListContains("errorFontColor")
+                    && !IsIgnoredVisualElement(label))
+                {
+                    label.style.color = new StyleColor(fontColor);
+                }
+            });
+        
+        visualElement.SetBorderColor(borderColor);
     }
 
     public static bool IsIgnoredVisualElement(VisualElement visualElement)
@@ -333,7 +350,8 @@ public static class ApplyThemeStyleUtils
             controlStyleConfig.activeBorderColor,
             controlStyleConfig.activeBackgroundColor,
             controlStyleConfig.activeBackgroundGradient,
-            controlStyleConfig.activeBackgroundImage);
+            controlStyleConfig.activeBackgroundImage,
+            ObjectUtils.FirstNonDefault(controlStyleConfig.activeTextShadow, controlStyleConfig.textShadow));
     }
 
     private static void ApplyFocusStyle(VisualElementData data)
@@ -344,7 +362,8 @@ public static class ApplyThemeStyleUtils
             controlStyleConfig.focusBorderColor,
             controlStyleConfig.focusBackgroundColor,
             controlStyleConfig.focusBackgroundGradient,
-            controlStyleConfig.focusBackgroundImage);
+            controlStyleConfig.focusBackgroundImage,
+            ObjectUtils.FirstNonDefault(controlStyleConfig.focusTextShadow, controlStyleConfig.textShadow));
     }
 
     private static void ApplyHoverStyle(VisualElementData data)
@@ -355,7 +374,8 @@ public static class ApplyThemeStyleUtils
             controlStyleConfig.hoverBorderColor,
             controlStyleConfig.hoverBackgroundColor,
             controlStyleConfig.hoverBackgroundGradient,
-            controlStyleConfig.hoverBackgroundImage);
+            controlStyleConfig.hoverBackgroundImage,
+            ObjectUtils.FirstNonDefault(controlStyleConfig.hoverTextShadow, controlStyleConfig.textShadow));
     }
 
     private static void ApplyDefaultStyle(VisualElementData data)
@@ -366,7 +386,8 @@ public static class ApplyThemeStyleUtils
             controlStyleConfig.borderColor,
             controlStyleConfig.backgroundColor,
             controlStyleConfig.backgroundGradient,
-            controlStyleConfig.backgroundImage);
+            controlStyleConfig.backgroundImage,
+            controlStyleConfig.textShadow);
     }
     
     private static void ApplyDisabledStyle(VisualElementData data)
@@ -377,7 +398,8 @@ public static class ApplyThemeStyleUtils
             controlStyleConfig.disabledBorderColor,
             controlStyleConfig.disabledBackgroundColor,
             controlStyleConfig.disabledBackgroundGradient,
-            controlStyleConfig.disabledBackgroundImage);
+            controlStyleConfig.disabledBackgroundImage,
+            ObjectUtils.FirstNonDefault(controlStyleConfig.disabledTextShadow, controlStyleConfig.textShadow));
     }
 
     private static void UpdateStyles(VisualElementData data)
@@ -473,5 +495,43 @@ public static class ApplyThemeStyleUtils
                                 && !IsIgnoredVisualElement(label))
                 .ForEach(label => label.style.color = new StyleColor(color));
         });
+    }
+
+    public static void ApplyNoBackgroundInHierarchyTextShadow(TextShadowConfig textShadowConfig, VisualElement root)
+    {
+        root.Query(null, "noBackgroundInHierarchy")
+            .ForEach(visualElement =>
+            {
+                if (visualElement is Label label)
+                {
+                    ApplyTextShadow(label, textShadowConfig);
+                }
+                else if (visualElement is ItemPicker itemPicker)
+                {
+                    ApplyTextShadow(itemPicker.LabelElement, textShadowConfig);
+                }
+                else
+                {
+                    visualElement.Query<Label>(null, "unity-base-field__label")
+                        .ForEach(controlLabel => ApplyTextShadow(controlLabel, textShadowConfig));
+                }
+            });
+    }
+
+    public static void ApplyTextShadow(VisualElement visualElement, TextShadowConfig textShadowConfig)
+    {
+        if (textShadowConfig == null)
+        {
+            visualElement.style.textShadow = new StyleTextShadow();
+            return;
+        }
+        
+        TextShadow textShadow = new()
+        {
+            color = textShadowConfig.color,
+            offset = textShadowConfig.offset,
+            blurRadius = textShadowConfig.blurRadius,
+        };
+        visualElement.style.textShadow = textShadow;
     }
 }

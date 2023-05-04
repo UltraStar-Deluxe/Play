@@ -7,8 +7,8 @@
             <ui:VisualElement name="column" picking-mode="Ignore" class="mr-4 child-mb-3" style="max-width: 25%;">
                 <ui:VisualElement name="songInfoContainer" style="padding-left: 10px;">
                     <ui:VisualElement name="coverImage" class="mb-3" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/NoCover.png?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); height: 150px; -unity-background-scale-mode: scale-and-crop; width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;" />
-                    <ui:Label text="Some Very Very Very long Title" name="titleLabel" class="ellipsis" style="-unity-font-style: bold; font-size: 20px; white-space: normal; max-height: 55px;" />
-                    <ui:Label text="Some Very Very Very long Artist" name="artistLabel" class="secondaryFontColor ellipsis" style="-unity-font-style: normal; font-size: 14px; white-space: normal; max-height: 50px;" />
+                    <ui:Label text="Some Very Very Very long Title" name="titleLabel" class="ellipsis noBackgroundInHierarchy" style="-unity-font-style: bold; font-size: 20px; white-space: normal; max-height: 55px;" />
+                    <ui:Label text="Some Very Very Very long Artist" name="artistLabel" class="secondaryFontColor ellipsis noBackgroundInHierarchy" style="-unity-font-style: normal; font-size: 14px; white-space: normal; max-height: 50px;" />
                 </ui:VisualElement>
                 <ToggleButton text="Your Results" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
                 <ToggleButton text="Team Results" display-tooltip-when-elided="true" name="showTeamResultsButton" style="-unity-text-align: middle-left;" />

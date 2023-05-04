@@ -13,6 +13,13 @@
         "hoverBackgroundColor": "#20202030",
         "focusBackgroundColor": "#20202040",
         "activeBackgroundColor": "#40404040",
+        "textShadow": {
+            "color": "#a0a0a0",
+            "offset": {
+                "x": 1,
+                "y": 1
+            }
+        }
     },
 
    "dynamicPanel": {
@@ -20,6 +27,29 @@
        "hoverBackgroundColor": "#00a07e",
        "focusBackgroundColor": "#00a07e",
        "activeBackgroundColor": "#00a07e",
+
+       "textShadow": {
+           "color": "#a0a0a0",
+           "offset": {
+               "x": 1,
+               "y": 1
+           }
+       },
+
+       "focusTextShadow": {
+           "color": "#00000000",
+           "offset": {
+               "x": 1,
+               "y": 1
+           }
+       },
+       "hoverTextShadow": {
+           "color": "#00000000",
+           "offset": {
+               "x": 1,
+               "y": 1
+           }
+       }
    },
 
     "staticPanel": {
@@ -28,6 +58,13 @@
 
     "primaryFontColor": "#F0F0F0",
     "secondaryFontColor": "#CCCCCC",
+    "noBackgroundInHierarchyTextShadow": {
+        "color": "#a0a0a0",
+        "offset": {
+            "x": 1,
+            "y": 1
+        },
+    },
 
     "staticBackground": {
         "impagePath": "backgrounds/black-10percent.png",

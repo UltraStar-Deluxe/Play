@@ -1,9 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:VisualElement name="androidSongFolderHintContainer" style="width: 100%; margin-bottom: 10px; flex-shrink: 0;">
-            <ui:Label text="Android requires songs to be stored in the folder ..." display-tooltip-when-elided="true" name="androidSongFolderHintLabel" style="width: 100%; white-space: normal;" />
+            <ui:Label text="Android requires songs to be stored in the folder ..." display-tooltip-when-elided="true" name="androidSongFolderHintLabel" class="noBackgroundInHierarchy" style="width: 100%; white-space: normal;" />
         </ui:VisualElement>
-        <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="searchAudioFilesWithoutSongMetaPicker" label="Search audio files&#10;without sing-along data" style="flex-shrink: 0;" />
+        <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="searchAudioFilesWithoutSongMetaPicker" label="Search audio files&#10;without sing-along data" class="noBackgroundInHierarchy" style="flex-shrink: 0;" />
         <ui:VisualElement name="songListContainer" style="width: 100%; flex-grow: 1;">
             <ui:VisualElement name="songFolderList" />
             <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: center;">

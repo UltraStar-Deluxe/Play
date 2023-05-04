@@ -16,8 +16,8 @@
             </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="warningContainer" style="flex-direction: row; align-items: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: center;">
-            <MaterialIcon name="warningIcon" icon="warning" class="rounded warning" style="margin-right: 5px;" />
-            <ui:Label text="Path does not exist" display-tooltip-when-elided="true" name="warningLabel" style="white-space: normal; flex-shrink: 1;" />
+            <MaterialIcon name="warningIcon" icon="warning" class="rounded warning noBackgroundInHierarchy" style="margin-right: 5px;" />
+            <ui:Label text="Path does not exist" display-tooltip-when-elided="true" name="warningLabel" class="noBackgroundInHierarchy" style="white-space: normal; flex-shrink: 1;" />
         </ui:VisualElement>
         <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
     </ui:VisualElement>

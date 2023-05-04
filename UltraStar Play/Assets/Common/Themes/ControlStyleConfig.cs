@@ -34,4 +34,10 @@ public class ControlStyleConfig
     public string focusBackgroundImage;
     public string activeBackgroundImage;
     public string disabledBackgroundImage;
+    
+    public TextShadowConfig textShadow;
+    public TextShadowConfig hoverTextShadow;
+    public TextShadowConfig focusTextShadow;
+    public TextShadowConfig activeTextShadow;
+    public TextShadowConfig disabledTextShadow;
 }

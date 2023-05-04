@@ -10,25 +10,25 @@
                 </ui:Button>
                 <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
             </ui:VisualElement>
-            <ItemPicker name="showFpsPicker" label="Show FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-            <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline" />
-            <ItemPicker name="analyzeBeatsWithoutTargetNotePicker" label="Analyze Beats Without Target Note" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-            <ItemPicker name="disableDynamicThemesPicker" label="Disable Dynamic Themes" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
-            <ItemPicker name="useUniversalCharsetDetectorPicker" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings." wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
-            <ItemPicker name="customEventSystemOptInOnAndroidPicker" label="Use custom event system&#10;for input actions.&#10;This enables keyboard&#10;and gamepad control&#10;but can cause issues on Android" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" />
-            <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker" />
-            <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker" style="margin-bottom: 10px;" />
+            <ItemPicker name="showFpsPicker" label="Show FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
+            <ItemPicker name="analyzeBeatsWithoutTargetNotePicker" label="Analyze Beats Without Target Note" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ItemPicker name="disableDynamicThemesPicker" label="Disable Dynamic Themes" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+            <ItemPicker name="useUniversalCharsetDetectorPicker" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings." wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+            <ItemPicker name="customEventSystemOptInOnAndroidPicker" label="Use custom event system&#10;for input actions.&#10;This enables keyboard&#10;and gamepad control&#10;but can cause issues on Android" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+            <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
+            <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
             <ui:VisualElement name="networkConfigContainer">
                 <ui:VisualElement name="udpPortOnClientContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
-                    <ui:Label text="UDP Port of Companion App&#10;(default 34568)" display-tooltip-when-elided="true" name="udpPortOnClientLabel" />
+                    <ui:Label text="UDP Port of Companion App&#10;(default 34568)" display-tooltip-when-elided="true" name="udpPortOnClientLabel" class="noBackgroundInHierarchy" />
                     <ui:TextField picking-mode="Ignore" name="udpPortOnClientTextField" style="min-width: 200px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="udpPortOnServerContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
-                    <ui:Label text="UDP Port of Main Game&#10;(default 34567)" display-tooltip-when-elided="true" name="udpPortOnServerLabel" />
+                    <ui:Label text="UDP Port of Main Game&#10;(default 34567)" display-tooltip-when-elided="true" name="udpPortOnServerLabel" class="noBackgroundInHierarchy" />
                     <ui:TextField picking-mode="Ignore" name="udpPortOnServerTextField" style="min-width: 200px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="ownHostContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
-                    <ui:Label text="IP Address of Main Game&#10;(leave empty for automatic value)" display-tooltip-when-elided="true" name="ownHostLabel" />
+                    <ui:Label text="IP Address of Main Game&#10;(leave empty for automatic value)" display-tooltip-when-elided="true" name="ownHostLabel" class="noBackgroundInHierarchy" />
                     <ui:TextField picking-mode="Ignore" name="ownHostTextField" style="min-width: 200px;" />
                 </ui:VisualElement>
             </ui:VisualElement>
