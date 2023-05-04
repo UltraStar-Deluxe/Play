@@ -115,6 +115,11 @@ public static class VisualElementUtils
 
     public static bool HasGeometry(VisualElement visualElement)
     {
+        if (visualElement == null)
+        {
+            return false;
+        }
+        
         return !float.IsNaN(visualElement.worldBound.width)
             && !float.IsNaN(visualElement.worldBound.height);
     }
@@ -148,5 +153,13 @@ public static class VisualElementUtils
         VisualElement focusedVisualElement = GetFocusedVisualElement(visualElement.focusController);
         VisualElement matchingParentOfFocusedVisualElement = focusedVisualElement.GetParent(parent => parent == visualElement);
         return matchingParentOfFocusedVisualElement != null;
+    }
+    
+    public static bool IsNonStyleKeywordValueSet(StyleLength styleLength)
+    {
+        return styleLength != new StyleLength(StyleKeyword.Null)
+               && styleLength != new StyleLength(StyleKeyword.Auto)
+               && styleLength != new StyleLength(StyleKeyword.Initial)
+               && styleLength != new StyleLength(StyleKeyword.None);
     }
 }
