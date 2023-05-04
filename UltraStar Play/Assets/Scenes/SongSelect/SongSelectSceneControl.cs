@@ -337,6 +337,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
         {
             passTheMicToggle.value = false;
+            passTheMicToggle.SetEnabled(false);
             passTheMicToggle.RegisterValueChangedCallback(evt =>
             {
                 if (evt.newValue)
@@ -345,6 +346,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                     StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => passTheMicToggle.value = false));
                 }
             });
+        }
+        else
+        {
+            passTheMicToggle.SetEnabled(true);
         }
         
         // Init modifier dialog
