@@ -14,7 +14,7 @@
                 <ui:Label text="Developer Mode" display-tooltip-when-elided="true" name="devModeLabel" />
                 <ItemPicker name="devModePicker" noPreviousButton="true" wrapAround="true" wrap-around="true" style="width: auto; height: auto; flex-grow: 1; flex-shrink: 0;" />
             </ui:VisualElement>
-            <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-bottom: 20px;" />
+            <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="onlyVisibleWhenDevModeEnabled" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-bottom: 20px;" />
             <ui:Button text="View Log" display-tooltip-when-elided="true" name="viewLogButton" class="onlyVisibleWhenDevModeEnabled" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-bottom: 20px;" />
             <ui:VisualElement name="networkConfigContainer" class="onlyVisibleWhenDevModeEnabled">
                 <ui:VisualElement name="udpPortOnClientContainer" style="margin-bottom: 20px;">
