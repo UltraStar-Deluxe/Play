@@ -99,52 +99,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             ? ScrollerVisibility.Auto
             : ScrollerVisibility.Hidden;
         songListViewScrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
-        songListView.makeItem = () =>
-        {
-            VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(songEntryVisualElement);
-            return songEntryVisualElement;
-        };
-        songListView.bindItem = (VisualElement element, int index) =>
-        {
-            if (index < DummyScrollViewItemCountPerSide
-                || index >= (songs.Count + DummyScrollViewItemCountPerSide))
-            {
-                element.HideByVisibility();
-                // element.style.opacity = 0.33f;
-                return;
-            }
-            element.ShowByVisibility();
-            // element.style.opacity = 1;
-            
-            SongMeta songMeta = songs[index - DummyScrollViewItemCountPerSide];
-            element.userData = songMeta;
-            CreateSongEntryControl(songMeta, element);
-            if (songListView.selectedIndex == index)
-            {
-                ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, true);
-            }
-            else
-            {
-                ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, false);
-            }
-        };
-        songListView.unbindItem = (VisualElement element, int index) =>
-        {
-            SongMeta songMeta = element.userData as SongMeta;
-            if (songMeta == null)
-            {
-                return;
-            }
-            element.userData = null;
-            
-            SongEntryControl songEntryControl = songEntryControls.FirstOrDefault(it => it.SongMeta == songMeta);
-            if (songEntryControl != null)
-            {
-                songEntryControl.Dispose();
-                songEntryControls.Remove(songEntryControl);
-            }
-        };
+        songListView.makeItem = OnMakeItem;
+        songListView.bindItem = OnBindItem;
+        songListView.unbindItem = OnUnbindItem;
         songListView.selectedIndicesChanged += OnSongListViewSelectionIndexChanged;
 
         songListView.Q<ScrollView>().ObserveEveryValueChanged(scrollView => scrollView.scrollOffset)
@@ -159,6 +116,55 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         {
             SetSongs(songs);
         }
+    }
+
+    private void OnUnbindItem(VisualElement element, int index)
+    {
+        SongMeta songMeta = element.userData as SongMeta;
+        if (songMeta == null)
+        {
+            return;
+        }
+        element.userData = null;
+        
+        SongEntryControl songEntryControl = songEntryControls.FirstOrDefault(it => it.SongMeta == songMeta);
+        if (songEntryControl != null)
+        {
+            songEntryControl.Dispose();
+            songEntryControls.Remove(songEntryControl);
+        }
+    }
+
+    private void OnBindItem(VisualElement element, int index)
+    {
+        if (index < DummyScrollViewItemCountPerSide
+            || index >= (songs.Count + DummyScrollViewItemCountPerSide))
+        {
+            element.HideByVisibility();
+            // element.style.opacity = 0.33f;
+            return;
+        }
+        element.ShowByVisibility();
+        // element.style.opacity = 1;
+        
+        SongMeta songMeta = songs[index - DummyScrollViewItemCountPerSide];
+        element.userData = songMeta;
+        CreateSongEntryControl(songMeta, element);
+        if (songListView.selectedIndex == index)
+        {
+            ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, true);
+        }
+        else
+        {
+            ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, false);
+        }
+    }
+
+    private VisualElement OnMakeItem()
+    {
+        VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songEntryVisualElement);
+        return songEntryVisualElement;
     }
 
     private void InitSongSelectSoundEffect()
