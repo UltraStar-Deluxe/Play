@@ -18,7 +18,7 @@
             "offset": {
                 "x": 1,
                 "y": 1
-            }
+            },
         }
     },
 
@@ -27,29 +27,6 @@
        "hoverBackgroundColor": "#00a07e",
        "focusBackgroundColor": "#00a07e",
        "activeBackgroundColor": "#00a07e",
-
-       "textShadow": {
-           "color": "#a0a0a0",
-           "offset": {
-               "x": 1,
-               "y": 1
-           }
-       },
-
-       "focusTextShadow": {
-           "color": "#00000000",
-           "offset": {
-               "x": 1,
-               "y": 1
-           }
-       },
-       "hoverTextShadow": {
-           "color": "#00000000",
-           "offset": {
-               "x": 1,
-               "y": 1
-           }
-       }
    },
 
     "staticPanel": {

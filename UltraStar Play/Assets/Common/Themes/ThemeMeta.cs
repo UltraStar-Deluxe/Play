@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using UnityEngine;
 
 public class ThemeMeta
 {
@@ -12,8 +14,17 @@ public class ThemeMeta
         {
             if (themeJson == null)
             {
-                string json = File.ReadAllText(AbsoluteFilePath);
-                themeJson = JsonConverter.FromJson<ThemeJson>(json);
+                try
+                {
+                    string json = File.ReadAllText(AbsoluteFilePath);
+                    themeJson = JsonConverter.FromJson<ThemeJson>(json);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to load theme {AbsoluteFilePath}: {e.Message}");
+                    Debug.LogException(e);
+                    themeJson = new();
+                }
             }
 
             return themeJson;

@@ -304,19 +304,37 @@ public static class ApplyThemeStyleUtils
         {
             visualElement.style.color = new StyleColor(fontColor);
         }
-        visualElement.Query<Label>()
-            .ForEach(label =>
-            {
-                ApplyTextShadow(label, textShadowConfig);
 
-                if (hasFontColor
-                    && !label.ClassListContains("warningFontColor")
-                    && !label.ClassListContains("errorFontColor")
-                    && !IsIgnoredVisualElement(label))
+        if (visualElement.childCount == 0)
+        {
+            // Set textShadow directly on element
+            if (!visualElement.ClassListContains("noTextShadow"))
+            {
+                ApplyTextShadow(visualElement, textShadowConfig);
+            }
+        }
+        else
+        {
+            // Set textShadow for child labels
+            visualElement.Query<Label>()
+                .ForEach(label =>
                 {
-                    label.style.color = new StyleColor(fontColor);
-                }
-            });
+                    if (label.ClassListContains("noTextShadow"))
+                    {
+                        return;
+                    }
+                    
+                    ApplyTextShadow(label, textShadowConfig);
+
+                    if (hasFontColor
+                        && !label.ClassListContains("warningFontColor")
+                        && !label.ClassListContains("errorFontColor")
+                        && !IsIgnoredVisualElement(label))
+                    {
+                        label.style.color = new StyleColor(fontColor);
+                    }
+                });
+        }
         
         visualElement.SetBorderColor(borderColor);
     }
@@ -502,6 +520,11 @@ public static class ApplyThemeStyleUtils
         root.Query(null, "noBackgroundInHierarchy")
             .ForEach(visualElement =>
             {
+                if (visualElement.ClassListContains("noTextShadow"))
+                {
+                    return;
+                }
+            
                 if (visualElement is Label label)
                 {
                     ApplyTextShadow(label, textShadowConfig);
