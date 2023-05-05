@@ -293,7 +293,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             ImageManager.LoadSpriteFromUri(absoluteImageFilePath, loadedSprite =>
             {
                 backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.videoScaleMode);
+                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.imageScaleMode);
             });
         }
         else
