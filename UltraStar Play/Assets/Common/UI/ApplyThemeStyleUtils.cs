@@ -304,6 +304,12 @@ public static class ApplyThemeStyleUtils
         if (hasFontColor)
         {
             visualElement.style.color = new StyleColor(fontColor);
+            if (visualElement is Button)
+            {
+                visualElement.Query<Label>()
+                    .ForEach(label => label.style.color = new StyleColor(fontColor));
+            }
+            visualElement.style.color = new StyleColor(fontColor);
         }
 
         if (visualElement.childCount == 0)
