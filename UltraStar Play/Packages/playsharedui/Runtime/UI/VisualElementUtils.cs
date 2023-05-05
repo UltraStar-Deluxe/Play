@@ -115,6 +115,11 @@ public static class VisualElementUtils
 
     public static bool HasGeometry(VisualElement visualElement)
     {
+        if (visualElement == null)
+        {
+            return false;
+        }
+        
         return !float.IsNaN(visualElement.worldBound.width)
             && !float.IsNaN(visualElement.worldBound.height);
     }
@@ -148,5 +153,29 @@ public static class VisualElementUtils
         VisualElement focusedVisualElement = GetFocusedVisualElement(visualElement.focusController);
         VisualElement matchingParentOfFocusedVisualElement = focusedVisualElement.GetParent(parent => parent == visualElement);
         return matchingParentOfFocusedVisualElement != null;
+    }
+    
+    public static bool IsNonStyleKeywordValueSet(StyleLength style)
+    {
+        return style != new StyleLength(StyleKeyword.Null)
+               && style != new StyleLength(StyleKeyword.Auto)
+               && style != new StyleLength(StyleKeyword.Initial)
+               && style != new StyleLength(StyleKeyword.None);
+    }
+    
+    public static bool IsNonStyleKeywordValueSet(StyleBackground style)
+    {
+        return style != new StyleBackground(StyleKeyword.Null)
+               && style != new StyleBackground(StyleKeyword.Auto)
+               && style != new StyleBackground(StyleKeyword.Initial)
+               && style != new StyleBackground(StyleKeyword.None);
+    }
+    
+    public static bool IsNonStyleKeywordValueSet(StyleColor style)
+    {
+        return style != new StyleColor(StyleKeyword.Null)
+               && style != new StyleColor(StyleKeyword.Auto)
+               && style != new StyleColor(StyleKeyword.Initial)
+               && style != new StyleColor(StyleKeyword.None);
     }
 }

@@ -348,7 +348,23 @@ Toggle.smallControl {
     -unity-text-outline-color: rgba(64, 64, 64, 0.5);
 }
 
+.noTextShadow {
+    text-shadow: unset;
+}
+
 .textShadow {
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.noBackgroundInHierarchy.unity-label {
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.noBackgroundInHierarchy .unity-base-field__label {
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.noBackgroundInHierarchy #itemPickerLabel {
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 

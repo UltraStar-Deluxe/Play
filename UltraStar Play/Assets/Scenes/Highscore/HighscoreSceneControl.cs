@@ -127,7 +127,8 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
         highscoreEntry.Q<Label>(R.UxmlNames.playerNameLabel).text = songStatistic.PlayerName;
         highscoreEntry.Q<Label>(R.UxmlNames.scoreLabel).text = songStatistic.Score.ToString();
         highscoreEntry.Q<Label>(R.UxmlNames.dateLabel).text = songStatistic.DateTime.ToString("d", CultureInfo.CurrentUICulture);
-        highscoreEntry.Q<VisualElement>(R.UxmlNames.commonScoreIcon).SetVisibleByDisplay(songStatistic.ScoreMode == EScoreMode.CommonAverage);
+        // highscoreEntry.Q<VisualElement>(R.UxmlNames.commonScoreIcon).SetVisibleByDisplay(songStatistic.ScoreMode == EScoreMode.CommonAverage);
+        highscoreEntry.Q<VisualElement>(R.UxmlNames.commonScoreIcon).HideByDisplay();
     }
 
     public List<IBinding> GetBindings()

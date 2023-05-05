@@ -33,6 +33,9 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.targetNoteImage)]
     private VisualElement image;
 
+    [Inject(UxmlName = R.UxmlNames.targetNoteBorder)]
+    private VisualElement targetNoteBorder;
+    
     [Inject(Optional = true)]
     private MicProfile micProfile;
 
@@ -84,10 +87,8 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
             : color;
 
         image.style.unityBackgroundImageTintColor = finalColor;
-        image.style.borderTopColor = finalColor;
-        image.style.borderBottomColor = finalColor;
-        image.style.borderLeftColor = finalColor;
-        image.style.borderRightColor = finalColor;
+        image.SetBorderColor(finalColor);
+        targetNoteBorder.SetBorderColor(finalColor);
     }
 
     private void CreateGoldenNoteParticleEffect()

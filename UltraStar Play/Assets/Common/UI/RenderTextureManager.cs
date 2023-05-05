@@ -29,12 +29,12 @@ public class RenderTextureManager : AbstractSingletonBehaviour, INeedInjection
         applicationManager.ScreenSizeChangedEventStream
             // Throttle the event stream to avoid that the RenderTextures are recreated too often (e.g. when changing window size).
             .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
-            .Subscribe(evt => UpdateScreenSizedRenderTextures());
+            .Subscribe(evt => UpdateScreenSizedRenderTextures(evt));
     }
 
-    private void UpdateScreenSizedRenderTextures()
+    private void UpdateScreenSizedRenderTextures(ScreenSizeChangedEvent evt)
     {
-        Debug.Log("Recreating screen sized RenderTextures because screen size changed.");
+        Debug.Log($"Recreating screen sized RenderTextures because screen size changed: {evt}");
         Camera[] cameras = FindObjectsOfType<Camera>();
         renderTextureConsumers.ToList().ForEach(consumer =>
         {

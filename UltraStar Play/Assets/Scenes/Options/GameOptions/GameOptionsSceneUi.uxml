@@ -1,8 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ui:DropdownField label="Language" index="-1" choices="a, b, c, d" name="languageDropdownField" class="mb-3" />
-        <ItemPicker name="passTheMicTimeItemPicker" label="&apos;Pass the mic&apos; time" min-value="10" max-value="60" step-value="5" style="margin-bottom: 10px;" />
-        <ItemPicker name="reduceAudioVolumeItemPicker" label="&apos;Reduce audio&apos; volume" min-value="0" max-value="10" style="margin-bottom: 10px;" />
-        <ItemPicker name="defaultMedleyTargetDurationPicker" label="Default Medley Duration" min-value="10" max-value="60" step-value="5" style="margin-bottom: 10px;" />
+        <ui:DropdownField label="Language" index="-1" choices="a, b, c, d" name="languageDropdownField" class="mb-3 noBackgroundInHierarchy" />
+        <ItemPicker name="passTheMicTimeItemPicker" label="&apos;Pass the mic&apos; time" min-value="10" max-value="60" step-value="5" class="noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+        <ItemPicker name="reduceAudioVolumeItemPicker" label="&apos;Reduce audio&apos; volume" min-value="0" max-value="10" class="noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+        <ItemPicker name="defaultMedleyTargetDurationPicker" label="Default Medley Duration" min-value="10" max-value="60" step-value="5" class="noBackgroundInHierarchy" style="margin-bottom: 10px;" />
     </ui:VisualElement>
 </ui:UXML>

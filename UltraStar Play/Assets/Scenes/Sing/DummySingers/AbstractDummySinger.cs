@@ -18,6 +18,8 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
     [Inject]
     protected SongMeta songMeta;
 
+    private readonly HashSet<int> analyzedBeats = new();
+
     void Awake()
     {
         if (!Application.isEditor)
@@ -42,13 +44,16 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         int beatToAnalyze = playerControl.PlayerMicPitchTracker.BeatToAnalyze;
         if (currentBeat <= 0
             || beatToAnalyze > currentBeat
-            || playerControl.PlayerMicPitchTracker.RecordingSentence == null)
+            || playerControl.PlayerMicPitchTracker.RecordingSentence == null
+            || analyzedBeats.Contains(beatToAnalyze))
         {
             return;
         }
-
+        
         BeatPitchEvent pitchEvent = GetDummyPitchEvent(beatToAnalyze);
         FirePitchEvent(pitchEvent, beatToAnalyze);
+        
+        analyzedBeats.Add(beatToAnalyze);
     }
 
     protected void FirePitchEvent(BeatPitchEvent pitchEvent, int fallbackBeat)

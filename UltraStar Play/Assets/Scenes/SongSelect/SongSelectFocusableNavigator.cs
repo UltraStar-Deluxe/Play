@@ -48,7 +48,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator
     {
         if (GetFocusableNavigatorRootVisualElement() == null)
         {
-            songSelectSceneControl.AttemptStartSong();
+            songSelectSceneControl.AttemptStartSelectedSong();
         }
     }
 

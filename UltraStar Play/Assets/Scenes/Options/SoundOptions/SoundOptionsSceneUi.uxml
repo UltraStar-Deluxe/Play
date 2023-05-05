@@ -1,12 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ItemPicker name="volumeChooser" label="Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-        <ItemPicker name="previewVolumeChooser" label="Preview Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-        <ItemPicker name="backgroundMusicVolumeChooser" label="Background Music Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-        <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="vocalsAudioVolumeChooser" label="Vocals Volume" min-value="0" max-value="100" step-value="10" />
-        <ItemPicker name="animateSceneChangeVolumePicker" label="Scene Transition Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-        <ItemPicker name="sfxVolumeChooser" label="Sound Effects Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-        <ui:TextField picking-mode="Ignore" label="Soundfont (.sf2)" name="soundfontPathTextField" is-delayed="true" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
+        <ItemPicker name="volumeChooser" label="Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+        <ItemPicker name="previewVolumeChooser" label="Preview Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+        <ItemPicker name="backgroundMusicVolumeChooser" label="Background Music Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+        <ItemPicker wrapAround="true" minValue="0" maxValue="100" stepValue="10" name="vocalsAudioVolumeChooser" label="Vocals Volume" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+        <ItemPicker name="animateSceneChangeVolumePicker" label="Scene Transition Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+        <ItemPicker name="sfxVolumeChooser" label="Sound Effects Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+        <ui:TextField picking-mode="Ignore" label="Soundfont (.sf2)" name="soundfontPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
             <ui:Label tabindex="-1" text="Default soundfont" display-tooltip-when-elided="true" name="soundfontPathTextFieldHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;" />
         </ui:TextField>
         <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); justify-content: flex-end;">

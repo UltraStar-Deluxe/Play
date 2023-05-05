@@ -4,11 +4,11 @@
     <ui:Template name="NextRoundInfoUi" src="project://database/Assets/Common/GameRounds/NextGameRoundInfoUi.uxml?fileID=9197481963319205126&amp;guid=4b0fc95be5bd7c84abec348087a5d4af&amp;type=3#NextGameRoundInfoUi" />
     <ui:VisualElement name="background" class="px-4 py-2" style="width: 100%; height: 100%;">
         <ui:VisualElement name="row" style="flex-grow: 1;">
-            <ui:VisualElement name="column" picking-mode="Ignore" class="mr-4 child-mb-3" style="max-width: 33%;">
+            <ui:VisualElement name="column" picking-mode="Ignore" class="mr-4 child-mb-3" style="max-width: 25%;">
                 <ui:VisualElement name="songInfoContainer" style="padding-left: 10px;">
                     <ui:VisualElement name="coverImage" class="mb-3" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/NoCover.png?fileID=2800000&amp;guid=1d183c612f1866943a54609ced7fece7&amp;type=3#NoCover&apos;); height: 150px; -unity-background-scale-mode: scale-and-crop; width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;" />
-                    <ui:Label text="Some Title" name="titleLabel" style="-unity-font-style: bold; font-size: 20px; white-space: normal;" />
-                    <ui:Label text="Some Artist" name="artistLabel" class="secondaryFontColor" style="-unity-font-style: normal; font-size: 14px; white-space: normal;" />
+                    <ui:Label text="Some Very Very Very long Title" name="titleLabel" class="ellipsis noBackgroundInHierarchy" style="-unity-font-style: bold; font-size: 20px; white-space: normal; max-height: 55px;" />
+                    <ui:Label text="Some Very Very Very long Artist" name="artistLabel" class="secondaryFontColor ellipsis noBackgroundInHierarchy" style="-unity-font-style: normal; font-size: 14px; white-space: normal; max-height: 50px;" />
                 </ui:VisualElement>
                 <ToggleButton text="Your Results" display-tooltip-when-elided="true" name="showCurrentResultsButton" style="-unity-text-align: middle-left;" />
                 <ToggleButton text="Team Results" display-tooltip-when-elided="true" name="showTeamResultsButton" style="-unity-text-align: middle-left;" />
@@ -16,12 +16,17 @@
             </ui:VisualElement>
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="playerResultsRoot" style="flex-grow: 1; justify-content: center; height: 100%;">
-                    <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="display: flex; flex-grow: 1; align-items: center;">
+                    <ui:VisualElement name="onePlayerLayout" picking-mode="Ignore" style="display: none; flex-grow: 1; align-items: center;">
                         <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="twoPlayerLayout" picking-mode="Ignore" style="margin-top: 20px; margin-bottom: 20px; flex-direction: row; flex-grow: 1; display: none; justify-content: center;">
-                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
-                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="p-5" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="px-3 py-5" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="px-3 py-5" style="flex-grow: 1;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="threePlayerLayout" picking-mode="Ignore" style="margin-top: 20px; margin-bottom: 20px; flex-direction: row; flex-grow: 1; display: flex; justify-content: center;">
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="py-5" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="py-5 px-2" style="flex-grow: 1;" />
+                        <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" class="py-5" style="flex-grow: 1;" />
                     </ui:VisualElement>
                     <ui:VisualElement name="nPlayerLayout" picking-mode="Ignore" style="flex-grow: 1; margin-top: 20px; margin-bottom: 20px; display: none; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center;">
                         <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
@@ -42,7 +47,7 @@
                         <ui:Instance template="SingingResultsPlayerUi" name="singingResultsPlayerUi" picking-mode="Ignore" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="highscoresRoot" style="flex-grow: 1; justify-content: flex-start; align-items: center; height: 100%; display: flex;">
+                <ui:VisualElement name="highscoresRoot" style="flex-grow: 1; justify-content: flex-start; align-items: center; height: 100%; display: none;">
                     <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0);">
                         <ui:Button display-tooltip-when-elided="true" name="previousDifficultyButton" class="squareButton transparentButton">
                             <MaterialIcon tabindex="-1" name="previousItemIcon" icon="chevron_left" />

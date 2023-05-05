@@ -13,6 +13,13 @@
         "hoverBackgroundColor": "#20202030",
         "focusBackgroundColor": "#20202040",
         "activeBackgroundColor": "#40404040",
+        "textShadow": {
+            "color": "#a0a0a0",
+            "offset": {
+                "x": 1,
+                "y": 1
+            },
+        }
     },
 
    "dynamicPanel": {
@@ -28,6 +35,13 @@
 
     "primaryFontColor": "#F0F0F0",
     "secondaryFontColor": "#CCCCCC",
+    "noBackgroundInHierarchyTextShadow": {
+        "color": "#a0a0a0",
+        "offset": {
+            "x": 1,
+            "y": 1
+        },
+    },
 
     "staticBackground": {
         "impagePath": "backgrounds/black-10percent.png",

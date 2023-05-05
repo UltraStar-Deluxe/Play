@@ -150,6 +150,11 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         {
             playerScoreProgressBar.ProgressColor = micProfile.Color;
         }
+        else
+        {
+            // Do not show border because it looks bad without a fill color
+            playerImage.SetBorderWidth(0);
+        }
 
         float playerScoreFactor = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
         animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, TotalScoreAnimTimeInSeconds)

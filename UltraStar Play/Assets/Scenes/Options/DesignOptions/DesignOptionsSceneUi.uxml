@@ -1,14 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; height: 10%; flex-grow: 1; margin-bottom: 20px;">
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="themePicker" label="Theme" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animatedBackgroundItemPicker" label="Animated Background" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundLightItemPicker" label="Background Lights" />
-            <ItemPicker name="imageAsCursorPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Use Image as Cursor" />
-            <ItemPicker name="vfxEnabledPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Visual Effects" />
-            <ItemPicker name="sceneChangeAnimationPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Scene Transition" />
-            <ItemPicker name="sceneChangeDurationPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Scene Transition Duration" />
-            <ItemPicker name="showScrollBarInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Scroll Bar in Song Select" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="themePicker" label="Theme" class="noBackgroundInHierarchy" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animatedBackgroundItemPicker" label="Animated Background" class="noBackgroundInHierarchy" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundLightItemPicker" label="Background Lights" class="noBackgroundInHierarchy" />
+            <ItemPicker name="imageAsCursorPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Use Image as Cursor" class="noBackgroundInHierarchy" />
+            <ItemPicker name="vfxEnabledPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Visual Effects" class="noBackgroundInHierarchy" />
+            <ItemPicker name="sceneChangeAnimationPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Scene Transition" class="noBackgroundInHierarchy" />
+            <ItemPicker name="sceneChangeDurationPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Scene Transition Duration" class="noBackgroundInHierarchy" />
+            <ItemPicker name="showScrollBarInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Scroll Bar in Song Select" class="noBackgroundInHierarchy" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

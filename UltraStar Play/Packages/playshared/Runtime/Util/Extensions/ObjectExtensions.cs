@@ -24,4 +24,16 @@ public static class ObjectExtensions
             return obj;
         }
     }
+    
+    public static T OrIfNull<T>(this T obj, Func<T> fallbackObjectProvider) where T : class
+    {
+        if (obj == null)
+        {
+            return fallbackObjectProvider();
+        }
+        else
+        {
+            return obj;
+        }
+    }
 }

@@ -396,6 +396,10 @@
     width: 80%;
 }
 
+#scoreName {
+    -unity-text-align: middle-left;
+}
+
 #scoreValue {
     min-width: 45px;
     -unity-text-align: middle-right;
@@ -455,6 +459,8 @@
 }
 
 .scoreRow {
+    flex-grow: 1;
+    flex-direction: row;
     padding: 5px;
 }
 
@@ -466,13 +472,26 @@
 
 #singingResultsPlayerUiRoot {
     max-width: 250px;
-    max-height: 250px;
+    max-height: 280px;
+}
+
+#onePlayerLayout #singingResultsPlayerUiRoot {
+    max-height: 300px;
 }
 
 #playerScoreProgressBar.singingResults {
     min-width: 30px;
     min-height: 30px;
-    --border-size: 24;
+    width: 100%;
+    height: 100%;
+    --border-size: 18;
+}
+
+#singingResultsPlayerUiRoot #playerImage.singingResults {
+    width: 80%;
+    height: 80%;
+    border-width: 0.5px;
+    border-color: rgba(32, 32, 32, 0.25);
 }
 
 #singingResultsPlayerUiRoot AspectRatioPanel {

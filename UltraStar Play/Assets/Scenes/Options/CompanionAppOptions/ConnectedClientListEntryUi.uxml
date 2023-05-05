@@ -4,12 +4,12 @@
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                     <MaterialIcon name="clientIcon" icon="phone_iphone" />
-                    <ui:Label text="My Connected App" name="clientNameLabel" style="-unity-font-style: bold; font-size: 20px; overflow: hidden; margin-right: 20px; flex-grow: 1;" />
+                    <ui:Label text="My Connected App" name="clientNameLabel" class="noBackgroundInHierarchy" style="-unity-font-style: bold; font-size: 20px; overflow: hidden; margin-right: 20px; flex-grow: 1;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="permissionsContainer" style="background-color: rgba(0, 0, 0, 0); flex-wrap: wrap; flex-direction: row; justify-content: space-between;">
-                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" />
-                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" />
-                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" />
+                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />
+                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />
+                    <ui:Toggle label="DummyPermission" name="dummyPermissionToggle" class="noBackgroundInHierarchy" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

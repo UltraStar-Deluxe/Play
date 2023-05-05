@@ -80,7 +80,8 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
         }
 
         EditorNoteControl dragStartNoteControl = editorNoteDisplayer.GetNoteControl(dragStartNote);
-        if (!dragStartNoteControl.Note.IsEditable)
+        if (dragStartNoteControl == null
+            || !dragStartNoteControl.Note.IsEditable)
         {
             return;
         }

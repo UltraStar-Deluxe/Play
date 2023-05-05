@@ -297,7 +297,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitSongRouletteSongMetas();
         songRouletteControl.SelectionClickedEventStream
-            .Subscribe(_ => AttemptStartSong());
+            .Subscribe(_ => AttemptStartSelectedSong());
 
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
@@ -337,6 +337,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
         {
             passTheMicToggle.value = false;
+            passTheMicToggle.SetEnabled(false);
             passTheMicToggle.RegisterValueChangedCallback(evt =>
             {
                 if (evt.newValue)
@@ -345,6 +346,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                     StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => passTheMicToggle.value = false));
                 }
             });
+        }
+        else
+        {
+            passTheMicToggle.SetEnabled(true);
         }
         
         // Init modifier dialog
@@ -756,10 +761,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    private SingSceneData CreateSingSceneDataWithSelectedSongAndSettings()
+    private SingSceneData CreateSingSceneDataWithGivenSongAndSettings(SongMeta songMeta)
     {
         SingSceneData singSceneData = new();
-        singSceneData.SongMetas = new List<SongMeta> { SelectedSong };
+        singSceneData.SongMetas = new List<SongMeta> { songMeta };
         singSceneData.SingScenePlayerData = CreateSingScenePlayerData();
         singSceneData.partyModeSceneData = sceneData.partyModeSceneData;
         singSceneData.gameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
@@ -789,7 +794,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         return singScenePlayerData;
     }
 
-    private void StartSingScene()
+    private void StartSingScene(SongMeta songMeta)
     {
         if (!songQueueManager.IsSongQueueEmpty)
         {
@@ -797,7 +802,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
         else
         {
-            StartSingSceneWithSelectedSongAndSettings();
+            StartSingSceneWithGivenSongAndSettings(songMeta);
         }
     }
 
@@ -807,15 +812,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
-    private void StartSingSceneWithSelectedSongAndSettings()
+    private void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta)
     {
-        if (SelectedSong.FailedToLoadVoices)
+        if (songMeta.FailedToLoadVoices)
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
         }
 
-        SingSceneData singSceneData = CreateSingSceneDataWithSelectedSongAndSettings();
+        SingSceneData singSceneData = CreateSingSceneDataWithGivenSongAndSettings(songMeta);
         if (singSceneData != null)
         {
             sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
@@ -839,7 +844,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SongEditorSceneData editorSceneData = new();
         editorSceneData.SongMeta = songMeta;
 
-        SingSceneData singSceneData = CreateSingSceneDataWithSelectedSongAndSettings();
+        SingSceneData singSceneData = CreateSingSceneDataWithGivenSongAndSettings(songMeta);
         if (singSceneData != null)
         {
             editorSceneData.PlayerProfileToMicProfileMap = singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap;
@@ -864,17 +869,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songRouletteControl.SelectSong(randomSongMeta);
     }
 
-    private void CheckAudioThenStartSingScene()
+    private void CheckAudioThenStartSingScene(SongMeta songMeta)
     {
-        if (SelectedSong == null)
+        if (songMeta == null)
         {
             return;
         }
 
         // Check that the audio file exists
-        if (!SongMetaUtils.AudioResourceExists(SelectedSong))
+        if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
-            string audioUri = SongMetaUtils.GetAudioUri(SelectedSong);
+            string audioUri = SongMetaUtils.GetAudioUri(songMeta);
             string message = "Audio file resource does not exist: " + audioUri;
             Debug.Log(message);
             UiManager.CreateNotification(message);
@@ -882,10 +887,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.Init(SelectedSong);
+        songAudioPlayer.Init(songMeta);
         if (!songAudioPlayer.IsPartiallyLoaded)
         {
-            string message = $"Audio file '{SelectedSong.Mp3}' could not be loaded.\n" +
+            string message = $"Audio file '{songMeta.Mp3}' could not be loaded.\n" +
                              $"Please use one of the formats {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}.";
             Debug.Log(message);
             UiManager.CreateNotification(message);
@@ -900,21 +905,26 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
         
         // Start the sing scene or show the player select overlay.
-        StartSingScene();
+        StartSingScene(songMeta);
     }
 
-    public void AttemptStartSong()
+    public void AttemptStartSelectedSong()
+    {
+        AttemptStartSong(songRouletteControl.SelectedSongEntryControl.SongMeta);
+    }
+    
+    public void AttemptStartSong(SongMeta songMeta)
     {
         if (IsPartyModeRandomSongSelection
-            && partyModeControl.RandomlySelectedSong != songRouletteControl.SelectedSongEntryControl.SongMeta)
+            && partyModeControl.RandomlySelectedSong != songMeta)
         {
             // The user selected a different song than the randomly selected.
             // Ask to use joker or quit.
             if (CanUseSongSelectionJoker)
             {
                 partyModeControl.OpenAskToUseJokerDialog(
-                    songRouletteControl.SelectedSongEntryControl.SongMeta,
-                    () => CheckAudioThenStartSingScene());
+                    songMeta,
+                    () => CheckAudioThenStartSingScene(songMeta));
             }
             else
             {
@@ -925,7 +935,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        CheckAudioThenStartSingScene();
+        CheckAudioThenStartSingScene(songMeta);
     }
 
     public void StartSongEditorScene()

@@ -7,11 +7,11 @@
                 </ui:Button>
                 <ui:VisualElement name="titleImageAndText" class="optionsSceneTitleAndImageContainer">
                     <ui:VisualElement name="titleAndDescription">
-                        <ui:Label text="Settings" name="sceneTitle" class="titleText" style="-unity-font-style: bold; flex-shrink: 1; min-width: 120px;" />
+                        <ui:Label text="Settings" name="sceneTitle" class="titleText noBackgroundInHierarchy" style="-unity-font-style: bold; flex-shrink: 1; min-width: 120px;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label text="Loaded Scene" name="loadedSceneTitle" style="-unity-font-style: bold; margin-left: 20px;" />
+            <ui:Label text="Loaded Scene" name="loadedSceneTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold; margin-left: 20px;" />
             <ui:VisualElement name="topButtonRow" class="ml-auto" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
                 <ui:Button display-tooltip-when-elided="true" name="issuesButton" class="squareButton mr-2">
                     <MaterialIcon tabindex="-1" name="issuesIcon" icon="warning" class="rounded" />

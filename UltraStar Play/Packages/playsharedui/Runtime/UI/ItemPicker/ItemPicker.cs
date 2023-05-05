@@ -68,7 +68,7 @@ public class ItemPicker : VisualElement
     public Label ItemLabel { get; private set; }
     public Image ItemImage { get; private set; }
 
-    private Label LabelElement { get; set; }
+    public Label LabelElement { get; private set; }
 
     private object control;
 

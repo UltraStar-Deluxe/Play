@@ -601,7 +601,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         EScene currentScene = GetCurrentScene();
         if (IsIgnoredScene(currentScene))
         {
-            // Song editor is out of scope for theming.
             return;
         }
 
@@ -625,6 +624,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ApplyThemeStyleUtils.ApplyWarningFontColor(themeJson.warningFontColor, root);
         ApplyThemeStyleUtils.ApplyErrorFontColor(themeJson.errorFontColor, root);
         
+        // Text shadow of elements without a background
+        ApplyThemeStyleUtils.ApplyNoBackgroundInHierarchyTextShadow(themeJson.noBackgroundInHierarchyTextShadow, root);
+        
         // Buttons
         root.Query<Button>().ForEach(button =>
         {
@@ -643,11 +645,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 {
                     controlsRow.style.backgroundColor = new StyleColor(backgroundColor);
                 });
-                
-                defaultControlStyleConfig.backgroundGradient.IfNotNull(backgroundGradient =>
+
+                if (defaultControlStyleConfig.backgroundGradient != null)
                 {
-                    ApplyThemeStyleUtils.ApplyGradient(controlsRow, backgroundGradient);
-                });
+                    ApplyThemeStyleUtils.ApplyGradient(controlsRow, defaultControlStyleConfig.backgroundGradient);
+                }
+                else
+                {
+                    ApplyThemeStyleUtils.ApplyGradient(controlsRow, null);
+                }
+
+                ;
                 
                 defaultControlStyleConfig.fontColor.IfNotDefault(fontColor =>
                 {

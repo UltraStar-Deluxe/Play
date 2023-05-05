@@ -55,6 +55,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     [Inject(UxmlName = R.UxmlNames.twoPlayerLayout)]
     private VisualElement twoPlayerLayout;
+    
+    [Inject(UxmlName = R.UxmlNames.threePlayerLayout)]
+    private VisualElement threePlayerLayout;
 
     [Inject(UxmlName = R.UxmlNames.nPlayerLayout)]
     private VisualElement nPlayerLayout;
@@ -461,6 +464,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         List<VisualElement> layouts = new();
         layouts.Add(onePlayerLayout);
         layouts.Add(twoPlayerLayout);
+        layouts.Add(threePlayerLayout);
         layouts.Add(nPlayerLayout);
 
         VisualElement selectedLayout = GetSelectedLayout();
@@ -485,6 +489,10 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         if (playerCount == 2)
         {
             return twoPlayerLayout;
+        }
+        if (playerCount == 3)
+        {
+            return threePlayerLayout;
         }
         return nPlayerLayout;
     }

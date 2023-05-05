@@ -29,6 +29,7 @@ public class ThemeJson
     public Color32 secondaryFontColor;
     public Color32 warningFontColor;
     public Color32 errorFontColor;
+    public TextShadowConfig noBackgroundInHierarchyTextShadow;
     
     public List<Color32> microphoneColors;
     public Dictionary<string, Color32> phraseRatingColors;

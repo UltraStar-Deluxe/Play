@@ -118,7 +118,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             }
         });
         VisualElementUtils.RegisterCallbackToHideByDisplayOnDirectClick(searchPropertyDropdownOverlay);
-        
+
         filterActiveIcon.HideByDisplay();
         nonPersistentSettings.PlaylistName
             .Subscribe(_ => UpdateFilterActiveIcon());
@@ -141,6 +141,10 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         RegisterToggleSearchPropertyCallback(lyricsPropertyToggle, ESearchProperty.Lyrics);
 
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
+        new UseAvailableScreenHeightControl(searchPropertyDropdownContainer)
+        {
+            MarginInPx = 8,
+        };
 
         songRouletteControl.SongListChangedEventStream.Subscribe(songList =>
         {

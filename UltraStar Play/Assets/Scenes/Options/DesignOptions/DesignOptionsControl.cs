@@ -89,6 +89,7 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         {
             return;
         }
+        ApplyThemeStyleUtils.ClearCache();
         themeManager.SetCurrentTheme(themeMeta);
     }
 

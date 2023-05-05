@@ -14,25 +14,25 @@
         <ui:ScrollView vertical-scroller-visibility="AlwaysVisible" style="width: 100%; height: 10%; margin-bottom: 20px; flex-grow: 1;">
             <ui:VisualElement name="column" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="selectedRecordingDeviceOptionsContainer" class="child-mb-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                    <ItemPicker name="colorPicker" label="Color" wrap-around="false" min-value="0" max-value="100" step-value="10" />
-                    <ItemPicker name="delayPicker" label="Delay" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
+                    <ItemPicker name="colorPicker" label="Color" wrap-around="false" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                    <ItemPicker name="delayPicker" label="Delay" wrap-around="true" min-value="0" max-value="1000" step-value="10" class="noBackgroundInHierarchy" />
                     <ui:Button text="Calibrate Delay" display-tooltip-when-elided="true" name="calibrateDelayButton" class="controlMinWidth ellipsis ml-auto mb-3" />
-                    <ItemPicker name="amplificationPicker" label="Amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-                    <ItemPicker name="noiseSuppressionPicker" label="Noise Suppression" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-                    <ItemPicker name="sampleRatePicker" label="Sample Rate" wrap-around="true" min-value="0" max-value="100" step-value="10" />
-                    <ui:VisualElement name="recordingDeviceInactiveOverlay" picking-mode="Ignore" class="overlay inactiveOverlay roundCorners" style="background-color: rgba(0, 0, 0, 0.5);" />
+                    <ItemPicker name="amplificationPicker" label="Amplification" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                    <ItemPicker name="noiseSuppressionPicker" label="Noise Suppression" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                    <ItemPicker name="sampleRatePicker" label="Sample Rate" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                    <ui:VisualElement name="recordingDeviceInactiveOverlay" picking-mode="Ignore" class="overlay inactiveOverlay roundCorners" style="background-color: rgba(0, 0, 0, 0.5); display: none;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="globalSettingsContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-                    <ui:Label tabindex="-1" text="Global Settings" display-tooltip-when-elided="true" name="globalSettingsLabel" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />
-                    <ui:Toggle name="playRecordedAudioToggle" label="Play recorded audio" class="mb-3" />
-                    <ui:Toggle name="usePortAudioToggle" label="Enable multi-channel support (PortAudio)" style="-unity-text-align: upper-center;" />
+                    <ui:Label tabindex="-1" text="Global Settings" display-tooltip-when-elided="true" name="globalSettingsLabel" class="noBackgroundInHierarchy" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />
+                    <ui:Toggle name="playRecordedAudioToggle" label="Play recorded audio" class="mb-3 noBackgroundInHierarchy" />
+                    <ui:Toggle name="usePortAudioToggle" label="Enable multi-channel support (PortAudio)" class="noBackgroundInHierarchy" style="-unity-text-align: upper-center;" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:ScrollView>
         <ui:VisualElement name="bottomRow" style="width: 100%; justify-content: space-between; align-items: center; flex-direction: row;">
             <ui:VisualElement name="notConnectedContainer" picking-mode="Ignore" style="width: 100%; flex-direction: row; align-items: center; position: absolute; justify-content: center;">
-                <MaterialIcon name="warningIcon" icon="warning" class="rounded warningFontColor" />
-                <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warningFontColor" />
+                <MaterialIcon name="warningIcon" icon="warning" class="rounded warningFontColor noBackgroundInHierarchy" />
+                <ui:Label text="Hardware not Connected" display-tooltip-when-elided="true" name="notConnectedLabel" class="warningFontColor noBackgroundInHierarchy" />
             </ui:VisualElement>
             <ui:Button text="Delete" name="deleteButton" class="controlMinWidth ml-auto" style="visibility: visible; display: flex;" />
         </ui:VisualElement>

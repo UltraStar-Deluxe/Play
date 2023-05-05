@@ -22,8 +22,8 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     
     private int lastScreenWidth;
     private int lastScreenHeight;
-    private readonly Subject<Resolution> screenSizeChangedEventStream = new();
-    public IObservable<Resolution> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
+    private readonly Subject<ScreenSizeChangedEvent> screenSizeChangedEventStream = new();
+    public IObservable<ScreenSizeChangedEvent> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
 
     protected override object GetInstance()
     {
@@ -59,7 +59,9 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         if (lastScreenHeight != Screen.height
             || lastScreenWidth != Screen.width)
         {
-            screenSizeChangedEventStream.OnNext(Screen.currentResolution);
+            screenSizeChangedEventStream.OnNext(new ScreenSizeChangedEvent(
+                new Vector2Int(lastScreenWidth, lastScreenHeight),
+                new Vector2Int(Screen.width, Screen.height)));
             lastScreenWidth = Screen.width;
             lastScreenHeight = Screen.height;
         }
