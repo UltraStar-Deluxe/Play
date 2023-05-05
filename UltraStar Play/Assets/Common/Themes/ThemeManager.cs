@@ -84,6 +84,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
+    private string lastThemeDynamicBackgroundJson;
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -172,15 +174,18 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (renderUiWithBackgroundShader)
         {
             // The UIDocument is rendered into a RenderTexture, which is then blended into the background shader.
-            renderTextureManager.GetOrCreateScreenSizedRenderTexture(ParticleRenderTextureName, 
+            // particleRenderTexture may use a smaller resolution than the screen.
+            renderTextureManager.GetOrCreateScreenAspectRatioRenderTexture(ParticleRenderTextureName, 
                 particleRenderTexture =>
                 {
                     backgroundParticlesCamera.targetTexture = particleRenderTexture;
                 });
+            
+            // uiRenderTexture should use the exact screen size.
             renderTextureManager.GetOrCreateScreenSizedRenderTexture(UiRenderTextureName, 
                 uiRenderTexture =>
                 {
-                    RenderTexture particleRenderTexture = renderTextureManager.GetExistingScreenSizedRenderTexture(ParticleRenderTextureName);
+                    RenderTexture particleRenderTexture = renderTextureManager.GetExistingRenderTexture(ParticleRenderTextureName);
                     
                     uiDocument.panelSettings.targetTexture = uiRenderTexture;
                     backgroundShaderControl.SetUiRenderTextures(
@@ -293,7 +298,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             ImageManager.LoadSpriteFromUri(absoluteImageFilePath, loadedSprite =>
             {
                 backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.videoScaleMode);
+                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.imageScaleMode);
             });
         }
         else
@@ -365,6 +370,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (backgroundJson == null)
         {
             backgroundJson = new();
+        }
+
+        string backgroundJsonAsString = JsonConverter.ToJson(backgroundJson);
+        if (backgroundJsonAsString == lastThemeDynamicBackgroundJson)
+        {
+            return;
         }
 
         // Material
@@ -471,6 +482,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
+
+        lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
     private void OnDestroy()

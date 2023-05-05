@@ -1,9 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="background" style="flex-grow: 1; align-items: center; justify-content: center;">
-        <ui:VisualElement name="logo" style="flex-grow: 1; position: absolute; width: 60%; height: 100%; left: 0; align-items: flex-start;" />
-        <ui:VisualElement name="column" style="position: absolute; left: 66%;">
-            <ui:Button text="Sing" name="startButton" class="mainSceneButton mb-3" />
-            <ui:Button text="Team&#10;&amp; Tournament" name="partyButton" class="mainSceneButton" />
+        <ui:VisualElement name="logo" style="flex-grow: 1; position: absolute; width: 100%; left: 0; align-items: flex-start; top: 0; height: 60%;" />
+        <ui:VisualElement name="row" style="position: absolute; top: 66.6%;">
+            <ui:Button text="Sing" name="startButton" class="mb-3" style="height: 60px; width: 160px; font-size: 18px;" />
+            <ui:Button text="Team&#10;&amp; Tournament" name="partyButton" class="mainSceneButton ml-5" style="width: 160px; height: 60px; font-size: 18px;" />
         </ui:VisualElement>
         <ui:VisualElement name="bottomButtonRow" class="child-mr-2 pb-2 px-2" style="width: 100%; align-items: center; flex-direction: row; justify-content: flex-end; position: absolute; bottom: 0;">
             <ui:Button name="versionInfoContainer" class="transparentButton focusableNavigatorIgnore" style="overflow: visible; align-items: flex-start; margin-right: auto;">

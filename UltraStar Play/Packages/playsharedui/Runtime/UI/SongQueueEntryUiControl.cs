@@ -64,6 +64,7 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
             if (SongQueueEntryDto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap.TryGetValue(playerProfileName, out MicProfileDto micProfileDto))
             {
                 micIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfileDto.Color);
+                micIcon.style.color = new StyleColor(micProfileDto.Color);
             }
             else
             {

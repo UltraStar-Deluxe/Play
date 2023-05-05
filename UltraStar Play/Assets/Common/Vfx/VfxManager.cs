@@ -100,9 +100,9 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
     
     private void InitCameraTargetTextures()
     {
-        renderTextureManager.GetOrCreateScreenSizedRenderTexture(ForegroundVfxRenderTextureName,
+        renderTextureManager.GetOrCreateScreenAspectRatioRenderTexture(ForegroundVfxRenderTextureName,
             foregroundRenderTexture => foregroundVfxCamera.targetTexture = foregroundRenderTexture);
-        renderTextureManager.GetOrCreateScreenSizedRenderTexture(BackgroundVfxRenderTextureName,
+        renderTextureManager.GetOrCreateScreenAspectRatioRenderTexture(BackgroundVfxRenderTextureName,
                 backgroundRenderTexture => backgroundVfxCamera.targetTexture = backgroundRenderTexture);
     }
 

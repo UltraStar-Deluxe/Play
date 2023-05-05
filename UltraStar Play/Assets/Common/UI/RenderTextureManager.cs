@@ -43,7 +43,9 @@ public class RenderTextureManager : AbstractSingletonBehaviour, INeedInjection
             camerasUsingRenderTexture.ForEach(cam => cam.targetTexture = null);
             
             Destroy(consumer.renderTexture);
-            consumer.renderTexture = DoCreateRenderTexture();
+            consumer.renderTexture = consumer.isScreenSized
+                ? DoCreateScreenSizedRenderTexture()
+                : DoCreateScreenAspectRatioRenderTexture();
             consumer.useRenderTexture(consumer.renderTexture);
             
             // Reassign the RenderTexture to the cameras.
@@ -51,7 +53,7 @@ public class RenderTextureManager : AbstractSingletonBehaviour, INeedInjection
         });
     }
 
-    public RenderTexture GetExistingScreenSizedRenderTexture(string renderTextureName)
+    public RenderTexture GetExistingRenderTexture(string renderTextureName)
     {
         RenderTextureConsumer existingConsumer = renderTextureConsumers.FirstOrDefault(consumer => consumer.renderTexture.name == renderTextureName);
         if (existingConsumer != null)
@@ -61,17 +63,27 @@ public class RenderTextureManager : AbstractSingletonBehaviour, INeedInjection
         
         return null;
     }
-    
+
+    public void GetOrCreateScreenAspectRatioRenderTexture(string renderTextureName, Action<RenderTexture> useRenderTexture)
+    {
+        GetOrCreateRenderTexture(renderTextureName, false, useRenderTexture);
+    }
+
     public void GetOrCreateScreenSizedRenderTexture(string renderTextureName, Action<RenderTexture> useRenderTexture)
     {
-        RenderTexture existingScreenSizedRenderTexture = GetExistingScreenSizedRenderTexture(renderTextureName);
+        GetOrCreateRenderTexture(renderTextureName, true, useRenderTexture);
+    }
+    
+    private void GetOrCreateRenderTexture(string renderTextureName, bool isScreenSized, Action<RenderTexture> useRenderTexture)
+    {
+        RenderTexture existingScreenSizedRenderTexture = GetExistingRenderTexture(renderTextureName);
         if (existingScreenSizedRenderTexture != null)
         {
             useRenderTexture(existingScreenSizedRenderTexture);
             return;
         }
 
-        RenderTexture renderTexture = DoCreateRenderTexture();
+        RenderTexture renderTexture = DoCreateScreenSizedRenderTexture();
         renderTexture.name = renderTextureName;
         useRenderTexture(renderTexture);
         
@@ -79,17 +91,33 @@ public class RenderTextureManager : AbstractSingletonBehaviour, INeedInjection
         {
             id = renderTextureName,
             useRenderTexture = useRenderTexture,
-            renderTexture = renderTexture, 
+            renderTexture = renderTexture,
+            isScreenSized = isScreenSized,
         });
 
         useRenderTexture(renderTexture);
     }
 
-    private RenderTexture DoCreateRenderTexture()
+    private RenderTexture DoCreateScreenSizedRenderTexture()
     {
         return new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.ARGB32);
     }
 
+    private RenderTexture DoCreateScreenAspectRatioRenderTexture()
+    {
+        if (Screen.width <= 1920)
+        {
+            return DoCreateScreenSizedRenderTexture();
+        }
+        
+        // Save memory by using a lower resolution with same aspect ratio.
+        float aspectRatio = (float)Screen.width / Screen.height;
+        int height = 720;
+        int width = (int)(height * aspectRatio);
+        
+        return new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
+    }
+    
     protected override void OnDestroySingleton()
     {
         renderTextureConsumers.ForEach(consumer => Destroy(consumer.renderTexture));
@@ -100,5 +128,6 @@ public class RenderTextureManager : AbstractSingletonBehaviour, INeedInjection
         public string id;
         public Action<RenderTexture> useRenderTexture;
         public RenderTexture renderTexture;
+        public bool isScreenSized;
     }
 }
