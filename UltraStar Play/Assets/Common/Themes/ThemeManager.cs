@@ -201,11 +201,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             backgroundParticlesCamera.gameObject.SetActive(false);
         }
 
-        if (anyThemeLoaded)
-        {
-            ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement);
-        }
-        else
+        if (!anyThemeLoaded)
         {
             LoadCurrentTheme();
         }
@@ -605,6 +601,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
+        using DisposableStopwatch d = new("ThemeManager.DoApplyThemeSpecificStylesToVisualElements");
+        
         if (settings.DisableDynamicThemes)
         {
             DisableDynamicBackground();
