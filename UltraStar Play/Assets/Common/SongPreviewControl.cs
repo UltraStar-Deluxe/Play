@@ -197,6 +197,11 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual void StartVideoPreview(SongMeta songMeta)
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
+        
         if (songMeta.Video.IsNullOrEmpty()
             || !SongMetaUtils.VideoResourceExists(songMeta)
             || songVideoPlayer == null)
@@ -213,6 +218,11 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
+        
         try
         {
             songAudioPlayer.Init(songMeta);
