@@ -213,7 +213,8 @@ public static class ApplyThemeStyleUtils
         {
             listViewToSelectedVisualElement[listView] = listItemAncestor;
         }
-        else if (listViewToSelectedVisualElement[listView] == listItemAncestor)
+        else if (listViewToSelectedVisualElement.TryGetValue(listView, out VisualElement selectedListItemVisualElement)
+                 && selectedListItemVisualElement == listItemAncestor)
         {
             listViewToSelectedVisualElement[listView] = null;
         }
