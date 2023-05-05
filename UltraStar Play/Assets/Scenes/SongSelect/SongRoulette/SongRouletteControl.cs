@@ -84,6 +84,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private void Start()
     {
+        using IDisposable d = ProfileMarkerUtils.Auto("SongRouletteControl.Start");
+        
         songListViewScrollView = songListView.Q<ScrollView>();
         
         songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.TrickleDown);
@@ -331,7 +333,7 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     public void SetSongs(IReadOnlyCollection<SongMeta> songMetas)
     {
-        using DisposableStopwatch d = new("SongRouletteControl.SetSongs");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongRouletteControl.SetSongs");
         
         int lastSelectedSongIndex = NumberUtils.Limit(SelectedSongIndex, 0, songMetas.Count - 1);
         SongMeta lastSelectedSongMeta = Selection.Value.SongMeta;

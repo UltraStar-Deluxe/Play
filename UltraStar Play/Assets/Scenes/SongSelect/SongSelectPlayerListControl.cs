@@ -92,7 +92,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     
     private void UpdateListEntries()
     {
-        using DisposableStopwatch d = new("SongSelectPlayerListControl.UpdateListEntries");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectPlayerListControl.UpdateListEntries");
 
         // Remove old entries
         playerList.Clear();

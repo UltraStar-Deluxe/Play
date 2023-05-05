@@ -7,6 +7,7 @@ using System.Threading;
 using ProTrans;
 using UniInject;
 using UniRx;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -228,8 +229,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public VisualElementSlideInControl SongQueueSlideInControl { get; private set; }
     public VisualElementSlideInControl ModifiersOverlaySlideInControl { get; private set; }
 
+    static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
+    
     public void OnInjectionFinished()
     {
+        using IDisposable d = onInjectionFinishedProfilerMarker.Auto();
+        
         injector.Inject(SongSelectionPlaylistChooserControl);
         injector.Inject(createSingAlongSongControl);
         injector.Inject(partyModeControl);
@@ -241,7 +246,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     private void Start()
     {
-        using DisposableStopwatch d = new("SongSelectSceneControl.Start");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.Start");
         
         songMetaManager.ScanFilesIfNotDoneYet();
         // Give the song search some time, otherwise the "no songs found" label flickers once.
@@ -323,7 +328,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void InitSongQueue()
     {
-        using DisposableStopwatch d = new("SongSelectScene.InitSongQueueOverlay");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongQueueOverlay");
         
         songQueueLengthContainer.HideByDisplay();
         songQueueManager.SongQueueChangedEventStream
@@ -343,7 +348,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void InitHideSlideInControlsViaClick()
     {
-        using DisposableStopwatch d = new("SongSelectScene.InitHideSlideInControlsViaClick");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitHideSlideInControlsViaClick");
         
         hiddenHideModifiersOverlayArea.HideByDisplay();
         hiddenHideModifiersOverlayArea.RegisterCallback<PointerDownEvent>(_ => ModifiersOverlaySlideInControl.SlideOut());
@@ -378,7 +383,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void InitModifierDialog()
     {
-        using DisposableStopwatch d = new("SongSelectScene.InitModifierDialog");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitModifierDialog");
      
         // Modifier dialog overlay
         modifierDialogOverlay.ShowByDisplay();
@@ -435,7 +440,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateSongQueue()
     {
-        using DisposableStopwatch d = new("SongSelectScene.UpdateSongQueue");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.UpdateSongQueue");
         
         string newSongQueueLengthAsString = SongQueueManager.SongQueueLength.ToString();
         if (songQueueLengthLabel.text != newSongQueueLengthAsString)
@@ -484,7 +489,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void InitDifficultyAndScoreMode()
     {
-        using DisposableStopwatch d = new("SongSelectScene.InitDifficultyAndScoreMode");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitDifficultyAndScoreMode");
         
         // Set difficulty for all players
         settings.ObserveEveryValueChanged(it => it.Difficulty)
@@ -715,7 +720,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void InitSongMetas()
     {
-        using DisposableStopwatch d = new("SongSelectScene.InitSongMetas");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongMetas");
         
         songMetas = new List<SongMeta>(songMetaManager.GetSongMetas());
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
@@ -744,7 +749,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void InitSongRoulette()
     {
-        using DisposableStopwatch d = new("SongSelectScene.InitSongRouletteSongMetas");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongRouletteSongMetas");
         
         lastSongMetasReloadFrame = Time.frameCount;
         UpdateFilteredSongs();
@@ -997,7 +1002,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void OnSearchTextChanged()
     {
-        using DisposableStopwatch d = new("SongSelectSceneControl.OnSearchTextChanged");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.OnSearchTextChanged");
         
         SongMeta lastSelectedSong = SelectedSong;
         string rawSearchText = songSearchControl.GetRawSearchText();
@@ -1125,7 +1130,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void UpdateFilteredSongs()
     {
-        using DisposableStopwatch d = new("SongSelectSceneControl.UpdateFilteredSongs");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.UpdateFilteredSongs");
         
         List<SongMeta> filteredSongMetas = GetFilteredSongMetas();
         if (!filteredSongMetas.IsNullOrEmpty()

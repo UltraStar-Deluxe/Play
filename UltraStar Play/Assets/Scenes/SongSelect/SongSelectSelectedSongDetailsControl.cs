@@ -80,7 +80,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     
     public void OnInjectionFinished()
     {
-        using DisposableStopwatch d = new("SongSelectSelectedSongDetailsControl.OnInjectionFinished");
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSelectedSongDetailsControl.OnInjectionFinished");
         
         injector.Inject(songRatingIconControl);
         
