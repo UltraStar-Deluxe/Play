@@ -157,7 +157,7 @@
             <ui:Instance template="SongSelectEditPlaylistDialogUi" name="SongSelectEditPlaylistDialogUi" />
         </ui:VisualElement>
         <ui:VisualElement name="searchPropertyDropdownOverlay" class="focusableNavigatorRoot" style="position: absolute; width: 100%; height: 100%; display: none;">
-            <ui:VisualElement name="searchPropertyDropdownContainer" class="roundCorners" style="position: absolute; width: 35%; background-color: rgba(32, 32, 32, 0.88); top: 18%; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; flex-direction: column; height: 80%;">
+            <ui:VisualElement name="searchPropertyDropdownContainer" class="roundCorners staticPanel" style="position: absolute; width: 35%; top: 18%; left: 33%; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; flex-direction: column; height: 80%;">
                 <ui:Instance template="SongSelectSearchPropertyDialogUi" name="SongSelectSearchPropertyDialogUi" />
             </ui:VisualElement>
         </ui:VisualElement>
