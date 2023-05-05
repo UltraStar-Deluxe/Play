@@ -72,8 +72,8 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             // Take "screenshot" of "old" scene.
-            RenderTexture uiRenderTexture = renderTextureManager.GetExistingScreenSizedRenderTexture(ThemeManager.UiRenderTextureName);
-            RenderTexture uiCopyRenderTexture = renderTextureManager.GetExistingScreenSizedRenderTexture(UiCopyRenderTextureName);
+            RenderTexture uiRenderTexture = renderTextureManager.GetExistingRenderTexture(ThemeManager.UiRenderTextureName);
+            RenderTexture uiCopyRenderTexture = renderTextureManager.GetExistingRenderTexture(UiCopyRenderTextureName);
             
             if (uiRenderTexture == null)
             {

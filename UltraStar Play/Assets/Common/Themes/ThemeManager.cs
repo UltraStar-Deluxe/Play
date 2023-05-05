@@ -174,15 +174,18 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (renderUiWithBackgroundShader)
         {
             // The UIDocument is rendered into a RenderTexture, which is then blended into the background shader.
-            renderTextureManager.GetOrCreateScreenSizedRenderTexture(ParticleRenderTextureName, 
+            // particleRenderTexture may use a smaller resolution than the screen.
+            renderTextureManager.GetOrCreateScreenAspectRatioRenderTexture(ParticleRenderTextureName, 
                 particleRenderTexture =>
                 {
                     backgroundParticlesCamera.targetTexture = particleRenderTexture;
                 });
+            
+            // uiRenderTexture should use the exact screen size.
             renderTextureManager.GetOrCreateScreenSizedRenderTexture(UiRenderTextureName, 
                 uiRenderTexture =>
                 {
-                    RenderTexture particleRenderTexture = renderTextureManager.GetExistingScreenSizedRenderTexture(ParticleRenderTextureName);
+                    RenderTexture particleRenderTexture = renderTextureManager.GetExistingRenderTexture(ParticleRenderTextureName);
                     
                     uiDocument.panelSettings.targetTexture = uiRenderTexture;
                     backgroundShaderControl.SetUiRenderTextures(
