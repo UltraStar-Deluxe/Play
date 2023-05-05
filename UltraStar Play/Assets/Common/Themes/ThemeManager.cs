@@ -84,6 +84,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
+    private string lastThemeDynamicBackgroundJson;
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -367,6 +369,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             backgroundJson = new();
         }
 
+        string backgroundJsonAsString = JsonConverter.ToJson(backgroundJson);
+        if (backgroundJsonAsString == lastThemeDynamicBackgroundJson)
+        {
+            return;
+        }
+
         // Material
         if (!backgroundJson.gradientRampFile.IsNullOrEmpty())
         {
@@ -471,6 +479,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
+
+        lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
     private void OnDestroy()
