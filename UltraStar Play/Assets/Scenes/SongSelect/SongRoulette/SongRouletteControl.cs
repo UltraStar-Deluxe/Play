@@ -331,6 +331,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     public void SetSongs(IReadOnlyCollection<SongMeta> songMetas)
     {
+        using DisposableStopwatch d = new("SongRouletteControl.SetSongs");
+        
         int lastSelectedSongIndex = NumberUtils.Limit(SelectedSongIndex, 0, songMetas.Count - 1);
         SongMeta lastSelectedSongMeta = Selection.Value.SongMeta;
         songs = new List<SongMeta>(songMetas);

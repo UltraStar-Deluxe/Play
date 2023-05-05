@@ -106,6 +106,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     private void ScanPlaylists()
     {
+        using DisposableStopwatch d = new("PlaylistManager.ScanPlaylists took <ms> ms");
+        
         playlists = new List<IPlaylist>();
         
         ScanPlaylistsInFolder(PlaylistFolder);

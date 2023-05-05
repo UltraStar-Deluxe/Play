@@ -92,6 +92,8 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     
     private void UpdateListEntries()
     {
+        using DisposableStopwatch d = new("SongSelectPlayerListControl.UpdateListEntries");
+
         // Remove old entries
         playerList.Clear();
         playerEntryControls.Clear();
@@ -103,7 +105,6 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             CreateListEntry(playerProfile);
         }
         UpdateVoiceSelection();
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerList);
     }
 
     private void CreateListEntry(PlayerProfile playerProfile)
@@ -131,6 +132,8 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         };
         
         playerEntryControls.Add(listEntryControl);
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerEntryVisualElement);
     }
 
     private List<MicProfile> GetAvailableMicProfiles()

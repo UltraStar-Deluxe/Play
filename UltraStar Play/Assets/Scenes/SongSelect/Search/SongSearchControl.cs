@@ -92,6 +92,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     
     public void OnInjectionFinished()
     {
+        using DisposableStopwatch d = new("SongSearchControl.OnInjectionFinished");
+        
         isInjectionFinished = true;
         searchProperties = new HashSet<ESearchProperty>(settings.SearchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
