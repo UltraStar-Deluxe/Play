@@ -143,10 +143,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         RegisterToggleSearchPropertyCallback(lyricsPropertyToggle, ESearchProperty.Lyrics);
 
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
-        new UseAvailableScreenHeightControl(searchPropertyDropdownContainer)
-        {
-            MarginInPx = 8,
-        };
+        new UseAvailableScreenHeightControl(searchPropertyDropdownContainer);
 
         songRouletteControl.SongListChangedEventStream.Subscribe(songList =>
         {
