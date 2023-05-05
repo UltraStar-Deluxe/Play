@@ -81,6 +81,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private float transitionToSelectedItemTimeInSeconds;
     private float transitionStartScrollOffsetX;
+
+    private SongMeta initiallySelectedSongMeta;
     
     private void Start()
     {
@@ -116,6 +118,34 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         {
             SetSongs(songs);
         }
+
+        SelectInitialSongMeta();
+    }
+
+    private void SelectInitialSongMeta()
+    {
+        if (initiallySelectedSongMeta == null
+            || songs.IsNullOrEmpty()
+            || !songs.Contains(initiallySelectedSongMeta))
+        {
+            return;
+        }
+        
+        if (VisualElementUtils.HasGeometry(songListView))
+        {
+            DoSelectInitialSongMeta();
+        }
+        else
+        {
+            songListView.RegisterHasGeometryCallbackOneShot(_ => DoSelectInitialSongMeta());
+        }
+    }
+    
+    private void DoSelectInitialSongMeta()
+    {
+        SelectSong(initiallySelectedSongMeta);
+        transitionStartScrollOffsetX = songListViewScrollView.scrollOffset.x;
+        transitionToSelectedItemTimeInSeconds = -maxTransitionToSelectedItemTimeInSeconds;
     }
 
     private void OnUnbindItem(VisualElement element, int index)
@@ -426,9 +456,14 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     public void SelectSong(SongMeta songMeta)
     {
-        if (songMeta == null
-            || songListViewScrollView == null)
+        if (songMeta == null)
         {
+            return;
+        }
+        
+        if(songListViewScrollView == null)
+        {
+            initiallySelectedSongMeta = songMeta;
             return;
         }
 
