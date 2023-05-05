@@ -30,21 +30,23 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     
     [Inject(UxmlName = R.UxmlNames.inputLegend, Optional = true)]
     private VisualElement inputLegendContainer;
+    
+    [Inject]
+    private UIDocument uiDocument;
+    
+    [Inject]
+    private PanelHelper panelHelper;
 
     private readonly ReactiveProperty<string> fuzzySearchText = new("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
     private static readonly float fuzzySearchResetTimeInSeconds = 0.75f;
 
-    private bool isPointerOverSongList;
-    
     void Start()
     {
         focusableNavigator.NoNavigationTargetFoundInListViewCallback = OnNoNavigationTargetFoundInListView;
         focusableNavigator.BeforeNavigationInListViewCallback = OnBeforeNavigationInListView;
         
-        songListView.RegisterCallback<PointerEnterEvent>(_ => isPointerOverSongList = true, TrickleDown.TrickleDown);
-        songListView.RegisterCallback<PointerLeaveEvent>(_ => isPointerOverSongList = false, TrickleDown.TrickleDown);
         songListView.ReleaseMouse();
             
         // Toggle song is favorite
@@ -155,7 +157,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
-        if (!isPointerOverSongList)
+        if (!IsPointerOverSongList())
         {
             return;
         }
@@ -168,6 +170,14 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             songRouletteControl.SelectPreviousSong();
         }
+    }
+
+    private bool IsPointerOverSongList()
+    {
+        VisualElement elementUnderPointer = VisualElementUtils.GetElementUnderPointer(uiDocument, panelHelper);
+        return elementUnderPointer == songListView
+               || elementUnderPointer.GetFirstAncestorOfType<ListView>() != null
+               || elementUnderPointer.GetFirstAncestorOfType<ListViewH>() != null;
     }
 
     private void OnBack()

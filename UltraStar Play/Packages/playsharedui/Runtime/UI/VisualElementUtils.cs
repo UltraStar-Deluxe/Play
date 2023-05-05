@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using Label = UnityEngine.UIElements.Label;
 
 public static class VisualElementUtils
 {
@@ -177,5 +180,17 @@ public static class VisualElementUtils
                && style != new StyleColor(StyleKeyword.Auto)
                && style != new StyleColor(StyleKeyword.Initial)
                && style != new StyleColor(StyleKeyword.None);
+    }
+    
+    public static VisualElement GetElementUnderPointer(UIDocument uiDocument, PanelHelper panelHelper)
+    {
+        if (Pointer.current == null)
+        {
+            return null;
+        }
+        
+        Vector2 pointerPanelPos = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
+        VisualElement picked = uiDocument.rootVisualElement.panel.Pick(pointerPanelPos);
+        return picked;
     }
 }
