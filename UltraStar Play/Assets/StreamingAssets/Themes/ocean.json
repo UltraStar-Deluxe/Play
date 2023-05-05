@@ -2,23 +2,23 @@
     "defaultControl": {
         "fontColor": "#E5E5E5",
         "backgroundColor": "#3399D8",
-        "hoverBackgroundColor": "#2E72F0",
-        "focusBackgroundColor": "#2E72F0",
+        "hoverBackgroundColor": "#34acec",
+        "focusBackgroundColor": "#34acec",
         "activeBackgroundColor": "#2C3CE6",
         "focusBorderColor": "#3399D8",
     },
 
     "transparentButton": {
         "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#20202030",
-        "focusBackgroundColor": "#20202040",
-        "activeBackgroundColor": "#40404040",
+        "hoverBackgroundColor": "#20202040",
+        "focusBackgroundColor": "#20202050",
+        "activeBackgroundColor": "#40404050",
         "textShadow": {
             "color": "#a0a0a0",
             "offset": {
                 "x": 1,
                 "y": 1
-            },
+            }
         }
     },
 
@@ -26,11 +26,13 @@
        "backgroundColor": "#23304300",
        "hoverBackgroundColor": "#00a07e",
        "focusBackgroundColor": "#00a07e",
-       "activeBackgroundColor": "#00a07e",
+       "activeBackgroundColor": "#00a07e"
    },
 
     "staticPanel": {
-        "backgroundGradient": "24deg, #233043, #344054",
+        "a": "#425169",
+        "b": "#38465f",
+        "backgroundGradient": "24deg, #425169, #38465f"
     },
 
     "primaryFontColor": "#F0F0F0",
@@ -40,12 +42,12 @@
         "offset": {
             "x": 1,
             "y": 1
-        },
+        }
     },
 
     "staticBackground": {
         "impagePath": "backgrounds/black-10percent.png",
-        "imageScaleMode": "StretchToFill",
+        "imageScaleMode": "StretchToFill"
     },
     
     "dynamicBackground": {

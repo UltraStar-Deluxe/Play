@@ -1,11 +1,11 @@
 {
     "defaultControl": {
         "fontColor": "#E5E5E5",
-        "backgroundColor": "#3399D8",
-        "hoverBackgroundColor": "#2E72F0",
-        "focusBackgroundColor": "#2E72F0",
+        "backgroundColor": "#3f9bdb",
+        "hoverBackgroundColor": "#72b4d4",
+        "focusBackgroundColor": "#72b4d4",
         "activeBackgroundColor": "#2C3CE6",
-        "focusBorderColor": "#3399D8",
+        "focusBorderColor": "#3f9bdb",
     },
 
     "transparentButton": {
@@ -23,7 +23,7 @@
     },
 
     "staticPanel": {
-        "backgroundGradient": "24deg, #233043, #344054",
+        "backgroundGradient": "24deg, #425169, #38465f"
     },
     
     "primaryFontColor": "#F0F0F0",
