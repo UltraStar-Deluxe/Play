@@ -241,6 +241,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     
     private void Start()
     {
+        using DisposableStopwatch d = new("SongSelectSceneControl.Start");
+        
         songMetaManager.ScanFilesIfNotDoneYet();
         // Give the song search some time, otherwise the "no songs found" label flickers once.
         if (!SongMetaManager.IsSongScanFinished)
@@ -295,12 +297,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             }
         });
 
-        InitSongRouletteSongMetas();
-        songRouletteControl.SelectionClickedEventStream
-            .Subscribe(_ => AttemptStartSelectedSong());
+        InitSongRoulette();
 
         UpdateInputLegend();
-        inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
+        inputManager.InputDeviceChangeEventStream
+            .Subscribe(_ => UpdateInputLegend())
+            .AddTo(gameObject);
 
         importSongsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(EScene.SongLibraryOptionsScene)));
 
@@ -309,13 +311,26 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
         });
 
+        // Song queue
+        InitSongQueue();
+        
+        // Init modifier dialog
+        InitModifierDialog();
+        
+        // Hide slide-in controls with click outside
+        InitHideSlideInControlsViaClick();
+    }
+
+    private void InitSongQueue()
+    {
+        using DisposableStopwatch d = new("SongSelectScene.InitSongQueueOverlay");
+        
         songQueueLengthContainer.HideByDisplay();
         songQueueManager.SongQueueChangedEventStream
             .Subscribe(_ => UpdateSongQueue())
             .AddTo(gameObject);
         UpdateSongQueue();
-
-        // Song queue overlay
+        
         songQueueOverlay.ShowByDisplay();
         SongQueueSlideInControl = new(songQueueOverlay, ESide2D.Right, false);
         toggleSongQueueOverlayButton.RegisterCallbackButtonTriggered(_ => SongQueueSlideInControl.ToggleVisible());
@@ -324,45 +339,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueueAsMedley(SelectedSong));
         songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
         songQueueUiControl.OnDelete = songQueueEntryDto => songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
-        
-        // Modifier dialog overlay
-        modifierDialogOverlay.ShowByDisplay();
-        ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
-        toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.ToggleVisible());
-        closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.SlideOut());
+    }
 
-        // Disable 'pass the mic' toggle if needed. It requires a team with at least 2 players
-        if (!HasPartyModeSceneData
-            || PartyModeSettings.TeamSettings.Teams.AllMatch(team =>
-                team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
-        {
-            passTheMicToggle.value = false;
-            passTheMicToggle.SetEnabled(false);
-            passTheMicToggle.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.newValue)
-                {
-                    UiManager.CreateNotification("'Pass the mic' requires a team with more than one player");
-                    StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => passTheMicToggle.value = false));
-                }
-            });
-        }
-        else
-        {
-            passTheMicToggle.SetEnabled(true);
-        }
+    private void InitHideSlideInControlsViaClick()
+    {
+        using DisposableStopwatch d = new("SongSelectScene.InitHideSlideInControlsViaClick");
         
-        // Init modifier dialog
-        injector.WithRootVisualElement(modifierDialogOverlay)
-            .Inject(modifierDialogControl);
-        modifierDialogControl.OpenDialog(nonPersistentSettings.GameRoundSettings);
-        modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
-        
-        modifiersActiveIcon.HideByDisplay();
-        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
-            .Subscribe(_ => UpdateModifiersActiveIcon());
-        
-        // Hide slide-in controls with click outside
         hiddenHideModifiersOverlayArea.HideByDisplay();
         hiddenHideModifiersOverlayArea.RegisterCallback<PointerDownEvent>(_ => ModifiersOverlaySlideInControl.SlideOut());
         ModifiersOverlaySlideInControl.Visible.Subscribe(newValue =>
@@ -394,8 +376,67 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
     }
 
+    private void InitModifierDialog()
+    {
+        using DisposableStopwatch d = new("SongSelectScene.InitModifierDialog");
+     
+        // Modifier dialog overlay
+        modifierDialogOverlay.ShowByDisplay();
+        ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
+        toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.ToggleVisible());
+        closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.SlideOut());
+
+        // Modifier active icon
+        modifiersActiveIcon.HideByDisplay();
+        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
+            .Subscribe(_ => UpdateModifiersActiveIcon());
+        
+        // Delay initialization of modifier dialog control
+        bool initializedModifierDialogControl = false;
+        ModifiersOverlaySlideInControl.Visible.Subscribe(newValue =>
+        {
+            if (newValue
+                && !initializedModifierDialogControl)
+            {
+                initializedModifierDialogControl = true;
+                InitModifierDialogControl();
+            }
+        });
+    }
+
+    private void InitModifierDialogControl()
+    {
+        injector.WithRootVisualElement(modifierDialogOverlay)
+            .Inject(modifierDialogControl);
+        modifierDialogControl.OpenDialog(nonPersistentSettings.GameRoundSettings);
+        modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
+        
+        // Disable 'pass the mic' toggle if needed. It requires a team with at least 2 players
+        if (!HasPartyModeSceneData
+            || PartyModeSettings.TeamSettings.Teams.AllMatch(team =>
+                team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
+        {
+            passTheMicToggle.value = false;
+            passTheMicToggle.SetEnabled(false);
+            passTheMicToggle.RegisterValueChangedCallback(evt =>
+            {
+                if (evt.newValue)
+                {
+                    UiManager.CreateNotification("'Pass the mic' requires a team with more than one player");
+                    StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => passTheMicToggle.value = false));
+                }
+            });
+        }
+        else
+        {
+            passTheMicToggle.SetEnabled(true);
+        }
+    }
+
     private void UpdateSongQueue()
     {
+        using DisposableStopwatch d = new("SongSelectScene.UpdateSongQueue");
+        
         string newSongQueueLengthAsString = SongQueueManager.SongQueueLength.ToString();
         if (songQueueLengthLabel.text != newSongQueueLengthAsString)
         {
@@ -443,6 +484,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void InitDifficultyAndScoreMode()
     {
+        using DisposableStopwatch d = new("SongSelectScene.InitDifficultyAndScoreMode");
+        
         // Set difficulty for all players
         settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(newValue => settings.PlayerProfiles.ForEach(it => it.Difficulty = newValue));
@@ -672,6 +715,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void InitSongMetas()
     {
+        using DisposableStopwatch d = new("SongSelectScene.InitSongMetas");
+        
         songMetas = new List<SongMeta>(songMetaManager.GetSongMetas());
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
         noSongsFoundLabel.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
@@ -692,16 +737,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             InitSongMetas();
             SongMeta selectedSong = songRouletteControl.Selection.Value.SongMeta;
-            InitSongRouletteSongMetas();
+            InitSongRoulette();
             songRouletteControl.SelectSong(selectedSong);
         }
     }
 
-    private void InitSongRouletteSongMetas()
+    private void InitSongRoulette()
     {
+        using DisposableStopwatch d = new("SongSelectScene.InitSongRouletteSongMetas");
+        
         lastSongMetasReloadFrame = Time.frameCount;
         UpdateFilteredSongs();
         songRouletteControl.Selection.Subscribe(newValue => songSelectSelectedSongDetailsControl.OnSongSelectionChanged(newValue));
+        songRouletteControl.SelectionClickedEventStream
+            .Subscribe(_ => AttemptStartSelectedSong());
 
         if (sceneData.SongMeta != null)
         {
@@ -948,6 +997,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void OnSearchTextChanged()
     {
+        using DisposableStopwatch d = new("SongSelectSceneControl.OnSearchTextChanged");
+        
         SongMeta lastSelectedSong = SelectedSong;
         string rawSearchText = songSearchControl.GetRawSearchText();
 
@@ -1074,6 +1125,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void UpdateFilteredSongs()
     {
+        using DisposableStopwatch d = new("SongSelectSceneControl.UpdateFilteredSongs");
+        
         List<SongMeta> filteredSongMetas = GetFilteredSongMetas();
         if (!filteredSongMetas.IsNullOrEmpty()
             && filteredSongMetas.SequenceEqual(songRouletteControl.Songs))
