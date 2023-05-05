@@ -214,9 +214,9 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnKeyboardTextInput(char newChar)
     {
-        if (newChar == 27)
+        if (newChar == (int)KeyCode.Escape
+            || newChar == (int)KeyCode.Return)
         {
-            // Ignore ESCAPE key
             return;
         }
 
