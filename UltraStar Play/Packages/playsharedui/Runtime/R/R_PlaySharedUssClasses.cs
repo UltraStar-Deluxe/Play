@@ -68,6 +68,7 @@ public static partial class R_PlayShared
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
+        public const string ignoreTheme = "ignoreTheme";
         public const string inactiveOverlay = "inactiveOverlay";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputLegendBar = "inputLegendBar";
@@ -86,7 +87,6 @@ public static partial class R_PlayShared
         public const string lastChild = "lastChild";
         public const string lightButton = "lightButton";
         public const string lyricsContainer = "lyricsContainer";
-        public const string mainSceneButton = "mainSceneButton";
         public const string marginBottomSmall = "marginBottomSmall";
         public const string marginBottomSmaller = "marginBottomSmaller";
         public const string materialIcon = "materialIcon";
@@ -100,7 +100,9 @@ public static partial class R_PlayShared
         public const string mr_1 = "mr-1";
         public const string nextLyrics = "nextLyrics";
         public const string noBackground = "noBackground";
+        public const string noBackgroundInHierarchy = "noBackgroundInHierarchy";
         public const string noSearchResults = "noSearchResults";
+        public const string noTextShadow = "noTextShadow";
         public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
