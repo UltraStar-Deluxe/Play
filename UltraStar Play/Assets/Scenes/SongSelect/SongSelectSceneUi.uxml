@@ -105,8 +105,8 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="songListContainer" picking-mode="Ignore" style="width: 100%; position: absolute; min-height: 30%; align-items: center;">
-            <ListViewH focusable="true" name="songListView" fixed-item-width="150" style="min-width: 200px; width: 100%;" />
+        <ui:VisualElement name="songListContainer" style="width: 100%; position: absolute; min-height: 30%; align-items: center; justify-content: center;">
+            <ListViewH focusable="true" name="songListView" fixed-item-width="150" picking-mode="Ignore" style="min-width: 200px; width: 100%; height: 300px;" />
             <ui:VisualElement name="noSongsFoundContainer" picking-mode="Ignore" style="position: absolute; width: 100%; display: flex; align-items: stretch; justify-content: center; max-width: 33%;">
                 <MaterialIcon tabindex="-1" name="noSongsFoundIcon" icon="cloud_download" class="noBackgroundInHierarchy" style="font-size: 64px;" />
                 <ui:Label text="You have no songs downloaded yet." display-tooltip-when-elided="true" name="noSongsFoundLabel" class="largerFont noBackgroundInHierarchy" style="white-space: normal; display: flex; -unity-text-align: middle-left; margin-left: auto; margin-right: auto; -unity-font-style: bold;" />
