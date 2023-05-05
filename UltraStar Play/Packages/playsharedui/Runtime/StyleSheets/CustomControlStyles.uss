@@ -639,4 +639,7 @@ RadialChildLayouter > *
     font-size: var(--font-size-xs);
     -unity-text-align: middle-center;
     padding: 10px;
+    -unity-font-definition: url('project://database/Packages/playsharedui/Runtime/Fonts/Roboto_Mono/static/RobotoMono-Medium%20SDF.asset');
+    -unity-font-style: bold;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
