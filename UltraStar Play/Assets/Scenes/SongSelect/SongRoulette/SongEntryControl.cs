@@ -12,6 +12,9 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
 {
     [Inject]
     private SongRouletteControl songRouletteControl;
+    
+    [Inject(Key = nameof(defaultSongImage))]
+    private Sprite defaultSongImage;
 
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
@@ -298,8 +301,8 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         string uri = SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta);
         if (uri.IsNullOrEmpty())
         {
-            songImageOuter.style.backgroundImage = new StyleBackground();
-            songImageInner.style.backgroundImage = new StyleBackground();
+            songImageOuter.style.backgroundImage = new StyleBackground(defaultSongImage);
+            songImageInner.style.backgroundImage = new StyleBackground(defaultSongImage);
             return;
         }
         
