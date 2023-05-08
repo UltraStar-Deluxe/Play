@@ -225,7 +225,7 @@ public static class ApplicationUtils
     public static bool CanUsePortAudio()
     {
         // TODO: Build PortAudio for Linux and macOS and include the compiled libs in PortAudioForUnity.
-        return PlatformUtils.IsWindows();
+        return PlatformUtils.IsWindows;
     }
     
     public static string GetVideoPlayerUri(string uri)

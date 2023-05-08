@@ -75,7 +75,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         audioSeparationJobs.Add(audioSeparationJob);
 
         // Set path to spleeter executable if needed
-        string fallbackAudioSeparationCommand = PlatformUtils.IsWindows()
+        string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
             ? $"\"{ApplicationUtils.GetStreamingAssetsPath("SpleeterMsvcExe/Spleeter.exe").Replace("/", "\\")}\""
             : "";
         
@@ -269,7 +269,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             : fallbackAudioSeparationCommand;
         SpleeterSharpConfig.Create()
             .SetSpleeterCommand(audioSeparationCommand)
-            .SetIsWindows(PlatformUtils.IsWindows())
+            .SetIsWindows(PlatformUtils.IsWindows)
             .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
     }
 

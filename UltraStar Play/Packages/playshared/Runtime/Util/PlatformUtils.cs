@@ -24,12 +24,15 @@
         }
     }
 
-    public static bool IsWindows()
+    public static bool IsWindows
     {
+        get
+        {
 #if UNITY_STANDALONE_WIN
-        return true;
+            return true;
 #else
-        return false;
+            return false;
 #endif
+        }
     }
 }
