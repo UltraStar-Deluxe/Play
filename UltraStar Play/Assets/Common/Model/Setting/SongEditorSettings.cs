@@ -52,5 +52,5 @@ public class SongEditorSettings
     public ESongEditorSamplesSource PitchDetectionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
 
     // Audio separation
-    public string AudioSeparationCommand { get; set; } = "python -m spleeter";
+    public string AudioSeparationCommand { get; set; } = "";
 }
