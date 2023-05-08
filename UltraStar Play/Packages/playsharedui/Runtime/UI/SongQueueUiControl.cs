@@ -30,6 +30,25 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
     
     public void SetSongQueueEntryDtos(IReadOnlyList<SongQueueEntryDto> songQueueEntryDtos)
     {
+        // Remember focus
+        int focusedIndex = -1;
+        bool wasToggleMedleyButtonFocused = false;
+        VisualElement focusedElement = VisualElementUtils.GetFocusedVisualElement(songQueueEntriesScrollView.focusController);
+        if (focusedElement != null
+            && focusedElement.GetAncestors().Contains(songQueueEntriesScrollView))
+        {
+            // Search index of focused element
+            SongQueueEntryUiControl focusedSongQueueEntryUiControl = SongQueueEntryControls.FirstOrDefault(control => focusedElement.GetAncestors().Contains(control.VisualElement));
+            if (focusedSongQueueEntryUiControl != null)
+            {
+                focusedIndex = SongQueueEntryControls.IndexOf(focusedSongQueueEntryUiControl);
+                if (focusedIndex >= 0)
+                {
+                    wasToggleMedleyButtonFocused = focusedElement.name == R_PlayShared.UxmlNames.toggleMedleyButton;
+                }
+            }
+        }
+
         songQueueEntriesScrollView.Clear();
         SongQueueEntryControls.Clear();
         
@@ -54,6 +73,24 @@ public class SongQueueUiControl : INeedInjection, IInjectionFinishedListener
                 currentSongQueueEntryControl.VisualElement.AddToClassList("medleyWithPrevious");
             }
             lastSongQueueEntryControl = currentSongQueueEntryControl;
+        }
+
+        // Restore focus
+        focusedIndex = Math.Min(focusedIndex, SongQueueEntryControls.Count - 1);
+        if (focusedIndex >= 0)
+        {
+            SongQueueEntryUiControl focusedSongQueueEntryUiControl = SongQueueEntryControls[focusedIndex];
+            if (focusedSongQueueEntryUiControl != null)
+            {
+                if (wasToggleMedleyButtonFocused)
+                {
+                    focusedSongQueueEntryUiControl.ToggleMedleyButton?.Focus();
+                }
+                else
+                {
+                    focusedSongQueueEntryUiControl.DeleteButton?.Focus();
+                }
+            }
         }
     }
     

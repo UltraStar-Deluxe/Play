@@ -53,7 +53,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         CreateJobListUi();
-        sceneNavigator.SceneChangedEventStream.Subscribe(_ => CreateJobListUi());
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
 
         // CreateDummyJobs();
         // StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(5f, () => CreateDummyJobs()));
@@ -61,7 +61,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         UpdateJobsUi();
     }
 
-    void Update()
+    private void Update()
     {
         jobToJobControl.Values.ForEach(jobListEntryControl => jobListEntryControl.Update());
 
@@ -250,6 +250,19 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         {
             jobListElement.style.top = jobListElement.parent.contentRect.height - jobListElement.contentRect.height;
             jobListElement.style.right = 0;
+        }
+    }
+    
+    private void OnSceneChanged()
+    {
+        if (jobListElement != null)
+        {
+            // Move the element to the new scene
+            uiDocument.rootVisualElement.Add(jobListElement);
+        }
+        else
+        {
+            CreateJobListUi();
         }
     }
 

@@ -1291,7 +1291,9 @@ public abstract class BaseHorizontalCollectionView : BindableElement, ISerializa
         rect = evt.newRect;
         
         if (Mathf.Abs(rect.size.x - m_LastWidth) > 0.01f
-            || Mathf.Abs(rect.size.y - m_LastHeight) > 0.01f)
+            // Only check for horizontal size change
+            // || Mathf.Abs(rect.size.y - m_LastHeight) > 0.01f
+            )
         {
             this.Resize(rect.size);
         }

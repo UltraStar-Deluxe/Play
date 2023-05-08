@@ -30,9 +30,11 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.toggleMedleyButton)]
     private Button toggleMedleyButton;
+    public Button ToggleMedleyButton => toggleMedleyButton;
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.deleteButton)]
     private Button deleteButton;
+    public Button DeleteButton => deleteButton;
     
     [Inject]
     public SongQueueEntryDto SongQueueEntryDto { get; private set; }

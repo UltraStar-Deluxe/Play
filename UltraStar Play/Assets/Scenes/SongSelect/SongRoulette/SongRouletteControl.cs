@@ -81,9 +81,13 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private float transitionToSelectedItemTimeInSeconds;
     private float transitionStartScrollOffsetX;
+
+    private SongMeta initiallySelectedSongMeta;
     
     private void Start()
     {
+        using IDisposable d = ProfileMarkerUtils.Auto("SongRouletteControl.Start");
+        
         songListViewScrollView = songListView.Q<ScrollView>();
         
         songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.TrickleDown);
@@ -97,52 +101,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             ? ScrollerVisibility.Auto
             : ScrollerVisibility.Hidden;
         songListViewScrollView.verticalScrollerVisibility = ScrollerVisibility.Hidden;
-        songListView.makeItem = () =>
-        {
-            VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
-            ThemeManager.ApplyThemeSpecificStylesToVisualElements(songEntryVisualElement);
-            return songEntryVisualElement;
-        };
-        songListView.bindItem = (VisualElement element, int index) =>
-        {
-            if (index < DummyScrollViewItemCountPerSide
-                || index >= (songs.Count + DummyScrollViewItemCountPerSide))
-            {
-                element.HideByVisibility();
-                // element.style.opacity = 0.33f;
-                return;
-            }
-            element.ShowByVisibility();
-            // element.style.opacity = 1;
-            
-            SongMeta songMeta = songs[index - DummyScrollViewItemCountPerSide];
-            element.userData = songMeta;
-            CreateSongEntryControl(songMeta, element);
-            if (songListView.selectedIndex == index)
-            {
-                ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, true);
-            }
-            else
-            {
-                ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, false);
-            }
-        };
-        songListView.unbindItem = (VisualElement element, int index) =>
-        {
-            SongMeta songMeta = element.userData as SongMeta;
-            if (songMeta == null)
-            {
-                return;
-            }
-            element.userData = null;
-            
-            SongEntryControl songEntryControl = songEntryControls.FirstOrDefault(it => it.SongMeta == songMeta);
-            if (songEntryControl != null)
-            {
-                songEntryControl.Dispose();
-                songEntryControls.Remove(songEntryControl);
-            }
-        };
+        songListView.makeItem = OnMakeItem;
+        songListView.bindItem = OnBindItem;
+        songListView.unbindItem = OnUnbindItem;
         songListView.selectedIndicesChanged += OnSongListViewSelectionIndexChanged;
 
         songListView.Q<ScrollView>().ObserveEveryValueChanged(scrollView => scrollView.scrollOffset)
@@ -157,6 +118,83 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         {
             SetSongs(songs);
         }
+
+        SelectInitialSongMeta();
+    }
+
+    private void SelectInitialSongMeta()
+    {
+        if (initiallySelectedSongMeta == null
+            || songs.IsNullOrEmpty()
+            || !songs.Contains(initiallySelectedSongMeta))
+        {
+            return;
+        }
+        
+        if (VisualElementUtils.HasGeometry(songListView))
+        {
+            DoSelectInitialSongMeta();
+        }
+        else
+        {
+            songListView.RegisterHasGeometryCallbackOneShot(_ => DoSelectInitialSongMeta());
+        }
+    }
+    
+    private void DoSelectInitialSongMeta()
+    {
+        SelectSong(initiallySelectedSongMeta);
+        transitionStartScrollOffsetX = songListViewScrollView.scrollOffset.x;
+        transitionToSelectedItemTimeInSeconds = -maxTransitionToSelectedItemTimeInSeconds;
+    }
+
+    private void OnUnbindItem(VisualElement element, int index)
+    {
+        SongMeta songMeta = element.userData as SongMeta;
+        if (songMeta == null)
+        {
+            return;
+        }
+        element.userData = null;
+        
+        SongEntryControl songEntryControl = songEntryControls.FirstOrDefault(it => it.SongMeta == songMeta);
+        if (songEntryControl != null)
+        {
+            songEntryControl.Dispose();
+            songEntryControls.Remove(songEntryControl);
+        }
+    }
+
+    private void OnBindItem(VisualElement element, int index)
+    {
+        if (index < DummyScrollViewItemCountPerSide
+            || index >= (songs.Count + DummyScrollViewItemCountPerSide))
+        {
+            element.HideByVisibility();
+            // element.style.opacity = 0.33f;
+            return;
+        }
+        element.ShowByVisibility();
+        // element.style.opacity = 1;
+        
+        SongMeta songMeta = songs[index - DummyScrollViewItemCountPerSide];
+        element.userData = songMeta;
+        CreateSongEntryControl(songMeta, element);
+        if (songListView.selectedIndex == index)
+        {
+            ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, true);
+        }
+        else
+        {
+            ApplyThemeStyleUtils.SetListViewItemActive(songListView, element, false);
+        }
+    }
+
+    private VisualElement OnMakeItem()
+    {
+        VisualElement songEntryVisualElement = songEntryUi.CloneTree().Children().FirstOrDefault();
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(songEntryVisualElement);
+        return songEntryVisualElement;
     }
 
     private void InitSongSelectSoundEffect()
@@ -331,6 +369,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     public void SetSongs(IReadOnlyCollection<SongMeta> songMetas)
     {
+        using IDisposable d = ProfileMarkerUtils.Auto("SongRouletteControl.SetSongs");
+        
         int lastSelectedSongIndex = NumberUtils.Limit(SelectedSongIndex, 0, songMetas.Count - 1);
         SongMeta lastSelectedSongMeta = Selection.Value.SongMeta;
         songs = new List<SongMeta>(songMetas);
@@ -416,9 +456,14 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     public void SelectSong(SongMeta songMeta)
     {
-        if (songMeta == null
-            || songListViewScrollView == null)
+        if (songMeta == null)
         {
+            return;
+        }
+        
+        if(songListViewScrollView == null)
+        {
+            initiallySelectedSongMeta = songMeta;
             return;
         }
 

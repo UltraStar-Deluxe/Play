@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -29,6 +30,9 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     
     [Inject]
     private RenderTextureManager renderTextureManager;
+    
+    [Inject]
+    private ApplicationManager applicationManager;
     
     protected override object GetInstance()
     {
@@ -103,7 +107,9 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             }
 
             VisualElement background = GetBackgroundVisualElement();
-            LeanTween.value(gameObject, 1, 0, animationTimeInSeconds)
+            
+            // Fade-out is done here. It takes half of the total animation time. 
+            LeanTween.value(gameObject, 1, 0, animationTimeInSeconds / 2)
                 .setOnUpdate((float interpolatedValue) => background.style.opacity = interpolatedValue)
                 .setOnComplete(() => doLoadSceneAction());
         }
@@ -124,37 +130,64 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             return;
         }
 
+        if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            // Only the fade-in is done here. Thus, it takes only half of the total animation time.
+            animationTimeInSeconds /= 2;
+        }
+        
         VisualElement background = GetBackgroundVisualElement();
-        LeanTween.value(gameObject, 0, 1, animationTimeInSeconds)
-            .setOnStart(() =>
+        StartCoroutine(SceneChangeAnimationCoroutine(animationTimeInSeconds, background));
+    }
+
+    private IEnumerator SceneChangeAnimationCoroutine(
+        float animationTimeInSeconds,
+        VisualElement background,
+        Action onComplete = null)
+    {
+        if (animationTimeInSeconds <= 0)
+        {
+            yield break;
+        }
+        
+        if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
+        }   
+        
+        float timeInSeconds = 0;
+        float timeInPercent = 0;
+        while(timeInSeconds < 1
+              && timeInPercent < 1)
+        {
+            float interpolatedValue = LeanTween.easeInSine(0, 1, timeInPercent);
+            
+            if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
             {
-                if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
-                {
-                    themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
-                }
-            })
-            .setOnUpdate((float interpolatedValue) =>
+                // Scale and fade out the snapshot of the old UIDocument.
+                // Handled by the background shader to get correct premultiplied
+                // blending and avoid the one-frame flicker issue.
+                themeManager.backgroundShaderControl.SetTransitionAnimationTime(interpolatedValue);
+            }
+            else if (settings.SceneChangeAnimation is ESceneChangeAnimation.Fade)
             {
-                if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
-                {
-                    // Scale and fade out the snapshot of the old UIDocument.
-                    // Handled by the background shader to get correct premultiplied
-                    // blending and avoid the one-frame flicker issue.
-                    themeManager.backgroundShaderControl.SetTransitionAnimationTime(interpolatedValue);
-                }
-                else if (settings.SceneChangeAnimation is ESceneChangeAnimation.Fade)
-                {
-                    background.style.opacity = interpolatedValue;
-                }
-            })
-            .setEaseInSine()
-            .setOnComplete(() =>
-            {
-                if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
-                {
-                    themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
-                }
-            });
+                background.style.opacity = interpolatedValue;
+            }
+
+            // Force a slow animation, even if the FPS is low.
+            float maxDeltaTimeInSeconds = 1f / applicationManager.targetFrameRate;
+            float deltaTimeInSeconds = Mathf.Min(Time.deltaTime, maxDeltaTimeInSeconds);
+            timeInSeconds += deltaTimeInSeconds;
+            timeInPercent = timeInSeconds / animationTimeInSeconds;
+            yield return new WaitForEndOfFrame();
+        }
+        
+        if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        {
+            themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
+        }
+        
+        onComplete?.Invoke();
     }
 
     private void PlaySceneChangeAnimationSound()

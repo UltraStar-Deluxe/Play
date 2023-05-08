@@ -80,6 +80,8 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     
     public void OnInjectionFinished()
     {
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSelectedSongDetailsControl.OnInjectionFinished");
+        
         injector.Inject(songRatingIconControl);
         
         songIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{songSelectSceneControl.SelectedSongIndex + 1}"));

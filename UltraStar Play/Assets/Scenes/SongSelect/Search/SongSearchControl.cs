@@ -92,6 +92,8 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     
     public void OnInjectionFinished()
     {
+        using IDisposable d = ProfileMarkerUtils.Auto("SongSearchControl.OnInjectionFinished");
+        
         isInjectionFinished = true;
         searchProperties = new HashSet<ESearchProperty>(settings.SearchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
@@ -141,10 +143,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         RegisterToggleSearchPropertyCallback(lyricsPropertyToggle, ESearchProperty.Lyrics);
 
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
-        new UseAvailableScreenHeightControl(searchPropertyDropdownContainer)
-        {
-            MarginInPx = 8,
-        };
+        new UseAvailableScreenHeightControl(searchPropertyDropdownContainer);
 
         songRouletteControl.SongListChangedEventStream.Subscribe(songList =>
         {

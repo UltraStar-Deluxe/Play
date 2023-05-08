@@ -213,7 +213,8 @@ public static class ApplyThemeStyleUtils
         {
             listViewToSelectedVisualElement[listView] = listItemAncestor;
         }
-        else if (listViewToSelectedVisualElement[listView] == listItemAncestor)
+        else if (listViewToSelectedVisualElement.TryGetValue(listView, out VisualElement selectedListItemVisualElement)
+                 && selectedListItemVisualElement == listItemAncestor)
         {
             listViewToSelectedVisualElement[listView] = null;
         }
@@ -302,6 +303,12 @@ public static class ApplyThemeStyleUtils
         bool hasFontColor = !Equals(fontColor, default(Color32));
         if (hasFontColor)
         {
+            visualElement.style.color = new StyleColor(fontColor);
+            if (visualElement is Button)
+            {
+                visualElement.Query<Label>()
+                    .ForEach(label => label.style.color = new StyleColor(fontColor));
+            }
             visualElement.style.color = new StyleColor(fontColor);
         }
 
