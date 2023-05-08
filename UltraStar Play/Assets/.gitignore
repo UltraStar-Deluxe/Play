@@ -84,3 +84,6 @@ JMO Assets.meta
 ## StreamingAssets
 StreamingAssets/SpleeterMsvcExe/
 StreamingAssets/SpleeterMsvcExe.meta
+
+StreamingAssets/SpeechRecognitionModels/
+StreamingAssets/SpeechRecognitionModels.meta

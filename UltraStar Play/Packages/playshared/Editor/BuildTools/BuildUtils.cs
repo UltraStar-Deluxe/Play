@@ -17,6 +17,8 @@ public static class BuildUtils
 
     public static void PerformCustomBuild(CustomBuildOptions options)
     {
+        // TODO: Exclude certain folders from StreamingAssets when building for Android, e.g. spleeter and speech recognition models (all StreamingAssets are unzipped at start on Android)
+        
         string executableName = GetExecutableName(options.appName, options.buildTarget, options.buildAppBundleForGooglePlay, options.configureKeystoreForAndroidBuild);
         string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
         string executableFileInOutputFolder = !executableName.IsNullOrEmpty() ? $"/{executableName}" : "";
