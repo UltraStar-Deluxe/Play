@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SpleeterSharp;
-using UnityEngine;
 using UniInject;
 using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -74,11 +74,17 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
         audioSeparationJobs.Add(audioSeparationJob);
 
+        // Set path to spleeter executable if needed
+        string fallbackAudioSeparationCommand = PlatformUtils.IsWindows()
+            ? $"\"{ApplicationUtils.GetStreamingAssetsPath("SpleeterMsvcExe/Spleeter.exe").Replace("/", "\\")}\""
+            : "";
+        
         Subject<AudioSeparationResult> processSongSubject = new();
         DoProcessSongMetaAsObservable(
                 songMeta,
                 generatedSongFolderAbsolutePath,
-                cancellationTokenSource.Token)
+                cancellationTokenSource.Token,
+                fallbackAudioSeparationCommand)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -102,10 +108,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         return processSongSubject;
     }
 
-    private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(
-        SongMeta songMeta,
+    private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta,
         string generatedSongFolderAbsolutePath,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string fallbackAudioSeparationCommand)
     {
         if (audioSeparationProcessCount > 0)
         {
@@ -122,12 +128,14 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     audioSeparationProcessCount++;
 
                     Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
-                    UpdateSpleeterSharpConfig();
+                    UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
 
+                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Mp3);
+                    
                     SpleeterParameters spleeterParameters = new();
                     spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
-                    spleeterParameters.OutputFolder = generatedSongFolderAbsolutePath;
-                    spleeterParameters.OutputFileCodec = "ogg";
+                    spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
+                    spleeterParameters.Overwrite = true;
 
                     Debug.Log($"Calling SpleeterSharp with parameters {JsonConverter.ToJson(spleeterParameters)}");
                     Task<SpleeterResult> splitTask = SpleeterUtils.SplitAsync(spleeterParameters, cancellationToken);
@@ -201,7 +209,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
         // Check voice audio
         string vocalsAudioPath = spleeterResult.WrittenFiles
-            .FirstOrDefault(filePath => Path.GetFileNameWithoutExtension(filePath) == "vocals");
+            .FirstOrDefault(filePath => Path.GetFileName(filePath).Contains(".vocals."));
         if (!vocalsAudioPath.IsNullOrEmpty()
             && File.Exists(vocalsAudioPath))
         {
@@ -221,7 +229,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
         // Check instrumental audio
         string instrumentalAudioPath = spleeterResult.WrittenFiles
-            .FirstOrDefault(filePath => Path.GetFileNameWithoutExtension(filePath) == "accompaniment");
+            .FirstOrDefault(filePath => Path.GetFileName(filePath).Contains("accompaniment"));
         if (!instrumentalAudioPath.IsNullOrEmpty()
             && File.Exists(instrumentalAudioPath))
         {
@@ -240,11 +248,11 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
 
         // Remove folder that was created by spleeter
-        string spleeterOutputFolder = Path.GetDirectoryName(instrumentalAudioPath);
-        if (Directory.Exists(spleeterOutputFolder))
-        {
-            Directory.Delete(spleeterOutputFolder);
-        }
+        // string spleeterOutputFolder = Path.GetDirectoryName(instrumentalAudioPath);
+        // if (Directory.Exists(spleeterOutputFolder))
+        // {
+        //     Directory.Delete(spleeterOutputFolder);
+        // }
 
         // Save song meta
         if (songMetaChanged)
@@ -253,11 +261,14 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UpdateSpleeterSharpConfig()
+    private void UpdateSpleeterSharpConfig(string fallbackAudioSeparationCommand)
     {
         Debug.Log($"Updating spleeter config");
+        string audioSeparationCommand = !settings.SongEditorSettings.AudioSeparationCommand.IsNullOrEmpty()
+            ? settings.SongEditorSettings.AudioSeparationCommand
+            : fallbackAudioSeparationCommand;
         SpleeterSharpConfig.Create()
-            .SetSpleeterCommand(settings.SongEditorSettings.AudioSeparationCommand)
+            .SetSpleeterCommand(audioSeparationCommand)
             .SetIsWindows(PlatformUtils.IsWindows())
             .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
     }
