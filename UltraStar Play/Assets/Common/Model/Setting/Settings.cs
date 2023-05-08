@@ -58,7 +58,7 @@ public class Settings : ISettings
     
     // Design / presentation settings
     public ESceneChangeAnimation SceneChangeAnimation { get; set; } = ESceneChangeAnimation.Zoom;
-    public float SceneChangeDurationInSeconds { get; set; } = 0.3f;
+    public float SceneChangeDurationInSeconds { get; set; } = 0.4f;
     public bool UseImageAsCursor { get; set; } = true;
     public bool EnableVfx { get; set; } = true;
     public bool ShowScrollBarInSongSelect { get; set; }
