@@ -37,6 +37,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
 
+    [Inject(UxmlName = R.UxmlNames.playlistDropdownField)]
+    private DropdownField playlistDropdownField;
+    
     [Inject(UxmlName = R.UxmlNames.artistPropertyToggle)]
     private Toggle artistPropertyToggle;
 
@@ -196,7 +199,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public void ShowSearchPropertyDropdownOverlay()
     {
         searchPropertyDropdownOverlay.ShowByDisplay();
-        artistPropertyToggle.Q<Toggle>().Focus();
+        playlistDropdownField.Focus();
     }
 
     public void HideSearchPropertyDropdownOverlay()
