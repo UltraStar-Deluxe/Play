@@ -42,8 +42,8 @@ Plugins/Serilog/Serilog.meta
 Plugins/Serilog/Serilog.Sinks.File/
 Plugins/Serilog/Serilog.Sinks.File.meta
 
-StreamingAssets/Input/UltraStarPlayInputActions.inputactions
-StreamingAssets/Input/UltraStarPlayInputActions.inputactions.meta
+Plugins/Opportunity.LrcParser/
+Plugins/Opportunity.LrcParser.meta
 
 Plugins/Jokenizer.Net/
 Plugins/Jokenizer.Net.meta
@@ -82,6 +82,9 @@ JMO Assets.meta
 
 ######################################
 ## StreamingAssets
+StreamingAssets/Input/UltraStarPlayInputActions.inputactions
+StreamingAssets/Input/UltraStarPlayInputActions.inputactions.meta
+
 StreamingAssets/SpleeterMsvcExe/
 StreamingAssets/SpleeterMsvcExe.meta
 
