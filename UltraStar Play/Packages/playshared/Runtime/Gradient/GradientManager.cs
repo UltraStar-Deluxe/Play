@@ -33,7 +33,7 @@ public static class GradientManager
     public static List<GradientConfig> GetGradientConfigsForTransition(GradientConfig fromGradient, GradientConfig toGradient, float animTimeInSeconds)
     {
         List<GradientConfig> gradientConfigs = new();
-        int targetFrameRate = Application.targetFrameRate;
+        int targetFrameRate = ApplicationUtils.CurrentFrameRate;
         if (targetFrameRate <= 0)
         {
             targetFrameRate = 30;

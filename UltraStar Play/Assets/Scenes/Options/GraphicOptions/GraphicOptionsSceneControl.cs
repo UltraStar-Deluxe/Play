@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using PrimeInputActions;
 using ProTrans;
 using UniInject;
-using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -46,9 +44,18 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
             fullscreenModePicker.HideByDisplay();
         }
 
-        List<int> fpsOptions = new() { 30, 60 };
-        new LabeledItemPickerControl<int>(targetFpsPicker, fpsOptions)
-            .Bind(() => settings.TargetFps,
+        List<int> fpsOptions = new() { -1, 30, 60 };
+        LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, fpsOptions);
+        targetFpsPickerControl.GetLabelTextFunction = newValue =>
+        {
+            if (newValue <= 0)
+            {
+                return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto);
+            }
+
+            return newValue.ToString();
+        };
+        targetFpsPickerControl.Bind(() => settings.TargetFps,
                 newValue => settings.TargetFps = newValue);
     }
 

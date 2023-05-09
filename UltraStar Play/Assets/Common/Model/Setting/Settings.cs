@@ -10,7 +10,7 @@ public class Settings : ISettings
     // Graphics settings
     public ScreenResolution ScreenResolution { get; set; } = new ScreenResolution(1280, 720, 60);
     public FullScreenMode FullScreenMode { get; set; } = UnityEngine.FullScreenMode.Windowed;
-    public int TargetFps { get; set; } = 30;
+    public int TargetFps { get; set; } = -1;
 
     // Audio settings
     public int PreviewVolumePercent { get; set; } = 50;

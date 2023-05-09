@@ -175,7 +175,7 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             }
 
             // Force a slow animation, even if the FPS is low.
-            float maxDeltaTimeInSeconds = 1f / applicationManager.targetFrameRate;
+            float maxDeltaTimeInSeconds = 1f / ApplicationUtils.CurrentFrameRate;
             float deltaTimeInSeconds = Mathf.Min(Time.deltaTime, maxDeltaTimeInSeconds);
             timeInSeconds += deltaTimeInSeconds;
             timeInPercent = timeInSeconds / animationTimeInSeconds;

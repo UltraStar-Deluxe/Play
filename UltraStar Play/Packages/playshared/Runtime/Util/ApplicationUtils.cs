@@ -8,6 +8,12 @@ using UnityEngine;
 
 public static class ApplicationUtils
 {
+    public static int CurrentFrameRate => Math.Max(1, Application.targetFrameRate > 0
+        // The target frame rate is used
+        ? Application.targetFrameRate
+        // The refresh rate of the monitor is used
+        : (int)Screen.currentResolution.refreshRateRatio.value);
+    
     public const string GeneratedFolderName = "Generated";
 
     public static readonly IReadOnlyList<string> supportedSoundfontFiles = new List<string>

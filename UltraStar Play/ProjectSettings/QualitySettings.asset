@@ -76,7 +76,7 @@ QualitySettings:
     realtimeReflectionProbes: 0
     billboardsFaceCameraPosition: 0
     useLegacyDetailDistribution: 1
-    vSyncCount: 0
+    vSyncCount: 1
     lodBias: 0.4
     maximumLODLevel: 0
     enableLODCrossFade: 1
@@ -268,7 +268,7 @@ QualitySettings:
     realtimeReflectionProbes: 1
     billboardsFaceCameraPosition: 1
     useLegacyDetailDistribution: 1
-    vSyncCount: 0
+    vSyncCount: 1
     lodBias: 2
     maximumLODLevel: 0
     enableLODCrossFade: 1
@@ -303,6 +303,7 @@ QualitySettings:
     PSM: 5
     PSP2: 2
     Samsung TV: 2
+    Server: 0
     Standalone: 5
     Tizen: 2
     Web: 5
