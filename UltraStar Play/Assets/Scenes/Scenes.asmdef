@@ -25,7 +25,9 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "Facepunch.Steamworks.Win64.dll",
-        ""
+        "Flurl.dll",
+        "Flurl.Http.dll",
+        "HtmlAgilityPack.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
