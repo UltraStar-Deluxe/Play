@@ -474,11 +474,29 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
             return voiceName;
         }
-        
-        string lyricsWithVoiceNames = newVoiceNameToLyricsMap
-            .Select(entry => GetVoiceDisplayName(entry.Key) + ": " + entry.Value)
-            .JoinWith("\n\n");
-        SetLyrics(lyricsWithVoiceNames);
+
+        try
+        {
+            string lyrics = "";
+            if (newVoiceNameToLyricsMap.Count == 1)
+            {
+                lyrics = newVoiceNameToLyricsMap.FirstOrDefault().Value;
+            }
+            else if (newVoiceNameToLyricsMap.Count > 1)
+            {
+                lyrics = newVoiceNameToLyricsMap
+                    .Select(entry => $"<i><b>{GetVoiceDisplayName(entry.Key)}</i></b>\n\n{entry.Value}")
+                    .JoinWith("\n\n");
+            }
+
+            SetLyrics(lyrics);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Failed to construct lyrics string");
+            Debug.LogException(e);
+            SetLyrics("");
+        }
     }
 
     private void SetLyrics(string text)
