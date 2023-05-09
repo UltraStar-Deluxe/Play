@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using ICSharpCode.SharpZipLib.Zip;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -15,11 +17,48 @@ public static class BuildUtils
     private const string KeystoreKeyAliasEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS";
     private const string KeystoreKeyAliasPasswordEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS_PASSWORD";
 
+    private static readonly Dictionary<string, string> copyFilesBeforeBuild = new()
+    {
+        { "Assets/StreamingAssets/HOW_TO_DOWNLOAD_SPEECH_RECOGNITION_MODELS.txt" , "Assets/StreamingAssets/SpeechRecognitionModels/HOW_TO_DOWNLOAD_SPEECH_RECOGNITION_MODELS.txt" },
+    };
+
+    private static readonly List<string> ignoredFoldersOfMobileBuild = new()
+    {
+        "Assets/StreamingAssets/SpleeterMsvcExe",
+        "Assets/StreamingAssets/SpeechRecognitionModels",
+    };
+    
+    private static string IgnoredAssetsOfMobileBuildFolder => "IgnoredAssetsOfMobileBuild";
+    
     public static void PerformCustomBuild(CustomBuildOptions options)
     {
-        // TODO: Exclude certain folders from StreamingAssets when building for Android, e.g. spleeter and speech recognition models (all StreamingAssets are unzipped at start on Android)
-        
-        string executableName = GetExecutableName(options.appName, options.buildTarget, options.buildAppBundleForGooglePlay, options.configureKeystoreForAndroidBuild);
+        CopyFilesBeforeBuild();
+
+        bool isMobileBuild = options.buildTarget is BuildTarget.Android or BuildTarget.iOS; 
+        try
+        {
+            if (isMobileBuild)
+            {
+                ExcludeAssetsBeforeMobileBuild();
+            }
+            
+            AssetDatabase.Refresh();
+            // DoPerformCustomBuild(options);
+            Debug.Log("Simulating build...");
+        }
+        finally
+        {
+            if (isMobileBuild)
+            {
+                IncludeAssetsAfterMobileBuild();
+            }
+        }
+    }
+
+    private static void DoPerformCustomBuild(CustomBuildOptions options)
+    {
+        string executableName = GetExecutableName(options.appName, options.buildTarget, 
+            options.buildAppBundleForGooglePlay, options.configureKeystoreForAndroidBuild);
         string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
         string executableFileInOutputFolder = !executableName.IsNullOrEmpty() ? $"/{executableName}" : "";
         string fullOutputPath = $"{outputFolderPath}{executableFileInOutputFolder}";
@@ -29,7 +68,8 @@ public static class BuildUtils
         }
 
         string[] enabledScenePaths = GetEnabledScenePaths();
-        Debug.Log($"Starting build of {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}");
+        Debug.Log(
+            $"Starting build of {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}");
 
         // Build Android app bundle (aab file) or apk file
         EditorUserBuildSettings.buildAppBundle = options.buildAppBundleForGooglePlay;
@@ -68,11 +108,13 @@ public static class BuildUtils
             PlayerSettings.Android.useCustomKeystore = false;
         }
 
-        BuildReport buildReport = BuildPipeline.BuildPlayer(enabledScenePaths, fullOutputPath, options.buildTarget, options.buildOptions);
+        BuildReport buildReport = BuildPipeline.BuildPlayer(enabledScenePaths, fullOutputPath, options.buildTarget,
+            options.buildOptions);
 
         LogType logType = GetLogType(buildReport.summary.result);
         TimeSpan buildDuration = buildReport.summary.buildEndedAt - buildReport.summary.buildStartedAt;
-        Debug.unityLogger.Log(logType, $"Built {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}. Duration: {buildDuration.TotalSeconds} seconds");
+        Debug.unityLogger.Log(logType,
+            $"Built {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}. Duration: {buildDuration.TotalSeconds} seconds");
 
         if (options.compressOutputFolderToZipFile
             && options.buildTarget
@@ -93,10 +135,106 @@ public static class BuildUtils
                 {
                     Directory.CreateDirectory(outputFolderPath);
                 }
+
                 Directory.Move(generatedFolderPath, subfolderPath);
                 Debug.Log($"Moved folder {generatedFolderPath} to {subfolderPath}");
             }
+
             CompressDirectoryToZipFile(outputFolderPath, outputFolderPath + ".zip");
+        }
+    }
+
+    private static void CopyFilesBeforeBuild()
+    {
+        foreach (KeyValuePair<string, string> entry in copyFilesBeforeBuild)
+        {
+            Debug.Log($"Copy file before build: {entry.Key} -> {entry.Value}");
+            if (!FileUtils.Exists(entry.Key))
+            {
+                Debug.LogWarning("Cannot copy file. File does not exist: " + entry.Key);
+                continue;
+            }
+            
+            DirectoryUtils.CreateDirectory(new FileInfo(entry.Value).Directory.FullName);
+            FileUtils.MoveFileOverwriteIfExists(entry.Key, entry.Value);
+            if (!FileUtils.Exists(entry.Value))
+            {
+                throw new Exception($"Failed to copy {entry.Key} to {entry.Value}");
+            }
+        }
+        
+        // Wait for file operations to complete.
+        Thread.Sleep(100);
+    }
+
+    private static void ExcludeAssetsBeforeMobileBuild()
+    {
+        DirectoryUtils.CreateDirectory(IgnoredAssetsOfMobileBuildFolder);
+        foreach (string path in ignoredFoldersOfMobileBuild)
+        {
+            string src = path;
+            string dest = $"{IgnoredAssetsOfMobileBuildFolder}/{path}";
+            Debug.Log($"Exclude directory before mobile build: {src} -> {dest}");
+            if (!DirectoryUtils.Exists(src))
+            {
+                Debug.LogWarning("Cannot move directory. Directory does not exist: " + src);
+                continue;
+            }
+            
+            DirectoryUtils.CreateDirectory(new DirectoryInfo(dest).Parent.FullName);
+            Directory.Move(src, dest);
+            try
+            {
+                FileUtils.MoveFileOverwriteIfExists(src + ".meta", dest + ".meta");
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Failed to move .meta file: " + e.Message);
+            }
+            
+            // Wait for file operation to complete
+            Thread.Sleep(100);
+            
+            // Delete empty directory if needed.
+            if (Directory.Exists(src)
+                && Directory.GetFiles(src).IsNullOrEmpty())
+            {
+                Directory.Delete(src);
+            }
+        }
+    }
+
+    private static void IncludeAssetsAfterMobileBuild()
+    {
+        DirectoryUtils.CreateDirectory(IgnoredAssetsOfMobileBuildFolder);
+        foreach (string path in ignoredFoldersOfMobileBuild)
+        {
+            string src = $"{IgnoredAssetsOfMobileBuildFolder}/{path}";
+            string dest = path;
+            Debug.Log($"Include directory after mobile build: {src} -> {dest}");
+            if (!DirectoryUtils.Exists(src))
+            {
+                Debug.LogWarning("Cannot move directory. Directory does not exist: " + src);
+                continue;
+            }
+            
+            DirectoryUtils.CreateDirectory(new DirectoryInfo(dest).Parent.FullName);
+            Directory.Move(src, dest);
+            try
+            {
+                FileUtils.MoveFileOverwriteIfExists(src + ".meta", dest + ".meta");
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Failed to move .meta file: " + e.Message);
+            }
+            
+            // Delete empty directory if needed.
+            if (Directory.Exists(src)
+                && Directory.GetFiles(src).IsNullOrEmpty())
+            {
+                Directory.Delete(src);
+            }
         }
     }
 
