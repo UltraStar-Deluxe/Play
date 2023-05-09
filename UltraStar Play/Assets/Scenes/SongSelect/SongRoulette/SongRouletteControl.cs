@@ -83,6 +83,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     private float transitionStartScrollOffsetX;
 
     private SongMeta initiallySelectedSongMeta;
+
+    private Vector2 lastScrollOffset;
     
     private void Start()
     {
@@ -119,9 +121,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         songListView.bindItem = OnBindItem;
         songListView.unbindItem = OnUnbindItem;
         songListView.selectedIndicesChanged += OnSongListViewSelectionIndexChanged;
-
-        songListView.Q<ScrollView>().ObserveEveryValueChanged(scrollView => scrollView.scrollOffset)
-            .Subscribe(_ => OnScrollOffsetChanged());
 
         InitSongSelectSoundEffect();
         
@@ -234,7 +233,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        
         if (!InputUtils.IsPointerDown())
         {
             if (isPointerDownOnListView)
@@ -248,11 +246,23 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         }
     }
 
+    private void LateUpdate()
+    {
+        // React to changed scrollOffset in LateUpdated to ensure Unity has calculated the UI layout.
+        if (Math.Abs(lastScrollOffset.x - songListViewScrollView.scrollOffset.x) > 0.1f)
+        {
+            lastScrollOffset = songListViewScrollView.scrollOffset;
+            OnScrollOffsetChanged();
+        }
+    }
+
     private void UpdateScrollSelectedListViewItemToCenter()
     {
         if (songListView == null
             || songListViewScrollView == null
-            || songListView.itemsSource == null)
+            || songListView.itemsSource == null
+            || !VisualElementUtils.HasGeometry(songListView)
+            || !VisualElementUtils.HasGeometry(songListViewScrollView))
         {
             return;
         }
@@ -274,25 +284,13 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             songListViewScrollView.scrollOffset = new Vector2(
                 interpolatedScrollOffsetX,
                 songListViewScrollView.scrollOffset.y);
-            // Debug.Log($"songListViewScrollView.scrollOffset.x: {songListViewScrollView.scrollOffset.x}, interpolatedScrollOffsetX: " + interpolatedScrollOffsetX);
         }
         else if (Mathf.Abs(songListViewScrollView.scrollOffset.x - targetScrollOffsetX) > 0.01f)
         {
-            // Debug.Log($"songListViewScrollView.scrollOffset.x: {songListViewScrollView.scrollOffset.x}, targetScrollOffsetX: {targetScrollOffsetX}");
             songListViewScrollView.scrollOffset = new Vector2(
                 targetScrollOffsetX,
                 songListViewScrollView.scrollOffset.y);
         }
-        
-        // Fix ListView not creating items sometimes by triggering a scroll event (probably a Unity bug).
-        // VisualElement selectedListViewItem = songListView.Q(null, "unity-collection-view__item--selected");
-        // if (selectedListViewItem == null
-        //     && SelectedSongMeta != null)
-        // {
-        //     songListViewScrollView.scrollOffset = new Vector2(
-        //         songListViewScrollView.scrollOffset.x + Random.Range(0, 2),
-        //         songListViewScrollView.scrollOffset.y);
-        // }
     }
 
     private void SelectListViewItemClosestToCenter()
@@ -329,19 +327,27 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     
     private void UpdateListViewItemPositions()
     {
-        if (!dynamicListViewItemsSize)
+        if (!dynamicListViewItemsSize
+            || !VisualElementUtils.HasGeometry(songListView))
         {
             return;
         }
-        
+
         List<VisualElement> listViewItems = songListView.Query(null, "unity-collection-view__item").ToList();
         float maxDistanceToCenter = songListView.worldBound.width / 2f;
+        float songListCenterX = songListView.worldBound.center.x;
         float maxOffset = -50;
         float maxScaleOffset = 0.5f;
         foreach (VisualElement listViewItem in listViewItems)
         {
-            float horizontalDistanceToCenter = Mathf.Abs(listViewItem.worldBound.center.x - songListView.worldBound.center.x);
+            if (!VisualElementUtils.HasGeometry(listViewItem))
+            {
+                continue;
+            }
+            
+            float horizontalDistanceToCenter = Mathf.Abs(listViewItem.worldBound.center.x - songListCenterX);
             float distanceFactor = horizontalDistanceToCenter / maxDistanceToCenter;
+            distanceFactor = NumberUtils.Limit(distanceFactor, 0, 1);
             listViewItem.style.top = maxOffset * distanceFactor;
             float scale = 1 - maxScaleOffset * distanceFactor;
             listViewItem.style.scale = new StyleScale(new Vector2(scale, scale));
@@ -444,8 +450,6 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         {
             SetSelectionAndScrollToSongIndex(Selection.Value.SongIndex);
         }
-
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => UpdateListViewItemPositions()));
     }
 
     private void SetSelectionAndScrollToSongIndex(int songIndex)
