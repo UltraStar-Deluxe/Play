@@ -5,10 +5,10 @@ old_dir=$(pwd)
 declare -A voskmodels=(
     ["vosk-model-small-en-us-0.15"]="https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"
     ["vosk-model-small-de-0.15"]="https://alphacephei.com/vosk/models/vosk-model-small-de-0.15.zip"
-    ["vosk-model-small-es-0.42"]="https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip"
-    ["vosk-model-small-fr-0.22"]="https://alphacephei.com/vosk/models/vosk-model-small-fr-0.22.zip"
-    ["vosk-model-small-ja-0.22"]="https://alphacephei.com/vosk/models/vosk-model-small-ja-0.22.zip"
-    ["vosk-model-small-cn-0.22"]="https://alphacephei.com/vosk/models/vosk-model-small-cn-0.22.zip"
+    # ["vosk-model-small-es-0.42"]="https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip"
+    # ["vosk-model-small-fr-0.22"]="https://alphacephei.com/vosk/models/vosk-model-small-fr-0.22.zip"
+    # ["vosk-model-small-ja-0.22"]="https://alphacephei.com/vosk/models/vosk-model-small-ja-0.22.zip"
+    # ["vosk-model-small-cn-0.22"]="https://alphacephei.com/vosk/models/vosk-model-small-cn-0.22.zip"
 )
 
 cd "../../UltraStar Play/Assets/StreamingAssets"
