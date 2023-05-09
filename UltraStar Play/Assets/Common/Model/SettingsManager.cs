@@ -182,6 +182,13 @@ public class SettingsManager : AbstractSingletonBehaviour
                 .Subscribe(_ => defaultSettings.PlayerProfiles.FirstOrDefault().Name = steamManager.PlayerName);
         }
 
+        // Set speech recognition model
+        if (PlatformUtils.IsStandalone)
+        {
+            defaultSettings.SongEditorSettings.SpeechRecognitionModelPath =
+                ApplicationUtils.GetStreamingAssetsPath("SpeechRecognitionModels/vosk-model-small-en-us-0.15");
+        }
+        
         return defaultSettings;
     }
 

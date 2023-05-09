@@ -68,7 +68,8 @@ public class StyleSheetControl : AbstractSingletonBehaviour, INeedInjection
         }
 
         if (ApplicationUtils.IsSmallScreen()
-            && smallScreenStyleSheet != null)
+            && smallScreenStyleSheet != null
+            && !PlatformUtils.IsStandalone)
         {
             uiDocument.rootVisualElement.styleSheets.Add(smallScreenStyleSheet);
         }

@@ -175,6 +175,10 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     private bool IsPointerOverSongList()
     {
         VisualElement elementUnderPointer = VisualElementUtils.GetElementUnderPointer(uiDocument, panelHelper);
+        if (elementUnderPointer == null)
+        {
+            return false;
+        }
         return elementUnderPointer == songListView
                || elementUnderPointer.GetFirstAncestorOfType<ListView>() != null
                || elementUnderPointer.GetFirstAncestorOfType<ListViewH>() != null;

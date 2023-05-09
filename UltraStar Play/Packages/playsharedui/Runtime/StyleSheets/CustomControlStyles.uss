@@ -20,6 +20,18 @@ ToggleButton.active {
     background-color: var(--control-color-accent2);
 }
 
+ToggleButton.active:focus {
+    background-color: var(--control-color-accent2);
+}
+
+ToggleButton.active:hover {
+    background-color: var(--control-color-accent2);
+}
+
+ToggleButton.active:hover:focus {
+    background-color: var(--control-color-accent2);
+}
+
 .textOnlyButton:hover {
     color: var(--control-color-accent1);
 }

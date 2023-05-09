@@ -10,7 +10,7 @@ public class Settings : ISettings
     // Graphics settings
     public ScreenResolution ScreenResolution { get; set; } = new ScreenResolution(1280, 720, 60);
     public FullScreenMode FullScreenMode { get; set; } = UnityEngine.FullScreenMode.Windowed;
-    public int TargetFps { get; set; } = 30;
+    public int TargetFps { get; set; } = -1;
 
     // Audio settings
     public int PreviewVolumePercent { get; set; } = 50;
@@ -58,7 +58,7 @@ public class Settings : ISettings
     
     // Design / presentation settings
     public ESceneChangeAnimation SceneChangeAnimation { get; set; } = ESceneChangeAnimation.Zoom;
-    public float SceneChangeDurationInSeconds { get; set; } = 0.3f;
+    public float SceneChangeDurationInSeconds { get; set; } = 0.4f;
     public bool UseImageAsCursor { get; set; } = true;
     public bool EnableVfx { get; set; } = true;
     public bool ShowScrollBarInSongSelect { get; set; }

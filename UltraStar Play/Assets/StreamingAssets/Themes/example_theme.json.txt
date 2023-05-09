@@ -31,6 +31,15 @@
     "warningFontColor":  "#FEC84B",
     "errorFontColor": "#F97066",
 
+    // Drop shadow to make elements without a background more readable.
+    "noBackgroundInHierarchyTextShadow": {
+        "color": "#a0a0a0",
+        "offset": {
+            "x": 1,
+            "y": 1
+        }
+    },
+
     // This group defines the dynamic background parameters.
     "dynamicBackground": {
         // A single-pixel high image that defines the color gradient to use.
@@ -152,33 +161,46 @@
 // Gradients are similar to CSS linear-gradient, namely <angle>, <start-color>, <end-color>
 // where <angle> is optional.
 {
-    fontColor: "...",
-    hoverFontColor: "...",
-    focusFontColor: "...",
-    activeFontColor: "...",
-    disabledFontColor: "...",
-
-    backgroundColor: "..."
-    hoverBackgroundColor: "..."
-    focusBackgroundColor: "..."
-    activeBackgroundColor: "..."
-    disabledBackgroundColor: "..."
+    "fontColor": "...",
+    "hoverFontColor": "...",
+    "focusFontColor": "...",
+    "activeFontColor": "...",
+    "disabledFontColor": "...",
     
-    backgroundGradient: "45deg, #101828, #475467"
-    hoverBackgroundGradient: "..."
-    focusBackgroundGradient: "..."
-    activeBackgroundGradient: "..."
-    disabledBackgroundGradient: "..."
+    "backgroundColor": "..."
+    "hoverBackgroundColor": "..."
+    "focusBackgroundColor": "..."
+    "activeBackgroundColor": "..."
+    "disabledBackgroundColor": "..."
     
-    borderColor: "..."
-    hoverBorderColor: "..."
-    focusBorderColor: "..."
-    activeBorderColor: "..."
-    disabledBorderColor: "..."
+    "backgroundGradient": "45deg, #101828, #475467"
+    "hoverBackgroundGradient": "..."
+    "focusBackgroundGradient": "..."
+    "activeBackgroundGradient": "..."
+    "disabledBackgroundGradient": "..."
+    
+    "borderColor": "..."
+    "hoverBorderColor": "..."
+    "focusBorderColor": "..."
+    "activeBorderColor": "..."
+    "disabledBorderColor": "..."
 
-    backgroundImage: "..."
-    hoverBackgroundImage: "..."
-    focusBackgroundImage: "..."
-    activeBackgroundImage: "..."
-    disabledBackgroundImage: "..."
+    "backgroundImage": "..."
+    "hoverBackgroundImage": "..."
+    "focusBackgroundImage": "..."
+    "activeBackgroundImage": "..."
+    "disabledBackgroundImage": "..."
+    
+    "textShadow": : {
+        "color": "#a0a0a0",
+        "offset": {
+            "x": 1,
+            "y": 1
+        },
+        "blurRadius": 0
+    }
+    "hoverTextShadow": "..."
+    "focusTextShadow": "..."
+    "activeTextShadow": "..."
+    "disabledTextShadow": "..."
 }

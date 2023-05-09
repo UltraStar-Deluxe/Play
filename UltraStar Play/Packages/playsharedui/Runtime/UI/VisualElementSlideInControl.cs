@@ -27,16 +27,19 @@ public class VisualElementSlideInControl
         
         this.visualElement.RegisterCallback<GeometryChangedEvent>(evt =>
         {
+            Vector2 resolvedStyleSize = ResolvedStyleSize;
+
             if (!isInitialized)
             {
                 isInitialized = true;
-                lastSize = ResolvedStyleSize;
+                lastSize = resolvedStyleSize;
                 UpdatePositionWithoutTransition();
             }
-            else if (Math.Abs(lastSize.x - ResolvedStyleSize.x) > 1f
-                     || Math.Abs(lastSize.y - ResolvedStyleSize.y) > 1f)
+            else if (Math.Abs(lastSize.x - resolvedStyleSize.x) > 5f
+                     || Math.Abs(lastSize.y - resolvedStyleSize.y) > 5f)
             {
-                lastSize = ResolvedStyleSize;
+                Debug.Log($"VisualElementSlideInControl: size of {visualElement.name} changed from {lastSize} to {resolvedStyleSize}. Thus, updating position without transition.");
+                lastSize = resolvedStyleSize;
                 UpdatePositionWithoutTransition();
             }
         });

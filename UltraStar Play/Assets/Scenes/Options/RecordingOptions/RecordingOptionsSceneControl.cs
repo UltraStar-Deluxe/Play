@@ -378,6 +378,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     private void UpdateRecordingDeviceInactiveOverlay()
     {
+        recordingDeviceInactiveOverlay.ShowByDisplay();
         recordingDeviceInactiveOverlay.style.backgroundColor = enabledToggle.value
             ? new StyleColor(Color.clear)
             : new StyleColor(new Color(0, 0, 0, 0.5f));

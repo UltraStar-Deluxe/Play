@@ -24,6 +24,8 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     private int lastScreenHeight;
     private readonly Subject<ScreenSizeChangedEvent> screenSizeChangedEventStream = new();
     public IObservable<ScreenSizeChangedEvent> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
+    
+    private int lastTargetFrameRate;
 
     protected override object GetInstance()
     {
@@ -33,8 +35,8 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         targetFrameRate = settings.TargetFps;
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = targetFrameRate;
+        lastTargetFrameRate = targetFrameRate;
+        ApplyTargetFrameRateAndVSync();
         lastScreenWidth = Screen.width;
         lastScreenHeight = Screen.height;
 
@@ -44,6 +46,24 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         ApplicationUtils.SetUsePortAudio(settings.PreferPortAudio);
     }
 
+    private void ApplyTargetFrameRateAndVSync()
+    {
+        if (targetFrameRate <= 0)
+        {
+            // Use the frame rate of the monitor
+            Debug.Log("Set target frame rate to -1 (monitor refresh rate, vsync on)");
+            QualitySettings.vSyncCount = 1;
+            Application.targetFrameRate = -1;
+        }
+        else
+        {
+            // Use the target frame rate
+            Debug.Log($"Set target frame rate to {targetFrameRate} (vsync on)");
+            Application.targetFrameRate = targetFrameRate;
+            QualitySettings.vSyncCount = 0;
+        }
+    }
+
     private void Update()
     {
         if (this != Instance)
@@ -51,9 +71,10 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         
-        if (Application.targetFrameRate != targetFrameRate)
+        if (lastTargetFrameRate != targetFrameRate)
         {
-            Application.targetFrameRate = targetFrameRate;
+            lastTargetFrameRate = targetFrameRate;
+            ApplyTargetFrameRateAndVSync();
         }
         
         if (lastScreenHeight != Screen.height
