@@ -91,6 +91,20 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         songListViewScrollView = songListView.Q<ScrollView>();
         
         songListView.RegisterCallback<WheelEvent>(evt => evt.StopImmediatePropagation(), TrickleDown.TrickleDown);
+        songListView.RegisterCallback<KeyDownEvent>(evt =>
+        {
+            if (songs.IsNullOrEmpty())
+            {
+                return;
+            }
+            
+            if ((evt.keyCode == KeyCode.End && Selection.Value.SongIndex == songs.Count - 1) 
+                || (evt.keyCode == KeyCode.Home && Selection.Value.SongIndex == 0))
+            {
+                // Already selected the first / last item
+                evt.StopImmediatePropagation();                
+            }
+        }, TrickleDown.TrickleDown);
         songListView.RegisterCallback<PointerDownEvent>(_ =>
         {
             isPointerDownOnListView = true;
