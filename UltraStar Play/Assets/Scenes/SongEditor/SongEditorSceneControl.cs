@@ -56,6 +56,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     [InjectedInInspector]
     public SongEditorMicSampleRecorder songEditorMicSampleRecorder;
     
+    [InjectedInInspector]
+    public StyleSheet songEditorSmallScreenStyleSheet;
+    
     [Inject]
     private Injector injector;
 
@@ -131,6 +134,12 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private void Start()
     {
         Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInSongInMillis} ms.");
+        if (ApplicationUtils.IsSmallScreen()
+            && songEditorSmallScreenStyleSheet != null)
+        {
+            uiDocument.rootVisualElement.styleSheets.Add(songEditorSmallScreenStyleSheet);
+        }
+        
         songAudioPlayer.Init(SongMeta);
 
         songAudioPlayer.PlaybackStartedEventStream

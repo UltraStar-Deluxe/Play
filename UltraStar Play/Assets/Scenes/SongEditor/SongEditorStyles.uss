@@ -7,17 +7,18 @@
     --control-color-accent2: rgb(70, 96, 124);
     --selection-color-transparent: rgba(21, 88, 219, 0.5);
     --recording-button-color: rgb(200, 32, 32);
-    --font-size-xxs: 8px;
-    --font-size-xs: 10px;
-    --font-size-s: 11px;
-    --font-size: 14px;
-    --font-size-l: 18px;
-    --font-size-xl: 20px;
-    --font-size-xxl: 24px;
-    --control-height: 25px;
-    --control-width: 80px;
-    --control-width-half: 40px;
-    --control-width-large: 100px;
+    --font-size-xxs: 7px;
+    --font-size-xs: 8px;
+    --font-size-s: 9px;
+    --font-size: 11px;
+    --font-size-l: 14px;
+    --font-size-xl: 18px;
+    --font-size-xxl: 20px;
+    --font-icon-size: 18px;
+    --control-height: 20px;
+    --control-width: 50px;
+    --control-width-half: 25px;
+    --control-width-large: 80px;
     --control-height-large: 40px;
     --control-height-small: 20px;
     --panel-background-color: rgb(60, 63, 65);
@@ -131,7 +132,7 @@ Button.selected:hover {
 }
 
 #leftSideBarMainColumn MaterialIcon {
-    font-size: 24px;
+    font-size: var(--font-size-xl);
     width: auto;
     height: auto;
 }
@@ -251,6 +252,10 @@ SongEditorSideBarGroup > .unity-base-field {
 
 SongEditorSideBarGroup > .unity-button {
     margin-bottom: 8px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 SongEditorSideBarGroup > ItemPicker {

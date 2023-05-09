@@ -780,6 +780,8 @@ MonoBehaviour:
   songEditorSceneInputControl: {fileID: 182898102}
   songEditorAlternativeAudioPlayer: {fileID: 1897508174}
   songEditorMicSampleRecorder: {fileID: 1527616032}
+  songEditorSmallScreenStyleSheet: {fileID: 7433441132597879392, guid: 7b77cf73f5c04d349a357325316b3ca3,
+    type: 3}
 --- !u!4 &524897707
 Transform:
   m_ObjectHideFlags: 0
