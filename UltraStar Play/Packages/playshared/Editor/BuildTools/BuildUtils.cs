@@ -43,8 +43,7 @@ public static class BuildUtils
             }
             
             AssetDatabase.Refresh();
-            // DoPerformCustomBuild(options);
-            Debug.Log("Simulating build...");
+            DoPerformCustomBuild(options);
         }
         finally
         {
