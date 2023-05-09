@@ -202,6 +202,7 @@
 .unity-base-popup-field__arrow {
     -unity-background-image-tint-color: var(--font-color);
     -unity-background-scale-mode: scale-to-fit;
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/baseline_arrow_drop_down_white_24dp.png');
     border-width: 0;
 }
 
@@ -238,6 +239,7 @@
 .unity-enum-field__arrow {
     -unity-background-image-tint-color: var(--font-color);
     -unity-background-scale-mode: scale-to-fit;
+    background-image: url('project://database/Packages/playshared/Runtime/Graphics/Icons/baseline_arrow_drop_down_white_24dp.png');
     border-width: 0;
 }
 
