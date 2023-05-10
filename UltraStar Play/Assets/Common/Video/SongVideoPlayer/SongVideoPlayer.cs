@@ -35,6 +35,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 && videoImageVisualElement != null)
             {
                 videoImageVisualElement.ShowByDisplay();
+                videoImageVisualElement.style.opacity = 1;
             }
         }
     }
@@ -158,6 +159,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (videoImageVisualElement != null)
         {
             videoImageVisualElement.ShowByDisplay();
+            videoImageVisualElement.style.opacity = 1;
         }
         videoPlayer.Pause();
     }
@@ -198,8 +200,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             // Positive VideoGap, thus skip the start of the video
             videoPlayer.time = SongMeta.VideoGap;
         }
-        
-        videoImageVisualElement?.ShowByDisplay();
+
+        if (videoImageVisualElement != null)
+        {
+            videoImageVisualElement.ShowByDisplay();
+            videoImageVisualElement.style.opacity = 1;
+        }
     }
 
     private void SyncVideoPlayPause(double positionInSongInMillis)
@@ -275,6 +281,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (videoImageVisualElement != null)
         {
             videoImageVisualElement.HideByDisplay();
+            videoImageVisualElement.style.opacity = 0;
         }
         if (SongMeta.Background.IsNullOrEmpty())
         {
