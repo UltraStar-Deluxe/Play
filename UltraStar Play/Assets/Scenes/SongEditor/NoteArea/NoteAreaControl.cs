@@ -10,8 +10,8 @@ using UnityEngine.UIElements;
 
 public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 {
-    private const float ViewportAutomaticScrollingBoarderPercent = 0.0333f;
-    private const float ViewportAutomaticScrollingJumpPercent = 0.333f;
+    public const float ViewportAutomaticScrollingBoarderPercent = 0.01f;
+    private const float ViewportAutomaticScrollingJumpPercent = 0.2f;
     private const int DefaultViewportWidthInMillis = 8000;
 
     private const float DoubleClickToTogglePlayPauseDistanceThresholdInPx = 5f;

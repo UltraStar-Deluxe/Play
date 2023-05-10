@@ -15,8 +15,6 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
 {
     public static NoteAreaRect LastSelectionRect;
 
-    private static readonly float scrollBorderPercent = 0.05f;
-
     [Inject]
     private SongEditorSelectionControl selectionControl;
 
@@ -264,17 +262,17 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
 
     private void UpdateScrollAmount(NoteAreaDragEvent dragEvent)
     {
-        int scrollAmountX = 200;
-        scrollAmountX += (int)(Math.Abs(dragEvent.GeneralDragEvent.LocalCoordinateInPercent.Distance.x) - scrollBorderPercent) * 1000;
+        int scrollAmountX = (int)(noteAreaControl.ViewportWidth * Time.deltaTime);
+        scrollAmountX += (int)(Math.Abs(dragEvent.GeneralDragEvent.LocalCoordinateInPercent.Distance.x) - NoteAreaControl.ViewportAutomaticScrollingBoarderPercent) * 1000;
 
         int scrollAmountY = 1;
 
         // X-Coordinate
-        if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.x > (1 - scrollBorderPercent))
+        if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.x > (1 - NoteAreaControl.ViewportAutomaticScrollingBoarderPercent))
         {
             scrollAmount = new Vector2(scrollAmountX, scrollAmount.y);
         }
-        else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.x < scrollBorderPercent)
+        else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.x < NoteAreaControl.ViewportAutomaticScrollingBoarderPercent)
         {
             scrollAmount = new Vector2(-scrollAmountX, scrollAmount.y);
         }
@@ -284,11 +282,11 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
         }
 
         // Y-Coordinate
-        if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y > (1 - scrollBorderPercent))
+        if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y > (1 - NoteAreaControl.ViewportAutomaticScrollingBoarderPercent))
         {
             scrollAmount = new Vector2(scrollAmount.x, scrollAmountY);
         }
-        else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y < scrollBorderPercent)
+        else if (dragEvent.GeneralDragEvent.LocalCoordinateInPercent.CurrentPosition.y < NoteAreaControl.ViewportAutomaticScrollingBoarderPercent)
         {
             scrollAmount = new Vector2(scrollAmount.x, -scrollAmountY);
         }
