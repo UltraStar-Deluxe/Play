@@ -194,8 +194,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.GoToLastPlaybackPosition = newValue);
 
         Bind(musicVolumeSlider,
-            () => settings.SongEditorAudioVolumePercent,
-            newValue => settings.SongEditorAudioVolumePercent = (int) newValue);
+            () => settings.SongEditorSettings.MusicVolumePercent,
+            newValue => settings.SongEditorSettings.MusicVolumePercent = (int) newValue);
 
         drawNoteLayerPickerControl = new(drawNoteLayerPicker, EnumUtils.GetValuesAsList<ESongEditorDrawNoteLayer>());
         drawNoteLayerPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));

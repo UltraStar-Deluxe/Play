@@ -6,7 +6,7 @@ public class SongEditorSettings
 {
     public bool AutoSave { get; set; } = true;
 
-    public float MusicVolume { get; set; } = 1;
+    public int MusicVolumePercent { get; set; } = 100;
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
     public bool GoToLastPlaybackPosition { get; set; } = true;
 
