@@ -21,6 +21,7 @@
     --control-width-large: 80px;
     --control-height-large: 40px;
     --control-height-small: 20px;
+    --secondary-side-bar-panel-width: 160px;
     --panel-background-color: rgb(60, 63, 65);
     --note-area-background-color: rgb(43, 43, 43);
     background-color: rgb(50, 50, 50);
@@ -167,7 +168,7 @@ Button.selected:hover {
 
 .secondarySideBarPanel {
     display: none;
-    width: 200px;
+    width: var(--secondary-side-bar-panel-width);
     height: 100%;
     padding-left: 2px;
     padding-right: 0;
