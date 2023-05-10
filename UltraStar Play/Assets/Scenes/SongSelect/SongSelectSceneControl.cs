@@ -1178,7 +1178,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_title);
         if (HasPartyModeSceneData)
         {
-            sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
+            sceneTitle.text += $"\n{PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.RoundCount}";
         }
 
         songSearchControl.UpdateTranslation();

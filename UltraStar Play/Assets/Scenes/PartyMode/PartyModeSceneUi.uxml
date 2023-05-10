@@ -9,7 +9,7 @@
                         <MaterialIcon tabindex="-1" name="backIcon" icon="arrow_back" />
                     </ui:Button>
                     <ui:VisualElement name="titleAndDescription">
-                        <ui:Label text="Party Mode" name="sceneTitle" class="titleText noBackgroundInHierarchy" />
+                        <ui:Label text="Team &amp; Tournament" name="sceneTitle" class="titleText noBackgroundInHierarchy" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
