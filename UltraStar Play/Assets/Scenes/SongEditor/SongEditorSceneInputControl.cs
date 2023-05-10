@@ -91,7 +91,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         
         // Play / pause
         InputManager.GetInputAction(R.InputActions.songEditor_togglePause).PerformedAsObservable()
-            .Where(_ => !AnyInputFieldHasFocus())
+            .Where(_ => !AnyInputFieldHasFocus()
+                        // Do not confuse with playSelectedNotes action
+                        && !InputUtils.IsKeyboardControlPressed())
             .Subscribe(_ =>
             {
                 songEditorSceneControl.ToggleAudioPlayPause();
