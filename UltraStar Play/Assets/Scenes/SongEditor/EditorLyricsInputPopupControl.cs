@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using UniInject;
-using UnityEngine;
+﻿using UniInject;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
@@ -28,6 +26,8 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
 
     public virtual void OnInjectionFinished()
     {
+        textField.selectAllOnFocus = false;
+        textField.selectAllOnMouseUp = false;
         initialText = GetInitialText();
         textField.value = initialText;
         textField.Focus();

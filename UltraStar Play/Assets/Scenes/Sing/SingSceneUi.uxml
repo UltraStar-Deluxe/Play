@@ -5,8 +5,8 @@
     <ui:Template name="SingingLyricsUi" src="project://database/Assets/Scenes/Sing/Lyrics/SingingLyricsBottomUi.uxml?fileID=9197481963319205126&amp;guid=3b914bf71af2e4748a4d38d046a11420&amp;type=3#SingingLyricsBottomUi" />
     <ui:Template name="InputDeviceIconContainer" src="project://database/Assets/Common/Input/InputDeviceIconContainer.uxml?fileID=9197481963319205126&amp;guid=bfaa37d17fe5feb40b35b3c1a0afa59d&amp;type=3#InputDeviceIconContainer" />
     <ui:VisualElement name="background">
-        <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;);" />
-        <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none;" />
+        <ui:VisualElement name="songVideoImage" style="width: 100%; height: 100%; position: absolute; background-image: url(&apos;project://database/Assets/Scenes/Sing/SingSceneVideoRenderTexture.renderTexture?fileID=8400000&amp;guid=d8b963bb121871f40acbd4b66020fbc2&amp;type=2#SingSceneVideoRenderTexture&apos;); -unity-background-scale-mode: scale-and-crop; background-color: rgb(0, 0, 0); opacity: 0;" />
+        <ui:VisualElement name="songImage" style="width: 100%; height: 100%; position: absolute; display: none; -unity-background-scale-mode: scale-and-crop;" />
         <ui:VisualElement name="webcamRenderContainerParent" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; height: 100%; position: absolute;">
             <ui:Image name="webcamRenderContainer" style="flex-grow: 1; background-color: rgb(0, 0, 0); display: none;" />
         </ui:VisualElement>

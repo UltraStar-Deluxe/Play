@@ -99,6 +99,13 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
             return;
         }
 
+        // Do not open context menu via long press on standalone platform (only with right click)
+        if (PlatformUtils.IsStandalone
+            && context.control.path == "/Mouse/press")
+        {
+            return;
+        }
+        
         Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         if (!targetVisualElement.worldBound.Contains(pointerPosition))
         {

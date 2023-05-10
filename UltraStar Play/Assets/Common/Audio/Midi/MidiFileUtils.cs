@@ -193,19 +193,28 @@ public static class MidiFileUtils
         return lengthInMillis;
     }
     
-    public static MidiFile CreateMidiFile(SongMeta songMeta, List<Note> loadNotesFromMidiFile, byte velocity, int offsetInMillis = 0)
+    public static MidiFile CreateMidiFile(SongMeta songMeta, List<Note> loadNotesFromMidiFile, byte velocity, int offsetInMillis = 0, float timeFactor=1)
     {
         List<MidiEvent> midiEvents = new();
         int lastNoteEndInMillis = 0;
         loadNotesFromMidiFile.ForEach(note =>
         {
             int startInMillis = (int)(BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.StartBeat) + offsetInMillis);
+            if (Math.Abs(timeFactor - 1) > 0.001f)
+            {
+                startInMillis = (int)(startInMillis * timeFactor);
+            }
             if (startInMillis < lastNoteEndInMillis)
             {
                 return;
             }
+            
             int endInMillis = (int)(BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.EndBeat) + offsetInMillis);
-
+            if (Math.Abs(timeFactor - 1) > 0.001f)
+            {
+                endInMillis = (int)(endInMillis * timeFactor);
+            }
+            
             int deltaInMillis = startInMillis - lastNoteEndInMillis;
             
             int noteLengthInMillis = endInMillis - startInMillis;

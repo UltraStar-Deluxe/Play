@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FullSerializer;
 using UnityEngine;
 
@@ -29,6 +30,30 @@ public class Statistics
         return result;
     }
 
+    public SongStatistic GetLocalHighscoreStats(SongMeta songMeta, EDifficulty difficulty)
+    {
+        LocalStatistic localStatistic = GetLocalStats(songMeta);
+        if (localStatistic == null
+            || localStatistic.StatsEntries == null
+            || localStatistic.StatsEntries.SongStatistics.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        SongStatistic songStatistics = localStatistic.StatsEntries.GetTopScores(1, difficulty).FirstOrDefault();
+        return songStatistics;
+    }
+
+    public int GetLocalHighscore(SongMeta songMeta, EDifficulty difficulty)
+    {
+        SongStatistic songStatistic = GetLocalHighscoreStats(songMeta, difficulty);
+        if (songStatistic == null)
+        {
+            return 0;
+        }
+        return songStatistic.Score;
+    }
+    
     public WebStatistic GetWebStats(SongMeta songMeta)
     {
         WebStatistics.TryGetValue(songMeta.SongHash, out WebStatistic result);

@@ -322,11 +322,15 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         float margin = 5;
         float width = Mathf.Max(VisualElement.worldBound.width + margin * 2, 150);
         float height = VisualElement.worldBound.height + margin * 2;
+        float left = Mathf.Max(0, VisualElement.worldBound.x - width / 2);
+        float top = Mathf.Max(0, VisualElement.worldBound.y - margin);
         editLyricsPopup.style.position = new StyleEnum<Position>(Position.Absolute);
-        editLyricsPopup.style.left = VisualElement.worldBound.x - width / 2;
-        editLyricsPopup.style.top = VisualElement.worldBound.y - margin;
+        editLyricsPopup.style.left = left;
+        editLyricsPopup.style.top = top;
         editLyricsPopup.style.width = width;
         editLyricsPopup.style.height = height;
+        editLyricsPopup.style.maxWidth = Length.Percent(100);
+        editLyricsPopup.style.maxHeight = Length.Percent(100);
 
         lyricsInputControl = injector
             .WithBindingForInstance(this)

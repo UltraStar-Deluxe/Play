@@ -321,6 +321,88 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         }
     }
 
+    public AbstractSongEditorLayer GetLayerOfNote(Note note)
+    {
+        if (note.Sentence != null
+            && note.Sentence.Voice != null
+            && voiceNameToLayerMap.TryGetValue(note.Sentence.Voice.Name, out SongEditorVoiceLayer voiceLayer))
+        {
+            return voiceLayer;
+        }
+
+        foreach (KeyValuePair<ESongEditorLayer, SongEditorEnumLayer> entry in layerEnumToLayerMap)
+        {
+            SongEditorEnumLayer enumLayer = entry.Value;
+            if (enumLayer.ContainsNote(note))
+            {
+                return enumLayer;
+            }
+        }
+
+        return null;
+    }
+    
+    public bool IsMidiSoundPlayAlongEnabled(AbstractSongEditorLayer layer)
+    {
+        if (layer == null)
+        {
+            return false;
+        }
+        
+        if (layer is SongEditorEnumLayer enumLayer)
+        {
+            return IsEnumLayerMidiSoundPlayAlongEnabled(enumLayer.LayerEnum);
+        }
+        else if (layer is SongEditorVoiceLayer voiceLayer)
+        {
+            return IsVoiceLayerMidiSoundPlayAlongEnabled(voiceLayer.VoiceName);
+        }
+        return true;
+    }
+
+    private bool IsVoiceLayerMidiSoundPlayAlongEnabled(string voiceName)
+    {
+        voiceName = Voice.NormalizeVoiceName(voiceName);
+        if (voiceNameToLayerMap.TryGetValue(voiceName, out SongEditorVoiceLayer layer))
+        {
+            return layer.IsMidiSoundPlayAlongEnabled;
+        }
+        return true;
+    }
+
+    private bool IsEnumLayerMidiSoundPlayAlongEnabled(ESongEditorLayer layerEnum)
+    {
+        return layerEnumToLayerMap[layerEnum].IsMidiSoundPlayAlongEnabled;
+    }
+
+    public void SetMidiSoundPlayAlongEnabled(AbstractSongEditorLayer layer, bool newValue)
+    {
+        if (layer is SongEditorEnumLayer enumLayer)
+        {
+            SetEnumLayerMidiSoundPlayAlongEnabled(enumLayer.LayerEnum, newValue);
+        }
+        else if (layer is SongEditorVoiceLayer voiceLayer)
+        {
+            SetVoiceLayerMidiSoundPlayAlongEnabled(voiceLayer.VoiceName, newValue);
+        }
+    }
+
+    private void SetVoiceLayerMidiSoundPlayAlongEnabled(string voiceName, bool newValue)
+    {
+        voiceName = Voice.NormalizeVoiceName(voiceName);
+        if (newValue == voiceNameToLayerMap[voiceName].IsMidiSoundPlayAlongEnabled)
+        {
+            return;
+        }
+
+        voiceNameToLayerMap[voiceName].IsMidiSoundPlayAlongEnabled = newValue;
+    }
+
+    private void SetEnumLayerMidiSoundPlayAlongEnabled(ESongEditorLayer layerEnum, bool newValue)
+    {
+        layerEnumToLayerMap[layerEnum].IsMidiSoundPlayAlongEnabled = newValue;
+    }
+
     public bool IsLayerEditable(AbstractSongEditorLayer layer)
     {
         if (layer is SongEditorEnumLayer enumLayer)

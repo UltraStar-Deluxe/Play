@@ -13,6 +13,9 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
+    private SongEditorLayerManager layerManager;
+    
+    [Inject]
     private SongMeta songMeta;
 
     [Inject]
@@ -21,6 +24,9 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+    
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
@@ -80,7 +86,8 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         double currentPositionInBeats = songAudioPlayer.GetCurrentBeat(true);
         List<Note> allVisibleNotes = songEditorSceneControl.GetAllVisibleNotes();
         List<Note> followingNotes = allVisibleNotes
-            .Where(note => note.StartBeat > currentPositionInBeats)
+            .Where(note => note.StartBeat > currentPositionInBeats 
+                           && layerManager.IsMidiSoundPlayAlongEnabled(layerManager.GetLayerOfNote(note)))
             .ToList();
         if (followingNotes.IsNullOrEmpty())
         {
@@ -97,12 +104,17 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         {
             distanceToFirstNoteStartInMillis = 0;
         }
-        
+
+        float timeFactor = nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value > 0
+            ? 1 / nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value
+            : 1;
         MidiFile midiFile = MidiFileUtils.CreateMidiFile(
             songMeta,
             followingNotes,
-            (byte)settings.SongEditorSettings.MidiVelocity);
-        MidiFileUtils.SetFirstDeltaTimeTo(midiFile, 0, (int)distanceToFirstNoteStartInMillis);
+            (byte)settings.SongEditorSettings.MidiVelocity,
+            0,
+            timeFactor);
+        MidiFileUtils.SetFirstDeltaTimeTo(midiFile, 0, (int)(distanceToFirstNoteStartInMillis * timeFactor));
         midiManager.PlayMidiFile(midiFile);
         
         isPlaying = true;

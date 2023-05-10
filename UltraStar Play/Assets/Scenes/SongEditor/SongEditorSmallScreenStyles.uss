@@ -16,4 +16,5 @@
     --control-width-half: 60px;
     --control-width-large: 150px;
     --round-button-size: 50px;
+    --secondary-side-bar-panel-width: 200px;
 }

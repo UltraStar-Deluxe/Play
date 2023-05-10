@@ -37,6 +37,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     {
         base.Start();
 
+        songPreviewVideoImage.style.opacity = 0;
         StartSongPreviewEventStream.Subscribe(_ =>
         {
             if (currentSongEntryControl == null)
@@ -47,7 +48,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
             if (SongMetaUtils.VideoResourceExists(currentSongEntryControl.SongMeta))
             {
                 songPreviewVideoImage.ShowByDisplay();
-                songPreviewVideoImage.SetBackgroundImageAlpha(0);
+                songPreviewVideoImage.style.opacity = 0;
             }
 
             songPreviewBackgroundImage.ShowByDisplay();
@@ -66,7 +67,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
             {
                 return;
             }
-            songPreviewVideoImage.SetBackgroundImageAlpha(newValue);
+            songPreviewVideoImage.style.opacity = newValue;
         });
         BackgroundImageFadeIn.Subscribe(newValue =>
         {

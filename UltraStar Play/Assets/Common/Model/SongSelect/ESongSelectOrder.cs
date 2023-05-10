@@ -6,6 +6,5 @@
     Language,
     Folder,
     Year,
-    CountCanceled,
-    CountFinished
+    Highscore,
 }

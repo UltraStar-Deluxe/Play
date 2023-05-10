@@ -16,6 +16,12 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     [Inject]
     private SongEditorLayerManager layerManager;
 
+    public override void OnInjectionFinished()
+    {
+        base.OnInjectionFinished();
+        textField.SelectAll();
+    }
+    
     protected override string GetInitialText()
     {
         return ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editorNoteControl.Note.Text);

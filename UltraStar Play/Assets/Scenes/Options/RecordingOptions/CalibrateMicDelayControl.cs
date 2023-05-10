@@ -29,6 +29,9 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private RecordingOptionsSceneControl recordingOptionsSceneControl;
+    
+    [Inject]
+    private BackgroundMusicManager backgroundMusicManager;
 
     private bool isCalibrationInProgress;
 
@@ -38,6 +41,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     private List<int> delaysInMillis = new();
     private int currentIteration;
+    private float oldBackgroundMusicVolume = -1;
 
     void Awake()
     {
@@ -99,6 +103,8 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
         delaysInMillis = new List<int>();
         currentIteration = 0;
+        oldBackgroundMusicVolume = backgroundMusicManager.BackgroundMusicAudioSource.volume;
+        backgroundMusicManager.BackgroundMusicAudioSource.volume = 0;
         StartIteration();
     }
 
@@ -107,6 +113,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         Debug.Log("Mic delay calibration - timeout");
         audioSource.Stop();
         isCalibrationInProgress = false;
+        backgroundMusicManager.BackgroundMusicAudioSource.volume = oldBackgroundMusicVolume;
         calibrationResultEventStream.OnNext(new CalibrationResult
         {
             IsSuccess = false
@@ -118,6 +125,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         Debug.Log($"Mic delay calibration - median delay of {delaysInMillis.Count} values: {delaysInMillis[delaysInMillis.Count/2]}");
         audioSource.Stop();
         isCalibrationInProgress = false;
+        backgroundMusicManager.BackgroundMusicAudioSource.volume = oldBackgroundMusicVolume;
 
         calibrationResultEventStream.OnNext(new CalibrationResult
         {
@@ -163,6 +171,14 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         else
         {
             Debug.Log("Mic delay calibration - wrong pitch: " + MidiUtils.GetAbsoluteName(pitchEvent.MidiNote));
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (oldBackgroundMusicVolume >= 0)
+        {
+            backgroundMusicManager.BackgroundMusicAudioSource.volume = oldBackgroundMusicVolume;
         }
     }
 
