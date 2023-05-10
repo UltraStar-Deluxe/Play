@@ -294,6 +294,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SongSelectionPlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
         songSelectFilterControl.FiltersChangedEventStream.Subscribe(_ => UpdateFilteredSongs());
 
+        settings.ObserveEveryValueChanged(it => it.Difficulty)
+            .Subscribe(it =>
+            {
+                if (songOrderDropdownField.value is ESongOrder.Highscore)
+                {
+                    UpdateFilteredSongs();
+                }
+            });
+        
         playlistManager.PlaylistChangeEventStream.Subscribe(playlistChangeEvent =>
         {
             if (playlistChangeEvent.Playlist == SongSelectionPlaylistChooserControl.Selection.Value)
@@ -1063,10 +1072,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 return SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
             case ESongOrder.Year:
                 return songMeta.Year;
-            case ESongOrder.CountCanceled:
-                return statistics.GetLocalStats(songMeta)?.TimesCanceled;
-            case ESongOrder.CountFinished:
-                return statistics.GetLocalStats(songMeta)?.TimesFinished;
+            case ESongOrder.Highscore:
+                // Return negative value to sort descending
+                return -statistics.GetLocalHighscore(songMeta, settings.Difficulty);
             default:
                 Debug.LogWarning("Unknown order for songs: " + songOrderDropdownField.value);
                 return songMeta.Artist;

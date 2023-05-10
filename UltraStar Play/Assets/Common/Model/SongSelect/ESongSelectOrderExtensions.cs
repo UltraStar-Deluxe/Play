@@ -18,10 +18,8 @@ public static class EnumExtensions
                 return TranslationManager.GetTranslation(R.Messages.order_Folder);
             case ESongOrder.Year:
                 return TranslationManager.GetTranslation(R.Messages.order_Year);
-            case ESongOrder.CountCanceled:
-                return TranslationManager.GetTranslation(R.Messages.order_CountCanceled);
-            case ESongOrder.CountFinished:
-                return TranslationManager.GetTranslation(R.Messages.order_CountFinished);
+            case ESongOrder.Highscore:
+                return TranslationManager.GetTranslation(R.Messages.order_Highscore);
             default:
                 return TranslationManager.GetTranslation(R.Messages.order_Artist);
         }
