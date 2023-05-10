@@ -25,6 +25,9 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
     private Settings settings;
 
     [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+    
+    [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
     private bool isPlaying;
@@ -101,12 +104,17 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         {
             distanceToFirstNoteStartInMillis = 0;
         }
-        
+
+        float timeFactor = nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value > 0
+            ? 1 / nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value
+            : 1;
         MidiFile midiFile = MidiFileUtils.CreateMidiFile(
             songMeta,
             followingNotes,
-            (byte)settings.SongEditorSettings.MidiVelocity);
-        MidiFileUtils.SetFirstDeltaTimeTo(midiFile, 0, (int)distanceToFirstNoteStartInMillis);
+            (byte)settings.SongEditorSettings.MidiVelocity,
+            0,
+            timeFactor);
+        MidiFileUtils.SetFirstDeltaTimeTo(midiFile, 0, (int)(distanceToFirstNoteStartInMillis * timeFactor));
         midiManager.PlayMidiFile(midiFile);
         
         isPlaying = true;
