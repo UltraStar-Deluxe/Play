@@ -633,9 +633,12 @@ public static class SongMetaUtils
         {
             audioAuthor = selectedSong.Artist;
         }
-        
         string audioLicense = selectedSong.GetUnknownHeaderEntry($"AUDIOLICENSE");
         string audioSource = selectedSong.GetUnknownHeaderEntry($"AUDIOSOURCE");
+        
+        string lyricsAuthor = selectedSong.GetUnknownHeaderEntry($"LYRICSAUTHOR");
+        string lyricsLicense = selectedSong.GetUnknownHeaderEntry($"LYRICSLICENSE");
+        string lyricsSource = selectedSong.GetUnknownHeaderEntry($"LYRICSSOURCE");
         
         string backgroundAuthor = selectedSong.GetUnknownHeaderEntry($"BACKGROUNDAUTHOR");
         string backgroundLicense = selectedSong.GetUnknownHeaderEntry($"BACKGROUNDLICENSE");
@@ -652,6 +655,7 @@ public static class SongMetaUtils
         return new List<string>()
         {
             GetAttributionText("Audio", audioAuthor, audioLicense, audioSource),
+            GetAttributionText("Lyrics", lyricsAuthor, lyricsLicense, lyricsSource),
             GetAttributionText("Video", videoAuthor, videoLicense, videoSource),
             GetAttributionText("Background", backgroundAuthor, backgroundLicense, backgroundSource),
             GetAttributionText("Cover", coverAuthor, coverLicense, coverSource),
