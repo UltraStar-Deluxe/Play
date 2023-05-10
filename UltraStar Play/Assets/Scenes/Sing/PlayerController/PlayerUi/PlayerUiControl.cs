@@ -190,6 +190,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             playerScoreProgressBar.HideByVisibility();
             playerImageBorder.HideByVisibility();
+            // Do not show border because it looks bad without a fill color
+            playerImage.SetBorderWidth(0);
         }
 
         settings.ObserveEveryValueChanged(it => it.ShowPlayerNames)

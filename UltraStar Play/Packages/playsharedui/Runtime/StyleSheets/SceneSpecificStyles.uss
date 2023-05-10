@@ -332,6 +332,8 @@
     flex-shrink: 0;
     width: 64px;
     height: 64px;
+    border-width: 0.5px;
+    border-color: rgba(32, 32, 32, 0.25);
 }
 
 .singScenePlayerUi.singScenePlayerUiSmall #playerInfoContainer #playerImage {
