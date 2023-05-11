@@ -1,4 +1,6 @@
 ﻿using UniInject;
+using UniRx;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
@@ -63,7 +65,10 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
         songEditorSceneControl.HideEditLyricsPopup();
         if (textField.focusController.focusedElement == textField)
         {
+            // Move focus away
             textField.Blur();
+            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                () => textField.GetRootVisualElement().Q<Button>().Focus()));
         }
     }
 
