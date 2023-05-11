@@ -29,6 +29,12 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private SongEditorSelectionControl selectionControl;
 
     [Inject]
+    private PitchDetectionAction pitchDetectionAction;
+    
+    [Inject]
+    private SpeechRecognitionAction speechRecognitionAction;
+    
+    [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
     [Inject]
@@ -145,6 +151,15 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => songEditorSceneControl.StartEditingSelectedNoteText());
         
+        // AI tools
+        InputManager.GetInputAction(R.InputActions.songEditor_pitchDetection).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => MoveSelectedNotesToDetectedPitch());
+        
+        InputManager.GetInputAction(R.InputActions.songEditor_speechRecognition).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => SetTextOfSelectedNotesToAnalyzedSpeech());
+        
         // Change position in song
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
@@ -208,6 +223,18 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
+    }
+
+    private void SetTextOfSelectedNotesToAnalyzedSpeech()
+    {
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true);
+    }
+
+    private void MoveSelectedNotesToDetectedPitch()
+    {
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource);
     }
 
     private void OnBack(InputAction.CallbackContext context)

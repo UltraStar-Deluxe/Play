@@ -11,12 +11,14 @@ public static partial class R
         public static readonly string songEditor_jumpToEndOfSong = "songEditor/jumpToEndOfSong";
         public static readonly string songEditor_jumpToStartOfSong = "songEditor/jumpToStartOfSong";
         public static readonly string songEditor_paste = "songEditor/paste";
+        public static readonly string songEditor_pitchDetection = "songEditor/pitchDetection";
         public static readonly string songEditor_playSelectedNotes = "songEditor/playSelectedNotes";
         public static readonly string songEditor_redo = "songEditor/redo";
         public static readonly string songEditor_save = "songEditor/save";
         public static readonly string songEditor_selectAll = "songEditor/selectAll";
         public static readonly string songEditor_selectNextNote = "songEditor/selectNextNote";
         public static readonly string songEditor_selectPreviousNote = "songEditor/selectPreviousNote";
+        public static readonly string songEditor_speechRecognition = "songEditor/speechRecognition";
         public static readonly string songEditor_toggleNoteTypeFreestyle = "songEditor/toggleNoteTypeFreestyle";
         public static readonly string songEditor_toggleNoteTypeGolden = "songEditor/toggleNoteTypeGolden";
         public static readonly string songEditor_toggleNoteTypeNormal = "songEditor/toggleNoteTypeNormal";

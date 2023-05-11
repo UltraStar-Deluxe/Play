@@ -409,6 +409,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Draw new Note", "Shift+Drag (no selection)"));
             inputActionInfos.Add(new InputActionInfo("Extend Selection", "Shift+Drag (with existing selection)"));
             inputActionInfos.Add(new InputActionInfo("Toggle Selection", "Ctrl+Drag"));
+            inputActionInfos.Add(new InputActionInfo("Make golden", "G"));
+            inputActionInfos.Add(new InputActionInfo("Make freestyle", "F"));
+            inputActionInfos.Add(new InputActionInfo("Make rap", "R"));
+            inputActionInfos.Add(new InputActionInfo("Make rap-golden", "T"));
+            inputActionInfos.Add(new InputActionInfo("Pitch detection", "M"));
+            inputActionInfos.Add(new InputActionInfo("Speech recognition", "N"));
         }
         else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {

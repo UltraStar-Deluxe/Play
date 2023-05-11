@@ -1504,6 +1504,24 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "pitchDetection",
+                    "type": "Button",
+                    "id": "e7d9fa4d-9718-4504-8475-e60d7439a703",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "speechRecognition",
+                    "type": "Button",
+                    "id": "98d8ca68-5c1f-45d6-ad56-b8fb143fdf7c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "toggleNoteTypeNormal",
                     "type": "Button",
                     "id": "2b17f574-6759-4ab4-a758-3a7375e2d31e",
@@ -2219,6 +2237,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "anyKeyboardKey",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6429a813-4ea5-42db-acf3-7c30e04b3ba7",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "pitchDetection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "18b2c1f7-8bf4-42b4-875b-6bbbb06dfaab",
+                    "path": "<Keyboard>/n",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "speechRecognition",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

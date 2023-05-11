@@ -41,6 +41,11 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, ESongEditorSamplesSource samplesSource, bool notify)
     {
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
         if (audioClip == null)
         {

@@ -32,6 +32,11 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
     public void MoveNotesToDetectedPitch(List<Note> notes, bool notify, ESongEditorSamplesSource samplesSource)
     {
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
         AudioClip audioClip = GetAudioClip(samplesSource);
         if (audioClip == null)
         {
