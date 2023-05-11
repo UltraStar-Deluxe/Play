@@ -1,4 +1,4 @@
-#songEditorRoot {
+.songEditorRoot {
     --font-color: rgb(208, 208, 208);
     --font-color-secondary: rgb(168, 168, 168);
     --font-color-inverted: rgb(64, 64, 64);
