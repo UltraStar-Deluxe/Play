@@ -134,6 +134,7 @@ public static partial class R
         public const string smallControl = "smallControl";
         public const string smallerFont = "smallerFont";
         public const string smallFont = "smallFont";
+        public const string songEditorRoot = "songEditorRoot";
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
         public const string squareButton = "squareButton";
         public const string startPreviewIcon = "startPreviewIcon";

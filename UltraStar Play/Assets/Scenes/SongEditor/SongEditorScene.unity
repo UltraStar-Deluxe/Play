@@ -657,7 +657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfac381e8120d2d41b8da847760356a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSongName: Some Title
+  defaultSongName: Kryptonite
   defaultSongNamePasteBin: 'Code Monkey
 
     Summer Wine
@@ -1718,7 +1718,7 @@ VideoPlayer:
   m_TargetMaterialRenderer: {fileID: 0}
   m_TargetMaterialProperty: _MainTex
   m_RenderMode: 2
-  m_AspectRatio: 2
+  m_AspectRatio: 1
   m_DataSource: 1
   m_TimeUpdateMode: 2
   m_PlaybackSpeed: 1

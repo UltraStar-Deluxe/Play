@@ -109,6 +109,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorSideBarControl sideBarControl = new();
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
+    private readonly SongEditorBackgroundAudioWaveFormControl songEditorBackgroundAudioWaveFormControl = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
@@ -116,6 +117,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private readonly List<IDialogControl> openDialogControls = new();
     public bool IsAnyDialogOpen => openDialogControls.Count > 0;
+
     public void OnInjectionFinished()
     {
         injector.Inject(overviewAreaControl);
@@ -126,6 +128,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(sideBarControl);
         injector.Inject(issueAnalyzerControl);
         injector.Inject(statusBarControl);
+        injector.Inject(songEditorBackgroundAudioWaveFormControl);
         injector
             .WithRootVisualElement(rightSideBar)
             .CreateAndInject<DragToChangeRightSideBarWidthControl>();
@@ -134,11 +137,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private void Start()
     {
         Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInSongInMillis} ms.");
-        if (ApplicationUtils.IsSmallScreen()
-            && songEditorSmallScreenStyleSheet != null)
-        {
-            uiDocument.rootVisualElement.styleSheets.Add(songEditorSmallScreenStyleSheet);
-        }
+
+        InitSongEditorStyleSheet();
         
         songAudioPlayer.Init(SongMeta);
 
@@ -159,6 +159,17 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         InitAutoSave();
 
         InitSteamAchievement();
+    }
+
+    private void InitSongEditorStyleSheet()
+    {
+        uiDocument.rootVisualElement.AddToClassList(R.UssClasses.songEditorRoot);
+        
+        if (ApplicationUtils.IsSmallScreen()
+            && songEditorSmallScreenStyleSheet != null)
+        {
+            uiDocument.rootVisualElement.styleSheets.Add(songEditorSmallScreenStyleSheet);
+        }
     }
 
     private void InitSteamAchievement()

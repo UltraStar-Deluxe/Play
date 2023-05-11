@@ -575,6 +575,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
                 .WithRootVisualElement(noteVisualElement)
                 .WithBindingForInstance(note)
                 .CreateAndInject<EditorNoteControl>();
+            noteVisualElement.userData = editorNoteControl;
             noteToControlMap.Add(note, editorNoteControl);
             VisualElement parentElement = layer != null
                 ? songEditorLayerToParentElement[layer.LayerEnum]

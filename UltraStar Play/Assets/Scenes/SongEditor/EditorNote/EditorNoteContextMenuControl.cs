@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
-using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -78,15 +77,17 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
 
         contextMenu.AddButton("Edit lyrics", () => songEditorSceneControl.StartEditingSelectedNoteText());
-        FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuForAiTools(contextMenu, selectedNotes);
-        FillContextMenuToAddSpaceBetweenNotes(contextMenu);
+        FillContextMenuToMergeAndAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
         FillContextMenuToMergeSentences(contextMenu, selectedNotes);
-        FillContextMenuToMoveToOtherSentence(contextMenu, selectedNotes);
-        FillContextMenuToMoveToOtherVoice(contextMenu, selectedNotes);
+        FillContextMenuToMoveToOtherSentenceOrVoice(contextMenu, selectedNotes);
         FillContextMenuToDeleteNotes(contextMenu, selectedNotes);
     }
 
@@ -104,28 +105,25 @@ public class EditorNoteContextMenuControl : ContextMenuControl
             () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource));
     }
 
-    private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)
+    private void FillContextMenuToMergeAndAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
-        contextMenu.AddButton("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
+        
+        if (mergeNotesAction.CanExecute(selectedNotes))
+        {
+            contextMenu.AddButton("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
+        }
+        
+        if (selectedNotes.Count > 1)
+        {
+            contextMenu.AddButton("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
+        }
     }
 
     private void FillContextMenuToDeleteNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
         contextMenu.AddButton("Delete", () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
-    }
-
-    private void FillContextMenuToSplitAndMergeNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
-    {
-        if (splitNotesAction.CanExecute(selectedNotes))
-        {
-            contextMenu.AddButton("Split Notes", () => splitNotesAction.ExecuteAndNotify(selectedNotes));
-        }
-        if (mergeNotesAction.CanExecute(selectedNotes))
-        {
-            contextMenu.AddButton("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
-        }
     }
 
     private void FillContextMenuToSetNoteType(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
@@ -168,7 +166,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
     }
 
-    private void FillContextMenuToMoveToOtherVoice(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToMoveToOtherSentenceOrVoice(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.soloVoiceName, Voice.firstVoiceName);
         bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.secondVoiceName);
@@ -190,19 +188,15 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         if (moveNoteToOwnSentenceAction.CanMoveToOwnSentence(selectedNotes))
         {
-            contextMenu.AddButton("Assign to own sentence", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
+            contextMenu.AddButton("Assign to own phrase", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
         }
-    }
-
-    private void FillContextMenuToMoveToOtherSentence(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
-    {
+        
         bool canMoveToPreviousSentence = moveNoteToAdjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, noteControl.Note);
         bool canMoveToNextSentence = moveNoteToAdjacentSentenceAction.CanMoveToNextSentence(selectedNotes, noteControl.Note);
         if (canMoveToPreviousSentence)
         {
-            contextMenu.AddSeparator();
-            contextMenu.AddButton("Move to previous sentence",
-                () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(noteControl.Note));
+            contextMenu.AddButton("Assign to previous phrase",
+                () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(selectedNotes));
         }
         if (!canMoveToPreviousSentence && canMoveToNextSentence)
         {
@@ -210,8 +204,8 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
         if (canMoveToNextSentence)
         {
-            contextMenu.AddButton("Move to next sentence",
-                () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(noteControl.Note));
+            contextMenu.AddButton("Assign to next phrase",
+                () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(selectedNotes));
         }
     }
 
