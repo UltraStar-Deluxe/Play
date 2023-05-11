@@ -255,8 +255,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void DoSpeechRecognition()
     {
-        if (NoteAreaSelectionDragListener.LastSelectionRect == null
-            || NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats <= 0)
+        if (NoteAreaSelectionDragListener.lastSelectionRect.Value == null
+            || NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats <= 0)
         {
             return;
         }
@@ -264,8 +264,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
         VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
-            NoteAreaSelectionDragListener.LastSelectionRect.MinBeat,
-            NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats,
+            NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
+            NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
             settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             2,
             true,
@@ -276,15 +276,15 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void DoDetectPitch()
     {
-        if (NoteAreaSelectionDragListener.LastSelectionRect == null
-            || NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats <= 0)
+        if (NoteAreaSelectionDragListener.lastSelectionRect.Value == null
+            || NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats <= 0)
         {
             return;
         }
         
         pitchDetectionAction.CreateNotesForDetectedPitch(
-            NoteAreaSelectionDragListener.LastSelectionRect.MinBeat,
-            NoteAreaSelectionDragListener.LastSelectionRect.LengthInBeats,
+            NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
+            NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
             settings.SongEditorSettings.PitchDetectionSamplesSource,
             true);
     }

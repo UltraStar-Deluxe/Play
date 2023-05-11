@@ -74,6 +74,16 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
     {
         List<Note> allNotes = songEditorSceneControl.GetAllVisibleNotes();
         SetSelection(allNotes);
+
+        // Update selection range for pitch detection and speech recognition
+        int minMidiNote = MidiUtils.SingableNoteMin;
+        int maxMidiNote = MidiUtils.SingableNoteMax;
+        if (!allNotes.IsNullOrEmpty())
+        {
+            minMidiNote = allNotes.Select(note => note.MidiNote).Min();
+            maxMidiNote = allNotes.Select(note => note.MidiNote).Max();
+        }
+        NoteAreaSelectionDragListener.lastSelectionRect.Value = NoteAreaRect.CreateFromMillis(songMeta, 0, (int)songAudioPlayer.DurationOfSongInMillis, minMidiNote, maxMidiNote);
     }
 
     public void AddToSelection(List<EditorNoteControl> uiNotes)
