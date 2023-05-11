@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
-using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -85,8 +84,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         FillContextMenuToAddSpaceBetweenNotes(contextMenu);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
         FillContextMenuToMergeSentences(contextMenu, selectedNotes);
-        FillContextMenuToMoveToOtherSentence(contextMenu, selectedNotes);
-        FillContextMenuToMoveToOtherVoice(contextMenu, selectedNotes);
+        FillContextMenuToMoveToOtherSentenceOrVoice(contextMenu, selectedNotes);
         FillContextMenuToDeleteNotes(contextMenu, selectedNotes);
     }
 
@@ -168,7 +166,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
     }
 
-    private void FillContextMenuToMoveToOtherVoice(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
+    private void FillContextMenuToMoveToOtherSentenceOrVoice(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.soloVoiceName, Voice.firstVoiceName);
         bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.secondVoiceName);
@@ -190,19 +188,15 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
         if (moveNoteToOwnSentenceAction.CanMoveToOwnSentence(selectedNotes))
         {
-            contextMenu.AddButton("Assign to own sentence", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
+            contextMenu.AddButton("Assign to own phrase", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
         }
-    }
-
-    private void FillContextMenuToMoveToOtherSentence(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
-    {
+        
         bool canMoveToPreviousSentence = moveNoteToAdjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, noteControl.Note);
         bool canMoveToNextSentence = moveNoteToAdjacentSentenceAction.CanMoveToNextSentence(selectedNotes, noteControl.Note);
         if (canMoveToPreviousSentence)
         {
-            contextMenu.AddSeparator();
-            contextMenu.AddButton("Move to previous sentence",
-                () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(noteControl.Note));
+            contextMenu.AddButton("Assign to previous phrase",
+                () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(selectedNotes));
         }
         if (!canMoveToPreviousSentence && canMoveToNextSentence)
         {
@@ -210,8 +204,8 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
         if (canMoveToNextSentence)
         {
-            contextMenu.AddButton("Move to next sentence",
-                () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(noteControl.Note));
+            contextMenu.AddButton("Assign to next phrase",
+                () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(selectedNotes));
         }
     }
 
