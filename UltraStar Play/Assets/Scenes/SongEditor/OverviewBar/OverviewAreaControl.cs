@@ -65,7 +65,6 @@ public class OverviewAreaControl : IInjectionFinishedListener
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaIssueVisualizer>();
 
-        // Create the audio waveform image.
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource).Subscribe(_ =>
         {
             UpdateAudioWaveForm();
@@ -101,47 +100,10 @@ public class OverviewAreaControl : IInjectionFinishedListener
             };
         }
 
-        using (new DisposableStopwatch($"Created audio waveform in <millis> ms"))
-        {
-            string audioUri = GetAudioUri(settings.SongEditorSettings.PlaybackSamplesSource);
-            if (audioUri.IsNullOrEmpty())
-            {
-                Debug.LogWarning($"No {settings.SongEditorSettings.PlaybackSamplesSource} audio found. Split the audio first. Using original music instead.");
-                audioUri = GetAudioUri(ESongEditorSamplesSource.OriginalMusic);
-            }
-            
-            if (!SongMetaUtils.AudioResourceExists(songMeta))
-            {
-                Debug.Log($"Audio file resource does not exist {audioUri}");
-                return;
-            }
-
-            string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
-            if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
-            {
-                // Cannot draw audio wave form of MIDI file.
-                return;
-            }
-            
-            // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-            AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
-            audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip);
-        }
+        AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, audioManager, settings);
+        SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioClip);
     }
-
-    private string GetAudioUri(ESongEditorSamplesSource samplesSource)
-    {
-        switch (samplesSource)
-        {
-            case ESongEditorSamplesSource.Instrumental:
-                return SongMetaUtils.GetInstrumentalAudioUri(songMeta);
-            case ESongEditorSamplesSource.Vocals:
-                return SongMetaUtils.GetVocalsAudioUri(songMeta);
-            default:
-                return SongMetaUtils.GetAudioUri(songMeta);
-        }
-    }
-
+    
     private void RegisterPointerEvents()
     {
         bool isPointerDown = false;

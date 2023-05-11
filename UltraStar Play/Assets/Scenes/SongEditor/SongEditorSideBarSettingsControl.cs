@@ -65,6 +65,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.showRightSideBarToggle)]
     private Toggle showRightSideBarToggle;
+    
+    [Inject(UxmlName = R.UxmlNames.showAudioWaveformInBackgroundToggle)]
+    private Toggle showAudioWaveformInBackgroundToggle;
 
     [Inject(UxmlName = R.UxmlNames.showStatusBarToggle)]
     private Toggle showStatusBarToggle;
@@ -360,6 +363,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(showRightSideBarToggle,
             () => settings.SongEditorSettings.ShowRightSideBar,
             newValue => settings.SongEditorSettings.ShowRightSideBar = newValue);
+        Bind(showAudioWaveformInBackgroundToggle,
+            () => settings.SongEditorSettings.ShowAudioWaveformInBackground,
+            newValue => settings.SongEditorSettings.ShowAudioWaveformInBackground = newValue);
         Bind(showStatusBarToggle,
             () => settings.SongEditorSettings.ShowStatusBar,
             newValue => settings.SongEditorSettings.ShowStatusBar = newValue);

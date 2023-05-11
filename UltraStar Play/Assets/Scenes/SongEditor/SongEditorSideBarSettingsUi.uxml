@@ -49,6 +49,7 @@
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="layoutGroup" label="Layout">
             <ui:Toggle name="showRightSideBarToggle" label="Show right side" />
+            <ui:Toggle name="showAudioWaveformInBackgroundToggle" label="Show wave form" />
             <ui:Toggle name="showVideoAreaToggle" label="Show preview" />
             <ui:Toggle name="showVirtualPianoToggle" label="Show virtual piano" />
             <ui:Toggle name="showStatusBarToggle" label="Show status bar" />

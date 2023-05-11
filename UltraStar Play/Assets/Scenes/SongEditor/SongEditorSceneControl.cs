@@ -109,6 +109,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorSideBarControl sideBarControl = new();
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
+    private readonly SongEditorBackgroundAudioWaveFormControl songEditorBackgroundAudioWaveFormControl = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
@@ -116,6 +117,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private readonly List<IDialogControl> openDialogControls = new();
     public bool IsAnyDialogOpen => openDialogControls.Count > 0;
+
     public void OnInjectionFinished()
     {
         injector.Inject(overviewAreaControl);
@@ -126,6 +128,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(sideBarControl);
         injector.Inject(issueAnalyzerControl);
         injector.Inject(statusBarControl);
+        injector.Inject(songEditorBackgroundAudioWaveFormControl);
         injector
             .WithRootVisualElement(rightSideBar)
             .CreateAndInject<DragToChangeRightSideBarWidthControl>();
