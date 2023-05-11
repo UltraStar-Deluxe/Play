@@ -268,7 +268,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
                 songEditorSceneControl.StartEditingSelectedNoteText();
                 // When the newly selected note has not been drawn yet (because it is not in the current viewport),
                 // then the lyric edit mode might not have been started. To fix this, open lyrics edit mode again 1 frame later.
-                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
                     () => songEditorSceneControl.StartEditingSelectedNoteText()));
             }
         }
@@ -326,7 +326,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
                 songEditorSceneControl.StartEditingSelectedNoteText();
                 // When the newly selected note has not been drawn yet (because it is not in the current viewport),
                 // then the lyric edit mode might not have been started. To fix this, open lyrics edit mode again 1 frame later.
-                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2,
                     () => songEditorSceneControl.StartEditingSelectedNoteText()));
             }
         }
