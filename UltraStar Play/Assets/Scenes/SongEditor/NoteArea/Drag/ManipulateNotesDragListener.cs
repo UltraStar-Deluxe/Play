@@ -4,6 +4,7 @@ using System.Linq;
 using UniInject;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -33,6 +34,12 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
 
     [Inject]
     private SongEditorLayerManager layerManager;
+    
+    [Inject]
+    private UIDocument uiDocument;
+    
+    [Inject]
+    private PanelHelper panelHelper;
 
     private List<Note> selectedNotes = new();
     private List<Note> followingNotes = new();
@@ -67,20 +74,9 @@ public class ManipulateNotesDragListener : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        Note dragStartNote = songEditorSceneControl
-            .GetAllVisibleNotes()
-            .Where(note => note.IsEditable)
-            .FirstOrDefault(note => note.StartBeat <= dragEvent.PositionInSongInBeatsDragStart
-                                    && dragEvent.PositionInSongInBeatsDragStart <= note.EndBeat
-                                    && note.MidiNote <= dragEvent.MidiNoteDragStart
-                                    && dragEvent.MidiNoteDragStart <= note.MidiNote);
-        if (dragStartNote == null)
-        {
-            return;
-        }
-
-        EditorNoteControl dragStartNoteControl = editorNoteDisplayer.GetNoteControl(dragStartNote);
-        if (dragStartNoteControl == null
+        Vector2 startPosInPanelCoordinates = dragEvent.GeneralDragEvent.ScreenCoordinateInPixels.StartPosition;
+        VisualElement pickedElement = uiDocument.rootVisualElement.panel.Pick(startPosInPanelCoordinates);
+        if (pickedElement.userData is not EditorNoteControl dragStartNoteControl
             || !dragStartNoteControl.Note.IsEditable)
         {
             return;
