@@ -154,6 +154,11 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     private void AddToSelectionWithoutNotify(Note note)
     {
+        if (!note.IsEditable)
+        {
+            return;
+        }
+        
         selectedNotes.Add(note);
         EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(note);
         if (noteControl != null)
