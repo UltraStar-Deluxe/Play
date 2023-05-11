@@ -77,11 +77,14 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         }
 
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
 
         contextMenu.AddButton("Edit lyrics", () => songEditorSceneControl.StartEditingSelectedNoteText());
-        FillContextMenuToSplitAndMergeNotes(contextMenu, selectedNotes);
         FillContextMenuForAiTools(contextMenu, selectedNotes);
-        FillContextMenuToAddSpaceBetweenNotes(contextMenu);
+        FillContextMenuToMergeAndAddSpaceBetweenNotes(contextMenu, selectedNotes);
         FillContextMenuToSetNoteType(contextMenu, selectedNotes);
         FillContextMenuToMergeSentences(contextMenu, selectedNotes);
         FillContextMenuToMoveToOtherSentenceOrVoice(contextMenu, selectedNotes);
@@ -102,28 +105,25 @@ public class EditorNoteContextMenuControl : ContextMenuControl
             () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource));
     }
 
-    private void FillContextMenuToAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu)
+    private void FillContextMenuToMergeAndAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
-        contextMenu.AddButton("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
+        
+        if (mergeNotesAction.CanExecute(selectedNotes))
+        {
+            contextMenu.AddButton("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
+        }
+        
+        if (selectedNotes.Count > 1)
+        {
+            contextMenu.AddButton("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
+        }
     }
 
     private void FillContextMenuToDeleteNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
         contextMenu.AddButton("Delete", () => deleteNotesAction.ExecuteAndNotify(selectedNotes));
-    }
-
-    private void FillContextMenuToSplitAndMergeNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
-    {
-        if (splitNotesAction.CanExecute(selectedNotes))
-        {
-            contextMenu.AddButton("Split Notes", () => splitNotesAction.ExecuteAndNotify(selectedNotes));
-        }
-        if (mergeNotesAction.CanExecute(selectedNotes))
-        {
-            contextMenu.AddButton("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
-        }
     }
 
     private void FillContextMenuToSetNoteType(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
