@@ -3,6 +3,8 @@ public static partial class R
 {
     public static class UssClasses
     {
+        public const string child_mb_4 = "child-mb-4";
+        public const string controlWithLabelVertical = "controlWithLabelVertical";
         public const string fontColorBorder = "fontColorBorder";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string jpg = "jpg";
