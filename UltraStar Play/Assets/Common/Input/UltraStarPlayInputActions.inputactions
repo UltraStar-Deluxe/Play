@@ -1477,6 +1477,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "openSearch",
+                    "type": "Button",
+                    "id": "343611d0-e431-4fe5-b1e6-a8eacb9988ba",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "selectNextNote",
                     "type": "Button",
                     "id": "2f18f4c5-9751-42e6-9058-e4d3cb87d882",
@@ -2261,6 +2270,39 @@
                     "action": "speechRecognition",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Button With One Modifier",
+                    "id": "4e14feb1-cbd3-4e1a-9d08-67c41c5ffbcc",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSearch",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "2b7c98c1-24a8-4849-9fe7-a8a0d8af70b0",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSearch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "d382ce41-5de7-4c7f-8391-708e2b0080f9",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "openSearch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
