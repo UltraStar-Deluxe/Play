@@ -181,27 +181,30 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         VisualElement loadedSceneVisualElement = loadedSceneRecipe.visualTreeAsset.CloneTree().Children().FirstOrDefault();
         loadedSceneContent.Add(loadedSceneVisualElement);
 
-        // Load scene scripts.
-        // Add new bindings.
-        Injector loadedSceneInjector = injector.CreateChildInjector();
+        // Instantiate new game objects
         foreach (GameObject gameObjectRecipe in loadedSceneRecipe.sceneGameObjects)
         {
-            foreach (IBinder binder in gameObjectRecipe.GetComponentsInChildren<IBinder>())
+            GameObject loadedGameObject = Instantiate(gameObjectRecipe);
+            loadedGameObjects.Add(loadedGameObject);
+        }
+
+        // Add new bindings
+        Injector loadedSceneInjector = injector.CreateChildInjector();
+        foreach (GameObject loadedGameObject in loadedGameObjects)
+        {
+            foreach (IBinder binder in loadedGameObject.GetComponentsInChildren<IBinder>())
             {
                 binder.GetBindings().ForEach(binding => loadedSceneInjector.AddBinding(binding));
             }
         }
 
-        // Inject new game objects
-        foreach (GameObject gameObjectRecipe in loadedSceneRecipe.sceneGameObjects)
+        // Inject and update translations
+        foreach (GameObject loadedGameObject in loadedGameObjects)
         {
-            GameObject loadedGameObject = Instantiate(gameObjectRecipe);
-            loadedGameObjects.Add(loadedGameObject);
-            
             // Inject new game object
             loadedSceneInjector
                 .WithRootVisualElement(loadedSceneVisualElement)
-                .InjectAllComponentsInChildren(loadedGameObject);
+                .InjectAllComponentsInChildren(loadedGameObject, true);
             
             // Update translations
             loadedGameObject.GetComponentsInChildren<ITranslator>()
