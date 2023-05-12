@@ -10,6 +10,7 @@ public static partial class R
         public static readonly string songEditor_editLyrics = "songEditor/editLyrics";
         public static readonly string songEditor_jumpToEndOfSong = "songEditor/jumpToEndOfSong";
         public static readonly string songEditor_jumpToStartOfSong = "songEditor/jumpToStartOfSong";
+        public static readonly string songEditor_openSearch = "songEditor/openSearch";
         public static readonly string songEditor_paste = "songEditor/paste";
         public static readonly string songEditor_pitchDetection = "songEditor/pitchDetection";
         public static readonly string songEditor_playSelectedNotes = "songEditor/playSelectedNotes";

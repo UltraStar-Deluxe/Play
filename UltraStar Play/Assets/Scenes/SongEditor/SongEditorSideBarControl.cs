@@ -414,7 +414,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Make rap", "R"));
             inputActionInfos.Add(new InputActionInfo("Make rap-golden", "T"));
             inputActionInfos.Add(new InputActionInfo("Pitch detection", "M"));
-            inputActionInfos.Add(new InputActionInfo("Speech recognition", "N"));
+            inputActionInfos.Add(new InputActionInfo("Speech recognition", "L"));
         }
         else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {

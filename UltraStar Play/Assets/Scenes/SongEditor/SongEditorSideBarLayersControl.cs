@@ -47,7 +47,6 @@ public class SongEditorSideBarLayersControl : INeedInjection, IInjectionFinished
                 layerManager.GetVoiceLayers()
                     .ForEach(layer => CreateLayerInputControl(layer));
                 layerManager.GetEnumLayers()
-                    .Where(it => it.LayerEnum != ESongEditorLayer.CopyPaste)
                     .ForEach(layer => CreateLayerInputControl(layer));
             }));
     }

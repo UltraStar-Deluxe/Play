@@ -42,22 +42,13 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorSceneInputControl songEditorSceneInputControl;
 
-    private List<Note> lastCopiedNotes = new();
     
-    public List<Note> CopiedNotes
+    public bool HasCopiedNotes => copyPasteData != null && !copyPasteData.copiedNotes.IsNullOrEmpty();
+
+    private SongEditorCopyPasteData copyPasteData;
+
+    private void Start()
     {
-        get
-        {
-            return layerManager.GetEnumLayerNotes(ESongEditorLayer.CopyPaste);
-        }
-    }
-
-    private readonly Dictionary<Note, OriginalNoteCopyData> copiedNoteToOriginalDataMap = new();
-
-    void Start()
-    {
-        songAudioPlayer.PositionInSongEventStream.Subscribe(newMillis => MoveCopiedNotesToMillisInSong(newMillis));
-
         // Copy action
         InputManager.GetInputAction(R.InputActions.songEditor_copy).PerformedAsObservable()
             .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
@@ -72,120 +63,84 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_paste).PerformedAsObservable()
             .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
             .Subscribe(_ => PasteCopiedNotes());
-        
-        // Cancel copy
-        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(SongEditorSceneInputControl.cancelCopyPriority)
-            .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
-            .Where(_ => HasCopiedNotes())
-            .Subscribe(_ =>
-            {
-                ClearCopiedNotes();
-                InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
-            });
     }
 
-    private void MoveCopiedNotesToMillisInSong(double newMillis)
-    {
-        if (CopiedNotes.IsNullOrEmpty() || songAudioPlayer.IsPlaying)
-        {
-            return;
-        }
-
-        int newBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, newMillis));
-        int minBeat = CopiedNotes.Select(it => it.StartBeat).Min();
-        int distanceInBeats = newBeat - minBeat;
-        if (distanceInBeats == 0)
-        {
-            return;
-        }
-
-        foreach (Note note in CopiedNotes)
-        {
-            note.IsEditable = true;
-            note.MoveHorizontal(distanceInBeats);
-            note.IsEditable = false;
-        }
-
-        editorNoteDisplayer.UpdateNotes();
-    }
-
-    private void ClearCopiedNotes()
-    {
-        CopiedNotes.ForEach(copiedNote => editorNoteDisplayer.RemoveNoteControl(copiedNote));
-        layerManager.ClearEnumLayer(ESongEditorLayer.CopyPaste);
-        copiedNoteToOriginalDataMap.Clear();
-    }
-
-    public bool HasCopiedNotes()
-    {
-        return !layerManager.GetEnumLayerNotes(ESongEditorLayer.CopyPaste).IsNullOrEmpty();
-    }
-    
     public void PasteCopiedNotes()
     {
-        if (!HasCopiedNotes())
+        if (!HasCopiedNotes)
         {
             return;
         }
 
         List<Note> pastedNotes = new();
 
-        // Paste to original layer
-        layerManager.GetEnumLayers().ForEach(layer =>
+        if (copyPasteData.copiedNotes.IsNullOrEmpty())
         {
-            List<Note> copiedNotesFromLayer = CopiedNotes
-                .Where(copiedNote => copiedNoteToOriginalDataMap[copiedNote].OriginalEnumLayer == layer)
-                .ToList();
+            return;
+        }
 
-            copiedNotesFromLayer.ForEach(copiedNote =>
+        // Shift to playback position
+        int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
+        int minBeat = copyPasteData.copiedNotes.Select(it => it.StartBeat).Min();
+        int distanceInBeats = currentBeat - minBeat;
+        
+        // Paste to enum layer
+        foreach (Note copiedNote in copyPasteData.copiedNotes)
+        {
+            if (copyPasteData.copiedNoteToLayerMap.TryGetValue(copiedNote, out ESongEditorLayer layerEnum))
             {
-                copiedNote.IsEditable = true;
-                layerManager.RemoveNoteFromAllEnumLayers(copiedNote);
-                layerManager.AddNoteToEnumLayer(layer.LayerEnum, copiedNote);
-                pastedNotes.Add(copiedNote);
-            });
-        });
+                Note pastedNote = copiedNote.Clone();
+                pastedNote.IsEditable = true;
+                pastedNote.SetStartAndEndBeat(
+                    pastedNote.StartBeat + distanceInBeats,
+                    pastedNote.EndBeat + distanceInBeats);
+                
+                layerManager.AddNoteToEnumLayer(layerEnum, pastedNote);
+                pastedNotes.Add(pastedNote);
+            }
+        }
 
         // Paste to original voice
         songMeta.GetVoices().ForEach(voice =>
         {
-            List<Note> copiedNotesFromVoice = CopiedNotes
-                .Where(copiedNote => copiedNoteToOriginalDataMap[copiedNote].OriginalEnumLayer == null
-                                     && copiedNoteToOriginalDataMap[copiedNote].OriginalVoice == voice)
+            List<Note> copiedNotesFromVoice = copyPasteData.copiedNotes
+                .Where(copiedNote => !copyPasteData.copiedNoteToLayerMap.ContainsKey(copiedNote)
+                                     && copyPasteData.copiedNoteToOriginalVoiceMap.ContainsKey(copiedNote)
+                                     && copyPasteData.copiedNoteToOriginalVoiceMap[copiedNote] == voice)
                 .ToList();
-            copiedNotesFromVoice.ForEach(copiedNote =>
+            List<Note> pastedNotesFromVoice = copiedNotesFromVoice.Select(copiedNote =>
             {
-                copiedNote.IsEditable = true;
-                layerManager.RemoveNoteFromAllEnumLayers(copiedNote);
-            });
-            moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, copiedNotesFromVoice, voice.Name);
-            pastedNotes.AddRange(copiedNotesFromVoice);
+                Note pastedNote = copiedNote.Clone();
+                pastedNote.IsEditable = true;
+                pastedNote.SetSentence(null);
+                pastedNote.SetStartAndEndBeat(
+                    pastedNote.StartBeat + distanceInBeats,
+                    pastedNote.EndBeat + distanceInBeats);
+                return pastedNote;
+            }).ToList();
+            
+            moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, pastedNotesFromVoice, voice.Name);
+            pastedNotes.AddRange(pastedNotesFromVoice);
         });
 
-        // Make editable again
-        pastedNotes.ForEach(note =>
+        // Set correct editable status
+        pastedNotes.ForEach(pastedNote =>
         {
-            if (layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer enumLayer))
+            if (layerManager.TryGetEnumLayer(pastedNote, out SongEditorEnumLayer enumLayer))
             {
-                note.IsEditable = layerManager.IsEnumLayerEditable(enumLayer.LayerEnum);
+                pastedNote.IsEditable = layerManager.IsEnumLayerEditable(enumLayer.LayerEnum);
             }
             else
             {
-                string voiceName = note.Sentence?.Voice?.Name;
-                note.IsEditable = layerManager.IsVoiceLayerEditable(voiceName);
+                string voiceName = pastedNote.Sentence?.Voice?.Name;
+                pastedNote.IsEditable = layerManager.IsVoiceLayerEditable(voiceName);
             }
         });
-
-        // All done, nothing to copy anymore.
-        ClearCopiedNotes();
 
         // Select copied notes.
         selectionControl.SetSelection(pastedNotes);
 
         songMetaChangeEventStream.OnNext(new NotesPastedEvent());
-        
-        // Copy notes again to allow pasting multiple times.
-        CopyNotes(lastCopiedNotes);
     }
 
     public void CutSelectedNotes()
@@ -207,25 +162,30 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     
     private void CopyNotes(List<Note> notes)
     {
-        ClearCopiedNotes();
+        copyPasteData = new SongEditorCopyPasteData();
 
-        lastCopiedNotes = notes.ToList();
         notes.ForEach(note =>
         {
             layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer layer);
 
             Note copiedNote = note.Clone();
-            copiedNoteToOriginalDataMap[copiedNote] = new OriginalNoteCopyData
-            {
-                OriginalEnumLayer = layer,
-                OriginalSentence = note.Sentence,
-                OriginalVoice = note.Sentence?.Voice,
-            };
-
             copiedNote.SetSentence(null);
-            copiedNote.IsEditable = false;
-            CopiedNotes.Add(copiedNote);
-            layerManager.AddNoteToEnumLayer(ESongEditorLayer.CopyPaste, copiedNote);
+            
+            copyPasteData.copiedNotes.Add(copiedNote);
+
+            if (note.Sentence != null
+                && note.Sentence.Voice != null)
+            {
+                copyPasteData.copiedNoteToOriginalSentenceMap[copiedNote] = note.Sentence;
+                copyPasteData.copiedNoteToOriginalVoiceMap[copiedNote] = note.Sentence.Voice;
+            }
+            else
+            {
+                if (layerManager.TryGetLayerEnumOfNote(note, out ESongEditorLayer layerEnum))
+                {
+                    copyPasteData.copiedNoteToLayerMap[copiedNote] = layerEnum;
+                }
+            }
         });
 
         selectionControl.ClearSelection();
@@ -233,10 +193,12 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         editorNoteDisplayer.UpdateNotes();
     }
 
-    private class OriginalNoteCopyData
+    private class SongEditorCopyPasteData
     {
-        public SongEditorEnumLayer OriginalEnumLayer { get; set; }
-        public Sentence OriginalSentence { get; set; }
-        public Voice OriginalVoice { get; set; }
+        // Flag to check whether deserialized JSON is actually copy paste data.
+        public List<Note> copiedNotes = new();
+        public Dictionary<Note, ESongEditorLayer> copiedNoteToLayerMap = new();
+        public Dictionary<Note, Sentence> copiedNoteToOriginalSentenceMap = new();
+        public Dictionary<Note, Voice> copiedNoteToOriginalVoiceMap = new();
     }
 }

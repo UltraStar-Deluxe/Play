@@ -91,6 +91,20 @@
                 <ui:Label text="03:12" display-tooltip-when-elided="true" name="statusBarPositionInfoLabel" class="tinyFont" style="margin-left: 10px;" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="searchOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
+            <ui:VisualElement name="searchContainer" class="panel p-1" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; top: 80%; position: absolute;">
+                <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0);">
+                    <ui:TextField picking-mode="Ignore" name="searchTextField" style="width: 150px;" />
+                    <ui:Button display-tooltip-when-elided="true" name="searchPreviousButton" class="squareButton comboBoxButton" style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                        <MaterialIcon tabindex="-1" name="searchPreviousIcon" icon="arrow_left" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Button display-tooltip-when-elided="true" name="searchNextButton" class="squareButton comboBoxButton">
+                        <MaterialIcon tabindex="-1" name="searchNextIcon" icon="arrow_right" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:Label tabindex="-1" text="xx matches" display-tooltip-when-elided="true" name="searchResultLabel" style="align-self: flex-start;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="editLyricsPopup" class="panel" style="position: absolute; height: 30px; min-width: 150px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; justify-content: center; top: -1000px;">
             <ui:TextField picking-mode="Ignore" value="The lyrics" text="The lyrics" name="editLyricsPopupTextField" style="position: absolute; height: 100%; display: flex; width: 100%; min-height: 20px;" />
         </ui:VisualElement>

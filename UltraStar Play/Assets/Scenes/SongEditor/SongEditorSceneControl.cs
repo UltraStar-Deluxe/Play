@@ -110,6 +110,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private readonly SongEditorIssueAnalyzerControl issueAnalyzerControl = new();
     private readonly SongEditorStatusBarControl statusBarControl = new();
     private readonly SongEditorBackgroundAudioWaveFormControl songEditorBackgroundAudioWaveFormControl = new();
+    private readonly SongEditorSearchControl songEditorSearchControl = new();
 
     [Inject]
     private SongEditorSceneData sceneData;
@@ -129,6 +130,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         injector.Inject(issueAnalyzerControl);
         injector.Inject(statusBarControl);
         injector.Inject(songEditorBackgroundAudioWaveFormControl);
+        injector.Inject(songEditorSearchControl);
         injector
             .WithRootVisualElement(rightSideBar)
             .CreateAndInject<DragToChangeRightSideBarWidthControl>();
@@ -478,6 +480,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         bb.BindExistingInstance(songEditorMicSampleRecorder);
         bb.BindExistingInstance(songEditorAlternativeAudioPlayer);
         bb.BindExistingInstance(selectionControl);
+        bb.BindExistingInstance(songEditorSearchControl);
         bb.BindExistingInstance(lyricsAreaControl);
         bb.BindExistingInstance(editorNoteDisplayer);
         bb.BindExistingInstance(sideBarControl);

@@ -40,6 +40,8 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
     private readonly List<IDisposable> disposables = new();
 
     public IReadOnlyCollection<int> ButtonFilter { get; set; } = new List<int> { 0, 1, 2 };
+    
+    public bool RequirePointerDirectlyOnTargetElement { get; set; }
 
     public virtual void OnInjectionFinished()
     {
@@ -93,6 +95,16 @@ public abstract class AbstractDragControl<EVENT> : INeedInjection, IInjectionFin
             return;
         }
 
+        if (RequirePointerDirectlyOnTargetElement)
+        {
+            if (evt is not PointerDownEvent pointerDownEvent
+                || pointerDownEvent.target is not VisualElement visualElement
+                || visualElement != targetVisualElement)
+            {
+                return;
+            }
+        }
+        
         dragControlPointerDownEvent = new DragControlPointerEvent(evt);
         DragState.Value = EDragState.WaitingForDistanceThreshold;
         IsPointerDown = true;

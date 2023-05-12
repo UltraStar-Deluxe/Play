@@ -68,6 +68,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private ExtendNotesAction extendNotesAction;
 
     [Inject]
+    private SongEditorSearchControl sonEditorSearchControl;
+
+    [Inject]
     private UIDocument uiDocument;
 
     [Inject]
@@ -165,6 +168,11 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(OnNavigate);
         
+        // Open search
+        InputManager.GetInputAction(R.InputActions.songEditor_openSearch).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => sonEditorSearchControl.ShowSearchOverlay());
+        
         // Make golden / freestyle / normal
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeGolden).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
@@ -242,6 +250,10 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         if (songEditorSceneControl.IsAnyDialogOpen)
         {
             songEditorSceneControl.CloseAllOpenDialogs();
+        }
+        else if (sonEditorSearchControl.IsSearchOverlayVisible)
+        {
+            sonEditorSearchControl.HideSearchOverlay();
         }
         else if (songEditorSideBarControl.IsAnySideBarContainerVisible)
         {
