@@ -2,7 +2,7 @@
 {
     MicRecording = 0,
     ButtonRecording = 1,
-    MidiFile = 3,
+    Import = 3,
     PitchDetection = 4,
     SpeechRecognition = 5,
 }

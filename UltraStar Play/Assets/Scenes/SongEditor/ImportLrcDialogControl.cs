@@ -81,8 +81,8 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
         }
         
         // Remove old notes
-        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.MidiFile);
-        layerManager.ClearEnumLayer(ESongEditorLayer.MidiFile);
+        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.Import);
+        layerManager.ClearEnumLayer(ESongEditorLayer.Import);
         
         // Import new notes
         List<Note> importedNotes = lrcFormatImporter.ImportLrcFormat(importLrcTextField.value, songMeta, settings);
@@ -92,7 +92,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
         }
         else
         {
-            importedNotes.ForEach(note => layerManager.AddNoteToEnumLayer(ESongEditorLayer.MidiFile, note));
+            importedNotes.ForEach(note => layerManager.AddNoteToEnumLayer(ESongEditorLayer.Import, note));
             UiManager.CreateNotification($"Imported {importedNotes.Count} notes");
         }
         

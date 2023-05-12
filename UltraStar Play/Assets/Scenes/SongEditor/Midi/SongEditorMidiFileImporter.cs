@@ -58,8 +58,8 @@ public class SongEditorMidiFileImporter : INeedInjection
         }
 
         // Remove old notes
-        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.MidiFile);
-        layerManager.ClearEnumLayer(ESongEditorLayer.MidiFile);
+        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.Import);
+        layerManager.ClearEnumLayer(ESongEditorLayer.Import);
         
         MidiFile midiFile = MidiFileUtils.LoadMidiFile(midiFilePath);
         if (midiFile == null)
@@ -79,8 +79,8 @@ public class SongEditorMidiFileImporter : INeedInjection
             if (voiceName == null)
             {
                 // Add all notes to dedicated MIDI layer
-                layerManager.ClearEnumLayer(ESongEditorLayer.MidiFile);
-                loadedNotes.ForEach(loadedNote => layerManager.AddNoteToEnumLayer(ESongEditorLayer.MidiFile, loadedNote));
+                layerManager.ClearEnumLayer(ESongEditorLayer.Import);
+                loadedNotes.ForEach(loadedNote => layerManager.AddNoteToEnumLayer(ESongEditorLayer.Import, loadedNote));
             }
             else
             {
