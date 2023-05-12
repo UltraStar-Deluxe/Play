@@ -8,7 +8,7 @@
                 </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement name="midiFileIssueContainer" class="mb-2" style="background-color: rgba(0, 0, 0, 0); align-items: center; flex-direction: row; justify-content: center;">
-                <MaterialIcon tabindex="-1" icon="warning" name="warningIcon" class="warning" style="margin-right: 5px;" />
+                <MaterialIcon tabindex="-1" icon="warning" name="warningIcon" class="warning rounded" style="margin-right: 5px;" />
                 <ui:Label tabindex="-1" text="File not found" display-tooltip-when-elided="true" name="midiFileIssueLabel" />
             </ui:VisualElement>
             <ui:VisualElement name="midiImportSettingsContainer" style="background-color: rgba(0, 0, 0, 0); align-items: stretch;">
