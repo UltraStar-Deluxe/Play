@@ -229,6 +229,7 @@ public static partial class R
         public static readonly string order_CountFinished = "order_CountFinished";
         public static readonly string order_Folder = "order_Folder";
         public static readonly string order_Genre = "order_Genre";
+        public static readonly string order_Highscore = "order_Highscore";
         public static readonly string order_Language = "order_Language";
         public static readonly string order_Title = "order_Title";
         public static readonly string order_Year = "order_Year";

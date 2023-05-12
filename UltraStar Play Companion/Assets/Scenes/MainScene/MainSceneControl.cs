@@ -107,20 +107,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
-    [Inject(UxmlName = R.UxmlNames.recordingDeviceLabel)]
-    private Label recordingDeviceLabel;
-
     [Inject(UxmlName = R.UxmlNames.recordingDevicePicker)]
     private ItemPicker recordingDevicePicker;
 
-    [Inject(UxmlName = R.UxmlNames.languageLabel)]
-    private Label languageLabel;
-
     [Inject(UxmlName = R.UxmlNames.languagePicker)]
     private ItemPicker languagePicker;
-
-    [Inject(UxmlName = R.UxmlNames.devModeLabel)]
-    private Label devModeLabel;
 
     [Inject(UxmlName = R.UxmlNames.devModePicker)]
     private ItemPicker devModePicker;
@@ -273,7 +264,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private void InitMenu()
     {
         // Recording device
-        new AutoFitLabelControl(recordingDevicePicker.ItemLabel);
         recordingDevicePickerControl = new(recordingDevicePicker, Microphone.devices.ToList());
         recordingDevicePickerControl.AutoSmallFont = false;
         recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
@@ -336,9 +326,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     {
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.companionApp_title);
         connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
-        recordingDeviceLabel.text = TranslationManager.GetTranslation(R.Messages.options_recording_title);
-        languageLabel.text = TranslationManager.GetTranslation(R.Messages.language);
-        devModeLabel.text = TranslationManager.GetTranslation(R.Messages.devMode);
+        recordingDevicePicker.Label = TranslationManager.GetTranslation(R.Messages.options_recording_title);
+        languagePicker.Label = TranslationManager.GetTranslation(R.Messages.language);
+        devModePicker.Label = TranslationManager.GetTranslation(R.Messages.devMode);
         visualizeAudioToggle.label = TranslationManager.GetTranslation(R.Messages.companionApp_visualizeMicInput);
         closeMenuButton.text = TranslationManager.GetTranslation(R.Messages.back);
 

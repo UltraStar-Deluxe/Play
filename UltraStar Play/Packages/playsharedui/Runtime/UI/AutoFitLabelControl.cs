@@ -71,15 +71,18 @@ public class AutoFitLabelControl
             }
 
             nextFontSizeInPx = NumberUtils.Limit(nextFontSizeInPx, minFontSizeInPx, maxFontSizeInPx);
-            labelElement.style.fontSize = nextFontSizeInPx;
             
-            if (lastFontSizeInPx >= 0
-                && Mathf.Abs(lastFontSizeInPx - nextFontSizeInPx) < 0.5f)
+            // Use a whole number for font size, otherwise Unity may be struggling to layout the text.
+            nextFontSizeInPx = (int)nextFontSizeInPx;
+            
+            if (lastFontSizeInPx >= 0 && Mathf.Abs(lastFontSizeInPx - nextFontSizeInPx) < 0.5f)
             {
                 // Font size is already good enough.
                 return;
             }
 
+            labelElement.style.fontSize = nextFontSizeInPx;
+            
             lastFontSizeInPx = nextFontSizeInPx;
         }
     }

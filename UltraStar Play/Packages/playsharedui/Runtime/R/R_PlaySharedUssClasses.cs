@@ -75,8 +75,8 @@ public static partial class R_PlayShared
         public const string inputLegendLabel = "inputLegendLabel";
         public const string intermediateTeamResults = "intermediateTeamResults";
         public const string itemPickerButton = "itemPickerButton";
-        public const string itemPickerContent = "itemPickerContent";
         public const string itemPickerControlsRow = "itemPickerControlsRow";
+        public const string itemPickerItemImage = "itemPickerItemImage";
         public const string itemPickerItemLabel = "itemPickerItemLabel";
         public const string itemPickerLabel = "itemPickerLabel";
         public const string itemPickerNextItemButton = "itemPickerNextItemButton";

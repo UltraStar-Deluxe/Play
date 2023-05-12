@@ -287,6 +287,9 @@ public static partial class R
         public const string layerEditableIcon = "layerEditableIcon";
         public const string layerEntryUiRoot = "layerEntryUiRoot";
         public const string layerInvisibleIcon = "layerInvisibleIcon";
+        public const string layerMidiSoundButton = "layerMidiSoundButton";
+        public const string layerMidiSoundOffIcon = "layerMidiSoundOffIcon";
+        public const string layerMidiSoundOnIcon = "layerMidiSoundOnIcon";
         public const string layerNameLabel = "layerNameLabel";
         public const string layerNotEditableIcon = "layerNotEditableIcon";
         public const string layersSideBarContainer = "layersSideBarContainer";
@@ -404,6 +407,7 @@ public static partial class R
         public const string noteAreaPositionInSongIndicator = "noteAreaPositionInSongIndicator";
         public const string noteAreaSelectionFrame = "noteAreaSelectionFrame";
         public const string noteAreaSentences = "noteAreaSentences";
+        public const string noteAreaWaveform = "noteAreaWaveform";
         public const string noteContainer = "noteContainer";
         public const string noteEntry = "noteEntry";
         public const string noteImage = "noteImage";
@@ -558,12 +562,19 @@ public static partial class R
         public const string ScrollView = "ScrollView";
         public const string searchAudioFilesWithoutSongMetaPicker = "searchAudioFilesWithoutSongMetaPicker";
         public const string searchBarContainer = "searchBarContainer";
+        public const string searchContainer = "searchContainer";
         public const string searchErrorIcon = "searchErrorIcon";
+        public const string searchNextButton = "searchNextButton";
+        public const string searchNextIcon = "searchNextIcon";
+        public const string searchOverlay = "searchOverlay";
+        public const string searchPreviousButton = "searchPreviousButton";
+        public const string searchPreviousIcon = "searchPreviousIcon";
         public const string searchPropertyAccordionItem = "searchPropertyAccordionItem";
         public const string searchPropertyButton = "searchPropertyButton";
         public const string searchPropertyDropdownContainer = "searchPropertyDropdownContainer";
         public const string searchPropertyDropdownOverlay = "searchPropertyDropdownOverlay";
         public const string searchPropertyScrollView = "searchPropertyScrollView";
+        public const string searchResultLabel = "searchResultLabel";
         public const string searchTextField = "searchTextField";
         public const string searchTextFieldHint = "searchTextFieldHint";
         public const string secondBackground = "secondBackground";
@@ -605,6 +616,7 @@ public static partial class R
         public const string settingsSideBarContainer = "settingsSideBarContainer";
         public const string settingsTitle = "settingsTitle";
         public const string sfxVolumeChooser = "sfxVolumeChooser";
+        public const string showAudioWaveformInBackgroundToggle = "showAudioWaveformInBackgroundToggle";
         public const string showBackgroundButton = "showBackgroundButton";
         public const string showBackgroundIcon = "showBackgroundIcon";
         public const string showControlHintsToggle = "showControlHintsToggle";
