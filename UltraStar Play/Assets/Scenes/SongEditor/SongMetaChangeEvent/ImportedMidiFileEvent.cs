@@ -1,3 +1,3 @@
-﻿public class ImportedMidiFileEvent : SongMetaChangeEvent
+﻿public class ImportedMidiFileEvent : ImportedNotesEvent
 {
 }

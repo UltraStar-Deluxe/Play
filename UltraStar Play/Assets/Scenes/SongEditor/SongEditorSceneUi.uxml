@@ -2,6 +2,7 @@
     <ui:Template name="SongEditorSideBarMainColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarMainColumnUi.uxml?fileID=9197481963319205126&amp;guid=9015a7e9aa0de9248bb4893d185955a1&amp;type=3#SongEditorSideBarMainColumnUi" />
     <ui:Template name="SongEditorSideBarSecondaryColumnUi" src="project://database/Assets/Scenes/SongEditor/SongEditorSideBarSecondaryColumnUi.uxml?fileID=9197481963319205126&amp;guid=91ce971b984f18c4fa80c614d2dc32d8&amp;type=3#SongEditorSideBarSecondaryColumnUi" />
     <ui:Template name="ImportMidiFileDialogUi" src="project://database/Assets/Scenes/SongEditor/ImportMidiFileDialogUi.uxml?fileID=9197481963319205126&amp;guid=12c6b8c6d3c252947b7e6253befb9789&amp;type=3#ImportMidiFileDialogUi" />
+    <ui:Template name="ImportLrcDialogUi" src="project://database/Assets/Scenes/SongEditor/ImportLrcDialogUi.uxml?fileID=9197481963319205126&amp;guid=42c32785af42b57418f728546c04b525&amp;type=3#ImportLrcDialogUi" />
     <Style src="project://database/Assets/Scenes/SongEditor/SongEditorStyles.uss?fileID=7433441132597879392&amp;guid=d010d6b3e8b73774591bb17f251cbb92&amp;type=3#SongEditorStyles" />
     <ui:VisualElement name="songEditorRoot" class="songEditorRoot" style="width: 100%; height: 100%; flex-direction: column; align-items: flex-start;">
         <ui:VisualElement name="row" style="flex-direction: row; flex-grow: 1;">
@@ -41,10 +42,13 @@
                     </ui:ScrollView>
                     <ui:VisualElement name="lyricsAreaButtonRow" style="flex-direction: row; flex-shrink: 0;">
                         <ToggleButton display-tooltip-when-elided="true" name="toggleLyricsAreaEditModeButton" class="squareButton mr-1">
-                            <MaterialIcon tabindex="-1" name="toggleEditModeIcon" icon="edit" style="font-size: 18px;" />
+                            <MaterialIcon tabindex="-1" name="toggleEditModeIcon" icon="edit" picking-mode="Ignore" style="font-size: 18px;" />
                         </ToggleButton>
                         <ToggleButton text="P1" display-tooltip-when-elided="true" name="lyricsAreaVoice1Button" class="squareButton smallFont mr-1" />
                         <ToggleButton text="P2" display-tooltip-when-elided="true" name="lyricsAreaVoice2Button" class="squareButton smallFont" />
+                        <ToggleButton display-tooltip-when-elided="true" name="openImportLrcDialogButton" class="squareButton ml-auto">
+                            <MaterialIcon tabindex="-1" name="lrcImportIcon" icon="cloud_download" picking-mode="Ignore" style="font-size: 18px;" />
+                        </ToggleButton>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="videoArea" class="panel" style="border-right-width: 0; height: 90px; align-items: center; justify-content: center; flex-shrink: 0; flex-direction: row;">
@@ -110,6 +114,9 @@
         </ui:VisualElement>
         <ui:VisualElement name="importMidiFileDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
             <ui:Instance template="ImportMidiFileDialogUi" name="ImportMidiFileDialogUi" class="overlayDialog" style="min-width: 50%;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="importLrcDialogOverlay" class="overlay" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
+            <ui:Instance template="ImportLrcDialogUi" name="ImportLrcDialogUi" class="overlayDialog" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

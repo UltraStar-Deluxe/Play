@@ -150,7 +150,7 @@
       "MicRecording": "#FF0000",
       "ButtonRecording": "#00FF00",
       "CopyPaste": "#FF00FF",
-      "MidiFile": "#FFFF00",
+      "Import": "#FFFF00",
     }
 }
 

@@ -38,26 +38,14 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 
     protected override void ApplyNewText(string newText)
     {
-        ApplyEditModeText(newText, true);
+        ApplyEditModeTextAndNotify(newText, true);
     }
 
-    private void ApplyEditModeText(string newText, bool undoable)
+    private void ApplyEditModeTextAndNotify(string newText, bool undoable)
     {
         string viewModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
-
-        if (LyricsUtils.IsOnlyWhitespace(newText))
-        {
-            return;
-        }
-
-        // Replace multiple control characters with a single character
-        viewModeText = Regex.Replace(viewModeText, @"\s+", " ");
-        viewModeText = Regex.Replace(viewModeText, @";+", ";");
-
-        // Split note to apply space and semicolon control characters.
-        // Otherwise the text would mess up following notes when using the LyricsArea.
-        List<Note> notesAfterSplit = SplitNoteForNewText(editorNoteControl.Note, viewModeText);
-
+        
+        TryApplyEditModeText(editorNoteControl.Note, newText, layerManager, out List<Note> notesAfterSplit);
         if (notesAfterSplit.Count > 1)
         {
             // Note has been split
@@ -71,8 +59,35 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
             songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable});
         }
     }
+    
+    public static bool TryApplyEditModeText(
+        Note note,
+        string newText,
+        SongEditorLayerManager layerManager,
+        out List<Note> notesAfterSplit)
+    {
+        string viewModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
 
-    public List<Note> SplitNoteForNewText(Note note, string newText)
+        if (LyricsUtils.IsOnlyWhitespace(viewModeText))
+        {
+            notesAfterSplit = new List<Note> { note };
+            return false;
+        }
+
+        // Replace multiple control characters with a single character
+        viewModeText = Regex.Replace(viewModeText, @"\s+", " ");
+        viewModeText = Regex.Replace(viewModeText, @";+", ";");
+
+        // Split note to apply space and semicolon control characters.
+        // Otherwise the text would mess up following notes when using the LyricsArea.
+        notesAfterSplit = SplitNoteForNewText(note, viewModeText, layerManager);
+        return true;
+    }
+
+    public static List<Note> SplitNoteForNewText(
+        Note note,
+        string newText,
+        SongEditorLayerManager layerManager)
     {
         List<Note> notesAfterSplit = new List<Note> { note };
         if (note.Length <= 1
@@ -127,7 +142,8 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
             Note newNote = new(note.Type, newNoteStartBeat, newNoteEndBeat - newNoteStartBeat, note.TxtPitch, newNoteText);
             notesAfterSplit.Add(newNote);
             newNote.SetSentence(note.Sentence);
-            if (layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer songEditorLayer))
+            if (layerManager != null
+                && layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer songEditorLayer))
             {
                 layerManager.AddNoteToEnumLayer(songEditorLayer.LayerEnum, newNote);
             }

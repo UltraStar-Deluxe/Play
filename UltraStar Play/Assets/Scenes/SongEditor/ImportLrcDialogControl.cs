@@ -1,0 +1,127 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using AudioSynthesis.Midi.Event;
+using UniInject;
+using UniRx;
+using UnityEngine.UIElements;
+
+public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
+{
+    [Inject]
+    private Injector injector;
+    
+    [Inject]
+    private Settings settings;
+    
+    [Inject]
+    private SongMeta songMeta;
+    
+    [Inject]
+    private SongEditorLayerManager layerManager;
+    
+    [Inject]
+    private EditorNoteDisplayer editorNoteDisplayer;
+    
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
+    
+    [Inject(UxmlName = R.UxmlNames.importLrcDialogOverlay)]
+    private VisualElement importLrcDialogOverlay;
+    
+    [Inject(UxmlName = R.UxmlNames.importLrcTextField)]
+    private TextField importLrcTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.importLrcIssueContainer)]
+    private VisualElement importLrcIssueContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.importLrcIssueLabel)]
+    private Label importLrcIssueLabel;
+    
+    [Inject(UxmlName = R.UxmlNames.openImportLrcDialogButton)]
+    private Button openImportLrcDialogButton;
+    
+    [Inject(UxmlName = R.UxmlNames.closeImportLrcDialogButton)]
+    private Button closeImportLrcDialogButton;
+    
+    [Inject(UxmlName = R.UxmlNames.importLrcFormatDialogButton)]
+    private Button importLrcFormatDialogButton;
+    
+    private readonly LrcFormatImporter lrcFormatImporter = new();
+
+    private readonly Subject<bool> lrcTextChangedEventStream = new();
+
+    public void OnInjectionFinished()
+    {
+        injector.Inject(lrcFormatImporter);
+
+        importLrcTextField.value = "";
+        importLrcTextField.RegisterValueChangedCallback(evt => lrcTextChangedEventStream.OnNext(true));
+        lrcTextChangedEventStream.Throttle(new TimeSpan(0, 0, 0, 0, 200))
+            .Subscribe(_ => UpdateErrorMessage());
+        
+        importLrcFormatDialogButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            ImportLrcFormat();
+            CloseDialog();
+        });
+        openImportLrcDialogButton.RegisterCallbackButtonTriggered(_ => OpenDialog());
+        closeImportLrcDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
+        VisualElementUtils.RegisterDirectClickCallback(importLrcDialogOverlay, CloseDialog);
+        
+        CloseDialog();
+    }
+
+    private void ImportLrcFormat()
+    {
+        if (importLrcTextField.value.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        // Remove old notes
+        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.Import);
+        layerManager.ClearEnumLayer(ESongEditorLayer.Import);
+        
+        // Import new notes
+        List<Note> importedNotes = lrcFormatImporter.ImportLrcFormat(importLrcTextField.value, songMeta, settings);
+        if (importedNotes.IsNullOrEmpty())
+        {
+            UiManager.CreateNotification($"Failed to import");
+        }
+        else
+        {
+            importedNotes.ForEach(note => layerManager.AddNoteToEnumLayer(ESongEditorLayer.Import, note));
+            UiManager.CreateNotification($"Imported {importedNotes.Count} notes");
+        }
+        
+        songMetaChangeEventStream.OnNext(new ImportedNotesEvent());
+    }
+    
+    public void OpenDialog()
+    {
+        importLrcDialogOverlay.ShowByDisplay();
+        UpdateErrorMessage();
+    }
+
+    public void CloseDialog()
+    {
+        importLrcDialogOverlay.HideByDisplay();
+    }
+
+    private void UpdateErrorMessage()
+    {
+        string errorMessage = lrcFormatImporter.GetLrcFormatErrorMessage(importLrcTextField.text);
+        SetErrorMessage(errorMessage);
+    }
+    
+    private void SetErrorMessage(string errorMessage)
+    {
+        bool hasError = !errorMessage.IsNullOrEmpty();
+        importLrcIssueContainer.SetVisibleByDisplay(hasError);
+        importLrcIssueLabel.text = errorMessage;
+        importLrcFormatDialogButton.SetEnabled(!hasError
+                                               && !importLrcTextField.value.IsNullOrEmpty());
+    }
+}

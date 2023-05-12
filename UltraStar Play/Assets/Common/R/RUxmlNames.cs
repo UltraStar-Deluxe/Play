@@ -86,6 +86,7 @@ public static partial class R
         public const string close = "close";
         public const string close_dontshow = "close_dontshow";
         public const string closeIcon = "closeIcon";
+        public const string closeImportLrcDialogButton = "closeImportLrcDialogButton";
         public const string closeImportMidiDialogButton = "closeImportMidiDialogButton";
         public const string closeMenuOverlayButton = "closeMenuOverlayButton";
         public const string closeModifiersOverlayButton = "closeModifiersOverlayButton";
@@ -227,6 +228,12 @@ public static partial class R
         public const string image = "image";
         public const string imageAsCursorPicker = "imageAsCursorPicker";
         public const string img_title = "img_title";
+        public const string importLrcDialogOverlay = "importLrcDialogOverlay";
+        public const string ImportLrcDialogUi = "ImportLrcDialogUi";
+        public const string importLrcFormatDialogButton = "importLrcFormatDialogButton";
+        public const string importLrcIssueContainer = "importLrcIssueContainer";
+        public const string importLrcIssueLabel = "importLrcIssueLabel";
+        public const string importLrcTextField = "importLrcTextField";
         public const string importMidiFileButton = "importMidiFileButton";
         public const string importMidiFileDialogButton = "importMidiFileDialogButton";
         public const string importMidiFileDialogOverlay = "importMidiFileDialogOverlay";
@@ -237,6 +244,7 @@ public static partial class R
         public const string importSongsButton = "importSongsButton";
         public const string importSongsIcon = "importSongsIcon";
         public const string importSongsLabel = "importSongsLabel";
+        public const string infoIcon = "infoIcon";
         public const string innerSongEntryUi = "innerSongEntryUi";
         public const string innerTimeBar = "innerTimeBar";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
@@ -317,6 +325,11 @@ public static partial class R
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logo = "logo";
         public const string logoContainer = "logoContainer";
+        public const string lrcImportDescription = "lrcImportDescription";
+        public const string lrcImportIcon = "lrcImportIcon";
+        public const string lrcImportLyricsContainer = "lrcImportLyricsContainer";
+        public const string lrcImportSettingsContainer = "lrcImportSettingsContainer";
+        public const string lrcImportTitle = "lrcImportTitle";
         public const string lyricsArea = "lyricsArea";
         public const string lyricsAreaButtonRow = "lyricsAreaButtonRow";
         public const string lyricsAreaTextField = "lyricsAreaTextField";
@@ -423,6 +436,7 @@ public static partial class R
         public const string openFileIcon = "openFileIcon";
         public const string openFolderButton = "openFolderButton";
         public const string openFolderIcon = "openFolderIcon";
+        public const string openImportLrcDialogButton = "openImportLrcDialogButton";
         public const string openPersistentDataPathButton = "openPersistentDataPathButton";
         public const string openPersistentDataPathIcon = "openPersistentDataPathIcon";
         public const string openPersistentDataPathLabel = "openPersistentDataPathLabel";
