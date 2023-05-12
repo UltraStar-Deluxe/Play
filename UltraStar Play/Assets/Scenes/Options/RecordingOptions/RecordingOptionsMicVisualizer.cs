@@ -27,7 +27,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
-    private readonly float[] emptySamplesArray = new float[2];
+    private readonly float[] emptySamplesArray = new float[16000];
     
     private void Start()
     {
