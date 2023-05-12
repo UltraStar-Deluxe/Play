@@ -199,7 +199,6 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
             result.Add(layerEnum, new SongEditorEnumLayer(layerEnum));
         }
 
-        result[ESongEditorLayer.CopyPaste].IsEditable = false;
         result[ESongEditorLayer.PitchDetection].IsEditable = false;
 
         result.ForEach(entry => entry.Value.Color = GetSongEditorLayerColor(entry.Key));
@@ -321,6 +320,30 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         }
     }
 
+    public bool TryGetLayerEnumOfNote(Note note, out ESongEditorLayer layerEnum)
+    {
+        if (note.Sentence != null
+            && note.Sentence.Voice != null
+            && voiceNameToLayerMap.TryGetValue(note.Sentence.Voice.Name, out SongEditorVoiceLayer voiceLayer))
+        {
+            layerEnum = ESongEditorLayer.ButtonRecording;
+            return false;
+        }
+
+        foreach (KeyValuePair<ESongEditorLayer, SongEditorEnumLayer> entry in layerEnumToLayerMap)
+        {
+            SongEditorEnumLayer enumLayer = entry.Value;
+            if (enumLayer.ContainsNote(note))
+            {
+                layerEnum = entry.Key;
+                return true;
+            }
+        }
+
+        layerEnum = ESongEditorLayer.ButtonRecording;
+        return false;
+    }
+    
     public AbstractSongEditorLayer GetLayerOfNote(Note note)
     {
         if (note.Sentence != null

@@ -70,7 +70,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
         }
 
         if (selectedNotes.Count > 0
-            || songEditorCopyPasteManager.CopiedNotes.Count > 0)
+            || songEditorCopyPasteManager.HasCopiedNotes)
         {
             contextMenu.AddSeparator();
             if (selectedNotes.Count > 0)
@@ -78,7 +78,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
                 contextMenu.AddButton("Copy notes", () => songEditorCopyPasteManager.CopySelectedNotes());
             }
 
-            if (songEditorCopyPasteManager.CopiedNotes.Count > 0)
+            if (songEditorCopyPasteManager.HasCopiedNotes)
             {
                 contextMenu.AddButton("Paste notes", () => songEditorCopyPasteManager.PasteCopiedNotes());
             }
