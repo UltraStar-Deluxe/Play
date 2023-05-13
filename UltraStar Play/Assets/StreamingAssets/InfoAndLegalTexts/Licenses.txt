@@ -2,7 +2,8 @@ Melody Mania uses third-party assets, code and libraries under various licenses.
 
 This includes the Unity platform and related assets under the terms of Unity Technologies (https://unity3d.com/legal).
 
-Further, Melody Mania includes software of the following projects, without claim on completeness:
+Further, Melody Mania includes code and assets of the following projects, without claim on completeness:
+
 
 MIT License
 -----------
@@ -41,9 +42,28 @@ See https://opensource.org/license/MIT/
 - Unity Test Runner (GitHub Actions, not included in build)
     - https://github.com/game-ci/unity-test-runner
 
+- Flurl
+    - https://github.com/tmenier/Flurl
+
+- HtmlAgilityPack
+    - https://github.com/zzzprojects/html-agility-pack
+
+- Facepunch.Steamworks
+    - https://github.com/Facepunch/Facepunch.Steamworks
+
+- Newtonsoft.Json
+    - https://github.com/JamesNK/Newtonsoft.Json
+
+- Spleeter
+    - https://github.com/deezer/spleeter/
+
+- UnityStandaloneFileBrowser
+    - https://github.com/gkngkc/UnityStandaloneFileBrowser
+
 - Soundfont "MuseScore_General.sf2"
     - https://musescore.org/en/handbook/3/soundfonts-and-sfz-files
-    
+
+
 Apache License 2.0
 ------------------
 See https://www.apache.org/licenses/LICENSE-2.0.html
@@ -57,6 +77,10 @@ See https://www.apache.org/licenses/LICENSE-2.0.html
 - Vosk Speech Recognition Toolkit
     - https://github.com/alphacep/vosk-api
 
+- Opportunity.LrcParser
+    - https://github.com/OpportunityLiu/LrcParser
+
+
 Mozilla Public License
 ----------------------
 See https://www.mozilla.org/en-US/MPL/1.1 respectively https://www.mozilla.org/en-US/MPL/2.0
@@ -65,3 +89,36 @@ See https://www.mozilla.org/en-US/MPL/1.1 respectively https://www.mozilla.org/e
     - https://github.com/achimmihca/UTF-Unknown-Unity (MPL 2.0)
     - https://github.com/CharsetDetector/UTF-unknown  (MPL 1.1)
     - https://github.com/errepi/ude (MPL 1.1)
+
+
+Pixabay Content License
+-----------------------
+See https://pixabay.com/service/terms
+
+Content from Pixabay has been used among other things for
+player profile images, background images, video loops, and sound effects.
+
+
+Unity Asset Store Terms of Service and EULA
+-------------------------------------------
+See https://unity.com/legal/as-terms
+
+Content from the Unity Asset Store has been used among other things for
+visual effects and sound effects.
+
+
+Sonniss - Game Audio Bundle
+---------------------------------
+See https://sonniss.com/gameaudiogdc
+
+This project includes sound effects from https://sonniss.com.
+
+Each year Sonniss give away sounds for free in celebration of the Game Developers Conference.
+All of the sound effects are royalty free and commercially usable with no attribution required.
+You can use the sound effects on an unlimited number of projects.
+
+
+Free Music Archive
+------------------
+This project includes demo songs from Free Music Archive ( https://freemusicarchive.org ).
+Details about each song's license can be found in accompanying files next to the song.
