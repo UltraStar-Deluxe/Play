@@ -5,7 +5,6 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
 
@@ -52,6 +51,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     [InjectedInInspector]
     public bool applyThemeSpecificStyles = true;
     
+    [InjectedInInspector]
+    public VideoPlayer backgroundVideoPlayer;
+
+    [InjectedInInspector]
+    public VideoPlayer backgroundLightVideoPlayer;
+
     private Material backgroundMaterialCopy;
     private Material particleMaterialCopy;
 
@@ -76,12 +81,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    private VideoPlayer backgroundVideoPlayer;
-    
     [Inject]
     private RenderTextureManager renderTextureManager;
 
+    [Inject]
+    private BackgroundLightManager backgroundLightManager;
+    
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     private string lastThemeDynamicBackgroundJson;
@@ -325,34 +330,47 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteVideoFilePath);
             string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
-            if (backgroundVideoPlayer.url != videoPlayerUrl)
-            {
-                backgroundVideoPlayer.url = videoPlayerUrl;
-            }
-            if (!backgroundVideoPlayer.isPlaying)
-            {
-                backgroundVideoPlayer.Play();
-            }
-            float playbackSpeed = staticBackgroundJson.videoPlaybackSpeed > 0
-                ? staticBackgroundJson.videoPlaybackSpeed
-                : 1;
-            if (Math.Abs(backgroundVideoPlayer.playbackSpeed - playbackSpeed) > 0.01f)
-            {
-                backgroundVideoPlayer.playbackSpeed = playbackSpeed;
-            }
+            StartVideoPlayer(backgroundVideoPlayer, videoPlayerUrl, staticBackgroundJson.videoPlaybackSpeed);
+            
             backgroundElement.image = backgroundVideoPlayer.targetTexture;
             backgroundElement.style.backgroundImage = null;
             ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.videoScaleMode);
         }
         else
         {
-            backgroundVideoPlayer.Stop();
-            backgroundVideoPlayer.url = "";
-            backgroundVideoPlayer.playbackSpeed = 1;
+            StopVideoPlayer(backgroundVideoPlayer);
             backgroundElement.image = null;
         }
     }
 
+    private void StopVideoPlayer(VideoPlayer videoPlayer)
+    {
+        videoPlayer.Stop();
+        videoPlayer.url = "";
+        videoPlayer.playbackSpeed = 1;
+    }
+    
+    private void StartVideoPlayer(VideoPlayer videoPlayer, string videoUrl, float playbackSpeed = 0)
+    {
+        if (videoPlayer.url != videoUrl)
+        {
+            videoPlayer.url = videoUrl;
+        }
+
+        if (!videoPlayer.isPlaying)
+        {
+            videoPlayer.Play();
+        }
+
+        float finalPlaybackSpeed = playbackSpeed > 0
+            ? playbackSpeed
+            : 1;
+        if (Math.Abs(videoPlayer.playbackSpeed - finalPlaybackSpeed) > 0.01f)
+        {
+            videoPlayer.playbackSpeed = finalPlaybackSpeed;
+        }
+    }
+    
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
         EScene currentScene = GetCurrentScene();
@@ -479,6 +497,25 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
 
+        string absoluteLightVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.lightVideoPath);
+        if (!absoluteLightVideoFilePath.IsNullOrEmpty()
+            && ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(absoluteLightVideoFilePath)))
+        {
+            string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteLightVideoFilePath);
+            string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
+            StartVideoPlayer(backgroundLightVideoPlayer, videoPlayerUrl, backgroundJson.lightVideoPlaybackSpeed);
+            
+            // Use the video as background lights instead of the bokeh particle system
+            backgroundLightManager.IsBackgroundLightEnabled = false;
+        }
+        else
+        {
+            StopVideoPlayer(backgroundLightVideoPlayer);
+            
+            // Use the bokeh particle system as background lights
+            backgroundLightManager.IsBackgroundLightEnabled = true;
+        }
+        
         lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 

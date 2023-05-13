@@ -3,7 +3,7 @@ Shader "UltraStar Play/Background Shader"
     Properties
     {
         [NoScaleOffset][HideInInspector] _UiTex ("UI Texture", 2D) = "white" {}
-        [NoScaleOffset][HideInInspector] _BgTex ("BG Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _AdditiveLightTex ("Additive Light Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _ParticleTex ("Particle Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _TransitionTex ("Transition Texture", 2D) = "white" {}
         [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "gray" {}
@@ -57,7 +57,7 @@ Shader "UltraStar Play/Background Shader"
 
             sampler2D _ParticleTex;
             sampler2D _UiTex;
-            sampler2D _BgTex;
+            sampler2D _AdditiveLightTex;
             sampler2D _TransitionTex;
             sampler2D _ColorRampTex;
             sampler2D _PatternTex;
@@ -216,7 +216,7 @@ Shader "UltraStar Play/Background Shader"
                 #endif
                 
                 // Background texture
-                half4 bgTexture = tex2D(_BgTex, input.texcoord0.xy);
+                half4 bgTexture = tex2D(_AdditiveLightTex, input.texcoord0.xy);
                 color.rgb = color.rgb + bgTexture.rgb;
 
                 half4 uiColors = half4(0, 0, 0, 0);

@@ -26,6 +26,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AdditiveLightTex:
+        m_Texture: {fileID: 8400000, guid: 29796eae10b449a4fbae71c0b5f2959f, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BgTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}

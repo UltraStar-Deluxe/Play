@@ -1,12 +1,15 @@
+using System;
 using UniInject;
 using UnityEngine;
 
 // This script must be placed next to a Camera component. Otherwise OnRenderImage is not called by Unity.
-public class BackgroundShaderControl : MonoBehaviour
+public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjection
 {
+    public static BackgroundShaderControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<BackgroundShaderControl>();
+
     private static readonly int _ParticleTex = Shader.PropertyToID("_ParticleTex");
     private static readonly int _UiTex = Shader.PropertyToID("_UiTex");
-    private static readonly int _BgTex = Shader.PropertyToID("_BgTex");
+    private static readonly int _AdditiveLightTex = Shader.PropertyToID("_AdditiveLightTex");
     private static readonly int _TransitionTex = Shader.PropertyToID("_TransitionTex");
     private static readonly int _TransitionTime = Shader.PropertyToID("_TransitionTime");
     private static readonly int _TimeApplication = Shader.PropertyToID("_TimeApplication");
@@ -15,14 +18,23 @@ public class BackgroundShaderControl : MonoBehaviour
     public Material material;
 
     [InjectedInInspector]
-    public RenderTexture backgroundTexture;
-    
-    private void Awake()
+    public RenderTexture lightTexture;
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
     {
         if (material == null)
         {
-            enabled = false;
+            Debug.LogError("Missing material on BackgroundShaderControl");
+            gameObject.SetActive(false);
+            return;
         }
+        
+        SetLightRenderTexture(lightTexture);
     }
 
     private void Update()
@@ -34,9 +46,13 @@ public class BackgroundShaderControl : MonoBehaviour
     public void SetUiRenderTextures(RenderTexture uiRenderTexture, RenderTexture particleRenderTexture, Texture transitionTexture)
     {
         material.SetTexture(_UiTex, uiRenderTexture);
-        material.SetTexture(_BgTex, backgroundTexture);
         material.SetTexture(_ParticleTex, particleRenderTexture);
         material.SetTexture(_TransitionTex, transitionTexture);
+    }
+
+    public void SetLightRenderTexture(RenderTexture renderTexture)
+    {
+        material.SetTexture(_AdditiveLightTex, renderTexture);
     }
 
     public void SetTransitionAnimationEnabled(bool enable)
