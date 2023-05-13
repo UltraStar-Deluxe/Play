@@ -208,7 +208,9 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
                 or SentencesDeletedEvent
                 or NotesPastedEvent
                 or NotesAddedEvent
-                or ImportedMidiFileEvent)
+                or SentencesChangedEvent
+                or ImportedNotesEvent
+                or NotesChangedEvent)
         {
             UpdateLyrics();
         }
