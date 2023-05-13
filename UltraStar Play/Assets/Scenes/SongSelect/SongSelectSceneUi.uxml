@@ -142,15 +142,15 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="hiddenHideModifiersOverlayArea" class="overlay" style="flex-grow: 1; display: none;" />
-        <ui:VisualElement name="modifierDialogOverlay" class="overlay absolutePositionTransition" style="display: none; right: 0; align-items: flex-end; width: auto; justify-content: space-around;">
-            <ui:VisualElement name="modifierDialogOverlayInnerContainer" class="staticPanel focusableNavigatorRoot px-1 pt-1 pb-2" style="height: 100%; justify-content: space-around;">
+        <ui:VisualElement name="modifierDialogOverlay" picking-mode="Ignore" class="overlay absolutePositionTransition" style="display: flex; right: 0; align-items: flex-end; justify-content: space-around; max-width: 100%;">
+            <ui:VisualElement name="modifierDialogOverlayInnerContainer" class="staticPanel focusableNavigatorRoot px-1 pt-1 pb-2" style="height: 100%; justify-content: space-around; max-width: 100%;">
                 <ui:VisualElement name="row" style="align-items: center;">
                     <ui:Label tabindex="-1" text="Modifiers" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
                     <ui:Button display-tooltip-when-elided="true" name="closeModifiersOverlayButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
                         <MaterialIcon tabindex="-1" picking-mode="Ignore" name="closeIcon" icon="close" class="noTextShadow" style="font-size: 20px;" />
                     </ui:Button>
                 </ui:VisualElement>
-                <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" style="flex-grow: 1;" />
+                <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="editPlaylistOverlay" style="width: 100%; height: 100%; position: absolute; align-items: center; justify-content: center; display: none; background-color: rgba(32, 32, 32, 0.5); top: 0; left: 2px;">
