@@ -79,8 +79,8 @@
     "lyricsShadow": false,
     "lyricsContainerGradient": "#dddbe3cc, #dddbe3cc",
     
-    "staticBackground": {
-        "imagePath": "backgrounds/singing16.png",
-        "imageScaleMode": "StretchToFill",
+    "dynamicBackground": {
+        "videoPath": "videos/singing16.mp4",
+        "lightVideoPath": "videos/pixabay/gruner-bildschirm-158201-bw.mp4"
     }
 }
