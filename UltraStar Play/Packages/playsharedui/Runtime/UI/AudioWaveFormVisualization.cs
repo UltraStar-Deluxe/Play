@@ -1,8 +1,9 @@
-﻿using UniInject;
+﻿using System;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class AudioWaveFormVisualization : INeedInjection
+public class AudioWaveFormVisualization : INeedInjection, IDisposable
 {
     public Color WaveformColor { get; set; }= Color.white;
 
@@ -15,9 +16,9 @@ public class AudioWaveFormVisualization : INeedInjection
         dynTexture = new DynamicTexture(gameObject, visualElement);
     }
 
-    public void Destroy()
+    public void Dispose()
     {
-        dynTexture.Destroy();
+        dynTexture.Dispose();
     }
 
     public void DrawWaveFormMinAndMaxValues(AudioClip audioClip, int minSampleSingleChannel = -1, int maxSampleSingleChannel = -1)

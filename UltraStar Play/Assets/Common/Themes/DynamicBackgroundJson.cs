@@ -22,4 +22,16 @@ public class DynamicBackgroundJson
     public Vector2 uiShadowOffset;
     public string particleFile;
     public float particleOpacity;
+    
+    /**
+     * Video for base background.
+     */
+    public string videoPath;
+    public float videoPlaybackSpeed;
+    
+    /**
+     * Video for additive light.
+     */
+    public string lightVideoPath;
+    public float lightVideoPlaybackSpeed;
 }

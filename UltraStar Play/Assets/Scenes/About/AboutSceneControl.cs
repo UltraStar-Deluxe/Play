@@ -18,13 +18,14 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
     private static readonly OrderedDictionary<string, string> aboutTextFilesInStreamingAssets = new()
     {
-        { "Melody Mania", "AboutAndLicenseTexts/Melody-Mania.txt" },
-        { "Licenses", "AboutAndLicenseTexts/Licenses.txt" },
-        { "MIT License", "AboutAndLicenseTexts/MIT-License.txt" },
-        { "APL 2.0", "AboutAndLicenseTexts/APL-2.0.txt" },
-        { "MPL 1.1", "AboutAndLicenseTexts/MPL-1.1.txt" },
-        { "MPL 2.0", "AboutAndLicenseTexts/MPL-2.0.txt" },
-        { "BGM", "AboutAndLicenseTexts/BGM.txt" },
+        { "Melody Mania", "InfoAndLegalTexts/Melody-Mania.txt" },
+        { "Licenses", "InfoAndLegalTexts/Licenses.txt" },
+        { "MIT License", "InfoAndLegalTexts/MIT-License.txt" },
+        { "APL 2.0", "InfoAndLegalTexts/APL-2.0.txt" },
+        { "MPL 1.1", "InfoAndLegalTexts/MPL-1.1.txt" },
+        { "MPL 2.0", "InfoAndLegalTexts/MPL-2.0.txt" },
+        { "BGM", "InfoAndLegalTexts/BGM.txt" },
+        { "Pixabay", "InfoAndLegalTexts/Pixabay-Content-License.txt" },
     };
 
     [Inject]

@@ -1,11 +1,12 @@
-﻿using UniInject;
+﻿using System;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectMicEntryControl : IInjectionFinishedListener
+public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable
 {
     private static readonly int displayedSampleCount = 1024;
 
@@ -65,9 +66,9 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener
         });
     }
 
-    public void Destroy()
+    public void Dispose()
     {
         visualElement.RemoveFromHierarchy();
-        audioWaveFormVisualizer.Destroy();
+        audioWaveFormVisualizer.Dispose();
     }
 }

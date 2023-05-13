@@ -1,12 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
-using UnityEngine.Serialization;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -25,6 +19,24 @@ public class BackgroundLightManager : AbstractSingletonBehaviour, INeedInjection
     private Settings settings;
 
     public int BackgroundLightInstancesCount => backgroundLightInstancesParent.transform.childCount;
+
+    private bool isBackgroundLightEnabled = true;
+    public bool IsBackgroundLightEnabled
+    {
+        get => isBackgroundLightEnabled;
+        set
+        {
+            isBackgroundLightEnabled = value;
+            if (isBackgroundLightEnabled)
+            {
+                SetActiveBackgroundLight(settings.BackgroundLightIndex);
+            }
+            else
+            {
+                SetActiveBackgroundLight(0);
+            }
+        }
+    }
 
     protected override object GetInstance()
     {

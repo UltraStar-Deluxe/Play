@@ -41,7 +41,20 @@
     },
 
     // This group defines the dynamic background parameters.
+    // The dynamic background can use
+    // - a (looping) video for its base
+    // - a (looping) video for additive lights
+    // - images for pattern, particle, and gradients that can be animated
     "dynamicBackground": {
+        // Path to the video file.
+        "videoPath": "videos/cool-loop.mp4",
+        // Playback speed of the video where 1 is normal playback speed.
+        "videoPlaybackSpeed": 0.5,
+    
+        // Path to the video file that should be used as additive light.
+        "lightVideoPath": "videos/cool-loop.mp4",
+        "lightVideoPlaybackSpeed": 0.5,
+        
         // A single-pixel high image that defines the color gradient to use.
         "gradientRampFile": "gradients/green lime.png",
         // The type of gradient to use, accepted values are:
@@ -87,30 +100,23 @@
         "uiShadowOffset": { "x": -16, "y": 10 }
     },
 
-    // This group defines the parameters for a static background image or video
+    // This group defines the parameters for a static background image. The image is placed on top of other background element such as videos.
     "staticBackground": {
         // Path to the image file.
         "imagePath": "backgrounds/open-sign-1836961_1920.jpg",
         // The scale mode defines how to scale the content to the screen. Can be one of 'StretchToFill', 'ScaleAndCrop', 'ScaleToFit'
-        "imageScaleMode": "ScaleAndCrop",
-
-        // Path to the video file.
-        "videoPath": "videos/cool-loop.mp4",
-        // The scale mode defines how to scale the content to the screen. Can be one of 'StretchToFill', 'ScaleAndCrop', 'ScaleToFit'
-        "videoScaleMode": "ScaleAndCrop",
-        // Playback speed of the video. 0 is freeze, 1 is normal playback speed.
-        "videoPlaybackSpeed": 0.5,
+        "imageScaleMode": "ScaleAndCrop"
     },
 
-    // Overwrite the default background image or video for a specific scene.
+    // Overwrite the default background for a specific scene.
     // Available scene names can be found here: https://github.com/UltraStar-Deluxe/Play/blob/master/UltraStar%20Play/Assets/Common/Scene/EScene.cs
-    "sceneSpecificStaticBackgrounds": {
+    "sceneSpecificBackgrounds": {
         "MainScene": {
-            "imagePath": "backgrounds/vinyl.png",
-            "imageScaleMode": "ScaleAndCrop",
+            "staticBackground": { ... },
+            "dynamicBackground": { ... },
         }
     },
-    
+
     // Defines the paths to custom icons for the song rating emojis.
     // If not set, default icons will be used.
     "songRatingIcons": {

@@ -20,7 +20,7 @@ using UnityEngine.UIElements;
  *      });
  * </pre>
  */
-public class DynamicTexture
+public class DynamicTexture : IDisposable
 {
     public Color backgroundColor = new(0, 0, 0, 0);
 
@@ -34,10 +34,14 @@ public class DynamicTexture
     public bool IsInitialized => texture != null;
 
     private readonly GameObject gameObject;
+    private readonly string name;
 
-    public DynamicTexture(GameObject gameObject, VisualElement visualElement)
+    public DynamicTexture(GameObject gameObject, VisualElement visualElement, string name = null)
     {
         this.gameObject = gameObject;
+        this.name = !name.IsNullOrEmpty()
+            ? name
+            : $"DynamicTexture on VisualElement '{visualElement.name}', associated with GameObject '{gameObject.name}'";
 
         if (visualElement.resolvedStyle.width <= 0
             || visualElement.resolvedStyle.height <= 0)
@@ -53,20 +57,26 @@ public class DynamicTexture
 
     public void Init(int textureWidth, int textureHeight)
     {
-        Destroy();
+        DestroyTexture();
 
         TextureWidth = textureWidth;
         TextureHeight = textureHeight;
         CreateTexture();
     }
 
-    public void Destroy()
+    private void DestroyTexture()
     {
         if (texture != null)
         {
             GameObject.Destroy(texture);
             texture = null;
         }
+    }
+    
+    public void Dispose()
+    {
+        Debug.Log("Dispose DynamicTexture: " + name);
+        DestroyTexture();
     }
 
     private void CreateTexture()
@@ -86,7 +96,13 @@ public class DynamicTexture
 
         // release texture when GameObject is destroyed
         gameObject.OnDestroyAsObservable()
-            .Subscribe(_ => Destroy());
+            .Subscribe(_ =>
+            {
+                // Delay the destruction of the texture to the next frame.
+                // Otherwise ugly white images may be visible during scene transition.
+                MainThreadDispatcher.StartCoroutine(
+                    CoroutineUtils.ExecuteAfterDelayInFrames(1, () => Dispose()));
+            });
 
         // create a 'blank screen' image 
         blank = new Color[TextureWidth * TextureHeight];

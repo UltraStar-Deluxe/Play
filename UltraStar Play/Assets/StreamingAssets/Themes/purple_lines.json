@@ -72,9 +72,11 @@
     "lyricsContainerGradient": "#000000, #1E232B",
 
     "staticBackground": {
-        "videoPath": "videos/pixabay/linien-4967.mp4",
-        "videoScaleMode": "StretchToFill",
         "imagePath": "backgrounds/vinyl.png",
         "imageScaleMode": "ScaleAndCrop"
     },
+
+    "dynamicBackground": {
+        "videoPath": "videos/pixabay/linien-4967.mp4"
+    }
 }

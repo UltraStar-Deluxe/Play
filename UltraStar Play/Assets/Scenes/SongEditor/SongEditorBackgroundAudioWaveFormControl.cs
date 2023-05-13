@@ -44,10 +44,10 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
     {
         noteAreaControl.ViewportEventStream.Subscribe(evt =>
         {
-            TargetElement.HideByVisibility();
             if (evt.X != lastNoteAreaMin
                 || evt.Width != lastNoteAreaWidth)
             {
+                TargetElement.HideByVisibility();
                 lastNoteAreaMin = evt.X;
                 lastNoteAreaWidth = evt.Width;
                 isDirty = true;

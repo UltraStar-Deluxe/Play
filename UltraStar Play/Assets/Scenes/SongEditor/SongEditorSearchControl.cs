@@ -208,6 +208,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
     {
         searchOverlay.ShowByDisplay();
         searchTextField.Focus();
+        UpdateSearchResultLabel();
     }
     
     public void HideSearchOverlay()

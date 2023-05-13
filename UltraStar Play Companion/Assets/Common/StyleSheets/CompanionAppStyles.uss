@@ -3,6 +3,10 @@
     transition: left 0.5s;
 }
 
+.overlayBackground {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
 .stopRecordingButton {
     background-color: #dc3545;
 }

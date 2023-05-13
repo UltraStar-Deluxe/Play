@@ -3,7 +3,8 @@ Shader "UltraStar Play/Background Shader"
     Properties
     {
         [NoScaleOffset][HideInInspector] _UiTex ("UI Texture", 2D) = "white" {}
-        [NoScaleOffset][HideInInspector] _BgTex ("BG Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _BaseTex ("Base Texture", 2D) = "white" {}
+        [NoScaleOffset][HideInInspector] _AdditiveLightTex ("Additive Light Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _ParticleTex ("Particle Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _TransitionTex ("Transition Texture", 2D) = "white" {}
         [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "gray" {}
@@ -50,6 +51,7 @@ Shader "UltraStar Play/Background Shader"
             #pragma multi_compile_fragment _ _UI_SHADOW
             #pragma multi_compile_fragment _ _UI_TRANSITION_ANIM
             #pragma multi_compile_fragment _ _USE_SIMPLE_BACKGROUND
+            #pragma multi_compile_fragment _ _USE_BASE_TEXTURE
 
             half _Gradient;
             half _EnableGradientAnimation;
@@ -57,7 +59,8 @@ Shader "UltraStar Play/Background Shader"
 
             sampler2D _ParticleTex;
             sampler2D _UiTex;
-            sampler2D _BgTex;
+            sampler2D _BaseTex;
+            sampler2D _AdditiveLightTex;
             sampler2D _TransitionTex;
             sampler2D _ColorRampTex;
             sampler2D _PatternTex;
@@ -209,15 +212,21 @@ Shader "UltraStar Play/Background Shader"
                     // and remap colors using the selected gradient texture
                     half coords =  lerp(gradient, 1 - gradient, sceneGrayscale);
                     color = tex2Dgrad(_ColorRampTex, coords.xx + frac(_TimeApplication.xx * _ColorRampScrolling), 0, 0).rgb;
-
+                    
+                    // Base texture
+                    #if defined(_USE_BASE_TEXTURE)
+                        half4 baseTexture = tex2D(_BaseTex, input.texcoord0.xy);
+                        color.rgb = lerp(color.rgb, baseTexture.rgb, baseTexture.a);
+                    #endif
+                
                     // Pattern
                     half4 pattern = tex2D(_PatternTex, input.patternTexcoord.xy) * _PatternColor;
                     color.rgb = lerp(color.rgb, pattern.rgb, pattern.a);
+
+                    // Additive light texture
+                    half4 lightTexture = tex2D(_AdditiveLightTex, input.texcoord0.xy);
+                    color.rgb = color.rgb + lightTexture.rgb;
                 #endif
-                
-                // Background texture
-                half4 bgTexture = tex2D(_BgTex, input.texcoord0.xy);
-                color.rgb = color.rgb + bgTexture.rgb;
 
                 half4 uiColors = half4(0, 0, 0, 0);
 
