@@ -17,6 +17,7 @@ public class VisualElementSlideInControl
     private Vector2 ResolvedStyleSize => new Vector2(visualElement.resolvedStyle.width, visualElement.resolvedStyle.height);
     private Vector2 lastSize;
     
+    public float OutsideMargin { get; set; } = 2f;
     public ReactiveProperty<bool> Visible => toggleControl.State;
 
     public VisualElementSlideInControl(VisualElement visualElement, ESide2D side, bool initiallyVisible)
@@ -55,7 +56,7 @@ public class VisualElementSlideInControl
         Visible.Value = false;
     }
     
-    private void UpdatePositionWithoutTransition()
+    public void UpdatePositionWithoutTransition()
     {
         // No animation is done when the units change. Here, we change from unit "auto" to unit "px".
         if (side == ESide2D.Right)
@@ -92,19 +93,19 @@ public class VisualElementSlideInControl
         
         if (side == ESide2D.Right)
         {
-            visualElement.style.right = -visualElement.resolvedStyle.width;
+            visualElement.style.right = -(visualElement.resolvedStyle.width + OutsideMargin);
         }
         else if (side == ESide2D.Left)
         {
-            visualElement.style.left = -visualElement.resolvedStyle.width;
+            visualElement.style.left = -(visualElement.resolvedStyle.width + OutsideMargin);
         }
         else if (side == ESide2D.Top)
         {
-            visualElement.style.top = -visualElement.resolvedStyle.height;
+            visualElement.style.top = -(visualElement.resolvedStyle.height + OutsideMargin);
         }
         else if (side == ESide2D.Bottom)
         {
-            visualElement.style.bottom = -visualElement.resolvedStyle.height;
+            visualElement.style.bottom = -(visualElement.resolvedStyle.height + OutsideMargin);
         }
     }
 
