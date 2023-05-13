@@ -87,6 +87,9 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private ApplicationManager applicationManager;
     
     [Inject]
+    private CursorManager cursorManager;
+    
+    [Inject]
     private AchievementEventStream achievementEventStream;
 
     private IDisposable autoSaveDisposable;
@@ -192,6 +195,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private void OnDestroy()
     {
         videoAreaControl.Dispose();
+        cursorManager.SetDefaultCursor();
     }
 
     private void InitAutoSave()
