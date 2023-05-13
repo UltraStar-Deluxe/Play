@@ -28,12 +28,15 @@
 
     "staticBackground": {
         "imagePath": "backgrounds/black-10percent.png",
-        "imageScaleMode": "StretchToFill",
+        "imageScaleMode": "StretchToFill"
     },
-    "sceneSpecificStaticBackgrounds": {
+
+    "sceneSpecificBackgrounds": {
         "MainScene": {
-            "imagePath": "backgrounds/fully-transparent.png",
-            "imageScaleMode": "ScaleAndCrop",
+            "staticBackground": {
+                "imagePath": "backgrounds/fully-transparent.png",
+                "imageScaleMode": "ScaleAndCrop",
+            }
         }
     },
     

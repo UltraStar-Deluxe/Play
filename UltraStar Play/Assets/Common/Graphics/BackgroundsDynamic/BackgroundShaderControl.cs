@@ -1,4 +1,3 @@
-using System;
 using UniInject;
 using UnityEngine;
 
@@ -9,6 +8,7 @@ public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjectio
 
     private static readonly int _ParticleTex = Shader.PropertyToID("_ParticleTex");
     private static readonly int _UiTex = Shader.PropertyToID("_UiTex");
+    private static readonly int _BaseTex = Shader.PropertyToID("_BaseTex");
     private static readonly int _AdditiveLightTex = Shader.PropertyToID("_AdditiveLightTex");
     private static readonly int _TransitionTex = Shader.PropertyToID("_TransitionTex");
     private static readonly int _TransitionTime = Shader.PropertyToID("_TransitionTime");
@@ -17,6 +17,9 @@ public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjectio
     [InjectedInInspector]
     public Material material;
 
+    [InjectedInInspector]
+    public RenderTexture baseTexture;
+    
     [InjectedInInspector]
     public RenderTexture lightTexture;
 
@@ -34,7 +37,8 @@ public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjectio
             return;
         }
         
-        SetLightRenderTexture(lightTexture);
+        SetBaseTexture(baseTexture);
+        SetLightTexture(lightTexture);
     }
 
     private void Update()
@@ -43,16 +47,21 @@ public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjectio
         Shader.SetGlobalFloat(_TimeApplication, Time.time);
     }
 
-    public void SetUiRenderTextures(RenderTexture uiRenderTexture, RenderTexture particleRenderTexture, Texture transitionTexture)
+    public void SetUiTextures(RenderTexture uiRenderTexture, RenderTexture particleRenderTexture, Texture transitionTexture)
     {
         material.SetTexture(_UiTex, uiRenderTexture);
         material.SetTexture(_ParticleTex, particleRenderTexture);
         material.SetTexture(_TransitionTex, transitionTexture);
     }
 
-    public void SetLightRenderTexture(RenderTexture renderTexture)
+    public void SetLightTexture(RenderTexture renderTexture)
     {
         material.SetTexture(_AdditiveLightTex, renderTexture);
+    }
+
+    public void SetBaseTexture(RenderTexture renderTexture)
+    {
+        material.SetTexture(_BaseTex, renderTexture);
     }
 
     public void SetTransitionAnimationEnabled(bool enable)
@@ -76,6 +85,18 @@ public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjectio
         else
         {
             material.DisableKeyword("_USE_SIMPLE_BACKGROUND");
+        }
+    }
+    
+    public void SetBaseTextureEnabled(bool enable)
+    {
+        if (enable)
+        {
+            material.EnableKeyword("_USE_BASE_TEXTURE");
+        }
+        else
+        {
+            material.DisableKeyword("_USE_BASE_TEXTURE");
         }
     }
 

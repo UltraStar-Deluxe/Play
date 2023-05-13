@@ -965,6 +965,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: f7976d665216032408a77e0afc13b55f, type: 2}
+  baseTexture: {fileID: 8400000, guid: 5d595c04f16a061448bd02182100a7a3, type: 2}
   lightTexture: {fileID: 8400000, guid: 29796eae10b449a4fbae71c0b5f2959f, type: 2}
 --- !u!1 &1197462286522570267
 GameObject:

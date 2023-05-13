@@ -73,12 +73,15 @@
     
     "staticBackground": {
         "imagePath": "backgrounds/semi-transparent-black.png",
-        "imageScaleMode": "StretchToFill",
+        "imageScaleMode": "StretchToFill"
     },
-    "sceneSpecificStaticBackgrounds": {
+
+    "sceneSpecificBackgrounds": {
         "MainScene": {
-            "imagePath": "backgrounds/vinyl.png",
-            "imageScaleMode": "ScaleAndCrop",
+            "staticBackground": {
+                "imagePath": "backgrounds/vinyl.png",
+                "imageScaleMode": "ScaleAndCrop"
+            }
         }
     },
 

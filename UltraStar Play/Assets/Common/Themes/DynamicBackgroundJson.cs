@@ -24,12 +24,14 @@ public class DynamicBackgroundJson
     public float particleOpacity;
     
     /**
-     * Video file path for additive light.
+     * Video for base background.
+     */
+    public string videoPath;
+    public float videoPlaybackSpeed;
+    
+    /**
+     * Video for additive light.
      */
     public string lightVideoPath;
-
-    /**
-     * The playback speed for the video.
-     */
     public float lightVideoPlaybackSpeed;
 }

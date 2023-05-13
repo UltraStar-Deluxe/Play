@@ -20,9 +20,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public const string UiRenderTextureName = "ThemeManager.UiRenderTexture";
     public const string ParticleRenderTextureName = "ThemeManager.ParticleRenderTexture";
     private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
-    private const string StaticBackgroundVideoElementName = "staticBackgroundVideo";
     private const string StaticBackgroundImageElementName = "staticBackgroundImage";
-    private const float DefaultSceneChangeAnimationTimeInSeconds = 0.25f;
     private readonly Color defaultGoldenColor = Colors.CreateColor("#DACD4A");
     
     public static ThemeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeManager>();
@@ -193,7 +191,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     RenderTexture particleRenderTexture = renderTextureManager.GetExistingRenderTexture(ParticleRenderTextureName);
                     
                     uiDocument.panelSettings.targetTexture = uiRenderTexture;
-                    backgroundShaderControl.SetUiRenderTextures(
+                    backgroundShaderControl.SetUiTextures(
                         uiRenderTexture,
                         particleRenderTexture,
                         transitionTexture);
@@ -251,7 +249,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
         ApplyThemeStaticBackgroundImage(themeMeta);
-        ApplyThemeStaticBackgroundVideo(themeMeta);
         ApplyThemeDynamicBackground(themeMeta);
     }
 
@@ -308,41 +305,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
     }
     
-    private void ApplyThemeStaticBackgroundVideo(ThemeMeta themeMeta)
-    {
-        EScene currentScene = GetCurrentScene();
-        if (!ThemeMetaUtils.HasStaticBackground(themeMeta, settings, currentScene))
-        {
-            DisableStaticBackground();
-            return;
-        }
-
-        Image backgroundElement = GetOrCreateStaticBackgroundElement(StaticBackgroundVideoElementName);
-        if (backgroundElement == null)
-        {
-            return;
-        }
-
-        StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForScene(themeMeta, currentScene);
-        string absoluteVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.videoPath);
-        if (!absoluteVideoFilePath.IsNullOrEmpty()
-            && ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(absoluteVideoFilePath)))
-        {
-            string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteVideoFilePath);
-            string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
-            StartVideoPlayer(backgroundVideoPlayer, videoPlayerUrl, staticBackgroundJson.videoPlaybackSpeed);
-            
-            backgroundElement.image = backgroundVideoPlayer.targetTexture;
-            backgroundElement.style.backgroundImage = null;
-            ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.videoScaleMode);
-        }
-        else
-        {
-            StopVideoPlayer(backgroundVideoPlayer);
-            backgroundElement.image = null;
-        }
-    }
-
     private void StopVideoPlayer(VideoPlayer videoPlayer)
     {
         videoPlayer.Stop();
@@ -380,7 +342,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        DynamicBackgroundJson backgroundJson = themeMeta.ThemeJson?.dynamicBackground;
+        DynamicBackgroundJson backgroundJson = ThemeMetaUtils.GetDynamicBackgroundJsonForScene(themeMeta, currentScene);
         if (backgroundJson == null)
         {
             backgroundJson = new();
@@ -497,6 +459,32 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
 
+        ApplyThemeBaseBackgroundVideo(themeMeta, backgroundJson);
+        ApplyThemeLightBackgroundVideo(themeMeta, backgroundJson);
+        
+        lastThemeDynamicBackgroundJson = backgroundJsonAsString;
+    }
+
+    private void ApplyThemeBaseBackgroundVideo(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    {
+        string absoluteVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.videoPath);
+        if (!absoluteVideoFilePath.IsNullOrEmpty()
+            && ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(absoluteVideoFilePath)))
+        {
+            string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteVideoFilePath);
+            string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
+            StartVideoPlayer(backgroundVideoPlayer, videoPlayerUrl, backgroundJson.videoPlaybackSpeed);
+            backgroundShaderControl.SetBaseTextureEnabled(true);
+        }
+        else
+        {
+            StopVideoPlayer(backgroundLightVideoPlayer);
+            backgroundShaderControl.SetBaseTextureEnabled(false);
+        }
+    }
+
+    private void ApplyThemeLightBackgroundVideo(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    {
         string absoluteLightVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.lightVideoPath);
         if (!absoluteLightVideoFilePath.IsNullOrEmpty()
             && ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(absoluteLightVideoFilePath)))
@@ -515,8 +503,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             // Use the bokeh particle system as background lights
             backgroundLightManager.IsBackgroundLightEnabled = true;
         }
-        
-        lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
     private void OnDestroy()
@@ -997,12 +983,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void DisableStaticBackground()
     {
-        Image backgroundVideoElement = GetExistingStaticBackgroundElement(StaticBackgroundVideoElementName);
-        if (backgroundVideoElement != null)
-        {
-            backgroundVideoElement.RemoveFromHierarchy();
-        }
-        
         Image backgroundImageElement = GetExistingStaticBackgroundElement(StaticBackgroundImageElementName);
         if (backgroundImageElement != null)
         {

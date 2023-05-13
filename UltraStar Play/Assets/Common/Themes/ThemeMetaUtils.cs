@@ -41,10 +41,11 @@ public static class ThemeMetaUtils
 
     public static StaticBackgroundJson GetStaticBackgroundJsonForScene(ThemeMeta themeMeta, EScene scene)
     {
-        if (themeMeta.ThemeJson.sceneSpecificStaticBackgrounds != null
-            && themeMeta.ThemeJson.sceneSpecificStaticBackgrounds.TryGetValue(scene.ToString(), out StaticBackgroundJson staticBackgroundJson))
+        if (themeMeta.ThemeJson.sceneSpecificBackgrounds != null
+            && themeMeta.ThemeJson.sceneSpecificBackgrounds.TryGetValue(scene.ToString(), out StaticAndDynamicBackgroundJson staticAndDynamicBackgroundJson)
+            && staticAndDynamicBackgroundJson.staticBackground != null)
         {
-            return staticBackgroundJson;
+            return staticAndDynamicBackgroundJson.staticBackground;
         }
         
         return themeMeta.ThemeJson.staticBackground;
@@ -57,8 +58,21 @@ public static class ThemeMetaUtils
             // No theme background in sing scene
             return false;
         }
-        
+
+        DynamicBackgroundJson dynamicBackgroundJson = GetDynamicBackgroundJsonForScene(themeMeta, scene);
         return !settings.DisableDynamicThemes
-                && themeMeta.ThemeJson.dynamicBackground != null;
+                && dynamicBackgroundJson != null;
+    }
+
+    public static DynamicBackgroundJson GetDynamicBackgroundJsonForScene(ThemeMeta themeMeta, EScene scene)
+    {
+        if (themeMeta.ThemeJson.sceneSpecificBackgrounds != null
+            && themeMeta.ThemeJson.sceneSpecificBackgrounds.TryGetValue(scene.ToString(), out StaticAndDynamicBackgroundJson staticAndDynamicBackgroundJson)
+            && staticAndDynamicBackgroundJson.dynamicBackground != null)
+        {
+            return staticAndDynamicBackgroundJson.dynamicBackground;
+        }
+        
+        return themeMeta.ThemeJson.dynamicBackground;
     }
 }

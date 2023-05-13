@@ -10,7 +10,7 @@ using UnityEngine;
 public class ThemeJson
 {
     public StaticBackgroundJson staticBackground;
-    public Dictionary<string, StaticBackgroundJson> sceneSpecificStaticBackgrounds;
+    public Dictionary<string, StaticAndDynamicBackgroundJson> sceneSpecificBackgrounds;
     public DynamicBackgroundJson dynamicBackground;
     public SongRatingIconsJson songRatingIcons;
     
