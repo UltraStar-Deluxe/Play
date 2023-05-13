@@ -117,6 +117,7 @@ public static partial class R
         public const string songArtistLabel = "songArtistLabel";
         public const string songCoverAndTitleContainer = "songCoverAndTitleContainer";
         public const string songDetailsContainer = "songDetailsContainer";
+        public const string SongDetailsPlayerEntryUi = "SongDetailsPlayerEntryUi";
         public const string SongDetailsUi = "SongDetailsUi";
         public const string songDetailsUiRoot = "songDetailsUiRoot";
         public const string songImage = "songImage";
