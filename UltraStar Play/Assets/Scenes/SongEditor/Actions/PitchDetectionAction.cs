@@ -65,6 +65,8 @@ public class PitchDetectionAction : AbstractAudioClipAction
             return;
         }
 
+        int endBeat = startBeat + lengthInBeats;
+        
         // Remove old analyzed notes
         songEditorLayerManager.GetEnumLayerNotes(ESongEditorLayer.PitchDetection)
             .Where(oldNote =>
@@ -105,6 +107,11 @@ public class PitchDetectionAction : AbstractAudioClipAction
                 // Add created notes to song editor layer
                 createdNotes.ForEach(createdNote =>
                 {
+                    if (createdNote.EndBeat > endBeat)
+                    {
+                        createdNote.SetEndBeat(endBeat);
+                    }
+                    
                     // IsEditable must be set AFTER the notes have been set completely. Otherwise SetLength will not work.
                     createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.PitchDetection);
                     songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.PitchDetection, createdNote);
