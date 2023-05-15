@@ -118,6 +118,16 @@ All of the sound effects are royalty free and commercially usable with no attrib
 You can use the sound effects on an unlimited number of projects.
 
 
+Creative Commons
+----------------
+See https://creativecommons.org/licenses/by/3.0/
+See https://creativecommons.org/licenses/by-sa/3.0/
+
+- "Well Done" Copyright 2013 by Iwan Gabovitch <qubodup.net> multi-licensed under Creative Commons Attribution 3.0 license <http://creativecommons.org/licenses/by/3.0/legalcode>
+  and/or GPLv3+ <http://www.gnu.org/licenses/gpl.html>
+    - https://opengameart.org/content/well-done
+
+
 Free Music Archive
 ------------------
 This project includes demo songs from Free Music Archive ( https://freemusicarchive.org ).
