@@ -62,6 +62,7 @@ public class Settings : ISettings
     public bool UseImageAsCursor { get; set; } = true;
     public bool EnableVfx { get; set; } = true;
     public bool ShowScrollBarInSongSelect { get; set; }
+    public ESongBackgroundScaleMode SongBackgroundScaleMode { get; set; } = ESongBackgroundScaleMode.FitOutside;
     
     // Sing scene settings
     public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.SentenceBySentence;
