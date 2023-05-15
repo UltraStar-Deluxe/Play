@@ -1,6 +1,15 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+#songListView .unity-scroller--horizontal {
+    bottom: 20px;
+    left: 0;
+}
+
+#songListView .unity-base-slider__tracker {
+    visibility: hidden;
+}
+
 #songEntryUiRoot {
     width: 150px;
     padding-top: 60px;
