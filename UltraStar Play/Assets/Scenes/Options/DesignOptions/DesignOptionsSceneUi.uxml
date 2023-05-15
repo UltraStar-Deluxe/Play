@@ -2,7 +2,6 @@
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; height: 10%; flex-grow: 1; margin-bottom: 20px;">
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="themePicker" label="Theme" class="noBackgroundInHierarchy" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animatedBackgroundItemPicker" label="Animated Background" class="noBackgroundInHierarchy" />
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundLightItemPicker" label="Background Lights" class="noBackgroundInHierarchy" />
             <ItemPicker name="imageAsCursorPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Use Image as Cursor" class="noBackgroundInHierarchy" />
             <ItemPicker name="vfxEnabledPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Visual Effects" class="noBackgroundInHierarchy" />
