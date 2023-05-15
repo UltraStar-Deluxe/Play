@@ -93,7 +93,9 @@ public class VisualElementSlideInControl
         
         if (side == ESide2D.Right)
         {
+            Length oldRight = visualElement.style.right.value;
             visualElement.style.right = -(visualElement.resolvedStyle.width + OutsideMargin);
+            Debug.Log($"SlideOut {visualElement.name}, old right: {oldRight}, res right: {visualElement.resolvedStyle.right}, right: {visualElement.style.right.value}, layout: {visualElement.layout}");
         }
         else if (side == ESide2D.Left)
         {
@@ -116,7 +118,9 @@ public class VisualElementSlideInControl
         
         if (side == ESide2D.Right)
         {
+            Length oldRight = visualElement.style.right.value;
             visualElement.style.right = 0;
+            Debug.Log($"SlideIn {visualElement.name}, old right: {oldRight}, res right: {visualElement.resolvedStyle.right}, right: {visualElement.style.right.value}, layout: {visualElement.layout}");
         }
         else if (side == ESide2D.Left)
         {

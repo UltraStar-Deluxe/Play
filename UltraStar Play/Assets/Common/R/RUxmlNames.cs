@@ -669,6 +669,7 @@ public static partial class R
         public const string songArtist = "songArtist";
         public const string songBackgroundImage = "songBackgroundImage";
         public const string songBackgroundLabel = "songBackgroundLabel";
+        public const string songBackgroundScaleModePicker = "songBackgroundScaleModePicker";
         public const string songCoverImage = "songCoverImage";
         public const string songCoverLabel = "songCoverLabel";
         public const string songEditorRoot = "songEditorRoot";
