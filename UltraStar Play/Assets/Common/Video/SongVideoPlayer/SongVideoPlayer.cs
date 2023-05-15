@@ -45,6 +45,9 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public bool forceSyncOnForwardJumpInTheSong;
 
+    [Inject]
+    private Settings settings;
+    
     // SongAudioPlayer to synchronize the playback position with.
     [Inject]
     private SongAudioPlayer songAudioPlayer;
@@ -78,7 +81,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         HasLoadedBackgroundImage = false;
         InitEventSubscriber();
-        InitVideo(SongMeta);
+        UnloadVideo();
+        
+        settings.ObserveEveryValueChanged(it => it.SongBackgroundScaleMode)
+            .Subscribe(_ => UpdateBackgroundScaleMode());
     }
 
     private void InitEventSubscriber()
@@ -392,5 +398,44 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         RenderTexture.active = renderTexture;
         GL.Clear(true, true, Color.clear);
         RenderTexture.active = rt;
+    }
+    
+    private void UpdateBackgroundScaleMode()
+    {
+        switch (settings.SongBackgroundScaleMode)
+        {
+            case ESongBackgroundScaleMode.FitInside:
+                if (videoPlayer != null)
+                {
+                    videoPlayer.aspectRatio = VideoAspectRatio.FitInside;
+                }
+                if (videoImageVisualElement != null)
+                {
+                    videoImageVisualElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(ScaleMode.ScaleToFit);
+                }
+                
+                if (backgroundImageVisualElement != null)
+                {
+                    backgroundImageVisualElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(ScaleMode.ScaleToFit);
+                }
+                
+                break;
+            case ESongBackgroundScaleMode.FitOutside:
+                if (videoPlayer != null)
+                {
+                    videoPlayer.aspectRatio = VideoAspectRatio.FitOutside;
+                }
+                if (videoImageVisualElement != null)
+                {
+                    videoImageVisualElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(ScaleMode.ScaleAndCrop);
+                }
+                
+                if (backgroundImageVisualElement != null)
+                {
+                    backgroundImageVisualElement.style.unityBackgroundScaleMode = new StyleEnum<ScaleMode>(ScaleMode.ScaleAndCrop);
+                }
+                
+                break;
+        }
     }
 }

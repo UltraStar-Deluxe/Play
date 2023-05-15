@@ -142,7 +142,7 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="hiddenHideModifiersOverlayArea" class="overlay" style="flex-grow: 1; display: none;" />
-        <ui:VisualElement name="modifierDialogOverlay" picking-mode="Ignore" class="overlay absolutePositionTransition" style="display: flex; right: 0; align-items: flex-end; justify-content: space-around; max-width: 100%;">
+        <ui:VisualElement name="modifierDialogOverlay" picking-mode="Ignore" class="overlay absolutePositionTransition" style="display: none; right: 0; align-items: flex-end; justify-content: space-around; max-width: 100%;">
             <ui:VisualElement name="modifierDialogOverlayInnerContainer" class="staticPanel focusableNavigatorRoot px-1 pt-1 pb-2" style="height: 100%; justify-content: space-around; max-width: 100%;">
                 <ui:VisualElement name="row" style="align-items: center;">
                     <ui:Label tabindex="-1" text="Modifiers" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
