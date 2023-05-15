@@ -103,6 +103,10 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
 
             int yStart = dynamicTexture.TextureHeight * (note.MidiNote - midiNoteMin) / midiNoteRange;
             int yLength = dynamicTexture.TextureHeight / midiNoteRange * 2;
+            
+            int minHeightInPx = 5;
+            yLength = NumberUtils.Limit(yLength, minHeightInPx, dynamicTexture.TextureHeight);
+            
             int yEnd = yStart + yLength;
             int xStart = (int)(dynamicTexture.TextureWidth * startMillis / songDurationInMillis);
             int xEnd = (int)(dynamicTexture.TextureWidth * endMillis / songDurationInMillis);
