@@ -594,7 +594,9 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
         if (noteAreaControl.ViewportWidth < HideElementThresholdInMillis)
         {
-            if (settings.SongEditorSettings.ShowNotePitchLabel)
+            if (settings.SongEditorSettings.ShowNotePitchLabel
+                && (!songEditorLayerManager.TryGetEnumLayer(editorNoteControl.Note, out SongEditorEnumLayer enumLayer) 
+                    || enumLayer.LayerEnum is not ESongEditorLayer.PitchDetection))
             {
                 editorNoteControl.ShowPitchLabel();
             }

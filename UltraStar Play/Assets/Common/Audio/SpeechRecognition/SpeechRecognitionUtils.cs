@@ -327,6 +327,10 @@ public static class SpeechRecognitionUtils
             Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
             return createdNote;
         }).ToList();
+        
+        // Shorten new notes left and right to give a little space
+        AddSpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, 150, songMeta);
+        
         return createdNotes;
     }
 

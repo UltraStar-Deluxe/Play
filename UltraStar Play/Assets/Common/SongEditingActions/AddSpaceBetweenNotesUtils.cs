@@ -1,13 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public static class AddSpaceBetweenNotesUtils
 {
-    public static void AddSpaceBetweenNotes(IReadOnlyCollection<Note> notes, int spaceInBeats)
+    public static void AddSpaceInMillisBetweenNotes(IReadOnlyCollection<Note> notes, int millis, SongMeta songMeta)
+    {
+        double beats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, millis);
+        Debug.Log("AddSpaceInMillisBetweenNotes - lengthInBeats: " + beats);
+        if (beats < 1)
+        {
+            return;
+        }
+
+        AddSpaceInBeatsBetweenNotes(notes, (int)beats);
+    }
+    
+    public static void AddSpaceInBeatsBetweenNotes(IReadOnlyCollection<Note> notes, int spaceInBeats)
     {
         if (spaceInBeats <= 0)
         {
-            UiManager.CreateNotification("Minimum amount of space (in beats) must be greater than 0.");
             return;
         }
 
@@ -33,5 +45,30 @@ public static class AddSpaceBetweenNotesUtils
                 }
             }
         }
+    }
+
+    public static void ShortenNotesByMillis(IReadOnlyCollection<Note> notes, int millis, SongMeta songMeta)
+    {
+        double lengthInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, millis);
+        Debug.Log("ShortenNotesByMillis - lengthInBeats: " + lengthInBeats);
+        if (lengthInBeats < 1)
+        {
+            return;
+        }
+        
+        ShortenNotesByBeats(notes, (int)lengthInBeats);
+    }
+    
+    public static void ShortenNotesByBeats(IReadOnlyCollection<Note> notes, int lengthInBeats)
+    {
+        // Remove half from start and end of note
+        int halfLengthInBeats = lengthInBeats / 2;
+        notes.ForEach(currentNote =>
+            {
+                if (currentNote.Length > lengthInBeats + 1)
+                {
+                    currentNote.SetStartAndEndBeat(currentNote.StartBeat + halfLengthInBeats, currentNote.EndBeat - halfLengthInBeats);
+                }
+            });
     }
 }
