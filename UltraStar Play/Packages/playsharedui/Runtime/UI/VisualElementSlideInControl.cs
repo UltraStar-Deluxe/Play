@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -55,26 +56,25 @@ public class VisualElementSlideInControl
     {
         Visible.Value = false;
     }
+
+    private void EnableTransition()
+    {
+        visualElement.style.transitionProperty = new(new List<StylePropertyName> {
+            new StylePropertyName("right"),
+            new StylePropertyName("left"),
+            new StylePropertyName("top"),
+            new StylePropertyName("bottom")
+        });
+    }
+    
+    private void DisableTransition()
+    {
+        visualElement.style.transitionProperty = new(new List<StylePropertyName>());
+    }
     
     public void UpdatePositionWithoutTransition()
     {
-        // No animation is done when the units change. Here, we change from unit "auto" to unit "px".
-        if (side == ESide2D.Right)
-        {
-            visualElement.style.right = new StyleLength(StyleKeyword.Auto);
-        }
-        else if (side == ESide2D.Left)
-        {
-            visualElement.style.left = new StyleLength(StyleKeyword.Auto);
-        }
-        else if (side == ESide2D.Top)
-        {
-            visualElement.style.top = new StyleLength(StyleKeyword.Auto);
-        }
-        else if (side == ESide2D.Bottom)
-        {
-            visualElement.style.bottom = new StyleLength(StyleKeyword.Auto);
-        }
+        DisableTransition();
         
         if (Visible.Value)
         {
@@ -84,6 +84,8 @@ public class VisualElementSlideInControl
         {
             DoSlideOut();
         }
+
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(2, () => EnableTransition()));
     }
 
     private void DoSlideOut()
@@ -93,9 +95,7 @@ public class VisualElementSlideInControl
         
         if (side == ESide2D.Right)
         {
-            Length oldRight = visualElement.style.right.value;
             visualElement.style.right = -(visualElement.resolvedStyle.width + OutsideMargin);
-            Debug.Log($"SlideOut {visualElement.name}, old right: {oldRight}, res right: {visualElement.resolvedStyle.right}, right: {visualElement.style.right.value}, layout: {visualElement.layout}");
         }
         else if (side == ESide2D.Left)
         {
@@ -118,9 +118,7 @@ public class VisualElementSlideInControl
         
         if (side == ESide2D.Right)
         {
-            Length oldRight = visualElement.style.right.value;
             visualElement.style.right = 0;
-            Debug.Log($"SlideIn {visualElement.name}, old right: {oldRight}, res right: {visualElement.resolvedStyle.right}, right: {visualElement.style.right.value}, layout: {visualElement.layout}");
         }
         else if (side == ESide2D.Left)
         {

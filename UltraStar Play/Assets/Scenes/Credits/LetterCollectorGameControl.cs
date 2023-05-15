@@ -86,6 +86,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
     public void Start()
     {
         // Init UI
+        background.ShowByDisplay();
         creditsSummaryLabel.text = "";
         scoreLabel.text = "0";
         bonusLabel.style.opacity = 0;
@@ -170,11 +171,8 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
         LeanTween.value(gameObject, 1, 0, fadeOutTimeInSeconds)
             .setOnUpdate(value =>
             {
-                player.style.opacity = value;
-                categoryNameContainer.style.opacity = value;
-                skipButton.style.opacity = value;
-                background.style.unityBackgroundImageTintColor = new StyleColor(new Color(1, 1, 1, value));
-                secondBackground.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f, 1 - value));
+                background.style.opacity = value;
+                secondBackground.style.opacity = 1 - value;
             });
 
         string creditsSummaryText = creditsCategoryEntries
@@ -187,6 +185,7 @@ public class LetterCollectorGameControl : MonoBehaviour, INeedInjection
                     ? ($"<i>{category.Name}</i>" + "\n" + categoryContent)
                     : categoryContent;
             }).JoinWith("\n\n");
+        
         // Extra line breaks for continued scroll range
         creditsSummaryLabel.text = creditsSummaryText + "\n\n\n\n\n\n\n\n";
     }

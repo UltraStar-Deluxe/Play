@@ -11,6 +11,9 @@ using UnityEngine;
 public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 {
     [Inject]
+    private SongMeta songMeta;
+    
+    [Inject]
     private EditorNoteControl editorNoteControl;
 
     [Inject]
@@ -45,7 +48,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     {
         string viewModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
         
-        TryApplyEditModeText(editorNoteControl.Note, newText, layerManager, out List<Note> notesAfterSplit);
+        TryApplyEditModeText(songMeta, editorNoteControl.Note, newText, layerManager, out List<Note> notesAfterSplit);
         if (notesAfterSplit.Count > 1)
         {
             // Note has been split
@@ -61,6 +64,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     }
     
     public static bool TryApplyEditModeText(
+        SongMeta songMeta,
         Note note,
         string newText,
         SongEditorLayerManager layerManager,
@@ -80,11 +84,12 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 
         // Split note to apply space and semicolon control characters.
         // Otherwise the text would mess up following notes when using the LyricsArea.
-        notesAfterSplit = SplitNoteForNewText(note, viewModeText, layerManager);
+        notesAfterSplit = SplitNoteForNewText(songMeta, note, viewModeText, layerManager);
         return true;
     }
 
     public static List<Note> SplitNoteForNewText(
+        SongMeta songMeta,
         Note note,
         string newText,
         SongEditorLayerManager layerManager)
@@ -156,6 +161,9 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
         notesAfterSplit.ForEach(currentNote =>
             currentNote.SetText(currentNote.Text.Replace(";", "")));
 
+        // Shorten new notes left and right to give a little space
+        AddSpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, 150, songMeta);
+        
         return notesAfterSplit;
     }
 

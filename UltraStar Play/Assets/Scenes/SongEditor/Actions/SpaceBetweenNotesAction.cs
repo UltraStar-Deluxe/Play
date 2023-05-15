@@ -14,7 +14,13 @@ public class SpaceBetweenNotesAction : INeedInjection
 
     public void Execute(IReadOnlyCollection<Note> selectedNotes, int spaceInBeats)
     {
-        AddSpaceBetweenNotesUtils.AddSpaceBetweenNotes(selectedNotes, spaceInBeats);
+        if (spaceInBeats <= 0)
+        {
+            UiManager.CreateNotification("Minimum amount of space (in beats) must be greater than 0.");
+            return;
+        }
+
+        AddSpaceBetweenNotesUtils.AddSpaceInBeatsBetweenNotes(selectedNotes, spaceInBeats);
     }
 
     public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, int spaceInBeats)

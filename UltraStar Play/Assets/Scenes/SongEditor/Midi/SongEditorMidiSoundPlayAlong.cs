@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AudioSynthesis.Midi;
 using UniInject;
+using UniRx;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -32,7 +34,13 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
 
     private bool isPlaying;
     private float startTimeInSeconds;
-    
+
+    private void Start()
+    {
+        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => RestartMidiPlayAlong());
+        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => RestartMidiPlayAlong());
+    }
+
     void Update()
     {
         if (!settings.SongEditorSettings.MidiSoundPlayAlongEnabled)
@@ -55,7 +63,17 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
             StopMidiPlayAlong();
         }
     }
-
+    
+    private void RestartMidiPlayAlong()
+    {
+        if (!isPlaying)
+        {
+            return;
+        }
+        StopMidiPlayAlong();
+        StartMidiPlayAlong();
+    }
+    
     private bool InsideAnyVisibleNote()
     {
         int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);

@@ -324,7 +324,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     {
         if (note.Sentence != null
             && note.Sentence.Voice != null
-            && voiceNameToLayerMap.TryGetValue(note.Sentence.Voice.Name, out SongEditorVoiceLayer voiceLayer))
+            && voiceNameToLayerMap.TryGetValue(Voice.NormalizeVoiceName(note.Sentence.Voice.Name), out SongEditorVoiceLayer voiceLayer))
         {
             layerEnum = ESongEditorLayer.ButtonRecording;
             return false;
@@ -348,7 +348,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     {
         if (note.Sentence != null
             && note.Sentence.Voice != null
-            && voiceNameToLayerMap.TryGetValue(note.Sentence.Voice.Name, out SongEditorVoiceLayer voiceLayer))
+            && voiceNameToLayerMap.TryGetValue(Voice.NormalizeVoiceName(note.Sentence.Voice.Name), out SongEditorVoiceLayer voiceLayer))
         {
             return voiceLayer;
         }
