@@ -42,9 +42,24 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
+        UpdateTargetFps();
+        settings.ObserveEveryValueChanged(it => it.TargetFps)
+            .Subscribe(_ => UpdateTargetFps());
+    }
+
+    private void UpdateTargetFps()
+    {
         targetFrameRate = settings.TargetFps;
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = targetFrameRate;
+        if (targetFrameRate > 0)
+        {
+            Application.targetFrameRate = targetFrameRate;
+            QualitySettings.vSyncCount = 0;
+        }
+        else
+        {
+            Application.targetFrameRate = -1;
+            QualitySettings.vSyncCount = 1;
+        }
     }
 
     protected override void OnEnableSingleton()

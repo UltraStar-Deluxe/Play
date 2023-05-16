@@ -13,6 +13,7 @@
                     <ui:TextField picking-mode="Ignore" name="udpPortOnServerTextField" label="UDP Port of Main Game&#10;(default 34567)" style="flex-direction: column;" />
                     <ui:TextField picking-mode="Ignore" name="ownHostTextField" label="IP Address of Companion App&#10;(leave empty for automatic value)" style="flex-direction: column;" />
                 </ui:VisualElement>
+                <ItemPicker name="targetFpsPicker" noPreviousButton="true" wrapAround="true" wrap-around="true" label="FPS" class="controlWithLabelVertical onlyVisibleWhenDevModeEnabled" />
             </ui:VisualElement>
         </ui:ScrollView>
         <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-bottom: 10px; margin-top: 10px;" />
