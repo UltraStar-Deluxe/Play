@@ -164,6 +164,18 @@
     overflow: hidden;
 }
 
+.singSceneOverlayButton {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.singSceneOverlayButton:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.singSceneOverlayButton:focus {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 .singSceneOverlayProgressBar {
     opacity: 0.5;
 }
