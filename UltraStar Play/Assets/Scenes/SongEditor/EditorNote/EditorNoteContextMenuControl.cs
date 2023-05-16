@@ -198,10 +198,6 @@ public class EditorNoteContextMenuControl : ContextMenuControl
             contextMenu.AddButton("Assign to previous phrase",
                 () => moveNoteToAdjacentSentenceAction.MoveToPreviousSentenceAndNotify(selectedNotes));
         }
-        if (!canMoveToPreviousSentence && canMoveToNextSentence)
-        {
-            contextMenu.AddSeparator();
-        }
         if (canMoveToNextSentence)
         {
             contextMenu.AddButton("Assign to next phrase",
