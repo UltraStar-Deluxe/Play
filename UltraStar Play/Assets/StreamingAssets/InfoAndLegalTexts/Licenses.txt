@@ -60,9 +60,6 @@ See https://opensource.org/license/MIT/
 - UnityStandaloneFileBrowser
     - https://github.com/gkngkc/UnityStandaloneFileBrowser
 
-- Soundfont "MuseScore_General.sf2"
-    - https://musescore.org/en/handbook/3/soundfonts-and-sfz-files
-
 
 Apache License 2.0
 ------------------
@@ -89,6 +86,11 @@ See https://www.mozilla.org/en-US/MPL/1.1 respectively https://www.mozilla.org/e
     - https://github.com/achimmihca/UTF-Unknown-Unity (MPL 2.0)
     - https://github.com/CharsetDetector/UTF-unknown  (MPL 1.1)
     - https://github.com/errepi/ude (MPL 1.1)
+
+
+GeneralUser GS Soundfont License
+--------------------------------
+See http://www.schristiancollins.com/generaluser.php
 
 
 Pixabay Content License

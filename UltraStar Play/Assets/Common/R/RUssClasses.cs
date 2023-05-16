@@ -128,6 +128,7 @@ public static partial class R
         public const string singingLyrics = "singingLyrics";
         public const string singingLyricsSentenceUi = "singingLyricsSentenceUi";
         public const string singingResults = "singingResults";
+        public const string singSceneOverlayButton = "singSceneOverlayButton";
         public const string singSceneOverlayProgressBar = "singSceneOverlayProgressBar";
         public const string singScenePlayerUi = "singScenePlayerUi";
         public const string small = "small";

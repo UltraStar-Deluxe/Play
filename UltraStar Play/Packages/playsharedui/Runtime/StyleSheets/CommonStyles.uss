@@ -4,7 +4,7 @@ VisualElement
 }
 
 #logo {
-    background-image: url("project://database/Packages/playshared/Runtime/Graphics/Logos/LogoLarge-512.png");
+    background-image: url("project://database/Packages/playshared/Runtime/Graphics/Logos/LogoLarge.png");
     -unity-background-scale-mode: scale-to-fit;
 }
 
@@ -398,4 +398,8 @@ Toggle.smallControl {
 
 .absolutePositionTransition {
     transition: bottom 0.5s, top 0.5s, left 0.5s, right 0.5s;
+}
+
+.horizontalScrollBarTop ScrollView {
+    flex-direction: column-reverse;
 }

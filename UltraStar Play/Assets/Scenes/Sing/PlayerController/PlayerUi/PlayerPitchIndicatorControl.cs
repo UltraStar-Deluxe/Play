@@ -74,8 +74,10 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
         float yPosPercent = 100f * yPosRangeFactor.x;
         yPosPercent = NumberUtils.Limit(yPosPercent, 0, 100);
         float smoothYPos = playerPitchIndicator.style.top.value.value + (yPosPercent - playerPitchIndicator.style.top.value.value) * 0.2f;
-        
-        float xPosPercent = 100f * noteDisplayer.GetXInPercent(songAudioPlayer.PositionInSongInMillis);
+
+        int micDelay = micProfile?.DelayInMillis ?? 0;
+        double positionInSongInMillisConsideringMicDelay = songAudioPlayer.PositionInSongInMillis - micDelay;
+        float xPosPercent = 100f * noteDisplayer.GetXInPercent(positionInSongInMillisConsideringMicDelay);
         xPosPercent = NumberUtils.Limit(xPosPercent, 0, float.MaxValue);
         
         playerPitchIndicator.style.left =  new StyleLength(Length.Percent(xPosPercent));

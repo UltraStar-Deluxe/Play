@@ -149,8 +149,17 @@ public class RecordedNoteControl : INeedInjection, IInjectionFinishedListener
     {
         // If no target note, then remove saturation from color and make transparent
         Color color = micProfile.Color;
-        Color finalColor = (RecordedNote != null && RecordedNote.TargetNote == null)
-            ? color.RgbToHsv().WithGreen(0).HsvToRgb().WithAlpha(0.25f)
+        bool isTransparent = RecordedNote != null
+                             && (RecordedNote.TargetNote == null
+                                 || RecordedNote.TargetNote.IsFreestyle);
+        Color finalColor = isTransparent
+            ? color
+                // Remove saturation
+                .RgbToHsv()
+                .WithGreen(0)
+                .HsvToRgb()
+                // Make transparent
+                .WithAlpha(0.25f)
             : color;
         image.style.unityBackgroundImageTintColor = finalColor;
         image.style.backgroundColor = finalColor;

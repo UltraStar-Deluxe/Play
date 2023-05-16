@@ -10,6 +10,7 @@ public static class AttributionUtils
         attributionTextField.AddToClassList("multiline");
         attributionTextField.AddToClassList("noBackground");
         attributionTextField.AddToClassList("smallerFont");
+        attributionTextField.AddToClassList("wordWrap");
         attributionTextField.value = SongMetaUtils.GetAttributionText(songMeta);
         return attributionTextField;
     }

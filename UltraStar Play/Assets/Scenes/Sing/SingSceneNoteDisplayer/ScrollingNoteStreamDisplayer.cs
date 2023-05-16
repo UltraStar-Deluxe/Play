@@ -91,7 +91,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         return PitchIndicatorXPercent;
     }
     
-    protected override Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result)
     {
         // The VerticalPitchIndicator's position is the position where recording happens.
         // Thus, a note with startBeat == (currentBeat + micDelayInBeats) will have its left side drawn where the VerticalPitchIndicator is.
@@ -108,7 +108,8 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         yEndPercent *= 100;
         xStartPercent *= 100;
         xEndPercent *= 100;
-        return new Rect(xStartPercent, yStartPercent, xEndPercent - xStartPercent, yEndPercent - yStartPercent);
+        result = new Rect(xStartPercent, yStartPercent, xEndPercent - xStartPercent, yEndPercent - yStartPercent);
+        return true;
     }
     
     protected override TargetNoteControl CreateTargetNoteControl(Note note)

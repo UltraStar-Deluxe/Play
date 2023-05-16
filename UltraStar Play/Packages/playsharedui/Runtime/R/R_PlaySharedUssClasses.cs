@@ -65,6 +65,7 @@ public static partial class R_PlayShared
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
         public const string goldenNote = "goldenNote";
         public const string horizontal = "horizontal";
+        public const string horizontalScrollBarTop = "horizontalScrollBarTop";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string iconImage = "iconImage";
         public const string iconImageTextSized = "iconImageTextSized";
@@ -134,6 +135,7 @@ public static partial class R_PlayShared
         public const string singingResultUi_4 = "singingResultUi-4";
         public const string singingResultUi_5 = "singingResultUi-5";
         public const string singSceneContextMenu = "singSceneContextMenu";
+        public const string singSceneOverlayButton = "singSceneOverlayButton";
         public const string singSceneOverlayProgressBar = "singSceneOverlayProgressBar";
         public const string singScenePlayerUi = "singScenePlayerUi";
         public const string singScenePlayerUiSmall = "singScenePlayerUiSmall";
@@ -176,6 +178,7 @@ public static partial class R_PlayShared
         public const string unity_base_popup_field = "unity-base-popup-field";
         public const string unity_base_popup_field__arrow = "unity-base-popup-field__arrow";
         public const string unity_base_popup_field__text = "unity-base-popup-field__text";
+        public const string unity_base_slider__tracker = "unity-base-slider__tracker";
         public const string unity_base_slider__horizontal = "unity-base-slider--horizontal";
         public const string unity_base_slider__vertical = "unity-base-slider--vertical";
         public const string unity_base_text_field = "unity-base-text-field";

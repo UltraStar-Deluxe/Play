@@ -894,7 +894,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         if (HasPartyModeSceneData)
         {
-            UiManager.CreateNotification("Song editor not available in party mode");
+            UiManager.CreateNotification("Song editor not available in Team & Tournament mode.");
             return;
         }
 

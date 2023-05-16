@@ -30,8 +30,9 @@ public class NoNoteSingSceneDisplayer : AbstractSingSceneNoteDisplayer
         // Do nothing.
     }
 
-    protected override Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result)
     {
-        return Rect.zero;
+        result = Rect.zero;
+        return false;
     }
 }

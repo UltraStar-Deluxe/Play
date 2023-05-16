@@ -147,7 +147,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         InitSongEditorStyleSheet();
         
-        songAudioPlayer.Init(SongMeta);
+        songAudioPlayer.Init(SongMeta, sceneData.PositionInSongInMillis);
 
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(positionInSongInMillis => OnAudioPlaybackStarted(positionInSongInMillis));
@@ -343,7 +343,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             singSceneData.SingScenePlayerData.PlayerProfileToMicProfileMap = sceneData.PlayerProfileToMicProfileMap;
         }
         singSceneData.PositionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
-        sceneNavigator.LoadScene(EScene.SingScene, sceneData.PreviousSceneData);
+        sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
 
     public void ContinueToSongSelectScene()

@@ -23,6 +23,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNotePicker)]
     private ItemPicker analyzeBeatsWithoutTargetNotePicker;
 
+    [Inject(UxmlName = R.UxmlNames.animatedBackgroundItemPicker)]
+    private ItemPicker animatedBackgroundItemPicker;
+
     [Inject(UxmlName = R.UxmlNames.disableDynamicThemesPicker)]
     private ItemPicker disableDynamicThemesPicker;
 
@@ -82,6 +85,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(analyzeBeatsWithoutTargetNotePicker)
             .Bind(() => settings.AnalyzeBeatsWithoutTargetNote,
                 newValue => settings.AnalyzeBeatsWithoutTargetNote = newValue);
+
+        new BoolPickerControl(animatedBackgroundItemPicker)
+            .Bind(() => settings.AnimatedBackground,
+                newValue => settings.AnimatedBackground = newValue);
 
         new BoolPickerControl(disableDynamicThemesPicker)
             .Bind(() => settings.DisableDynamicThemes,

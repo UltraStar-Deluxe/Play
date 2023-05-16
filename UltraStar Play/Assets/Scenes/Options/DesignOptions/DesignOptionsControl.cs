@@ -23,9 +23,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.sceneChangeDurationPicker)]
     private ItemPicker sceneChangeDurationPicker;
     
-    [Inject(UxmlName = R.UxmlNames.animatedBackgroundItemPicker)]
-    private ItemPicker animatedBackgroundItemPicker;
-    
     [Inject(UxmlName = R.UxmlNames.backgroundLightItemPicker)]
     private ItemPicker backgroundLightItemPicker;
     
@@ -73,10 +70,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         sceneChangeDurationPickerControl.Bind(() => settings.SceneChangeDurationInSeconds,
                 newValue => settings.SceneChangeDurationInSeconds = newValue);
         sceneChangeDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
-        
-        new BoolPickerControl(animatedBackgroundItemPicker)
-            .Bind(() => settings.AnimatedBackground,
-                newValue => settings.AnimatedBackground = newValue);
         
         new LabeledItemPickerControl<int>(backgroundLightItemPicker, NumberUtils.CreateIntList(0, backgroundLightManager.BackgroundLightInstancesCount))
             .Bind(() => settings.BackgroundLightIndex,

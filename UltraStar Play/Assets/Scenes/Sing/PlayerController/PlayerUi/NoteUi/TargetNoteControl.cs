@@ -81,14 +81,15 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
             ? themeManager.GetGoldenColor()
             : micProfile.Color;
 
-        // Make freestyle and rap notes transparent
-        Color finalColor = Note.Type is ENoteType.Freestyle or ENoteType.Rap or ENoteType.RapGolden
-            ? color.WithAlpha(0.3f)
-            : color;
+        // hide freestyle notes
+        if (Note.Type is ENoteType.Freestyle)
+        {
+            VisualElement.HideByVisibility();
+        }
 
-        image.style.unityBackgroundImageTintColor = finalColor;
-        image.SetBorderColor(finalColor);
-        targetNoteBorder.SetBorderColor(finalColor);
+        image.style.unityBackgroundImageTintColor = color;
+        image.SetBorderColor(color);
+        targetNoteBorder.SetBorderColor(color);
     }
 
     private void CreateGoldenNoteParticleEffect()

@@ -1,6 +1,15 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+#songListView .unity-scroller--horizontal {
+    bottom: 20px;
+    left: 0;
+}
+
+#songListView .unity-base-slider__tracker {
+    visibility: hidden;
+}
+
 #songEntryUiRoot {
     width: 150px;
     padding-top: 60px;
@@ -153,6 +162,23 @@
 
 #innerTimeBar {
     overflow: hidden;
+}
+
+#playerPitchIndicator {
+    width: 20px;
+    height: 20px;
+}
+
+.singSceneOverlayButton {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.singSceneOverlayButton:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.singSceneOverlayButton:focus {
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .singSceneOverlayProgressBar {

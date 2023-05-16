@@ -222,11 +222,23 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             }
             PlayerControl playerControl = CreatePlayerControl(playerProfile, micProfile, i);
 
-            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<PlayerScoreControlData> scoreDatas)
-                && sceneData.MedleySongIndex < scoreDatas.Count
-                && sceneData.MedleySongIndex >= 0)
+            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<PlayerScoreControlData> scoreDatas))
             {
-                playerControl.PlayerScoreControl.ScoreData = scoreDatas[sceneData.MedleySongIndex];
+                if (sceneData.MedleySongIndex < 0)
+                {
+                    // No medley, select first score data
+                    playerControl.PlayerScoreControl.ScoreData = scoreDatas.FirstOrDefault();
+                }
+                else if (sceneData.MedleySongIndex < scoreDatas.Count)
+                {
+                    // This is a medley (or short song), select score data for this medley entry song
+                    playerControl.PlayerScoreControl.ScoreData = scoreDatas[sceneData.MedleySongIndex];
+                }
+                
+                if (playerControl.PlayerScoreControl.ScoreData != null)
+                {
+                    playerControl.PlayerUiControl.ShowTotalScore(playerControl.PlayerScoreControl.ScoreData.TotalScore, false);
+                }
             }
 
             // Update leading player icon
@@ -627,12 +639,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         if (HasPartyModeSceneData)
         {
-            UiManager.CreateNotification("Song editor not available in party mode");
+            UiManager.CreateNotification("Song editor not available in Team & Tournament mode.");
             return;
         }
         if (sceneData.IsMedley)
         {
-            UiManager.CreateNotification("Song editor not available during medley");
+            UiManager.CreateNotification("Song editor not available during medley.");
             return;
         }
 

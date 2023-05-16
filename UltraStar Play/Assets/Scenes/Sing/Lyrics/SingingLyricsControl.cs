@@ -201,13 +201,19 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         {
             SortedNotes = new List<Note>(sentence.Notes);
             SortedNotes.Sort(Note.comparerByStartBeat);
+            FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence, false);
+            UpdateFontSize(currentSentenceContainer);
         }
         else
         {
+            // After last sentence => fade out the current lyrics
             SortedNotes = new List<Note>();
+            LeanTween.value(gameObject, currentSentenceContainer.resolvedStyle.opacity, 0, 1f)
+                .setOnUpdate(interpolatedValue =>
+                {
+                    currentSentenceContainer.style.opacity = interpolatedValue;
+                });
         }
-        FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence, false);
-        UpdateFontSize(currentSentenceContainer);
     }
 
     private void UpdateFontSize(VisualElement visualElement)

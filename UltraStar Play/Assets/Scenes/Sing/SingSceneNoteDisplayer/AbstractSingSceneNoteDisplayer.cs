@@ -84,11 +84,15 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     
     private readonly HashSet<Label> initializedNoteLabelWidth = new();
 
-    protected abstract Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat);
+    protected abstract bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result);
 
     protected void UpdateNotePosition(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
     {
-        Rect notePositionInPercent = GetNotePositionInPercent(visualElement, midiNote, noteStartBeat, noteEndBeat);
+        if (!TryGetNotePositionInPercent(visualElement, midiNote, noteStartBeat, noteEndBeat, out Rect notePositionInPercent))
+        {
+            return;
+        }
+        
         visualElement.style.position = new StyleEnum<Position>(Position.Absolute);
         visualElement.style.width = new StyleLength(new Length(notePositionInPercent.width, LengthUnit.Percent));
         visualElement.style.height = new StyleLength(new Length(notePositionInPercent.height, LengthUnit.Percent));
@@ -155,7 +159,10 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
             initializedNoteLabelWidth.Add(targetNoteControl.Label);
 
             // Width of label until start of following note
-            Rect notePositionInPercent = GetNotePositionInPercent(targetNoteControl.Label, 60, targetNoteControl.Note.StartBeat, nextTargetNoteControl.Note.StartBeat);
+            if (!TryGetNotePositionInPercent(targetNoteControl.Label, 60, targetNoteControl.Note.StartBeat, nextTargetNoteControl.Note.StartBeat, out Rect notePositionInPercent))
+            {
+                return;
+            }
             targetNoteControl.Label.style.width = Length.Percent(notePositionInPercent.width);
             targetNoteControl.Label.RegisterHasGeometryCallbackOneShot(_ => targetNoteControl.UpdateLabelFontSize());
         }

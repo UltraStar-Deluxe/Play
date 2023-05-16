@@ -201,11 +201,17 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     public void SetCurrentBeat(double currentBeat)
     {
         // Change the current display sentence, when the current beat is over its last note.
-        if (displaySentenceIndex < SortedSentences.Count && currentBeat >= GetDisplaySentence().LinebreakBeat)
+        if (displaySentenceIndex < SortedSentences.Count
+            && currentBeat >= GetDisplaySentence().LinebreakBeat)
         {
             Sentence nextDisplaySentence = GetUpcomingSentenceForBeat(currentBeat);
             int nextDisplaySentenceIndex = SortedSentences.IndexOf(nextDisplaySentence);
-            if (nextDisplaySentenceIndex >= 0)
+            if (nextDisplaySentenceIndex < 0)
+            {
+                // After last sentence
+                SetDisplaySentenceIndex(SortedSentences.Count);
+            }
+            else
             {
                 SetDisplaySentenceIndex(nextDisplaySentenceIndex);
             }

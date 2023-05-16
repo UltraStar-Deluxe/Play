@@ -176,7 +176,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         {
             UpdatePitchDetectionFromConnectedClient();
         }
-        else
+        else if (micSampleRecorder != null
+                 && micSampleRecorder.IsRecording.Value)
         {
             UpdatePitchDetectionFromLocalMicrophone();
         }
@@ -346,6 +347,12 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     public void FirePitchEvent(PitchEvent pitchEvent, int beat, Note noteAtBeat, Sentence sentenceAtBeat)
     {
+        if (beat < BeatToAnalyze)
+        {
+            // Ignore this event, the beat was already analyzed.
+            return;
+        }
+        
         int recordedMidiNote = pitchEvent != null
             ? pitchEvent.MidiNote
             : -1;

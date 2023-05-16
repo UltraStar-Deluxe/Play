@@ -25,6 +25,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         { "MPL 1.1", "InfoAndLegalTexts/MPL-1.1.txt" },
         { "MPL 2.0", "InfoAndLegalTexts/MPL-2.0.txt" },
         { "BGM", "InfoAndLegalTexts/BGM.txt" },
+        { "Soundfont", "InfoAndLegalTexts/GeneralUser-GS-Soundfont-License.txt" },
         { "Pixabay", "InfoAndLegalTexts/Pixabay-Content-License.txt" },
     };
 

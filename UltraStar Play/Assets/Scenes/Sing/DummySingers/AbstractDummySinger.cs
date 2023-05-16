@@ -20,6 +20,8 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
 
     private readonly HashSet<int> analyzedBeats = new();
 
+    protected virtual int BeatToAnalyze => playerControl.PlayerMicPitchTracker.BeatToAnalyze;
+    
     void Awake()
     {
         if (!Application.isEditor)
@@ -39,9 +41,16 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
                 return;
             }
         }
+        
+        // Disable mic input
+        if (playerControl.MicSampleRecorder != null
+            && playerControl.MicSampleRecorder.IsRecording.Value)
+        {
+            playerControl.MicSampleRecorder.StopRecording();
+        }
 
         int currentBeat = (int)singSceneControl.CurrentBeat;
-        int beatToAnalyze = playerControl.PlayerMicPitchTracker.BeatToAnalyze;
+        int beatToAnalyze = BeatToAnalyze;
         if (currentBeat <= 0
             || beatToAnalyze > currentBeat
             || playerControl.PlayerMicPitchTracker.RecordingSentence == null
@@ -52,8 +61,11 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         
         BeatPitchEvent pitchEvent = GetDummyPitchEvent(beatToAnalyze);
         FirePitchEvent(pitchEvent, beatToAnalyze);
-        
-        analyzedBeats.Add(beatToAnalyze);
+
+        if (pitchEvent != null)
+        {
+            analyzedBeats.Add(pitchEvent.Beat);
+        }
     }
 
     protected void FirePitchEvent(BeatPitchEvent pitchEvent, int fallbackBeat)

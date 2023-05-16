@@ -542,6 +542,55 @@ VideoPlayer:
   m_WaitForFirstFrame: 0
   m_FrameReadyEventEnabled: 0
   m_VideoShaders: []
+--- !u!1 &2624125879990867997
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8467351238493057356}
+  - component: {fileID: 5672860147961129897}
+  m_Layer: 0
+  m_Name: WrongBeatAnalyzedSinger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &8467351238493057356
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624125879990867997}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 199.97614, y: -54.347656, z: -434.36813}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7508707485095029509}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5672860147961129897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2624125879990867997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b6f97df470bcd24da8f41c0cbda30bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerIndexToSimulate: 0
+  minOffsetInclusive: 0
+  maxOffsetExclusive: 5
+  beatToAnalyzeOffset: 0
+  stutter: 0
 --- !u!1 &2940136062762420913
 GameObject:
   m_ObjectHideFlags: 0
@@ -837,6 +886,7 @@ Transform:
   - {fileID: 1084258561737551269}
   - {fileID: 1084258561844141764}
   - {fileID: 1084258561087617617}
+  - {fileID: 8467351238493057356}
   - {fileID: 1084258560531820790}
   - {fileID: 729696328608357567}
   m_Father: {fileID: 0}

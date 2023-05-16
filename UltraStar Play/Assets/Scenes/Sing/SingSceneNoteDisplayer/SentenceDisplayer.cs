@@ -27,7 +27,24 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     private void DisplaySentence(Sentence sentence)
     {
         currentSentence = sentence;
-        RemoveAllDisplayedNotes();
+
+        if (sentence == null)
+        {
+            // Last sentence done => fade out notes, then remove
+            LeanTween.value(gameObject, targetNoteEntryContainer.resolvedStyle.opacity, 0, 1f)
+                .setOnUpdate(interpolatedValue =>
+                {
+                    targetNoteEntryContainer.style.opacity = interpolatedValue;
+                    recordedNoteEntryContainer.style.opacity = interpolatedValue;
+                })
+                .setOnComplete(() => RemoveAllDisplayedNotes());
+        }
+        else
+        {
+            // Immediately remove all notes to have space for the next sentence
+            RemoveAllDisplayedNotes();
+        }
+        
         if (sentence == null
             || !medleyControl.IsSentenceInMedleyRange(sentence))
         {
@@ -83,8 +100,14 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         return (float)xPercent;
     }
 
-    protected override Rect GetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat)
+    protected override bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result)
     {
+        if (currentSentence == null)
+        {
+            result = Rect.zero;
+            return false;
+        }
+        
         int sentenceStartBeat = currentSentence.MinBeat;
         int sentenceEndBeat = currentSentence.MaxBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
@@ -99,6 +122,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         yEndPercent *= 100;
         xStartPercent *= 100;
         xEndPercent *= 100;
-        return new Rect(xStartPercent, yStartPercent, xEndPercent - xStartPercent, yEndPercent - yStartPercent);
+        result = new Rect(xStartPercent, yStartPercent, xEndPercent - xStartPercent, yEndPercent - yStartPercent);
+        return true;
     }
 }
