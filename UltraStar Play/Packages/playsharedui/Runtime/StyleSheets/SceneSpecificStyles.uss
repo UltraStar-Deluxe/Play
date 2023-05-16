@@ -164,6 +164,11 @@
     overflow: hidden;
 }
 
+#playerPitchIndicator {
+    width: 20px;
+    height: 20px;
+}
+
 .singSceneOverlayButton {
     background-color: rgba(0, 0, 0, 0.5);
 }
