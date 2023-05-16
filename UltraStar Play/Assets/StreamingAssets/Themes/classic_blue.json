@@ -41,5 +41,15 @@
         "gradientAnimAmplitude": 0.1,
         "particleFile": "particles/star.png",
         "particleOpacity": 0.2
+    },
+    "songRatingIcons": {
+        "toneDeaf": "icons/usdx/[score]rating_0.png",
+        "amateur": "icons/usdx/[score]rating_1.png",
+        "wannabe": "icons/usdx/[score]rating_2.png",
+        "hopeful": "icons/usdx/[score]rating_3.png",
+        "risingStar": "icons/usdx/[score]rating_4.png",
+        "leadSinger": "icons/usdx/[score]rating_5.png",
+        "superstar": "icons/usdx/[score]rating_6.png",
+        "ultrastar": "icons/usdx/[score]rating_7.png"
     }
 }
