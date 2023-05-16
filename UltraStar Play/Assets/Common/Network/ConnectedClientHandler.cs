@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using CircularBuffer;
 using UniRx;
 using UnityEngine;
 
@@ -28,6 +30,11 @@ public class ConnectedClientHandler : IConnectedClientHandler
     private StreamWriter tcpClientStreamWriter;
 
     private bool isDisposed;
+
+    private readonly CircularBuffer<long> delayValuesInMillis = new(10);
+    private readonly CircularBuffer<long> jitterValuesInMillis = new(10);
+    private long averageJitterInMillis;
+    public long JitterInMillis => averageJitterInMillis;
 
     public ConnectedClientHandler(
         IServerSideConnectRequestManager serverSideConnectRequestManager,
@@ -186,14 +193,35 @@ public class ConnectedClientHandler : IConnectedClientHandler
                 // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
                 return;
             case CompanionAppMessageType.BeatPitchEvents:
+                Debug.Log("ReceivedMessageFromClient - BeatPitchEventsDto: " + json);
                 BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
-                beatPitchEventsDto.BeatPitchEvents
-                    .ForEach(beatPitchEventDto => receivedMessageStream.OnNext(beatPitchEventDto));
+                
+                UpdateJitterStats(beatPitchEventsDto);
+                // Debug.Log($"Average jitter: {averageJitterInMillis} ms");
+                
+                receivedMessageStream.OnNext(beatPitchEventsDto);
                 return;
             default:
                 Debug.Log($"Unknown MessageType {messageType} in JSON from server: {json}");
                 return;
         }
+    }
+
+    private void UpdateJitterStats(CompanionAppMessageDto companionAppMessageDto)
+    {
+        long messageDtoUnixTimeInMillis = companionAppMessageDto.UnixTimeMilliseconds;
+        
+        long lastMessageDelay = !delayValuesInMillis.IsEmpty
+            ? delayValuesInMillis.LastOrDefault()
+            : 0;
+        long currentMessageDelayInMillis = TimeUtils.GetUnixTimeMilliseconds() - messageDtoUnixTimeInMillis;
+        delayValuesInMillis.PushBack(currentMessageDelayInMillis);
+        long currentMessageJitterInMillis = delayValuesInMillis.Count >= 2
+            ? Math.Abs(currentMessageDelayInMillis - lastMessageDelay)
+            : 0;
+
+        jitterValuesInMillis.PushBack(currentMessageJitterInMillis);
+        averageJitterInMillis = (long)jitterValuesInMillis.Average();
     }
 
     public void Dispose()

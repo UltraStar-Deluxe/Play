@@ -1,6 +1,10 @@
-﻿public class CompanionAppMessageDto : JsonSerializable
+﻿using System;
+
+public class CompanionAppMessageDto : JsonSerializable
 {
     public CompanionAppMessageType MessageType { get; set; }
+
+    public long UnixTimeMilliseconds { get; set; }  
 
     public CompanionAppMessageDto()
     {

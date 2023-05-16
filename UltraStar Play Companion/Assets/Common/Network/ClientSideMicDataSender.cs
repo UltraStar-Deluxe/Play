@@ -108,6 +108,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - settings.MicProfile.DelayInMillis;
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
         if (currentBeatConsideringMicDelay <= lastAnalyzedBeat
+            // Do not start analyzing beats too much before the first lyrics (typically at beat 0 when GAP is set correctly)
             || currentBeatConsideringMicDelay < -20)
         {
             return;
@@ -124,6 +125,8 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             PitchEvent pitchEvent = AnalyzeMicSamplesOfBeat(recordingEvent, beat, estimatedPositionInSongInMillis);
             int midiNote = pitchEvent?.MidiNote ?? -1;
             float frequency = pitchEvent?.Frequency ?? -1;
+            // int midiNote = MidiUtils.MidiNoteConcertPitch;
+            // float frequency = MidiUtils.MidiNoteConcertPitchFrequency;
             beatPitchEvents.Add(new BeatPitchEvent(midiNote, beat, frequency));
 
             loopCount++;
@@ -134,7 +137,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
             }
         }
 
-        // Send all events int one message
+        // Send all events in one message
         List<BeatPitchEventDto> beatPitchEventDtos = beatPitchEvents
             .Select(it => new BeatPitchEventDto(it.MidiNote, it.Beat, it.Frequency))
             .ToList();
@@ -142,7 +145,13 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         {
             Debug.LogWarning($"Sending {beatPitchEventDtos.Count} beats to server: {beatPitchEventDtos.Select(it => it.Beat).ToCsv(", ")}");
         }
-        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDtos));
+
+        BeatPitchEventsDto beatPitchEventsDto = new BeatPitchEventsDto(beatPitchEventDtos)
+        {
+            UnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds(),
+        };
+        Debug.Log("SendMessageToServer - BeatPitchEventsDto: " + beatPitchEventsDto.ToJson());
+        SendMessageToServer(beatPitchEventsDto);
 
         lastAnalyzedBeat = currentBeatConsideringMicDelay;
     }
@@ -159,7 +168,10 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         int midiNote = pitchEvent?.MidiNote ?? -1;
         float frequency = pitchEvent?.Frequency ?? -1;
         BeatPitchEventDto beatPitchEventDto = new(midiNote, -1, frequency);
-        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDto));
+        SendMessageToServer(new BeatPitchEventsDto(beatPitchEventDto)
+        {
+            UnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds(),
+        });
     }
 
     private void SendMessageToServer(JsonSerializable jsonSerializable)
