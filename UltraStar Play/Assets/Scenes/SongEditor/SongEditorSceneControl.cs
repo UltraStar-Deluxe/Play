@@ -147,7 +147,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         InitSongEditorStyleSheet();
         
-        songAudioPlayer.Init(SongMeta);
+        songAudioPlayer.Init(SongMeta, sceneData.PositionInSongInMillis);
 
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(positionInSongInMillis => OnAudioPlaybackStarted(positionInSongInMillis));

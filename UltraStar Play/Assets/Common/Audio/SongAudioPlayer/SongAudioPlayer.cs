@@ -225,6 +225,8 @@ public class SongAudioPlayer : MonoBehaviour
     private bool HasVideo => !VideoPlayer.url.IsNullOrEmpty();
 
     private bool isPaused;
+
+    private double initialPositionInMillis;
     
     private void Update()
     {
@@ -234,13 +236,15 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public void Init(SongMeta songMeta)
+    public void Init(SongMeta songMeta, double startPositionInMillis = 0)
     {
         if (!gameObject.activeInHierarchy)
         {
             return;
         }
 
+        this.initialPositionInMillis = startPositionInMillis;
+        
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
@@ -292,6 +296,7 @@ public class SongAudioPlayer : MonoBehaviour
         
         AudioPlayer.clip = audioClip;
         DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
+        PositionInSongInMillis = initialPositionInMillis;
         loadedEventStream.OnNext(true);
     }
     
@@ -307,6 +312,7 @@ public class SongAudioPlayer : MonoBehaviour
 
         AudioPlayer.clip = audioClip;
         DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
+        PositionInSongInMillis = initialPositionInMillis;
         loadedEventStream.OnNext(true);
     }
 
@@ -335,6 +341,7 @@ public class SongAudioPlayer : MonoBehaviour
             () => VideoPlayer.length > 0, () =>
             {
                 DurationOfSongInMillis = 1000.0 * VideoPlayer.length;
+                PositionInSongInMillis = initialPositionInMillis;
                 PauseAudio();
                 loadedEventStream.OnNext(true);
             }));
