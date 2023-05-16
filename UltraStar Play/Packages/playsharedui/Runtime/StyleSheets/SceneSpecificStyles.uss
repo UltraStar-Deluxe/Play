@@ -701,7 +701,15 @@
     margin-bottom: 16px;
 }
 
-#loadedOptionsRoot > TextField > .unity-base-text-field__label {
+#loadedOptionsRoot > TextField > .unity-base-field__label {
+    width: 300px;
+}
+
+#loadedOptionsRoot > IntegerField > .unity-base-field__label {
+    width: 300px;
+}
+
+#loadedOptionsRoot > ScrollView > IntegerField > .unity-base-field__label {
     width: 300px;
 }
 

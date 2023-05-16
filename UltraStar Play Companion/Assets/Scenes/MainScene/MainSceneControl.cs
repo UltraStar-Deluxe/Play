@@ -115,7 +115,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.devModePicker)]
     private ItemPicker devModePicker;
-
+    
+    [Inject(UxmlName = R.UxmlNames.targetFpsPicker)]
+    private ItemPicker targetFpsPicker;
+    
     [Inject]
     private TranslationManager translationManager;
 
@@ -287,6 +290,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         settings
             .ObserveEveryValueChanged(it => it.IsDevModeEnabled)
             .Subscribe(newValue => OnDevModeEnabledChanged(newValue));
+
+        // Target FPS
+        LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, new List<int> { -1, 5, 10, 15, 20, 30, 60, 90, 120 });
+        targetFpsPickerControl.GetLabelTextFunction = item => item > 0 ? $"{item}" : "Auto";
+        targetFpsPickerControl.Bind(
+            () => settings.TargetFps,
+            newValue => settings.TargetFps = newValue);
 
         // Network config
         networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();

@@ -352,6 +352,12 @@ public class SongAudioPlayer : MonoBehaviour
         Init(SongMeta);
     }
 
+    public void StopAudio()
+    {
+        VideoPlayer.Stop();
+        AudioPlayer.Stop();
+    }
+    
     public void PauseAudio()
     {
         if (!IsPlaying)

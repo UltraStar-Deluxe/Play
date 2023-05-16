@@ -14,7 +14,7 @@ public class Settings : ISettings
     public SystemLanguage Language { get; set; } = SystemLanguage.English;
     public MicProfile MicProfile { get; set; } = new MicProfile();
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
-    public int TargetFps { get; set; } = 30;
+    public int TargetFps { get; set; } = 60;
     public bool ShowAudioWaveForm { get; set; } = true;
     public float MousePadSensitivity { get; set; } = 1;
     public bool IsDevModeEnabled { get; set; }

@@ -1006,6 +1006,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         if (songAudioPlayer.IsPlaying)
         {
             Debug.LogWarning("Song already playing");
+            return;
         }
 
         songAudioPlayer.Init(SongMeta);

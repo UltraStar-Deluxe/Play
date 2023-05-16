@@ -49,6 +49,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
+    
+    [Inject(UxmlName = R.UxmlNames.messageBufferTimeTextField)]
+    private IntegerField messageBufferTimeTextField;
 
     [Inject]
     private ThemeManager themeManager;
@@ -148,6 +151,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         {
             openPersistentDataPathButton.HideByDisplay();
         }
+        
+        // Message delay
+        FieldBindingUtils.Bind(messageBufferTimeTextField,
+            () => settings.ConnectedClientMessageBufferTimeInMillis,
+            newValue => settings.ConnectedClientMessageBufferTimeInMillis = newValue);
         
         // Network config
         networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();

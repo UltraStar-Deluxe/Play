@@ -15,7 +15,7 @@ public class MicProfile
     public int Amplification { get; set; }
     public int NoiseSuppression { get; set; } = 5;
     public bool IsEnabled { get; set; } = true;
-    public int DelayInMillis { get; set; } = 300;
+    public int DelayInMillis { get; set; } = 200;
     public int SampleRate { get; set; }
 
     // A connected companion app can be used as a mic. This string identifies the client.

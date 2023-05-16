@@ -22,7 +22,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     private List<Note> upcomingNotes = new();
     private List<Sentence> upcomingSentences = new();
 
-    private int micDelayInMillis;
+    private int delayInMillis;
     private int displayedBeats;
 
     private int frameCount;
@@ -37,7 +37,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
         if (micProfile != null)
         {
-            micDelayInMillis = micProfile.DelayInMillis;
+            delayInMillis = micProfile.DelayInMillis + settings.ConnectedClientMessageBufferTimeInMillis;
             effectsContainer.Add(CreateRecordingPositionIndicator());
         }
 
@@ -95,7 +95,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     {
         // The VerticalPitchIndicator's position is the position where recording happens.
         // Thus, a note with startBeat == (currentBeat + micDelayInBeats) will have its left side drawn where the VerticalPitchIndicator is.
-        double millisInSong = songAudioPlayer.PositionInSongInMillis - micDelayInMillis;
+        double millisInSong = songAudioPlayer.PositionInSongInMillis - delayInMillis;
         double currentBeatConsideringMicDelay = BpmUtils.MillisecondInSongToBeat(songMeta, millisInSong);
 
         Vector2 yStartEndPercent = GetYStartAndEndInPercentForMidiNote(midiNote);

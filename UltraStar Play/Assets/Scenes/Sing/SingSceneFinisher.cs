@@ -21,6 +21,12 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
 
     [Inject]
     private SingSceneControl singSceneControl;
+    
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+    
+    [Inject]
+    private SongVideoPlayer songVideoPlayer;
 
     [Inject]
     private SongMeta songMeta;
@@ -28,13 +34,13 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
     [Inject]
     private SingSceneData sceneData;
 
-    private double positionInSongInMillisOld;
+    private double positionInSongInMillisMax;
 
     private bool hasFinishedScene;
 
     private void Update()
     {
-        double durationOfSongInMillis = singSceneControl.DurationOfSongInMillis;
+        double durationOfSongInMillis = songAudioPlayer.DurationOfSongInMillis;
         if (durationOfSongInMillis <= 0)
         {
             return;
@@ -49,33 +55,47 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
                 hasFinishedScene = true;
                 singSceneControl.FinishScene(!isEarlyFinish, true);
             }
+
+            if (hasBeenNearEndOfSong
+                && positionInSongInMillisMax > songAudioPlayer.PositionInSongInMillis)
+            {
+                // Do not go back to old time value.
+                songAudioPlayer.PositionInSongInMillis = positionInSongInMillisMax - 1;
+            }
         }
         else
         {
-            double positionInSongInMillis = singSceneControl.PositionInSongInMillis;
+            double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
 
             // Normal detection of song finished.
             // This only works when the position is not reset to zero when the AudioClip finishes.
-            if (Math.Abs(durationOfSongInMillis - positionInSongInMillis) <= 1)
+            // 16 ms is roughly 1 frame at 60 FPS
+            if (Math.Abs(durationOfSongInMillis - positionInSongInMillis) <= 16)
             {
                 IsSongFinished = true;
+                songVideoPlayer.FreezeVideo = true;
             }
 
             // Detect end of the song by looking for a falling flank in the playback position.
             if (hasBeenNearEndOfSong)
             {
-                // The position is back to the start.
-                if (positionInSongInMillis < 1000 && positionInSongInMillis < positionInSongInMillisOld)
+                // The position is back to a previous value.
+                if (positionInSongInMillis < positionInSongInMillisMax)
                 {
                     IsSongFinished = true;
+                    songVideoPlayer.FreezeVideo = true;
+                    songAudioPlayer.StopAudio();
                 }
-                positionInSongInMillisOld = positionInSongInMillis;
+                else
+                {
+                    positionInSongInMillisMax = positionInSongInMillis;
+                }
             }
             else
             {
                 // The position is near the end of the song.
                 double missingMillis = durationOfSongInMillis - positionInSongInMillis;
-                if (missingMillis < 1000)
+                if (missingMillis < 500)
                 {
                     hasBeenNearEndOfSong = true;
                 }
