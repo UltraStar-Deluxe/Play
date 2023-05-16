@@ -80,7 +80,12 @@ public class PlayerNoteRecorder : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void ContinueLastRecordedNote(int analyzedBeat, int targetNoteEndBeat)
     {
-        lastRecordedNote.EndBeat = analyzedBeat + 1;
+        int newEndBeat = analyzedBeat + 1;
+        if (lastRecordedNote.EndBeat < newEndBeat)
+        {
+            lastRecordedNote.EndBeat = newEndBeat;
+        }
+        
         if (targetNoteEndBeat >= 0
             && lastRecordedNote.EndBeat > targetNoteEndBeat)
         {
