@@ -487,10 +487,19 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             {
                 if (dto is BeatPitchEventDto beatPitchEventDto)
                 {
-                    connectedClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency));
+                    FireBeatPitchEvent(beatPitchEventDto);
+                }
+                else if (dto is BeatPitchEventsDto beatPitchEventsDto)
+                {
+                    beatPitchEventsDto.BeatPitchEvents.ForEach(beatPitchEventDto => FireBeatPitchEvent(beatPitchEventDto));
                 }
             })
             .AddTo(gameObject);
+    }
+
+    private void FireBeatPitchEvent(BeatPitchEventDto beatPitchEventDto)
+    {
+        connectedClientBeatPitchEventStream.OnNext(new BeatPitchEvent(beatPitchEventDto.MidiNote, beatPitchEventDto.Beat, beatPitchEventDto.Frequency));
     }
 
     public List<IBinding> GetBindings()

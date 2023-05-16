@@ -102,6 +102,7 @@ public class Settings : ISettings
     public int UdpPortOnClient { get; set; } = 34568;
     public string OwnHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
+    public int ConnectedClientMessageBufferTimeInMillis { get; set; }= 300;
     
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
