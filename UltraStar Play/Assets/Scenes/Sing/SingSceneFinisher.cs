@@ -46,8 +46,6 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
             return;
         }
 
-        Debug.Log("pos: " + songAudioPlayer.PositionInSongInMillis);
-        
         if (IsSongFinished)
         {
             durationAfterSongFinishedInSeconds += Time.deltaTime;

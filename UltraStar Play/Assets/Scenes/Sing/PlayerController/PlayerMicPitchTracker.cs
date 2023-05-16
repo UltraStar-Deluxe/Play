@@ -85,7 +85,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
         if (micProfile == null)
         {
-            Debug.LogWarning($"No mic for player {playerProfile.Name}. Not recording player notes.");
+            Log.Logger.Warning($"No mic for player {playerProfile.Name}. Not recording player notes.");
             gameObject.SetActive(false);
             return;
         }
@@ -138,7 +138,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     {
         if (GetConnectedClientHandler() == null)
         {
-            Debug.LogWarning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
+            Log.Logger.Warning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
             gameObject.SetActive(false);
             return;
         }
@@ -256,7 +256,6 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private void DequeuePitchEventsFromConnectedClient(long messageBufferTimeInMillis, int eventBufferTimeInBeats)
     {
-        Debug.Log($"DequeuePitchEventsFromConnectedClient: {messageBufferTimeInMillis} {eventBufferTimeInBeats}");
         int positionInSongInMillisConsideringMicDelay = (int)(songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis);
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillisConsideringMicDelay);
         long unixTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
@@ -268,18 +267,18 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             // Handle the event when this was for an old message
             long messageAgeInMillis = Math.Abs(unixTimeInMillis - beatPitchEventAndTime.unixTimeInMillis);
             bool handleBecauseOfMessageBufferTime = messageAgeInMillis > messageBufferTimeInMillis;
-            if (handleBecauseOfMessageBufferTime)
-            {
-                Debug.Log($"Handling old message with age {messageAgeInMillis} ms" + JsonConverter.ToJson(beatPitchEvent));
-            }
+            // if (handleBecauseOfMessageBufferTime)
+            // {
+            //     Log.Logger.Information($"Handling old message with age {messageAgeInMillis} ms" + JsonConverter.ToJson(beatPitchEvent));
+            // }
             
             int eventAgeInBeats = Math.Abs(currentBeatConsideringMicDelay - beatPitchEventAndTime.beatPitchEvent.Beat);
             bool handleBecauseOfEventBufferTime = eventAgeInBeats > eventBufferTimeInBeats;
-            if (!handleBecauseOfMessageBufferTime 
-                && handleBecauseOfEventBufferTime)
-            {
-                Debug.Log($"Handling old event with age {eventAgeInBeats} beats: " + JsonConverter.ToJson(beatPitchEvent));
-            }
+            // if (!handleBecauseOfMessageBufferTime 
+            //     && handleBecauseOfEventBufferTime)
+            // {
+            //     Log.Logger.Information(($"Handling old event with age {eventAgeInBeats} beats: " + JsonConverter.ToJson(beatPitchEvent));
+            // }
             
             if (handleBecauseOfMessageBufferTime
                 || handleBecauseOfEventBufferTime)
@@ -294,7 +293,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             }
         }
         
-        Debug.Log("DequeuePitchEventsFromConnectedClient: Remaining events: " + beatPitchEventsFromConnectedClientQueue.Count);
+        // Log.Logger.Information("DequeuePitchEventsFromConnectedClient: Remaining events: " + beatPitchEventsFromConnectedClientQueue.Count);
     }
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
@@ -334,7 +333,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
         {
             // Looks like the companion app does not know the current position in the song. Send it this info again.
-            Debug.LogWarning($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
+            Log.Logger.Warning($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
             if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + (SendPositionInSongIntervalInMillis / 10) < TimeUtils.GetUnixTimeMilliseconds())
             {
                 SendPositionInSongToClient();
@@ -345,7 +344,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, songAudioPlayer.PositionInSongInMillis);
         if (pitchEvent.Beat > currentBeat)
         {
-            Debug.LogWarning($"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
+            Log.Logger.Warning($"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
             return;
         }
 
@@ -394,7 +393,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             SongGap = songMeta.Gap,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
         };
-        Debug.Log($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
+        Log.Logger.Information($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
         connectedClientHandler.SendMessageToClient(positionInSongDto);
     }
 
