@@ -193,7 +193,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
                 // Nothing to do. If the connection would not be still alive anymore, then this message would have failed already.
                 return;
             case CompanionAppMessageType.BeatPitchEvents:
-                Debug.Log("ReceivedMessageFromClient - BeatPitchEventsDto: " + json);
+                // Debug.Log("ReceivedMessageFromClient - BeatPitchEventsDto: " + json);
                 BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
                 
                 UpdateJitterStats(beatPitchEventsDto);

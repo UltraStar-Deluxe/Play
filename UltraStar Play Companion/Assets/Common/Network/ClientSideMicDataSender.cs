@@ -150,7 +150,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         {
             UnixTimeMilliseconds = TimeUtils.GetUnixTimeMilliseconds(),
         };
-        Debug.Log("SendMessageToServer - BeatPitchEventsDto: " + beatPitchEventsDto.ToJson());
+
         SendMessageToServer(beatPitchEventsDto);
 
         lastAnalyzedBeat = currentBeatConsideringMicDelay;
@@ -176,6 +176,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 
     private void SendMessageToServer(JsonSerializable jsonSerializable)
     {
+        // Debug.Log("SendMessageToServer - " + jsonSerializable.ToJson());
         if (clientSideConnectRequestManager.TryGetConnectedServerHandler(out IConnectedServerHandler connectedServerHandler))
         {
             connectedServerHandler.SendMessageToServer(jsonSerializable);
