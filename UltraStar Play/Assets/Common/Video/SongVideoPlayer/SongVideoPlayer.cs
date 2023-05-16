@@ -77,6 +77,17 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public string videoPlayerErrorMessage;
 
+    private bool freezeVideo;
+    public bool FreezeVideo
+    {
+        get => FreezeVideo;
+        set
+        {
+            FreezeVideo = value;
+            SyncVideoWithMusic(false);
+        }
+    }
+    
     public void OnInjectionFinished()
     {
         HasLoadedBackgroundImage = false;
@@ -259,19 +270,26 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         double timeDifferenceInSeconds = targetPositionInVideoInSeconds - videoPlayer.time;
 
-        // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
-        // A big mismatch is corrected immediately.
-        if (forceImmediateSync || Math.Abs(timeDifferenceInSeconds) > 3)
+        if (freezeVideo)
         {
-            // Correct the mismatch immediately.
-            videoPlayer.time = targetPositionInVideoInSeconds;
-            videoPlayer.playbackSpeed = 1f;
+            videoPlayer.playbackSpeed = 0;
         }
         else
         {
-            // Smooth out the time difference over a duration of 2 seconds
-            float playbackSpeed = 1 + (float)(timeDifferenceInSeconds / 2.0);
-            videoPlayer.playbackSpeed = playbackSpeed;
+            // A short mismatch in video and song position is smoothed out by adjusting the playback speed of the video.
+            // A big mismatch is corrected immediately.
+            if (forceImmediateSync || Math.Abs(timeDifferenceInSeconds) > 3)
+            {
+                // Correct the mismatch immediately.
+                videoPlayer.time = targetPositionInVideoInSeconds;
+                videoPlayer.playbackSpeed = 1f;
+            }
+            else
+            {
+                // Smooth out the time difference over a duration of 2 seconds
+                float playbackSpeed = 1 + (float)(timeDifferenceInSeconds / 2.0);
+                videoPlayer.playbackSpeed = playbackSpeed;
+            }
         }
     }
 
