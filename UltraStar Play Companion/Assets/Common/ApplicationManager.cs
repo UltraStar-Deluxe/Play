@@ -44,11 +44,17 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     {
         UpdateTargetFps();
         settings.ObserveEveryValueChanged(it => it.TargetFps)
-            .Subscribe(_ => UpdateTargetFps());
+            .Subscribe(_ => UpdateTargetFps())
+            .AddTo(gameObject);
     }
 
     private void UpdateTargetFps()
     {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+        
         targetFrameRate = settings.TargetFps;
         if (targetFrameRate > 0)
         {
