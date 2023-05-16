@@ -83,7 +83,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         get => FreezeVideo;
         set
         {
-            FreezeVideo = value;
+            freezeVideo = value;
             SyncVideoWithMusic(false);
         }
     }
