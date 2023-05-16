@@ -16,7 +16,7 @@ using IBinding = UniInject.IBinding;
 public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITranslator, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
-    private static readonly List<int> noiseSuppressionItems= new() { 0, 5, 10, 15, 20, 25, 30 };
+    private static readonly List<int> noiseSuppressionItems= new() { 0, 1, 3, 5, 10, 15, 20, 25, 30 };
 
     [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
     private RecordingOptionsMicVisualizer micVisualizer;
