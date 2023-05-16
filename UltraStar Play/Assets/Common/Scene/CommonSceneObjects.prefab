@@ -1379,6 +1379,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -7523,7 +7524,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d973b629cee9ea644a4ec87bd50e2aaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSoundfontAsset: {fileID: 4900000, guid: 690449332ab7ce94898435bd09ec8fb5,
+  defaultSoundfontAsset: {fileID: 4900000, guid: 5facb210d318fed4c96878b4c2eba06d,
     type: 3}
 --- !u!82 &8801158838415278696
 AudioSource:
