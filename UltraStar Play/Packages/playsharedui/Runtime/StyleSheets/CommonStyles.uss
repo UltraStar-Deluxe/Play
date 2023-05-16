@@ -4,7 +4,7 @@ VisualElement
 }
 
 #logo {
-    background-image: url("project://database/Packages/playshared/Runtime/Graphics/Logos/LogoLarge-512.png");
+    background-image: url("project://database/Packages/playshared/Runtime/Graphics/Logos/LogoLarge.png");
     -unity-background-scale-mode: scale-to-fit;
 }
 
