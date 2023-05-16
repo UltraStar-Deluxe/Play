@@ -183,7 +183,7 @@ public class RadialProgressBar : VisualElement
         Painter2D painter = mgc.painter2D;
         float radius = (contentRect.width / 2) - (StrokeWidth / 2);
         float startAngle = -90;
-        float endAngle = startAngle + (360 * ProgressInPercent / 100);
+        float endAngle = startAngle + (359.9999f * ProgressInPercent / 100);
         Vector2 center = contentRect.center;
         
         // Draw Track
