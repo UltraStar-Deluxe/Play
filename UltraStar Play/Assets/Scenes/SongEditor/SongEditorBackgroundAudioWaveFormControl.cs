@@ -31,6 +31,9 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
     [Inject]
     private Settings settings;
     
+    [Inject]
+    private GameObject gameObject;
+    
     private int lastNoteAreaMin;
     private int lastNoteAreaWidth;
     private bool isDirty;
@@ -42,17 +45,19 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
 
     public void OnInjectionFinished()
     {
-        noteAreaControl.ViewportEventStream.Subscribe(evt =>
-        {
-            if (evt.X != lastNoteAreaMin
-                || evt.Width != lastNoteAreaWidth)
+        noteAreaControl.ViewportEventStream
+            .Subscribe(evt =>
             {
-                TargetElement.HideByVisibility();
-                lastNoteAreaMin = evt.X;
-                lastNoteAreaWidth = evt.Width;
-                isDirty = true;
-            }
-        });
+                if (evt.X != lastNoteAreaMin
+                    || evt.Width != lastNoteAreaWidth)
+                {
+                    TargetElement.HideByVisibility();
+                    lastNoteAreaMin = evt.X;
+                    lastNoteAreaWidth = evt.Width;
+                    isDirty = true;
+                }
+            })
+            .AddTo(gameObject);
         
         // Update audio wave form when note area was stable for some time.
         noteAreaControl.ViewportEventStream
@@ -64,14 +69,18 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
                 {
                     UpdateAudioWaveForm();
                 }
-            });
+            })
+            .AddTo(gameObject);
         
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
-            .Subscribe(_ => UpdateAudioWaveForm());
+            .Subscribe(_ => UpdateAudioWaveForm())
+            .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowAudioWaveformInBackground)
-            .Subscribe(_ => UpdateAudioWaveForm());
+            .Subscribe(_ => UpdateAudioWaveForm())
+            .AddTo(gameObject);
         songAudioPlayer.LoadedEventStream
-            .Subscribe(_ => UpdateAudioWaveForm());
+            .Subscribe(_ => UpdateAudioWaveForm())
+            .AddTo(gameObject);
         TargetElement.RegisterCallbackOneShot<GeometryChangedEvent>(
             _ => UpdateAudioWaveForm());
     }
