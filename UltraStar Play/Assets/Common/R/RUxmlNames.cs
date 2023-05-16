@@ -341,6 +341,7 @@ public static partial class R
         public const string main = "main";
         public const string menuOverlayInputLegend = "menuOverlayInputLegend";
         public const string menuScrollView = "menuScrollView";
+        public const string messageBufferTimeTextField = "messageBufferTimeTextField";
         public const string micButton = "micButton";
         public const string micCheckIcon = "micCheckIcon";
         public const string micDelayTextField = "micDelayTextField";

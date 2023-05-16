@@ -145,6 +145,7 @@ public static partial class R
         public const string spacer = "spacer";
         public const string tabContentContainer = "tabContentContainer";
         public const string tabGroup = "tabGroup";
+        public const string targetFpsPicker = "targetFpsPicker";
         public const string teamLabel = "teamLabel";
         public const string titleAndDescription = "titleAndDescription";
         public const string titleContainer = "titleContainer";

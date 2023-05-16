@@ -618,25 +618,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1084258561087617631, guid: 0f35eb07433348d4abddb4095d2d1e17,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3706478735755504748, guid: 0f35eb07433348d4abddb4095d2d1e17,
         type: 3}
       propertyPath: m_Name
       value: SingSceneControlsContainer
-      objectReference: {fileID: 0}
-    - target: {fileID: 5672860147961129897, guid: 0f35eb07433348d4abddb4095d2d1e17,
-        type: 3}
-      propertyPath: maxOffset
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5672860147961129897, guid: 0f35eb07433348d4abddb4095d2d1e17,
-        type: 3}
-      propertyPath: minOffset
-      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 7508707485095029509, guid: 0f35eb07433348d4abddb4095d2d1e17,
         type: 3}
