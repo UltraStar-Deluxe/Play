@@ -31,8 +31,6 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
     {
         base.OnInjectionFinished();
         AddButton(TranslationManager.GetTranslation("cancel"), _ => CloseDialog());
-
-        // Use mic sample recorders in scene to select mic by singing
     }
 
     private void UpdateMicProfileList()
