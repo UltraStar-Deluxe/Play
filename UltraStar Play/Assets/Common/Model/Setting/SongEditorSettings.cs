@@ -33,7 +33,7 @@ public class SongEditorSettings
     public bool ShowAudioWaveformInBackground { get; set; } = true;
     public bool ShowVideoArea { get; set; } = true;
     public bool ShowStatusBar { get; set; } = true;
-    public bool ShowVirtualPianoArea { get; set; } = true;
+    public bool ShowVirtualPianoArea { get; set; }
     public bool SmallLeftSideBar { get; set; }
     public bool ShowControlHints { get; set; } = true;
     public bool ShowNotePitchLabel { get; set; } = true;
