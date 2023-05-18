@@ -1,7 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using SFB;
 using UniInject;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -98,6 +95,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         dragControl = injector
             .WithRootVisualElement(videoImage)
             .CreateAndInject<GeneralDragControl>();
+        dragControl.EnableEndlessDrag = true;
         dragControl.AddListener(this);
 
         videoImage.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
