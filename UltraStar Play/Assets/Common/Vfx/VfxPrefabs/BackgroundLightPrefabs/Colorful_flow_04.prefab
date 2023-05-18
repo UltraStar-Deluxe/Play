@@ -10430,7 +10430,7 @@ ParticleSystem:
     m_TextureAlphaAffectsParticles: 1
     m_TextureBilinearFiltering: 0
     randomDirectionAmount: 0
-    sphericalDirectionAmount: 0
+    sphericalDirectionAmount: 0.42
     randomPositionAmount: 0
     radius:
       value: 5
@@ -12367,7 +12367,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
   NoiseModule:
-    enabled: 1
+    enabled: 0
     strength:
       serializedVersion: 2
       minMaxState: 0
@@ -20112,7 +20112,7 @@ ParticleSystem:
     m_TextureAlphaAffectsParticles: 1
     m_TextureBilinearFiltering: 0
     randomDirectionAmount: 0
-    sphericalDirectionAmount: 0
+    sphericalDirectionAmount: 0.24
     randomPositionAmount: 0
     radius:
       value: 5
@@ -22049,7 +22049,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
   NoiseModule:
-    enabled: 1
+    enabled: 0
     strength:
       serializedVersion: 2
       minMaxState: 0
