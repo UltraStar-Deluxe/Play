@@ -37,7 +37,7 @@ public class AbstractAudioClipAction : INeedInjection
         {
             if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
             {
-                UiManager.CreateNotification("No vocals audio found. Separate the audio first.");
+                UiManager.CreateNotification("No vocals audio found. Split the audio first.");
                 return null;
             }
             return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
@@ -46,7 +46,7 @@ public class AbstractAudioClipAction : INeedInjection
         {
             if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.InstrumentalAudio)))
             {
-                UiManager.CreateNotification("No instrumental audio found. Separate the audio first.");
+                UiManager.CreateNotification("No instrumental audio found. Split the audio first.");
                 return null;
             }
             return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
