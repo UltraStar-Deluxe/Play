@@ -17,4 +17,13 @@ public class DragControlPointerEvent
         PointerId = evt.pointerId;
         Button = evt.button;
     }
+    
+    public DragControlPointerEvent(IPointerEvent evt, Vector3 offset)
+    {
+        Position = evt.position + offset;
+        LocalPosition = evt.localPosition + offset;
+        DeltaPosition = evt.deltaPosition;
+        PointerId = evt.pointerId;
+        Button = evt.button;
+    }
 }
