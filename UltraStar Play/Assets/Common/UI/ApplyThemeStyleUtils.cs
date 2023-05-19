@@ -307,7 +307,15 @@ public static class ApplyThemeStyleUtils
             if (visualElement is Button)
             {
                 visualElement.Query<Label>()
-                    .ForEach(label => label.style.color = new StyleColor(fontColor));
+                    .ForEach(label =>
+                    {
+                        if (IsIgnoredVisualElement(label))
+                        {
+                            return;
+                        }
+                        
+                        label.style.color = new StyleColor(fontColor);
+                    });
             }
             visualElement.style.color = new StyleColor(fontColor);
         }
@@ -315,7 +323,8 @@ public static class ApplyThemeStyleUtils
         if (visualElement.childCount == 0)
         {
             // Set textShadow directly on element
-            if (!visualElement.ClassListContains("noTextShadow"))
+            if (!visualElement.ClassListContains("noTextShadow")
+                || IsIgnoredVisualElement(visualElement))
             {
                 ApplyTextShadow(visualElement, textShadowConfig);
             }
@@ -326,7 +335,8 @@ public static class ApplyThemeStyleUtils
             visualElement.Query<Label>()
                 .ForEach(label =>
                 {
-                    if (label.ClassListContains("noTextShadow"))
+                    if (label.ClassListContains("noTextShadow")
+                        || IsIgnoredVisualElement(label))
                     {
                         return;
                     }
@@ -453,6 +463,11 @@ public static class ApplyThemeStyleUtils
 
     private static void UpdateStyles(VisualElementData data)
     {
+        if (IsIgnoredVisualElement(data.visualElement))
+        {
+            return;
+        }
+        
         bool shouldApplyHoverStyle = data.isPointerOver;
         bool shouldApplyFocusStyle = data.hasFocus;
         bool shouldApplyActiveStyle = data.isActive;
