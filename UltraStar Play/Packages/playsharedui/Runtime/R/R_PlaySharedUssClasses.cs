@@ -86,7 +86,6 @@ public static partial class R_PlayShared
         public const string largeFont = "largeFont";
         public const string largerFont = "largerFont";
         public const string lastChild = "lastChild";
-        public const string lightButton = "lightButton";
         public const string lyricsContainer = "lyricsContainer";
         public const string marginBottomSmall = "marginBottomSmall";
         public const string marginBottomSmaller = "marginBottomSmaller";
