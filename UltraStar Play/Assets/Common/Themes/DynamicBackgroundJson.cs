@@ -30,6 +30,11 @@ public class DynamicBackgroundJson
     public float videoPlaybackSpeed;
     
     /**
+     * Image for static base background.
+     */
+    public string imagePath;
+    
+    /**
      * Video for additive light.
      */
     public string lightVideoPath;

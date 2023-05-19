@@ -54,12 +54,12 @@ public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjectio
         material.SetTexture(_TransitionTex, transitionTexture);
     }
 
-    public void SetLightTexture(RenderTexture renderTexture)
+    public void SetLightTexture(Texture renderTexture)
     {
         material.SetTexture(_AdditiveLightTex, renderTexture);
     }
 
-    public void SetBaseTexture(RenderTexture renderTexture)
+    public void SetBaseTexture(Texture renderTexture)
     {
         material.SetTexture(_BaseTex, renderTexture);
     }
