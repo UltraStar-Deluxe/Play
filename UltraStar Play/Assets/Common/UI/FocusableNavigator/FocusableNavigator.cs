@@ -513,7 +513,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         CustomNavigationTarget customNavigationTarget = customNavigationTargets.FirstOrDefault(customNavigationTarget =>
             customNavigationTarget.Matches(focusedVisualElement, navigationDirection));
-        if (customNavigationTarget != null)
+        if (customNavigationTarget != null
+            && IsFocusableNow(customNavigationTarget.TargetVisualElement))
         {
             DoFocusVisualElement(customNavigationTarget.TargetVisualElement,
                     $"Moving focus to VisualElement from custom navigation target (start: {customNavigationTarget.StartVisualElement.name}, direction: {navigationDirection}, target: {customNavigationTarget.TargetVisualElement.name}");
