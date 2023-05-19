@@ -847,15 +847,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 themeMeta.ThemeJson.transparentButton,
                 themeMeta.ThemeJson.defaultControl);
         }
-        
-        if (visualElement.ClassListContains("lightButton"))
-        {
-            return ObjectUtils.FirstNonDefault(
-                themeMeta.ThemeJson.lightButton,
-                themeMeta.ThemeJson.textOnlyButton,
-                themeMeta.ThemeJson.transparentButton,
-                themeMeta.ThemeJson.defaultControl);
-        }
 
         if (visualElement.ClassListContains("dangerButton"))
         {

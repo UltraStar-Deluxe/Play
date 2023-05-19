@@ -25,20 +25,6 @@
         "activeFontColor": "#344054"
     },
 
-    "lightButton": {
-        "name": "vinyl-lightButton",
-        "backgroundColor": "#F9FAFB",
-        "hoverBackgroundColor": "#344054",
-        "focusBackgroundColor": "#344054",
-        "activeBackgroundColor": "#404040dd",
-        "borderColor": "#00000100",
-
-        "fontColor": "#344054",
-        "hoverFontColor": "#F9FAFB",
-        "focusFontColor": "#F9FAFB",
-        "activeFontColor": "#F9FAFB"
-    },
-
     "dynamicPanel": {
         "backgroundColor": "#00000100",
         "focusBackgroundColor": "#1D2939",
