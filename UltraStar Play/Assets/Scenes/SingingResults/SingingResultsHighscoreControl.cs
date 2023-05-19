@@ -97,6 +97,8 @@ public class SingingResultsHighscoreControl : INeedInjection
         {
             CreateHighscoreEntry(topSongStatistics[i], i);
         }
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(highscoreEntryList);
     }
 
     private void CreateHighscoreEntry(SongStatistic songStatistic, int index)
