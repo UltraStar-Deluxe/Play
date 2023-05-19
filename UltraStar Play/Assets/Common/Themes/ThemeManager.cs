@@ -1006,7 +1006,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     
     private void DisableDynamicBackground()
     {
-        backgroundShaderControl.DisableShader();
+        backgroundVideoPlayer.Stop();
+        backgroundLightVideoPlayer.Stop();
         backgroundParticleSystem.gameObject.SetActive(false);
     }
 

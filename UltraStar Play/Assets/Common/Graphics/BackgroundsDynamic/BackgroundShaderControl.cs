@@ -104,10 +104,4 @@ public class BackgroundShaderControl : AbstractSingletonBehaviour, INeedInjectio
     {
         material.SetFloat(_TransitionTime, time);
     }
-
-    public void DisableShader()
-    {
-        material.SetFloat("_EnableGradientAnimation", 0);
-        material.SetFloat("_UI_SHADOW", 0);
-    }
 }
