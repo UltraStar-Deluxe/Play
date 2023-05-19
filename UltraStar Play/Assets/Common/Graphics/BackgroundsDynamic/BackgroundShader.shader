@@ -7,7 +7,7 @@ Shader "UltraStar Play/Background Shader"
         [NoScaleOffset][HideInInspector] _AdditiveLightTex ("Additive Light Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _ParticleTex ("Particle Texture", 2D) = "white" {}
         [NoScaleOffset][HideInInspector] _TransitionTex ("Transition Texture", 2D) = "white" {}
-        [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "gray" {}
+        [NoScaleOffset] _ColorRampTex ("Gradient Ramp", 2D) = "black" {}
         _ColorRampScrolling ("Gradient Scrolling", Float) = 0
         [Space]
         [Header(Pattern)]
