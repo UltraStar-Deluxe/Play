@@ -8,6 +8,13 @@ using UnityEngine.UIElements;
 
 public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        micSelectionDialogControl = null;
+    }
+    private static MicSelectionDialogControl micSelectionDialogControl;
+    
     [Inject(Key = nameof(micPitchTrackerPrefab))]
     private MicPitchTracker micPitchTrackerPrefab;
     
@@ -110,8 +117,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     public ReactiveProperty<bool> IsSelected {get; private set; } = new(false);
 
     private Dictionary<string, string> voiceNames;
-
-    private MicSelectionDialogControl micSelectionDialogControl;
+    
     private readonly PlayerProfileImageControl playerProfileImageControl = new();
     
     private readonly Subject<MicSelectionDialogControl.MicProfileChangedEvent> micProfileChangedEventStream = new();
