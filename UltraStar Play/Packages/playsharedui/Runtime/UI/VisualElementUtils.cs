@@ -76,6 +76,11 @@ public static class VisualElementUtils
 
     public static VisualElement GetFocusedVisualElement(FocusController focusController)
     {
+        if (focusController == null)
+        {
+            return null;
+        }
+        
         VisualElement focusedVisualElement = focusController.focusedElement as VisualElement;
         return focusedVisualElement;
     }
