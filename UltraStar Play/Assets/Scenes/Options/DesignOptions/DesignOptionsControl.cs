@@ -65,7 +65,7 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             newValue => settings.SongBackgroundScaleMode = newValue);
         songBackgroundScaleModePickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
 
-        LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.55f, 0.05f));
+        LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.9f, 0.05f));
         sceneChangeDurationPickerControl.Bind(() => settings.SceneChangeDurationInSeconds,
                 newValue => settings.SceneChangeDurationInSeconds = newValue);
         sceneChangeDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
