@@ -4,7 +4,6 @@
 #togglePlayerSelectedButton {
     width: 120%;
     height: 120%;
-    background-color: red;
 }
 
 #songListView .unity-scroller--horizontal {
