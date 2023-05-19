@@ -170,9 +170,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.AddTabGroupButton(showTeamResultsButton, teamResultsUi);
         
-        InitClickThoughToBackground();
-        background.RegisterCallback<PointerUpEvent>(evt => Continue());
-        
         continueButton.RegisterCallbackButtonTriggered(_ => Continue());
         continueButton.Focus();
         
