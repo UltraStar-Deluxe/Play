@@ -39,12 +39,16 @@ public class OverviewAreaControl : IInjectionFinishedListener
     [Inject]
     private Settings settings;
     
+    [Inject]
+    private GameObject gameObject;
+    
     private OverviewAreaPositionInSongIndicatorControl positionInSongIndicatorControl;
     private OverviewAreaViewportIndicatorControl viewportIndicatorControl;
     private OverviewAreaNoteVisualizer noteVisualizer;
     private OverviewAreaIssueVisualizer issueVisualizer;
 
     private AudioWaveFormVisualization audioWaveFormVisualization;
+    private ContextMenuControl contextMenuControl;
 
     public void OnInjectionFinished()
     {
@@ -65,10 +69,13 @@ public class OverviewAreaControl : IInjectionFinishedListener
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<OverviewAreaIssueVisualizer>();
 
-        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource).Subscribe(_ =>
-        {
-            UpdateAudioWaveForm();
-        });
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
+            .Subscribe(_ => UpdateAudioWaveForm())
+            .AddTo(gameObject);
+        
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AudioWaveformSamplesSource)
+            .Subscribe(_ => UpdateAudioWaveForm())
+            .AddTo(gameObject);
         
         songAudioPlayer.LoadedEventStream.Subscribe(_ =>
         {
@@ -79,6 +86,23 @@ public class OverviewAreaControl : IInjectionFinishedListener
         {
             UpdateAudioWaveForm();
         });
+        
+        contextMenuControl = injector
+            .WithRootVisualElement(overviewArea)
+            .CreateAndInject<ContextMenuControl>();
+        contextMenuControl.FillContextMenuAction = FillContextMenu;
+    }
+
+    private void FillContextMenu(ContextMenuPopupControl popupControl)
+    {
+        popupControl.AddButton("Show original music",
+            () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.OriginalMusic);
+        popupControl.AddButton("Show vocals audio",
+            () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.Vocals);
+        popupControl.AddButton("Show instrumental audio",
+            () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.Instrumental);
+        popupControl.AddButton("Show playback audio (default)",
+            () => settings.SongEditorSettings.AudioWaveformSamplesSource = ESongEditorAudioWaveformSamplesSource.SameAsPlayback);
     }
 
     public void UpdateAudioWaveForm()

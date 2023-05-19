@@ -75,6 +75,9 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
             .Subscribe(_ => UpdateAudioWaveForm())
             .AddTo(gameObject);
+        settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AudioWaveformSamplesSource)
+            .Subscribe(_ => UpdateAudioWaveForm())
+            .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.ShowAudioWaveformInBackground)
             .Subscribe(_ => UpdateAudioWaveForm())
             .AddTo(gameObject);
