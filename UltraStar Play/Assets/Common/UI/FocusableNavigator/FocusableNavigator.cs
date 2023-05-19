@@ -685,10 +685,16 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     protected bool IsFocusableNow(VisualElement visualElement)
     {
-        return visualElement != null
-               && visualElement.IsVisibleByDisplay()
-               && !float.IsNaN(visualElement.worldBound.center.x)
-               && !float.IsNaN(visualElement.worldBound.center.y)
+        if (visualElement == null)
+        {
+            return false;
+        }
+        Rect worldBound = visualElement.worldBound;
+        return visualElement.IsVisibleByDisplay()
+               && !float.IsNaN(worldBound.center.x)
+               && !float.IsNaN(worldBound.center.y)
+               && worldBound.height > 0
+               && worldBound.width > 0
                && visualElement is not Focusable { focusable: false }
                && visualElement.enabledInHierarchy
                && visualElement.canGrabFocus
