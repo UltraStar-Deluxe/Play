@@ -78,7 +78,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="bottomContent" picking-mode="Ignore" class="pb-2 px-4 focusableNavigatorPriorityParent" style="background-color: rgba(0, 0, 0, 0); width: 100%; bottom: 0; position: absolute; flex-direction: row;">
             <ui:VisualElement name="bottomLeft" picking-mode="Ignore" class="pr-3" style="background-color: rgba(0, 0, 0, 0); justify-content: flex-end; flex-grow: 1;">
-                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerList" mode="Horizontal" horizontal-scroller-visibility="AlwaysVisible" style="align-items: flex-end;">
+                <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="playerList" mode="Horizontal" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="align-items: flex-end;">
                     <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
                     <ui:Instance template="SongSelectScenePlayerEntryUi" name="playerEntry" />
                 </ui:ScrollView>
