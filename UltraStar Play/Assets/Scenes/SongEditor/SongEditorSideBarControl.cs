@@ -24,8 +24,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.doPitchDetectionInSelectionButton)]
     private Button doPitchDetectionInSelectionButton;
     
-    [Inject(UxmlName = R.UxmlNames.analyzePitchUsingBasicPitchButton)]
-    private Button analyzePitchUsingBasicPitchButton;
+    [Inject(UxmlName = R.UxmlNames.pitchDetectionUsingBasicPitchButton)]
+    private Button pitchDetectionUsingBasicPitchButton;
     
     [Inject(UxmlName = R.UxmlNames.doSpeechRecognitionButton)]
     private Button doSpeechRecognitionButton;
@@ -167,7 +167,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         UpdateRecordingButton();
         
         doPitchDetectionInSelectionButton.RegisterCallbackButtonTriggered(_ => DoDetectPitchInSelection());
-        analyzePitchUsingBasicPitchButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingBasicPitch());
+        pitchDetectionUsingBasicPitchButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingBasicPitch());
         doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
         
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());

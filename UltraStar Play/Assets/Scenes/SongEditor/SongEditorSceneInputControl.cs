@@ -242,7 +242,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private void MoveSelectedNotesToDetectedPitch()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-        pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource);
+        pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(selectedNotes, true);
     }
 
     private void OnBack(InputAction.CallbackContext context)

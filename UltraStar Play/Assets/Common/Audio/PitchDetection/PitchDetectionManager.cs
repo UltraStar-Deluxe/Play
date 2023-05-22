@@ -82,7 +82,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
         // Set path to Basic Pitch executable if needed
         string fallbackPitchDetectionCommand = PlatformUtils.IsWindows
-            ? $"\"{ApplicationUtils.GetStreamingAssetsPath("BasicPitchExe/basic_pitch_exe.exe").Replace("/", "\\")}\""
+            ? $"\"{ApplicationUtils.GetStreamingAssetsPath("BasicPitchExe/basic_pitch_exe.exe").Replace("/", "\\")}\" --onset_threshold 0.3 --frame_threshold 0.3"
             : "";
         
         Subject<BasicPitchDetectionResult> processSongSubject = new();

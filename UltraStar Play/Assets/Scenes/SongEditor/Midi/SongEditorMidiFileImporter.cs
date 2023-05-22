@@ -43,7 +43,8 @@ public class SongEditorMidiFileImporter : INeedInjection
         bool importLyrics,
         bool importNotes,
         string voiceName,
-        bool shiftNotesToPlaybackPosition)
+        bool shiftNotesToPlaybackPosition,
+        ESongEditorLayer layer)
     {
         if (!importLyrics
             && !importNotes)
@@ -59,8 +60,8 @@ public class SongEditorMidiFileImporter : INeedInjection
         }
 
         // Remove old notes
-        editorNoteDisplayer.ClearNotesInLayer(ESongEditorLayer.Import);
-        layerManager.ClearEnumLayer(ESongEditorLayer.Import);
+        editorNoteDisplayer.ClearNotesInLayer(layer);
+        layerManager.ClearEnumLayer(layer);
         
         MidiFile midiFile = MidiFileUtils.LoadMidiFile(midiFilePath);
         if (midiFile == null)
@@ -80,8 +81,12 @@ public class SongEditorMidiFileImporter : INeedInjection
             if (voiceName == null)
             {
                 // Add all notes to dedicated layer
-                layerManager.ClearEnumLayer(ESongEditorLayer.Import);
-                loadedNotes.ForEach(loadedNote => layerManager.AddNoteToEnumLayer(ESongEditorLayer.Import, loadedNote));
+                layerManager.ClearEnumLayer(layer);
+                loadedNotes.ForEach(loadedNote =>
+                {
+                    layerManager.AddNoteToEnumLayer(layer, loadedNote);
+                    loadedNote.IsEditable = layerManager.IsLayerEditable(layerManager.GetEnumLayer(layer));
+                });
             }
             else
             {
@@ -97,8 +102,6 @@ public class SongEditorMidiFileImporter : INeedInjection
             }
 
             songMetaChangeEventStream.OnNext(new ImportedMidiFileEvent());
-            
-            UiManager.CreateNotification("Loaded MIDI file successfully");
         }
         catch (Exception e)
         {

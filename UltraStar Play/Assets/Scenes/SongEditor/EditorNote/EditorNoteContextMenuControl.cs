@@ -62,6 +62,12 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     {
         base.OnInjectionFinished();
         FillContextMenuAction = FillContextMenu;
+        ShouldOpenContextMenuFunction = ShouldOpenContextMenu;
+    }
+
+    private bool ShouldOpenContextMenu()
+    {
+        return noteControl.Note.IsEditable;
     }
 
     private void FillContextMenu(ContextMenuPopupControl contextMenu)
@@ -101,8 +107,8 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         
         contextMenu.AddButton($"Speech recognition on {settings.SongEditorSettings.SpeechRecognitionSamplesSource} audio",
             () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
-        contextMenu.AddButton($"Pitch detection on {settings.SongEditorSettings.PitchDetectionSamplesSource} audio",
-            () => pitchDetectionAction.MoveNotesToDetectedPitch(selectedNotes, true, settings.SongEditorSettings.PitchDetectionSamplesSource));
+        contextMenu.AddButton($"Move to detected pitch",
+            () => pitchDetectionAction.MoveNotesToDetectedPitchUsingPitchDetectionLayer(selectedNotes, true));
     }
 
     private void FillContextMenuToMergeAndAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)

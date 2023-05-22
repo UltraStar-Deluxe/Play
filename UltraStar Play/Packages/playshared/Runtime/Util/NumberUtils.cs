@@ -57,9 +57,8 @@ public static class NumberUtils
         return result;
     }
 
-    public static T Median<T>(IEnumerable<T> enumerable)
+    public static T Median<T>(List<T> list)
     {
-        List<T> list = enumerable.ToList();
         if (list.IsNullOrEmpty())
         {
             return default(T);

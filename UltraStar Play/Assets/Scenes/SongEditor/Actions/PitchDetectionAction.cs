@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CircularBuffer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -65,9 +66,72 @@ public class PitchDetectionAction : AbstractAudioClipAction
             UiManager.CreateNotification($"Failed to import MIDI file.");
             return;
         }
-        songEditorMidiFileImporter.ImportMidiFile(midiFilePath, 1, 0, false, true, null, false);
+        songEditorMidiFileImporter.ImportMidiFile(
+            midiFilePath,
+            1,
+            0,
+            false,
+            true,
+            null,
+            false,
+            ESongEditorLayer.PitchDetection);
     }
 
+    public void MoveNotesToDetectedPitchUsingPitchDetectionLayer(List<Note> notes, bool notify)
+    {
+        List<Note> pitchDetectionLayerNotes = songEditorLayerManager.GetLayerNotes(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.PitchDetection));
+        if (pitchDetectionLayerNotes.IsNullOrEmpty())
+        {
+            UiManager.CreateNotification("Run pitch detection first");
+            return;
+        }
+
+        int minBeat = SongMetaUtils.MinBeat(notes);
+        int maxBeat = SongMetaUtils.MaxBeat(notes);
+        List<Note> pitchDetectionLayerNotesInRange = pitchDetectionLayerNotes
+            .Where(it => minBeat <= it.EndBeat && it.StartBeat <= maxBeat)
+            .ToList();
+        if (pitchDetectionLayerNotesInRange.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        // Find median MidiNote for each beat
+        Dictionary<int, List<int>> beatToMidiNotes = new();
+        foreach (Note pitchDetectionLayerNote in pitchDetectionLayerNotesInRange)
+        {
+            for (int beat = pitchDetectionLayerNote.StartBeat; beat < pitchDetectionLayerNote.EndBeat; beat++)
+            {
+                beatToMidiNotes.AddInsideList(beat, pitchDetectionLayerNote.MidiNote);
+            }
+        }
+        
+        foreach (Note note in notes)
+        {
+            // Move note to median MidiNote of their beats
+            List<int> midiNotes = new();
+            for (int beat = note.StartBeat; beat < note.EndBeat; beat++)
+            {
+                if (beatToMidiNotes.ContainsKey(beat))
+                {
+                    List<int> midiNotesOfBeat = beatToMidiNotes[beat];
+                    midiNotes.AddRange(midiNotesOfBeat);
+                }
+            }
+
+            if (!midiNotes.IsNullOrEmpty())
+            {
+                int medianMidiNote = NumberUtils.Median(midiNotes);
+                note.SetMidiNote(medianMidiNote);
+            }
+        }
+        
+        if (notify)
+        {
+            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        }
+    }
+    
     public void MoveNotesToDetectedPitch(List<Note> notes, bool notify, ESongEditorSamplesSource samplesSource)
     {
         if (notes.IsNullOrEmpty())

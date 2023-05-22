@@ -41,7 +41,7 @@ public class NoteAreaContextMenuControl : ContextMenuControl
     {
         base.OnInjectionFinished();
         FillContextMenuAction = FillContextMenu;
-        ShouldOpenContextMenu = () =>
+        ShouldOpenContextMenuFunction = () =>
             editorNoteDisplayer.EditorNoteControls.AllMatch(noteControl => !noteControl.IsPointerOver)
             && editorNoteDisplayer.EditorSentenceControls.AllMatch(sentenceControl => !sentenceControl.IsPointerOver);
     }

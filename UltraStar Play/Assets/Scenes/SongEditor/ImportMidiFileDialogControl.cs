@@ -298,7 +298,9 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             importMidiLyricsToggle.value,
             importMidiNotesToggle.value,
             voiceName,
-            true);
+            true,
+            ESongEditorLayer.Import);
+        UiManager.CreateNotification("Loaded MIDI file successfully");
     }
     
     public void OpenDialog()

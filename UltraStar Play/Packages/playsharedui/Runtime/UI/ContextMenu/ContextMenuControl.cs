@@ -19,7 +19,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     }
     
     public Action<ContextMenuPopupControl> FillContextMenuAction { get; set; }
-    public Func<bool> ShouldOpenContextMenu { get; set; }
+    public Func<bool> ShouldOpenContextMenuFunction { get; set; }
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     protected VisualElement targetVisualElement;
@@ -117,7 +117,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     public void OpenContextMenu(Vector2 position)
     {
         if (FillContextMenuAction == null
-            || (ShouldOpenContextMenu != null && !ShouldOpenContextMenu()))
+            || (ShouldOpenContextMenuFunction != null && !ShouldOpenContextMenuFunction()))
         {
             return;
         }
