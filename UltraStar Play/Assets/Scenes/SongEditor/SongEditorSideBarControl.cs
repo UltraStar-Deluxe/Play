@@ -21,8 +21,11 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
 
-    [Inject(UxmlName = R.UxmlNames.doPitchDetectionButton)]
-    private Button doPitchDetectionButton;
+    [Inject(UxmlName = R.UxmlNames.doPitchDetectionInSelectionButton)]
+    private Button doPitchDetectionInSelectionButton;
+    
+    [Inject(UxmlName = R.UxmlNames.analyzePitchUsingBasicPitchButton)]
+    private Button analyzePitchUsingBasicPitchButton;
     
     [Inject(UxmlName = R.UxmlNames.doSpeechRecognitionButton)]
     private Button doSpeechRecognitionButton;
@@ -163,7 +166,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         });
         UpdateRecordingButton();
         
-        doPitchDetectionButton.RegisterCallbackButtonTriggered(_ => DoDetectPitch());
+        doPitchDetectionInSelectionButton.RegisterCallbackButtonTriggered(_ => DoDetectPitchInSelection());
+        analyzePitchUsingBasicPitchButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingBasicPitch());
         doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
         
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
@@ -208,6 +212,11 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             .Subscribe(_ => UpdatePlayPauseIcon());
 
         InitTabGroup();
+    }
+
+    private void AnalyzePitchUsingBasicPitch()
+    {
+        pitchDetectionAction.CreateNotesUsingBasicPitch(true);
     }
 
     private void ShowSongEditorHelpDialog()
@@ -274,7 +283,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             false);
     }
 
-    private void DoDetectPitch()
+    private void DoDetectPitchInSelection()
     {
         if (NoteAreaSelectionDragListener.lastSelectionRect.Value == null
             || NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats <= 0)

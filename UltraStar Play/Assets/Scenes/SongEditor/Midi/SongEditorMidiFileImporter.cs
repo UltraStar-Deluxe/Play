@@ -42,7 +42,8 @@ public class SongEditorMidiFileImporter : INeedInjection
         int channelIndex,
         bool importLyrics,
         bool importNotes,
-        string voiceName)
+        string voiceName,
+        bool shiftNotesToPlaybackPosition)
     {
         if (!importLyrics
             && !importNotes)
@@ -78,7 +79,7 @@ public class SongEditorMidiFileImporter : INeedInjection
             
             if (voiceName == null)
             {
-                // Add all notes to dedicated MIDI layer
+                // Add all notes to dedicated layer
                 layerManager.ClearEnumLayer(ESongEditorLayer.Import);
                 loadedNotes.ForEach(loadedNote => layerManager.AddNoteToEnumLayer(ESongEditorLayer.Import, loadedNote));
             }
@@ -88,9 +89,12 @@ public class SongEditorMidiFileImporter : INeedInjection
                 MidiTrack track = midiFile.Tracks[trackIndex];
                 MidiToSongMetaUtils.AssignNotesToVoice(songMeta, loadedNotes, voiceName, track, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
             }
-            
-            // Shift notes such that the first note starts at the current playback position
-            ShiftNotesToPlaybackPosition(loadedNotes);
+
+            if (shiftNotesToPlaybackPosition)
+            {
+                // Shift notes such that the first note starts at the current playback position
+                ShiftNotesToPlaybackPosition(loadedNotes);
+            }
 
             songMetaChangeEventStream.OnNext(new ImportedMidiFileEvent());
             

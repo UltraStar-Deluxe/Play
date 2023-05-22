@@ -31,10 +31,8 @@
         <SongEditorSideBarGroup name="pitchDetectionGroup" label="Pitch Detection">
             <ItemPicker no-previous-button="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" label="Algorithm" class="smallControl controlWithLabelVertical" style="max-height: none;" />
             <ItemPicker name="pitchDetectionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio to Analyze" class="controlWithLabelVertical" />
-            <ui:Button text="Detect Pitch&#10;in Selection" display-tooltip-when-elided="true" name="doPitchDetectionButton" style="width: 100%; height: auto;" />
-        </SongEditorSideBarGroup>
-        <SongEditorSideBarGroup name="audioSeparationGroup" label="Audio Separation">
-            <ui:TextField value="python -m spleeter" text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Command" class="smallControl" style="flex-grow: 1; flex-direction: column;" />
+            <ui:Button text="Detect Pitch&#10;in Selection (DyWa)" display-tooltip-when-elided="true" name="doPitchDetectionInSelectionButton" style="width: 100%; height: auto;" />
+            <ui:Button text="Analyze Pitch&#10;(Basic Pitch)" display-tooltip-when-elided="true" name="analyzePitchUsingBasicPitchButton" style="width: 100%; height: auto;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="buttonRecordingGroup" label="Button Tapping">
             <ui:TextField picking-mode="Ignore" value="N" text="N" name="buttonRecordingButtonTextField" is-delayed="true" label="Button for tapping" style="flex-direction: column;" />

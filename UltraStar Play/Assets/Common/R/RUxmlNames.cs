@@ -24,6 +24,7 @@ public static partial class R
         public const string allCharactersContainer = "allCharactersContainer";
         public const string amplificationPicker = "amplificationPicker";
         public const string analyzeBeatsWithoutTargetNotePicker = "analyzeBeatsWithoutTargetNotePicker";
+        public const string analyzePitchUsingBasicPitchButton = "analyzePitchUsingBasicPitchButton";
         public const string androidSongFolderHintContainer = "androidSongFolderHintContainer";
         public const string androidSongFolderHintLabel = "androidSongFolderHintLabel";
         public const string animatedBackgroundItemPicker = "animatedBackgroundItemPicker";
@@ -37,7 +38,6 @@ public static partial class R
         public const string assignToPlayerToggle = "assignToPlayerToggle";
         public const string audioSeparationButton = "audioSeparationButton";
         public const string audioSeparationCommandTextField = "audioSeparationCommandTextField";
-        public const string audioSeparationGroup = "audioSeparationGroup";
         public const string audioWaveForm = "audioWaveForm";
         public const string autoSaveToggle = "autoSaveToggle";
         public const string backButton = "backButton";
@@ -46,6 +46,7 @@ public static partial class R
         public const string backgroundMusicVolumeChooser = "backgroundMusicVolumeChooser";
         public const string backIcon = "backIcon";
         public const string banner = "banner";
+        public const string basicPitchCommandTextField = "basicPitchCommandTextField";
         public const string bestMatchnigTrackAndChannelLabel = "bestMatchnigTrackAndChannelLabel";
         public const string bonusLabel = "bonusLabel";
         public const string bottomBarsOverlay = "bottomBarsOverlay";
@@ -151,7 +152,7 @@ public static partial class R
         public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
         public const string disableDynamicThemesPicker = "disableDynamicThemesPicker";
-        public const string doPitchDetectionButton = "doPitchDetectionButton";
+        public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
         public const string downloadSongArchiveIcon = "downloadSongArchiveIcon";

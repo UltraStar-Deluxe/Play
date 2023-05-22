@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -26,9 +24,49 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
     [Inject]
     private JobManager jobManager;
+    
+    [Inject]
+    private PitchDetectionManager pitchDetectionManager;
 
+    [Inject]
+    private SongEditorMidiFileImporter songEditorMidiFileImporter;
+    
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
+
+    public void CreateNotesUsingBasicPitch(bool notify)
+    {
+        Job pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of {songMeta.Mp3}");
+        IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMeta(songMeta, pitchDetectionJob);
+
+        pitchDetectionObservable
+            .CatchIgnore((Exception ex) =>
+            {
+                pitchDetectionJob.SetResult(EJobResult.Error);
+                UiManager.CreateNotification("Pitch detection failed.");
+            })
+            .Subscribe(result =>
+            {
+                pitchDetectionJob.SetResult(EJobResult.Ok);
+                ImportBasicPitchMidiFile(result.MidiFilePath);
+                
+                if (notify)
+                {
+                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+                }
+            });
+    }
+
+    private void ImportBasicPitchMidiFile(string midiFilePath)
+    {
+        if (!FileUtils.Exists(midiFilePath))
+        {
+            Debug.LogError($"Failed to import MIDI file created by Basic Pitch. File not found: {midiFilePath}");
+            UiManager.CreateNotification($"Failed to import MIDI file.");
+            return;
+        }
+        songEditorMidiFileImporter.ImportMidiFile(midiFilePath, 1, 0, false, true, null, false);
+    }
 
     public void MoveNotesToDetectedPitch(List<Note> notes, bool notify, ESongEditorSamplesSource samplesSource)
     {

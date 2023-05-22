@@ -43,6 +43,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
+        bb.BindExistingInstance(PitchDetectionManager.Instance);
         bb.BindExistingInstance(SongQueueManager.Instance);
         bb.BindExistingInstance(JobManager.Instance);   bb.BindExistingInstance(UltraStarPlaySceneChangeAnimationControl.Instance);
         bb.BindExistingInstance(ThemeManager.Instance);

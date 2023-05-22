@@ -803,6 +803,7 @@ Transform:
   - {fileID: 4951985271572529592}
   - {fileID: 6169907629867958379}
   - {fileID: 1199472798513005511}
+  - {fileID: 6186306770007941945}
   - {fileID: 1963245333797147550}
   - {fileID: 3405312177106734287}
   - {fileID: 1873797141292969039}
@@ -8463,6 +8464,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6402f29a483b3147b012ca67c74574b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &9012705084353794179
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6186306770007941945}
+  - component: {fileID: 280587633030602300}
+  m_Layer: 0
+  m_Name: PitchDetectionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6186306770007941945
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9012705084353794179}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &280587633030602300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9012705084353794179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc1bd08ac5424769bc404a18369c7c57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9038781141353725927
 GameObject:
   m_ObjectHideFlags: 0
@@ -9000,7 +9045,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Value
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11452418, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: enablePopup

@@ -52,6 +52,7 @@ public class SongEditorSettings
     // Pitch detection
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;
     public ESongEditorSamplesSource PitchDetectionSamplesSource { get; set; } = ESongEditorSamplesSource.Vocals;
+    public string BasicPitchCommand { get; set; } = "";
 
     // Audio separation
     public string AudioSeparationCommand { get; set; } = "";

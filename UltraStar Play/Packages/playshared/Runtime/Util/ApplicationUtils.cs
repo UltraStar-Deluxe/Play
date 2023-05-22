@@ -51,6 +51,13 @@ public static class ApplicationUtils
         "wma",
         "flac",
     }.Intersect(supportedAudioFiles).ToList();
+    
+    public static readonly IReadOnlyList<string> supportedBasicPitchDetectionAudioFiles = new List<string>
+    {
+        "wav",
+        "mp3",
+        "ogg",
+    }.Intersect(supportedAudioFiles).ToList();
 
     public static readonly IReadOnlyList<string> supportedVideoFiles = new List<string>
     {
@@ -141,6 +148,12 @@ public static class ApplicationUtils
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return supportedVocalsSeparationAudioFiles.Contains(fileExtension);
+    }
+    
+    public static bool IsSupportedBasicPitchDetectionAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return supportedBasicPitchDetectionAudioFiles.Contains(fileExtension);
     }
     
     private static string NormalizeFileExtension(string fileExtension)
