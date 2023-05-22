@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using ProTrans;
 using UniInject;
-using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -66,7 +65,7 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             newValue => settings.SongBackgroundScaleMode = newValue);
         songBackgroundScaleModePickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
 
-        LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.55f, 0.05f));
+        LabeledItemPickerControl<float> sceneChangeDurationPickerControl = new(sceneChangeDurationPicker, NumberUtils.CreateFloatList(0, 0.9f, 0.05f));
         sceneChangeDurationPickerControl.Bind(() => settings.SceneChangeDurationInSeconds,
                 newValue => settings.SceneChangeDurationInSeconds = newValue);
         sceneChangeDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
@@ -112,10 +111,15 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
          MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_title),
             titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddCustomThemes)));
-        helpDialogControl.AddButton("Themes Folder",
+
+        helpDialogControl.AddButton("Custom Themes Folder",
             _ => ApplicationUtils.OpenDirectory(ThemeManager.GetAbsoluteUserDefinedThemesFolder()));
+
+        if (PlatformUtils.IsStandalone)
+        {
+            helpDialogControl.AddButton("Default Themes Folder",
+                        _ => ApplicationUtils.OpenDirectory(ThemeManager.GetAbsoluteDefaultThemesFolder()));
+        }
         return helpDialogControl;
     }
 }

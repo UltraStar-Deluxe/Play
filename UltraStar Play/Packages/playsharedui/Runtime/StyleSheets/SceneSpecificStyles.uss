@@ -1,6 +1,11 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+#togglePlayerSelectedButton {
+    width: 120%;
+    height: 120%;
+}
+
 #songListView .unity-scroller--horizontal {
     bottom: 20px;
     left: 0;

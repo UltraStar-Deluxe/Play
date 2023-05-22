@@ -1,18 +1,18 @@
 {
     "defaultControl": {
-        "fontColor": "#E5E5E5",
-        "backgroundColor": "#3399D8",
-        "hoverBackgroundColor": "#34acec",
-        "focusBackgroundColor": "#34acec",
-        "activeBackgroundColor": "#2C3CE6",
-        "focusBorderColor": "#3399D8",
+        "fontColor": "#f0feff",
+        "backgroundColor": "#42a3e7",
+        "hoverBackgroundColor": "#7dc6e9",
+        "focusBackgroundColor": "#7dc6e9",
+        "activeBackgroundColor": "#3c95d1",
+        "focusBorderColor": "#42a3e7",
     },
 
     "transparentButton": {
         "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#20202040",
-        "focusBackgroundColor": "#20202050",
-        "activeBackgroundColor": "#40404050",
+        "hoverBackgroundColor": "#20202060",
+        "focusBackgroundColor": "#20202080",
+        "activeBackgroundColor": "#40404080",
         "textShadow": {
             "color": "#a0a0a0",
             "offset": {
@@ -24,9 +24,7 @@
 
    "dynamicPanel": {
        "backgroundColor": "#23304300",
-       "hoverBackgroundColor": "#00a07e",
        "focusBackgroundColor": "#00a07e",
-       "activeBackgroundColor": "#00a07e"
    },
 
     "staticPanel": {
@@ -53,7 +51,7 @@
     "dynamicBackground": {
         "gradientRampFile": "gradients/ocean.png",
         "gradientType": "Linear",
-        "gradientScale": 2.0,
+        "gradientScale": 1.4,
         "gradientSmoothness": 0.8,
         "gradientAngle": 100,
         "gradientAnimation": true,

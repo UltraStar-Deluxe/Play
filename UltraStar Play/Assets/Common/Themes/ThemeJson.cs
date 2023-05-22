@@ -17,7 +17,6 @@ public class ThemeJson
     public ControlStyleConfig defaultControl;
     public ControlStyleConfig transparentButton;
     public ControlStyleConfig textOnlyButton;
-    public ControlStyleConfig lightButton;
     public ControlStyleConfig dangerButton;
     public ControlStyleConfig toggle;
     public ControlStyleConfig slideToggleOff;

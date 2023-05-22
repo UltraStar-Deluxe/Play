@@ -10,14 +10,15 @@ public static class SongEditorAudioWaveformUtils
         Settings settings)
     {
         using IDisposable d = new DisposableStopwatch($"Get audio clip to draw audio wave form");
-        
-        string audioUri = GetAudioUri(songMeta, settings.SongEditorSettings.PlaybackSamplesSource);
+
+        ESongEditorSamplesSource samplesSource = GetAudioWaveformSamplesSource(settings);
+        string audioUri = GetAudioUri(songMeta, samplesSource);
         if (audioUri.IsNullOrEmpty())
         {
-            Debug.LogWarning($"No {settings.SongEditorSettings.PlaybackSamplesSource} audio found. Split the audio first. Using original music instead.");
+            Debug.LogWarning($"No {samplesSource} audio found. Split the audio first. Using original music instead.");
             audioUri = GetAudioUri(songMeta, ESongEditorSamplesSource.OriginalMusic);
         }
-            
+
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
             Debug.Log($"Audio file resource does not exist {audioUri}");
@@ -34,6 +35,32 @@ public static class SongEditorAudioWaveformUtils
         // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
         AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
         return audioClip;
+    }
+
+    private static ESongEditorSamplesSource GetAudioWaveformSamplesSource(Settings settings)
+    {
+        switch (settings.SongEditorSettings.AudioWaveformSamplesSource)
+        {
+            case ESongEditorAudioWaveformSamplesSource.Vocals:
+                return ESongEditorSamplesSource.Vocals;
+            case ESongEditorAudioWaveformSamplesSource.Instrumental:
+                return ESongEditorSamplesSource.Instrumental;
+            case ESongEditorAudioWaveformSamplesSource.OriginalMusic:
+                return ESongEditorSamplesSource.OriginalMusic;
+            case ESongEditorAudioWaveformSamplesSource.SameAsPlayback:
+            {
+                if (settings.SongEditorSettings.PlaybackSamplesSource is ESongEditorSamplesSource.Recording)
+                {
+                    return ESongEditorSamplesSource.OriginalMusic;
+                }
+                else
+                {
+                    return settings.SongEditorSettings.PlaybackSamplesSource;
+                }
+            }
+            default:
+                return ESongEditorSamplesSource.OriginalMusic;
+        }
     }
 
     public static void DrawAudioWaveform(

@@ -65,6 +65,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private readonly HashSet<string> failedToLoadThemeNames = new();
 
     private readonly List<Sprite> loadedSprites = new();
+    private Sprite dynamicBackgroundStaticImageSprite;
 
     private bool anyThemeLoaded;
 
@@ -459,13 +460,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
 
-        ApplyThemeBaseBackgroundVideo(themeMeta, backgroundJson);
-        ApplyThemeLightBackgroundVideo(themeMeta, backgroundJson);
+        ApplyThemeBaseBackground(themeMeta, backgroundJson);
+        ApplyThemeLightBackground(themeMeta, backgroundJson);
         
         lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
-    private void ApplyThemeBaseBackgroundVideo(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    private void ApplyThemeBaseBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
     {
         string absoluteVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.videoPath);
         if (!absoluteVideoFilePath.IsNullOrEmpty()
@@ -480,10 +481,29 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             StopVideoPlayer(backgroundLightVideoPlayer);
             backgroundShaderControl.SetBaseTextureEnabled(false);
+            
+            // Try to use static image as base background
+            string absoluteImageFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.imagePath);
+            if (!absoluteImageFilePath.IsNullOrEmpty()
+                && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
+            {
+                ImageManager.LoadSpriteFromFile(absoluteImageFilePath, loadedSprite =>
+                {
+                    dynamicBackgroundStaticImageSprite = loadedSprite;
+                    backgroundShaderControl.SetBaseTexture(loadedSprite.texture);
+                    backgroundShaderControl.SetBaseTextureEnabled(true);
+                });
+            }
+            else
+            {
+                dynamicBackgroundStaticImageSprite = null;
+                backgroundShaderControl.SetBaseTexture(backgroundShaderControl.baseTexture);
+                backgroundShaderControl.SetBaseTextureEnabled(false);
+            }
         }
     }
 
-    private void ApplyThemeLightBackgroundVideo(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    private void ApplyThemeLightBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
     {
         string absoluteLightVideoFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.lightVideoPath);
         if (!absoluteLightVideoFilePath.IsNullOrEmpty()
@@ -827,15 +847,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 themeMeta.ThemeJson.transparentButton,
                 themeMeta.ThemeJson.defaultControl);
         }
-        
-        if (visualElement.ClassListContains("lightButton"))
-        {
-            return ObjectUtils.FirstNonDefault(
-                themeMeta.ThemeJson.lightButton,
-                themeMeta.ThemeJson.textOnlyButton,
-                themeMeta.ThemeJson.transparentButton,
-                themeMeta.ThemeJson.defaultControl);
-        }
 
         if (visualElement.ClassListContains("dangerButton"))
         {
@@ -962,7 +973,16 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     public IReadOnlyCollection<Sprite> GetSprites()
     {
-        return loadedSprites;
+        if (dynamicBackgroundStaticImageSprite != null)
+        {
+            List<Sprite> result = new(loadedSprites);
+            result.Add(dynamicBackgroundStaticImageSprite);
+            return result;
+        }
+        else
+        {
+            return loadedSprites;
+        }
     }
 
     public static string GetAbsoluteUserDefinedThemesFolder()
@@ -977,7 +997,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     
     private void DisableDynamicBackground()
     {
-        backgroundShaderControl.DisableShader();
+        backgroundVideoPlayer.Stop();
+        backgroundLightVideoPlayer.Stop();
         backgroundParticleSystem.gameObject.SetActive(false);
     }
 

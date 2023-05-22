@@ -91,7 +91,15 @@ public static class AudioUtils
     {
         int lengthInSamples = endIndex - startIndex;
         short[] shortSampleArray = new short[lengthInSamples];
-        for (int i = 0; i < lengthInSamples; i++)
+        
+        if (startIndex < 0
+            || endIndex < 0)
+        {
+            Debug.LogError($"ToShortSampleArray called with invalid index. startIndex: {startIndex}, endIndex: {endIndex}");
+            return shortSampleArray;
+        }
+        
+        for (int i = 0; i < lengthInSamples && i + startIndex < floatSampleArray.Length; i++)
         {
             shortSampleArray[i] = (short)Math.Floor(floatSampleArray[i + startIndex] * short.MaxValue);
         }

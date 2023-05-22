@@ -1,16 +1,19 @@
 {
     "defaultControl": {
+        "name": "vinyl-defaultControl",
         "fontColor": "#D0D5DD",
         "backgroundColor": "#475467",
         "backgroundGradient": "45deg, #101828, #475467",
-        "hoverBackgroundGradient": "45deg, #101828, #000000",
-        "focusBackgroundGradient": "45deg, #101828, #000000",
-        "activeBackgroundGradient": "45deg, #101828, #000000",
+        "hoverBackgroundGradient": "45deg, #323232, #4e5b6e",
+        "focusBackgroundGradient": "45deg, #323232, #4e5b6e",
         "borderColor": "#00000100",
         "focusBorderColor": "#4F5B6F",
+        "a": "#323232",
+        "b": "#4e5b6e"
     },
 
     "transparentButton": {
+        "name": "vinyl-transparentButton",
         "backgroundColor": "#00000100",
         "hoverBackgroundColor": "#CCCCCC",
         "focusBackgroundColor": "#FFFFFF",
@@ -22,24 +25,9 @@
         "activeFontColor": "#344054"
     },
 
-    "lightButton": {
-        "backgroundColor": "#F9FAFB",
-        "hoverBackgroundColor": "#344054",
-        "focusBackgroundColor": "#344054",
-        "activeBackgroundColor": "#404040dd",
-        "borderColor": "#00000100",
-
-        "fontColor": "#344054",
-        "hoverFontColor": "#F9FAFB",
-        "focusFontColor": "#F9FAFB",
-        "activeFontColor": "#F9FAFB"
-    },
-
     "dynamicPanel": {
         "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#1D2939",
         "focusBackgroundColor": "#1D2939",
-        "activeBackgroundColor": "#1D2939"
     },
 
     "staticPanel": {
@@ -67,35 +55,28 @@
     "warningFontColor":  "#FEC84B",
     "errorFontColor": "#F97066",
 
-    "lyricsColor": "#FFFFFF",
     "lyricsOutlineColor": "#00000000",
     "lyricsContainerGradient": "#000000, #1E232B",
-    
-    "staticBackground": {
-        "imagePath": "backgrounds/semi-transparent-black.png",
-        "imageScaleMode": "StretchToFill"
+
+    "dynamicBackground": {
+        "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg"
     },
 
     "sceneSpecificBackgrounds": {
         "MainScene": {
-            "staticBackground": {
-                "imagePath": "backgrounds/vinyl.png",
-                "imageScaleMode": "ScaleAndCrop"
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-left.jpg",
+            }
+        },
+        "SongSelectScene": {
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg"
+            }
+        },
+        "SingingResultsScene": {
+            "dynamicBackground": {
+                "imagePath": "backgrounds/dot-grid-with-vinyl-bottom-right.jpg"
             }
         }
     },
-
-    "dynamicBackground": {
-        "gradientRampFile": "gradients/dark green.png",
-        "gradientType": "Linear",
-        "gradientScale": 2.5,
-        "gradientSmoothness": 0.0,
-        "gradientAngle": 70.0,
-        "gradientAnimation": true,
-        "gradientAnimSpeed": 1.5,
-        "gradientAnimAmplitude": 0.3,
-        "particleFile": "particles/logo.png",
-        "particleOpacity": 1.0
-    },
-    "sceneTransitionAnimationTime": "300ms"
 }

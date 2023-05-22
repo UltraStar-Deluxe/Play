@@ -8,6 +8,13 @@ using UnityEngine.UIElements;
 
 public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        micSelectionDialogControl = null;
+    }
+    private static MicSelectionDialogControl micSelectionDialogControl;
+    
     [Inject(Key = nameof(micPitchTrackerPrefab))]
     private MicPitchTracker micPitchTrackerPrefab;
     
@@ -110,8 +117,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     public ReactiveProperty<bool> IsSelected {get; private set; } = new(false);
 
     private Dictionary<string, string> voiceNames;
-
-    private MicSelectionDialogControl micSelectionDialogControl;
+    
     private readonly PlayerProfileImageControl playerProfileImageControl = new();
     
     private readonly Subject<MicSelectionDialogControl.MicProfileChangedEvent> micProfileChangedEventStream = new();
@@ -229,9 +235,17 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             .WithRootVisualElement(dialog)
             .CreateAndInject<MicSelectionDialogControl>();
         micSelectionDialogControl.Title = $"Select Microphone for {PlayerProfile.Name}";
-        micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ => micSelectionDialogControl = null);
+        micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ =>
+        {
+            micSelectionDialogControl = null;
+            // Stop recording if mic test is not active
+            UpdateAllMicPitchTrackers();
+        });
         micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;
         micSelectionDialogControl.MicProfiles = micProfiles;
+        
+        // Start recording to select microphone
+        UpdateAllMicPitchTrackers();
     }
     
     public void SetSelected(bool newValue, bool force)
@@ -268,8 +282,14 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micPitchTracker.MicProfile = micProfile;
         UpdateMicPitchTracker();
     }
+
+    private void UpdateAllMicPitchTrackers()
+    {
+        songSelectSceneControl.playerListControl.PlayerEntryControls
+            .ForEach(it => it.UpdateMicPitchTracker());
+    }
     
-    private void UpdateMicPitchTracker()
+    public void UpdateMicPitchTracker()
     {
         if (micPitchTracker == null)
         {
@@ -279,7 +299,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micPitchTracker.MicProfile = micProfile;
         if (micProfile == null
             || micProfile.IsInputFromConnectedClient
-            || !nonPersistentSettings.MicTestActive.Value)
+            || (!nonPersistentSettings.MicTestActive.Value
+                && micSelectionDialogControl == null))
         {
             if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {
@@ -288,7 +309,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
         else if (micProfile != null
                  && !micProfile.IsInputFromConnectedClient
-                 && nonPersistentSettings.MicTestActive.Value)
+                 && (nonPersistentSettings.MicTestActive.Value 
+                     || micSelectionDialogControl != null))
         {
             if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {

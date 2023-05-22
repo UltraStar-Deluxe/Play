@@ -8,6 +8,7 @@ public class SongEditorSettings
 
     public int MusicVolumePercent { get; set; } = 100;
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
+    public ESongEditorAudioWaveformSamplesSource AudioWaveformSamplesSource { get; set; } = ESongEditorAudioWaveformSamplesSource.SameAsPlayback;
     public bool GoToLastPlaybackPosition { get; set; } = true;
 
     public ESongEditorDrawNoteLayer DrawNoteLayer { get; set; }
@@ -33,7 +34,7 @@ public class SongEditorSettings
     public bool ShowAudioWaveformInBackground { get; set; } = true;
     public bool ShowVideoArea { get; set; } = true;
     public bool ShowStatusBar { get; set; } = true;
-    public bool ShowVirtualPianoArea { get; set; } = true;
+    public bool ShowVirtualPianoArea { get; set; }
     public bool SmallLeftSideBar { get; set; }
     public bool ShowControlHints { get; set; } = true;
     public bool ShowNotePitchLabel { get; set; } = true;

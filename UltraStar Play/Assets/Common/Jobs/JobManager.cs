@@ -173,6 +173,12 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         // Only show this job in the UI if it takes a noticeable amount of time.
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
         {
+            if (this == null)
+            {
+                // Object was destroyed in the meantime
+                return;
+            }
+            
             if (job.Result.Value is EJobResult.Pending)
             {
                 jobListElement.Add(jobListEntryElement);

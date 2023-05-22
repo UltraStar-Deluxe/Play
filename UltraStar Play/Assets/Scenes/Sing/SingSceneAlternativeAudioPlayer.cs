@@ -170,7 +170,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     {
         if (songMeta.VocalsAudio.IsNullOrEmpty())
         {
-            errorMessage = "No vocals audio found. Separate the audio first.";
+            errorMessage = "No vocals audio found. Split the audio first.";
             return false;
         }
         if (!SongMetaUtils.VocalsAudioResourceExists(songMeta))
@@ -181,7 +181,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
         if (songMeta.InstrumentalAudio.IsNullOrEmpty())
         {
-            errorMessage = "No instrumental audio found. Separate the audio first.";
+            errorMessage = "No instrumental audio found. Split the audio first.";
             return false;
         }
         if (!SongMetaUtils.InstrumentalAudioResourceExists(songMeta))

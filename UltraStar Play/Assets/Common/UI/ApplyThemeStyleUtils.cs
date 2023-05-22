@@ -307,7 +307,15 @@ public static class ApplyThemeStyleUtils
             if (visualElement is Button)
             {
                 visualElement.Query<Label>()
-                    .ForEach(label => label.style.color = new StyleColor(fontColor));
+                    .ForEach(label =>
+                    {
+                        if (IsIgnoredVisualElement(label))
+                        {
+                            return;
+                        }
+                        
+                        label.style.color = new StyleColor(fontColor);
+                    });
             }
             visualElement.style.color = new StyleColor(fontColor);
         }
@@ -315,7 +323,8 @@ public static class ApplyThemeStyleUtils
         if (visualElement.childCount == 0)
         {
             // Set textShadow directly on element
-            if (!visualElement.ClassListContains("noTextShadow"))
+            if (!visualElement.ClassListContains("noTextShadow")
+                || IsIgnoredVisualElement(visualElement))
             {
                 ApplyTextShadow(visualElement, textShadowConfig);
             }
@@ -326,7 +335,8 @@ public static class ApplyThemeStyleUtils
             visualElement.Query<Label>()
                 .ForEach(label =>
                 {
-                    if (label.ClassListContains("noTextShadow"))
+                    if (label.ClassListContains("noTextShadow")
+                        || IsIgnoredVisualElement(label))
                     {
                         return;
                     }
@@ -369,38 +379,62 @@ public static class ApplyThemeStyleUtils
     
     private static void ApplyActiveStyle(VisualElementData data)
     {
-        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
+        ControlStyleConfig c = GetControlStyleConfig(data);
         ApplyStyle(data,
-            controlStyleConfig.activeFontColor,
-            controlStyleConfig.activeBorderColor,
-            controlStyleConfig.activeBackgroundColor,
-            controlStyleConfig.activeBackgroundGradient,
-            controlStyleConfig.activeBackgroundImage,
-            ObjectUtils.FirstNonDefault(controlStyleConfig.activeTextShadow, controlStyleConfig.textShadow));
+            ObjectUtils.FirstNonDefault(c.activeFontColor, c.focusFontColor, c.hoverFontColor, c.fontColor),
+            ObjectUtils.FirstNonDefault(c.activeBorderColor, c.focusBorderColor, c.hoverBorderColor, c.borderColor),
+            ObjectUtils.FirstNonDefault(c.activeBackgroundColor, c.focusBackgroundColor, c.hoverBackgroundColor, c.backgroundColor),
+            ObjectUtils.FirstNonDefault(c.activeBackgroundGradient, c.focusBackgroundGradient, c.hoverBackgroundGradient, c.backgroundGradient),
+            ObjectUtils.FirstNonDefault(c.activeBackgroundImage, c.focusBackgroundImage, c.hoverBackgroundImage, c.backgroundImage),
+            ObjectUtils.FirstNonDefault(c.activeTextShadow, c.focusTextShadow, c.hoverTextShadow, c.textShadow));
     }
 
     private static void ApplyFocusStyle(VisualElementData data)
     {
-        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
+        ControlStyleConfig c = GetControlStyleConfig(data);
         ApplyStyle(data,
-            controlStyleConfig.focusFontColor,
-            controlStyleConfig.focusBorderColor,
-            controlStyleConfig.focusBackgroundColor,
-            controlStyleConfig.focusBackgroundGradient,
-            controlStyleConfig.focusBackgroundImage,
-            ObjectUtils.FirstNonDefault(controlStyleConfig.focusTextShadow, controlStyleConfig.textShadow));
+            ObjectUtils.FirstNonDefault(c.focusFontColor, c.activeFontColor, c.hoverFontColor, c.fontColor),
+            ObjectUtils.FirstNonDefault(c.focusBorderColor, c.activeBorderColor, c.hoverBorderColor, c.borderColor),
+            ObjectUtils.FirstNonDefault(c.focusBackgroundColor, c.activeBackgroundColor, c.hoverBackgroundColor, c.backgroundColor),
+            ObjectUtils.FirstNonDefault(c.focusBackgroundGradient, c.activeBackgroundGradient, c.hoverBackgroundGradient, c.backgroundGradient),
+            ObjectUtils.FirstNonDefault(c.focusBackgroundImage, c.activeBackgroundImage, c.hoverBackgroundImage, c.backgroundImage),
+            ObjectUtils.FirstNonDefault(c.focusTextShadow, c.activeTextShadow, c.hoverTextShadow, c.textShadow));
+    }
+    
+    private static void ApplyHoverFocusStyle(VisualElementData data)
+    {
+        ControlStyleConfig c = GetControlStyleConfig(data);
+        ApplyStyle(data,
+            ObjectUtils.FirstNonDefault(c.hoverFocusFontColor, c.hoverActiveFontColor, c.focusFontColor, c.activeFontColor, c.hoverFontColor, c.fontColor),
+            ObjectUtils.FirstNonDefault(c.hoverFocusBorderColor, c.hoverActiveBorderColor, c.focusBorderColor, c.activeBorderColor, c.hoverBorderColor, c.borderColor),
+            ObjectUtils.FirstNonDefault(c.hoverFocusBackgroundColor, c.hoverActiveBackgroundColor, c.focusBackgroundColor, c.activeBackgroundColor, c.hoverBackgroundColor, c.backgroundColor),
+            ObjectUtils.FirstNonDefault(c.hoverFocusBackgroundGradient, c.hoverActiveBackgroundGradient, c.focusBackgroundGradient, c.activeBackgroundGradient, c.hoverBackgroundGradient, c.backgroundGradient),
+            ObjectUtils.FirstNonDefault(c.hoverFocusBackgroundImage, c.hoverActiveBackgroundImage, c.focusBackgroundImage, c.activeBackgroundImage, c.hoverBackgroundImage, c.backgroundImage),
+            ObjectUtils.FirstNonDefault(c.hoverFocusTextShadow, c.hoverActiveTextShadow, c.focusTextShadow, c.activeTextShadow, c.hoverTextShadow, c.textShadow));
+    }
+
+    private static void ApplyHoverActiveStyle(VisualElementData data)
+    {
+        ControlStyleConfig c = GetControlStyleConfig(data);
+        ApplyStyle(data,
+            ObjectUtils.FirstNonDefault(c.hoverActiveFontColor, c.hoverFocusFontColor, c.activeFontColor, c.focusFontColor, c.hoverFontColor, c.fontColor),
+            ObjectUtils.FirstNonDefault(c.hoverActiveBorderColor, c.hoverFocusBorderColor, c.activeBorderColor, c.focusBorderColor, c.hoverBorderColor, c.borderColor),
+            ObjectUtils.FirstNonDefault(c.hoverActiveBackgroundColor, c.hoverFocusBackgroundColor, c.activeBackgroundColor, c.focusBackgroundColor, c.hoverBackgroundColor, c.backgroundColor),
+            ObjectUtils.FirstNonDefault(c.hoverActiveBackgroundGradient, c.hoverFocusBackgroundGradient, c.activeBackgroundGradient, c.focusBackgroundGradient, c.hoverBackgroundGradient, c.backgroundGradient),
+            ObjectUtils.FirstNonDefault(c.hoverActiveBackgroundImage, c.hoverFocusBackgroundImage, c.activeBackgroundImage, c.focusBackgroundImage, c.hoverBackgroundImage, c.backgroundImage),
+            ObjectUtils.FirstNonDefault(c.hoverActiveTextShadow, c.hoverFocusTextShadow, c.activeTextShadow, c.focusTextShadow, c.hoverTextShadow, c.textShadow));
     }
 
     private static void ApplyHoverStyle(VisualElementData data)
     {
-        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
+        ControlStyleConfig c = GetControlStyleConfig(data);
         ApplyStyle(data,
-            controlStyleConfig.hoverFontColor,
-            controlStyleConfig.hoverBorderColor,
-            controlStyleConfig.hoverBackgroundColor,
-            controlStyleConfig.hoverBackgroundGradient,
-            controlStyleConfig.hoverBackgroundImage,
-            ObjectUtils.FirstNonDefault(controlStyleConfig.hoverTextShadow, controlStyleConfig.textShadow));
+            ObjectUtils.FirstNonDefault(c.hoverFontColor, c.fontColor),
+            ObjectUtils.FirstNonDefault(c.hoverBorderColor, c.borderColor),
+            ObjectUtils.FirstNonDefault(c.hoverBackgroundColor, c.backgroundColor),
+            ObjectUtils.FirstNonDefault(c.hoverBackgroundGradient, c.backgroundGradient),
+            ObjectUtils.FirstNonDefault(c.hoverBackgroundImage, c.backgroundImage),
+            ObjectUtils.FirstNonDefault(c.hoverTextShadow, c.textShadow));
     }
 
     private static void ApplyDefaultStyle(VisualElementData data)
@@ -429,6 +463,11 @@ public static class ApplyThemeStyleUtils
 
     private static void UpdateStyles(VisualElementData data)
     {
+        if (IsIgnoredVisualElement(data.visualElement))
+        {
+            return;
+        }
+        
         bool shouldApplyHoverStyle = data.isPointerOver;
         bool shouldApplyFocusStyle = data.hasFocus;
         bool shouldApplyActiveStyle = data.isActive;
@@ -442,9 +481,13 @@ public static class ApplyThemeStyleUtils
         {
             ApplyDisabledStyle(data);
         }
-        else if (shouldApplyHoverStyle)
+        else if (shouldApplyHoverStyle && shouldApplyFocusStyle)
         {
-            ApplyHoverStyle(data);
+            ApplyHoverFocusStyle(data);
+        }
+        else if (shouldApplyHoverStyle && shouldApplyActiveStyle)
+        {
+            ApplyHoverActiveStyle(data);
         }
         else if (shouldApplyFocusStyle)
         {
@@ -453,6 +496,10 @@ public static class ApplyThemeStyleUtils
         else if (shouldApplyActiveStyle)
         {
             ApplyActiveStyle(data);
+        }
+        else if (shouldApplyHoverStyle)
+        {
+            ApplyHoverStyle(data);
         }
     }
 

@@ -53,7 +53,6 @@ public static partial class R
         public const string largerFont = "largerFont";
         public const string largestFont = "largestFont";
         public const string leftSideBar = "leftSideBar";
-        public const string lightButton = "lightButton";
         public const string listItem = "listItem";
         public const string lyricsContainer = "lyricsContainer";
         public const string m_2 = "m-2";
@@ -62,7 +61,6 @@ public static partial class R
         public const string mb_1 = "mb-1";
         public const string mb_2 = "mb-2";
         public const string mb_3 = "mb-3";
-        public const string middleCenterText = "middleCenterText";
         public const string ml_1 = "ml-1";
         public const string ml_2 = "ml-2";
         public const string ml_3 = "ml-3";

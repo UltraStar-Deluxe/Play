@@ -19,7 +19,6 @@
     "defaultControl": {...},
     "transparentButton": {...},
     "textOnlyButton": {...},
-    "lightButton": {...},
     "dangerButton": {...},
     "toggle": {...},
     "staticPanel": {...},
@@ -171,30 +170,40 @@
     "hoverFontColor": "...",
     "focusFontColor": "...",
     "activeFontColor": "...",
+    "hoverFocusFontColor": "...",
+    "hoverActiveFontColor": "...",
     "disabledFontColor": "...",
     
     "backgroundColor": "..."
     "hoverBackgroundColor": "..."
     "focusBackgroundColor": "..."
     "activeBackgroundColor": "..."
+    "hoverFocusBackgroundColor": "..."
+    "hoverActiveBackgroundColor": "..."
     "disabledBackgroundColor": "..."
     
     "backgroundGradient": "45deg, #101828, #475467"
     "hoverBackgroundGradient": "..."
     "focusBackgroundGradient": "..."
     "activeBackgroundGradient": "..."
+    "hoverFocusBackgroundGradient": "..."
+    "hoverActiveBackgroundGradient": "..."
     "disabledBackgroundGradient": "..."
     
     "borderColor": "..."
     "hoverBorderColor": "..."
     "focusBorderColor": "..."
     "activeBorderColor": "..."
+    "hoverFocusBorderColor": "..."
+    "hoverActiveBorderColor": "..."
     "disabledBorderColor": "..."
 
     "backgroundImage": "..."
     "hoverBackgroundImage": "..."
     "focusBackgroundImage": "..."
     "activeBackgroundImage": "..."
+    "hoverFocusBackgroundImage": "..."
+    "hoverActiveBackgroundImage": "..."
     "disabledBackgroundImage": "..."
     
     "textShadow": : {
@@ -208,5 +217,7 @@
     "hoverTextShadow": "..."
     "focusTextShadow": "..."
     "activeTextShadow": "..."
+    "hoverFocusTextShadow": "..."
+    "hoverActiveTextShadow": "..."
     "disabledTextShadow": "..."
 }

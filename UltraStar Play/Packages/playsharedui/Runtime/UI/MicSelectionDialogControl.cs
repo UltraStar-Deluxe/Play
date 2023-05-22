@@ -31,8 +31,6 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
     {
         base.OnInjectionFinished();
         AddButton(TranslationManager.GetTranslation("cancel"), _ => CloseDialog());
-
-        // Use mic sample recorders in scene to select mic by singing
     }
 
     private void UpdateMicProfileList()
@@ -54,8 +52,33 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
             
             micWithNameControls.Add(micWithNameControl);
         });
+
+        AddInfoLabel();
     }
-    
+
+    private void AddInfoLabel()
+    {
+        VisualElement infoContainer = new();
+        infoContainer.name = "row";
+        infoContainer.style.justifyContent = Justify.Center;
+        infoContainer.style.alignItems = Align.Center;
+        infoContainer.AddToClassList("py-2");
+
+        MaterialIcon infoIcon = new();
+        infoIcon.Icon = "info_outline";
+        infoIcon.name = "infoIcon";
+        infoIcon.AddToClassList("smallFont");
+        infoIcon.AddToClassList("pr-1");
+        infoContainer.Add(infoIcon);
+
+        Label infoLabel = new();
+        infoLabel.text = "sing into a mic to select it";
+        infoLabel.AddToClassList("smallerFont");
+        infoContainer.Add(infoLabel);
+        
+        AddVisualElement(infoContainer);
+    }
+
     private void OnMicSelected(MicProfile newMicProfile)
     {
         OnMicProfileSelected?.Invoke(newMicProfile);

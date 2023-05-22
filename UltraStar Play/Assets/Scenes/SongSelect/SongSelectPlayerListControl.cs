@@ -28,6 +28,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private VisualElement playerList;
 
     private readonly List<SongSelectPlayerEntryControl> playerEntryControls = new();
+    public IReadOnlyList<SongSelectPlayerEntryControl> PlayerEntryControls => playerEntryControls;
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;

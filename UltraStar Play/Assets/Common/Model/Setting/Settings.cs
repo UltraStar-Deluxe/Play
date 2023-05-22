@@ -54,7 +54,7 @@ public class Settings : ISettings
     public bool DisableDynamicThemes { get; set; }
     // Screen.currentResolution may only be called from Start() and Awake(), thus use a dummy here.
     public bool AnimatedBackground { get; set; } = true;
-    public int BackgroundLightIndex { get; set; } = 1;
+    public int BackgroundLightIndex { get; set; } = 4;
     
     // Design / presentation settings
     public ESceneChangeAnimation SceneChangeAnimation { get; set; } = ESceneChangeAnimation.Zoom;

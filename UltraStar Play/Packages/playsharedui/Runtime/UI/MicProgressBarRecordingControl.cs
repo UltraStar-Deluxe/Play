@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -24,7 +25,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         }
     }
 
-    private IDisposable recordingEventDisposable;
+    private readonly List<IDisposable> micSampleRecorderDisposables = new();
 
     private long lastRecordingEventTimeInMillis;
     private double noiseAboveThresholdDurationInMillis;
@@ -37,17 +38,23 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
 
     private void UpdateRecordingEventSubscription()
     {
-        if (recordingEventDisposable != null)
-        {
-            recordingEventDisposable.Dispose();
-        }
+        micSampleRecorderDisposables.ForEach(d => d.Dispose());
+        micSampleRecorderDisposables.Clear();
         
         MicSampleRecorder micSampleRecorder = GameObject.FindObjectsOfType<MicSampleRecorder>()
             .FirstOrDefault(it => it.MicProfile == MicProfile);
         if (micSampleRecorder != null)
         {
-            recordingEventDisposable = micSampleRecorder.RecordingEventStream
-                .Subscribe(evt => OnRecordingEvent(evt));
+            micSampleRecorderDisposables.Add(micSampleRecorder.RecordingEventStream
+                .Subscribe(evt => OnRecordingEvent(evt)));
+            micSampleRecorderDisposables.Add(micSampleRecorder.IsRecording
+                .Subscribe(isRecording =>
+                {
+                    if (!isRecording)
+                    {
+                        MicProgressBarControl.ProgressBarValue = 0;
+                    }
+                }));
         }
         
         lastRecordingEventTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
@@ -87,6 +94,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
 
     public void Dispose()
     {
-        recordingEventDisposable?.Dispose();
+        micSampleRecorderDisposables.ForEach(d => d.Dispose());
+        micSampleRecorderDisposables.Clear();
     }
 }

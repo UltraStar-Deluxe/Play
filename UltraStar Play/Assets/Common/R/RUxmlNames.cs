@@ -10,7 +10,8 @@ public static partial class R
         public const string aboutUSPlayButton = "aboutUSPlayButton";
         public const string addButton = "addButton";
         public const string addGuestButton = "addGuestButton";
-        public const string addIcon = "addIcon";
+        public const string addPlayerIcon = "addPlayerIcon";
+        public const string addPlayerLabel = "addPlayerLabel";
         public const string addSongFolderButton = "addSongFolderButton";
         public const string addSongFolderIcon = "addSongFolderIcon";
         public const string addTeamButton = "addTeamButton";
