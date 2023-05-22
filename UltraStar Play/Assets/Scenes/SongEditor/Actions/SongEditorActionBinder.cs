@@ -35,6 +35,8 @@ public class SongEditorActionBinder : MonoBehaviour, IBinder
         bb.BindTypeToNewInstances(typeof(SpaceBetweenNotesAction));
         bb.BindTypeToNewInstances(typeof(PitchDetectionAction));
         bb.BindTypeToNewInstances(typeof(SpeechRecognitionAction));
+        
+        bb.BindTypeToNewInstances(typeof(SongEditorMidiFileImporter));
         return bb.GetBindings();
     }
 }

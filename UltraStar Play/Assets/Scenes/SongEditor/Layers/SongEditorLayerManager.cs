@@ -200,6 +200,9 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         }
 
         result[ESongEditorLayer.PitchDetection].IsEditable = false;
+        result[ESongEditorLayer.PitchDetection].IsMidiSoundPlayAlongEnabled = false;
+        result[ESongEditorLayer.SpeechRecognition].IsMidiSoundPlayAlongEnabled = false;
+        result[ESongEditorLayer.ButtonRecording].IsMidiSoundPlayAlongEnabled = false;
 
         result.ForEach(entry => entry.Value.Color = GetSongEditorLayerColor(entry.Key));
 

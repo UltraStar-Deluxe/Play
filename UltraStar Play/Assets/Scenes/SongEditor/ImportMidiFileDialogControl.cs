@@ -74,7 +74,8 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     [Inject]
     private MidiManager midiManager;
 
-    private readonly SongEditorMidiFileImporter midiFileImporter = new();
+    [Inject]
+    private SongEditorMidiFileImporter midiFileImporter;
 
     private DropdownFieldControl<TrackAndChannel> midiTrackIndexPickerControl;
     private DropdownFieldControl<EVoice> midiAssignToPlayerPickerControl;
@@ -115,8 +116,6 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
     public void OnInjectionFinished()
     {
-        injector.Inject(midiFileImporter);
-        
         stopMidiPreviewIcon.HideByDisplay();
         
         closeImportMidiDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
@@ -298,7 +297,10 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             midiTrackIndexPickerControl.SelectedItem.channelIndex,
             importMidiLyricsToggle.value,
             importMidiNotesToggle.value,
-            voiceName);
+            voiceName,
+            true,
+            ESongEditorLayer.Import);
+        UiManager.CreateNotification("Loaded MIDI file successfully");
     }
     
     public void OpenDialog()

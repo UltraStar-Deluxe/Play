@@ -114,9 +114,6 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmItemPicker)]
     private ItemPicker pitchDetectionAlgorithmItemPicker;
 
-    [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
-    private TextField audioSeparationCommandTextField;
-
     [Inject(UxmlName = R.UxmlNames.audioSeparationButton)]
     private Button audioSeparationButton;
 
@@ -337,11 +334,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         pitchDetectionAudioItemPickerControl.Bind(
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
             newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
-
-        // Audio separation (Spleeter)
-        Bind(audioSeparationCommandTextField,
-            () => settings.SongEditorSettings.AudioSeparationCommand,
-            newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
+        
         audioSeparationButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (SongMetaUtils.VocalsAudioResourceExists(songMeta)

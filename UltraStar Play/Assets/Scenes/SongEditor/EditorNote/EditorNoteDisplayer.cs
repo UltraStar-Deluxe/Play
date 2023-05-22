@@ -111,7 +111,6 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         ReloadSentences();
 
         songEditorLayerToParentElement.Add(ESongEditorLayer.ButtonRecording, noteAreaNotesBackground);
-        songEditorLayerToParentElement.Add(ESongEditorLayer.MicRecording, noteAreaNotesBackground);
         songEditorLayerToParentElement.Add(ESongEditorLayer.Import, noteAreaNotesBackground);
         songEditorLayerToParentElement.Add(ESongEditorLayer.PitchDetection, noteAreaNotesBackground);
         songEditorLayerToParentElement.Add(ESongEditorLayer.SpeechRecognition, noteAreaNotesBackground);

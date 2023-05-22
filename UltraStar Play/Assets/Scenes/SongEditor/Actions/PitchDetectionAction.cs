@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using CircularBuffer;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -26,10 +25,113 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
     [Inject]
     private JobManager jobManager;
+    
+    [Inject]
+    private PitchDetectionManager pitchDetectionManager;
 
+    [Inject]
+    private SongEditorMidiFileImporter songEditorMidiFileImporter;
+    
     private IAudioSamplesAnalyzer audioSamplesAnalyzer;
     private EPitchDetectionAlgorithm audioSamplesAnalyzerPitchDetectionAlgorithm;
 
+    public void CreateNotesUsingBasicPitch(bool notify)
+    {
+        Job pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of {songMeta.Mp3}");
+        IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMeta(songMeta, pitchDetectionJob);
+
+        pitchDetectionObservable
+            .CatchIgnore((Exception ex) =>
+            {
+                pitchDetectionJob.SetResult(EJobResult.Error);
+                UiManager.CreateNotification("Pitch detection failed.");
+            })
+            .Subscribe(result =>
+            {
+                pitchDetectionJob.SetResult(EJobResult.Ok);
+                ImportBasicPitchMidiFile(result.MidiFilePath);
+                
+                if (notify)
+                {
+                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+                }
+            });
+    }
+
+    private void ImportBasicPitchMidiFile(string midiFilePath)
+    {
+        if (!FileUtils.Exists(midiFilePath))
+        {
+            Debug.LogError($"Failed to import MIDI file created by Basic Pitch. File not found: {midiFilePath}");
+            UiManager.CreateNotification($"Failed to import MIDI file.");
+            return;
+        }
+        songEditorMidiFileImporter.ImportMidiFile(
+            midiFilePath,
+            1,
+            0,
+            false,
+            true,
+            null,
+            false,
+            ESongEditorLayer.PitchDetection);
+    }
+
+    public void MoveNotesToDetectedPitchUsingPitchDetectionLayer(List<Note> notes, bool notify)
+    {
+        List<Note> pitchDetectionLayerNotes = songEditorLayerManager.GetLayerNotes(songEditorLayerManager.GetEnumLayer(ESongEditorLayer.PitchDetection));
+        if (pitchDetectionLayerNotes.IsNullOrEmpty())
+        {
+            UiManager.CreateNotification("Run pitch detection first");
+            return;
+        }
+
+        int minBeat = SongMetaUtils.MinBeat(notes);
+        int maxBeat = SongMetaUtils.MaxBeat(notes);
+        List<Note> pitchDetectionLayerNotesInRange = pitchDetectionLayerNotes
+            .Where(it => minBeat <= it.EndBeat && it.StartBeat <= maxBeat)
+            .ToList();
+        if (pitchDetectionLayerNotesInRange.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        // Find median MidiNote for each beat
+        Dictionary<int, List<int>> beatToMidiNotes = new();
+        foreach (Note pitchDetectionLayerNote in pitchDetectionLayerNotesInRange)
+        {
+            for (int beat = pitchDetectionLayerNote.StartBeat; beat < pitchDetectionLayerNote.EndBeat; beat++)
+            {
+                beatToMidiNotes.AddInsideList(beat, pitchDetectionLayerNote.MidiNote);
+            }
+        }
+        
+        foreach (Note note in notes)
+        {
+            // Move note to median MidiNote of their beats
+            List<int> midiNotes = new();
+            for (int beat = note.StartBeat; beat < note.EndBeat; beat++)
+            {
+                if (beatToMidiNotes.ContainsKey(beat))
+                {
+                    List<int> midiNotesOfBeat = beatToMidiNotes[beat];
+                    midiNotes.AddRange(midiNotesOfBeat);
+                }
+            }
+
+            if (!midiNotes.IsNullOrEmpty())
+            {
+                int medianMidiNote = NumberUtils.Median(midiNotes);
+                note.SetMidiNote(medianMidiNote);
+            }
+        }
+        
+        if (notify)
+        {
+            songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+        }
+    }
+    
     public void MoveNotesToDetectedPitch(List<Note> notes, bool notify, ESongEditorSamplesSource samplesSource)
     {
         if (notes.IsNullOrEmpty())

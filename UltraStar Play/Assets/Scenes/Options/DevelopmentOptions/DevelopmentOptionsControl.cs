@@ -70,7 +70,13 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
-
+    
+    [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
+    private TextField audioSeparationCommandTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.basicPitchCommandTextField)]
+    private TextField basicPitchCommandTextField;
+    
     private NetworkConfigControl networkConfigControl;
 
     protected override void Start()
@@ -156,6 +162,16 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(messageBufferTimeTextField,
             () => settings.ConnectedClientMessageBufferTimeInMillis,
             newValue => settings.ConnectedClientMessageBufferTimeInMillis = newValue);
+        
+        // Spleeter command (audio separation)
+        FieldBindingUtils.Bind(audioSeparationCommandTextField,
+            () => settings.SongEditorSettings.AudioSeparationCommand,
+            newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
+        
+        // Basic Pitch command (pitch detection)
+        FieldBindingUtils.Bind(basicPitchCommandTextField,
+            () => settings.SongEditorSettings.BasicPitchCommand,
+            newValue => settings.SongEditorSettings.BasicPitchCommand = newValue);
         
         // Network config
         networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
