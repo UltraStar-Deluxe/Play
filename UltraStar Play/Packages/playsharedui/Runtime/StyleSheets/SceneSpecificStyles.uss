@@ -359,6 +359,14 @@
     padding-bottom: 0;
 }
 
+#playerInfoContainer {
+    align-items: stretch;
+}
+
+#playerInfoContainer #playerNameContainer {
+    justify-content: center;
+}
+
 #playerInfoContainer #playerImage {
     flex-shrink: 0;
     width: 64px;
