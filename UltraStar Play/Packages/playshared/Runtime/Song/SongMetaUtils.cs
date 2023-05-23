@@ -77,7 +77,7 @@ public static class SongMetaUtils
      * Checks if a file exists.
      * Assumes that the resource behind a http and https URI exists (always returns true for these URIs).
      */
-    private static bool ResourceExists(SongMeta songMeta, string pathOrUri)
+    public static bool ResourceExists(SongMeta songMeta, string pathOrUri)
     {
         if (songMeta == null
             || pathOrUri.IsNullOrEmpty())

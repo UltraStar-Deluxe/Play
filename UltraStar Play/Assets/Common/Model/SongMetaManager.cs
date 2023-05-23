@@ -223,12 +223,12 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
         
         List<string> existingSongMetaAudioFiles = existingSongMetas
-            .Select(songMeta => Path.GetFullPath(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3)))
+            .SelectMany(songMeta => GetAbsoluteAudioFilePaths(songMeta))
             .ToList();
 
         List<string> audioFilesWithoutSongMeta = audioFiles
             .Where(audioFile => !ApplicationUtils.IsGeneratedAudioFile(audioFile))
-            .Select(audioFile => Path.GetFullPath(audioFile))
+            .Select(audioFile => PathUtils.NormalizePath(Path.GetFullPath(audioFile)))
             .Except(existingSongMetaAudioFiles)
             .ToList();
 
@@ -239,6 +239,28 @@ public class SongMetaManager : AbstractSingletonBehaviour
             .ToList();
 
         generatedSongMetas.ForEach(songMeta => allSongMetas.Add(songMeta));
+    }
+
+    private List<string> GetAbsoluteAudioFilePaths(SongMeta songMeta)
+    {
+        List<string> result = new List<string>();
+        
+        void TryAddAudioFilePath(string audioFilePath)
+        {
+            if (SongMetaUtils.ResourceExists(songMeta, audioFilePath))
+            {
+                string absoluteFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, audioFilePath);
+                result.Add(PathUtils.NormalizePath(absoluteFilePath));
+            }
+        }
+        
+        TryAddAudioFilePath(songMeta.Mp3);
+        TryAddAudioFilePath(songMeta.VocalsAudio);
+        TryAddAudioFilePath(songMeta.InstrumentalAudio);
+
+        return result
+            .Distinct()
+            .ToList();
     }
 
     private SongMeta GenerateSongMetaForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
