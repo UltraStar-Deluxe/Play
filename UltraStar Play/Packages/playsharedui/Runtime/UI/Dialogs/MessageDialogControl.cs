@@ -18,6 +18,7 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogMessage)]
     protected Label dialogMessage;
+    public Label MessageElement => dialogMessage;
 
     [Inject(UxmlName = R_PlayShared.UxmlNames.dialogButtonContainer)]
     protected VisualElement dialogButtonContainer;

@@ -152,8 +152,11 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         midiAssignToPlayerPickerControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoice>(), EVoice.P1, voice => GetDisplayName(voice));
         midiAssignToPlayerPickerControl.SetSelection(EVoice.P1);
 
+        midiFilePathTextField.DisableParseEscapeSequences();
         midiFilePathTextField.RegisterValueChangedCallback(evt => UpdateControls());
 
+        midiLyricsTextField.DisableParseEscapeSequences();
+        
         if (PlatformUtils.IsStandalone)
         {
             selectMidiFileButton.RegisterCallbackButtonTriggered(_ => OpenMidiFileDialog());

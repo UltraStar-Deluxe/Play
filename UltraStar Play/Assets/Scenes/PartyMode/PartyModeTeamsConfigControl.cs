@@ -120,6 +120,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
         // Edit team name
         TextField teamNameTextField = teamVisualElement.Q<TextField>(R.UxmlNames.teamNameTextField);
+        teamNameTextField.DisableParseEscapeSequences();
         FieldBindingUtils.Bind(gameObject, teamNameTextField,
             () => team.name,
             newValue => team.name = newValue);
@@ -182,6 +183,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
         Label playerNameLabel = playerVisualElement.Q<Label>(R.UxmlNames.playerNameLabel);
         TextField guestNameTextField = playerVisualElement.Q<TextField>(R.UxmlNames.guestNameTextField);
+        guestNameTextField.DisableParseEscapeSequences();
         Button deleteGuestButton = playerVisualElement.Q<Button>(R.UxmlNames.deleteGuestButton);
 
         playerNameLabel.SetVisibleByDisplay(!isGuest);
@@ -263,6 +265,10 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         playerVisualElement.RemoveFromHierarchy();
         playerToVisualElement.Remove(playerProfile);
         partyModeSettings.GuestPlayerProfiles.Remove(playerProfile);
+        partyModeSettings.TeamSettings.Teams.ForEach(teamSettings =>
+        {
+            teamSettings.guestPlayerProfiles.Remove(playerProfile);
+        });
     }
 
     private List<PlayerProfile> GetAllPlayerProfiles()

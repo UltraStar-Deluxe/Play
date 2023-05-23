@@ -623,6 +623,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SingSceneControlsContainer
       objectReference: {fileID: 0}
+    - target: {fileID: 6266340837699803124, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7508707485095029509, guid: 0f35eb07433348d4abddb4095d2d1e17,
         type: 3}
       propertyPath: m_RootOrder
@@ -677,6 +682,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9028838522266562842, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

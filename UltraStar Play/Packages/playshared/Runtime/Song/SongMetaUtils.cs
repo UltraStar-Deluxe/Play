@@ -77,7 +77,7 @@ public static class SongMetaUtils
      * Checks if a file exists.
      * Assumes that the resource behind a http and https URI exists (always returns true for these URIs).
      */
-    private static bool ResourceExists(SongMeta songMeta, string pathOrUri)
+    public static bool ResourceExists(SongMeta songMeta, string pathOrUri)
     {
         if (songMeta == null
             || pathOrUri.IsNullOrEmpty())
@@ -175,19 +175,21 @@ public static class SongMetaUtils
         return GetAbsoluteFilePath(songMeta, songMeta.FileName);
     }
 
-    public static List<Sentence> GetSentencesAtBeat(SongMeta songMeta, int beat)
+    public static List<Sentence> GetSentencesAtBeat(SongMeta songMeta, int beat, bool inclusiveMinBeat = true, bool inclusiveMaxBeat = true)
     {
-        return songMeta.GetVoices().SelectMany(voice => voice.Sentences)
-            .Where(sentence => IsBeatInSentence(sentence, beat)).ToList();
+        return songMeta.GetVoices()
+            .SelectMany(voice => voice.Sentences)
+            .Where(sentence => IsBeatInSentence(sentence, beat, inclusiveMinBeat, inclusiveMaxBeat))
+            .ToList();
     }
 
-    public static Sentence GetSentenceAtBeat(Voice voice, int beat)
+    public static Sentence GetSentenceAtBeat(Voice voice, int beat, bool inclusiveMinBeat = true, bool inclusiveMaxBeat = true)
     {
         if (voice == null)
         {
             return null;
         }
-        return voice.Sentences.FirstOrDefault(sentence => sentence.MinBeat <= beat && beat <= sentence.MaxBeat);
+        return voice.Sentences.FirstOrDefault(sentence => IsBeatInSentence(sentence, beat, inclusiveMinBeat, inclusiveMaxBeat));
     }
 
     public static Note GetNoteAtBeat(IEnumerable<Note> notes, int beat, bool inclusiveStartBeat = true, bool inclusiveEndBeat = true)

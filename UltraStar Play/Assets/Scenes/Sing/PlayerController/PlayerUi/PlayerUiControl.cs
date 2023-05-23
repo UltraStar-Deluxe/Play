@@ -465,8 +465,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         playerProfileImageControl.PlayerProfile = newCurrentPlayerProfile;
 
         // Highlight the change with an animation
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerScoreLabel, setNextPlayerProfileAnimTimeInSeconds);
         AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerNameLabel, setNextPlayerProfileAnimTimeInSeconds);
-        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerImage, setNextPlayerProfileAnimTimeInSeconds);
+        AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, playerImageContainer, setNextPlayerProfileAnimTimeInSeconds);
     }
 
     public void SetNextPlayerProfile(PlayerProfile newNextPlayerProfile)

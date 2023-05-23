@@ -1,6 +1,14 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+#jokerList {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
 #togglePlayerSelectedButton {
     width: 120%;
     height: 120%;
@@ -357,6 +365,14 @@
 #root.singScenePlayerUiSmall {
     padding-top: 0;
     padding-bottom: 0;
+}
+
+#playerInfoContainer {
+    align-items: stretch;
+}
+
+#playerInfoContainer #playerNameContainer {
+    justify-content: center;
 }
 
 #playerInfoContainer #playerImage {

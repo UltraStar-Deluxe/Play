@@ -134,6 +134,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
             textParts[i] = text.Substring(startIndex, length);
             
             TextField textField = new TextField();
+            textField.DisableParseEscapeSequences();
             textField.isReadOnly = true;
             textField.pickingMode = PickingMode.Ignore;
             textField.AddToClassList("multiline");

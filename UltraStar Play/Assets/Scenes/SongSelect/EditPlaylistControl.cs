@@ -64,6 +64,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         createPlaylistButton.RegisterCallbackButtonTriggered(_ => CreateThenEditNewPlaylist());
         submitEditPlaylistButton.RegisterCallbackButtonTriggered(_ => SubmitEditPlaylistDialog());
         playlistNameTextField.RegisterValueChangedCallback(evt => OnPlaylistNameTextFieldChanged(evt.newValue));
+        playlistNameTextField.DisableParseEscapeSequences();
 
         deletePlaylistButton.RegisterCallbackButtonTriggered(_ =>
         {

@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="playerInfoContainer" style="flex-direction: row; align-items: center;">
+    <ui:VisualElement name="playerInfoContainer" style="flex-direction: row;">
         <ui:VisualElement name="playerImageContainer" style="justify-content: center; align-items: center; flex-shrink: 0;">
             <RadialProgressBar show-label="false" progress="80" name="playerScoreProgressBar" class="overlay" style="flex-shrink: 0;" />
             <ui:VisualElement name="playerImageBorder" class="circle overlay" style="align-items: center; flex-shrink: 0;" />

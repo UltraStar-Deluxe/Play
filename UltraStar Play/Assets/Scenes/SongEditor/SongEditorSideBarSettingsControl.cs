@@ -237,6 +237,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.MicProfile = newValue);
         new AutoFitLabelControl(micDeviceItemPickerControl.ItemPicker.ItemLabel, 8, 15);
         
+        micRecordingPitchTextField.DisableParseEscapeSequences();
         Bind(micRecordingPitchTextField,
             () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
             newValue =>
@@ -247,6 +248,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 }
             });
         
+        micDelayTextField.DisableParseEscapeSequences();
         Bind(micDelayTextField,
             () => settings.SongEditorSettings.MicDelayInMillis.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MicDelayInMillis = newIntValue));
@@ -257,6 +259,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             newValue => settings.SongEditorSettings.SpeechRecognitionWhenRecording = newValue);
 
         // Button recording settings
+        buttonRecordingPitchTextField.DisableParseEscapeSequences();
         Bind(buttonRecordingPitchTextField,
             () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
             newValue =>
@@ -266,6 +269,8 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                     settings.SongEditorSettings.DefaultPitchForCreatedNotes = newMidiNote;
                 }
             });
+        
+        buttonRecordingButtonTextField.DisableParseEscapeSequences();
         Bind(buttonRecordingButtonTextField,
             () => settings.SongEditorSettings.ButtonDisplayNameForButtonRecording,
             newValue => settings.SongEditorSettings.ButtonDisplayNameForButtonRecording = newValue);
@@ -274,12 +279,16 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(midiNotePlayAlongToggle,
             () => settings.SongEditorSettings.MidiSoundPlayAlongEnabled,
             newValue => settings.SongEditorSettings.MidiSoundPlayAlongEnabled = newValue);
+        
         Bind(midiGainSlider,
             () => settings.SongEditorSettings.MidiGain,
             newValue => settings.SongEditorSettings.MidiGain = newValue);
+        
         Bind(midiVelocitySlider,
             () => settings.SongEditorSettings.MidiVelocity,
             newValue => settings.SongEditorSettings.MidiVelocity = (int)newValue);
+        
+        midiDelayTextField.DisableParseEscapeSequences();
         Bind(midiDelayTextField,
             () => settings.SongEditorSettings.MidiPlaybackOffsetInMillis.ToString(),
             newValue => PropertyUtils.TrySetIntFromString(newValue, newIntValue => settings.SongEditorSettings.MidiPlaybackOffsetInMillis = newIntValue));
@@ -287,9 +296,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         importMidiFileButton.RegisterCallbackButtonTriggered(_ => importMidiFileDialogControl.OpenDialog());
 
         // Speech recognition
+        sentenceLineSizeTextField.DisableParseEscapeSequences();
         Bind(speechRecognitionModelPathTextField,
             () => settings.SongEditorSettings.SpeechRecognitionModelPath,
             newValue => settings.SongEditorSettings.SpeechRecognitionModelPath = newValue);
+        
+        speechRecognitionPhrasesTextField.DisableParseEscapeSequences();
         Bind(speechRecognitionPhrasesTextField,
             () => settings.SongEditorSettings.SpeechRecognitionPhrases,
             newValue => settings.SongEditorSettings.SpeechRecognitionPhrases = newValue);
@@ -389,9 +401,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             .AddTo(gameObject);
 
         // Grid size
+        gridSizeTextField.DisableParseEscapeSequences();
         Bind(gridSizeTextField,
             () => settings.SongEditorSettings.GridSizeInPx.ToString(CultureInfo.InvariantCulture),
             newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.GridSizeInPx = newFloatValue));
+        
+        sentenceLineSizeTextField.DisableParseEscapeSequences();
         Bind(sentenceLineSizeTextField,
             () => settings.SongEditorSettings.SentenceLineSizeInPx.ToString(CultureInfo.InvariantCulture),
             newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.SentenceLineSizeInPx = newFloatValue));

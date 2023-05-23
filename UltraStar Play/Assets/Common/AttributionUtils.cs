@@ -5,6 +5,7 @@ public static class AttributionUtils
     public static VisualElement CreateAttributionVisualElement(SongMeta songMeta)
     {
         TextField attributionTextField = new TextField();
+        attributionTextField.DisableParseEscapeSequences();
         attributionTextField.multiline = true;
         attributionTextField.isReadOnly = true;
         attributionTextField.AddToClassList("multiline");

@@ -107,6 +107,7 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         }
 
         deleteButton.RegisterCallbackButtonTriggered(_ => deleteEventStream.OnNext(true));
+        textField.DisableParseEscapeSequences();
         textField.RegisterValueChangedCallback(evt =>
         {
             UpdateButtons();

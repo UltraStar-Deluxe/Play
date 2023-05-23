@@ -179,17 +179,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         versionProperties.TryGetValue("commit_hash", out string commitHash);
         commitHashText.text = "Commit: " + commitHash;
         
-        // Show the build timestamp only for development builds
-        if (Debug.isDebugBuild)
-        {
-            versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-            buildTimeStampText.text = "Build timestamp: " + buildTimeStamp;
-        }
-        else
-        {
-            buildTimeStampText.text = "";
-            buildTimeStampText.HideByDisplay();
-        }
+        versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
+        buildTimeStampText.text = "Build timestamp: " + buildTimeStamp;
     }
 
     public void CloseQuitGameDialog()

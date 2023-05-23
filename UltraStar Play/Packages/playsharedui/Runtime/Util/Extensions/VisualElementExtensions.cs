@@ -322,4 +322,16 @@ public static class VisualElementExtensions
             0, VisualElement.MeasureMode.Undefined,
             0, VisualElement.MeasureMode.Undefined);
     }
+
+    public static void DisableParseEscapeSequences(this TextField textField)
+    {
+        // See https://forum.unity.com/threads/preventing-escaped-characters-in-textfield.1071425/
+        TextElement textElement = textField.Q<TextElement>();
+        if (textElement == null)
+        {
+            return;
+        }
+        
+        textElement.parseEscapeSequences = false;
+    }
 }

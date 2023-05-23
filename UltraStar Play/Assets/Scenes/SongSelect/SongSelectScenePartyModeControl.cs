@@ -123,7 +123,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     private VisualElement CreateJokerList()
     {
         VisualElement jokerList = new();
-        jokerList.AddToClassList("jokerList");
+        jokerList.name = "jokerList";
         if (sceneData.partyModeSceneData.remainingJokerCount < 0)
         {
             return jokerList;

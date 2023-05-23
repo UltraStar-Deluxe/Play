@@ -324,7 +324,7 @@ public static class ApplyThemeStyleUtils
         {
             // Set textShadow directly on element
             if (!visualElement.ClassListContains("noTextShadow")
-                || IsIgnoredVisualElement(visualElement))
+                && !IsIgnoredVisualElement(visualElement))
             {
                 ApplyTextShadow(visualElement, textShadowConfig);
             }
@@ -338,6 +338,13 @@ public static class ApplyThemeStyleUtils
                     if (label.ClassListContains("noTextShadow")
                         || IsIgnoredVisualElement(label))
                     {
+                        return;
+                    }
+
+                    if (label.ClassListContains("textShadow")
+                        && (textShadowConfig == null || Equals(textShadowConfig.color, default(Color32))))
+                    {
+                        // Do not remove text shadow
                         return;
                     }
                     

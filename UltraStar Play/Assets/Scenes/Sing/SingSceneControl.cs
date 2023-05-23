@@ -195,7 +195,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         injector.Inject(countdownControl);
         injector.Inject(medleyControl);
         injector.Inject(audioFadeInControl);
-        injector.Inject(modifierControl);
     }
 
     private void Start()
@@ -319,6 +318,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             medleyControl.StartCurrentMedleySong();
         }
+
+        // Init modifierControl after all playerControls are initialized
+        injector.Inject(modifierControl);
 
         TriggerAchievementsAtSongStart();
     }
