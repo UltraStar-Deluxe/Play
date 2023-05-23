@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -41,7 +42,7 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
         });
 
         // Choose next players
-        singSceneControl.PartyModeSettings.TeamSettings.Teams.ForEach(team => ChooseNextPlayer(team));
+        ChooseInitialNextPlayers();
     }
 
     public void Update(float deltaTimeInSeconds)
@@ -100,6 +101,11 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
         PlayerProfile nextPlayerProfile = RandomUtils.RandomOf(unusedPlayerProfiles);
         teamToNextPlayerProfile[team] = nextPlayerProfile;
         UpdateNextPlayerUi(team);
+    }
+
+    private void ChooseInitialNextPlayers()
+    {
+        singSceneControl.PartyModeSettings.TeamSettings.Teams.ForEach(team => ChooseNextPlayer(team));
     }
 
     private void SetNextPlayerAsCurrentPlayer(PartyModeTeamSettings team)
