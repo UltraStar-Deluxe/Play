@@ -3,6 +3,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 #if UNITY_EDITOR
     using UnityEditor;
 #endif
@@ -22,6 +23,9 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
     
     [Inject]
     private SceneNavigator sceneNavigator;
+    
+    [Inject]
+    private UIDocument uiDocument;
     
     protected override object GetInstance()
     {
@@ -46,6 +50,22 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
     }
 
     private void Update()
+    {
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+        
+        if (Keyboard.current.f4Key.wasReleasedThisFrame)
+        {
+            // Toggle UI visibility
+            uiDocument.rootVisualElement.SetVisibleByDisplay(!uiDocument.rootVisualElement.IsVisibleByDisplay());
+        }
+
+        UpdateEditorOnlyGlobalShortcuts();
+    }
+
+    private void UpdateEditorOnlyGlobalShortcuts()
     {
         if (!Application.isEditor
             || Keyboard.current == null)
