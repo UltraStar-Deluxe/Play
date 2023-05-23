@@ -1,6 +1,14 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+#jokerList {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
 #togglePlayerSelectedButton {
     width: 120%;
     height: 120%;
