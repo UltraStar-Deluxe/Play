@@ -208,6 +208,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private MessageDialogControl searchExpressionHelpDialogControl;
     private MessageDialogControl lyricsDialogControl;
+    private MessageDialogControl noSingAlongDataDialogControl;
 
     public PartyModeSceneData PartyModeSceneData => sceneData.partyModeSceneData;
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
@@ -966,6 +967,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         if (playerListControl.GetSelectedPlayerProfiles().IsNullOrEmpty())
         {
             UiManager.CreateNotification(TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
+            return;
+        }
+        
+        // Check that there is associated and persisted sing-along data. If not, ask to open song editor.
+        if (SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta))
+        {
+            noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
+            noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
+                                           + "Do you want to open the song editor?";
+            noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
+            Button openSongEditorButton = noSingAlongDataDialogControl.AddButton("Open Song Editor", _ => StartSongEditorScene(songMeta));
+            noSingAlongDataDialogControl.AddButton("Start Song", _ => StartSingScene(songMeta));
+            noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
+            openSongEditorButton.Focus();
             return;
         }
         
