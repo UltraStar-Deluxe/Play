@@ -48,7 +48,7 @@ public class DelayedPerfectSinger : PerfectSinger
 
     protected override BeatPitchEvent GetDummyPitchEvent(int beat)
     {
-        Note noteAtBeat = GetNoteAtBeat(beat);
+        Note noteAtBeat = GetNoteAtBeat(beat, true, false);
         int midiNote = noteAtBeat != null
             ? noteAtBeat.MidiNote
             : 60;

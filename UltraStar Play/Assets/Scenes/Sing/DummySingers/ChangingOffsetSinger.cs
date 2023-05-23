@@ -15,7 +15,7 @@ public class ChangingOffsetSinger : AbstractDummySinger
     protected override BeatPitchEvent GetDummyPitchEvent(int beat)
     {
         // Change noteOffset when note changes.
-        Note noteAtBeat = GetNoteAtBeat(beat);
+        Note noteAtBeat = GetNoteAtBeat(beat, true, false);
         if (lastNote != null
             && noteAtBeat != lastNote
             && Random.Range(0, 100) > 100 - randomness)

@@ -22,7 +22,7 @@ public class NearlyPerfectSinger : AbstractDummySinger
     protected override BeatPitchEvent GetDummyPitchEvent(int beat)
     {
         BeatPitchEvent result = null;
-        Note noteAtBeat = GetNoteAtBeat(beat);
+        Note noteAtBeat = GetNoteAtBeat(beat, true, false);
         if (noteAtBeat != null)
         {
             float frequency = 0;

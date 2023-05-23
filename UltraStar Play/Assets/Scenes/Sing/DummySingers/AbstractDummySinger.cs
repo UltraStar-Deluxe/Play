@@ -73,7 +73,7 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         int beat = pitchEvent != null
             ? pitchEvent.Beat
             : fallbackBeat;
-        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat);
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat, true, false);
         Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat, true, false);
         playerControl.PlayerMicPitchTracker.FirePitchEvent(pitchEvent, beat, noteAtBeat, sentenceAtBeat);
     }
@@ -99,14 +99,14 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
 
     protected Sentence GetSentenceAtBeat(int beat)
     {
-        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat);
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.Voice, beat, true, false);
         return sentenceAtBeat;
     }
 
-    protected Note GetNoteAtBeat(int beat)
+    protected Note GetNoteAtBeat(int beat, bool inclusiveStartBeat = true, bool inclusiveEndBeat = true)
     {
         Sentence sentenceAtBeat = GetSentenceAtBeat(beat);
-        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat);
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(sentenceAtBeat, beat, inclusiveStartBeat, inclusiveEndBeat);
         return noteAtBeat;
     }
 }

@@ -5,7 +5,7 @@ public class PerfectSinger : AbstractDummySinger
 
     protected override BeatPitchEvent GetDummyPitchEvent(int beat)
     {
-        Note noteAtBeat = GetNoteAtBeat(beat);
+        Note noteAtBeat = GetNoteAtBeat(beat, true, false);
         if (noteAtBeat != null)
         {
             float frequency = 0;
