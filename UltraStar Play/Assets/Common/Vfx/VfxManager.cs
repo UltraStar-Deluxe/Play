@@ -141,7 +141,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         backgroundVfxElement.AddToClassList("overlay");
         backgroundVfxElement.image = backgroundVfxCamera.targetTexture;
         backgroundVfxElement.pickingMode = PickingMode.Ignore;
-        uiDocument.rootVisualElement.Q(R.UxmlNames.background)?.AddAsFirstChild(backgroundVfxElement);
+        uiDocument.rootVisualElement.AddAsFirstChild(backgroundVfxElement);
     }
 
     public static void CreateParticleEffect(ParticleEffectConfig particleEffectConfig)
