@@ -265,6 +265,10 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         playerVisualElement.RemoveFromHierarchy();
         playerToVisualElement.Remove(playerProfile);
         partyModeSettings.GuestPlayerProfiles.Remove(playerProfile);
+        partyModeSettings.TeamSettings.Teams.ForEach(teamSettings =>
+        {
+            teamSettings.guestPlayerProfiles.Remove(playerProfile);
+        });
     }
 
     private List<PlayerProfile> GetAllPlayerProfiles()
