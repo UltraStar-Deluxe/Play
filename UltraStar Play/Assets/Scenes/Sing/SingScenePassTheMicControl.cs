@@ -27,7 +27,8 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
     public void OnInjectionFinished()
     {
         passTheMicProgressBar.SetVisibleByDisplay(singSceneControl.IsPassTheMic);
-        if (!singSceneControl.HasPartyModeSceneData)
+        if (!singSceneControl.HasPartyModeSceneData
+            || !singSceneControl.IsPassTheMic)
         {
             return;
         }
