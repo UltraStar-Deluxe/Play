@@ -98,6 +98,7 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
         textField.RegisterValueChangedCallback(evt => ValidateValue(evt.newValue, true));
         textField.RegisterCallback<NavigationSubmitEvent>(evt => TrySubmitValue(textField.value));
         textField.Focus();
+        textField.DisableParseEscapeSequences();
 
         InitialValue = "";
         ValidateValue(InitialValue, false);

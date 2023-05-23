@@ -41,7 +41,9 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
         okButton.RegisterCallbackButtonTriggered(_ => TryCreateNewSong());
 
         artistTextField.value = "";
+        artistTextField.DisableParseEscapeSequences();
         titleTextField.value = "";
+        titleTextField.DisableParseEscapeSequences();
         createCoverToggle.value = true;
         createBackgroundToggle.value = true;
         createVideoToggle.value = false;

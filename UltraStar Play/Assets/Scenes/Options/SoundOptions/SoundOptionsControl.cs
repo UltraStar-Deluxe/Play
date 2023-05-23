@@ -88,6 +88,7 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
         vocalsAudioVolumePickerControl.Bind(() => settings.VocalsAudioVolumePercent,
             newValue => settings.VocalsAudioVolumePercent = (int)newValue);
 
+        soundfontPathTextField.DisableParseEscapeSequences();
         FieldBindingUtils.Bind(gameObject,
             soundfontPathTextField,
             () => settings.SoundfontPath,

@@ -64,6 +64,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         voice = songMeta.GetVoices()[0];
         EnterViewMode();
 
+        textField.DisableParseEscapeSequences();
         textField.selectAllOnMouseUp = false;
         textField.selectAllOnFocus = false;
         textField.RegisterCallback<BlurEvent>(evt =>

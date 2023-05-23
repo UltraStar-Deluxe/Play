@@ -79,6 +79,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
     public void OnInjectionFinished()
     {
         urlTextField.value = "";
+        urlTextField.DisableParseEscapeSequences();
         new TextFieldHintControl(urlTextField);
         
         statusLabel.text = "Click the button to start the download";

@@ -42,6 +42,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
             // Focus on the name of the newly added player to directly allow changing its name
             TextField nameTextField = playerProfileList[playerProfileList.childCount - 1].Q<TextField>("nameTextField");
+            nameTextField.DisableParseEscapeSequences();
             nameTextField.Focus();
             
             ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
@@ -92,6 +93,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         });
 
         TextField nameTextField = visualElement.Q<TextField>(R.UxmlNames.nameTextField);
+        nameTextField.DisableParseEscapeSequences();
         nameTextField.value = playerProfile.Name;
         nameTextField.RegisterValueChangedCallback(evt => playerProfile.Name = evt.newValue);
 

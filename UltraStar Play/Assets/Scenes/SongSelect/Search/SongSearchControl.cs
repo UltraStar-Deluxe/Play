@@ -103,6 +103,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         {
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
+        searchTextField.DisableParseEscapeSequences();
         new TextFieldHintControl(searchTextFieldHint);
 
         songSelectSceneInputControl.FuzzySearchText.Subscribe(newValue => searchTextFieldHint.SetVisibleByVisibility(newValue.IsNullOrEmpty()));

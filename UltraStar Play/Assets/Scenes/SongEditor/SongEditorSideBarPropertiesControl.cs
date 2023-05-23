@@ -154,6 +154,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
         songPropertiesSideBarContainer.Add(visualElement);
 
         TextField textField = visualElement.Q<TextField>(R.UxmlNames.propertyTextField);
+        textField.DisableParseEscapeSequences();
         textField.label = labelText;
         textField.isDelayed = true;
         textField.value = valueGetter();

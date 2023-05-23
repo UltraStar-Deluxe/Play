@@ -56,6 +56,7 @@ public class ImportLrcDialogControl : INeedInjection, IInjectionFinishedListener
     {
         injector.Inject(lrcFormatImporter);
 
+        importLrcTextField.DisableParseEscapeSequences();
         importLrcTextField.value = "";
         importLrcTextField.RegisterValueChangedCallback(evt => lrcTextChangedEventStream.OnNext(true));
         lrcTextChangedEventStream.Throttle(new TimeSpan(0, 0, 0, 0, 200))

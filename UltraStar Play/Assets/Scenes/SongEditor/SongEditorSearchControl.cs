@@ -54,6 +54,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         
         searchTextField.RegisterValueChangedCallback(evt => UpdateSearchResultLabel());
         searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => SearchNext());
+        searchTextField.DisableParseEscapeSequences();
         
         searchPreviousButton.RegisterCallbackButtonTriggered(_ => SearchPrevious());
         searchNextButton.RegisterCallbackButtonTriggered(_ => SearchNext());

@@ -28,6 +28,7 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
 
     public virtual void OnInjectionFinished()
     {
+        textField.DisableParseEscapeSequences();
         textField.selectAllOnFocus = false;
         textField.selectAllOnMouseUp = false;
         initialText = GetInitialText();
