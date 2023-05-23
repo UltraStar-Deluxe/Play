@@ -46,6 +46,9 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
 
     private readonly Subject<List<SongMeta>> songListChangedEventStream = new();
     public IObservable<List<SongMeta>> SongListChangedEventStream => songListChangedEventStream;
+    
+    private readonly Subject<SongMeta> submitEventStream = new();
+    public IObservable<SongMeta> SubmitEventStream => submitEventStream;
 
     private ScrollView songListViewScrollView;
     private int DummyScrollViewItemCountPerSide => dynamicListViewItemsSize
@@ -110,6 +113,14 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
         songListView.RegisterCallback<PointerDownEvent>(_ =>
         {
             isPointerDownOnListView = true;
+        }, TrickleDown.TrickleDown);
+
+        songListView.RegisterCallback<NavigationSubmitEvent>(_ =>
+        {
+            if (SelectedSongMeta != null)
+            {
+                submitEventStream.OnNext(SelectedSongMeta);
+            }
         }, TrickleDown.TrickleDown);
 
         // Hide scroll bars

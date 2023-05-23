@@ -91,6 +91,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     private readonly Subject<SearchChangedEvent> searchChangedEventStream = new();
     public IObservable<SearchChangedEvent> SearchChangedEventStream => searchChangedEventStream;
 
+    private readonly Subject<bool> submitEventStream = new();
+    public IObservable<bool> SubmitEventStream => submitEventStream;
+
     private bool isInjectionFinished;
     
     public void OnInjectionFinished()
@@ -104,6 +107,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             searchChangedEventStream.OnNext(new SearchTextChangedEvent());
         });
         searchTextField.DisableParseEscapeSequences();
+        searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => submitEventStream.OnNext(true));
         new TextFieldHintControl(searchTextFieldHint);
 
         songSelectSceneInputControl.FuzzySearchText.Subscribe(newValue => searchTextFieldHint.SetVisibleByVisibility(newValue.IsNullOrEmpty()));

@@ -79,8 +79,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
             .Subscribe(_ => songSelectSceneControl.ToggleSelectedPlayers());
         
         // Open the sing scene
-        InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
-            .Subscribe(OnSubmit);
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
             .Subscribe(_ => songSelectSceneControl.AttemptStartSelectedSong());
         
@@ -141,20 +139,6 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         return false;
     }
 
-    private void OnSubmit(InputAction.CallbackContext callbackContext)
-    {
-        VisualElement focusedElement = VisualElementUtils.GetFocusedVisualElement(songListView.focusController);
-        if (songSearchControl.IsSearchTextFieldFocused())
-        {
-            songSelectSceneControl.SubmitSearch();
-        }
-        else if (focusedElement?.GetFirstAncestorOfType<ListView>() != null
-                 || focusedElement?.GetFirstAncestorOfType<ListViewH>() != null)
-        {
-            songSelectSceneControl.AttemptStartSelectedSong();
-        }
-    }
-
     private void OnScrollWheel(InputAction.CallbackContext context)
     {
         if (!IsPointerOverSongList())
@@ -192,7 +176,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         }
         else if (songSearchControl.IsSearchTextFieldFocused())
         {
-            songSelectSceneControl.SubmitSearch();
+            songSelectSceneControl.OnSubmitSearch();
         }
         else if (songSelectSceneControl.SongQueueSlideInControl.Visible.Value)
         {

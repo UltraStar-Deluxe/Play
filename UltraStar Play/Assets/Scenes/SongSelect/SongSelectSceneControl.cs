@@ -283,6 +283,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songSelectSceneInputControl.FuzzySearchText
             .Subscribe(newValue => fuzzySearchTextLabel.text = newValue);
 
+        songRouletteControl.SubmitEventStream.Subscribe(_ => AttemptStartSelectedSong());
         songRouletteControl.Focus();
 
         quitSceneButton.RegisterCallbackButtonTriggered(_ => QuitSongSelect());
@@ -290,6 +291,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songSearchControl.SearchChangedEventStream
             .Throttle(new TimeSpan(0, 0, 0, 0, 500))
             .Subscribe(_ => OnSearchTextChanged());
+        songSearchControl.SubmitEventStream.Subscribe(_ => OnSubmitSearch());
 
         SongSelectionPlaylistChooserControl.Selection.Subscribe(_ => UpdateFilteredSongs());
         songSelectFilterControl.FiltersChangedEventStream.Subscribe(_ => UpdateFilteredSongs());
@@ -1193,7 +1195,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         UpdateInputLegend();
     }
 
-    public void SubmitSearch()
+    public void OnSubmitSearch()
     {
         selectedSongBeforeSearch = SelectedSong;
         songSearchControl.ResetSearchText();
