@@ -231,7 +231,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     private VisualElement CreateSongListEntry(SongDto songDto)
     {
         VisualElement songListEntry = songListEntryUi.CloneTreeAndGetFirstChild();
-        songListEntry.Q<Label>(R.UxmlNames.songListEntryLabel).text = $"{songDto.Artist} - {songDto.Title}";
+        songListEntry.Q<Label>(R.UxmlNames.songListEntryLabel).text = SongMetaUtils.GetArtistDashTitle(songDto.Artist, songDto.Title);
         songListEntry.Q<Button>(R.UxmlNames.songListEntryButton).RegisterCallbackButtonTriggered(_ => songDetailsControl.ShowSongDetails(songDto));
         return songListEntry;
     }

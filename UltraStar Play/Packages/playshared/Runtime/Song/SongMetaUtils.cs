@@ -455,9 +455,30 @@ public static class SongMetaUtils
 
     public static string GetArtistDashTitle(SongMeta songMeta)
     {
-        return $"{songMeta?.Artist} - {songMeta?.Title}";
+        return GetArtistDashTitle(songMeta.Artist, songMeta.Title);
     }
 
+    public static string GetArtistDashTitle(string artist, string title)
+    {
+        if (artist.IsNullOrEmpty()
+            && title.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        if (artist.IsNullOrEmpty())
+        {
+            return title;
+        }
+        
+        if (title.IsNullOrEmpty())
+        {
+            return artist;
+        }
+
+        return $"{artist} - {title}";
+    }
+    
     public static int MinBeat(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())
