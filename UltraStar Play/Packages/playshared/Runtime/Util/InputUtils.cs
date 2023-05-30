@@ -160,6 +160,15 @@ public static class InputUtils
     {
         return mouse != null ? mouse.position.ReadValue() : Vector2.zero;
     }
+    
+    public static Vector2 GetCurrentPointerPosition()
+    {
+        if (Pointer.current == null)
+        {
+            return Vector2.zero;
+        }
+        return Pointer.current.position.value;
+    }
 
     public static Vector2 GetPointerPositionInPanelCoordinates(PanelHelper panelHelper, bool invertY = false)
     {

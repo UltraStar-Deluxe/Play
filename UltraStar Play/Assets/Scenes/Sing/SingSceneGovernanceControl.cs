@@ -3,6 +3,7 @@ using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 
@@ -64,7 +65,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     
     private ContextMenuControl contextMenuControl;
 
-    private Vector3 lastMousePosition;
+    private Vector2 lastPointerPosition;
     private float hideDelayInSeconds;
     private readonly float longHideDelayInSeconds = 2f;
     private readonly float shortHideDelayInSeconds = 0.2f;
@@ -153,24 +154,27 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         
         // Hide by default, show on mouse move or key press.
         doNotShowOverlayBeforeTimeInSeconds = Time.time + 0.5f;
-        lastMousePosition = Input.mousePosition;
+        lastPointerPosition = Input.mousePosition;
         hideDelayInSeconds = longHideDelayInSeconds;
         HideOverlayAndCursor();
     }
 
     public void Update()
     {
+        Vector2 currentPointerPosition = InputUtils.GetCurrentPointerPosition();
         if (Time.time > doNotShowOverlayBeforeTimeInSeconds)
         {
-            UpdateShowOverlayAndCursorByInput();
+            UpdateShowOverlayAndCursorByInput(currentPointerPosition);
         }
 
-        lastMousePosition = Input.mousePosition;
+        lastPointerPosition = currentPointerPosition;
     }
 
-    private void UpdateShowOverlayAndCursorByInput()
+    private void UpdateShowOverlayAndCursorByInput(Vector2 currentPointerPosition)
     {
-        if (lastMousePosition != Input.mousePosition
+        if ((lastPointerPosition != currentPointerPosition
+            && currentPointerPosition.x >= 0 && currentPointerPosition.x <= Screen.width
+            && currentPointerPosition.y >= 0 && currentPointerPosition.x <= Screen.height)
             || Input.anyKeyDown)
         {
             ShowOverlayAndCursor();
