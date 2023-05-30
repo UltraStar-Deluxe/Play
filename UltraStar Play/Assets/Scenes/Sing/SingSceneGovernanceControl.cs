@@ -77,7 +77,9 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private float popupMenuClosedTimeInSeconds;
 
     private bool fillAppearanceContextMenu;
-    
+
+    private float doNotShowOverlayBeforeTimeInSeconds;
+
     public void OnInjectionFinished()
     {
         contextMenuControl = injector
@@ -150,6 +152,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         titleLabel.text = songMeta.Title;
         
         // Hide by default, show on mouse move or key press.
+        doNotShowOverlayBeforeTimeInSeconds = Time.time + 0.5f;
         lastMousePosition = Input.mousePosition;
         hideDelayInSeconds = longHideDelayInSeconds;
         HideOverlayAndCursor();
@@ -157,11 +160,19 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     public void Update()
     {
+        if (Time.time > doNotShowOverlayBeforeTimeInSeconds)
+        {
+            UpdateShowOverlayAndCursorByInput();
+        }
+
+        lastMousePosition = Input.mousePosition;
+    }
+
+    private void UpdateShowOverlayAndCursorByInput()
+    {
         if (lastMousePosition != Input.mousePosition
             || Input.anyKeyDown)
         {
-            lastMousePosition = Input.mousePosition;
-
             ShowOverlayAndCursor();
             if (Time.time - playbackStartTimeInSeconds < 0.5f)
             {
