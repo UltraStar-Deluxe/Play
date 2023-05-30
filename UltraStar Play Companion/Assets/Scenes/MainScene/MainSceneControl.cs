@@ -207,10 +207,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         clientNameTextField.RegisterCallback<BlurEvent>(_ => OnClientNameTextFieldSubmit());
         
         visualizeAudioToggle.value = settings.ShowAudioWaveForm;
-        audioWaveForm.SetVisibleByDisplay(settings.ShowAudioWaveForm);
+        audioWaveForm.SetVisibleByVisibility(settings.ShowAudioWaveForm);
         visualizeAudioToggle.RegisterValueChangedCallback(changeEvent =>
         {
-            audioWaveForm.SetVisibleByDisplay(changeEvent.newValue);
+            audioWaveForm.SetVisibleByVisibility(changeEvent.newValue);
             settings.ShowAudioWaveForm = changeEvent.newValue;
         });
         
@@ -350,7 +350,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private void Update()
     {
-        if (audioWaveForm.style.display != DisplayStyle.None
+        if (audioWaveForm.IsVisibleByDisplay()
+            && audioWaveForm.IsVisibleByVisibility()
             && audioWaveFormVisualization != null)
         {
             audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(micSampleRecorder.MicSamples);
@@ -414,7 +415,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connectedTo, "remote" , connectEvent.ServerIpEndPoint.Address);
             onlyVisibleWhenConnected.ForEach(it => it.ShowByDisplay());
             onlyVisibleWhenNotConnected.ForEach(it => it.HideByDisplay());
-            audioWaveForm.SetVisibleByDisplay(settings.ShowAudioWaveForm);
+            audioWaveForm.SetVisibleByVisibility(settings.ShowAudioWaveForm);
             connectionThroubleshootingText.HideByDisplay();
             serverErrorResponseText.HideByDisplay();
             toggleRecordingButton.Focus();
