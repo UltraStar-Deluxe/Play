@@ -35,6 +35,7 @@ public class SongRating
                 values = new List<SongRating>();
                 values.Add(Ultrastar);
                 values.Add(Superstar);
+                values.Add(LeadSinger);
                 values.Add(RisingStar);
                 values.Add(Hopeful);
                 values.Add(Wannabe);
