@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -218,58 +219,80 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateFontSize(VisualElement visualElement)
     {
-        // When the first label is ready, update the font size of all labels.
-        Label firstLabel = visualElement.Q<Label>();
-        if (firstLabel == null)
+        List<Label> labels = visualElement.Query<Label>().ToList();
+        if (labels.IsNullOrEmpty())
         {
             return;
         }
-        
-        firstLabel.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
+
+        // When all labels are ready (i.e. they have well defined geometry) then update their font size.
+        List<Label> labelsWithoutGeometry = labels.Where(label => !VisualElementUtils.HasGeometry(label)).ToList();
+        if (labelsWithoutGeometry.IsNullOrEmpty())
         {
-            DoUpdateFontSize(visualElement);
-        });
+            DoUpdateFontSize(visualElement, labels);
+        }
+        else
+        {
+            foreach (Label label in labels)
+            {
+                label.RegisterCallbackOneShot<GeometryChangedEvent>(_ =>
+                {
+                    labelsWithoutGeometry.Remove(label);
+                    if (labelsWithoutGeometry.IsNullOrEmpty())
+                    {
+                        DoUpdateFontSize(visualElement, labels);
+                    }
+                });
+            }
+        }
     }
     
     /**
      * Reduces the font size until all labels fit in the container
      */
-    private void DoUpdateFontSize(VisualElement visualElement)
+    private void DoUpdateFontSize(VisualElement visualElement, List<Label> labels)
     {
-        List<Label> labels = visualElement.Query<Label>().ToList();
         if (labels.IsNullOrEmpty())
         {
             Debug.Log("No labels");
             return;
         }
-        
-        float GetTotalLabelWidth()
-        {
-            return labels.Select(label =>
-            {
-                Vector2 preferredSize = label.GetPreferredTextSize();
-                return preferredSize.x;
-            }).Sum();
-        }
 
         float fontSize = labels.FirstOrDefault().resolvedStyle.fontSize;
         float containerWidth = visualElement.contentRect.width;
+        // TODO: binary search for better performance.
         for (int iteration = 0; iteration < MaxFontSizeIterations; iteration++)
         {
-            float totalLabelWidth = GetTotalLabelWidth();
+            float totalLabelWidth = GetTotalLabelWidth(labels);
             if (totalLabelWidth > containerWidth)
             {
                 if (fontSize <= MinFontSize)
                 {
-                    Debug.Log("Font size too small");
-                    return;
+                    // Required font size is too small
+                    Debug.Log("Required font size is too small, aborting optimal font size search");
+                    break;
                 }
                 fontSize -= 1;
                 labels.ForEach(label => label.style.fontSize = fontSize);
             }
+            else
+            {
+                // All labels fit in the container
+                break;
+            }
         }
     }
 
+    private float GetTotalLabelWidth(List<Label> labels)
+    {
+        return labels.Select(label =>
+        {
+            Vector2 preferredTextSize = label.GetPreferredTextSize();
+            IResolvedStyle resolvedStyle = label.resolvedStyle;
+            return resolvedStyle.marginLeft + preferredTextSize.x + resolvedStyle.marginRight;
+        }).Sum();
+    }
+    
     private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence, bool isNextSentence)
     {
         visualElement.Query<Label>()
