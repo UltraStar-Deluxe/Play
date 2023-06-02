@@ -119,7 +119,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel focusableNavigatorRoot pt-1 px-1 pb-2" style="max-width: 40%; justify-content: flex-start; align-items: stretch; width: auto; display: none; right: 0;">
+        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel focusableNavigatorRoot pt-1 px-1 pb-2" style="max-width: 40%; justify-content: flex-start; align-items: stretch; width: auto; right: 0;">
             <ui:VisualElement name="row" style="align-items: center;">
                 <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
                 <ui:Button display-tooltip-when-elided="true" name="closeSongQueueButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
@@ -138,6 +138,12 @@
                         <MaterialIcon tabindex="-1" icon="link" name="linkIcon" />
                     </ui:VisualElement>
                     <ui:Label tabindex="-1" text="Enqueue Medley" display-tooltip-when-elided="true" name="addToSongQueueAsMedleyLabel" class="tinyFont" />
+                </ui:Button>
+                <ui:Button display-tooltip-when-elided="true" name="startSongQueueButton" enable-rich-text="false" class="ml-1" style="height: auto;">
+                    <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+                        <MaterialIcon tabindex="-1" icon="play_arrow" name="startQueueIcon" />
+                    </ui:VisualElement>
+                    <ui:Label tabindex="-1" text="Start Queue" display-tooltip-when-elided="true" name="addToSongQueueAsMedleyLabel" class="tinyFont" />
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
