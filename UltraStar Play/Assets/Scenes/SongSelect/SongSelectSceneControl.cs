@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Flurl.Util;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -119,12 +120,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject]
     private SongQueueManager songQueueManager;
 
-    [Inject(UxmlName = R.UxmlNames.noSongsFoundLabel)]
-    private Label noSongsFoundLabel;
-
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
+    [Inject(UxmlName = R.UxmlNames.songScanInProgressContainer)]
+    private VisualElement songScanInProgressContainer;
+    
     [Inject(UxmlName = R.UxmlNames.importSongsButton)]
     private Button importSongsButton;
 
@@ -741,13 +742,31 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         
         songMetas = new List<SongMeta>(songMetaManager.GetSongMetas());
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
-        noSongsFoundLabel.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
-        noSongsFoundContainer.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
-
+        
+        songMetaManager.SongScanFinishedEventStream
+            .ObserveOnMainThread()
+            .Subscribe(evt => UpdateSongScanLabels(evt));
+        UpdateSongScanLabels(null);
+        
         // Trigger achievement
         if (songMetas.Count > 100)
         {
             achievementEventStream.OnNext(AchievementId.browseMoreThan100Songs);
+        }
+    }
+
+    private void UpdateSongScanLabels(SongScanFinishedEvent evt)
+    {
+        if (SongMetaManager.IsSongScanFinished
+            || evt != null)
+        {
+            songScanInProgressContainer.HideByDisplay();
+            noSongsFoundContainer.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
+        }
+        else
+        {
+            songScanInProgressContainer.ShowByDisplay();
+            noSongsFoundContainer.HideByDisplay();
         }
     }
 
