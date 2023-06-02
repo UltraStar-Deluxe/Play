@@ -303,13 +303,16 @@ public static class ApplyThemeStyleUtils
         bool hasFontColor = !Equals(fontColor, default(Color32));
         if (hasFontColor)
         {
+            // Set font color for child elements
             visualElement.style.color = new StyleColor(fontColor);
             if (visualElement is Button)
             {
                 visualElement.Query<Label>()
                     .ForEach(label =>
                     {
-                        if (IsIgnoredVisualElement(label))
+                        if (IsIgnoredVisualElement(label)
+                            || label.ClassListContains("warningFontColor")
+                            || label.ClassListContains("errorFontColor"))
                         {
                             return;
                         }
