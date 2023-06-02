@@ -77,6 +77,8 @@ See https://www.apache.org/licenses/LICENSE-2.0.html
 - Opportunity.LrcParser
     - https://github.com/OpportunityLiu/LrcParser
 
+- Basic Pitch
+    - https://github.com/spotify/basic-pitch
 
 Mozilla Public License
 ----------------------
