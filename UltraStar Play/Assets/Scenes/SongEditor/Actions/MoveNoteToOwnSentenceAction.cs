@@ -32,7 +32,13 @@ public class MoveNoteToOwnSentenceAction : INeedInjection
             .FirstOrDefault();
         newSentence.SetVoice(voice);
         
-        notes.ForEach(note => note.SetSentence(newSentence));
+        notes.ForEach(note =>
+        {
+            // Prevent notes from merging into a single word
+            SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
+            
+            note.SetSentence(newSentence);
+        });
         newSentence.FitToNotes();
         
         // Remove old sentence if not more notes left
