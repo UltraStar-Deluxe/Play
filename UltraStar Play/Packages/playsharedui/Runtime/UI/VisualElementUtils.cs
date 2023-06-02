@@ -126,9 +126,24 @@ public static class VisualElementUtils
         {
             return false;
         }
-        
-        return !float.IsNaN(visualElement.worldBound.width)
-            && !float.IsNaN(visualElement.worldBound.height);
+
+        Rect worldBound = visualElement.worldBound;
+        return !float.IsNaN(worldBound.width)
+               && !float.IsNaN(worldBound.height);
+    }
+    
+    public static bool HasGeometryAndNonZeroSize(VisualElement visualElement)
+    {
+        if (visualElement == null)
+        {
+            return false;
+        }
+
+        Rect worldBound = visualElement.worldBound;
+        return !float.IsNaN(worldBound.width)
+               && !float.IsNaN(worldBound.height)
+               && worldBound.width > 0
+               && worldBound.height > 0;
     }
     
     public static VisualElement LoadVisualElementFromResources(string path)

@@ -5,12 +5,15 @@ public static partial class R
     {
         public const string child_mb_4 = "child-mb-4";
         public const string controlWithLabelVertical = "controlWithLabelVertical";
+        public const string ellipsis = "ellipsis";
         public const string fontColorBorder = "fontColorBorder";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string jpg = "jpg";
+        public const string largeFont = "largeFont";
         public const string ml_1 = "ml-1";
         public const string ml_2 = "ml-2";
         public const string ml_3 = "ml-3";
+        public const string ml_auto = "ml-auto";
         public const string mr_2 = "mr-2";
         public const string mr_3 = "mr-3";
         public const string mr_auto = "mr-auto";

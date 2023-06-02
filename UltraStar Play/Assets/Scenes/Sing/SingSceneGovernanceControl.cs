@@ -3,6 +3,7 @@ using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 
@@ -64,7 +65,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     
     private ContextMenuControl contextMenuControl;
 
-    private Vector3 lastMousePosition;
+    private Vector2 lastPointerPosition;
     private float hideDelayInSeconds;
     private readonly float longHideDelayInSeconds = 2f;
     private readonly float shortHideDelayInSeconds = 0.2f;
@@ -77,7 +78,9 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private float popupMenuClosedTimeInSeconds;
 
     private bool fillAppearanceContextMenu;
-    
+
+    private float doNotShowOverlayBeforeTimeInSeconds;
+
     public void OnInjectionFinished()
     {
         contextMenuControl = injector
@@ -150,18 +153,30 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         titleLabel.text = songMeta.Title;
         
         // Hide by default, show on mouse move or key press.
-        lastMousePosition = Input.mousePosition;
+        doNotShowOverlayBeforeTimeInSeconds = Time.time + 0.5f;
+        lastPointerPosition = Input.mousePosition;
         hideDelayInSeconds = longHideDelayInSeconds;
         HideOverlayAndCursor();
     }
 
     public void Update()
     {
-        if (lastMousePosition != Input.mousePosition
+        Vector2 currentPointerPosition = InputUtils.GetCurrentPointerPosition();
+        if (Time.time > doNotShowOverlayBeforeTimeInSeconds)
+        {
+            UpdateShowOverlayAndCursorByInput(currentPointerPosition);
+        }
+
+        lastPointerPosition = currentPointerPosition;
+    }
+
+    private void UpdateShowOverlayAndCursorByInput(Vector2 currentPointerPosition)
+    {
+        if ((lastPointerPosition != currentPointerPosition
+            && currentPointerPosition.x >= 0 && currentPointerPosition.x <= Screen.width
+            && currentPointerPosition.y >= 0 && currentPointerPosition.x <= Screen.height)
             || Input.anyKeyDown)
         {
-            lastMousePosition = Input.mousePosition;
-
             ShowOverlayAndCursor();
             if (Time.time - playbackStartTimeInSeconds < 0.5f)
             {

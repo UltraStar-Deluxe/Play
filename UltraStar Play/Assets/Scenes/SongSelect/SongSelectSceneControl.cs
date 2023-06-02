@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Flurl.Util;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -72,6 +73,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.addToSongQueueAsMedleyButton)]
     private Button addToSongQueueAsMedleyButton;
     
+    [Inject(UxmlName = R.UxmlNames.startSongQueueButton)]
+    private Button startSongQueueButton;
+    
     [Inject(UxmlName = R.UxmlNames.toggleCoopModeButton)]
     private Button toggleCoopModeButton;
     
@@ -116,12 +120,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject]
     private SongQueueManager songQueueManager;
 
-    [Inject(UxmlName = R.UxmlNames.noSongsFoundLabel)]
-    private Label noSongsFoundLabel;
-
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
+    [Inject(UxmlName = R.UxmlNames.songScanInProgressContainer)]
+    private VisualElement songScanInProgressContainer;
+    
     [Inject(UxmlName = R.UxmlNames.importSongsButton)]
     private Button importSongsButton;
 
@@ -354,6 +358,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         closeSongQueueButton.RegisterCallbackButtonTriggered(_ => SongQueueSlideInControl.SlideOut());
         addToSongQueueAsNewButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueue(SelectedSong));
         addToSongQueueAsMedleyButton.RegisterCallbackButtonTriggered(_ => AddSongToSongQueueAsMedley(SelectedSong));
+        startSongQueueButton.RegisterCallbackButtonTriggered(_ => StartSingSceneWithNextSongQueueEntry());
         songQueueUiControl.OnToggleMedley = songQueueEntryDto => songQueueManager.ToggleMedley(songQueueEntryDto);
         songQueueUiControl.OnDelete = songQueueEntryDto => songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
     }
@@ -464,6 +469,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
         }
         songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
+        startSongQueueButton.SetEnabled(!songQueueManager.IsSongQueueEmpty);
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(songQueueOverlay);
     }
 
@@ -736,13 +742,31 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         
         songMetas = new List<SongMeta>(songMetaManager.GetSongMetas());
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
-        noSongsFoundLabel.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
-        noSongsFoundContainer.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
-
+        
+        songMetaManager.SongScanFinishedEventStream
+            .ObserveOnMainThread()
+            .Subscribe(evt => UpdateSongScanLabels(evt));
+        UpdateSongScanLabels(null);
+        
         // Trigger achievement
         if (songMetas.Count > 100)
         {
             achievementEventStream.OnNext(AchievementId.browseMoreThan100Songs);
+        }
+    }
+
+    private void UpdateSongScanLabels(SongScanFinishedEvent evt)
+    {
+        if (SongMetaManager.IsSongScanFinished
+            || evt != null)
+        {
+            songScanInProgressContainer.HideByDisplay();
+            noSongsFoundContainer.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
+        }
+        else
+        {
+            songScanInProgressContainer.ShowByDisplay();
+            noSongsFoundContainer.HideByDisplay();
         }
     }
 
@@ -862,18 +886,16 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingScene(SongMeta songMeta)
     {
-        if (!songQueueManager.IsSongQueueEmpty)
-        {
-            StartSingSceneWithNextSongQueueEntry();
-        }
-        else
-        {
-            StartSingSceneWithGivenSongAndSettings(songMeta);
-        }
+        StartSingSceneWithGivenSongAndSettings(songMeta);
     }
 
     private void StartSingSceneWithNextSongQueueEntry()
     {
+        if (songQueueManager.IsSongQueueEmpty)
+        {
+            return;
+        }
+        
         SingSceneData singSceneData = songQueueManager.CreateNextSingSceneData(sceneData.partyModeSceneData);
         sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }

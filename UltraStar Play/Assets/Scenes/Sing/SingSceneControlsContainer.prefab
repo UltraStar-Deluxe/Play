@@ -154,7 +154,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3215426187342577301
 Transform:
   m_ObjectHideFlags: 0
@@ -200,7 +200,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9101029528512970024
 Transform:
   m_ObjectHideFlags: 0
@@ -232,7 +232,7 @@ MonoBehaviour:
   randomness: 10
   noteOffset: 0
   maxNonPerfectOffset: 3
-  minBeatCount: 3
+  minBeatCount: 4
 --- !u!1 &3353654448907392714
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,7 +849,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3254825394069265912
 Transform:
   m_ObjectHideFlags: 0
@@ -878,10 +878,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerIndexToSimulate: 1
-  randomness: 15
+  randomness: 34
   noteOffset: 0
-  maxNonPerfectOffset: 2
-  minBeatCount: 4
+  maxNonPerfectOffset: 3
+  minBeatCount: 2
 --- !u!1 &8637791745041204541
 GameObject:
   m_ObjectHideFlags: 0

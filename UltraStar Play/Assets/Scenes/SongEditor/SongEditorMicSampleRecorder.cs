@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UnityEngine.InputSystem;
 using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -148,6 +149,23 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
                 DrawRecordedSamplesWaveForm();
             }
         }
+    }
+
+    private void Update()
+    {
+        if (Keyboard.current != null
+            && Keyboard.current.rightCtrlKey.wasPressedThisFrame)
+        {
+            ClearRecordingBuffer();
+        }
+    }
+
+    private void ClearRecordingBuffer()
+    {
+        Array.Clear(RecordingBuffer, 0, RecordingBuffer.Length);
+        recordingIndex = 0;
+        recordingStartIndex = 0;
+        recordedSamplesChangedEventStream.OnNext(true);
     }
 
     private void DoSpeechRecognitionForNewlyRecordedSamples()

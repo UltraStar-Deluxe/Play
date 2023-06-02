@@ -63,7 +63,6 @@ public static partial class R
         public const string mb_3 = "mb-3";
         public const string ml_1 = "ml-1";
         public const string ml_2 = "ml-2";
-        public const string ml_3 = "ml-3";
         public const string ml_5 = "ml-5";
         public const string ml_auto = "ml-auto";
         public const string modalDialogContainer = "modalDialogContainer";
@@ -91,6 +90,7 @@ public static partial class R
         public const string optionsSceneTopRow = "optionsSceneTopRow";
         public const string outlineOnFocus = "outlineOnFocus";
         public const string overlay = "overlay";
+        public const string overlayBackground = "overlayBackground";
         public const string overlayDialog = "overlayDialog";
         public const string p_1 = "p-1";
         public const string p_4 = "p-4";

@@ -13,6 +13,7 @@ public static partial class R
         public const string buttonRow = "buttonRow";
         public const string clientNameTextField = "clientNameTextField";
         public const string closeMenuButton = "closeMenuButton";
+        public const string column = "column";
         public const string commitHashText = "commitHashText";
         public const string connectionInfoText = "connectionInfoText";
         public const string connectionStatusText = "connectionStatusText";
@@ -35,6 +36,7 @@ public static partial class R
         public const string GameRoundConfigUi = "GameRoundConfigUi";
         public const string gameRoundConfigUiRoot = "gameRoundConfigUiRoot";
         public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
+        public const string hamburgerMenuIcon = "hamburgerMenuIcon";
         public const string hiddenCloseMenuButton = "hiddenCloseMenuButton";
         public const string hiddenFavoriteIcon = "hiddenFavoriteIcon";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
@@ -124,13 +126,16 @@ public static partial class R
         public const string songInfoContainer = "songInfoContainer";
         public const string songInfoLabelContainer = "songInfoLabelContainer";
         public const string songListContainer = "songListContainer";
+        public const string songListEntryArtistLabel = "songListEntryArtistLabel";
         public const string songListEntryButton = "songListEntryButton";
-        public const string songListEntryLabel = "songListEntryLabel";
+        public const string songListEntryTitleLabel = "songListEntryTitleLabel";
         public const string songListEntryUiRoot = "songListEntryUiRoot";
         public const string songListIcon = "songListIcon";
+        public const string songListStatusLabel = "songListStatusLabel";
         public const string songListTabGroup = "songListTabGroup";
         public const string SongListUi = "SongListUi";
         public const string songListUiRoot = "songListUiRoot";
+        public const string songListView = "songListView";
         public const string songQueueContainer = "songQueueContainer";
         public const string songQueueIcon = "songQueueIcon";
         public const string SongQueueOverlayUi = "SongQueueOverlayUi";
@@ -139,7 +144,6 @@ public static partial class R
         public const string songSearchContainer = "songSearchContainer";
         public const string songSearchHint = "songSearchHint";
         public const string songSearchTextField = "songSearchTextField";
-        public const string songsScrollView = "songsScrollView";
         public const string songTitleLabel = "songTitleLabel";
         public const string songViewContainer = "songViewContainer";
         public const string spacer = "spacer";

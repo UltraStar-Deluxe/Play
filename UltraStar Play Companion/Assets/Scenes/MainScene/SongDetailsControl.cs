@@ -361,8 +361,11 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
             }
 
+            playerEntryControl.IsSelected.Value = IsPlayerSelectedInSettings(playerProfile);
             playerEntryControl.IsSelected.Subscribe(newValue =>
             {
+                SetPlayerSelectedInSettings(playerProfile, newValue);
+
                 // Update mic profile.
                 if (newValue
                     && playerEntryControl.MicProfile == null)
@@ -377,7 +380,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
                 UpdateEnqueueButton();
             });
-
+            
             playerEntryControl.SetSeparatorVisibleByDisplay(playerProfileIndex < playerProfileNames.Count - 1);
             
             playerEntryControls.Add(playerEntryControl);
@@ -386,6 +389,23 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         UpdateEnqueueButton();
         enqueueSettingsAccordionItem.UpdateTargetHeight();
+    }
+
+    private bool IsPlayerSelectedInSettings(string playerProfile)
+    {
+        return !settings.DeselectedPlayerProfiles.Contains(playerProfile);
+    }
+
+    private void SetPlayerSelectedInSettings(string playerProfile, bool selected)
+    {
+        if (selected)
+        {
+            settings.DeselectedPlayerProfiles.Remove(playerProfile);
+        }
+        else
+        {
+            settings.DeselectedPlayerProfiles.AddIfNotContains(playerProfile);
+        }
     }
 
     private void UpdateEnqueueButton()

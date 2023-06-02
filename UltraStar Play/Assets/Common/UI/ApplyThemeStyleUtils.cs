@@ -303,13 +303,16 @@ public static class ApplyThemeStyleUtils
         bool hasFontColor = !Equals(fontColor, default(Color32));
         if (hasFontColor)
         {
+            // Set font color for child elements
             visualElement.style.color = new StyleColor(fontColor);
             if (visualElement is Button)
             {
                 visualElement.Query<Label>()
                     .ForEach(label =>
                     {
-                        if (IsIgnoredVisualElement(label))
+                        if (IsIgnoredVisualElement(label)
+                            || label.ClassListContains("warningFontColor")
+                            || label.ClassListContains("errorFontColor"))
                         {
                             return;
                         }
@@ -458,14 +461,14 @@ public static class ApplyThemeStyleUtils
     
     private static void ApplyDisabledStyle(VisualElementData data)
     {
-        ControlStyleConfig controlStyleConfig = GetControlStyleConfig(data);
+        ControlStyleConfig c = GetControlStyleConfig(data);
         ApplyStyle(data,
-            controlStyleConfig.disabledFontColor,
-            controlStyleConfig.disabledBorderColor,
-            controlStyleConfig.disabledBackgroundColor,
-            controlStyleConfig.disabledBackgroundGradient,
-            controlStyleConfig.disabledBackgroundImage,
-            ObjectUtils.FirstNonDefault(controlStyleConfig.disabledTextShadow, controlStyleConfig.textShadow));
+            ObjectUtils.FirstNonDefault(c.disabledFontColor, c.fontColor),
+            ObjectUtils.FirstNonDefault(c.disabledBorderColor, c.borderColor),
+            ObjectUtils.FirstNonDefault(c.disabledBackgroundColor, c.backgroundColor),
+            ObjectUtils.FirstNonDefault(c.disabledBackgroundGradient, c.backgroundGradient),
+            ObjectUtils.FirstNonDefault(c.disabledBackgroundImage, c.backgroundImage),
+            ObjectUtils.FirstNonDefault(c.disabledTextShadow, c.textShadow));
     }
 
     private static void UpdateStyles(VisualElementData data)
@@ -480,7 +483,7 @@ public static class ApplyThemeStyleUtils
         bool shouldApplyActiveStyle = data.isActive;
         bool shouldApplyDisabledStyle = !data.visualElement.enabledInHierarchy;
 
-        if (!shouldApplyHoverStyle && !shouldApplyFocusStyle && !shouldApplyActiveStyle && !shouldApplyDisabledStyle)
+        if (!shouldApplyHoverStyle && !shouldApplyFocusStyle && !shouldApplyActiveStyle)
         {
             ApplyDefaultStyle(data);
         }

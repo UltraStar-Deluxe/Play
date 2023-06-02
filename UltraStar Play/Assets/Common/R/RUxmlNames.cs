@@ -24,7 +24,6 @@ public static partial class R
         public const string allCharactersContainer = "allCharactersContainer";
         public const string amplificationPicker = "amplificationPicker";
         public const string analyzeBeatsWithoutTargetNotePicker = "analyzeBeatsWithoutTargetNotePicker";
-        public const string analyzePitchUsingBasicPitchButton = "analyzePitchUsingBasicPitchButton";
         public const string androidSongFolderHintContainer = "androidSongFolderHintContainer";
         public const string androidSongFolderHintLabel = "androidSongFolderHintLabel";
         public const string animatedBackgroundItemPicker = "animatedBackgroundItemPicker";
@@ -478,6 +477,7 @@ public static partial class R
         public const string pitchDetectionAlgorithmPicker = "pitchDetectionAlgorithmPicker";
         public const string pitchDetectionAudioPicker = "pitchDetectionAudioPicker";
         public const string pitchDetectionGroup = "pitchDetectionGroup";
+        public const string pitchDetectionUsingBasicPitchButton = "pitchDetectionUsingBasicPitchButton";
         public const string pitchIndicator = "pitchIndicator";
         public const string pitchIndicatorIcon = "pitchIndicatorIcon";
         public const string pitchLabel = "pitchLabel";
@@ -649,6 +649,7 @@ public static partial class R
         public const string showScrollBarInSongSelectPicker = "showScrollBarInSongSelectPicker";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
         public const string showSearchExpressionInfoTitle = "showSearchExpressionInfoTitle";
+        public const string showSongIndexInSongSelectPicker = "showSongIndexInSongSelectPicker";
         public const string showStatusBarToggle = "showStatusBarToggle";
         public const string showTeamResultsButton = "showTeamResultsButton";
         public const string showVideoAreaToggle = "showVideoAreaToggle";
@@ -710,6 +711,9 @@ public static partial class R
         public const string songQueueUi = "songQueueUi";
         public const string SongQueueUi = "SongQueueUi";
         public const string songRatingStarIcon = "songRatingStarIcon";
+        public const string songScanInProgressContainer = "songScanInProgressContainer";
+        public const string songScanInProgressIcon = "songScanInProgressIcon";
+        public const string songScanInProgressLabel = "songScanInProgressLabel";
         public const string SongSelectEditPlaylistDialogUi = "SongSelectEditPlaylistDialogUi";
         public const string songSelectionItemPicker = "songSelectionItemPicker";
         public const string songSelectionJokerCountItemPicker = "songSelectionJokerCountItemPicker";
@@ -737,6 +741,8 @@ public static partial class R
         public const string startButton = "startButton";
         public const string startIcon = "startIcon";
         public const string startMidiPreviewIcon = "startMidiPreviewIcon";
+        public const string startQueueIcon = "startQueueIcon";
+        public const string startSongQueueButton = "startSongQueueButton";
         public const string statusBar = "statusBar";
         public const string statusBarControlHintLabel = "statusBarControlHintLabel";
         public const string statusBarPositionInfoLabel = "statusBarPositionInfoLabel";

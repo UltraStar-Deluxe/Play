@@ -6841,7 +6841,7 @@ MonoBehaviour:
   particleZ: 19.99
   foregroundVfxLayer: 6
   backgroundVfxLayer: 7
-  testParticleEffect: 12
+  testParticleEffect: 13
   testParticleScale: 0.5
   testParticleIsBackground: 0
   particleRecipes:
@@ -9046,6 +9046,10 @@ PrefabInstance:
     - target: {fileID: 11414302, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_Value
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11452418, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
+      propertyPath: toggleKey
+      value: 288
       objectReference: {fileID: 0}
     - target: {fileID: 11452418, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: enablePopup

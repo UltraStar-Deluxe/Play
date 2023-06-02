@@ -31,6 +31,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.showScrollBarInSongSelectPicker)]
     private ItemPicker showScrollBarInSongSelectPicker;
     
+    [Inject(UxmlName = R.UxmlNames.showSongIndexInSongSelectPicker)]
+    private ItemPicker showSongIndexInSongSelectPicker;
+    
     [Inject(UxmlName = R.UxmlNames.songBackgroundScaleModePicker)]
     private ItemPicker songBackgroundScaleModePicker;
     
@@ -59,6 +62,10 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         new BoolPickerControl(showScrollBarInSongSelectPicker)
             .Bind(() => settings.ShowScrollBarInSongSelect, 
                 newValue => settings.ShowScrollBarInSongSelect = newValue);
+        
+        new BoolPickerControl(showSongIndexInSongSelectPicker)
+            .Bind(() => settings.ShowSongIndexInSongSelect, 
+                newValue => settings.ShowSongIndexInSongSelect = newValue);
 
         LabeledItemPickerControl<ESongBackgroundScaleMode> songBackgroundScaleModePickerControl = new LabeledItemPickerControl<ESongBackgroundScaleMode>(songBackgroundScaleModePicker, EnumUtils.GetValuesAsList<ESongBackgroundScaleMode>());
         songBackgroundScaleModePickerControl.Bind(() => settings.SongBackgroundScaleMode,
