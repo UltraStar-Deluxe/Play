@@ -135,7 +135,7 @@ public class SettingsManager : AbstractSingletonBehaviour
                     Directory.CreateDirectory(internalSongFolder);
                 }
 
-                defaultSettings.songDirs.Add(internalSongFolder);
+                defaultSettings.SongDirs.Add(internalSongFolder);
             }
             catch (Exception ex)
             {
