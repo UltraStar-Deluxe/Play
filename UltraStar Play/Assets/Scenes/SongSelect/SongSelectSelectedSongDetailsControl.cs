@@ -74,6 +74,9 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     [Inject(UxmlName = R.UxmlNames.durationLabel)]
     private Label durationLabel;
     
+    [Inject]
+    private SongMetaManager songMetaManager;
+    
     private SongMeta SelectedSong => songSelectSceneControl.SelectedSong;
     
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new SongSelectSongRatingIconControl();
@@ -96,6 +99,22 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
                 UpdateSongStatistics(songSelectSceneControl.SelectedSong);
                 UpdateSongRatingIcons(songSelectSceneControl.SelectedSong);
             });
+        
+        // Smaller song index label if numbers get huge
+        int songCount = songMetaManager.GetSongMetas().Count;
+        if (songCount > 10000)
+        {
+            songIndexLabel.AddToClassList("tinyFont");
+        }
+        else if (songCount > 1000)
+        {
+            songIndexLabel.AddToClassList("smallFont");
+        }
+        else
+        {
+            songIndexLabel.AddToClassList("smallFont");
+        }
+        songIndexContainer.SetVisibleByDisplay(settings.ShowSongIndexInSongSelect);
     }
 
     private void OpenHighScoreScene()

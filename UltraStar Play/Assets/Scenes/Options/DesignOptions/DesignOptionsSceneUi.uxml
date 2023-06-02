@@ -8,6 +8,7 @@
             <ItemPicker name="sceneChangeAnimationPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Scene Transition" class="noBackgroundInHierarchy" />
             <ItemPicker name="sceneChangeDurationPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Scene Transition Duration" class="noBackgroundInHierarchy" />
             <ItemPicker name="showScrollBarInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Scroll Bar in Song Select" class="noBackgroundInHierarchy" />
+            <ItemPicker name="showSongIndexInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Index in Song Select" class="noBackgroundInHierarchy" />
             <ItemPicker name="songBackgroundScaleModePicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Song Background Scale Mode" class="noBackgroundInHierarchy" />
         </ui:ScrollView>
     </ui:VisualElement>

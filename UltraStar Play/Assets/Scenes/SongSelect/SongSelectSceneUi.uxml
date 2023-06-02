@@ -54,9 +54,9 @@
                 <ui:Button display-tooltip-when-elided="true" name="selectRandomSongButton" class="squareButton transparentButton">
                     <MaterialIcon tabindex="-1" name="selectRandomSongIcon" icon="casino" />
                 </ui:Button>
-                <ui:VisualElement name="songIndexContainer" class="smallFont roundCorners ml-3" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); align-items: center; flex-direction: row; display: none;">
-                    <MaterialIcon name="songIndexIcon" icon="album" picking-mode="Ignore" style="font-size: 32px;" />
-                    <ui:Label text="1000 / 9999" display-tooltip-when-elided="true" name="songIndexLabel" enable-rich-text="false" picking-mode="Ignore" style="-unity-text-align: upper-right;" />
+                <ui:VisualElement name="songIndexContainer" class="roundCorners" style="border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); align-items: center; flex-direction: row;">
+                    <MaterialIcon name="songIndexIcon" icon="album" picking-mode="Ignore" style="font-size: 32px; display: none;" />
+                    <ui:Label text="1000 / 9999" display-tooltip-when-elided="true" name="songIndexLabel" enable-rich-text="false" picking-mode="Ignore" class="smallFont" style="-unity-text-align: upper-right; white-space: normal;" />
                 </ui:VisualElement>
                 <ui:Label text="3:23" display-tooltip-when-elided="true" name="durationLabel" class="smallerFont secondaryFontColor" style="-unity-text-align: upper-center; width: 40px; display: none;" />
             </ui:VisualElement>
@@ -119,7 +119,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel focusableNavigatorRoot pt-1 px-1 pb-2" style="max-width: 40%; justify-content: flex-start; align-items: stretch; width: auto; right: 0;">
+        <ui:VisualElement name="songQueueOverlay" class="overlay absolutePositionTransition staticPanel focusableNavigatorRoot pt-1 px-1 pb-2" style="max-width: 40%; justify-content: flex-start; align-items: stretch; width: auto; right: 0; display: none;">
             <ui:VisualElement name="row" style="align-items: center;">
                 <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center; flex-grow: 1;" />
                 <ui:Button display-tooltip-when-elided="true" name="closeSongQueueButton" class="circle mb-1 transparentButton" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; width: 25px; height: 25px;">
