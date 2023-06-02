@@ -6841,7 +6841,7 @@ MonoBehaviour:
   particleZ: 19.99
   foregroundVfxLayer: 6
   backgroundVfxLayer: 7
-  testParticleEffect: 12
+  testParticleEffect: 13
   testParticleScale: 0.5
   testParticleIsBackground: 0
   particleRecipes:

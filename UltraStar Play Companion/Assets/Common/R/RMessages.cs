@@ -323,7 +323,6 @@ public static partial class R
         public static readonly string submit = "submit";
         public static readonly string timeUppercase = "timeUppercase";
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
-        public static readonly string uri_howToAddCustomThemes = "uri_howToAddCustomThemes";
         public static readonly string uri_howToCompanionApp = "uri_howToCompanionApp";
         public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
         public static readonly string uri_howToSongEditor = "uri_howToSongEditor";
