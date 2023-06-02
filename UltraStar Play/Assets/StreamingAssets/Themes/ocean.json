@@ -10,16 +10,16 @@
 
     "transparentButton": {
         "backgroundColor": "#00000100",
-        "hoverBackgroundColor": "#20202060",
-        "focusBackgroundColor": "#20202080",
+        "hoverBackgroundColor": "#60606060",
+        "focusBackgroundColor": "#60606080",
         "activeBackgroundColor": "#40404080",
         "textShadow": {
-            "color": "#a0a0a0",
+            "color": "#a0acad",
             "offset": {
                 "x": 1,
                 "y": 1
             }
-        }
+        },
     },
 
    "dynamicPanel": {
