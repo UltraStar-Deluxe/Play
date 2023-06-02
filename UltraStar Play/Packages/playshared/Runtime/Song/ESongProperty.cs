@@ -15,6 +15,8 @@
     VideoGap,
     PreviewStart,
     PreviewEnd,
+    MedleyStart,
+    MedleyEnd,
     VocalsAudio,
     InstrumentalAudio,
     Other,
