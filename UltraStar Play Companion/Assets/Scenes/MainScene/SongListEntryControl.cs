@@ -16,19 +16,48 @@ public class SongListEntryControl : INeedInjection, IInjectionFinishedListener
     private Button songListEntryButton;
 
     [Inject]
-    private SongDto songDto;
-    
-    [Inject]
     private SongDetailsControl songDetailsControl;
     
-    public void OnInjectionFinished()
+    private SongDto songDto;
+    public SongDto SongDto
     {
+        get => songDto;
+        set
+        {
+            songDto = value;
+            UpdateLabels();
+        }
+    }
+
+    private void UpdateLabels()
+    {
+        if (songDto == null)
+        {
+            songListEntryTitleLabel.text = "";
+            songListEntryArtistLabel.text = "";
+            return;
+        }
+        
         songListEntryTitleLabel.SetVisibleByDisplay(!songDto.Title.IsNullOrEmpty());
         songListEntryTitleLabel.text = ObjectUtils.NullableToString(songDto.Title, "");
         
         songListEntryArtistLabel.SetVisibleByDisplay(!songDto.Artist.IsNullOrEmpty());
         songListEntryArtistLabel.text = ObjectUtils.NullableToString(songDto.Artist, "");
-        
-        songListEntryButton.RegisterCallbackButtonTriggered(_ => songDetailsControl.ShowSongDetails(songDto));
+    }
+
+    public void OnInjectionFinished()
+    {
+        VisualElement.userData = this;
+        songListEntryButton.RegisterCallbackButtonTriggered(_ => OpenSongDetails());
+    }
+
+    private void OpenSongDetails()
+    {
+        if (songDto == null)
+        {
+            return;
+        }
+
+        songDetailsControl.ShowSongDetails(songDto);
     }
 }

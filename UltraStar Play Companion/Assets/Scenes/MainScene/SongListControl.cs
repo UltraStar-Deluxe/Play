@@ -18,8 +18,8 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     [Inject(UxmlName = R.UxmlNames.songSearchHint)]
     private Label songSearchHint;
 
-    [Inject(UxmlName = R.UxmlNames.songsScrollView)]
-    private ScrollView songsScrollView;
+    [Inject(UxmlName = R.UxmlNames.songListView)]
+    private ListView songListView;
     
     [Inject(UxmlName = R.UxmlNames.showSongSearchButton)]
     private Button showSongSearchButton;
@@ -35,6 +35,9 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     
     [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
     private VisualElement songDetailsContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.songListStatusLabel)]
+    private Label songListStatusLabel;
     
     [Inject]
     private SongListRequestor songListRequestor;
@@ -72,13 +75,47 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
         songSearchTextField.RegisterValueChangedCallback(evt =>
         {
             songSearchHint.SetVisibleByDisplay(songSearchTextField.value.IsNullOrEmpty());
-            UpdateSongSearchList();
+            UpdateSongListViewItems();
         });
 
         mainGameHttpClient.Permissions.Subscribe(_ => UpdateSongQueue());
         
         songQueueUiControl.OnDelete = entry => DeleteSongQueueEntry(entry);
         songQueueUiControl.OnToggleMedley = entry => ToggleMedley(entry);
+        
+        songListView.makeItem = OnMakeItem;
+        songListView.bindItem = OnBindItem;
+        songListView.unbindItem = OnUnbindItem;
+    }
+
+    private void OnBindItem(VisualElement visualElement, int index)
+    {
+        List<SongDto> songDtos = songListView.itemsSource as List<SongDto>;
+        if (visualElement.userData is SongListEntryControl songListEntryControl
+            && index >= 0 && index < songDtos.Count)
+        {
+            songListEntryControl.SongDto = songDtos[index];
+        }
+    }
+    
+    private void OnUnbindItem(VisualElement visualElement, int index)
+    {
+        if (visualElement.userData is SongListEntryControl songListEntryControl)
+        {
+            songListEntryControl.SongDto = null;
+        }
+    }
+
+    private VisualElement OnMakeItem()
+    {
+        VisualElement songListEntry = songListEntryUi.CloneTreeAndGetFirstChild();
+        
+        injector
+            .WithRootVisualElement(songListEntry)
+            .WithBindingForInstance(songDetailsControl)
+            .CreateAndInject<SongListEntryControl>();
+        
+        return songListEntry;
     }
 
     private void DeleteSongQueueEntry(SongQueueEntryDto entry)
@@ -145,14 +182,12 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
             });
     }
 
-    private void UpdateSongSearchList()
+    private void UpdateSongListViewItems()
     {
-        songsScrollView.Clear();
-
         if (songListRequestor.LoadedSongsDto == null
             || songListRequestor.LoadedSongsDto.SongList.IsNullOrEmpty())
         {
-            songsScrollView.Add(new Label("No songs found"));
+            SetSongListStatus("No songs found");
             return;
         }
 
@@ -161,15 +196,16 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
             .ToList();
         songDtos.Sort((a,b) => string.Compare(a.Artist, b.Artist, StringComparison.InvariantCulture));
 
-        foreach (SongDto songDto in songDtos)
+        songListView.itemsSource = songDtos;
+        songListView.RefreshItems();
+        
+        if (songListRequestor.LoadedSongsDto.IsSongScanFinished)
         {
-            SongListEntryControl songListEntryControl = CreateSongListEntryControl(songDto);
-            songsScrollView.Add(songListEntryControl.VisualElement);
+            SetSongListStatus("");
         }
-
-        if (!songListRequestor.LoadedSongsDto.IsSongScanFinished)
+        else
         {
-            songsScrollView.Add(new Label("..."));
+            SetSongListStatus("Loading song list...");
         }
     }
     
@@ -185,12 +221,17 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     {
         if (!evt.ErrorMessage.IsNullOrEmpty())
         {
-            songsScrollView.Clear();
-            songsScrollView.Add(new Label(evt.ErrorMessage));
+            ClearSongList();
+            SetSongListStatus(evt.ErrorMessage);
             return;
         }
 
-        UpdateSongSearchList();
+        UpdateSongListViewItems();
+    }
+
+    private void ClearSongList()
+    {
+        songListView.itemsSource = new List<SongDto>();
     }
 
     public void UpdateTranslation()
@@ -222,25 +263,18 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
                 
         if (!songListRequestor.SuccessfullyLoadedAllSongs)
         {
-            songsScrollView.Clear();
-            songsScrollView.Add(new Label("Loading song list..."));
+            ClearSongList();
+            SetSongListStatus("Loading song list...");
             songListRequestor.RequestSongList();
         }
     }
 
-    private SongListEntryControl CreateSongListEntryControl(SongDto songDto)
+    private void SetSongListStatus(string text)
     {
-        VisualElement songListEntry = songListEntryUi.CloneTreeAndGetFirstChild();
-
-        SongListEntryControl songListEntryControl = injector
-            .WithRootVisualElement(songListEntry)
-            .WithBindingForInstance(songDto)
-            .WithBindingForInstance(songDetailsControl)
-            .CreateAndInject<SongListEntryControl>();
-        
-        return songListEntryControl;
+        songListStatusLabel.SetVisibleByDisplay(!text.IsNullOrEmpty());
+        songListStatusLabel.text = text;
     }
-
+    
     public void Dispose()
     {
         songDetailsControl.Dispose();
