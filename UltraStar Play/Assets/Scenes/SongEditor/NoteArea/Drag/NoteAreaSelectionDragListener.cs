@@ -227,9 +227,10 @@ public class NoteAreaSelectionDragListener : INeedInjection, IInjectionFinishedL
             ObjectUtils.Swap(ref startBeat, ref endBeat);
         }
 
-        return (startBeat <= note.StartBeat && note.EndBeat <= endBeat)
-            && (startMidiNote <= note.MidiNote && note.MidiNote <= endMidiNote)
-            && Mathf.Abs(startMidiNote - endMidiNote) > 0;
+        double[] beatIntersection = NumberUtils.GetIntersection(startBeat, endBeat, note.StartBeat, note.EndBeat);
+        return !beatIntersection.IsNullOrEmpty()
+               && (startMidiNote <= note.MidiNote && note.MidiNote <= endMidiNote)
+               && Mathf.Abs(startMidiNote - endMidiNote) > 0;
     }
 
     private void UpdateSelectionFrames(NoteAreaDragEvent dragEvent)

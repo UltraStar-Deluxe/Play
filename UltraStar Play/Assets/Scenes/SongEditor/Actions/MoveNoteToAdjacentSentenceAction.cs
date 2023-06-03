@@ -76,6 +76,8 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
         }
         
         Sentence previousSentence = SongMetaUtils.GetPreviousSentence(oldSentence);
+        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
+        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(previousSentence);
         notes.ForEach(note => note.SetSentence(previousSentence));
 
         // Remove old sentence if not more notes left
@@ -108,8 +110,10 @@ public class MoveNoteToAjacentSentenceAction : INeedInjection
             return;
         }
         
-        Sentence previousSentence = SongMetaUtils.GetNextSentence(oldSentence);
-        notes.ForEach(note => note.SetSentence(previousSentence));
+        Sentence nextSentence = SongMetaUtils.GetNextSentence(oldSentence);
+        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(oldSentence);
+        SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(nextSentence);
+        notes.ForEach(note => note.SetSentence(nextSentence));
 
         // Remove old sentence if not more notes left
         if (oldSentence.Notes.Count == 0)

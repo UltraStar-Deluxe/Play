@@ -27,6 +27,9 @@ public class NoteAreaContextMenuControl : ContextMenuControl
 
     [Inject]
     private SetMusicGapAction setMusicGapAction;
+    
+    [Inject]
+    private SetSongPropertyAction setSongPropertyAction;
 
     [Inject]
     private SongEditorCopyPasteManager songEditorCopyPasteManager;
@@ -86,12 +89,12 @@ public class NoteAreaContextMenuControl : ContextMenuControl
         
         if (selectedNotes.Count == 0)
         {
+            double positionInSongInMillis = noteAreaControl.ScreenPixelPositionToMillis(contextMenu.Position.x);
+            
             contextMenu.AddSeparator();
-            contextMenu.AddButton("Set GAP", () =>
-            {
-                double positionInSongInMillis = noteAreaControl.ScreenPixelPositionToMillis(contextMenu.Position.x);
-                setMusicGapAction.ExecuteAndNotify(positionInSongInMillis);
-            });
+            contextMenu.AddButton("Set GAP", () => setMusicGapAction.ExecuteAndNotify(positionInSongInMillis));
+            contextMenu.AddButton("Set Medley Start", () => setSongPropertyAction.SetMedleyStartAndNotify(positionInSongInMillis));
+            contextMenu.AddButton("Set Medley End", () => setSongPropertyAction.SetMedleyEndAndNotify(positionInSongInMillis));
         }
     }
 }

@@ -114,6 +114,14 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             "Preview End (beat)",
             PropertyUtils.CreateStringGetterFromFloatGetter(() => songMeta.PreviewEnd, true, "0.00"),
             PropertyUtils.CreateStringSetterFromFloatSetter(newValue => songMeta.PreviewEnd = newValue));
+        CreateSongPropertiesInputControl(ESongProperty.MedleyStart,
+            "Medley Start (beat)",
+            PropertyUtils.CreateStringGetterFromFloatGetter(() => songMeta.MedleyStartBeat, true, "0"),
+            PropertyUtils.CreateStringSetterFromFloatSetter(newValue => songMeta.MedleyStartBeat = (int)newValue));
+        CreateSongPropertiesInputControl(ESongProperty.MedleyEnd,
+            "Medley End (beat)",
+            PropertyUtils.CreateStringGetterFromFloatGetter(() => songMeta.MedleyEndBeat, true, "0"),
+            PropertyUtils.CreateStringSetterFromFloatSetter(newValue => songMeta.MedleyEndBeat = (int)newValue));
         CreateSongPropertiesInputControl(ESongProperty.Language,
             TranslationManager.GetTranslation(R.Messages.songProperty_language),
             () => songMeta.Language,

@@ -727,4 +727,40 @@ public static class SongMetaUtils
         
         return mergedVoice;
     }
+
+    public static void AddTrailingSpaceToLastNoteOfSentence(Sentence sentence)
+    {
+        if (sentence == null)
+        {
+            return;
+        }
+        
+        AddTrailingSpaceToLastNoteOfSentence(sentence.Notes.LastOrDefault());
+    }
+
+    public static void AddTrailingSpaceToLastNoteOfSentence(List<Note> notes)
+    {
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        notes.ForEach(note => AddTrailingSpaceToLastNoteOfSentence(note));
+    }
+    
+    public static void AddTrailingSpaceToLastNoteOfSentence(Note note)
+    {
+        if (note == null)
+        {
+            return;
+        }
+        
+        // Add space at end of note if it was the last note in the sentence. Otherwise, formerly separate words might be merged.
+        if (!note.Text.EndsWith(" ")
+            && note.Sentence != null
+            && note.Sentence.Notes.LastOrDefault() == note)
+        {
+            note.SetText(note.Text + " ");
+        }
+    }
 }

@@ -19,7 +19,11 @@ public static class MoveNotesToOtherVoiceUtils
         selectedNotes.Sort(Note.comparerByStartBeat);
         selectedNotes.ForEach(note =>
         {
+            // Prevent notes from merging into a single word
+            SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
+            
             Sentence oldSentence = note.Sentence;
+
             // Find or create a sentence in the target voice for the note
             Sentence targetSentence;
             Sentence existingTargetSentence = SongMetaUtils.FindExistingSentenceForNote(sortedTargetSentences, note);
@@ -64,6 +68,10 @@ public static class MoveNotesToOtherVoiceUtils
 
                 targetSentence = createdSentence;
             }
+            
+            // Prevent notes from merging into a single word
+            SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(targetSentence.Notes.LastOrDefault());
+            
             targetSentence.AddNote(note);
 
             // Set lyrics if none yet (otherwise, there is a warning because of missing lyrics)

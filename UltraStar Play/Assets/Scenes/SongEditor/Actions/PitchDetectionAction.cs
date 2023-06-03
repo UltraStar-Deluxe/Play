@@ -95,33 +95,52 @@ public class PitchDetectionAction : AbstractAudioClipAction
         {
             return;
         }
-        
-        // Find median MidiNote for each beat
-        Dictionary<int, List<int>> beatToMidiNotes = new();
+
+        // Map beat to detected pitches
+        Dictionary<int, List<int>> beatToDetectedPitches = new();
         foreach (Note pitchDetectionLayerNote in pitchDetectionLayerNotesInRange)
         {
             for (int beat = pitchDetectionLayerNote.StartBeat; beat < pitchDetectionLayerNote.EndBeat; beat++)
             {
-                beatToMidiNotes.AddInsideList(beat, pitchDetectionLayerNote.MidiNote);
+                beatToDetectedPitches.AddInsideList(beat, pitchDetectionLayerNote.MidiNote);
             }
         }
         
+        int localAverageWindowSizeInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, 3000);
+        localAverageWindowSizeInBeats = NumberUtils.Limit(localAverageWindowSizeInBeats, 1, int.MaxValue);
+        
         foreach (Note note in notes)
         {
-            // Move note to median MidiNote of their beats
-            List<int> midiNotes = new();
+            // Move note to pitch that is closest to local average on pitch detection layer
+            List<int> detectedPitchesOfNote = new();
             for (int beat = note.StartBeat; beat < note.EndBeat; beat++)
             {
-                if (beatToMidiNotes.ContainsKey(beat))
+                if (beatToDetectedPitches.ContainsKey(beat))
                 {
-                    List<int> midiNotesOfBeat = beatToMidiNotes[beat];
-                    midiNotes.AddRange(midiNotesOfBeat);
+                    List<int> detectedPitchesOfBeat = beatToDetectedPitches[beat];
+                    if (detectedPitchesOfBeat.Count == 1)
+                    {
+                        detectedPitchesOfNote.Add(detectedPitchesOfBeat[0]);
+                    }
+                    else if (detectedPitchesOfBeat.Count > 1)
+                    {
+                        if (TryFindLocalAveragePitch(pitchDetectionLayerNotes, beat, localAverageWindowSizeInBeats, out int localAveragePitch))
+                        {
+                            int detectedPitchOfBeatClosestToAverage = detectedPitchesOfBeat.FindMinElement(pitch => Math.Abs(pitch - localAveragePitch));
+                            detectedPitchesOfNote.Add(detectedPitchOfBeatClosestToAverage);
+                        }
+                        else
+                        {
+                            // Could not determine best candidate. Just take the first one.
+                            detectedPitchesOfNote.Add(detectedPitchesOfBeat.FirstOrDefault());
+                        }
+                    }
                 }
             }
 
-            if (!midiNotes.IsNullOrEmpty())
+            if (!detectedPitchesOfNote.IsNullOrEmpty())
             {
-                int medianMidiNote = NumberUtils.Median(midiNotes);
+                int medianMidiNote = NumberUtils.Median(detectedPitchesOfNote);
                 note.SetMidiNote(medianMidiNote);
             }
         }
@@ -131,7 +150,25 @@ public class PitchDetectionAction : AbstractAudioClipAction
             songMetaChangeEventStream.OnNext(new NotesChangedEvent());
         }
     }
-    
+
+    private bool TryFindLocalAveragePitch(List<Note> notes, int beat, int localAverageWindowSizeInBeats, out int localAveragePitch)
+    {
+        List<Note> notesInWindow = notes
+            .Where(note => note.StartBeat - localAverageWindowSizeInBeats <= beat 
+                           && beat < note.EndBeat + localAverageWindowSizeInBeats)
+            .ToList();
+        if (notesInWindow.IsNullOrEmpty())
+        {
+            localAveragePitch = 0;
+            return false;
+        }
+        
+        localAveragePitch = (int)notesInWindow
+            .Select(note => note.MidiNote)
+            .Average();
+        return true;
+    }
+
     public void MoveNotesToDetectedPitch(List<Note> notes, bool notify, ESongEditorSamplesSource samplesSource)
     {
         if (notes.IsNullOrEmpty())
