@@ -276,4 +276,20 @@ public static class CollectionExtensions
     {
         enumerable.ForEach(item => list.Remove(item));
     }
+
+    public static void RemoveFirst<T>(this List<T> list)
+    {
+        if (!list.IsNullOrEmpty())
+        {
+            list.RemoveAt(0);
+        }
+    }
+    
+    public static void RemoveLast<T>(this List<T> list)
+    {
+        if (!list.IsNullOrEmpty())
+        {
+            list.RemoveAt(list.Count - 1);
+        }
+    }
 }

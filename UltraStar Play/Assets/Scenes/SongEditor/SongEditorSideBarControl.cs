@@ -412,6 +412,8 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Move Right side Of Note", "Alt+Arrow Keys | 7 (Numpad) | 8 (Numpad) | 9 (Numpad)"));
             inputActionInfos.Add(new InputActionInfo("Select Next Note", "Tab | 6 (Numpad)"));
             inputActionInfos.Add(new InputActionInfo("Select Previous Note", "Shift+Tab | 4 (Numpad)"));
+            inputActionInfos.Add(new InputActionInfo("Navigate Position History", "Alt+Arrow Keys"));
+            inputActionInfos.Add(new InputActionInfo("Select Previous Note", "Shift+Tab | 4 (Numpad)"));
             inputActionInfos.Add(new InputActionInfo("Play Selected Notes", "Ctrl+Space | 5 (Numpad)"));
             inputActionInfos.Add(new InputActionInfo("Toggle Play / Pause", "Space | Double Click"));
             inputActionInfos.Add(new InputActionInfo("Play MIDI Sound Of Note", "Ctrl+Click Note"));

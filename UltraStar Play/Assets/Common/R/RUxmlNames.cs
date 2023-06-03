@@ -609,6 +609,7 @@ public static partial class R
         public const string selectFolderButton = "selectFolderButton";
         public const string selectFolderIcon = "selectFolderIcon";
         public const string selectionIndicator = "selectionIndicator";
+        public const string selectionIndicatorInner = "selectionIndicatorInner";
         public const string selectMidiFileButton = "selectMidiFileButton";
         public const string selectModelPathButton = "selectModelPathButton";
         public const string selectRandomSongButton = "selectRandomSongButton";
