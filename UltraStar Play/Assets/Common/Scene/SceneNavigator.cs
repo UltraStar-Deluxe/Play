@@ -40,6 +40,8 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     
     public bool logSceneChangeDuration;
 
+    private readonly List<AudioSource> mutedAudioSources = new();
+    
     protected override object GetInstance()
     {
         return Instance;
@@ -52,15 +54,51 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         {
             stopwatch.Reset();
             stopwatch.Start();
+            OnBeforeSceneChange();
         });
         SceneChangedEventStream.Subscribe(_ =>
         {
             stopwatch.Stop();
+            OnSceneChanged();
             if (logSceneChangeDuration)
             {
                 Debug.Log($"Changing scenes took {stopwatch.ElapsedMilliseconds} ms (including animation if fade in/out transition is used)");
             }
         }).AddTo(gameObject);
+    }
+
+    private void OnSceneChanged()
+    {
+        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+            () => UnmuteAudioSources()));
+    }
+
+    private void OnBeforeSceneChange()
+    {
+        MuteAudioSources();
+    }
+
+    private void MuteAudioSources()
+    {
+        // Mute AudioSources in scene to prevent audio stutter
+        mutedAudioSources.Clear();
+        foreach (AudioSource audioSource in FindObjectsOfType<AudioSource>())
+        {
+            audioSource.mute = true;
+            mutedAudioSources.Add(audioSource);
+        }
+    }
+    
+    private void UnmuteAudioSources()
+    {
+        foreach (AudioSource audioSource in mutedAudioSources)
+        {
+            if (audioSource != null)
+            {
+                audioSource.mute = false;
+            }
+        }
+        mutedAudioSources.Clear();
     }
 
     protected override void OnEnableSingleton()
