@@ -6,6 +6,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -150,7 +151,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    public virtual void OnNavigate(Vector2 navigationDirection)
+    public virtual void OnNavigate(Vector2 navigationDirection, InputAction inputAction, InputControl inputControl)
     {
         if (PlatformUtils.IsAndroid
             && !settings.EnableEventSystemOnAndroid)
@@ -175,7 +176,13 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             if (!IsNavigatingAwayFromTextField(navigationDirection, focusedTextField))
             {
-                return;
+                // Unity only sends navigation events to TextField if they come from a keyboard.
+                // These events are ignored here to move the cursor or select text in the TextField.
+                if (inputControl != null
+                    && inputControl.device is Keyboard)
+                {
+                    return;
+                }
             }
         }
 

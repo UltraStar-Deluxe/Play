@@ -24,7 +24,7 @@ public class DefaultFocusableNavigator : FocusableNavigator
         InputManager.GetInputAction(R.InputActions.ui_submit).PerformedAsObservable()
             .Subscribe(_ => OnSubmit());
         InputManager.GetInputAction(R.InputActions.ui_navigate).PerformedAsObservable()
-            .Subscribe(context => OnNavigate(context.ReadValue<Vector2>()));
+            .Subscribe(context => OnNavigate(context.ReadValue<Vector2>(), context.action, context.control));
 	}
 
     protected override VisualElement GetFocusableNavigatorRootVisualElement(VisualElement visualElement)
