@@ -8,9 +8,6 @@ using UnityEngine.UIElements;
 
 public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFinishedListener
 {
-    [Inject(Key = nameof(defaultSongImage))]
-    private Sprite defaultSongImage;
-    
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
     
@@ -138,8 +135,8 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         selectedSongArtist.text = "";
         selectedSongTitle.text = "";
         songIndexLabel.text = "";
-        selectedSongImageOuter.style.backgroundImage = new StyleBackground(defaultSongImage);
-        selectedSongImageInner.style.backgroundImage = new StyleBackground(defaultSongImage);
+        selectedSongImageOuter.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
+        selectedSongImageInner.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
         songRatingIconControl.HideSongRatingIcons();
         UpdateSongStatistics(null);
     }

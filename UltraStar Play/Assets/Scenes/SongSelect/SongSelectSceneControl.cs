@@ -40,9 +40,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [InjectedInInspector]
     public MicPitchTracker micPitchTrackerPrefab;
     
-    [InjectedInInspector]
-    public Sprite defaultSongImage;
-    
     [Inject]
     private UiManager uiManager;
 
@@ -1144,7 +1141,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         bb.BindExistingInstance(songSearchControl);
         bb.BindExistingInstance(songSelectSelectedSongDetailsControl);
         bb.Bind(nameof(micPitchTrackerPrefab)).ToExistingInstance(micPitchTrackerPrefab);
-        bb.Bind(nameof(defaultSongImage)).ToExistingInstance(defaultSongImage);
         return bb.GetBindings();
     }
 
