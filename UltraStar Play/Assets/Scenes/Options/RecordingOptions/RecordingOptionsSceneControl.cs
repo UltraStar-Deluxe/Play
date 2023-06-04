@@ -68,6 +68,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
     private Toggle playRecordedAudioToggle;
+    
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
+    private VisualElement playRecordedAudioInfoContainer;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
@@ -371,7 +374,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         micVisualizer.SetMicProfile(micProfile);
         calibrateMicDelayControl.MicProfile = micProfile;
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
-
+        
+        playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);
+        
         UpdateSampleRateLabel();
         InitPitchDetectionFromConnectionClient();
     }
