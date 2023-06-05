@@ -74,6 +74,7 @@ public static partial class R
         public const string nameLabel = "nameLabel";
         public const string networkConfigContainer = "networkConfigContainer";
         public const string noFavoriteIcon = "noFavoriteIcon";
+        public const string noMicIcon = "noMicIcon";
         public const string ownHostTextField = "ownHostTextField";
         public const string playerEntry = "playerEntry";
         public const string playersContainer = "playersContainer";

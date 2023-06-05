@@ -79,6 +79,7 @@ public static partial class R
         public const string mx_2 = "mx-2";
         public const string mx_3 = "mx-3";
         public const string my_2 = "my-2";
+        public const string nBackgroundInHierarchy = "nBackgroundInHierarchy";
         public const string nextLyrics = "nextLyrics";
         public const string noBackgroundInHierarchy = "noBackgroundInHierarchy";
         public const string noteAreaGridLabel = "noteAreaGridLabel";
@@ -101,6 +102,7 @@ public static partial class R
         public const string pl_1 = "pl-1";
         public const string playerInfoUiList = "playerInfoUiList";
         public const string playerScoreLabel = "playerScoreLabel";
+        public const string playRecordedAudioInfoContainer = "playRecordedAudioInfoContainer";
         public const string pr_3 = "pr-3";
         public const string previousNoteLyrics = "previousNoteLyrics";
         public const string pt_1 = "pt-1";
