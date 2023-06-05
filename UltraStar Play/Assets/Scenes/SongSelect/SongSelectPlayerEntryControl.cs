@@ -21,9 +21,6 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     private VisualElement visualElement;
 
-    [Inject(Key = nameof(micProfiles))]
-    private List<MicProfile> micProfiles;
-        
     [Inject(Key = nameof(messageDialogUi))]
     private VisualTreeAsset messageDialogUi;
     
@@ -55,10 +52,16 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private Settings settings;
     
     [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+    
+    [Inject]
     private NonPersistentSettings nonPersistentSettings;
     
     [Inject]
     private FocusableNavigator focusableNavigator;
+    
+    [Inject]
+    private SongSelectPlayerListControl selectPlayerListControl;
     
     // The PlayerProfile is set in Init and must not be null.
     public PlayerProfile PlayerProfile { get; private set; }
@@ -242,12 +245,12 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             UpdateAllMicPitchTrackers();
         });
         micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;
-        micSelectionDialogControl.MicProfiles = micProfiles;
+        micSelectionDialogControl.MicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, serverSideConnectRequestManager);
         
         // Start recording to select microphone
         UpdateAllMicPitchTrackers();
     }
-    
+
     public void SetSelected(bool newValue, bool force)
     {
         if (partyModeTeamSettings != null
