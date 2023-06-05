@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CircularBuffer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -14,7 +15,10 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
 
     [Inject]
     private Injector injector;
-
+    
+    [Inject]
+    private IServerSideConnectRequestManager serverSideConnectRequestManager;
+    
     public MicProfile MicProfile
     {
         get => MicProgressBarControl.MicProfile;
@@ -29,11 +33,26 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
 
     private long lastRecordingEventTimeInMillis;
     private double noiseAboveThresholdDurationInMillis;
+
+    private readonly CircularBuffer<int> lastReceivedMidiNotesFromConnectedClient = new(10);
     
     public void OnInjectionFinished()
     {
         injector.Inject(MicProgressBarControl);
         UpdateRecordingEventSubscription();
+    }
+
+    public void Update()
+    {
+        long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        long timeSinceLastRecordingEvent = currentTimeInMillis - lastRecordingEventTimeInMillis;
+        if (timeSinceLastRecordingEvent > 500)
+        {
+            noiseAboveThresholdDurationInMillis -= Time.deltaTime * 1000;
+        }
+        noiseAboveThresholdDurationInMillis = NumberUtils.Limit(noiseAboveThresholdDurationInMillis, 0, TargetNoiseAboveThresholdDurationInMillis);
+
+        UpdateProgressBarValue();
     }
 
     private void UpdateRecordingEventSubscription()
@@ -45,6 +64,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
             .FirstOrDefault(it => it.MicProfile == MicProfile);
         if (micSampleRecorder != null)
         {
+            // Subscribe to sample recording
             micSampleRecorderDisposables.Add(micSampleRecorder.RecordingEventStream
                 .Subscribe(evt => OnRecordingEvent(evt)));
             micSampleRecorderDisposables.Add(micSampleRecorder.IsRecording
@@ -55,11 +75,62 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
                         MicProgressBarControl.ProgressBarValue = 0;
                     }
                 }));
+            
+            // Subscribe to Companion App messages
+            MicProfile micProfile = micSampleRecorder.MicProfile;
+            if (micProfile != null
+                && micProfile.IsInputFromConnectedClient)
+            {
+                if (serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId,
+                        out IConnectedClientHandler connectedClientHandler))
+                {
+                    micSampleRecorderDisposables.Add(connectedClientHandler.ReceivedMessageStream
+                        .ObserveOnMainThread()
+                        .Subscribe(evt => OnConnectedClientMessageReceived(evt)));
+                }
+            }
         }
         
         lastRecordingEventTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
-    
+
+    private void OnConnectedClientMessageReceived(JsonSerializable evt)
+    {
+        if (evt is StopRecordingMessageDto)
+        {
+            MicProgressBarControl.ProgressBarValue = 0;
+        }
+        else if (evt is BeatPitchEventsDto beatPitchEventsDto
+                 && !beatPitchEventsDto.BeatPitchEvents.IsNullOrEmpty())
+        {
+            // Increase the progress bar when singing the same note for a longer time
+            long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+            long deltaTimeInMillis = Math.Abs(currentTimeInMillis - lastRecordingEventTimeInMillis) < 500
+                ? currentTimeInMillis - lastRecordingEventTimeInMillis
+                : 0;
+            
+            BeatPitchEventDto beatPitchEventDto = beatPitchEventsDto.BeatPitchEvents.LastOrDefault();
+            int midiNote = beatPitchEventDto.MidiNote;
+            if (midiNote <= 0)
+            {
+                return;
+            }
+            
+            lastReceivedMidiNotesFromConnectedClient.PushBack(midiNote);
+            int medianMidiNote = NumberUtils.Median(lastReceivedMidiNotesFromConnectedClient.ToList());
+            if (Math.Abs(medianMidiNote - beatPitchEventDto.MidiNote) <= 2)
+            {
+                noiseAboveThresholdDurationInMillis += deltaTimeInMillis;
+            }
+            else
+            {
+                noiseAboveThresholdDurationInMillis -= deltaTimeInMillis;
+            }
+
+            lastRecordingEventTimeInMillis = currentTimeInMillis;
+        }
+    }
+
     private void OnRecordingEvent(RecordingEvent evt)
     {
         bool isAboveThreshold = false;
@@ -86,12 +157,20 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         {
             noiseAboveThresholdDurationInMillis -= durationSinceLastRecordingEventInMillis;
         }
-        noiseAboveThresholdDurationInMillis = NumberUtils.Limit(noiseAboveThresholdDurationInMillis, 0, TargetNoiseAboveThresholdDurationInMillis);
-        
-        // Update progress in UI
-        MicProgressBarControl.ProgressBarValue = (float)(100 * (noiseAboveThresholdDurationInMillis / TargetNoiseAboveThresholdDurationInMillis));
     }
 
+    private void UpdateProgressBarValue()
+    {
+        if (MicProfile != null)
+        {
+            MicProgressBarControl.ProgressBarValue = (float)(100 * (noiseAboveThresholdDurationInMillis / TargetNoiseAboveThresholdDurationInMillis));
+        }
+        else
+        {
+            MicProgressBarControl.ProgressBarValue = 0;
+        }
+    }
+    
     public void Dispose()
     {
         micSampleRecorderDisposables.ForEach(d => d.Dispose());

@@ -127,6 +127,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     public IObservable<MicSelectionDialogControl.MicProfileChangedEvent> MicProfileChangedEventStream => micProfileChangedEventStream;
 
     public Action<MicProfile> OnMicProfileSelected { get; set; }
+
+    private int lastUpdateAllMicPitchTrackersFrameCount;
     
     public void OnInjectionFinished()
     {
@@ -161,6 +163,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
                 PlayerProfile.IsSelected = newValue;
             }
         });
+
+        nonPersistentSettings.MicTestActive.Subscribe(_ => UpdateAllMicPitchTrackers());
     }
 
     private void InitVoiceSelection()
@@ -217,6 +221,12 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
+    public void Update()
+    {
+        micProgressBarRecordingControl.Update();
+        micSelectionDialogControl?.Update();
+    }
+
     private void OpenMicSelectionDialog()
     {
         if (micSelectionDialogControl != null)
@@ -226,9 +236,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
         void OnMicSelected(MicProfile newMicProfile)
         {
+            OnMicProfileSelected?.Invoke(newMicProfile);
             MicProfile = newMicProfile;
             micSelectionDialogControl?.CloseDialog();
-            OnMicProfileSelected?.Invoke(newMicProfile);
         }
 
         VisualElement dialog = messageDialogUi.CloneTreeAndGetFirstChild();
@@ -242,15 +252,67 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         {
             micSelectionDialogControl = null;
             // Stop recording if mic test is not active
+            if (!nonPersistentSettings.MicTestActive.Value)
+            {
+                SendStopRecordingMessageToAllConnectedClients();
+            }
+            
             UpdateAllMicPitchTrackers();
         });
         micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;
-        micSelectionDialogControl.MicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, serverSideConnectRequestManager);
+        micSelectionDialogControl.MicProfiles = GetAvailableMicProfiles();
         
         // Start recording to select microphone
         UpdateAllMicPitchTrackers();
     }
 
+    private List<MicProfile> GetAvailableMicProfiles()
+    {
+        return SettingsUtils.GetAvailableMicProfiles(settings, serverSideConnectRequestManager);
+    }
+
+    private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
+    {
+        return serverSideConnectRequestManager.GetConnectedClientHandlers(GetAvailableMicProfiles());
+    }
+    
+    private void SendStopRecordingMessageToAllConnectedClients()
+    {
+        GetConnectedClientHandlers().ForEach(it => it.ConnectedClientHandler.SendMessageToClient(new StopRecordingMessageDto()));
+    }
+
+    private void SendStartRecordingMessageToAllConnectedClients()
+    {
+        GetConnectedClientHandlers().ForEach(it => it.ConnectedClientHandler.SendMessageToClient(new StartRecordingMessageDto()));
+    }
+    
+    private ConnectedClientHandlerAndMicProfile GetConnectedClientHandler()
+    {
+        if (micProfile == null)
+        {
+            return null;
+        }
+        return serverSideConnectRequestManager.GetConnectedClientHandlers(new List<MicProfile> { micProfile }).FirstOrDefault();
+    }
+    
+    private void SendStopRecordingMessageToConnectedClient()
+    {
+        if (micProfile != null
+            && micProfile.IsInputFromConnectedClient)
+        {
+            GetConnectedClientHandler()?.ConnectedClientHandler.SendMessageToClient(new StopRecordingMessageDto());
+        }
+    }
+
+    private void SendStartRecordingMessageToConnectedClient()
+    {
+        if (micProfile != null
+            && micProfile.IsInputFromConnectedClient)
+        {
+            GetConnectedClientHandler()?.ConnectedClientHandler.SendMessageToClient(new StartRecordingMessageDto());
+        }
+    }
+    
     public void SetSelected(bool newValue, bool force)
     {
         if (partyModeTeamSettings != null
@@ -288,8 +350,15 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private void UpdateAllMicPitchTrackers()
     {
+        if (lastUpdateAllMicPitchTrackersFrameCount == Time.frameCount)
+        {
+            return;
+        }
+        
         songSelectSceneControl.playerListControl.PlayerEntryControls
             .ForEach(it => it.UpdateMicPitchTracker());
+
+        lastUpdateAllMicPitchTrackersFrameCount = Time.frameCount;
     }
     
     public void UpdateMicPitchTracker()
@@ -301,21 +370,29 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         
         micPitchTracker.MicProfile = micProfile;
         if (micProfile == null
-            || micProfile.IsInputFromConnectedClient
             || (!nonPersistentSettings.MicTestActive.Value
                 && micSelectionDialogControl == null))
         {
-            if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
+            if (micProfile != null
+                && micProfile.IsInputFromConnectedClient)
+            {
+                SendStopRecordingMessageToConnectedClient();
+            }
+            else if (micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {
                 micPitchTracker.MicSampleRecorder.StopRecording();
             }
         }
         else if (micProfile != null
-                 && !micProfile.IsInputFromConnectedClient
                  && (nonPersistentSettings.MicTestActive.Value 
                      || micSelectionDialogControl != null))
         {
-            if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
+            if (micProfile != null
+                && micProfile.IsInputFromConnectedClient)
+            {
+                SendStartRecordingMessageToConnectedClient();
+            }
+            else if (!micPitchTracker.MicSampleRecorder.IsRecording.Value)
             {
                 micPitchTracker.MicSampleRecorder.StartRecording();
             }

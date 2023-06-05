@@ -1,5 +1,6 @@
 ﻿using System;
 using UniInject;
+using UnityEngine;
 
 public class MicProgressBarControl : INeedInjection, IInjectionFinishedListener
 {
@@ -45,6 +46,7 @@ public class MicProgressBarControl : INeedInjection, IInjectionFinishedListener
     {
         if (MicProfile == null)
         {
+            micProgressBar.ProgressInPercent = 0;
             micProgressBar.HideByDisplay();
             return;
         }

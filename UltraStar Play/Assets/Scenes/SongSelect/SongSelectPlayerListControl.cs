@@ -61,6 +61,11 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         }
     }
 
+    private void Update()
+    {
+        playerEntryControls.ForEach(it => it.Update());
+    }
+
     private void SelectMicsForPartyMode()
     {
         // Assign mics by re-selecting every player profile of this round.
