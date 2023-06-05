@@ -16,7 +16,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
     [Inject]
     private Injector injector;
     
-    [Inject]
+    [Inject(Optional = true)]
     private IServerSideConnectRequestManager serverSideConnectRequestManager;
     
     public MicProfile MicProfile
@@ -79,7 +79,8 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
             // Subscribe to Companion App messages
             MicProfile micProfile = micSampleRecorder.MicProfile;
             if (micProfile != null
-                && micProfile.IsInputFromConnectedClient)
+                && micProfile.IsInputFromConnectedClient
+                && serverSideConnectRequestManager != null)
             {
                 if (serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId,
                         out IConnectedClientHandler connectedClientHandler))

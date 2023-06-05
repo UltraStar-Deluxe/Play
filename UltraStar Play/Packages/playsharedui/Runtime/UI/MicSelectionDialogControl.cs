@@ -25,6 +25,8 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
 
     public Action<MicProfile> OnMicProfileSelected { get; set; }
 
+    public bool ShowInfoLabel { get; set; } = true;
+
     private readonly List<MicWithNameControl> micWithNameControls = new();
     
     public override void OnInjectionFinished()
@@ -60,7 +62,10 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
             micWithNameControls.Add(micWithNameControl);
         });
 
-        AddInfoLabel();
+        if (ShowInfoLabel)
+        {
+            AddInfoLabel();
+        }
     }
 
     private void AddInfoLabel()
