@@ -35,6 +35,11 @@ public class MicWithNameControl : INeedInjection, IInjectionFinishedListener, ID
         MicProgressBarRecordingControl.MicProgressBarControl.OnProgressBarFilled = localMicProfile => OnMicSelected?.Invoke(localMicProfile);
     }
 
+    public void Update()
+    {
+        MicProgressBarRecordingControl.Update();
+    }
+
     public void Dispose()
     {
         MicProgressBarRecordingControl?.Dispose();

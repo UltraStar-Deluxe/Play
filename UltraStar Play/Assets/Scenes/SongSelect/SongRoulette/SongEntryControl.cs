@@ -13,9 +13,6 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     [Inject]
     private SongRouletteControl songRouletteControl;
     
-    [Inject(Key = nameof(defaultSongImage))]
-    private Sprite defaultSongImage;
-
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
 
@@ -63,6 +60,9 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private UiManager uiManager;
     
     public string Name { get; set; }
 
@@ -301,21 +301,32 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         string uri = SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta);
         if (uri.IsNullOrEmpty())
         {
-            songImageOuter.style.backgroundImage = new StyleBackground(defaultSongImage);
-            songImageInner.style.backgroundImage = new StyleBackground(defaultSongImage);
+            songImageOuter.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
+            songImageInner.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
             return;
         }
         
-        ImageManager.LoadSpriteFromUri(uri, loadedSprite =>
-        {
-            if (coverSongMeta != songMeta)
+        ImageManager.LoadSpriteFromUri(uri,
+            loadedSprite =>
             {
-                // The associated song has changed in the meantime.
-                return;
-            }
-            songImageOuter.style.backgroundImage = new StyleBackground(loadedSprite);
-            songImageInner.style.backgroundImage = new StyleBackground(loadedSprite);
-        });
+                if (coverSongMeta != songMeta)
+                {
+                    // The associated song has changed in the meantime.
+                    return;
+                }
+                songImageOuter.style.backgroundImage = new StyleBackground(loadedSprite);
+                songImageInner.style.backgroundImage = new StyleBackground(loadedSprite);
+            },
+            _ =>
+            {
+                if (coverSongMeta != songMeta)
+                {
+                    // The associated song has changed in the meantime.
+                    return;
+                }
+                songImageOuter.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
+                songImageInner.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
+            });
     }
 
     private void UpdateIcons()

@@ -1612,6 +1612,24 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "navigateForward",
+                    "type": "Button",
+                    "id": "0a54c63c-e83d-407b-8a6b-fefbd1ec8566",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "navigateBackward",
+                    "type": "Button",
+                    "id": "8deb8a5e-6dba-46d2-8447-1ac8ac4987c6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "anyKeyboardKey",
                     "type": "PassThrough",
                     "id": "41b84b84-f352-4238-a37f-9a402b6bcd62",
@@ -2301,6 +2319,72 @@
                     "processors": "",
                     "groups": "",
                     "action": "openSearch",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Button With One Modifier",
+                    "id": "a4b627eb-005a-4bf0-a5f4-feb250ff7ade",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateForward",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "4117cb85-cc80-433f-abf7-7933fc390c0b",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateForward",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "384264ba-4e4c-4404-9996-1a4bcab8b143",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateForward",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Button With One Modifier",
+                    "id": "09204d3d-c9c4-4bc4-908f-1d1a1ced9e51",
+                    "path": "ButtonWithOneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateBackward",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "2e41d786-1357-4810-83b5-1bba5f52a420",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateBackward",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "button",
+                    "id": "bd9a0196-b11d-4ac5-9e4b-51af33fdb1f1",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateBackward",
                     "isComposite": false,
                     "isPartOfComposite": true
                 }

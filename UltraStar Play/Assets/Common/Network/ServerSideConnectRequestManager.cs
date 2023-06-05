@@ -27,6 +27,9 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     
     private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new();
     public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream.ObserveOnMainThread();
+    
+    private readonly Subject<MicProfile> connectedClientMicProfileChangedEventStream = new();
+    public IObservable<MicProfile> ConnectedClientMicProfileChangedEventStream => connectedClientMicProfileChangedEventStream;
 
     private UdpClient serverUdpClient;
 
@@ -61,6 +64,29 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                 ServerAcceptMessageFromClient();
             }
         });
+
+        ClientConnectedEventStream
+            .Subscribe(evt => UpdateConnectedMicProfileName(evt));
+    }
+
+    public void UpdateConnectedMicProfileName(ClientConnectionEvent clientConnectionEvent)
+    {
+        if (!clientConnectionEvent.IsConnected)
+        {
+            return;
+        }
+        
+        settings.MicProfiles
+            .ForEach(micProfile =>
+            {
+                if (micProfile.IsInputFromConnectedClient
+                    && micProfile.ConnectedClientId == clientConnectionEvent.ConnectedClientHandler.ClientId
+                    && micProfile.Name != clientConnectionEvent.ConnectedClientHandler.ClientName)
+                {
+                    micProfile.Name = clientConnectionEvent.ConnectedClientHandler.ClientName;
+                    connectedClientMicProfileChangedEventStream.OnNext(micProfile);
+                }
+            });
     }
 
     private void ServerAcceptMessageFromClient()

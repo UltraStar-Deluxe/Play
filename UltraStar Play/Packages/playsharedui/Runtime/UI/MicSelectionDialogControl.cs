@@ -25,6 +25,8 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
 
     public Action<MicProfile> OnMicProfileSelected { get; set; }
 
+    public bool ShowInfoLabel { get; set; } = true;
+
     private readonly List<MicWithNameControl> micWithNameControls = new();
     
     public override void OnInjectionFinished()
@@ -33,6 +35,13 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
         AddButton(TranslationManager.GetTranslation("cancel"), _ => CloseDialog());
     }
 
+    public void Update()
+    {
+        micWithNameControls
+            .ToList()
+            .ForEach(it => it.Update());
+    }
+    
     private void UpdateMicProfileList()
     {
         dialogMessageContainer.Clear();
@@ -53,7 +62,10 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
             micWithNameControls.Add(micWithNameControl);
         });
 
-        AddInfoLabel();
+        if (ShowInfoLabel)
+        {
+            AddInfoLabel();
+        }
     }
 
     private void AddInfoLabel()
@@ -72,7 +84,7 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
         infoContainer.Add(infoIcon);
 
         Label infoLabel = new();
-        infoLabel.text = "sing into a mic to select it";
+        infoLabel.text = "click or sing into a mic to select it";
         infoLabel.AddToClassList("smallerFont");
         infoContainer.Add(infoLabel);
         

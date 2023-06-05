@@ -61,6 +61,11 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         }
     }
 
+    private void Update()
+    {
+        playerEntryControls.ForEach(it => it.Update());
+    }
+
     private void SelectMicsForPartyMode()
     {
         // Assign mics by re-selecting every player profile of this round.
@@ -116,7 +121,6 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         SongSelectPlayerEntryControl listEntryControl = injector
             .WithRootVisualElement(playerEntryVisualElement)
             .WithBindingForInstance(playerProfile)
-            .WithBinding(new Binding("micProfiles", new ExistingInstanceProvider<List<MicProfile>>(GetAvailableMicProfiles())))
             .WithBindingForInstance(PartyModeUtils.GetTeam(songSelectSceneControl.PartyModeSceneData, playerProfile))
             .CreateAndInject<SongSelectPlayerEntryControl>();
         listEntryControl.Init(playerProfile);
@@ -137,13 +141,6 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerEntryVisualElement);
     }
 
-    private List<MicProfile> GetAvailableMicProfiles()
-    {
-        return settings.MicProfiles
-            .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
-            .ToList();
-    }
-    
     private void UseMicProfileWhereNeeded(MicProfile micProfile)
     {
         if (micProfile == null
@@ -161,7 +158,25 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             return;
         }
         
-        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfile = playerEntryControls.FirstOrDefault(it => it.PlayerProfile.IsSelected && it.MicProfile == null);
+        List<SongSelectPlayerEntryControl> listEntryControlsWithMissingMicProfile = playerEntryControls
+            .Where(it => it.PlayerProfile.IsSelected && it.MicProfile == null)
+            .ToList();
+        if (listEntryControlsWithMissingMicProfile.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        // Prefer player with same name
+        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfileAndSameName = listEntryControlsWithMissingMicProfile.FirstOrDefault(it =>
+            string.Equals(it.PlayerProfile.Name, micProfile.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (listEntryControlWithMissingMicProfileAndSameName != null)
+        {
+            listEntryControlWithMissingMicProfileAndSameName.MicProfile = micProfile;
+            return;
+        }
+        
+        // Assign to first player with missing mic profile
+        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfile = listEntryControlsWithMissingMicProfile.FirstOrDefault();
         if (listEntryControlWithMissingMicProfile != null)
         {
             listEntryControlWithMissingMicProfile.MicProfile = micProfile;

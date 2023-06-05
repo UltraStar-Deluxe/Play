@@ -1,6 +1,6 @@
 ﻿public static class ArrayUtils
 {
-    public static void TrySet<T>(T[] array, T value, int index)
+    public static void SafeSet<T>(T[] array, T value, int index)
     {
         if (array == null 
             || index < 0
@@ -12,7 +12,7 @@
         array[index] = value;
     }
     
-    public static T TryGet<T>(T[] array, int index, T fallbackValue)
+    public static T SafeGet<T>(T[] array, int index, T fallbackValue)
     {
         if (array == null 
             || index < 0

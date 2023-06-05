@@ -1,4 +1,5 @@
-﻿using UnityEngine.UIElements;
+﻿using UnityEngine;
+using UnityEngine.UIElements;
 
 public static class SongMetaImageUtils
 {
@@ -51,12 +52,21 @@ public static class SongMetaImageUtils
             return;
         }
         
-        ImageManager.LoadSpriteFromUri(uri, loadedSprite =>
-        {
-            foreach (VisualElement visualElement in visualElements)
+        ImageManager.LoadSpriteFromUri(uri,
+            loadedSprite =>
             {
-                visualElement.style.backgroundImage = new StyleBackground(loadedSprite);
-            }
-        });
+                foreach (VisualElement visualElement in visualElements)
+                {
+                    visualElement.style.backgroundImage = new StyleBackground(loadedSprite);
+                }
+            },
+            _ =>
+            {
+                Sprite defaultCoverImage = UiManager.Instance.defaultSongImage;
+                foreach (VisualElement visualElement in visualElements)
+                {
+                    visualElement.style.backgroundImage = new StyleBackground(defaultCoverImage);
+                }
+            });
     }
 }

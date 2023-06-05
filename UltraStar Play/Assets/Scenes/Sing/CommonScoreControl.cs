@@ -14,6 +14,9 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private SingSceneControl singSceneControl;
 
+    [Inject]
+    private GameObject gameObject;
+    
     [Inject(UxmlName = R.UxmlNames.commonScoreSentenceRatingContainer)]
     private VisualElement commonScoreSentenceRatingContainer;
 
@@ -30,7 +33,15 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
         commonScoreSentenceRatingContainer.Clear();
         if (singSceneControl.IsCommonScore)
         {
-            InitCommonScore();
+            if (singSceneControl.PlayerControls.IsNullOrEmpty())
+            {
+                MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                    () => InitCommonScore()));
+            }
+            else
+            {
+                InitCommonScore();
+            }
         }
     }
 
@@ -40,7 +51,7 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
         {
             scoreControl.SentenceScoreEventStream
                 .Subscribe(_ => UpdateCommonScoreLabel())
-                .AddTo(singSceneControl.gameObject);
+                .AddTo(gameObject);
         });
 
         // Show only "friendly" sentence ratings.
@@ -49,7 +60,7 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
             .Subscribe(sentenceScoreEvent =>
             {
                 if (ratedSentences.Contains(sentenceScoreEvent.SentenceScore.Sentence)
-                    || sentenceScoreEvent.SentenceRating.PercentageThreshold <= 0.5)
+                    || sentenceScoreEvent.SentenceRating.PercentageThreshold < 0.25)
                 {
                     return;
                 }

@@ -120,11 +120,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
 
-    private bool ShowHighScoresNext => !sceneData.IsMedley
-                                       && !HasPartyModeSceneData
-                                       && statistics.HasHighscore(sceneData.SongMetas.LastOrDefault())
-                                       && !OnlyShowHighscores;
-
     private bool OnlyShowHighscores => sceneData.lastSceneData is SongSelectSceneData;
     
     private readonly SingingResultsHighscoreControl highscoreControl = new();
@@ -157,11 +152,6 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         injector.Inject(nextGameRoundUiControl);
         injector.Inject(teamResultsUiControl);
         injector.Inject(highscoreControl);
-
-        if (ShowHighScoresNext)
-        {
-            nextGameRoundUiControl.HideNextGameRoundUi();
-        }
     }
 
     private void Start()

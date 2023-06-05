@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -39,7 +40,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     private SceneRecipeManager sceneRecipeManager;
     
     public bool logSceneChangeDuration;
-
+    
     protected override object GetInstance()
     {
         return Instance;

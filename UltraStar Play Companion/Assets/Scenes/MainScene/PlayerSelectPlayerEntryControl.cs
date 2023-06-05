@@ -30,6 +30,9 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
     [Inject(UxmlName = R_PlayShared.UxmlNames.micIcon)]
     private VisualElement micIcon;
     
+    [Inject(UxmlName = R.UxmlNames.noMicIcon)]
+    private VisualElement noMicIcon;
+    
     [Inject(UxmlName = R_PlayShared.UxmlNames.nameLabel)]
     private Label nameLabel;
     
@@ -75,7 +78,11 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         nameLabel.RegisterCallback<PointerDownEvent>(_ => ToggleSelected());
         selectedToggle.RegisterValueChangedCallback(evt => IsSelected.Value = evt.newValue);
         micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
-        IsSelected.Subscribe(newValue => selectedToggle.value = newValue);
+        IsSelected.Subscribe(newValue =>
+        {
+            selectedToggle.value = newValue;
+            UpdateMicIcon();
+        });
         
         VoiceChooserControl = new(voiceChooser, new List<string>()
         {
@@ -115,9 +122,9 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
 
         void OnMicSelected(MicProfile newMicProfile)
         {
+            OnMicProfileSelected?.Invoke(newMicProfile);
             MicProfile = newMicProfile;
             micSelectionDialogControl.CloseDialog();
-            OnMicProfileSelected?.Invoke(newMicProfile);
         }
 
         VisualElement dialog = messageDialogUi.CloneTreeAndGetFirstChild();
@@ -129,6 +136,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
             .CreateAndInject<MicSelectionDialogControl>();
         micSelectionDialogControl.Title = $"Select Microphone for {PlayerProfileName}";
         micSelectionDialogControl.AddButton("OK", _ => micSelectionDialogControl.CloseDialog());
+        micSelectionDialogControl.ShowInfoLabel = false;
         micSelectionDialogControl.DialogClosedEventStream.Subscribe(_ => OnMicSelectionDialogClosed());
         micSelectionDialogControl.MicProfiles = micProfiles;
         micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;
@@ -151,10 +159,12 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
             micIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
             micIcon.style.color = new StyleColor(micProfile.Color);
             micIcon.ShowByVisibility();
+            noMicIcon.HideByDisplay();
         }
         else
         {
             micIcon.HideByVisibility();
+            noMicIcon.SetVisibleByDisplay(IsSelected.Value);
         }
     }
 

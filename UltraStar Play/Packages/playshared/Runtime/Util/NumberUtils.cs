@@ -19,6 +19,19 @@ public static class NumberUtils
         return value;
     }
 
+    public static long Limit(long value, long min, long max)
+    {
+        if (value < min)
+        {
+            return min;
+        }
+        if (value > max)
+        {
+            return max;
+        }
+        return value;
+    }
+    
     public static float Limit(float value, float min, float max)
     {
         if (value < min)

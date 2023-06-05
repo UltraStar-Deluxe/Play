@@ -3,6 +3,7 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -52,7 +53,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator
         }
     }
 
-    public override void OnNavigate(Vector2 navigationDirection)
+    public override void OnNavigate(Vector2 navigationDirection, InputAction inputAction, InputControl inputControl)
     {
         if (navigationDirection.y < 0
             && GetFocusableNavigatorRootVisualElement() == topContent)
@@ -61,7 +62,7 @@ public class SongSelectFocusableNavigator : FocusableNavigator
             return;
         }
 
-        base.OnNavigate(navigationDirection);
+        base.OnNavigate(navigationDirection, inputAction, inputControl);
     }
 
     private void OnNoNavigationTargetFound(NoNavigationTargetFoundEvent evt)

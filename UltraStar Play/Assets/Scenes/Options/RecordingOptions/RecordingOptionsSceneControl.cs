@@ -68,6 +68,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
     private Toggle playRecordedAudioToggle;
+    
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
+    private VisualElement playRecordedAudioInfoContainer;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
@@ -179,8 +182,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             .Subscribe(newValue => OnRecordingDeviceSelected(devicePickerControl.SelectedItem))
             .AddTo(gameObject);
 
-        serverSideConnectRequestManager.ClientConnectedEventStream
-            .Subscribe(UpdateMicProfileNames)
+        serverSideConnectRequestManager.ConnectedClientMicProfileChangedEventStream
+            .Subscribe(OnConnectedClientMicProfileChanged)
             .AddTo(gameObject);
 
         calibrateDelayButton.RegisterCallbackButtonTriggered(_ => calibrateMicDelayControl.StartCalibration());
@@ -371,7 +374,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         micVisualizer.SetMicProfile(micProfile);
         calibrateMicDelayControl.MicProfile = micProfile;
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
-
+        
+        playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);
+        
         UpdateSampleRateLabel();
         InitPitchDetectionFromConnectionClient();
     }
@@ -419,26 +424,11 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             serverSideConnectRequestManager.GetAllConnectedClientHandlers());
     }
 
-    public void UpdateMicProfileNames(ClientConnectionEvent clientConnectionEvent)
+    public void OnConnectedClientMicProfileChanged(MicProfile micProfile)
     {
-        if (clientConnectionEvent.IsConnected)
+        if (devicePickerControl.SelectedItem == micProfile)
         {
-            devicePickerControl.Items.ForEach(micProfile => UpdateMicProfileName(clientConnectionEvent, micProfile));
-        }
-        devicePickerControl.UpdateLabelText();
-    }
-
-    private void UpdateMicProfileName(ClientConnectionEvent clientConnectionEvent, MicProfile micProfile)
-    {
-        if (micProfile.IsInputFromConnectedClient
-            && micProfile.ConnectedClientId == clientConnectionEvent.ConnectedClientHandler.ClientId)
-        {
-            micProfile.Name = clientConnectionEvent.ConnectedClientHandler.ClientName;
-
-            if (devicePickerControl.SelectedItem == micProfile)
-            {
-                devicePickerControl.UpdateLabelText();
-            }
+            devicePickerControl.UpdateLabelText();
         }
     }
 

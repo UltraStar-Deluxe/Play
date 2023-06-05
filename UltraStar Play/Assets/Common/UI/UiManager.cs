@@ -49,6 +49,9 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     [InjectedInInspector]
     public VisualTreeAsset songQueuePlayerEntryUi;
     
+    [InjectedInInspector]
+    public Sprite defaultSongImage;
+    
     [Inject]
     private Injector injector;
 

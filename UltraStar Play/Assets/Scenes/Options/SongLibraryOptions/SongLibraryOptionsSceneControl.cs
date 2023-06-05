@@ -67,6 +67,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
     private readonly List<DownloadSongArchiveUiControl> downloadSongArchiveUiControls = new();
+
+    private MessageDialogControl deleteSongFolderDialog;
     
     protected override void Start()
     {
@@ -365,16 +367,52 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
             songFolderListEntryControls.ForEach(control => control.CheckPathIsValid());
         });
-        songFolderListEntryControl.DeleteEventStream.Subscribe(_ =>
-        {
-            settings.SongDirs.RemoveAt(indexInList);
-            UpdateSongFolderList();
-        });
+        songFolderListEntryControl.DeleteEventStream.Subscribe(_ => OnDeleteSongFolder(indexInList));
 
         songFolderListEntryControls.Add(songFolderListEntryControl);
         songFolderList.Add(visualElement);
     }
 
+    private void OnDeleteSongFolder(int indexInList)
+    {
+        string songFolder = CollectionUtils.SafeGet(settings.SongDirs, indexInList, "");
+        if (DirectoryUtils.Exists(songFolder))
+        {
+            // Ask before delete
+            OpenDeleteSongFolderDialog(indexInList);
+            return;
+        }
+        
+        DoDeleteSongFolder(indexInList);
+    }
+    
+    public void OpenDeleteSongFolderDialog(int indexInList)
+    {
+        if (deleteSongFolderDialog != null)
+        {
+            return;
+        }
+
+        deleteSongFolderDialog = uiManager.CreateDialogControl("Delete Song Folder");
+        deleteSongFolderDialog.DialogClosedEventStream.Subscribe(_ => deleteSongFolderDialog = null);
+        deleteSongFolderDialog.Message = $"Do you want to delete the song folder\n'{settings.SongDirs[indexInList]}'";
+
+        deleteSongFolderDialog.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => deleteSongFolderDialog.CloseDialog());
+        deleteSongFolderDialog.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ =>
+        {
+            deleteSongFolderDialog.CloseDialog();
+            DoDeleteSongFolder(indexInList);
+        });
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(deleteSongFolderDialog.DialogRootVisualElement);
+    }
+
+    private void DoDeleteSongFolder(int indexInList)
+    {
+        settings.SongDirs.RemoveAt(indexInList);
+        UpdateSongFolderList();
+    }
+    
     protected override void OnDestroy()
     {
         base.OnDestroy();

@@ -54,6 +54,8 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
 
         connectedClientCountLabel.text = TranslationManager.GetTranslation(R.Messages.options_connectedClientCount,
             "count", ServerSideConnectRequestManager.ConnectedClientCount);
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(connectedClientList);
     }
 
     private VisualElement CreateClientEntry(IConnectedClientHandler clientHandler)

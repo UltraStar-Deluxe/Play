@@ -50,11 +50,17 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
         {
             VisualElement playerEntryVisualElement = nextGameRoundInfoPlayerEntryUi.CloneTree().Children().FirstOrDefault();
             nextGameRoundPlayerEntryList.Add(playerEntryVisualElement);
-            playerEntryVisualElement.Q<Label>().text = playerProfileName;
+            
+            Label playerNameLabel = playerEntryVisualElement.Q<Label>(R.UxmlNames.nextGameRoundPlayerEntryLabel);
+            playerNameLabel.text = playerProfileName;
+            
             VisualElement micVisualElement = playerEntryVisualElement.Q<VisualElement>(R.UxmlNames.nextGameRoundPlayerEntryMicImage);
             if (songQueueEntryDto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap.TryGetValue(playerProfileName, out MicProfileDto micProfileDto))
             {
+                micVisualElement.ShowByDisplay();
+                micVisualElement.style.color = new StyleColor(micProfileDto.Color);
                 micVisualElement.style.unityBackgroundImageTintColor = new StyleColor(micProfileDto.Color);
+                Debug.Log("Set mic color: " + micProfileDto.Color);
             }
             else
             {

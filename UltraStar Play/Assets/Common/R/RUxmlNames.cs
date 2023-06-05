@@ -524,6 +524,8 @@ public static partial class R
         public const string playlistChooserTitle = "playlistChooserTitle";
         public const string playlistDropdownField = "playlistDropdownField";
         public const string playlistNameTextField = "playlistNameTextField";
+        public const string playRecordedAudioInfoContainer = "playRecordedAudioInfoContainer";
+        public const string playRecordedAudioInfoLabel = "playRecordedAudioInfoLabel";
         public const string playRecordedAudioToggle = "playRecordedAudioToggle";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
@@ -609,6 +611,7 @@ public static partial class R
         public const string selectFolderButton = "selectFolderButton";
         public const string selectFolderIcon = "selectFolderIcon";
         public const string selectionIndicator = "selectionIndicator";
+        public const string selectionIndicatorInner = "selectionIndicatorInner";
         public const string selectMidiFileButton = "selectMidiFileButton";
         public const string selectModelPathButton = "selectModelPathButton";
         public const string selectRandomSongButton = "selectRandomSongButton";

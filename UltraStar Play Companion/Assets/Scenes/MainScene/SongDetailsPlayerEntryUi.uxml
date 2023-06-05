@@ -2,6 +2,7 @@
     <ui:VisualElement name="playerEntry" class="fontColorBorder px-1" style="width: 100%; height: auto; align-items: stretch;">
         <ui:VisualElement name="row" style="width: 100%; height: 40px; flex-direction: row; align-items: center;">
             <ui:Button display-tooltip-when-elided="true" name="micButton" class="squareButton transparentBackgroundColor mr-2" style="height: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;">
+                <MaterialIcon name="noMicIcon" icon="mic_off" picking-mode="Ignore" class="overlay" style="width: 32px; height: 32px; justify-content: center;" />
                 <MaterialIcon name="micIcon" icon="mic" picking-mode="Ignore" style="width: 32px; height: 32px; justify-content: center;" />
             </ui:Button>
             <ui:VisualElement name="labelContainer" class="ml-1" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1;">
