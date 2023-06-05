@@ -21,6 +21,9 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     [Inject(UxmlName = R.UxmlNames.connectedClientList)]
     private ScrollView connectedClientList;
 
+    [Inject(UxmlName = R.UxmlNames.noConnectedClientsContainer)]
+    private VisualElement noConnectedClientsContainer;
+
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
@@ -54,6 +57,8 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
 
         connectedClientCountLabel.text = TranslationManager.GetTranslation(R.Messages.options_connectedClientCount,
             "count", ServerSideConnectRequestManager.ConnectedClientCount);
+        
+        noConnectedClientsContainer.SetVisibleByDisplay(ServerSideConnectRequestManager.ConnectedClientCount <= 0);
         
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(connectedClientList);
     }
