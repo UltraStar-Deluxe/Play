@@ -85,7 +85,6 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
             }
         }
 
-        Debug.Log($"micDelay {micProfile.Name}: " + micDelay);
         double positionInSongInMillisConsideringMicDelay = songAudioPlayer.PositionInSongInMillis - micDelay;
         float xPosPercent = 100f * noteDisplayer.GetXInPercent(positionInSongInMillisConsideringMicDelay);
         xPosPercent = NumberUtils.Limit(xPosPercent, 0, float.MaxValue);
