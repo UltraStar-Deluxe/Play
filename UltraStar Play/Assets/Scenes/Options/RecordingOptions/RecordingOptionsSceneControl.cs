@@ -113,7 +113,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         
         new AutoFitLabelControl(devicePicker.ItemLabel, 10, 15);
         
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, CreateMicProfiles());
+        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, CreateAndPersistMicProfiles());
         devicePickerControl.AutoSmallFont = false;
         devicePickerControl.GetLabelTextFunction = item => item != null ? item.GetDisplayNameWithChannel() : "";
         if (!TryReSelectLastMicProfile())
@@ -240,9 +240,8 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     {
         micPitchTracker.StopRecording();
 
-        List<MicProfile> sortedMicProfiles = GetSortedMicProfiles();
         MicProfile lastMicProfile = SelectedMicProfile;
-        devicePickerControl.Items = sortedMicProfiles;
+        devicePickerControl.Items = CreateAndPersistMicProfiles();
         Debug.Log($"MicProfiles: {devicePickerControl.Items.ToCsv()}");
         if (devicePickerControl.Items.Count > 0)
         {
@@ -265,13 +264,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
             OnRecordingDeviceSelected(nextSelectedMicProfile);
         }
-    }
-
-    private List<MicProfile> GetSortedMicProfiles()
-    {
-        List<MicProfile> micProfiles = CreateMicProfiles();
-        micProfiles.Sort((a, b) => string.CompareOrdinal(a.GetDisplayNameWithChannel(), b.GetDisplayNameWithChannel()));
-        return micProfiles;
     }
 
     private void Update()
@@ -424,12 +416,12 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         notConnectedLabel.text = TranslationManager.GetTranslation(R.Messages.options_deviceNotConnected);
     }
 
-    private List<MicProfile> CreateMicProfiles()
+    private List<MicProfile> CreateAndPersistMicProfiles()
     {
-        return MicProfileUtils.CreateMicProfiles(
-            settings.MicProfiles,
-            themeManager.GetMicrophoneColors(),
-            serverSideConnectRequestManager.GetAllConnectedClientHandlers());
+        return MicProfileUtils.CreateAndPersistMicProfiles(
+            settings,
+            themeManager,
+            serverSideConnectRequestManager);
     }
 
     public void OnConnectedClientMicProfileChanged(MicProfile micProfile)

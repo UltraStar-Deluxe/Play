@@ -52,9 +52,11 @@ public static class SettingsUtils
         return settings.SceneChangeDurationInSeconds > 0;
     }
     
-    public static List<MicProfile> GetAvailableMicProfiles(Settings settings, ServerSideConnectRequestManager serverSideConnectRequestManager)
+    public static List<MicProfile> GetAvailableMicProfiles(Settings settings, ThemeManager themeManager, ServerSideConnectRequestManager serverSideConnectRequestManager)
     {
-        return settings.MicProfiles
+        List<MicProfile> allMicProfiles = MicProfileUtils.CreateAndPersistMicProfiles(settings, themeManager, serverSideConnectRequestManager);
+
+        return allMicProfiles
             .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
             .ToList();
     }

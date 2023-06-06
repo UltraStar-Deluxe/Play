@@ -52,6 +52,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     private Settings settings;
     
     [Inject]
+    private ThemeManager themeManager;
+    
+    [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
     
     [Inject]
@@ -305,7 +308,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private List<MicProfile> GetAvailableMicProfiles()
     {
-        return SettingsUtils.GetAvailableMicProfiles(settings, serverSideConnectRequestManager);
+        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
     }
 
     private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
