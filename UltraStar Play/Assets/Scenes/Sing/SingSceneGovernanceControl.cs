@@ -174,7 +174,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     {
         if ((lastPointerPosition != currentPointerPosition
             && currentPointerPosition.x >= 0 && currentPointerPosition.x <= Screen.width
-            && currentPointerPosition.y >= 0 && currentPointerPosition.x <= Screen.height)
+            && currentPointerPosition.y >= 0 && currentPointerPosition.y <= Screen.height)
             || Input.anyKeyDown)
         {
             ShowOverlayAndCursor();
@@ -187,10 +187,9 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
                 hideDelayInSeconds = longHideDelayInSeconds;
             }
         }
-
-        if (hideDelayInSeconds <= 0
-            && songAudioPlayer.IsPlaying
-            && !isPointerOverBottomControls)
+        else if (hideDelayInSeconds <= 0
+                 && songAudioPlayer.IsPlaying
+                 && !isPointerOverBottomControls)
         {
             HideOverlayAndCursor();
         }
