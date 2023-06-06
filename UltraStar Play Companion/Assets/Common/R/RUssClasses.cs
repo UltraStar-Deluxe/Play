@@ -10,6 +10,7 @@ public static partial class R
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string jpg = "jpg";
         public const string largeFont = "largeFont";
+        public const string mb_3 = "mb-3";
         public const string ml_1 = "ml-1";
         public const string ml_2 = "ml-2";
         public const string ml_3 = "ml-3";
@@ -25,6 +26,7 @@ public static partial class R
         public const string outline = "outline";
         public const string overlay = "overlay";
         public const string overlayBackground = "overlayBackground";
+        public const string p_3 = "p-3";
         public const string px_1 = "px-1";
         public const string roundCorners = "roundCorners";
         public const string smallControl = "smallControl";

@@ -67,6 +67,8 @@ public static partial class R
         public const string modifierChipsCombo = "modifierChipsCombo";
         public const string modifierContainer = "modifierContainer";
         public const string modifierDialogOverlay = "modifierDialogOverlay";
+        public const string modifierDialogOverlayInner = "modifierDialogOverlayInner";
+        public const string modifiersDialogOverlayTitle = "modifiersDialogOverlayTitle";
         public const string mouseIcon = "mouseIcon";
         public const string mousePadArea = "mousePadArea";
         public const string mouseSensitivityFloatField = "mouseSensitivityFloatField";

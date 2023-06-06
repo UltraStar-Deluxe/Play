@@ -402,6 +402,9 @@ public static partial class R
         public const string nextSentenceContainer = "nextSentenceContainer";
         public const string nextSentenceLabel = "nextSentenceLabel";
         public const string nicknameCharacterContainer = "nicknameCharacterContainer";
+        public const string noConnectedClientsContainer = "noConnectedClientsContainer";
+        public const string noConnectedClientsIcon = "noConnectedClientsIcon";
+        public const string noConnectedClientsLabel = "noConnectedClientsLabel";
         public const string noCoopIcon = "noCoopIcon";
         public const string noiseSuppressionPicker = "noiseSuppressionPicker";
         public const string noMicCheckIcon = "noMicCheckIcon";
