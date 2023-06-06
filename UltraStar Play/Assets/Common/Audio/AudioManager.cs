@@ -54,7 +54,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
             .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f));
     }
 
-    public static void PlaySoundEffect(AudioClip clip)
+    public static void PlaySoundEffect(AudioClip clip, float volume = 1)
     {
         if (clip == null)
         {
@@ -63,7 +63,8 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
         AudioManager audioManager = Instance;
         if (audioManager == null
-            || audioManager.settings.SfxVolumePercent <= 0)
+            || audioManager.settings.SfxVolumePercent <= 0
+            || volume <= 0)
         {
             return;
         }
@@ -72,6 +73,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
         AudioSource source = sfxInstance.AddComponent<AudioSource>();
         source.clip = clip;
+        source.volume = volume;
         source.Play();
 
         // set the mixer group (e.g. music, sfx, etc.)
@@ -164,7 +166,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         if (audioManager == null)
             return;
 
-        PlaySoundEffect(audioManager.songSelectSound);
+        PlaySoundEffect(audioManager.songSelectSound, 0.3f);
     }
 
     public static void PlaySingingResultsRatingPopupSound()
