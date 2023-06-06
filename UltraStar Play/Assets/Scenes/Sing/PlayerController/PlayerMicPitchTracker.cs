@@ -15,7 +15,7 @@ using UnityEngine.XR;
  * Thereby, it applies some additional rounding an joker rules.
  */
 [RequireComponent(typeof(MicSampleRecorder))]
-public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
+public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     private const int SendPositionInSongIntervalInMillis = 2000;
 
@@ -78,7 +78,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private readonly Queue<BeatPitchEventAndTime> beatPitchEventsFromConnectedClientQueue = new();
 
-    private void Start()
+    public void OnInjectionFinished()
     {
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);

@@ -97,7 +97,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
         if (MicProfile == null)
         {
-            Debug.LogError("missing MicProfile");
+            Debug.LogError("MicSampleRecorder - Failed to start recording, missing MicProfile");
             return;
         }
         if (MicProfile.IsInputFromConnectedClient)
