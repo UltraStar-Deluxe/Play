@@ -73,9 +73,18 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
         
         float yPosPercent = 100f * yPosRangeFactor.x;
         yPosPercent = NumberUtils.Limit(yPosPercent, 0, 100);
-        float smoothYPos = playerPitchIndicator.style.top.value.value + (yPosPercent - playerPitchIndicator.style.top.value.value) * 0.2f;
+        float smoothYPos = playerPitchIndicator.style.top.value.value + (yPosPercent - playerPitchIndicator.style.top.value.value) * (10f * Time.deltaTime);
 
-        int micDelay = micProfile?.DelayInMillis ?? 0;
+        int micDelay = 0;
+        if (micProfile != null)
+        {
+            micDelay += micProfile.DelayInMillis;
+            if (micProfile.IsInputFromConnectedClient)
+            {
+                micDelay += settings.ConnectedClientMessageBufferTimeInMillis;
+            }
+        }
+
         double positionInSongInMillisConsideringMicDelay = songAudioPlayer.PositionInSongInMillis - micDelay;
         float xPosPercent = 100f * noteDisplayer.GetXInPercent(positionInSongInMillisConsideringMicDelay);
         xPosPercent = NumberUtils.Limit(xPosPercent, 0, float.MaxValue);

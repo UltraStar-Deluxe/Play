@@ -27,8 +27,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     
     private bool isInitialized;
 
-    private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => nonPersistentSettings.activeSearchPropertyFilters;
-    public bool IsAnyFilterActive => !nonPersistentSettings.activeSearchPropertyFilters.IsNullOrEmpty()
+    private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => nonPersistentSettings.ActiveSearchPropertyFilters;
+    public bool IsAnyFilterActive => !nonPersistentSettings.ActiveSearchPropertyFilters.IsNullOrEmpty()
         || nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value;
     
     private readonly Subject<bool> filtersChangedEventStream = new();
@@ -161,8 +161,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
                 value = value,
             };
 
-            if (nonPersistentSettings.activeSearchPropertyFilters.ContainsKey(searchPropertyFilter.searchProperty)
-                && nonPersistentSettings.activeSearchPropertyFilters[searchPropertyFilter.searchProperty].Contains(searchPropertyFilter))
+            if (nonPersistentSettings.ActiveSearchPropertyFilters.ContainsKey(searchPropertyFilter.searchProperty)
+                && nonPersistentSettings.ActiveSearchPropertyFilters[searchPropertyFilter.searchProperty].Contains(searchPropertyFilter))
             {
                 filterToggle.value = true;
                 EnableFilter(searchPropertyFilter);

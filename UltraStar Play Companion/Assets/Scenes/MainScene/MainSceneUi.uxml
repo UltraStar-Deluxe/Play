@@ -55,8 +55,11 @@
                 <ui:Instance template="MainSceneMenuUi" name="MainSceneMenuUi" style="flex-grow: 1;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="modifierDialogOverlay" class="overlay" style="flex-grow: 1; display: none;">
-            <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" class="overlayBackground roundCorners" style="width: 100%; height: 100%; max-width: 90%; max-height: 90%;" />
+        <ui:VisualElement name="modifierDialogOverlay" class="overlay" style="display: flex; background-color: rgba(32, 32, 32, 0.75);">
+            <ui:VisualElement name="modifierDialogOverlayInner" class="overlayBackground p-3" style="max-width: 100%; max-height: 100%; border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; width: 90%;">
+                <ui:Label tabindex="-1" text="Select Game Modifiers" display-tooltip-when-elided="true" name="modifiersDialogOverlayTitle" class="titleText mb-3" style="-unity-text-align: upper-center; -unity-font-style: bold;" />
+                <ui:Instance template="GameRoundModifierDialogUi" name="GameRoundModifierDialogUi" style="width: 100%;" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="dialogContainer" class="overlay" style="flex-grow: 1; display: none;" />
     </ui:VisualElement>

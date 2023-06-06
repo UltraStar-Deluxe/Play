@@ -26,16 +26,15 @@ public class SingingResultsHighscoreEntryControl : INeedInjection, IInjectionFin
     private int index;
     
     [Inject]
-    private SongStatistic songStatistic;
+    private HighScoreEntry highScoreEntry;
     
     public void OnInjectionFinished()
     {
         visualElement.AddToClassList($"highscoreEntry-{index}");
         posLabel.text = (index + 1).ToString();
-        playerNameLabel.text = songStatistic.PlayerName;
-        scoreLabel.text = songStatistic.Score.ToString();
-        dateLabel.text = songStatistic.DateTime.ToString("d", CultureInfo.CurrentUICulture);
-        // commonScoreIcon.SetVisibleByDisplay(songStatistic.ScoreMode == EScoreMode.CommonAverage);
+        playerNameLabel.text = highScoreEntry.PlayerName;
+        scoreLabel.text = highScoreEntry.Score.ToString();
+        dateLabel.text = highScoreEntry.DateTime.ToString("d", CultureInfo.CurrentUICulture);
         commonScoreIcon.HideByDisplay();
     }
 }

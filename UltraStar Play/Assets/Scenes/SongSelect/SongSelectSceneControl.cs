@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Flurl.Util;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -19,6 +19,8 @@ using IBinding = UniInject.IBinding;
 
 public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, ITranslator, IInjectionFinishedListener
 {
+    private readonly IComparer<object> songMetaPropertyComparer = new NullOrEmptyValueLastComparer();
+
     [InjectedInInspector]
     public SongSelectSceneInputControl songSelectSceneInputControl;
     
@@ -1087,7 +1089,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Where(songMeta => playlist == null
                             || playlist.HasSongEntry(songMeta))
             .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
-            .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta))
+            .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
             .ToList();
         return filteredSongs;
     }

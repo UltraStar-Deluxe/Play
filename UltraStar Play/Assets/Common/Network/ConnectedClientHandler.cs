@@ -10,6 +10,8 @@ using UnityEngine;
 
 public class ConnectedClientHandler : IConnectedClientHandler
 {
+    private const int MaxSendMessageAttemptCount = 5;
+    
     private readonly Subject<JsonSerializable> receivedMessageStream = new();
     public IObservable<JsonSerializable> ReceivedMessageStream => receivedMessageStream;
 
@@ -167,6 +169,11 @@ public class ConnectedClientHandler : IConnectedClientHandler
 
     public void SendMessageToClient(JsonSerializable jsonSerializable)
     {
+        DoSendMessageToClient(jsonSerializable, 1);
+    }
+    
+    private void DoSendMessageToClient(JsonSerializable jsonSerializable, int attempt)
+    {
         if (tcpClient != null
             && tcpClientStream != null
             && tcpClientStreamWriter != null
@@ -175,10 +182,21 @@ public class ConnectedClientHandler : IConnectedClientHandler
             tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
             tcpClientStreamWriter.Flush();
         }
+        else if (attempt < MaxSendMessageAttemptCount)
+        {
+            Debug.LogWarning($"Cannot send message to client. Trying to send again after delay (attempt: {attempt}, tcpClient == null: {tcpClient == null}, tcpClientStream == null: {tcpClientStream == null}, tcpClientStreamWriter == null: {tcpClientStreamWriter == null}, tcpClientStream.CanWrite: {tcpClientStream?.CanWrite})");
+            TrySendMessageToClientAfterDelay(jsonSerializable, attempt + 1, 0.1f);
+        }
         else
         {
-            Debug.LogWarning("Cannot send message to client.");
+            Debug.LogWarning($"Cannot send message to client. Failed for good, not trying to send again later. (tcpClient == null: {tcpClient == null}, tcpClientStream == null: {tcpClientStream == null}, tcpClientStreamWriter == null: {tcpClientStreamWriter == null}, tcpClientStream.CanWrite: {tcpClientStream?.CanWrite})");
         }
+    }
+
+    private void TrySendMessageToClientAfterDelay(JsonSerializable jsonSerializable, int attempt, float delayInSeconds)
+    {
+        MainThreadDispatcher.StartCoroutine(
+            CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds, () => DoSendMessageToClient(jsonSerializable, attempt)));
     }
 
     private void HandleJsonMessageFromClient(string json)

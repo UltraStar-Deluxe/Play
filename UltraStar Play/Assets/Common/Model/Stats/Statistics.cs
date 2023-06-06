@@ -11,8 +11,7 @@ using UnityEngine;
 public class Statistics
 {
     public float TotalPlayTimeSeconds { get; set; }
-    public Dictionary<string, LocalStatistic> LocalStatistics { get; private set; } = new();
-    public Dictionary<string, WebStatistic> WebStatistics { get; private set; } = new();
+    public Dictionary<string, SongStatistics> LocalStatistics { get; private set; } = new();
 
     // Indicates whether the Statistics have non-persisted changes.
     // The flag is checked by the StatsManager, e.g., on scene change.
@@ -20,81 +19,75 @@ public class Statistics
     [fsIgnore]
     public bool IsDirty { get; set; }
 
-    public LocalStatistic GetLocalStats(SongMeta songMeta)
+    public SongStatistics GetLocalStatistics(SongMeta songMeta)
     {
         if (songMeta == null)
         {
             return null;
         }
-        LocalStatistics.TryGetValue(songMeta.SongHash, out LocalStatistic result);
+        LocalStatistics.TryGetValue(songMeta.SongHash, out SongStatistics result);
         return result;
     }
 
-    public SongStatistic GetLocalHighscoreStats(SongMeta songMeta, EDifficulty difficulty)
+    public HighScoreEntry GetLocalHighScore(SongMeta songMeta, EDifficulty difficulty)
     {
-        LocalStatistic localStatistic = GetLocalStats(songMeta);
-        if (localStatistic == null
-            || localStatistic.StatsEntries == null
-            || localStatistic.StatsEntries.SongStatistics.IsNullOrEmpty())
+        SongStatistics songStatistics = GetLocalStatistics(songMeta);
+        if (songStatistics == null
+            || songStatistics.HighScoreRecord == null
+            || songStatistics.HighScoreRecord.HighScoreEntries.IsNullOrEmpty())
         {
             return null;
         }
 
-        SongStatistic songStatistics = localStatistic.StatsEntries.GetTopScores(1, difficulty).FirstOrDefault();
-        return songStatistics;
+        HighScoreEntry highScoresEntry = songStatistics.HighScoreRecord.GetTopScores(1, difficulty).FirstOrDefault();
+        return highScoresEntry;
     }
 
     public int GetLocalHighscore(SongMeta songMeta, EDifficulty difficulty)
     {
-        SongStatistic songStatistic = GetLocalHighscoreStats(songMeta, difficulty);
-        if (songStatistic == null)
+        HighScoreEntry highScoreEntry = GetLocalHighScore(songMeta, difficulty);
+        if (highScoreEntry == null)
         {
             return 0;
         }
-        return songStatistic.Score;
+        return highScoreEntry.Score;
     }
     
-    public WebStatistic GetWebStats(SongMeta songMeta)
-    {
-        WebStatistics.TryGetValue(songMeta.SongHash, out WebStatistic result);
-        return result;
-    }
-
     public void RecordSongStarted(SongMeta songMeta)
     {
-        LocalStatistic localStatistic = CreateLocalStatistics(songMeta);
-        localStatistic.IncrementSongStarted();
+        SongStatistics songStatistics = CreateLocalStatistics(songMeta);
+        songStatistics.IncrementSongStarted();
 
         IsDirty = true;
     }
 
-    public void RecordSongFinished(SongMeta songMeta, List<SongStatistic> songStatistics)
+    public void RecordSongFinished(SongMeta songMeta, List<HighScoreEntry> highScoreEntries)
     {
         Debug.Log("Recording song finished stats for: " + songMeta.Title);
-        LocalStatistic localStatistic = CreateLocalStatistics(songMeta);
-        localStatistic.IncrementSongFinished();
-        foreach (SongStatistic songStatistic in songStatistics)
+        SongStatistics songStatistics = CreateLocalStatistics(songMeta);
+        songStatistics.IncrementSongFinished();
+        foreach (HighScoreEntry highScoreEntry in highScoreEntries)
         {
-            localStatistic.AddSongStatistics(songStatistic);
+            songStatistics.AddHighScore(highScoreEntry);
         }
 
         IsDirty = true;
     }
 
-    private LocalStatistic CreateLocalStatistics(SongMeta songMeta)
+    private SongStatistics CreateLocalStatistics(SongMeta songMeta)
     {
-        LocalStatistic localStatistic = LocalStatistics.GetOrInitialize(songMeta.SongHash);
-        localStatistic.SongArtist = songMeta.Artist;
-        localStatistic.SongTitle = songMeta.Title;
-        return localStatistic;
+        SongStatistics songStatistics = LocalStatistics.GetOrInitialize(songMeta.SongHash);
+        songStatistics.SongArtist = songMeta.Artist;
+        songStatistics.SongTitle = songMeta.Title;
+        return songStatistics;
     }
     
     public bool HasHighscore(SongMeta songMeta)
     {
-        if (GetLocalStats(songMeta) != null)
-        {
-            return !GetLocalStats(songMeta).StatsEntries.SongStatistics.IsNullOrEmpty();
-        }
-        return false;
+        SongStatistics localStatistics = GetLocalStatistics(songMeta);
+        return localStatistics != null
+            && localStatistics.HighScoreRecord != null
+            && localStatistics.HighScoreRecord.HighScoreEntries != null
+            && localStatistics.HighScoreRecord.HighScoreEntries.Count > 0;
     }
 }

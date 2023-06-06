@@ -65,6 +65,9 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     [Inject(UxmlName = R.UxmlNames.enqueueSettingsAccordionItem)]
     private AccordionItem enqueueSettingsAccordionItem;
     
+    [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
+    private VisualElement modifierDialogOverlay;
+    
     private SongDto songDto;
     public SongDto SongDto
     {
@@ -92,7 +95,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         injector.Inject(gameRoundSettingsUiControl);
         gameRoundSettingsUiControl.GameRoundSettings = settings.GameRoundSettings;
-
+        VisualElementUtils.RegisterDirectClickCallback(modifierDialogOverlay, () => gameRoundSettingsUiControl.CloseModifierDialog());
+        
         gameRoundSettingsUiControl
             .DialogClosedEventStream
             .Subscribe(_ => enqueueSettingsAccordionItem.UpdateTargetHeight());
@@ -131,6 +135,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
         
         HideSongDetails();
+
+        UiManager.CreateNotification($"Enqueued Song '{dto.SongDto.Title}'");
     }
     
     private void EnqueueSongAsMedley()
@@ -148,6 +154,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
         
         HideSongDetails();
+        
+        UiManager.CreateNotification($"Enqueued Medley Song '{dto.SongDto.Title}'");
     }
     
     public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()

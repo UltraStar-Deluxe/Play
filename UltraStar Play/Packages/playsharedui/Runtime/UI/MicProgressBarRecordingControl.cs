@@ -8,7 +8,6 @@ using UnityEngine;
 
 public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
-    private const float SampleVolumeThreshold = 0.3f;
     private const float TargetNoiseAboveThresholdDurationInMillis = 1000;
     
     public MicProgressBarControl MicProgressBarControl { get; private set; } = new();
@@ -134,16 +133,8 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
 
     private void OnRecordingEvent(RecordingEvent evt)
     {
-        bool isAboveThreshold = false;
-        for (int sampleIndex = evt.NewSamplesStartIndex; sampleIndex < evt.NewSamplesEndIndex; sampleIndex++)
-        {
-            float sample = evt.MicSamples[sampleIndex];
-            if (Mathf.Abs(sample) > SampleVolumeThreshold)
-            {
-                isAboveThreshold = true;
-                break;
-            }
-        }
+        int noiseSuppression = MicProfile?.NoiseSuppression ?? 0;
+        bool isAboveThreshold = AbstractAudioSamplesAnalyzer.IsAboveNoiseSuppressionThreshold(evt.MicSamples, evt.NewSamplesStartIndex, evt.NewSamplesEndIndex, noiseSuppression);
 
         // Increase / decrease time above threshold
         long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();

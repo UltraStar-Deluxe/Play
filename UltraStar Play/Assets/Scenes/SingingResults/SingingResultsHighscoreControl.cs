@@ -79,36 +79,36 @@ public class SingingResultsHighscoreControl : INeedInjection
         currentDifficultyLabel.text = currentDifficulty.GetTranslatedName();
 
         highscoreEntryList.Clear();
-        LocalStatistic localStatistic = statistics.GetLocalStats(sceneData.SongMetas.LastOrDefault());
-        List<SongStatistic> songStatistics = localStatistic?.StatsEntries?.SongStatistics?
+        SongStatistics songStatistics = statistics.GetLocalStatistics(sceneData.SongMetas.LastOrDefault());
+        List<HighScoreEntry> highScoreEntries = songStatistics?.HighScoreRecord?.HighScoreEntries?
             .Where(it => it.Difficulty == currentDifficulty).ToList();
         
-        if (songStatistics.IsNullOrEmpty())
+        if (highScoreEntries.IsNullOrEmpty())
         {
-            Label noHighscoresLabel = new Label("No highscores yet");
+            Label noHighscoresLabel = new Label("No high scores yet");
             noHighscoresLabel.name = "noHighscoresLabel";
             highscoreEntryList.Add(noHighscoresLabel);
             return;
         }
         
-        songStatistics.Sort(new CompareBySongScoreDescending());
-        List<SongStatistic> topSongStatistics = songStatistics.Take(highscoreCount).ToList();
-        for (int i = 0; i < topSongStatistics.Count; i++)
+        highScoreEntries.Sort(new CompareBySongScoreDescending());
+        List<HighScoreEntry> topSongEntries = highScoreEntries.Take(highscoreCount).ToList();
+        for (int i = 0; i < topSongEntries.Count; i++)
         {
-            CreateHighscoreEntry(topSongStatistics[i], i);
+            CreateHighscoreEntry(topSongEntries[i], i);
         }
         
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(highscoreEntryList);
     }
 
-    private void CreateHighscoreEntry(SongStatistic songStatistic, int index)
+    private void CreateHighscoreEntry(HighScoreEntry highScoreEntry, int index)
     {
         VisualElement highscoreEntry = highscoreEntryUi.CloneTree().Children().FirstOrDefault();
         highscoreEntryList.Add(highscoreEntry);
 
         injector
             .WithRootVisualElement(highscoreEntry)
-            .WithBindingForInstance(songStatistic)
+            .WithBindingForInstance(highScoreEntry)
             .WithBinding(new Binding("entryIndex", new ExistingInstanceProvider<int>(index)))
             .CreateAndInject<SingingResultsHighscoreEntryControl>();
     }

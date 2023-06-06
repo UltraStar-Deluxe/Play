@@ -11,7 +11,7 @@
             <ui:VisualElement name="recordedNoteEntryContainer" style="width: 100%; position: absolute; height: 100%; overflow: hidden;" />
             <ui:VisualElement name="effectsContainer" style="width: 100%; position: absolute; height: 100%; overflow: hidden;" />
             <ui:VisualElement name="playerPitchIndicator" style="position: absolute;">
-                <ui:VisualElement picking-mode="Ignore" name="pitchIndicatorIcon" class="overlay" style="background-image: url(&apos;project://database/Assets/JMO%20Assets/Cartoon%20FX%20Remaster/Demo%20Assets/UI/CFXR%20Demo%20Btn%20Arrow.png?fileID=2800000&amp;guid=b0394665e16ef504bb922274dd606020&amp;type=3#CFXR Demo Btn Arrow&apos;); left: 100%;" />
+                <ui:VisualElement picking-mode="Ignore" name="pitchIndicatorIcon" class="overlay" style="background-image: url(&apos;project://database/Assets/Scenes/Sing/PlayerController/PlayerUi/PitchIndicatorArraow.png?fileID=2800000&amp;guid=2eb4bc180a8c49043b2b2ec484962bf9&amp;type=3#PitchIndicatorArraow&apos;); left: 100%;" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

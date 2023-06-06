@@ -185,8 +185,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private bool hasRecordedSongStartedStatistics;
 
     private bool hasFinishedScene;
-
-    private float startMicrophoneDelayInSeconds = 0.5f;
     
     public void OnInjectionFinished()
     {
@@ -265,29 +263,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Associate LyricsDisplayer with one of the (duet) players
         InitSingingLyricsControls();
 
-        // Start the audio when microphones are ready.
-        if (sceneData.IsMedley)
-        {
-            // No time to wait
-            StartAudioPlayback();
-        }
-        else
-        {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds, 
-                () => StartAudioPlayback()));
-        }
+        StartAudioPlayback();
+        
         StartVideoOrShowBackgroundImage();
 
         // Input legend (in pause overlay)
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
-
-        // Automatically start recording on companion apps
-        PlayerControls.ForEach(playerControl =>
-        {
-            playerControl.PlayerMicPitchTracker.SendMicProfileToConnectedClient();
-            playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
-        });
 
         // Skip beginning of song via #START tag of txt file
         if (sceneData.PositionInSongInMillis <= 0
@@ -760,7 +742,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         singingResultsSceneData.partyModeSceneData = sceneData.partyModeSceneData;
 
         // Add scores, either for individual players, or as one common score.
-        List<SongStatistic> songStatistics = new();
+        List<HighScoreEntry> highScoreEntries = new();
         if (IsIndividualScore)
         {
             // Add and record score for each player individually.
@@ -771,8 +753,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 singingResultsSceneData.AddPlayerScores(playerControl.PlayerProfile, playerScoreControlData);
             });
 
-            songStatistics = PlayerControls
-                .Select(playerControl => new SongStatistic(playerControl.PlayerProfile.Name,
+            highScoreEntries = PlayerControls
+                .Select(playerControl => new HighScoreEntry(playerControl.PlayerProfile.Name,
                     playerControl.PlayerProfile.Difficulty,
                     playerControl.PlayerScoreControl.TotalScore,
                     EScoreMode.Individual))
@@ -795,12 +777,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             PlayerScoreControlData commonScoreData = CreateAveragePlayerScoreControlData(scoreControlDatas);
             singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScoreData);
 
-            SongStatistic commonSongStatistic = new SongStatistic(
+            HighScoreEntry commonHighScoreEntry = new HighScoreEntry(
                 commonPlayerProfileName,
                 easiestPlayerProfileDifficulty,
                 commonScoreData.TotalScore,
                 EScoreMode.CommonAverage);
-            songStatistics = new() { commonSongStatistic };
+            highScoreEntries = new() { commonHighScoreEntry };
         }
 
         // Check if the full song has been sung, i.e., the playback position is after the last note.
@@ -817,9 +799,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             }
         });
         if (isAfterLastNote
-            && !songStatistics.IsNullOrEmpty())
+            && !highScoreEntries.IsNullOrEmpty())
         {
-            UpdateSongFinishedStats(songStatistics);
+            UpdateSongFinishedStats(highScoreEntries);
         }
 
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
@@ -867,7 +849,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         return serverSideConnectRequestManager.GetConnectedClientHandlers(micProfiles);
     }
 
-    private void UpdateSongFinishedStats(List<SongStatistic> songStatistics)
+    private void UpdateSongFinishedStats(List<HighScoreEntry> highScoreEntries)
     {
         if (sceneData.IsMedley
             || HasPartyModeSceneData)
@@ -875,7 +857,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             // Medleys and party mode are not recorded
             return;
         }
-        statistics.RecordSongFinished(SongMeta, songStatistics);
+        statistics.RecordSongFinished(SongMeta, highScoreEntries);
     }
 
     private PlayerControl CreatePlayerControl(PlayerProfile playerProfile, MicProfile micProfile, int playerIndex)
@@ -894,17 +876,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         PlayerControls.Add(playerControl);
 
-        // Start microphone after a short delay. Otherwise the scene transition is not smooth.
-        if (sceneData.IsMedley)
-        {
-            // No time to wait
-            playerControl.PlayerMicPitchTracker.InitPitchDetection();
-        }
-        else
-        {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds,
-                () => playerControl.PlayerMicPitchTracker.InitPitchDetection()));
-        }
+        playerControl.PlayerMicPitchTracker.InitPitchDetection();
 
         AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, playerIndex);
 

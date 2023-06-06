@@ -40,8 +40,8 @@ public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListen
     public void OnInjectionFinished()
     {
         injector.Inject(passTheMicControl);
-
-        if (singSceneControl.HasPartyModeSceneData)
+        
+        if (HasFinishCondition())
         {
             // Check for finish when any score changes after a sentence is complete
             singSceneControl.PlayerControls
@@ -49,6 +49,22 @@ public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListen
                 .Merge()
                 .Subscribe(_ => UpdateFinishCondition());
         }
+    }
+
+    private bool HasFinishCondition()
+    {
+        if (sceneData?.gameRoundSettings?.finishConditionSettings == null)
+        {
+            return false;
+        }
+        
+        EGameRoundFinishCondition finishCondition = sceneData.gameRoundSettings.finishConditionSettings.condition;
+        if (finishCondition is EGameRoundFinishCondition.ReachEndOfSong)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public void Update()
@@ -61,7 +77,7 @@ public class SingSceneModifierControl : INeedInjection, IInjectionFinishedListen
         if (!singSceneFinisher.IsSongFinished
             && IsFinishConditionTriggered())
         {
-            Debug.Log($"Trigger party mode song finish");
+            Debug.Log($"Trigger finish condition: {sceneData.gameRoundSettings.finishConditionSettings.condition}");
             singSceneFinisher.TriggerEarlySongFinish();
         }
     }

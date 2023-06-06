@@ -4,13 +4,13 @@
  * Stores offline statistics for a single song
  */
 [Serializable]
-public class LocalStatistic
+public class SongStatistics
 {
     public int TimesStarted { get; private set; }
     public int TimesFinished { get; private set; }
     public int TimesCanceled => TimesStarted - TimesFinished;
     public DateTime LastPlayed { get; private set; } = DateTime.MinValue;
-    public StatisticEntries StatsEntries { get; private set; } = new();
+    public HighScoreRecord HighScoreRecord { get; private set; } = new();
     public string SongArtist { get; set; }
     public string SongTitle { get; set; }
 
@@ -29,8 +29,13 @@ public class LocalStatistic
     }
 
     // Called for every player when a song is finished
-    public void AddSongStatistics(SongStatistic songStatistic)
+    public void AddHighScore(HighScoreEntry highScoreEntry)
     {
-        StatsEntries.AddRecord(songStatistic);
+        if (highScoreEntry.Score <= 0)
+        {
+            return;
+        }
+        
+        HighScoreRecord.AddRecord(highScoreEntry);
     }
 }

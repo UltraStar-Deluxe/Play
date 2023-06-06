@@ -15,7 +15,7 @@ using UnityEngine.XR;
  * Thereby, it applies some additional rounding an joker rules.
  */
 [RequireComponent(typeof(MicSampleRecorder))]
-public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
+public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     private const int SendPositionInSongIntervalInMillis = 2000;
 
@@ -78,7 +78,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private readonly Queue<BeatPitchEventAndTime> beatPitchEventsFromConnectedClientQueue = new();
 
-    private void Start()
+    public void OnInjectionFinished()
     {
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
@@ -106,13 +106,9 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         {
             InitPitchDetectionFromConnectedClient();
             serverSideConnectRequestManager.ClientConnectedEventStream
-                .Subscribe(evt =>
-                {
-                    if (evt.IsConnected)
-                    {
-                        InitPitchDetectionFromConnectedClient();
-                    }
-                })
+                .ObserveOnMainThread()
+                .Where(evt => evt.IsConnected)
+                .Subscribe(_ => OnClientConnected())
                 .AddTo(gameObject);
         }
         else
@@ -121,6 +117,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
         }
     }
     
+    private void OnClientConnected()
+    {
+        InitPitchDetectionFromConnectedClient();
+    }
+
     private void InitPitchDetectionFromLocalMicrophone()
     {
         if (micProfile == null)
@@ -136,14 +137,14 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
 
     private void InitPitchDetectionFromConnectedClient()
     {
-        if (GetConnectedClientHandler() == null)
+        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
+        if (connectedClientHandler == null)
         {
             Log.Logger.Warning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
-            gameObject.SetActive(false);
             return;
         }
 
-        GetConnectedClientHandler().ReceivedMessageStream
+        connectedClientHandler.ReceivedMessageStream
             .ObserveOnMainThread()
             .Subscribe(dto =>
             {
@@ -158,6 +159,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
             })
             .AddTo(gameObject);
 
+        SendMicProfileToConnectedClient();
+        SendStartRecordingMessageToConnectedClient();
         SendPositionInSongToClientRapidly();
     }
 
@@ -237,8 +240,13 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection
     {
         // Read messages from client since last time the reader thread was active.
         IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        connectedClientHandler?.ReadMessagesFromClient();
-
+        if (connectedClientHandler == null)
+        {
+            // Disconnected
+            return;
+        }
+        connectedClientHandler.ReadMessagesFromClient();
+        
         if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + SendPositionInSongIntervalInMillis < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Synchronize position in song with connected client.

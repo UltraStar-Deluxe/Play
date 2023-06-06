@@ -41,4 +41,9 @@ public class GameRoundSettingsUiControl : INeedInjection, IInjectionFinishedList
             modifierDialogControl.OpenDialog(GameRoundSettings);
         });
     }
+
+    public void CloseModifierDialog()
+    {
+        modifierDialogControl.CloseDialog();
+    }
 }
