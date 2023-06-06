@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
@@ -36,6 +37,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         addButton.RegisterCallbackButtonTriggered(_ =>
         {
             PlayerProfile newPlayerProfile = new PlayerProfile();
+            newPlayerProfile.Name = GetNewPlayerProfileName();
             settings.PlayerProfiles.Add(newPlayerProfile);
             VisualElement playerProfileEntryVisualElement = CreatePlayerProfileEntry(newPlayerProfile);
             playerProfileEntryVisualElement.RegisterHasGeometryCallbackOneShot(_ => playerProfileEntryVisualElement.ScrollToSelf());
@@ -47,6 +49,29 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             
             ThemeManager.ApplyThemeSpecificStylesToVisualElements(playerProfileList);
         });
+    }
+
+    private string GetNewPlayerProfileName()
+    {
+        bool ExistsPlayerProfileWithName(string newName)
+        {
+            return settings.PlayerProfiles.Any(playerProfile =>
+            {
+                string nameWithoutWhiteSpace = playerProfile.Name.Replace(" ", "");
+                string newNameWithoutWhiteSpace = newName.Replace(" ", "");
+                return nameWithoutWhiteSpace.Equals(newNameWithoutWhiteSpace, StringComparison.InvariantCultureIgnoreCase);
+            });
+        }
+        
+        int index = 1;
+        string playerProfileName = $"Player{index:00}";
+        while (ExistsPlayerProfileWithName(playerProfileName))
+        {
+            index++;
+            playerProfileName = $"Player{index:00}";
+        }
+
+        return playerProfileName;
     }
 
     private void UpdatePlayerProfileList()

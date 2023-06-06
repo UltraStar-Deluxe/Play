@@ -23,7 +23,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
     [Inject]
     protected MicSampleRecorderManager micSampleRecorderManager;
 
-    private MicProfile micProfile;
+    protected MicProfile micProfile;
     public MicProfile MicProfile
     {
         get => micProfile;
@@ -87,12 +87,12 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         }
     }
     
-    private MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
+    protected MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
 
     protected readonly Subject<PitchEvent> pitchEventStream = new();
     public IObservable<PitchEvent> PitchEventStream => pitchEventStream;
 
-    public IAudioSamplesAnalyzer AudioSamplesAnalyzer { get; private set; }
+    public IAudioSamplesAnalyzer AudioSamplesAnalyzer { get; protected set; }
 
     private readonly List<IDisposable> micSampleRecorderDisposables = new();
     
@@ -122,7 +122,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(newValue, MicSampleRecorder.FinalSampleRate.Value);
     }
 
-    public void StartRecording()
+    public virtual void StartRecording()
     {
         if (MicSampleRecorder == null)
         {
@@ -132,7 +132,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         MicSampleRecorder.StartRecording();
     }
     
-    public void StopRecording()
+    public virtual void StopRecording()
     {
         if (MicSampleRecorder == null)
         {
@@ -201,7 +201,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         }
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         DisposeMicSampleRecorderDisposables();
     }

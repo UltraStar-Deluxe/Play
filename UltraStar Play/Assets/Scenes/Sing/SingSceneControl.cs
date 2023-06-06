@@ -102,6 +102,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.playerUiContainer)]
     private VisualElement playerUiContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.playerUiContainerPlaceholder)]
+    private VisualElement playerUiContainerPlaceholder;
 
     [Inject(UxmlName = R.UxmlNames.songTimeProgressBar)]
     private ProgressBar songTimeProgressBar;
@@ -385,6 +388,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
             .ToList()
             .ForEach(it => it.RemoveFromHierarchy());
+        
+        UpdatePlayerUiContainerHeight();
+        
         playerInfoUiLists.ForEach(playerInfoUiList => playerInfoUiList.Clear());
         if (playerCount <= 1)
         {
@@ -414,6 +420,26 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 playerUiColumns[i] = column;
             }
         }
+    }
+
+    private void UpdatePlayerUiContainerHeight()
+    {
+        // The player UI should be in front of the lyrics and player info UIs.
+        // Therefor, it uses absolute positioning.
+        // Its size is adjusted here by a placeholder element that is positioned relatively.
+        Rect placeholderWorldBound = playerUiContainerPlaceholder.worldBound;
+        Rect worldBound = playerUiContainer.worldBound;
+        if (Math.Abs(placeholderWorldBound.xMin - worldBound.xMin) < 1
+            && Math.Abs(placeholderWorldBound.xMax - worldBound.xMax) < 1
+            && Math.Abs(placeholderWorldBound.yMin - worldBound.yMin) < 1
+            && Math.Abs(placeholderWorldBound.yMax - worldBound.yMax) < 1)
+        {
+            return;
+        }
+        playerUiContainer.style.top = placeholderWorldBound.yMin;
+        playerUiContainer.style.left = placeholderWorldBound.xMin;
+        playerUiContainer.style.width = placeholderWorldBound.width;
+        playerUiContainer.style.height = placeholderWorldBound.height;
     }
 
     private void InitSingingLyricsControls()
@@ -564,6 +590,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             achievementEventStream.OnNext(AchievementId.useWebcamInSingScene);
         }
+
+        UpdatePlayerUiContainerHeight();
     }
 
     public void SkipToNextSingableNoteOrEndOfSong()
@@ -939,7 +967,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
         
         songAudioPlayer.PauseAudio();
-        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.StopRecording());
         
         // Trigger achievement
         if (songAudioPlayer.PositionInSongInMillis > 60000)
@@ -958,8 +986,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         songAudioPlayer.PlayAudio();
         PlayerControls.ForEach(playerControl =>
         {
+            playerControl.PlayerMicPitchTracker.StartRecording();
             playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
-            playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
         });
     }
     
