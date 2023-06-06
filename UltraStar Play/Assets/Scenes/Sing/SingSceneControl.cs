@@ -271,13 +271,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
-        // Automatically start recording on companion apps
-        PlayerControls.ForEach(playerControl =>
-        {
-            playerControl.PlayerMicPitchTracker.SendMicProfileToConnectedClient();
-            playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
-        });
-
         // Skip beginning of song via #START tag of txt file
         if (sceneData.PositionInSongInMillis <= 0
             && SongMeta.Start > 0)

@@ -106,13 +106,9 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
         {
             InitPitchDetectionFromConnectedClient();
             serverSideConnectRequestManager.ClientConnectedEventStream
-                .Subscribe(evt =>
-                {
-                    if (evt.IsConnected)
-                    {
-                        InitPitchDetectionFromConnectedClient();
-                    }
-                })
+                .ObserveOnMainThread()
+                .Where(evt => evt.IsConnected)
+                .Subscribe(_ => OnClientConnected())
                 .AddTo(gameObject);
         }
         else
@@ -121,6 +117,11 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
     
+    private void OnClientConnected()
+    {
+        InitPitchDetectionFromConnectedClient();
+    }
+
     private void InitPitchDetectionFromLocalMicrophone()
     {
         if (micProfile == null)
@@ -136,14 +137,14 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
 
     private void InitPitchDetectionFromConnectedClient()
     {
-        if (GetConnectedClientHandler() == null)
+        IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
+        if (connectedClientHandler == null)
         {
             Log.Logger.Warning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
-            gameObject.SetActive(false);
             return;
         }
 
-        GetConnectedClientHandler().ReceivedMessageStream
+        connectedClientHandler.ReceivedMessageStream
             .ObserveOnMainThread()
             .Subscribe(dto =>
             {
@@ -158,6 +159,8 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
             })
             .AddTo(gameObject);
 
+        SendMicProfileToConnectedClient();
+        SendStartRecordingMessageToConnectedClient();
         SendPositionInSongToClientRapidly();
     }
 
@@ -237,8 +240,13 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
     {
         // Read messages from client since last time the reader thread was active.
         IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-        connectedClientHandler?.ReadMessagesFromClient();
-
+        if (connectedClientHandler == null)
+        {
+            // Disconnected
+            return;
+        }
+        connectedClientHandler.ReadMessagesFromClient();
+        
         if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + SendPositionInSongIntervalInMillis < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Synchronize position in song with connected client.
