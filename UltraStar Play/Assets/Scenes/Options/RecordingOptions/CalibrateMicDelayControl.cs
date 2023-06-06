@@ -16,22 +16,22 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     [InjectedInInspector]
     public List<string> midiNoteNames;
 
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    private AudioSource audioSource;
+
+    [Inject]
+    private NewestSamplesMicPitchTracker micPitchTracker;
+
+    [Inject]
+    private RecordingOptionsSceneControl recordingOptionsSceneControl;
+
+    [Inject]
+    private BackgroundMusicManager backgroundMusicManager;
+
     public MicProfile MicProfile { get; set; }
 
     private readonly Subject<CalibrationResult> calibrationResultEventStream = new();
     public IObservable<CalibrationResult> CalibrationResultEventStream => calibrationResultEventStream;
-
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    private AudioSource audioSource;
-
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private MicPitchTracker micPitchTracker;
-
-    [Inject]
-    private RecordingOptionsSceneControl recordingOptionsSceneControl;
-    
-    [Inject]
-    private BackgroundMusicManager backgroundMusicManager;
 
     private bool isCalibrationInProgress;
 

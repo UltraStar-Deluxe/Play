@@ -7,7 +7,7 @@ using UnityEngine;
 public class MicProfile
 {
     public static readonly Comparison<MicProfile> compareByName =
-        (micProfile1, micProfile2) => string.Compare(micProfile1.Name, micProfile2.Name, StringComparison.InvariantCulture);
+        (micProfile1, micProfile2) => string.Compare(micProfile1.GetDisplayNameWithChannel(), micProfile2.GetDisplayNameWithChannel(), StringComparison.InvariantCulture);
 
     public string Name { get; set; }
     public int ChannelIndex { get; set; }

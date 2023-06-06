@@ -25,6 +25,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private ThemeManager themeManager;
     
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
@@ -326,7 +329,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         }
 
         // Restore the previously assigned microphones
-        List<MicProfile> availableMicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, serverSideConnectRequestManager);
+        List<MicProfile> availableMicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
         foreach (SongSelectPlayerEntryControl playerEntryControl in playerEntryControls)
         {
             PlayerProfile playerProfile = playerEntryControl.PlayerProfile;

@@ -13,7 +13,7 @@ using CircularBuffer;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
+public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecordingEventListener
 {
     public static ClientSideMicDataSender Instance
     {
@@ -55,9 +55,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         clientSideConnectRequestManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus)
             .AddTo(gameObject);
-        micSampleRecorder.RecordingEventStream
-            .Subscribe(HandleNewMicSamples)
-            .AddTo(gameObject);
+        micSampleRecorder.AddRecordingEventListener(this);
         micSampleRecorder.IsRecording
             .Subscribe(HandleRecordingStatusChanged)
             .AddTo(gameObject);
@@ -88,7 +86,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
         }
     }
 
-    private void HandleNewMicSamples(RecordingEvent recordingEvent)
+    public void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         // Do pitch detection
         if (HasPositionInSong)

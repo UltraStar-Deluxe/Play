@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Flurl.Util;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.XR;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -14,8 +12,7 @@ using UnityEngine.XR;
  * Analyzes each beat of a player in the sing scene.
  * Thereby, it applies some additional rounding an joker rules.
  */
-[RequireComponent(typeof(MicSampleRecorder))]
-public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, IInjectionFinishedListener
 {
     private const int SendPositionInSongIntervalInMillis = 2000;
 
@@ -34,17 +31,16 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
     [Inject(Optional = true)]
     private MicProfile micProfile;
 
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    private MicSampleRecorder micSampleRecorder;
-
-    [Inject]
-    private Settings settings;
-
+    private MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
+    
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     [Inject]
     private SingSceneMedleyControl medleyControl;
+    
+    [Inject]
+    private new Settings settings;
 
     // The rounding distance of the PlayerProfile
     private float roundingDistance;
@@ -78,26 +74,21 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
 
     private readonly Queue<BeatPitchEventAndTime> beatPitchEventsFromConnectedClientQueue = new();
 
-    public void OnInjectionFinished()
+    public override void OnInjectionFinished()
     {
+        base.OnInjectionFinished();
+        
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
 
-        if (micProfile == null)
-        {
-            Log.Logger.Warning($"No mic for player {playerProfile.Name}. Not recording player notes.");
-            gameObject.SetActive(false);
-            return;
-        }
-
         roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
-        micSampleRecorder.MicProfile = micProfile;
         beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
     }
 
     public void InitPitchDetection()
     {
-        if (micProfile == null)
+        if (micProfile == null
+            || MicSampleRecorder == null)
         {
             return;
         }
@@ -124,15 +115,16 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
 
     private void InitPitchDetectionFromLocalMicrophone()
     {
-        if (micProfile == null)
+        if (micProfile == null
+            || MicSampleRecorder == null)
         {
             return;
         }
         
-        micSampleRecorder.StartRecording();
+        MicSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
-        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, micSampleRecorder.FinalSampleRate.Value);
+        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
     }
 
     private void InitPitchDetectionFromConnectedClient()
@@ -191,9 +183,12 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
         return connectedClientHandler;
     }
 
-    private void Update()
+    protected override void Update()
     {
-        if (micProfile == null)
+        base.Update();
+        
+        if (micProfile == null
+            || MicSampleRecorder == null)
         {
             return;
         }
@@ -202,11 +197,15 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
         {
             UpdatePitchDetectionFromConnectedClient();
         }
-        else if (micSampleRecorder != null
-                 && micSampleRecorder.IsRecording.Value)
+        else if (MicSampleRecorder.IsRecording.Value)
         {
             UpdatePitchDetectionFromLocalMicrophone();
         }
+    }
+
+    public override void OnRecordingEvent(RecordingEvent recordingEvent)
+    {
+        // Nothing to do here. New samples are handled in Update.
     }
 
     private void UpdatePitchDetectionFromLocalMicrophone()
@@ -514,12 +513,18 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
 
     private int GetMicSampleBufferIndexForBeat(int beat)
     {
+        if (micProfile == null
+            || MicSampleRecorder == null)
+        {
+            return 0;
+        }
+        
         double beatInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
         double beatPassedBeforeMs = songAudioPlayer.PositionInSongInMillis - beatInMs;
-        int beatPassedBeforeSamplesInMicBuffer = Convert.ToInt32(((beatPassedBeforeMs - micProfile.DelayInMillis) / 1000) * micSampleRecorder.FinalSampleRate.Value);
+        int beatPassedBeforeSamplesInMicBuffer = Convert.ToInt32(((beatPassedBeforeMs - micProfile.DelayInMillis) / 1000) * MicSampleRecorder.FinalSampleRate.Value);
         // The newest sample has the highest index in the MicSampleBuffer
-        int sampleBufferIndex = micSampleRecorder.MicSamples.Length - beatPassedBeforeSamplesInMicBuffer;
-        sampleBufferIndex = NumberUtils.Limit(sampleBufferIndex, 0, micSampleRecorder.MicSamples.Length - 1);
+        int sampleBufferIndex = MicSampleRecorder.MicSamples.Length - beatPassedBeforeSamplesInMicBuffer;
+        sampleBufferIndex = NumberUtils.Limit(sampleBufferIndex, 0, MicSampleRecorder.MicSamples.Length - 1);
         return sampleBufferIndex;
     }
 
@@ -555,9 +560,10 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
 
     void OnDisable()
     {
-        if (micProfile != null)
+        if (micProfile != null
+            && MicSampleRecorder != null)
         {
-            micSampleRecorder.StopRecording();
+            MicSampleRecorder.StopRecording();
         }
     }
 
@@ -648,19 +654,25 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
         }
     }
 
-    public PitchEvent GetPitchEventOfSamples(int startSampleBufferIndex, int endSampleBufferIndex)
+    private PitchEvent GetPitchEventOfSamples(int startSampleBufferIndex, int endSampleBufferIndex)
     {
+        if (micProfile == null
+            || MicSampleRecorder == null)
+        {
+            return null;
+        }
+        
         if (startSampleBufferIndex > endSampleBufferIndex)
         {
             ObjectUtils.Swap(ref startSampleBufferIndex, ref endSampleBufferIndex);
         }
-        startSampleBufferIndex = NumberUtils.Limit(startSampleBufferIndex, 0, micSampleRecorder.MicSamples.Length - 1);
-        endSampleBufferIndex = NumberUtils.Limit(endSampleBufferIndex, 0, micSampleRecorder.MicSamples.Length - 1);
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(micSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile.AmplificationMultiplier, micProfile.NoiseSuppression);
+        startSampleBufferIndex = NumberUtils.Limit(startSampleBufferIndex, 0, MicSampleRecorder.MicSamples.Length - 1);
+        endSampleBufferIndex = NumberUtils.Limit(endSampleBufferIndex, 0, MicSampleRecorder.MicSamples.Length - 1);
+        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(MicSampleRecorder.MicSamples, startSampleBufferIndex, endSampleBufferIndex, micProfile.AmplificationMultiplier, micProfile.NoiseSuppression);
         return pitchEvent;
     }
 
-    public PitchEvent GetPitchEventOfBeat(int beat)
+    private PitchEvent GetPitchEventOfBeat(int beat)
     {
         int startSampleBufferIndex = GetMicSampleBufferIndexForBeat(beat);
         int endSampleBufferIndex = GetMicSampleBufferIndexForBeat(beat + 1);
@@ -668,7 +680,7 @@ public class PlayerMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFi
         return pitchEvent;
     }
 
-    public void SendMicProfileToConnectedClient()
+    private void SendMicProfileToConnectedClient()
     {
         GetConnectedClientHandler()?.SendMessageToClient(new MicProfileMessageDto(micProfile));
     }

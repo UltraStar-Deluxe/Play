@@ -6,6 +6,33 @@ using UnityEngine;
 
 public static class MicProfileUtils
 {
+    public static List<MicProfile> CreateAndPersistMicProfiles(
+        Settings settings,
+        ThemeManager themeManager,
+        ServerSideConnectRequestManager serverSideConnectRequestManager)
+    {
+        List<MicProfile> persistedMicProfiles = settings.MicProfiles;
+        List<Color32> microphoneColors = themeManager.GetMicrophoneColors();
+        List<IConnectedClientHandler> connectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
+        List<MicProfile> micProfiles = CreateMicProfiles(persistedMicProfiles, microphoneColors, connectedClientHandlers);
+        micProfiles.Sort(MicProfile.compareByName);
+        
+        List<MicProfile> newMicProfiles = micProfiles
+            .Except(persistedMicProfiles)
+            .ToList();
+        if (!newMicProfiles.IsNullOrEmpty())
+        {
+            string micProfileNamesCsv = newMicProfiles
+                .Select(micProfile => micProfile.GetDisplayNameWithChannel())
+                .ToCsv();
+            Debug.Log($"Found new mics: {micProfileNamesCsv}");
+            settings.MicProfiles.AddRange(newMicProfiles);
+            settings.MicProfiles.Sort(MicProfile.compareByName);
+        }
+
+        return micProfiles;
+    }
+    
     public static List<MicProfile> CreateMicProfiles(List<MicProfile> persistedMicProfiles, List<Color32> micProfileColors, List<IConnectedClientHandler> connectedClientHandlers)
     {
         // Create list of connected and loaded microphones without duplicates.

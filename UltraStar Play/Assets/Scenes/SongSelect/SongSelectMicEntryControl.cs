@@ -33,11 +33,11 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable
 
     private readonly GameObject gameObject;
     private readonly VisualElement visualElement;
-    private readonly MicPitchTracker micPitchTracker;
+    private readonly NewestSamplesMicPitchTracker micPitchTracker;
 
     private AudioWaveFormVisualization audioWaveFormVisualizer;
 
-    public SongSelectMicEntryControl(GameObject gameObject, VisualElement visualElement, MicPitchTracker micPitchTracker)
+    public SongSelectMicEntryControl(GameObject gameObject, VisualElement visualElement, NewestSamplesMicPitchTracker micPitchTracker)
     {
         this.gameObject = gameObject;
         this.visualElement = visualElement;
@@ -48,7 +48,7 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable
     {
         if (audioWaveFormVisualizer != null)
         {
-            float[] samples = micPitchTracker.MicSampleRecorder.MicSamples;
+            float[] samples = micPitchTracker.MicSamples;
             audioWaveFormVisualizer.DrawWaveFormValues(samples, samples.Length - displayedSampleCount, displayedSampleCount);
         }
     }

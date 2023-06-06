@@ -17,6 +17,9 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
 
     [Inject]
     protected SongMeta songMeta;
+    
+    [Inject]
+    protected MicSampleRecorderManager micSampleRecorderManager;
 
     private readonly HashSet<int> analyzedBeats = new();
 
@@ -43,10 +46,10 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         }
         
         // Disable mic input
-        if (playerControl.MicSampleRecorder != null
-            && playerControl.MicSampleRecorder.IsRecording.Value)
+        if (playerControl.PlayerMicPitchTracker != null
+            && playerControl.PlayerMicPitchTracker.IsRecording.Value)
         {
-            playerControl.MicSampleRecorder.StopRecording();
+            playerControl.PlayerMicPitchTracker.StopRecording();
         }
 
         int currentBeat = (int)singSceneControl.CurrentBeat;
@@ -90,11 +93,23 @@ public abstract class AbstractDummySinger : MonoBehaviour, INeedInjection
         return true;
     }
 
-    public void SetPlayerControl(PlayerControl playerControl)
+    public void SetPlayerControl(PlayerControl newPlayerControl)
     {
-        this.playerControl = playerControl;
+        this.playerControl = newPlayerControl;
+        
         // Disable real microphone input for this player
-        playerControl.MicSampleRecorder.enabled = false;
+        if (newPlayerControl == null
+            || newPlayerControl.MicProfile == null)
+        {
+            return;
+        }
+        
+        MicSampleRecorder micSampleRecorder = micSampleRecorderManager.GetOrCreateMicSampleRecorder(this.playerControl.MicProfile);
+        if (micSampleRecorder != null)
+        {
+            micSampleRecorder.StopRecording();
+            micSampleRecorder.enabled = false;
+        }
     }
 
     protected Sentence GetSentenceAtBeat(int beat)

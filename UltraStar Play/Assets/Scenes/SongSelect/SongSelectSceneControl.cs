@@ -40,7 +40,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public SongSelectPlayerListControl playerListControl;
 
     [InjectedInInspector]
-    public MicPitchTracker micPitchTrackerPrefab;
+    public NewestSamplesMicPitchTracker micPitchTrackerPrefab;
     
     [Inject]
     private UiManager uiManager;
@@ -269,7 +269,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         InitDifficultyAndScoreMode();
 
-        toggleMicCheckButton.RegisterCallbackButtonTriggered(_ => ToggleMicCheckActive());
+        toggleMicCheckButton.RegisterCallbackButtonTriggered(_ => nonPersistentSettings.MicTestActive.Value = !nonPersistentSettings.MicTestActive.Value);
+        nonPersistentSettings.MicTestActive.Subscribe(_ => UpdateMicCheckButton());
         UpdateMicCheckButton();
         
         songOrderDropdownField.value = settings.SongOrder;
@@ -483,25 +484,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         toggleMicCheckButton.SetActive(nonPersistentSettings.MicTestActive.Value);
         micCheckIcon.SetVisibleByDisplay(nonPersistentSettings.MicTestActive.Value);
         noMicCheckIcon.SetVisibleByDisplay(!nonPersistentSettings.MicTestActive.Value);
-    }
-
-    private void ToggleMicCheckActive()
-    {
-        nonPersistentSettings.MicTestActive.Value = !nonPersistentSettings.MicTestActive.Value;
-        UpdateMicCheckButton();
-        
-        if (nonPersistentSettings.MicTestActive.Value)
-        {
-            FindObjectsOfType<MicSampleRecorder>()
-                .Where(it => it.MicProfile != null && !it.IsRecording.Value)
-                .ForEach(it => it.StartRecording());
-        }
-        else
-        {
-            FindObjectsOfType<MicSampleRecorder>()
-                .Where(it => it.MicProfile != null && it.IsRecording.Value)
-                .ForEach(it => it.StopRecording());
-        }
     }
 
     private void InitDifficultyAndScoreMode()
