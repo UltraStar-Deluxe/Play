@@ -351,6 +351,7 @@ public static partial class R
         public const string micIcon = "micIcon";
         public const string micPitchOutOfRangeIndicatorBottom = "micPitchOutOfRangeIndicatorBottom";
         public const string micPitchOutOfRangeIndicatorTop = "micPitchOutOfRangeIndicatorTop";
+        public const string micPlaybackVolumeChooser = "micPlaybackVolumeChooser";
         public const string micProgressBar = "micProgressBar";
         public const string micRecordingGroup = "micRecordingGroup";
         public const string micRecordingPitchTextField = "micRecordingPitchTextField";
@@ -376,6 +377,7 @@ public static partial class R
         public const string musicGroup = "musicGroup";
         public const string musicNoteIcon = "musicNoteIcon";
         public const string musicPlaybackSpeedSlider = "musicPlaybackSpeedSlider";
+        public const string musicVolumeChooser = "musicVolumeChooser";
         public const string musicVolumeSlider = "musicVolumeSlider";
         public const string nameCharacterContainer = "nameCharacterContainer";
         public const string nameLabel = "nameLabel";
@@ -519,6 +521,7 @@ public static partial class R
         public const string playerUi = "playerUi";
         public const string PlayerUi = "PlayerUi";
         public const string playerUiContainer = "playerUiContainer";
+        public const string playerUiContainerPlaceholder = "playerUiContainerPlaceholder";
         public const string playIcon = "playIcon";
         public const string playlistChooserDropdownContainer = "playlistChooserDropdownContainer";
         public const string playlistChooserDropdownOverlay = "playlistChooserDropdownOverlay";
