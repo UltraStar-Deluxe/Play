@@ -273,11 +273,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             LeanTween.cancel(singSceneControl.gameObject, micDisconnectedAnimationId);
         }
 
-        Vector3 from = Vector3.one * 0.5f;
+        Vector2 from = Vector2.one * 0.5f;
         micDisconnectedIcon.style.scale = new StyleScale(new Scale(from));
-        micDisconnectedAnimationId = LeanTween.value(singSceneControl.gameObject, from, Vector3.one, 0.5f)
+        micDisconnectedAnimationId = LeanTween.value(singSceneControl.gameObject, from, Vector2.one, 0.5f)
             .setEaseSpring()
-            .setOnUpdate(s => micDisconnectedIcon.style.scale = new StyleScale(new Scale(new Vector3(s, s, s))))
+            .setOnUpdate(s => micDisconnectedIcon.style.scale = new StyleScale(new Scale(new Vector2(s, s))))
             .id;
     }
 
