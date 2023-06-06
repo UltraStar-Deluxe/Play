@@ -442,6 +442,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     public void Dispose()
     {
         GameObject.Destroy(micPitchTracker);
+        micProgressBarRecordingControl.Dispose();
         focusableNavigator.RemoveCustomNavigationTarget(micButton, Vector2.left, true);
     }
 }
