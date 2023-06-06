@@ -65,6 +65,9 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     [Inject(UxmlName = R.UxmlNames.enqueueSettingsAccordionItem)]
     private AccordionItem enqueueSettingsAccordionItem;
     
+    [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
+    private VisualElement modifierDialogOverlay;
+    
     private SongDto songDto;
     public SongDto SongDto
     {
@@ -92,7 +95,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     {
         injector.Inject(gameRoundSettingsUiControl);
         gameRoundSettingsUiControl.GameRoundSettings = settings.GameRoundSettings;
-
+        VisualElementUtils.RegisterDirectClickCallback(modifierDialogOverlay, () => gameRoundSettingsUiControl.CloseModifierDialog());
+        
         gameRoundSettingsUiControl
             .DialogClosedEventStream
             .Subscribe(_ => enqueueSettingsAccordionItem.UpdateTargetHeight());
