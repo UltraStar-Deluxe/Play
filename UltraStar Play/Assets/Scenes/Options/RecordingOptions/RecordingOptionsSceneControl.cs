@@ -240,8 +240,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     {
         micPitchTracker.StopRecording();
 
+        List<MicProfile> sortedMicProfiles = GetSortedMicProfiles();
         MicProfile lastMicProfile = SelectedMicProfile;
-        devicePickerControl.Items = CreateMicProfiles();
+        devicePickerControl.Items = sortedMicProfiles;
         Debug.Log($"MicProfiles: {devicePickerControl.Items.ToCsv()}");
         if (devicePickerControl.Items.Count > 0)
         {
@@ -264,6 +265,13 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
             OnRecordingDeviceSelected(nextSelectedMicProfile);
         }
+    }
+
+    private List<MicProfile> GetSortedMicProfiles()
+    {
+        List<MicProfile> micProfiles = CreateMicProfiles();
+        micProfiles.Sort((a, b) => string.CompareOrdinal(a.GetDisplayNameWithChannel(), b.GetDisplayNameWithChannel()));
+        return micProfiles;
     }
 
     private void Update()
