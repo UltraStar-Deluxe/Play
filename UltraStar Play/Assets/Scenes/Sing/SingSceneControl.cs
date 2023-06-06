@@ -185,8 +185,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private bool hasRecordedSongStartedStatistics;
 
     private bool hasFinishedScene;
-
-    private float startMicrophoneDelayInSeconds = 0.5f;
     
     public void OnInjectionFinished()
     {
@@ -265,17 +263,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // Associate LyricsDisplayer with one of the (duet) players
         InitSingingLyricsControls();
 
-        // Start the audio when microphones are ready.
-        if (sceneData.IsMedley)
-        {
-            // No time to wait
-            StartAudioPlayback();
-        }
-        else
-        {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds, 
-                () => StartAudioPlayback()));
-        }
+        StartAudioPlayback();
+        
         StartVideoOrShowBackgroundImage();
 
         // Input legend (in pause overlay)
@@ -894,17 +883,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         PlayerControls.Add(playerControl);
 
-        // Start microphone after a short delay. Otherwise the scene transition is not smooth.
-        if (sceneData.IsMedley)
-        {
-            // No time to wait
-            playerControl.PlayerMicPitchTracker.InitPitchDetection();
-        }
-        else
-        {
-            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(startMicrophoneDelayInSeconds,
-                () => playerControl.PlayerMicPitchTracker.InitPitchDetection()));
-        }
+        playerControl.PlayerMicPitchTracker.InitPitchDetection();
 
         AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, playerIndex);
 
