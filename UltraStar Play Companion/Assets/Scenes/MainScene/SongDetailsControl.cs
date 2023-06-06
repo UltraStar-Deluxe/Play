@@ -135,6 +135,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
         
         HideSongDetails();
+
+        UiManager.CreateNotification($"Enqueued Song '{dto.SongDto.Title}'");
     }
     
     private void EnqueueSongAsMedley()
@@ -152,6 +154,8 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
         
         HideSongDetails();
+        
+        UiManager.CreateNotification($"Enqueued Medley Song '{dto.SongDto.Title}'");
     }
     
     public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()

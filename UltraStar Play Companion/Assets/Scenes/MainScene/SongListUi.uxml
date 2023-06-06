@@ -17,7 +17,7 @@
             <ui:ListView name="songListView" fixed-item-height="64" style="width: 100%; flex-grow: 1;" />
         </ui:VisualElement>
         <ui:VisualElement name="songQueueContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
-            <ui:Label tabindex="-1" text="Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center;" />
+            <ui:Label tabindex="-1" text="Song Queue" display-tooltip-when-elided="true" name="songQueueTitle" style="-unity-font-style: bold; -unity-text-align: upper-center;" />
             <ui:Instance template="SongQueueOverlayUi" name="SongQueueUi" />
         </ui:VisualElement>
     </ui:VisualElement>
