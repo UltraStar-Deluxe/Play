@@ -122,7 +122,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(newValue, MicSampleRecorder.FinalSampleRate.Value);
     }
 
-    public void StartRecording()
+    public virtual void StartRecording()
     {
         if (MicSampleRecorder == null)
         {
@@ -132,7 +132,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         MicSampleRecorder.StartRecording();
     }
     
-    public void StopRecording()
+    public virtual void StopRecording()
     {
         if (MicSampleRecorder == null)
         {
@@ -201,7 +201,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         }
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         DisposeMicSampleRecorderDisposables();
     }

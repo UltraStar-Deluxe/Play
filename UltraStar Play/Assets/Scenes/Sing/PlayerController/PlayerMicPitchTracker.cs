@@ -696,6 +696,40 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         SendPositionInSongToClientRapidly();
     }
 
+    public override void StartRecording()
+    {
+        if (micProfile == null)
+        {
+            return;
+        }
+        
+        if (micProfile.IsInputFromConnectedClient)
+        {
+            SendStartRecordingMessageToConnectedClient();
+        }
+        else
+        {
+            base.StartRecording();
+        }
+    }
+
+    public override void StopRecording()
+    {
+        if (micProfile == null)
+        {
+            return;
+        }
+        
+        if (micProfile.IsInputFromConnectedClient)
+        {
+            SendStopRecordingMessageToConnectedClient();
+        }
+        else
+        {
+            base.StopRecording();
+        }
+    }
+    
     private class BeatPitchEventAndTime
     {
         public BeatPitchEvent beatPitchEvent;

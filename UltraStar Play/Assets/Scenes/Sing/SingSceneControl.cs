@@ -939,7 +939,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
         
         songAudioPlayer.PauseAudio();
-        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+        PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.StopRecording());
         
         // Trigger achievement
         if (songAudioPlayer.PositionInSongInMillis > 60000)
@@ -958,8 +958,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         songAudioPlayer.PlayAudio();
         PlayerControls.ForEach(playerControl =>
         {
+            playerControl.PlayerMicPitchTracker.StartRecording();
             playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
-            playerControl.PlayerMicPitchTracker.SendStartRecordingMessageToConnectedClient();
         });
     }
     
