@@ -85,7 +85,7 @@ public class SingingResultsHighscoreControl : INeedInjection
         
         if (songStatistics.IsNullOrEmpty())
         {
-            Label noHighscoresLabel = new Label("No highscores yet");
+            Label noHighscoresLabel = new Label("No high scores yet");
             noHighscoresLabel.name = "noHighscoresLabel";
             highscoreEntryList.Add(noHighscoresLabel);
             return;
