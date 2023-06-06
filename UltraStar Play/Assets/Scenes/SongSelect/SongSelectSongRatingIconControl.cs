@@ -19,14 +19,14 @@ public class SongSelectSongRatingIconControl : INeedInjection
     
     public void UpdateSongRatingIcons(SongMeta selectedSong, EDifficulty difficulty)
     {
-        LocalStatistic localStatistic = statistics.GetLocalStats(selectedSong);
-        if (localStatistic == null)
+        SongStatistics songStatistics = statistics.GetLocalStatistics(selectedSong);
+        if (songStatistics == null)
         {
             HideSongRatingIcons();
             return;
         }
         
-        List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(1, difficulty);
+        List<HighScoreEntry> topScores = songStatistics.HighScoreRecord.GetTopScores(1, difficulty);
         List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
         if (topScoreNumbers.IsNullOrEmpty())
         {

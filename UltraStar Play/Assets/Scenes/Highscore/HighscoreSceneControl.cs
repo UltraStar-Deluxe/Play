@@ -95,21 +95,21 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
         difficultyText.text = TranslationManager.GetTranslation(R.Messages.difficulty) + ": " + difficulty.GetTranslatedName();
         titleAndArtistText.text = $"{songMeta.Title} - {songMeta.Artist}";
 
-        LocalStatistic localStatistic = statistics.GetLocalStats(songMeta);
-        List<SongStatistic> songStatistics = localStatistic?.StatsEntries?.SongStatistics?
+        SongStatistics songStatistics = statistics.GetLocalStatistics(songMeta);
+        List<HighScoreEntry> highScoreEntries = songStatistics?.HighScoreRecord?.HighScoreEntries?
             .Where(it => it.Difficulty == difficulty).ToList();
-        if (songStatistics.IsNullOrEmpty())
+        if (highScoreEntries.IsNullOrEmpty())
         {
-            songStatistics = new List<SongStatistic>();
+            highScoreEntries = new List<HighScoreEntry>();
         }
-        songStatistics.Sort(new CompareBySongScoreDescending());
-        List<SongStatistic> topSongStatistics = songStatistics.Take(highscoreEntries.Count).ToList();
+        highScoreEntries.Sort(new CompareBySongScoreDescending());
+        List<HighScoreEntry> topScoreEntries = highScoreEntries.Take(highscoreEntries.Count).ToList();
         for (int i = 0; i < highscoreEntries.Count; i++)
         {
-            if (i < topSongStatistics.Count)
+            if (i < topScoreEntries.Count)
             {
                 highscoreEntries[i].ShowByDisplay();
-                FillHighscoreEntry(highscoreEntries[i], topSongStatistics[i], i);
+                FillHighscoreEntry(highscoreEntries[i], topScoreEntries[i], i);
             }
             else
             {
@@ -121,12 +121,12 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
         UpdateTranslation();
     }
 
-    private void FillHighscoreEntry(VisualElement highscoreEntry, SongStatistic songStatistic, int index)
+    private void FillHighscoreEntry(VisualElement highscoreEntry, HighScoreEntry highScoreEntry, int index)
     {
         highscoreEntry.Q<Label>(R.UxmlNames.posLabel).text = (index + 1).ToString();
-        highscoreEntry.Q<Label>(R.UxmlNames.playerNameLabel).text = songStatistic.PlayerName;
-        highscoreEntry.Q<Label>(R.UxmlNames.scoreLabel).text = songStatistic.Score.ToString();
-        highscoreEntry.Q<Label>(R.UxmlNames.dateLabel).text = songStatistic.DateTime.ToString("d", CultureInfo.CurrentUICulture);
+        highscoreEntry.Q<Label>(R.UxmlNames.playerNameLabel).text = highScoreEntry.PlayerName;
+        highscoreEntry.Q<Label>(R.UxmlNames.scoreLabel).text = highScoreEntry.Score.ToString();
+        highscoreEntry.Q<Label>(R.UxmlNames.dateLabel).text = highScoreEntry.DateTime.ToString("d", CultureInfo.CurrentUICulture);
         // highscoreEntry.Q<VisualElement>(R.UxmlNames.commonScoreIcon).SetVisibleByDisplay(songStatistic.ScoreMode == EScoreMode.CommonAverage);
         highscoreEntry.Q<VisualElement>(R.UxmlNames.commonScoreIcon).HideByDisplay();
     }

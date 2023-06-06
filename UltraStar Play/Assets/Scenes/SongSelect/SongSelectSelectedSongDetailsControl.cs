@@ -184,10 +184,10 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     private void UpdateSongStatistics(SongMeta songMeta)
     {
-        LocalStatistic localStatistic = statistics.GetLocalStats(songMeta);
-        if (localStatistic != null)
+        SongStatistics songStatistics = statistics.GetLocalStatistics(songMeta);
+        if (songStatistics != null)
         {
-            List<SongStatistic> topScores = localStatistic.StatsEntries.GetTopScores(1, settings.Difficulty);
+            List<HighScoreEntry> topScores = songStatistics.HighScoreRecord.GetTopScores(1, settings.Difficulty);
             List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
 
             UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);

@@ -209,23 +209,23 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             return false;
         }
         
-        LocalStatistic localStatistic = statistics.GetLocalStats(sceneData.SongMetas.LastOrDefault());
-        if (localStatistic == null
-            || localStatistic.StatsEntries == null
-            || localStatistic.StatsEntries.SongStatistics.IsNullOrEmpty())
+        SongStatistics songStatistics = statistics.GetLocalStatistics(sceneData.SongMetas.LastOrDefault());
+        if (songStatistics == null
+            || songStatistics.HighScoreRecord == null
+            || songStatistics.HighScoreRecord.HighScoreEntries.IsNullOrEmpty())
         {
             return false;
         }
 
-        SongStatistic songStatistic = localStatistic.StatsEntries
+        HighScoreEntry highScoreEntry = songStatistics.HighScoreRecord
             .GetTopScores(1, PlayerProfile.Difficulty)
             .FirstOrDefault();
-        if (songStatistic == null)
+        if (highScoreEntry == null)
         {
             return false;
         }
         
-        return songStatistic.Score == playerScoreData.TotalScore;
+        return highScoreEntry.Score == playerScoreData.TotalScore;
     }
 
     private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)

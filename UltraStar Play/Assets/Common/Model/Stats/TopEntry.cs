@@ -7,13 +7,13 @@ public class TopEntry
 {
     public string SongName { get; private set; }
     public string SongArtist { get; private set; }
-    public SongStatistic SongStatistic { get; private set; }
+    public HighScoreEntry HighScoreEntry { get; private set; }
 
-    public TopEntry(string songName, string songArtist, SongStatistic songStatistic)
+    public TopEntry(string songName, string songArtist, HighScoreEntry highScoreEntry)
     {
         this.SongName = songName;
         this.SongArtist = songArtist;
-        this.SongStatistic = songStatistic;
+        this.HighScoreEntry = highScoreEntry;
     }
 }
 
@@ -22,11 +22,11 @@ public class CompareByTopEntryScore : IComparer<TopEntry>
 {
     public int Compare(TopEntry x, TopEntry y)
     {
-        if (x.SongStatistic == null || y.SongStatistic == null)
+        if (x.HighScoreEntry == null || y.HighScoreEntry == null)
         {
             return 0;
         }
 
-        return x.SongStatistic.Score.CompareTo(y.SongStatistic.Score);
+        return x.HighScoreEntry.Score.CompareTo(y.HighScoreEntry.Score);
     }
 }

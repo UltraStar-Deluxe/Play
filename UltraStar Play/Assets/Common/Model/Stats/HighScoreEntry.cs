@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-//Represents a single song statistic entry
 [Serializable]
-public class SongStatistic
+public class HighScoreEntry
 {
     public string PlayerName { get; private set; }
     public EDifficulty Difficulty { get; private set; }
@@ -11,7 +10,7 @@ public class SongStatistic
     public int Score { get; private set; }
     public DateTime DateTime { get; private set; }
 
-    public SongStatistic(string playerName, EDifficulty difficulty, int score, EScoreMode scoreMode)
+    public HighScoreEntry(string playerName, EDifficulty difficulty, int score, EScoreMode scoreMode)
     {
         this.PlayerName = playerName;
         this.Difficulty = difficulty;
@@ -21,18 +20,17 @@ public class SongStatistic
     }
 }
 
-//Comparer for score sorting
-public class CompareBySongScoreAscending : IComparer<SongStatistic>
+public class CompareBySongScoreAscending : IComparer<HighScoreEntry>
 {
-    public int Compare(SongStatistic x, SongStatistic y)
+    public int Compare(HighScoreEntry x, HighScoreEntry y)
     {
         return x.Score.CompareTo(y.Score);
     }
 }
 
-public class CompareBySongScoreDescending: IComparer<SongStatistic>
+public class CompareBySongScoreDescending: IComparer<HighScoreEntry>
 {
-    public int Compare(SongStatistic x, SongStatistic y)
+    public int Compare(HighScoreEntry x, HighScoreEntry y)
     {
         return -x.Score.CompareTo(y.Score);
     }

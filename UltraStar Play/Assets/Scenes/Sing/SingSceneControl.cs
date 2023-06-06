@@ -760,7 +760,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         singingResultsSceneData.partyModeSceneData = sceneData.partyModeSceneData;
 
         // Add scores, either for individual players, or as one common score.
-        List<SongStatistic> songStatistics = new();
+        List<HighScoreEntry> highScoreEntries = new();
         if (IsIndividualScore)
         {
             // Add and record score for each player individually.
@@ -771,8 +771,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 singingResultsSceneData.AddPlayerScores(playerControl.PlayerProfile, playerScoreControlData);
             });
 
-            songStatistics = PlayerControls
-                .Select(playerControl => new SongStatistic(playerControl.PlayerProfile.Name,
+            highScoreEntries = PlayerControls
+                .Select(playerControl => new HighScoreEntry(playerControl.PlayerProfile.Name,
                     playerControl.PlayerProfile.Difficulty,
                     playerControl.PlayerScoreControl.TotalScore,
                     EScoreMode.Individual))
@@ -795,12 +795,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             PlayerScoreControlData commonScoreData = CreateAveragePlayerScoreControlData(scoreControlDatas);
             singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScoreData);
 
-            SongStatistic commonSongStatistic = new SongStatistic(
+            HighScoreEntry commonHighScoreEntry = new HighScoreEntry(
                 commonPlayerProfileName,
                 easiestPlayerProfileDifficulty,
                 commonScoreData.TotalScore,
                 EScoreMode.CommonAverage);
-            songStatistics = new() { commonSongStatistic };
+            highScoreEntries = new() { commonHighScoreEntry };
         }
 
         // Check if the full song has been sung, i.e., the playback position is after the last note.
@@ -817,9 +817,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             }
         });
         if (isAfterLastNote
-            && !songStatistics.IsNullOrEmpty())
+            && !highScoreEntries.IsNullOrEmpty())
         {
-            UpdateSongFinishedStats(songStatistics);
+            UpdateSongFinishedStats(highScoreEntries);
         }
 
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
@@ -867,7 +867,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         return serverSideConnectRequestManager.GetConnectedClientHandlers(micProfiles);
     }
 
-    private void UpdateSongFinishedStats(List<SongStatistic> songStatistics)
+    private void UpdateSongFinishedStats(List<HighScoreEntry> highScoreEntries)
     {
         if (sceneData.IsMedley
             || HasPartyModeSceneData)
@@ -875,7 +875,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             // Medleys and party mode are not recorded
             return;
         }
-        statistics.RecordSongFinished(SongMeta, songStatistics);
+        statistics.RecordSongFinished(SongMeta, highScoreEntries);
     }
 
     private PlayerControl CreatePlayerControl(PlayerProfile playerProfile, MicProfile micProfile, int playerIndex)
