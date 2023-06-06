@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
 
@@ -14,7 +13,11 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
 {
     public static MicSampleRecorderManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<MicSampleRecorderManager>();
 
+    [Inject]
+    private ISettings settings;
+    
     private readonly List<MicSampleRecorder> micSampleRecorders = new();
+    public IReadOnlyList<MicSampleRecorder> MicSampleRecorders => micSampleRecorders;
     
     protected override object GetInstance()
     {
@@ -37,6 +40,16 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         }
     }
 
+    protected override void StartSingleton()
+    {
+        settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
+            .Subscribe(newValue =>
+            {
+                Debug.Log($"PlayRecordedAudio changed: {newValue}");
+                micSampleRecorders.ForEach(it => it.PlayRecordedAudio = newValue);
+            });
+    }
+    
     public MicSampleRecorder GetOrCreateMicSampleRecorder(MicProfile micProfile)
     {
         if (micProfile == null)
@@ -58,6 +71,7 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         micSampleRecorderGameObject.AddComponent<AudioSource>();
         micSampleRecorder = micSampleRecorderGameObject.AddComponent<MicSampleRecorder>();
         micSampleRecorder.MicProfile = micProfile;
+        micSampleRecorder.PlayRecordedAudio = settings.PlayRecordedAudio;
         micSampleRecorders.Add(micSampleRecorder);
         return micSampleRecorder;
     }

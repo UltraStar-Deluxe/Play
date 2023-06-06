@@ -28,11 +28,6 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     [Inject]
     private PlayerProfile playerProfile;
 
-    [Inject(Optional = true)]
-    private MicProfile micProfile;
-
-    private MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
-    
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
@@ -40,7 +35,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private SingSceneMedleyControl medleyControl;
     
     [Inject]
-    private new Settings settings;
+    private Settings mainGameSettings;
 
     // The rounding distance of the PlayerProfile
     private float roundingDistance;
@@ -124,7 +119,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         MicSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
-        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
+        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(mainGameSettings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
     }
 
     private void InitPitchDetectionFromConnectedClient()
@@ -255,7 +250,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         // Handle received messages after buffer time.
         if (!beatPitchEventsFromConnectedClientQueue.IsNullOrEmpty())
         {
-            long connectedClientMessageBufferTime = (long)Mathf.Max(settings.ConnectedClientMessageBufferTimeInMillis, connectedClientHandler.JitterInMillis * 1.5f);
+            long connectedClientMessageBufferTime = (long)Mathf.Max(mainGameSettings.ConnectedClientMessageBufferTimeInMillis, connectedClientHandler.JitterInMillis * 1.5f);
             int beatBufferTime = Mathf.Max(1, (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, connectedClientMessageBufferTime * 1.5f));
             DequeuePitchEventsFromConnectedClient(connectedClientMessageBufferTime, beatBufferTime);
         }
@@ -361,6 +356,12 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     public void SendPositionInSongToClientRapidly()
     {
+        if (micProfile == null
+            || !micProfile.IsInputFromConnectedClient)
+        {
+            return;
+        }
+        
         PlayerNoteRecorder playerNoteRecorder = GetComponent<PlayerNoteRecorder>();
         if (playerNoteRecorder != null
             && !playerNoteRecorder.isActiveAndEnabled)
@@ -483,13 +484,13 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             Note currentOrUpcomingNote = currentAndUpcomingNotesInRecordingSentence[0];
             if (currentOrUpcomingNote.StartBeat > BeatToAnalyze
-                && !settings.AnalyzeBeatsWithoutTargetNote)
+                && !mainGameSettings.AnalyzeBeatsWithoutTargetNote)
             {
                 // Next beat to analyze is at the next note
                 BeatToAnalyze = currentOrUpcomingNote.StartBeat;
             }
         }
-        else if (settings.AnalyzeBeatsWithoutTargetNote
+        else if (mainGameSettings.AnalyzeBeatsWithoutTargetNote
                  && BeatToAnalyze < RecordingSentence.MaxBeat)
         {
             BeatToAnalyze++;
@@ -531,7 +532,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private void SetRecordingSentence(int sentenceIndex)
     {
         if (sentenceIndex == 0
-            && settings.ShowPitchIndicator)
+            && mainGameSettings.ShowPitchIndicator)
         {
             // Start with very first beat, possibly before the lyrics start to update the pitch indicator.
             BeatToAnalyze = (int)BpmUtils.MillisecondInSongToBeat(songMeta, 0);
@@ -546,7 +547,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         }
         currentAndUpcomingNotesInRecordingSentence = SongMetaUtils.GetSortedNotes(RecordingSentence);
 
-        if (settings.ShowPitchIndicator)
+        if (mainGameSettings.ShowPitchIndicator)
         {
             // Analyze all beats to update pitch indicator.
             BeatToAnalyze++;

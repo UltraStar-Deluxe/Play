@@ -7,6 +7,8 @@ public interface ISettings
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
 
     public bool ShowFps { get; set; }
+    
+    public bool PlayRecordedAudio { get; set; }
 
     /**
      * The UDP port on the server (e.g. Companion App) for initiating a connection.

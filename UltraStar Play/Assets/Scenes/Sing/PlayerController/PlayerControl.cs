@@ -108,6 +108,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
                 childrenInjector.Inject(childThatNeedsInjection);
             }
         }
+
+        PlayerMicPitchTracker.MicProfile = MicProfile;
+
         SetDisplaySentenceIndex(0);
 
         InitAchievements();

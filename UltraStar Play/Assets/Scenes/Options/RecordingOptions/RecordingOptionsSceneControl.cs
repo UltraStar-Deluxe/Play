@@ -204,14 +204,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             });
 
         // Play recorded audio
-        micPitchTracker.PlayRecordedAudio = settings.PlayRecordedAudio;
         FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
             () => settings.PlayRecordedAudio,
-            newValue =>
-            {
-                settings.PlayRecordedAudio = newValue;
-                micPitchTracker.PlayRecordedAudio = newValue;
-            });
+            newValue => settings.PlayRecordedAudio = newValue);
 
         // Use PortAudio
         if (ApplicationUtils.CanUsePortAudio())
