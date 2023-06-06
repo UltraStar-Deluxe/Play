@@ -12,7 +12,7 @@ using Vosk;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IRecordingEventListener
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -48,9 +48,9 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     [Inject]
     private PitchDetectionAction pitchDetectionAction;
     
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    private MicSampleRecorder micSampleRecorder;
-    
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
+
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
@@ -78,19 +78,58 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     private readonly Subject<bool> recordedSamplesChangedEventStream = new Subject<bool>();
     public IObservable<bool> RecordedSamplesChangedEventStream => recordedSamplesChangedEventStream;
 
-    private int SampleRate => micSampleRecorder.FinalSampleRate.Value;
-
     private bool areLastNonAnalyzedSamplesAboveThreshold;
     private int analyzeStartIndex;
 
     private bool speechRecognizerDirty;
     private SpeechRecognitionParameters speechRecognitionParameters;
     private VoskRecognizer speechRecognizer;
+
+    private MicProfile micProfile;
+    public MicProfile MicProfile
+    {
+        get => micProfile;
+        set
+        {
+            DisposeMicSampleRecorderDisposables();
+            
+            micProfile = value;
+
+            if (MicSampleRecorder == null)
+            {
+                return;
+            }
+            
+            // Listen to changes
+            micSampleRecorderDisposables.Add(MicSampleRecorder.FinalSampleRate.Subscribe(newValue => FinalSampleRate.Value = newValue));
+            micSampleRecorderDisposables.Add(MicSampleRecorder.IsRecording.Subscribe(newValue => IsRecording.Value = newValue));
+            micSampleRecorderDisposables.Add(MicSampleRecorder.AddRecordingEventListener(this));
+        }
+    }
+
+    public float[] MicSamples
+    {
+        get
+        {
+            if (MicSampleRecorder == null)
+            {
+                return Array.Empty<float>();
+            }
+            
+            return MicSampleRecorder.MicSamples;
+        }
+    }
+
+    public ReactiveProperty<int> FinalSampleRate { get; private set; } = new(MicSampleRecorder.DefaultSampleRate);
+    public ReactiveProperty<bool> IsRecording { get; private set; } = new();
     
+    private MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
+
+    private readonly List<IDisposable> micSampleRecorderDisposables = new();
+
     public void OnInjectionFinished()
     {
         InitMicSampleRecorder();
-        micSampleRecorder.RecordingEventStream.Subscribe(RecordSamples);
 
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(evt =>
         {
@@ -109,7 +148,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
             FillAudioClipWithRecordingBuffer();
             DoSpeechRecognitionForNewlyRecordedSamples();
         });
-        micSampleRecorder.IsRecording.Subscribe(newValue =>
+        IsRecording.Subscribe(newValue =>
         {
             if (newValue)
             {
@@ -184,6 +223,8 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
             InitSpeechRecognizer();
         }
 
+        int sampleRate = FinalSampleRate.Value;
+        
         int micDelayInSamples = GetMicDelayInSamples();
         int fromIndex = analyzeStartIndex - micDelayInSamples;
         int toIndex = recordingIndex - micDelayInSamples - 1;
@@ -191,16 +232,16 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         analyzeStartIndex = recordingIndex;
 
         int recordingStartIndexConsideringMicDelay = recordingStartIndex - micDelayInSamples;
-        double offsetInMillis = ((double)recordingStartIndexConsideringMicDelay / SampleRate) * 1000.0;
+        double offsetInMillis = ((double)recordingStartIndexConsideringMicDelay / sampleRate) * 1000.0;
         int offsetInBeats = (int)BpmUtils.MillisecondInSongToBeat(songMeta, offsetInMillis);
         
-        Debug.Log($"Analyzing speech from second {(double)fromIndex / SampleRate} to second {(double)toIndex / SampleRate} (length: {(lengthInSamples) / SampleRate} seconds)");
-        speechRecognitionAction.CreateNotesFromSpeechRecognition(RecordingBuffer, fromIndex, toIndex, SampleRate, 2, true, speechRecognitionParameters, speechRecognizer, true, offsetInBeats);
+        Debug.Log($"Analyzing speech from second {(double)fromIndex / sampleRate} to second {(double)toIndex / sampleRate} (length: {(lengthInSamples) / sampleRate} seconds)");
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(RecordingBuffer, fromIndex, toIndex, sampleRate, 2, true, speechRecognitionParameters, speechRecognizer, true, offsetInBeats);
     }
 
     private void UpdateRecordingStartIndex()
     {
-        recordingStartIndex = (int)Math.Floor(songAudioPlayer.PositionInSongInSeconds * SampleRate);
+        recordingStartIndex = (int)Math.Floor(songAudioPlayer.PositionInSongInSeconds * FinalSampleRate.Value);
         recordingIndex = recordingStartIndex;
         analyzeStartIndex = recordingIndex;
     }
@@ -229,7 +270,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         recordedAudioWaveFormVisualization.DrawWaveFormMinAndMaxValues(RecordingBuffer);
     }
 
-    private void RecordSamples(RecordingEvent recordingEvent)
+    public void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         InitRecordingBufferIfNeeded();
 
@@ -264,13 +305,18 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
 
     private int GetMicDelayInSamples()
     {
-        return (int)(micSampleRecorder.MicProfile.DelayInMillis / 1000.0 * SampleRate);
+        if (MicSampleRecorder == null)
+        {
+            return 0;
+        }
+        
+        return (int)(MicSampleRecorder.MicProfile.DelayInMillis / 1000.0 * FinalSampleRate.Value);
     }
 
     private void InitAudioClipIfNeeded()
     {
         if (audioClip != null
-            && (audioClip.frequency != SampleRate
+            && (audioClip.frequency != FinalSampleRate.Value
                 || audioClip.samples != GetRequiredRecordingBufferLengthInSamples()))
         {
             // Create new recording buffer with different settings
@@ -290,9 +336,9 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         }
 
         int channels = 1;
-        audioClip = AudioClip.Create(GetType().Name, RecordingBuffer.Length, channels, SampleRate, false);
+        audioClip = AudioClip.Create(GetType().Name, RecordingBuffer.Length, channels, FinalSampleRate.Value, false);
         audioClip.SetData(RecordingBuffer, 0);
-        Debug.Log($"Created AudioClip to buffer samples: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {SampleRate} Hz => {audioClip.samples} samples");
+        Debug.Log($"Created AudioClip to buffer samples: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {FinalSampleRate.Value} Hz => {audioClip.samples} samples");
     }
 
     private void InitRecordingBufferIfNeeded()
@@ -309,18 +355,18 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         {
             RecordingBuffer = cachedRecordingBuffer;
             HasRecordedAudio = cachedRecordingBuffer.AnyMatch(sample => sample != 0);
-            Debug.Log($"Reusing existing recording buffer: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {SampleRate} Hz => {RecordingBuffer.Length} samples");
+            Debug.Log($"Reusing existing recording buffer: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {FinalSampleRate.Value} Hz => {RecordingBuffer.Length} samples");
             return;
         }
 
         RecordingBuffer = new float[requiredRecordingBufferLength];
         songMetaToRecordedAudioSamples[songMeta] = RecordingBuffer;
-        Debug.Log($"Initialized new recording buffer: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {SampleRate} Hz => {RecordingBuffer.Length} samples");
+        Debug.Log($"Initialized new recording buffer: {songAudioPlayer.DurationOfSongInSeconds} seconds @ {FinalSampleRate.Value} Hz => {RecordingBuffer.Length} samples");
     }
 
     private int GetRequiredRecordingBufferLengthInSamples()
     {
-        return (int)(songAudioPlayer.DurationOfSongInMillis / 1000.0 * SampleRate);
+        return (int)(songAudioPlayer.DurationOfSongInMillis / 1000.0 * FinalSampleRate.Value);
     }
     
     private void InitMicSampleRecorder()
@@ -348,7 +394,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
 
     private void UpdateMicProfileAndStartOrStopRecording()
     {
-        micSampleRecorder.MicProfile = CreateSongEditorSpecificMicProfile();
+        MicProfile = CreateSongEditorSpecificMicProfile();
         StartOrStopRecording();
     }
 
@@ -367,19 +413,24 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     
     private void StartOrStopRecording()
     {
+        if (MicSampleRecorder == null)
+        {
+            return;
+        }
+        
         bool shouldBeRecoding = nonPersistentSettings.IsSongEditorRecordingEnabled.Value 
                                 && songAudioPlayer.IsPlaying
                                 && settings.SongEditorSettings.MicProfile != null
                                 && settings.SongEditorSettings.MicProfile.IsEnabledAndConnected(serverSideConnectRequestManager);
 
-        if (!shouldBeRecoding && micSampleRecorder.IsRecording.Value)
+        if (!shouldBeRecoding && MicSampleRecorder.IsRecording.Value)
         {
-            micSampleRecorder.StopRecording();
+            MicSampleRecorder.StopRecording();
         }
-        else if (shouldBeRecoding && !micSampleRecorder.IsRecording.Value)
+        else if (shouldBeRecoding && !MicSampleRecorder.IsRecording.Value)
         {
             speechRecognizerDirty = true;
-            micSampleRecorder.StartRecording();
+            MicSampleRecorder.StartRecording();
         }
     }
 
@@ -387,5 +438,16 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
     {
         speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(ESongEditorSamplesSource.Recording);
         speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+    }
+    
+    private void OnDestroy()
+    {
+        DisposeMicSampleRecorderDisposables();
+    }
+
+    private void DisposeMicSampleRecorderDisposables()
+    {
+        micSampleRecorderDisposables.ForEach(it => it.Dispose());
+        micSampleRecorderDisposables.Clear();
     }
 }

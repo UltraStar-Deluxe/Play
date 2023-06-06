@@ -1,5 +1,4 @@
-﻿using System;
-using ProTrans;
+﻿using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -7,11 +6,8 @@ using UnityEngine.UIElements;
 
 public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 {
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private MicSampleRecorder micSampleRecorder;
-
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private MicPitchTracker micPitchTracker;
+    [Inject]
+    private NewestSamplesMicPitchTracker micPitchTracker;
 
     [Inject(UxmlName = R.UxmlNames.noteLabel)]
     private Label noteLabel;
@@ -61,7 +57,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
             return;
         }
 
-        float[] micData = micPitchTracker.MicSampleRecorder.MicSamples;
+        float[] micData = micPitchTracker.MicSamples;
 
         // Consider amplification
         AbstractAudioSamplesAnalyzer.ApplyAmplification(micData, 0, micData.Length, micProfile.AmplificationMultiplier);
@@ -77,14 +73,14 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
 
     public void SetMicProfile(MicProfile micProfile)
     {
-        micPitchTracker.MicSampleRecorder.StopRecording();
+        micPitchTracker.StopRecording();
 
         micPitchTracker.MicProfile = micProfile;
         if (!micProfile.Name.IsNullOrEmpty()
             && !micProfile.IsInputFromConnectedClient
             && micProfile.IsConnected(ServerSideConnectRequestManager.Instance))
         {
-            micPitchTracker.MicSampleRecorder.StartRecording();
+            micPitchTracker.StartRecording();
         }
     }
 

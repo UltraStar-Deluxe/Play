@@ -768,6 +768,7 @@ Transform:
   m_Children:
   - {fileID: 280779799394265030}
   - {fileID: 5543064232540367519}
+  - {fileID: 5679655992247309606}
   - {fileID: 4725083428892299482}
   - {fileID: 8210014063461271944}
   - {fileID: 3855433877842653761}
@@ -8513,6 +8514,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6402f29a483b3147b012ca67c74574b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &8969446237973460766
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5679655992247309606}
+  - component: {fileID: 8214259186714304603}
+  m_Layer: 5
+  m_Name: MicSampleRecorderManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5679655992247309606
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8969446237973460766}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8214259186714304603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8969446237973460766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a539927f282025c43bda7f497dd8b2c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  micSampleRecorderPrefab: {fileID: 0}
 --- !u!1 &9012705084353794179
 GameObject:
   m_ObjectHideFlags: 0

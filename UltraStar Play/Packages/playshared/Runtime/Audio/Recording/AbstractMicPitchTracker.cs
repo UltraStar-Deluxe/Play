@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -7,8 +8,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-[RequireComponent(typeof(MicSampleRecorder))]
-public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IRecordingEventListener
 {
     // Longest period of singable notes (C2) requires 674 samples at 44100 Hz sample rate.
     // Thus, 1024 samples should be sufficient.
@@ -20,45 +20,84 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
     [Inject]
     protected ISettings settings;
 
+    [Inject]
+    protected MicSampleRecorderManager micSampleRecorderManager;
+
+    private MicProfile micProfile;
     public MicProfile MicProfile
     {
-        get
-        {
-            return MicSampleRecorder.MicProfile;
-        }
+        get => micProfile;
         set
         {
-            MicSampleRecorder.MicProfile = value;
+            DisposeMicSampleRecorderDisposables();
+
+            micProfile = value;
+
+            if (MicSampleRecorder == null)
+            {
+                return;
+            }
+
+            // Listen to changes
+            micSampleRecorderDisposables.Add(MicSampleRecorder.FinalSampleRate.Subscribe(newValue => FinalSampleRate.Value = newValue));
+            micSampleRecorderDisposables.Add(MicSampleRecorder.IsRecording.Subscribe(newValue => IsRecording.Value = newValue));
+            micSampleRecorderDisposables.Add(MicSampleRecorder.AddRecordingEventListener(this));
+
             // The sample rate could have changed, which means a new analyzer is needed.
             AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
         }
     }
 
-    private MicSampleRecorder micSampleRecorder;
-    public MicSampleRecorder MicSampleRecorder
+    public float[] MicSamples
     {
         get
         {
-            if (micSampleRecorder == null
-                && gameObject)
+            if (MicSampleRecorder == null)
             {
-                micSampleRecorder = GetComponent<MicSampleRecorder>();
+                return Array.Empty<float>();
             }
-
-            return micSampleRecorder;
+            
+            return MicSampleRecorder.MicSamples;
         }
     }
+
+    public ReactiveProperty<int> FinalSampleRate { get; private set; } = new(MicSampleRecorder.DefaultSampleRate);
+    public ReactiveProperty<bool> IsRecording { get; private set; } = new();
+
+    public bool PlayRecordedAudio
+    {
+        get
+        {
+            if (MicSampleRecorder == null)
+            {
+                return false;
+            }
+
+            return MicSampleRecorder.PlayRecordedAudio;
+        }
+        
+        set
+        {
+            if (MicSampleRecorder == null)
+            {
+                return;
+            }
+
+            MicSampleRecorder.PlayRecordedAudio = value;
+        }
+    }
+    
+    private MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
 
     protected readonly Subject<PitchEvent> pitchEventStream = new();
     public IObservable<PitchEvent> PitchEventStream => pitchEventStream;
 
     public IAudioSamplesAnalyzer AudioSamplesAnalyzer { get; private set; }
 
+    private readonly List<IDisposable> micSampleRecorderDisposables = new();
+    
     public virtual void OnInjectionFinished()
     {
-        MicSampleRecorder.RecordingEventStream.Subscribe(recordingEvent => OnRecordingEvent(recordingEvent));
-
-        AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
         settings.ObserveEveryValueChanged(it => it.PitchDetectionAlgorithm)
             .Subscribe(OnPitchDetectionAlgorithmChanged)
             .AddTo(gameObject);
@@ -66,15 +105,16 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
 
     protected virtual void Update()
     {
-        if (AudioSamplesAnalyzer is CamdAudioSamplesAnalyzer)
+        if (AudioSamplesAnalyzer is CamdAudioSamplesAnalyzer camdAudioSamplesAnalyzer)
         {
-            (AudioSamplesAnalyzer as CamdAudioSamplesAnalyzer).HalftoneContinuationBias = halftoneContinuationBias;
+            camdAudioSamplesAnalyzer.HalftoneContinuationBias = halftoneContinuationBias;
         }
     }
 
     private void OnPitchDetectionAlgorithmChanged(EPitchDetectionAlgorithm newValue)
     {
-        if (MicProfile == null)
+        if (MicProfile == null
+            || MicSampleRecorder == null)
         {
             return;
         }
@@ -82,7 +122,27 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(newValue, MicSampleRecorder.FinalSampleRate.Value);
     }
 
-    protected abstract void OnRecordingEvent(RecordingEvent recordingEvent);
+    public void StartRecording()
+    {
+        if (MicSampleRecorder == null)
+        {
+            return;
+        }
+        
+        MicSampleRecorder.StartRecording();
+    }
+    
+    public void StopRecording()
+    {
+        if (MicSampleRecorder == null)
+        {
+            return;
+        }
+        
+        MicSampleRecorder.StopRecording();
+    }
+
+    public abstract void OnRecordingEvent(RecordingEvent recordingEvent);
 
     public static PitchEvent AnalyzeBeat(
         SongMeta songMeta,
@@ -139,5 +199,16 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             default:
                 throw new UnityException("Unknown pitch detection algorithm:" + pitchDetectionAlgorithm);
         }
+    }
+
+    private void OnDestroy()
+    {
+        DisposeMicSampleRecorderDisposables();
+    }
+
+    private void DisposeMicSampleRecorderDisposables()
+    {
+        micSampleRecorderDisposables.ForEach(it => it.Dispose());
+        micSampleRecorderDisposables.Clear();
     }
 }

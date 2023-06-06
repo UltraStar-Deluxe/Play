@@ -6,7 +6,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinishedListener, IDisposable
+public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinishedListener, IDisposable, IRecordingEventListener
 {
     private const float TargetNoiseAboveThresholdDurationInMillis = 1000;
     
@@ -63,9 +63,8 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
             .FirstOrDefault(it => it.MicProfile == MicProfile);
         if (micSampleRecorder != null)
         {
-            // Subscribe to sample recording
-            micSampleRecorderDisposables.Add(micSampleRecorder.RecordingEventStream
-                .Subscribe(evt => OnRecordingEvent(evt)));
+            // Subscribe to recording events
+            micSampleRecorderDisposables.Add(micSampleRecorder.AddRecordingEventListener(this));
             micSampleRecorderDisposables.Add(micSampleRecorder.IsRecording
                 .Subscribe(isRecording =>
                 {
@@ -131,9 +130,10 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         }
     }
 
-    private void OnRecordingEvent(RecordingEvent evt)
+    public void OnRecordingEvent(RecordingEvent evt)
     {
         int noiseSuppression = MicProfile?.NoiseSuppression ?? 0;
+        noiseSuppression = NumberUtils.Limit(noiseSuppression, 10, 100);
         bool isAboveThreshold = AbstractAudioSamplesAnalyzer.IsAboveNoiseSuppressionThreshold(evt.MicSamples, evt.NewSamplesStartIndex, evt.NewSamplesEndIndex, noiseSuppression);
 
         // Increase / decrease time above threshold

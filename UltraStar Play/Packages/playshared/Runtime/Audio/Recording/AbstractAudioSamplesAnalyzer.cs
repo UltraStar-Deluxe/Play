@@ -13,6 +13,11 @@ public abstract class AbstractAudioSamplesAnalyzer : IAudioSamplesAnalyzer
 
     public static void ApplyAmplification(float[] sampleBuffer, int fromIndexInclusive, int toIndexExclusive, int amplificationFactor)
     {
+        if (sampleBuffer.IsNullOrEmpty())
+        {
+            return;
+        }
+        
         if (amplificationFactor == 1)
         {
             return;

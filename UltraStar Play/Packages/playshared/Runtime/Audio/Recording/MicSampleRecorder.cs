@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using PortAudioForUnity;
-using UniInject;
 using UniRx;
 using UnityEngine;
 
-// Disable warning about fields that are never assigned, their values are injected.
-#pragma warning disable CS0649
-
 [RequireComponent(typeof(AudioSource))]
-public class MicSampleRecorder : MonoBehaviour, INeedInjection
+public class MicSampleRecorder : MonoBehaviour
 {
-    private const int DefaultSampleRate = 44100;
+    public const int DefaultSampleRate = 44100;
 
     private MicProfile micProfile;
     public MicProfile MicProfile
@@ -69,18 +65,40 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         }
     }
 
-    private readonly Subject<RecordingEvent> recordingEventStream = new();
-    public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
+    private readonly List<IRecordingEventListener> recordingEventListeners = new();
 
-    [Inject(SearchMethod = SearchMethods.GetComponent)]
     private AudioSource audioSource;
     private AudioClip micAudioClip;
 
     private int lastSamplePosition;
 
+    private bool continueRecordingOnAddListener;
+    private bool continueRecordingOnEnable;
+
+    private void Awake()
+    {
+        audioSource = GetComponentInChildren<AudioSource>();
+    }
+    
+    private void OnEnable()
+    {
+        if (MicProfile != null
+            && continueRecordingOnEnable)
+        {
+            Debug.Log($"Continue recording on enable: {MicProfile.GetDisplayNameWithChannel()}");
+            StartRecording();
+        }
+    }
+    
     private void OnDisable()
     {
-        StopRecording();
+        if (MicProfile != null
+            && IsRecording.Value)
+        {
+            Debug.Log($"Stopping recording on disable: {MicProfile.GetDisplayNameWithChannel()}");
+            continueRecordingOnEnable = true;
+            StopRecording();
+        }
     }
 
     private void Update()
@@ -117,7 +135,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
             return;
         }
 
-        Debug.Log($"Starting recording with '{MicProfile.Name}' at {FinalSampleRate} Hz");
+        Debug.Log($"Starting recording with '{MicProfile.GetDisplayNameWithChannel()}' at {FinalSampleRate} Hz");
 
         string outputDeviceName = playRecordedAudio && MicrophoneAdapter.UsePortAudio
             ? PortAudioUtils.GetDefaultOutputDeviceName()
@@ -126,7 +144,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         // Code for low-latency Unity microphone input taken from
         // https://support.unity3d.com/hc/en-us/articles/206485253-How-do-I-get-Unity-to-playback-a-Microphone-input-in-real-time-
         DestroyAudioClips();
-        using DisposableStopwatch d = new("MicrophoneAdapter.Start took <ms>");
+        using DisposableStopwatch d = new($"MicrophoneAdapter.Start took <ms> with {MicProfile.GetDisplayNameWithChannel()}");
         {
             micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName);
         }
@@ -165,7 +183,7 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
 
         IsRecording.Value = false;
 
-        Debug.Log($"Stopping recording with '{MicProfile.Name}'");
+        Debug.Log($"Stopping recording with '{MicProfile.GetDisplayNameWithChannel()}'");
         if (audioSource.isPlaying)
         {
             audioSource.Stop();
@@ -224,7 +242,39 @@ public class MicSampleRecorder : MonoBehaviour, INeedInjection
         int newSamplesStartIndex = MicSamples.Length - newSamplesCount;
         int newSamplesEndIndex = MicSamples.Length - 1;
         RecordingEvent recordingEvent = new(MicSamples, newSamplesStartIndex, newSamplesEndIndex);
-        recordingEventStream.OnNext(recordingEvent);
+        foreach (IRecordingEventListener recordingEventListener in recordingEventListeners)
+        {
+            recordingEventListener.OnRecordingEvent(recordingEvent);
+        }
+    }
+
+    public IDisposable AddRecordingEventListener(IRecordingEventListener recordingEventListener)
+    {
+        recordingEventListeners.Add(recordingEventListener);
+
+        // Continue recording if needed
+        if (continueRecordingOnAddListener)
+        {
+            continueRecordingOnAddListener = false;
+            Debug.Log($"Continue recording on add listener: {MicProfile.GetDisplayNameWithChannel()}");
+            StartRecording();
+        }
+
+        return Disposable.Create(() => RemoveRecordingEventListener(recordingEventListener));
+    }
+
+    public void RemoveRecordingEventListener(IRecordingEventListener recordingEventListener)
+    {
+        recordingEventListeners.Remove(recordingEventListener);
+
+        // Stop recording if no listeners left
+        if (recordingEventListeners.IsNullOrEmpty()
+            && IsRecording.Value)
+        {
+            continueRecordingOnAddListener = true;
+            Debug.Log($"Stopping recording because no listeners left: {MicProfile.GetDisplayNameWithChannel()}");
+            StopRecording();
+        }
     }
 
     private void UpdateMicrophoneAudioPlayback()

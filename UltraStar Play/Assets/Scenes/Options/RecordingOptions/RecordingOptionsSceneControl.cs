@@ -18,14 +18,14 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new() { 0, 1, 3, 5, 10, 15, 20, 25, 30 };
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private RecordingOptionsMicVisualizer micVisualizer;
+    [InjectedInInspector]
+    public RecordingOptionsMicVisualizer micVisualizer;
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private CalibrateMicDelayControl calibrateMicDelayControl;
+    [InjectedInInspector]
+    public CalibrateMicDelayControl calibrateMicDelayControl;
 
-    [Inject(SearchMethod = SearchMethods.FindObjectOfType)]
-    private MicPitchTracker micPitchTracker;
+    [InjectedInInspector]
+    public NewestSamplesMicPitchTracker micPitchTracker;
 
     [Inject]
     private UiManager uiManager;
@@ -169,10 +169,10 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             SelectedMicProfile.SampleRate = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
-        micPitchTracker.MicSampleRecorder.FinalSampleRate
+        micPitchTracker.FinalSampleRate
             .Subscribe(_ => UpdateSampleRateLabel())
             .AddTo(gameObject);
-        micPitchTracker.MicSampleRecorder.IsRecording
+        micPitchTracker.IsRecording
             .Subscribe(_ => UpdateSampleRateLabel())
             .AddTo(gameObject);
 
@@ -204,13 +204,13 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             });
 
         // Play recorded audio
-        micPitchTracker.MicSampleRecorder.PlayRecordedAudio = settings.PlayRecordedAudio;
+        micPitchTracker.PlayRecordedAudio = settings.PlayRecordedAudio;
         FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
             () => settings.PlayRecordedAudio,
             newValue =>
             {
                 settings.PlayRecordedAudio = newValue;
-                micPitchTracker.MicSampleRecorder.PlayRecordedAudio = newValue;
+                micPitchTracker.PlayRecordedAudio = newValue;
             });
 
         // Use PortAudio
@@ -220,7 +220,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
                 () => settings.PreferPortAudio,
                 preferPortAudio =>
                 {
-                    micPitchTracker.MicSampleRecorder.StopRecording();
+                    micPitchTracker.StopRecording();
 
                     settings.PreferPortAudio = preferPortAudio;
                     ApplicationUtils.SetUsePortAudio(preferPortAudio);
@@ -238,7 +238,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     private void UpdateRecordingDevices()
     {
-        micPitchTracker.MicSampleRecorder.StopRecording();
+        micPitchTracker.StopRecording();
 
         MicProfile lastMicProfile = SelectedMicProfile;
         devicePickerControl.Items = CreateMicProfiles();
@@ -286,7 +286,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             // When "auto" is selected, then also show the automatically used sample rate.
             string sampleRateText = SelectedMicProfile.IsInputFromConnectedClient
                 ? ""
-                : $"\n({micPitchTracker.MicSampleRecorder.FinalSampleRate.Value} Hz)";
+                : $"\n({micPitchTracker.FinalSampleRate.Value} Hz)";
             return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto) + sampleRateText;
         }
         return $"{item} Hz";
@@ -498,6 +498,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
         bb.BindExistingInstance(micVisualizer);
+        bb.BindExistingInstance(micPitchTracker);
         bb.BindExistingInstance(calibrateMicDelayControl);
         return bb.GetBindings();
     }

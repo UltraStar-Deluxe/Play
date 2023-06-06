@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 9201570461547644151}
   - component: {fileID: 9201570461547644150}
-  - component: {fileID: 9201570461547644136}
   - component: {fileID: 9201570461547644149}
   m_Layer: 0
   m_Name: MicPitchTracker
@@ -130,19 +129,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &9201570461547644136
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9201570461547644148}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a42a4bc532d84a4483bac5e1df02248, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playRecordedAudio: 0
 --- !u!114 &9201570461547644149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,7 +232,7 @@ Transform:
   - {fileID: 9201570462206043761}
   - {fileID: 9201570461658409595}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9201570462036454463
 MonoBehaviour:
@@ -260,6 +246,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5312f631956e3bc4b82156ae5066a7b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  micVisualizer: {fileID: 9201570462206043762}
+  calibrateMicDelayControl: {fileID: 9201570461658409594}
+  micPitchTracker: {fileID: 9201570461547644149}
 --- !u!1 &9201570462053217374
 GameObject:
   m_ObjectHideFlags: 0

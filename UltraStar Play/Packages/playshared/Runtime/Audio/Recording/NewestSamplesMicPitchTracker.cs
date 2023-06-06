@@ -6,7 +6,7 @@
 /**
  * Analyzes the newest samples from a mic and fires an event for the analysis result.
  */
-public class MicPitchTracker : AbstractMicPitchTracker
+public class NewestSamplesMicPitchTracker : AbstractMicPitchTracker
 {
     // Wait until at least this amount of new samples is available in the mic buffer.
     // This makes the MicPitchTracker more frame-rate independent.
@@ -26,7 +26,7 @@ public class MicPitchTracker : AbstractMicPitchTracker
         pitchEventStream.Subscribe(UpdateLastMidiNoteFields);
     }
 
-    protected override void OnRecordingEvent(RecordingEvent recordingEvent)
+    public override void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         // Detect the pitch of the sample
         int newSampleLength = recordingEvent.NewSampleCount;
