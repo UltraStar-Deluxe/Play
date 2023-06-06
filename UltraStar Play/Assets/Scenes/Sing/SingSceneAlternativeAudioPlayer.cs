@@ -133,9 +133,10 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void UseOriginalSongAudio()
     {
-        songAudioPlayer.VolumeFactor = NumberUtils.PercentToFactor(settings.VolumePercent)
-                                             * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
-                                             * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
+        songAudioPlayer.VolumeFactor = NumberUtils.PercentToFactor(settings.VolumePercent) 
+                                       * NumberUtils.PercentToFactor(settings.MusicVolumePercent)
+                                       * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
+                                       * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
         vocalsAudioSource.volume = 0;
         instrumentalAudioSource.volume = 0;
 
@@ -153,9 +154,11 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
         songAudioPlayer.VolumeFactor = 0;
         instrumentalAudioSource.volume = NumberUtils.PercentToFactor(settings.VolumePercent)
+                                         * NumberUtils.PercentToFactor(settings.MusicVolumePercent)
                                          * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
                                          * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
         vocalsAudioSource.volume = NumberUtils.PercentToFactor(settings.VolumePercent)
+                                   * NumberUtils.PercentToFactor(settings.MusicVolumePercent)
                                    * NumberUtils.PercentToFactor(settings.VocalsAudioVolumePercent)
                                    * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
                                    * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);

@@ -20,6 +20,9 @@ public class Settings : ISettings
     public float MousePadSensitivity { get; set; } = 1;
     public bool IsDevModeEnabled { get; set; }
     
+    public bool PlayRecordedAudio { get; set; }
+    public int MicrophonePlaybackVolumePercent { get; set; } = 100;
+
     // The settings use a list of deselected player such that players are selected by default.
     public List<string> DeselectedPlayerProfiles { get; private set; } = new();
 

@@ -93,6 +93,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     [Inject(UxmlName = R.UxmlNames.recordingDeviceInactiveOverlay)]
     private VisualElement recordingDeviceInactiveOverlay;
     
+    [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
+    private ItemPicker micPlaybackVolumeChooser;
+
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
     private LabeledItemPickerControl<int> amplificationPickerControl;
@@ -207,6 +210,16 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
             () => settings.PlayRecordedAudio,
             newValue => settings.PlayRecordedAudio = newValue);
+
+        // Recorded audio playback volume
+        PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
+        micPlaybackVolumePickerControl.Bind(() => settings.MicrophonePlaybackVolumePercent,
+            newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
+        
+        // Only visible when play recorded audio is enabled
+        settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
+            .Subscribe(newValue => micPlaybackVolumeChooser.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
 
         // Use PortAudio
         if (ApplicationUtils.CanUsePortAudio())

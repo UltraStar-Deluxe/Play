@@ -9,6 +9,6 @@ public class CreateConstantsBuildPreprocessor : IPreprocessBuildWithReport
     public void OnPreprocessBuild(BuildReport report)
     {
         Debug.Log("CreateConstantsBuildPreprocessor - OnPreprocessBuild");
-        CreateConstantsMenuItems.CreateAllConstants();
+//        CreateConstantsMenuItems.CreateAllConstants();
     }
 }

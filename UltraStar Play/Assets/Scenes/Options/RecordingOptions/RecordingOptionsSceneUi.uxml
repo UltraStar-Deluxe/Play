@@ -29,6 +29,7 @@
                         <MaterialIcon tabindex="-1" name="infoIcon" icon="info_outline" class="smallFont mr-1 nBackgroundInHierarchy" />
                         <ui:Label tabindex="-1" text="Does not work with Companion App" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
                     </ui:VisualElement>
+                    <ItemPicker name="micPlaybackVolumeChooser" label="Microphone Playback Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy mt-2" />
                     <ui:Toggle name="usePortAudioToggle" label="Enable multi-channel support (PortAudio)" class="noBackgroundInHierarchy mt-3" style="-unity-text-align: upper-center;" />
                 </ui:VisualElement>
             </ui:VisualElement>

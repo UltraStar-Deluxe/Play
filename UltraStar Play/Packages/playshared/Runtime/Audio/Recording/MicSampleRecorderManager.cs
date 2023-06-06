@@ -45,8 +45,17 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
             .Subscribe(newValue =>
             {
-                Debug.Log($"PlayRecordedAudio changed: {newValue}");
                 micSampleRecorders.ForEach(it => it.PlayRecordedAudio = newValue);
+            });
+        
+        settings.ObserveEveryValueChanged(it => it.MicrophonePlaybackVolumePercent)
+            .Subscribe(newValue =>
+            {
+                micSampleRecorders.ForEach(it =>
+                {
+                    float finalVolume = NumberUtils.PercentToFactor(newValue);
+                    it.Volume = finalVolume;
+                });
             });
     }
     

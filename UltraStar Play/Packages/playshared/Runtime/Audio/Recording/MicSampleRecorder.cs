@@ -65,6 +65,12 @@ public class MicSampleRecorder : MonoBehaviour
         }
     }
 
+    public float Volume
+    {
+        get => audioSource.volume;
+        set => audioSource.volume = value;
+    }
+
     private readonly List<IRecordingEventListener> recordingEventListeners = new();
 
     private AudioSource audioSource;

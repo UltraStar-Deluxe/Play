@@ -9,6 +9,7 @@ public interface ISettings
     public bool ShowFps { get; set; }
     
     public bool PlayRecordedAudio { get; set; }
+    public int MicrophonePlaybackVolumePercent { get; set; }
 
     /**
      * The UDP port on the server (e.g. Companion App) for initiating a connection.
