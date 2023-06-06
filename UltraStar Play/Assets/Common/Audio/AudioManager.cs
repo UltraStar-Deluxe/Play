@@ -157,7 +157,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         if (audioManager == null)
             return;
 
-        PlaySoundEffect(audioManager.defaultButtonSound);
+        PlaySoundEffect(audioManager.defaultButtonSound, 0.5f);
     }
     
     public static void PlaySongSelectSound()
@@ -175,7 +175,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         if (audioManager == null)
             return;
 
-        PlaySoundEffect(audioManager.singingResultsRatingPopupSound);
+        PlaySoundEffect(audioManager.singingResultsRatingPopupSound, 0.5f);
     }
 
     public AudioClip LoadAudioClipFromFile(string path, bool streamAudio = true)
