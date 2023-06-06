@@ -11,16 +11,6 @@ using UnityEngine.UIElements;
 
 public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void StaticInit()
-    {
-        lastPlayerProfileToMicProfileMap = null;
-    }
-
-    // Static reference to be persisted across scenes.
-    // Used to restore the player-microphone assignment.
-    private static Dictionary<PlayerProfile, MicProfile> lastPlayerProfileToMicProfileMap;
-
     [InjectedInInspector]
     public VisualTreeAsset playerEntryUi;
 
@@ -35,6 +25,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
@@ -134,6 +127,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             playerEntryControls
                 .Where(it => it != listEntryControl && it.MicProfile == newMicProfile)
                 .ForEach(it => it.MicProfile = null);
+
+            // Remember this mic
+            nonPersistentSettings.PlayerProfileNameToLastUsedMicProfile[playerProfile.Name] = new MicProfileReference(newMicProfile);
         };
         
         playerEntryControls.Add(listEntryControl);
@@ -172,6 +168,18 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         if (listEntryControlWithMissingMicProfileAndSameName != null)
         {
             listEntryControlWithMissingMicProfileAndSameName.MicProfile = micProfile;
+            return;
+        }
+        
+        // Prefer player that used this mic last time
+        SongSelectPlayerEntryControl listEntryControlWithMissingMicProfileThatUsedThisMicProfileLastTime = listEntryControlsWithMissingMicProfile.FirstOrDefault(
+            it => nonPersistentSettings.PlayerProfileNameToLastUsedMicProfile
+                      .TryGetValue(it.PlayerProfile.Name, out MicProfileReference micProfileReference) 
+                  && micProfileReference.Name == micProfile.Name 
+                  && micProfileReference.ChannelIndex == micProfile.ChannelIndex);
+        if (listEntryControlWithMissingMicProfileThatUsedThisMicProfileLastTime != null)
+        {
+            listEntryControlWithMissingMicProfileThatUsedThisMicProfileLastTime.MicProfile = micProfile;
             return;
         }
         
@@ -312,16 +320,21 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     private void LoadLastPlayerProfileToMicProfileMap()
     {
-        if (lastPlayerProfileToMicProfileMap.IsNullOrEmpty())
+        if (nonPersistentSettings.PlayerProfileNameToLastUsedMicProfile.IsNullOrEmpty())
         {
             return;
         }
 
         // Restore the previously assigned microphones
-        foreach (KeyValuePair<PlayerProfile, MicProfile> playerProfileAndMicProfileEntry in lastPlayerProfileToMicProfileMap)
+        List<MicProfile> availableMicProfiles = SettingsUtils.GetAvailableMicProfiles(settings, serverSideConnectRequestManager);
+        foreach (SongSelectPlayerEntryControl playerEntryControl in playerEntryControls)
         {
-            PlayerProfile playerProfile = playerProfileAndMicProfileEntry.Key;
-            MicProfile lastUsedMicProfile = playerProfileAndMicProfileEntry.Value;
+            PlayerProfile playerProfile = playerEntryControl.PlayerProfile;
+            if (!TryGetLastUsedMicProfile(availableMicProfiles, playerProfile.Name, out MicProfile lastUsedMicProfile))
+            {
+                // No mic was assigned to this player yet.
+                continue;
+            }
 
             if (!lastUsedMicProfile.IsConnected(serverSideConnectRequestManager)
                 || !lastUsedMicProfile.IsEnabled)
@@ -346,11 +359,40 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             });
         }
     }
+    
+    public bool TryGetLastUsedMicProfile(List<MicProfile> availableMicProfiles, string playerProfileName, out MicProfile micProfile)
+    {
+        if (nonPersistentSettings.PlayerProfileNameToLastUsedMicProfile
+            .TryGetValue(playerProfileName, out MicProfileReference micProfileReference))
+        {
+            micProfile = availableMicProfiles.FirstOrDefault(
+                availableMicProfile => availableMicProfile.Name == micProfileReference.Name
+                                       && availableMicProfile.ChannelIndex == micProfileReference.ChannelIndex);
+            return micProfile != null;
+        }
 
+        micProfile = null;
+        return false;
+    }
+
+    private void UpdatePlayerProfileNameToLastUsedMicProfile()
+    {
+        nonPersistentSettings.PlayerProfileNameToLastUsedMicProfile.Clear();
+        foreach (SongSelectPlayerEntryControl playerEntryControl in playerEntryControls)
+        {
+            if (playerEntryControl.MicProfile != null)
+            {
+                string playerProfileName = playerEntryControl.PlayerProfile.Name;
+                MicProfileReference micProfileReference = new(playerEntryControl.MicProfile);
+                nonPersistentSettings.PlayerProfileNameToLastUsedMicProfile[playerProfileName] = micProfileReference;
+            }
+        }
+    }
+    
     private void OnDestroy()
     {
         // Remember the currently assigned microphones
-        lastPlayerProfileToMicProfileMap = GetSelectedPlayerProfileToMicProfileMap();
+        UpdatePlayerProfileNameToLastUsedMicProfile();
         playerEntryControls.ForEach(control => control.Dispose());
     }
 

@@ -137,7 +137,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         songSelectFilterControl.FiltersChangedEventStream
             .Subscribe(_ => UpdateFilterActiveIcon());
 
-        if (!nonPersistentSettings.activeSearchPropertyFilters.IsNullOrEmpty())
+        if (!nonPersistentSettings.ActiveSearchPropertyFilters.IsNullOrEmpty())
         {
             songSelectFilterControl.InitFilters();
         }
