@@ -20,9 +20,6 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     }
 
     [Inject]
-    private MicSampleRecorderManager micSampleRecorderManager;
-
-    [Inject]
     private Settings companionAppSettings;
 
     [Inject]
