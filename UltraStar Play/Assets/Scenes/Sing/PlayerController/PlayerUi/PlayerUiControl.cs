@@ -349,6 +349,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void CreateMultiplePerfectSentenceEffect()
     {
+        if (settings.ScoreMode is EScoreMode.None)
+        {
+            return;
+        }
+        
         EParticleEffect noteAreaEffect = RandomUtils.RandomOfItems(
             EParticleEffect.FireworksEffect2D_Firework5_BlueStar,
             EParticleEffect.FireworksEffect2D_Firework6_YellowStar);
@@ -362,6 +367,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private void CreateSinglePerfectSentenceEffect()
     {
+        if (settings.ScoreMode is EScoreMode.None)
+        {
+            return;
+        }
+        
         VfxManager.CreateParticleEffect(new ParticleEffectConfig()
         {
             particleEffect = EParticleEffect.ShinyItemLoop,
