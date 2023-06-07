@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEngine.UIElements;
 
 public class BootstrapIcon : FontIcon

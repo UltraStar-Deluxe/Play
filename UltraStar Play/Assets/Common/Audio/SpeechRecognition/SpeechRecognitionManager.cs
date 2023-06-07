@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using UnityEngine;
 using UniInject;
-using UniRx;
+using UnityEngine;
 using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using PrimeInputActions;
-using UniInject;
-using UniRx;
+﻿using UniInject;
 using UnityEngine.UIElements;
 
 public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinishedListener

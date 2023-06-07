@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
 using System.Text;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Tar;
 using ICSharpCode.SharpZipLib.Zip;
 using UniRx;
 using UnityEngine;
-using ZipFile = ICSharpCode.SharpZipLib.Zip.ZipFile;
 
 public class ExtractArchiveControl : MonoBehaviour
 {

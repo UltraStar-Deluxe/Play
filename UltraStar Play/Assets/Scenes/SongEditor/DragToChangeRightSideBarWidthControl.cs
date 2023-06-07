@@ -1,6 +1,4 @@
-﻿using System;
-using UniInject;
-using UniRx;
+﻿using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 

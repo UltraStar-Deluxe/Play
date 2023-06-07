@@ -4,10 +4,7 @@ using ProTrans;
 using Serilog.Events;
 using UniInject;
 using UniRx;
-using ProTrans;
-using Serilog.Events;
 using UnityEngine;
-using Button = UnityEngine.UIElements.Button;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 

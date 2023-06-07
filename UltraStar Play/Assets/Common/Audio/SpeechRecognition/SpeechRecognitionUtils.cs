@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using UnityEngine;
-using UniInject;
 using UniRx;
-using UnityEngine.Rendering;
+using UnityEngine;
 using Vosk;
 
 public static class SpeechRecognitionUtils

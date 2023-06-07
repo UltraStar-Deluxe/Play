@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using UniInject;
-using UnityEngine;
-using UniRx;
 using CircularBuffer;
+using UniInject;
+using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

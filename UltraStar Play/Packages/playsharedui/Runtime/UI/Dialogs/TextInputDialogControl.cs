@@ -1,9 +1,7 @@
 ﻿using System;
-using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
-using Button = UnityEngine.UIElements.Button;
 
 public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedListener
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UniRx;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public static class PitchDetectionUtils
 {

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using ProTrans;
-using SimpleHttpServerForUnity;
 using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.

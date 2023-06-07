@@ -1,8 +1,6 @@
-﻿using System;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class ShowFpsControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener
