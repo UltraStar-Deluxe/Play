@@ -73,7 +73,7 @@ public class Settings : ISettings
     public bool ShowLyricsOnNotes { get; set; }
     public bool ShowPlayerNames { get; set; }
     public bool ShowScoreNumbers { get; set; }
-    public bool ShowSongProgress { get; set; }
+    public bool ShowSongProgress { get; set; } = true;
     public bool AnalyzeBeatsWithoutTargetNote { get; set; } = true;
 
     // Song select settings
