@@ -1,18 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IRecordingEventListener
+public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -103,7 +101,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
             // Listen to changes
             micSampleRecorderDisposables.Add(MicSampleRecorder.FinalSampleRate.Subscribe(newValue => FinalSampleRate.Value = newValue));
             micSampleRecorderDisposables.Add(MicSampleRecorder.IsRecording.Subscribe(newValue => IsRecording.Value = newValue));
-            micSampleRecorderDisposables.Add(MicSampleRecorder.AddRecordingEventListener(this));
+            micSampleRecorderDisposables.Add(MicSampleRecorder.RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt)));
         }
     }
 
@@ -270,7 +268,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         recordedAudioWaveFormVisualization.DrawWaveFormMinAndMaxValues(RecordingBuffer);
     }
 
-    public void OnRecordingEvent(RecordingEvent recordingEvent)
+    private void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         InitRecordingBufferIfNeeded();
 

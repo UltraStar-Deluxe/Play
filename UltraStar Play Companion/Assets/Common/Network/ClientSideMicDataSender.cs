@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using UniInject;
-using UnityEngine;
-using UniRx;
 using CircularBuffer;
+using UniInject;
+using UniRx;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecordingEventListener
+public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
 {
     public static ClientSideMicDataSender Instance
     {
@@ -24,15 +20,13 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
     }
 
     [Inject]
-    private MicSampleRecorder micSampleRecorder;
+    private MicSampleRecorderManager micSampleRecorderManager;
 
     [Inject]
-    private Settings settings;
+    private Settings companionAppSettings;
 
     [Inject]
     private ClientSideConnectRequestManager clientSideConnectRequestManager;
-
-    private IAudioSamplesAnalyzer audioSamplesAnalyzer;
 
     private readonly CircularBuffer<PositionInSongData> receivedPositionInSongTimes = new(3);
     private PositionInSongData bestPositionInSongData;
@@ -47,33 +41,25 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
     {
         ResetPositionInSong();
 
-        UpdateAudioSamplesAnalyzer();
-        micSampleRecorder.FinalSampleRate
-            .Subscribe(_ => UpdateAudioSamplesAnalyzer())
-            .AddTo(gameObject);
-
         clientSideConnectRequestManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus)
             .AddTo(gameObject);
-        micSampleRecorder.AddRecordingEventListener(this);
-        micSampleRecorder.IsRecording
+        RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
+        IsRecording
             .Subscribe(HandleRecordingStatusChanged)
             .AddTo(gameObject);
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
+
         if (HasPositionInSong
             && bestPositionInSongData.UnixTimeInMillisWhenReceivedPositionInSong + 30000 < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Did not receive new position in song for some time. Probably not in sing scene anymore.
             ResetPositionInSong();
         }
-    }
-
-    private void UpdateAudioSamplesAnalyzer()
-    {
-        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(EPitchDetectionAlgorithm.Dywa, micSampleRecorder.FinalSampleRate.Value);
     }
 
     private void HandleRecordingStatusChanged(bool isRecording)
@@ -86,7 +72,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
         }
     }
 
-    public void OnRecordingEvent(RecordingEvent recordingEvent)
+    private void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         // Do pitch detection
         if (HasPositionInSong)
@@ -101,9 +87,15 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
 
     private void AnalyzeMicSamplesCorrespondingToBeatsInSong(RecordingEvent recordingEvent)
     {
+        if (micProfile == null
+            || MicSampleRecorder == null)
+        {
+            return;
+        }
+
         // Check if can analyze new beat
         double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
-        double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - settings.MicProfile.DelayInMillis;
+        double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - MicProfile.DelayInMillis;
         int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
         if (currentBeatConsideringMicDelay <= lastAnalyzedBeat
             // Do not start analyzing beats too much before the first lyrics (typically at beat 0 when GAP is set correctly)
@@ -156,12 +148,18 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
 
     private void AnalyzeNewestMicSamples(RecordingEvent recordingEvent)
     {
-        PitchEvent pitchEvent = audioSamplesAnalyzer.ProcessAudioSamples(
+        if (micProfile == null
+            || MicSampleRecorder == null)
+        {
+            return;
+        }
+        
+        PitchEvent pitchEvent = AudioSamplesAnalyzer.ProcessAudioSamples(
             recordingEvent.MicSamples,
             recordingEvent.NewSamplesStartIndex,
             recordingEvent.NewSamplesEndIndex,
-            settings.MicProfile.AmplificationMultiplier,
-            settings.MicProfile.NoiseSuppression);
+            MicProfile.AmplificationMultiplier,
+            MicProfile.NoiseSuppression);
 
         int midiNote = pitchEvent?.MidiNote ?? -1;
         float frequency = pitchEvent?.Frequency ?? -1;
@@ -194,16 +192,22 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
 
     private PitchEvent AnalyzeMicSamplesOfBeat(RecordingEvent recordingEvent, int beat, double positionInSongInMillis)
     {
+        if (micProfile == null
+            || MicSampleRecorder == null)
+        {
+            return null;
+        }
+        
         PitchEvent pitchEvent = AbstractMicPitchTracker.AnalyzeBeat(
             songMeta,
             beat,
             positionInSongInMillis,
-            micSampleRecorder.FinalSampleRate.Value,
-            settings.MicProfile.DelayInMillis,
-            settings.MicProfile.AmplificationMultiplier,
-            settings.MicProfile.NoiseSuppression,
+            MicSampleRecorder.FinalSampleRate.Value,
+            MicProfile.DelayInMillis,
+            MicProfile.AmplificationMultiplier,
+            MicProfile.NoiseSuppression,
             recordingEvent.MicSamples,
-            audioSamplesAnalyzer);
+            AudioSamplesAnalyzer);
         return pitchEvent;
     }
 
@@ -211,14 +215,14 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
     {
         Debug.Log($"Received new mic profile: {micProfileMessageDto.ToJson()}");
 
-        MicProfile micProfile = new(settings.MicProfile.Name);
-        micProfile.Amplification = micProfileMessageDto.Amplification;
-        micProfile.NoiseSuppression = micProfileMessageDto.NoiseSuppression;
-        micProfile.SampleRate = micProfileMessageDto.SampleRate;
-        micProfile.DelayInMillis = micProfileMessageDto.DelayInMillis;
-        micProfile.Color = Colors.CreateColor(micProfileMessageDto.HexColor);
+        MicProfile newMicProfile = new(companionAppSettings.MicProfile.Name);
+        newMicProfile.Amplification = micProfileMessageDto.Amplification;
+        newMicProfile.NoiseSuppression = micProfileMessageDto.NoiseSuppression;
+        newMicProfile.SampleRate = micProfileMessageDto.SampleRate;
+        newMicProfile.DelayInMillis = micProfileMessageDto.DelayInMillis;
+        newMicProfile.Color = Colors.CreateColor(micProfileMessageDto.HexColor);
 
-        settings.MicProfile = micProfile;
+        companionAppSettings.MicProfile = newMicProfile;
     }
 
     private void HandlePositionInSongMessage(PositionInSongDto positionInSongDto)
@@ -285,13 +289,13 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
                     if (dto is StopRecordingMessageDto)
                     {
                         Debug.Log("Stopping recording because of message from server");
-                        micSampleRecorder.StopRecording();
+                        StopRecording();
                         ResetPositionInSong();
                     }
                     else if (dto is StartRecordingMessageDto)
                     {
                         Debug.Log("Starting recording because of message from server");
-                        micSampleRecorder.StartRecording();
+                        StartRecording();
                     }
                     else if (dto is PositionInSongDto positionInSongDto)
                     {

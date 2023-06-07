@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 // CSS colors as constants for Unity3D.
 // List of CSS colors at W3Schools: https://www.w3schools.com/cssref/css_colors.asp

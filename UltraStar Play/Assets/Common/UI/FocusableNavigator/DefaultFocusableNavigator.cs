@@ -1,5 +1,4 @@
 using PrimeInputActions;
-using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;

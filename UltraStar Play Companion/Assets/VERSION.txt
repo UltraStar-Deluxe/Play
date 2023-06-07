@@ -1,4 +1,4 @@
 release = 0.10.0
-build_timestamp = 2306062019
-commit_hash = 1a058f35
+build_timestamp = 2306071116
+commit_hash = 1a4ffb1c
 website_link = https://usplay.net/

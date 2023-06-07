@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ProTrans;
 using System.Linq;
 using PortAudioForUnity;
+using ProTrans;
 using UnityEngine;
 
 public static class ApplicationUtils

@@ -226,6 +226,7 @@ Transform:
   m_Children:
   - {fileID: 7793846927334274923}
   - {fileID: 5848255959784561741}
+  - {fileID: 4959958248036601200}
   - {fileID: 7793846928232682641}
   - {fileID: 4190712076537908168}
   - {fileID: 5264907938372646005}
@@ -525,8 +526,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3cbd99cd8f34a34ca25aa1d1dcad059, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nonStaticSettings:
-    mousePadSensitivity: 1
 --- !u!1 &7793846928700202827
 GameObject:
   m_ObjectHideFlags: 0
@@ -740,6 +739,50 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24627b3d72d8c974cbbad3a55d72cb44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &9144568547191983620
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4959958248036601200}
+  - component: {fileID: 850230216315098825}
+  m_Layer: 0
+  m_Name: MicSampleRecorderManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4959958248036601200
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9144568547191983620}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5970054433468432184}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &850230216315098825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9144568547191983620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a539927f282025c43bda7f497dd8b2c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &4923342378948524271

@@ -3,8 +3,6 @@ using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
-using UniInject.Extensions;
-using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;

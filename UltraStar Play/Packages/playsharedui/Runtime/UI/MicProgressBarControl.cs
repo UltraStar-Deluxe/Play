@@ -1,6 +1,5 @@
 ﻿using System;
 using UniInject;
-using UnityEngine;
 
 public class MicProgressBarControl : INeedInjection, IInjectionFinishedListener
 {

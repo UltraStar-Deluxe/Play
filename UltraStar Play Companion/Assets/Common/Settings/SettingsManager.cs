@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class SettingsManager : AbstractSingletonBehaviour
 {

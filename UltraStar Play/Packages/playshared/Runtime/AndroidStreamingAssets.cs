@@ -6,13 +6,12 @@
 // From there the StreamingAssets can be loaded synchronously like on other platforms (via System.IO classes).
 
 using System;
-using UnityEngine;
-using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Security.Cryptography;
-using ICSharpCode.SharpZipLib.Zip;
+using System.IO;
 using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
+using UnityEngine;
 
 public static class AndroidStreamingAssets
 {

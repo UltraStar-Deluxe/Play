@@ -4,10 +4,7 @@ using ProTrans;
 using Serilog.Events;
 using UniInject;
 using UniRx;
-using ProTrans;
-using Serilog.Events;
 using UnityEngine;
-using Button = UnityEngine.UIElements.Button;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -29,9 +26,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [InjectedInInspector]
     public ClientSideMicDataSender clientSideMicDataSender;
-
-    [InjectedInInspector]
-    public MicSampleRecorder micSampleRecorder;
 
     [Inject]
     private UIDocument uiDocument;
@@ -188,11 +182,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         }
 
         menuOverlay.ShowByDisplay();
-
-        settings.ObserveEveryValueChanged(it => it.MicProfile)
-            .Subscribe(_ => OnMicProfileChanged());
-        micSampleRecorder.IsRecording.Subscribe(OnRecordingStateChanged);
-        micSampleRecorder.FinalSampleRate.Subscribe(_ => UpdateRecordingDeviceInfo());
+        
+        clientSideMicDataSender.IsRecording.Subscribe(OnRecordingStateChanged);
+        clientSideMicDataSender.FinalSampleRate.Subscribe(_ => UpdateRecordingDeviceInfo());
 
         // All controls are hidden until a connection has been established.
         onlyVisibleWhenConnected.ForEach(it => it.HideByDisplay());
@@ -237,6 +229,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         InitMenu();
     }
 
+    private void Start()
+    {
+        settings.ObserveEveryValueChanged(it => it.MicProfile)
+            .Subscribe(_ => OnMicProfileChanged());
+    }
+    
     private void UpdateDevModeControlsVisibility()
     {
         onlyVisibleWhenDevModeEnabled.ForEach(it => it.SetVisibleByDisplay(settings.IsDevModeEnabled));
@@ -259,7 +257,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
         showSongViewButton.RegisterCallbackButtonTriggered(_ =>
         {
-            micSampleRecorder.StopRecording();
+            clientSideMicDataSender.StopRecording();
             songListControl.Show();
         });
     }
@@ -267,7 +265,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private void InitMenu()
     {
         // Recording device
-        recordingDevicePickerControl = new(recordingDevicePicker, Microphone.devices.ToList());
+        List<string> deviceNames = Microphone.devices.ToList();
+        deviceNames.Sort();
+        recordingDevicePickerControl = new(recordingDevicePicker, deviceNames);
         recordingDevicePickerControl.AutoSmallFont = false;
         recordingDevicePickerControl.SelectItem(settings.MicProfile.Name);
         recordingDevicePickerControl.Selection.Subscribe(newValue => settings.SetMicProfileName(newValue));
@@ -354,7 +354,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             && audioWaveForm.IsVisibleByVisibility()
             && audioWaveFormVisualization != null)
         {
-            audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(micSampleRecorder.MicSamples);
+            audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(clientSideMicDataSender.MicSamples);
         }
     }
 
@@ -369,11 +369,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     {
         // Update MicProfile of sample recorder.
         int newFinalSampleRate = MicSampleRecorder.GetFinalSampleRate(settings.MicProfile.Name, settings.MicProfile.SampleRate);
-        if (micSampleRecorder.MicProfile == null
-            || settings.MicProfile.Name != micSampleRecorder.MicProfile.Name
-            || newFinalSampleRate != micSampleRecorder.FinalSampleRate.Value)
+        if (clientSideMicDataSender.MicProfile == null
+            || settings.MicProfile.Name != clientSideMicDataSender.MicProfile.Name
+            || newFinalSampleRate != clientSideMicDataSender.FinalSampleRate.Value)
         {
-            micSampleRecorder.MicProfile = settings.MicProfile;
+            clientSideMicDataSender.MicProfile = settings.MicProfile;
         }
 
         UpdateRecordingDeviceInfo();
@@ -381,7 +381,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private void UpdateRecordingDeviceInfo()
     {
-        recordingDeviceInfo.text = $"Sample Rate:{micSampleRecorder.FinalSampleRate}Hz, " +
+        recordingDeviceInfo.text = $"Sample Rate:{clientSideMicDataSender.FinalSampleRate}Hz, " +
                                    $"Delay: {settings.MicProfile.DelayInMillis}ms, " +
                                    $"Amp: {settings.MicProfile.Amplification}, " +
                                    $"Supp: {settings.MicProfile.NoiseSuppression}";
@@ -446,13 +446,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private void ToggleRecording()
     {
-        if (micSampleRecorder.IsRecording.Value)
+        if (clientSideMicDataSender.IsRecording.Value)
         {
-            micSampleRecorder.StopRecording();
+            clientSideMicDataSender.StopRecording();
         }
         else
         {
-            micSampleRecorder.StartRecording();
+            clientSideMicDataSender.StartRecording();
         }
     }
 
@@ -485,7 +485,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         BindingBuilder bb = new();
         bb.BindExistingInstance(this);
         bb.BindExistingInstance(gameObject);
-        bb.BindExistingInstance(micSampleRecorder);
         bb.BindExistingInstance(clientSideMicDataSender);
         bb.BindExistingInstance(inputSimulationControl);
         bb.BindExistingInstance(songListRequestor);

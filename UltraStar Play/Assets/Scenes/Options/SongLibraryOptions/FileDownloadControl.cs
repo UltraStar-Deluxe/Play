@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using ProTrans;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;

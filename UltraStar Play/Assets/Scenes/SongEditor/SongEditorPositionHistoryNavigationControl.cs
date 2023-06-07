@@ -4,7 +4,6 @@ using System.Linq;
 using PrimeInputActions;
 using UniInject;
 using UniRx;
-using UnityEngine;
 
 public class SongEditorPositionHistoryNavigationControl : INeedInjection, IInjectionFinishedListener
 {

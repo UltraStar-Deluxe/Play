@@ -6,7 +6,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinishedListener, IDisposable, IRecordingEventListener
+public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
     private const float TargetNoiseAboveThresholdDurationInMillis = 1000;
     
@@ -14,6 +14,9 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
 
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
     
     [Inject(Optional = true)]
     private IServerSideConnectRequestManager serverSideConnectRequestManager;
@@ -59,12 +62,11 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         micSampleRecorderDisposables.ForEach(d => d.Dispose());
         micSampleRecorderDisposables.Clear();
         
-        MicSampleRecorder micSampleRecorder = GameObject.FindObjectsOfType<MicSampleRecorder>()
-            .FirstOrDefault(it => it.MicProfile == MicProfile);
+        MicSampleRecorder micSampleRecorder = micSampleRecorderManager.GetOrCreateMicSampleRecorder(MicProfile);
         if (micSampleRecorder != null)
         {
             // Subscribe to recording events
-            micSampleRecorderDisposables.Add(micSampleRecorder.AddRecordingEventListener(this));
+            micSampleRecorderDisposables.Add(micSampleRecorder.RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt)));
             micSampleRecorderDisposables.Add(micSampleRecorder.IsRecording
                 .Subscribe(isRecording =>
                 {
@@ -130,7 +132,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         }
     }
 
-    public void OnRecordingEvent(RecordingEvent evt)
+    private void OnRecordingEvent(RecordingEvent evt)
     {
         int noiseSuppression = MicProfile?.NoiseSuppression ?? 0;
         noiseSuppression = NumberUtils.Limit(noiseSuppression, 10, 100);

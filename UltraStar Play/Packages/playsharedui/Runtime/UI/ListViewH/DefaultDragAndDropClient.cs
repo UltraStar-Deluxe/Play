@@ -3,7 +3,7 @@
 // Unity 2022.2.4f1
 
 using System.Collections.Generic;
-using Object = UnityEngine.Object;
+using UnityEngine;
 
 public class DefaultDragAndDropClient : IDragAndDrop, IDragAndDropData
 {

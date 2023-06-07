@@ -1,5 +1,4 @@
-﻿using System.IO;
-using UniInject;
+﻿using UniInject;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.

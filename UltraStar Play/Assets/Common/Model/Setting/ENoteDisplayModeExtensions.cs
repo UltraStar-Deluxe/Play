@@ -1,5 +1,4 @@
-﻿using System;
-using ProTrans;
+﻿using ProTrans;
 
 public static class NoteDisplayModeExtensions
 {

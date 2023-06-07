@@ -1,9 +1,6 @@
 ﻿using System.IO;
 using AudioSynthesis.Bank;
 using AudioSynthesis.Midi;
-using AudioSynthesis.Sequencer;
-using AudioSynthesis.Synthesis;
-using CircularBuffer;
 using UniInject;
 using UniRx;
 using UnityEngine;

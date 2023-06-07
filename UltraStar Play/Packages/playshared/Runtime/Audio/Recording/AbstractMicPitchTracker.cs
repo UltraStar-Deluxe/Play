@@ -8,7 +8,7 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IRecordingEventListener
+public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, IInjectionFinishedListener
 {
     // Longest period of singable notes (C2) requires 674 samples at 44100 Hz sample rate.
     // Thus, 1024 samples should be sufficient.
@@ -41,7 +41,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             // Listen to changes
             micSampleRecorderDisposables.Add(MicSampleRecorder.FinalSampleRate.Subscribe(newValue => FinalSampleRate.Value = newValue));
             micSampleRecorderDisposables.Add(MicSampleRecorder.IsRecording.Subscribe(newValue => IsRecording.Value = newValue));
-            micSampleRecorderDisposables.Add(MicSampleRecorder.AddRecordingEventListener(this));
+            micSampleRecorderDisposables.Add(MicSampleRecorder.RecordingEventStream.Subscribe(evt => recordingEventStream.OnNext(evt)));
 
             // The sample rate could have changed, which means a new analyzer is needed.
             AudioSamplesAnalyzer = CreateAudioSamplesAnalyzer(settings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
@@ -63,6 +63,9 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
 
     public ReactiveProperty<int> FinalSampleRate { get; private set; } = new(MicSampleRecorder.DefaultSampleRate);
     public ReactiveProperty<bool> IsRecording { get; private set; } = new();
+
+    private readonly Subject<RecordingEvent> recordingEventStream = new();
+    public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
 
     public bool PlayRecordedAudio
     {
@@ -141,8 +144,6 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         
         MicSampleRecorder.StopRecording();
     }
-
-    public abstract void OnRecordingEvent(RecordingEvent recordingEvent);
 
     public static PitchEvent AnalyzeBeat(
         SongMeta songMeta,

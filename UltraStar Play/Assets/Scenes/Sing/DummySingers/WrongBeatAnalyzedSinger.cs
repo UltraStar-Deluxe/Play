@@ -1,6 +1,5 @@
 ﻿using UniInject;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 /**
  * Simulate pitch events on wrong beats.

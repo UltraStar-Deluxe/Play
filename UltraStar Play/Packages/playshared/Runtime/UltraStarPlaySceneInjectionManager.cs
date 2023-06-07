@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UniInject;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UltraStarPlaySceneInjectionManager : SceneInjectionManager

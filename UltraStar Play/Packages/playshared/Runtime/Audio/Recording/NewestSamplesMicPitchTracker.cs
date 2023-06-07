@@ -24,9 +24,10 @@ public class NewestSamplesMicPitchTracker : AbstractMicPitchTracker
 
         // Update label in inspector for debugging.
         pitchEventStream.Subscribe(UpdateLastMidiNoteFields);
+        RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
     }
 
-    public override void OnRecordingEvent(RecordingEvent recordingEvent)
+    private void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         // Detect the pitch of the sample
         int newSampleLength = recordingEvent.NewSampleCount;

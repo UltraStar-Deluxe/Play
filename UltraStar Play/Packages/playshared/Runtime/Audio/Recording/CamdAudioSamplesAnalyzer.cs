@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using CircularBuffer;
-using UnityEngine;
 
 public class CamdAudioSamplesAnalyzer : AbstractAudioSamplesAnalyzer
 {

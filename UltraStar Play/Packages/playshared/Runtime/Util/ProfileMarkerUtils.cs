@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Unity.Profiling;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public static class ProfileMarkerUtils
 {

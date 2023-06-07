@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using Debug = UnityEngine.Debug;
 
 // A stopwatch that performs an action when it is disposed.
 public class DisposableStopwatch : IDisposable

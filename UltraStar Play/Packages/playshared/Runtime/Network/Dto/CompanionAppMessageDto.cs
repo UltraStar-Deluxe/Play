@@ -1,6 +1,4 @@
-﻿using System;
-
-public class CompanionAppMessageDto : JsonSerializable
+﻿public class CompanionAppMessageDto : JsonSerializable
 {
     public CompanionAppMessageType MessageType { get; set; }
 
