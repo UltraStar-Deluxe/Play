@@ -71,7 +71,8 @@ public class MicSampleRecorder : MonoBehaviour
         set => audioSource.volume = value;
     }
 
-    private readonly List<IRecordingEventListener> recordingEventListeners = new();
+    private readonly CountSubject<RecordingEvent> recordingEventStream = new();
+    public IObservable<RecordingEvent> RecordingEventStream => recordingEventStream;
 
     private AudioSource audioSource;
     private AudioClip micAudioClip;
@@ -84,6 +85,25 @@ public class MicSampleRecorder : MonoBehaviour
     private void Awake()
     {
         audioSource = GetComponentInChildren<AudioSource>();
+
+        recordingEventStream.Count.Subscribe(subscriberCount =>
+        {
+            if (subscriberCount <= 0
+                && IsRecording.Value)
+            {
+                continueRecordingOnAddListener = true;
+                Debug.Log($"Stopping recording because no subscribers left: {MicProfile.GetDisplayNameWithChannel()}");
+                StopRecording();
+            }
+            else if (subscriberCount > 0
+                     && !IsRecording.Value
+                     && continueRecordingOnAddListener)
+            {
+                continueRecordingOnAddListener = false;
+                Debug.Log($"Continue recording for new subscriber: {MicProfile.GetDisplayNameWithChannel()}");
+                StartRecording();
+            }
+        });
     }
     
     private void OnEnable()
@@ -248,39 +268,7 @@ public class MicSampleRecorder : MonoBehaviour
         int newSamplesStartIndex = MicSamples.Length - newSamplesCount;
         int newSamplesEndIndex = MicSamples.Length - 1;
         RecordingEvent recordingEvent = new(MicSamples, newSamplesStartIndex, newSamplesEndIndex);
-        foreach (IRecordingEventListener recordingEventListener in recordingEventListeners)
-        {
-            recordingEventListener.OnRecordingEvent(recordingEvent);
-        }
-    }
-
-    public IDisposable AddRecordingEventListener(IRecordingEventListener recordingEventListener)
-    {
-        recordingEventListeners.Add(recordingEventListener);
-
-        // Continue recording if needed
-        if (continueRecordingOnAddListener)
-        {
-            continueRecordingOnAddListener = false;
-            Debug.Log($"Continue recording on add listener: {MicProfile.GetDisplayNameWithChannel()}");
-            StartRecording();
-        }
-
-        return Disposable.Create(() => RemoveRecordingEventListener(recordingEventListener));
-    }
-
-    public void RemoveRecordingEventListener(IRecordingEventListener recordingEventListener)
-    {
-        recordingEventListeners.Remove(recordingEventListener);
-
-        // Stop recording if no listeners left
-        if (recordingEventListeners.IsNullOrEmpty()
-            && IsRecording.Value)
-        {
-            continueRecordingOnAddListener = true;
-            Debug.Log($"Stopping recording because no listeners left: {MicProfile.GetDisplayNameWithChannel()}");
-            StopRecording();
-        }
+        recordingEventStream.OnNext(recordingEvent);
     }
 
     private void UpdateMicrophoneAudioPlayback()

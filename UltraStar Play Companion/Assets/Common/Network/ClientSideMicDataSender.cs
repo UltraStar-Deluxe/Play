@@ -13,7 +13,7 @@ using CircularBuffer;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecordingEventListener
+public class ClientSideMicDataSender : MonoBehaviour, INeedInjection
 {
     public static ClientSideMicDataSender Instance
     {
@@ -55,7 +55,7 @@ public class ClientSideMicDataSender : MonoBehaviour, INeedInjection, IRecording
         clientSideConnectRequestManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus)
             .AddTo(gameObject);
-        micSampleRecorder.AddRecordingEventListener(this);
+        micSampleRecorder.RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
         micSampleRecorder.IsRecording
             .Subscribe(HandleRecordingStatusChanged)
             .AddTo(gameObject);
