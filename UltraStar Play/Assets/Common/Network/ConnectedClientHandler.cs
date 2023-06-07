@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using CircularBuffer;
 using UniRx;
 using UnityEngine;
@@ -195,8 +196,9 @@ public class ConnectedClientHandler : IConnectedClientHandler
 
     private void TrySendMessageToClientAfterDelay(JsonSerializable jsonSerializable, int attempt, float delayInSeconds)
     {
-        MainThreadDispatcher.StartCoroutine(
-            CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds, () => DoSendMessageToClient(jsonSerializable, attempt)));
+        // The message will be sent on a new thread after the given delay.
+        Task.Delay(TimeSpan.FromSeconds(delayInSeconds))
+            .ContinueWith(t => DoSendMessageToClient(jsonSerializable, attempt));
     }
 
     private void HandleJsonMessageFromClient(string json)
