@@ -138,6 +138,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             && micProfile.IsInputFromConnectedClient)
         {
             serverSideConnectRequestManager.ClientConnectedEventStream
+                .ObserveOnMainThread()
                 .Subscribe(HandleClientConnectedEvent)
                 .AddTo(singSceneControl);
         }

@@ -48,6 +48,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         
         // Remove/add MicProfile when Client (dis)connects.
         serverSideConnectRequestManager.ClientConnectedEventStream
+            .ObserveOnMainThread()
             .Subscribe(HandleClientConnectedEvent)
             .AddTo(gameObject);
 

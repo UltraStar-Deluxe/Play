@@ -207,6 +207,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         });
         
         clientSideConnectRequestManager.ConnectEventStream
+            .ObserveOnMainThread()
             .Subscribe(UpdateConnectionStatus);
         
         UpdateVersionInfoText();

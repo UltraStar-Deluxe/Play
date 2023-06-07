@@ -41,6 +41,7 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         
         UpdateConnectedClients();
         serverSideConnectRequestManager.ClientConnectedEventStream
+            .ObserveOnMainThread()
             .Subscribe(_ => UpdateConnectedClients())
             .AddTo(gameObject);
     }

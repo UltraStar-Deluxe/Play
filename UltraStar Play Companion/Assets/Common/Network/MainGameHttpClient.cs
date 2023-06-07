@@ -40,6 +40,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         clientSideConnectRequestManager.ConnectEventStream
+            .ObserveOnMainThread()
             .Where(connectEvent => connectEvent.IsSuccess)
             .Subscribe(connectEvent =>
             {

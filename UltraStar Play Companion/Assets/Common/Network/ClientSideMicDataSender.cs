@@ -42,6 +42,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         ResetPositionInSong();
 
         clientSideConnectRequestManager.ConnectEventStream
+            .ObserveOnMainThread()
             .Subscribe(UpdateConnectionStatus)
             .AddTo(gameObject);
         RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
