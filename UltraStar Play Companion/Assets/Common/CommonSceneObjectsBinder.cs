@@ -12,6 +12,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
     {
         BindingBuilder bb = new();
         bb.BindExistingInstance(ApplicationManager.Instance);
+        bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
         bb.BindExistingInstance(ClientSideConnectRequestManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);

@@ -270,7 +270,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
         recordedAudioWaveFormVisualization.DrawWaveFormMinAndMaxValues(RecordingBuffer);
     }
 
-    public void OnRecordingEvent(RecordingEvent recordingEvent)
+    private void OnRecordingEvent(RecordingEvent recordingEvent)
     {
         InitRecordingBufferIfNeeded();
 

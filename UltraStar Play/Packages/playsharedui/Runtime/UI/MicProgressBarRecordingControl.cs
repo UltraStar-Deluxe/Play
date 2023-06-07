@@ -132,7 +132,7 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
         }
     }
 
-    public void OnRecordingEvent(RecordingEvent evt)
+    private void OnRecordingEvent(RecordingEvent evt)
     {
         int noiseSuppression = MicProfile?.NoiseSuppression ?? 0;
         noiseSuppression = NumberUtils.Limit(noiseSuppression, 10, 100);

@@ -198,11 +198,6 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         }
     }
 
-    public override void OnRecordingEvent(RecordingEvent recordingEvent)
-    {
-        // Nothing to do here. New samples are handled in Update.
-    }
-
     private void UpdatePitchDetectionFromLocalMicrophone()
     {
         // No sentence to analyze left (all done).
