@@ -157,6 +157,20 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         return dialogControl;
     }
 
+    public string GetFinalPlayerProfileImagePath(PlayerProfile playerProfile)
+    {
+        if (playerProfile.ImagePath == PlayerProfile.WebcamImagePath)
+        {
+            int playerProfileIndex = settings.PlayerProfiles.IndexOf(playerProfile);
+            string webCamImagePath = PlayerProfileUtils.GetAbsoluteWebCamImagePath(playerProfileIndex);
+            return webCamImagePath;
+        }
+        else
+        {
+            return playerProfile.ImagePath;
+        }
+    }
+    
     public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
     {
         if (imagePath.IsNullOrEmpty())

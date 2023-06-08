@@ -57,22 +57,11 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
 
         UpdatePlayerImageBackgroundColor();
 
-        if (playerProfile.ImagePath == PlayerProfile.WebcamImagePath)
+        string finalImagePath = uiManager.GetFinalPlayerProfileImagePath(playerProfile);
+        uiManager.LoadPlayerProfileImage(finalImagePath, loadedSprite =>
         {
-            int playerProfileIndex = settings.PlayerProfiles.IndexOf(playerProfile);
-            string webCamImagePath = PlayerProfileUtils.GetAbsoluteWebCamImagePath(playerProfileIndex);
-            uiManager.LoadPlayerProfileImage(webCamImagePath, loadedSprite =>
-            {
-                image.style.backgroundImage = new StyleBackground(loadedSprite);
-            });
-        }
-        else
-        {
-            uiManager.LoadPlayerProfileImage(playerProfile.ImagePath, loadedSprite =>
-            {
-                image.style.backgroundImage = new StyleBackground(loadedSprite);
-            });
-        }
+            image.style.backgroundImage = new StyleBackground(loadedSprite);
+        });
     }
 
     private void UpdatePlayerImageBackgroundColor()
