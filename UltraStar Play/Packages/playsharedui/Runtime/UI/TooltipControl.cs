@@ -118,7 +118,7 @@ public class TooltipControl
         label.style.left = pos.x;
         label.style.top = pos.y;
 
-        GetUiDocument().rootVisualElement.Children().First().Add(label);
+        GetUiDocument().rootVisualElement.Add(label);
 
         label.RegisterCallbackOneShot<GeometryChangedEvent>(evt => VisualElementUtils.MoveVisualElementFullyInsideScreen(label, GetPanelHelper()));
     }
