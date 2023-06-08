@@ -132,7 +132,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
         catch (Exception e)
         {
             Debug.LogException(e);
-            Debug.LogError("Failed sending data to client. Removing ConnectedClientHandler.");
+            Debug.LogError($"Failed sending data to client (still alive check). Removing ConnectedClientHandler '{ClientName}'.");
             serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
         }
     }
@@ -175,22 +175,33 @@ public class ConnectedClientHandler : IConnectedClientHandler
     
     private void DoSendMessageToClient(JsonSerializable jsonSerializable, int attempt)
     {
-        if (tcpClient != null
-            && tcpClientStream != null
-            && tcpClientStreamWriter != null
-            && tcpClientStream.CanWrite)
+        try
         {
-            tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
-            tcpClientStreamWriter.Flush();
+            if (tcpClient != null
+                && tcpClientStream != null
+                && tcpClientStreamWriter != null
+                && tcpClientStream.CanWrite
+                && !isDisposed)
+            {
+                tcpClientStreamWriter.WriteLine(jsonSerializable.ToJson());
+                tcpClientStreamWriter.Flush();
+            }
+            else if (attempt < MaxSendMessageAttemptCount
+                     && !isDisposed)
+            {
+                Debug.LogWarning($"Cannot send message to client. Trying to send again after delay (attempt: {attempt}, tcpClient == null: {tcpClient == null}, tcpClientStream == null: {tcpClientStream == null}, tcpClientStreamWriter == null: {tcpClientStreamWriter == null}, tcpClientStream.CanWrite: {tcpClientStream?.CanWrite}, isDisposed: {isDisposed})");
+                TrySendMessageToClientAfterDelay(jsonSerializable, attempt + 1, 0.1f);
+            }
+            else
+            {
+                Debug.LogWarning($"Cannot send message to client. Failed for good, not trying to send again later. (tcpClient == null: {tcpClient == null}, tcpClientStream == null: {tcpClientStream == null}, tcpClientStreamWriter == null: {tcpClientStreamWriter == null}, tcpClientStream.CanWrite: {tcpClientStream?.CanWrite}, isDisposed: {isDisposed})");
+            }
         }
-        else if (attempt < MaxSendMessageAttemptCount)
+        catch (Exception ex)
         {
-            Debug.LogWarning($"Cannot send message to client. Trying to send again after delay (attempt: {attempt}, tcpClient == null: {tcpClient == null}, tcpClientStream == null: {tcpClientStream == null}, tcpClientStreamWriter == null: {tcpClientStreamWriter == null}, tcpClientStream.CanWrite: {tcpClientStream?.CanWrite})");
-            TrySendMessageToClientAfterDelay(jsonSerializable, attempt + 1, 0.1f);
-        }
-        else
-        {
-            Debug.LogWarning($"Cannot send message to client. Failed for good, not trying to send again later. (tcpClient == null: {tcpClient == null}, tcpClientStream == null: {tcpClientStream == null}, tcpClientStreamWriter == null: {tcpClientStreamWriter == null}, tcpClientStream.CanWrite: {tcpClientStream?.CanWrite})");
+            Debug.LogException(ex);
+            Debug.LogError($"Exception occurred when sending message to client. Removing ConnectedClientHandler '{ClientName}'.");
+            serverSideConnectRequestManager.RemoveConnectedClientHandler(this);
         }
     }
 
