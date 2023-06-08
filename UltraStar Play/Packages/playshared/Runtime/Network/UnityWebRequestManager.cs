@@ -16,13 +16,14 @@ public class UnityWebRequestManager : AbstractSingletonBehaviour
 
     protected void Update()
     {
-        runningRequestDatas.ToList().ForEach(request =>
+        if (runningRequestDatas.IsNullOrEmpty())
         {
-            if (request.unityWebRequest.isDone)
-            {
-                runningRequestDatas.Remove(request);
-            }
-            
+            return;
+        }
+        
+        // Invoke callbacks
+        runningRequestDatas.ForEach(request =>
+        {
             if (request.unityWebRequest.result
                 is UnityWebRequest.Result.ConnectionError
                 or UnityWebRequest.Result.ProtocolError
@@ -35,6 +36,9 @@ public class UnityWebRequestManager : AbstractSingletonBehaviour
                 request.onSuccess?.Invoke(request.unityWebRequest.downloadHandler?.text);
             }
         });
+        
+        // Remove finished requests (don't remove in loop above to avoid modifying collection while iterating)
+        runningRequestDatas.RemoveAll(request => request.unityWebRequest.isDone);
     }
 
     public void AddUnityWebRequest(
