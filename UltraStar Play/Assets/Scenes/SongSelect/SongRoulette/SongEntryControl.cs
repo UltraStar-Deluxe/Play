@@ -76,8 +76,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         set
         {
             songMeta = value;
-            songArtist.text = songMeta.Artist;
-            songTitle.text = songMeta.Title;
+            UpdateLabels();
             UpdateIcons();
             UpdateCover();
         }
@@ -297,6 +296,12 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     
     private void UpdateCover()
     {
+        if (songMeta == null)
+        {
+            SetCoverImage(uiManager.defaultSongImage);
+            return;
+        }
+        
         SongMeta coverSongMeta = songMeta;
         string uri = SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta);
         if (uri.IsNullOrEmpty())
@@ -314,8 +319,8 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                     // The associated song has changed in the meantime.
                     return;
                 }
-                songImageOuter.style.backgroundImage = new StyleBackground(loadedSprite);
-                songImageInner.style.backgroundImage = new StyleBackground(loadedSprite);
+
+                SetCoverImage(loadedSprite);
             },
             _ =>
             {
@@ -324,9 +329,15 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                     // The associated song has changed in the meantime.
                     return;
                 }
-                songImageOuter.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
-                songImageInner.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
+
+                SetCoverImage(uiManager.defaultSongImage);
             });
+    }
+
+    private void SetCoverImage(Sprite sprite)
+    {
+        songImageOuter.style.backgroundImage = new StyleBackground(sprite);
+        songImageInner.style.backgroundImage = new StyleBackground(sprite);
     }
 
     private void UpdateIcons()
@@ -345,9 +356,23 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta));
         songRatingIconControl.UpdateSongRatingIcons(songMeta, settings.Difficulty);
     }
+    
+    private void UpdateLabels()
+    {
+        if (songMeta == null)
+        {
+            songArtist.text = "";
+            songTitle.text = "";
+            return;
+        }
+        
+        songArtist.text = songMeta.Artist;
+        songTitle.text = songMeta.Title;
+    }
 
     public void Dispose()
     {
+        SongMeta = null;
         UnregisterCallbacks();
     }
 }

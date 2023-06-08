@@ -97,7 +97,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
 
     public IAudioSamplesAnalyzer AudioSamplesAnalyzer { get; protected set; }
 
-    private readonly List<IDisposable> micSampleRecorderDisposables = new();
+    protected readonly List<IDisposable> micSampleRecorderDisposables = new();
     
     public virtual void OnInjectionFinished()
     {
@@ -207,7 +207,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         DisposeMicSampleRecorderDisposables();
     }
 
-    private void DisposeMicSampleRecorderDisposables()
+    protected void DisposeMicSampleRecorderDisposables()
     {
         micSampleRecorderDisposables.ForEach(it => it.Dispose());
         micSampleRecorderDisposables.Clear();

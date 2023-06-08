@@ -66,6 +66,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         });
 
         ClientConnectedEventStream
+            .ObserveOnMainThread()
             .Subscribe(evt => UpdateConnectedMicProfileName(evt));
     }
 

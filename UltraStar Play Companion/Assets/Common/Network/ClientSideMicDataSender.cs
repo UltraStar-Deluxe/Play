@@ -20,9 +20,6 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     }
 
     [Inject]
-    private MicSampleRecorderManager micSampleRecorderManager;
-
-    [Inject]
     private Settings companionAppSettings;
 
     [Inject]
@@ -42,6 +39,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         ResetPositionInSong();
 
         clientSideConnectRequestManager.ConnectEventStream
+            .ObserveOnMainThread()
             .Subscribe(UpdateConnectionStatus)
             .AddTo(gameObject);
         RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
