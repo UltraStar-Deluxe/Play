@@ -25,7 +25,7 @@ public static class AnimationUtils
     {
         return LeanTween.value(gameObject, Vector3.one, Vector3.one * 0.75f, animTimeInSeconds)
             .setEasePunch()
-            .setOnUpdate(s => visualElement.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))))
+            .setOnUpdate(s => visualElement.style.scale = new StyleScale(new Scale(new Vector2(s, s))))
             .setDelay(delayInSeconds)
             .id;
     }

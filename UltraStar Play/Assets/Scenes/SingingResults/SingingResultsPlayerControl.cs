@@ -97,7 +97,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one * 0.75f, Vector3.one, bounceAnimTimeInSeconds)
                 .setEaseSpring()
                 .setOnStart(() => newHighscoreContainer.ShowByVisibility())
-                .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))))
+                .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector2(s, s))))
                 .setDelay(TotalScoreAnimTimeInSeconds);
         }
         
@@ -111,9 +111,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
             ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
             // Bouncy size animation
-            ratingLabel.style.scale = new StyleScale(new Scale(Vector3.zero));
-            ratingImage.style.scale = new StyleScale(new Scale(Vector3.zero));
-            LeanTween.value(singingResultsSceneControl.gameObject, Vector3.one, Vector3.one * 0.5f, bounceAnimTimeInSeconds)
+            ratingLabel.style.scale = new StyleScale(new Scale(Vector2.zero));
+            ratingImage.style.scale = new StyleScale(new Scale(Vector2.zero));
+            LeanTween.value(singingResultsSceneControl.gameObject, Vector2.one, Vector2.one * 0.5f, bounceAnimTimeInSeconds)
                 .setEasePunch()
                 .setOnStart(() =>
                 {
@@ -124,7 +124,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
                 })
                 .setOnUpdate(s =>
                 {
-                    Vector3 scale = new Vector3(s, s, 1);
+                    Vector3 scale = new Vector2(s, s);
                     ratingLabel.style.scale = new StyleScale(new Scale(scale));
                     ratingImage.style.scale = new StyleScale(new Scale(scale));
                 })

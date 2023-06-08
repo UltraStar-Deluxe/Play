@@ -465,7 +465,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             songQueueLengthLabel.text = newSongQueueLengthAsString;
             LeanTween.value(gameObject, Vector3.one * 1.5f, Vector3.one, 1.5f)
                 .setEaseOutBounce()
-                .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector3(s, s, 1))));
+                .setOnUpdate(s => songQueueLengthLabel.style.scale = new StyleScale(new Scale(new Vector2(s, s))));
         }
         songQueueUiControl.SetSongQueueEntryDtos(songQueueManager.GetSongQueueEntries());
         startSongQueueButton.SetEnabled(!songQueueManager.IsSongQueueEmpty);
