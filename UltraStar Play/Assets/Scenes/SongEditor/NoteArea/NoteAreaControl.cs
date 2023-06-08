@@ -4,6 +4,7 @@ using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
@@ -215,8 +216,21 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void SetPositionInSongInMillis(double positionInSongInMillis)
     {
+        if (Mouse.current == null
+            || !Mouse.current.middleButton.isPressed)
+        {
+            // Synchronize viewport with playback position, but only if not dragging the viewport manually.
+            MoveViewportToPositionInSongInMillis(positionInSongInMillis);
+        }
+
+        UpdatePositionInSongIndicator(positionInSongInMillis);
+    }
+
+    private void MoveViewportToPositionInSongInMillis(double positionInSongInMillis)
+    {
         float viewportAutomaticScrollingLeft = ViewportX + ViewportWidth * ViewportAutomaticScrollingBoarderPercent;
         float viewportAutomaticScrollingRight = ViewportX + ViewportWidth * (1 - ViewportAutomaticScrollingBoarderPercent);
+
         if (positionInSongInMillis < ViewportX || positionInSongInMillis > (ViewportX + ViewportWidth))
         {
             // Center viewport to position in song
@@ -235,10 +249,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             double newViewportX = positionInSongInMillis - ViewportWidth * (1 - ViewportAutomaticScrollingJumpPercent);
             SetViewportX((int)newViewportX);
         }
-
-        UpdatePositionInSongIndicator(positionInSongInMillis);
     }
-
+    
     public bool IsNoteVisible(Note note)
     {
         // Check y axis, which is the midi note
