@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -131,13 +132,12 @@ public static class ImageManager
         }
 
         // Remove sprites from the cache that have not been marked as still in use.
-        foreach (CachedSprite cachedSprite in new List<CachedSprite>(spriteCache.Values))
-        {
-            if (!usedSprites.Contains(cachedSprite.Sprite))
-            {
-                RemoveCachedSprite(cachedSprite);
-            }
-        }
+        List<CachedSprite> unusedSprites = spriteCache.Values
+            .Where(cachedSprite => !usedSprites.Contains(cachedSprite.Sprite))
+            .ToList();
+        
+        Debug.Log($"Removing {unusedSprites.Count} unused sprites from cache.");
+        unusedSprites.ForEach(RemoveCachedSprite);
     }
 
     private static void RemoveCachedSprite(CachedSprite cachedSprite)
