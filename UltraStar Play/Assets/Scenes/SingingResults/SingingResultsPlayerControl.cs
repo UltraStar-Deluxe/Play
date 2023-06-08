@@ -124,7 +124,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
                 })
                 .setOnUpdate(s =>
                 {
-                    Vector3 scale = new Vector2(s, s);
+                    Vector2 scale = new Vector2(s, s);
                     ratingLabel.style.scale = new StyleScale(new Scale(scale));
                     ratingImage.style.scale = new StyleScale(new Scale(scale));
                 })
