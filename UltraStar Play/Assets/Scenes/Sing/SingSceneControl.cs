@@ -81,6 +81,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private UiManager uiManager;
 
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -800,7 +803,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             EDifficulty easiestPlayerProfileDifficulty = PlayerControls
                 .FindMinElement(playerControl => (int)playerControl.PlayerProfile.Difficulty)
                 .PlayerProfile.Difficulty;
-            string commonProfileImagePath = PlayerControls.FirstOrDefault().PlayerProfile.ImagePath;
+            string commonProfileImagePath = uiManager.GetFinalPlayerProfileImagePath(PlayerControls.Select(it => it.PlayerProfile).FirstOrDefault());
             PlayerProfile commonPlayerProfile = new(commonPlayerProfileName, easiestPlayerProfileDifficulty, commonProfileImagePath);
             PlayerScoreControlData commonScoreData = CreateAveragePlayerScoreControlData(scoreControlDatas);
             singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScoreData);
