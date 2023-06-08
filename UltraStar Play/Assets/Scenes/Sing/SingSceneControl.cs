@@ -808,6 +808,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             PlayerScoreControlData commonScoreData = CreateAveragePlayerScoreControlData(scoreControlDatas);
             singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScoreData);
 
+            // Define common mic profile
+            MicProfile commonMicProfile = PlayerControls
+                    .Select(it => it.MicProfile)
+                    .FirstOrDefault(it => it != null);
+            singingResultsSceneData.PlayerProfileToMicProfileMap = new()
+            {
+                { commonPlayerProfile, commonMicProfile }
+            };
+
             HighScoreEntry commonHighScoreEntry = new HighScoreEntry(
                 commonPlayerProfileName,
                 easiestPlayerProfileDifficulty,
