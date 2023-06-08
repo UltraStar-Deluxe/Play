@@ -32,16 +32,28 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
 
     public void Play()
     {
+        if (webcamTexture == null)
+        {
+            return;
+        }
         webcamTexture.Play();
     }
 
     public void Stop()
     {
+        if (webcamTexture == null)
+        {
+            return;
+        }
         webcamTexture.Stop();
     }
 
     public string CurrentDeviceName()
     {
+        if (webcamTexture == null)
+        {
+            return "";
+        }
         return webcamTexture.deviceName;
     }
 
