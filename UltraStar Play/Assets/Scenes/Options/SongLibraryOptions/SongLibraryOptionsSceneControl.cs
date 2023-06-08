@@ -395,7 +395,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         deleteSongFolderDialog = uiManager.CreateDialogControl("Delete Song Folder");
         deleteSongFolderDialog.DialogClosedEventStream.Subscribe(_ => deleteSongFolderDialog = null);
-        deleteSongFolderDialog.Message = $"Do you want to delete the song folder\n'{settings.SongDirs[indexInList]}'";
+        deleteSongFolderDialog.Message = $"Do you want to remove the song folder\n'{settings.SongDirs[indexInList]}'?\nNo files will be deleted.";
 
         deleteSongFolderDialog.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => deleteSongFolderDialog.CloseDialog());
         deleteSongFolderDialog.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ =>
