@@ -58,7 +58,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         
         if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
         {
-            UiManager.CreateNotification($"Vocals audio of {songMeta} does not exist at path {songMeta.VocalsAudio}");
+            UiManager.CreateNotification($"Vocals audio for '{Path.GetFileName(songMeta.Mp3)}' does not exist at path '{songMeta.VocalsAudio}'");
             return Observable.Empty<BasicPitchDetectionResult>();
         }
         

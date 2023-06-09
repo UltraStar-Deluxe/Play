@@ -216,6 +216,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void AnalyzePitchUsingBasicPitch()
     {
+        if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
+        {
+            UiManager.CreateNotification("No vocals audio found. Split the audio first.");
+            return;
+        }
+
         pitchDetectionAction.CreateNotesUsingBasicPitch(true);
     }
 

@@ -609,4 +609,14 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
     {
         songListView.Focus();
     }
+
+    public void OpenSelectedSongContextMenu()
+    {
+        if (SelectedSongEntryControl == null)
+        {
+            return;
+        }
+
+        SelectedSongEntryControl.OpenContextMenu();
+    }
 }

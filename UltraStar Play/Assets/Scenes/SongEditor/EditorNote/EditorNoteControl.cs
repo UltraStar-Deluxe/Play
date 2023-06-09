@@ -92,6 +92,23 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
     public bool IsPointerOverLeftHandle { get; private set; }
     public bool IsPointerOverCenter { get; private set; }
 
+    public bool IsEditable
+    {
+        get
+        {
+            return Note != null && Note.IsEditable;
+        }
+        set
+        {
+            if (Note == null)
+            {
+                return;
+            }
+
+            Note.IsEditable = value;
+        }
+    }
+
     private float lastClickTime;
 
     private readonly List<IDisposable> disposables = new();

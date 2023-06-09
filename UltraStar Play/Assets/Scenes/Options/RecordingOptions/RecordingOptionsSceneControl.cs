@@ -145,6 +145,22 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(_ => DeleteSelectedRecordingDevice());
         
+        // Select random color via context menu
+        VisualElement colorPickerColorElement = colorPicker.Q<VisualElement>(null, R_PlayShared.UssClasses.itemPickerItemLabel);
+        if (colorPickerColorElement != null)
+        {
+            ContextMenuControl contextMenuControl = injector
+                .WithRootVisualElement(colorPickerColorElement)
+                .CreateAndInject<ContextMenuControl>();
+            contextMenuControl.FillContextMenuAction = contextMenuPopupControl =>
+            {
+                contextMenuPopupControl.AddButton("Random Color", () =>
+                {
+                    colorPickerControl.SelectItem(Colors.CreateRandomColor());
+                });
+            };
+        }
+
         devicePickerControl.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
         amplificationPickerControl.Selection.Subscribe(newValue =>
         {
@@ -363,7 +379,18 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         amplificationPickerControl.TrySelectItem(micProfile.Amplification);
         noiseSuppressionPickerControl.TrySelectItem(micProfile.NoiseSuppression);
         delayPickerControl.SelectItem(micProfile.DelayInMillis);
-        colorPickerControl.TrySelectItem(micProfile.Color);
+    
+        Color32 micProfileColor = micProfile.Color
+            .OrIfDefault(colorPickerControl.Items.FirstOrDefault());
+        if (colorPickerControl.Items.Contains(micProfileColor))
+        {
+            colorPickerControl.TrySelectItem(micProfileColor);
+        }
+        else
+        {
+            colorPickerControl.SelectItem(micProfile.Color);
+        }
+
         sampleRatePickerControl.TrySelectItem(micProfile.SampleRate);
 
         enabledToggle.value = micProfile.IsEnabled;

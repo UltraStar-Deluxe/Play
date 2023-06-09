@@ -1001,17 +1001,6 @@
                 },
                 {
                     "name": "",
-                    "id": "b053835c-a87f-4f67-8d56-4f6884a42357",
-                    "path": "<Keyboard>/anyKey",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "closeContextMenu",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "8323a2e9-14d9-444d-9bf8-0837fa72bb0b",
                     "path": "<Keyboard>/s",
                     "interactions": "",

@@ -35,6 +35,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     public VisualElement FocusedVisualElement => uiDocument.rootVisualElement.focusController.focusedElement as VisualElement;
     private bool triedToFocusLastVisualElement;
     protected VisualElement lastFocusedVisualElement;
+    protected VisualElement lastFocusableNavigatorRootVisualElement;
 
     protected readonly Subject<NoNavigationTargetFoundEvent> noNavigationTargetFoundEventStream = new();
     public IObservable<NoNavigationTargetFoundEvent> NoNavigationTargetFoundEventStream => noNavigationTargetFoundEventStream;
@@ -89,26 +90,56 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             TryFocusLastFocusedVisualElement();
         }
-        else if (focusedVisualElement != null)
+        else if (focusedVisualElement != null
+                 && lastFocusedVisualElement != focusedVisualElement)
         {
             lastFocusedVisualElement = focusedVisualElement;
+            lastFocusableNavigatorRootVisualElement = GetFocusableNavigatorRootVisualElement(lastFocusedVisualElement);
         }
     }
 
-    public void TryFocusLastFocusedVisualElement()
+    protected void TryFocusLastFocusedVisualElement()
     {
         if (triedToFocusLastVisualElement)
         {
             return;
         }
-        
-        if (lastFocusedVisualElement != null
-            && IsFocusableNow(lastFocusedVisualElement))
+
+        if (lastFocusedVisualElement != null)
         {
-            DoFocusVisualElement(lastFocusedVisualElement,
-                $"Moving focus to last focused VisualElement: {lastFocusedVisualElement}");
+            if (IsFocusableNow(lastFocusedVisualElement))
+            {
+                DoFocusVisualElement(lastFocusedVisualElement,
+                    $"Moving focus to last focused VisualElement: {lastFocusedVisualElement}");
+            }
+            else
+            {
+                // Try select other element in the hierarchy of the last focused element
+                TryFocusElementInDescendants(lastFocusableNavigatorRootVisualElement,
+                    descendant => descendant != lastFocusedVisualElement);
+            }
         }
         triedToFocusLastVisualElement = true;
+    }
+
+    private void TryFocusElementInDescendants(VisualElement visualElement, Func<VisualElement, bool> filter = null)
+    {
+        if (visualElement == null)
+        {
+            return;
+        }
+        
+        List<VisualElement> focusableElements = GetFocusableVisualElementsInDescendants(visualElement, filter);
+        if (focusableElements.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        VisualElement focusableElement = focusableElements.FirstOrDefault();
+        if (focusableElement != null)
+        {
+            focusableElement.Focus();
+        }
     }
 
     public virtual void OnBack()
@@ -119,9 +150,22 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
+        bool cancelNotifyForThisFrame = false;
         if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
         {
             FocusedVisualElement.SendEvent(NavigationCancelEvent.GetPooled());
+            cancelNotifyForThisFrame = true;
+        }
+        else if (!ContextMenuPopupControl.OpenContextMenuPopups.IsNullOrEmpty())
+        {
+            ContextMenuPopupControl.OpenContextMenuPopups
+                .ToList()
+                .ForEach(it => it.CloseContextMenu());
+            cancelNotifyForThisFrame = true;
+        }
+
+        if (cancelNotifyForThisFrame)
+        {
             InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
         }
     }
@@ -604,9 +648,15 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                && focusedTextField.selectIndex == focusedTextField.cursorIndex;
     }
 
-    protected virtual List<VisualElement> GetFocusableVisualElementsInDescendants(VisualElement rootVisualElement)
+    protected virtual List<VisualElement> GetFocusableVisualElementsInDescendants(VisualElement rootVisualElement, Func<VisualElement, bool> filter = null)
     {
+        if (rootVisualElement == null)
+        {
+            return null;
+        }
+        
         List<VisualElement> descendants = rootVisualElement.Query<VisualElement>()
+            .Where(descendant => filter == null || filter(descendant))
             .Where(descendant => descendant.tabIndex > 0
                 || descendant
                     is Button
@@ -706,14 +756,27 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                && visualElement.enabledInHierarchy
                && visualElement.canGrabFocus
                && !visualElement.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
-               && visualElement.GetAncestors().AllMatch(ancestor =>
-               {
-                   return ancestor.IsVisibleByDisplay()
-                       && !float.IsNaN(ancestor.worldBound.center.x)
-                       && !float.IsNaN(ancestor.worldBound.center.y)
-                       && ancestor.enabledInHierarchy
-                       && !ancestor.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
-                       && !ancestor.ClassListContains(VisualElementSlideInControl.SlideOutClassName);
-               });
+               && IsAllAncestorsFocusableNow(visualElement);
+    }
+
+    private bool IsAllAncestorsFocusableNow(VisualElement visualElement)
+    {
+        List<VisualElement> ancestors = visualElement.GetAncestors();
+        
+        bool isInHierarchy = ancestors.AnyMatch(ancestor => ancestor == uiDocument.rootVisualElement);
+        if (!isInHierarchy)
+        {
+            return false;
+        }
+        
+        return ancestors.AllMatch(ancestor =>
+        {
+            return ancestor.IsVisibleByDisplay()
+                   && !float.IsNaN(ancestor.worldBound.center.x)
+                   && !float.IsNaN(ancestor.worldBound.center.y)
+                   && ancestor.enabledInHierarchy
+                   && !ancestor.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
+                   && !ancestor.ClassListContains(VisualElementSlideInControl.SlideOutClassName);
+        }) ;
     }
 }

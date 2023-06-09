@@ -236,7 +236,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes();
+        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes()
+            .Where(it => it.IsEditable)
+            .ToList();
         int maxEndBeat = selectedNotes.Select(it => it.EndBeat).Max();
 
         // Find the next note, i.e., the note right of maxEndBeat with the smallest distance to it.
@@ -297,7 +299,9 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes();
+        List<Note> notes = songEditorSceneControl.GetAllVisibleNotes()
+            .Where(it => it.IsEditable)
+            .ToList();
         int minStartBeat = selectedNotes.Select(it => it.StartBeat).Min();
 
         // Find the previous note, i.e., the note left of minStartBeat with the smallest distance to it.
@@ -345,7 +349,8 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        SetSelection(new List<EditorNoteControl> { sortedUiNotes.First() });
+        EditorNoteControl firstEditableUiNote = sortedUiNotes.FirstOrDefault(it => it.IsEditable);
+        SetSelection(new List<EditorNoteControl> { firstEditableUiNote });
     }
 
     private void SelectLastVisibleNote()
@@ -356,7 +361,8 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        SetSelection(new List<EditorNoteControl> { sortedUiNotes.Last() });
+        EditorNoteControl lastEditableUiNote = sortedUiNotes.LastOrDefault(it => it.IsEditable);
+        SetSelection(new List<EditorNoteControl> { lastEditableUiNote });
     }
 
     private List<EditorNoteControl> GetSortedVisibleUiNotes()

@@ -375,4 +375,15 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         SongMeta = null;
         UnregisterCallbacks();
     }
+
+    public void OpenContextMenu()
+    {
+        if (!isPopupMenuOpen)
+        {
+            ContextMenuPopupControl contextMenuPopupControl = contextMenuControl?.OpenContextMenu(new Vector2(
+                openSongMenuButton.worldBound.xMin,
+                openSongMenuButton.worldBound.yMin));
+            contextMenuPopupControl?.VisualElement.Q<Button>().Focus();
+        }
+    }
 }
