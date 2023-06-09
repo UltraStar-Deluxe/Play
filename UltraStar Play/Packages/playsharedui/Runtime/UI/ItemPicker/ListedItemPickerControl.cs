@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
 {
@@ -64,6 +65,13 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
             return;
         }
 
+        if (SelectedItemIndex < 0
+            && !Items.IsNullOrEmpty())
+        {
+            Selection.Value = Items.LastOrDefault();
+            return;
+        }
+        
         if (HasSelectedItem)
         {
             if (WrapAround || SelectedItemIndex > 0)
@@ -84,6 +92,13 @@ public abstract class ListedItemPickerControl<T> : AbstractItemPickerControl<T>
             return;
         }
 
+        if (SelectedItemIndex < 0
+            && !Items.IsNullOrEmpty())
+        {
+            Selection.Value = Items.FirstOrDefault();
+            return;
+        }
+        
         if (HasSelectedItem)
         {
             if (WrapAround
