@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 // CSS colors as constants for Unity3D.
 // List of CSS colors at W3Schools: https://www.w3schools.com/cssref/css_colors.asp
@@ -179,6 +180,14 @@ public static class Colors
         }
     }
 
+    public static Color32 CreateRandomColor(byte alpha = 255)
+    {
+        byte r = (byte)Random.Range(0, 255);
+        byte g = (byte)Random.Range(0, 255);
+        byte b = (byte)Random.Range(0, 255);
+        return new Color32(r, g, b, alpha);
+    }
+    
     /**
      * ColorUtility.TryParseHtmlString cannot be called during serialization.
      * But this function can.
