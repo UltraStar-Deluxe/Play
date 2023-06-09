@@ -145,6 +145,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     public override bool HasHelpDialog => true;
     public override MessageDialogControl CreateHelpDialogControl()
     {
+        string absolutePlayerProfileImagesFolder = PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder();
+        
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
@@ -153,13 +155,17 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
                 TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages) },
             { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages_title),
                 TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
-                    "path", ApplicationUtils.ReplacePathsWithDisplayString(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder())) },
+                    "path", ApplicationUtils.ReplacePathsWithDisplayString(absolutePlayerProfileImagesFolder)) },
         };
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton("Images Folder",
-            _ => ApplicationUtils.OpenDirectory(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder()));
+            _ =>
+            {
+                DirectoryUtils.CreateDirectory(absolutePlayerProfileImagesFolder);
+                ApplicationUtils.OpenDirectory(absolutePlayerProfileImagesFolder);
+            });
         return helpDialogControl;
     }
 }
