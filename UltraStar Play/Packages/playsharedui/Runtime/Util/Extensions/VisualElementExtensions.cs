@@ -255,7 +255,8 @@ public static class VisualElementExtensions
 
     public static VisualElement GetRootVisualElement(this VisualElement visualElement)
     {
-        return visualElement.GetParent(parent => parent.parent == null);
+        return visualElement.GetParent(parent => parent.parent == null 
+                                                 || parent.ClassListContains("unity-ui-document__root"));
     }
     
     public static VisualElement GetParent(this VisualElement visualElement, Func<VisualElement, bool> condition=null)
