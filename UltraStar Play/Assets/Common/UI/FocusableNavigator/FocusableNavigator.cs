@@ -119,9 +119,22 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
+        bool cancelNotifyForThisFrame = false;
         if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
         {
             FocusedVisualElement.SendEvent(NavigationCancelEvent.GetPooled());
+            cancelNotifyForThisFrame = true;
+        }
+        else if (!ContextMenuPopupControl.OpenContextMenuPopups.IsNullOrEmpty())
+        {
+            ContextMenuPopupControl.OpenContextMenuPopups
+                .ToList()
+                .ForEach(it => it.CloseContextMenu());
+            cancelNotifyForThisFrame = true;
+        }
+
+        if (cancelNotifyForThisFrame)
+        {
             InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
         }
     }
