@@ -469,16 +469,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         versionProperties.TryGetValue("commit_hash", out string commitHash);
         commitHashText.text = TranslationManager.GetTranslation(R.Messages.commit, "value", commitHash);
         
-        // Show the build timestamp only for development builds
-        if (Debug.isDebugBuild)
-        {
-            versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-            buildTimeStampText.text = TranslationManager.GetTranslation(R.Messages.buildTimeStamp, "value", buildTimeStamp);
-        }
-        else
-        {
-            buildTimeStampText.text = "";
-        }
+        // Show the build time stamp
+        versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
+        buildTimeStampText.text = TranslationManager.GetTranslation(R.Messages.buildTimeStamp, "value", buildTimeStamp);
     }
 
     public List<IBinding> GetBindings()
