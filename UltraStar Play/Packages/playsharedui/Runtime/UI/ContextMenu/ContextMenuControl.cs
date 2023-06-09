@@ -50,6 +50,8 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     private readonly Subject<ContextMenuPopupControl> contextMenuClosedEventStream = new();
     public IObservable<ContextMenuPopupControl> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
+    private VisualElement focusedVisualElementOnOpen;
+    
     public virtual void OnInjectionFinished()
     {
         panelHelper = new PanelHelper(uiDocument);
@@ -122,13 +124,26 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
             return;
         }
 
+        focusedVisualElementOnOpen = targetVisualElement.focusController?.focusedElement as VisualElement;
+        
         ContextMenuPopupControl contextMenuPopupControl = new(gameObject, position);
         injector.Inject(contextMenuPopupControl);
         FillContextMenuAction(contextMenuPopupControl);
 
-        contextMenuPopupControl.ContextMenuClosedEventStream.Subscribe(_ => contextMenuClosedEventStream.OnNext(contextMenuPopupControl));
+        contextMenuPopupControl.ContextMenuClosedEventStream.Subscribe(_ => OnContextMenuClose(contextMenuPopupControl));
         contextMenuOpenedEventStream.OnNext(contextMenuPopupControl);
         anyContextMenuOpenedEventStream.OnNext(contextMenuPopupControl);
+    }
+
+    private void OnContextMenuClose(ContextMenuPopupControl contextMenuPopupControl)
+    {
+        contextMenuClosedEventStream.OnNext(contextMenuPopupControl);
+        
+        // Focus last element
+        if (focusedVisualElementOnOpen != null)
+        {
+            focusedVisualElementOnOpen.Focus();
+        }
     }
 
     public void Dispose()
