@@ -98,7 +98,7 @@ public static class MainGameBuildTools
     private static CustomBuildOptions CreateCustomBuildOptions(BuildTarget buildTarget)
     {
         CustomBuildOptions customBuildOptions = new CustomBuildOptions(appName, buildTarget);
-        customBuildOptions.compressOutputFolderToZipFile = true;
+        // customBuildOptions.compressOutputFolderToZipFile = true;
         return customBuildOptions;
     }
 }
