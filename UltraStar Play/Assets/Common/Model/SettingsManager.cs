@@ -145,6 +145,13 @@ public class SettingsManager : AbstractSingletonBehaviour
         }
 #endif
 
+        // Add song folder for demo song package
+        string demoSongFolder = ApplicationUtils.GetDemoSongFolderAbsolutePath();
+        if (DirectoryUtils.Exists(demoSongFolder))
+        {
+            defaultSettings.SongDirs.Add(demoSongFolder);
+        }
+
         // Add player profiles
         defaultSettings.PlayerProfiles.Add(new PlayerProfile("Player01", EDifficulty.Medium, "01-UltraStar-chan/ultrastar-chan-f-closeup.png"));
         defaultSettings.PlayerProfiles.Add(new PlayerProfile("Player02", EDifficulty.Medium, "01-UltraStar-chan/ultrastar-chan-m-closeup.png"));
