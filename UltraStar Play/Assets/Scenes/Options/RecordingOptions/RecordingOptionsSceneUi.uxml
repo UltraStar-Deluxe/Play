@@ -24,12 +24,12 @@
                 </ui:VisualElement>
                 <ui:VisualElement name="globalSettingsContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                     <ui:Label tabindex="-1" text="Global Settings" display-tooltip-when-elided="true" name="globalSettingsLabel" class="noBackgroundInHierarchy" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />
-                    <ui:Toggle name="playRecordedAudioToggle" label="Play recorded audio" class="noBackgroundInHierarchy" />
-                    <ui:VisualElement name="playRecordedAudioInfoContainer" style="flex-direction: row; align-items: center;">
+                    <ui:Toggle name="playRecordedAudioToggle" label="Play recorded audio" class="noBackgroundInHierarchy" style="display: none;" />
+                    <ui:VisualElement name="playRecordedAudioInfoContainer" style="flex-direction: row; align-items: center; display: none;">
                         <MaterialIcon tabindex="-1" name="infoIcon" icon="info_outline" class="smallFont mr-1 nBackgroundInHierarchy" />
                         <ui:Label tabindex="-1" text="Does not work with Companion App" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
                     </ui:VisualElement>
-                    <ItemPicker name="micPlaybackVolumeChooser" label="Microphone Playback Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy mt-2" />
+                    <ItemPicker name="micPlaybackVolumeChooser" label="Microphone Playback Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy mt-2" style="display: none;" />
                     <ui:Toggle name="usePortAudioToggle" label="Enable multi-channel support (PortAudio)" class="noBackgroundInHierarchy mt-3" style="-unity-text-align: upper-center;" />
                 </ui:VisualElement>
             </ui:VisualElement>
