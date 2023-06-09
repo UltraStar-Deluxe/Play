@@ -116,12 +116,12 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
         OpenContextMenu(pointerPosition + popupOffset);
     }
 
-    public void OpenContextMenu(Vector2 position)
+    public ContextMenuPopupControl OpenContextMenu(Vector2 position)
     {
         if (FillContextMenuAction == null
             || (ShouldOpenContextMenuFunction != null && !ShouldOpenContextMenuFunction()))
         {
-            return;
+            return null;
         }
 
         focusedVisualElementOnOpen = targetVisualElement.focusController?.focusedElement as VisualElement;
@@ -133,6 +133,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
         contextMenuPopupControl.ContextMenuClosedEventStream.Subscribe(_ => OnContextMenuClose(contextMenuPopupControl));
         contextMenuOpenedEventStream.OnNext(contextMenuPopupControl);
         anyContextMenuOpenedEventStream.OnNext(contextMenuPopupControl);
+        return contextMenuPopupControl;
     }
 
     private void OnContextMenuClose(ContextMenuPopupControl contextMenuPopupControl)
