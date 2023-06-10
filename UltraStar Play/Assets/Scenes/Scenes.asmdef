@@ -17,7 +17,8 @@
         "playsharedui",
         "AndroidRuntimePermissions.Runtime",
         "UnityStandaloneFileBrowser",
-        "Vosk"
+        "Vosk",
+        "Vuplex.WebView"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

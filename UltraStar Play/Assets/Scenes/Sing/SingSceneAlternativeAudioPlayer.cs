@@ -52,7 +52,23 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
         modifierControl.ModifiedVolumePercent.Subscribe(_ => UpdateAudioSources());
         audioFadeInControl.FadeInVolumePercent.Subscribe(_ => UpdateAudioSources());
+        
+        settings.ObserveEveryValueChanged(it => it.VolumePercent)
+            .Subscribe(_ => UpdateAudioSources());
+        settings.ObserveEveryValueChanged(it => it.MusicVolumePercent)
+            .Subscribe(_ => UpdateAudioSources());
+        settings.ObserveEveryValueChanged(it => it.VocalsAudioVolumePercent)
+            .Subscribe(_ => UpdateAudioSources());
 
+        songAudioPlayer.PlaybackStartedEventStream.Subscribe(_ =>
+        {
+            PlayInstrumentalAndVocalsAudio();
+            SyncAudioPosition();
+        });
+        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => PauseInstrumentalAndVocalsAudio());
+        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => SyncAudioPosition());
+        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => SyncAudioPosition());
+        
         Init();
     }
 
@@ -64,18 +80,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             return;
         }
 
-        songAudioPlayer.PlaybackStartedEventStream.Subscribe(_ =>
-        {
-            PlayInstrumentalAndVocalsAudio();
-            SyncAudioPosition();
-        });
-        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => PauseInstrumentalAndVocalsAudio());
-        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => SyncAudioPosition());
-        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => SyncAudioPosition());
-
         UpdateAudioSources();
-        settings.ObserveEveryValueChanged(it => it.VocalsAudioVolumePercent)
-            .Subscribe(_ => UpdateAudioSources());
 
         isInitialized = true;
     }

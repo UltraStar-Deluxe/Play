@@ -46,6 +46,9 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     public ReactiveProperty<float> VideoFadeIn { get; private set; } = new();
     public ReactiveProperty<float> BackgroundImageFadeIn { get; private set; } = new();
 
+    // TODO: Inject the instance
+    private WebViewManager WebViewManager => WebViewManager.Instance;
+
     protected virtual void Start()
     {
         if (GetFinalPreviewVolume() <= 0)
@@ -85,7 +88,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         // The video has an additional delay to load.
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
-        if (songVideoPlayer.HasLoadedVideo && songVideoPlayer.videoPlayer.time <= 0)
+        if (songVideoPlayer.HasLoadedVideo && songVideoPlayer.PositionInVideoInMillis <= 0)
         {
             videoFadeInStartTimeInSeconds = Time.time;
         }
@@ -197,14 +200,16 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual void StartVideoPreview(SongMeta songMeta)
     {
-        if (!gameObject.activeInHierarchy)
+        if (!gameObject.activeInHierarchy
+            || songMeta == null)
         {
             return;
         }
-        
-        if (songMeta.Video.IsNullOrEmpty()
-            || !SongMetaUtils.VideoResourceExists(songMeta)
-            || songVideoPlayer == null)
+
+        // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
+        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewManager.CanHandleUrl);
+        if (songVideoPlayer == null
+            || !SongMetaUtils.ResourceExists(songMeta, videoUri))
         {
             return;
         }
@@ -252,6 +257,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
                 .Subscribe(_ =>
                 {
                     DoSkipToSongPreview();
+                    songAudioPlayer.PlayAudio();
                     audioLoadedDisposable?.Dispose();
                 });
         }

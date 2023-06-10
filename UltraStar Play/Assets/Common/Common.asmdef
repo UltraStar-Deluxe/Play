@@ -19,7 +19,8 @@
         "playsharedui",
         "Vosk",
         "SpleeterSharp",
-        "UnityStandaloneFileBrowser"
+        "UnityStandaloneFileBrowser",
+        "Vuplex.WebView"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -32,7 +32,9 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public bool logFocusedVisualElements;
 
-    public VisualElement FocusedVisualElement => uiDocument.rootVisualElement.focusController.focusedElement as VisualElement;
+    public VisualElement FocusedVisualElement => uiDocument != null
+        ? uiDocument.rootVisualElement?.focusController?.focusedElement as VisualElement
+        : null;
     private bool triedToFocusLastVisualElement;
     protected VisualElement lastFocusedVisualElement;
     protected VisualElement lastFocusableNavigatorRootVisualElement;

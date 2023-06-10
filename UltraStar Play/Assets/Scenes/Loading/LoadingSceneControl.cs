@@ -57,6 +57,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         {
             settings.SongDirs = CreateInitialSongFolders();
         }
+        
+        // Create custom player profile images folder
+        DirectoryUtils.CreateDirectory(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder());
 
         // The next scene should show up automatically.
         // However, in case of an Exception (e.g. song folder not found)

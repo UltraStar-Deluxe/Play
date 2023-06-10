@@ -51,7 +51,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
         if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
         {
-            UiManager.CreateNotification($"Vocals separation not supported for {fileExtension} files.\n" +
+            UiManager.CreateNotification($"Vocals separation not supported for this audio file.\n" +
                                          $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}");
             return Observable.Empty<AudioSeparationResult>();
         }

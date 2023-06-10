@@ -26,6 +26,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         { "BGM", "InfoAndLegalTexts/BGM.txt" },
         { "Soundfont", "InfoAndLegalTexts/GeneralUser-GS-Soundfont-License.txt" },
         { "Pixabay", "InfoAndLegalTexts/Pixabay-Content-License.txt" },
+        { "CEF", "InfoAndLegalTexts/Chromium-Embedded-Framework.txt" },
     };
 
     [Inject]
