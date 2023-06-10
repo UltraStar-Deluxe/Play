@@ -6,8 +6,10 @@ using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Vuplex.WebView;
+using Keyboard = Vuplex.WebView.Keyboard;
 
 public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 {
@@ -154,6 +156,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_toggleWebViewControl).PerformedAsObservable()
             .Subscribe(_ => ToggleWebViewControl())
             .AddTo(gameObject);
+        
+        InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(200)
+            .Subscribe(_ =>
+            {
+                if (IsWebViewCanvasControlEnabled)
+                {
+                    ToggleWebViewControl();
+                    InputManager.GetInputAction(R.InputActions.usplay_back).CancelNotifyForThisFrame();
+                }
+            });
     }
 
     private void ToggleWebViewControl()
@@ -226,11 +238,23 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private void OnEnable()
     {
         webViewPrefab.Initialized += OnWebViewPrefabInitialized;
+        
+        UnityEngine.InputSystem.Keyboard keyboard = InputSystem.GetDevice<UnityEngine.InputSystem.Keyboard>();
+        if (keyboard != null)
+        {
+            keyboard.onTextInput += OnKeyboardTextInput;
+        }
     }
 
     private void OnDisable()
     {
         webViewPrefab.Initialized -= OnWebViewPrefabInitialized;
+        
+        UnityEngine.InputSystem.Keyboard keyboard = InputSystem.GetDevice<UnityEngine.InputSystem.Keyboard>();
+        if (keyboard != null)
+        {
+            keyboard.onTextInput -= OnKeyboardTextInput;
+        }
     }
     
     private void OnWebViewPrefabInitialized(object sender, EventArgs e)
@@ -557,35 +581,15 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    // private async Task<string> GetStringFromJavaScript(string code, string fallbackValue = "")
-    // {
-    //     string jsResult = await webView.ExecuteJavaScript(code);
-    //     if (jsResult.IsNullOrEmpty())
-    //     {
-    //         Debug.LogError($"Failed to get result from JavaScript via {code}");
-    //         return fallbackValue;
-    //     }
-    //     
-    //     return fallbackValue;
-    // }
-    //
-    // private async Task<double> GetNumberFromJavaScript(string code, int fallbackValue = 0)
-    // {
-    //     string jsResult = await GetStringFromJavaScript(code);
-    //     if (jsResult.IsNullOrEmpty())
-    //     {
-    //         return fallbackValue;
-    //     }
-    //
-    //     if (double.TryParse(jsResult, out double valueAsNumber))
-    //     {
-    //         return valueAsNumber;
-    //     }
-    //     
-    //     Debug.LogError($"Failed to parse JavaScript result of {code} to double. Result: " + jsResult);
-    //     return fallbackValue;
-    // }
-    
+    private void OnKeyboardTextInput(char newChar)
+    {
+        // if (IsWebViewInitialized
+        //     && IsWebViewCanvasControlEnabled)
+        // {
+        //     webView.SendKey(newChar.ToString());
+        // }
+    }
+
     private static bool HostsMatch(string a, string b)
     {
         string aWithoutWww = a.Replace("www.", "");
