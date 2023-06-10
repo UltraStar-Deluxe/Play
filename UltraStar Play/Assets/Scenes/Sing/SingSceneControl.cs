@@ -126,6 +126,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     [Inject]
     private AchievementEventStream achievementEventStream;
+
+    [Inject]
+    private WebViewManager webViewManager;
     
     public List<PlayerControl> PlayerControls { get; private set; } = new();
 
@@ -524,7 +527,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private void StartVideoOrShowBackgroundImage()
     {
         songVideoPlayer.SongMeta = SongMeta;
-        if (SongMeta.Video.IsNullOrEmpty())
+        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, webViewManager.CanHandleUrl);
+        if (!SongMetaUtils.ResourceExists(SongMeta, videoUri))
         {
             songVideoPlayer.ShowBackgroundImage();
         }

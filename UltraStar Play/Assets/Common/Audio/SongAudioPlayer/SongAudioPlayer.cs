@@ -22,6 +22,8 @@ public class SongAudioPlayer : MonoBehaviour
     private readonly LazyFromComponent<WebViewManager> webViewManagerLazy = new(ctx => WebViewManager.Instance);
     private WebViewManager WebViewManager => webViewManagerLazy.GetValue(this);
     
+    private SceneNavigator SceneNavigator => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneNavigator>();
+    
     private MidiManager MidiManager => MidiManager.Instance;
     
     // The last frame in which the position in the song was calculated
@@ -289,6 +291,19 @@ public class SongAudioPlayer : MonoBehaviour
     private double initialPositionInMillis;
 
     private bool isWebViewAudio;
+
+    private void Start()
+    {
+        SceneNavigator.BeforeSceneChangeEventStream
+            .Subscribe(_ =>
+            {
+                if (isWebViewAudio)
+                {
+                    PauseAudio();
+                }
+            })
+            .AddTo(gameObject);
+    }
     
     private void Update()
     {

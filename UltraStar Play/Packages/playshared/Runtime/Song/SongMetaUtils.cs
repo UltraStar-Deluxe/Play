@@ -719,4 +719,12 @@ public static class SongMetaUtils
             note.SetText(note.Text + " ");
         }
     }
+
+    public static string GetVideoUriPreferAudioUriIfWebView(SongMeta songMeta, Func<string, bool> canHandleUri)
+    {
+        string videoUri = WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3) && canHandleUri.Invoke(songMeta.Mp3)
+            ? SongMetaUtils.GetAudioUri(songMeta)
+            : SongMetaUtils.GetVideoUri(songMeta);
+        return videoUri;
+    }
 }

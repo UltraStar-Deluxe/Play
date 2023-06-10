@@ -443,14 +443,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         UnloadVideo();
 
         if (initSongMeta == null
-            || initSongMeta.Video.IsNullOrEmpty()
             || ignoredVideoFiles.Contains(initSongMeta.Video))
         {
             return;
         }
 
-        string videoUri = SongMetaUtils.GetVideoUri(initSongMeta);
-        if (!SongMetaUtils.VideoResourceExists(initSongMeta))
+        // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
+        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, webViewManager.CanHandleUrl);
+        if (!SongMetaUtils.ResourceExists(initSongMeta, videoUri))
         {
             Debug.LogWarning("Video file resource does not exist: " + videoUri);
             return;
