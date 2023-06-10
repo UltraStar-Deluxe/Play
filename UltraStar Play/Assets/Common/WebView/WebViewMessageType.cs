@@ -7,4 +7,5 @@
     PlaybackPositionInMillis,
     DurationInMillis,
     Volume,
+    CanLoadUrl,
 }

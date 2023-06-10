@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Vuplex.WebView;
 
 public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
@@ -16,17 +17,29 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     public CanvasWebViewPrefab webViewPrefab;
     
     [InjectedInInspector]
+    public Canvas webViewCanvas;
+    
+    [InjectedInInspector]
     public Camera webViewCamera;
     
+    [InjectedInInspector]
+    public TextAsset defaultWebViewHtml;
+    
+    [Inject]
+    private UIDocument uiDocument;
+    
+    [Inject]
+    private SceneNavigator sceneNavigator;
+
     private IWebView webView;
 
     private bool IsWebViewInitialized => webView != null;
     private readonly Subject<bool> webViewInitializedEventStream = new();
 
-    private bool hasScannedTemplates;
-    private readonly Dictionary<string, string> hostToHtmlTemplatePath = new();
-    private readonly Dictionary<string, CachedHtmlTemplate> hostToCachedHtmlTemplate = new();
-    private readonly Dictionary<string, CachedHtmlTemplate> urlToCachedHtmlTemplate = new();
+    private bool hasScannedJavaScriptFiles;
+    private readonly Dictionary<string, string> hostToWebViewScript = new();
+    private readonly Dictionary<string, CachedWebViewScript> hostToCachedWebViewScript = new();
+    private readonly Dictionary<string, CachedWebViewScript> urlToCachedWebViewScript = new();
 
     private bool isPlaying;
     public bool IsPlaying
@@ -108,6 +121,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     
     private string loadedUrl;
 
+    private bool javaScriptCanLoadUrl;
+    
+    public bool IsWebViewCanvasControlEnabled => webViewCanvas.renderMode is RenderMode.ScreenSpaceOverlay;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -121,6 +138,54 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         Web.SetAutoplayEnabled(true);
     }
 
+    protected override void StartSingleton()
+    {
+        sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
+        RegisterInputActions();
+    }
+
+    private void OnSceneChanged()
+    {
+        RegisterInputActions();
+    }
+
+    private void RegisterInputActions()
+    {
+        InputManager.GetInputAction(R.InputActions.usplay_toggleWebViewControl).PerformedAsObservable()
+            .Subscribe(_ => ToggleWebViewControl())
+            .AddTo(gameObject);
+    }
+
+    private void ToggleWebViewControl()
+    {
+        if (IsWebViewCanvasControlEnabled)
+        {
+            webViewCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+            SetWebViewInputEnabled(false);
+            SetUiToolkitInputEnabled(true);
+        }
+        else
+        {
+            webViewCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            SetWebViewInputEnabled(true);
+            SetUiToolkitInputEnabled(false);
+        }
+    }
+
+    private void SetWebViewInputEnabled(bool newValue)
+    {
+        webViewPrefab.HoveringEnabled = newValue;
+        webViewPrefab.ClickingEnabled = newValue;
+        webViewPrefab.ScrollingEnabled = newValue;
+        webViewPrefab.KeyboardEnabled = newValue;
+        webViewPrefab.CursorIconsEnabled = newValue;
+    }
+    
+    private void SetUiToolkitInputEnabled(bool newValue)
+    {
+        uiDocument.rootVisualElement.SetVisibleByDisplay(newValue);
+    }
+    
     private void Update()
     {
         if (!IsWebViewInitialized)
@@ -172,10 +237,38 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     {
         webView = webViewPrefab.WebView;
         webViewPrefab.WebView.MessageEmitted += OnWebViewMessageReceived;
+        webView.LoadProgressChanged += OnWebViewLoadProgressChanged;
+        
+        webView.LoadHtml(defaultWebViewHtml.text);
         
         webViewInitializedEventStream.OnNext(true);
     }
-    
+
+    private void OnWebViewLoadProgressChanged(object sender, ProgressChangedEventArgs e)
+    {
+        if (e.Type is ProgressChangeType.Finished)
+        {
+            OnWebViewFinishedLoading();
+        }
+        else if (e.Type is ProgressChangeType.Failed)
+        {
+            OnWebViewFailedLoading();
+        }
+    }
+
+    private void OnWebViewFinishedLoading()
+    {
+        isContentLoaded = true;
+        Debug.Log("Finished loading of URL: " + loadedUrl);
+        webView.ExecuteJavaScript("getDurationInMillis()");
+    }
+
+    private void OnWebViewFailedLoading()
+    {
+        Debug.Log("Failed loading of URL: " + loadedUrl);
+        UiManager.CreateNotification($"Failed to load {loadedUrl}");
+    }
+
     private void OnWebViewMessageReceived(object sender, EventArgs<string> e)
     {
         // Debug.Log($"Received message from WebView: {e.Value}");
@@ -243,6 +336,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                         isPlaying = false;
                         break;
                     }
+                    case WebViewMessageType.CanLoadUrl:
+                    {
+                        BoolWebViewMessageDto boolWebViewMessageDto = JsonConverter.FromJson<BoolWebViewMessageDto>(json);
+                        javaScriptCanLoadUrl = boolWebViewMessageDto.value;
+                        break;
+                    }
                     case WebViewMessageType.Volume:
                     {
                         NumberWebViewMessageDto numberWebViewMessageDto = JsonConverter.FromJson<NumberWebViewMessageDto>(json);
@@ -271,13 +370,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return false;
         }
         
-        if (!hasScannedTemplates)
+        if (!hasScannedJavaScriptFiles)
         {
-            ScanHtmlTemplates();
+            ScanJavaScriptFiles();
         }
         
-        string htmlTemplate = GetHtmlTemplate(url);
-        return !htmlTemplate.IsNullOrEmpty();
+        string webViewScript = GetWebViewScript(url);
+        return !webViewScript.IsNullOrEmpty();
     }
 
     public bool LoadUrl(string url)
@@ -288,10 +387,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return false;
         }
 
-        string finalHtmlCode = GetFinalHtmlCode(url);
-        if (finalHtmlCode.IsNullOrEmpty())
+        string webViewScript = GetWebViewScript(url);
+        if (webViewScript.IsNullOrEmpty())
         {
-            Debug.LogError($"Failed to load HTML code for url: {url}");
+            Debug.LogError($"Failed to load WebView script code for url: {url}");
             return false;
         }
 
@@ -299,18 +398,35 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             PausePlayback();
         }
-        SetPlaybackPositionInMillis(0);
 
         if (loadedUrl == url)
         {
             // Already loaded.
-            Debug.Log($"Reusing already loaded HTML for URL {url}");
+            Debug.Log($"Reusing already loaded web page for URL {url}");
+            SetPlaybackPositionInMillis(0);
             return true;
         }
 
-        isContentLoaded = false;
+        if (!javaScriptCanLoadUrl)
+        {
+            isContentLoaded = false;
+        }
         loadedUrl = url;
-        RunWhenWebViewInitialized(() => webView.LoadHtml(finalHtmlCode));
+        RunWhenWebViewInitialized(() =>
+        {
+            if (isContentLoaded && javaScriptCanLoadUrl)
+            {
+                Debug.Log("Loading new URL via JavaScript");
+                webView.ExecuteJavaScript($"loadUrl('{url}')");
+            }
+            else
+            {
+                Debug.Log("Loading new URL into WebView");
+                webView.PageLoadScripts.Clear();
+                webView.PageLoadScripts.Add(webViewScript);
+                webView.LoadUrl(url);
+            }
+        });
         return true;
     }
 
@@ -355,79 +471,68 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         isPlaying = false;
         webView.ExecuteJavaScript("stopPlayback()");
     }
-    
-    private string GetFinalHtmlCode(string url)
+
+    private void ScanJavaScriptFiles()
     {
-        string htmlTemplate = GetHtmlTemplate(url);
-        if (htmlTemplate.IsNullOrEmpty())
-        {
-            return "";
-        }
-        return htmlTemplate
-            .Replace("{{URL}}", url);
-    }
-    
-    private void ScanHtmlTemplates()
-    {
-        if (hasScannedTemplates)
+        if (hasScannedJavaScriptFiles)
         {
             return;
         }
-        hasScannedTemplates = true;
+        hasScannedJavaScriptFiles = true;
         
-        string webViewTemplatesFolder = ApplicationUtils.GetStreamingAssetsPath("WebViewTemplates");
-        DirectoryUtils.CreateDirectory(webViewTemplatesFolder);
+        string webViewScriptsFolder = ApplicationUtils.GetStreamingAssetsPath("WebViewScripts");
+        DirectoryUtils.CreateDirectory(webViewScriptsFolder);
         
-        string[] htmlTemplateFilePaths = Directory.GetFiles(webViewTemplatesFolder, "*.html");
-        foreach (string htmlTemplateFilePath in htmlTemplateFilePaths)
+        string[] webViewScriptPaths = Directory.GetFiles(webViewScriptsFolder, "*.js");
+        foreach (string webViewScriptPath in webViewScriptPaths)
         {
-            string host = Path.GetFileNameWithoutExtension(htmlTemplateFilePath);
-            hostToHtmlTemplatePath[host] = htmlTemplateFilePath;
+            string host = Path.GetFileNameWithoutExtension(webViewScriptPath);
+            hostToWebViewScript[host] = webViewScriptPath;
         }
     }
 
-    private string GetHtmlTemplate(string url)
+    private string GetWebViewScript(string url)
     {
         // Try get cached template for the specific URL.
-        if (urlToCachedHtmlTemplate.TryGetValue(url, out CachedHtmlTemplate cachedHtmlTemplate))
+        if (urlToCachedWebViewScript.TryGetValue(url, out CachedWebViewScript cachedWebViewScript))
         {
-            return cachedHtmlTemplate.HtmlTemplate;
+            return cachedWebViewScript.Content;
         }
         
         // Try get cached template for the host.
         string urlHost = new Uri(url).Host;
-        if (!hostToCachedHtmlTemplate.TryGetValue(urlHost, out cachedHtmlTemplate))
+        if (!hostToCachedWebViewScript.TryGetValue(urlHost, out cachedWebViewScript))
         {
             // Load and remember the template for the host.
-            cachedHtmlTemplate = LoadAndCacheHtmlTemplateForHost(urlHost);
+            cachedWebViewScript = LoadAndCacheWebViewScriptForHost(urlHost);
         }
 
-        if (cachedHtmlTemplate == null)
+        if (cachedWebViewScript == null)
         {
             return "";
         }
         
         // Remember the template for the specific URL.
-        urlToCachedHtmlTemplate[url] = cachedHtmlTemplate;
+        urlToCachedWebViewScript[url] = cachedWebViewScript;
         
-        return cachedHtmlTemplate.HtmlTemplate;
+        return cachedWebViewScript.Content;
     }
 
-    private CachedHtmlTemplate LoadAndCacheHtmlTemplateForHost(string urlHost)
+    private CachedWebViewScript LoadAndCacheWebViewScriptForHost(string urlHost)
     {
-        List<KeyValuePair<string, string>> matchingTemplatePaths = hostToHtmlTemplatePath
+        List<KeyValuePair<string, string>> matches = hostToWebViewScript
             .Where(entry => HostsMatch(entry.Key, urlHost))
             .ToList();
-        if (matchingTemplatePaths.IsNullOrEmpty())
+        if (matches.IsNullOrEmpty())
         {
             return null;
         }
 
-        string htmlTemplatePath = matchingTemplatePaths.FirstOrDefault().Value;
-        string htmlTemplate = File.ReadAllText(htmlTemplatePath);
-        CachedHtmlTemplate cachedHtmlTemplate = new CachedHtmlTemplate(htmlTemplate);
-        hostToCachedHtmlTemplate[urlHost] = cachedHtmlTemplate;
-        return cachedHtmlTemplate;
+        string filePath = matches.FirstOrDefault().Value;
+        string fileContent = File.ReadAllText(filePath);
+        CachedWebViewScript cachedWebViewScript = new CachedWebViewScript(fileContent);
+        hostToCachedWebViewScript[urlHost] = cachedWebViewScript;
+        return cachedWebViewScript;
     }
 
     private void RunWhenWebViewInitialized(Action action)
@@ -483,13 +588,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         return aWithoutWww.ToLowerInvariant() == bWithoutWww.ToLowerInvariant();
     }
 
-    private class CachedHtmlTemplate
+    private class CachedWebViewScript
     {
-        public string HtmlTemplate { get; private set; }
+        public string Content { get; private set; }
 
-        public CachedHtmlTemplate(string htmlTemplate)
+        public CachedWebViewScript(string content)
         {
-            this.HtmlTemplate = htmlTemplate;
+            this.Content = content;
         }
-    } 
+    }
 }

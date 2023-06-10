@@ -7584,7 +7584,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   webViewPrefab: {fileID: 5119066810394802187}
+  webViewCanvas: {fileID: 519528370131799763}
   webViewCamera: {fileID: 2364365025742481650}
+  defaultWebViewHtml: {fileID: 4900000, guid: e3afca435ff14476bad0b2ad71017bc3, type: 3}
   volumeInPercent: 0
   isContentLoaded: 0
 --- !u!1 &5675655531140774825
