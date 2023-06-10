@@ -51,7 +51,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
         if (!ApplicationUtils.IsSupportedBasicPitchDetectionAudioFormat(fileExtension))
         {
-            UiManager.CreateNotification($"Pitch Detection using Basic Pitch not supported for {fileExtension} files.\n" +
+            UiManager.CreateNotification($"Pitch Detection using Basic Pitch not supported for this audio file.\n" +
                                          $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.ToCsv(",", "", "")}");
             return Observable.Empty<BasicPitchDetectionResult>();
         }
