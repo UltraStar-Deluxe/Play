@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using UniInject;
 using UniRx;
 using UnityEngine;
 
@@ -47,7 +46,21 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
+    
+    private UiManager uiManager;
+    private UiManager UiManager
+    {
+        get
+        {
+            if (uiManager == null)
+            {
+                uiManager = UiManager.Instance;
+            }
 
+            return uiManager;
+        }
+    }
+    
     private Settings settings;
     private Settings Settings
     {
@@ -61,9 +74,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return settings;
         }
     }
-
-    [Inject]
-    private UiManager uiManager;
 
     private WebViewManager webViewManager;
     private WebViewManager WebViewManager
@@ -185,6 +195,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private void ScanFilesAsynchronously()
     {
         Debug.Log("ScanFilesAsynchronously");
+
+        // Load objects while still on the main thread.
+        UiManager loadedUiManager = UiManager;
+        WebViewManager loadedWebViewManager = WebViewManager;
+        Settings loadedSetting = Settings;
 
         // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
         // Thus, use the static instance.
