@@ -19,6 +19,9 @@ public class SongAudioPlayer : MonoBehaviour
     private readonly LazyFromComponent<VideoPlayer> videoPlayerLazy = new(ctx => ctx.GetComponentInChildren<VideoPlayer>());
     private VideoPlayer VideoPlayer => videoPlayerLazy.GetValue(this);
 
+    private readonly LazyFromComponent<WebViewManager> webViewManagerLazy = new(ctx => WebViewManager.Instance);
+    private WebViewManager WebViewManager => webViewManagerLazy.GetValue(this);
+    
     private MidiManager MidiManager => MidiManager.Instance;
     
     // The last frame in which the position in the song was calculated
@@ -69,6 +72,7 @@ public class SongAudioPlayer : MonoBehaviour
         {
             if (AudioPlayer == null
                 || VideoPlayer == null
+                || WebViewManager == null
                 || !IsFullyLoaded)
             {
                 return 0;
@@ -115,6 +119,10 @@ public class SongAudioPlayer : MonoBehaviour
             {
                  VideoPlayer.time = newTimeInSeconds;
             }
+            else if (HasWebView)
+            {
+                WebViewManager.SetPlaybackPositionInMillis(newPositionInSongInMillis);
+            }
 
             positionInSongEventStream.OnNext(positionInSongInMillis);
         }
@@ -138,6 +146,10 @@ public class SongAudioPlayer : MonoBehaviour
             else if (HasVideo)
             {
                 return VideoPlayer.time * 1000.0;
+            }
+            else if (HasWebView)
+            {
+                return WebViewManager.EstimatedPlaybackPositionInMillis;
             }
 
             return 0;
@@ -169,36 +181,83 @@ public class SongAudioPlayer : MonoBehaviour
         get
         {
             return !isPaused
-                   && (AudioPlayer.isPlaying || VideoPlayer.isPlaying);
+                   && (
+                       (HasAudio && AudioPlayer.isPlaying)
+                       || (HasVideo && VideoPlayer.isPlaying)
+                       || (HasWebView && WebViewManager.IsPlaying));
         }
     }
 
-    public bool IsPartiallyLoaded => HasAudio || HasVideo;
+    public bool IsPartiallyLoaded => HasAudio || HasVideo || HasWebView;
     public bool IsFullyLoaded => (HasAudio && AudioPlayer.clip.length > 0) 
-                                 || (HasVideo && VideoPlayer.length > 0);
+                                 || (HasVideo && VideoPlayer.length > 0)
+                                 || (HasWebView && WebViewManager.DurationInMillis > 0);
     
     private SongMeta SongMeta { get; set; }
 
     public float VolumeFactor
     {
-        get => AudioPlayer.volume;
-        set => AudioPlayer.volume = value;
+        get
+        {
+            if (HasWebView)
+            {
+                return WebViewManager.VolumeInPercent / 100f;
+            }
+            else
+            {
+                return AudioPlayer.volume;
+            }
+        }
+        set
+        {
+            if (HasWebView)
+            {
+                WebViewManager.VolumeInPercent = (int)(value * 100);
+            }
+            else
+            {
+                AudioPlayer.volume = value;
+            }
+        }
     }
 
     public float Pitch
     {
-        get => AudioPlayer.pitch;
-        set => AudioPlayer.pitch = value;
+        get
+        {
+            if (HasWebView)
+            {
+                return 1;
+            }
+            return AudioPlayer.pitch;
+        }
+        set
+        {
+            if (HasWebView)
+            {
+                return;
+            }
+            AudioPlayer.pitch = value;
+        }
     }
 
     public float PlaybackSpeed
     {
         get
         {
+            if (HasWebView)
+            {
+                return 1;
+            }
             return AudioPlayer.pitch;
         }
         set
         {
+            if (HasWebView)
+            {
+                return;
+            }
+            
             // Playback speed cannot be set randomly. Allowed (and useful) is a range of 0.5 to 1.5.
             float newPlaybackSpeed = value;
             if (newPlaybackSpeed < 0.5f)
@@ -223,10 +282,13 @@ public class SongAudioPlayer : MonoBehaviour
 
     private bool HasAudio => AudioPlayer.clip != null;
     private bool HasVideo => !VideoPlayer.url.IsNullOrEmpty();
+    private bool HasWebView => isWebViewAudio;
 
     private bool isPaused;
 
     private double initialPositionInMillis;
+
+    private bool isWebViewAudio;
     
     private void Update()
     {
@@ -266,6 +328,10 @@ public class SongAudioPlayer : MonoBehaviour
         {
             LoadMidiAsAudio(audioUri);
         }
+        else if (WebViewManager.CanHandleUrl(audioUri))
+        {
+            LoadAsWebView(audioUri);
+        }
         else
         {
             // Load audio file
@@ -275,12 +341,16 @@ public class SongAudioPlayer : MonoBehaviour
 
     private void ResetAudioAndVideo()
     {
+        isWebViewAudio = false;
+        
         VideoPlayer.Stop();
         VideoPlayer.url = "";
 
         AudioPlayer.Stop();
         AudioPlayer.clip = null;
         
+        WebViewManager.PausePlayback();
+
         DurationOfSongInMillis = 0;
     }
     
@@ -347,6 +417,41 @@ public class SongAudioPlayer : MonoBehaviour
             }));
     }
 
+    private void LoadAsWebView(string audioUri)
+    {
+        bool success = WebViewManager.LoadUrl(audioUri);
+        if (!success)
+        {
+            Debug.LogError($"Failed to load video using WebView from URL {audioUri}");
+            return;
+        }
+        
+        isWebViewAudio = true;
+
+        // The video is loaded asynchronously.
+        long startTime = TimeUtils.GetUnixTimeMilliseconds();
+        long timeoutInMillis = 5000;
+        StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
+            () =>
+            {
+                return WebViewManager.DurationInMillis > 0
+                    || TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis);
+            },
+            () =>
+                {
+                    if (TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis))
+                    {
+                        Debug.Log("Loading audio using WebView timed out.");
+                        return;
+                    }
+                    
+                    DurationOfSongInMillis = WebViewManager.DurationInMillis;
+                    PositionInSongInMillis = initialPositionInMillis;
+                    PauseAudio();
+                    loadedEventStream.OnNext(true);
+                }));
+    }
+    
     public void ReloadAudio()
     {
         Init(SongMeta);
@@ -356,6 +461,7 @@ public class SongAudioPlayer : MonoBehaviour
     {
         VideoPlayer.Stop();
         AudioPlayer.Stop();
+        WebViewManager.PausePlayback();
     }
     
     public void PauseAudio()
@@ -367,6 +473,7 @@ public class SongAudioPlayer : MonoBehaviour
 
         AudioPlayer.Pause();
         VideoPlayer.Pause();
+        WebViewManager.PausePlayback();
         isPaused = true;
         playbackStoppedEventStream.OnNext(PositionInSongInMillis);
     }
@@ -386,6 +493,10 @@ public class SongAudioPlayer : MonoBehaviour
         else if (HasVideo)
         {
             VideoPlayer.Play();
+        }
+        else if (HasWebView)
+        {
+            WebViewManager.ResumePlayback();
         }
         isPaused = false;
         playbackStartedEventStream.OnNext(PositionInSongInMillis);

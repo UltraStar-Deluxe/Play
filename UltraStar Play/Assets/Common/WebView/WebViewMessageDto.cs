@@ -3,7 +3,6 @@
 public class WebViewMessageDto
 {
     public string type;
-    public string value;
 
     public static bool TryParseType(string type, out WebViewMessageType webViewMessageType)
     {

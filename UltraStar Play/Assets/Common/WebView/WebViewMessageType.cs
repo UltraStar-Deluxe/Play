@@ -1,8 +1,9 @@
 ﻿public enum WebViewMessageType
 {
     Unknown,
-    Started,
-    Stopped,
+    Ready,
+    StartedOrResumed,
+    StoppedOrPaused,
     PlaybackPositionInMillis,
     DurationInMillis,
     Volume,

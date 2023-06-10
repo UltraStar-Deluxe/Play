@@ -64,6 +64,20 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     [Inject]
     private UiManager uiManager;
+
+    private WebViewManager webViewManager;
+    private WebViewManager WebViewManager
+    {
+        get
+        {
+            if (webViewManager == null)
+            {
+                webViewManager = WebViewManager.Instance;
+            }
+
+            return webViewManager;
+        }
+    }
     
     public static void ResetSongMetas()
     {
@@ -409,7 +423,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues, null, Settings.UseUniversalCharsetDetector);
             songIssues.AddRange(parseFileIssues);
 
-            List<SongIssue> mediaFormatIssues = SongMetaUtils.GetSupportedMediaFormatIssues(newSongMeta);
+            List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(newSongMeta, WebViewManager);
             songIssues.AddRange(mediaFormatIssues);
 
             if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
@@ -571,5 +585,51 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public SongMeta GetSongMetaByTitle(string title)
     {
         return allSongMetas.FirstOrDefault(songMeta => songMeta.Title == title);
+    }
+    
+    
+    // Checks whether the audio and video file formats of the song are supported.
+    // Returns true iff the audio file of the SongMeta exists and is supported.
+    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, WebViewManager webViewManager)
+    {
+        List<SongIssue> songIssues = new();
+
+        // Check video format.
+        // Video is optional.
+        if (!songMeta.Video.IsNullOrEmpty())
+        {
+            if (!ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(songMeta.Video))
+                && !webViewManager.CanHandleUrl(songMeta.Video))
+            {
+                songIssues.Add(SongIssue.CreateWarning(songMeta, $"Unsupported video format {Path.GetExtension(songMeta.Video)}"));
+                // Do not attempt to load the video file
+                songMeta.Video = "";
+            }
+            else if (!SongMetaUtils.VideoResourceExists(songMeta))
+            {
+                songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video file resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetVideoUri(songMeta))}'"));
+                // Do not attempt to load the video file
+                songMeta.Video = "";
+            }
+        }
+
+        // Check audio format.
+        // Audio is mandatory. Without working audio file, the song cannot be played.
+        if (!ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3))
+            // Also accept a video file as audio file.
+            && !ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(songMeta.Mp3))
+            && !webViewManager.CanHandleUrl(songMeta.Mp3))
+        {
+            songIssues.Add(SongIssue.CreateError(songMeta, $"Unsupported audio format {Path.GetExtension(songMeta.Mp3)}"));
+        }
+        else if (!SongMetaUtils.AudioResourceExists(songMeta))
+        {
+            songIssues.Add(SongIssue.CreateError(songMeta, $"Audio file resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetAudioUri(songMeta))}'"));
+        }
+
+        // Log found issues
+        songIssues.ForEach(songIssue => songIssue.Log());
+
+        return songIssues;
     }
 }

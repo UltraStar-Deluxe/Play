@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isMedley: 0
   playerCount: 1
-  defaultSongName: Sonic Rainboom VIP
+  defaultSongName: Kick Back
   defaultSongNamePasteBin: 'Sonic Rainboom VIP
 
     Summer Wine
@@ -488,7 +488,7 @@ PrefabInstance:
     - target: {fileID: 6394043851129678520, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000061035156
+      value: 0.000061035156
       objectReference: {fileID: 0}
     - target: {fileID: 6602900608042437802, guid: 526f667f64d4f6949a1aa2bbba7ef376,
         type: 3}
@@ -633,6 +633,31 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: url
+      value: https://www.youtube.com/watch?v=tEOZjZZmlAI
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: html
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: videoId
+      value: https://www.youtube.com/watch?v=tEOZjZZmlAI
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: videoUrl
+      value: https://www.youtube.com/watch?v=tEOZjZZmlAI
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215375562649057914, guid: 0f35eb07433348d4abddb4095d2d1e17,
+        type: 3}
+      propertyPath: htmlTextAsset
+      value: 
+      objectReference: {fileID: 4900000, guid: e8bd1ec1f114aec47bbe70ef7bab9aeb, type: 3}
     - target: {fileID: 7508707485095029509, guid: 0f35eb07433348d4abddb4095d2d1e17,
         type: 3}
       propertyPath: m_RootOrder

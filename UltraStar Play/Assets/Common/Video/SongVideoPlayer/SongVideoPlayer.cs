@@ -19,6 +19,9 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     [InjectedInInspector]
     public VideoPlayer videoPlayer;
 
+    [Inject]
+    private WebViewManager webViewManager;
+    
     [Inject(UxmlName = R.UxmlNames.songVideoImage, Optional = true)]
     private VisualElement videoImageVisualElement;
     public VisualElement VideoImageVisualElement
@@ -69,6 +72,27 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public bool HasLoadedVideo { get; private set; }
     public bool HasLoadedBackgroundImage { get; private set; }
 
+    public double PositionInVideoInMillis
+    {
+        get
+        {
+            if (videoPlayer == null
+                || !HasLoadedVideo)
+            {
+                return 0;
+            }
+
+            if (isWebViewVideo)
+            {
+                return webViewManager.EstimatedPlaybackPositionInMillis;
+            }
+            else
+            {
+                return videoPlayer.time * 1000;
+            }
+        }
+    }
+    
     private float nextSyncTimeInSeconds;
 
     private IDisposable jumpBackInSongEventStreamDisposable;
@@ -87,8 +111,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
     
+    private RenderTexture originalWebViewCameraRenderTexture;
+    private bool isWebViewVideo;
+
     public void OnInjectionFinished()
     {
+        originalWebViewCameraRenderTexture = webViewManager.webViewCamera.targetTexture;
         HasLoadedBackgroundImage = false;
         InitEventSubscriber();
         UnloadVideo();
@@ -163,9 +191,22 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void LoadVideo(string uri)
     {
-        videoPlayer.url = ApplicationUtils.GetVideoPlayerUri(uri);
-        // The url is empty if loading the video failed.
-        HasLoadedVideo = !videoPlayer.url.IsNullOrEmpty();
+        if (webViewManager.CanHandleUrl(uri))
+        {
+            isWebViewVideo = true;
+            SetWebViewRenderTextureToVideoRenderTexture();
+            HasLoadedVideo = true;
+        }
+        else
+        {
+            isWebViewVideo = false;
+            ResetWebViewRenderTexture();
+            
+            videoPlayer.url = ApplicationUtils.GetVideoPlayerUri(uri);
+            // The url is empty if loading the video failed.
+            HasLoadedVideo = !videoPlayer.url.IsNullOrEmpty();
+        }
+        
         // For now, only load the video. Starting it is done from the outside.
         if (!HasLoadedVideo)
         {
@@ -180,6 +221,32 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         videoPlayer.Pause();
     }
 
+    private void SetWebViewRenderTextureToVideoRenderTexture()
+    {
+        if (originalWebViewCameraRenderTexture == null)
+        {
+            return;
+        }
+        
+        if (webViewManager.webViewCamera.targetTexture != videoPlayer.targetTexture)
+        {
+            webViewManager.webViewCamera.targetTexture = videoPlayer.targetTexture;
+        }
+    }
+
+    private void ResetWebViewRenderTexture()
+    {
+        if (originalWebViewCameraRenderTexture == null)
+        {
+            return;
+        }
+
+        if (webViewManager.webViewCamera.targetTexture != originalWebViewCameraRenderTexture)
+        {
+            webViewManager.webViewCamera.targetTexture = originalWebViewCameraRenderTexture;
+        }
+    }
+    
     private void UnloadVideo()
     {
         if (!HasLoadedVideo)

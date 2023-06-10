@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -13,19 +14,21 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     [InjectedInInspector]
     public CanvasWebViewPrefab webViewPrefab;
-
+    
     [InjectedInInspector]
-    public string testUrl;
+    public Camera webViewCamera;
     
     private IWebView webView;
 
     private bool IsWebViewInitialized => webView != null;
     private readonly Subject<bool> webViewInitializedEventStream = new();
 
+    private bool hasScannedTemplates;
     private readonly Dictionary<string, string> hostToHtmlTemplatePath = new();
     private readonly Dictionary<string, CachedHtmlTemplate> hostToCachedHtmlTemplate = new();
     private readonly Dictionary<string, CachedHtmlTemplate> urlToCachedHtmlTemplate = new();
 
+    private bool isPlaying;
     public bool IsPlaying
     {
         get
@@ -34,26 +37,11 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             {
                 return false;
             }
-            return GetBoolFromJavaScript("isPlaying()");
-        }
-        set
-        {
-            if (!IsWebViewInitialized)
-            {
-                return;
-            }
-
-            if (value)
-            {
-                ContinuePlayback();
-            }
-            else
-            {
-                PausePlayback();
-            }
+            return isPlaying;
         }
     }
     
+    private int durationInMillis;
     public int DurationInMillis
     {
         get
@@ -62,11 +50,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             {
                 return 0;
             }
-            return GetIntFromJavaScript("getPlaybackPositionInMillis()");
+            return durationInMillis;
         }
     }
     
-    public int PlaybackPositionInMillis
+    private int lastReceivedPlaybackPositionInMillis;
+    private int estimatedPlaybackPositionInMillis;
+    public int EstimatedPlaybackPositionInMillis
     {
         get
         {
@@ -74,14 +64,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             {
                 return 0;
             }
-            return GetIntFromJavaScript("getPlaybackPositionInMillis()");
-        }
-        set
-        {
-            webView.ExecuteJavaScript($"setPlaybackPositionInMillis({value})");
+            
+            return estimatedPlaybackPositionInMillis;
         }
     }
     
+    public int volumeInPercent;
     public int VolumeInPercent
     {
         get
@@ -90,14 +78,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             {
                 return 0;
             }
-            return GetIntFromJavaScript("getVolume()");
+            return volumeInPercent;
         }
         set
         {
             webView.ExecuteJavaScript($"setVolume({value})");
+            volumeInPercent = value;
         }
     }
 
+    public bool isContentLoaded;
     public bool IsContentLoaded
     {
         get
@@ -106,11 +96,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             {
                 return false;
             }
-            return GetBoolFromJavaScript("isContentLoaded()");
+            return isContentLoaded;
         }
     }
 
-    private long lastPlaybackPositionUpdatedTimeInMillis;
+    private long lastEstimatedPlaybackPositionUpdatedTimeInMillis;
+
+    private string loadedUrl;
     
     protected override object GetInstance()
     {
@@ -123,48 +115,24 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         // Explicitly allow playback of video or audio without user interaction.
         // This must be called early, e.g. in Awake.
         Web.SetAutoplayEnabled(true);
-        
-        // Load html templates.
-        LoadHtmlTemplates();
     }
 
-    protected override void StartSingleton()
+    private void Update()
     {
-        RunWhenWebViewInitialized(() => LoadTestUrl());
+        UpdatePlaybackPositionInMillisEstimate();
     }
 
-    // private void Update()
-    // {
-    //     UpdatePlaybackPositionInMillisEstimate();
-    // }
-    //
-    // private void UpdatePlaybackPositionInMillisEstimate()
-    // {
-    //     if (!isPlaying)
-    //     {
-    //         return;
-    //     }
-    //
-    //     long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-    //     long deltaTimeInMillis = currentTimeInMillis - lastPlaybackPositionUpdatedTimeInMillis;
-    //     playbackPositionInMillis += (int)deltaTimeInMillis;
-    //     lastPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
-    // }
-
-    private void LoadTestUrl()
+    private void UpdatePlaybackPositionInMillisEstimate()
     {
-        if (testUrl.IsNullOrEmpty())
+        if (!isPlaying)
         {
             return;
         }
 
-        if (!CanHandleUrl(testUrl))
-        {
-            Debug.LogWarning("Cannot handle URL: " + testUrl);
-            return;
-        }
-
-        LoadUrl(testUrl);
+        long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        long deltaTimeInMillis = currentTimeInMillis - lastEstimatedPlaybackPositionUpdatedTimeInMillis;
+        estimatedPlaybackPositionInMillis += (int)deltaTimeInMillis;
+        lastEstimatedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
     }
 
     private void OnEnable()
@@ -207,29 +175,50 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.LogError($"Failed to parse WebViewMessageDto: {json}");
             }
     
-            // if (WebViewMessageDto.TryParseType(webViewMessageDto.type, out WebViewMessageType webViewMessageType)
-            //     && int.TryParse(webViewMessageDto.value, out int valueAsInt))
-            // {
-            //     switch (webViewMessageType)
-            //     {
-            //         case WebViewMessageType.PlaybackPositionInMillis:
-            //             playbackPositionInMillis = valueAsInt;
-            //             lastPlaybackPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-            //             break;
-            //         case WebViewMessageType.DurationInMillis:
-            //             durationInMillis = valueAsInt;
-            //             break;
-            //         case WebViewMessageType.Started:
-            //             isPlaying = true;
-            //             break;
-            //         case WebViewMessageType.Stopped:
-            //             isPlaying = false;
-            //             break;
-            //         case WebViewMessageType.Volume:
-            //             volumeInPercent = valueAsInt;
-            //             break;
-            //     }
-            // }
+            if (WebViewMessageDto.TryParseType(webViewMessageDto.type, out WebViewMessageType webViewMessageType))
+            {
+                switch (webViewMessageType)
+                {
+                    case WebViewMessageType.PlaybackPositionInMillis:
+                    {
+                        NumberWebViewMessageDto numberWebViewMessageDto = JsonConverter.FromJson<NumberWebViewMessageDto>(json);
+                        
+                        lastReceivedPlaybackPositionInMillis = (int)numberWebViewMessageDto.value;
+                        Debug.Log($"estimated playback position offset: {lastReceivedPlaybackPositionInMillis - estimatedPlaybackPositionInMillis}");
+                        
+                        estimatedPlaybackPositionInMillis = lastReceivedPlaybackPositionInMillis;
+                        lastEstimatedPlaybackPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+                        break;
+                    }
+                    case WebViewMessageType.DurationInMillis:
+                    {
+                        NumberWebViewMessageDto numberWebViewMessageDto = JsonConverter.FromJson<NumberWebViewMessageDto>(json);
+                        durationInMillis = (int)numberWebViewMessageDto.value;
+                        break;
+                    }
+                    case WebViewMessageType.Ready:
+                    {
+                        isContentLoaded = true;
+                        break;
+                    }
+                    case WebViewMessageType.StartedOrResumed:
+                    {
+                        isPlaying = true;
+                        break;
+                    }
+                    case WebViewMessageType.StoppedOrPaused:
+                    {
+                        isPlaying = false;
+                        break;
+                    }
+                    case WebViewMessageType.Volume:
+                    {
+                        NumberWebViewMessageDto numberWebViewMessageDto = JsonConverter.FromJson<NumberWebViewMessageDto>(json);
+                        volumeInPercent = (int)numberWebViewMessageDto.value;
+                        break;
+                    }
+                }
+            }
         }
         catch (Exception e)
         {
@@ -240,37 +229,101 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool CanHandleUrl(string url)
     {
+        try
+        {
+            // Try to parse the URL to make sure it's valid.
+            string host = new Uri(url).Host;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        
+        if (!hasScannedTemplates)
+        {
+            ScanHtmlTemplates();
+        }
+        
         string htmlTemplate = GetHtmlTemplate(url);
         return !htmlTemplate.IsNullOrEmpty();
     }
 
-    public void LoadUrl(string url)
+    public bool LoadUrl(string url)
     {
         if (!CanHandleUrl(url))
         {
-            throw new Exception($"Cannot handle URL: {url}");
+            Debug.Log($"Cannot handle URL: {url}");
+            return false;
         }
 
         string finalHtmlCode = GetFinalHtmlCode(url);
         if (finalHtmlCode.IsNullOrEmpty())
         {
             Debug.LogError($"Failed to load HTML code for url: {url}");
+            return false;
+        }
+
+        if (isPlaying)
+        {
+            PausePlayback();
+        }
+        SetPlaybackPositionInMillis(0);
+
+        if (loadedUrl == url)
+        {
+            // Already loaded.
+            Debug.Log($"Reusing already loaded HTML for URL {url}");
+            return true;
+        }
+        
+        loadedUrl = url;
+        RunWhenWebViewInitialized(() => webView.LoadHtml(finalHtmlCode));
+        return true;
+    }
+
+    public void ResumePlayback()
+    {
+        if (!IsWebViewInitialized)
+        {
             return;
         }
 
-        webView.LoadHtml(finalHtmlCode);
+        Debug.Log("ResumePlayback");
+        isPlaying = true;
+        webView.ExecuteJavaScript("resumePlayback()");
     }
 
-    public void ContinuePlayback()
+    public void SetPlaybackPositionInMillis(double value)
     {
-        webView.ExecuteJavaScript("continuePlayback()");
+        webView.ExecuteJavaScript($"setPlaybackPositionInMillis({value})");
+        estimatedPlaybackPositionInMillis = (int)value;
+        lastEstimatedPlaybackPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
 
     public void PausePlayback()
     {
+        if (!IsWebViewInitialized)
+        {
+            return;
+        }
+        
+        Debug.Log("PausePlayback");
+        isPlaying = false;
         webView.ExecuteJavaScript("pausePlayback()");
     }
 
+    public void StopPlayback()
+    {
+        if (!IsWebViewInitialized)
+        {
+            return;
+        }
+        
+        Debug.Log("StopPlayback");
+        isPlaying = false;
+        webView.ExecuteJavaScript("stopPlayback()");
+    }
+    
     private string GetFinalHtmlCode(string url)
     {
         string htmlTemplate = GetHtmlTemplate(url);
@@ -282,8 +335,14 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             .Replace("{{URL}}", url);
     }
     
-    private void LoadHtmlTemplates()
+    private void ScanHtmlTemplates()
     {
+        if (hasScannedTemplates)
+        {
+            return;
+        }
+        hasScannedTemplates = true;
+        
         string webViewTemplatesFolder = ApplicationUtils.GetStreamingAssetsPath("WebViewTemplates");
         DirectoryUtils.CreateDirectory(webViewTemplatesFolder);
         
@@ -356,51 +415,51 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private string GetStringFromJavaScript(string code, string fallbackValue = "")
-    {
-        string jsResult = webView.ExecuteJavaScript(code).Result;
-        if (jsResult.IsNullOrEmpty())
-        {
-            Debug.LogError($"Failed to get result from JavaScript via {code}");
-            return fallbackValue;
-        }
-        
-        return fallbackValue;
-    }
-    
-    private int GetIntFromJavaScript(string code, int fallbackValue = 0)
-    {
-        string jsResult = GetStringFromJavaScript(code);
-        if (jsResult.IsNullOrEmpty())
-        {
-            return fallbackValue;
-        }
-
-        if (int.TryParse(jsResult, out int valueAsInt))
-        {
-            return valueAsInt;
-        }
-        
-        Debug.LogError($"Failed to parse JavaScript result of {code}. Result: " + jsResult);
-        return fallbackValue;
-    }
-    
-    private bool GetBoolFromJavaScript(string code, bool fallbackValue = false)
-    {
-        string jsResult = GetStringFromJavaScript(code);
-        if (jsResult.IsNullOrEmpty())
-        {
-            return fallbackValue;
-        }
-
-        if (bool.TryParse(jsResult, out bool valueAsBool))
-        {
-            return valueAsBool;
-        }
-        
-        Debug.LogError($"Failed to parse JavaScript result of {code}. Result: " + jsResult);
-        return fallbackValue;
-    }
+    // private async Task<string> GetStringFromJavaScript(string code, string fallbackValue = "")
+    // {
+    //     string jsResult = await webView.ExecuteJavaScript(code);
+    //     if (jsResult.IsNullOrEmpty())
+    //     {
+    //         Debug.LogError($"Failed to get result from JavaScript via {code}");
+    //         return fallbackValue;
+    //     }
+    //     
+    //     return fallbackValue;
+    // }
+    //
+    // private async Task<int> GetIntFromJavaScript(string code, int fallbackValue = 0)
+    // {
+    //     string jsResult = await GetStringFromJavaScript(code);
+    //     if (jsResult.IsNullOrEmpty())
+    //     {
+    //         return fallbackValue;
+    //     }
+    //
+    //     if (int.TryParse(jsResult, out int valueAsInt))
+    //     {
+    //         return valueAsInt;
+    //     }
+    //     
+    //     Debug.LogError($"Failed to parse JavaScript result of {code}. Result: " + jsResult);
+    //     return fallbackValue;
+    // }
+    //
+    // private async Task<bool> GetBoolFromJavaScript(string code, bool fallbackValue = false)
+    // {
+    //     string jsResult = await GetStringFromJavaScript(code);
+    //     if (jsResult.IsNullOrEmpty())
+    //     {
+    //         return fallbackValue;
+    //     }
+    //
+    //     if (bool.TryParse(jsResult, out bool valueAsBool))
+    //     {
+    //         return valueAsBool;
+    //     }
+    //     
+    //     Debug.LogError($"Failed to parse JavaScript result of {code}. Result: " + jsResult);
+    //     return fallbackValue;
+    // }
     
     private static bool HostsMatch(string a, string b)
     {

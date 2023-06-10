@@ -80,6 +80,9 @@
             },
             events: {
                 'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange,
+                // 'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
+                // 'onError': onPlayerError
             },
         });
     }
@@ -87,11 +90,48 @@
     // 4. The API will call this function when the video player is ready.
     function onPlayerReady(event) {
         console.log("onPlayerReady");
+
         player.playVideo();
-        player.setVolume(0);
+
+        // Send the playback position frequently
+        setInterval(() => {
+                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    postMessage({type: 'PlaybackPositionInMillis', value: getPlaybackPositionInMillis()})
+                }
+            },
+            1000);
+    }
+
+    var wasReady = false;
+    function onPlayerStateChange(event) {
+        console.log("onPlayerStateChange: " + event.data);
+        
+        if (player.getVideoLoadedFraction() > 0 && !wasReady) {
+            wasReady = true;
+            postMessage({ type: 'Ready', value: true });
+            postMessage({ type: 'DurationInMillis', value: getDurationInMillis() });
+            
+            if (event.data === YT.PlayerState.PLAYING){
+                postMessage({ type: 'StartedOrResumed', value: true });
+            } else {
+                postMessage({ type: 'StoppedOrPaused', value: true });
+            }
+        }
     }
 
     // Methods that are called by the main game.
+    function getDurationInMillis() {
+        if (!player)
+        {
+            console.log("getDurationInMillis: player not ready yet");
+            return 0;
+        }
+
+        const result = player.getDuration() * 1000;
+        console.log("getDurationInMillis: " + result);
+        return result;
+    }
+    
     function getPlaybackPositionInMillis() {
         if (!player)
         {
@@ -112,7 +152,9 @@
         }
 
         console.log("setPlaybackPositionInMillis: " + positionInMillis);
-        return player.seekTo(positionInMillis / 1000, true);
+        player.seekTo(positionInMillis / 1000, true);
+
+        postMessage({ type: 'PlaybackPositionInMillis', value: positionInMillis });
     }
 
     function getVolume() {
@@ -130,12 +172,13 @@
     function setVolume(volumeZeroToHundred) {
         if (!player)
         {
-            console.log("setVolume: player not ready yet");
+            // console.log("setVolume: player not ready yet");
             return 0;
         }
 
-        console.log("setVolume: " + volumeZeroToHundred);
-        return player.setVolume(volumeZeroToHundred);
+        // console.log("setVolume: " + volumeZeroToHundred);
+        player.setVolume(volumeZeroToHundred);
+        // postMessage({ type: 'Volume', value: volumeZeroToHundred });
     }
 
     function isContentLoaded() {
@@ -150,14 +193,15 @@
         return result;
     }
 
-    function continuePlayback() {
+    function resumePlayback() {
         if (!player)
         {
-            console.log("continuePlayback: player not ready yet");
+            console.log("resumePlayback: player not ready yet");
             return;
         }
 
-        console.log("continuePlayback");
+        console.log("resumePlayback");
+        postMessage({ type: 'StartedOrResumed', value: true });
         return player.playVideo();
     }
 
@@ -169,7 +213,28 @@
         }
 
         console.log("pausePlayback");
+        postMessage({ type: 'StoppedOrPaused', value: true });
         return player.pauseVideo();
+    }
+
+    function stopPlayback() {
+        if (!player)
+        {
+            console.log("stopPlayback: player not ready yet");
+            return;
+        }
+
+        console.log("stopPlayback");
+        postMessage({ type: 'StoppedOrPaused', value: true });
+        return player.stopVideo();
+    }
+    
+    function postMessage(jsonObject) {
+        if (typeof vuplex === 'undefined' || !vuplex || !vuplex.postMessage) {
+            console.log("postMessage: vuplex is not defined, ignoring message: " + JSON.stringify(jsonObject));
+            return;
+        }
+        vuplex.postMessage(jsonObject);   
     }
 </script>
 </body>

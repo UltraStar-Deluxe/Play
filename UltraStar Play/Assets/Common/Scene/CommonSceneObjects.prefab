@@ -7584,7 +7584,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   webViewPrefab: {fileID: 5119066810394802187}
-  testUrl: https://www.youtube.com/watch?v=tEOZjZZmlAI
+  webViewCamera: {fileID: 2364365025742481650}
+  volumeInPercent: 0
+  isContentLoaded: 0
 --- !u!1 &5675655531140774825
 GameObject:
   m_ObjectHideFlags: 0
@@ -9420,7 +9422,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114949863196309792, guid: 3e10f3b6a733e441c8352020cff2f1f6,
         type: 3}
+      propertyPath: DragMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114949863196309792, guid: 3e10f3b6a733e441c8352020cff2f1f6,
+        type: 3}
+      propertyPath: ClickingEnabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114949863196309792, guid: 3e10f3b6a733e441c8352020cff2f1f6,
+        type: 3}
+      propertyPath: HoveringEnabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114949863196309792, guid: 3e10f3b6a733e441c8352020cff2f1f6,
+        type: 3}
       propertyPath: KeyboardEnabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114949863196309792, guid: 3e10f3b6a733e441c8352020cff2f1f6,
+        type: 3}
+      propertyPath: ScrollingEnabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114949863196309792, guid: 3e10f3b6a733e441c8352020cff2f1f6,

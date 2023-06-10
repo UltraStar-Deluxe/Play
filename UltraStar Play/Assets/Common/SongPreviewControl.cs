@@ -85,7 +85,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         // The video has an additional delay to load.
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
-        if (songVideoPlayer.HasLoadedVideo && songVideoPlayer.videoPlayer.time <= 0)
+        if (songVideoPlayer.HasLoadedVideo && songVideoPlayer.PositionInVideoInMillis <= 0)
         {
             videoFadeInStartTimeInSeconds = Time.time;
         }
@@ -252,6 +252,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
                 .Subscribe(_ =>
                 {
                     DoSkipToSongPreview();
+                    songAudioPlayer.PlayAudio();
                     audioLoadedDisposable?.Dispose();
                 });
         }
