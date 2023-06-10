@@ -53,6 +53,9 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     // SongAudioPlayer to synchronize the playback position with.
     [Inject]
     private SongAudioPlayer songAudioPlayer;
+    
+    [Inject]
+    private SceneNavigator sceneNavigator;
 
     private SongMeta songMeta;
     public SongMeta SongMeta
@@ -120,6 +123,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         HasLoadedBackgroundImage = false;
         InitEventSubscriber();
         UnloadVideo();
+
+        sceneNavigator.BeforeSceneChangeEventStream
+            .Subscribe(_ => ResetWebViewRenderTexture())
+            .AddTo(gameObject);
         
         settings.ObserveEveryValueChanged(it => it.SongBackgroundScaleMode)
             .Subscribe(_ => UpdateBackgroundScaleMode());
