@@ -258,9 +258,14 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnWebViewFinishedLoading()
     {
-        isContentLoaded = true;
         Debug.Log("Finished loading of URL: " + loadedUrl);
-        webView.ExecuteJavaScript("getDurationInMillis()");
+        isContentLoaded = true;
+        UpdateVolume();
+    }
+
+    private void UpdateVolume()
+    {
+        VolumeInPercent = VolumeInPercent;
     }
 
     private void OnWebViewFailedLoading()
