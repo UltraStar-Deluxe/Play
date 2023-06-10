@@ -559,6 +559,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
         string filePath = matches.FirstOrDefault().Value;
         string fileContent = File.ReadAllText(filePath);
+        
+        Debug.Log($"Found WebView script for host '{urlHost}' in file '{filePath}'");
+        
         CachedWebViewScript cachedWebViewScript = new CachedWebViewScript(fileContent);
         hostToCachedWebViewScript[urlHost] = cachedWebViewScript;
         return cachedWebViewScript;
