@@ -69,5 +69,6 @@ public static partial class R
         public static readonly string usplay_togglePlayers = "usplay/togglePlayers";
         public static readonly string usplay_toggleResultGraph = "usplay/toggleResultGraph";
         public static readonly string usplay_toggleSongMenu = "usplay/toggleSongMenu";
+        public static readonly string usplay_toggleWebViewControl = "usplay/toggleWebViewControl";
     }
 }
