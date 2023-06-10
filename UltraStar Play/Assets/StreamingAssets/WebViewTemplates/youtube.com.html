@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<!-- https://stackoverflow.com/questions/325273/make-iframe-to-fit-100-of-containers-remaining-height -->
+<style>
+    body, html, iframe {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .flex-column {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .flex-grow {
+        flex-grow: 1;
+    }
+</style>
+
+<body>
+<!-- https://developers.google.com/youtube/iframe_api_reference -->
+
+<div class="flex-column">
+    <div class="flex-grow">
+        <div id="player">
+            <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // The URL that will be replaced with the MP3 tag value of the UltraStar txt file.
+    var url = '{{URL}}';
+    const fallbackUrl = 'https://www.youtube.com/watch?v=tEOZjZZmlAI';
+    
+    // 2. This code loads the IFrame Player API code asynchronously.
+    const tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // 3. This function creates an <iframe> (and YouTube player)
+    //    after the API code downloads.
+    var player;
+
+    function onYouTubeIframeAPIReady() {
+        console.log("onYouTubeIframeAPIReady");
+        
+        if (url.startsWith("{{")) {
+            console.log("url is not set. Using fallback value instead.");
+            url = fallbackUrl;
+        }
+
+        if (url.startsWith("{{")) {
+            console.log("url is not set even after using fallback value. Aborting.");
+            return;
+        }
+
+        const urlObject = new URL(url);
+        const videoId = urlObject.searchParams.get('v');
+        
+        player = new YT.Player('player', {
+            videoId: videoId,
+            width: 560,
+            height: 349,
+            playerVars: {
+                'autoplay': 1,
+                'controls': 0,
+                'rel': 0,
+                'modestbranding': 1,
+                'frameborder': 0,
+                'allowfullscreen': 1
+            },
+            events: {
+                'onReady': onPlayerReady,
+            },
+        });
+    }
+
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+        console.log("onPlayerReady");
+        player.playVideo();
+        player.setVolume(0);
+    }
+
+    // Methods that are called by the main game.
+    function getPlaybackPositionInMillis() {
+        if (!player)
+        {
+            console.log("getPlaybackPositionInMillis: player not ready yet");
+            return 0;
+        }
+
+        const result = player.getCurrentTime() * 1000;
+        console.log("getPlaybackPositionInMillis: " + result);
+        return result;
+    }
+
+    function setPlaybackPositionInMillis(positionInMillis) {
+        if (!player)
+        {
+            console.log("setPlaybackPositionInMillis: player not ready yet");
+            return;
+        }
+
+        console.log("setPlaybackPositionInMillis: " + positionInMillis);
+        return player.seekTo(positionInMillis / 1000, true);
+    }
+
+    function getVolume() {
+        if (!player)
+        {
+            console.log("getVolume: player not ready yet");
+            return 0;
+        }
+
+        const result = player.getVolume();
+        console.log("getVolume: " + result);
+        return result;
+    }
+
+    function setVolume(volumeZeroToHundred) {
+        if (!player)
+        {
+            console.log("setVolume: player not ready yet");
+            return 0;
+        }
+
+        console.log("setVolume: " + volumeZeroToHundred);
+        return player.setVolume(volumeZeroToHundred);
+    }
+
+    function isContentLoaded() {
+        if (!player)
+        {
+            console.log("isContentLoaded: player not ready yet");
+            return;
+        }
+        
+        const result = player.getVideoLoadedFraction() > 0;
+        console.log("isContentLoaded: " + result);
+        return result;
+    }
+
+    function continuePlayback() {
+        if (!player)
+        {
+            console.log("continuePlayback: player not ready yet");
+            return;
+        }
+
+        console.log("continuePlayback");
+        return player.playVideo();
+    }
+
+    function pausePlayback() {
+        if (!player)
+        {
+            console.log("pausePlayback: player not ready yet");
+            return;
+        }
+
+        console.log("pausePlayback");
+        return player.pauseVideo();
+    }
+</script>
+</body>
+</html>

@@ -89,6 +89,9 @@ See https://www.mozilla.org/en-US/MPL/1.1 respectively https://www.mozilla.org/e
     - https://github.com/CharsetDetector/UTF-unknown  (MPL 1.1)
     - https://github.com/errepi/ude (MPL 1.1)
 
+Chromium Embedded Framework (CEF) License
+-----------------------------------------
+See https://github.com/chromiumembedded/cef/blob/master/LICENSE.txt
 
 GeneralUser GS Soundfont License
 --------------------------------
