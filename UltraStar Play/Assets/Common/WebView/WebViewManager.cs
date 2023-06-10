@@ -46,7 +46,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     {
         get
         {
-            if (!IsWebViewInitialized)
+            if (!IsWebViewInitialized
+                || !isContentLoaded)
             {
                 return 0;
             }
@@ -144,6 +145,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private void UpdatePlaybackPositionInMillisEstimate()
     {
         if (!isPlaying
+            || !isContentLoaded
             || estimatedPlaybackPositionUpdatedFrameCount == Time.frameCount)
         {
             return;
@@ -305,7 +307,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             Debug.Log($"Reusing already loaded HTML for URL {url}");
             return true;
         }
-        
+
+        isContentLoaded = false;
         loadedUrl = url;
         RunWhenWebViewInitialized(() => webView.LoadHtml(finalHtmlCode));
         return true;
