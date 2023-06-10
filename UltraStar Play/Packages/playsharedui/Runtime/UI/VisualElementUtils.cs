@@ -207,7 +207,7 @@ public static class VisualElementUtils
         }
         
         Vector2 pointerPanelPos = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
-        VisualElement picked = uiDocument.rootVisualElement.panel.Pick(pointerPanelPos);
+        VisualElement picked = uiDocument.rootVisualElement?.panel?.Pick(pointerPanelPos);
         return picked;
     }
 }
