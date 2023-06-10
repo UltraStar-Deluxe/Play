@@ -41,8 +41,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
     
-    private int durationInMillis;
-    public int DurationInMillis
+    private double durationInMillis;
+    public double DurationInMillis
     {
         get
         {
@@ -53,10 +53,15 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return durationInMillis;
         }
     }
+
+
+    private long receivedPlaybackPositionUpdatedTimeInMillis;
+    private double receivedPlaybackPositionInMillis;
     
-    private int lastReceivedPlaybackPositionInMillis;
-    private int estimatedPlaybackPositionInMillis;
-    public int EstimatedPlaybackPositionInMillis
+    private int estimatedPlaybackPositionUpdatedFrameCount;
+    private long estimatedPlaybackPositionUpdatedTimeInMillis;
+    private double estimatedPlaybackPositionInMillis;
+    public double EstimatedPlaybackPositionInMillis
     {
         get
         {
@@ -64,7 +69,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             {
                 return 0;
             }
-            
+
             return estimatedPlaybackPositionInMillis;
         }
     }
@@ -99,11 +104,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return isContentLoaded;
         }
     }
-
-    private long lastEstimatedPlaybackPositionUpdatedTimeInMillis;
-
-    private string loadedUrl;
     
+    private string loadedUrl;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -119,20 +122,38 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private void Update()
     {
+        if (!IsWebViewInitialized)
+        {
+            return;
+        }
+
         UpdatePlaybackPositionInMillisEstimate();
+        SendPlaybackPositionInMillisIfNeeded();
+    }
+
+    private void SendPlaybackPositionInMillisIfNeeded()
+    {
+        long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        long timeInMillisSinceLastUpdate = currentTimeInMillis - receivedPlaybackPositionUpdatedTimeInMillis;
+        if (timeInMillisSinceLastUpdate > 100)
+        {
+            webView.ExecuteJavaScript("sendPlaybackPositionInMillis()");
+        }
     }
 
     private void UpdatePlaybackPositionInMillisEstimate()
     {
-        if (!isPlaying)
+        if (!isPlaying
+            || estimatedPlaybackPositionUpdatedFrameCount == Time.frameCount)
         {
             return;
         }
 
         long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-        long deltaTimeInMillis = currentTimeInMillis - lastEstimatedPlaybackPositionUpdatedTimeInMillis;
+        long deltaTimeInMillis = currentTimeInMillis - estimatedPlaybackPositionUpdatedTimeInMillis;
         estimatedPlaybackPositionInMillis += (int)deltaTimeInMillis;
-        lastEstimatedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
+        estimatedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
+        estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
     }
 
     private void OnEnable()
@@ -155,7 +176,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     
     private void OnWebViewMessageReceived(object sender, EventArgs<string> e)
     {
-        Debug.Log($"Received message from WebView: {e.Value}");
+        // Debug.Log($"Received message from WebView: {e.Value}");
         string json = e.Value.Trim();
         if (!json.StartsWith("{")
             || !json.EndsWith("}"))
@@ -182,18 +203,27 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                     case WebViewMessageType.PlaybackPositionInMillis:
                     {
                         NumberWebViewMessageDto numberWebViewMessageDto = JsonConverter.FromJson<NumberWebViewMessageDto>(json);
+
+                        long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
                         
-                        lastReceivedPlaybackPositionInMillis = (int)numberWebViewMessageDto.value;
-                        Debug.Log($"estimated playback position offset: {lastReceivedPlaybackPositionInMillis - estimatedPlaybackPositionInMillis}");
+                        // Log how far away from the actual time the estimate has become. 
+                        // double oldEstimatedPlaybackPositionInMillis = EstimatedPlaybackPositionInMillis;
+                        // double oldEstimatedPlaybackPositionInMillisOffset = numberWebViewMessageDto.value -
+                        //                                                     oldEstimatedPlaybackPositionInMillis;
+                        // Debug.Log($"Received new playback position. Old estimate offset: {oldEstimatedPlaybackPositionInMillisOffset}");
                         
-                        estimatedPlaybackPositionInMillis = lastReceivedPlaybackPositionInMillis;
-                        lastEstimatedPlaybackPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+                        receivedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
+                        receivedPlaybackPositionInMillis = numberWebViewMessageDto.value;
+                        
+                        estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
+                        estimatedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
+                        estimatedPlaybackPositionInMillis = receivedPlaybackPositionInMillis;
                         break;
                     }
                     case WebViewMessageType.DurationInMillis:
                     {
                         NumberWebViewMessageDto numberWebViewMessageDto = JsonConverter.FromJson<NumberWebViewMessageDto>(json);
-                        durationInMillis = (int)numberWebViewMessageDto.value;
+                        durationInMillis = numberWebViewMessageDto.value;
                         break;
                     }
                     case WebViewMessageType.Ready:
@@ -288,7 +318,6 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        Debug.Log("ResumePlayback");
         isPlaying = true;
         webView.ExecuteJavaScript("resumePlayback()");
     }
@@ -296,8 +325,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     public void SetPlaybackPositionInMillis(double value)
     {
         webView.ExecuteJavaScript($"setPlaybackPositionInMillis({value})");
-        estimatedPlaybackPositionInMillis = (int)value;
-        lastEstimatedPlaybackPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        receivedPlaybackPositionInMillis = value;
+        estimatedPlaybackPositionInMillis = value;
+        estimatedPlaybackPositionUpdatedTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
     }
 
     public void PausePlayback()
@@ -307,7 +338,6 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         
-        Debug.Log("PausePlayback");
         isPlaying = false;
         webView.ExecuteJavaScript("pausePlayback()");
     }
@@ -319,7 +349,6 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         
-        Debug.Log("StopPlayback");
         isPlaying = false;
         webView.ExecuteJavaScript("stopPlayback()");
     }
@@ -427,7 +456,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     //     return fallbackValue;
     // }
     //
-    // private async Task<int> GetIntFromJavaScript(string code, int fallbackValue = 0)
+    // private async Task<double> GetNumberFromJavaScript(string code, int fallbackValue = 0)
     // {
     //     string jsResult = await GetStringFromJavaScript(code);
     //     if (jsResult.IsNullOrEmpty())
@@ -435,29 +464,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     //         return fallbackValue;
     //     }
     //
-    //     if (int.TryParse(jsResult, out int valueAsInt))
+    //     if (double.TryParse(jsResult, out double valueAsNumber))
     //     {
-    //         return valueAsInt;
+    //         return valueAsNumber;
     //     }
     //     
-    //     Debug.LogError($"Failed to parse JavaScript result of {code}. Result: " + jsResult);
-    //     return fallbackValue;
-    // }
-    //
-    // private async Task<bool> GetBoolFromJavaScript(string code, bool fallbackValue = false)
-    // {
-    //     string jsResult = await GetStringFromJavaScript(code);
-    //     if (jsResult.IsNullOrEmpty())
-    //     {
-    //         return fallbackValue;
-    //     }
-    //
-    //     if (bool.TryParse(jsResult, out bool valueAsBool))
-    //     {
-    //         return valueAsBool;
-    //     }
-    //     
-    //     Debug.LogError($"Failed to parse JavaScript result of {code}. Result: " + jsResult);
+    //     Debug.LogError($"Failed to parse JavaScript result of {code} to double. Result: " + jsResult);
     //     return fallbackValue;
     // }
     

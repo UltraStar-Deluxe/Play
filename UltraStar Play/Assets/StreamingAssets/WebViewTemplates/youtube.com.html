@@ -92,14 +92,6 @@
         console.log("onPlayerReady");
 
         player.playVideo();
-
-        // Send the playback position frequently
-        setInterval(() => {
-                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-                    postMessage({type: 'PlaybackPositionInMillis', value: getPlaybackPositionInMillis()})
-                }
-            },
-            1000);
     }
 
     var wasReady = false;
@@ -109,7 +101,9 @@
         if (player.getVideoLoadedFraction() > 0 && !wasReady) {
             wasReady = true;
             postMessage({ type: 'Ready', value: true });
-            postMessage({ type: 'DurationInMillis', value: getDurationInMillis() });
+            
+            const durationInMillis = player.getDuration() * 1000;
+            postMessage({ type: 'DurationInMillis', value: durationInMillis });
             
             if (event.data === YT.PlayerState.PLAYING){
                 postMessage({ type: 'StartedOrResumed', value: true });
@@ -120,54 +114,65 @@
     }
 
     // Methods that are called by the main game.
-    function getDurationInMillis() {
-        if (!player)
-        {
-            console.log("getDurationInMillis: player not ready yet");
-            return 0;
-        }
-
-        const result = player.getDuration() * 1000;
-        console.log("getDurationInMillis: " + result);
-        return result;
-    }
+    // function getDurationInMillis() {
+    //     if (!player)
+    //     {
+    //         console.log("getDurationInMillis: player not ready yet");
+    //         return 0;
+    //     }
+    //
+    //     const result = player.getDuration() * 1000;
+    //     console.log("getDurationInMillis: " + result);
+    //     return result;
+    // }
     
-    function getPlaybackPositionInMillis() {
+    // function getPlaybackPositionInMillis() {
+    //     if (!player)
+    //     {
+    //         // console.log("getPlaybackPositionInMillis: player not ready yet");
+    //         return 0;
+    //     }
+    //
+    //     const result = player.getCurrentTime() * 1000;
+    //     // console.log("getPlaybackPositionInMillis: " + result);
+    //     return result;
+    // }
+
+    function sendPlaybackPositionInMillis() {
         if (!player)
         {
-            console.log("getPlaybackPositionInMillis: player not ready yet");
+            // console.log("sendPlaybackPositionInMillis: player not ready yet");
             return 0;
         }
 
         const result = player.getCurrentTime() * 1000;
-        console.log("getPlaybackPositionInMillis: " + result);
+        // console.log("sendPlaybackPositionInMillis: " + result);
+        postMessage({ type: 'PlaybackPositionInMillis', value: result });
         return result;
     }
 
     function setPlaybackPositionInMillis(positionInMillis) {
         if (!player)
         {
-            console.log("setPlaybackPositionInMillis: player not ready yet");
+            // console.log("setPlaybackPositionInMillis: player not ready yet");
             return;
         }
 
-        console.log("setPlaybackPositionInMillis: " + positionInMillis);
+        // console.log("setPlaybackPositionInMillis: " + positionInMillis);
         player.seekTo(positionInMillis / 1000, true);
-
-        postMessage({ type: 'PlaybackPositionInMillis', value: positionInMillis });
     }
 
-    function getVolume() {
-        if (!player)
-        {
-            console.log("getVolume: player not ready yet");
-            return 0;
-        }
-
-        const result = player.getVolume();
-        console.log("getVolume: " + result);
-        return result;
-    }
+    // function getVolume() {
+    //     if (!player)
+    //     {
+    //         console.log("getVolume: player not ready yet");
+    //         return 0;
+    //     }
+    //
+    //     const result = player.getVolume();
+    //     console.log("getVolume: " + result);
+    //     return result;
+    // }
 
     function setVolume(volumeZeroToHundred) {
         if (!player)
@@ -181,26 +186,26 @@
         // postMessage({ type: 'Volume', value: volumeZeroToHundred });
     }
 
-    function isContentLoaded() {
-        if (!player)
-        {
-            console.log("isContentLoaded: player not ready yet");
-            return;
-        }
-        
-        const result = player.getVideoLoadedFraction() > 0;
-        console.log("isContentLoaded: " + result);
-        return result;
-    }
+    // function isContentLoaded() {
+    //     if (!player)
+    //     {
+    //         console.log("isContentLoaded: player not ready yet");
+    //         return;
+    //     }
+    //    
+    //     const result = player.getVideoLoadedFraction() > 0;
+    //     console.log("isContentLoaded: " + result);
+    //     return result;
+    // }
 
     function resumePlayback() {
         if (!player)
         {
-            console.log("resumePlayback: player not ready yet");
+            // console.log("resumePlayback: player not ready yet");
             return;
         }
 
-        console.log("resumePlayback");
+        // console.log("resumePlayback");
         postMessage({ type: 'StartedOrResumed', value: true });
         return player.playVideo();
     }
@@ -208,11 +213,11 @@
     function pausePlayback() {
         if (!player)
         {
-            console.log("pausePlayback: player not ready yet");
+            // console.log("pausePlayback: player not ready yet");
             return;
         }
 
-        console.log("pausePlayback");
+        // console.log("pausePlayback");
         postMessage({ type: 'StoppedOrPaused', value: true });
         return player.pauseVideo();
     }
@@ -220,18 +225,18 @@
     function stopPlayback() {
         if (!player)
         {
-            console.log("stopPlayback: player not ready yet");
+            // console.log("stopPlayback: player not ready yet");
             return;
         }
 
-        console.log("stopPlayback");
+        // console.log("stopPlayback");
         postMessage({ type: 'StoppedOrPaused', value: true });
         return player.stopVideo();
     }
     
     function postMessage(jsonObject) {
         if (typeof vuplex === 'undefined' || !vuplex || !vuplex.postMessage) {
-            console.log("postMessage: vuplex is not defined, ignoring message: " + JSON.stringify(jsonObject));
+            // console.log("postMessage: vuplex is not defined, ignoring message: " + JSON.stringify(jsonObject));
             return;
         }
         vuplex.postMessage(jsonObject);   
