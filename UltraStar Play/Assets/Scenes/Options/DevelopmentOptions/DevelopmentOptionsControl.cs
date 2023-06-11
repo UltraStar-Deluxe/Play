@@ -48,6 +48,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
     
+    [Inject(UxmlName = R.UxmlNames.openWebViewScriptsPathButton)]
+    private Button openWebViewScriptsPathButton;
+    
     [Inject(UxmlName = R.UxmlNames.messageBufferTimeTextField)]
     private IntegerField messageBufferTimeTextField;
 
@@ -154,6 +157,16 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         else
         {
             openPersistentDataPathButton.HideByDisplay();
+        }
+        
+        // Open WebView scripts path
+        if (PlatformUtils.IsStandalone)
+        {
+            openWebViewScriptsPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(ApplicationUtils.GetWebViewScriptsAbsolutePath()));
+        }
+        else
+        {
+            openWebViewScriptsPathButton.HideByDisplay();
         }
         
         // Message delay

@@ -509,7 +509,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
         hasScannedJavaScriptFiles = true;
         
-        string webViewScriptsFolder = ApplicationUtils.GetStreamingAssetsPath("WebViewScripts");
+        string webViewScriptsFolder = ApplicationUtils.GetWebViewScriptsAbsolutePath();
         DirectoryUtils.CreateDirectory(webViewScriptsFolder);
         
         string[] webViewScriptPaths = Directory.GetFiles(webViewScriptsFolder, "*.js");

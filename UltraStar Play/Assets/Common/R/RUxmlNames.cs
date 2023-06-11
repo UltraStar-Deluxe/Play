@@ -445,11 +445,12 @@ public static partial class R
         public const string openFolderIcon = "openFolderIcon";
         public const string openImportLrcDialogButton = "openImportLrcDialogButton";
         public const string openPersistentDataPathButton = "openPersistentDataPathButton";
-        public const string openPersistentDataPathIcon = "openPersistentDataPathIcon";
         public const string openPersistentDataPathLabel = "openPersistentDataPathLabel";
         public const string openSongFolderButton = "openSongFolderButton";
         public const string openSongMenuButton = "openSongMenuButton";
         public const string openSongMenuIcon = "openSongMenuIcon";
+        public const string openWebViewScriptsPathButton = "openWebViewScriptsPathButton";
+        public const string openWebViewScriptsPathLabel = "openWebViewScriptsPathLabel";
         public const string optionsSceneScrollView = "optionsSceneScrollView";
         public const string orderChooserTitle = "orderChooserTitle";
         public const string otherTeamsScrollView = "otherTeamsScrollView";
