@@ -266,8 +266,8 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                     songSelectSceneControl.ShowLyricsAndInfoPopup(SongMeta);
                 }
             });
-        
-        contextMenuPopup.AddButton("Vocals Separation", "call_split",
+
+        VisualElement buttonContainer = contextMenuPopup.AddButton("Vocals Isolation", "call_split",
             () =>
             {
                 if (SongMeta != null)
@@ -275,6 +275,13 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                     audioSeparationManager.ProcessSongMeta(SongMeta);
                 }
             });
+        
+        // Disable button if vocals and instrumental audio already exist.
+        if (SongMetaUtils.VocalsAudioResourceExists(SongMeta)
+            && SongMetaUtils.InstrumentalAudioResourceExists(SongMeta))
+        {
+            buttonContainer.Q<Button>().SetEnabled(false);
+        }
     }
 
     private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)

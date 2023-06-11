@@ -51,7 +51,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
         if (!ApplicationUtils.IsSupportedVocalsSeparationAudioFormat(fileExtension))
         {
-            UiManager.CreateNotification($"Vocals separation not supported for this audio file.\n" +
+            UiManager.CreateNotification($"Vocals isolation not supported for this audio file.\n" +
                                          $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}");
             return Observable.Empty<AudioSeparationResult>();
         }
@@ -61,7 +61,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // Create job to show in UI
         if (audioSeparationJob == null)
         {
-            audioSeparationJob = new Job($"Vocals separation of '{Path.GetFileName(songMeta.Mp3)}'");
+            audioSeparationJob = new Job($"Vocals isolation of '{Path.GetFileName(songMeta.Mp3)}'");
             jobManager.AddJob(audioSeparationJob);
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
@@ -115,8 +115,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     {
         if (audioSeparationProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing vocals separation");
-            return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing vocals separation"));
+            UiManager.CreateNotification("Already performing vocals isolation");
+            return Observable.Throw<AudioSeparationResult>(new IllegalStateException("Already performing vocals isolation"));
         }
 
         return Observable.Create<AudioSeparationResult>(o =>
