@@ -229,7 +229,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (!isPlaying
             || !isContentLoaded
-            || estimatedPlaybackPositionUpdatedFrameCount == Time.frameCount)
+            || estimatedPlaybackPositionUpdatedFrameCount == Time.frameCount
+            || receivedPlaybackPositionInMillis <= 0)
         {
             return;
         }
