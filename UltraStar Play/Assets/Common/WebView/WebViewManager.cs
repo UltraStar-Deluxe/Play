@@ -31,7 +31,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     
     [Inject]
     private SceneNavigator sceneNavigator;
-
+    
+    [Inject]
+    private Settings settings;
+    
     private IWebView webView;
 
     private bool IsWebViewInitialized => webView != null;
@@ -102,7 +105,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
         set
         {
-            webView.ExecuteJavaScript($"setVolume({value})");
+            // The embedded browser does not consider AudioListener.volume. Thus, this must be considered here explicitly.
+            float jsVolume = AudioListener.volume * NumberUtils.PercentToFactor(volumeInPercent) * 100;
+            webView.ExecuteJavaScript($"setVolume({jsVolume})");
             volumeInPercent = value;
         }
     }
@@ -142,6 +147,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
+        settings.ObserveEveryValueChanged(it => it.VolumePercent)
+            .Subscribe(_ => UpdateVolume());
         RegisterInputActions();
     }
 
