@@ -57,7 +57,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         }
 
         Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Mp3)}'");
-        Job audioSeparationJob = new("Vocals separation", processSongJob);
+        Job audioSeparationJob = new("Vocals isolation", processSongJob);
         Job speechRecognitionJob = new("Speech recognition", processSongJob);
         Job pitchDetectionJob = new("Pitch detection", processSongJob);
 

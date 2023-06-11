@@ -933,17 +933,6 @@
                 },
                 {
                     "name": "",
-                    "id": "73145dd7-26f2-4bac-bc26-6eed175586eb",
-                    "path": "<Gamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "togglePlayers",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "479cc28f-605c-4269-b28b-007ff626e181",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",

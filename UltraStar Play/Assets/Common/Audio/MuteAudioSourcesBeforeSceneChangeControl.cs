@@ -46,8 +46,13 @@ public class MuteAudioSourcesBeforeSceneChangeControl : AbstractSingletonBehavio
         mutedAudioSources.Clear();
         foreach (AudioSource audioSource in FindObjectsOfType<AudioSource>())
         {
-            audioSource.mute = true;
-            mutedAudioSources.Add(audioSource);
+            if (audioSource.GetComponentInParent<DontDestroyOnLoadManager>() == null
+                && audioSource.clip != null)
+            {
+                Debug.Log($"Muting AudioSource: {audioSource.name} ({audioSource.clip.name}");
+                audioSource.mute = true;
+                mutedAudioSources.Add(audioSource);
+            }
         }
     }
     

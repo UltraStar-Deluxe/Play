@@ -67,13 +67,11 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         if (settings.SongEditorSettings.PlaybackSamplesSource == ESongEditorSamplesSource.OriginalMusic)
         {
             AudioSource.volume = 0;
-            songAudioPlayer.VolumeFactor = NumberUtils.PercentToFactor(settings.VolumePercent)
-                                           * NumberUtils.PercentToFactor(settings.SongEditorSettings.MusicVolumePercent);
+            songAudioPlayer.VolumeFactor = NumberUtils.PercentToFactor(settings.SongEditorSettings.MusicVolumePercent);
         }
         else
         {
-            AudioSource.volume = NumberUtils.PercentToFactor(settings.VolumePercent)
-                                 * NumberUtils.PercentToFactor(settings.SongEditorSettings.MusicVolumePercent);
+            AudioSource.volume = NumberUtils.PercentToFactor(settings.SongEditorSettings.MusicVolumePercent);
             songAudioPlayer.VolumeFactor = 0;
         }
     }

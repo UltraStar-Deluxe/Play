@@ -53,8 +53,6 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         modifierControl.ModifiedVolumePercent.Subscribe(_ => UpdateAudioSources());
         audioFadeInControl.FadeInVolumePercent.Subscribe(_ => UpdateAudioSources());
         
-        settings.ObserveEveryValueChanged(it => it.VolumePercent)
-            .Subscribe(_ => UpdateAudioSources());
         settings.ObserveEveryValueChanged(it => it.MusicVolumePercent)
             .Subscribe(_ => UpdateAudioSources());
         settings.ObserveEveryValueChanged(it => it.VocalsAudioVolumePercent)
@@ -133,8 +131,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void UseOriginalSongAudio()
     {
-        songAudioPlayer.VolumeFactor = NumberUtils.PercentToFactor(settings.VolumePercent) 
-                                       * NumberUtils.PercentToFactor(settings.MusicVolumePercent)
+        songAudioPlayer.VolumeFactor = NumberUtils.PercentToFactor(settings.MusicVolumePercent)
                                        * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
                                        * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
         vocalsAudioSource.volume = 0;
@@ -153,12 +150,10 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         }
 
         songAudioPlayer.VolumeFactor = 0;
-        instrumentalAudioSource.volume = NumberUtils.PercentToFactor(settings.VolumePercent)
-                                         * NumberUtils.PercentToFactor(settings.MusicVolumePercent)
+        instrumentalAudioSource.volume = NumberUtils.PercentToFactor(settings.MusicVolumePercent)
                                          * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
                                          * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
-        vocalsAudioSource.volume = NumberUtils.PercentToFactor(settings.VolumePercent)
-                                   * NumberUtils.PercentToFactor(settings.MusicVolumePercent)
+        vocalsAudioSource.volume = NumberUtils.PercentToFactor(settings.MusicVolumePercent)
                                    * NumberUtils.PercentToFactor(settings.VocalsAudioVolumePercent)
                                    * NumberUtils.PercentToFactor(modifierControl.ModifiedVolumePercent.Value)
                                    * NumberUtils.PercentToFactor(audioFadeInControl.FadeInVolumePercent.Value);
