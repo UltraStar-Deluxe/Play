@@ -17,13 +17,15 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
 
+    [Inject]
+    private WebViewManager webViewManager;
+    
     [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
     private VisualElement songPreviewVideoImage;
 
     [Inject(UxmlName = R.UxmlNames.songPreviewBackgroundImage)]
     private VisualElement songPreviewBackgroundImage;
 
-    
     private SongEntryControl currentSongEntryControl;
 
     private int initialSongIndex;
@@ -44,7 +46,8 @@ public class SongSelectSongPreviewControl : SongPreviewControl
                 return;
             }
 
-            if (SongMetaUtils.VideoResourceExists(currentSongEntryControl.SongMeta))
+            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(currentSongEntryControl.SongMeta, webViewManager.CanHandleUrl);
+            if (SongMetaUtils.ResourceExists(currentSongEntryControl.SongMeta, videoUri))
             {
                 songPreviewVideoImage.ShowByDisplay();
                 songPreviewVideoImage.style.opacity = 0;
