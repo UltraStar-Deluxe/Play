@@ -85,7 +85,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 return 0;
             }
 
-            if (isWebViewVideo)
+            if (IsWebViewVideo)
             {
                 return webViewManager.EstimatedPlaybackPositionInMillis;
             }
@@ -115,7 +115,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     }
     
     private RenderTexture originalWebViewCameraRenderTexture;
-    private bool isWebViewVideo;
+    public bool IsWebViewVideo { get; private set; }
 
     public void OnInjectionFinished()
     {
@@ -200,13 +200,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         if (webViewManager.CanHandleUrl(uri))
         {
-            isWebViewVideo = true;
+            IsWebViewVideo = true;
             SetWebViewRenderTextureToVideoRenderTexture();
             HasLoadedVideo = true;
         }
         else
         {
-            isWebViewVideo = false;
+            IsWebViewVideo = false;
             ResetWebViewRenderTexture();
             
             videoPlayer.url = ApplicationUtils.GetVideoPlayerUri(uri);

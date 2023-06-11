@@ -505,6 +505,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             if (isContentLoaded && javaScriptCanLoadUrl)
             {
                 Debug.Log("Loading new URL via JavaScript");
+                webView.ExecuteJavaScript($"setVolume(0)");
                 webView.ExecuteJavaScript($"loadUrl('{url}')");
             }
             else
