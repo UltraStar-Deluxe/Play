@@ -87,6 +87,10 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
             StopAllMidiNotes();
             DestroyMidiAudioClip();
         });
+        
+        // Deactivate until the MidiManager has been initialized.
+        // This is to prevent OnAudioFilterRead to create weird noise (probably a Unity bug).
+        gameObject.SetActive(false);
     }
 
     public void InitIfNotDoneYet()
@@ -104,6 +108,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         audioSource.Play();
 
         isInitialized = true;
+        gameObject.SetActive(true);
     }
 
     private void InitPatchBank()
