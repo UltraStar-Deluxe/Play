@@ -6,9 +6,12 @@
                 <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="controlMinWidth" style="margin-right: 5px;" />
                 <ui:Button display-tooltip-when-elided="true" name="openPersistentDataPathButton" style="margin-right: 5px; flex-direction: row;">
                     <ui:Label tabindex="-1" text="Data Folder" display-tooltip-when-elided="true" name="openPersistentDataPathLabel" />
-                    <MaterialIcon tabindex="-1" icon="open_in_new" name="openPersistentDataPathIcon" />
+                    <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
                 </ui:Button>
-                <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+                <ui:Button display-tooltip-when-elided="true" name="openWebViewScriptsPathButton" style="margin-right: 5px; flex-direction: row;">
+                    <ui:Label tabindex="-1" text="Browser Scripts" display-tooltip-when-elided="true" name="openWebViewScriptsPathLabel" />
+                    <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
+                </ui:Button>
             </ui:VisualElement>
             <ItemPicker name="showFpsPicker" label="Show FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />

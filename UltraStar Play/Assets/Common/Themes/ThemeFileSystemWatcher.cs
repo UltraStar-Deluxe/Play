@@ -25,6 +25,7 @@ public class ThemeFileSystemWatcher : AbstractSingletonBehaviour, INeedInjection
 #if UNITY_STANDALONE
     protected override void StartSingleton()
     {
+        Debug.Log($"Watching theme files in {ThemeManager.GetAbsoluteUserDefinedThemesFolder()} and {ThemeManager.GetAbsoluteDefaultThemesFolder()}");
         disposables.Add(FileSystemWatcherUtils.CreateFileSystemWatcher(
             ThemeManager.GetAbsoluteUserDefinedThemesFolder(),
             "*.json",

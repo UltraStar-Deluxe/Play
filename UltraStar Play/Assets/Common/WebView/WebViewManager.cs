@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
+using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Vuplex.WebView;
-using Keyboard = Vuplex.WebView.Keyboard;
 
 public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 {
@@ -33,6 +33,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private SceneNavigator sceneNavigator;
 
+    [Inject]
+    private UiManager uiManager;
+    
+    [Inject]
+    private Settings settings;
+    
     private IWebView webView;
 
     private bool IsWebViewInitialized => webView != null;
@@ -103,7 +109,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
         set
         {
-            webView.ExecuteJavaScript($"setVolume({value})");
+            // The embedded browser does not consider AudioListener.volume. Thus, this must be considered here explicitly.
+            float jsVolume = AudioListener.volume * NumberUtils.PercentToFactor(volumeInPercent) * 100;
+            webView.ExecuteJavaScript($"setVolume({jsVolume})");
             volumeInPercent = value;
         }
     }
@@ -142,8 +150,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
+        sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => OnBeforeSceneChanged());
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
+        settings.ObserveEveryValueChanged(it => it.VolumePercent)
+            .Subscribe(_ => UpdateVolume());
         RegisterInputActions();
+    }
+
+    private void OnBeforeSceneChanged()
+    {
+        PausePlayback();
     }
 
     private void OnSceneChanged()
@@ -223,7 +239,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (!isPlaying
             || !isContentLoaded
-            || estimatedPlaybackPositionUpdatedFrameCount == Time.frameCount)
+            || estimatedPlaybackPositionUpdatedFrameCount == Time.frameCount
+            || receivedPlaybackPositionInMillis <= 0)
         {
             return;
         }
@@ -416,13 +433,54 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return false;
         }
 
+        string host = new Uri(url).Host;
+        if (settings.AcceptedWebViewHosts.Contains(host))
+        {
+            return DoLoadUrl(url);
+        }
+        
+        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("Open in Embedded Browser");
+        messageDialogControl.Message = $"The song file references an external website.\n"
+                                       + $"Do you want to open {host} in the embedded browser?";
+
+        VisualElement infoContainer = new();
+        infoContainer.name = "row";
+        infoContainer.AddToClassList("ml-auto");
+        infoContainer.AddToClassList("mr-auto");
+        infoContainer.AddToClassList("my-3");
+        messageDialogControl.AddVisualElement(infoContainer);
+        
+        FontIcon infoIcon = new MaterialIcon();
+        infoIcon.Icon = "info_outline";
+        infoIcon.style.fontSize = 14;
+        infoIcon.AddToClassList("mr-1");
+        infoContainer.Add(infoIcon);
+        
+        Label infoLabel = new Label($"You can open the embedded browser anytime by pressing F8 or Ctrl+B.");
+        infoLabel.AddToClassList("smallFont");
+        infoContainer.Add(infoLabel);
+        
+        messageDialogControl.AddButton("Yes, do not ask again", _ =>
+        {
+            messageDialogControl.CloseDialog();
+            settings.AcceptedWebViewHosts.Add(host);
+            DoLoadUrl(url);
+        });
+        messageDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
+            _ => messageDialogControl.CloseDialog());
+
+        return false;
+    }
+
+    private bool DoLoadUrl(string url)
+    {
         string webViewScript = GetWebViewScript(url);
         if (webViewScript.IsNullOrEmpty())
         {
             Debug.LogError($"Failed to load WebView script code for url: {url}");
             return false;
         }
-
+        
         if (isPlaying)
         {
             PausePlayback();
@@ -440,6 +498,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             isContentLoaded = false;
         }
+        
         loadedUrl = url;
         RunWhenWebViewInitialized(() =>
         {
@@ -458,7 +517,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         });
         return true;
     }
-
+    
     public void ResumePlayback()
     {
         if (!IsWebViewInitialized)
@@ -468,6 +527,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
         isPlaying = true;
         webView.ExecuteJavaScript("resumePlayback()");
+        UpdateVolume();
     }
 
     public void SetPlaybackPositionInMillis(double value)
@@ -488,6 +548,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         
         isPlaying = false;
         webView.ExecuteJavaScript("pausePlayback()");
+        webView.ExecuteJavaScript("setVolume(0)");
     }
 
     public void StopPlayback()
@@ -509,7 +570,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
         hasScannedJavaScriptFiles = true;
         
-        string webViewScriptsFolder = ApplicationUtils.GetStreamingAssetsPath("WebViewScripts");
+        string webViewScriptsFolder = ApplicationUtils.GetWebViewScriptsAbsolutePath();
         DirectoryUtils.CreateDirectory(webViewScriptsFolder);
         
         string[] webViewScriptPaths = Directory.GetFiles(webViewScriptsFolder, "*.js");
@@ -598,6 +659,17 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         string aWithoutWww = a.Replace("www.", "");
         string bWithoutWww = b.Replace("www.", "");
         return aWithoutWww.ToLowerInvariant() == bWithoutWww.ToLowerInvariant();
+    }
+    
+    public void ReloadScripts()
+    {
+        hostToWebViewScript.Clear();
+        hostToCachedWebViewScript.Clear();
+        urlToCachedWebViewScript.Clear();
+        loadedUrl = null;
+        hasScannedJavaScriptFiles = false;
+        javaScriptCanLoadUrl = false;
+        Debug.Log("Reloaded WebView scripts by clearing cache.");
     }
 
     private class CachedWebViewScript
