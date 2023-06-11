@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Vuplex.WebView;
-using Keyboard = Vuplex.WebView.Keyboard;
 
 public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 {
@@ -595,6 +594,17 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         string aWithoutWww = a.Replace("www.", "");
         string bWithoutWww = b.Replace("www.", "");
         return aWithoutWww.ToLowerInvariant() == bWithoutWww.ToLowerInvariant();
+    }
+    
+    public void ReloadScripts()
+    {
+        hostToWebViewScript.Clear();
+        hostToCachedWebViewScript.Clear();
+        urlToCachedWebViewScript.Clear();
+        loadedUrl = null;
+        hasScannedJavaScriptFiles = false;
+        javaScriptCanLoadUrl = false;
+        Debug.Log("Reloaded WebView scripts by clearing cache.");
     }
 
     private class CachedWebViewScript
