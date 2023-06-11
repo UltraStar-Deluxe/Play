@@ -256,11 +256,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         tabGroupControl.AddTabGroupButton(showInputSimulationButton, inputSimulationContainer);
         tabGroupControl.ShowContainer(micViewContainer);
 
-        showSongViewButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            clientSideMicDataSender.StopRecording();
-            songListControl.Show();
-        });
+        showSongViewButton.RegisterCallbackButtonTriggered(_ => songListControl.Show());
     }
 
     private void InitMenu()
@@ -372,7 +368,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         int newFinalSampleRate = MicSampleRecorder.GetFinalSampleRate(settings.MicProfile.Name, settings.MicProfile.SampleRate);
         if (clientSideMicDataSender.MicProfile == null
             || settings.MicProfile.Name != clientSideMicDataSender.MicProfile.Name
-            || newFinalSampleRate != clientSideMicDataSender.FinalSampleRate.Value)
+            || newFinalSampleRate != clientSideMicDataSender.FinalSampleRate.Value
+            || settings.MicProfile.DelayInMillis != clientSideMicDataSender.MicProfile.DelayInMillis
+            || settings.MicProfile.Amplification != clientSideMicDataSender.MicProfile.Amplification
+            || settings.MicProfile.NoiseSuppression != clientSideMicDataSender.MicProfile.NoiseSuppression)
         {
             clientSideMicDataSender.MicProfile = settings.MicProfile;
         }
