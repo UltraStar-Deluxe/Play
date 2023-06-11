@@ -256,11 +256,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         tabGroupControl.AddTabGroupButton(showInputSimulationButton, inputSimulationContainer);
         tabGroupControl.ShowContainer(micViewContainer);
 
-        showSongViewButton.RegisterCallbackButtonTriggered(_ =>
-        {
-            clientSideMicDataSender.StopRecording();
-            songListControl.Show();
-        });
+        showSongViewButton.RegisterCallbackButtonTriggered(_ => songListControl.Show());
     }
 
     private void InitMenu()
