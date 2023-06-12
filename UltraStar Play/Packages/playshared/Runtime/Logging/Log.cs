@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Display;
+using UniRx;
 using UnityEngine;
+using ILogger = Serilog.ILogger;
+using Object = UnityEngine.Object;
 
 public static class Log
 {
@@ -14,15 +20,27 @@ public static class Log
     public static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
     public static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
 
-    public static Serilog.ILogger Logger { get; private set; }
+    private static ILogger Logger { get; set; }
 
     private static LogHistorySink logHistorySink;
+
+    private static ILogHandler defaultUnityLogHandler;
+    private static readonly ILogHandler customUnityLogHandler = new CustomUnityLogHandler();
+
+    private static readonly Subject<LogEvent> logEventStream = new();
+    public static IObservable<LogEvent> LogEventStream => logEventStream;
+
+    public static bool IsUsingDefaultUnityLogHandler => defaultUnityLogHandler == null 
+                                                        || Debug.unityLogger.logHandler == defaultUnityLogHandler 
+                                                        || Application.isEditor;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
         logHistorySink = new();
         Logger = CreateLogger();
+        Logger.Information("===== Initialized Serilog Logger =====");
+        UseCustomUnityLogHandler();
     }
 
     public static List<LogEvent> GetLogHistory()
@@ -30,7 +48,7 @@ public static class Log
         return logHistorySink.LogHistory;
     }
 
-    private static Serilog.ILogger CreateLogger()
+    private static ILogger CreateLogger()
     {
         if (!Directory.Exists(logFileFolder))
         {
@@ -41,7 +59,6 @@ public static class Log
             .MinimumLevel.Information()
             .Enrich.FromLogContext()
             .Enrich.With<UnityStackTraceEnricher>()
-            .WriteTo.Sink(new UnityLogEventSink())
             .WriteTo.Sink(logHistorySink)
             .WriteTo.File(
                 logFilePath, // path
@@ -56,43 +73,17 @@ public static class Log
                 RollingInterval.Day, // rollingInterval
                 false, // rollOnFileSizeLimit
                 5, // retainedFileCountLimit
-                System.Text.Encoding.UTF8, // Encoding
-                null); // FileLifecycleHooks
+                Encoding.UTF8, // Encoding
+                null) // FileLifecycleHooks
+            .WriteTo.Sink(new LogEventStreamSink());
 
-        Serilog.ILogger logger = loggerConfiguration.CreateLogger();
-        logger.Information("===== Initialized Serilog Logger =====");
+        ILogger logger = loggerConfiguration.CreateLogger();
         return logger;
-    }
-
-    public static void HandleUnityLog(string logString, string stackTrace, LogType type)
-    {
-        if (logString.EndsWith(UnityLogEventSink.unityLogEventSinkMarker))
-        {
-            // Has already been logged to the Unity Console.
-            return;
-        }
-
-        Serilog.ILogger loggerWithContext = Logger.ForContext(UnityLogEventSink.skipUnityLogEventSinkPropertyName, true);
-
-        switch (type)
-        {
-            case LogType.Warning:
-                loggerWithContext.Warning(logString);
-                break;
-            case LogType.Assert:
-            case LogType.Error:
-            case LogType.Exception:
-                loggerWithContext.Error(logString + "\n" + stackTrace);
-                break;
-            default:
-                loggerWithContext.Information(logString);
-                break;
-        }
     }
 
     public static string GetLogText(LogEventLevel logEventLevel)
     {
-        MessageTemplateTextFormatter textFormatter = new(Log.outputTemplate);
+        MessageTemplateTextFormatter textFormatter = new(outputTemplate);
         List<string> logLines = GetLogHistory()
             .Where(logEvent => (int)logEvent.Level >= (int)logEventLevel)
             .Select(logEvent =>
@@ -114,5 +105,126 @@ public static class Log
             logText = prefix + logText.Substring(logText.Length - (LogTextMaxLengthInChars - prefix.Length));
         }
         return logText;
+    }
+
+    public static LogType GetUnityLogType(LogEvent logEvent)
+    {
+        switch (logEvent.Level)
+        {
+            case LogEventLevel.Verbose:
+            case LogEventLevel.Debug:
+            case LogEventLevel.Information:
+                return LogType.Log;
+            case LogEventLevel.Warning:
+                return LogType.Warning;
+            case LogEventLevel.Error:
+            case LogEventLevel.Fatal:
+                return logEvent.Exception != null ? LogType.Exception : LogType.Error;
+            default:
+                Debug.LogError("Unknown LogLevel" + logEvent.Level);
+                return LogType.Log;
+        }
+    }
+    
+    private static void UseCustomUnityLogHandler()
+    {
+        if (defaultUnityLogHandler == null)
+        {
+            defaultUnityLogHandler = Debug.unityLogger.logHandler;
+        }
+
+        if (Debug.unityLogger.logHandler == customUnityLogHandler)
+        {
+            return;
+        }
+
+        Debug.unityLogger.logHandler = customUnityLogHandler;
+        Debug.Log("===== Using Custom Unity Log Handler =====");
+    }
+    
+    private static void UseDefaultUnityLogHandler()
+    {
+        if (defaultUnityLogHandler == null)
+        {
+            defaultUnityLogHandler = Debug.unityLogger.logHandler;
+        }
+        
+        if (Debug.unityLogger.logHandler == defaultUnityLogHandler)
+        {
+            return;
+        }
+
+        Debug.unityLogger.logHandler = defaultUnityLogHandler;
+        Debug.Log("===== Using Default Unity Log Handler =====");
+    }
+    
+    private class CustomUnityLogHandler : ILogHandler
+    {
+        public void LogFormat(LogType logType, Object context, string format, params object[] args)
+        {
+            if (Logger == null)
+            {
+                defaultUnityLogHandler?.LogFormat(logType, context, format, args);
+                return;
+            }
+            
+            switch (logType)
+            {
+                case LogType.Log:
+                    Logger.Information(GetLogMessage(context, format, args));
+                    break;
+                case LogType.Warning:
+                    Logger.Warning(GetLogMessage(context, format, args));
+                    break;
+                case LogType.Error:
+                    Logger.Error(GetLogMessage(context, format, args));
+                    break;
+                case LogType.Exception:
+                    Logger.Error(GetLogMessage(context, format, args));
+                    break;
+                case LogType.Assert:
+                    Logger.Fatal(GetLogMessage(context, format, args));
+                    break;
+                default:
+                    Logger.Information(GetLogMessage(context, format, args));
+                    break;
+            }
+
+            if (Application.isEditor)
+            {
+                // Forward to UnityEditor's console via defaultUnityLogHandler.
+                // This must not be logged again with the Serilog Logger to avoid an infinite loop.
+                defaultUnityLogHandler?.LogFormat(logType, context, format, args);
+            }
+        }
+
+        public void LogException(Exception exception, Object context)
+        {
+            if (Logger == null)
+            {
+                defaultUnityLogHandler?.LogException(exception, context);
+                return;
+            }
+            
+            Logger.Error(exception, GetLogMessage(context, "{0}", exception.Message));
+        }
+
+        private string GetLogMessage(Object context, string format, params object[] args)
+        {
+            if (context == null)
+            {
+                return string.Format(format, args);
+            }
+
+            return string.Format($"[{context.name}] {format}", args);;
+        }
+    }
+    
+    private class LogEventStreamSink : ILogEventSink
+    {
+        public void Emit(LogEvent logEvent)
+        {
+            logEventStream.OnNext(logEvent);
+        }
     }
 }

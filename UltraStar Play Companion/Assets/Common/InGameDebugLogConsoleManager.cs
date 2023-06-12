@@ -12,7 +12,7 @@ public class InGameDebugConsoleManager : AbstractInGameDebugConsoleManager, INee
         return Instance;
     }
 
-    protected override void StartSingleton()
+    protected override void AwakeSingleton()
     {
         base.Init();
     }

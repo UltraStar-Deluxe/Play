@@ -73,13 +73,13 @@ public class SingSceneWebcamControl : MonoBehaviour, INeedInjection
         if (newValue)
         {
             Play();
-            Log.Logger.Information("Webcam activated: {webcamname}", webcamTexture.deviceName);
+            Debug.Log("Webcam activated: {webcamTexture.deviceName}");
             webcamRenderContainer.ShowByDisplay();
         }
         else
         {
             Stop();
-            Log.Logger.Information("Webcam deactivated: {webcamname}", webcamTexture.deviceName);
+            Debug.Log($"Webcam deactivated: {webcamTexture.deviceName}");
             webcamRenderContainer.HideByDisplay();
         }
     }

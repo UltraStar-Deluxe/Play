@@ -70,14 +70,12 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void OnEnableSingleton()
     {
-        Application.logMessageReceivedThreaded += Log.HandleUnityLog;
         Touch.onFingerDown += OnFingerDown;
         Touch.onFingerUp += OnFingerUp;
     }
 
     protected override void OnDisableSingleton()
     {
-        Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
         Touch.onFingerDown -= OnFingerDown;
         Touch.onFingerUp -= OnFingerUp;
     }

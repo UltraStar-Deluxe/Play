@@ -4,6 +4,7 @@ using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -86,16 +87,6 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
             lastScreenWidth = Screen.width;
             lastScreenHeight = Screen.height;
         }
-    }
-
-    protected override void OnEnableSingleton()
-    {
-        Application.logMessageReceivedThreaded += Log.HandleUnityLog;
-    }
-
-    protected override void OnDisableSingleton()
-    {
-        Application.logMessageReceivedThreaded -= Log.HandleUnityLog;
     }
 
     public bool HasCommandLineArgument(string argumentName)

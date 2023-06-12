@@ -278,7 +278,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
         catch (Exception e)
         {
-            Log.Logger.Error(e, $"Failed to rename playlist to '{newName}'");
+            Debug.LogException(e);
+            Debug.LogError($"Failed to rename playlist to '{newName}': {e.Message}");
             errorMessage = $"Failed to rename playlist to '{newName}': " + e.Message;
             return false;
         }
@@ -314,7 +315,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
         catch (Exception e)
         {
-            Log.Logger.Error(e, $"Failed to delete playlist '{oldName}'");
+            Debug.LogException(e);
+            Debug.LogError($"Failed to delete playlist '{oldName}': {e.Message}");
             return $"Failed to delete playlist '{oldName}': " + e.Message;
         }
 

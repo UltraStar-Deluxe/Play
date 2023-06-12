@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using PrimeInputActions;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
@@ -72,7 +73,8 @@ public static class InputLegendControl
         }
         catch (NotImplementedException e)
         {
-            Log.Logger.Error(e, $"Could not determine BindingDisplayString for InputAction '{inputAction.name}'");
+            Debug.LogException(e);
+            Debug.LogError($"Could not determine BindingDisplayString for InputAction '{inputAction.name}': {e.Message}");
             return "";
         }
     }
