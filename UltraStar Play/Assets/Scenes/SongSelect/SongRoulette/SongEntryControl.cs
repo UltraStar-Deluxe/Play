@@ -61,9 +61,6 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     [Inject]
     private Settings settings;
     
-    [Inject]
-    private UiManager uiManager;
-    
     public string Name { get; set; }
 
     private SongMeta songMeta;
@@ -305,7 +302,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     {
         if (songMeta == null)
         {
-            SetCoverImage(uiManager.defaultSongImage);
+            SetDefaultCoverImageWithColor();
             return;
         }
         
@@ -313,8 +310,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         string uri = SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta);
         if (uri.IsNullOrEmpty())
         {
-            songImageOuter.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
-            songImageInner.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
+            SetDefaultCoverImageWithColor();
             return;
         }
         
@@ -327,7 +323,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                     return;
                 }
 
-                SetCoverImage(loadedSprite);
+                SetCoverImageWithoutColor(loadedSprite);
             },
             _ =>
             {
@@ -337,14 +333,23 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                     return;
                 }
 
-                SetCoverImage(uiManager.defaultSongImage);
+                SetDefaultCoverImageWithColor();
             });
     }
 
-    private void SetCoverImage(Sprite sprite)
+    private void SetDefaultCoverImageWithColor()
+    {
+        SongMetaImageUtils.SetDefaultSongImage(songImageOuter, songImageInner);
+        SongMetaImageUtils.SetDefaultSongImageColor(songMeta, songImageOuter, songImageInner);
+    }
+    
+    private void SetCoverImageWithoutColor(Sprite sprite)
     {
         songImageOuter.style.backgroundImage = new StyleBackground(sprite);
+        songImageOuter.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+        
         songImageInner.style.backgroundImage = new StyleBackground(sprite);
+        songImageInner.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
     }
 
     private void UpdateIcons()
