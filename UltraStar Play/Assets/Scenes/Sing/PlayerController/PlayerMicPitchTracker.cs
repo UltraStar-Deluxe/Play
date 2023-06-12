@@ -127,7 +127,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
         if (connectedClientHandler == null)
         {
-            Log.Logger.Warning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
+            Debug.LogWarning($"Did not find connected client handler for player {playerProfile.Name}. Not recording player notes.");
             return;
         }
 
@@ -266,7 +266,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             bool handleBecauseOfMessageBufferTime = messageAgeInMillis > messageBufferTimeInMillis;
             // if (handleBecauseOfMessageBufferTime)
             // {
-            //     Log.Logger.Information($"Handling old message with age {messageAgeInMillis} ms" + JsonConverter.ToJson(beatPitchEvent));
+            //     Debug.Log($"Handling old message with age {messageAgeInMillis} ms" + JsonConverter.ToJson(beatPitchEvent));
             // }
             
             int eventAgeInBeats = Math.Abs(currentBeatConsideringMicDelay - beatPitchEventAndTime.beatPitchEvent.Beat);
@@ -274,7 +274,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             // if (!handleBecauseOfMessageBufferTime 
             //     && handleBecauseOfEventBufferTime)
             // {
-            //     Log.Logger.Information(($"Handling old event with age {eventAgeInBeats} beats: " + JsonConverter.ToJson(beatPitchEvent));
+            //     Debug.Log(($"Handling old event with age {eventAgeInBeats} beats: " + JsonConverter.ToJson(beatPitchEvent));
             // }
             
             if (handleBecauseOfMessageBufferTime
@@ -290,7 +290,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             }
         }
         
-        // Log.Logger.Information("DequeuePitchEventsFromConnectedClient: Remaining events: " + beatPitchEventsFromConnectedClientQueue.Count);
+        // Debug.Log("DequeuePitchEventsFromConnectedClient: Remaining events: " + beatPitchEventsFromConnectedClientQueue.Count);
     }
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
@@ -330,7 +330,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
         {
             // Looks like the companion app does not know the current position in the song. Send it this info again.
-            Log.Logger.Warning($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
+            Debug.LogWarning($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
             if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + (SendPositionInSongIntervalInMillis / 10) < TimeUtils.GetUnixTimeMilliseconds())
             {
                 SendPositionInSongToClient();
@@ -341,7 +341,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, songAudioPlayer.PositionInSongInMillis);
         if (pitchEvent.Beat > currentBeat)
         {
-            Log.Logger.Warning($"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
+            Debug.LogWarning($"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
             return;
         }
 
@@ -396,7 +396,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             SongGap = songMeta.Gap,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
         };
-        Log.Logger.Information($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
+        Debug.Log($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
         connectedClientHandler.SendMessageToClient(positionInSongDto);
     }
 

@@ -68,7 +68,8 @@ public class UltraStarPlayInputManager : InputManager, INeedInjection
         }
         catch (Exception e)
         {
-            Log.Logger.Error(e, "Could not enable enhanced touch support");
+            Debug.LogException(e);
+            Debug.LogError($"Could not enable enhanced touch support: {e.Message}");
         }
 
         UpdateInputDeviceIcon();

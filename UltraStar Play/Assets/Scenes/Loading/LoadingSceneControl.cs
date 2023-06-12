@@ -50,7 +50,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         // The settings are loaded on access.
         Settings settings = SettingsManager.Instance.Settings;
         string jsonSettings = JsonConverter.ToJson(settings, false);
-        Log.Logger.Information("loaded settings:" + jsonSettings);
+        Debug.Log("loaded settings:" + jsonSettings);
 
         // Init song folders if none yet
         if (settings.SongDirs.IsNullOrEmpty())
