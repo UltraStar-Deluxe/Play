@@ -25,6 +25,7 @@ public class Settings : ISettings
 
     // The settings use a list of deselected player such that players are selected by default.
     public List<string> DeselectedPlayerProfiles { get; private set; } = new();
+    public Dictionary<string, MicProfileReference> PlayerProfileNameToLastUsedMicProfile { get; private set; } = new();
 
     public int UdpPortOnServer { get; set; } = 34567;
     public int UdpPortOnClient { get; set; } = 34568;

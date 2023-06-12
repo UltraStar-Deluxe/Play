@@ -68,7 +68,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     private ExtendNotesAction extendNotesAction;
 
     [Inject]
-    private SongEditorSearchControl sonEditorSearchControl;
+    private SongEditorSearchControl songEditorSearchControl;
 
     [Inject]
     private UIDocument uiDocument;
@@ -170,8 +170,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         
         // Open search
         InputManager.GetInputAction(R.InputActions.songEditor_openSearch).PerformedAsObservable()
-            .Where(_ => !AnyInputFieldHasFocus())
-            .Subscribe(_ => sonEditorSearchControl.ShowSearchOverlay());
+            .Where(_ => GetFocusedTextField() == null || GetFocusedTextField() == songEditorSearchControl.SearchTextField)
+            .Subscribe(_ => songEditorSearchControl.ShowSearchOverlay());
         
         // Make golden / freestyle / normal
         InputManager.GetInputAction(R.InputActions.songEditor_toggleNoteTypeGolden).PerformedAsObservable()
@@ -251,9 +251,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         {
             songEditorSceneControl.CloseAllOpenDialogs();
         }
-        else if (sonEditorSearchControl.IsSearchOverlayVisible)
+        else if (songEditorSearchControl.IsSearchOverlayVisible)
         {
-            sonEditorSearchControl.HideSearchOverlay();
+            songEditorSearchControl.HideSearchOverlay();
         }
         else if (songEditorSideBarControl.IsAnySideBarContainerVisible)
         {
@@ -634,6 +634,16 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     public bool AnyInputFieldHasFocus()
     {
-        return uiDocument.rootVisualElement.focusController.focusedElement is TextField;
+        return GetFocusedTextField() != null;
+    }
+
+    public TextField GetFocusedTextField()
+    {
+        if (uiDocument == null)
+        {
+            return null;
+        }
+
+        return uiDocument.rootVisualElement?.focusController?.focusedElement as TextField;
     }
 }

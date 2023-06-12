@@ -134,8 +134,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         selectedSongArtist.text = "";
         selectedSongTitle.text = "";
         songIndexLabel.text = "";
-        selectedSongImageOuter.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
-        selectedSongImageInner.style.backgroundImage = new StyleBackground(uiManager.defaultSongImage);
+        SongMetaImageUtils.SetDefaultSongImage(selectedSongImageOuter, selectedSongImageInner);
         songRatingIconControl.HideSongRatingIcons();
         UpdateSongStatistics(null);
     }

@@ -7,6 +7,11 @@ using UnityEngine;
 
 public static class SongMetaUtils
 {
+    private static readonly HashBasedColorGenerator colorGenerator = new(
+        o => o?.GetHashCode() ?? 0,
+        new Vector2(0.4f, 1f),
+        new Vector2(0.7f, 1f));
+    
     public static bool SongMetaFileExists(SongMeta songMeta)
     {
         return ResourceExists(songMeta, songMeta.FileName);
@@ -726,5 +731,16 @@ public static class SongMetaUtils
             ? SongMetaUtils.GetAudioUri(songMeta)
             : SongMetaUtils.GetVideoUri(songMeta);
         return videoUri;
+    }
+    
+    public static Color32 CreateColorForSongMeta(SongMeta songMeta)
+    {
+        string artistDashTitle = GetArtistDashTitle(songMeta);
+        if (artistDashTitle.IsNullOrEmpty())
+        {
+            return Color.white;
+        }
+        
+        return colorGenerator.ToColor(artistDashTitle);
     }
 }

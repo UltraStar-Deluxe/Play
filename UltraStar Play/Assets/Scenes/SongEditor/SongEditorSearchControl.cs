@@ -32,6 +32,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
     
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
+    public TextField SearchTextField => searchTextField;
     
     [Inject(UxmlName = R.UxmlNames.searchPreviousButton)]
     private Button searchPreviousButton;
@@ -45,18 +46,33 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
     public bool IsSearchOverlayVisible => searchOverlay.IsVisibleByDisplay();
 
     private DragToMoveControl dragToMoveControl;
+
+    private Subject<SongEditorSearchResult> searchResultEventStream = new();
+    public IObservable<SongEditorSearchResult> SearchResultEventStream => searchResultEventStream;
+
+    private SongEditorSearchResult lastSearchResult;
+
+    private int lastSearchFrameCount;
     
     public void OnInjectionFinished()
     {
         HideSearchOverlay();
-        UpdateSearchResultLabel();
+        UpdateSearchResult();
         
-        searchTextField.RegisterValueChangedCallback(evt => UpdateSearchResultLabel());
+        searchTextField.RegisterValueChangedCallback(evt => UpdateSearchResult());
         searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => SearchNext());
         searchTextField.DisableParseEscapeSequences();
         
         searchPreviousButton.RegisterCallbackButtonTriggered(_ => SearchPrevious());
         searchNextButton.RegisterCallbackButtonTriggered(_ => SearchNext());
+
+        SearchResultEventStream.Subscribe(evt =>
+        {
+            lastSearchResult = evt;
+            searchResultLabel.text = evt.SearchText.IsNullOrEmpty()
+                ? ""
+                : $"{evt.MatchingNotes.Count} matches";
+        });
 
         VisualElementUtils.RegisterDirectClickCallback(searchOverlay, () => HideSearchOverlay());
 
@@ -79,13 +95,16 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
     private void SearchDirection(int direction)
     {
         string searchText = searchTextField.text;
-        if (searchText.IsNullOrEmpty())
+        if (searchText.IsNullOrEmpty()
+            || lastSearchResult == null
+            || lastSearchFrameCount == Time.frameCount)
         {
             return;
         }
 
-        // Find notes matching the search text
-        List<Note> matchingNotes = SearchMatchingNotes();
+        lastSearchFrameCount = Time.frameCount;
+        
+        List<Note> matchingNotes = lastSearchResult.MatchingNotes.ToList();
 
         // Reduce search result to notes in direction
         int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
@@ -134,6 +153,11 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         if (note != null)
         {
             songAudioPlayer.PositionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+            int indexOfNote = matchingNotes.IndexOf(note);
+            if (indexOfNote >= 0)
+            {
+                searchResultLabel.text = $"{indexOfNote + 1} / {matchingNotes.Count}";
+            }
         }
     }
 
@@ -192,23 +216,24 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         return sortedMatchingNotes;
     }
 
-    private void UpdateSearchResultLabel()
+    private void UpdateSearchResult()
     {
         if (searchTextField.text.IsNullOrEmpty())
         {
-            searchResultLabel.text = "";
+            searchResultEventStream.OnNext(SongEditorSearchResult.emptyResult);
             return;
         }
 
         List<Note> matchingNotes = SearchMatchingNotes();
-        searchResultLabel.text = $"{matchingNotes.Count.ToString()} matches";
+        searchResultEventStream.OnNext(new SongEditorSearchResult(searchTextField.text, matchingNotes));
     }
 
     public void ShowSearchOverlay()
     {
         searchOverlay.ShowByDisplay();
         searchTextField.Focus();
-        UpdateSearchResultLabel();
+        searchTextField.SelectAll();
+        UpdateSearchResult();
     }
     
     public void HideSearchOverlay()
@@ -247,6 +272,22 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
                     }
                 });
             lyrics = sb.ToString();
+        }
+    }
+
+    public class SongEditorSearchResult
+    {
+        public static readonly SongEditorSearchResult emptyResult = new("", new List<Note>());
+        
+        public string SearchText { get; private set; } = "";
+        
+        private readonly List<Note> matchingNotes = new();
+        public IReadOnlyCollection<Note> MatchingNotes => matchingNotes;
+
+        public SongEditorSearchResult(string searchText, IEnumerable<Note> matchingNotes)
+        {
+            this.SearchText = searchText;
+            this.matchingNotes.AddRange(matchingNotes);
         }
     }
 }

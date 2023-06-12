@@ -330,7 +330,32 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         
         void AssignUnusedMicProfile(PlayerSelectPlayerEntryControl playerEntryControl)
         {
-            playerEntryControl.MicProfile = GetUnusedMicProfiles().FirstOrDefault();
+            MicProfileReference lastUsedMicProfile = settings.PlayerProfileNameToLastUsedMicProfile
+                .FirstOrDefault(entry => entry.Key == playerEntryControl.PlayerProfileName)
+                .Value;
+            
+            List<MicProfile> unusedMicProfiles = GetUnusedMicProfiles();
+            
+            // Prefer the last used mic profile
+            MicProfile unusedMicProfileThatWasUsedLastTime = unusedMicProfiles
+                .FirstOrDefault(unusedMicProfile => Equals(new MicProfileReference(unusedMicProfile), lastUsedMicProfile));
+            if (unusedMicProfileThatWasUsedLastTime != null)
+            {
+                playerEntryControl.MicProfile = unusedMicProfileThatWasUsedLastTime;
+                return;
+            }
+
+            // Prefer a mic profile with the same name of the player
+            MicProfile unusedMicProfileWithSameNameAsPlayer = unusedMicProfiles
+                .FirstOrDefault(unusedMicProfile => string.Equals(unusedMicProfile.Name, playerEntryControl.PlayerProfileName, StringComparison.InvariantCultureIgnoreCase));
+            if (unusedMicProfileWithSameNameAsPlayer != null)
+            {
+                playerEntryControl.MicProfile = unusedMicProfileWithSameNameAsPlayer;
+                return;
+            }
+
+            // Use any unused mic profile, no further preferences.
+            playerEntryControl.MicProfile = unusedMicProfiles.FirstOrDefault();
         }
         
         int playerProfileIndex = 0;
@@ -543,8 +568,22 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
     public void HideSongDetails()
     {
+        SaveLastUsedMicProfiles();
+        
         songDetailsContainer.HideByDisplay();
         songListContainer.ShowByDisplay();
+    }
+
+    private void SaveLastUsedMicProfiles()
+    {
+        settings.PlayerProfileNameToLastUsedMicProfile.Clear();
+        foreach (PlayerSelectPlayerEntryControl playerEntryControl in playerEntryControls)
+        {
+            if (playerEntryControl.MicProfile != null)
+            {
+                settings.PlayerProfileNameToLastUsedMicProfile[playerEntryControl.PlayerProfileName] = new MicProfileReference(playerEntryControl.MicProfile);
+            }
+        }
     }
 
     public void Dispose()

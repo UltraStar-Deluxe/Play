@@ -58,15 +58,42 @@ public static class SongMetaImageUtils
                 foreach (VisualElement visualElement in visualElements)
                 {
                     visualElement.style.backgroundImage = new StyleBackground(loadedSprite);
+                    visualElement.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
                 }
             },
             _ =>
             {
-                Sprite defaultCoverImage = UiManager.Instance.defaultSongImage;
-                foreach (VisualElement visualElement in visualElements)
-                {
-                    visualElement.style.backgroundImage = new StyleBackground(defaultCoverImage);
-                }
+                SetDefaultSongImage(visualElements);
+                SetDefaultSongImageColor(songMeta, visualElements);
             });
+    }
+
+    public static void SetDefaultSongImage(params VisualElement[] visualElements)
+    {
+        if (visualElements.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        Sprite defaultCoverImage = UiManager.Instance.defaultSongImage;
+        foreach (VisualElement visualElement in visualElements)
+        {
+            visualElement.style.backgroundImage = new StyleBackground(defaultCoverImage);
+        }
+    }
+    
+    public static void SetDefaultSongImageColor(SongMeta songMeta, params VisualElement[] visualElements)
+    {
+        if (songMeta == null
+            || visualElements.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        Color32 color = SongMetaUtils.CreateColorForSongMeta(songMeta);
+        foreach (VisualElement visualElement in visualElements)
+        {
+            visualElement.style.unityBackgroundImageTintColor = new StyleColor(color);
+        }
     }
 }
