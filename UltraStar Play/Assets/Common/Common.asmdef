@@ -20,7 +20,8 @@
         "Vosk",
         "SpleeterSharp",
         "UnityStandaloneFileBrowser",
-        "Vuplex.WebView"
+        "Vuplex.WebView",
+        "LiteNetLib"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

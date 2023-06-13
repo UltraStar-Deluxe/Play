@@ -100,8 +100,7 @@ public class Settings : ISettings
     public List<string> IgnoredReleases { get; set; } = new();
 
     // Companion App / REST API settings
-    public int UdpPortOnServer { get; set; } = 34567;
-    public int UdpPortOnClient { get; set; } = 34568;
+    public int IpPortOnServer { get; set; } = 34567;
     public string OwnHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
     public int ConnectedClientMessageBufferTimeInMillis { get; set; } = 200;

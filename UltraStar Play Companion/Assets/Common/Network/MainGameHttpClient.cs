@@ -40,7 +40,6 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         clientSideConnectRequestManager.ConnectEventStream
-            .ObserveOnMainThread()
             .Where(connectEvent => connectEvent.IsSuccess)
             .Subscribe(connectEvent =>
             {
@@ -51,7 +50,6 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
             });
 
         clientSideConnectRequestManager.ReceivedMessageStream
-            .ObserveOnMainThread()
             .Subscribe(dto =>
             {
                 if (dto is PermissionsMessageDto permissionsMessageDto)

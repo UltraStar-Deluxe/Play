@@ -41,7 +41,6 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         
         UpdateConnectedClients();
         serverSideConnectRequestManager.ClientConnectedEventStream
-            .ObserveOnMainThread()
             .Subscribe(_ => UpdateConnectedClients())
             .AddTo(gameObject);
     }
@@ -57,9 +56,9 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
             });
 
         connectedClientCountLabel.text = TranslationManager.GetTranslation(R.Messages.options_connectedClientCount,
-            "count", ServerSideConnectRequestManager.ConnectedClientCount);
+            "count", serverSideConnectRequestManager.ConnectedClientCount);
         
-        noConnectedClientsContainer.SetVisibleByDisplay(ServerSideConnectRequestManager.ConnectedClientCount <= 0);
+        noConnectedClientsContainer.SetVisibleByDisplay(serverSideConnectRequestManager.ConnectedClientCount <= 0);
         
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(connectedClientList);
     }

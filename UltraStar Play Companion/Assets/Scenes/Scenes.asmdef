@@ -10,7 +10,8 @@
         "com.achimmihca.uniinject",
         "Unity.InputSystem",
         "playshared",
-        "playsharedui"
+        "playsharedui",
+        "LiteNetLib"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

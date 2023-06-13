@@ -86,7 +86,6 @@ public class MicProgressBarRecordingControl : INeedInjection, IInjectionFinished
                         out IConnectedClientHandler connectedClientHandler))
                 {
                     micSampleRecorderDisposables.Add(connectedClientHandler.ReceivedMessageStream
-                        .ObserveOnMainThread()
                         .Subscribe(evt => OnConnectedClientMessageReceived(evt)));
                 }
             }

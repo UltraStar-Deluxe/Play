@@ -92,7 +92,6 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             InitPitchDetectionFromConnectedClient();
             serverSideConnectRequestManager.ClientConnectedEventStream
-                .ObserveOnMainThread()
                 .Where(evt => evt.IsConnected)
                 .Subscribe(_ => OnClientConnected())
                 .AddTo(gameObject);
@@ -132,7 +131,6 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         }
 
         connectedClientHandler.ReceivedMessageStream
-            .ObserveOnMainThread()
             .Subscribe(dto =>
             {
                 if (dto is BeatPitchEventDto beatPitchEventDto)
@@ -227,14 +225,15 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private void UpdatePitchDetectionFromConnectedClient()
     {
-        // Read messages from client since last time the reader thread was active.
         IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
         if (connectedClientHandler == null)
         {
             // Disconnected
             return;
         }
-        connectedClientHandler.ReadMessagesFromClient();
+        
+        // Read messages from client since last time the reader thread was active.
+        // connectedClientHandler.ReadMessagesFromClient();
         
         if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + SendPositionInSongIntervalInMillis < TimeUtils.GetUnixTimeMilliseconds())
         {

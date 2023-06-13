@@ -15,7 +15,8 @@
         "playsharedui",
         "Vosk",
         "SpleeterSharp",
-        "UnityStandaloneFileBrowser"
+        "UnityStandaloneFileBrowser",
+        "LiteNetLib"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

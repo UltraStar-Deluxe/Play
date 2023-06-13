@@ -17,3 +17,6 @@ Plugins/Serilog/Serilog.Sinks.File.meta
 
 Plugins/LeanTween/
 Plugins/LeanTween.meta
+
+Plugins/LiteNetLib/
+Plugins/LiteNetLib.meta

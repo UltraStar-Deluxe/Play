@@ -45,6 +45,7 @@ public static partial class R
         public const string inputSimulationContainer = "inputSimulationContainer";
         public const string inputSimulationTabGroup = "inputSimulationTabGroup";
         public const string InputSimulationUi = "InputSimulationUi";
+        public const string ipPortOnServerTextField = "ipPortOnServerTextField";
         public const string keyboardIcon = "keyboardIcon";
         public const string keyboardSimulationContainer = "keyboardSimulationContainer";
         public const string labelContainer = "labelContainer";
@@ -161,8 +162,6 @@ public static partial class R
         public const string toggleRecordingButtonContainer = "toggleRecordingButtonContainer";
         public const string triangleDown = "triangleDown";
         public const string triangleUp = "triangleUp";
-        public const string udpPortOnClientTextField = "udpPortOnClientTextField";
-        public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string viewLogButton = "viewLogButton";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";

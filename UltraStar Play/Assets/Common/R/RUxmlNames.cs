@@ -260,6 +260,9 @@ public static partial class R
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ip = "ip";
         public const string ipAddressLabel = "ipAddressLabel";
+        public const string ipPortOnServerContainer = "ipPortOnServerContainer";
+        public const string ipPortOnServerLabel = "ipPortOnServerLabel";
+        public const string ipPortOnServerTextField = "ipPortOnServerTextField";
         public const string issueEntryUiRoot = "issueEntryUiRoot";
         public const string issueImage = "issueImage";
         public const string issueMessageLabel = "issueMessageLabel";
@@ -842,12 +845,6 @@ public static partial class R
         public const string trackAndChannelDropdownField = "trackAndChannelDropdownField";
         public const string tryAddSongsLabel = "tryAddSongsLabel";
         public const string twoPlayerLayout = "twoPlayerLayout";
-        public const string udpPortOnClientContainer = "udpPortOnClientContainer";
-        public const string udpPortOnClientLabel = "udpPortOnClientLabel";
-        public const string udpPortOnClientTextField = "udpPortOnClientTextField";
-        public const string udpPortOnServerContainer = "udpPortOnServerContainer";
-        public const string udpPortOnServerLabel = "udpPortOnServerLabel";
-        public const string udpPortOnServerTextField = "udpPortOnServerTextField";
         public const string undoButton = "undoButton";
         public const string unexpectedErrorContainer = "unexpectedErrorContainer";
         public const string unexpectedErrorLabel = "unexpectedErrorLabel";
