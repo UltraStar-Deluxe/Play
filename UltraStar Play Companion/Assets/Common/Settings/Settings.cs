@@ -18,7 +18,7 @@ public class Settings : ISettings
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
     public int TargetFps { get; set; } = 60;
     public bool ShowAudioWaveForm { get; set; } = true;
-    public float MousePadSensitivity { get; set; } = 1;
+    public float MousePadSensitivity { get; set; } = 0.2f;
     public bool IsDevModeEnabled { get; set; }
     
     public bool PlayRecordedAudio { get; set; }

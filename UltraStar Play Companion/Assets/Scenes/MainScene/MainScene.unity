@@ -171,17 +171,6 @@ MonoBehaviour:
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: 8fab1d000cb604d46a497680cdf338cd, type: 3}
   m_SortingOrder: 0
---- !u!114 &599260815 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 905131499534332176, guid: cfadc19478457fb46971b4bf44ad9bc7, type: 3}
-  m_PrefabInstance: {fileID: 7793846928310591085}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a42a4bc532d84a4483bac5e1df02248, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &781607866
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,6 +200,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 631f7515e9f74d8fb517375a65cb7f78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  halftoneContinuationBias: 0.1
 --- !u!4 &781607868
 Transform:
   m_ObjectHideFlags: 0
@@ -303,7 +293,6 @@ MonoBehaviour:
   versionPropertiesTextAsset: {fileID: 4900000, guid: d2f6d8e833e31724796bca2ae8f0d566, type: 3}
   songListRequestor: {fileID: 1757853345}
   clientSideMicDataSender: {fileID: 781607867}
-  micSampleRecorder: {fileID: 599260815}
 --- !u!4 &2047619672
 Transform:
   m_ObjectHideFlags: 0
