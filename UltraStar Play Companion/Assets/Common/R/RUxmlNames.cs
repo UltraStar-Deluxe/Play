@@ -16,6 +16,8 @@ public static partial class R
         public const string column = "column";
         public const string commitHashText = "commitHashText";
         public const string connectionInfoText = "connectionInfoText";
+        public const string connectionServerAddressTextField = "connectionServerAddressTextField";
+        public const string connectionServerPortTextField = "connectionServerPortTextField";
         public const string connectionStatusText = "connectionStatusText";
         public const string connectionThroubleshootingText = "connectionThroubleshootingText";
         public const string connectionViewContainer = "connectionViewContainer";
@@ -45,7 +47,6 @@ public static partial class R
         public const string inputSimulationContainer = "inputSimulationContainer";
         public const string inputSimulationTabGroup = "inputSimulationTabGroup";
         public const string InputSimulationUi = "InputSimulationUi";
-        public const string ipPortOnServerTextField = "ipPortOnServerTextField";
         public const string keyboardIcon = "keyboardIcon";
         public const string keyboardSimulationContainer = "keyboardSimulationContainer";
         public const string labelContainer = "labelContainer";
@@ -61,6 +62,7 @@ public static partial class R
         public const string menuOverlayScrollView = "menuOverlayScrollView";
         public const string menuUiRoot = "menuUiRoot";
         public const string micButton = "micButton";
+        public const string micDataDeliveryMethodField = "micDataDeliveryMethodField";
         public const string micIcon = "micIcon";
         public const string MicrophoneUi = "MicrophoneUi";
         public const string microphoneUiRoot = "microphoneUiRoot";
@@ -75,10 +77,8 @@ public static partial class R
         public const string mouseSensitivityFloatField = "mouseSensitivityFloatField";
         public const string mouseSimulationContainer = "mouseSimulationContainer";
         public const string nameLabel = "nameLabel";
-        public const string networkConfigContainer = "networkConfigContainer";
         public const string noFavoriteIcon = "noFavoriteIcon";
         public const string noMicIcon = "noMicIcon";
-        public const string ownHostTextField = "ownHostTextField";
         public const string playerEntry = "playerEntry";
         public const string playersContainer = "playersContainer";
         public const string playersContainerTitle = "playersContainerTitle";

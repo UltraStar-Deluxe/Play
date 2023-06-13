@@ -100,10 +100,11 @@ public class Settings : ISettings
     public List<string> IgnoredReleases { get; set; } = new();
 
     // Companion App / REST API settings
-    public int IpPortOnServer { get; set; } = 34567;
-    public string OwnHost { get; set; } = new("");
+    public int ConnectionServerPort { get; set; } = 34567;
+    public int HttpServerPort { get; set; } = 6789;
+    public string HttpServerHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
-    public int ConnectedClientMessageBufferTimeInMillis { get; set; } = 200;
+    public int ConnectedClientMessageBufferTimeInMillis { get; set; } = 150;
     
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();

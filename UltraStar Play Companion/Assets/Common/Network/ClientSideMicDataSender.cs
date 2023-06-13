@@ -169,8 +169,8 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
 
     private void SendMessageToServer(JsonSerializable jsonSerializable)
     {
-        // Debug.Log("SendMessageToServer - " + jsonSerializable.ToJson());
-        clientSideConnectRequestManager.SendMessageToServer(jsonSerializable);
+        // Debug.Log($"SendMessageToServer - method: {companionAppSettings.MicDataDeliveryMethod}, message: " + jsonSerializable.ToJson());
+        clientSideConnectRequestManager.SendMessageToServer(jsonSerializable, companionAppSettings.MicDataDeliveryMethod);
     }
 
     private double GetEstimatedPositionInSongInMillis()

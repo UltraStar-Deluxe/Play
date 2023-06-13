@@ -32,8 +32,6 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     
     public bool IsConnected => ServerPeer != null;
     
-    private bool receivedValidConnectResponse;
-
     private readonly Subject<JsonSerializable> receivedMessageStream = new();
     public IObservable<JsonSerializable> ReceivedMessageStream => receivedMessageStream;
 
@@ -66,26 +64,62 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     
     private void ConnectToServer()
     {
-        if (IsConnected
-            && receivedValidConnectResponse)
+        if (IsConnected)
         {
             return;
         }
 
-        if (!IsConnected)
+        connectEventStream.OnNext(new ConnectEvent(connectRequestCount));
+        connectRequestCount++;
+
+        if (settings.ConnectionServerAddress.IsNullOrEmpty()
+            || settings.ConnectionServerPort <= 0)
         {
-            Debug.Log($"Sending connect request as broadcast to port {settings.IpPortOnServer}. Connect request count: {connectRequestCount}");
-            connectEventStream.OnNext(new ConnectEvent(connectRequestCount));
-            connectRequestCount++;
-            
-            NetDataWriter netDataWriter = new NetDataWriter();
-            netDataWriter.Put(1);
-            liteNetLibClient.SendBroadcast(netDataWriter, settings.IpPortOnServer);
+            SendDiscoveryBroadcast();
         }
-        else if (!receivedValidConnectResponse)
+        else
         {
-            
+            try
+            {
+                Debug.Log($"Attempt to connect with manually set host {settings.ConnectionServerAddress} and port {settings.ConnectionServerPort}");
+                IPAddress ipAddress = IPAddress.Parse(settings.ConnectionServerAddress);
+                SendConnectMessage(new IPEndPoint(ipAddress, settings.ConnectionServerPort));
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                Debug.LogError($"Failed forced connection to server with host {settings.ConnectionServerAddress} and port {settings.ConnectionServerPort}: {e.Message}");
+            }
         }
+    }
+
+    private void SendDiscoveryBroadcast()
+    {
+        Debug.Log($"Sending discovery broadcast to port {settings.ConnectionServerPort}. Connect request count: {connectRequestCount}");
+            
+        NetDataWriter netDataWriter = new NetDataWriter();
+        netDataWriter.Put(1);
+        liteNetLibClient.SendBroadcast(netDataWriter, settings.ConnectionServerPort);
+    }
+    
+    private void OnReceivedDiscoveryResponse(IPEndPoint remoteEndPoint)
+    {
+        Debug.Log($"Received discovery response from {remoteEndPoint}");
+        SendConnectMessage(remoteEndPoint);
+    }
+    
+    private void SendConnectMessage(IPEndPoint remoteEndPoint)
+    {
+        Debug.Log($"Sending connect request to {remoteEndPoint}");
+        ConnectRequestDto connectRequestDto = new()
+        {
+            ClientId = settings.ClientId,
+            ClientName = settings.ClientName,
+            ProtocolVersion = ProtocolVersions.ProtocolVersion
+        };
+        NetDataWriter netDataWriter = new NetDataWriter();
+        netDataWriter.Put(connectRequestDto.ToJson());
+        liteNetLibClient.Connect(remoteEndPoint, netDataWriter);
     }
     
     public void DisconnectFromServer()
@@ -125,7 +159,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         }
     }
 
-    public void SendMessageToServer(JsonSerializable jsonSerializable)
+    public void SendMessageToServer(JsonSerializable jsonSerializable, DeliveryMethod deliveryMethod)
     {
         if (jsonSerializable == null
             || !IsConnected)
@@ -133,7 +167,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             return;
         }
         
-        ServerPeer.Send(jsonSerializable, DeliveryMethod.ReliableOrdered);
+        ServerPeer.Send(jsonSerializable, deliveryMethod);
     }
     
     private void HandleMessageFromServer(string message)
@@ -227,7 +261,6 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
         Debug.Log($"Disconnected: reason: {disconnectInfo.Reason}, additional info: {disconnectInfo.AdditionalData}, socket error code: {disconnectInfo.SocketErrorCode}");
-        receivedValidConnectResponse = false;
     }
 
     public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
@@ -252,16 +285,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             && liteNetLibClient.ConnectedPeersCount == 0
             && reader.GetInt() == 1)
         {
-            Debug.Log($"Received discovery response. Sending ConnectRequest to: {remoteEndPoint}");
-            NetDataWriter netDataWriter = new();
-            ConnectRequestDto connectRequestDto = new()
-            {
-                ClientId = settings.ClientId,
-                ClientName = settings.ClientName,
-                ProtocolVersion = ProtocolVersions.ProtocolVersion
-            };
-            netDataWriter.Put(connectRequestDto.ToJson());
-            liteNetLibClient.Connect(remoteEndPoint, netDataWriter);
+            OnReceivedDiscoveryResponse(remoteEndPoint);
         }
     }
 

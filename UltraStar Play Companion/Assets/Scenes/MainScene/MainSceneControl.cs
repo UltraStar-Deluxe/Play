@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using LiteNetLib;
 using ProTrans;
 using Serilog.Events;
 using UniInject;
@@ -140,6 +141,15 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.mouseSensitivityFloatField)]
     private FloatField mouseSensitivityFloatField;
 
+    [Inject(UxmlName = R.UxmlNames.connectionServerPortTextField)]
+    private IntegerField connectionServerPortTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.connectionServerAddressTextField)]
+    private TextField connectionServerAddressTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.micDataDeliveryMethodField)]
+    private EnumField micDataDeliveryMethodField;
+    
     [Inject(UxmlName = R.UxmlNames.tabGroup)]
     private VisualElement tabGroup;
     
@@ -158,7 +168,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
     private BoolPickerControl devModePickerControl;
-    private NetworkConfigControl networkConfigControl;
 
     private float frameCountTime;
     private int frameCount;
@@ -295,7 +304,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             newValue => settings.TargetFps = newValue);
 
         // Network config
-        networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
+        FieldBindingUtils.Bind(connectionServerPortTextField,
+            () => settings.ConnectionServerPort,
+            newValue => settings.ConnectionServerPort = newValue);
+        
+        FieldBindingUtils.Bind(connectionServerAddressTextField,
+            () => settings.ConnectionServerAddress,
+            newValue => settings.ConnectionServerAddress = newValue);
+        
+        FieldBindingUtils.Bind(micDataDeliveryMethodField,
+            () => settings.MicDataDeliveryMethod,
+            newValue => settings.MicDataDeliveryMethod = (DeliveryMethod)newValue);
 
         // Show/hide menu overlay
         HideMenu();

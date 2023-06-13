@@ -33,11 +33,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorPicker)]
     private ItemPicker useUniversalCharsetDetectorPicker;
 
-    [Inject(UxmlName = R.UxmlNames.ipAddressLabel)]
-    private Label ipAddressLabel;
+    [Inject(UxmlName = R.UxmlNames.connectionEndpointLabel)]
+    private Label connectionEndpointLabel;
 
-    [Inject(UxmlName = R.UxmlNames.httpServerPortLabel)]
-    private Label httpServerPortLabel;
+    [Inject(UxmlName = R.UxmlNames.httpEndpointExampleLabel)]
+    private Label httpEndpointExampleLabel;
 
     [Inject(UxmlName = R.UxmlNames.showLogButton)]
     private Button showLogButton;
@@ -67,7 +67,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     private Injector injector;
 
     [Inject]
-    private HttpServer httpServer;
+    private UltraStarPlayHttpServer httpServer;
+    
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
@@ -78,8 +81,15 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.basicPitchCommandTextField)]
     private TextField basicPitchCommandTextField;
     
-    private NetworkConfigControl networkConfigControl;
-
+    [Inject(UxmlName = R.UxmlNames.clientDiscoveryPortTextField)]
+    private IntegerField clientDiscoveryPortTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.httpServerHostTextField)]
+    private TextField httpServerHostTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.httpServerPortTextField)]
+    private IntegerField httpServerPortTextField;
+    
     protected override void Start()
     {
         base.Start();
@@ -127,18 +137,15 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                     }
                 });
 
-        ipAddressLabel.text = TranslationManager.GetTranslation(R.Messages.options_ipAddress,
-            "value", httpServer.host);
+        connectionEndpointLabel.text = $"Connection endpoint: {serverSideConnectRequestManager.GetConnectionEndpoint()}";
 
         if (HttpServer.IsSupported)
         {
-            httpServerPortLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerPortWithExampleUri,
-                "host", httpServer.host,
-                "port", httpServer.port);
+            httpEndpointExampleLabel.text = "HTTP endpoint example: " + httpServer.GetExampleEndpoint();
         }
         else
         {
-            httpServerPortLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
+            httpEndpointExampleLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
         }
 
         // View and copy log
@@ -187,7 +194,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             newValue => settings.SongEditorSettings.BasicPitchCommand = newValue);
         
         // Network config
-        networkConfigControl = injector.CreateAndInject<NetworkConfigControl>();
+        FieldBindingUtils.Bind(clientDiscoveryPortTextField,
+            () => settings.ConnectionServerPort,
+            newValue => settings.ConnectionServerPort = newValue);
+
+        FieldBindingUtils.Bind(httpServerHostTextField,
+            () => settings.HttpServerHost,
+            newValue => settings.HttpServerHost = newValue);
+        
+        FieldBindingUtils.Bind(httpServerPortTextField,
+            () => settings.HttpServerPort,
+            newValue => settings.HttpServerPort = newValue);
     }
 
     private void RestartScene()

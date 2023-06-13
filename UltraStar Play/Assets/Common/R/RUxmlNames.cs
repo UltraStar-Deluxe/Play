@@ -82,6 +82,7 @@ public static partial class R
         public const string changeVoiceButton = "changeVoiceButton";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
+        public const string clientDiscoveryPortTextField = "clientDiscoveryPortTextField";
         public const string clientIcon = "clientIcon";
         public const string clientNameLabel = "clientNameLabel";
         public const string close = "close";
@@ -103,6 +104,7 @@ public static partial class R
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
         public const string connectedClientListEntryUiRoot = "connectedClientListEntryUiRoot";
+        public const string connectionEndpointLabel = "connectionEndpointLabel";
         public const string contentContainer = "contentContainer";
         public const string continueButton = "continueButton";
         public const string controlsContainer = "controlsContainer";
@@ -221,7 +223,9 @@ public static partial class R
         public const string horizontalGrid = "horizontalGrid";
         public const string horizontalGridLabelContainer = "horizontalGridLabelContainer";
         public const string horizontalGridLineContainer = "horizontalGridLineContainer";
-        public const string httpServerPortLabel = "httpServerPortLabel";
+        public const string httpEndpointExampleLabel = "httpEndpointExampleLabel";
+        public const string httpServerHostTextField = "httpServerHostTextField";
+        public const string httpServerPortTextField = "httpServerPortTextField";
         public const string icon = "icon";
         public const string iconBar = "iconBar";
         public const string ignoreAllFutureVersionsButton = "ignoreAllFutureVersionsButton";
@@ -259,10 +263,6 @@ public static partial class R
         public const string inputLegendLabel = "inputLegendLabel";
         public const string internetOptionsButton = "internetOptionsButton";
         public const string ip = "ip";
-        public const string ipAddressLabel = "ipAddressLabel";
-        public const string ipPortOnServerContainer = "ipPortOnServerContainer";
-        public const string ipPortOnServerLabel = "ipPortOnServerLabel";
-        public const string ipPortOnServerTextField = "ipPortOnServerTextField";
         public const string issueEntryUiRoot = "issueEntryUiRoot";
         public const string issueImage = "issueImage";
         public const string issueMessageLabel = "issueMessageLabel";
@@ -385,7 +385,6 @@ public static partial class R
         public const string nameCharacterContainer = "nameCharacterContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
-        public const string networkConfigContainer = "networkConfigContainer";
         public const string newHighscoreContainer = "newHighscoreContainer";
         public const string newHighscoreIcon = "newHighscoreIcon";
         public const string newHighscoreLabel = "newHighscoreLabel";
@@ -467,9 +466,6 @@ public static partial class R
         public const string overviewAreaSentences = "overviewAreaSentences";
         public const string overviewAreaViewportIndicator = "overviewAreaViewportIndicator";
         public const string overviewAreaWaveform = "overviewAreaWaveform";
-        public const string ownHostContainer = "ownHostContainer";
-        public const string ownHostLabel = "ownHostLabel";
-        public const string ownHostTextField = "ownHostTextField";
         public const string partyButton = "partyButton";
         public const string partyModeSongSelectionConfigUi = "partyModeSongSelectionConfigUi";
         public const string PartyModeSongSelectionRoundUi = "PartyModeSongSelectionRoundUi";

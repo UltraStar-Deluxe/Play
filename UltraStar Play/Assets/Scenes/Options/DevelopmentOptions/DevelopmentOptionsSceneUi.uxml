@@ -20,21 +20,14 @@
             <ItemPicker name="disableDynamicThemesPicker" label="Disable Dynamic Themes" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
             <ItemPicker name="useUniversalCharsetDetectorPicker" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings." wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
             <ItemPicker name="customEventSystemOptInOnAndroidPicker" label="Use custom event system&#10;for input actions.&#10;This enables keyboard&#10;and gamepad control&#10;but can cause issues on Android" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
-            <ui:TextField text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" style="flex-grow: 1;" />
-            <ui:TextField text="python -m spleeter" name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" style="flex-grow: 1;" />
-            <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
-            <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
-            <ui:VisualElement name="networkConfigContainer">
-                <ui:VisualElement name="ipPortOnServerContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
-                    <ui:Label text="IP  Port of Main Game&#10;(default 34567)" display-tooltip-when-elided="true" name="ipPortOnServerLabel" class="noBackgroundInHierarchy" />
-                    <ui:TextField picking-mode="Ignore" name="ipPortOnServerTextField" style="min-width: 200px;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="ownHostContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
-                    <ui:Label text="IP Address of Main Game&#10;(leave empty for automatic value)" display-tooltip-when-elided="true" name="ownHostLabel" class="noBackgroundInHierarchy" />
-                    <ui:TextField picking-mode="Ignore" name="ownHostTextField" style="min-width: 200px;" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;of Companion App" value="300" class="noBackgroundInHierarchy" style="min-width: 200px;" />
+            <ui:TextField text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
+            <ui:TextField text="python -m spleeter" name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
+            <ui:IntegerField label="Connection Port&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />
+            <ui:Label text="Connection endpoint: ????" name="connectionEndpointLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
+            <ui:TextField label="HTTP Server Host&#10;(leave empty for automatic value)" name="httpServerHostTextField" class="noBackgroundInHierarchy mb-3" />
+            <ui:IntegerField label="HTTP Server Port&#10;(default: 6789)" name="httpServerPortTextField" class="noBackgroundInHierarchy mb-3" />
+            <ui:Label text="HTTP endpoint example: ????" name="httpEndpointExampleLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+            <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>
