@@ -14,11 +14,13 @@ public class ConnectedClientHandler : IConnectedClientHandler
     public string ClientName { get; private set; }
     public string ClientId { get; private set; }
 
-    private readonly CircularBuffer<long> delayValuesInMillis = new(10);
-    private readonly CircularBuffer<long> jitterValuesInMillis = new(10);
+    private readonly CircularBuffer<long> delayValuesInMillis = new(60);
+    private readonly CircularBuffer<long> jitterValuesInMillis = new(60);
     private long averageJitterInMillis;
     public long JitterInMillis => averageJitterInMillis;
 
+    private float lastUpdateAverageJitterTimeInSeconds;
+    
     public ConnectedClientHandler(
         NetPeer peer,
         string clientName,
@@ -71,7 +73,6 @@ public class ConnectedClientHandler : IConnectedClientHandler
                 BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
                 
                 UpdateJitterStats(beatPitchEventsDto);
-                // Debug.Log($"Average jitter: {averageJitterInMillis} ms");
                 
                 receivedMessageStream.OnNext(beatPitchEventsDto);
                 return;
@@ -95,6 +96,13 @@ public class ConnectedClientHandler : IConnectedClientHandler
             : 0;
 
         jitterValuesInMillis.PushBack(currentMessageJitterInMillis);
-        averageJitterInMillis = (long)jitterValuesInMillis.Average();
+
+        float currentTimeInSeconds = Time.time;
+        if (currentTimeInSeconds - lastUpdateAverageJitterTimeInSeconds > 1)
+        {
+            lastUpdateAverageJitterTimeInSeconds = Time.time;
+            averageJitterInMillis = (long)jitterValuesInMillis.Average();
+            Debug.Log($"Average jitter with client {Peer.EndPoint}: {averageJitterInMillis} ms");
+        }
     }
 }
