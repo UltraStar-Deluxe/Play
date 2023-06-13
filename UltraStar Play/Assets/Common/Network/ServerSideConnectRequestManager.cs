@@ -9,6 +9,7 @@ using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using AddressFamily = System.Net.Sockets.AddressFamily;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -54,8 +55,8 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         liteNetLibServer.BroadcastReceiveEnabled = true;
         // 16 ms are approx. 60 FPS
         liteNetLibServer.UpdateTime = 16;
-        liteNetLibServer.Start(settings.IpPortOnServer);
-        Debug.Log($"Listening for broadcast messages on port {settings.IpPortOnServer}");
+        liteNetLibServer.Start(settings.ConnectionServerPort);
+        Debug.Log($"Listening for broadcast messages on port {settings.ConnectionServerPort}");
 
         ClientConnectedEventStream
             .Subscribe(evt => UpdateConnectedMicProfileName(evt));
@@ -298,5 +299,11 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     public void WriteNet(NetLogLevel level, string str, params object[] args)
     {
         Debug.LogFormat(level.ToUnityLogType(), LogOption.NoStacktrace, this, str, args);
+    }
+
+    public IPEndPoint GetConnectionEndpoint()
+    {
+        IPAddress localIpAddress = IpAddressUtils.GetLocalIpAddress();
+        return new IPEndPoint(localIpAddress, liteNetLibServer.LocalPort);
     }
 }

@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class UltraStarPlayHttpServer : HttpServer, INeedInjection
 {
+    private const int DefaultPort = 6789;
+    
     protected override void Awake()
     {
         if (!Application.isPlaying)
@@ -31,9 +33,13 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
         }
 
         Settings settings = SettingsManager.Instance.Settings;
-        host = !settings.OwnHost.IsNullOrEmpty()
-            ? settings.OwnHost
+        host = !settings.HttpServerHost.IsNullOrEmpty()
+            ? settings.HttpServerHost
             : IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
+        
+        port = settings.HttpServerPort > 0
+            ? settings.HttpServerPort
+            : DefaultPort;
 
         NoEndpointFoundCallback = SendNoEndpointFound;
         StartHttpListener();
@@ -49,6 +55,11 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
             .SetCallbackAndAdd(SendHello);
     }
 
+    public string GetExampleEndpoint()
+    {
+        return $"{host}:{port}/{HttpApiEndpointPaths.Songs}";
+    }
+    
     private void SendHello(EndpointRequestData requestData)
     {
         requestData.Context.Response.SendResponse(new MessageDto

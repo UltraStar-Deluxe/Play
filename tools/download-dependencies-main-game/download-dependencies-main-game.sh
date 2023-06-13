@@ -13,7 +13,7 @@ sh download-vosk-models.sh
 sh download-spleetermsvcexe.sh
 sh download-spleetersharp.sh
 sh download-unitystandalonefilebrowser.sh
-#sh download-soundfonts.sh
+sh download-litenetlib.sh
 sh download-third-party-assets.sh
 
 # Optionally download demo song package

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LiteNetLib;
 using UnityEngine;
 
 [Serializable]
@@ -27,8 +28,9 @@ public class Settings : ISettings
     public List<string> DeselectedPlayerProfiles { get; private set; } = new();
     public Dictionary<string, MicProfileReference> PlayerProfileNameToLastUsedMicProfile { get; private set; } = new();
 
-    public int IpPortOnServer { get; set; } = 34567;
-    public string OwnHost { get; set; }
+    public int ConnectionServerPort { get; set; } = 34567;
+    public string ConnectionServerAddress { get; set; } = "";
+    public DeliveryMethod MicDataDeliveryMethod { get; set; } = DeliveryMethod.ReliableOrdered;
 
     public GameRoundSettings GameRoundSettings { get; set; } = new();
     

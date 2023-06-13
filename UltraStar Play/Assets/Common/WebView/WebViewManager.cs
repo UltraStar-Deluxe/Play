@@ -109,10 +109,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
         set
         {
+            volumeInPercent = value;
+            
+            if (!IsWebViewInitialized)
+            {
+                return;
+            }
+            
             // The embedded browser does not consider AudioListener.volume. Thus, this must be considered here explicitly.
             float jsVolume = AudioListener.volume * NumberUtils.PercentToFactor(volumeInPercent) * 100;
             webView.ExecuteJavaScript($"setVolume({jsVolume})");
-            volumeInPercent = value;
         }
     }
 

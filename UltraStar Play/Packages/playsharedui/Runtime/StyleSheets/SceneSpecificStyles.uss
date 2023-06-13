@@ -722,11 +722,19 @@
     margin-bottom: 16px;
 }
 
+#loadedOptionsRoot > IntegerField {
+    margin-bottom: 16px;
+}
+
 #loadedOptionsRoot > TextField > .unity-base-field__label {
     width: 300px;
 }
 
 #loadedOptionsRoot > IntegerField > .unity-base-field__label {
+    width: 300px;
+}
+
+#loadedOptionsRoot > ScrollView > TextField > .unity-base-field__label {
     width: 300px;
 }
 
