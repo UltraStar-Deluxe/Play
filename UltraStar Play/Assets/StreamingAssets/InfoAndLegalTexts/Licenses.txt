@@ -60,6 +60,8 @@ See https://opensource.org/license/MIT/
 - UnityStandaloneFileBrowser
     - https://github.com/gkngkc/UnityStandaloneFileBrowser
 
+- LiteNetLib
+    - https://github.com/RevenantX/LiteNetLib
 
 Apache License 2.0
 ------------------
