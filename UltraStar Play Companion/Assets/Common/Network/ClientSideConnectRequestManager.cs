@@ -106,7 +106,8 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
         // Try to connect to the server every second.
         if (!IsConnected
-            && Time.time - lastConnectionAttemptTimeInSeconds > 1)
+            && (lastConnectionAttemptTimeInSeconds == 0
+                || Time.time - lastConnectionAttemptTimeInSeconds > 1))
         {
             lastConnectionAttemptTimeInSeconds = Time.time;
             ConnectToServer();
