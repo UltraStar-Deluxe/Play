@@ -207,6 +207,13 @@ public static class Log
             }
             
             Logger.Error(exception, GetLogMessage(context, "{0}", exception.Message));
+            
+            if (Application.isEditor)
+            {
+                // Forward to UnityEditor's console via defaultUnityLogHandler.
+                // This must not be logged again with the Serilog Logger to avoid an infinite loop.
+                defaultUnityLogHandler?.LogException(exception, context);
+            }
         }
 
         private string GetLogMessage(Object context, string format, params object[] args)
