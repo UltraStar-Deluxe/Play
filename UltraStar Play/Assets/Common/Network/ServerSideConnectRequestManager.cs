@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using LiteNetLib;
+using LiteNetLib.Utils;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
@@ -12,34 +13,29 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeedInjection, IServerSideConnectRequestManager
+public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeedInjection, IServerSideConnectRequestManager, INetEventListener, INetLogger
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void InitOnLoad()
-    {
-        idToConnectedClientMap = new();
-    }
-
     public static ServerSideConnectRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ServerSideConnectRequestManager>();
 
-    private static Dictionary<string, IConnectedClientHandler> idToConnectedClientMap = new();
-    public static int ConnectedClientCount => idToConnectedClientMap.Count;
+    public int ConnectedClientCount => liteNetLibServer.ConnectedPeersCount;
     
     private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new();
     public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream.ObserveOnMainThread();
     
     private readonly Subject<MicProfile> connectedClientMicProfileChangedEventStream = new();
     public IObservable<MicProfile> ConnectedClientMicProfileChangedEventStream => connectedClientMicProfileChangedEventStream;
-
-    private UdpClient serverUdpClient;
-
-    private bool hasBeenDestroyed;
-
+    
     [Inject]
     private HttpServer httpServer;
 
     [Inject]
     private Settings settings;
+
+    private NetManager liteNetLibServer;
+    private NetPeer liteNetLibPeer;
+
+    private readonly Dictionary<NetPeer, IConnectedClientHandler> peerToConnectedClientHandler = new();
+    private readonly Dictionary<NetPeer, ConnectRequestDto> peerToConnectRequestDto = new();
 
     protected override object GetInstance()
     {
@@ -53,23 +49,35 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             return;
         }
 
-        serverUdpClient = !settings.OwnHost.IsNullOrEmpty()
-            ? new UdpClient(new IPEndPoint(IPAddress.Parse(settings.OwnHost), settings.UdpPortOnServer))
-            : new UdpClient(settings.UdpPortOnServer);
-
-        ThreadPool.QueueUserWorkItem(poolHandle =>
-        {
-            while (!hasBeenDestroyed)
-            {
-                ServerAcceptMessageFromClient();
-            }
-        });
+        NetDebug.Logger = this;
+        liteNetLibServer = new NetManager(this);
+        liteNetLibServer.BroadcastReceiveEnabled = true;
+        // 16 ms are approx. 60 FPS
+        liteNetLibServer.UpdateTime = 16;
+        liteNetLibServer.Start(settings.IpPortOnServer);
+        Debug.Log($"Listening for broadcast messages on port {settings.IpPortOnServer}");
 
         ClientConnectedEventStream
-            .ObserveOnMainThread()
             .Subscribe(evt => UpdateConnectedMicProfileName(evt));
     }
 
+    private void OnDestroy()
+    {
+        NetDebug.Logger = null;
+        liteNetLibServer?.Stop();
+        
+        if (Instance == this)
+        {
+            RemoveAllConnectedClientHandlers();
+        }
+    }
+    
+
+    private void Update()
+    {
+        liteNetLibServer.PollEvents();
+    }
+    
     public void UpdateConnectedMicProfileName(ClientConnectionEvent clientConnectionEvent)
     {
         if (!clientConnectionEvent.IsConnected)
@@ -89,159 +97,28 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                 }
             });
     }
-
-    private void ServerAcceptMessageFromClient()
-    {
-        try
-        {
-            Debug.Log("Server listening for connect request on " + serverUdpClient.Client.LocalEndPoint);
-            IPEndPoint clientIpEndPoint = new(IPAddress.Any, 0);
-            // Receive is a blocking call.
-            byte[] receivedBytes = serverUdpClient.Receive(ref clientIpEndPoint);
-            string message = Encoding.UTF8.GetString(receivedBytes);
-            HandleConnectRequest(clientIpEndPoint, message);
-        }
-        catch (Exception e)
-        {
-            if (e is SocketException se
-                && se.SocketErrorCode == SocketError.Interrupted
-                && hasBeenDestroyed)
-            {
-                // Dont log error when closing the socket has interrupted the wait for requests.
-                return;
-            }
-            Debug.LogException(e);
-        }
-    }
-
-    private void HandleConnectRequest(IPEndPoint clientIpEndPoint, string message)
-    {
-        Debug.Log($"Received connect request from client {clientIpEndPoint} ({clientIpEndPoint.Address}): '{message}'");
-        try
-        {
-            ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
-            if (connectRequestDto.ProtocolVersion != ProtocolVersions.ProtocolVersion)
-            {
-                throw new ConnectRequestException($"Malformed ConnectRequest: protocolVersion does not match"
-                    + $" (server (main game): {ProtocolVersions.ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
-            }
-            if (connectRequestDto.ClientName.IsNullOrEmpty())
-            {
-                throw new ConnectRequestException("Malformed ConnectRequest: missing ClientName.");
-            }
-            if (connectRequestDto.ClientId.IsNullOrEmpty())
-            {
-                throw new ConnectRequestException("Malformed ConnectRequest: missing ClientId.");
-            }
-
-            HandleClientMessage(clientIpEndPoint, connectRequestDto);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            serverUdpClient.Send(new ConnectResponseDto
-            {
-                ErrorMessage = e.Message
-            }.ToJson(), clientIpEndPoint);
-        }
-    }
-
-    private void HandleClientMessageWithNoMicrophone(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
-    {
-        List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
-
-        ConnectResponseDto connectResponseDto = new()
-        {
-            ClientName = connectRequestDto.ClientName,
-            ClientId = connectRequestDto.ClientId,
-            HttpServerPort = httpServer.port,
-            Permissions = permissions,
-        };
-        serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
-    }
-
-    private void HandleClientMessage(IPEndPoint clientIpEndPoint, ConnectRequestDto connectRequestDto)
-    {
-        ConnectedClientHandler newConnectedClientHandler = RegisterClient(clientIpEndPoint, connectRequestDto.ClientName, connectRequestDto.ClientId);
-        clientConnectedEventStream.OnNext(new ClientConnectionEvent(newConnectedClientHandler, true));
-
-        List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
-        
-        ConnectResponseDto connectResponseDto = new()
-        {
-            ClientName = connectRequestDto.ClientName,
-            ClientId = connectRequestDto.ClientId,
-            HttpServerPort = httpServer.port,
-            MessagingPort = newConnectedClientHandler.ClientTcpListener.GetPort(),
-            Permissions = permissions,
-        };
-        Debug.Log("Sending ConnectResponse to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
-        serverUdpClient.Send(connectResponseDto.ToJson(), clientIpEndPoint);
-
-        // Send MicProfile
-        MicProfile micProfileOfClient = settings.MicProfiles
-            .FirstOrDefault(micProfile => micProfile.ConnectedClientId == newConnectedClientHandler.ClientId);
-        if (micProfileOfClient == null)
-        {
-            micProfileOfClient = new MicProfile();
-        }
-
-        Debug.Log("Sending MicProfile to " + clientIpEndPoint.Address + ":" + clientIpEndPoint.Port);
-        newConnectedClientHandler.SendMessageToClient(new MicProfileMessageDto(micProfileOfClient));
-    }
-
-    private void OnDestroy()
-    {
-        hasBeenDestroyed = true;
-        serverUdpClient?.Close();
-        if (Instance == this)
-        {
-            RemoveAllConnectedClientHandlers();
-        }
-    }
     
     private void RemoveAllConnectedClientHandlers()
     {
-        idToConnectedClientMap.Values.ForEach(connectedClientHandler =>
+        foreach (NetPeer peer in liteNetLibServer.ConnectedPeerList.ToList())
         {
-            clientConnectedEventStream.OnNext(new ClientConnectionEvent(connectedClientHandler, false));
-            connectedClientHandler.Dispose();
-        });
-        idToConnectedClientMap.Clear();
+            peer.Disconnect();
+        }
     }
 
-    public void RemoveConnectedClientHandler(IConnectedClientHandler connectedClientHandler)
-    {
-        if (idToConnectedClientMap.ContainsKey(connectedClientHandler.ClientId))
-        {
-            idToConnectedClientMap.Remove(connectedClientHandler.ClientId);
-        }
-        clientConnectedEventStream.OnNext(new ClientConnectionEvent(connectedClientHandler, false));
-        connectedClientHandler.Dispose();
-    }
-    
-    private ConnectedClientHandler RegisterClient(
-        IPEndPoint clientIpEndPoint,
+    private ConnectedClientHandler RegisterConnectedClient(
+        NetPeer peer,
         string clientName,
         string clientId)
     {
-        // Dispose any currently registered client with the same IP-Address.
-        if (idToConnectedClientMap.TryGetValue(clientId, out IConnectedClientHandler existingConnectedClientHandler))
-        {
-            existingConnectedClientHandler.Dispose();
-        }
-        
-        ConnectedClientHandler connectedClientHandler = new(this, clientIpEndPoint, clientName, clientId);
-        idToConnectedClientMap[clientId] = connectedClientHandler;
-
-        Debug.Log("New number of connected clients: " + idToConnectedClientMap.Count);
-        
+        ConnectedClientHandler connectedClientHandler = new(peer, clientName, clientId);
+        peerToConnectedClientHandler[peer] = connectedClientHandler;
         return connectedClientHandler;
     }
 
     public List<IConnectedClientHandler> GetAllConnectedClientHandlers()
     {
-        return idToConnectedClientMap.Values.ToList();
+        return peerToConnectedClientHandler.Values.ToList();
     }
 
     public bool TryGetConnectedClientHandler(string clientId, out IConnectedClientHandler connectedClientHandler)
@@ -251,7 +128,9 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             connectedClientHandler = null;
             return false;
         }
-        return idToConnectedClientMap.TryGetValue(clientId, out connectedClientHandler);
+
+        connectedClientHandler = peerToConnectedClientHandler.Values.FirstOrDefault(it => it.ClientId == clientId);
+        return connectedClientHandler != null;
     }
 
     public List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers(IEnumerable<MicProfile> micProfiles)
@@ -267,5 +146,157 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                 }
             });
         return result;
+    }
+
+    public void OnPeerConnected(NetPeer peer)
+    {
+        if (!peerToConnectRequestDto.TryGetValue(peer, out ConnectRequestDto connectRequestDto))
+        {
+            Debug.LogError($"Peer connected without ConnectRequest data: {peer.EndPoint}");
+            return;
+        }
+        
+        Debug.Log($"Peer connected {peer.EndPoint} with ConnectRequest: {connectRequestDto.ToJson()}. Sending ConnectResponse.");
+        
+        // Send connect response
+        List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
+        ConnectResponseDto connectResponseDto = new()
+        {
+            ClientName = connectRequestDto.ClientName,
+            ClientId = connectRequestDto.ClientId,
+            HttpServerPort = httpServer.port,
+            Permissions = permissions,
+        };
+        Debug.Log($"Sending ConnectResponse to {peer.EndPoint}");
+        peer.Send(connectResponseDto, DeliveryMethod.ReliableOrdered);
+        
+        // Send MicProfile
+        MicProfile micProfileOfClient = settings.MicProfiles
+            .FirstOrDefault(micProfile => micProfile.ConnectedClientId == connectRequestDto.ClientId);
+        if (micProfileOfClient == null)
+        {
+            micProfileOfClient = new MicProfile();
+        }
+
+        Debug.Log($"Sending MicProfile to {peer.EndPoint}");
+        peer.Send(new MicProfileMessageDto(micProfileOfClient), DeliveryMethod.ReliableOrdered);
+    }
+
+    public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+    {
+        Debug.LogWarning($"Peer disconnected: {peer.EndPoint}, reason: {disconnectInfo.Reason}");
+        if (!peerToConnectedClientHandler.TryGetValue(peer, out IConnectedClientHandler connectedClientHandler))
+        {
+            return;
+        }
+
+        peerToConnectedClientHandler.Remove(peer);
+        clientConnectedEventStream.OnNext(new ClientConnectionEvent(connectedClientHandler, false));
+    }
+
+    public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
+    {
+        Debug.LogError($"Network error: {endPoint}, {socketError}");
+    }
+
+    public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber, DeliveryMethod deliveryMethod)
+    {
+        string message = reader.GetString();
+        if (message.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        // Debug.Log($"Received message from client {peer.EndPoint}: {message}");
+        
+        if (peerToConnectedClientHandler.TryGetValue(peer, out IConnectedClientHandler connectedClientHandler))
+        {
+            connectedClientHandler.HandleMessageFromClient(message);
+        }
+        else
+        {
+            Debug.LogError($"Received message from unknown peer {peer.EndPoint}: {message}");
+        }
+    }
+
+    public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
+    {
+        if (messageType is UnconnectedMessageType.Broadcast)
+        {
+            Debug.Log($"Received discovery request from {remoteEndPoint}. Sending discovery response.");
+            NetDataWriter netDataWriter = new();
+            netDataWriter.Put(1);
+            liteNetLibServer.SendUnconnectedMessage(netDataWriter, remoteEndPoint);
+        }
+    }
+
+    public void OnNetworkLatencyUpdate(NetPeer peer, int latency)
+    {
+        // Debug.Log($"OnNetworkLatencyUpdate: {peer.EndPoint}, latency: {latency}");
+    }
+
+    public void OnConnectionRequest(ConnectionRequest request)
+    {
+        IPEndPoint remoteEndPoint = request.RemoteEndPoint;
+        if (request.Data.IsNull)
+        {
+            Debug.LogError("Missing connection request");
+            return;
+        }
+        
+        string message = request.Data.GetString();
+        if (message.IsNullOrEmpty())
+        {
+            Debug.LogError("Missing connection request");
+            return;
+        }
+
+        try
+        {
+            if (!CompanionAppMessageUtils.TryGetMessageType(message, out CompanionAppMessageType messageType))
+            {
+                throw new Exception($"Malformed connection request: wrong message type");
+            }
+            
+            ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
+            if (connectRequestDto.ProtocolVersion != ProtocolVersions.ProtocolVersion)
+            {
+                throw new ConnectRequestException($"Malformed connection request: protocol version does not match"
+                                                  + $" (server (main game): {ProtocolVersions.ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
+            }
+            if (connectRequestDto.ClientName.IsNullOrEmpty())
+            {
+                throw new ConnectRequestException($"Malformed connection request: missing ClientName.");
+            }
+            if (connectRequestDto.ClientId.IsNullOrEmpty())
+            {
+                throw new ConnectRequestException($"Malformed connection request: missing ClientId.");
+            }
+            
+            Debug.Log($"Accepted connection request from {remoteEndPoint}");
+            NetPeer peer = request.Accept();
+            
+            // Register client
+            peerToConnectRequestDto[peer] = connectRequestDto;
+            ConnectedClientHandler newConnectedClientHandler = RegisterConnectedClient(peer, connectRequestDto.ClientName, connectRequestDto.ClientId);
+            clientConnectedEventStream.OnNext(new ClientConnectionEvent(newConnectedClientHandler, true));
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+            Debug.LogError($"Received invalid ConnectRequest from {remoteEndPoint}: {message}");
+
+            NetDataWriter netDataWriter = new();
+            netDataWriter.Put(new ConnectResponseDto()
+            {
+                ErrorMessage = e.Message,
+            }.ToJson());
+            request.Reject(netDataWriter);
+        }
+    }
+
+    public void WriteNet(NetLogLevel level, string str, params object[] args)
+    {
+        Debug.LogFormat(level.ToUnityLogType(), LogOption.NoStacktrace, this, str, args);
     }
 }

@@ -18,7 +18,8 @@
         "AndroidRuntimePermissions.Runtime",
         "UnityStandaloneFileBrowser",
         "Vosk",
-        "Vuplex.WebView"
+        "Vuplex.WebView",
+        "LiteNetLib"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -27,8 +27,7 @@ public class Settings : ISettings
     public List<string> DeselectedPlayerProfiles { get; private set; } = new();
     public Dictionary<string, MicProfileReference> PlayerProfileNameToLastUsedMicProfile { get; private set; } = new();
 
-    public int UdpPortOnServer { get; set; } = 34567;
-    public int UdpPortOnClient { get; set; } = 34568;
+    public int IpPortOnServer { get; set; } = 34567;
     public string OwnHost { get; set; }
 
     public GameRoundSettings GameRoundSettings { get; set; } = new();

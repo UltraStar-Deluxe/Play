@@ -8,14 +8,8 @@ using UnityEngine.UIElements;
 
 public class NetworkConfigControl : INeedInjection, IInjectionFinishedListener
 {
-    [Inject(UxmlName = "networkConfigContainer")]
-    protected VisualElement networkConfigContainer;
-
-    [Inject(UxmlName = "udpPortOnClientTextField")]
-    protected TextField udpPortOnClientTextField;
-
-    [Inject(UxmlName = "udpPortOnServerTextField")]
-    protected TextField udpPortOnServerTextField;
+    [Inject(UxmlName = "ipPortOnServerTextField")]
+    protected TextField ipPortOnServerTextField;
 
     [Inject(UxmlName = "ownHostTextField")]
     protected TextField ownHostTextField;
@@ -23,19 +17,12 @@ public class NetworkConfigControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     protected ISettings settings;
 
-    [Inject]
-    protected GameObject gameObject;
-
     public virtual void OnInjectionFinished()
     {
         // Update value when TextField changes
-        BindTextField(udpPortOnServerTextField,
-            () => settings.UdpPortOnServer,
-            newStringValue => PropertyUtils.TrySetIntFromString(newStringValue, newIntValue => settings.UdpPortOnServer = newIntValue));
-
-        BindTextField(udpPortOnClientTextField,
-            () => settings.UdpPortOnClient,
-            newStringValue => PropertyUtils.TrySetIntFromString(newStringValue, newIntValue => settings.UdpPortOnClient = newIntValue));
+        BindTextField(ipPortOnServerTextField,
+            () => settings.IpPortOnServer,
+            newStringValue => PropertyUtils.TrySetIntFromString(newStringValue, newIntValue => settings.IpPortOnServer = newIntValue));
 
         BindTextField(ownHostTextField,
             () => settings.OwnHost,

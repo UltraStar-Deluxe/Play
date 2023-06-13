@@ -1,7 +1,8 @@
 ﻿public enum CompanionAppMessageType
 {
     Unknown,
-    StillAliveCheck,
+    ConnectRequest,
+    ConnectResponse,
     BeatPitchEvents,
     PositionInSong,
     StopRecording,

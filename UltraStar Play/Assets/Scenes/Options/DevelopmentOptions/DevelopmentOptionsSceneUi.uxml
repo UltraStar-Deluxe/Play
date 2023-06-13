@@ -25,13 +25,9 @@
             <ui:Label text="IP Address: aaa.bbb.ccc.ddd" name="ipAddressLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
             <ui:Label text="Http Server Port: ????" name="httpServerPortLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
             <ui:VisualElement name="networkConfigContainer">
-                <ui:VisualElement name="udpPortOnClientContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
-                    <ui:Label text="UDP Port of Companion App&#10;(default 34568)" display-tooltip-when-elided="true" name="udpPortOnClientLabel" class="noBackgroundInHierarchy" />
-                    <ui:TextField picking-mode="Ignore" name="udpPortOnClientTextField" style="min-width: 200px;" />
-                </ui:VisualElement>
-                <ui:VisualElement name="udpPortOnServerContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
-                    <ui:Label text="UDP Port of Main Game&#10;(default 34567)" display-tooltip-when-elided="true" name="udpPortOnServerLabel" class="noBackgroundInHierarchy" />
-                    <ui:TextField picking-mode="Ignore" name="udpPortOnServerTextField" style="min-width: 200px;" />
+                <ui:VisualElement name="ipPortOnServerContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
+                    <ui:Label text="IP  Port of Main Game&#10;(default 34567)" display-tooltip-when-elided="true" name="ipPortOnServerLabel" class="noBackgroundInHierarchy" />
+                    <ui:TextField picking-mode="Ignore" name="ipPortOnServerTextField" style="min-width: 200px;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="ownHostContainer" style="margin-bottom: 20px; flex-direction: row; justify-content: space-between;">
                     <ui:Label text="IP Address of Main Game&#10;(leave empty for automatic value)" display-tooltip-when-elided="true" name="ownHostLabel" class="noBackgroundInHierarchy" />

@@ -207,7 +207,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         });
         
         clientSideConnectRequestManager.ConnectEventStream
-            .ObserveOnMainThread()
             .Subscribe(UpdateConnectionStatus);
         
         UpdateVersionInfoText();
@@ -359,7 +358,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     {
         settings.ClientName = clientNameTextField.value;
         // Reconnect to let the main know about the new clientName.
-        clientSideConnectRequestManager.CloseConnectionAndReconnect();
+        clientSideConnectRequestManager.DisconnectFromServer();
     }
 
     private void OnMicProfileChanged()

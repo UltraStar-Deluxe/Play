@@ -12,7 +12,8 @@
         "com.achimmihca.simplehttpserverforunity",
         "com.achimmihca.utfunknownunity",
         "com.achimmihca.portaudioforunity",
-        "IngameDebugConsole.Runtime"
+        "IngameDebugConsole.Runtime",
+        "LiteNetLib"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

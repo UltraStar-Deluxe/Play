@@ -9,8 +9,7 @@
                 <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="onlyVisibleWhenDevModeEnabled" />
                 <ui:Button text="View Log" display-tooltip-when-elided="true" name="viewLogButton" class="onlyVisibleWhenDevModeEnabled" />
                 <ui:VisualElement name="networkConfigContainer" class="onlyVisibleWhenDevModeEnabled">
-                    <ui:TextField picking-mode="Ignore" name="udpPortOnClientTextField" label="UDP Port of Companion App&#10;(default 34568)" style="flex-direction: column;" />
-                    <ui:TextField picking-mode="Ignore" name="udpPortOnServerTextField" label="UDP Port of Main Game&#10;(default 34567)" style="flex-direction: column;" />
+                    <ui:TextField picking-mode="Ignore" name="ipPortOnServerTextField" label="IP Port of Main Game&#10;(default 34567)" style="flex-direction: column;" />
                     <ui:TextField picking-mode="Ignore" name="ownHostTextField" label="IP Address of Companion App&#10;(leave empty for automatic value)" style="flex-direction: column;" />
                 </ui:VisualElement>
                 <ItemPicker name="targetFpsPicker" noPreviousButton="true" wrapAround="true" wrap-around="true" label="FPS" class="controlWithLabelVertical onlyVisibleWhenDevModeEnabled" />

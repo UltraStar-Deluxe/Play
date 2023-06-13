@@ -39,7 +39,6 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         ResetPositionInSong();
 
         clientSideConnectRequestManager.ConnectEventStream
-            .ObserveOnMainThread()
             .Subscribe(UpdateConnectionStatus)
             .AddTo(gameObject);
         RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
@@ -171,10 +170,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
     private void SendMessageToServer(JsonSerializable jsonSerializable)
     {
         // Debug.Log("SendMessageToServer - " + jsonSerializable.ToJson());
-        if (clientSideConnectRequestManager.TryGetConnectedServerHandler(out IConnectedServerHandler connectedServerHandler))
-        {
-            connectedServerHandler.SendMessageToServer(jsonSerializable);
-        }
+        clientSideConnectRequestManager.SendMessageToServer(jsonSerializable);
     }
 
     private double GetEstimatedPositionInSongInMillis()
@@ -278,10 +274,9 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         }
 
         if (connectEvent.IsSuccess
-            && clientSideConnectRequestManager.TryGetConnectedServerHandler(out IConnectedServerHandler connectedServerHandler))
+            && clientSideConnectRequestManager.IsConnected)
         {
-            receivedMessageStreamDisposable = connectedServerHandler.ReceivedMessageStream
-                .ObserveOnMainThread()
+            receivedMessageStreamDisposable = clientSideConnectRequestManager.ReceivedMessageStream
                 .Subscribe(dto =>
                 {
                     if (dto is StopRecordingMessageDto)
