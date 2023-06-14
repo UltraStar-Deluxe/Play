@@ -248,7 +248,12 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     private Sentence GetUpcomingSentenceForBeat(double currentBeat)
     {
-        Sentence result = Voice.Sentences
+        if (SortedSentences.IsNullOrEmpty())
+        {
+            return null;
+        }
+        
+        Sentence result = SortedSentences
             .FirstOrDefault(sentence => currentBeat < sentence.LinebreakBeat);
         return result;
     }
