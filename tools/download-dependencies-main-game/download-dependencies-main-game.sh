@@ -13,6 +13,7 @@ sh download-vosk-models.sh
 sh download-spleetermsvcexe.sh
 sh download-spleetersharp.sh
 sh download-unitystandalonefilebrowser.sh
+sh download-lrcparser.sh
 sh download-litenetlib.sh
 sh download-third-party-assets.sh
 

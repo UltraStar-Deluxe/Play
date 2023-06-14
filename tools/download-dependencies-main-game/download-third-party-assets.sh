@@ -29,8 +29,8 @@ git remote add origin https://github.com/achimmihca/MelodyManiaThirdPartyAssets
 git config core.sparsecheckout true
 echo Assets/* >> .git/info/sparse-checkout
 git pull --depth=100 origin main
-# Commit from 28 March 2023: ec47fc679c35eea58aaecdb284c24fb9a3e81ccc
-git checkout ec47fc679c35eea58aaecdb284c24fb9a3e81ccc
+# Commit from 14 June 2023: ece7ac5fe9f168ec690e53ed346fc0ac7c1b415d
+git checkout ece7ac5fe9f168ec690e53ed346fc0ac7c1b415d
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v "Assets/Background Bokeh VFX" "../"
