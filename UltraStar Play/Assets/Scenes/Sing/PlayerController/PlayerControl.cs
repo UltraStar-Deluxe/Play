@@ -248,7 +248,12 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     private Sentence GetUpcomingSentenceForBeat(double currentBeat)
     {
-        Sentence result = Voice.Sentences
+        if (SortedSentences.IsNullOrEmpty())
+        {
+            return null;
+        }
+        
+        Sentence result = SortedSentences
             .FirstOrDefault(sentence => currentBeat < sentence.LinebreakBeat);
         return result;
     }
@@ -264,7 +269,11 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         {
             return null;
         }
-        return SortedSentences.Last().Notes.OrderBy(note => note.EndBeat).Last();
+        return SortedSentences
+            .LastOrDefault()
+            .Notes
+            .OrderBy(note => note.EndBeat)
+            .LastOrDefault();
     }
 
     public class EnterSentenceEvent
