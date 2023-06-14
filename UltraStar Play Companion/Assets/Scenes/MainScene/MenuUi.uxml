@@ -11,7 +11,7 @@
                 <ItemPicker name="targetFpsPicker" noPreviousButton="true" wrapAround="true" wrap-around="true" label="FPS" class="controlWithLabelVertical onlyVisibleWhenDevModeEnabled" />
                 <ui:IntegerField label="Connection Port on Main Game&#10;(default 34567)" value="34567" name="connectionServerPortTextField" is-delayed="true" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />
                 <ui:TextField label="IP Address of Main Game&#10;(leave empty for automatic connection)" name="connectionServerAddressTextField" is-delayed="true" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />
-                <ui:EnumField label="Mic Data Delivery Method" type="LiteNetLib.DeliveryMethod, LiteNetLib" name="micDataDeliveryMethodField" value="ReliableOrdered" style="flex-direction: column;" />
+                <ui:EnumField label="Mic Data Delivery Method" type="LiteNetLib.DeliveryMethod, LiteNetLib" name="micDataDeliveryMethodField" value="ReliableOrdered" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />
             </ui:VisualElement>
         </ui:ScrollView>
         <ui:Button text="Back" display-tooltip-when-elided="true" name="closeMenuButton" style="width: 100%; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-left: 0; margin-right: 0; margin-bottom: 10px; margin-top: 10px;" />
