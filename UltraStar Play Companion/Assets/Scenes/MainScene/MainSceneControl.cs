@@ -307,7 +307,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         FieldBindingUtils.Bind(connectionServerPortTextField,
             () => settings.ConnectionServerPort,
             newValue => settings.ConnectionServerPort = newValue);
-        
+        connectionServerPortTextField.DisableChangeValueByDragging();
+            
         FieldBindingUtils.Bind(connectionServerAddressTextField,
             () => settings.ConnectionServerAddress,
             newValue => settings.ConnectionServerAddress = newValue);

@@ -118,6 +118,7 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         finishConditionPointsSlider.highValue = 9900;
         new SliderIntStepControl(finishConditionPointsSlider, 100);
         new BaseFieldWithTextValueFieldControl<int>(finishConditionPointsSlider, finishConditionPointsTextField);
+        finishConditionPointsTextField.DisableChangeValueByDragging();
 
         // Modifiers
         UpdateGameRoundModifierToToggle();
@@ -155,6 +156,7 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
             });
 
         modifierConditionPlayerAdvanceBaseFieldWithTextValueFieldControl = new BaseFieldWithTextValueFieldControl<int>(playerAdvancePointsSlider, playerAdvancePointsTextField); 
+        playerAdvancePointsTextField.DisableChangeValueByDragging();
         
         // Modifier enum toggles
         gameRoundModifierToToggle.ForEach(entry =>

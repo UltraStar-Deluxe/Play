@@ -180,6 +180,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(messageBufferTimeTextField,
             () => settings.ConnectedClientMessageBufferTimeInMillis,
             newValue => settings.ConnectedClientMessageBufferTimeInMillis = newValue);
+        messageBufferTimeTextField.DisableChangeValueByDragging();
         
         // Spleeter command (audio separation)
         audioSeparationCommandTextField.DisableParseEscapeSequences();
@@ -197,7 +198,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(clientDiscoveryPortTextField,
             () => settings.ConnectionServerPort,
             newValue => settings.ConnectionServerPort = newValue);
-
+        clientDiscoveryPortTextField.DisableChangeValueByDragging();
+        
         FieldBindingUtils.Bind(httpServerHostTextField,
             () => settings.HttpServerHost,
             newValue => settings.HttpServerHost = newValue);
@@ -205,6 +207,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(httpServerPortTextField,
             () => settings.HttpServerPort,
             newValue => settings.HttpServerPort = newValue);
+        httpServerPortTextField.DisableChangeValueByDragging();
     }
 
     private void RestartScene()

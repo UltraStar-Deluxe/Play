@@ -335,4 +335,16 @@ public static class VisualElementExtensions
         
         textElement.parseEscapeSequences = false;
     }
+
+    public static void DisableChangeValueByDragging(this IntegerField visualElement)
+    {
+        // See https://forum.unity.com/threads/disable-integerfield-changing-value-on-drag.1448113/#post-9079210
+        visualElement.labelElement.style.cursor = StyleKeyword.Initial;
+ 
+        visualElement.labelElement.RegisterCallback<MouseMoveEvent>(
+            e => e.StopImmediatePropagation(), TrickleDown.TrickleDown);
+ 
+        visualElement.labelElement.RegisterCallback<PointerMoveEvent>(
+            e => e.StopImmediatePropagation(), TrickleDown.TrickleDown);
+    }
 }
