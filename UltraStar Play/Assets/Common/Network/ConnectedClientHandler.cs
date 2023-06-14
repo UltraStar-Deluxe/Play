@@ -102,7 +102,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
         {
             lastUpdateAverageJitterTimeInSeconds = Time.time;
             averageJitterInMillis = (long)jitterValuesInMillis.Average();
-            Debug.Log($"Average jitter with client {Peer.EndPoint}: {averageJitterInMillis} ms");
+            // Debug.Log($"Average jitter with client {Peer.EndPoint}: {averageJitterInMillis} ms");
         }
     }
 }
