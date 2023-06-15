@@ -62,9 +62,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject]
     private OptionsOverviewSceneControl optionsOverviewSceneControl;
     
-    [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaPicker)]
-    private ItemPicker searchAudioFilesWithoutSongMetaPicker;
-    
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
     private readonly List<DownloadSongArchiveUiControl> downloadSongArchiveUiControls = new();
 
@@ -88,10 +85,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         addSongFolderButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
         downloadSongArchiveButton.RegisterCallbackButtonTriggered(_ => CreateDownloadSongArchiveUiControl());
-
-        new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
-            .Bind(() => settings.SearchAudioFilesWithoutSongMeta,
-                newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
