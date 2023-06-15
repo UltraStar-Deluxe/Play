@@ -9,15 +9,15 @@ using UnityEngine;
 
 public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 {
-    // The audio clips and midi notes that are played for calibration.
+    private const long TimeoutInMillis = 2000;
+    private const long PauseTimeInMillis = 500;
+    
+    // The notes that are played for calibration.
     [InjectedInInspector]
-    public List<AudioClip> audioClips;
+    public List<MidiNoteAndFrequency> midiNoteNameAndFrequencies;
 
-    [InjectedInInspector]
-    public List<string> midiNoteNames;
-
-    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
-    private AudioSource audioSource;
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildrenIncludeInactive)]
+    private SineToneAudioGenerator sineToneAudioGenerator;
 
     [Inject]
     private NewestSamplesMicPitchTracker micPitchTracker;
@@ -35,33 +35,22 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     private bool isCalibrationInProgress;
 
-    private float startTimeInSeconds;
-    private readonly float timeoutInSeconds = 2;
-    private float pauseTime = float.MinValue;
+    private long currentIterationStartTimeInMillis;
+    private long nextIterationStartTimeInMillis;
 
-    private List<int> delaysInMillis = new();
+    private List<long> delaysInMillis = new();
     private int currentIteration;
     private float oldBackgroundMusicVolume = -1;
 
-    void Awake()
-    {
-        // Sanity check
-        if (midiNoteNames.Count == 0)
-        {
-            throw new UnityException("midiNoteNames not set");
-        }
-        if (audioClips.Count == 0)
-        {
-            throw new UnityException("audioClips not set");
-        }
-        if (audioClips.Count != midiNoteNames.Count)
-        {
-            throw new UnityException("audioClips and midiNotes must have same length");
-        }
-    }
-
     void Start()
     {
+        // Sanity check
+        if (midiNoteNameAndFrequencies.IsNullOrEmpty())
+        {
+            throw new UnityException("No notes configured for calibration");
+        }
+        sineToneAudioGenerator.gameObject.SetActive(false);
+        
         micPitchTracker.PitchEventStream
             .Subscribe(OnPitchDetected)
             .AddTo(gameObject);
@@ -77,17 +66,14 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (pauseTime > 0)
+        long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        if (nextIterationStartTimeInMillis > 0
+            && currentTimeInMillis >= nextIterationStartTimeInMillis)
         {
-            pauseTime -= Time.deltaTime;
+            nextIterationStartTimeInMillis = 0;
+            StartIteration(currentIteration);
         }
-        else if (pauseTime > float.MinValue)
-        {
-            pauseTime = float.MinValue;
-            StartIteration();
-        }
-
-        if ((startTimeInSeconds + timeoutInSeconds) < Time.time)
+        else if (currentTimeInMillis - currentIterationStartTimeInMillis > TimeoutInMillis)
         {
             OnCalibrationTimedOut();
         }
@@ -100,20 +86,30 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
             return;
         }
         isCalibrationInProgress = true;
-
-        delaysInMillis = new List<int>();
+        
+        Debug.Log("Starting mic delay calibration");
+        delaysInMillis.Clear();
         currentIteration = 0;
         oldBackgroundMusicVolume = backgroundMusicManager.BackgroundMusicAudioSource.volume;
         backgroundMusicManager.BackgroundMusicAudioSource.volume = 0;
-        StartIteration();
+        sineToneAudioGenerator.gameObject.SetActive(true);
+        sineToneAudioGenerator.Play();
+        StartIteration(currentIteration);
     }
 
+    private void StopCalibration()
+    {
+        Debug.Log("Stopping mic delay calibration");
+        sineToneAudioGenerator.Stop();
+        sineToneAudioGenerator.gameObject.SetActive(false);
+        backgroundMusicManager.BackgroundMusicAudioSource.volume = oldBackgroundMusicVolume;
+        isCalibrationInProgress = false;
+    }
+    
     private void OnCalibrationTimedOut()
     {
-        Debug.Log("Mic delay calibration - timeout");
-        audioSource.Stop();
-        isCalibrationInProgress = false;
-        backgroundMusicManager.BackgroundMusicAudioSource.volume = oldBackgroundMusicVolume;
+        Debug.Log($"Mic delay calibration iteration {currentIteration} timed out");
+        StopCalibration();
         calibrationResultEventStream.OnNext(new CalibrationResult
         {
             IsSuccess = false
@@ -122,50 +118,68 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     public void OnEndCalibration()
     {
-        Debug.Log($"Mic delay calibration - median delay of {delaysInMillis.Count} values: {delaysInMillis[delaysInMillis.Count/2]}");
-        audioSource.Stop();
-        isCalibrationInProgress = false;
-        backgroundMusicManager.BackgroundMusicAudioSource.volume = oldBackgroundMusicVolume;
-
+        Debug.Log($"Mic delay calibration successful: median delay of {delaysInMillis.Count} values: {delaysInMillis[delaysInMillis.Count/2]}");
+        StopCalibration();
         calibrationResultEventStream.OnNext(new CalibrationResult
         {
             IsSuccess = true,
-            DelaysInMilliseconds = new List<int>(delaysInMillis)
+            DelaysInMilliseconds = new List<long>(delaysInMillis)
         });
     }
 
-    private void StartIteration()
+    private void StartIteration(int iteration)
     {
-        startTimeInSeconds = Time.time;
-        audioSource.clip = audioClips[currentIteration];
-        audioSource.Play();
+        Debug.Log($"Starting mic delay calibration iteration {iteration}");
+        currentIterationStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        sineToneAudioGenerator.Frequency = GetFrequency(iteration);
+        sineToneAudioGenerator.Play();
+    }
+
+    private string GetMidiNoteName(int iteration)
+    {
+        if (midiNoteNameAndFrequencies.Count < iteration)
+        {
+            throw new IndexOutOfRangeException($"No note configured for iteration {iteration}");
+        }
+        return midiNoteNameAndFrequencies[iteration].midiNoteName;
+    }
+    
+    private int GetFrequency(int iteration)
+    {
+        if (midiNoteNameAndFrequencies.Count < iteration)
+        {
+            throw new IndexOutOfRangeException($"No note configured for iteration {iteration}");
+        }
+        return midiNoteNameAndFrequencies[iteration].frequency;
     }
 
     private void OnPitchDetected(PitchEvent pitchEvent)
     {
-        if (pitchEvent == null || !isCalibrationInProgress || pauseTime > 0)
+        if (pitchEvent == null || !isCalibrationInProgress || nextIterationStartTimeInMillis > 0)
         {
             return;
         }
 
-        string targetMidiNoteName = midiNoteNames[currentIteration];
+        string targetMidiNoteName = GetMidiNoteName(currentIteration);
         if (MidiUtils.GetAbsoluteName(pitchEvent.MidiNote) == targetMidiNoteName)
         {
-            audioSource.Stop();
-            float delayInSeconds = Time.time - startTimeInSeconds;
-            int delayInMillis = (int)(delayInSeconds * 1000);
+            long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+            long delayInMillis = currentTimeInMillis - currentIterationStartTimeInMillis;
             delaysInMillis.Add(delayInMillis);
-            Debug.Log($"Mic delay calibration - delay of iteration {currentIteration}: {delayInMillis}");
-
+            
+            Debug.Log($"Mic delay calibration - correct pitch, delay of iteration {currentIteration}: {delayInMillis} ms");
+            sineToneAudioGenerator.Stop();
+            
             currentIteration++;
-            if (currentIteration >= midiNoteNames.Count)
+            if (currentIteration >= midiNoteNameAndFrequencies.Count)
             {
                 OnEndCalibration();
             }
             else
             {
                 // Wait a bit for silence before the next iteration.
-                pauseTime = 0.5f;
+                nextIterationStartTimeInMillis = currentTimeInMillis + PauseTimeInMillis;
+                Debug.Log($"currentTime: {currentTimeInMillis}, nextIterationStartTimeInMillis: {nextIterationStartTimeInMillis}");
             }
         }
         else
@@ -182,9 +196,16 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         }
     }
 
+    [Serializable]
+    public struct MidiNoteAndFrequency
+    {
+        public string midiNoteName;
+        public int frequency;
+    }
+    
     public class CalibrationResult
     {
         public bool IsSuccess { get; set; }
-        public List<int> DelaysInMilliseconds { get; set; }
+        public List<long> DelaysInMilliseconds { get; set; }
     }
 }

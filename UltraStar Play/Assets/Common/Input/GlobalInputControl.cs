@@ -56,9 +56,11 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         
-        if (Keyboard.current.f4Key.wasReleasedThisFrame)
+        if (Application.isEditor
+            && Keyboard.current.f4Key.wasReleasedThisFrame)
         {
             // Toggle UI visibility
+            Debug.Log("Toggle UI visibility");
             uiDocument.rootVisualElement.SetVisibleByDisplay(!uiDocument.rootVisualElement.IsVisibleByDisplay());
         }
 

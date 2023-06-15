@@ -89,7 +89,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     
     [Inject(UxmlName = R.UxmlNames.httpServerPortTextField)]
     private IntegerField httpServerPortTextField;
-    
+
+    [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaPicker)]
+    private ItemPicker searchAudioFilesWithoutSongMetaPicker;
+
     protected override void Start()
     {
         base.Start();
@@ -208,6 +211,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.HttpServerPort,
             newValue => settings.HttpServerPort = newValue);
         httpServerPortTextField.DisableChangeValueByDragging();
+        
+        new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
+            .Bind(() => settings.SearchAudioFilesWithoutSongMeta,
+                newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
     }
 
     private void RestartScene()
