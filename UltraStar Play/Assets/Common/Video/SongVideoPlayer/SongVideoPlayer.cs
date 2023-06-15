@@ -129,7 +129,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             .AddTo(gameObject);
         
         settings.ObserveEveryValueChanged(it => it.SongBackgroundScaleMode)
-            .Subscribe(_ => UpdateBackgroundScaleMode());
+            .Subscribe(_ => UpdateBackgroundScaleMode())
+            .AddTo(gameObject);
     }
 
     private void InitEventSubscriber()

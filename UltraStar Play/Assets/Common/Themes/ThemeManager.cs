@@ -101,7 +101,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         ImageManager.AddSpriteHolder(this);
 
         settings.ObserveEveryValueChanged(it => it.AnimatedBackground)
-            .Subscribe(animatedBackground => backgroundShaderControl.SetSimpleBackgroundEnabled(!animatedBackground));
+            .Subscribe(animatedBackground => backgroundShaderControl.SetSimpleBackgroundEnabled(!animatedBackground))
+            .AddTo(gameObject);
 
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
         

@@ -53,7 +53,8 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         settings.ObserveEveryValueChanged(it => it.SfxVolumePercent)
-            .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f));
+            .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f))
+            .AddTo(gameObject);
     }
 
     public static void PlaySoundEffect(AudioClip clip, float volume = 1)

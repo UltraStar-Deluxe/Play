@@ -50,22 +50,36 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             })
             .AddTo(gameObject);
 
-        modifierControl.ModifiedVolumePercent.Subscribe(_ => UpdateAudioSources());
-        audioFadeInControl.FadeInVolumePercent.Subscribe(_ => UpdateAudioSources());
+        modifierControl.ModifiedVolumePercent
+            .Subscribe(_ => UpdateAudioSources())
+            .AddTo(gameObject);
+        audioFadeInControl.FadeInVolumePercent
+            .Subscribe(_ => UpdateAudioSources())
+            .AddTo(gameObject);
         
         settings.ObserveEveryValueChanged(it => it.MusicVolumePercent)
-            .Subscribe(_ => UpdateAudioSources());
+            .Subscribe(_ => UpdateAudioSources())
+            .AddTo(gameObject);
         settings.ObserveEveryValueChanged(it => it.VocalsAudioVolumePercent)
-            .Subscribe(_ => UpdateAudioSources());
+            .Subscribe(_ => UpdateAudioSources())
+            .AddTo(gameObject);
 
-        songAudioPlayer.PlaybackStartedEventStream.Subscribe(_ =>
-        {
-            PlayInstrumentalAndVocalsAudio();
-            SyncAudioPosition();
-        });
-        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => PauseInstrumentalAndVocalsAudio());
-        songAudioPlayer.JumpForwardInSongEventStream.Subscribe(_ => SyncAudioPosition());
-        songAudioPlayer.JumpBackInSongEventStream.Subscribe(_ => SyncAudioPosition());
+        songAudioPlayer.PlaybackStartedEventStream
+            .Subscribe(_ =>
+            {
+                PlayInstrumentalAndVocalsAudio();
+                SyncAudioPosition();
+            })
+            .AddTo(gameObject);
+        songAudioPlayer.PlaybackStoppedEventStream
+            .Subscribe(_ => PauseInstrumentalAndVocalsAudio())
+            .AddTo(gameObject);
+        songAudioPlayer.JumpForwardInSongEventStream
+            .Subscribe(_ => SyncAudioPosition())
+            .AddTo(gameObject);
+        songAudioPlayer.JumpBackInSongEventStream
+            .Subscribe(_ => SyncAudioPosition())
+            .AddTo(gameObject);
         
         Init();
     }
