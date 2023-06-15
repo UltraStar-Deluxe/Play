@@ -70,7 +70,8 @@ public class WebCamManager : AbstractSingletonBehaviour, INeedInjection
 
     public void SaveSnapshot(string filePath)
     {
-        if (webCamTexture == null)
+        if (webCamTexture == null
+            || !webCamTexture.isPlaying)
         {
             return;
         }

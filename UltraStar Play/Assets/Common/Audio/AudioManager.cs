@@ -28,6 +28,8 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
     public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
 
+    private static Dictionary<AudioClip, int> audioClipToLastPlayedFrameCount = new();
+
     [InjectedInInspector]
     public AudioMixer mainAudioMixer;
 
@@ -51,7 +53,8 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
     protected override void StartSingleton()
     {
         settings.ObserveEveryValueChanged(it => it.SfxVolumePercent)
-            .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f));
+            .Subscribe(newValue => SetVolume(SfxAudioMixerName, newValue / 100f))
+            .AddTo(gameObject);
     }
 
     public static void PlaySoundEffect(AudioClip clip, float volume = 1)
@@ -60,6 +63,13 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
+
+        if (audioClipToLastPlayedFrameCount.TryGetValue(clip, out int lastPlayedFrameCount)
+            && lastPlayedFrameCount == Time.frameCount)
+        {
+            return;
+        }
+        audioClipToLastPlayedFrameCount[clip] = Time.frameCount;
 
         AudioManager audioManager = Instance;
         if (audioManager == null

@@ -42,7 +42,8 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         lastScreenHeight = Screen.height;
 
         settings.ObserveEveryValueChanged(it => it.TargetFps)
-            .Subscribe(newValue => targetFrameRate = newValue);
+            .Subscribe(newValue => targetFrameRate = newValue)
+            .AddTo(gameObject);
             
         ApplicationUtils.SetUsePortAudio(settings.PreferPortAudio);
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFinishedListener
@@ -39,6 +40,12 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
     
     [Inject]
     private SceneNavigator sceneNavigator;
+        
+    [Inject]
+    private FocusableNavigator focusableNavigator;
+    
+    [Inject(UxmlName = R.UxmlNames.songListView)]
+    private VisualElement songListView;
     
     [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
     private VisualElement localHighScoreContainer;
@@ -86,7 +93,8 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         songIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{songSelectSceneControl.SelectedSongIndex + 1}"));
 
         highscoreTitleButton.RegisterCallbackButtonTriggered(_ => OpenHighScoreScene());
-        
+        focusableNavigator.AddCustomNavigationTarget(highscoreTitleButton, Vector2.up, songListView);
+
         songAudioPlayer.LoadedEventStream
             .Subscribe(_ => UpdateSongDurationLabel(songAudioPlayer.DurationOfSongInMillis));
         settings.ObserveEveryValueChanged(it => it.Difficulty)

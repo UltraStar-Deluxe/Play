@@ -60,4 +60,16 @@ public static class SettingsUtils
             .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
             .ToList();
     }
+    
+    public static void IncreaseVolume(Settings settings)
+    {
+        settings.VolumePercent += 10;
+        settings.VolumePercent = NumberUtils.Limit(settings.VolumePercent, 0, 100);
+    }
+
+    public static void DecreaseVolume(Settings settings)
+    {
+        settings.VolumePercent -= 10;
+        settings.VolumePercent = NumberUtils.Limit(settings.VolumePercent, 0, 100);
+    }
 }

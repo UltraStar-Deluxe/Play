@@ -41,7 +41,10 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     
     [Inject(UxmlName = R.UxmlNames.togglePlayerSelectedButton)]
     private Button togglePlayerSelectedButton;
-    
+
+    [Inject(UxmlName = R.UxmlNames.songListView)]
+    private ListViewH songListView;
+
     [Inject(UxmlName = R.UxmlNames.changeVoiceButton)]
     private Button changeVoiceButton;
     
@@ -149,6 +152,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
         
         focusableNavigator.AddCustomNavigationTarget(micButton, Vector2.left, togglePlayerSelectedButton, true);
+        focusableNavigator.AddCustomNavigationTarget(micButton, Vector2.up, songListView);
+        focusableNavigator.AddCustomNavigationTarget(togglePlayerSelectedButton, Vector2.up, songListView);
+        focusableNavigator.AddCustomNavigationTarget(togglePlayerSelectedButton, Vector2.down, changeVoiceButton, true);
         
         IsSelected.Subscribe(newValue =>
         {

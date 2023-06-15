@@ -164,7 +164,7 @@ public class PartyModeSceneControl : MonoBehaviour, INeedInjection, IBinder, IIn
         if (PartyModeSettings.SongSelectionSettings.SongPoolPlaylist == null
             || PartyModeSettings.SongSelectionSettings.SongPoolPlaylist.IsEmpty)
         {
-            return "Select a playlist that is not empty";
+            return "Selected playlist is empty";
         }
 
         return "";

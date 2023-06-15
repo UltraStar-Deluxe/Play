@@ -87,6 +87,8 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
 
     public bool IsVisible => visualElement.IsVisibleByDisplay();
     
+    public Func<List<EGameRoundModifier>> GetAvailableModifiersFunction { get; set; } = () => EnumUtils.GetValuesAsList<EGameRoundModifier>();
+
     private bool isInitialized;
     
     public void OnInjectionFinished()
@@ -246,7 +248,7 @@ public class GameRoundModifierDialogControl : INeedInjection, IInjectionFinished
         GameRoundSettings.finishConditionSettings.condition = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<EGameRoundFinishCondition>());
         GameRoundSettings.finishConditionSettings.points = RandomUtils.RandomOf(NumberUtils.CreateIntList(1000, 9000, 1000));
 
-        GameRoundSettings.modifiers = RandomUtils.RandomHashSetOf(EnumUtils.GetValuesAsList<EGameRoundModifier>());
+        GameRoundSettings.modifiers = RandomUtils.RandomHashSetOf(GetAvailableModifiersFunction?.Invoke());
         GameRoundSettings.modifierConditionSettings.condition = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<EGameRoundModifierCondition>());
 
         GameRoundSettings.modifierConditionSettings.scoreFrom = RandomUtils.RandomOf(NumberUtils.CreateIntList(0, 10000, 1000));

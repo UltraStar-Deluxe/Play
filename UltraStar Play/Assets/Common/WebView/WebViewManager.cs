@@ -159,7 +159,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => OnBeforeSceneChanged());
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
         settings.ObserveEveryValueChanged(it => it.VolumePercent)
-            .Subscribe(_ => UpdateVolume());
+            .Subscribe(_ => UpdateVolume())
+            .AddTo(gameObject);
         RegisterInputActions();
     }
 

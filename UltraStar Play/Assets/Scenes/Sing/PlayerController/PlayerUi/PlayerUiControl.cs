@@ -112,9 +112,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             .Inject(playerPitchIndicatorControl);
 
         // Show rating and score after each sentence
+        playerScoreLabel.text = "";
         if (singSceneControl.IsIndividualScore)
         {
-            playerScoreLabel.text = "";
             ShowTotalScore(playerScoreControl.TotalScore);
             playerScoreControl.SentenceScoreEventStream.Subscribe(sentenceScoreEvent =>
             {

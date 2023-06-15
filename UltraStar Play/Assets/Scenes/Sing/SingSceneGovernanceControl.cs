@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -80,6 +81,8 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     private float doNotShowOverlayBeforeTimeInSeconds;
 
+    private bool isContextMenuOpenedFromInputAction;
+    
     public void OnInjectionFinished()
     {
         contextMenuControl = injector
@@ -309,8 +312,10 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         
         contextMenuPopup.AddButton("Appearance", "filter_b_and_w", () =>
         {
+            bool wasContextMenuOpenedFromInputAction = isContextMenuOpenedFromInputAction;
             fillAppearanceContextMenu = true;
             contextMenuPopup.CloseContextMenu();
+            isContextMenuOpenedFromInputAction = wasContextMenuOpenedFromInputAction;
             contextMenuControl.OpenContextMenu(Vector2.zero);
         });
         
@@ -364,6 +369,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private void OnContextMenuClosed(ContextMenuPopupControl contextMenuPopupControl)
     {
         isPopupMenuOpen = false;
+        isContextMenuOpenedFromInputAction = false;
         popupMenuClosedTimeInSeconds = Time.time;
     }
     
@@ -372,5 +378,21 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         isPopupMenuOpen = true;
         new AnchoredPopupControl(contextMenuPopupControl.VisualElement, openControlsMenuButton, Corner2D.TopRight);
         contextMenuPopupControl.VisualElement.AddToClassList("singSceneContextMenu");
+        
+        if (isContextMenuOpenedFromInputAction)
+        {
+            FocusFirstButton(contextMenuPopupControl);
+        }
+    }
+
+    private void FocusFirstButton(ContextMenuPopupControl contextMenuPopupControl)
+    {
+        contextMenuPopupControl.VisualElement.Query<Button>().ToList().FirstOrDefault().Focus();
+    }
+
+    public void OpenContextMenuFromInputAction()
+    {
+        isContextMenuOpenedFromInputAction = true;
+        contextMenuControl.OpenContextMenu(Vector2.zero);
     }
 }

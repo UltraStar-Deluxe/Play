@@ -167,14 +167,12 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 continue;
             }
 
-            ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
             if (i < currentNoteIndex)
             {
                 label.AddToClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
                 
-                currentThemeMeta.ThemeJson.previousNoteLyricsColor.IfNotDefault(color =>
-                    label.style.color = new StyleColor(color));
+                GetPreviousNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
             }
             else if (i == currentNoteIndex)
             {
