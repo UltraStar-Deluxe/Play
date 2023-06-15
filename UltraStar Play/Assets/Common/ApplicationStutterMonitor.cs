@@ -42,7 +42,7 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
 
     private void Update()
     {
-        if (currentScene is EScene.SingScene)
+        if (currentScene is EScene.SongEditorScene)
         {
             // The song editor is expected to have frame drops
             return;
@@ -55,7 +55,8 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
             Debug.LogWarning($"Frame drop detected, deltaTime: {deltaTimeInMillis} ms");
         }
 
-        if (Keyboard.current.leftShiftKey.wasPressedThisFrame)
+        if (Application.isEditor
+            && Keyboard.current.f3Key.wasPressedThisFrame)
         {
             Thread.Sleep(120);
         }
