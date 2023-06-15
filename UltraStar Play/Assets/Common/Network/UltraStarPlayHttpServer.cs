@@ -35,7 +35,7 @@ public class UltraStarPlayHttpServer : HttpServer, INeedInjection
         Settings settings = SettingsManager.Instance.Settings;
         host = !settings.HttpServerHost.IsNullOrEmpty()
             ? settings.HttpServerHost
-            : IpAddressUtils.GetIpAddress(AddressFamily.IPv4, NetworkInterfaceType.Wireless80211);
+            : (IpAddressUtils.GetLocalIpAddress()?.ToString() ?? "localhost");
         
         port = settings.HttpServerPort > 0
             ? settings.HttpServerPort
