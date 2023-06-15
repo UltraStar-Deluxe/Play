@@ -92,7 +92,8 @@ public class MouseEventScrollControl : MonoBehaviour, INeedInjection, IInjection
     private void OnMouseMoveOnRootVisualElement(MouseMoveEvent evt)
     {
         if (dragging
-            && !(uiDocument.rootVisualElement.focusController.focusedElement is TextField))
+            && !(uiDocument.rootVisualElement.focusController.focusedElement is TextField)
+            && mouseDownScrollView != null)
         {
             Vector2 dragDelta = dragStartPosition - evt.localMousePosition;
             mouseDownScrollView.scrollOffset = new Vector2(
