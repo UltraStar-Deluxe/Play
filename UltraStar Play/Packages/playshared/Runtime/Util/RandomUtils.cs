@@ -6,6 +6,10 @@ public static class RandomUtils
 {
     public static T RandomOfItems<T>(params T[] values)
     {
+        if (values.IsNullOrEmpty())
+        {
+            return default(T);
+        }
         return RandomOf(values.ToList());
     }
     
@@ -21,6 +25,10 @@ public static class RandomUtils
 
     public static HashSet<T> RandomHashSetOf<T>(IReadOnlyList<T> values)
     {
+        if (values.IsNullOrEmpty())
+        {
+            return new HashSet<T>();
+        }
         HashSet<T> result = new();
         int itemCount = Random.Range(0, values.Count + 1);
         List<T> remainingValues = new(values);
