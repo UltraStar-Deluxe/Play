@@ -329,7 +329,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             || pitchEvent.Beat < lastAnalyzedBeatFromConnectedClient)
         {
             // Looks like the companion app does not know the current position in the song. Send it this info again.
-            Debug.LogWarning($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
+            // Debug.LogWarning($"Received invalid beat from connected client: beat {pitchEvent.Beat}");
             if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + (SendPositionInSongIntervalInMillis / 10) < TimeUtils.GetUnixTimeMilliseconds())
             {
                 SendPositionInSongToClient();
@@ -340,7 +340,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, songAudioPlayer.PositionInSongInMillis);
         if (pitchEvent.Beat > currentBeat)
         {
-            Debug.LogWarning($"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
+            // Debug.LogWarning($"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
             return;
         }
 
@@ -395,7 +395,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             SongGap = songMeta.Gap,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
         };
-        Debug.Log($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
+        // Debug.Log($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
         connectedClientHandler.SendMessageToClient(positionInSongDto);
     }
 
