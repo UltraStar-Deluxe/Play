@@ -15,6 +15,8 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
     private SceneNavigator sceneNavigator;
     
     private float ignoreFrameDropUntilTimeInSeconds;
+
+    private EScene currentScene;
     
     protected override object GetInstance()
     {
@@ -24,6 +26,12 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
     protected override void StartSingleton()
     {
         sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => OnBeforeSceneChange());
+        sceneNavigator.SceneChangedEventStream.Subscribe(evt => OnAfterSceneChanged(evt));
+    }
+
+    private void OnAfterSceneChanged(SceneChangedEvent evt)
+    {
+        currentScene = evt.NewScene;
     }
 
     private void OnBeforeSceneChange()
@@ -34,6 +42,12 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
 
     private void Update()
     {
+        if (currentScene is EScene.SingScene)
+        {
+            // The song editor is expected to have frame drops
+            return;
+        }
+        
         if (Time.deltaTime > ThresholdInSeconds
             && ignoreFrameDropUntilTimeInSeconds < Time.time)
         {
