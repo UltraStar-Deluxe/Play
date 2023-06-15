@@ -644,7 +644,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
 
-        using DisposableStopwatch d = new("ThemeManager.DoApplyThemeSpecificStylesToVisualElements");
+        // using DisposableStopwatch d = new("ThemeManager.DoApplyThemeSpecificStylesToVisualElements");
         
         if (settings.DisableDynamicThemes)
         {
