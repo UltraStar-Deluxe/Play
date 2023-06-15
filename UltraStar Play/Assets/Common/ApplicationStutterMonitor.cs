@@ -1,0 +1,49 @@
+﻿using System.Threading;
+using UniInject;
+using UniRx;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInjection
+{
+    public static ApplicationStutterMonitor Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplicationStutterMonitor>();
+    
+    private const float ThresholdInMillis = 50;
+    private const float ThresholdInSeconds = ThresholdInMillis / 1000f;
+
+    [Inject]
+    private SceneNavigator sceneNavigator;
+    
+    private float ignoreFrameDropUntilTimeInSeconds;
+    
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => OnBeforeSceneChange());
+    }
+
+    private void OnBeforeSceneChange()
+    {
+        // The scene change is expected to take a bit longer
+        ignoreFrameDropUntilTimeInSeconds = Time.time + 0.5f;
+    }
+
+    private void Update()
+    {
+        if (Time.deltaTime > ThresholdInSeconds
+            && ignoreFrameDropUntilTimeInSeconds < Time.time)
+        {
+            int deltaTimeInMillis = (int)(Time.deltaTime * 1000);
+            Debug.LogWarning($"Frame drop detected, deltaTime: {deltaTimeInMillis} ms");
+        }
+
+        if (Keyboard.current.leftShiftKey.wasPressedThisFrame)
+        {
+            Thread.Sleep(120);
+        }
+    }
+}
