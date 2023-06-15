@@ -125,8 +125,11 @@ public class VoicesBuilder
 
         try
         {
-            ParseSentenceStartBeatAndEndBeat(line, out int startBeat, out int endBeat);
-            currentSentence.SetLinebreakBeat(startBeat);
+            ParseSentenceStartBeatAndEndBeat(line, out int previousSentenceEndBeat, out int nextSentenceStartBeat);
+            if (previousSentenceEndBeat >= 0)
+            {
+                currentSentence.SetLinebreakBeat(previousSentenceEndBeat);
+            }
             currentSentence = null;
         }
         catch (VoicesBuilderException e)
@@ -135,33 +138,29 @@ public class VoicesBuilder
         }
     }
 
-    private void ParseSentenceStartBeatAndEndBeat(string line, out int startBeat, out int endBeat)
+    private void ParseSentenceStartBeatAndEndBeat(string line, out int previousSentenceEndBeat, out int nextSentenceStartBeat)
     {
-        // Format of line breaks: - STARTBEAT ENDBEAT
-        // Thereby, ENDBEAT is optional.
+        // Format of line breaks: - previousSentenceEndBeat nextSentenceStartBeat
+        // Thereby, previousSentenceEndBeat and nextSentenceStartBeat are optional.
         char[] splitChars = { ' ' };
         string[] data = line.Trim().Split(splitChars, StringSplitOptions.RemoveEmptyEntries);
 
-        startBeat = 0;
-        endBeat = 0;
+        previousSentenceEndBeat = -1;
+        nextSentenceStartBeat = -1;
         if (data.Length == 3)
         {
             string startBeatText = data[1];
-            startBeat = ConvertToBeat(startBeatText);
-            // TODO: Store endBeatText in SongMeta.
+            previousSentenceEndBeat = ConvertToBeat(startBeatText);
+            // TODO: Store endBeatText in SongMeta as ExtendedStartBeat ?
             string endBeatText = data[2];
-            endBeat = ConvertToBeat(endBeatText);
-            lastBeat = endBeat;
+            nextSentenceStartBeat = ConvertToBeat(endBeatText);
+            lastBeat = nextSentenceStartBeat;
         }
         else if (data.Length == 2)
         {
             string startBeatText = data[1];
-            startBeat = ConvertToBeat(startBeatText);
-            lastBeat = startBeat;
-        }
-        else
-        {
-            throw new VoicesBuilderException("Invalid instruction: " + line);
+            previousSentenceEndBeat = ConvertToBeat(startBeatText);
+            lastBeat = previousSentenceEndBeat;
         }
     }
 
