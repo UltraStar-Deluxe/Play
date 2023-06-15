@@ -28,6 +28,8 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
     public static AudioManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioManager>();
 
+    private static Dictionary<AudioClip, int> audioClipToLastPlayedFrameCount = new();
+
     [InjectedInInspector]
     public AudioMixer mainAudioMixer;
 
@@ -60,6 +62,13 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
+
+        if (audioClipToLastPlayedFrameCount.TryGetValue(clip, out int lastPlayedFrameCount)
+            && lastPlayedFrameCount == Time.frameCount)
+        {
+            return;
+        }
+        audioClipToLastPlayedFrameCount[clip] = Time.frameCount;
 
         AudioManager audioManager = Instance;
         if (audioManager == null
