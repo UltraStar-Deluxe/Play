@@ -719,6 +719,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "singSceneOpenContextMenu",
+                    "type": "Button",
+                    "id": "dce2ba3d-29c2-4c62-8de3-91b0066e43b4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1055,7 +1064,7 @@
                 {
                     "name": "",
                     "id": "9ccd4e70-f819-4f2b-918a-b1ca19844790",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/buttonNorth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1390,6 +1399,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "toggleWebViewControl",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d8b477ba-d7e2-45ba-a8ef-41d85ffcf131",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneOpenContextMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fa8062d1-a159-46d6-9988-a6a8dbbd6fc2",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneOpenContextMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

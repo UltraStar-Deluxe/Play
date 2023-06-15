@@ -95,14 +95,12 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 
     private void IncreaseVolume()
     {
-        settings.VolumePercent += 10;
-        settings.VolumePercent = NumberUtils.Limit(settings.VolumePercent, 0, 100);
+        SettingsUtils.IncreaseVolume(settings);
     }
 
     private void DecreaseVolume()
     {
-        settings.VolumePercent -= 10;
-        settings.VolumePercent = NumberUtils.Limit(settings.VolumePercent, 0, 100);
+        SettingsUtils.DecreaseVolume(settings);
     }
     
     /**
