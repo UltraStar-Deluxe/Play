@@ -14,6 +14,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         micSelectionDialogControl = null;
     }
     private static MicSelectionDialogControl micSelectionDialogControl;
+    public static MicSelectionDialogControl MicSelectionDialogControl => micSelectionDialogControl;
     
     [Inject(Key = nameof(micPitchTrackerPrefab))]
     private NewestSamplesMicPitchTracker micPitchTrackerPrefab;

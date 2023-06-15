@@ -49,7 +49,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         // Remove/add MicProfile when Client (dis)connects.
         serverSideConnectRequestManager.ClientConnectedEventStream
             .ObserveOnMainThread()
-            .Subscribe(HandleClientConnectedEvent)
+            .Subscribe(OnClientConnected)
             .AddTo(gameObject);
 
         if (songSelectSceneControl.HasPartyModeSceneData)
@@ -71,26 +71,37 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(true, true));
     }
 
-    private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
+    private void OnClientConnected(ClientConnectionEvent evt)
     {
         // Find existing or create new MicProfile for the newly connected device
-        MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == connectionEvent.ConnectedClientHandler.ClientId);
+        MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == evt.ConnectedClientHandler.ClientId);
         if (connectedMicProfile == null)
         {
-            connectedMicProfile = new MicProfile(connectionEvent.ConnectedClientHandler.ClientName, 0, connectionEvent.ConnectedClientHandler.ClientId);
+            connectedMicProfile = new MicProfile(evt.ConnectedClientHandler.ClientName, 0, evt.ConnectedClientHandler.ClientId);
             settings.MicProfiles.Add(connectedMicProfile);
         }
 
-        if (connectionEvent.IsConnected)
+        if (evt.IsConnected)
         {
             // Assign to player if needed
             UseMicProfileWhereNeeded(connectedMicProfile);
         }
-        else if (!connectionEvent.IsConnected)
+        else if (!evt.IsConnected)
         {
             // Remove from players where already assigned
             RemoveMicProfileFromListEntries(connectedMicProfile);
         }
+        
+        // Refresh mic selection dialog.
+        if (SongSelectPlayerEntryControl.MicSelectionDialogControl != null)
+        {
+            SongSelectPlayerEntryControl.MicSelectionDialogControl.MicProfiles = GetAvailableMicProfiles();
+        }
+    }
+    
+    private List<MicProfile> GetAvailableMicProfiles()
+    {
+        return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);
     }
     
     private void UpdateListEntries()
