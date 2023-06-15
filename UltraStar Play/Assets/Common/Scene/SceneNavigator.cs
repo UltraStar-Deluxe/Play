@@ -75,7 +75,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
     {
-        sceneChangedEventStream.OnNext(new SceneChangedEvent());
+        sceneChangedEventStream.OnNext(new SceneChangedEvent(sceneRecipeManager.GetCurrentScene()));
     }
 
     public void LoadScene(EScene scene, bool skipAnimation=false)
@@ -105,7 +105,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
             && currentScene != EScene.SongEditorScene)
         {
             sceneRecipeManager.LoadSceneFromRecipe(sceneRecipe);
-            sceneChangedEventStream.OnNext(new SceneChangedEvent());
+            sceneChangedEventStream.OnNext(new SceneChangedEvent(targetScene));
         }
         else
         {
