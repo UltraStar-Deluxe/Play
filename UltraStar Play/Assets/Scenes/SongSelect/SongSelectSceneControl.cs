@@ -406,6 +406,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
         toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.ToggleVisible());
         closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.SlideOut());
+        modifierDialogControl.GetAvailableModifiersFunction = GetAvailableModifiers;
 
         // Modifier active icon
         modifiersActiveIcon.HideByDisplay();
@@ -454,6 +455,16 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
+    private List<EGameRoundModifier> GetAvailableModifiers()
+    {
+        List<EGameRoundModifier> availableModifiers = EnumUtils.GetValuesAsList<EGameRoundModifier>();
+        if (!HasPartyModeSceneData)
+        {
+            availableModifiers.Remove(EGameRoundModifier.PassTheMic);
+        }
+        return availableModifiers;
+    }
+    
     private void UpdateSongQueue()
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.UpdateSongQueue");
