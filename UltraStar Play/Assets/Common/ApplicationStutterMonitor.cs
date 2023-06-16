@@ -8,7 +8,7 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
 {
     public static ApplicationStutterMonitor Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplicationStutterMonitor>();
     
-    private const float ThresholdInMillis = 50;
+    private const float ThresholdInMillis = 100;
     private const float ThresholdInSeconds = ThresholdInMillis / 1000f;
 
     [Inject]
