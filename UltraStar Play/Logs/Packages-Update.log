@@ -204,3 +204,12 @@ The following packages were updated:
   com.unity.render-pipelines.universal from version 14.0.5 to 14.0.7
   com.unity.timeline from version 1.7.2 to 1.7.4
   com.unity.toolchain.win-x86_64-linux-x86_64 from version 2.0.3 to 2.0.4
+
+=== Fri Jun 16 23:35:54 2023
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.inputsystem from version 1.5.1 to 1.6.1
+  com.unity.render-pipelines.universal from version 14.0.7 to 14.0.8
