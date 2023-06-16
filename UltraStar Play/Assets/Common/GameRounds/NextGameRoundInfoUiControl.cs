@@ -20,7 +20,10 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.nextGameRoundPlayerEntryList)]
     private VisualElement nextGameRoundPlayerEntryList;
-
+    
+    [Inject(UxmlName = R.UxmlNames.nextGameRoundModifierActiveIcon)]
+    private VisualElement nextGameRoundModifierActiveIcon;
+    
     [Inject]
     private SongQueueManager songQueueManager;
     
@@ -64,6 +67,8 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
                 micVisualElement.HideByDisplay();
             }
         });
+        
+        nextGameRoundModifierActiveIcon.SetVisibleByDisplay(songQueueEntryDto.GameRoundSettings.AnyModifierOrFinishConditionActive);
     }
 
     public void HideNextGameRoundUi()
