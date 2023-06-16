@@ -15,6 +15,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.showFpsPicker)]
     private ItemPicker showFpsPicker;
 
+    [Inject(UxmlName = R.UxmlNames.streamAudioInSingScenePicker)]
+    private ItemPicker streamAudioInSingScenePicker;
+
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
     private ItemPicker pitchDetectionAlgorithmPicker;
 
@@ -100,6 +103,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(showFpsPicker)
             .Bind(() => settings.ShowFps,
                   newValue => settings.ShowFps = newValue);
+        
+        new BoolPickerControl(streamAudioInSingScenePicker)
+            .Bind(() => settings.StreamAudioInSingScene,
+                newValue => settings.StreamAudioInSingScene = newValue);
 
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmPicker)
             .Bind(() => settings.PitchDetectionAlgorithm,

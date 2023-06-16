@@ -1038,7 +1038,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
-        songAudioPlayer.LoadSongAudio(SongMeta, sceneData.PositionInSongInMillis)
+        songAudioPlayer.LoadSongAudio(SongMeta, sceneData.PositionInSongInMillis, settings.StreamAudioInSingScene)
             .CatchIgnore((Exception error) =>
             {
                 // Loading the audio failed.
