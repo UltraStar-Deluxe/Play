@@ -87,6 +87,7 @@ public class Settings : ISettings
     // Technical settings
     public bool ShowFps { get; set; }
     public bool UseUniversalCharsetDetector { get; set; } = true;
+    public bool StreamAudioInSingScene { get; set; } = true;
 
     /**
      * Require explicit user action to use custom event system

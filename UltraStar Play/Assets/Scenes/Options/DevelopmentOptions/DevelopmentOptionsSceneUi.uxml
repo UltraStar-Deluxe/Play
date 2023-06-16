@@ -14,6 +14,8 @@
                 </ui:Button>
             </ui:VisualElement>
             <ItemPicker name="showFpsPicker" label="Show FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ItemPicker name="streamAudioInSingScenePicker" label="Stream audio for singing" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
             <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
             <ItemPicker name="analyzeBeatsWithoutTargetNotePicker" label="Analyze Beats Without Target Note" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animatedBackgroundItemPicker" label="Animated Background" class="noBackgroundInHierarchy" />
@@ -28,7 +30,6 @@
             <ui:TextField label="HTTP Server Host&#10;(leave empty for automatic value)" name="httpServerHostTextField" class="noBackgroundInHierarchy mb-3" />
             <ui:IntegerField label="HTTP Server Port&#10;(default: 6789)" name="httpServerPortTextField" class="noBackgroundInHierarchy mb-3" />
             <ui:Label text="HTTP endpoint example: ????" name="httpEndpointExampleLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
-            <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

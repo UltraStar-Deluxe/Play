@@ -119,8 +119,9 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
         AddHeaders(unityWebRequest);
         unityWebRequest.SendWebRequest();
 
-        void WrappedOnSuccess(string response)
+        void WrappedOnSuccess(DownloadHandler downloadHandler)
         {
+            string response = downloadHandler?.text;
             LogRequestSuccess(unityWebRequest);
             onSuccess?.Invoke(response);
         }
