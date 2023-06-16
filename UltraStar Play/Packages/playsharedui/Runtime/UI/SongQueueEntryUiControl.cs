@@ -19,6 +19,9 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
     [Inject(UxmlName = R_PlayShared.UxmlNames.songTitle)]
     private Label songTitle;
     
+    [Inject(UxmlName = R_PlayShared.UxmlNames.songQueueEntryModifierActiveIcon)]
+    private VisualElement songQueueEntryModifierActiveIcon;
+    
     [Inject(UxmlName = R_PlayShared.UxmlNames.playerEntryList)]
     private VisualElement playerEntryList;
     
@@ -54,6 +57,11 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
         // Add song entries
         songArtist.text = SongQueueEntryDto.SongDto.Artist;
         songTitle.text = SongQueueEntryDto.SongDto.Title;
+        
+        // Any modifier active
+        songQueueEntryModifierActiveIcon.SetVisibleByDisplay(
+            !SongQueueEntryDto.IsMedleyWithPreviousEntry
+            && SongQueueEntryDto.GameRoundSettings.AnyModifierOrFinishConditionActive);
 
         // Add player entries
         playerEntryList.Clear();

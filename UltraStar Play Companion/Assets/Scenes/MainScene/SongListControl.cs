@@ -9,6 +9,8 @@ using UnityEngine.UIElements;
 
 public class SongListControl : INeedInjection, IInjectionFinishedListener, ITranslator, IDisposable
 {
+    private IComparer<SongDto> songDtoComparer = new SongListSongDtoComparer();
+    
     [Inject(Key = nameof(songListEntryUi))]
     private VisualTreeAsset songListEntryUi;
     
@@ -194,7 +196,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
         List<SongDto> songDtos = new List<SongDto>(songListRequestor.LoadedSongsDto.SongList)
             .Where(songDto => SongSearchMatches(songDto))
             .ToList();
-        songDtos.Sort((a,b) => string.Compare(a.Artist, b.Artist, StringComparison.InvariantCulture));
+        songDtos.Sort(songDtoComparer);
 
         songListView.itemsSource = songDtos;
         songListView.RefreshItems();

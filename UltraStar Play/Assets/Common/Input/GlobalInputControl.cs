@@ -64,9 +64,12 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
             uiDocument.rootVisualElement.SetVisibleByDisplay(!uiDocument.rootVisualElement.IsVisibleByDisplay());
         }
 
+#if UNITY_EDITOR
         UpdateEditorOnlyGlobalShortcuts();
+#endif
     }
 
+#if UNITY_EDITOR
     private void UpdateEditorOnlyGlobalShortcuts()
     {
         if (!Application.isEditor
@@ -89,7 +92,8 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
             RefreshAssetDatabase();
         }
     }
-
+#endif
+    
     private void RefreshAssetDatabase()
     {
 #if UNITY_EDITOR

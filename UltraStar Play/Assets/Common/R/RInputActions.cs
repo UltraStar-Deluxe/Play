@@ -58,6 +58,7 @@ public static partial class R
         public static readonly string usplay_restartSong = "usplay/restartSong";
         public static readonly string usplay_search = "usplay/search";
         public static readonly string usplay_singSceneOpenContextMenu = "usplay/singSceneOpenContextMenu";
+        public static readonly string usplay_singSceneShowGovernanceOverlay = "usplay/singSceneShowGovernanceOverlay";
         public static readonly string usplay_skipToNextLyrics = "usplay/skipToNextLyrics";
         public static readonly string usplay_space = "usplay/space";
         public static readonly string usplay_start = "usplay/start";

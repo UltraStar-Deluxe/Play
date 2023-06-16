@@ -392,6 +392,7 @@ public static partial class R
         public const string nextGameRoundInfoPlayerEntryUiRoot = "nextGameRoundInfoPlayerEntryUiRoot";
         public const string NextGameRoundInfoUi = "NextGameRoundInfoUi";
         public const string nextGameRoundInfoUiRoot = "nextGameRoundInfoUiRoot";
+        public const string nextGameRoundModifierActiveIcon = "nextGameRoundModifierActiveIcon";
         public const string nextGameRoundPlayerEntryLabel = "nextGameRoundPlayerEntryLabel";
         public const string nextGameRoundPlayerEntryList = "nextGameRoundPlayerEntryList";
         public const string nextGameRoundPlayerEntryMicImage = "nextGameRoundPlayerEntryMicImage";
