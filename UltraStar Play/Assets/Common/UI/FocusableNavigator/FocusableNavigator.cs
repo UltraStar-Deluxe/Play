@@ -208,6 +208,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         VisualElement focusedVisualElement = FocusedVisualElement;
         if (focusedVisualElement == null)
         {
+            Debug.LogWarning("FocusableNavigator.OnNavigate: No focused VisualElement found.");
             noNavigationTargetFoundEventStream.OnNext(new NoNavigationTargetFoundEvent
             {
                 NavigationDirection = navigationDirection,
