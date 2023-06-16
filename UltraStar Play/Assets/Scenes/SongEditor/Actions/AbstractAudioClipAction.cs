@@ -39,7 +39,7 @@ public class AbstractAudioClipAction : INeedInjection
                 UiManager.CreateNotification("No vocals audio found. Split the audio first.");
                 return null;
             }
-            return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
+            return audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
         }
         else if (samplesSource == ESongEditorSamplesSource.Instrumental)
         {
@@ -48,11 +48,11 @@ public class AbstractAudioClipAction : INeedInjection
                 UiManager.CreateNotification("No instrumental audio found. Split the audio first.");
                 return null;
             }
-            return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
+            return audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetInstrumentalAudioUri(songMeta), false);
         }
 
         // Use the song's audio.
         // For reading the audio samples, the AudioClip must not be streamed. All data must have been fully loaded.
-        return audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta), false);
+        return audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetAudioUri(songMeta), false);
     }
 }

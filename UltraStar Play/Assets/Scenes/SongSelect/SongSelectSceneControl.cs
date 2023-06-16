@@ -955,6 +955,29 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
+        // Check that any player is selected
+        if (playerListControl.GetSelectedPlayerProfiles().IsNullOrEmpty())
+        {
+            UiManager.CreateNotification(
+                TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
+            return;
+        }
+
+        // Check that there is associated and persisted sing-along data. If not, ask to open song editor.
+        if (SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta))
+        {
+            noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
+            noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
+                                                   + "Do you want to open the song editor?";
+            noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
+            Button openSongEditorButton =
+                noSingAlongDataDialogControl.AddButton("Open Song Editor", _ => StartSongEditorScene(songMeta));
+            noSingAlongDataDialogControl.AddButton("Start Song", _ => StartSingScene(songMeta));
+            noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
+            openSongEditorButton.Focus();
+            return;
+        }
+
         // Check that the audio file exists
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
@@ -966,39 +989,16 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.Init(songMeta);
-        if (!songAudioPlayer.IsPartiallyLoaded)
-        {
-            string message = $"Audio file '{songMeta.Mp3}' could not be loaded.\n" +
-                             $"Please use one of the formats {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}.";
-            Debug.Log(message);
-            UiManager.CreateNotification(message);
-            return;
-        }
-
-        // Check that any player is selected
-        if (playerListControl.GetSelectedPlayerProfiles().IsNullOrEmpty())
-        {
-            UiManager.CreateNotification(TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
-            return;
-        }
-        
-        // Check that there is associated and persisted sing-along data. If not, ask to open song editor.
-        if (SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta))
-        {
-            noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
-            noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
-                                           + "Do you want to open the song editor?";
-            noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
-            Button openSongEditorButton = noSingAlongDataDialogControl.AddButton("Open Song Editor", _ => StartSongEditorScene(songMeta));
-            noSingAlongDataDialogControl.AddButton("Start Song", _ => StartSingScene(songMeta));
-            noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
-            openSongEditorButton.Focus();
-            return;
-        }
-        
-        // Start the sing scene or show the player select overlay.
-        StartSingScene(songMeta);
+        songAudioPlayer.LoadSongAudio(songMeta)
+            .CatchIgnore((Exception error) =>
+            {
+                string message = $"Audio file '{songMeta.Mp3}' could not be loaded.\n" +
+                                 $"Please use one of {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}\n" +
+                                 $"or a supported website URI.";
+                Debug.Log(message);
+                UiManager.CreateNotification(message);
+            })
+            .Subscribe(_ => StartSingScene(songMeta));
     }
 
     public void AttemptStartSelectedSong()

@@ -1038,25 +1038,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
-        songAudioPlayer.Init(SongMeta);
-
-        if (!songAudioPlayer.IsPartiallyLoaded)
-        {
-            // Loading the audio failed.
-            PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
-            sceneNavigator.LoadScene(EScene.SongSelectScene);
-        }
-
-        // The time bar needs the duration of the song to calculate positions.
-        // The duration of the song should be available now.
-        timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
-        songAudioPlayer.LoadedEventStream.Subscribe(_ => timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis));
-
-        songAudioPlayer.PlayAudio();
-        if (sceneData.PositionInSongInMillis > 0)
-        {
-            SkipToPositionInSong(sceneData.PositionInSongInMillis);
-        }
+        songAudioPlayer.LoadSongAudio(SongMeta, sceneData.PositionInSongInMillis)
+            .CatchIgnore((Exception error) =>
+            {
+                // Loading the audio failed.
+                PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
+                sceneNavigator.LoadScene(EScene.SongSelectScene);
+            })
+            .Subscribe(_ =>
+            {
+                timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
+                songAudioPlayer.PlayAudio();
+            });
     }
 
     public List<IBinding> GetBindings()

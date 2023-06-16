@@ -41,8 +41,8 @@ public class SongAudioPlayer : MonoBehaviour
     private readonly Subject<float> playbackSpeedChangedEventStream = new();
     public IObservable<float> PlaybackSpeedChangedEventStream => playbackSpeedChangedEventStream;
 
-    private readonly Subject<bool> loadedEventStream = new();
-    public IObservable<bool> LoadedEventStream => loadedEventStream;
+    private readonly Subject<SongAudioLoadedEvent> loadedEventStream = new();
+    public IObservable<SongAudioLoadedEvent> LoadedEventStream => loadedEventStream;
 
     public IObservable<Pair<double>> JumpBackInSongEventStream
     {
@@ -288,8 +288,6 @@ public class SongAudioPlayer : MonoBehaviour
 
     private bool isPaused;
 
-    private double initialPositionInMillis;
-
     private bool isWebViewAudio;
 
     private void Start()
@@ -313,20 +311,13 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public void Init(SongMeta songMeta, double startPositionInMillis = 0)
+    public IObservable<SongAudioLoadedEvent> LoadSongAudio(SongMeta songMeta, double startPositionInMillis = 0, bool streamAudio = true)
     {
-        if (!gameObject.activeInHierarchy)
-        {
-            return;
-        }
-
-        this.initialPositionInMillis = startPositionInMillis;
-        
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
-            Debug.Log($"Audio file resource does not exist {songMeta.Mp3}");
-            return;
+            Debug.Log($"Audio resource does not exist: {audioUri}");
+            return Observable.Throw<SongAudioLoadedEvent>(new Exception($"Audio resource does not exist: {audioUri}"));
         }
 
         SongMeta = songMeta;
@@ -336,21 +327,19 @@ public class SongAudioPlayer : MonoBehaviour
         string fileExtension = Path.GetExtension(audioUri);
         if (ApplicationUtils.IsSupportedVideoFormat(fileExtension))
         {
-            // Load video file
-            LoadAsVideo(audioUri);
+            return LoadAsVideo(songMeta, audioUri, startPositionInMillis);
         }
         else if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
         {
-            LoadMidiAsAudio(audioUri);
+            return LoadMidiAsAudio(songMeta, audioUri, startPositionInMillis);
         }
         else if (WebViewManager.CanHandleUrl(audioUri))
         {
-            LoadAsWebView(audioUri);
+            return LoadAsWebView(songMeta, audioUri, startPositionInMillis);
         }
         else
         {
-            // Load audio file
-            LoadAsAudio(audioUri);
+            return LoadAsAudio(songMeta, audioUri, startPositionInMillis, streamAudio);
         }
     }
 
@@ -369,46 +358,67 @@ public class SongAudioPlayer : MonoBehaviour
         DurationOfSongInMillis = 0;
     }
     
-    private void LoadMidiAsAudio(string uri)
+    private IObservable<SongAudioLoadedEvent> LoadMidiAsAudio(SongMeta songMeta, string audioUri,
+        double startPositionInMillis)
     {
-        AudioClip audioClip = MidiManager.CreateAudioClip(uri);
+        AudioClip audioClip = MidiManager.CreateAudioClip(audioUri);
         if (audioClip == null)
         {
-            Debug.LogError($"Failed to load audio clip from MIDI file {uri}");
             AudioPlayer.Stop();
-            return;
+            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+                new Exception($"Failed to load audio clip from MIDI file {audioUri}"));
         }
-        
-        AudioPlayer.clip = audioClip;
-        DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
-        PositionInSongInMillis = initialPositionInMillis;
-        loadedEventStream.OnNext(true);
+
+        return Observable.Create<SongAudioLoadedEvent>(o =>
+        {
+            AudioPlayer.clip = audioClip;
+            DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
+            PositionInSongInMillis = startPositionInMillis;
+            FireLoadedEvent(o, songMeta, audioUri);
+            return Disposable.Empty;
+        });
     }
     
-    private void LoadAsAudio(string audioUri)
+    private IObservable<SongAudioLoadedEvent> LoadAsAudio(
+        SongMeta songMeta,
+        string audioUri,
+        double startPositionInMillis,
+        bool streamAudio)
     {
-        AudioClip audioClip = AudioManager.LoadAudioClipFromUri(audioUri);
-        if (audioClip == null)
+        return Observable.Create<SongAudioLoadedEvent>(o =>
         {
-            Debug.LogError($"Failed to load audio clip from {audioUri}");
-            AudioPlayer.Stop();
-            return;
-        }
+            AudioManager.LoadAudioClipFromUri(audioUri, streamAudio)
+                .CatchIgnore((Exception error) => o.OnError(error))
+                .Subscribe(loadedAudioClip =>
+                {
+                    if (loadedAudioClip == null)
+                    {
+                        AudioPlayer.Stop();
+                        string errorMessage = $"Failed to load audio clip from {audioUri}";
+                        Debug.LogError(errorMessage);
+                        o.OnError(new Exception(errorMessage));
+                        return;
+                    }
 
-        AudioPlayer.clip = audioClip;
-        DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
-        PositionInSongInMillis = initialPositionInMillis;
-        loadedEventStream.OnNext(true);
+                    AudioPlayer.clip = loadedAudioClip;
+                    DurationOfSongInMillis = 1000.0 * loadedAudioClip.samples / loadedAudioClip.frequency;
+                    PositionInSongInMillis = startPositionInMillis;
+                    FireLoadedEvent(o, songMeta, audioUri);
+                });
+            
+            return Disposable.Empty;
+        });
     }
 
-    private void LoadAsVideo(string audioUri)
+    private IObservable<SongAudioLoadedEvent> LoadAsVideo(SongMeta songMeta, string audioUri,
+        double startPositionInMillis)
     {
         VideoPlayer.url = audioUri;
         if (VideoPlayer.url.IsNullOrEmpty())
         {
-            Debug.LogError($"Failed to load video from {audioUri}");
             VideoPlayer.Stop();
-            return;
+            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+                new Exception($"Failed to load video from {audioUri}"));
         }
         
         // Play the audio of the video player through the AudioSource.
@@ -422,37 +432,45 @@ public class SongAudioPlayer : MonoBehaviour
         VideoPlayer.Play();
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
-        StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-            () => VideoPlayer.length > 0, () =>
-            {
-                DurationOfSongInMillis = 1000.0 * VideoPlayer.length;
-                PositionInSongInMillis = initialPositionInMillis;
-                PauseAudio();
-                loadedEventStream.OnNext(true);
-            }));
+        return Observable.Create<SongAudioLoadedEvent>(o =>
+        {
+            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
+                () => VideoPlayer.length > 0,
+                () =>
+                {
+                    DurationOfSongInMillis = 1000.0 * VideoPlayer.length;
+                    PositionInSongInMillis = startPositionInMillis;
+                    PauseAudio();
+                    FireLoadedEvent(o, songMeta, audioUri);
+                }));
+            return Disposable.Empty;
+        });
     }
 
-    private void LoadAsWebView(string audioUri)
+    private IObservable<SongAudioLoadedEvent> LoadAsWebView(SongMeta songMeta, string audioUri,
+        double startPositionInMillis)
     {
         bool success = WebViewManager.LoadUrl(audioUri);
         if (!success)
         {
-            Debug.LogError($"Failed to load video using WebView from URL {audioUri}");
-            return;
+            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+                new Exception($"Failed to load audio via WebView with URL {audioUri}"));
         }
         
         isWebViewAudio = true;
 
-        // The video is loaded asynchronously.
+        // The WebView is loaded asynchronously. When the duration is available then the audio is loaded.
         long startTime = TimeUtils.GetUnixTimeMilliseconds();
         long timeoutInMillis = 5000;
-        StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-            () =>
-            {
-                return WebViewManager.DurationInMillis > 0
-                    || TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis);
-            },
-            () =>
+        return Observable.Create<SongAudioLoadedEvent>(o =>
+        {
+            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
+                () =>
+                {
+                    return WebViewManager.DurationInMillis > 0
+                           || TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis);
+                },
+                () =>
                 {
                     if (TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis))
                     {
@@ -461,15 +479,24 @@ public class SongAudioPlayer : MonoBehaviour
                     }
                     
                     DurationOfSongInMillis = WebViewManager.DurationInMillis;
-                    PositionInSongInMillis = initialPositionInMillis;
+                    PositionInSongInMillis = startPositionInMillis;
                     PauseAudio();
-                    loadedEventStream.OnNext(true);
+                    FireLoadedEvent(o, songMeta, audioUri);
                 }));
+
+            return Disposable.Empty;
+        });
+    }
+
+    private void FireLoadedEvent(IObserver<SongAudioLoadedEvent> o, SongMeta songMeta, string audioUri)
+    {
+        o.OnNext(new SongAudioLoadedEvent(songMeta, audioUri));
+        loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, audioUri));
     }
     
     public void ReloadAudio()
     {
-        Init(SongMeta);
+        LoadSongAudio(SongMeta);
     }
 
     public void StopAudio()

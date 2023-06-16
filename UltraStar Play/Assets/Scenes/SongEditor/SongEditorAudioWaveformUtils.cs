@@ -33,7 +33,7 @@ public static class SongEditorAudioWaveformUtils
         }
 
         // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
+        AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(audioUri, false);
         return audioClip;
     }
 

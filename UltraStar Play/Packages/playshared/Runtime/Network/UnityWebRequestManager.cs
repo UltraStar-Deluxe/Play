@@ -33,7 +33,7 @@ public class UnityWebRequestManager : AbstractSingletonBehaviour
             }
             else if (request.unityWebRequest.result is UnityWebRequest.Result.Success)
             {
-                request.onSuccess?.Invoke(request.unityWebRequest.downloadHandler?.text);
+                request.onSuccess?.Invoke(request.unityWebRequest.downloadHandler);
             }
         });
         
@@ -43,7 +43,7 @@ public class UnityWebRequestManager : AbstractSingletonBehaviour
 
     public void AddUnityWebRequest(
         UnityWebRequest unityWebRequest,
-        Action<string> onSuccess,
+        Action<DownloadHandler> onSuccess,
         Action<Exception> onError)
     {
         runningRequestDatas.Add(new RequestData()
@@ -57,7 +57,7 @@ public class UnityWebRequestManager : AbstractSingletonBehaviour
     private class RequestData
     {
         public UnityWebRequest unityWebRequest;
-        public Action<string> onSuccess;
+        public Action<DownloadHandler> onSuccess;
         public Action<Exception> onError;
     }
 }

@@ -133,7 +133,8 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
                 && !ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(SongMetaUtils.GetAudioUri(songMeta))))
             {
                 // Load as streaming audio
-                audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta));
+                audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta)).Subscribe(
+                    loadedAudioClip => Debug.Log($"Preloaded AudioClip {loadedAudioClip.name}"));
             }
 
             if (SongMetaUtils.CoverResourceExists(songMeta)

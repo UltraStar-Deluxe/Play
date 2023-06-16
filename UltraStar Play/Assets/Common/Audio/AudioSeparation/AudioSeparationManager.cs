@@ -66,7 +66,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
 
-        AudioClip audioClip = audioManager.LoadAudioClipFromUri(audioUri, false);
+        AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(audioUri, false);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
 

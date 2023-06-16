@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -26,24 +29,18 @@ public static class AudioUtils
         audioSource.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - pitch));
     }
     
-    // This method should only be called from tests and the AudioManager.
+    // This method should only be called from tests.
     // Use the cached version of the AudioManager for the normal game logic.
-    public static AudioClip GetAudioClipUncached(string uri, bool streamAudio)
-    {
-        return LoadAudio(uri, streamAudio);
-    }
-
-    private static AudioClip LoadAudio(string uri, bool streamAudio)
+    public static AudioClip LoadUncachedAudioClipImmediately(string uri, bool streamAudio)
     {
         Uri uriHandle = new Uri(uri);
-        using UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uriHandle, AudioType.UNKNOWN);
-        DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
-        downloadHandler.streamAudio = streamAudio;
-
+        using UnityWebRequest webRequest = CreateAudioClipRequest(uriHandle, streamAudio);
         webRequest.SendWebRequest();
+
         while (!webRequest.isDone)
         {
-            Task.Delay(30);
+            Debug.Log("Waiting for AudioClip to load via Thread.Sleep");
+            Thread.Sleep(10);
         }
 
         if (webRequest.result
@@ -52,13 +49,20 @@ public static class AudioUtils
         {
             Debug.LogError("Error Loading Audio: " + uri);
             Debug.LogError(webRequest.error);
-            return null;
         }
 
-        AudioClip audioClip = downloadHandler.audioClip;
+        AudioClip audioClip = (webRequest.downloadHandler as DownloadHandlerAudioClip)?.audioClip;
         string fileName = Path.GetFileName(uriHandle.LocalPath);
         audioClip.name = $"Audio file '{fileName}'";
         return audioClip;
+    }
+
+    public static UnityWebRequest CreateAudioClipRequest(Uri uriHandle, bool streamAudio)
+    {
+        UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uriHandle, AudioType.UNKNOWN);
+        DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
+        downloadHandler.streamAudio = streamAudio;
+        return webRequest;
     }
 
     public static float[] ToMonoAudioSamples(float[] originalSamples, int channelCount)

@@ -68,7 +68,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         set
         {
             songMeta = value;
-            InitVideo(songMeta);
+            LoadSongVideo(songMeta);
         }
     }
 
@@ -436,10 +436,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public void ReloadVideo()
     {
         // This method is used in the SongEditor, but only on Standalone platform.
-        InitVideo(songMeta);
+        LoadSongVideo(songMeta);
     }
 
-    private void InitVideo(SongMeta initSongMeta)
+    private void LoadSongVideo(SongMeta initSongMeta)
     {
         UnloadVideo();
 
