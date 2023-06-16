@@ -106,9 +106,11 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                 backgroundRenderTexture => backgroundVfxCamera.targetTexture = backgroundRenderTexture);
     }
 
+#if UNITY_EDITOR
     private void Update()
     {
-        if (Keyboard.current.rightCtrlKey.wasPressedThisFrame)
+        if (Application.isEditor
+            && Keyboard.current.rightCtrlKey.wasPressedThisFrame)
         {
             CreateParticleEffect(new ParticleEffectConfig()
             {
@@ -120,7 +122,8 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
             });
         }
     }
-
+#endif
+    
     private void InitVfxElement()
     {
         foregroundVfxElement = uiDocument.rootVisualElement.Q<Image>("foregroundVfxElement");
