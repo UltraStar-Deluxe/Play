@@ -14,8 +14,8 @@ git remote add origin https://github.com/achimmihca/MelodyMania-Songs.git
 git config core.sparsecheckout true
 echo "Songs/*" >> .git/info/sparse-checkout
 git pull --depth=100 origin main
-# Commit from 11 June 2023: 697bb1813b65738bea1b40673b49c144846c4f37
-git checkout 697bb1813b65738bea1b40673b49c144846c4f37
+# Commit from 16 June 2023: ab6435f13e8bf0243d009a930d0f8444ea55c320
+git checkout ab6435f13e8bf0243d009a930d0f8444ea55c320
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v Songs/* ./

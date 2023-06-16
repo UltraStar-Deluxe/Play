@@ -32,6 +32,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
 
+    private static readonly Dictionary<SongMeta, string> songMetaToScoreRelevantHash = new();
+
     // Static to be persisted across scenes.
     private static List<string> lastSongDirs;
     private static bool isSongScanStarted;
@@ -540,6 +542,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     public void SaveSong(SongMeta songMeta, bool isAutoSave)
     {
+        songMetaToScoreRelevantHash.Remove(songMeta);
+        
         SongMetaUtils.CreateDirectory(songMeta);
         string songFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
         try
@@ -646,5 +650,22 @@ public class SongMetaManager : AbstractSingletonBehaviour
         songIssues.ForEach(songIssue => songIssue.Log());
 
         return songIssues;
+    }
+
+    public static string GetAndCacheScoreRelevantHash(SongMeta songMeta)
+    {
+        if (songMeta == null)
+        {
+            return "";
+        }
+        
+        if (songMetaToScoreRelevantHash.TryGetValue(songMeta, out string scoreRelevantHash))
+        {
+            return scoreRelevantHash;
+        }
+
+        scoreRelevantHash = SongMetaUtils.GetScoreRelevantSongHash(songMeta);
+        songMetaToScoreRelevantHash[songMeta] = scoreRelevantHash;
+        return scoreRelevantHash;
     }
 }

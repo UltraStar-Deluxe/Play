@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using UniInject;
+using UniRx;
 using UnityEngine;
 
 //Holds all in-memory stats data
 [Serializable]
-public class StatsManager : AbstractSingletonBehaviour
+public class StatsManager : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -28,11 +30,20 @@ public class StatsManager : AbstractSingletonBehaviour
 
     public static StatsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatsManager>();
 
-    private float lastSaveTimeInSeconds;
+    private float lastSaveTimeInMillis;
+
+    [Inject]
+    private SceneNavigator sceneNavigator;
     
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    protected override void StartSingleton()
+    {
+        sceneNavigator.SceneChangedEventStream
+            .Subscribe(_ => SaveStatsIfDirty());
     }
 
     public void Save()
@@ -51,10 +62,10 @@ public class StatsManager : AbstractSingletonBehaviour
 
     private void UpdateTotalPlayTime()
     {
-        float currentTimeInSeconds = Time.time;
-        float timeSinceLastSaveInSeconds = currentTimeInSeconds - lastSaveTimeInSeconds;
-        Statistics.TotalPlayTimeSeconds += timeSinceLastSaveInSeconds;
-        lastSaveTimeInSeconds = currentTimeInSeconds;
+        float currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        float timeSinceLastSaveInMillis = currentTimeInMillis - lastSaveTimeInMillis;
+        Statistics.TotalPlayTimeSeconds += (timeSinceLastSaveInMillis / 1000f);
+        lastSaveTimeInMillis = currentTimeInMillis;
     }
 
     public void Reload()
@@ -70,6 +81,7 @@ public class StatsManager : AbstractSingletonBehaviour
         }
 
         string fileContent = File.ReadAllText(databasePath);
+        lastSaveTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         statistics = JsonConverter.FromJson<Statistics>(fileContent);
     }
 
@@ -80,10 +92,15 @@ public class StatsManager : AbstractSingletonBehaviour
 
     protected override void OnDisableSingleton()
     {
-        // Save the statistics when necessary.
-        if (statistics != null && statistics.IsDirty)
+        SaveStatsIfDirty();
+    }
+
+    private void SaveStatsIfDirty()
+    {
+        if (statistics != null
+            && statistics.IsDirty)
         {
-            Debug.Log("Stats have changed. Saving stats");
+            Debug.Log("Stats have changed, saving.");
             Save();
         }
     }

@@ -10,7 +10,7 @@ using UnityEngine;
 [Serializable]
 public class Statistics
 {
-    public float TotalPlayTimeSeconds { get; set; }
+    public double TotalPlayTimeSeconds { get; set; }
     public Dictionary<string, SongStatistics> LocalStatistics { get; private set; } = new();
 
     // Indicates whether the Statistics have non-persisted changes.
@@ -26,7 +26,7 @@ public class Statistics
             return null;
         }
 
-        string scoreRelevantSongHash = SongMetaUtils.GetScoreRelevantSongHash(songMeta);
+        string scoreRelevantSongHash = SongMetaManager.GetAndCacheScoreRelevantHash(songMeta);
         LocalStatistics.TryGetValue(scoreRelevantSongHash, out SongStatistics result);
         return result;
     }
@@ -57,6 +57,7 @@ public class Statistics
     
     public void RecordSongStarted(SongMeta songMeta)
     {
+        Debug.Log($"Recording song started stats for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
         SongStatistics songStatistics = CreateLocalStatistics(songMeta);
         songStatistics.IncrementSongStarted();
 
@@ -65,7 +66,7 @@ public class Statistics
 
     public void RecordSongFinished(SongMeta songMeta, List<HighScoreEntry> highScoreEntries)
     {
-        Debug.Log("Recording song finished stats for: " + songMeta.Title);
+        Debug.Log($"Recording song finished stats for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
         SongStatistics songStatistics = CreateLocalStatistics(songMeta);
         songStatistics.IncrementSongFinished();
         foreach (HighScoreEntry highScoreEntry in highScoreEntries)
@@ -78,7 +79,7 @@ public class Statistics
 
     private SongStatistics CreateLocalStatistics(SongMeta songMeta)
     {
-        string scoreRelevantSongHash = SongMetaUtils.GetScoreRelevantSongHash(songMeta);
+        string scoreRelevantSongHash = SongMetaManager.GetAndCacheScoreRelevantHash(songMeta);
         SongStatistics songStatistics = LocalStatistics.GetOrInitialize(scoreRelevantSongHash);
         songStatistics.SongArtist = songMeta.Artist;
         songStatistics.SongTitle = songMeta.Title;

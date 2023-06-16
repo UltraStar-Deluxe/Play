@@ -192,6 +192,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private float startTimeInSeconds;
     private bool hasRecordedSongStartedStatistics;
+    private bool hasRecordedSongFinishedStatistics;
 
     private bool hasFinishedScene;
     
@@ -565,19 +566,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         topSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
         bottomSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
 
-        if (!hasRecordedSongStartedStatistics)
-        {
-            // Save information that the song has been started after some seconds or half of the song.
-            float songSingingDuration = Time.time - startTimeInSeconds;
-            float songDurationInSeconds = (float)songAudioPlayer.DurationOfSongInMillis / 1000;
-            if (songSingingDuration >= 30
-                || (songDurationInSeconds > 0
-                    && songSingingDuration >= songDurationInSeconds / 2))
-            {
-                hasRecordedSongStartedStatistics = true;
-                statistics.RecordSongStarted(SongMeta);
-            }
-        }
+        UpdateSongStartedStats();
         
         singSceneGovernanceControl.Update();
 
@@ -893,14 +882,36 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         return serverSideConnectRequestManager.GetConnectedClientHandlers(micProfiles);
     }
 
+    private void UpdateSongStartedStats()
+    {
+        if (hasRecordedSongStartedStatistics)
+        {
+            return;
+        }
+
+        // Save information that the song has been started after some seconds or half of the song.
+        float songSingingDuration = Time.time - startTimeInSeconds;
+        float songDurationInSeconds = (float)songAudioPlayer.DurationOfSongInMillis / 1000;
+        if (songSingingDuration >= 30
+            || (songDurationInSeconds > 0
+                && songSingingDuration >= songDurationInSeconds / 2))
+        {
+            hasRecordedSongStartedStatistics = true;
+            statistics.RecordSongStarted(SongMeta);
+        }
+    }
+    
     private void UpdateSongFinishedStats(List<HighScoreEntry> highScoreEntries)
     {
-        if (sceneData.IsMedley
+        if (hasRecordedSongFinishedStatistics
+            || sceneData.IsMedley
             || HasPartyModeSceneData)
         {
             // Medleys and party mode are not recorded
             return;
         }
+
+        hasRecordedSongFinishedStatistics = true;
         statistics.RecordSongFinished(SongMeta, highScoreEntries);
     }
 
