@@ -105,6 +105,7 @@ public static class UltraStarSongFileWriter
         AppendHeaderField(sb, "mp3", songMeta.Mp3);
         AppendHeaderField(sb, "VocalsAudio", songMeta.VocalsAudio);
         AppendHeaderField(sb, "InstrumentalAudio", songMeta.InstrumentalAudio);
+        AppendHeaderField(sb, "MBID_RECORD", songMeta.MusicBrainzRecord);
         AppendHeaderField(sb, "bpm", songMeta.Bpm.ToString(CultureInfo.InvariantCulture));
         if (songMeta.Gap != 0)
         {

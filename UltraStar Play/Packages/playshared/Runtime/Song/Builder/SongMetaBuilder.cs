@@ -213,6 +213,9 @@ public static class SongMetaBuilder
                     case "vocalsaudio":
                         songMeta.VocalsAudio = item.Value;
                         break;
+                    case "mbid_record":
+                        songMeta.MusicBrainzRecord = item.Value;
+                        break;
                     case "instrumentalaudio":
                         songMeta.InstrumentalAudio = item.Value;
                         break;
