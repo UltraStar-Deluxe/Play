@@ -94,7 +94,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 // (2) Run speech recognition on vocals audio
 
                 // Load vocals audio
-                AudioClip vocalsAudioClip = audioManager.LoadAudioClipFromUri(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
+                AudioClip vocalsAudioClip = audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
                 int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * BpmUtils.GetBeatsPerSecond(songMeta));
 
                 SpeechRecognitionParameters speechRecognitionParameters = new(

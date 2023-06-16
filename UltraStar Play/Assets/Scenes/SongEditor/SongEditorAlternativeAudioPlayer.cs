@@ -131,7 +131,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             return null;
         }
 
-        AudioClip loadedAudioClip = audioManager.LoadAudioClipFromUri(audioClipUri, false);
+        AudioClip loadedAudioClip = audioManager.LoadAudioClipFromUriImmediately(audioClipUri, false);
         if (loadedAudioClip == null)
         {
             UiManager.CreateNotification($"Failed to load {audioClipUri}");

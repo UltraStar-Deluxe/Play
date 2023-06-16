@@ -232,47 +232,25 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         
         try
         {
-            songAudioPlayer.Init(songMeta);
+            songAudioPlayer.LoadSongAudio(songMeta)
+                .CatchIgnore((Exception error) =>
+                {
+                    string errorMessage = $"Audio could not be loaded: {SongMetaUtils.GetArtistDashTitle(songMeta)}";
+                    Debug.LogError(errorMessage);
+                    UiManager.CreateNotification(errorMessage);
+                })
+                .Subscribe(_ =>
+                {
+                    Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
+                    songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
+                    songAudioPlayer.VolumeFactor = 0;
+                    songAudioPlayer.PlayAudio();
+                });
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
             string errorMessage = $"Audio could not be loaded (artist: {songMeta.Artist}, title: {songMeta.Title})";
-            UiManager.CreateNotification(errorMessage);
-            return;
-        }
-
-        void DoSkipToSongPreview()
-        {
-            Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
-            songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
-        }
-        
-        IDisposable audioLoadedDisposable = null;
-        if (songAudioPlayer.IsFullyLoaded)
-        {
-            DoSkipToSongPreview();            
-        }
-        else
-        {
-            audioLoadedDisposable = songAudioPlayer.LoadedEventStream
-                .Subscribe(_ =>
-                {
-                    DoSkipToSongPreview();
-                    songAudioPlayer.PlayAudio();
-                    audioLoadedDisposable?.Dispose();
-                });
-        }
-
-        songAudioPlayer.VolumeFactor = 0;
-        if (songAudioPlayer.IsPartiallyLoaded)
-        {
-            songAudioPlayer.PlayAudio();
-        }
-        else
-        {
-            string errorMessage = $"Audio could not be loaded (artist: {songMeta.Artist}, title: {songMeta.Title})";
-            Debug.LogError(errorMessage);
             UiManager.CreateNotification(errorMessage);
         }
     }

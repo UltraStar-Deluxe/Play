@@ -29,6 +29,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
 
     public void OnInjectionFinished()
     {
+        songAudioPlayer.LoadedEventStream.Subscribe(_ => UpdateIssueOverviewImage());
         issueAnalyzerControl.IssuesEventStream.Subscribe(_ => UpdateIssueOverviewImage());
 
         overviewAreaIssues.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
@@ -61,6 +62,11 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
         }
 
         int songDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
+        if (songDurationInMillis <= 0)
+        {
+            // Song is not loaded yet
+            return;
+        }
 
         int startMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
         int endMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.EndBeat);

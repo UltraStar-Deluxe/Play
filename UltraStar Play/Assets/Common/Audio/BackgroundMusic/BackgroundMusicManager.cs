@@ -110,24 +110,24 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 
     private void UpdateAudioClip()
     {
-        AudioClip loadedAudioClip = null;
         ThemeMeta currentTheme = themeManager.GetCurrentTheme();
         string backgroundMusicPath = currentTheme?.ThemeJson?.backgroundMusic;
         if (!backgroundMusicPath.IsNullOrEmpty())
         {
             string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(currentTheme, backgroundMusicPath);
-            loadedAudioClip = audioManager.LoadAudioClipFromUri(absolutePath);
-        }
-
-        if (loadedAudioClip != null
-            && backgroundMusicAudioSource.clip != loadedAudioClip)
-        {
-            backgroundMusicAudioSource.clip = loadedAudioClip;
-        }
-        else if (loadedAudioClip == null
-                 && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
-        {
-            backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
+            audioManager.LoadAudioClipFromUri(absolutePath).Subscribe(loadedAudioClip =>
+            {
+                if (loadedAudioClip != null
+                    && backgroundMusicAudioSource.clip != loadedAudioClip)
+                {
+                    backgroundMusicAudioSource.clip = loadedAudioClip;
+                }
+                else if (loadedAudioClip == null
+                         && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
+                {
+                    backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
+                }
+            });
         }
     }
 }

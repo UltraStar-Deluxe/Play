@@ -35,7 +35,7 @@ public class PitchDetectionTests
         {
             // Load the audio clip
             string uri = pathAndNoteName.Key;
-            AudioClip audioClip = AudioUtils.GetAudioClipUncached(uri, false);
+            AudioClip audioClip = AudioUtils.LoadUncachedAudioClipImmediately(uri, false);
             float[] samples = new float[audioClip.samples];
             audioClip.GetData(samples, 0);
 
