@@ -1435,6 +1435,39 @@
                 },
                 {
                     "name": "",
+                    "id": "7aabc6a6-7ba7-46e3-bdf8-e5efd9b3ae31",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "108d827d-d8d5-4fd9-9de7-27d7293be15f",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3a3339fb-0782-488b-bc01-19975b76e063",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "bd57174a-ddb7-44bd-9688-e94f1fdf94ff",
                     "path": "<Keyboard>/enter",
                     "interactions": "",
