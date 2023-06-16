@@ -6,7 +6,7 @@
             <ui:Label tabindex="-1" text="Some Artist - Some Title" display-tooltip-when-elided="true" name="nextGameRoundSongInfoLabel" class="smallFont" />
         </ui:VisualElement>
         <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: flex-start;">
-            <ui:VisualElement name="nextGameRoundPlayerEntryList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center;">
+            <ui:VisualElement name="nextGameRoundPlayerEntryList" style="background-color: rgba(0, 0, 0, 0); flex-direction: row; align-items: center; flex-wrap: wrap;">
                 <ui:Instance template="NextRoundInfoPlayerEntryUi" name="NextRoundInfoPlayerEntryUi" />
                 <ui:Instance template="NextRoundInfoPlayerEntryUi" name="NextRoundInfoPlayerEntryUi" />
             </ui:VisualElement>
