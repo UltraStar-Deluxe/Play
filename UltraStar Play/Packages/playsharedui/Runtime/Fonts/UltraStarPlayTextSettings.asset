@@ -19,7 +19,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 962c0e3031e352e49a518053a5f34649, type: 2}
   - {fileID: 11400000, guid: 9f10fb0b7decc69479216194a434f924, type: 2}
   - {fileID: 11400000, guid: 42a22443bbf3a394db82f24ef7c78983, type: 2}
-  m_MatchMaterialPreset: 0
+  - {fileID: 11400000, guid: 3d9a44dab64cc3443a1029324f5af59c, type: 2}
+  - {fileID: 11400000, guid: bc90f569494fe184aa7b3215fbbdbeb0, type: 2}
+  - {fileID: 11400000, guid: 14df0a4ae3502fd4da745e090d94ee52, type: 2}
+  - {fileID: 11400000, guid: fef67739e862b0d499ea4db65436e3cd, type: 2}
+  - {fileID: 11400000, guid: 75a7b485cf9230446a57a4caba633999, type: 2}
+  - {fileID: 11400000, guid: 6fbe2f04d3dba594a943ce734e51dac4, type: 2}
+  - {fileID: 11400000, guid: 8f00017875473b44982524c54cf41542, type: 2}
+  - {fileID: 11400000, guid: 873b73f7143ed08409c0d0bea0d91a59, type: 2}
+  - {fileID: 11400000, guid: ae1a5fce994809d4282db66a81abb55e, type: 2}
+  - {fileID: 11400000, guid: 68a216e4dee60b64686b671dc4468625, type: 2}
+  - {fileID: 11400000, guid: 97fef952c6afcd94985aad38dfce85a4, type: 2}
+  m_MatchMaterialPreset: 1
   m_MissingCharacterUnicode: 0
   m_ClearDynamicDataOnBuild: 1
   m_DefaultSpriteAsset: {fileID: 0}
