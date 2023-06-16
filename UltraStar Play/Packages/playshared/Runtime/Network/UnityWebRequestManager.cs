@@ -22,7 +22,7 @@ public class UnityWebRequestManager : AbstractSingletonBehaviour
         }
         
         // Invoke callbacks
-        runningRequestDatas.ForEach(request =>
+        runningRequestDatas.ToList().ForEach(request =>
         {
             if (request.unityWebRequest.result
                 is UnityWebRequest.Result.ConnectionError
