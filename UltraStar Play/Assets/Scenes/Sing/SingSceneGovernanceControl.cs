@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
+using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 
@@ -82,9 +84,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private float doNotShowOverlayBeforeTimeInSeconds;
 
     private bool isContextMenuOpenedFromInputAction;
+
+    private InputAction showOverlayInputAction;
     
     public void OnInjectionFinished()
     {
+        showOverlayInputAction = InputManager.GetInputAction(R.InputActions.usplay_singSceneShowGovernanceOverlay).InputAction;
+        
         contextMenuControl = injector
             .WithRootVisualElement(openControlsMenuButton)
             .CreateAndInject<ContextMenuControl>();
@@ -177,7 +183,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         if ((lastPointerPosition != currentPointerPosition
             && currentPointerPosition.x >= 0 && currentPointerPosition.x <= Screen.width
             && currentPointerPosition.y >= 0 && currentPointerPosition.y <= Screen.height)
-            || Input.anyKeyDown)
+            || showOverlayInputAction.ReadValue<float>() > 0.5f)
         {
             ShowOverlayAndCursor();
             if (Time.time - playbackStartTimeInSeconds < 0.5f)
