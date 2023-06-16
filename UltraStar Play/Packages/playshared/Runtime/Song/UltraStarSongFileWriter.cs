@@ -82,7 +82,7 @@ public static class UltraStarSongFileWriter
         sb.AppendLine($"{GetNoteTypePrefix(note.Type)} {note.StartBeat} {note.Length} {note.TxtPitch} {note.Text}");
     }
 
-    private static string GetNoteTypePrefix(ENoteType noteType)
+    public static string GetNoteTypePrefix(ENoteType noteType)
     {
         switch (noteType)
         {
@@ -92,7 +92,7 @@ public static class UltraStarSongFileWriter
             case ENoteType.Rap: return "R";
             case ENoteType.RapGolden: return "G";
             default:
-                throw new UltraStarSongFileWriterException("Unkown note type '" + noteType + "'.");
+                throw new UltraStarSongFileWriterException("Unknown note type '" + noteType + "'.");
         }
     }
 
@@ -105,6 +105,7 @@ public static class UltraStarSongFileWriter
         AppendHeaderField(sb, "mp3", songMeta.Mp3);
         AppendHeaderField(sb, "VocalsAudio", songMeta.VocalsAudio);
         AppendHeaderField(sb, "InstrumentalAudio", songMeta.InstrumentalAudio);
+        AppendHeaderField(sb, "MBID_RECORD", songMeta.MusicBrainzRecord);
         AppendHeaderField(sb, "bpm", songMeta.Bpm.ToString(CultureInfo.InvariantCulture));
         if (songMeta.Gap != 0)
         {

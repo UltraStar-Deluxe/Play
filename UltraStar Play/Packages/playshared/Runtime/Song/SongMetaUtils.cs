@@ -743,4 +743,43 @@ public static class SongMetaUtils
         
         return colorGenerator.ToColor(artistDashTitle);
     }
+
+    public static string GetScoreRelevantSongHash(SongMeta songMeta)
+    {
+        StringBuilder sb = new();
+        sb.Append("{");
+        
+        sb.Append("BPM:");
+        sb.Append(songMeta.Bpm.ToStringInvariantCulture());
+        
+        int voiceIndex = 1;
+        foreach (Voice voice in songMeta.GetVoices())
+        {
+            sb.Append("|");
+            sb.Append("P");
+            sb.Append(voiceIndex);
+            
+            IEnumerable<Note> scoreRelevantNotes = voice.Sentences.SelectMany(sentence => sentence.Notes)
+                .Where(n => n.Type is not ENoteType.Freestyle)
+                .OrderBy(n => n.StartBeat);
+            foreach (Note note in scoreRelevantNotes)
+            {
+                sb.Append("|");
+                sb.Append(UltraStarSongFileWriter.GetNoteTypePrefix(note.Type));
+                sb.Append(" ");
+                sb.Append(note.StartBeat);
+                sb.Append(" ");
+                sb.Append(note.Length);
+                sb.Append(" ");
+                sb.Append(note.TxtPitch);
+            }
+            voiceIndex++;
+        }
+        
+        sb.Append("}");
+
+        string scoreRelevantSongHash = Hashing.Md5(Encoding.UTF8.GetBytes(sb.ToString()));
+        Debug.Log($"ScoreRelevantSongHash: {scoreRelevantSongHash}, from string: {sb}");
+        return scoreRelevantSongHash;
+    }
 }

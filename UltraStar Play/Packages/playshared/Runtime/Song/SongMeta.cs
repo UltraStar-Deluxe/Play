@@ -23,6 +23,14 @@ public class SongMeta
     public string SongHash { get; private set; } = "";
 
     /**
+     * MusicBrainz identifier for the recording.
+     * For example, 99 Red Balloons, the original by Nena, has a release MBID of 189002e7-3285-4e2e-92a3-7f6c30d407a2.
+     * See https://musicbrainz.org/doc/Recording
+     * See https://musicbrainz.org/doc/MusicBrainz_Identifier
+     */
+    public string MusicBrainzRecord { get; set; } = "";
+    
+    /**
      * Artist of the song.
      */
     public string Artist { get; set; } = "";
