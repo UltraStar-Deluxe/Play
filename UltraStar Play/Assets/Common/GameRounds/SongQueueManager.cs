@@ -98,6 +98,12 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
             // This is a medley
             singSceneData.MedleySongIndex = 0;
         }
+        else if (singSceneData.gameRoundSettings != null 
+                 && singSceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
+        {
+            // Set as medley song to play shortened version
+            singSceneData.MedleySongIndex = 0;
+        }
 
         return singSceneData;
     }
