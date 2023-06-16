@@ -82,7 +82,7 @@ public static class UltraStarSongFileWriter
         sb.AppendLine($"{GetNoteTypePrefix(note.Type)} {note.StartBeat} {note.Length} {note.TxtPitch} {note.Text}");
     }
 
-    private static string GetNoteTypePrefix(ENoteType noteType)
+    public static string GetNoteTypePrefix(ENoteType noteType)
     {
         switch (noteType)
         {
@@ -92,7 +92,7 @@ public static class UltraStarSongFileWriter
             case ENoteType.Rap: return "R";
             case ENoteType.RapGolden: return "G";
             default:
-                throw new UltraStarSongFileWriterException("Unkown note type '" + noteType + "'.");
+                throw new UltraStarSongFileWriterException("Unknown note type '" + noteType + "'.");
         }
     }
 
