@@ -26,7 +26,7 @@ public class Statistics
             return null;
         }
 
-        string scoreRelevantSongHash = SongMetaUtils.GetScoreRelevantSongHash(songMeta);
+        string scoreRelevantSongHash = SongMetaManager.GetAndCacheScoreRelevantHash(songMeta);
         LocalStatistics.TryGetValue(scoreRelevantSongHash, out SongStatistics result);
         return result;
     }
@@ -78,7 +78,7 @@ public class Statistics
 
     private SongStatistics CreateLocalStatistics(SongMeta songMeta)
     {
-        string scoreRelevantSongHash = SongMetaUtils.GetScoreRelevantSongHash(songMeta);
+        string scoreRelevantSongHash = SongMetaManager.GetAndCacheScoreRelevantHash(songMeta);
         SongStatistics songStatistics = LocalStatistics.GetOrInitialize(scoreRelevantSongHash);
         songStatistics.SongArtist = songMeta.Artist;
         songStatistics.SongTitle = songMeta.Title;
