@@ -38,13 +38,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private static List<string> lastSongDirs;
     private static bool isSongScanStarted;
     private static bool isSongScanFinished;
-    public static bool IsSongScanFinished
-    {
-        get
-        {
-            return isSongScanFinished;
-        }
-    }
+    public static bool IsSongScanFinished => isSongScanFinished;
+
+    private static int targetSongCount;
+    public static int LoadedSongsCount => allSongMetas.Count;
+    public static double LoadedSongsPercent => 100.0 * allSongMetas.Count / targetSongCount;
 
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
@@ -220,6 +218,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
             // Only search for audio files in configured song folders, not in the generated song folder
             audioFiles = ScanForFiles(SettingsManager.Instance.Settings.SongDirs, GetAudioFileExtensionPatterns());
+
+            targetSongCount = txtFiles.Count;
         }
 
         // Load the txt files in a background thread
@@ -231,18 +231,19 @@ public class SongMetaManager : AbstractSingletonBehaviour
             Debug.Log("Started song-scan-thread.");
             lock (scanLock)
             {
-                LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
-                allSongMetas.AddRange(newSongMetas);
-                allSongIssues.AddRange(newSongIssues);
+                // Split the txt files into chunks and load them in parallel
+                LoadAndAddSongMetasFromTxtFiles(txtFiles);
+                
+                // Generate song meta for audio files that do not have a corresponding SongMeta.
+                GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, audioFiles, allSongMetas.ToList());
+                
                 isSongScanFinished = true;
             }
+            
             stopwatch.Stop();
             Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Loaded {allSongMetas.Count} songs. Errors: {SongErrors.Count}, Warnings: {SongWarnings.Count}.");
 
-            // Generate song meta for audio files that do not have a corresponding SongMeta.
-            GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, audioFiles, allSongMetas.ToList());
-
-            songScanFinishedEventStream.OnNext(new SongScanFinishedEvent());
+            songScanFinishedEventStream.OnNext(new SongScanFinishedEvent(allSongMetas.Count));
         });
     }
 
@@ -360,6 +361,18 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
+    private void LoadAndAddSongMetasFromTxtFiles(List<string> txtFiles)
+    {
+        foreach (string path in txtFiles)
+        {
+            if (TryLoadSongMetaFromFile(path, out SongMeta newSongMeta, out List<SongIssue> newSongIssues))
+            {
+                allSongMetas.Add(newSongMeta);
+            }
+            allSongIssues.AddRange(newSongIssues);
+        }
+    }
+    
     private void LoadSongMetasFromTxtFiles(List<string> txtFiles, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
     {
         songMetas = new();

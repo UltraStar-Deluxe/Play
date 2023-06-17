@@ -90,7 +90,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private SongSelectSceneData sceneData;
 
     private List<SongMeta> songMetas;
-    private int lastSongMetasReloadFrame = -1;
+    private float lastSongMetaCountUpdateTimeInSeconds;
     private string lastRawSearchText;
     private SongMeta selectedSongBeforeSearch;
 
@@ -123,6 +123,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.songScanInProgressContainer)]
     private VisualElement songScanInProgressContainer;
+    
+    [Inject(UxmlName = R.UxmlNames.songScanInProgressProgressLabel)]
+    private Label songScanInProgressProgressLabel;
     
     [Inject(UxmlName = R.UxmlNames.importSongsButton)]
     private Button importSongsButton;
@@ -258,6 +261,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             Thread.Sleep(100);
         }
 
+        songMetaManager.SongScanFinishedEventStream
+            .ObserveOnMainThread()
+            .Subscribe(evt =>
+            {
+                InitSongMetas();
+                UpdateFilteredSongs();
+                UpdateSongScanLabels(SongMetaManager.IsSongScanFinished || evt != null);
+            })
+            .AddTo(gameObject);
+        UpdateSongScanLabels(SongMetaManager.IsSongScanFinished);
+        
         InitSongMetas();
 
         if (HasPartyModeSceneData
@@ -729,15 +743,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void InitSongMetas()
     {
+        if (!SongMetaManager.IsSongScanFinished)
+        {
+            return;
+        }
+        
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongMetas");
         
         songMetas = new List<SongMeta>(songMetaManager.GetSongMetas());
         songMetas.Sort((songMeta1, songMeta2) => string.Compare(songMeta1.Artist, songMeta2.Artist, true, CultureInfo.InvariantCulture));
-        
-        songMetaManager.SongScanFinishedEventStream
-            .ObserveOnMainThread()
-            .Subscribe(evt => UpdateSongScanLabels(evt));
-        UpdateSongScanLabels(null);
         
         // Trigger achievement
         if (songMetas.Count > 100)
@@ -746,13 +760,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    private void UpdateSongScanLabels(SongScanFinishedEvent evt)
+    private void UpdateSongScanLabels(bool isSongScanFinished)
     {
-        if (SongMetaManager.IsSongScanFinished
-            || evt != null)
+        if (SongMetaManager.LoadedSongsCount > 0)
+        {
+            songScanInProgressProgressLabel.text = $"{SongMetaManager.LoadedSongsPercent:00} %";
+        }
+        
+        if (isSongScanFinished)
         {
             songScanInProgressContainer.HideByDisplay();
-            noSongsFoundContainer.SetVisibleByDisplay(songMetas.IsNullOrEmpty());
+            noSongsFoundContainer.SetVisibleByDisplay(SongMetaManager.LoadedSongsCount <= 0);
         }
         else
         {
@@ -764,13 +782,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private void Update()
     {
         // Check if new songs were loaded in background. Update scene if necessary.
-        if (songMetas.Count != songMetaManager.GetSongMetas().Count
-            && lastSongMetasReloadFrame + 10 < Time.frameCount)
+        if (!SongMetaManager.IsSongScanFinished
+            && Time.time - lastSongMetaCountUpdateTimeInSeconds > 1f )
         {
-            InitSongMetas();
-            SongMeta selectedSong = songRouletteControl.Selection.Value.SongMeta;
-            InitSongRoulette();
-            songRouletteControl.SelectSong(selectedSong);
+            lastSongMetaCountUpdateTimeInSeconds = Time.time;
+            UpdateSongScanLabels(SongMetaManager.IsSongScanFinished);
         }
     }
 
@@ -778,7 +794,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectScene.InitSongRouletteSongMetas");
         
-        lastSongMetasReloadFrame = Time.frameCount;
         UpdateFilteredSongs();
         songRouletteControl.Selection.Subscribe(newValue => songSelectSelectedSongDetailsControl.OnSongSelectionChanged(newValue));
         songRouletteControl.SelectionClickedEventStream
@@ -1167,6 +1182,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void UpdateFilteredSongs()
     {
+        if (!SongMetaManager.IsSongScanFinished)
+        {
+            return;
+        }
+        
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.UpdateFilteredSongs");
         
         List<SongMeta> filteredSongMetas = GetFilteredSongMetas();
