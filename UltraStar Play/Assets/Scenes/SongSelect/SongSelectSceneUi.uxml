@@ -78,6 +78,7 @@
             <ui:VisualElement name="songScanInProgressContainer" picking-mode="Ignore" style="position: absolute; width: 100%; max-width: 33%; justify-content: center; align-items: flex-start;">
                 <MaterialIcon tabindex="-1" name="songScanInProgressIcon" icon="hourglass_bottom" class="noBackgroundInHierarchy" style="font-size: 64px;" />
                 <ui:Label text="Loading songs..." display-tooltip-when-elided="true" name="songScanInProgressLabel" class="largerFont noBackgroundInHierarchy" style="white-space: normal; display: flex; -unity-text-align: middle-left; -unity-font-style: bold;" />
+                <ui:Label text="45 %" display-tooltip-when-elided="true" name="songScanInProgressProgressLabel" class="noBackgroundInHierarchy secondaryFontColor" style="white-space: normal; display: flex; -unity-text-align: middle-left; -unity-font-style: bold;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="bottomContent" picking-mode="Ignore" class="pb-2 px-4 focusableNavigatorPriorityParent" style="background-color: rgba(0, 0, 0, 0); width: 100%; bottom: 0; position: absolute; flex-direction: row;">
