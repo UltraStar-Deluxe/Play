@@ -1,4 +1,4 @@
-release = 0.10.10
-build_timestamp = 2306162349
-commit_hash = abd9f3b5
-website_link = https://usplay.net/
+release = 1.0.0
+build_timestamp = 2306171122
+commit_hash = 453b8bbb
+website_link = https://melodymania.org
