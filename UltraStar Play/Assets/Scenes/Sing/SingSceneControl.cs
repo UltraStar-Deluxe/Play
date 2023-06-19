@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -590,13 +591,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
-        IEnumerable<int> nextSingableNotes = PlayerControls
+        List<int> nextSingableNotes = PlayerControls
             .Select(it => it.GetNextSingableNote(CurrentBeat))
             .Where(nextSingableNote => nextSingableNote != null)
-            .Select(nextSingableNote => nextSingableNote.StartBeat);
-        if (nextSingableNotes.Count() <= 0)
+            .Select(nextSingableNote => nextSingableNote.StartBeat)
+            .ToList();
+        
+        if (nextSingableNotes.IsNullOrEmpty())
         {
-            SkipToEndOfSong();
+            // Skip to end of the audio if last note has been finished.
+            int maxBeatInVocals = PlayerControls
+                .Select(playerControl => playerControl.MaxBeatInVoice)
+                .Max();
+            if (CurrentBeat >= maxBeatInVocals)
+            {
+                SkipToEndOfSong();
+            }
             return;
         }
         int nextStartBeat = nextSingableNotes.Min();

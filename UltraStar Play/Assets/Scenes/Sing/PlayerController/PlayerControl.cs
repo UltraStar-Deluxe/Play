@@ -60,6 +60,8 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     // The sorted sentences of the Voice
     public List<Sentence> SortedSentences { get; private set; } = new();
 
+    public int MaxBeatInVoice => SortedSentences.LastOrDefault()?.ExtendedMaxBeat ?? 0;
+    
     [Inject]
     private Injector injector;
 
