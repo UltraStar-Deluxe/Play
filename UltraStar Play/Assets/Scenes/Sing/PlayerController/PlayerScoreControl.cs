@@ -253,7 +253,6 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         Note analyzedNote = noteAnalyzedEvent.Note;
         if (ScoreData.NoteToNoteScoreMap.TryGetValue(analyzedNote, out NoteScore noteScore))
         {
-            //Debug.Log($"OnNoteAnalyzed: {noteScore.correctlySungBeats} / {analyzedNote.Length}, {analyzedNote.StartBeat}, {analyzedNote.EndBeat}, {analyzedNote.Text}");
             if (noteScore.CorrectlySungBeats >= analyzedNote.Length)
             {
                 noteScoreEventStream.OnNext(new NoteScoreEvent(noteScore));
