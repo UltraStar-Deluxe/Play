@@ -267,7 +267,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             bool handleBecauseOfMessageBufferTime = messageAgeInMillis > messageBufferTimeInMillis;
             // if (handleBecauseOfMessageBufferTime)
             // {
-            //     Log.Verbose($"Handling old message with age {messageAgeInMillis} ms" + JsonConverter.ToJson(beatPitchEvent));
+            //     Log.Verbose(() => $"Handling old message with age {messageAgeInMillis} ms" + JsonConverter.ToJson(beatPitchEvent));
             // }
             
             int eventAgeInBeats = Math.Abs(currentBeatConsideringMicDelay - beatPitchEventAndTime.beatPitchEvent.Beat);
@@ -275,7 +275,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             // if (!handleBecauseOfMessageBufferTime 
             //     && handleBecauseOfEventBufferTime)
             // {
-            //     Log.Verbose(($"Handling old event with age {eventAgeInBeats} beats: " + JsonConverter.ToJson(beatPitchEvent));
+            //     Log.Verbose(() => $"Handling old event with age {eventAgeInBeats} beats: " + JsonConverter.ToJson(beatPitchEvent));
             // }
             
             if (handleBecauseOfMessageBufferTime
@@ -291,7 +291,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             }
         }
         
-        // Log.Verbose("DequeuePitchEventsFromConnectedClient: Remaining events: " + beatPitchEventsFromConnectedClientQueue.Count);
+        // Log.Verbose(() => "DequeuePitchEventsFromConnectedClient: Remaining events: " + beatPitchEventsFromConnectedClientQueue.Count);
     }
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
@@ -342,7 +342,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, songAudioPlayer.PositionInSongInMillis);
         if (pitchEvent.Beat > currentBeat)
         {
-            // Log.Verbose($"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
+            Log.Verbose(() => $"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
             return;
         }
 
@@ -397,7 +397,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             SongGap = songMeta.Gap,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
         };
-        // Log.Verbose($"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
+        Log.Verbose(() => $"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
         connectedClientHandler.SendMessageToClient(positionInSongDto);
     }
 

@@ -85,8 +85,7 @@ public static class Log
                 5, // retainedFileCountLimit
                 Encoding.UTF8, // Encoding
                 null) // FileLifecycleHooks
-            .WriteTo.Sink(new LogEventStreamSink())
-            .WriteTo.Sink(new VerboseLogEventForwardToUnitySink());
+            .WriteTo.Sink(new LogEventStreamSink());
 
         ILogger logger = loggerConfiguration.CreateLogger();
         return logger;
@@ -133,6 +132,16 @@ public static class Log
                 UnityEngine.Debug.LogError("Unknown LogLevel" + logEventLevel);
                 return LogType.Log;
         }
+    }
+    
+    private static string GetSerilogLogMessage(Object context, string format, params object[] args)
+    {
+        if (context == null)
+        {
+            return string.Format(format, args);
+        }
+
+        return string.Format($"[{context.name}] {format}", args);
     }
     
     public static LogType GetUnityLogType(LogEvent logEvent)
@@ -186,37 +195,39 @@ public static class Log
         UnityEngine.Debug.Log("===== Using Default Unity Log Handler =====");
     }
     
-    public static void Verbose(string message)
+    public static void Verbose(Func<string> messageGetter)
     {
-        DoLog(message, LogEventLevel.Verbose, Logger.Verbose);
+        DoLog(messageGetter, LogEventLevel.Verbose, Logger.Verbose);
     }
     
-    public static void Debug(string message)
+    public static void Debug(Func<string> messageGetter)
     {
-        DoLog(message, LogEventLevel.Debug, Logger.Debug);
+        DoLog(messageGetter, LogEventLevel.Debug, Logger.Debug);
     }
 
-    public static void Information(string message)
+    public static void Information(Func<string> messageGetter)
     {
-        DoLog(message, LogEventLevel.Information, Logger.Information);
+        DoLog(messageGetter, LogEventLevel.Information, Logger.Information);
     }
 
-    public static void Warning(string message)
+    public static void Warning(Func<string> messageGetter)
     {
-        DoLog(message, LogEventLevel.Warning, Logger.Warning);
+        DoLog(messageGetter, LogEventLevel.Warning, Logger.Warning);
     }
 
-    public static void Error(string message)
+    public static void Error(Func<string> messageGetter)
     {
-        DoLog(message, LogEventLevel.Error, Logger.Error);
+        DoLog(messageGetter, LogEventLevel.Error, Logger.Error);
     }
 
-    public static void Exception(Exception ex)
+    public static void Exception(Func<Exception> exceptionGetter)
     {
         if (MinimumLogLevel > LogEventLevel.Fatal)
         {
             return;
         }
+        
+        Exception ex = exceptionGetter();
         
         if (Logger == null
             && MinimumLogLevel <= LogEventLevel.Fatal)
@@ -232,12 +243,14 @@ public static class Log
         }
     }
     
-    private static void DoLog(string message, LogEventLevel logEventLevel, Action<string> doLogWithSerilog)
+    private static void DoLog(Func<string> messageGetter, LogEventLevel logEventLevel, Action<string> doLogWithSerilog)
     {
         if (MinimumLogLevel > logEventLevel)
         {
             return;
         }
+
+        string message = messageGetter();
         
         if (Logger == null
             && MinimumLogLevel <= logEventLevel)
@@ -266,11 +279,33 @@ public static class Log
     
     private static void LogWithDefaultUnityLogHandler(LogType unityLogType, string message)
     {
+        if (!Application.isEditor)
+        {
+            return;
+        }
+        
         if (defaultUnityLogHandler == null)
         {
             defaultUnityLogHandler = UnityEngine.Debug.unityLogger.logHandler;
         }
-        defaultUnityLogHandler.LogFormat(unityLogType, null, message);
+
+        try
+        {
+            defaultUnityLogHandler.LogFormat(unityLogType, null, message);
+        }
+        catch (FormatException formatException1)
+        {
+            try
+            {
+                string messageWithEscapedCurlyBraces = message.Replace("{", "{{").Replace("}", "}}");
+                defaultUnityLogHandler.LogFormat(unityLogType, null, messageWithEscapedCurlyBraces);
+            }
+            catch (FormatException formatException2)
+            {
+                string messageWithEscapedCurlyBraces = message.Replace("{", "CURLY_OPEN").Replace("}", "CURLY_CLOSE");
+                defaultUnityLogHandler.LogFormat(unityLogType, null, messageWithEscapedCurlyBraces);
+            }
+        }
     }
     
     private static void LogWithDefaultUnityLogHandler(Exception ex)
@@ -295,22 +330,22 @@ public static class Log
             switch (logType)
             {
                 case LogType.Log:
-                    Logger.Information(GetLogMessage(context, format, args));
+                    Logger.Information(GetSerilogLogMessage(context, format, args));
                     break;
                 case LogType.Warning:
-                    Logger.Warning(GetLogMessage(context, format, args));
+                    Logger.Warning(GetSerilogLogMessage(context, format, args));
                     break;
                 case LogType.Error:
-                    Logger.Error(GetLogMessage(context, format, args));
+                    Logger.Error(GetSerilogLogMessage(context, format, args));
                     break;
                 case LogType.Exception:
-                    Logger.Error(GetLogMessage(context, format, args));
+                    Logger.Error(GetSerilogLogMessage(context, format, args));
                     break;
                 case LogType.Assert:
-                    Logger.Fatal(GetLogMessage(context, format, args));
+                    Logger.Fatal(GetSerilogLogMessage(context, format, args));
                     break;
                 default:
-                    Logger.Information(GetLogMessage(context, format, args));
+                    Logger.Information(GetSerilogLogMessage(context, format, args));
                     break;
             }
 
@@ -330,7 +365,7 @@ public static class Log
                 return;
             }
             
-            Logger.Error(exception, GetLogMessage(context, "{0}", exception.Message));
+            Logger.Error(exception, GetSerilogLogMessage(context, "{0}", exception.Message));
             
             if (Application.isEditor)
             {
@@ -339,16 +374,6 @@ public static class Log
                 defaultUnityLogHandler?.LogException(exception, context);
             }
         }
-
-        private string GetLogMessage(Object context, string format, params object[] args)
-        {
-            if (context == null)
-            {
-                return string.Format(format, args);
-            }
-
-            return string.Format($"[{context.name}] {format}", args);;
-        }
     }
     
     private class LogEventStreamSink : ILogEventSink
@@ -356,21 +381,6 @@ public static class Log
         public void Emit(LogEvent logEvent)
         {
             logEventStream.OnNext(logEvent);
-        }
-    }
-    
-    private class VerboseLogEventForwardToUnitySink : ILogEventSink
-    {
-        public void Emit(LogEvent logEvent)
-        {
-            if (logEvent.Level
-                    is LogEventLevel.Verbose
-                    or LogEventLevel.Debug
-                && Application.isEditor
-                && defaultUnityLogHandler != null)
-            {
-                LogWithDefaultUnityLogHandler(logEvent);
-            }
         }
     }
 }

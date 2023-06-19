@@ -208,7 +208,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             return;
         }
         
-        // Log.Verbose($"Received message from client {peer.EndPoint}: {message}");
+        Log.Verbose(() => $"Received message from client {peer.EndPoint}: {message}");
         
         if (peerToConnectedClientHandler.TryGetValue(peer, out IConnectedClientHandler connectedClientHandler))
         {
@@ -233,7 +233,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
     public void OnNetworkLatencyUpdate(NetPeer peer, int latency)
     {
-        // Log.Verbose($"OnNetworkLatencyUpdate: {peer.EndPoint}, latency: {latency}");
+        Log.Verbose(() => $"OnNetworkLatencyUpdate: {peer.EndPoint}, latency: {latency}");
     }
 
     public void OnConnectionRequest(ConnectionRequest request)

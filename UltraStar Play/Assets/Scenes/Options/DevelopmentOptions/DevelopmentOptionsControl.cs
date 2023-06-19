@@ -250,21 +250,21 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         Log.MinimumLogLevel = settings.MinimumLogLevel;
                       
         Debug.Log("Changed minimum log level to " + settings.MinimumLogLevel + ". The following is for testing log levels...");
-                      
-        Log.Verbose("Serilog verbose log message");
         
-        Log.Debug("Serilog debug log message");
-                      
-        Log.Information("Serilog info log message");
+        Log.Verbose(() => "Serilog verbose log message");
+        
+        Log.Debug(() => "Serilog debug log message");
+        
+        Log.Information(() => "Serilog info log message");
         Debug.Log("Unity info log message");
-                      
-        Log.Warning("Serilog warning log message");
+        
+        Log.Warning(() => "Serilog warning log message");
         Debug.LogWarning("Unity warning log message");
-                      
-        Log.Error("Serilog error log message");
+        
+        Log.Error(() => "Serilog error log message");
         Debug.LogError("Unity error log message");
-                      
-        Log.Exception(new Exception("Serilog exception log message"));
+        
+        Log.Exception(() => new Exception("Serilog exception log message"));
         Debug.LogException(new Exception("Unity exception message"));
     }
 

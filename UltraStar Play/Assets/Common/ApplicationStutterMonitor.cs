@@ -52,7 +52,7 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
             && ignoreFrameDropUntilTimeInSeconds < Time.time)
         {
             int deltaTimeInMillis = (int)(Time.deltaTime * 1000);
-            Debug.LogWarning($"Frame drop detected, deltaTime: {deltaTimeInMillis} ms");
+            Log.Debug(() => $"Frame drop detected, deltaTime: {deltaTimeInMillis} ms");
         }
 
         if (Application.isEditor
