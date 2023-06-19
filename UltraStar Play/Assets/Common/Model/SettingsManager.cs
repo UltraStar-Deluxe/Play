@@ -117,6 +117,9 @@ public class SettingsManager : AbstractSingletonBehaviour
                 settings = CreateDefaultSettings();
             }
             OverwriteSettingsWithCommandLineArguments();
+
+            // Update log level
+            Log.MinimumLogLevel = settings.MinimumLogLevel;
         }
     }
 

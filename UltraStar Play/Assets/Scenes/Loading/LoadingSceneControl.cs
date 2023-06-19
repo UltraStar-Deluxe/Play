@@ -173,7 +173,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         viewMoreButton.RegisterCallbackButtonTriggered(_ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_logFiles)));
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
-            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
+            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");
         });
     }
