@@ -324,7 +324,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnWebViewMessageReceived(object sender, EventArgs<string> e)
     {
-        // Log.Debug($"Received message from WebView: {e.Value}");
+        Log.Verbose(() => $"Received message from WebView: {e.Value}");
         string json = e.Value.Trim();
         if (!json.StartsWith("{")
             || !json.EndsWith("}"))
@@ -358,7 +358,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                         // double oldEstimatedPlaybackPositionInMillis = EstimatedPlaybackPositionInMillis;
                         // double oldEstimatedPlaybackPositionInMillisOffset = numberWebViewMessageDto.value -
                         //                                                     oldEstimatedPlaybackPositionInMillis;
-                        // Log.Verbose($"Received new playback position. Old estimate offset: {oldEstimatedPlaybackPositionInMillisOffset}");
+                        // Log.Verbose(() => $"Received new playback position. Old estimate offset: {oldEstimatedPlaybackPositionInMillisOffset}");
                         
                         receivedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
                         receivedPlaybackPositionInMillis = numberWebViewMessageDto.value;

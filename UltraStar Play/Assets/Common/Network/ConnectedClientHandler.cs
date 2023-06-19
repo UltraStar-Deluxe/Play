@@ -69,7 +69,6 @@ public class ConnectedClientHandler : IConnectedClientHandler
         switch (messageType)
         {
             case CompanionAppMessageType.BeatPitchEvents:
-                // Log.Verbose("ReceivedMessageFromClient - BeatPitchEventsDto: " + json);
                 BeatPitchEventsDto beatPitchEventsDto = JsonConverter.FromJson<BeatPitchEventsDto>(json);
                 
                 UpdateJitterStats(beatPitchEventsDto);
@@ -102,7 +101,7 @@ public class ConnectedClientHandler : IConnectedClientHandler
         {
             lastUpdateAverageJitterTimeInSeconds = Time.time;
             averageJitterInMillis = (long)jitterValuesInMillis.Average();
-            // Log.Verbose($"Average jitter with client {Peer.EndPoint}: {averageJitterInMillis} ms");
+            Log.Verbose(() => $"Average jitter with client {Peer.EndPoint}: {averageJitterInMillis} ms");
         }
     }
 }
