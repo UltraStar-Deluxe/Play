@@ -34,8 +34,9 @@
             <ui:Button text="Detect Pitch&#10;in Selection (DyWa)" display-tooltip-when-elided="true" name="doPitchDetectionInSelectionButton" style="width: 100%; height: auto; display: none;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="buttonRecordingGroup" label="Button Tapping">
-            <ui:TextField picking-mode="Ignore" value="N" text="N" name="buttonRecordingButtonTextField" is-delayed="true" label="Button for tapping" style="flex-direction: column;" />
-            <ui:TextField picking-mode="Ignore" value="A#4" text="A#4" name="buttonRecordingPitchTextField" is-delayed="true" label="Default pitch" style="flex-direction: column;" />
+            <ui:TextField value="N" text="N" name="buttonRecordingButtonTextField" is-delayed="true" label="Button for tapping" style="flex-direction: column;" />
+            <ui:TextField value="A#4" text="A#4" name="buttonRecordingPitchTextField" is-delayed="true" label="Default pitch" style="flex-direction: column;" />
+            <ui:TextField text="A#4" name="buttonRecordingLyricsTextField" is-delayed="true" label="Lyrics for button tapping" multiline="true" value="Lorem ipsum&#10;dolor met" class="multiline" style="flex-direction: column; min-height: 120px; white-space: normal;" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="midiGroup" label="MIDI">
             <ui:Toggle name="midiNotePlayAlongToggle" label="Play MIDI sounds" />

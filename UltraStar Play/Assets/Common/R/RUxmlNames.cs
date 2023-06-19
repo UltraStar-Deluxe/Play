@@ -67,6 +67,7 @@ public static partial class R
         public const string buttonContainer = "buttonContainer";
         public const string buttonRecordingButtonTextField = "buttonRecordingButtonTextField";
         public const string buttonRecordingGroup = "buttonRecordingGroup";
+        public const string buttonRecordingLyricsTextField = "buttonRecordingLyricsTextField";
         public const string buttonRecordingPitchTextField = "buttonRecordingPitchTextField";
         public const string buttonRow = "buttonRow";
         public const string calibrateDelayButton = "calibrateDelayButton";

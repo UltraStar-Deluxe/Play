@@ -49,4 +49,20 @@ public static class StringUtils
     {
         return string.Format($"{{0:D{targetLength}}}", number);
     }
+
+    public static int MinIndexOf(string text, int startIndex, params char[] characters)
+    {
+        int minIndex = -1;
+        foreach (char character in characters)
+        {
+            int i = text.IndexOf(character, startIndex);
+            if (i >= 0
+                && (i < minIndex || minIndex < 0))
+            {
+                minIndex = i;
+            }
+        }
+
+        return minIndex;
+    }
 }

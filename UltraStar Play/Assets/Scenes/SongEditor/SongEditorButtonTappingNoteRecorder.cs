@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -28,11 +30,16 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorHistoryManager historyManager;
 
+    [Inject(UxmlName = R.UxmlNames.buttonRecordingLyricsTextField)]
+    private TextField buttonRecordingLyricsTextField;
+    
     private List<Note> upcomingSortedRecordedNotes = new();
 
     private int lastPitchDetectedFrame;
     private int lastPitchDetectedBeat;
     private Note lastRecordedNote;
+
+    private int cursorIndex;
 
     private bool hasRecordedNotes;
 
@@ -41,6 +48,16 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         songAudioPlayer.JumpBackInSongEventStream.Subscribe(OnJumpedBackInSong);
         songAudioPlayer.PlaybackStartedEventStream.Subscribe(OnPlaybackStarted);
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(OnPlaybackStopped);
+
+        buttonRecordingLyricsTextField.RegisterCallback<BlurEvent>(evt =>
+        {
+            // After pasting new text, move the cursor to the start
+            if (buttonRecordingLyricsTextField.cursorIndex >= buttonRecordingLyricsTextField.text.Length)
+            {
+                buttonRecordingLyricsTextField.cursorIndex = 0;
+                cursorIndex = 0;
+            }
+        });
     }
 
     private void OnPlaybackStopped(double positionInSongInMillis)
@@ -63,6 +80,17 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         if (songAudioPlayer.IsPlaying)
         {
             UpdateRecordingViaButtonClick();
+        }
+
+        // Synchronize cursorIndex with TextField
+        bool isTextFieldFocused = buttonRecordingLyricsTextField.focusController?.focusedElement == buttonRecordingLyricsTextField;
+        if (isTextFieldFocused)
+        {
+            cursorIndex = buttonRecordingLyricsTextField.cursorIndex;
+        }
+        else if (cursorIndex != buttonRecordingLyricsTextField.cursorIndex)
+        {
+            buttonRecordingLyricsTextField.cursorIndex = cursorIndex;
         }
     }
 
@@ -125,11 +153,43 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     private void CreateNewRecordedNote(int midiNote, int currentBeat, ESongEditorLayer targetLayer)
     {
-        lastRecordedNote = new Note(ENoteType.Normal, currentBeat, 1, midiNote - 60, "");
-        songEditorLayerManager.AddNoteToEnumLayer(targetLayer, lastRecordedNote);
+        string text = GetCurrentWordForButtonTappingAndSelectNextWord();
+        Note newNote = new Note(ENoteType.Normal, currentBeat, 1, midiNote - 60, text);
+        songEditorLayerManager.AddNoteToEnumLayer(targetLayer, newNote);
+        lastRecordedNote = newNote;
 
         // EndBeat of new note is currentBeat + 1. Overwrite notes that start before this beat.
         OverwriteExistingNotes(currentBeat + 1, targetLayer);
+    }
+
+    private string GetCurrentWordForButtonTappingAndSelectNextWord()
+    {
+        string buttonTappingLyrics = settings.SongEditorSettings.ButtonRecordingLyrics;
+        if (buttonTappingLyrics.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        if (cursorIndex < 0
+            || cursorIndex >= buttonTappingLyrics.Length)
+        {
+            return "";
+        }
+        
+        string remainingButtonTappingLyrics = buttonTappingLyrics.Substring(cursorIndex);
+        int indexOfFirstSpaceOrNewline = StringUtils.MinIndexOf(remainingButtonTappingLyrics, 0, ' ', '\n');
+        if (indexOfFirstSpaceOrNewline < 0)
+        {
+            cursorIndex = buttonRecordingLyricsTextField.text.Length;
+            return remainingButtonTappingLyrics;
+        }
+
+        string firstWord = remainingButtonTappingLyrics.Substring(0, indexOfFirstSpaceOrNewline);
+        cursorIndex += indexOfFirstSpaceOrNewline + 1;
+        firstWord = firstWord.Replace("\n", "")
+            .Replace(" ", "")
+            .Replace(";", "");
+        return firstWord;
     }
 
     private void ContinueLastRecordedNote(int currentBeat, ESongEditorLayer targetLayer)
