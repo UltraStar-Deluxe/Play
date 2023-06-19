@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using Serilog.Events;
 using UnityEngine;
 
 [Serializable]
@@ -88,6 +89,7 @@ public class Settings : ISettings
     public bool ShowFps { get; set; }
     public bool UseUniversalCharsetDetector { get; set; } = true;
     public bool StreamAudioInSingScene { get; set; } = true;
+    public LogEventLevel MinimumLogLevel { get; set; }= LogEventLevel.Information;
 
     /**
      * Require explicit user action to use custom event system

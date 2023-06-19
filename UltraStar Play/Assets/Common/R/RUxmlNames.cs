@@ -373,6 +373,7 @@ public static partial class R
         public const string midiNotePlayAlongToggle = "midiNotePlayAlongToggle";
         public const string midiTrackAndChannelContainer = "midiTrackAndChannelContainer";
         public const string midiVelocitySlider = "midiVelocitySlider";
+        public const string minimumLogLevelPicker = "minimumLogLevelPicker";
         public const string mitPitchIndicatorContainer = "mitPitchIndicatorContainer";
         public const string modifierDialogOverlay = "modifierDialogOverlay";
         public const string modifierDialogOverlayInnerContainer = "modifierDialogOverlayInnerContainer";

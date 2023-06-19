@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using ProTrans;
 using Serilog.Events;
 using SimpleHttpServerForUnity;
@@ -96,6 +98,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaPicker)]
     private ItemPicker searchAudioFilesWithoutSongMetaPicker;
 
+    [Inject(UxmlName = R.UxmlNames.minimumLogLevelPicker)]
+    private ItemPicker minimumLogLevelPicker;
+    
     protected override void Start()
     {
         base.Start();
@@ -103,6 +108,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(showFpsPicker)
             .Bind(() => settings.ShowFps,
                   newValue => settings.ShowFps = newValue);
+
+        List<LogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<LogEventLevel>()
+            .OrderBy(logEventLevel => (int)logEventLevel)
+            .ToList();
+        new LabeledItemPickerControl<LogEventLevel>(minimumLogLevelPicker, logEventLevels)
+            .Bind(() => settings.MinimumLogLevel,
+                  newValue =>
+                  {
+                      settings.MinimumLogLevel = newValue;
+                      UpdateLogEventLevel();
+                  });
         
         new BoolPickerControl(streamAudioInSingScenePicker)
             .Bind(() => settings.StreamAudioInSingScene,
@@ -162,7 +178,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         showLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
-            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
+            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");
         });
 
@@ -222,6 +238,34 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
             .Bind(() => settings.SearchAudioFilesWithoutSongMeta,
                 newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
+    }
+
+    private void UpdateLogEventLevel()
+    {
+        if (Log.MinimumLogLevel == settings.MinimumLogLevel)
+        {
+            return;
+        }
+        
+        Log.MinimumLogLevel = settings.MinimumLogLevel;
+                      
+        Debug.Log("Changed minimum log level to " + settings.MinimumLogLevel + ". The following is for testing log levels...");
+                      
+        Log.Verbose("Serilog verbose log message");
+        
+        Log.Debug("Serilog debug log message");
+                      
+        Log.Information("Serilog info log message");
+        Debug.Log("Unity info log message");
+                      
+        Log.Warning("Serilog warning log message");
+        Debug.LogWarning("Unity warning log message");
+                      
+        Log.Error("Serilog error log message");
+        Debug.LogError("Unity error log message");
+                      
+        Log.Exception(new Exception("Serilog exception log message"));
+        Debug.LogException(new Exception("Unity exception message"));
     }
 
     private void RestartScene()

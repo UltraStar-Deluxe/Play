@@ -779,7 +779,7 @@ public static class SongMetaUtils
         sb.Append("}");
 
         string scoreRelevantSongHash = Hashing.Md5(Encoding.UTF8.GetBytes(sb.ToString()));
-        // Debug.Log($"ScoreRelevantSongHash: {scoreRelevantSongHash}, from string: {sb}");
+        // Log.Verbose($"{songMeta} has ScoreRelevantSongHash {scoreRelevantSongHash}, from string: {sb}");
         return scoreRelevantSongHash;
     }
 }

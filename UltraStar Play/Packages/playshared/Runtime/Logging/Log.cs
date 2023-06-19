@@ -19,7 +19,10 @@ public static class Log
     public static readonly string outputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{StackTrace}";
     public static readonly string logFileFolder = $"{Application.persistentDataPath}/Logs";
     public static readonly string logFilePath = $"{logFileFolder}/{Application.productName}.log";
+    
+    private static readonly MessageTemplateTextFormatter textFormatter = new(outputTemplate);
 
+    private static LoggingLevelSwitch loggingLevelSwitch;
     private static ILogger Logger { get; set; }
 
     private static LogHistorySink logHistorySink;
@@ -31,12 +34,19 @@ public static class Log
     public static IObservable<LogEvent> LogEventStream => logEventStream;
 
     public static bool IsUsingDefaultUnityLogHandler => defaultUnityLogHandler == null 
-                                                        || Debug.unityLogger.logHandler == defaultUnityLogHandler 
+                                                        || UnityEngine.Debug.unityLogger.logHandler == defaultUnityLogHandler 
                                                         || Application.isEditor;
 
+    public static LogEventLevel MinimumLogLevel
+    {
+        get => loggingLevelSwitch.MinimumLevel;
+        set => loggingLevelSwitch.MinimumLevel = value;
+    }
+    
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
+        loggingLevelSwitch = new();
         logHistorySink = new();
         Logger = CreateLogger();
         Logger.Information("===== Initialized Serilog Logger =====");
@@ -56,7 +66,7 @@ public static class Log
         }
         int fileSizeLimitBytes = 250 * 1000 * 1000; // 250 MB
         LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Information()
+            .MinimumLevel.ControlledBy(loggingLevelSwitch)
             .Enrich.FromLogContext()
             .Enrich.With<UnityStackTraceEnricher>()
             .WriteTo.Sink(logHistorySink)
@@ -75,24 +85,23 @@ public static class Log
                 5, // retainedFileCountLimit
                 Encoding.UTF8, // Encoding
                 null) // FileLifecycleHooks
-            .WriteTo.Sink(new LogEventStreamSink());
+            .WriteTo.Sink(new LogEventStreamSink())
+            .WriteTo.Sink(new VerboseLogEventForwardToUnitySink());
 
         ILogger logger = loggerConfiguration.CreateLogger();
         return logger;
     }
 
-    public static string GetLogText(LogEventLevel logEventLevel)
+    public static string GetLogHistoryAsText(LogEventLevel logEventLevel)
     {
-        MessageTemplateTextFormatter textFormatter = new(outputTemplate);
         List<string> logLines = GetLogHistory()
             .Where(logEvent => (int)logEvent.Level >= (int)logEventLevel)
             .Select(logEvent =>
             {
-                StringWriter stringWriter = new();
+                using StringWriter stringWriter = new();
                 textFormatter.Format(logEvent, stringWriter);
                 string logLine = stringWriter.ToString();
-                // Workaround for Unity TextField interpreting backslash for special characters.
-                return logLine.Replace("\\", "/");
+                return logLine;
             })
             .ToList();
 
@@ -107,6 +116,25 @@ public static class Log
         return logText;
     }
 
+    public static LogType GetUnityLogType(LogEventLevel logEventLevel)
+    {
+        switch (logEventLevel)
+        {
+            case LogEventLevel.Verbose:
+            case LogEventLevel.Debug:
+            case LogEventLevel.Information:
+                return LogType.Log;
+            case LogEventLevel.Warning:
+                return LogType.Warning;
+            case LogEventLevel.Error:
+            case LogEventLevel.Fatal:
+                return LogType.Error;
+            default:
+                UnityEngine.Debug.LogError("Unknown LogLevel" + logEventLevel);
+                return LogType.Log;
+        }
+    }
+    
     public static LogType GetUnityLogType(LogEvent logEvent)
     {
         switch (logEvent.Level)
@@ -121,7 +149,7 @@ public static class Log
             case LogEventLevel.Fatal:
                 return logEvent.Exception != null ? LogType.Exception : LogType.Error;
             default:
-                Debug.LogError("Unknown LogLevel" + logEvent.Level);
+                UnityEngine.Debug.LogError("Unknown LogLevel" + logEvent.Level);
                 return LogType.Log;
         }
     }
@@ -130,32 +158,128 @@ public static class Log
     {
         if (defaultUnityLogHandler == null)
         {
-            defaultUnityLogHandler = Debug.unityLogger.logHandler;
+            defaultUnityLogHandler = UnityEngine.Debug.unityLogger.logHandler;
         }
 
-        if (Debug.unityLogger.logHandler == customUnityLogHandler)
+        if (UnityEngine.Debug.unityLogger.logHandler == customUnityLogHandler)
         {
             return;
         }
 
-        Debug.unityLogger.logHandler = customUnityLogHandler;
-        Debug.Log("===== Using Custom Unity Log Handler =====");
+        UnityEngine.Debug.unityLogger.logHandler = customUnityLogHandler;
+        UnityEngine.Debug.Log("===== Using Custom Unity Log Handler =====");
     }
     
     private static void UseDefaultUnityLogHandler()
     {
         if (defaultUnityLogHandler == null)
         {
-            defaultUnityLogHandler = Debug.unityLogger.logHandler;
+            defaultUnityLogHandler = UnityEngine.Debug.unityLogger.logHandler;
         }
         
-        if (Debug.unityLogger.logHandler == defaultUnityLogHandler)
+        if (UnityEngine.Debug.unityLogger.logHandler == defaultUnityLogHandler)
         {
             return;
         }
 
-        Debug.unityLogger.logHandler = defaultUnityLogHandler;
-        Debug.Log("===== Using Default Unity Log Handler =====");
+        UnityEngine.Debug.unityLogger.logHandler = defaultUnityLogHandler;
+        UnityEngine.Debug.Log("===== Using Default Unity Log Handler =====");
+    }
+    
+    public static void Verbose(string message)
+    {
+        DoLog(message, LogEventLevel.Verbose, Logger.Verbose);
+    }
+    
+    public static void Debug(string message)
+    {
+        DoLog(message, LogEventLevel.Debug, Logger.Debug);
+    }
+
+    public static void Information(string message)
+    {
+        DoLog(message, LogEventLevel.Information, Logger.Information);
+    }
+
+    public static void Warning(string message)
+    {
+        DoLog(message, LogEventLevel.Warning, Logger.Warning);
+    }
+
+    public static void Error(string message)
+    {
+        DoLog(message, LogEventLevel.Error, Logger.Error);
+    }
+
+    public static void Exception(Exception ex)
+    {
+        if (MinimumLogLevel > LogEventLevel.Fatal)
+        {
+            return;
+        }
+        
+        if (Logger == null
+            && MinimumLogLevel <= LogEventLevel.Fatal)
+        {
+            LogWithDefaultUnityLogHandler(ex);
+            return;
+        }
+        
+        Logger.Error(ex, ex.Message);
+        if (Application.isEditor)
+        {
+            LogWithDefaultUnityLogHandler(ex);
+        }
+    }
+    
+    private static void DoLog(string message, LogEventLevel logEventLevel, Action<string> doLogWithSerilog)
+    {
+        if (MinimumLogLevel > logEventLevel)
+        {
+            return;
+        }
+        
+        if (Logger == null
+            && MinimumLogLevel <= logEventLevel)
+        {
+            LogType logType = GetUnityLogType(logEventLevel);
+            LogWithDefaultUnityLogHandler(logType, message);
+            return;
+        }
+
+        doLogWithSerilog(message);
+        if (Application.isEditor)
+        {
+            LogType logType = GetUnityLogType(logEventLevel);
+            LogWithDefaultUnityLogHandler(logType, message);
+        }
+    }
+
+    private static void LogWithDefaultUnityLogHandler(LogEvent logEvent)
+    {
+        LogType unityLogType = GetUnityLogType(logEvent);
+        using StringWriter stringWriter = new();
+        textFormatter.Format(logEvent, stringWriter);
+        string logLine = stringWriter.ToString();
+        LogWithDefaultUnityLogHandler(unityLogType, logLine);
+    }
+    
+    private static void LogWithDefaultUnityLogHandler(LogType unityLogType, string message)
+    {
+        if (defaultUnityLogHandler == null)
+        {
+            defaultUnityLogHandler = UnityEngine.Debug.unityLogger.logHandler;
+        }
+        defaultUnityLogHandler.LogFormat(unityLogType, null, message);
+    }
+    
+    private static void LogWithDefaultUnityLogHandler(Exception ex)
+    {
+        if (defaultUnityLogHandler == null)
+        {
+            defaultUnityLogHandler = UnityEngine.Debug.unityLogger.logHandler;
+        }
+        defaultUnityLogHandler.LogException(ex, null);
     }
     
     private class CustomUnityLogHandler : ILogHandler
@@ -232,6 +356,21 @@ public static class Log
         public void Emit(LogEvent logEvent)
         {
             logEventStream.OnNext(logEvent);
+        }
+    }
+    
+    private class VerboseLogEventForwardToUnitySink : ILogEventSink
+    {
+        public void Emit(LogEvent logEvent)
+        {
+            if (logEvent.Level
+                    is LogEventLevel.Verbose
+                    or LogEventLevel.Debug
+                && Application.isEditor
+                && defaultUnityLogHandler != null)
+            {
+                LogWithDefaultUnityLogHandler(logEvent);
+            }
         }
     }
 }

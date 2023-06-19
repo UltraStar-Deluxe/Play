@@ -53,8 +53,32 @@ public abstract class AbstractInGameDebugConsoleManager : AbstractSingletonBehav
     
     protected virtual void AddDebugLogConsoleCommands()
     {
+        AddDebugLogPathConsoleCommands();
+    }
+
+    private void AddDebugLogPathConsoleCommands()
+    {
         DebugLogConsole.AddCommand("logs.path", "Show path to log file",
             () => Debug.Log($"Log file path: {ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath)}"));
+
+        DebugLogConsole.AddCommand("logs.path.copy", "Copy path to log file",
+            () =>
+            {
+                string logFilePath = ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath);
+                ClipboardUtils.CopyToClipboard(logFilePath);
+                Debug.Log($"Copied to clipboard: {logFilePath}");
+            });
+
+        if (PlatformUtils.IsStandalone)
+        {
+            DebugLogConsole.AddCommand("logs.path.open", "Open folder with log file",
+                () =>
+                {
+                    string logFilePath = ApplicationUtils.ReplacePathsWithDisplayString(Log.logFilePath);
+                    ApplicationUtils.OpenDirectory(new FileInfo(logFilePath).DirectoryName);
+                    Debug.Log($"Open folder: {logFilePath}");
+                });
+        }
     }
 
     protected virtual void Update()
