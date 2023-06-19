@@ -14,7 +14,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     private PlayerControl playerControl;
 
     private Sentence currentSentence;
-
+    
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
@@ -26,22 +26,25 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 
     private void DisplaySentence(Sentence sentence)
     {
-        currentSentence = sentence;
-
         if (sentence == null)
         {
-            // Last sentence done => fade out notes, then remove
-            LeanTween.value(gameObject, targetNoteEntryContainer.resolvedStyle.opacity, 0, 1f)
-                .setOnUpdate(interpolatedValue =>
-                {
-                    targetNoteEntryContainer.style.opacity = interpolatedValue;
-                    recordedNoteEntryContainer.style.opacity = interpolatedValue;
-                })
-                .setOnComplete(() => RemoveAllDisplayedNotes());
+            // Last sentence done.
+            // Wait until the mic has finished recording the last note.
+            // Afterwards, fade out notes, then remove notes.
+            if (playerControl != null)
+            {
+                playerControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, 
+                    () =>
+                    {
+                        currentSentence = sentence;
+                        FadeOutNotesAfterLastSentence();
+                    }));
+            }
         }
         else
         {
             // Immediately remove all notes to have space for the next sentence
+            currentSentence = sentence;
             RemoveAllDisplayedNotes();
         }
         
@@ -63,6 +66,17 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         {
             CreateTargetNoteControl(note);
         }
+    }
+
+    private void FadeOutNotesAfterLastSentence()
+    {
+        LeanTween.value(gameObject, targetNoteEntryContainer.resolvedStyle.opacity, 0, 1f)
+            .setOnUpdate(interpolatedValue =>
+            {
+                targetNoteEntryContainer.style.opacity = interpolatedValue;
+                recordedNoteEntryContainer.style.opacity = interpolatedValue;
+            })
+            .setOnComplete(() => RemoveAllDisplayedNotes());
     }
 
     protected override void DisplayRecordedNote(RecordedNote recordedNote)

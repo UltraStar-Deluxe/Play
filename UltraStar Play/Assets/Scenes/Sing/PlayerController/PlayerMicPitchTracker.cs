@@ -537,8 +537,14 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         RecordingSentence = playerControl.GetSentence(sentenceIndex);
         if (RecordingSentence == null)
         {
-            currentAndUpcomingNotesInRecordingSentence = new List<Note>();
-            BeatToAnalyze = 0;
+            // After last sentence or no sentences at all.
+            // Wait until the mic has finished recording the last note. 
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f,
+                () =>
+                {
+                    currentAndUpcomingNotesInRecordingSentence = new List<Note>();
+                    BeatToAnalyze = 0;
+                }));
             return;
         }
         currentAndUpcomingNotesInRecordingSentence = SongMetaUtils.GetSortedNotes(RecordingSentence);
