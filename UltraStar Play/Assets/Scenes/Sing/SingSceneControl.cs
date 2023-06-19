@@ -281,14 +281,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         UpdateInputLegend();
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
-        // Skip beginning of song via #START tag of txt file
-        if (sceneData.PositionInSongInMillis <= 0
-            && SongMeta.Start > 0)
-        {
-            // #START tag in txt file is in seconds (but #END is in milliseconds).
-            SkipToPositionInSong(SongMeta.Start * 1000);
-        }
-
         // Progress bar to show time in song
         songTimeProgressBar.value = 0;
         songAudioPlayer.PositionInSongEventStream.Subscribe(_ =>
@@ -628,13 +620,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public void SkipToPositionInSong(double positionInSongInMillis)
     {
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
-        int nextBeatToScore = (int)Math.Max(CurrentBeat, sceneData.NextBeatToScore);
+        int positionInSongInBeats = (int)BpmUtils.MillisecondInSongToBeat(SongMeta, positionInSongInMillis);
         foreach (PlayerControl playerController in PlayerControls)
         {
-            playerController.PlayerScoreControl.NextBeatToScore = nextBeatToScore;
-            playerController.PlayerMicPitchTracker.SkipToBeat(CurrentBeat);
+            playerController.SkipToBeat(positionInSongInBeats);
         }
-        Debug.Log($"Skipped forward to {positionInSongInMillis} milliseconds, next beat to score is {nextBeatToScore}");
+        Debug.Log($"Skipped forward to {positionInSongInMillis} milliseconds ({positionInSongInBeats} beats)");
     }
 
     public void Restart()
@@ -659,7 +650,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         int maxBeatToScore = PlayerControls
             .Select(playerController => playerController.PlayerScoreControl.NextBeatToScore)
             .Max();
-        sceneData.NextBeatToScore = Math.Max((int)CurrentBeat, maxBeatToScore);
 
         sceneData.PlayerProfileToScoreDataMap = new();
         foreach (PlayerControl playerController in PlayerControls)
@@ -1038,7 +1028,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
-        songAudioPlayer.LoadSongAudio(SongMeta, sceneData.PositionInSongInMillis, settings.StreamAudioInSingScene)
+        double startPositionInSongInMillis = GetStartPositionInSongInMillis();
+        
+        songAudioPlayer.LoadSongAudio(SongMeta, startPositionInSongInMillis, settings.StreamAudioInSingScene)
             .CatchIgnore((Exception error) =>
             {
                 // Loading the audio failed.
@@ -1050,6 +1042,24 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
                 songAudioPlayer.PlayAudio();
             });
+
+        SkipToPositionInSong(startPositionInSongInMillis);
+    }
+
+    private double GetStartPositionInSongInMillis()
+    {
+        if (sceneData.PositionInSongInMillis > 0)
+        {
+            return sceneData.PositionInSongInMillis;
+        }
+
+        if (SongMeta.Start > 0)
+        {
+            // #START tag in txt file is in seconds (but #END is in milliseconds).
+            return SongMeta.Start * 1000.0;
+        }
+
+        return 0;
     }
 
     public List<IBinding> GetBindings()

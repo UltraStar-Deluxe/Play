@@ -41,6 +41,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private float roundingDistance;
 
     private int recordingSentenceIndex;
+    
+    private int beatToAnalyze;
     public int BeatToAnalyze { get; private set; }
 
     public Sentence RecordingSentence { get; private set; }
@@ -611,6 +613,12 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     public void SkipToBeat(double currentBeat)
     {
+        if (currentBeat < beatToAnalyze)
+        {
+            // Cannot jump back in song
+            return;
+        }
+        
         // Find sentence to analyze next.
         RecordingSentence = playerControl.SortedSentences
             .FirstOrDefault(sentence => currentBeat <= sentence.MaxBeat);

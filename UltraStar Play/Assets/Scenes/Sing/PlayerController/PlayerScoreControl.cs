@@ -86,7 +86,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    public int NextBeatToScore { get; set; }
+    public int NextBeatToScore { get; private set; }
 
     [Inject]
     private PlayerMicPitchTracker playerMicPitchTracker;
@@ -118,7 +118,28 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     private double maxScoreForNormalNotes;
     private double maxScoreForGoldenNotes;
 
-    public PlayerScoreControlData ScoreData { get; set; } = new();
+    public PlayerScoreControlData scoreData = new();
+    public PlayerScoreControlData ScoreData
+    {
+        get => scoreData;
+        set
+        {
+            scoreData = value;
+
+            // Do not score sentences and notes again, e.g. when coming back from the song editor
+            List<Note> alreadyScoredNotes = scoreData
+                .NoteToNoteScoreMap.Keys
+                .ToList();
+            if (!alreadyScoredNotes.IsNullOrEmpty())
+            {
+                int alreadyScoredBeat = alreadyScoredNotes
+                    .Select(alreadyScoreNote => alreadyScoreNote.EndBeat)
+                    .Max();
+                SkipToBeat(alreadyScoredBeat);
+                Debug.Log($"Skipped to beat {alreadyScoredBeat} because it was already scored.");
+            }
+        }
+    }
 
     private readonly HashSet<int> scoredBeats = new();
     private readonly HashSet<int> normalNoteBeats = new();
@@ -400,6 +421,20 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         return sentenceScore;
     }
 
+    public void SkipToBeat(int beat)
+    {
+        // Cannot skip to an old beat, otherwise notes may be scored multiple times.
+        if (beat > NextBeatToScore)
+        {
+            NextBeatToScore = beat;
+        }
+
+        if (beat > firstBeatToScoreInclusive)
+        {
+            firstBeatToScoreInclusive = beat;
+        }
+    }
+    
     public class SentenceScoreEvent
     {
         public SentenceScore SentenceScore { get; private set; }

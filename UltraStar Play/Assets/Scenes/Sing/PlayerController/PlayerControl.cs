@@ -276,6 +276,13 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             .LastOrDefault();
     }
 
+    public void SkipToBeat(int beat)
+    {
+        PlayerScoreControl.SkipToBeat(beat);
+        PlayerMicPitchTracker.SkipToBeat(beat);
+        Debug.Log($"Skipped forward to beat {beat} for player {PlayerProfile.Name}");
+    }
+    
     public class EnterSentenceEvent
     {
         public Sentence Sentence { get; private set; }
