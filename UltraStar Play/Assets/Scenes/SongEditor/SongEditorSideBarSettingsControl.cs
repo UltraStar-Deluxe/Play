@@ -42,6 +42,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionWhenRecordingToggle)]
     private Toggle speechRecognitionWhenRecordingToggle;
 
+    [Inject(UxmlName = R.UxmlNames.buttonRecordingLyricsTextField)]
+    private TextField buttonRecordingLyricsTextField;
+    
     [Inject(UxmlName = R.UxmlNames.buttonRecordingPitchTextField)]
     private TextField buttonRecordingPitchTextField;
 
@@ -247,6 +250,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                     settings.SongEditorSettings.DefaultPitchForCreatedNotes = newMidiNote;
                 }
             });
+
+        buttonRecordingLyricsTextField.DisableParseEscapeSequences();
+        buttonRecordingLyricsTextField.selectAllOnFocus = false;
+        buttonRecordingLyricsTextField.selectAllOnMouseUp = false;
+        Bind(buttonRecordingLyricsTextField,
+            () => settings.SongEditorSettings.ButtonRecordingLyrics,
+            newValue => settings.SongEditorSettings.ButtonRecordingLyrics = newValue);
         
         micDelayTextField.DisableParseEscapeSequences();
         Bind(micDelayTextField,

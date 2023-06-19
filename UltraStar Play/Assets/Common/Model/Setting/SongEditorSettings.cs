@@ -17,6 +17,7 @@ public class SongEditorSettings
     public int MicDelayInMillis { get; set; } = 450;
     public int DefaultPitchForCreatedNotes { get; set; } = MidiUtils.MidiNoteConcertPitch;
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
+    public string ButtonRecordingLyrics { get; set; } = "";
     public bool SpeechRecognitionWhenRecording { get; set; } = true;
 
     public bool AdjustFollowingNotes { get; set; }
