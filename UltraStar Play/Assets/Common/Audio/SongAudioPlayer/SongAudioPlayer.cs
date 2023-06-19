@@ -404,7 +404,8 @@ public class SongAudioPlayer : MonoBehaviour
                     DurationOfSongInMillis = 1000.0 * loadedAudioClip.samples / loadedAudioClip.frequency;
                     PositionInSongInMillis = startPositionInMillis;
                     FireLoadedEvent(o, songMeta, audioUri);
-                });
+                })
+                .AddTo(gameObject);
             
             return Disposable.Empty;
         });
