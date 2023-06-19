@@ -1139,7 +1139,7 @@ GameObject:
   - component: {fileID: 1747905243}
   - component: {fileID: 1747905242}
   m_Layer: 0
-  m_Name: SongEditorFocusableNavigator
+  m_Name: DisableDefaultFocusableNavigator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1157,8 +1157,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e5b9cfd240439a469c7929a2fa1cf11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  focusLastElementIfNothingFocused: 0
-  logFocusedVisualElements: 0
 --- !u!4 &1747905243
 Transform:
   m_ObjectHideFlags: 0

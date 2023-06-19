@@ -1,4 +1,4 @@
 release = 0.10.10
 build_timestamp = 2306162345
 commit_hash = abd9f3b5
-website_link = https://ultrastar-play.com/get
+website_link = https://melodymania.org/get

@@ -231,6 +231,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private readonly SongQueueUiControl songQueueUiControl = new();
     private readonly SongSelectFilterControl songSelectFilterControl = new();
     private readonly SongSelectSelectedSongDetailsControl songSelectSelectedSongDetailsControl = new();
+    
+    private MessageDialogControl askToAssignMicsDialog;
 
     public VisualElementSlideInControl SongQueueSlideInControl { get; private set; }
     public VisualElementSlideInControl ModifiersOverlaySlideInControl { get; private set; }
@@ -970,14 +972,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        // Check that any player is selected
-        if (playerListControl.GetSelectedPlayerProfiles().IsNullOrEmpty())
-        {
-            UiManager.CreateNotification(
-                TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
-            return;
-        }
-
         // Check that there is associated and persisted sing-along data. If not, ask to open song editor.
         if (SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta))
         {
@@ -1021,9 +1015,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         AttemptStartSong(songRouletteControl.SelectedSongEntryControl.SongMeta);
     }
     
-    public void AttemptStartSong(SongMeta songMeta)
+    public void AttemptStartSong(SongMeta songMeta, bool ignoreRandomlySelectedSong = false, bool ignoreMissingMicProfiles = false)
     {
-        if (IsPartyModeRandomSongSelection
+        List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
+        Dictionary<PlayerProfile, MicProfile> selectedPlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
+        
+        // Check that any player is selected
+        if (selectedPlayerProfiles.IsNullOrEmpty())
+        {
+            UiManager.CreateNotification(
+                TranslationManager.GetTranslation(R.Messages.songSelectScene_noPlayerSelected_message));
+            return;
+        }
+        
+        // Ask to use joker if the user selected a different song than the randomly selected.
+        if (!ignoreRandomlySelectedSong
+            && IsPartyModeRandomSongSelection
             && partyModeControl.RandomlySelectedSong != songMeta)
         {
             // The user selected a different song than the randomly selected.
@@ -1032,7 +1039,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             {
                 partyModeControl.OpenAskToUseJokerDialog(
                     songMeta,
-                    () => CheckAudioThenStartSingScene(songMeta));
+                    () => AttemptStartSong(songMeta, true, ignoreMissingMicProfiles));
             }
             else
             {
@@ -1043,7 +1050,52 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
+        // Ask to connect a Companion App when there are players without mics.
+        List<PlayerProfile> playerProfilesWithoutMics = selectedPlayerProfiles
+            .Where(selectedPlayerProfile => !selectedPlayerProfileToMicProfileMap.TryGetValue(selectedPlayerProfile, out MicProfile micProfile) 
+                                            || micProfile == null)
+            .ToList();
+        if (!ignoreMissingMicProfiles
+            && !playerProfilesWithoutMics.IsNullOrEmpty())
+        {
+            OpenAskToAssignMicsDialog(
+                playerProfilesWithoutMics,
+                () => AttemptStartSong(songMeta, ignoreRandomlySelectedSong, true));
+            return;
+        }
+        
         CheckAudioThenStartSingScene(songMeta);
+    }
+
+    private void OpenAskToAssignMicsDialog(List<PlayerProfile> playerProfilesWithoutMics, Action onIgnoreAndStart)
+    {
+        CloseAskToAssignMicsDialog();
+        
+        askToAssignMicsDialog = uiManager.CreateDialogControl("Missing Microphones");
+        string playerNamesCsv = playerProfilesWithoutMics
+            .Select(it => it.Name)
+            .ToCsv(", ", "", "");
+        askToAssignMicsDialog.Message = $"Missing microphones for player(s): {playerNamesCsv}\n" +
+                                        $"Connect a Companion app or assign another microphone.\n";
+        askToAssignMicsDialog.AddButton("Start anyway", _ =>
+        {
+            CloseAskToAssignMicsDialog();
+            onIgnoreAndStart?.Invoke();
+        });
+        askToAssignMicsDialog.AddButton(TranslationManager.GetTranslation(R.Messages.cancel), _ =>
+        {
+            CloseAskToAssignMicsDialog();
+        });
+    }
+
+    private void CloseAskToAssignMicsDialog()
+    {
+        if (askToAssignMicsDialog == null)
+        {
+            return;
+        }
+
+        askToAssignMicsDialog.CloseDialog();
     }
 
     public void StartSongEditorScene()

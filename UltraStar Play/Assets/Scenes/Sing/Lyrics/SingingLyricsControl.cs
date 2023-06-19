@@ -61,6 +61,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             SetNextSentence(nextSentence);
         });
 
+        ClearSentenceContainer(currentSentenceContainer);
+        ClearSentenceContainer(nextSentenceContainer);
+        
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
 
@@ -199,7 +202,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         {
             SortedNotes = new List<Note>(sentence.Notes);
             SortedNotes.Sort(Note.comparerByStartBeat);
-            FillContainerWithSentenceText(currentSentenceContainer, CurrentSentence, false);
+            FillSentenceContainer(currentSentenceContainer, CurrentSentence, false);
             UpdateFontSize(currentSentenceContainer);
         }
         else
@@ -289,11 +292,10 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             return resolvedStyle.marginLeft + preferredTextSize.x + resolvedStyle.marginRight;
         }).Sum();
     }
-    
-    private void FillContainerWithSentenceText(VisualElement visualElement, Sentence sentence, bool isNextSentence)
+
+    private void ClearSentenceContainer(VisualElement visualElement)
     {
         visualElement.Query<Label>()
-            .ToList()
             .ForEach(label =>
             {
                 if (label != positionBeforeLyricsIndicator)
@@ -301,6 +303,12 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                     label.RemoveFromHierarchy();
                 }
             });
+    }
+    
+    private void FillSentenceContainer(VisualElement visualElement, Sentence sentence, bool isNextSentence)
+    {
+        ClearSentenceContainer(visualElement);
+        
         if (visualElement == currentSentenceContainer)
         {
             currentSentenceNoteToLabelMap.Clear();
@@ -372,7 +380,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void SetNextSentence(Sentence sentence)
     {
-        FillContainerWithSentenceText(nextSentenceContainer, sentence, true);
+        FillSentenceContainer(nextSentenceContainer, sentence, true);
         UpdateFontSize(nextSentenceContainer);
     }
 

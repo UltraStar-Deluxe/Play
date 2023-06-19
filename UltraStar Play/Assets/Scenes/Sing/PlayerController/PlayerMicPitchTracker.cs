@@ -41,6 +41,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private float roundingDistance;
 
     private int recordingSentenceIndex;
+    
+    private int beatToAnalyze;
     public int BeatToAnalyze { get; private set; }
 
     public Sentence RecordingSentence { get; private set; }
@@ -535,8 +537,14 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         RecordingSentence = playerControl.GetSentence(sentenceIndex);
         if (RecordingSentence == null)
         {
-            currentAndUpcomingNotesInRecordingSentence = new List<Note>();
-            BeatToAnalyze = 0;
+            // After last sentence or no sentences at all.
+            // Wait until the mic has finished recording the last note. 
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f,
+                () =>
+                {
+                    currentAndUpcomingNotesInRecordingSentence = new List<Note>();
+                    BeatToAnalyze = 0;
+                }));
             return;
         }
         currentAndUpcomingNotesInRecordingSentence = SongMetaUtils.GetSortedNotes(RecordingSentence);
@@ -611,6 +619,12 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     public void SkipToBeat(double currentBeat)
     {
+        if (currentBeat < beatToAnalyze)
+        {
+            // Cannot jump back in song
+            return;
+        }
+        
         // Find sentence to analyze next.
         RecordingSentence = playerControl.SortedSentences
             .FirstOrDefault(sentence => currentBeat <= sentence.MaxBeat);

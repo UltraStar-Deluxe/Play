@@ -60,6 +60,8 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     // The sorted sentences of the Voice
     public List<Sentence> SortedSentences { get; private set; } = new();
 
+    public int MaxBeatInVoice => SortedSentences.LastOrDefault()?.ExtendedMaxBeat ?? 0;
+    
     [Inject]
     private Injector injector;
 
@@ -276,6 +278,13 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
             .LastOrDefault();
     }
 
+    public void SkipToBeat(int beat)
+    {
+        PlayerScoreControl.SkipToBeat(beat);
+        PlayerMicPitchTracker.SkipToBeat(beat);
+        Debug.Log($"Skipped forward to beat {beat} for player {PlayerProfile.Name}");
+    }
+    
     public class EnterSentenceEvent
     {
         public Sentence Sentence { get; private set; }
