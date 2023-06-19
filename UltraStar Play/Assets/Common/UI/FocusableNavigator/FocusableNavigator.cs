@@ -52,11 +52,6 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     
     public virtual void OnInjectionFinished()
     {
-        if (!gameObject.activeInHierarchy)
-        {
-            return;
-        }
-
         if (!PlatformUtils.IsAndroid
             || (eventSystem != null
                 && settings.EnableEventSystemOnAndroid))
@@ -75,7 +70,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     protected virtual void Update()
     {
-        if (!gameObject.activeInHierarchy)
+        if (this == null
+            || !gameObject.activeInHierarchy)
         {
             return;
         }
@@ -146,6 +142,12 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnBack()
     {
+        if (this == null
+            || !gameObject.activeInHierarchy)
+        {
+            return;
+        }
+        
         if (PlatformUtils.IsAndroid
             && !settings.EnableEventSystemOnAndroid)
         {
@@ -174,6 +176,12 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnSubmit()
     {
+        if (this == null
+            || !gameObject.activeInHierarchy)
+        {
+            return;
+        }
+        
         if (PlatformUtils.IsAndroid
             && !settings.EnableEventSystemOnAndroid)
         {
@@ -199,6 +207,12 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnNavigate(Vector2 navigationDirection, InputAction inputAction, InputControl inputControl)
     {
+        if (this == null
+            || !gameObject.activeInHierarchy)
+        {
+            return;
+        }
+        
         if (PlatformUtils.IsAndroid
             && !settings.EnableEventSystemOnAndroid)
         {
