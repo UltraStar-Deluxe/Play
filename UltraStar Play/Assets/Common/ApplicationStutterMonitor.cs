@@ -54,11 +54,5 @@ public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInject
             int deltaTimeInMillis = (int)(Time.deltaTime * 1000);
             Log.Debug(() => $"Frame drop detected, deltaTime: {deltaTimeInMillis} ms");
         }
-
-        if (Application.isEditor
-            && Keyboard.current.f3Key.wasPressedThisFrame)
-        {
-            Thread.Sleep(120);
-        }
     }
 }

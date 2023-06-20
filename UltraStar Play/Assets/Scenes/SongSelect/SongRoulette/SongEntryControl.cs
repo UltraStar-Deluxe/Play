@@ -240,8 +240,11 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
             () => songSelectSceneControl.StartSongEditorScene());
         if (PlatformUtils.IsStandalone)
         {
-            contextMenuPopup.AddButton("Open Folder", "open_in_new",
-                () => SongMetaUtils.OpenDirectory(SongMeta));
+            if (DirectoryUtils.Exists(SongMeta.Directory))
+            {
+                contextMenuPopup.AddButton("Open Folder", "open_in_new",
+                    () => SongMetaUtils.OpenDirectory(SongMeta));
+            }
             contextMenuPopup.AddButton("Reload Song", "replay",
                 () => songMetaManager.ReloadSong(SongMeta));
         }

@@ -4,7 +4,11 @@ using System.Linq;
 
 public static class MoveNotesToOtherVoiceUtils
 {
-    public static MoveNotesToVoiceResult MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
+    public static MoveNotesToVoiceResult MoveNotesToVoice(
+        SongMeta songMeta,
+        List<Note> selectedNotes,
+        string voiceName,
+        bool preventMergingIntoSingleWord)
     {
         Voice targetVoice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceName);
         List<Sentence> changedSentences = new();
@@ -20,7 +24,10 @@ public static class MoveNotesToOtherVoiceUtils
         selectedNotes.ForEach(note =>
         {
             // Prevent notes from merging into a single word
-            SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
+            if (preventMergingIntoSingleWord)
+            {
+                SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
+            }
             
             Sentence oldSentence = note.Sentence;
 
@@ -70,8 +77,11 @@ public static class MoveNotesToOtherVoiceUtils
             }
             
             // Prevent notes from merging into a single word
-            SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(targetSentence.Notes.LastOrDefault());
-            
+            if (preventMergingIntoSingleWord)
+            {
+                SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(targetSentence.Notes.LastOrDefault());
+            }
+
             targetSentence.AddNote(note);
 
             // Set lyrics if none yet (otherwise, there is a warning because of missing lyrics)

@@ -972,8 +972,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        // Check that there is associated and persisted sing-along data. If not, ask to open song editor.
-        if (SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta))
+        // Check that there is associated sing-along data. If not, ask to open song editor.
+        if (SongMetaUtils.IsGeneratedAndNotYetSaved(songMeta)
+            && SongMetaUtils.GetAllNotes(songMeta).IsNullOrEmpty())
         {
             noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
             noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"

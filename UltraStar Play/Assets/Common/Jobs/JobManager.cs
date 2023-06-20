@@ -239,23 +239,34 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
 
     private void UpdateJobListPosition()
     {
+        float targetTop;
+        float targetRight;
         if (jobsWithoutParent.IsNullOrEmpty())
         {
             // Move outside of the screen
-            jobListElement.style.top = jobListElement.parent.contentRect.height;
-            jobListElement.style.right = -jobListElement.contentRect.width;
-            return;
+            targetTop = (int)Math.Floor(jobListElement.parent.contentRect.height);
+            targetRight = -(int)Math.Floor(jobListElement.contentRect.width);
         }
-
-        if (isJobListMinimized)
+        else if (isJobListMinimized)
         {
-            jobListElement.style.top = jobListElement.parent.contentRect.height - toggleJobListButton.contentRect.height;
-            jobListElement.style.right = -(jobListElement.contentRect.width - toggleJobListButton.contentRect.width);
+            // Move to bottom right corner, only the icon visible
+            targetTop = (int)Math.Floor(jobListElement.parent.contentRect.height - toggleJobListButton.contentRect.height);
+            targetRight = -(int)Math.Floor(jobListElement.contentRect.width - toggleJobListButton.contentRect.width);
         }
         else
         {
-            jobListElement.style.top = jobListElement.parent.contentRect.height - jobListElement.contentRect.height;
-            jobListElement.style.right = 0;
+            // Move to bottom right corner, all visible
+            targetTop = (int)Math.Floor(jobListElement.parent.contentRect.height - jobListElement.contentRect.height);
+            targetRight = 0;
+        }
+
+        if (Math.Abs(jobListElement.resolvedStyle.top - targetTop) > 2f)
+        {
+            jobListElement.style.top = targetTop;
+        }
+        if (Math.Abs(jobListElement.resolvedStyle.right - targetTop) > 2f)
+        {
+            jobListElement.style.right = targetRight;
         }
     }
     

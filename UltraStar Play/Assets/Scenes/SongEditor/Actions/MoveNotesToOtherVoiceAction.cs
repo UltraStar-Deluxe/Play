@@ -26,7 +26,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
             List<MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult> moveNotesToVoiceResults = noteGroups
                 .Select(noteGroup =>
                 {
-                    MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteGroup, voiceName);
+                    MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteGroup, voiceName, true);
                     return moveNotesToVoiceResult;
                 })
                 .ToList();
@@ -37,7 +37,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
                 moveNotesToVoiceResults.SelectMany(it => it.RemovedSentences).ToList());
         }
         
-        MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, selectedNotes, voiceName);
+        MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, selectedNotes, voiceName, true);
         return new MovedNotesToVoiceEvent(
             moveNotesToVoiceResult.Notes,
             moveNotesToVoiceResult.ChangedSentences,

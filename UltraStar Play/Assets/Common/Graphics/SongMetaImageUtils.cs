@@ -45,10 +45,8 @@ public static class SongMetaImageUtils
         string uri = GetCoverOrBackgroundImageUri(songMeta);
         if (uri.IsNullOrEmpty())
         {
-            foreach (VisualElement visualElement in visualElements)
-            {
-                visualElement.style.backgroundImage = new StyleBackground();
-            }
+            SetDefaultSongImage(visualElements);
+            SetDefaultSongImageColor(songMeta, visualElements);
             return;
         }
         

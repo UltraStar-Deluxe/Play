@@ -1701,6 +1701,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "assignToOwnSentence",
+                    "type": "Button",
+                    "id": "5c364de4-a0da-40db-8abd-407a1e61e3e8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "toggleNoteTypeNormal",
                     "type": "Button",
                     "id": "2b17f574-6759-4ab4-a758-3a7375e2d31e",
@@ -2557,6 +2566,17 @@
                     "action": "navigateBackward",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "82771815-d326-4d6e-b1cd-627f16f2bc59",
+                    "path": "<Keyboard>/j",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "assignToOwnSentence",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }
