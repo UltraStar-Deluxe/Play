@@ -76,6 +76,7 @@ public static class ApplicationUtils
 
     public static void OpenDirectory(string path)
     {
+        Debug.Log($"Open folder: {path}");
         Application.OpenURL("file://" + path);
     }
 
