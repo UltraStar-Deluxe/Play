@@ -249,17 +249,28 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private void GenerateSongMetasForAudioFiles(string generatedSongFolderAbsolutePath, List<string> audioFiles, List<SongMeta> existingSongMetas)
     {
-        if (!Settings.SearchAudioFilesWithoutSongMeta)
+        if (audioFiles.IsNullOrEmpty())
         {
             return;
         }
         
+        // Exclude audio files that are used in UltraStar txt files
         List<string> existingSongMetaAudioFiles = existingSongMetas
             .SelectMany(songMeta => GetAbsoluteAudioFilePaths(songMeta))
             .ToList();
 
+        // Exclude audio files that are stored next to an UltraStar txt file
+        HashSet<string> existingSongMetaFolders = existingSongMetas
+            .Select(songMeta => new DirectoryInfo(songMeta.Directory).FullName)
+            .ToHashSet();
+
         List<string> audioFilesWithoutSongMeta = audioFiles
-            .Where(audioFile => !ApplicationUtils.IsGeneratedAudioFile(audioFile))
+            .Where(audioFile =>
+            {
+                bool isGeneratedAudioFile = ApplicationUtils.IsGeneratedAudioFile(audioFile);
+                bool isNextToExistingSongMeta = existingSongMetaFolders.Contains(new FileInfo(audioFile).Directory.FullName);
+                return !isGeneratedAudioFile && !isNextToExistingSongMeta;
+            })
             .Select(audioFile => PathUtils.NormalizePath(Path.GetFullPath(audioFile)))
             .Except(existingSongMetaAudioFiles)
             .ToList();
@@ -268,6 +279,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         List<SongMeta> generatedSongMetas = audioFilesWithoutSongMeta
             .Select(audioFile => GenerateSongMetaForAudioFile(generatedSongFolderAbsolutePath, audioFile))
+            .Where(generatedSongMeta => generatedSongMeta != null)
             .ToList();
 
         generatedSongMetas.ForEach(songMeta => allSongMetas.Add(songMeta));
@@ -347,9 +359,15 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private List<string> GetAudioFileExtensionPatterns()
     {
-        return ApplicationUtils.supportedAudioFiles
-            .Select(fileExtension => $"*.{fileExtension}")
-            .ToList();
+        if (Settings.SearchAudioFilesWithoutSongMeta)
+        {
+            return ApplicationUtils.supportedAudioFiles
+                .Select(fileExtension => $"*.{fileExtension}")
+                .ToList();
+        }
+        
+        // Only search MIDI files with lyrics
+        return new List<string> { "*.mid", "*.kar" };
     }
 
     private void InitFolderIfNotDoneYet(string path)
