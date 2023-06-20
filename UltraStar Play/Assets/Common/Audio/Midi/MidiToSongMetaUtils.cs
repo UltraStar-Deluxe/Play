@@ -232,7 +232,10 @@ public static class MidiToSongMetaUtils
         foreach(MidiEvent midiEvent in lyricsEvents)
         {
             string midiEventLyrics = MidiFileUtils.GetLyrics(midiEvent);
-            if (midiEventLyrics.IsNullOrEmpty())
+            if (midiEventLyrics.IsNullOrEmpty()
+                || midiEventLyrics == " "
+                || midiEventLyrics == "\t"
+                || midiEventLyrics == "\n")
             {
                 continue;
             }
