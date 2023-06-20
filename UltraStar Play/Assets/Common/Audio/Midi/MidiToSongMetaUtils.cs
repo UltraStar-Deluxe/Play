@@ -176,11 +176,13 @@ public static class MidiToSongMetaUtils
         Note lastNote = null;
         foreach (Note note in loadedNotes)
         {
+            // Remove line break
             if (note.Text.Contains("\n"))
             {
                 note.SetText(note.Text.Replace("\n", ""));
             }
             
+            // Move space to end of word
             if (lastNote != null
                 && note.Text.StartsWith(" ")
                 && !lastNote.Text.EndsWith(" "))
@@ -399,7 +401,7 @@ public static class MidiToSongMetaUtils
         
         noteGroups.ForEach(notesGroup =>
         {
-            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, notesGroup, voiceName);
+            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, notesGroup, voiceName, false);
         });
     }
     
