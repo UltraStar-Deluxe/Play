@@ -10,7 +10,7 @@ using Vosk;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjectionFinishedListener
+public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -125,7 +125,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection, IInjec
 
     private readonly List<IDisposable> micSampleRecorderDisposables = new();
 
-    public void OnInjectionFinished()
+    public void Start()
     {
         InitMicSampleRecorder();
 
