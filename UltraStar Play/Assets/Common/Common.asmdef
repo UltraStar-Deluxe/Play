@@ -21,7 +21,8 @@
         "SpleeterSharp",
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
-        "LiteNetLib"
+        "LiteNetLib",
+        "com.whisper.unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

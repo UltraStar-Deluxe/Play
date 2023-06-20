@@ -234,7 +234,17 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         int offsetInBeats = (int)BpmUtils.MillisecondInSongToBeat(songMeta, offsetInMillis);
         
         Debug.Log($"Analyzing speech from second {(double)fromIndex / sampleRate} to second {(double)toIndex / sampleRate} (length: {(lengthInSamples) / sampleRate} seconds)");
-        speechRecognitionAction.CreateNotesFromSpeechRecognition(RecordingBuffer, fromIndex, toIndex, sampleRate, 2, true, speechRecognitionParameters, speechRecognizer, true, offsetInBeats);
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(
+            RecordingBuffer,
+            fromIndex,
+            toIndex,
+            sampleRate,
+            2,
+            true,
+            speechRecognitionParameters,
+            speechRecognitionManager.WhisperManager,
+            true,
+            offsetInBeats);
     }
 
     private void UpdateRecordingStartIndex()
@@ -435,7 +445,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
     private void InitSpeechRecognizer()
     {
         speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(ESongEditorSamplesSource.Recording);
-        speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+        // speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
     }
     
     private void OnDestroy()

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using UniInject;
 using UnityEngine;
 using Vosk;
+using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -13,12 +15,16 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
 {
     public static SpeechRecognitionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SpeechRecognitionManager>();
 
+    [field: Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    public WhisperManager WhisperManager { get; private set; }
+
     private readonly Dictionary<string, Model> pathToSpeechRecognitionModel = new();
     private VoskRecognizer lastVoskRecognizer;
 
     public bool HasLoadedSpeechRecognitionModel(string modelPath)
     {
-        return pathToSpeechRecognitionModel.ContainsKey(modelPath);
+        // return pathToSpeechRecognitionModel.ContainsKey(modelPath);
+        return WhisperManager.IsLoaded;
     }
 
     public VoskRecognizer CreateSpeechRecognizer(SpeechRecognitionParameters speechRecognitionParameters)
@@ -75,22 +81,45 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
             return true;
         }
 
+        if (WhisperManager.IsLoading)
+        {
+            errorMessage = "Speech recognition model is still loading.";
+            return false;
+        }
         if (modelPath.IsNullOrEmpty())
         {
             errorMessage = "Set the speech recognition model path first.";
             return false;
         }
-        if (!Directory.Exists(modelPath))
+        if (!FileUtils.Exists(modelPath))
         {
-            errorMessage = "Speech recognition model path is not a valid folder path.";
+            errorMessage = "Speech recognition model path is not a valid file path.";
             return false;
         }
 
         Debug.Log($"Loading speech recognition model from {modelPath}");
-        Model speechRecognitionModel = new(modelPath);
-        pathToSpeechRecognitionModel[modelPath] = speechRecognitionModel;
+        SetWhisperModelPath(WhisperManager, modelPath);
+        WhisperManager.language = "en";
+        WhisperManager.enableTokens = true;
+        WhisperManager.tokensTimestamps = true;
+        WhisperManager.translateToEnglish = false;
+        WhisperManager.singleSegment = false;
+        WhisperManager.InitModel();
+        // Model speechRecognitionModel = new(modelPath);
+        // pathToSpeechRecognitionModel[modelPath] = speechRecognitionModel;
         errorMessage = "";
         return true;
+    }
+
+    private void SetWhisperModelPath(WhisperManager whisperManager, string modelPath)
+    {
+        // Set the model field via reflection, because the property is private.
+        FieldInfo prop = whisperManager
+            .GetType()
+            .GetField("modelPath",
+                System.Reflection.BindingFlags.NonPublic
+                        | System.Reflection.BindingFlags.Instance);
+        prop.SetValue(whisperManager, modelPath);
     }
 
     public void Dispose()

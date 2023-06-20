@@ -102,7 +102,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                     speechRecognitionModelPath,
                     SpeechRecognitionUtils.GetSpeechRecognitionPhrases(settings.SongEditorSettings.SpeechRecognitionPhrases));
 
-                VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+                // VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
 
                 float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
@@ -113,7 +113,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         vocalsAudioClip.frequency,
                         speechRecognitionParameters,
                         speechRecognitionJob,
-                        speechRecognizer,
+                        speechRecognitionManager.WhisperManager,
                         false,
                         settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                         songMeta,

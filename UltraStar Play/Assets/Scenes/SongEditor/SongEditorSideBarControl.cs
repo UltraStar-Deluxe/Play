@@ -277,7 +277,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         }
         
         SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+        // VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
             NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
@@ -285,7 +285,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             2,
             true,
             speechRecognitionParameters,
-            speechRecognizer,
+            speechRecognitionManager.WhisperManager,
             false);
     }
 

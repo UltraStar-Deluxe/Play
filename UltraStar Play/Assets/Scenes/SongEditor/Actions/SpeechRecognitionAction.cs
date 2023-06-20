@@ -7,6 +7,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Vosk;
+using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -68,7 +69,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters(samplesSource);
 
-        VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+        // VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
 
         IObservable<object> loadSpeechRecognitionModelObservable =
             SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath,
@@ -80,6 +81,15 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             float[] monoAudioSamples =
                 AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
 
+            // SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
+            //         monoAudioSamples,
+            //         0,
+            //         monoAudioSamples.Length - 1,
+            //         audioClip.frequency,
+            //         cancellationTokenSource.Token,
+            //         onProgress,
+            //         speechRecognizer,
+            //         false)
             SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
                     monoAudioSamples,
                     0,
@@ -87,7 +97,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                     audioClip.frequency,
                     cancellationTokenSource.Token,
                     onProgress,
-                    speechRecognizer,
+                    speechRecognitionManager.WhisperManager,
                     false)
                 // Execute on Background thread
                 .SubscribeOn(Scheduler.ThreadPool)
@@ -98,10 +108,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                     Debug.LogError(ex);
                     speechRecognitionJob.SetResult(EJobResult.Error);
                 })
-                .Subscribe(voskResultJson =>
+                .Subscribe(speechRecognitionResult =>
                 {
                     speechRecognitionJob.SetResult(EJobResult.Ok);
-                    SpeechRecognitionUtils.MapSpeechRecognitionResultTextToNotes(songMeta, voskResultJson.result,
+                    SpeechRecognitionUtils.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words,
                         selectedNotes, minBeat);
                     if (notify)
                     {
@@ -119,7 +129,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int spaceBetweenNotesInBeats,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
-        VoskRecognizer speechRecognizer,
+        WhisperManager whisperManager,
         bool continuous,
         int offsetInBeats)
     {
@@ -137,7 +147,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 sampleRate,
                 speechRecognitionParameters,
                 null,
-                speechRecognizer,
+                whisperManager,
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
@@ -176,7 +186,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int spaceBetweenNotesInBeats,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
-        VoskRecognizer speechRecognizer,
+        WhisperManager whisperManager,
         bool continuous)
     {
         AudioClip audioClip = GetAudioClip(speechRecognitionSampleSource);
@@ -205,7 +215,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 audioClip.frequency,
                 speechRecognitionParameters,
                 JobManager.CreateAndAddJob("Speech Recognition"),
-                speechRecognizer,
+                whisperManager,
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
