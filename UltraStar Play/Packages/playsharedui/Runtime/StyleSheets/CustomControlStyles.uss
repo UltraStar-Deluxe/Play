@@ -595,6 +595,35 @@ AccordionItem.expanded #toggleAccordionItemContentIcon {
     margin-left: 20px;
 }
 
+#toggleJobListIcon {
+    font-size: 22px;
+}
+
+#jobList.minimized #toggleJobListIcon {
+    font-size: 8px;
+    transition: font-size 0.5s;
+}
+
+#jobList.minimized #toggleJobListIcon:hover {
+    font-size: 22px;
+}
+
+#toggleJobListButton {
+    width: 30px;
+    height: 30px;
+}
+
+#jobList.minimized #toggleJobListButton {
+    width: 15px;
+    height: 15px;
+    transition: width 0.5s, height 0.5s;
+}
+
+#jobList.minimized #toggleJobListButton:hover {
+    width: 30px;
+    height: 30px;
+}
+
 /**************************************************/
  */
 /* RADIAL PROGRESS BAR */
