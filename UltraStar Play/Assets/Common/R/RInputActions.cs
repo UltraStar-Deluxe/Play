@@ -4,6 +4,7 @@ public static partial class R
     public static class InputActions
     {
         public static readonly string songEditor_anyKeyboardKey = "songEditor/anyKeyboardKey";
+        public static readonly string songEditor_assignToOwnSentence = "songEditor/assignToOwnSentence";
         public static readonly string songEditor_copy = "songEditor/copy";
         public static readonly string songEditor_cut = "songEditor/cut";
         public static readonly string songEditor_delete = "songEditor/delete";

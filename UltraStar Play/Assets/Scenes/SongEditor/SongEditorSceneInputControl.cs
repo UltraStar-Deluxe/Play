@@ -63,6 +63,9 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private MoveNotesAction moveNotesAction;
+    
+    [Inject]
+    private MoveNoteToOwnSentenceAction moveNoteToOwnSentenceAction;
 
     [Inject]
     private ExtendNotesAction extendNotesAction;
@@ -154,6 +157,11 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(_ => songEditorSceneControl.StartEditingSelectedNoteText());
         
+        // Assign to own sentence
+        InputManager.GetInputAction(R.InputActions.songEditor_assignToOwnSentence).PerformedAsObservable()
+            .Where(_ => !AnyInputFieldHasFocus())
+            .Subscribe(_ => AssignSelectedNotesToOwnSentence());
+        
         // AI tools
         InputManager.GetInputAction(R.InputActions.songEditor_pitchDetection).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
@@ -231,6 +239,12 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_zoomOutVertical).PerformedAsObservable()
             .Where(_ => !AnyInputFieldHasFocus())
             .Subscribe(context => noteAreaControl.ZoomVertical(-1));
+    }
+
+    private void AssignSelectedNotesToOwnSentence()
+    {
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes);
     }
 
     private void SetTextOfSelectedNotesToAnalyzedSpeech()
