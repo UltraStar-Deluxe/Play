@@ -19,6 +19,7 @@ public class SongEditorSettings
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
     public string ButtonRecordingLyrics { get; set; } = "";
     public bool SpeechRecognitionWhenRecording { get; set; } = true;
+    public string SpeechRecognitionLanguage { get; set; } = "english";
 
     public bool AdjustFollowingNotes { get; set; }
 

@@ -437,9 +437,7 @@ public static class SpeechRecognitionUtils
                 noteEndInBeats = noteStartInBeats + 1;
             }
             int noteLengthInBeats = noteEndInBeats - noteStartInBeats;
-            string text = resultEntry.Text.EndsWith(" ")
-                ? resultEntry.Text
-                : resultEntry.Text + " ";
+            string text = resultEntry.Text;
             Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
             return createdNote;
         }).ToList();

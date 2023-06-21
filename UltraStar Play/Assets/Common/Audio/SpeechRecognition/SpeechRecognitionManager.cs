@@ -15,8 +15,11 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
 {
     public static SpeechRecognitionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SpeechRecognitionManager>();
 
-    [field: Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public WhisperManager WhisperManager { get; private set; }
+
+    [Inject]
+    private Settings settings;
 
     private readonly Dictionary<string, Model> pathToSpeechRecognitionModel = new();
     private VoskRecognizer lastVoskRecognizer;
@@ -97,9 +100,11 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
             return false;
         }
 
-        Debug.Log($"Loading speech recognition model from {modelPath}");
+        string language = settings.SongEditorSettings.SpeechRecognitionLanguage;
+        
+        Debug.Log($"Loading speech recognition model from {modelPath} with language {language}");
         SetWhisperModelPath(WhisperManager, modelPath);
-        WhisperManager.language = "en";
+        WhisperManager.language = language;
         WhisperManager.enableTokens = true;
         WhisperManager.tokensTimestamps = true;
         WhisperManager.translateToEnglish = false;

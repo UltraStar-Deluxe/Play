@@ -29,6 +29,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     
     [Inject(UxmlName = R.UxmlNames.selectModelPathButton)]
     private Button selectModelPathButton;
+    
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionLanguageCodeTextField)]
+    private TextField speechRecognitionLanguageCodeTextField;
 
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
@@ -306,6 +309,11 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         importMidiFileButton.RegisterCallbackButtonTriggered(_ => importMidiFileDialogControl.OpenDialog());
 
         // Speech recognition
+        speechRecognitionLanguageCodeTextField.DisableParseEscapeSequences();
+        Bind(speechRecognitionLanguageCodeTextField,
+            () => settings.SongEditorSettings.SpeechRecognitionLanguage,
+            newValue => settings.SongEditorSettings.SpeechRecognitionLanguage = newValue);
+        
         sentenceLineSizeTextField.DisableParseEscapeSequences();
         Bind(speechRecognitionModelPathTextField,
             () => settings.SongEditorSettings.SpeechRecognitionModelPath,
