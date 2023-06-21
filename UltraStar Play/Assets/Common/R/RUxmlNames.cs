@@ -746,6 +746,7 @@ public static partial class R
         public const string spacer = "spacer";
         public const string speechRecognitionAudioPicker = "speechRecognitionAudioPicker";
         public const string speechRecognitionGroup = "speechRecognitionGroup";
+        public const string speechRecognitionLanguageCodeTextField = "speechRecognitionLanguageCodeTextField";
         public const string speechRecognitionModelPathTextField = "speechRecognitionModelPathTextField";
         public const string speechRecognitionPhrasesTextField = "speechRecognitionPhrasesTextField";
         public const string speechRecognitionWhenRecordingToggle = "speechRecognitionWhenRecordingToggle";
