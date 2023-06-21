@@ -39,7 +39,7 @@ public static class AudioUtils
 
         while (!webRequest.isDone)
         {
-            Debug.Log("Waiting for AudioClip to load via Thread.Sleep");
+            Debug.LogWarning("Waiting for AudioClip to load via Thread.Sleep");
             Thread.Sleep(10);
         }
 
