@@ -980,11 +980,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
                                                    + "Do you want to open the song editor?";
             noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
-            Button openSongEditorButton =
-                noSingAlongDataDialogControl.AddButton("Open Song Editor", _ => StartSongEditorScene(songMeta));
-            noSingAlongDataDialogControl.AddButton("Start Song", _ => StartSingScene(songMeta));
+            Button defaultButton = noSingAlongDataDialogControl.AddButton("Create sing-along data", _ => createSingAlongSongControl.CreateSingAlongSong(songMeta));
+            noSingAlongDataDialogControl.AddButton("Open song editor", _ => StartSongEditorScene(songMeta));
+            // noSingAlongDataDialogControl.AddButton("Start song", _ => StartSingScene(songMeta));
             noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
-            openSongEditorButton.Focus();
+            defaultButton.Focus();
             return;
         }
 

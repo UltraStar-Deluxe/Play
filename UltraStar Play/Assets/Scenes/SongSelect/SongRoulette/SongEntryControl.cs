@@ -56,6 +56,9 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
     private SongMetaManager songMetaManager;
 
     [Inject]
+    private UiManager uiManager;
+
+    [Inject]
     private Injector injector;
 
     [Inject]
@@ -249,14 +252,25 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                 () => songMetaManager.ReloadSong(SongMeta));
         }
 
-        // contextMenuPopup.AddButton("Recreate Song", "replay_circle_filled",
-        //     () =>
-        //     {
-        //         if (SongMeta != null)
-        //         {
-        //             createSingAlongSongControl.CreateSingAlongSong(SongMeta);
-        //         }
-        //     });
+        contextMenuPopup.AddButton("Recreate Song", "replay_circle_filled",
+        () =>
+        {
+            uiManager.CreateConfirmationDialogControl(
+                $"Recreate '{SongMeta.Title}'",
+                "Do you want to recreate the song?\n\n"
+                    + "This will overwrite the current song files after executing\n"
+                    + "• vocals isolation,\n"
+                    + "• speech recognition,\n"
+                    + "• pitch detection.\n",
+                "Recreate Song",
+                _ =>
+                {
+                    if (SongMeta != null)
+                    {
+                        createSingAlongSongControl.CreateSingAlongSong(SongMeta);
+                    }
+                });
+        });
         
         contextMenuPopup.AddButton("Info", "lyrics",
             () =>

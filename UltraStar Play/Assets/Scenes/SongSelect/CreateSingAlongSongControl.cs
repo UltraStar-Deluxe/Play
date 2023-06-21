@@ -78,7 +78,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
         SpeechRecognitionParameters speechRecognitionParameters = new(
             settings.SongEditorSettings.SpeechRecognitionModelPath,
-            settings.SongEditorSettings.SpeechRecognitionLanguage);
+            "auto");
         
         // Load speech recognition model in parallel while doing audio separation.
         IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizer(speechRecognitionParameters, null);
