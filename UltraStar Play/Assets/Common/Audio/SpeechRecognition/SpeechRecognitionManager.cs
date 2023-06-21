@@ -5,6 +5,7 @@ using System.Threading;
 using UniInject;
 using UnityEngine;
 using Whisper;
+using Object = UnityEngine.Object;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -13,6 +14,9 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 {
     public static SpeechRecognitionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SpeechRecognitionManager>();
 
+    [InjectedInInspector]
+    public WhisperManager whisperManagerPrefab;
+    
     [Inject]
     private Settings settings;
 
@@ -85,28 +89,16 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
     {
         Debug.Log($"Creating WhisperManager with model '{modelPath}' and language '{language}'");
 
-        GameObject whisperManagerGameObject = new GameObject($"WhisperManager language: {language}, modelPath: {modelPath}");
-        whisperManagerGameObject.transform.parent = transform;
-        
-        WhisperManager whisperManager = whisperManagerGameObject.AddComponent<WhisperManager>();
+        WhisperManager whisperManager = Instantiate<WhisperManager>(whisperManagerPrefab, transform);
+        whisperManager.name = $"WhisperManager language: {language}, modelPath: {modelPath}";
         whisperManager.language = language;
         whisperManager.enableTokens = true;
         whisperManager.tokensTimestamps = true;
         whisperManager.translateToEnglish = false;
         whisperManager.singleSegment = false;
-        SetWhisperModelPath(whisperManager, modelPath);
+        whisperManager.IsModelPathInStreamingAssets = false;
+        whisperManager.ModelPath = modelPath;
         return whisperManager;
-    }
-
-    private void SetWhisperModelPath(WhisperManager whisperManager, string modelPath)
-    {
-        // Set the model field via reflection, because the property is private.
-        FieldInfo prop = whisperManager
-            .GetType()
-            .GetField("modelPath",
-                System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance);
-        prop.SetValue(whisperManager, modelPath);
     }
 
     private void OnApplicationQuit()
