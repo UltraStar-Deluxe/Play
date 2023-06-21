@@ -5,7 +5,6 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -78,10 +77,6 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
 
     private bool areLastNonAnalyzedSamplesAboveThreshold;
     private int analyzeStartIndex;
-
-    private bool speechRecognizerDirty;
-    private SpeechRecognitionParameters speechRecognitionParameters;
-    private VoskRecognizer speechRecognizer;
 
     private MicProfile micProfile;
     public MicProfile MicProfile
@@ -214,12 +209,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         {
             return;
         }
-
-        if (speechRecognizerDirty)
-        {
-            speechRecognizerDirty = false;
-            InitSpeechRecognizer();
-        }
+        
 
         int sampleRate = FinalSampleRate.Value;
         
@@ -239,8 +229,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
             sampleRate,
             2,
             true,
-            speechRecognitionParameters,
-            speechRecognitionManager.WhisperManager,
+            speechRecognitionAction.CreateSpeechRecognizerParameters(),
             true,
             -(int)gapShiftInBeats);
     }
@@ -435,17 +424,10 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         }
         else if (shouldBeRecoding && !MicSampleRecorder.IsRecording.Value)
         {
-            speechRecognizerDirty = true;
             MicSampleRecorder.StartRecording();
         }
     }
 
-    private void InitSpeechRecognizer()
-    {
-        speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(ESongEditorSamplesSource.Recording);
-        // speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
-    }
-    
     private void OnDestroy()
     {
         DisposeMicSampleRecorderDisposables();

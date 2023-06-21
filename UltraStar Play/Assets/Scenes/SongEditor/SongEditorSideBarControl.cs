@@ -5,7 +5,6 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Vosk;
 
 public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListener
 {
@@ -276,8 +275,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
         
-        SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        // VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+        SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters();
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
             NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
@@ -285,7 +283,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             2,
             true,
             speechRecognitionParameters,
-            speechRecognitionManager.WhisperManager,
             false);
     }
 

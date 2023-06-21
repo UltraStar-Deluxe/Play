@@ -6,7 +6,6 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Vosk;
 using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -40,6 +39,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionLanguageCodeTextField)]
+    private TextField speechRecognitionLanguageCodeTextField;
+    
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, ESongEditorSamplesSource samplesSource, bool notify)
     {
         if (selectedNotes.IsNullOrEmpty())
@@ -67,29 +69,18 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         Action<double> onProgress = progressInPercent =>
             speechRecognitionJob.EstimatedCurrentProgressInPercent = progressInPercent;
 
-        SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters(samplesSource);
-
-        // VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
-
-        IObservable<object> loadSpeechRecognitionModelObservable =
-            SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath,
-                speechRecognitionJob);
-        loadSpeechRecognitionModelObservable.Subscribe(_ =>
+        SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters();
+        
+        IObservable<SpeechRecognizer> loadSpeechRecognizerAsObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizer(
+            speechRecognitionParameters,
+            speechRecognitionJob);
+        loadSpeechRecognizerAsObservable.Subscribe(speechRecognizer =>
         {
             speechRecognitionJob.SetStatus(EJobStatus.Running);
 
             float[] monoAudioSamples =
                 AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
 
-            // SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
-            //         monoAudioSamples,
-            //         0,
-            //         monoAudioSamples.Length - 1,
-            //         audioClip.frequency,
-            //         cancellationTokenSource.Token,
-            //         onProgress,
-            //         speechRecognizer,
-            //         false)
             SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
                     monoAudioSamples,
                     0,
@@ -97,7 +88,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                     audioClip.frequency,
                     cancellationTokenSource.Token,
                     onProgress,
-                    speechRecognitionManager.WhisperManager,
+                    speechRecognizer,
                     false)
                 // Execute on Background thread
                 .SubscribeOn(Scheduler.ThreadPool)
@@ -129,7 +120,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int spaceBetweenNotesInBeats,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
-        WhisperManager whisperManager,
         bool continuous,
         int offsetInBeats)
     {
@@ -147,7 +137,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 sampleRate,
                 speechRecognitionParameters,
                 null,
-                whisperManager,
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
@@ -186,7 +175,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int spaceBetweenNotesInBeats,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
-        WhisperManager whisperManager,
         bool continuous)
     {
         AudioClip audioClip = GetAudioClip(speechRecognitionSampleSource);
@@ -215,7 +203,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 audioClip.frequency,
                 speechRecognitionParameters,
                 JobManager.CreateAndAddJob("Speech Recognition"),
-                whisperManager,
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
@@ -247,17 +234,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         return createNotesObservable;
     }
     
-    public SpeechRecognitionParameters CreateSpeechRecognizerParameters(ESongEditorSamplesSource samplesSource)
+    public SpeechRecognitionParameters CreateSpeechRecognizerParameters()
     {
-        AudioClip audioClip = GetAudioClip(samplesSource);
         return new SpeechRecognitionParameters(
-            audioClip.frequency,
-            GetSpeechRecognitionModelPath(),
-            SpeechRecognitionUtils.GetSpeechRecognitionPhrases(settings.SongEditorSettings.SpeechRecognitionPhrases));
-    }
-
-    private string GetSpeechRecognitionModelPath()
-    {
-        return speechRecognitionModelPathTextField.text;
+            settings.SongEditorSettings.SpeechRecognitionModelPath,
+            settings.SongEditorSettings.SpeechRecognitionLanguage);
     }
 }

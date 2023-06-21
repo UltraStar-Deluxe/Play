@@ -13,7 +13,6 @@
         "Unity.InputSystem",
         "playshared",
         "playsharedui",
-        "Vosk",
         "SpleeterSharp",
         "UnityStandaloneFileBrowser",
         "LiteNetLib",

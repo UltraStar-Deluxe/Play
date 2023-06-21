@@ -4,7 +4,7 @@ using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using Vosk;
+using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -76,13 +76,16 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 audioSeparationJob.SetResult(EJobResult.Ok);
             });
 
+        SpeechRecognitionParameters speechRecognitionParameters = new(
+            settings.SongEditorSettings.SpeechRecognitionModelPath,
+            settings.SongEditorSettings.SpeechRecognitionLanguage);
+        
         // Load speech recognition model in parallel while doing audio separation.
-        string speechRecognitionModelPath = settings.SongEditorSettings.SpeechRecognitionModelPath;
-        IObservable<object> loadSpeechRecognitionModelObservable = SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognitionModelPath, null);
+        IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizer(speechRecognitionParameters, null);
 
         // Continue when audio separation and loading speech recognition model have finished
         Observable.WhenAll<object>(
-                loadSpeechRecognitionModelObservable,
+                loadSpeechRecognizerObservable,
                 audioSeparationObservable)
             .CatchIgnore((Exception ex) =>
             {
@@ -96,14 +99,15 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 // Load vocals audio
                 AudioClip vocalsAudioClip = audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
                 int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * BpmUtils.GetBeatsPerSecond(songMeta));
-
-                SpeechRecognitionParameters speechRecognitionParameters = new(
-                    vocalsAudioClip.frequency,
-                    speechRecognitionModelPath,
-                    SpeechRecognitionUtils.GetSpeechRecognitionPhrases(settings.SongEditorSettings.SpeechRecognitionPhrases));
-
-                // VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
-
+                
+                if (!speechRecognitionManager.TryGetOrCreateSpeechRecognizer(
+                        speechRecognitionParameters,
+                        out string errorMessage,
+                        out SpeechRecognizer speechRecognizer))
+                {
+                    throw new Exception(errorMessage);
+                }
+                    
                 float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
                 SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
@@ -113,7 +117,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         vocalsAudioClip.frequency,
                         speechRecognitionParameters,
                         speechRecognitionJob,
-                        speechRecognitionManager.WhisperManager,
                         false,
                         settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                         songMeta,
