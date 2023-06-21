@@ -2,6 +2,13 @@
 
 public static class StringUtils
 {
+    private static readonly Regex whitespaceRegex = new(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    public static bool IsOnlyWhitespace(string newText)
+    {
+        return string.IsNullOrEmpty(newText) || whitespaceRegex.IsMatch(newText);
+    }
+    
     public static string ToTitleCase(string input)
     {
         if (input.Contains("_") || input.Contains("-"))

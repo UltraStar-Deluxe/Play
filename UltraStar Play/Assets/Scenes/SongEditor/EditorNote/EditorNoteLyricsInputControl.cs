@@ -71,7 +71,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     {
         string viewModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
 
-        if (LyricsUtils.IsOnlyWhitespace(viewModeText))
+        if (StringUtils.IsOnlyWhitespace(viewModeText))
         {
             notesAfterSplit = new List<Note> { note };
             return false;
@@ -95,7 +95,7 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     {
         List<Note> notesAfterSplit = new List<Note> { note };
         if (note.Length <= 1
-            || LyricsUtils.IsOnlyWhitespace(newText))
+            || StringUtils.IsOnlyWhitespace(newText))
         {
             return notesAfterSplit;
         }

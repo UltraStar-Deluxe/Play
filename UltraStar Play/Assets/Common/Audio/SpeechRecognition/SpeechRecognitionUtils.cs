@@ -96,7 +96,9 @@ public static class SpeechRecognitionUtils
                     .Subscribe(speechRecognitionResult =>
                     {
                         speechRecognitionJob?.SetResult(EJobResult.Ok);
-                        List<Note> createdNotes = CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote);
+                        List<Note> createdNotes = speechRecognitionResult != null && !speechRecognitionResult.Words.IsNullOrEmpty()
+                            ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote)
+                            : new List<Note>();
 
                         createNotesFromSpeechRecognitionSubject.OnNext(createdNotes);
                         createNotesFromSpeechRecognitionSubject.OnCompleted();
@@ -271,8 +273,19 @@ public static class SpeechRecognitionUtils
     {
         if (speechRecognitionProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing speech recognition");
             return Observable.Throw<SpeechRecognitionResult>(new IllegalStateException("Already performing speech recognition"));
+        }
+
+        if (startIndex < 0)
+        {
+            Debug.LogWarning("Received startIndex < 0. Setting startIndex to 0.");
+            startIndex = 0;
+        }
+        
+        int lengthInSamples = endIndex - startIndex;
+        if (lengthInSamples <= 0)
+        {
+            return Observable.Throw<SpeechRecognitionResult>(new IllegalStateException("No samples for speech recognition"));
         }
         
         // Do speech recognition in an observable. The observable's code may be executed on a background thread.
@@ -284,21 +297,34 @@ public static class SpeechRecognitionUtils
                 {
                     speechRecognitionProcessCount++;
 
-                    WhisperResult whisperResult = whisperManager.GetTextAsync(monoSamples, sampleRate, 1)
+                    float[] audioSamplesForSpeechRecognition = new float[lengthInSamples];
+                    Array.Copy(monoSamples, startIndex, audioSamplesForSpeechRecognition, 0, lengthInSamples);
+                    WhisperResult whisperResult = whisperManager.GetTextAsync(audioSamplesForSpeechRecognition, sampleRate, 1)
                         .Result;
 
                     cancellationToken.ThrowIfCancellationRequested();
                     
                     SpeechRecognitionResult speechRecognitionResult;
                     if (whisperResult != null
-                        && !whisperResult.Segments.IsNullOrEmpty())
+                        && !whisperResult.Segments.IsNullOrEmpty()
+                        && !whisperResult.Result.StartsWith("[BLANK_AUDIO]", StringComparison.InvariantCultureIgnoreCase)
+                        && !whisperResult.Result.StartsWith("[Music]", StringComparison.InvariantCultureIgnoreCase))
                     {
+                        TimeSpan offsetToStartIndex = TimeSpan.FromSeconds((double)startIndex / sampleRate);
                         string textResult = whisperResult.Result;
                         List<SpeechRecognitionWordResult> wordResults = whisperResult.Segments
                             .SelectMany(whisperSegment => whisperSegment.Tokens)
-                            .Where(token => !token.IsSpecial && !token.Text.StartsWith("[") && !token.Text.EndsWith("]"))
-                            .Select(token => new SpeechRecognitionWordResult(token.Text, token.Timestamp.Start, token.Timestamp.End))
+                            .Where(token => !token.IsSpecial && !token.Text.TrimStart().StartsWith("[") && !token.Text.TrimEnd().EndsWith("]"))
+                            .Select(token => new SpeechRecognitionWordResult(
+                                token.Text,
+                                token.Timestamp.Start + offsetToStartIndex,
+                                token.Timestamp.End + offsetToStartIndex))
                             .ToList();
+                        SpeechRecognitionWordResult.NormalizeText(wordResults);
+                        wordResults = wordResults
+                            .Where(wordResult => !StringUtils.IsOnlyWhitespace(wordResult.Text))
+                            .ToList();
+                        Debug.Log($"Speech recognition result words: {wordResults.Select(it => $"'{it.Text}'").JoinWith("|")}");
                         speechRecognitionResult = new(textResult, wordResults);
                     }
                     else
@@ -406,8 +432,14 @@ public static class SpeechRecognitionUtils
         {
             int noteStartInBeats = offsetInBeats + (int)(resultEntry.Start.TotalSeconds * beatsPerSeconds);
             int noteEndInBeats = offsetInBeats + (int)(resultEntry.End.TotalSeconds * beatsPerSeconds);
+            if (noteEndInBeats <= noteStartInBeats)
+            {
+                noteEndInBeats = noteStartInBeats + 1;
+            }
             int noteLengthInBeats = noteEndInBeats - noteStartInBeats;
-            string text = resultEntry.Text + " ";
+            string text = resultEntry.Text.EndsWith(" ")
+                ? resultEntry.Text
+                : resultEntry.Text + " ";
             Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
             return createdNote;
         }).ToList();

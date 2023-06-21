@@ -163,14 +163,14 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
                 }
             });
         
-        RecordedSamplesChangedEventStream.Buffer(new TimeSpan(0, 0, 0, 0, 1000))
-            .Subscribe(events =>
-            {
-                if (events.Count > 0)
-                {
-                    DoSpeechRecognitionForNewlyRecordedSamples();
-                }
-            });
+        // RecordedSamplesChangedEventStream.Buffer(new TimeSpan(0, 0, 0, 0, 1000))
+        //     .Subscribe(events =>
+        //     {
+        //         if (events.Count > 0)
+        //         {
+        //             DoSpeechRecognitionForNewlyRecordedSamples();
+        //         }
+        //     });
 
         // Load recorded samples from cache
         if (songMetaToRecordedAudioSamples.ContainsKey(songMeta))
@@ -229,11 +229,9 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         int lengthInSamples = toIndex - fromIndex;
         analyzeStartIndex = recordingIndex;
 
-        int recordingStartIndexConsideringMicDelay = recordingStartIndex - micDelayInSamples;
-        double offsetInMillis = ((double)recordingStartIndexConsideringMicDelay / sampleRate) * 1000.0;
-        int offsetInBeats = (int)BpmUtils.MillisecondInSongToBeat(songMeta, offsetInMillis);
-        
-        Debug.Log($"Analyzing speech from second {(double)fromIndex / sampleRate} to second {(double)toIndex / sampleRate} (length: {(lengthInSamples) / sampleRate} seconds)");
+        double gapShiftInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, songMeta.Gap);
+
+        Debug.Log($"Analyzing speech of newly recorded samples from second {(double)fromIndex / sampleRate} to second {(double)toIndex / sampleRate} (length: {(lengthInSamples) / sampleRate} seconds)");
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             RecordingBuffer,
             fromIndex,
@@ -244,7 +242,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
             speechRecognitionParameters,
             speechRecognitionManager.WhisperManager,
             true,
-            offsetInBeats);
+            -(int)gapShiftInBeats);
     }
 
     private void UpdateRecordingStartIndex()

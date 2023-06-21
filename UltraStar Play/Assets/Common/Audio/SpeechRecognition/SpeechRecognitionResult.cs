@@ -2,8 +2,8 @@
 
 public class SpeechRecognitionResult
 {
-    public string Text { get; private set; } 
-    public List<SpeechRecognitionWordResult> Words { get; private set; }
+    public string Text { get; set; } 
+    public List<SpeechRecognitionWordResult> Words { get; set; }
     
     public SpeechRecognitionResult(string text, List<SpeechRecognitionWordResult> words)
     {
