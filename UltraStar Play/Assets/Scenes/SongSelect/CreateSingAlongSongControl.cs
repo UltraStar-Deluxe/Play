@@ -28,6 +28,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private PitchDetectionManager pitchDetectionManager;
 
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
@@ -144,25 +147,43 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
                         // (5) Run pitch detection on vocals audio
                         pitchDetectionJob.SetStatus(EJobStatus.Running);
-                        PitchDetectionUtils.MoveNotesToDetectedPitch(
+                        PitchDetectionUtils.CreateNotesUsingBasicPitch(
+                                pitchDetectionManager,
                                 songMeta,
-                                createdNotes,
-                                vocalsAudioClip,
-                                settings.PitchDetectionAlgorithm,
                                 pitchDetectionJob)
                             .CatchIgnore((Exception ex) =>
                             {
                                 pitchDetectionJob.SetResult(EJobResult.Error);
                             })
-                            .Subscribe(_ =>
+                            .Subscribe(loadedPitchDetectionNotes =>
                             {
-                                pitchDetectionJob.SetResult(EJobResult.Ok);
+                                try
+                                {
+                                    PitchDetectionUtils.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+                                        songMeta,
+                                        createdNotes,
+                                        loadedPitchDetectionNotes);
+                                    pitchDetectionJob.SetResult(EJobResult.Ok);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.LogException(ex);
+                                    Debug.LogError("Failed to move notes to detected pitch");
+                                }
 
-                                // (6) Save and reload song
-                                songMetaManager.SaveSong(songMeta, true);
-                                songMetaManager.ReloadSong(songMeta);
+                                try
+                                {
+                                    // (6) Save and reload song
+                                    songMetaManager.SaveSong(songMeta, true);
+                                    songMetaManager.ReloadSong(songMeta);
 
-                                createdSingAlongVersionEventStream.OnNext(songMeta);
+                                    createdSingAlongVersionEventStream.OnNext(songMeta);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.LogException(ex);
+                                    Debug.LogError("Failed to save song with sing-along data");
+                                }
                             });
                     });
             });

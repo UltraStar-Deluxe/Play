@@ -165,7 +165,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         });
         UpdateRecordingButton();
         
-        doPitchDetectionInSelectionButton.RegisterCallbackButtonTriggered(_ => DoDetectPitchInSelection());
         pitchDetectionUsingBasicPitchButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingBasicPitch());
         doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
         
@@ -284,21 +283,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             true,
             speechRecognitionParameters,
             false);
-    }
-
-    private void DoDetectPitchInSelection()
-    {
-        if (NoteAreaSelectionDragListener.lastSelectionRect.Value == null
-            || NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats <= 0)
-        {
-            return;
-        }
-        
-        pitchDetectionAction.CreateNotesForDetectedPitch(
-            NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
-            NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
-            settings.SongEditorSettings.PitchDetectionSamplesSource,
-            true);
     }
 
     private void UpdateRecordingButton()
