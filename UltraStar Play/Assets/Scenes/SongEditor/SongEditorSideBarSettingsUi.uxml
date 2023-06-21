@@ -25,6 +25,7 @@
             <ui:EnumField label="Language (default: English)" type="EWhisperLanguage, Common" value="English" name="speechRecognitionLanguageChooser" style="flex-direction: column;" />
             <ui:TextField text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" label="Model Path" class="smallControl" style="flex-direction: column;" />
             <ui:Button text="Change Model Path" display-tooltip-when-elided="true" name="selectModelPathButton" />
+            <ui:TextField name="speechRecognitionPromptTextField" is-delayed="true" multiline="true" label="Prompt with guidelines" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;" />
             <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" label="Words to recognize" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column; display: none;" />
             <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio to Analyze" class="controlWithLabelVertical" />
             <ui:Button text="Analyze Speech&#10;in Selection" display-tooltip-when-elided="true" name="doSpeechRecognitionButton" style="width: 100%; height: auto;" />

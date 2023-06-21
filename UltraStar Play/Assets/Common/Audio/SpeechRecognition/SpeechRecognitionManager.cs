@@ -79,26 +79,28 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
     {
         WhisperManager whisperManager = CreateWhisperManager(
             parameters.ModelPath,
-            parameters.SpeechRecognitionLanguage);
+            parameters.SpeechRecognitionLanguage,
+            parameters.Prompt);
         SpeechRecognizer speechRecognizer = new(parameters, whisperManager);
         parametersToSpeechRecognizer[parameters] = speechRecognizer;
         return speechRecognizer;
     }
 
-    private WhisperManager CreateWhisperManager(string modelPath, string language)
+    private WhisperManager CreateWhisperManager(string modelPath, string language, string prompt)
     {
         language = language.ToLowerInvariant();
-        Debug.Log($"Creating WhisperManager with model '{modelPath}' and language '{language}'");
+        Debug.Log($"Creating WhisperManager with model '{modelPath}', modelPath: {modelPath}, prompt: {prompt}");
 
         WhisperManager whisperManager = Instantiate<WhisperManager>(whisperManagerPrefab, transform);
-        whisperManager.name = $"WhisperManager language: {language}, modelPath: {modelPath}";
+        whisperManager.name = $"WhisperManager language: {language}, modelPath: {modelPath}, prompt: {prompt}";
+        whisperManager.IsModelPathInStreamingAssets = false;
+        whisperManager.ModelPath = modelPath;
         whisperManager.language = language;
+        whisperManager.initialPrompt = prompt;
         whisperManager.enableTokens = true;
         whisperManager.tokensTimestamps = true;
         whisperManager.translateToEnglish = false;
         whisperManager.singleSegment = false;
-        whisperManager.IsModelPathInStreamingAssets = false;
-        whisperManager.ModelPath = modelPath;
         return whisperManager;
     }
 

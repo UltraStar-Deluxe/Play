@@ -235,6 +235,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     {
         return new SpeechRecognitionParameters(
             settings.SongEditorSettings.SpeechRecognitionModelPath,
-            settings.SongEditorSettings.SpeechRecognitionLanguage);
+            settings.SongEditorSettings.SpeechRecognitionLanguage,
+            settings.SongEditorSettings.SpeechRecognitionPrompt);
     }
 }

@@ -33,6 +33,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.speechRecognitionLanguageChooser)]
     private EnumField speechRecognitionLanguageChooser;
 
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionPromptTextField)]
+    private TextField speechRecognitionPromptTextField;
+    
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
 
@@ -319,6 +322,10 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 return EWhisperLanguage.English;
             },
             newValue => settings.SongEditorSettings.SpeechRecognitionLanguage = newValue.ToString());
+        
+        Bind(speechRecognitionPromptTextField,
+            () => settings.SongEditorSettings.SpeechRecognitionPrompt,
+            newValue => settings.SongEditorSettings.SpeechRecognitionPrompt = newValue);
         
         sentenceLineSizeTextField.DisableParseEscapeSequences();
         Bind(speechRecognitionModelPathTextField,

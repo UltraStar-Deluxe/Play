@@ -749,6 +749,7 @@ public static partial class R
         public const string speechRecognitionLanguageChooser = "speechRecognitionLanguageChooser";
         public const string speechRecognitionModelPathTextField = "speechRecognitionModelPathTextField";
         public const string speechRecognitionPhrasesTextField = "speechRecognitionPhrasesTextField";
+        public const string speechRecognitionPromptTextField = "speechRecognitionPromptTextField";
         public const string speechRecognitionWhenRecordingToggle = "speechRecognitionWhenRecordingToggle";
         public const string starIcons = "starIcons";
         public const string stars = "stars";
