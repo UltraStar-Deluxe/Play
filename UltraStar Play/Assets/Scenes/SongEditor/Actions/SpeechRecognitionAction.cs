@@ -39,9 +39,6 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
-    [Inject(UxmlName = R.UxmlNames.speechRecognitionLanguageCodeTextField)]
-    private TextField speechRecognitionLanguageCodeTextField;
-    
     public void SetTextToAnalyzedSpeech(List<Note> selectedNotes, ESongEditorSamplesSource samplesSource, bool notify)
     {
         if (selectedNotes.IsNullOrEmpty())

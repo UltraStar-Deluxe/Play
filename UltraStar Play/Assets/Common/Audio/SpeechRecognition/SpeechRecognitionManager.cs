@@ -87,6 +87,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 
     private WhisperManager CreateWhisperManager(string modelPath, string language)
     {
+        language = language.ToLowerInvariant();
         Debug.Log($"Creating WhisperManager with model '{modelPath}' and language '{language}'");
 
         WhisperManager whisperManager = Instantiate<WhisperManager>(whisperManagerPrefab, transform);
