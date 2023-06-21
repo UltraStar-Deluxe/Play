@@ -13,10 +13,22 @@ public class SpeechRecognizer
 
     private readonly WhisperManager whisperManager;
 
+    private readonly List<Action<double>> onProgressCallbacks = new();
+
     public SpeechRecognizer(SpeechRecognitionParameters speechRecognitionParameters, WhisperManager whisperManager)
     {
         this.SpeechRecognitionParameters = speechRecognitionParameters;
         this.whisperManager = whisperManager;
+        this.whisperManager.OnProgress += OnProgress;
+    }
+
+    private void OnProgress(int progress)
+    {
+        Log.Debug(() => $"SpeechRecognizer progress: {progress}");
+        foreach (Action<double> onProgressCallback in onProgressCallbacks)
+        {
+            onProgressCallback?.Invoke(progress);
+        }
     }
 
     public SpeechRecognitionResult GetSpeechRecognitionResult(
@@ -36,10 +48,20 @@ public class SpeechRecognizer
         int lengthInSamples = endIndex - startIndex;
         float[] audioSamplesForSpeechRecognition = new float[lengthInSamples];
         Array.Copy(monoSamples, startIndex, audioSamplesForSpeechRecognition, 0, lengthInSamples);
-        
-        // Blocking call to GetTextAsync
-        WhisperResult whisperResult = whisperManager.GetTextAsync(audioSamplesForSpeechRecognition, sampleRate, 1)
-            .Result;
+
+        WhisperResult whisperResult;
+        try
+        {
+            onProgressCallbacks.Add(onProgress);
+
+            // Blocking call to GetTextAsync
+            whisperResult = whisperManager.GetTextAsync(audioSamplesForSpeechRecognition, sampleRate, 1)
+                .Result;
+        }
+        finally
+        {
+            onProgressCallbacks.Remove(onProgress);
+        }
 
         cancellationToken.ThrowIfCancellationRequested();
         
