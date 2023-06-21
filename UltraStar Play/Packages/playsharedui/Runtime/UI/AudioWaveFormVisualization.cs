@@ -164,10 +164,10 @@ public class AudioWaveFormVisualization : INeedInjection, IDisposable
         // calculate window size to fit all samples in the texture
         int lengthInSamples = maxSampleSingleChannel - minSampleSingleChannel;
         int windowSizeInSamples = lengthInSamples / dynTexture.TextureWidth;
-        Debug.Log("windowSizeInSamples " + ((double)lengthInSamples / dynTexture.TextureWidth));
         float[] windowSamples = new float[windowSizeInSamples];
 
-        Debug.Log("minSample " + minSampleSingleChannel + " maxSample " + maxSampleSingleChannel + " lengthInSamples: " + lengthInSamples + " windowSizeInSamples " + windowSizeInSamples);
+        Log.Debug(() => $"AudioWaveForm windowSizeInSamples {((double)lengthInSamples / dynTexture.TextureWidth)}");
+        Log.Debug(() => $"AudioWaveForm minSample {minSampleSingleChannel} maxSample {maxSampleSingleChannel} lengthInSamples: {lengthInSamples} windowSizeInSamples {windowSizeInSamples}");
 
         // Move the window over all the samples. For each position, find the min and max value.
         for (int i = 0; i < dynTexture.TextureWidth; i++)
