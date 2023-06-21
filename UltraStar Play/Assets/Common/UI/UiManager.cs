@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ProTrans;
 using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -127,6 +128,33 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         dialogControl.Title = dialogTitle;
 
         return dialogControl;
+    }
+    
+    public MessageDialogControl CreateConfirmationDialogControl(
+        string dialogTitle,
+        string dialogMessage,
+        string confirmButtonText,
+        Action<EventBase> onConfirm,
+        string cancelButtonText = "",
+        Action<EventBase> onCancel = null)
+    {
+        MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
+        messageDialogControl.Message = dialogMessage;
+        messageDialogControl.AddButton(confirmButtonText, evt =>
+        {
+            messageDialogControl.CloseDialog();
+            onConfirm?.Invoke(evt);
+        });
+
+        cancelButtonText = !cancelButtonText.IsNullOrEmpty()
+            ? cancelButtonText
+            : TranslationManager.GetTranslation(R.Messages.cancel);
+        messageDialogControl.AddButton(cancelButtonText, evt =>
+        {
+            messageDialogControl.CloseDialog();
+            onCancel?.Invoke(evt);
+        });
+        return messageDialogControl;
     }
     
     public MessageDialogControl CreateHelpDialogControl(
