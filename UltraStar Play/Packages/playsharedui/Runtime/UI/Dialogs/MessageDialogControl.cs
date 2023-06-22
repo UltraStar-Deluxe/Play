@@ -1,4 +1,5 @@
 ﻿using UniInject;
+using UniRx;
 using UnityEngine.UIElements;
 
 public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinishedListener
@@ -66,7 +67,10 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
         button.RegisterCallbackButtonTriggered(callback);
 
         button.Focus();
-        
+        // Sometimes Unity cannot focus the button until it has been rendered once.
+        MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+            () => button.Focus()));
+
         return button;
     }
 
