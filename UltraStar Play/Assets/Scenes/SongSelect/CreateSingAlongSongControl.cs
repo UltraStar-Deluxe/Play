@@ -154,9 +154,22 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                             .CatchIgnore((Exception ex) =>
                             {
                                 pitchDetectionJob.SetResult(EJobResult.Error);
+                                Debug.LogException(ex);
+                                string localErrorMessage = $"Pitch detection failed.";
+                                Debug.LogError(localErrorMessage);
+                                UiManager.CreateNotification(localErrorMessage);
                             })
                             .Subscribe(loadedPitchDetectionNotes =>
                             {
+                                if (loadedPitchDetectionNotes.IsNullOrEmpty())
+                                {
+                                    pitchDetectionJob.SetResult(EJobResult.Error);
+                                    string localErrorMessage = "Failed to load pitch detection result.";
+                                    Debug.LogError(localErrorMessage);
+                                    UiManager.CreateNotification(localErrorMessage);
+                                    return;
+                                }
+                            
                                 try
                                 {
                                     PitchDetectionUtils.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
@@ -168,7 +181,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                                 catch (Exception ex)
                                 {
                                     Debug.LogException(ex);
-                                    Debug.LogError("Failed to move notes to detected pitch");
+                                    string localErrorMessage = "Failed to move notes to detected pitch";
+                                    Debug.LogError(localErrorMessage);
+                                    UiManager.CreateNotification(localErrorMessage);
                                 }
 
                                 try
@@ -182,7 +197,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                                 catch (Exception ex)
                                 {
                                     Debug.LogException(ex);
-                                    Debug.LogError("Failed to save song with sing-along data");
+                                    string localErrorMessage = "Failed to save song with sing-along data";
+                                    Debug.LogError(localErrorMessage);
+                                    UiManager.CreateNotification(localErrorMessage);
                                 }
                             });
                     });

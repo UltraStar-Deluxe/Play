@@ -47,19 +47,17 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
     public IObservable<BasicPitchDetectionResult> ProcessSongMeta(SongMeta songMeta, Job pitchDetectionJob = null)
     {
-        string audioUri = SongMetaUtils.GetAudioUri(songMeta);
-        string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
-        if (!ApplicationUtils.IsSupportedBasicPitchDetectionAudioFormat(fileExtension))
+        string vocalsAudioUri = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
+        if (!FileUtils.Exists(vocalsAudioUri))
         {
-            UiManager.CreateNotification($"Pitch Detection using Basic Pitch not supported for this audio file.\n" +
-                                         $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.ToCsv(",", "", "")}");
-            return Observable.Empty<BasicPitchDetectionResult>();
+            return Observable.Throw<BasicPitchDetectionResult>(
+                new Exception($"Vocals audio for '{Path.GetFileName(songMeta.Mp3)}' does not exist at path '{songMeta.VocalsAudio}'"));
         }
-        
-        if (!FileUtils.Exists(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio)))
+        if (!ApplicationUtils.IsSupportedBasicPitchDetectionAudioFormat(Path.GetExtension(vocalsAudioUri)))
         {
-            UiManager.CreateNotification($"Vocals audio for '{Path.GetFileName(songMeta.Mp3)}' does not exist at path '{songMeta.VocalsAudio}'");
-            return Observable.Empty<BasicPitchDetectionResult>();
+            return Observable.Throw<BasicPitchDetectionResult>(
+                new Exception($"Pitch Detection using Basic Pitch not supported for this audio file.\n" + 
+                              $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.ToCsv(",", "", "")}"));
         }
         
         string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
@@ -72,7 +70,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         }
         pitchDetectionJob.SetStatus(EJobStatus.Running);
 
-        AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(audioUri, false);
+        AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(vocalsAudioUri, true);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         pitchDetectionJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 3.0);
 

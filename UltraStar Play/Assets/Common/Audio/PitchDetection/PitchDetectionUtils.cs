@@ -5,6 +5,7 @@ using System.Linq;
 using AudioSynthesis.Midi;
 using AudioSynthesis.Midi.Event;
 using UniRx;
+using UnityEngine;
 
 public static class PitchDetectionUtils
 {
@@ -13,9 +14,9 @@ public static class PitchDetectionUtils
         SongMeta songMeta,
         Job pitchDetectionJob = null)
     {
-        if (!FileUtils.Exists(songMeta.Mp3))
+        if (!FileUtils.Exists(songMeta.VocalsAudio))
         {
-            return Observable.Throw<List<Note>>(new Exception("File not found"));
+            return Observable.Throw<List<Note>>(new Exception("Vocals audio not found. Split the audio first."));
         }
         
         string fileName = Path.GetFileName(songMeta.Mp3);
@@ -30,6 +31,9 @@ public static class PitchDetectionUtils
             .CatchIgnore((Exception ex) =>
             {
                 pitchDetectionJob.SetResult(EJobResult.Error);
+                Debug.LogException(ex);
+                Debug.LogError("Pitch detection failed");
+                pitchDetectionResultSubject.OnError(ex);
             })
             .Subscribe(result =>
             {
