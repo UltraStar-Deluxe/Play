@@ -71,20 +71,30 @@ public class SpeechRecognizer
             TimeSpan offsetToStartIndex = TimeSpan.FromSeconds((double)startIndex / sampleRate);
             string textResult = whisperResult.Result;
             List<SpeechRecognitionWordResult> wordResults = whisperResult.Segments
-                // Whisper outputs special segments such as [Music], [BLANK_AUDIO], [NOISE], etc. that are irrelevant for the lyrics.
-                .Where(segment => !segment.Text.TrimStart().StartsWith("[")
-                                  && !segment.Text.TrimEnd().EndsWith("]"))
+                // Whisper outputs special segments such as [Music], [BLANK_AUDIO], [NOISE], ♪, (sad music) etc. that are irrelevant for the lyrics.
+                .Where(segment =>
+                {
+                    string trimmedText = segment.Text.Trim();
+                    return IsValidLyrics(trimmedText);
+                })
                 .SelectMany(segment => segment.Tokens)
-                .Where(token => !token.IsSpecial
-                                && !token.Text.TrimStart().StartsWith("[")
-                                && !token.Text.TrimEnd().EndsWith("]"))
+                .Where(token =>
+                {
+                    string trimmedText = token.Text.Trim();
+                    return !token.IsSpecial
+                           && IsValidLyrics(trimmedText);
+                })
                 .Select(token => new SpeechRecognitionWordResult(
                     token.Text,
                     token.Timestamp.Start + offsetToStartIndex,
                     token.Timestamp.End + offsetToStartIndex,
                     token.Prob))
                 .ToList();
-            if (!wordResults.IsNullOrEmpty())
+            if (wordResults.IsNullOrEmpty())
+            {
+                Debug.Log($"Speech recognition did not find any words");
+            }
+            else
             {
                 SpeechRecognitionWordResult.NormalizeText(wordResults);
                 wordResults = wordResults
@@ -96,6 +106,14 @@ public class SpeechRecognizer
         }
 
         return null;
+    }
+
+    private bool IsValidLyrics(string text)
+    {
+        return !(text.StartsWith("[") && text.EndsWith("]"))
+            && !(text.StartsWith("(") && text.EndsWith(")"))
+            && !(text.StartsWith("<") && text.EndsWith(">"))
+            && !(text.StartsWith("♪") || text.EndsWith("♪"));
     }
 
     public void InitModel()
