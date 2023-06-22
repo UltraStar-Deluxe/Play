@@ -1077,7 +1077,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Select(it => it.Name)
             .ToCsv(", ", "", "");
         askToAssignMicsDialog.Message = $"Missing microphones for player(s): {playerNamesCsv}\n" +
-                                        $"Connect a Companion app or assign another microphone.\n";
+                                        $"Connect a Companion App or assign another microphone.\n";
         askToAssignMicsDialog.AddButton("Start anyway", _ =>
         {
             CloseAskToAssignMicsDialog();
