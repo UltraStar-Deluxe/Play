@@ -529,6 +529,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
     // See: https://github.com/UltraStar-Deluxe/Play/issues/111
     private void UpdateInputForYassShortcuts()
     {
+        // TODO: Implement these shortcuts as InputActions
         EKeyboardModifier modifier = InputUtils.GetCurrentKeyboardModifier();
         if (modifier != EKeyboardModifier.None
             // Yass shortcuts only work with a keyboard.
