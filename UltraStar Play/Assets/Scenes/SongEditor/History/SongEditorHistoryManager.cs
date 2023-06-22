@@ -52,7 +52,8 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         // Restore the last state of the editor for this song.
         if (songMetaToSongEditorMementoMap.TryGetValue(songMeta, out SongEditorMemento memento))
         {
-            LoadUndoState(memento);
+            // Do not load voices. The song may have been reloaded or sing-along data newly created in the meantime.
+            LoadUndoState(memento, false);
         }
 
         AddUndoState();
@@ -67,7 +68,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
         indexInHistory--;
         SongEditorMemento undoState = history[indexInHistory];
-        LoadUndoState(undoState);
+        LoadUndoState(undoState, true);
     }
 
     public void Redo()
@@ -79,7 +80,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
         indexInHistory++;
         SongEditorMemento undoState = history[indexInHistory];
-        LoadUndoState(undoState);
+        LoadUndoState(undoState, true);
     }
 
     public void AddUndoState()
@@ -152,10 +153,13 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         memento.MusicGap = songMeta.Gap;
     }
 
-    private void LoadUndoState(SongEditorMemento undoState)
+    private void LoadUndoState(SongEditorMemento undoState, bool loadVoices)
     {
         LoadLayers(undoState);
-        LoadVoices(undoState);
+        if (loadVoices)
+        {
+            LoadVoices(undoState);
+        }
         LoadSongMetaTags(undoState);
 
         editorNoteDisplayer.ClearNoteControls();

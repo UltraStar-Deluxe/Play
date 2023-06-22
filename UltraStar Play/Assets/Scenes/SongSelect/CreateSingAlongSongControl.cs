@@ -45,7 +45,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     }
 
-    public void CreateSingAlongSong(SongMeta songMeta)
+    public void CreateSingAlongSong(SongMeta songMeta, bool saveSongFile)
     {
         if (songMeta == null)
         {
@@ -188,10 +188,12 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
                                 try
                                 {
-                                    // (6) Save and reload song
-                                    songMetaManager.SaveSong(songMeta, true);
-                                    songMetaManager.ReloadSong(songMeta);
-
+                                    if (saveSongFile)
+                                    {
+                                        // (6) Save and reload song
+                                        songMetaManager.SaveSong(songMeta, true);
+                                        songMetaManager.ReloadSong(songMeta);
+                                    }
                                     createdSingAlongVersionEventStream.OnNext(songMeta);
                                 }
                                 catch (Exception ex)

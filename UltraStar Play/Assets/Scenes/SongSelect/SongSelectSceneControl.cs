@@ -980,7 +980,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
                                                    + "Do you want to open the song editor?";
             noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
-            Button defaultButton = noSingAlongDataDialogControl.AddButton("Create sing-along data", _ => createSingAlongSongControl.CreateSingAlongSong(songMeta));
+            Button defaultButton = noSingAlongDataDialogControl.AddButton("Create sing-along data", _ => createSingAlongSongControl.CreateSingAlongSong(songMeta, true));
             noSingAlongDataDialogControl.AddButton("Open song editor", _ => StartSongEditorScene(songMeta));
             // noSingAlongDataDialogControl.AddButton("Start song", _ => StartSingScene(songMeta));
             noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
@@ -1377,5 +1377,31 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 .Distinct()
                 .ToList();
         }
+    }
+
+    public void AskToRecreateSingAlongData(SongMeta songMeta)
+    {
+        MessageDialogControl dialogControl = uiManager.CreateDialogControl($"Recreate '{songMeta.Title}'");
+        dialogControl.Message = "Do you want to recreate the song?\n\n"
+                                + "This will overwrite the current song files after executing\n"
+                                + "• vocals isolation,\n"
+                                + "• speech recognition,\n"
+                                + "• pitch detection.";
+        dialogControl.AddButton("Recreate and Save", evt =>
+        {
+            dialogControl.CloseDialog();
+            createSingAlongSongControl.CreateSingAlongSong(songMeta, true);
+        });
+        dialogControl.AddButton("Recreate but do not save", evt =>
+        {
+            dialogControl.CloseDialog();
+            createSingAlongSongControl.CreateSingAlongSong(songMeta, false);
+        });
+        dialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel), evt =>
+        {
+            dialogControl.CloseDialog();
+        });
+        
+        dialogControl.AddInformationMessage($"AI model parameters can be changed in the song editor");
     }
 }
