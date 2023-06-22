@@ -37,10 +37,6 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
     public void CreateNotesUsingBasicPitch(bool notify)
     {
-        if (!FileUtils.Exists(songMeta.Mp3))
-        {
-            return;
-        }
         string fileName = Path.GetFileName(songMeta.Mp3);
         Job pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of '{fileName}'");
         IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMeta(songMeta, pitchDetectionJob);
@@ -68,7 +64,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
         if (!FileUtils.Exists(midiFilePath))
         {
             Debug.LogError($"Failed to import MIDI file created by Basic Pitch. File not found: {midiFilePath}");
-            UiManager.CreateNotification($"Failed to import MIDI file.");
+            UiManager.CreateNotification($"Failed to import MIDI file with pitch information.");
             return;
         }
         songEditorMidiFileImporter.ImportMidiFile(
