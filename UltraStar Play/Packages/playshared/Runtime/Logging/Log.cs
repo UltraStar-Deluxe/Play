@@ -383,4 +383,32 @@ public static class Log
             logEventStream.OnNext(logEvent);
         }
     }
+
+    public static void WithLevel(LogEventLevel logLevel, Func<string> messageGetter)
+    {
+        switch (logLevel)
+        {
+            case LogEventLevel.Verbose:
+                Verbose(messageGetter);
+                break;
+            case LogEventLevel.Debug:
+                Debug(messageGetter);
+                break;
+            case LogEventLevel.Information:
+                Information(messageGetter);
+                break;
+            case LogEventLevel.Warning:
+                Warning(messageGetter);
+                break;
+            case LogEventLevel.Error:
+                Error(messageGetter);
+                break;
+            case LogEventLevel.Fatal:
+                Error(messageGetter);
+                break;
+            default:
+                Information(messageGetter);
+                break;
+        }
+    }
 }
