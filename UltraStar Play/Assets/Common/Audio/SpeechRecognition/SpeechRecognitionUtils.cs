@@ -66,7 +66,6 @@ public static class SpeechRecognitionUtils
                 Debug.LogError(ex);
                 speechRecognitionJob?.SetResult(EJobResult.Error);
                 createNotesFromSpeechRecognitionSubject.OnError(ex);
-                UiManager.CreateNotification(ex.Message);
             })
             .Subscribe(speechRecognizer =>
             {
@@ -135,6 +134,7 @@ public static class SpeechRecognitionUtils
                 out string errorMessage,
                 out SpeechRecognizer _))
         {
+            loadSpeechRecognizerJob.SetResult(EJobResult.Error);
             return Observable.Create<SpeechRecognizer>(o =>
             {
                 o.OnError(new Exception(errorMessage));
