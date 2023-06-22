@@ -113,7 +113,7 @@ public class SpeechRecognizer
         return !(text.StartsWith("[") && text.EndsWith("]"))
             && !(text.StartsWith("(") && text.EndsWith(")"))
             && !(text.StartsWith("<") && text.EndsWith(">"))
-            && !(text.StartsWith("♪") || text.EndsWith("♪"));
+            && !(text is "♪" or "♪ " or " ♪" or " ♪ ");
     }
 
     public void InitModel()
