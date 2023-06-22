@@ -255,13 +255,13 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
         contextMenuPopup.AddButton("Recreate Song", "replay_circle_filled",
         () =>
         {
-            uiManager.CreateConfirmationDialogControl(
+            MessageDialogControl confirmationDialogControl = uiManager.CreateConfirmationDialogControl(
                 $"Recreate '{SongMeta.Title}'",
                 "Do you want to recreate the song?\n\n"
-                    + "This will overwrite the current song files after executing\n"
-                    + "• vocals isolation,\n"
-                    + "• speech recognition,\n"
-                    + "• pitch detection.\n",
+                + "This will overwrite the current song files after executing\n"
+                + "• vocals isolation,\n"
+                + "• speech recognition,\n"
+                + "• pitch detection.",
                 "Recreate Song",
                 _ =>
                 {
@@ -270,6 +270,8 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
                         createSingAlongSongControl.CreateSingAlongSong(SongMeta);
                     }
                 });
+            
+            confirmationDialogControl.AddInformationMessage($"AI model parameters can be changed in the song editor");
         });
         
         contextMenuPopup.AddButton("Info", "lyrics",
