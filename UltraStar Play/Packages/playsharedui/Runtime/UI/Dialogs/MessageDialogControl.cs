@@ -78,6 +78,27 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
     {
         dialogMessageContainer.Add(visualElement);
     }
+    
+    public void AddInformationMessage(string informationMessage)
+    {
+        VisualElement infoContainer = new();
+        infoContainer.name = "row";
+        infoContainer.AddToClassList("ml-auto");
+        infoContainer.AddToClassList("mr-auto");
+        infoContainer.AddToClassList("my-3");
+        
+        FontIcon infoIcon = new MaterialIcon();
+        infoIcon.Icon = "info_outline";
+        infoIcon.style.fontSize = 14;
+        infoIcon.AddToClassList("mr-1");
+        infoContainer.Add(infoIcon);
+        
+        Label infoLabel = new Label(informationMessage);
+        infoLabel.AddToClassList("smallFont");
+        infoContainer.Add(infoLabel);
+        
+        AddVisualElement(infoContainer);
+    }
 
     public override void CloseDialog()
     {
