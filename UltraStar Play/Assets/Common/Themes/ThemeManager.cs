@@ -15,7 +15,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     /**
      * Filename without extension of the theme that should be loaded by default
      */
-    public const string DefaultThemeName = "ocean";
+    public const string DefaultThemeName = "vinyl";
     private const string ThemeFolderName = "Themes";
     public const string UiRenderTextureName = "ThemeManager.UiRenderTexture";
     public const string ParticleRenderTextureName = "ThemeManager.ParticleRenderTexture";
