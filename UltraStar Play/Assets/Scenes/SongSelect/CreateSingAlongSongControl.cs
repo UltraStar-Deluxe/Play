@@ -4,7 +4,7 @@ using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using Vosk;
+using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -28,6 +28,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private PitchDetectionManager pitchDetectionManager;
 
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
@@ -42,7 +45,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     }
 
-    public void CreateSingAlongSong(SongMeta songMeta)
+    public void CreateSingAlongSong(SongMeta songMeta, bool saveSongFile)
     {
         if (songMeta == null)
         {
@@ -76,13 +79,17 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 audioSeparationJob.SetResult(EJobResult.Ok);
             });
 
+        SpeechRecognitionParameters speechRecognitionParameters = new(
+            settings.SongEditorSettings.SpeechRecognitionModelPath,
+            "auto",
+            settings.SongEditorSettings.SpeechRecognitionPrompt);
+        
         // Load speech recognition model in parallel while doing audio separation.
-        string speechRecognitionModelPath = settings.SongEditorSettings.SpeechRecognitionModelPath;
-        IObservable<object> loadSpeechRecognitionModelObservable = SpeechRecognitionUtils.LoadSpeechRecognitionModel(speechRecognitionModelPath, null);
+        IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizer(speechRecognitionParameters, null);
 
         // Continue when audio separation and loading speech recognition model have finished
         Observable.WhenAll<object>(
-                loadSpeechRecognitionModelObservable,
+                loadSpeechRecognizerObservable,
                 audioSeparationObservable)
             .CatchIgnore((Exception ex) =>
             {
@@ -96,14 +103,15 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 // Load vocals audio
                 AudioClip vocalsAudioClip = audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
                 int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * BpmUtils.GetBeatsPerSecond(songMeta));
-
-                SpeechRecognitionParameters speechRecognitionParameters = new(
-                    vocalsAudioClip.frequency,
-                    speechRecognitionModelPath,
-                    SpeechRecognitionUtils.GetSpeechRecognitionPhrases(settings.SongEditorSettings.SpeechRecognitionPhrases));
-
-                VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
-
+                
+                if (!speechRecognitionManager.TryGetOrCreateSpeechRecognizer(
+                        speechRecognitionParameters,
+                        out string errorMessage,
+                        out SpeechRecognizer speechRecognizer))
+                {
+                    throw new Exception(errorMessage);
+                }
+                    
                 float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
                 SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
@@ -113,7 +121,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         vocalsAudioClip.frequency,
                         speechRecognitionParameters,
                         speechRecognitionJob,
-                        speechRecognizer,
                         false,
                         settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                         songMeta,
@@ -140,25 +147,62 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
                         // (5) Run pitch detection on vocals audio
                         pitchDetectionJob.SetStatus(EJobStatus.Running);
-                        PitchDetectionUtils.MoveNotesToDetectedPitch(
+                        PitchDetectionUtils.CreateNotesUsingBasicPitch(
+                                pitchDetectionManager,
                                 songMeta,
-                                createdNotes,
-                                vocalsAudioClip,
-                                settings.PitchDetectionAlgorithm,
                                 pitchDetectionJob)
                             .CatchIgnore((Exception ex) =>
                             {
                                 pitchDetectionJob.SetResult(EJobResult.Error);
+                                Debug.LogException(ex);
+                                string localErrorMessage = $"Pitch detection failed.";
+                                Debug.LogError(localErrorMessage);
+                                UiManager.CreateNotification(localErrorMessage);
                             })
-                            .Subscribe(_ =>
+                            .Subscribe(loadedPitchDetectionNotes =>
                             {
-                                pitchDetectionJob.SetResult(EJobResult.Ok);
+                                if (loadedPitchDetectionNotes.IsNullOrEmpty())
+                                {
+                                    pitchDetectionJob.SetResult(EJobResult.Error);
+                                    string localErrorMessage = "Failed to load pitch detection result.";
+                                    Debug.LogError(localErrorMessage);
+                                    UiManager.CreateNotification(localErrorMessage);
+                                    return;
+                                }
+                            
+                                try
+                                {
+                                    PitchDetectionUtils.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
+                                        songMeta,
+                                        createdNotes,
+                                        loadedPitchDetectionNotes);
+                                    pitchDetectionJob.SetResult(EJobResult.Ok);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.LogException(ex);
+                                    string localErrorMessage = "Failed to move notes to detected pitch";
+                                    Debug.LogError(localErrorMessage);
+                                    UiManager.CreateNotification(localErrorMessage);
+                                }
 
-                                // (6) Save and reload song
-                                songMetaManager.SaveSong(songMeta, true);
-                                songMetaManager.ReloadSong(songMeta);
-
-                                createdSingAlongVersionEventStream.OnNext(songMeta);
+                                try
+                                {
+                                    if (saveSongFile)
+                                    {
+                                        // (6) Save and reload song
+                                        songMetaManager.SaveSong(songMeta, true);
+                                        songMetaManager.ReloadSong(songMeta);
+                                    }
+                                    createdSingAlongVersionEventStream.OnNext(songMeta);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.LogException(ex);
+                                    string localErrorMessage = "Failed to save song with sing-along data";
+                                    Debug.LogError(localErrorMessage);
+                                    UiManager.CreateNotification(localErrorMessage);
+                                }
                             });
                     });
             });

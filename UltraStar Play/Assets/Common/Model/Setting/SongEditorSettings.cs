@@ -19,6 +19,8 @@ public class SongEditorSettings
     public string ButtonDisplayNameForButtonRecording { get; set; } = "N";
     public string ButtonRecordingLyrics { get; set; } = "";
     public bool SpeechRecognitionWhenRecording { get; set; } = true;
+    public string SpeechRecognitionLanguage { get; set; } = EWhisperLanguage.English.ToString().ToLowerInvariant();
+    public string SpeechRecognitionPrompt { get; set; } = "";
 
     public bool AdjustFollowingNotes { get; set; }
 

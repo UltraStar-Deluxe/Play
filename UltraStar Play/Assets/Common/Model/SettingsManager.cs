@@ -196,7 +196,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         if (PlatformUtils.IsStandalone)
         {
             defaultSettings.SongEditorSettings.SpeechRecognitionModelPath =
-                ApplicationUtils.GetStreamingAssetsPath("SpeechRecognitionModels/vosk-model-small-en-us-0.15");
+                ApplicationUtils.GetStreamingAssetsPath("SpeechRecognitionModels/WhisperModels/ggml-tiny.bin");
         }
         
         return defaultSettings;

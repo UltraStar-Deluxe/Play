@@ -13,10 +13,10 @@
         "Unity.InputSystem",
         "playshared",
         "playsharedui",
-        "Vosk",
         "SpleeterSharp",
         "UnityStandaloneFileBrowser",
-        "LiteNetLib"
+        "LiteNetLib",
+        "com.whisper.unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

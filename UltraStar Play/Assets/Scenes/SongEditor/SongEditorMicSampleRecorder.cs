@@ -5,7 +5,6 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using Vosk;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -78,10 +77,6 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
 
     private bool areLastNonAnalyzedSamplesAboveThreshold;
     private int analyzeStartIndex;
-
-    private bool speechRecognizerDirty;
-    private SpeechRecognitionParameters speechRecognitionParameters;
-    private VoskRecognizer speechRecognizer;
 
     private MicProfile micProfile;
     public MicProfile MicProfile
@@ -163,14 +158,14 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
                 }
             });
         
-        RecordedSamplesChangedEventStream.Buffer(new TimeSpan(0, 0, 0, 0, 1000))
-            .Subscribe(events =>
-            {
-                if (events.Count > 0)
-                {
-                    DoSpeechRecognitionForNewlyRecordedSamples();
-                }
-            });
+        // RecordedSamplesChangedEventStream.Buffer(new TimeSpan(0, 0, 0, 0, 1000))
+        //     .Subscribe(events =>
+        //     {
+        //         if (events.Count > 0)
+        //         {
+        //             DoSpeechRecognitionForNewlyRecordedSamples();
+        //         }
+        //     });
 
         // Load recorded samples from cache
         if (songMetaToRecordedAudioSamples.ContainsKey(songMeta))
@@ -214,12 +209,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         {
             return;
         }
-
-        if (speechRecognizerDirty)
-        {
-            speechRecognizerDirty = false;
-            InitSpeechRecognizer();
-        }
+        
 
         int sampleRate = FinalSampleRate.Value;
         
@@ -229,12 +219,19 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         int lengthInSamples = toIndex - fromIndex;
         analyzeStartIndex = recordingIndex;
 
-        int recordingStartIndexConsideringMicDelay = recordingStartIndex - micDelayInSamples;
-        double offsetInMillis = ((double)recordingStartIndexConsideringMicDelay / sampleRate) * 1000.0;
-        int offsetInBeats = (int)BpmUtils.MillisecondInSongToBeat(songMeta, offsetInMillis);
-        
-        Debug.Log($"Analyzing speech from second {(double)fromIndex / sampleRate} to second {(double)toIndex / sampleRate} (length: {(lengthInSamples) / sampleRate} seconds)");
-        speechRecognitionAction.CreateNotesFromSpeechRecognition(RecordingBuffer, fromIndex, toIndex, sampleRate, 2, true, speechRecognitionParameters, speechRecognizer, true, offsetInBeats);
+        double gapShiftInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, songMeta.Gap);
+
+        Debug.Log($"Analyzing speech of newly recorded samples from second {(double)fromIndex / sampleRate} to second {(double)toIndex / sampleRate} (length: {(lengthInSamples) / sampleRate} seconds)");
+        speechRecognitionAction.CreateNotesFromSpeechRecognition(
+            RecordingBuffer,
+            fromIndex,
+            toIndex,
+            sampleRate,
+            2,
+            true,
+            speechRecognitionAction.CreateSpeechRecognizerParameters(),
+            true,
+            -(int)gapShiftInBeats);
     }
 
     private void UpdateRecordingStartIndex()
@@ -427,17 +424,10 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         }
         else if (shouldBeRecoding && !MicSampleRecorder.IsRecording.Value)
         {
-            speechRecognizerDirty = true;
             MicSampleRecorder.StartRecording();
         }
     }
 
-    private void InitSpeechRecognizer()
-    {
-        speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(ESongEditorSamplesSource.Recording);
-        speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
-    }
-    
     private void OnDestroy()
     {
         DisposeMicSampleRecorderDisposables();

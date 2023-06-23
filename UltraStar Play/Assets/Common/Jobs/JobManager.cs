@@ -79,9 +79,9 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         UpdateJobListPosition();
     }
 
-    public static Job CreateAndAddJob(string title)
+    public static Job CreateAndAddJob(string title, Job parentJob = null)
     {
-        Job job = new(title);
+        Job job = new(title, parentJob);
         Instance.AddJob(job);
         return job;
     }

@@ -8,6 +8,7 @@
     "com.achimmihca.uniinject": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#f8c6f93dabc03137957588f7d9e572fc623272b0",
     "com.achimmihca.utfunknownunity": "https://github.com/achimmihca/UTF-Unknown-Unity.git?path=UTF-Unknown-Unity/Packages/com.achimmihca.utfunknownunity#v1.0.1",
     "com.singularitygroup.hotreload": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.10.12",
+    "com.whisper.unity": "https://github.com/achimmihca/whisper.unity.git?path=/Packages/com.whisper.unity#37df0f23f6aff4d63d96278865b177c037db6d10",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ai.navigation": "1.1.4",

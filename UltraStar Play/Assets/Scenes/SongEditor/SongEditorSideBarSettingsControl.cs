@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -29,7 +30,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     
     [Inject(UxmlName = R.UxmlNames.selectModelPathButton)]
     private Button selectModelPathButton;
+    
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionLanguageChooser)]
+    private EnumField speechRecognitionLanguageChooser;
 
+    [Inject(UxmlName = R.UxmlNames.speechRecognitionPromptTextField)]
+    private TextField speechRecognitionPromptTextField;
+    
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
 
@@ -306,6 +313,21 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         importMidiFileButton.RegisterCallbackButtonTriggered(_ => importMidiFileDialogControl.OpenDialog());
 
         // Speech recognition
+        Bind(speechRecognitionLanguageChooser,
+            () =>
+            {
+                if (Enum.TryParse(settings.SongEditorSettings.SpeechRecognitionLanguage, out EWhisperLanguage whisperLanguage))
+                {
+                    return whisperLanguage;
+                }
+                return EWhisperLanguage.English;
+            },
+            newValue => settings.SongEditorSettings.SpeechRecognitionLanguage = newValue.ToString());
+        
+        Bind(speechRecognitionPromptTextField,
+            () => settings.SongEditorSettings.SpeechRecognitionPrompt,
+            newValue => settings.SongEditorSettings.SpeechRecognitionPrompt = newValue);
+        
         sentenceLineSizeTextField.DisableParseEscapeSequences();
         Bind(speechRecognitionModelPathTextField,
             () => settings.SongEditorSettings.SpeechRecognitionModelPath,
@@ -320,13 +342,20 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         {
             selectModelPathButton.RegisterCallbackButtonTriggered(_ =>
             {
-                string selectedFolder = FileSystemDialogUtils.OpenFolderDialog("Select Speech Recognition Model", speechRecognitionModelPathTextField.value);
-                if (selectedFolder.IsNullOrEmpty())
+                string oldFolder = FileUtils.Exists(speechRecognitionModelPathTextField.value)
+                    ? new FileInfo(speechRecognitionModelPathTextField.value).DirectoryName
+                    : "";
+                string selectedFile = FileSystemDialogUtils.OpenFileDialog(
+                    "Select Speech Recognition Model",
+                    oldFolder,
+                    FileSystemDialogUtils.CreateExtensionFilters("Model files", "bin"));
+                if (selectedFile.IsNullOrEmpty()
+                    || !FileUtils.Exists(selectedFile))
                 {
                     return;
                 }
 
-                speechRecognitionModelPathTextField.value = selectedFolder;
+                speechRecognitionModelPathTextField.value = selectedFile;
             });
         }
         else

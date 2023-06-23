@@ -73,8 +73,10 @@ See https://www.apache.org/licenses/LICENSE-2.0.html
 - Serilog
     - https://github.com/serilog/serilog
 
-- Vosk Speech Recognition Toolkit
-    - https://github.com/alphacep/vosk-api
+- Whisper Automatic Speech Recognition (ASR)
+    - https://github.com/openai/whisper
+    - https://github.com/ggerganov/whisper.cpp
+    - https://github.com/Macoron/whisper.unity
 
 - Opportunity.LrcParser
     - https://github.com/OpportunityLiu/LrcParser

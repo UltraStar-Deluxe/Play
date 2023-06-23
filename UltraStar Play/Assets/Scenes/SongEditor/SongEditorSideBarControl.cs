@@ -5,7 +5,6 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Vosk;
 
 public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListener
 {
@@ -166,7 +165,6 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         });
         UpdateRecordingButton();
         
-        doPitchDetectionInSelectionButton.RegisterCallbackButtonTriggered(_ => DoDetectPitchInSelection());
         pitchDetectionUsingBasicPitchButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingBasicPitch());
         doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
         
@@ -276,8 +274,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             return;
         }
         
-        SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
-        VoskRecognizer speechRecognizer = speechRecognitionManager.CreateSpeechRecognizer(speechRecognitionParameters);
+        SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters();
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
             NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
@@ -285,23 +282,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             2,
             true,
             speechRecognitionParameters,
-            speechRecognizer,
             false);
-    }
-
-    private void DoDetectPitchInSelection()
-    {
-        if (NoteAreaSelectionDragListener.lastSelectionRect.Value == null
-            || NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats <= 0)
-        {
-            return;
-        }
-        
-        pitchDetectionAction.CreateNotesForDetectedPitch(
-            NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
-            NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
-            settings.SongEditorSettings.PitchDetectionSamplesSource,
-            true);
     }
 
     private void UpdateRecordingButton()
@@ -432,6 +413,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             inputActionInfos.Add(new InputActionInfo("Make rap-golden", "T"));
             inputActionInfos.Add(new InputActionInfo("Pitch detection", "M"));
             inputActionInfos.Add(new InputActionInfo("Speech recognition", "L"));
+            inputActionInfos.Add(new InputActionInfo("Phrase from Selection", "W"));
         }
         else if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         {

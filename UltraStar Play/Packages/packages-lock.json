@@ -268,6 +268,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.whisper.unity": {
+      "version": "https://github.com/achimmihca/whisper.unity.git?path=/Packages/com.whisper.unity#37df0f23f6aff4d63d96278865b177c037db6d10",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "37df0f23f6aff4d63d96278865b177c037db6d10"
+    },
     "com.yasirkula.androidruntimepermissions": {
       "version": "https://github.com/yasirkula/UnityAndroidRuntimePermissions.git",
       "depth": 0,

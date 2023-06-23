@@ -61,7 +61,7 @@ public class DisposableStopwatch : IDisposable
         if (logPeriodInSeconds <= 0)
         {
             // Log immediately
-            UnityEngine.Debug.Log(logText);
+            Log.Debug(() => logText);
         }
         else
         {

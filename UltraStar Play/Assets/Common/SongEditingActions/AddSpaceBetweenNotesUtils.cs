@@ -49,8 +49,12 @@ public static class AddSpaceBetweenNotesUtils
 
     public static void ShortenNotesByMillis(IReadOnlyCollection<Note> notes, int millis, SongMeta songMeta)
     {
+        if (notes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
         double lengthInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, millis);
-        Debug.Log("ShortenNotesByMillis - lengthInBeats: " + lengthInBeats);
         if (lengthInBeats < 1)
         {
             return;

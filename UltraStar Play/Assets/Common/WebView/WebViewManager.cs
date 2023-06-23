@@ -450,22 +450,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         messageDialogControl.Message = $"The song file references an external website.\n"
                                        + $"Do you want to open {host} in the embedded browser?";
 
-        VisualElement infoContainer = new();
-        infoContainer.name = "row";
-        infoContainer.AddToClassList("ml-auto");
-        infoContainer.AddToClassList("mr-auto");
-        infoContainer.AddToClassList("my-3");
-        messageDialogControl.AddVisualElement(infoContainer);
-        
-        FontIcon infoIcon = new MaterialIcon();
-        infoIcon.Icon = "info_outline";
-        infoIcon.style.fontSize = 14;
-        infoIcon.AddToClassList("mr-1");
-        infoContainer.Add(infoIcon);
-        
-        Label infoLabel = new Label($"You can open the embedded browser anytime by pressing F8 or Ctrl+B.");
-        infoLabel.AddToClassList("smallFont");
-        infoContainer.Add(infoLabel);
+        messageDialogControl.AddInformationMessage($"You can open the embedded browser anytime by pressing F8 or Ctrl+B.");
         
         messageDialogControl.AddButton("Yes, do not ask again", _ =>
         {

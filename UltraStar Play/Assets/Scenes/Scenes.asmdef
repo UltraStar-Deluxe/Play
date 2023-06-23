@@ -17,9 +17,9 @@
         "playsharedui",
         "AndroidRuntimePermissions.Runtime",
         "UnityStandaloneFileBrowser",
-        "Vosk",
         "Vuplex.WebView",
-        "LiteNetLib"
+        "LiteNetLib",
+        "com.whisper.unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

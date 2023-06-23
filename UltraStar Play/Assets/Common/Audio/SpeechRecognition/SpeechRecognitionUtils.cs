@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using UniRx;
 using UnityEngine;
-using Vosk;
+using Whisper;
+using Debug = UnityEngine.Debug;
 
 public static class SpeechRecognitionUtils
 {
@@ -34,7 +36,6 @@ public static class SpeechRecognitionUtils
         int sampleRate,
         SpeechRecognitionParameters speechRecognitionParameters,
         Job speechRecognitionJob,
-        VoskRecognizer speechRecognizer,
         bool continuous,
         int midiNote,
         SongMeta songMeta,
@@ -58,16 +59,15 @@ public static class SpeechRecognitionUtils
 
         Subject<List<Note>> createNotesFromSpeechRecognitionSubject = new();
 
-        IObservable<object> loadSpeechRecognitionModelObservable = LoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath, null);
-        loadSpeechRecognitionModelObservable
+        IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = GetOrCreateSpeechRecognizer(speechRecognitionParameters, null);
+        loadSpeechRecognizerObservable
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogError(ex);
                 speechRecognitionJob?.SetResult(EJobResult.Error);
                 createNotesFromSpeechRecognitionSubject.OnError(ex);
-                UiManager.CreateNotification(ex.Message);
             })
-            .Subscribe(_ =>
+            .Subscribe(speechRecognizer =>
             {
                 speechRecognitionJob?.SetStatus(EJobStatus.Running);
                 
@@ -92,10 +92,12 @@ public static class SpeechRecognitionUtils
                         createNotesFromSpeechRecognitionSubject.OnError(ex);
                         UiManager.CreateNotification(ex.Message);
                     })
-                    .Subscribe(voskResultJson =>
+                    .Subscribe(speechRecognitionResult =>
                     {
                         speechRecognitionJob?.SetResult(EJobResult.Ok);
-                        List<Note> createdNotes = CreateNotesFromVoskResult(voskResultJson.result, songMeta, offsetInBeats, midiNote);
+                        List<Note> createdNotes = speechRecognitionResult != null && !speechRecognitionResult.Words.IsNullOrEmpty()
+                            ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote)
+                            : new List<Note>();
 
                         createNotesFromSpeechRecognitionSubject.OnNext(createdNotes);
                         createNotesFromSpeechRecognitionSubject.OnCompleted();
@@ -105,29 +107,44 @@ public static class SpeechRecognitionUtils
         return createNotesFromSpeechRecognitionSubject;
     }
 
-    public static IObservable<object> LoadSpeechRecognitionModel(
-        string modelPath,
+    public static IObservable<SpeechRecognizer> GetOrCreateSpeechRecognizer(
+        SpeechRecognitionParameters parameters,
         Job parentJob)
     {
-        if (SpeechRecognitionManager.Instance.HasLoadedSpeechRecognitionModel(modelPath))
+        SpeechRecognizer existingSpeechRecognizer = SpeechRecognitionManager.Instance.GetExistingSpeechRecognizer(parameters);
+        if (existingSpeechRecognizer != null)
         {
             // Nothing to do. Return observable that fires immediately.
-            return Observable.Create<object>(o =>
+            return Observable.Create<SpeechRecognizer>(o =>
             {
-                o.OnNext(true);
+                o.OnNext(existingSpeechRecognizer);
                 o.OnCompleted();
                 return Disposable.Empty;
             });
         }
 
         // Create UI job
-        Job loadSpeechRecognitionModelJob = new("Load speech recognition model", parentJob);
-        loadSpeechRecognitionModelJob.EstimatedTotalDurationInMillis = 60000;
-        loadSpeechRecognitionModelJob.SetStatus(EJobStatus.Running);
-        JobManager.Instance.AddJob(loadSpeechRecognitionModelJob);
+        Job loadSpeechRecognizerJob = new("Load speech recognition model", parentJob);
+        loadSpeechRecognizerJob.EstimatedTotalDurationInMillis = 60000;
+        loadSpeechRecognizerJob.SetStatus(EJobStatus.Running);
+        JobManager.Instance.AddJob(loadSpeechRecognizerJob);
 
-        Subject<object> loadSpeechRecognitionModelSubject = new();
-        LoadSpeechRecognitionModelAsObservable(modelPath)
+        if (!SpeechRecognitionManager.Instance.TryGetOrCreateSpeechRecognizer(
+                parameters,
+                out string errorMessage,
+                out SpeechRecognizer _))
+        {
+            loadSpeechRecognizerJob.SetResult(EJobResult.Error);
+            return Observable.Create<SpeechRecognizer>(o =>
+            {
+                o.OnError(new Exception(errorMessage));
+                o.OnCompleted();
+                return Disposable.Empty;
+            });
+        }
+
+        Subject<SpeechRecognizer> loadSpeechRecognizerSubject = new();
+        LoadSpeechRecognizerAsObservable(parameters)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -136,30 +153,30 @@ public static class SpeechRecognitionUtils
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogError(ex);
-                loadSpeechRecognitionModelJob.SetResult(EJobResult.Error);
-                loadSpeechRecognitionModelSubject.OnError(ex);
+                loadSpeechRecognizerJob.SetResult(EJobResult.Error);
+                loadSpeechRecognizerSubject.OnError(ex);
             })
-            .Subscribe(_ =>
+            .Subscribe(speechRecognizer =>
             {
-                loadSpeechRecognitionModelJob.SetResult(EJobResult.Ok);
-                loadSpeechRecognitionModelSubject.OnNext(true);
-                loadSpeechRecognitionModelSubject.OnCompleted();
+                loadSpeechRecognizerJob.SetResult(EJobResult.Ok);
+                loadSpeechRecognizerSubject.OnNext(speechRecognizer);
+                loadSpeechRecognizerSubject.OnCompleted();
             });
-        return loadSpeechRecognitionModelSubject;
+        return loadSpeechRecognizerSubject;
     }
 
-    private static IObservable<bool> LoadSpeechRecognitionModelAsObservable(
-        string modelPath)
+    private static IObservable<SpeechRecognizer> LoadSpeechRecognizerAsObservable(
+        SpeechRecognitionParameters parameters)
     {
         if (speechRecognitionProcessCount > 0)
         {
             UiManager.CreateNotification("Already performing speech recognition");
-            return Observable.Throw<bool>(new IllegalStateException("Already performing speech recognition"));
+            return Observable.Throw<SpeechRecognizer>(new IllegalStateException("Already performing speech recognition"));
         }
 
         SpeechRecognitionManager speechRecognitionManager = SpeechRecognitionManager.Instance;
 
-        return Observable.Create<bool>(o =>
+        return Observable.Create<SpeechRecognizer>(o =>
         {
             lock (lockObject)
             {
@@ -167,13 +184,14 @@ public static class SpeechRecognitionUtils
                 {
                     speechRecognitionProcessCount++;
 
-                    if (!speechRecognitionManager.TryLoadSpeechRecognitionModel(modelPath, out string errorMessage))
+                    if (!speechRecognitionManager.TryInitExistingSpeechRecognizer(parameters, out string errorMessage))
                     {
                         o.OnError(new IllegalStateException(errorMessage));
                         return Disposable.Empty;
                     }
 
-                    o.OnNext(true);
+                    SpeechRecognizer existingSpeechRecognizer = speechRecognitionManager.GetExistingSpeechRecognizer(parameters);
+                    o.OnNext(existingSpeechRecognizer);
                     o.OnCompleted();
 
                     return Disposable.Empty;
@@ -191,39 +209,57 @@ public static class SpeechRecognitionUtils
         });
     }
 
-    public static IObservable<VoskResultJson> DoSpeechRecognitionAsObservable(
+    public static IObservable<SpeechRecognitionResult> DoSpeechRecognitionAsObservable(
         float[] monoSamples,
         int startIndex,
         int endIndex,
         int sampleRate,
         CancellationToken cancellationToken,
         Action<double> onProgress,
-        VoskRecognizer speechRecognizer,
+        SpeechRecognizer speechRecognizer,
         bool continuous)
     {
         if (speechRecognitionProcessCount > 0)
         {
-            UiManager.CreateNotification("Already performing speech recognition");
-            return Observable.Throw<VoskResultJson>(new IllegalStateException("Already performing speech recognition"));
+            return Observable.Throw<SpeechRecognitionResult>(new IllegalStateException("Already performing speech recognition"));
+        }
+
+        if (startIndex < 0)
+        {
+            Debug.LogWarning("Received startIndex < 0. Setting startIndex to 0.");
+            startIndex = 0;
+        }
+        
+        int lengthInSamples = endIndex - startIndex;
+        if (lengthInSamples <= 0)
+        {
+            return Observable.Throw<SpeechRecognitionResult>(new IllegalStateException("No samples for speech recognition"));
         }
         
         // Do speech recognition in an observable. The observable's code may be executed on a background thread.
-        return Observable.Create<VoskResultJson>(o =>
+        return Observable.Create<SpeechRecognitionResult>(o =>
         {
             lock (lockObject)
             {
                 try
                 {
                     speechRecognitionProcessCount++;
+
+                    Stopwatch stopwatch = Stopwatch.StartNew();
                     
-                    short[] audioSamplesForSpeechRecognition = AudioUtils.ToShortSampleArray(monoSamples, startIndex, endIndex);
-                    VoskResultJson voskResultJson = AnalyzeSamples(audioSamplesForSpeechRecognition, speechRecognizer, sampleRate, cancellationToken, onProgress, continuous);
+                    SpeechRecognitionResult speechRecognitionResult = speechRecognizer.GetSpeechRecognitionResult(
+                        monoSamples,
+                        startIndex,
+                        endIndex,
+                        sampleRate,
+                        cancellationToken,
+                        onProgress);
 
                     double startSecond = (double)startIndex / sampleRate;
                     double endSecond = (double)endIndex / sampleRate;
-                    Debug.Log($"Analyzed text from second {startSecond:0.00} to second {endSecond:0.00}. Result: {voskResultJson?.text}");
+                    Debug.Log($"Analyzed text from second {startSecond:0.00} to second {endSecond:0.00} (duration of {endSecond-startSecond:0.00} seconds). Took {(stopwatch.ElapsedMilliseconds / 1000.0):0.00} seconds. Result: {speechRecognitionResult?.Text}");
                     
-                    o.OnNext(voskResultJson);
+                    o.OnNext(speechRecognitionResult);
                 }
                 catch (Exception ex)
                 {
@@ -240,87 +276,24 @@ public static class SpeechRecognitionUtils
             }
         });
     }
-
-    private static VoskResultJson AnalyzeSamples(
-        short[] monoSamplesArray,
-        VoskRecognizer speechRecognizer,
-        int sampleRate,
-        CancellationToken cancellationToken,
-        Action<double> onProgress,
-        bool continuous)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        using DisposableStopwatch ds = new("Speech recognition took <ms>");
-        
-        int targetWindowSizeInSeconds = 3;
-        int targetWindowSizeInSamples = sampleRate * targetWindowSizeInSeconds;
-        for (int sampleStartIndex = 0; sampleStartIndex < monoSamplesArray.Length; sampleStartIndex += targetWindowSizeInSamples)
-        {
-            double progressPercent = (double)sampleStartIndex / monoSamplesArray.Length * 100.0;
-            if (IsApplicationTerminating)
-            {
-                throw new Exception($"Exiting speech recognition at {(int)progressPercent} % because application is terminating");
-            }
-            if (cancellationToken.IsCancellationRequested)
-            {
-                Debug.Log($"Canceled speech recognition at {(int)progressPercent} %");
-                cancellationToken.ThrowIfCancellationRequested();
-            }
-
-            onProgress?.Invoke(progressPercent);
-
-            // Create array for the samples to be processed in this iteration
-            int remainingSampleCount = monoSamplesArray.Length - sampleStartIndex;
-            int windowSizeInSamples = remainingSampleCount < targetWindowSizeInSamples
-                ? remainingSampleCount
-                : targetWindowSizeInSamples;
-            short[] windowSamples = new short[windowSizeInSamples];
-            Array.Copy(monoSamplesArray, sampleStartIndex, windowSamples, 0, windowSizeInSamples);
-
-            // Process the samples
-            try
-            {
-                IsExternalSpeechRecognitionCallRunning = true;
-                speechRecognizer.AcceptWaveform(windowSamples, windowSamples.Length);
-            }
-            finally
-            {
-                IsExternalSpeechRecognitionCallRunning = false;
-            }
-        }
-
-        string voskResultJsonString = continuous
-            ? speechRecognizer.Result()
-            : speechRecognizer.FinalResult();
-        Debug.Log($"Raw speech recognition result: {voskResultJsonString}");
-        if (voskResultJsonString.IsNullOrEmpty())
-        {
-            return null;
-        }
-        VoskResultJson voskResultJson = JsonConverter.FromJson<VoskResultJson>(voskResultJsonString);
-        
-        if (!continuous)
-        {
-            speechRecognizer.Dispose();
-        }
-
-        return voskResultJson;
-    }
-
-    private static List<Note> CreateNotesFromVoskResult(
-        List<VoskResultWordJson> voskResultWords,
+    
+    private static List<Note> CreateNotesFromSpeechRecognitionResult(
+        List<SpeechRecognitionWordResult> words,
         SongMeta songMeta,
         int offsetInBeats,
         int midiNote)
     {
         double beatsPerSeconds = BpmUtils.GetBeatsPerSecond(songMeta);
-        List<Note> createdNotes = voskResultWords.Select(resultEntry =>
+        List<Note> createdNotes = words.Select(resultEntry =>
         {
-            int noteStartInBeats = offsetInBeats + (int)(resultEntry.start * beatsPerSeconds);
-            int noteEndInBeats = offsetInBeats + (int)(resultEntry.end * beatsPerSeconds);
+            int noteStartInBeats = offsetInBeats + (int)(resultEntry.Start.TotalSeconds * beatsPerSeconds);
+            int noteEndInBeats = offsetInBeats + (int)(resultEntry.End.TotalSeconds * beatsPerSeconds);
+            if (noteEndInBeats <= noteStartInBeats)
+            {
+                noteEndInBeats = noteStartInBeats + 1;
+            }
             int noteLengthInBeats = noteEndInBeats - noteStartInBeats;
-            string text = resultEntry.word + " ";
+            string text = resultEntry.Text;
             Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
             return createdNote;
         }).ToList();
@@ -354,38 +327,38 @@ public static class SpeechRecognitionUtils
         return wordsHashSet.ToList();
     }
 
-    public static void MapSpeechRecognitionResultTextToNotes(SongMeta songMeta, List<VoskResultWordJson> wordsJson, List<Note> notes, int wordOffsetInBeats)
+    public static void MapSpeechRecognitionResultTextToNotes(SongMeta songMeta, List<SpeechRecognitionWordResult> words, List<Note> notes, int wordOffsetInBeats)
     {
-        List<VoskResultWordJson> unusedWordsJson = wordsJson.ToList();
+        List<SpeechRecognitionWordResult> unusedWords = words.ToList();
         List<Note> unsetNotes = notes.ToList();
 
         // First round: Best matching word is the word that has the largest temporal overlap with the note
         unsetNotes.ToList().ForEach(note =>
         {
-            VoskResultWordJson bestMatchingWordJson = null;
+            SpeechRecognitionWordResult bestMatchingWord = null;
             double bestMatchingWordOverlapInMillis = 0;
-            foreach (VoskResultWordJson wordJson in unusedWordsJson)
+            foreach (SpeechRecognitionWordResult word in unusedWords)
             {
                 double noteStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.StartBeat - wordOffsetInBeats);
                 double noteEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.EndBeat - wordOffsetInBeats);
 
                 double overlapInMillis = NumberUtils.GetIntersectionLength(
                     noteStartInMillis, noteEndInMillis,
-                    wordJson.start * 1000, wordJson.end * 1000);
+                    word.Start.TotalMilliseconds, word.End.TotalMilliseconds);
                 if (overlapInMillis > 0
-                    && (bestMatchingWordJson == null
+                    && (bestMatchingWord == null
                         || bestMatchingWordOverlapInMillis < overlapInMillis))
                 {
-                    bestMatchingWordJson = wordJson;
+                    bestMatchingWord = word;
                     bestMatchingWordOverlapInMillis = overlapInMillis;
                 }
             }
 
-            if (bestMatchingWordJson != null)
+            if (bestMatchingWord != null)
             {
-                note.SetText(bestMatchingWordJson.word + " ");
+                note.SetText(bestMatchingWord.Text + " ");
                 // Do not use this word again
-                unusedWordsJson.Remove(bestMatchingWordJson);
+                unusedWords.Remove(bestMatchingWord);
                 unsetNotes.Remove(note);
             }
         });

@@ -1,103 +1,107 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Reflection;
 using System.Threading;
 using UniInject;
 using UnityEngine;
-using Vosk;
+using Whisper;
+using Object = UnityEngine.Object;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposable
+public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 {
     public static SpeechRecognitionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SpeechRecognitionManager>();
 
-    private readonly Dictionary<string, Model> pathToSpeechRecognitionModel = new();
-    private VoskRecognizer lastVoskRecognizer;
+    [InjectedInInspector]
+    public WhisperManager whisperManagerPrefab;
+    
+    [Inject]
+    private Settings settings;
 
-    public bool HasLoadedSpeechRecognitionModel(string modelPath)
+    private readonly Dictionary<SpeechRecognitionParameters, SpeechRecognizer> parametersToSpeechRecognizer = new();
+
+    public SpeechRecognizer GetExistingSpeechRecognizer(SpeechRecognitionParameters parameters)
     {
-        return pathToSpeechRecognitionModel.ContainsKey(modelPath);
-    }
-
-    public VoskRecognizer CreateSpeechRecognizer(SpeechRecognitionParameters speechRecognitionParameters)
-    {
-        // Load the model if needed
-        if (!HasLoadedSpeechRecognitionModel(speechRecognitionParameters.ModelPath))
+        if (parametersToSpeechRecognizer.TryGetValue(parameters, out SpeechRecognizer speechRecognizer))
         {
-            using (new DisposableStopwatch("Create speech recognition model took <ms>"))
-            {
-                if (!TryLoadSpeechRecognitionModel(speechRecognitionParameters.ModelPath, out string errorMessage))
-                {
-                    throw new IllegalStateException(errorMessage);
-                }
-            }
-        }
-        Model speechRecognitionModel = pathToSpeechRecognitionModel[speechRecognitionParameters.ModelPath];
-
-        using (new DisposableStopwatch("Create speech recognizer took <ms>"))
-        {
-            if (!HasLoadedSpeechRecognitionModel(speechRecognitionParameters.ModelPath))
-            {
-                throw new IllegalStateException("Speech recognition model not loaded");
-            }
-            if (speechRecognitionParameters.SampleRate <= 0)
-            {
-                throw new IllegalStateException("Invalid sample rate");
-            }
-
-            // Vosk always expects a new recognizer object for a new stream
-            // See https://github.com/alphacep/vosk-api/issues/919
-            lastVoskRecognizer?.Dispose();
-            if (!speechRecognitionParameters.Phrases.IsNullOrEmpty())
-            {
-                string voskGrammar = JsonConverter.ToJson(speechRecognitionParameters.Phrases);
-                lastVoskRecognizer = new(speechRecognitionModel, speechRecognitionParameters.SampleRate, voskGrammar);
-            }
-            else
-            {
-                lastVoskRecognizer = new(speechRecognitionModel, speechRecognitionParameters.SampleRate);
-            }
-
-            lastVoskRecognizer.SetWords(true);
+            return speechRecognizer;
         }
 
-        return lastVoskRecognizer;
+        return null;
     }
 
-    public bool TryLoadSpeechRecognitionModel(string modelPath, out string errorMessage)
+    public bool TryInitExistingSpeechRecognizer(SpeechRecognitionParameters parameters, out string errorMessage)
     {
-        if (HasLoadedSpeechRecognitionModel(modelPath))
+        if (parametersToSpeechRecognizer.TryGetValue(parameters, out SpeechRecognizer speechRecognizer))
         {
-            // Nothing to do
+            if (!speechRecognizer.IsLoaded)
+            {
+                speechRecognizer.InitModel();
+            }
             errorMessage = "";
             return true;
         }
 
+        errorMessage = $"No speech recognizer found for parameters {parameters}";
+        return false;
+    }
+    
+    public bool TryGetOrCreateSpeechRecognizer(SpeechRecognitionParameters parameters, out string errorMessage, out SpeechRecognizer speechRecognizer)
+    {
+        if (parametersToSpeechRecognizer.TryGetValue(parameters, out speechRecognizer))
+        {
+            Log.Debug(() => $"Reusing cached speech recognizer for parameters {parameters}");
+            errorMessage = "";
+            return true;
+        }
+
+        string modelPath = parameters.ModelPath;
         if (modelPath.IsNullOrEmpty())
         {
             errorMessage = "Set the speech recognition model path first.";
             return false;
         }
-        if (!Directory.Exists(modelPath))
+        if (!FileUtils.Exists(modelPath))
         {
-            errorMessage = "Speech recognition model path is not a valid folder path.";
+            errorMessage = "Speech recognition model path is not a valid file path.";
             return false;
         }
-
-        Debug.Log($"Loading speech recognition model from {modelPath}");
-        Model speechRecognitionModel = new(modelPath);
-        pathToSpeechRecognitionModel[modelPath] = speechRecognitionModel;
+        
+        speechRecognizer = CreateSpeechRecognizer(parameters);
+        
         errorMessage = "";
         return true;
     }
 
-    public void Dispose()
+    private SpeechRecognizer CreateSpeechRecognizer(SpeechRecognitionParameters parameters)
     {
-        lastVoskRecognizer?.Dispose();
-        pathToSpeechRecognitionModel.Values.ForEach(model => model?.Dispose());
-        pathToSpeechRecognitionModel.Clear();
+        WhisperManager whisperManager = CreateWhisperManager(
+            parameters.ModelPath,
+            parameters.SpeechRecognitionLanguage,
+            parameters.Prompt);
+        SpeechRecognizer speechRecognizer = new(parameters, whisperManager);
+        parametersToSpeechRecognizer[parameters] = speechRecognizer;
+        return speechRecognizer;
+    }
+
+    private WhisperManager CreateWhisperManager(string modelPath, string language, string prompt)
+    {
+        language = language.ToLowerInvariant();
+        Debug.Log($"Creating WhisperManager with model '{modelPath}', modelPath: {modelPath}, prompt: {prompt}");
+
+        WhisperManager whisperManager = Instantiate<WhisperManager>(whisperManagerPrefab, transform);
+        whisperManager.name = $"WhisperManager language: {language}, modelPath: {modelPath}, prompt: {prompt}";
+        whisperManager.IsModelPathInStreamingAssets = false;
+        whisperManager.ModelPath = modelPath;
+        whisperManager.language = language;
+        whisperManager.initialPrompt = prompt;
+        whisperManager.enableTokens = true;
+        whisperManager.tokensTimestamps = true;
+        whisperManager.translateToEnglish = false;
+        whisperManager.singleSegment = false;
+        return whisperManager;
     }
 
     private void OnApplicationQuit()
@@ -112,7 +116,5 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection, IDisposab
             Debug.Log("Waiting for speech recognition to finish");
             Thread.Sleep(500);
         }
-
-        Dispose();
     }
 }

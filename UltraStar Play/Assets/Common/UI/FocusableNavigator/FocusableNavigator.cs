@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PrimeInputActions;
+using Serilog.Events;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -30,7 +32,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     
     public bool focusLastElementIfNothingFocused;
 
-    public bool logFocusedVisualElements;
+    public LogEventLevel logLevel = LogEventLevel.Debug;
 
     public VisualElement FocusedVisualElement => uiDocument != null
         ? uiDocument.rootVisualElement?.focusController?.focusedElement as VisualElement
@@ -61,10 +63,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
         noNavigationTargetFoundEventStream.Subscribe(evt =>
         {
-            if (logFocusedVisualElements)
-            {
-                Debug.Log($"No navigation target found: {evt}");
-            }
+            Log.WithLevel(logLevel, () => $"No navigation target found: {evt}");
         });
     }
 
@@ -318,10 +317,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         if (navigationDirection.y > 0
             && selectedIndex > 0)
         {
-            if (logFocusedVisualElements)
-            {
-                Debug.Log("Select previous item in ListView");
-            }
+            Log.WithLevel(logLevel, () => "Select previous item in ListView");
             listView.SetSelectionAndScrollTo(selectedIndex - 1);
             TryFocusSelectedListViewItem(listView);
             return true;
@@ -329,10 +325,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         else if (navigationDirection.y < 0
                  && selectedIndex < listView.itemsSource.Count - 1)
         {
-            if (logFocusedVisualElements)
-            {
-                Debug.Log("Select next item in ListView");
-            }
+            Log.WithLevel(logLevel, () => "Select next item in ListView");
             listView.SetSelectionAndScrollTo(selectedIndex + 1);
             TryFocusSelectedListViewItem(listView);
             return true;
@@ -378,10 +371,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         if (navigationDirection.x < 0
             && selectedIndex > 0)
         {
-            if (logFocusedVisualElements)
-            {
-                Debug.Log("Select previous item in ListView");
-            }
+            Log.WithLevel(logLevel, () => "Select previous item in ListView");
             listView.SetSelectionAndScrollTo(selectedIndex - 1);
             TryFocusSelectedListViewItem(listView);
             return true;
@@ -389,10 +379,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         else if (navigationDirection.x > 0
                  && selectedIndex < listView.itemsSource.Count - 1)
         {
-            if (logFocusedVisualElements)
-            {
-                Debug.Log("Select next item in ListView");
-            }
+            Log.WithLevel(logLevel, () => "Select next item in ListView");
             listView.SetSelectionAndScrollTo(selectedIndex + 1);
             TryFocusSelectedListViewItem(listView);
             return true;
@@ -424,10 +411,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             }
 
             VisualElement firstFocusableVisualElement = focusableVisualElements[0];
-            if (logFocusedVisualElements)
-            {
-                Debug.Log($"Moving focus to first focusable VisualElement in selected ListView item: {firstFocusableVisualElement}");
-            }
+            Log.WithLevel(logLevel, () => $"Moving focus to first focusable VisualElement in selected ListView item: {firstFocusableVisualElement}");
             firstFocusableVisualElement.Focus();
         }
     }
@@ -444,10 +428,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             }
 
             VisualElement firstFocusableVisualElement = focusableVisualElements[0];
-            if (logFocusedVisualElements)
-            {
-                Debug.Log($"Moving focus to first focusable VisualElement in selected ListView item: {firstFocusableVisualElement}");
-            }
+            Log.WithLevel(logLevel, () => $"Moving focus to first focusable VisualElement in selected ListView item: {firstFocusableVisualElement}");
             firstFocusableVisualElement.Focus();
         }
     }
@@ -456,11 +437,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         VisualElement focusedVisualElement,
         Vector2 navigationDirection)
     {
-        if (logFocusedVisualElements)
-        {
-            Debug.Log("NavigateDropdownList");
-        }
-        
+        Log.WithLevel(logLevel, () => "NavigateDropdownList");
+
         if (navigationDirection.y > 0)
         {
             focusedVisualElement.SendEvent(NavigationMoveEvent.GetPooled(NavigationMoveEvent.Direction.Up));
@@ -530,10 +508,9 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     protected void DoFocusVisualElement(VisualElement visualElement, string logMessage)
     {
-        if (logFocusedVisualElements
-            && !logMessage.IsNullOrEmpty())
+        if (!logMessage.IsNullOrEmpty())
         {
-            Debug.Log(logMessage);
+            Log.WithLevel(logLevel, () => logMessage);
         }
 
         if (visualElement == null)

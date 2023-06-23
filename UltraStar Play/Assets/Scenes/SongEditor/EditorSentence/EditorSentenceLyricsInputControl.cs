@@ -25,7 +25,7 @@ public class EditorSentenceLyricsInputControl : EditorLyricsInputPopupControl
 
     protected override void ApplyNewText(string newText)
     {
-        if (!LyricsUtils.IsOnlyWhitespace(newText))
+        if (!StringUtils.IsOnlyWhitespace(newText))
         {
             ApplyEditModeText(newText, true);
         }

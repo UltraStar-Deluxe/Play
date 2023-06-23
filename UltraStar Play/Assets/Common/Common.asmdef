@@ -17,11 +17,11 @@
         "com.achimmihca.portaudioforunity",
         "playshared",
         "playsharedui",
-        "Vosk",
         "SpleeterSharp",
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
-        "LiteNetLib"
+        "LiteNetLib",
+        "com.whisper.unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

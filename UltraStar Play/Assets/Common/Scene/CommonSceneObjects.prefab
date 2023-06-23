@@ -8749,6 +8749,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2b0cc51ba6cdf44a91a7f831afdf2c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  whisperManagerPrefab: {fileID: 4159576471388054935, guid: cbc5e63d248305843853deae3bbaa2db,
+    type: 3}
 --- !u!1 &8818085272773697541
 GameObject:
   m_ObjectHideFlags: 0
