@@ -124,7 +124,8 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         false,
                         settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                         songMeta,
-                        0)
+                        0,
+                        SettingsUtils.CreateHyphenator(settings))
                     .CatchIgnore((Exception ex) =>
                     {
                         Debug.LogError(ex);

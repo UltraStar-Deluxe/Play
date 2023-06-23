@@ -137,7 +137,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
-                offsetInBeats)
+                offsetInBeats,
+                SettingsUtils.CreateHyphenator(settings))
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogError(ex);
@@ -203,7 +204,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
-                startBeat)
+                startBeat,
+                SettingsUtils.CreateHyphenator(settings))
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogError(ex);

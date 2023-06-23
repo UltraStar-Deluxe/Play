@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using NHyphenator;
+using NHyphenator.Loaders;
 using UniRx;
 using UnityEngine;
 using Whisper;
@@ -39,7 +41,8 @@ public static class SpeechRecognitionUtils
         bool continuous,
         int midiNote,
         SongMeta songMeta,
-        int offsetInBeats)
+        int offsetInBeats,
+        Hyphenator hyphenator)
     {
         CancellationTokenSource cancellationTokenSource = new();
         Action<double> onProgress;
@@ -96,7 +99,7 @@ public static class SpeechRecognitionUtils
                     {
                         speechRecognitionJob?.SetResult(EJobResult.Ok);
                         List<Note> createdNotes = speechRecognitionResult != null && !speechRecognitionResult.Words.IsNullOrEmpty()
-                            ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote)
+                            ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote, hyphenator)
                             : new List<Note>();
 
                         createNotesFromSpeechRecognitionSubject.OnNext(createdNotes);
@@ -281,7 +284,8 @@ public static class SpeechRecognitionUtils
         List<SpeechRecognitionWordResult> words,
         SongMeta songMeta,
         int offsetInBeats,
-        int midiNote)
+        int midiNote,
+        Hyphenator hyphenator)
     {
         double beatsPerSeconds = BpmUtils.GetBeatsPerSecond(songMeta);
         List<Note> createdNotes = words.Select(resultEntry =>
@@ -300,6 +304,16 @@ public static class SpeechRecognitionUtils
         
         // Shorten new notes left and right to give a little space
         AddSpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, 150, songMeta);
+        
+        // Split syllables if hyphenation is enabled
+        if (hyphenator != null)
+        {
+            string hyphenatedText = createdNotes
+                .Select(it => hyphenator.HyphenateText(it.Text))
+                .Select(it => $"'{it}'")
+                .ToCsv("|");
+            Debug.Log("Hyphenated text: " + hyphenatedText);
+        }
         
         return createdNotes;
     }
