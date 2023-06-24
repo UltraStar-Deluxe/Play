@@ -304,7 +304,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
 
     public void SetLyrics(string newText)
     {
-        string visibleWhitespaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newText);
+        string visibleWhitespaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(newText);
         switch (Note.Type)
         {
             case ENoteType.Freestyle:

@@ -308,14 +308,34 @@ public static class SpeechRecognitionUtils
         // Split syllables if hyphenation is enabled
         if (hyphenator != null)
         {
-            string hyphenatedText = createdNotes
-                .Select(it => hyphenator.HyphenateText(it.Text))
-                .Select(it => $"'{it}'")
-                .ToCsv("|");
-            Debug.Log("Hyphenated text: " + hyphenatedText);
+            HypenateNotes(songMeta, createdNotes, hyphenator);
         }
         
         return createdNotes;
+    }
+
+    private static void HypenateNotes(SongMeta songMeta, List<Note> createdNotes, Hyphenator hyphenator)
+    {
+        List<Note> newNotes = new();
+        foreach (Note note in createdNotes)
+        {
+            string newText = hyphenator.HyphenateText(note.Text);
+            if (newText == note.Text)
+            {
+                continue;
+            }
+            
+            EditLyricsUtils.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
+            newNotes.AddRange(notesAfterSplit);
+        }
+        
+        foreach (Note newNote in newNotes)
+        {
+            if (!createdNotes.Contains(newNote))
+            {
+                createdNotes.Add(newNote);
+            }
+        }
     }
 
     public static List<string> GetSpeechRecognitionPhrases(string lyrics)
