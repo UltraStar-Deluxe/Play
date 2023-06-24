@@ -21,9 +21,9 @@ public class HyphenationPatternsProvider : IHyphenatePatternsLoader
         this.hyphenationExceptionsText = hyphenationExceptionsText;
     }
 
-    public string LoadExceptions() => hyphenationPatternsText;
+    public string LoadExceptions() => hyphenationExceptionsText;
 
-    public string LoadPatterns() => hyphenationExceptionsText;
+    public string LoadPatterns() => hyphenationPatternsText;
     
     public static IHyphenatePatternsLoader CreateHyphenationPatternsLoader(string language)
     {
@@ -36,14 +36,17 @@ public class HyphenationPatternsProvider : IHyphenatePatternsLoader
         TextAsset fileNamesTextAsset = Resources.Load<TextAsset>("HyphenationPatterns/HyphenationPatternFileNames");
         string fileNamesText = fileNamesTextAsset.text.Replace("\r\n", "\n");
         string[] fileNames = fileNamesText.Split('\n');
+        
         string patternFileName = fileNames.FirstOrDefault(fileName =>
             fileName.EndsWith(".pat.txt")
             && (fileName.Contains($"-{twoLetterCountryCode}-") 
                 || fileName.Contains($"-{twoLetterCountryCode}.")));
         if (patternFileName.IsNullOrEmpty())
         {
+            Debug.Log($"No pattern file found for language {language} two letter country code {twoLetterCountryCode}");
             return null;
         }
+        Debug.Log($"Loading hyphenation patterns for language: {language}, two letter country code: {twoLetterCountryCode} from file {patternFileName}");
         
         string exceptionsFileName = fileNames.FirstOrDefault(fileName =>
             fileName.EndsWith(".hyp.txt")

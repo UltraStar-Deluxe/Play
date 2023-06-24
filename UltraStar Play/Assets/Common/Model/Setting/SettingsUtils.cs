@@ -92,7 +92,7 @@ public static class SettingsUtils
             return null;
         }
         
-        Hyphenator hyphenator = new Hyphenator(hyphenatePatternsLoader, ";", 5, 0, false, true);
+        Hyphenator hyphenator = new Hyphenator(hyphenatePatternsLoader, "-", 5, 0, true, true);
         return hyphenator;
     }
 }
