@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using NHyphenator;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -127,6 +128,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             return Observable.Empty<List<Note>>();
         }
 
+        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
+            ? SettingsUtils.CreateHyphenator(settings)
+            : null;
+        
         IObservable<List<Note>> createNotesObservable = SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
                 monoAudioSamples,
                 startIndex,
@@ -138,7 +143,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
                 offsetInBeats,
-                SettingsUtils.CreateHyphenator(settings),
+                hyphenator,
                 settings.SongEditorSettings.SpaceBetweenNotesInMillis)
             .CatchIgnore((Exception ex) =>
             {
@@ -195,6 +200,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         
         float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, startBeat, lengthInBeats, true);
 
+        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
+            ? SettingsUtils.CreateHyphenator(settings)
+            : null;
+        
         IObservable<List<Note>> createNotesObservable = SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
                 monoAudioSamples,
                 0,
@@ -206,7 +215,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
                 startBeat,
-                SettingsUtils.CreateHyphenator(settings),
+                hyphenator,
                 settings.SongEditorSettings.SpaceBetweenNotesInMillis)
             .CatchIgnore((Exception ex) =>
             {

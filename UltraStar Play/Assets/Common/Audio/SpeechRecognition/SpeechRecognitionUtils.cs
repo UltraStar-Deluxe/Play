@@ -310,7 +310,7 @@ public static class SpeechRecognitionUtils
         // Split syllables if hyphenation is enabled
         if (hyphenator != null)
         {
-            HypenateNotes(songMeta, createdNotes, hyphenator);
+            HyphenateNotesUtils.HypenateNotes(songMeta, createdNotes, hyphenator);
         }
         
         // Shorten new notes left and right to give a little space
@@ -320,30 +320,6 @@ public static class SpeechRecognitionUtils
         }
         
         return createdNotes;
-    }
-
-    private static void HypenateNotes(SongMeta songMeta, List<Note> createdNotes, Hyphenator hyphenator)
-    {
-        List<Note> newNotes = new();
-        foreach (Note note in createdNotes)
-        {
-            string newText = hyphenator.HyphenateText(note.Text);
-            if (newText == note.Text)
-            {
-                continue;
-            }
-            
-            EditLyricsUtils.TryApplyEditModeText(songMeta, note, newText, out List<Note> notesAfterSplit);
-            newNotes.AddRange(notesAfterSplit);
-        }
-        
-        foreach (Note newNote in newNotes)
-        {
-            if (!createdNotes.Contains(newNote))
-            {
-                createdNotes.Add(newNote);
-            }
-        }
     }
 
     public static List<string> GetSpeechRecognitionPhrases(string lyrics)

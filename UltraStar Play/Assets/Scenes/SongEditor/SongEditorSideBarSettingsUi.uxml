@@ -8,7 +8,7 @@
             <ui:Toggle name="autoSaveToggle" label="Auto Save" />
             <ItemPicker no-previous-button="true" name="drawNoteLayerPicker" wrap-around="true" label="Draw Notes on Layer" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
             <ui:IntegerField picking-mode="Ignore" value="100" text="300" name="spaceBetweenNotesTimeInMillisTextField" label="Space between notes (ms)" is-delayed="true" style="flex-direction: column;" />
-            <ui:Button text="Add Spae Between Notes" display-tooltip-when-elided="true" name="addSpaceBetweenNotesButton" />
+            <ui:Button text="Add Space Between Notes&#10;in Selection" display-tooltip-when-elided="true" name="addSpaceBetweenNotesButton" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="musicGroup" label="Playback">
             <ui:Toggle name="goToLastPlaybackPositionToggle" label="Jump back on pause&#10;" />
@@ -27,10 +27,12 @@
             <ui:EnumField label="Language (default: English)" type="EWhisperLanguage, Common" value="English" name="speechRecognitionLanguageChooser" style="flex-direction: column;" />
             <ui:TextField text="vosk-model-small-en-us-0.15" name="speechRecognitionModelPathTextField" is-delayed="true" label="Model Path" class="smallControl" style="flex-direction: column;" />
             <ui:Button text="Change Model Path" display-tooltip-when-elided="true" name="selectModelPathButton" />
-            <ui:TextField name="speechRecognitionPromptTextField" is-delayed="true" multiline="true" label="Prompt with guidelines" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;" />
+            <ui:TextField name="speechRecognitionPromptTextField" is-delayed="true" multiline="true" label="Prompt with guidelines (optional)" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column;" />
             <ui:TextField name="speechRecognitionPhrasesTextField" is-delayed="true" multiline="true" label="Words to recognize" class="smallFont multiline" style="white-space: normal; width: 100%; min-height: 120px; flex-direction: column; display: none;" />
             <ItemPicker name="speechRecognitionAudioPicker" no-previous-button="true" wrapAround="true" label="Audio to Analyze" class="controlWithLabelVertical" />
             <ui:Button text="Analyze Speech&#10;in Selection" display-tooltip-when-elided="true" name="doSpeechRecognitionButton" style="width: 100%; height: auto;" />
+            <ui:Toggle name="splitSyllablesAfterSpeechRecognitionToggle" label="Split syllables after&#10;speech recognition" />
+            <ui:Button text="Split Syllables&#10;in Selection" display-tooltip-when-elided="true" name="splitSyllablesInSelectionButton" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="pitchDetectionGroup" label="Pitch Detection" style="display: none;">
             <ItemPicker no-previous-button="true" name="pitchDetectionAlgorithmItemPicker" wrapAround="true" label="Algorithm" class="smallControl controlWithLabelVertical" style="max-height: none; display: none;" />

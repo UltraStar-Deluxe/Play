@@ -753,6 +753,8 @@ public static partial class R
         public const string speechRecognitionPhrasesTextField = "speechRecognitionPhrasesTextField";
         public const string speechRecognitionPromptTextField = "speechRecognitionPromptTextField";
         public const string speechRecognitionWhenRecordingToggle = "speechRecognitionWhenRecordingToggle";
+        public const string splitSyllablesAfterSpeechRecognitionToggle = "splitSyllablesAfterSpeechRecognitionToggle";
+        public const string splitSyllablesInSelectionButton = "splitSyllablesInSelectionButton";
         public const string starIcons = "starIcons";
         public const string stars = "stars";
         public const string startButton = "startButton";
