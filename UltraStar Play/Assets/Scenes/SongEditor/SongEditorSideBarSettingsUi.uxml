@@ -7,6 +7,8 @@
             <ui:Toggle name="syncLyricsAreaToggle" label="Synchronize position&#10;with lyrics cursor&#10;" />
             <ui:Toggle name="autoSaveToggle" label="Auto Save" />
             <ItemPicker no-previous-button="true" name="drawNoteLayerPicker" wrap-around="true" label="Draw Notes on Layer" class="controlWithLabelVertical mb-2" style="flex-direction: column;" />
+            <ui:IntegerField picking-mode="Ignore" value="100" text="300" name="spaceBetweenNotesTimeInMillisTextField" label="Space between notes (ms)" is-delayed="true" style="flex-direction: column;" />
+            <ui:Button text="Add Spae Between Notes" display-tooltip-when-elided="true" name="addSpaceBetweenNotesButton" />
         </SongEditorSideBarGroup>
         <SongEditorSideBarGroup name="musicGroup" label="Playback">
             <ui:Toggle name="goToLastPlaybackPositionToggle" label="Jump back on pause&#10;" />

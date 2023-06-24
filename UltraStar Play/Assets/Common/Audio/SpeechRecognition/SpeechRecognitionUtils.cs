@@ -303,7 +303,7 @@ public static class SpeechRecognitionUtils
         }).ToList();
         
         // Shorten new notes left and right to give a little space
-        AddSpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, 150, songMeta);
+        SpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
         
         // Split syllables if hyphenation is enabled
         if (hyphenator != null)

@@ -279,7 +279,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
             NoteAreaSelectionDragListener.lastSelectionRect.Value.LengthInBeats,
             settings.SongEditorSettings.SpeechRecognitionSamplesSource,
-            2,
+            150,
             true,
             speechRecognitionParameters,
             false);

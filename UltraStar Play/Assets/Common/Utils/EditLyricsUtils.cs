@@ -101,7 +101,7 @@ public class EditLyricsUtils
             currentNote.SetText(currentNote.Text.Replace(";", "")));
 
         // Shorten new notes left and right to give a little space
-        AddSpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, 150, songMeta);
+        SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, 150, songMeta);
         
         return notesAfterSplit;
     }

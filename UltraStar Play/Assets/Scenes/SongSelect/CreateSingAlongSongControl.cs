@@ -144,7 +144,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                             MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceName, false));
 
                         // (4) Add Space between notes
-                        AddSpaceBetweenNotesUtils.AddSpaceInBeatsBetweenNotes(createdNotes, 1);
+                        SpaceBetweenNotesUtils.AddSpaceInBeatsBetweenNotes(createdNotes, 1);
 
                         // (5) Run pitch detection on vocals audio
                         pitchDetectionJob.SetStatus(EJobStatus.Running);

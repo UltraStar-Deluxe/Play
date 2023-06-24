@@ -16,6 +16,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.autoSaveToggle)]
     private Toggle autoSaveToggle;
 
+    [Inject(UxmlName = R.UxmlNames.spaceBetweenNotesTimeInMillisTextField)]
+    private IntegerField spaceBetweenNotesTimeInMillisTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.addSpaceBetweenNotesButton)]
+    private Button addSpaceBetweenNotesButton;
+    
     [Inject(UxmlName = R.UxmlNames.goToLastPlaybackPositionToggle)]
     private Toggle goToLastPlaybackPositionToggle;
 
@@ -171,6 +177,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private SongEditorSelectionControl selectionControl;
+    
+    [Inject]
+    private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
     private LabeledItemPickerControl<ESongEditorRecordingSource> recordingSourceItemPickerControl;
     private LabeledItemPickerControl<MicProfile> micDeviceItemPickerControl;
@@ -212,6 +224,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         drawNoteLayerPickerControl.Bind(
             () => settings.SongEditorSettings.DrawNoteLayer,
             newValue => settings.SongEditorSettings.DrawNoteLayer = newValue);
+        
+        // Add space between notes
+        Bind(spaceBetweenNotesTimeInMillisTextField,
+            () => settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+            newValue => settings.SongEditorSettings.SpaceBetweenNotesInMillis = newValue);
+
+        addSpaceBetweenNotesButton.RegisterCallbackButtonTriggered(_ => AddSpaceBetweenNotes());
         
         // Playback speed
         songAudioPlayer.PlaybackSpeed = nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value;
@@ -458,6 +477,27 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         new LabeledItemPickerControl<ESongEditorPitchLabelFormat>(pitchLabelFormatPicker, EnumUtils.GetValuesAsList<ESongEditorPitchLabelFormat>())
             .Bind(() => settings.SongEditorSettings.PitchLabelFormat,
                 newValue => settings.SongEditorSettings.PitchLabelFormat = newValue);
+    }
+
+    private void AddSpaceBetweenNotes()
+    {
+        int spaceInMillis = settings.SongEditorSettings.SpaceBetweenNotesInMillis;
+        if (spaceInMillis <= 0)
+        {
+            return;
+        }
+        
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            // Perform on all notes, but per voice
+            songMeta.GetVoices()
+                .ForEach(voice => spaceBetweenNotesAction.ExecuteAndNotify(songMeta, SongMetaUtils.GetAllNotes(voice), spaceInMillis));
+        }
+        else
+        {
+            spaceBetweenNotesAction.ExecuteAndNotify(songMeta, selectedNotes, spaceInMillis);
+        }
     }
 
     private void SetMusicPlaybackSpeed(float newValue)

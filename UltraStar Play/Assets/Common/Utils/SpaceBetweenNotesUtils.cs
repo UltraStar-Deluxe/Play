@@ -2,12 +2,13 @@
 using System.Linq;
 using UnityEngine;
 
-public static class AddSpaceBetweenNotesUtils
+public static class SpaceBetweenNotesUtils
 {
+    public const int DefaultSpaceBetweenNotesInMillis = 150;
+    
     public static void AddSpaceInMillisBetweenNotes(IReadOnlyCollection<Note> notes, int millis, SongMeta songMeta)
     {
         double beats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, millis);
-        Debug.Log("AddSpaceInMillisBetweenNotes - lengthInBeats: " + beats);
         if (beats < 1)
         {
             return;
@@ -22,6 +23,8 @@ public static class AddSpaceBetweenNotesUtils
         {
             return;
         }
+
+        Debug.Log("AddSpaceInBeatsBetweenNotes - spaceInBeats: " + spaceInBeats);
 
         // Sort notes
         List<Note> sortedNotes = notes.OrderBy(note => note.StartBeat).ToList();

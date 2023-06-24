@@ -11,20 +11,20 @@ public class SpaceBetweenNotesAction : INeedInjection
     [Inject]
     private UiManager uiManager;
 
-    public void Execute(IReadOnlyCollection<Note> selectedNotes, int spaceInBeats)
+    public void Execute(SongMeta songMeta, IReadOnlyCollection<Note> selectedNotes, int spaceInMillis)
     {
-        if (spaceInBeats <= 0)
+        if (spaceInMillis <= 0)
         {
-            UiManager.CreateNotification("Minimum amount of space (in beats) must be greater than 0.");
+            UiManager.CreateNotification("Minimum amount of space must be greater than 0.");
             return;
         }
 
-        AddSpaceBetweenNotesUtils.AddSpaceInBeatsBetweenNotes(selectedNotes, spaceInBeats);
+        SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(selectedNotes, spaceInMillis, songMeta);
     }
 
-    public void ExecuteAndNotify(IReadOnlyCollection<Note> selectedNotes, int spaceInBeats)
+    public void ExecuteAndNotify(SongMeta songMeta, IReadOnlyCollection<Note> selectedNotes, int spaceInMillis)
     {
-        Execute(selectedNotes, spaceInBeats);
+        Execute(songMeta, selectedNotes, spaceInMillis);
         songMetaChangeEventStream.OnNext(new NotesChangedEvent());
     }
 }

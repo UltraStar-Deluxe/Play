@@ -114,7 +114,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int startIndex,
         int endIndex,
         int sampleRate,
-        int spaceBetweenNotesInBeats,
+        int spaceBetweenNotesInMillis,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
         bool continuous,
@@ -153,9 +153,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
             });
 
-            if (spaceBetweenNotesInBeats > 0)
+            if (spaceBetweenNotesInMillis > 0)
             {
-                spaceBetweenNotesAction.Execute(createdNotes, spaceBetweenNotesInBeats);
+                spaceBetweenNotesAction.Execute(songMeta, createdNotes, spaceBetweenNotesInMillis);
             }
 
             if (notify)
@@ -170,7 +170,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int startBeat,
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
-        int spaceBetweenNotesInBeats,
+        int spaceBetweenNotesInMillis,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
         bool continuous)
@@ -220,9 +220,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
             });
 
-            if (spaceBetweenNotesInBeats > 0)
+            if (spaceBetweenNotesInMillis > 0)
             {
-                spaceBetweenNotesAction.Execute(createdNotes, spaceBetweenNotesInBeats);
+                spaceBetweenNotesAction.Execute(songMeta, createdNotes, spaceBetweenNotesInMillis);
             }
 
             if (notify)

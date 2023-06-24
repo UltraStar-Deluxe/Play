@@ -58,4 +58,7 @@ public class SongEditorSettings
 
     // Audio separation
     public string AudioSeparationCommand { get; set; } = "";
+    
+    // Editing
+    public int SpaceBetweenNotesInMillis { get; set; } = SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis;
 }

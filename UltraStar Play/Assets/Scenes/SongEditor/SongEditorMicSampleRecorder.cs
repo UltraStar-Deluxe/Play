@@ -227,7 +227,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
             fromIndex,
             toIndex,
             sampleRate,
-            2,
+            150,
             true,
             speechRecognitionAction.CreateSpeechRecognizerParameters(),
             true,
