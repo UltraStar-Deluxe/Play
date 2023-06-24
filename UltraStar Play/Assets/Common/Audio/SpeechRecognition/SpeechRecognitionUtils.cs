@@ -42,7 +42,8 @@ public static class SpeechRecognitionUtils
         int midiNote,
         SongMeta songMeta,
         int offsetInBeats,
-        Hyphenator hyphenator)
+        Hyphenator hyphenator,
+        int spaceInMillisBetweenNotes)
     {
         CancellationTokenSource cancellationTokenSource = new();
         Action<double> onProgress;
@@ -99,7 +100,7 @@ public static class SpeechRecognitionUtils
                     {
                         speechRecognitionJob?.SetResult(EJobResult.Ok);
                         List<Note> createdNotes = speechRecognitionResult != null && !speechRecognitionResult.Words.IsNullOrEmpty()
-                            ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote, hyphenator)
+                            ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote, hyphenator, spaceInMillisBetweenNotes)
                             : new List<Note>();
 
                         createNotesFromSpeechRecognitionSubject.OnNext(createdNotes);
@@ -285,7 +286,8 @@ public static class SpeechRecognitionUtils
         SongMeta songMeta,
         int offsetInBeats,
         int midiNote,
-        Hyphenator hyphenator)
+        Hyphenator hyphenator,
+        int spaceInMillisBetweenNotes)
     {
         double beatsPerSeconds = BpmUtils.GetBeatsPerSecond(songMeta);
         List<Note> createdNotes = words.Select(resultEntry =>
@@ -309,6 +311,12 @@ public static class SpeechRecognitionUtils
         if (hyphenator != null)
         {
             HypenateNotes(songMeta, createdNotes, hyphenator);
+        }
+        
+        // Shorten new notes left and right to give a little space
+        if (spaceInMillisBetweenNotes > 0)
+        {
+            SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, spaceInMillisBetweenNotes, songMeta);
         }
         
         return createdNotes;

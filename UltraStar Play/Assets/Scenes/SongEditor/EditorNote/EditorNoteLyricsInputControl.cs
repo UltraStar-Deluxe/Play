@@ -10,6 +10,9 @@ using UniInject;
 public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 {
     [Inject]
+    private Settings settings;
+    
+    [Inject]
     private SongMeta songMeta;
     
     [Inject]
@@ -59,6 +62,8 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
         if (notesAfterSplit.Count > 1)
         {
             // Note has been split
+            SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
+
             songMetaChangeEventStream.OnNext(new NotesSplitEvent() { Undoable = undoable});
         }
         else

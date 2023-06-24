@@ -33,7 +33,7 @@ public class EditLyricsUtils
         return true;
     }
 
-    public static List<Note> SplitNoteForNewText(
+    private static List<Note> SplitNoteForNewText(
         SongMeta songMeta,
         Note note,
         string newText)
@@ -100,9 +100,6 @@ public class EditLyricsUtils
         notesAfterSplit.ForEach(currentNote =>
             currentNote.SetText(currentNote.Text.Replace(";", "")));
 
-        // Shorten new notes left and right to give a little space
-        SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, 150, songMeta);
-        
         return notesAfterSplit;
     }
 

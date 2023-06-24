@@ -81,7 +81,9 @@ public class LrcFormatImporter : INeedInjection
 
             notes.AddRange(notesAfterSplit);
         }
-        
+
+        SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notes, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
+
         return notes;
     }
 }

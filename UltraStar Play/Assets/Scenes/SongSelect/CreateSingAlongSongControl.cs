@@ -125,7 +125,8 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                         settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                         songMeta,
                         0,
-                        SettingsUtils.CreateHyphenator(settings))
+                        SettingsUtils.CreateHyphenator(settings),
+                        settings.SongEditorSettings.SpaceBetweenNotesInMillis)
                     .CatchIgnore((Exception ex) =>
                     {
                         Debug.LogError(ex);
@@ -144,7 +145,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                             MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceName, false));
 
                         // (4) Add Space between notes
-                        SpaceBetweenNotesUtils.AddSpaceInBeatsBetweenNotes(createdNotes, 1);
+                        SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
 
                         // (5) Run pitch detection on vocals audio
                         pitchDetectionJob.SetStatus(EJobStatus.Running);
