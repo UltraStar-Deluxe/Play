@@ -727,6 +727,11 @@ public static class SongMetaUtils
 
     public static string GetVideoUriPreferAudioUriIfWebView(SongMeta songMeta, Func<string, bool> canHandleUri)
     {
+        if (songMeta == null)
+        {
+            return "";
+        }
+        
         string videoUri = WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3) && canHandleUri.Invoke(songMeta.Mp3)
             ? SongMetaUtils.GetAudioUri(songMeta)
             : SongMetaUtils.GetVideoUri(songMeta);
@@ -781,5 +786,23 @@ public static class SongMetaUtils
         string scoreRelevantSongHash = Hashing.Md5(Encoding.UTF8.GetBytes(sb.ToString()));
         Log.Verbose(() => $"{songMeta} has ScoreRelevantSongHash {scoreRelevantSongHash}, from string: {sb}");
         return scoreRelevantSongHash;
+    }
+
+    public static bool HasNoSingAlongData(SongMeta songMeta)
+    {
+        if (!IsGeneratedAndNotYetSaved(songMeta))
+        {
+            // Song has saved UltraStar txt file.
+            return false;
+        }
+
+        if (ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(songMeta.Mp3))
+            && GetAllNotes(songMeta).Count > 0)
+        {
+            // Song has sing along data in the MIDI file.
+            return false;
+        }
+
+        return true;
     }
 }

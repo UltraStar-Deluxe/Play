@@ -658,6 +658,7 @@ public static partial class R
         public const string showLogButton = "showLogButton";
         public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
         public const string showOnlyDuetsToggle = "showOnlyDuetsToggle";
+        public const string showOnlyFilesWithoutSingAlongDataToggle = "showOnlyFilesWithoutSingAlongDataToggle";
         public const string showRightSideBarToggle = "showRightSideBarToggle";
         public const string showScrollBarInSongSelectPicker = "showScrollBarInSongSelectPicker";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
@@ -700,6 +701,7 @@ public static partial class R
         public const string songEntryNotSavedYetIcon = "songEntryNotSavedYetIcon";
         public const string songEntryUiRoot = "songEntryUiRoot";
         public const string songFolderList = "songFolderList";
+        public const string songFolderListTitle = "songFolderListTitle";
         public const string songImage = "songImage";
         public const string songImageInner = "songImageInner";
         public const string songImageOuter = "songImageOuter";

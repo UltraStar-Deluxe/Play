@@ -26,6 +26,7 @@
             </AccordionItem>
             <AccordionItem name="filtersAccordionItem" label="Filter By" content-visible="false">
                 <ui:Toggle label="Duet" name="showOnlyDuetsToggle" class="mb-2 mt-2" />
+                <ui:Toggle label="No sing-along data" name="showOnlyFilesWithoutSingAlongDataToggle" class="mb-2 mt-2" />
                 <ui:VisualElement name="filterListContainer" class="child-mb-2" style="width: 100%; align-items: stretch;" />
             </AccordionItem>
             <AccordionItem name="advancedSearchAccordionItem" label="Advanced Search" content-visible="false">

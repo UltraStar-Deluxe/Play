@@ -95,9 +95,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.httpServerPortTextField)]
     private IntegerField httpServerPortTextField;
 
-    [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaPicker)]
-    private ItemPicker searchAudioFilesWithoutSongMetaPicker;
-
     [Inject(UxmlName = R.UxmlNames.minimumLogLevelPicker)]
     private ItemPicker minimumLogLevelPicker;
     
@@ -234,10 +231,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.HttpServerPort,
             newValue => settings.HttpServerPort = newValue);
         httpServerPortTextField.DisableChangeValueByDragging();
-        
-        new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
-            .Bind(() => settings.SearchAudioFilesWithoutSongMeta,
-                newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
     }
 
     private void UpdateLogEventLevel()
