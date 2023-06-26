@@ -700,6 +700,7 @@ public static partial class R
         public const string songEntryNotSavedYetIcon = "songEntryNotSavedYetIcon";
         public const string songEntryUiRoot = "songEntryUiRoot";
         public const string songFolderList = "songFolderList";
+        public const string songFolderListTitle = "songFolderListTitle";
         public const string songImage = "songImage";
         public const string songImageInner = "songImageInner";
         public const string songImageOuter = "songImageOuter";
