@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using NHyphenator;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -114,7 +115,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int startIndex,
         int endIndex,
         int sampleRate,
-        int spaceBetweenNotesInBeats,
+        int spaceBetweenNotesInMillis,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
         bool continuous,
@@ -127,6 +128,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             return Observable.Empty<List<Note>>();
         }
 
+        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
+            ? SettingsUtils.CreateHyphenator(settings)
+            : null;
+        
         IObservable<List<Note>> createNotesObservable = SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
                 monoAudioSamples,
                 startIndex,
@@ -137,7 +142,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
-                offsetInBeats)
+                offsetInBeats,
+                hyphenator,
+                settings.SongEditorSettings.SpaceBetweenNotesInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogError(ex);
@@ -152,9 +159,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
             });
 
-            if (spaceBetweenNotesInBeats > 0)
+            if (spaceBetweenNotesInMillis > 0)
             {
-                spaceBetweenNotesAction.Execute(createdNotes, spaceBetweenNotesInBeats);
+                spaceBetweenNotesAction.Execute(songMeta, createdNotes, spaceBetweenNotesInMillis);
             }
 
             if (notify)
@@ -169,7 +176,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         int startBeat,
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
-        int spaceBetweenNotesInBeats,
+        int spaceBetweenNotesInMillis,
         bool notify,
         SpeechRecognitionParameters speechRecognitionParameters,
         bool continuous)
@@ -193,6 +200,10 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         
         float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, startBeat, lengthInBeats, true);
 
+        Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
+            ? SettingsUtils.CreateHyphenator(settings)
+            : null;
+        
         IObservable<List<Note>> createNotesObservable = SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
                 monoAudioSamples,
                 0,
@@ -203,7 +214,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 continuous,
                 settings.SongEditorSettings.DefaultPitchForCreatedNotes,
                 songMeta,
-                startBeat)
+                startBeat,
+                hyphenator,
+                settings.SongEditorSettings.SpaceBetweenNotesInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogError(ex);
@@ -218,9 +231,9 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
             });
 
-            if (spaceBetweenNotesInBeats > 0)
+            if (spaceBetweenNotesInMillis > 0)
             {
-                spaceBetweenNotesAction.Execute(createdNotes, spaceBetweenNotesInBeats);
+                spaceBetweenNotesAction.Execute(songMeta, createdNotes, spaceBetweenNotesInMillis);
             }
 
             if (notify)

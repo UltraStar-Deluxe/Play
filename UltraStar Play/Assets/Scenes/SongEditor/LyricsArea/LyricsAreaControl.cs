@@ -120,21 +120,21 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
                 addedNewline = false;
                 pasted = false;
                 // Add whitespace character for newly added newline character
-                newText = newText.Replace(ShowWhiteSpaceText.newlineReplacement, "⌇")
+                newText = newText.Replace(ShowWhiteSpaceUtils.newlineReplacement, "⌇")
                     .Replace("\n", "⌇")
-                    .Replace("⌇", ShowWhiteSpaceText.newlineReplacement);
+                    .Replace("⌇", ShowWhiteSpaceUtils.newlineReplacement);
             }
             else if (removeCharacter)
             {
                 removeCharacter = false;
                 // Remove whitespace character or newline character where the counterpart is missing
-                newText = newText.Replace(ShowWhiteSpaceText.newlineReplacement, "⌇")
+                newText = newText.Replace(ShowWhiteSpaceUtils.newlineReplacement, "⌇")
                     .Replace("\n", "")
-                    .Replace(ShowWhiteSpaceText.newlineVisibleWhiteSpaceCharacter, "")
-                    .Replace("⌇", ShowWhiteSpaceText.newlineReplacement);
+                    .Replace(ShowWhiteSpaceUtils.newlineVisibleWhiteSpaceCharacter, "")
+                    .Replace("⌇", ShowWhiteSpaceUtils.newlineReplacement);
             }
-            string normalText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
-            string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
+            string normalText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
+            string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(normalText);
             textField.SetValueWithoutNotify(visibleWhiteSpaceText);
         });
 
@@ -245,7 +245,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         lastEditModeText = null;
         string editModeText = LyricsUtils.GetEditModeText(Voice);
-        string newInputFieldText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
+        string newInputFieldText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(editModeText);
         SetInputFieldText(newInputFieldText);
 
         lyricsAreaMode = LyricsAreaMode.EditMode;
@@ -264,7 +264,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     private void ApplyEditModeText(string editModeText, bool undoable)
     {
         // Map edit-mode text to lyrics of notes
-        string text = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
+        string text = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(editModeText);
         LyricsUtils.MapEditModeTextToNotes(text, Voice.Sentences);
         songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable });
     }
@@ -316,7 +316,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         {
             char c = text[i];
             if (c == LyricsUtils.spaceCharacter
-                || c == ShowWhiteSpaceText.spaceReplacement[0]
+                || c == ShowWhiteSpaceUtils.spaceReplacement[0]
                 || c == LyricsUtils.syllableSeparator)
             {
                 noteIndex++;

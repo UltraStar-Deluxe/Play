@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class ShowWhiteSpaceText : MonoBehaviour
+public class ShowWhiteSpaceUtils : MonoBehaviour
 {
     // Unicode BULLET (U+2022).
     // This (or a similar ) character is also used to indicate white-space in office word processing and notepad++.

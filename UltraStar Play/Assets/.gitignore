@@ -63,6 +63,9 @@ Plugins/UnityStandaloneFileBrowser.meta
 Plugins/Soundfonts/MuseScore_General.sf2.bytes
 Plugins/Soundfonts.meta
 
+Plugins/NHyphenator
+Plugins/NHyphenator.meta
+
 ########################################
 ## Third-party assets
 Background Bokeh VFX/

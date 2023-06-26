@@ -1,5 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using NHyphenator;
+using NHyphenator.Loaders;
+using UnityEngine;
 
 public static class SettingsUtils
 {
@@ -71,5 +75,30 @@ public static class SettingsUtils
     {
         settings.VolumePercent -= 10;
         settings.VolumePercent = NumberUtils.Limit(settings.VolumePercent, 0, 100);
+    }
+
+    public static Hyphenator CreateHyphenator(Settings settings)
+    {
+        string speechRecognitionLanguage = settings?.SongEditorSettings?.SpeechRecognitionLanguage;
+        if (speechRecognitionLanguage.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        IHyphenatePatternsLoader hyphenatePatternsLoader = HyphenationPatternsProvider.CreateHyphenationPatternsLoader(speechRecognitionLanguage);
+        if (hyphenatePatternsLoader == null)
+        {
+            Debug.LogWarning("No hyphenation patterns found for language: " + speechRecognitionLanguage);
+            return null;
+        }
+        
+        Hyphenator hyphenator = new Hyphenator(
+            hyphenatePatternsLoader,
+            EditLyricsUtils.syllableSeparator,
+            5,
+            0,
+            true,
+            true);
+        return hyphenator;
     }
 }

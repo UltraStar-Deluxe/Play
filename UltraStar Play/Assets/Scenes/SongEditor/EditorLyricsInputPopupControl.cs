@@ -38,7 +38,7 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
 
     private void OnTextFieldValueChanged(string newInputFieldText)
     {
-        string visibleWhitespaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newInputFieldText);
+        string visibleWhitespaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(newInputFieldText);
         if (textField.value != visibleWhitespaceText)
         {
             textField.value = visibleWhitespaceText;
@@ -54,7 +54,7 @@ public abstract class EditorLyricsInputPopupControl : INeedInjection, IInjection
 
     public void SubmitAndCloseLyricsDialog()
     {
-        string newText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(textField.value);
+        string newText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(textField.value);
         ApplyNewText(newText);
         CloseLyricsDialog();
     }

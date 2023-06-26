@@ -10,6 +10,9 @@ using UniInject;
 public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 {
     [Inject]
+    private Settings settings;
+    
+    [Inject]
     private SongMeta songMeta;
     
     [Inject]
@@ -26,13 +29,13 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
     
     protected override string GetInitialText()
     {
-        return ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(editorNoteControl.Note.Text);
+        return ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(editorNoteControl.Note.Text);
     }
 
     protected override void PreviewNewText(string newText)
     {
         // Immediately apply changed lyrics to notes, but do not record it in the history.
-        string visibleWhiteSpaceText = ShowWhiteSpaceText.ReplaceWhiteSpaceWithVisibleCharacters(newText);
+        string visibleWhiteSpaceText = ShowWhiteSpaceUtils.ReplaceWhiteSpaceWithVisibleCharacters(newText);
         editorNoteControl.Note.SetText(visibleWhiteSpaceText);
         editorNoteControl.SetLyrics(visibleWhiteSpaceText);
         songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = false});
@@ -45,12 +48,22 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
 
     private void ApplyEditModeTextAndNotify(string newText, bool undoable)
     {
-        string viewModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
+        string viewModeText = ShowWhiteSpaceUtils.ReplaceVisibleCharactersWithWhiteSpace(newText);
         
-        TryApplyEditModeText(songMeta, editorNoteControl.Note, newText, layerManager, out List<Note> notesAfterSplit);
+        bool wasOnLayer = layerManager.TryGetEnumLayer(editorNoteControl.Note, out SongEditorEnumLayer songEditorLayer);
+        EditLyricsUtils.TryApplyEditModeText(songMeta, editorNoteControl.Note, newText, out List<Note> notesAfterSplit);
+        if (wasOnLayer
+            && !notesAfterSplit.IsNullOrEmpty())
+        {
+            layerManager.RemoveNoteFromAllEnumLayers(editorNoteControl.Note);
+            notesAfterSplit.ForEach(newNote => layerManager.AddNoteToEnumLayer(songEditorLayer.LayerEnum, newNote));
+        }
+        
         if (notesAfterSplit.Count > 1)
         {
             // Note has been split
+            SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
+
             songMetaChangeEventStream.OnNext(new NotesSplitEvent() { Undoable = undoable});
         }
         else
@@ -60,124 +73,5 @@ public class EditorNoteLyricsInputControl : EditorLyricsInputPopupControl
             editorNoteControl.SyncWithNote();
             songMetaChangeEventStream.OnNext(new LyricsChangedEvent { Undoable = undoable});
         }
-    }
-    
-    public static bool TryApplyEditModeText(
-        SongMeta songMeta,
-        Note note,
-        string newText,
-        SongEditorLayerManager layerManager,
-        out List<Note> notesAfterSplit)
-    {
-        string viewModeText = ShowWhiteSpaceText.ReplaceVisibleCharactersWithWhiteSpace(newText);
-
-        if (StringUtils.IsOnlyWhitespace(viewModeText))
-        {
-            notesAfterSplit = new List<Note> { note };
-            return false;
-        }
-
-        // Replace multiple control characters with a single character
-        viewModeText = Regex.Replace(viewModeText, @"\s+", " ");
-        viewModeText = Regex.Replace(viewModeText, @";+", ";");
-
-        // Split note to apply space and semicolon control characters.
-        // Otherwise the text would mess up following notes when using the LyricsArea.
-        notesAfterSplit = SplitNoteForNewText(songMeta, note, viewModeText, layerManager);
-        return true;
-    }
-
-    public static List<Note> SplitNoteForNewText(
-        SongMeta songMeta,
-        Note note,
-        string newText,
-        SongEditorLayerManager layerManager)
-    {
-        List<Note> notesAfterSplit = new List<Note> { note };
-        if (note.Length <= 1
-            || StringUtils.IsOnlyWhitespace(newText))
-        {
-            return notesAfterSplit;
-        }
-
-        List<int> splitIndexes = AllIndexesOfCharacterBeforeTextEnd(newText, ' ')
-            .ToList()
-            .Union(AllIndexesOfCharacterBeforeTextEnd(newText, ';').ToList())
-            .Distinct()
-            .ToList();
-        splitIndexes.Sort();
-        if (splitIndexes.IsNullOrEmpty())
-        {
-            // Nothing to split
-            return notesAfterSplit;
-        }
-
-        splitIndexes = splitIndexes
-            .Select(index => index + 1)
-            .ToList();
-
-        if (!splitIndexes.Contains(newText.Length))
-        {
-            splitIndexes.Add(newText.Length);
-        }
-
-        List<int> splitBeats = splitIndexes
-            .Select(index => (int)Math.Floor(note.StartBeat + note.Length * ((double)index / newText.Length)))
-            .ToList();
-
-        // Change original note
-        note.SetEndBeat(splitBeats[0]);
-        note.SetText(newText.Substring(0, splitIndexes[0]));
-
-        int lastSplitIndex = splitIndexes[0];
-        int lastSplitBeat = note.EndBeat;
-
-        // Start from 1 because original note was changed already above
-        for (int i = 1; i < splitIndexes.Count; i++)
-        {
-            int splitIndex = splitIndexes[i];
-            int splitBeat = splitBeats[i];
-
-            int newNoteStartBeat = lastSplitBeat;
-            int newNoteEndBeat = splitBeat;
-            int length = splitIndex - lastSplitIndex;
-            string newNoteText = newText.Substring(lastSplitIndex, length);
-
-            Note newNote = new(note.Type, newNoteStartBeat, newNoteEndBeat - newNoteStartBeat, note.TxtPitch, newNoteText);
-            notesAfterSplit.Add(newNote);
-            newNote.SetSentence(note.Sentence);
-            if (layerManager != null
-                && layerManager.TryGetEnumLayer(note, out SongEditorEnumLayer songEditorLayer))
-            {
-                layerManager.AddNoteToEnumLayer(songEditorLayer.LayerEnum, newNote);
-            }
-
-            lastSplitIndex = splitIndex;
-            lastSplitBeat = splitBeat;
-        }
-
-        // Remove semicolon from lyrics. These are only used to separate notes in the song editor.
-        notesAfterSplit.ForEach(currentNote =>
-            currentNote.SetText(currentNote.Text.Replace(";", "")));
-
-        // Shorten new notes left and right to give a little space
-        AddSpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notesAfterSplit, 150, songMeta);
-        
-        return notesAfterSplit;
-    }
-
-    private static List<int> AllIndexesOfCharacterBeforeTextEnd(string text, char searchChar)
-    {
-        List<int> result = new();
-        for (int i = 0; i < text.Length - 1; i++)
-        {
-            char c = text[i];
-            if (c == searchChar)
-            {
-                result.Add(i);
-            }
-        }
-
-        return result;
     }
 }

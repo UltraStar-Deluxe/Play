@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using NHyphenator;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -16,6 +17,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.autoSaveToggle)]
     private Toggle autoSaveToggle;
 
+    [Inject(UxmlName = R.UxmlNames.spaceBetweenNotesTimeInMillisTextField)]
+    private IntegerField spaceBetweenNotesTimeInMillisTextField;
+    
+    [Inject(UxmlName = R.UxmlNames.addSpaceBetweenNotesButton)]
+    private Button addSpaceBetweenNotesButton;
+    
     [Inject(UxmlName = R.UxmlNames.goToLastPlaybackPositionToggle)]
     private Toggle goToLastPlaybackPositionToggle;
 
@@ -145,6 +152,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     [Inject(UxmlName = R.UxmlNames.settingsSideBarContainer)]
     private VisualElement settingsSideBarContainer;
     
+    [Inject(UxmlName = R.UxmlNames.splitSyllablesAfterSpeechRecognitionToggle)]
+    private Toggle splitSyllablesAfterSpeechRecognitionToggle;
+        
+    [Inject(UxmlName = R.UxmlNames.splitSyllablesInSelectionButton)]
+    private Button splitSyllablesInSelectionButton;
+    
     [Inject]
     private SongMeta songMeta;
 
@@ -171,6 +184,15 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private Injector injector;
+    
+    [Inject]
+    private SongEditorSelectionControl selectionControl;
+    
+    [Inject]
+    private SpaceBetweenNotesAction spaceBetweenNotesAction;
+
+    [Inject]
+    private SongMetaChangeEventStream songMetaChangeEventStream;
 
     private LabeledItemPickerControl<ESongEditorRecordingSource> recordingSourceItemPickerControl;
     private LabeledItemPickerControl<MicProfile> micDeviceItemPickerControl;
@@ -212,6 +234,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         drawNoteLayerPickerControl.Bind(
             () => settings.SongEditorSettings.DrawNoteLayer,
             newValue => settings.SongEditorSettings.DrawNoteLayer = newValue);
+        
+        // Add space between notes
+        Bind(spaceBetweenNotesTimeInMillisTextField,
+            () => settings.SongEditorSettings.SpaceBetweenNotesInMillis,
+            newValue => settings.SongEditorSettings.SpaceBetweenNotesInMillis = newValue);
+
+        addSpaceBetweenNotesButton.RegisterCallbackButtonTriggered(_ => AddSpaceBetweenNotesInSelection());
         
         // Playback speed
         songAudioPlayer.PlaybackSpeed = nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value;
@@ -375,6 +404,12 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.SpeechRecognitionSamplesSource,
             newValue => settings.SongEditorSettings.SpeechRecognitionSamplesSource = newValue);
 
+        Bind(splitSyllablesAfterSpeechRecognitionToggle,
+            () => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition,
+            newValue => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition = newValue);
+        
+        splitSyllablesInSelectionButton.RegisterCallbackButtonTriggered(_ => SplitSyllablesInSelection());
+        
         // Pitch detection
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)
             .Bind(() => settings.SongEditorSettings.PitchDetectionAlgorithm,
@@ -458,6 +493,42 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         new LabeledItemPickerControl<ESongEditorPitchLabelFormat>(pitchLabelFormatPicker, EnumUtils.GetValuesAsList<ESongEditorPitchLabelFormat>())
             .Bind(() => settings.SongEditorSettings.PitchLabelFormat,
                 newValue => settings.SongEditorSettings.PitchLabelFormat = newValue);
+    }
+
+    private void SplitSyllablesInSelection()
+    {
+        Hyphenator hyphenator = SettingsUtils.CreateHyphenator(settings);
+        if (hyphenator == null)
+        {
+            return;
+        }
+        
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        HyphenateNotesUtils.HypenateNotes(songMeta, selectedNotes, hyphenator);
+        AddSpaceBetweenNotesInSelection();
+        songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+    }
+
+    private void AddSpaceBetweenNotesInSelection()
+    {
+        int spaceInMillis = settings.SongEditorSettings.SpaceBetweenNotesInMillis;
+        if (spaceInMillis <= 0)
+        {
+            return;
+        }
+        
+        List<Note> selectedNotes = selectionControl.GetSelectedNotes();
+        if (selectedNotes.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        spaceBetweenNotesAction.ExecuteAndNotify(songMeta, selectedNotes, spaceInMillis);
     }
 
     private void SetMusicPlaybackSpeed(float newValue)

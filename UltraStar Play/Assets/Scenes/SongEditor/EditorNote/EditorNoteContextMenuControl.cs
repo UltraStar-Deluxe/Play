@@ -119,11 +119,6 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         {
             contextMenu.AddButton("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
         }
-        
-        if (selectedNotes.Count > 1)
-        {
-            contextMenu.AddButton("Add space between notes", () => CreateAddSpaceBetweenNotesDialog());
-        }
     }
 
     private void FillContextMenuToDeleteNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
@@ -209,27 +204,5 @@ public class EditorNoteContextMenuControl : ContextMenuControl
             contextMenu.AddButton("Assign to next phrase",
                 () => moveNoteToAdjacentSentenceAction.MoveToNextSentenceAndNotify(selectedNotes));
         }
-    }
-
-    private void CreateAddSpaceBetweenNotesDialog()
-    {
-        void DoAddSpaceBetweenNotes(int spaceInBeats)
-        {
-            List<Note> selectedNotes = selectionControl.GetSelectedNotes();
-            if (selectedNotes.IsNullOrEmpty())
-            {
-                // Perform on all notes, but per voice
-                songMeta.GetVoices()
-                    .ForEach(voice => spaceBetweenNotesAction.ExecuteAndNotify(SongMetaUtils.GetAllNotes(voice), spaceInBeats));
-            }
-            else
-            {
-                spaceBetweenNotesAction.ExecuteAndNotify(selectedNotes, spaceInBeats);
-            }
-        }
-
-        songEditorSceneControl.CreateNumberInputDialog("Add space between notes",
-            "Enter the number of beats that should be the minimal distance between adjacent notes.",
-            spaceInBeats => DoAddSpaceBetweenNotes((int)spaceInBeats));
     }
 }

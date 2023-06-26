@@ -67,6 +67,9 @@ Apache License 2.0
 ------------------
 See https://www.apache.org/licenses/LICENSE-2.0.html
 
+- NHyphenator
+    - https://github.com/alkozko/NHyphenator
+
 - Material Design Icons
     - https://fonts.google.com/icons
 

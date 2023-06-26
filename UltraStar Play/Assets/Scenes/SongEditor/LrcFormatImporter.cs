@@ -77,11 +77,13 @@ public class LrcFormatImporter : INeedInjection
             Note note = new Note(ENoteType.Normal, currentLineBeat, lengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
             
             // Split note on space and semicolon characters
-            EditorNoteLyricsInputControl.TryApplyEditModeText(songMeta, note, note.Text, null, out List<Note> notesAfterSplit);
+            EditLyricsUtils.TryApplyEditModeText(songMeta, note, note.Text, out List<Note> notesAfterSplit);
 
             notes.AddRange(notesAfterSplit);
         }
-        
+
+        SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(notes, settings.SongEditorSettings.SpaceBetweenNotesInMillis, songMeta);
+
         return notes;
     }
 }
