@@ -658,6 +658,7 @@ public static partial class R
         public const string showLogButton = "showLogButton";
         public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
         public const string showOnlyDuetsToggle = "showOnlyDuetsToggle";
+        public const string showOnlyFilesWithoutSingAlongDataToggle = "showOnlyFilesWithoutSingAlongDataToggle";
         public const string showRightSideBarToggle = "showRightSideBarToggle";
         public const string showScrollBarInSongSelectPicker = "showScrollBarInSongSelectPicker";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";

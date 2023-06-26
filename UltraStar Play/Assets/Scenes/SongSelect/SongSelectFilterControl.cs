@@ -22,6 +22,9 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     [Inject(UxmlName = R.UxmlNames.showOnlyDuetsToggle)]
     private Toggle showOnlyDuetsToggle;
     
+    [Inject(UxmlName = R.UxmlNames.showOnlyFilesWithoutSingAlongDataToggle)]
+    private Toggle showOnlyFilesWithoutSingAlongDataToggle;
+    
     [Inject(UxmlName = R.UxmlNames.filtersAccordionItem)]
     private AccordionItem filtersAccordionItem;
     
@@ -29,19 +32,39 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
     private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => nonPersistentSettings.ActiveSearchPropertyFilters;
     public bool IsAnyFilterActive => !nonPersistentSettings.ActiveSearchPropertyFilters.IsNullOrEmpty()
-        || nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value;
+        || nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value
+        || nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value;
     
     private readonly Subject<bool> filtersChangedEventStream = new();
     public IObservable<bool> FiltersChangedEventStream => filtersChangedEventStream;
     
     public void OnInjectionFinished()
     {
-        showOnlyDuetsToggle.value = nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value;
-        showOnlyDuetsToggle.RegisterValueChangedCallback(evt =>
+        if (settings.SearchAudioFilesWithoutSongMeta)
         {
-            nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value = evt.newValue;
-            filtersChangedEventStream.OnNext(true);
-        });
+            showOnlyFilesWithoutSingAlongDataToggle.ShowByDisplay();
+        }
+        else
+        {
+            showOnlyFilesWithoutSingAlongDataToggle.HideByDisplay();
+            nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value = false;
+        }
+
+        FieldBindingUtils.Bind(showOnlyFilesWithoutSingAlongDataToggle,
+            () => nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value,
+            newValue =>
+            {
+                nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value = newValue;
+                filtersChangedEventStream.OnNext(true);
+            });
+
+        FieldBindingUtils.Bind(showOnlyDuetsToggle,
+            () => nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value,
+            newValue =>
+            {
+                nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value = newValue;
+                filtersChangedEventStream.OnNext(true);
+            });
 
         filtersAccordionItem.AfterContentVisibleChangedEventStream.Subscribe(_ => InitFilters());
     }
@@ -78,6 +101,12 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             return false;
         }
 
+        if (nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value
+            && !SongMetaUtils.HasNoSingAlongData(songMeta))
+        {
+            return false;
+        }
+        
         // EVERY category must match at least one value (i.e. return false if ANY does not match).
         foreach (ESearchProperty searchProperty in ActiveFilters.Keys)
         {
@@ -170,6 +199,8 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             
             filterToggle.RegisterValueChangedCallback(evt => SetFilterActive(searchPropertyFilter, evt.newValue));
         }
+        
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(filterListContainer);
     }
     
     private void DisableFilter(SearchPropertyFilter searchPropertyFilter)

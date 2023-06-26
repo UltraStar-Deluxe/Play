@@ -787,4 +787,22 @@ public static class SongMetaUtils
         Log.Verbose(() => $"{songMeta} has ScoreRelevantSongHash {scoreRelevantSongHash}, from string: {sb}");
         return scoreRelevantSongHash;
     }
+
+    public static bool HasNoSingAlongData(SongMeta songMeta)
+    {
+        if (!IsGeneratedAndNotYetSaved(songMeta))
+        {
+            // Song has saved UltraStar txt file.
+            return false;
+        }
+
+        if (ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(songMeta.Mp3))
+            && GetAllNotes(songMeta).Count > 0)
+        {
+            // Song has sing along data in the MIDI file.
+            return false;
+        }
+
+        return true;
+    }
 }
