@@ -727,6 +727,11 @@ public static class SongMetaUtils
 
     public static string GetVideoUriPreferAudioUriIfWebView(SongMeta songMeta, Func<string, bool> canHandleUri)
     {
+        if (songMeta == null)
+        {
+            return "";
+        }
+        
         string videoUri = WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3) && canHandleUri.Invoke(songMeta.Mp3)
             ? SongMetaUtils.GetAudioUri(songMeta)
             : SongMetaUtils.GetVideoUri(songMeta);
