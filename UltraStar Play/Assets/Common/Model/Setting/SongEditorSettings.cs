@@ -3,7 +3,7 @@
 [Serializable]
 public class SongEditorSettings
 {
-    public bool AutoSave { get; set; } = true;
+    public bool AutoSave { get; set; }
 
     public int MusicVolumePercent { get; set; } = 100;
     public ESongEditorSamplesSource PlaybackSamplesSource { get; set; } = ESongEditorSamplesSource.OriginalMusic;
