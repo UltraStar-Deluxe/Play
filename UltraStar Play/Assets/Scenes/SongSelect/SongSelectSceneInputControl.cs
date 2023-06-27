@@ -83,6 +83,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         
         // Toggle song menu
         InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
+            .Where(_ => !songSearchControl.IsSearchTextFieldFocused() && fuzzySearchText.Value.IsNullOrEmpty())
             .Subscribe(_ => songRouletteControl.OpenSelectedSongContextMenu());
         
         // Open the sing scene
@@ -221,7 +222,8 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     {
         if (newChar == (int)KeyCode.Escape
             || newChar == (int)KeyCode.Return
-            || webViewManager.IsWebViewCanvasControlEnabled)
+            || webViewManager.IsWebViewCanvasControlEnabled
+            || (newChar == (int)KeyCode.Space && fuzzySearchText.Value.IsNullOrEmpty()))
         {
             return;
         }
