@@ -93,8 +93,10 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 audioSeparationObservable)
             .CatchIgnore((Exception ex) =>
             {
+                audioSeparationJob.SetResult(EJobResult.Error);
                 speechRecognitionJob.SetResult(EJobResult.Error);
                 pitchDetectionJob.SetResult(EJobResult.Error);
+                UiManager.CreateNotification($"Failed to create sing-along data.\n{ex.Message}");
             })
             .Subscribe(_ =>
             {
@@ -103,14 +105,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 // Load vocals audio
                 AudioClip vocalsAudioClip = audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
                 int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * BpmUtils.GetBeatsPerSecond(songMeta));
-                
-                if (!speechRecognitionManager.TryGetOrCreateSpeechRecognizer(
-                        speechRecognitionParameters,
-                        out string errorMessage,
-                        out SpeechRecognizer speechRecognizer))
-                {
-                    throw new Exception(errorMessage);
-                }
                     
                 float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
