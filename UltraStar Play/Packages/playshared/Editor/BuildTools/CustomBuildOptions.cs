@@ -8,6 +8,7 @@ public class CustomBuildOptions
     public bool buildAppBundleForGooglePlay;
     public bool configureKeystoreForAndroidBuild;
     public bool compressOutputFolderToZipFile;
+    public bool uploadToSteam;
 
     public CustomBuildOptions()
     {
