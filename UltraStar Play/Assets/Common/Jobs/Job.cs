@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UniRx;
+using UnityEngine;
 
 public class Job
 {
@@ -181,6 +182,21 @@ public class Job
             throw new IllegalStateException($"Cannot change result from {Result.Value} to {newResult}");
         }
 
+        // Cancel job if the result is set to error
+        if (newResult is EJobResult.Error
+            && Status.Value is not EJobStatus.Finished)
+        {
+            try
+            {
+                Cancel();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError("Failed to cancel job after setting result to error");
+            }
+        }
+        
         Result.Value = newResult;
         endTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         if (Status.Value != EJobStatus.Finished)
