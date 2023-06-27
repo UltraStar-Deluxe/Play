@@ -116,7 +116,8 @@ public static class SpeechRecognitionUtils
         Job parentJob)
     {
         SpeechRecognizer existingSpeechRecognizer = SpeechRecognitionManager.Instance.GetExistingSpeechRecognizer(parameters);
-        if (existingSpeechRecognizer != null)
+        if (existingSpeechRecognizer != null
+            && existingSpeechRecognizer.IsLoaded)
         {
             // Nothing to do. Return observable that fires immediately.
             return Observable.Create<SpeechRecognizer>(o =>

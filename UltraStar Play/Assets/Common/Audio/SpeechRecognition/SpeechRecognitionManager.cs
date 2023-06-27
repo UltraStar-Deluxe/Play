@@ -34,6 +34,12 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 
     public bool TryInitExistingSpeechRecognizer(SpeechRecognitionParameters parameters, out string errorMessage)
     {
+        if (!IsWhisperSupportedOnHardware())
+        {
+            errorMessage = "Speech recognition is not yet supported on this hardware.\nPlease wait for a future release.";
+            return false;
+        }
+    
         if (parametersToSpeechRecognizer.TryGetValue(parameters, out SpeechRecognizer speechRecognizer))
         {
             if (!speechRecognizer.IsLoaded)
@@ -47,7 +53,41 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         errorMessage = $"No speech recognizer found for parameters {parameters}";
         return false;
     }
-    
+
+    private bool IsWhisperSupportedOnHardware()
+    {
+        string avxCheckPath = ApplicationUtils.GetStreamingAssetsPath("AvxCheck/avx-check.exe");
+        if (!FileUtils.Exists(avxCheckPath))
+        {
+            return true;
+        }
+        
+        // Run the avx-check.exe to check if the hardware supports AVX instructions.
+        // This is necessary because the Whisper library uses AVX instructions.
+        try
+        {
+            if (ProcessUtils.RunProcess(avxCheckPath, "--json", out string processOutput, out string processError))
+            {
+                AvxCheckResultJson avxCheckResultJson = JsonConverter.FromJson<AvxCheckResultJson>(processOutput);
+                bool isAvxSupported = avxCheckResultJson.avx > 0
+                                    && avxCheckResultJson.avx2 > 0;
+                Debug.Log($"isAvxSupported: {isAvxSupported}");
+                return isAvxSupported;
+            }
+            else
+            {
+                Debug.Log($"Failed to run avx-check. Assuming AVX instructions are supported. Error Message: {processError}");
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError("Failed to run avx-check.exe");
+            return true;
+        }
+    }
+
     public bool TryGetOrCreateSpeechRecognizer(SpeechRecognitionParameters parameters, out string errorMessage, out SpeechRecognizer speechRecognizer)
     {
         if (parametersToSpeechRecognizer.TryGetValue(parameters, out speechRecognizer))
@@ -116,5 +156,11 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             Debug.Log("Waiting for speech recognition to finish");
             Thread.Sleep(500);
         }
+    }
+    
+    private class AvxCheckResultJson
+    {
+        public int avx;
+        public int avx2;
     }
 }

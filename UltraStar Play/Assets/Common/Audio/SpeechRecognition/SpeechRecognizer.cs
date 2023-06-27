@@ -42,7 +42,7 @@ public class SpeechRecognizer
         if (!whisperManager.IsLoaded
             && !whisperManager.IsLoading)
         {
-            InitModel();
+            throw new Exception("Speech recognition model is not yet initialized.");
         }
         
         int lengthInSamples = endIndex - startIndex;
