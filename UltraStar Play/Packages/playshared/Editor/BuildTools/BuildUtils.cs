@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using ICSharpCode.SharpZipLib.Zip;
+using Serilog.Events;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -16,6 +19,11 @@ public static class BuildUtils
     private const string KeystorePasswordEnvironmentVariable = "UNITY_KEYSTORE_PASSWORD";
     private const string KeystoreKeyAliasEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS";
     private const string KeystoreKeyAliasPasswordEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS_PASSWORD";
+    
+    private const string SteamVdfFilePathEnvironmentVariable = "STEAM_UPLOAD_VDF_FILE";
+    private const string SteamUsernameEnvironmentVariable = "STEAM_USERNAME";
+    private const string SteamPasswordEnvironmentVariable = "STEAM_PASSWORD";
+    private const string SteamContentFolderEnvironmentVariable = "STEAM_CONTENT_FOLDER";
 
     private static readonly Dictionary<string, string> copyFilesBeforeBuild = new()
     {
@@ -142,6 +150,74 @@ public static class BuildUtils
 
             CompressDirectoryToZipFile(outputFolderPath, outputFolderPath + ".zip");
         }
+
+        if (options.uploadToSteam)
+        {
+            UploadBuildOutputToSteam(options);
+        }
+    }
+
+    public static void UploadBuildOutputToSteam(CustomBuildOptions options)
+    {
+        if (!(options.buildTarget
+                is BuildTarget.StandaloneWindows
+                or BuildTarget.StandaloneWindows64
+                or BuildTarget.StandaloneLinux64
+                or BuildTarget.StandaloneOSX))
+        {
+            throw new Exception($"Cannot upload to Steam with build target {options.buildTarget}");
+        }
+
+        string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
+        
+        // Get app version
+        string bundleVersion = BuildUtils.GetPlayerSettingsFileBundleVersion();
+        string timeStamp = DateTime.Now.ToString("yyMMddHHmm", CultureInfo.InvariantCulture);
+        string commitShortHash = GitUtils.GetCurrentCommitShortHash();
+
+        // Get environment variables
+        string vdfFilePath = GetEnvironmentVariableOrThrow(SteamVdfFilePathEnvironmentVariable);
+        string steamUsername = GetEnvironmentVariableOrThrow(SteamUsernameEnvironmentVariable);
+        string steamPassword = GetEnvironmentVariableOrThrow(SteamPasswordEnvironmentVariable);
+        string steamContentFolder = GetEnvironmentVariableOrThrow(SteamContentFolderEnvironmentVariable);
+        
+        // Update Steam VDF file
+        string vdfFileContent = File.ReadAllText(vdfFilePath);
+        // Update desc filed
+        string appNameNoSpaces = options.appName.Replace(" ", "_");
+        string description = $"{appNameNoSpaces}-{bundleVersion}-{commitShortHash}-{timeStamp}";
+        vdfFileContent = Regex.Replace(vdfFileContent, "\"desc\" \"[^\"]*\"", $"\"desc\" \"{description}\"");
+        File.WriteAllText(vdfFilePath, vdfFileContent);
+        Debug.Log($"Updated VDF file {vdfFilePath} with content:\n{vdfFileContent}");
+        
+        // Remove BurstDebugInformation folder from build output path.
+        foreach (DirectoryInfo directoryInfo in new DirectoryInfo(outputFolderPath).GetDirectories())
+        {
+            if (directoryInfo.Name.Contains("BurstDebugInformation") || directoryInfo.Name.Contains("DoNotShip"))
+            {
+                Debug.Log($"Removing debug folder from build output path: {directoryInfo.FullName}");
+                DirectoryUtils.Delete(directoryInfo.FullName);
+            }
+        }
+        
+        // Copy build output to target folder.
+        string source = outputFolderPath;
+        string destination = steamContentFolder;
+        DirectoryUtils.CopyAll(source, destination);
+        Debug.Log("Copied Unity build output to Steam content path.");
+        
+        // Run Steam upload tool
+        if (!ProcessUtils.RunProcess($"steamcmd.exe",
+                $"+login {steamUsername} {steamPassword} +run_app_build \"{vdfFilePath}\" +quit",
+                out string steamcmdOutput,
+                out string steamcmdErrorOutput,
+                LogEventLevel.Information,
+                LogEventLevel.Error)
+            || !steamcmdErrorOutput.IsNullOrEmpty())
+        {
+            throw new Exception("Upload to Steam failed.\n" + steamcmdErrorOutput);
+        }
+        Debug.Log("Uploaded build to Steam successfully.");
     }
 
     private static void CopyFilesBeforeBuild()
@@ -324,6 +400,16 @@ public static class BuildUtils
     {
         value = Environment.GetEnvironmentVariable(key);
         return !value.IsNullOrEmpty();
+    }
+
+    private static string GetEnvironmentVariableOrThrow(string key)
+    {
+        if (!TryGetEnvironmentVariable(key, out string value))
+        {
+            throw new Exception($"{key} environment variable missing");
+        }
+
+        return value;
     }
 
     private static void ConfigureKeystoreForAndroidBuild()

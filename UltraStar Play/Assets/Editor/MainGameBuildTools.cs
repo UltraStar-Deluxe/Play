@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using UnityEditor;
 
 public static class MainGameBuildTools
@@ -19,6 +21,23 @@ public static class MainGameBuildTools
     public static void BuildWindows64()
     {
         BuildUtils.PerformCustomBuild(CreateCustomBuildOptions(BuildTarget.StandaloneWindows64));
+    }
+    
+    [MenuItem("Tools/Build/Windows64 - Build and upload to Steam")]
+    public static void BuildWindows64AndSteamUpload()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
+        customBuildOptions.uploadToSteam = true;
+        BuildUtils.PerformCustomBuild(customBuildOptions);
+    }
+
+    [MenuItem("Tools/Build/Windows64 - Steam upload only")]
+    public static void SteamUploadLastWindows64Build()
+    {
+        CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.StandaloneWindows64);
+        customBuildOptions.uploadToSteam = true;
+        
+        BuildUtils.UploadBuildOutputToSteam(customBuildOptions);
     }
 
     [MenuItem("Tools/Build/Linux64")]

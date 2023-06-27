@@ -39,8 +39,22 @@ public static class Log
 
     public static LogEventLevel MinimumLogLevel
     {
-        get => loggingLevelSwitch.MinimumLevel;
-        set => loggingLevelSwitch.MinimumLevel = value;
+        get
+        {
+            if (loggingLevelSwitch == null)
+            {
+                return LogEventLevel.Information;
+            }
+            return loggingLevelSwitch.MinimumLevel;
+        }
+        set
+        {
+            if (loggingLevelSwitch == null)
+            {
+                return;
+            }
+            loggingLevelSwitch.MinimumLevel = value;
+        }
     }
     
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -197,27 +211,62 @@ public static class Log
     
     public static void Verbose(Func<string> messageGetter)
     {
-        DoLog(messageGetter, LogEventLevel.Verbose, Logger.Verbose);
+        if (Logger != null)
+        {
+            DoLog(messageGetter, LogEventLevel.Verbose, Logger.Verbose);
+        }
+        else
+        {
+            DoLog(messageGetter, LogEventLevel.Verbose, null);
+        }
     }
     
     public static void Debug(Func<string> messageGetter)
     {
-        DoLog(messageGetter, LogEventLevel.Debug, Logger.Debug);
+        if (Logger != null)
+        {
+            DoLog(messageGetter, LogEventLevel.Debug, Logger.Debug);
+        }
+        else
+        {
+            DoLog(messageGetter, LogEventLevel.Debug, null);
+        }
     }
 
     public static void Information(Func<string> messageGetter)
     {
-        DoLog(messageGetter, LogEventLevel.Information, Logger.Information);
+        if (Logger != null)
+        {
+            DoLog(messageGetter, LogEventLevel.Information, Logger.Information);
+        }
+        else
+        {
+            DoLog(messageGetter, LogEventLevel.Information, null);
+        }
     }
 
     public static void Warning(Func<string> messageGetter)
     {
-        DoLog(messageGetter, LogEventLevel.Warning, Logger.Warning);
+        if (Logger != null)
+        {
+            DoLog(messageGetter, LogEventLevel.Warning, Logger.Warning);
+        }
+        else
+        {
+            DoLog(messageGetter, LogEventLevel.Warning, null);
+        }
     }
 
     public static void Error(Func<string> messageGetter)
     {
-        DoLog(messageGetter, LogEventLevel.Error, Logger.Error);
+        if (Logger != null)
+        {
+            DoLog(messageGetter, LogEventLevel.Error, Logger.Error);
+        }
+        else
+        {
+            DoLog(messageGetter, LogEventLevel.Error, null);
+        }
     }
 
     public static void Exception(Func<Exception> exceptionGetter)
@@ -260,7 +309,7 @@ public static class Log
             return;
         }
 
-        doLogWithSerilog(message);
+        doLogWithSerilog?.Invoke(message);
         if (Application.isEditor)
         {
             LogType logType = GetUnityLogType(logEventLevel);
