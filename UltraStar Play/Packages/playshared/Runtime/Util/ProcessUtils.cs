@@ -12,6 +12,8 @@ public static class ProcessUtils
         LogEventLevel outputLogLevel = LogEventLevel.Debug,
         LogEventLevel errorOutputLogLevel = LogEventLevel.Debug)
     {
+        Log.WithLevel(outputLogLevel, () => $"Executing process '{executable} {arguments}'");
+        
         // Set up our processInfo to run the git command and log to output and errorOutput.
         ProcessStartInfo processInfo = new(executable, arguments)
         {
@@ -23,7 +25,6 @@ public static class ProcessUtils
 
         // Set up the Process
         using Process process = new() { StartInfo = processInfo };
-        Log.Information(() => $"Executing process '{executable} {arguments}'");
 
         try
         {
