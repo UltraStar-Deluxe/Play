@@ -192,6 +192,9 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
     [Inject]
+    private HyphenateNotesAction hyphenateNotesAction;
+    
+    [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
     private LabeledItemPickerControl<ESongEditorRecordingSource> recordingSourceItemPickerControl;
@@ -509,8 +512,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             return;
         }
 
-        HyphenateNotesUtils.HypenateNotes(songMeta, selectedNotes, hyphenator);
-        AddSpaceBetweenNotesInSelection();
+        hyphenateNotesAction.ExecuteAndNotify(songMeta, selectedNotes, hyphenator);
         songMetaChangeEventStream.OnNext(new NotesChangedEvent());
     }
 

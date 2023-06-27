@@ -311,7 +311,15 @@ public static class SpeechRecognitionUtils
         // Split syllables if hyphenation is enabled
         if (hyphenator != null)
         {
-            HyphenateNotesUtils.HypenateNotes(songMeta, createdNotes, hyphenator);
+            Dictionary<Note,List<Note>> noteToNotesAfterSplit = HyphenateNotesUtils.HypenateNotes(songMeta, createdNotes, hyphenator);
+            noteToNotesAfterSplit.ForEach(entry =>
+            {
+                Note note = entry.Key;
+                List<Note> notesAfterSplit = entry.Value;
+                List<Note> newNotes = new List<Note>(notesAfterSplit);
+                newNotes.Remove(note);
+                createdNotes.AddRange(newNotes);
+            });
         }
         
         // Shorten new notes left and right to give a little space
