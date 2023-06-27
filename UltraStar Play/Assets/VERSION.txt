@@ -1,4 +1,4 @@
-release = 0.10.10
-build_timestamp = 2306162345
-commit_hash = abd9f3b5
+release = 0.10.14
+build_timestamp = 2306271213
+commit_hash = 305938fde
 website_link = https://melodymania.org/get
