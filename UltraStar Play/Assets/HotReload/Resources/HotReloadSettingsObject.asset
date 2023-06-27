@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 324c6fd3c103e0f418eb4b98c46bf63c, type: 3}
   m_Name: HotReloadSettingsObject
-  m_EditorClassIdentifier: SingularityGroup.HotReload.Runtime:SingularityGroup.HotReload:HotReloadSettingsObject
+  m_EditorClassIdentifier: 
   IncludeInBuild: 1
   AllowAndroidAppToMakeHttpRequests: 0
   PromptsPrefab: {fileID: 4967086677379066170, guid: 0dc8d7047b14c44b7970c5d35665dbe1,
