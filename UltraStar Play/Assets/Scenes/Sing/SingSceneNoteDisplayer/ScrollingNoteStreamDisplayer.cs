@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 {
-    private const float PitchIndicatorXPercent = 0.15f;
+    private const float PitchIndicatorXPercent = 0.2f;
     private const float DisplayedNoteDurationInSeconds = 5;
 
     [Inject]
@@ -95,9 +95,11 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     
     protected override bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result)
     {
-        // The VerticalPitchIndicator's position is the position where recording happens.
-        // Thus, a note with startBeat == (currentBeat + micDelayInBeats) will have its left side drawn where the VerticalPitchIndicator is.
-        double millisInSong = songAudioPlayer.PositionInSongInMillis - delayInMillis;
+        // The VerticalPitchIndicator's position is the position in the song (where players should be singing now).
+        double millisInSong = songAudioPlayer.PositionInSongInMillis;
+        
+        // Alternative: The VerticalPitchIndicator's position is the position where recording happens.
+        // double millisInSong = songAudioPlayer.PositionInSongInMillis - delayInMillis;
         double currentBeatConsideringMicDelay = BpmUtils.MillisecondInSongToBeat(songMeta, millisInSong);
 
         Vector2 yStartEndPercent = GetYStartAndEndInPercentForMidiNote(midiNote);
