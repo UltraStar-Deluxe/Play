@@ -142,7 +142,10 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
                                           .Count() > 1) 
                                      || sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 8;
         
-        int voiceIndex = songMeta.GetVoices().IndexOf(Voice);
+        List<Voice> voices = songMeta.GetVoices()
+            .OrderBy(voice => Voice.NormalizeVoiceName(voice?.Name))
+            .ToList();
+        int voiceIndex = voices.IndexOf(Voice);
         if (hasTopPlayerInfoUiRow
             && voiceIndex <= 0)
         {
