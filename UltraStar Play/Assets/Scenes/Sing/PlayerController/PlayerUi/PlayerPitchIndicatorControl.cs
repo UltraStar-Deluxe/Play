@@ -29,7 +29,8 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
     [Inject(Optional = true)]
     private MicProfile micProfile;
     
-    private int lastMidiNote;
+    private int lastPitchEventMidiNote;
+    private int lastPitchEventBeat;
 
     private bool IsPitchIndicatorVisible => settings.ShowPitchIndicator 
                                             && noteDisplayer is not NoNoteSingSceneDisplayer
@@ -45,7 +46,7 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
             pitchIndicatorIcon.style.unityBackgroundImageTintColor = new StyleColor(micProfile.Color);
         }
         playerMicPitchTracker.BeatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzedEvent(evt));
-        UpdatePitchIndicatorPosition(MidiUtils.MidiNoteConcertPitch);
+        UpdatePitchIndicatorPosition(MidiUtils.MidiNoteConcertPitch, lastPitchEventBeat);
     }
 
     private void OnBeatAnalyzedEvent(BeatAnalyzedEvent beatAnalyzedEvent)
@@ -57,18 +58,19 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        lastMidiNote = beatAnalyzedEvent.RoundedRecordedMidiNote;
-        UpdatePitchIndicatorPosition(lastMidiNote);
+        lastPitchEventMidiNote = beatAnalyzedEvent.RoundedRecordedMidiNote;
+        lastPitchEventBeat = beatAnalyzedEvent.Beat;
+        UpdatePitchIndicatorPosition(lastPitchEventMidiNote, lastPitchEventBeat);
     }
 
-    private void UpdatePitchIndicatorPosition(int midiNote)
+    private void UpdatePitchIndicatorPosition(int midiNote, int startBeat)
     {
         if (!IsPitchIndicatorVisible)
         {
             return;
         }
         
-        Vector2 yPosRangeFactor = noteDisplayer.GetYStartAndEndInPercentForMidiNote(midiNote);
+        Vector2 yPosRangeFactor = noteDisplayer.GetYStartAndEndInPercentForMidiNote(midiNote, startBeat);
         float height = 100f * (yPosRangeFactor.y - yPosRangeFactor.x);
         
         float yPosPercent = 100f * yPosRangeFactor.x;
@@ -101,9 +103,9 @@ public class PlayerPitchIndicatorControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        if (lastMidiNote > 0)
+        if (lastPitchEventMidiNote > 0)
         {
-            UpdatePitchIndicatorPosition(lastMidiNote);
+            UpdatePitchIndicatorPosition(lastPitchEventMidiNote, lastPitchEventBeat);
         }
     }
 }

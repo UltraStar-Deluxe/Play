@@ -20,6 +20,9 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     [Inject]
     private WebViewManager webViewManager;
     
+    [Inject]
+    private ThemeManager themeManager;
+    
     [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
     private VisualElement songPreviewVideoImage;
 
@@ -63,13 +66,19 @@ public class SongSelectSongPreviewControl : SongPreviewControl
         });
 
         // Video / background image fade-in
+        float videoTargetAlpha = themeManager.GetCurrentTheme().ThemeJson.videoPreviewColor.a / 255f;
+        if (videoTargetAlpha <= 0)
+        {
+            videoTargetAlpha = 1;
+        }
         VideoFadeIn.Subscribe(newValue =>
         {
             if (currentSongEntryControl == null)
             {
                 return;
             }
-            songPreviewVideoImage.style.opacity = newValue;
+
+            songPreviewVideoImage.style.opacity = newValue * videoTargetAlpha;
         });
         BackgroundImageFadeIn.Subscribe(newValue =>
         {
