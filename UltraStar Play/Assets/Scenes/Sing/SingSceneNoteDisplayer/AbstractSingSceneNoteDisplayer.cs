@@ -67,7 +67,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     // The number of rows on which notes can be placed.
     protected int noteRowCount;
-    protected float[] noteRowToYPercent;
+    protected Dictionary<int, float> noteRowToYPercent;
 
     protected int maxNoteRowMidiNote;
     protected int minNoteRowMidiNote;
@@ -179,7 +179,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         }
     }
 
-    public void SetLineCount(int lineCount)
+    public virtual void SetLineCount(int lineCount)
     {
         if (lineDisplayer == null)
         {
@@ -194,7 +194,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         {
             throw new UnityException(this.GetType() + " must be initialized with a row count >= 12 (one row for each note in an octave)");
         }
-        noteRowToYPercent = new float[noteRowCount];
+        noteRowToYPercent = new Dictionary<int, float>();
 
         float lineHeightPercent = 1.0f / lineCount;
         noteHeightPercent = lineHeightPercent / 2.0f;
@@ -209,7 +209,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
         // Draw every second line.
         List<float> yPercentagesToDrawLinesFor = new();
-        for (int i = 0; i < noteRowToYPercent.Length; i++)
+        for (int i = 0; i < noteRowToYPercent.Count; i++)
         {
             if (i % 2 == 0)
             {
@@ -418,7 +418,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         return new Vector2(UnityEngine.Random.Range(min, max), UnityEngine.Random.Range(min, max));
     }
 
-    protected virtual int CalculateNoteRow(int midiNote)
+    protected virtual int CalculateNoteRow(int midiNote, int beat)
     {
         // Map midiNote to range of noteRows (wrap around).
         int wrappedMidiNote = midiNote;
@@ -440,10 +440,14 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         return noteRow;
     }
 
-    public Vector2 GetYStartAndEndInPercentForMidiNote(int midiNote)
+    public Vector2 GetYStartAndEndInPercentForMidiNote(int midiNote, int beat)
     {
-        int noteRow = CalculateNoteRow(midiNote);
-        float y = noteRowToYPercent[noteRow];
+        int noteRow = CalculateNoteRow(midiNote, beat) % noteRowCount;
+        if (!noteRowToYPercent.TryGetValue(noteRow, out float y))
+        {
+            Debug.LogWarning($"No vertical position for note row at index {noteRow} (midiNote {midiNote}, beat {beat})");
+            y = noteHeightPercent;
+        }
         float yStart = y - noteHeightPercent;
         float yEnd = y + noteHeightPercent;
         return new Vector2(yStart, yEnd);
