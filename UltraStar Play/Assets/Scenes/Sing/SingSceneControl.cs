@@ -256,6 +256,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                     .Subscribe(_ => UpdateLeadingPlayerIcon());
             }
         }
+        
+        AddPlayerUisToUiDocument();
 
         // Handle dummy singers
         if (Application.isEditor)
@@ -442,6 +444,44 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         playerUiContainer.style.height = placeholderWorldBound.height;
     }
 
+    private List<PlayerControl> GetPlayerControlsOfVoice(bool isFirstVoice)
+    {
+        Dictionary<Voice, List<PlayerControl>> voiceToPlayerControlsMap = new();
+        PlayerControls.ForEach(it => voiceToPlayerControlsMap.AddInsideList(it.Voice, it));
+        if (voiceToPlayerControlsMap.IsNullOrEmpty())
+        {
+            return new List<PlayerControl>();
+        }
+        
+        if (voiceToPlayerControlsMap.Keys.Count >= 2)
+        {
+            // There are two different sets of lyrics that need to be displayed
+            List<Voice> voices = voiceToPlayerControlsMap.Keys
+                .OrderBy(voice => Voice.NormalizeVoiceName(voice?.Name))
+                .ToList();
+            Voice firstVoice = voices.FirstOrDefault();
+            Voice secondVoice = voices.LastOrDefault();
+            List<PlayerControl> playerControlsUsingFirstVoice = voiceToPlayerControlsMap[firstVoice];
+            List<PlayerControl> playerControlsUsingSecondVoice = voiceToPlayerControlsMap[secondVoice];
+
+            if (isFirstVoice)
+            {
+                return playerControlsUsingFirstVoice;
+            }
+            else
+            {
+                return playerControlsUsingSecondVoice;
+            }
+        }
+        else if (voiceToPlayerControlsMap.Keys.Count == 1
+                 && isFirstVoice)
+        {
+            return voiceToPlayerControlsMap.Values.FirstOrDefault();
+        }
+        
+        return new List<PlayerControl>();
+    }
+    
     private void InitSingingLyricsControls()
     {
         if (PlayerControls.IsNullOrEmpty()
@@ -462,13 +502,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return singingLyricsControl;
         }
 
-        Dictionary<Voice, List<PlayerControl>> voiceToPlayerControlsMap = new();
-        PlayerControls.ForEach(it => voiceToPlayerControlsMap.AddInsideList(it.Voice, it));
-        if (voiceToPlayerControlsMap.Keys.Count >= 2)
+        List<PlayerControl> playerControlsUsingFirstVoice = GetPlayerControlsOfVoice(true);
+        List<PlayerControl> playerControlsUsingSecondVoice = GetPlayerControlsOfVoice(false);
+        if (!playerControlsUsingFirstVoice.IsNullOrEmpty()
+            && !playerControlsUsingSecondVoice.IsNullOrEmpty())
         {
             // There are two different sets of lyrics that need to be displayed
-            List<PlayerControl> playerControlsUsingFirstVoice = voiceToPlayerControlsMap[voiceToPlayerControlsMap.Keys.FirstOrDefault()];
-            List<PlayerControl> playerControlsUsingSecondVoice = voiceToPlayerControlsMap[voiceToPlayerControlsMap.Keys.LastOrDefault()];
             topSingingLyricsControl = CreateSingingLyricsControl(topLyricsContainer, playerControlsUsingFirstVoice.FirstOrDefault());
             bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, playerControlsUsingSecondVoice.FirstOrDefault());
         }
@@ -484,7 +523,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             {
                 topLyricsContainer.HideByDisplay();
             }
-            bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, PlayerControls[0]);
+            bottomSingingLyricsControl = CreateSingingLyricsControl(bottomLyricsContainer, PlayerControls.FirstOrDefault());
         }
     }
 
@@ -932,12 +971,28 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         PlayerControls.Add(playerControl);
 
         playerControl.PlayerMicPitchTracker.InitPitchDetection();
-
-        AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, playerIndex);
-
+        
         return playerControl;
     }
 
+    private void AddPlayerUisToUiDocument()
+    {
+        // Add the players first that are singing the first voice.
+        // This corresponds with the positioning of the player profile UI and lyrics boxes.
+        List<PlayerControl> playerControlsUsingFirstVoice = GetPlayerControlsOfVoice(true);
+        List<PlayerControl> playerControlsUsingSecondVoice = GetPlayerControlsOfVoice(false);
+        
+        foreach (PlayerControl playerControl in playerControlsUsingFirstVoice)
+        {
+            AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, PlayerControls.IndexOf(playerControl));
+        }
+        
+        foreach (PlayerControl playerControl in playerControlsUsingSecondVoice)
+        {
+            AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, PlayerControls.IndexOf(playerControl));
+        }
+    }
+    
     private void AddPlayerUi(VisualElement visualElement, int playerIndex)
     {
         int playerCount = sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count;

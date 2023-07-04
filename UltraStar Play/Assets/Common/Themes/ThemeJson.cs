@@ -33,6 +33,7 @@ public class ThemeJson
     public List<Color32> microphoneColors;
     public Dictionary<string, Color32> phraseRatingColors;
     public Dictionary<string, Color32> songEditorLayerColors;
+    public Color32 videoPreviewColor;
     
     public string backgroundMusic;
     

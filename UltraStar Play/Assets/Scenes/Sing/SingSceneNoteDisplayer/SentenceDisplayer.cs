@@ -126,7 +126,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         int sentenceEndBeat = currentSentence.MaxBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;
 
-        Vector2 yStartEndPercent = GetYStartAndEndInPercentForMidiNote(midiNote);
+        Vector2 yStartEndPercent = GetYStartAndEndInPercentForMidiNote(midiNote, (int)noteStartBeat);
         float yStartPercent = yStartEndPercent.x;
         float yEndPercent = yStartEndPercent.y;
         float xStartPercent = (float)(noteStartBeat - sentenceStartBeat) / beatsInSentence;
