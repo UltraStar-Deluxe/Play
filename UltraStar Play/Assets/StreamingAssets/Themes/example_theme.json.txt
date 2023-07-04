@@ -132,6 +132,9 @@
     // Custom background music.
     "backgroundMusic": "music/my-background-music.mp3",
     
+    // Color for the video preview in song select (can also be used to make it transparent).
+    "videoPreviewColor": "#00FF0022",
+    
     // Defines the colors for the rating after each phrase.
     "phraseRatingColors": {
       "perfect": "#00FF00",

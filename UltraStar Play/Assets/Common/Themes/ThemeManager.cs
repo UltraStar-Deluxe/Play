@@ -930,6 +930,18 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             currentThemeMeta.ThemeJson.primaryFontColor.IfNotDefault(color =>
                 root.Query(R.UxmlNames.timeBarPositionIndicator).ForEach(it => it.style.backgroundColor = new StyleColor(color)));
         }
+
+        if (currentScene is EScene.SongSelectScene)
+        {
+            currentThemeMeta.ThemeJson.videoPreviewColor.IfNotDefault(color =>
+            {
+                root.Query(R.UxmlNames.songPreviewVideoImage).ForEach(element =>
+                {
+                    // Transparency is applied in the fade-in animation
+                    element.style.unityBackgroundImageTintColor = new StyleColor(color.WithAlpha(255));
+                });
+            });
+        }
     }
 
     private bool IsSkipApplyThemeStylesToVisualElement(VisualElement visualElement)
