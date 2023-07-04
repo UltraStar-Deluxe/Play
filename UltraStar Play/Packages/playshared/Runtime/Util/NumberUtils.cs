@@ -194,4 +194,20 @@ public static class NumberUtils
             return current + step;
         }
     }
+
+    public static int ShortestCircleDirection(int startPosition, int targetPosition, int fullCircleDistance = 360)
+    {
+        https://stackoverflow.com/questions/7428718/algorithm-or-formula-for-the-shortest-direction-of-travel-between-two-degrees-on
+        if ((targetPosition - startPosition + fullCircleDistance) % fullCircleDistance < (fullCircleDistance / 2))
+        {
+            // clockwise
+            return 1;
+        }
+        else
+        {
+            // anti-clockwise
+            return -1;
+        }
+    }
+
 }
