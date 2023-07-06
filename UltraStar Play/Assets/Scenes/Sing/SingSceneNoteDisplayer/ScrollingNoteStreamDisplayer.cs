@@ -12,6 +12,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 {
     private const float PitchIndicatorXPercent = 0.2f;
     private const float DisplayedNoteDurationInSeconds = 5;
+    private const float DisplayedNoteDurationInMillis = DisplayedNoteDurationInSeconds * 1000;
 
     private const double ResetPitchDistanceThresholdInMillis = 1200;
     
@@ -378,7 +379,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     public override float GetXInPercent(double positionInSongInMillis)
     {
-        return PitchIndicatorXPercent;
+        // The VerticalPitchIndicator's position is the position in the song (where players should be singing now).
+        double offsetInMillis = positionInSongInMillis - songAudioPlayer.PositionInSongInMillis;
+        float offsetInPercent = (float)(offsetInMillis / DisplayedNoteDurationInMillis);
+        return PitchIndicatorXPercent + offsetInPercent;
     }
     
     protected override bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result)
