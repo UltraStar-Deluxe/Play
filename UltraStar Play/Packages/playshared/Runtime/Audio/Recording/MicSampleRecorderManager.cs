@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
@@ -17,6 +18,12 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
     private readonly List<MicSampleRecorder> micSampleRecorders = new();
     public IReadOnlyList<MicSampleRecorder> MicSampleRecorders => micSampleRecorders;
     
+    private readonly Subject<ConnectedMicDevicesChangedEvent> connectedMicDevicesChangesStream = new();
+    private IObservable<ConnectedMicDevicesChangedEvent> ConnectedMicDevicesChangesStream => connectedMicDevicesChangesStream;
+  
+    private string[] CurrentConnectedMicDevices => Microphone.devices;
+    private string[] lastConnectedMicDevices;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -55,8 +62,16 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
                     it.Volume = finalVolume;
                 });
             });
+        
+        Debug.Log($"Initial connected mic devices: {JsonConverter.ToJson(CurrentConnectedMicDevices)}");
+        SetLastConnectedMicDevices(CurrentConnectedMicDevices);
     }
-    
+
+    private void Update()
+    {
+        UpdateConnectedMicDevices();
+    }
+
     public MicSampleRecorder GetOrCreateMicSampleRecorder(MicProfile micProfile)
     {
         if (micProfile == null)
@@ -81,5 +96,26 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         micSampleRecorder.PlayRecordedAudio = settings.PlayRecordedAudio;
         micSampleRecorders.Add(micSampleRecorder);
         return micSampleRecorder;
+    }
+    
+    private void SetLastConnectedMicDevices(string[] devices)
+    {
+        // Create copy of array
+        lastConnectedMicDevices = devices.ToArray();
+    }
+    
+    private void UpdateConnectedMicDevices()
+    {
+        if (CurrentConnectedMicDevices == null
+            || lastConnectedMicDevices == null
+            || CurrentConnectedMicDevices.SequenceEqual(lastConnectedMicDevices))
+        {
+            return;
+        }
+
+        Debug.Log($"Connected mic devices changed, new: {JsonConverter.ToJson(CurrentConnectedMicDevices)}, old: {JsonConverter.ToJson(lastConnectedMicDevices)}");
+        ConnectedMicDevicesChangedEvent evt = new(CurrentConnectedMicDevices, lastConnectedMicDevices);
+        SetLastConnectedMicDevices(CurrentConnectedMicDevices);
+        connectedMicDevicesChangesStream.OnNext(evt);
     }
 }
