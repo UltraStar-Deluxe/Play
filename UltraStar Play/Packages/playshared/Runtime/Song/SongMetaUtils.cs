@@ -387,6 +387,22 @@ public static class SongMetaUtils
         return GetLyrics(voice, removeTilde);
     }
 
+    public static string GetLyrics(List<Note> notes, bool removeTilde = false)
+    {
+        StringBuilder sb = new();
+        notes.ForEach(note =>
+        {
+            sb.Append(note.Text);
+        });
+        string lyrics = sb.ToString();
+        if (removeTilde)
+        {
+            lyrics = lyrics.Replace("~", "");
+        }
+
+        return lyrics;
+    }
+    
     public static string GetLyrics(Voice voice, bool removeTilde = false)
     {
         StringBuilder sb = new();
@@ -803,6 +819,21 @@ public static class SongMetaUtils
             return false;
         }
 
+        return true;
+    }
+
+    public static bool TryGetDistanceInMillis(SongMeta songMeta, Note a, Note b, out double distanceInMillis)
+    {
+        if (songMeta == null
+            || a == null
+            || b == null)
+        {
+            distanceInMillis = 0;
+            return false;
+        }
+        
+        int distanceInBeats = Math.Abs(a.StartBeat - b.EndBeat);
+        distanceInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, distanceInBeats);
         return true;
     }
 }

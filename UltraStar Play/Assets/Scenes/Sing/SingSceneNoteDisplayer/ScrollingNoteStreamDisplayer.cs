@@ -12,7 +12,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 {
     private const float PitchIndicatorXPercent = 0.2f;
     private const float DisplayedNoteDurationInSeconds = 5;
+    private const float DisplayedNoteDurationInMillis = DisplayedNoteDurationInSeconds * 1000;
 
+    private const double ResetPitchDistanceThresholdInMillis = 1200;
+    
     [Inject]
     private SongAudioPlayer songAudioPlayer;
 
@@ -31,7 +34,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     private readonly Dictionary<Sentence, VisualElement> sentenceToSeparator = new();
 
-    private readonly Dictionary<Note, int> noteToPrecalculatedNoteRow = new();
+    private readonly Dictionary<Note, int> noteToPrecalculatedNoteRowUnwrapped = new();
 
     private int DefaultNoteRow => noteRowCount / 2;
     
@@ -68,12 +71,13 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     {
         base.SetLineCount(lineCount);
 
-        PrecalculateNoteRows();
+        PrecalculateNoteRowUnwrapped();
         PrecalculateBeatRangeToNote();
     }
 
     private void PrecalculateBeatRangeToNote()
     {
+        // Beat range of current note is from start of current note (inclusive) to start of following note (exclusive).
         Note previousNote = null;
         foreach (Note currentNote in upcomingNotes)
         {
@@ -84,29 +88,151 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             }
             previousNote = currentNote;
         }
+
+        if (!upcomingNotes.IsNullOrEmpty())
+        {
+            Note finalNote = upcomingNotes.LastOrDefault();
+            beatRangeToNoteOrPrevious.Add(new BeatRange(finalNote.StartBeat, finalNote.EndBeat), finalNote);
+        }
     }
 
-    private void PrecalculateNoteRows()
+    private void PrecalculateNoteRowUnwrapped()
     {
         Note previousNote = null;
+
+        List<Note> currentBatch = new();
         foreach (Note currentNote in upcomingNotes)
         {
-            int noteRow = PrecalculateNoteRow(upcomingNotes, currentNote, previousNote);
-            noteToPrecalculatedNoteRow[currentNote] = noteRow;
+            if (SongMetaUtils.TryGetDistanceInMillis(songMeta, currentNote, previousNote, out double distanceInMillis) 
+                && distanceInMillis > ResetPitchDistanceThresholdInMillis
+                && currentNote.StartBeat >= previousNote.EndBeat)
+            {
+                // Start a new batch of notes
+                // Debug.Log($"start new batch of notes: {currentNote.Text}@{currentNote.StartBeat}");
+                ShiftPrecalculatedNoteRowUnwrappedToMinimizeWrapping(currentBatch);
+                currentBatch.Clear();
+                previousNote = null;
+            }
+            
+            currentBatch.Add(currentNote);
+            int noteRow = PrecalculateNoteRowUnwrapped(upcomingNotes, currentNote, previousNote);
+            noteToPrecalculatedNoteRowUnwrapped[currentNote] = noteRow;
             previousNote = currentNote;
         }
     }
 
+    private void ShiftPrecalculatedNoteRowUnwrappedToMinimizeWrapping(List<Note> notesInBatch)
+    {
+        if (notesInBatch.IsNullOrEmpty()
+            || noteToPrecalculatedNoteRowUnwrapped.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        // Calculate overshoot / undershoot
+        HashSet<int> noteRowsInBatch = notesInBatch
+            .Select(note =>
+            {
+                if (noteToPrecalculatedNoteRowUnwrapped.TryGetValue(note, out int noteRow))
+                {
+                    return noteRow;
+                }
+                return DefaultNoteRow;
+            })
+            .ToHashSet();
+        int maxNoteRow = noteRowsInBatch.Max();
+        int minNoteRow = noteRowsInBatch.Min();
+
+        int topNoteRow = (noteRowCount - 1);
+        int bottomNoteRow = 0;
+        
+        int topNoteRowSpace = topNoteRow - maxNoteRow;
+        int bottomNoteRowSpace = minNoteRow - bottomNoteRow;
+        
+        int topNoteRowOvershoot = topNoteRowSpace < 0
+            ? topNoteRowSpace
+            : 0;
+        bool isTopOvershoot = topNoteRowOvershoot < 0;
+
+        int bottomNoteRowOvershoot = bottomNoteRowSpace < 0
+            ? minNoteRow
+            : 0;
+        bool isBottomOvershoot = bottomNoteRowOvershoot < 0;
+
+        if (isTopOvershoot
+            && isBottomOvershoot)
+        {
+            // Cannot be shifted to remove wrapping
+            // Debug.Log($"Cannot remove wrapping because top and bottom overshoot: {SongMetaUtils.GetLyrics(notesInBatch)} (min note row: {minNoteRow}, max note row: {maxNoteRow})");
+            return;
+        }
+        
+        int noteRowShift;
+        if (!isTopOvershoot
+            && !isBottomOvershoot)
+        {
+            // Shift to center, i.e. try to make top and bottom space equal
+            noteRowShift = (topNoteRowSpace - bottomNoteRowSpace) / 2;
+            // if (noteRowShift != 0)
+            // {
+            //     Debug.Log($"Shifted to center notes: {SongMetaUtils.GetLyrics(notesInBatch)} (old min note row: {minNoteRow}, old max note row: {maxNoteRow}, shift: {noteRowShift}, noteRowCount: {noteRowCount})");
+            // }
+        }
+        else if (isTopOvershoot)
+        {
+            noteRowShift = topNoteRowOvershoot;
+            int minNoteRowShift = -bottomNoteRowSpace;
+            if (noteRowShift < minNoteRowShift)
+            {
+                // Debug.Log($"Cannot remove wrapping completely: {SongMetaUtils.GetLyrics(notesInBatch)}");
+                noteRowShift = minNoteRowShift;
+            }
+            // Debug.Log($"Shifted downwards to reduce wrapping at top: {SongMetaUtils.GetLyrics(notesInBatch)} (old min note row: {minNoteRow}, old max note row: {maxNoteRow}, shift: {noteRowShift}, noteRowCount: {noteRowCount})");
+        }
+        else
+        {
+            noteRowShift = -bottomNoteRowOvershoot;
+            int maxNoteRowShift = topNoteRowSpace;
+            if (noteRowShift > maxNoteRowShift)
+            {
+                // Debug.Log($"Cannot remove wrapping completely: {SongMetaUtils.GetLyrics(notesInBatch)}");
+                noteRowShift = maxNoteRowShift;
+            }
+            // Debug.Log($"Shifted upwards to reduce wrapping at bottom: {SongMetaUtils.GetLyrics(notesInBatch)} (old min note row: {minNoteRow}, old max note row: {maxNoteRow}, shift: {noteRowShift}, noteRowCount: {noteRowCount})");
+        }
+        
+        ShiftPrecalculatedNoteRowUnwrapped(notesInBatch, noteRowShift);
+    }
+
+    private void ShiftPrecalculatedNoteRowUnwrapped(List<Note> notesInBatch, int noteRowShift)
+    {
+        if (noteRowShift == 0
+            || notesInBatch.IsNullOrEmpty())
+        {
+            return;
+        }
+        
+        foreach (Note note in notesInBatch)
+        {
+            if (noteToPrecalculatedNoteRowUnwrapped.TryGetValue(note, out int unshiftedNoteRow))
+            {
+                int shiftedNoteRow = unshiftedNoteRow + noteRowShift;
+                noteToPrecalculatedNoteRowUnwrapped[note] = shiftedNoteRow;
+            }
+        }
+    }
+    
     protected override int CalculateNoteRow(int midiNote, int beat)
     {
         Note note = GetNoteOrPreviousAtBeat(beat);
         if (note == null
-            || noteToPrecalculatedNoteRow.IsNullOrEmpty())
+            || noteToPrecalculatedNoteRowUnwrapped.IsNullOrEmpty())
         {
+            // Debug.Log($"Fallback to default note row (beat: {beat}, note: {note})");
             return DefaultNoteRow;
         }
 
-        if (noteToPrecalculatedNoteRow.TryGetValue(note, out int noteRow))
+        if (noteToPrecalculatedNoteRowUnwrapped.TryGetValue(note, out int noteRow))
         {
             int targetMidiNote = note.MidiNote;
             if (midiNote == targetMidiNote)
@@ -125,12 +251,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
                 targetMidiNote,
                 MidiUtils.NoteCountInAnOctave);
             
-            int noteRowOffset = relativePitchDistance > 2
-                ? 2
-                : 1;
+            int noteRowOffset = (int)Math.Min(relativePitchDistance, 2);
             
             int offsetNoteRow = noteRow + (noteRowOffset * noteRowOffsetDirection);
-            return offsetNoteRow % noteRowCount;
+            return offsetNoteRow;
         }
 
         return DefaultNoteRow;
@@ -144,8 +268,9 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
         
         // TODO: binary search for better performance.
-        BeatRange beatRange = beatRangeToNoteOrPrevious.Keys.FirstOrDefault(beatRange => beatRange.StartBeat <= beat && beat < beatRange.EndBeat);
-        if (beatRange.StartBeat <= 0 && beatRange.EndBeat <= 0)
+        BeatRange beatRange = beatRangeToNoteOrPrevious.Keys.FirstOrDefault(beatRange => beatRange.StartBeatInclusive <= beat && beat < beatRange.EndBeatExclusive);
+        if (beatRange.StartBeatInclusive <= 0
+            && beatRange.EndBeatExclusive <= 0)
         {
             return null;
         }
@@ -159,33 +284,32 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         return null;
     }
 
-    private int PrecalculateNoteRow(List<Note> notes, Note currentNote, Note previousNote)
+    private int PrecalculateNoteRowUnwrapped(List<Note> notes, Note currentNote, Note previousNote)
     {
         if (currentNote == null
             || previousNote == null)
         {
+            // Start with the center row
+            // Debug.Log($"start at noteRow: {startNoteRow}: {currentNote.Text}@{currentNote.StartBeat}");
             return DefaultNoteRow;
         }
 
-        int distanceInBeats = Math.Abs(currentNote.StartBeat - previousNote.StartBeat);
-        double distanceInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, distanceInBeats);
-        if (distanceInMillis > 1500)
-        {
-            // Restart at the center row
-            return DefaultNoteRow;
-        }
-        
         int midiNoteDifference = currentNote.MidiNote - previousNote.MidiNote;
-        if (noteToPrecalculatedNoteRow.TryGetValue(previousNote, out int previousNoteRow))
+        int midiNoteDistance = Math.Abs(midiNoteDifference);
+        if (noteToPrecalculatedNoteRowUnwrapped.TryGetValue(previousNote, out int previousNoteRow))
         {
-            int noteRowCountStep = Math.Min(Math.Abs(midiNoteDifference), 4);
+            int noteRowCountStep = GetNoteRowCountStep(midiNoteDistance);
             if (midiNoteDifference > 0)
             {
-                return (previousNoteRow + noteRowCountStep) % noteRowCount;
+                int resultNoteRow = previousNoteRow + noteRowCountStep;
+                // Debug.Log($"midiNoteDifference {previousNote.Text}@{previousNote.StartBeat} -> {currentNote.Text}@{currentNote.StartBeat} = {midiNoteDifference}, row-step: {noteRowCountStep}, old-res: {previousNoteRow}, res: {resultNoteRow}");
+                return resultNoteRow;
             }
             else if (midiNoteDifference < 0)
             {
-                return (previousNoteRow - noteRowCountStep) % noteRowCount;
+                int resultNoteRow = previousNoteRow - noteRowCountStep;
+                // Debug.Log($"midiNoteDifference {previousNote.Text}@{previousNote.StartBeat} -> {currentNote.Text}@{currentNote.StartBeat} = {midiNoteDifference}, row-step: {noteRowCountStep}, old-res: {previousNoteRow}, res: {resultNoteRow}");
+                return resultNoteRow;
             }
             else
             {
@@ -193,7 +317,33 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             }
         }
 
+        // Fallback to the center row
+        // Debug.Log($"fallback to center row: {currentNote.Text}@{currentNote.StartBeat}");
         return DefaultNoteRow;
+    }
+
+    private int GetNoteRowCountStep(int midiNoteDistance)
+    {
+        if (midiNoteDistance <= 0)
+        {
+            return 0;
+        }
+        else if (midiNoteDistance <= 1)
+        {
+            return 1;
+        }
+        else if (midiNoteDistance <= 3)
+        {
+            return 2;
+        }
+        else if (midiNoteDistance <= 5)
+        {
+            return 3;
+        }
+        else
+        {
+            return 4;
+        }
     }
 
     public override void Update()
@@ -229,7 +379,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     public override float GetXInPercent(double positionInSongInMillis)
     {
-        return PitchIndicatorXPercent;
+        // The VerticalPitchIndicator's position is the position in the song (where players should be singing now).
+        double offsetInMillis = positionInSongInMillis - songAudioPlayer.PositionInSongInMillis;
+        float offsetInPercent = (float)(offsetInMillis / DisplayedNoteDurationInMillis);
+        return PitchIndicatorXPercent + offsetInPercent;
     }
     
     protected override bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result)
@@ -423,13 +576,13 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     
     private struct BeatRange
     {
-        public int StartBeat { get; private set; }
-        public int EndBeat { get; private set; }
+        public int StartBeatInclusive { get; private set; }
+        public int EndBeatExclusive { get; private set; }
         
-        public BeatRange(int startBeat, int endBeat)
+        public BeatRange(int startBeatInclusive, int endBeatExclusive)
         {
-            this.StartBeat = startBeat;
-            this.EndBeat = endBeat;
+            this.StartBeatInclusive = startBeatInclusive;
+            this.EndBeatExclusive = endBeatExclusive;
         }
     }
 }
