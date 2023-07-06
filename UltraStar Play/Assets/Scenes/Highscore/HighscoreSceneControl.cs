@@ -151,7 +151,7 @@ public class HighscoreSceneControl : MonoBehaviour, INeedInjection, IInjectionFi
     private EDifficulty GetNextDifficulty(EDifficulty difficulty, int direction)
     {
         int currentDifficultyIndex = difficulty.GetIndex();
-        int nextDifficultyIndex = NumberUtils.Mod(currentDifficultyIndex + direction, EnumUtils.GetValuesAsList<EDifficulty>().Count);
+        int nextDifficultyIndex = NumberUtils.ModNegativeToPositive(currentDifficultyIndex + direction, EnumUtils.GetValuesAsList<EDifficulty>().Count);
         EDifficulty nextDifficulty = EnumUtils.GetValuesAsList<EDifficulty>()
             .FirstOrDefault(it => it.GetIndex() == nextDifficultyIndex);
         return nextDifficulty;

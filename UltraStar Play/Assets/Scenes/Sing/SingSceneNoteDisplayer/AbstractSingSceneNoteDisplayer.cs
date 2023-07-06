@@ -442,7 +442,8 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     public Vector2 GetYStartAndEndInPercentForMidiNote(int midiNote, int beat)
     {
-        int noteRow = CalculateNoteRow(midiNote, beat) % noteRowCount;
+        int rawNoteRow = CalculateNoteRow(midiNote, beat);
+        int noteRow = NumberUtils.ModNegativeToPositive(rawNoteRow, noteRowCount);
         if (!noteRowToYPercent.TryGetValue(noteRow, out float y))
         {
             Debug.LogWarning($"No vertical position for note row at index {noteRow} (midiNote {midiNote}, beat {beat})");

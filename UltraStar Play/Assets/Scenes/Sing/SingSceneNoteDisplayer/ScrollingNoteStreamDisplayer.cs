@@ -74,6 +74,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
 
     private void PrecalculateBeatRangeToNote()
     {
+        // Beat range of current note is from start of current note (inclusive) to start of following note (exclusive).
         Note previousNote = null;
         foreach (Note currentNote in upcomingNotes)
         {
@@ -83,6 +84,12 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
                 beatRangeToNoteOrPrevious.Add(new BeatRange(previousNote.StartBeat, currentNote.StartBeat), previousNote);
             }
             previousNote = currentNote;
+        }
+
+        if (!upcomingNotes.IsNullOrEmpty())
+        {
+            Note finalNote = upcomingNotes.LastOrDefault();
+            beatRangeToNoteOrPrevious.Add(new BeatRange(finalNote.StartBeat, finalNote.EndBeat), finalNote);
         }
     }
 
@@ -103,6 +110,7 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         if (note == null
             || noteToPrecalculatedNoteRow.IsNullOrEmpty())
         {
+            // Debug.Log($"Fallback to default note row (beat: {beat}, note: {note})");
             return DefaultNoteRow;
         }
 
@@ -125,12 +133,10 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
                 targetMidiNote,
                 MidiUtils.NoteCountInAnOctave);
             
-            int noteRowOffset = relativePitchDistance > 2
-                ? 2
-                : 1;
+            int noteRowOffset = (int)Math.Min(relativePitchDistance, 2);
             
             int offsetNoteRow = noteRow + (noteRowOffset * noteRowOffsetDirection);
-            return offsetNoteRow % noteRowCount;
+            return NumberUtils.ModNegativeToPositive(offsetNoteRow, noteRowCount);
         }
 
         return DefaultNoteRow;
@@ -144,8 +150,9 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         }
         
         // TODO: binary search for better performance.
-        BeatRange beatRange = beatRangeToNoteOrPrevious.Keys.FirstOrDefault(beatRange => beatRange.StartBeat <= beat && beat < beatRange.EndBeat);
-        if (beatRange.StartBeat <= 0 && beatRange.EndBeat <= 0)
+        BeatRange beatRange = beatRangeToNoteOrPrevious.Keys.FirstOrDefault(beatRange => beatRange.StartBeatInclusive <= beat && beat < beatRange.EndBeatExclusive);
+        if (beatRange.StartBeatInclusive <= 0
+            && beatRange.EndBeatExclusive <= 0)
         {
             return null;
         }
@@ -164,28 +171,38 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
         if (currentNote == null
             || previousNote == null)
         {
+            // Start with the center row
+            // Debug.Log($"start at center row: {currentNote.Text}@{currentNote.StartBeat}");
             return DefaultNoteRow;
         }
 
-        int distanceInBeats = Math.Abs(currentNote.StartBeat - previousNote.StartBeat);
+        int distanceInBeats = currentNote.StartBeat < previousNote.EndBeat
+            ? 0
+            : Math.Abs(currentNote.StartBeat - previousNote.EndBeat);
         double distanceInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, distanceInBeats);
-        if (distanceInMillis > 1500)
+        if (distanceInMillis > 1000)
         {
             // Restart at the center row
+            // Debug.Log($"restart at center row: {currentNote.Text}@{currentNote.StartBeat}");
             return DefaultNoteRow;
         }
         
         int midiNoteDifference = currentNote.MidiNote - previousNote.MidiNote;
+        int midiNoteDistance = Math.Abs(midiNoteDifference);
         if (noteToPrecalculatedNoteRow.TryGetValue(previousNote, out int previousNoteRow))
         {
-            int noteRowCountStep = Math.Min(Math.Abs(midiNoteDifference), 4);
+            int noteRowCountStep = GetNoteRowCountStep(midiNoteDistance);
             if (midiNoteDifference > 0)
             {
-                return (previousNoteRow + noteRowCountStep) % noteRowCount;
+                int resultNoteRow = NumberUtils.ModNegativeToPositive(previousNoteRow + noteRowCountStep, noteRowCount);
+                // Debug.Log($"midiNoteDifference {previousNote.Text}@{previousNote.StartBeat} -> {currentNote.Text}@{currentNote.StartBeat} = {midiNoteDifference}, row-step: {noteRowCountStep}, old-res: {previousNoteRow}, res: {resultNoteRow}");
+                return resultNoteRow;
             }
             else if (midiNoteDifference < 0)
             {
-                return (previousNoteRow - noteRowCountStep) % noteRowCount;
+                int resultNoteRow = NumberUtils.ModNegativeToPositive(previousNoteRow - noteRowCountStep, noteRowCount);
+                // Debug.Log($"midiNoteDifference {previousNote.Text}@{previousNote.StartBeat} -> {currentNote.Text}@{currentNote.StartBeat} = {midiNoteDifference}, row-step: {noteRowCountStep}, old-res: {previousNoteRow}, res: {resultNoteRow}");
+                return resultNoteRow;
             }
             else
             {
@@ -193,7 +210,33 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
             }
         }
 
+        // Fallback to the center row
+        // Debug.Log($"fallback to center row: {currentNote.Text}@{currentNote.StartBeat}");
         return DefaultNoteRow;
+    }
+
+    private int GetNoteRowCountStep(int midiNoteDistance)
+    {
+        if (midiNoteDistance <= 0)
+        {
+            return 0;
+        }
+        else if (midiNoteDistance <= 1)
+        {
+            return 1;
+        }
+        else if (midiNoteDistance <= 3)
+        {
+            return 2;
+        }
+        else if (midiNoteDistance <= 5)
+        {
+            return 3;
+        }
+        else
+        {
+            return 4;
+        }
     }
 
     public override void Update()
@@ -423,13 +466,13 @@ public class ScrollingNoteStreamDisplayer : AbstractSingSceneNoteDisplayer
     
     private struct BeatRange
     {
-        public int StartBeat { get; private set; }
-        public int EndBeat { get; private set; }
+        public int StartBeatInclusive { get; private set; }
+        public int EndBeatExclusive { get; private set; }
         
-        public BeatRange(int startBeat, int endBeat)
+        public BeatRange(int startBeatInclusive, int endBeatExclusive)
         {
-            this.StartBeat = startBeat;
-            this.EndBeat = endBeat;
+            this.StartBeatInclusive = startBeatInclusive;
+            this.EndBeatExclusive = endBeatExclusive;
         }
     }
 }
