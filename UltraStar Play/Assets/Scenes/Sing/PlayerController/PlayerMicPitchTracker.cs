@@ -93,9 +93,9 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         if (micProfile.IsInputFromConnectedClient)
         {
             InitPitchDetectionFromConnectedClient();
-            serverSideConnectRequestManager.ClientConnectedEventStream
+            serverSideConnectRequestManager.ClientConnectionChangedEventStream
                 .Where(evt => evt.IsConnected)
-                .Subscribe(_ => OnClientConnected())
+                .Subscribe(_ => OnClientConnectionChanged())
                 .AddTo(gameObject);
         }
         else
@@ -104,7 +104,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         }
     }
     
-    private void OnClientConnected()
+    private void OnClientConnectionChanged()
     {
         InitPitchDetectionFromConnectedClient();
     }

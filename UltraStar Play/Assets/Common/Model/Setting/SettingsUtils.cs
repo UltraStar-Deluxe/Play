@@ -45,10 +45,18 @@ public static class SettingsUtils
         return settings.PlayerProfiles.FirstOrDefault(playerProfile => playerProfile.Name == profileName);
     }
 
+    public static List<MicProfile> GetMicProfiles(Settings settings, string profileName)
+    {
+        return settings.MicProfiles
+            .Where(micProfile => micProfile.Name == profileName)
+            .ToList();
+    }
+    
     public static MicProfile GetMicProfile(Settings settings, string profileName, int channelIndex)
     {
-        return settings.MicProfiles.FirstOrDefault(micProfile => micProfile.Name == profileName
-                                                                 && micProfile.ChannelIndex == channelIndex);
+        return settings.MicProfiles
+            .FirstOrDefault(micProfile => micProfile.Name == profileName
+                                          && micProfile.ChannelIndex == channelIndex);
     }
 
     public static bool ShouldAnimateSceneChange(Settings settings)

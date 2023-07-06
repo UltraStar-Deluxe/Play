@@ -40,7 +40,7 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
         base.Start();
         
         UpdateConnectedClients();
-        serverSideConnectRequestManager.ClientConnectedEventStream
+        serverSideConnectRequestManager.ClientConnectionChangedEventStream
             .Subscribe(_ => UpdateConnectedClients())
             .AddTo(gameObject);
     }
