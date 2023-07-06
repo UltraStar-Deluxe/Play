@@ -59,7 +59,7 @@ public static class NumberUtils
 
     // Modulus operation that wraps negative numbers.
     // Example: Mod(-1, 3) == 2
-    public static int Mod(int a, int n)
+    public static int ModNegativeToPositive(int a, int n)
     {
         int result = a % n;
         if ((result < 0 && n > 0) || (result > 0 && n < 0))
