@@ -20,8 +20,8 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
     public int ConnectedClientCount => liteNetLibServer.ConnectedPeersCount;
     
-    private readonly Subject<ClientConnectionEvent> clientConnectedEventStream = new();
-    public IObservable<ClientConnectionEvent> ClientConnectedEventStream => clientConnectedEventStream.ObserveOnMainThread();
+    private readonly Subject<ClientConnectionChangedEvent> clientConnectionChangedEventStream = new();
+    public IObservable<ClientConnectionChangedEvent> ClientConnectionChangedEventStream => clientConnectionChangedEventStream.ObserveOnMainThread();
     
     private readonly Subject<MicProfile> connectedClientMicProfileChangedEventStream = new();
     public IObservable<MicProfile> ConnectedClientMicProfileChangedEventStream => connectedClientMicProfileChangedEventStream;
@@ -58,8 +58,8 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         liteNetLibServer.Start(settings.ConnectionServerPort);
         Debug.Log($"Listening for broadcast messages on port {settings.ConnectionServerPort}");
 
-        ClientConnectedEventStream
-            .Subscribe(evt => UpdateConnectedMicProfileName(evt));
+        ClientConnectionChangedEventStream
+            .Subscribe(evt => OnClientConnectionChanged(evt));
     }
 
     private void OnDestroy()
@@ -79,9 +79,9 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         liteNetLibServer.PollEvents();
     }
     
-    public void UpdateConnectedMicProfileName(ClientConnectionEvent clientConnectionEvent)
+    public void OnClientConnectionChanged(ClientConnectionChangedEvent clientConnectionChangedEvent)
     {
-        if (!clientConnectionEvent.IsConnected)
+        if (!clientConnectionChangedEvent.IsConnected)
         {
             return;
         }
@@ -90,10 +90,10 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             .ForEach(micProfile =>
             {
                 if (micProfile.IsInputFromConnectedClient
-                    && micProfile.ConnectedClientId == clientConnectionEvent.ConnectedClientHandler.ClientId
-                    && micProfile.Name != clientConnectionEvent.ConnectedClientHandler.ClientName)
+                    && micProfile.ConnectedClientId == clientConnectionChangedEvent.ConnectedClientHandler.ClientId
+                    && micProfile.Name != clientConnectionChangedEvent.ConnectedClientHandler.ClientName)
                 {
-                    micProfile.Name = clientConnectionEvent.ConnectedClientHandler.ClientName;
+                    micProfile.Name = clientConnectionChangedEvent.ConnectedClientHandler.ClientName;
                     connectedClientMicProfileChangedEventStream.OnNext(micProfile);
                 }
             });
@@ -192,7 +192,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         }
 
         peerToConnectedClientHandler.Remove(peer);
-        clientConnectedEventStream.OnNext(new ClientConnectionEvent(connectedClientHandler, false));
+        clientConnectionChangedEventStream.OnNext(new ClientConnectionChangedEvent(connectedClientHandler, false));
     }
 
     public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
@@ -280,7 +280,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             // Register client
             peerToConnectRequestDto[peer] = connectRequestDto;
             ConnectedClientHandler newConnectedClientHandler = RegisterConnectedClient(peer, connectRequestDto.ClientName, connectRequestDto.ClientId);
-            clientConnectedEventStream.OnNext(new ClientConnectionEvent(newConnectedClientHandler, true));
+            clientConnectionChangedEventStream.OnNext(new ClientConnectionChangedEvent(newConnectedClientHandler, true));
         }
         catch (Exception e)
         {

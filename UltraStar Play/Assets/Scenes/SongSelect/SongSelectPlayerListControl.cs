@@ -47,9 +47,10 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         LoadLastPlayerProfileToMicProfileMap();
         
         // Remove/add MicProfile when Client (dis)connects.
-        serverSideConnectRequestManager.ClientConnectedEventStream
+        serverSideConnectRequestManager.ClientConnectionChangedEventStream
             .ObserveOnMainThread()
-            .Subscribe(OnClientConnected)
+            .Subscribe(OnClientConnectionChanged)
+            .AddTo(gameObject);
             .AddTo(gameObject);
 
         if (songSelectSceneControl.HasPartyModeSceneData)
@@ -71,7 +72,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(true, true));
     }
 
-    private void OnClientConnected(ClientConnectionEvent evt)
+    private void OnClientConnectionChanged(ClientConnectionChangedEvent evt)
     {
         // Find existing or create new MicProfile for the newly connected device
         MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == evt.ConnectedClientHandler.ClientId);
