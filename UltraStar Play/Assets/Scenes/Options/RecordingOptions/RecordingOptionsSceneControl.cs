@@ -40,6 +40,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     [Inject]
     private ThemeManager themeManager;
+    
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
 
     [Inject(UxmlName = R.UxmlNames.devicePicker)]
     private ItemPicker devicePicker;
@@ -204,6 +207,10 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             .Subscribe(OnConnectedClientMicProfileChanged)
             .AddTo(gameObject);
 
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream
+            .Subscribe(evt => OnConnectedMicDevicesChanged())
+            .AddTo(gameObject);
+
         calibrateDelayButton.RegisterCallbackButtonTriggered(_ => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
             .Subscribe(calibrationResult =>
@@ -257,6 +264,11 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         {
             usePortAudioToggle.HideByDisplay();
         }
+    }
+
+    private void OnConnectedMicDevicesChanged()
+    {
+        UpdateRecordingDevices();
     }
 
     private void UpdateRecordingDevices()
@@ -458,7 +470,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             serverSideConnectRequestManager);
     }
 
-    public void OnConnectedClientMicProfileChanged(MicProfile micProfile)
+    private void OnConnectedClientMicProfileChanged(MicProfile micProfile)
     {
         if (devicePickerControl.SelectedItem == micProfile)
         {

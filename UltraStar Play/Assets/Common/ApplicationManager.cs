@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using PortAudioForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -20,6 +21,9 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
+    
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
     
     private int lastScreenWidth;
     private int lastScreenHeight;
@@ -44,8 +48,21 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         settings.ObserveEveryValueChanged(it => it.TargetFps)
             .Subscribe(newValue => targetFrameRate = newValue)
             .AddTo(gameObject);
-            
+        
         ApplicationUtils.SetUsePortAudio(settings.PreferPortAudio);
+
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream
+            .Subscribe(_ => OnConnectedMicDevicesChanged())
+            .AddTo(gameObject);
+    }
+
+    private void OnConnectedMicDevicesChanged()
+    {
+        if (MicrophoneAdapter.UsePortAudio)
+        {
+            Debug.LogWarning("Connected mic devices changed, but PortAudio is used for multi-channel support. A restart is required to use changed devices.");
+            UiManager.CreateNotification("Connected microphones changed.\nAn app restart is required.");
+        }
     }
 
     private void ApplyTargetFrameRateAndVSync()

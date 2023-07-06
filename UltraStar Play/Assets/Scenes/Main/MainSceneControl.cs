@@ -93,9 +93,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
     [Inject]
     private UiManager uiManager;
+    
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
 
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
+    private SettingsProblemHintControl settingsProblemHintControl;
 
     private bool IsNewSongDialogOpen => newSongDialogControl != null;
     private bool IsQuitGameDialogOpen => quitGameDialogControl != null;
@@ -139,10 +143,19 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
 
         songMetaManager.ScanFilesIfNotDoneYet();
 
-        new SettingsProblemHintControl(
+        settingsProblemHintControl = new SettingsProblemHintControl(
             settingsProblemHintIcon,
             SettingsProblemHintControl.GetAllSettingsProblems(settings, songMetaManager),
             injector);
+
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream
+            .Subscribe(_ => UpdateSettingsProblemHint())
+            .AddTo(gameObject);
+    }
+
+    private void UpdateSettingsProblemHint()
+    {
+        settingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetAllSettingsProblems(settings, songMetaManager));
     }
 
     private void OpenSongSelectScene()

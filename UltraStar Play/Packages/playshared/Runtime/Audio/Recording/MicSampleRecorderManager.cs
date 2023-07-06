@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PortAudioForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -19,7 +20,7 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
     public IReadOnlyList<MicSampleRecorder> MicSampleRecorders => micSampleRecorders;
     
     private readonly Subject<ConnectedMicDevicesChangedEvent> connectedMicDevicesChangesStream = new();
-    private IObservable<ConnectedMicDevicesChangedEvent> ConnectedMicDevicesChangesStream => connectedMicDevicesChangesStream;
+    public IObservable<ConnectedMicDevicesChangedEvent> ConnectedMicDevicesChangesStream => connectedMicDevicesChangesStream;
   
     private string[] CurrentConnectedMicDevices => Microphone.devices;
     private string[] lastConnectedMicDevices;
