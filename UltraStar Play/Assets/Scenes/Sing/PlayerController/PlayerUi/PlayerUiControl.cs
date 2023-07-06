@@ -137,8 +137,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         if (micProfile != null
             && micProfile.IsInputFromConnectedClient)
         {
-            serverSideConnectRequestManager.ClientConnectedEventStream
-                .Subscribe(HandleClientConnectedEvent)
+            serverSideConnectRequestManager.ClientConnectionChangedEventStream
+                .Subscribe(OnClientConnectionChanged)
                 .AddTo(singSceneControl);
         }
 
@@ -237,15 +237,15 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void HandleClientConnectedEvent(ClientConnectionEvent connectionEvent)
+    private void OnClientConnectionChanged(ClientConnectionChangedEvent connectionChangedEvent)
     {
         if (micProfile == null
-            || connectionEvent.ConnectedClientHandler.ClientId != micProfile.ConnectedClientId)
+            || connectionChangedEvent.ConnectedClientHandler.ClientId != micProfile.ConnectedClientId)
         {
             return;
         }
         
-        if (connectionEvent.IsConnected)
+        if (connectionChangedEvent.IsConnected)
         {
             HideMicDisconnectedInfo();
         }

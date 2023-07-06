@@ -24,6 +24,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
     
     [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
+    
+    [Inject]
     private Settings settings;
 
     [Inject]
@@ -47,9 +50,13 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         LoadLastPlayerProfileToMicProfileMap();
         
         // Remove/add MicProfile when Client (dis)connects.
-        serverSideConnectRequestManager.ClientConnectedEventStream
+        serverSideConnectRequestManager.ClientConnectionChangedEventStream
             .ObserveOnMainThread()
-            .Subscribe(OnClientConnected)
+            .Subscribe(OnClientConnectionChanged)
+            .AddTo(gameObject);
+
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream
+            .Subscribe(OnConnectedMicDevicesChanged)
             .AddTo(gameObject);
 
         if (songSelectSceneControl.HasPartyModeSceneData)
@@ -71,7 +78,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.ForEach(playerEntryControl => playerEntryControl.SetSelected(true, true));
     }
 
-    private void OnClientConnected(ClientConnectionEvent evt)
+    private void OnClientConnectionChanged(ClientConnectionChangedEvent evt)
     {
         // Find existing or create new MicProfile for the newly connected device
         MicProfile connectedMicProfile = settings.MicProfiles.FirstOrDefault(it => it.ConnectedClientId == evt.ConnectedClientHandler.ClientId);
@@ -97,8 +104,41 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         {
             SongSelectPlayerEntryControl.MicSelectionDialogControl.MicProfiles = GetAvailableMicProfiles();
         }
+        
+        // Update MicPitchTrackers of all players
+        playerEntryControls.ForEach(it => it.UpdateMicPitchTracker());
     }
     
+    private void OnConnectedMicDevicesChanged(ConnectedMicDevicesChangedEvent evt)
+    {
+        // Assign newly connected mic devices to player if needed
+        List<MicProfile> connectedMicProfiles = evt.ConnectedMicDevices
+            .SelectMany(micDeviceName => SettingsUtils.GetMicProfiles(settings, micDeviceName))
+            .ToList();
+        foreach (MicProfile micProfile in connectedMicProfiles)
+        {
+            UseMicProfileWhereNeeded(micProfile);
+        }
+        
+        // Remove newly disconnected players where already assigned
+        List<MicProfile> disconnectedMicProfile = evt.DisconnectedMicDevices
+            .SelectMany(micDeviceName => SettingsUtils.GetMicProfiles(settings, micDeviceName))
+            .ToList();
+        foreach (MicProfile micProfile in disconnectedMicProfile)
+        {
+            RemoveMicProfileFromListEntries(micProfile);
+        }
+        
+        // Refresh mic selection dialog.
+        if (SongSelectPlayerEntryControl.MicSelectionDialogControl != null)
+        {
+            SongSelectPlayerEntryControl.MicSelectionDialogControl.MicProfiles = GetAvailableMicProfiles();
+        }
+        
+        // Update MicPitchTrackers of all players
+        playerEntryControls.ForEach(it => it.UpdateMicPitchTracker());
+    }
+
     private List<MicProfile> GetAvailableMicProfiles()
     {
         return SettingsUtils.GetAvailableMicProfiles(settings, themeManager, serverSideConnectRequestManager);

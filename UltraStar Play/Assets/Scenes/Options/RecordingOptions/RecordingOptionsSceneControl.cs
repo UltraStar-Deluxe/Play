@@ -40,6 +40,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     [Inject]
     private ThemeManager themeManager;
+    
+    [Inject]
+    private MicSampleRecorderManager micSampleRecorderManager;
 
     [Inject(UxmlName = R.UxmlNames.devicePicker)]
     private ItemPicker devicePicker;
@@ -194,14 +197,18 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             .Subscribe(_ => UpdateSampleRateLabel())
             .AddTo(gameObject);
 
-        // Reselect recording device of connected client, when the client has now connected
-        serverSideConnectRequestManager.ClientConnectedEventStream
+        // Update recording device of connected client, when the client (dis)connects
+        serverSideConnectRequestManager.ClientConnectionChangedEventStream
             .Where(clientConnectedEvent => devicePickerControl.SelectedItem?.ConnectedClientId == clientConnectedEvent.ConnectedClientHandler.ClientId)
             .Subscribe(newValue => OnRecordingDeviceSelected(devicePickerControl.SelectedItem))
             .AddTo(gameObject);
 
         serverSideConnectRequestManager.ConnectedClientMicProfileChangedEventStream
             .Subscribe(OnConnectedClientMicProfileChanged)
+            .AddTo(gameObject);
+
+        micSampleRecorderManager.ConnectedMicDevicesChangesStream
+            .Subscribe(evt => OnConnectedMicDevicesChanged())
             .AddTo(gameObject);
 
         calibrateDelayButton.RegisterCallbackButtonTriggered(_ => calibrateMicDelayControl.StartCalibration());
@@ -257,6 +264,11 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         {
             usePortAudioToggle.HideByDisplay();
         }
+    }
+
+    private void OnConnectedMicDevicesChanged()
+    {
+        UpdateRecordingDevices();
     }
 
     private void UpdateRecordingDevices()
@@ -458,7 +470,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             serverSideConnectRequestManager);
     }
 
-    public void OnConnectedClientMicProfileChanged(MicProfile micProfile)
+    private void OnConnectedClientMicProfileChanged(MicProfile micProfile)
     {
         if (devicePickerControl.SelectedItem == micProfile)
         {
