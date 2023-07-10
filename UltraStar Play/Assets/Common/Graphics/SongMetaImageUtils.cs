@@ -59,7 +59,7 @@ public static class SongMetaImageUtils
                     visualElement.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
                 }
             },
-            _ =>
+            () =>
             {
                 SetDefaultSongImage(visualElements);
                 SetDefaultSongImageColor(songMeta, visualElements);

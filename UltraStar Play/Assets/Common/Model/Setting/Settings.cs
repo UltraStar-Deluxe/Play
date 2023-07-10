@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using ICSharpCode.SharpZipLib;
 using Serilog.Events;
 using UnityEngine;
 
@@ -24,6 +25,7 @@ public class Settings : ISettings
     public bool PreferPortAudio { get; set; }
     public bool PlayRecordedAudio { get; set; }
     public string SoundfontPath { get; set; } = "";
+    public float PreviewFadeInDurationInSeconds { get; set; } = 2;
 
     // Game settings
     public SystemLanguage Language { get; set; } = SystemLanguage.English;
@@ -50,6 +52,7 @@ public class Settings : ISettings
     // Song library settings
     public List<string> SongDirs { get; set; } = new();
     public bool SearchAudioFilesWithoutSongMeta { get; set; }
+    public string GeneratedFolderPath { get; set; } = "";
     
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
@@ -111,6 +114,7 @@ public class Settings : ISettings
     
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();
+    public bool DisableWebView { get; set; }
     
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();

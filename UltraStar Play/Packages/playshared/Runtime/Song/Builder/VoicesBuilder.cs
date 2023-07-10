@@ -109,9 +109,9 @@ public class VoicesBuilder
             Note note = CreateNote(line);
             currentSentence.AddNote(note);
         }
-        catch (VoicesBuilderException e)
+        catch (Exception e)
         {
-            ThrowLineError(lineNumber, e.Message);
+            ThrowLineError(lineNumber, e.Message, e);
         }
     }
 
@@ -132,9 +132,9 @@ public class VoicesBuilder
             }
             currentSentence = null;
         }
-        catch (VoicesBuilderException e)
+        catch (Exception e)
         {
-            ThrowLineError(lineNumber, e.Message);
+            ThrowLineError(lineNumber, e.Message, e);
         }
     }
 
@@ -244,12 +244,11 @@ public class VoicesBuilder
         return res;
     }
 
-    private void ThrowLineError(uint lineNumber, string message)
+    private void ThrowLineError(uint lineNumber, string message, Exception innerException = null)
     {
-        throw new VoicesBuilderException(message
-                                         + " (path: '" + path + "', " +
-                                         "line: " + lineNumber + ", " +
-                                         "encoding: " + encoding + ")");
+        throw new VoicesBuilderException(
+            $"{message} (path: '{path}', line: {lineNumber}, encoding: {encoding})",
+            innerException);
     }
 
     private void LogLineWarning(uint lineNumber, string message)

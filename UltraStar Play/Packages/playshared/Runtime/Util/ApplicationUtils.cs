@@ -225,11 +225,6 @@ public static class ApplicationUtils
         return generatedOutputFolder;
     }
 
-    public static string GetGeneratedSongFolderAbsolutePath()
-    {
-        return Application.persistentDataPath + $"/{GeneratedFolderName}/Songs";
-    }
-    
     public static string GetDemoSongFolderAbsolutePath()
     {
         return GetStreamingAssetsPath("DemoSongs");

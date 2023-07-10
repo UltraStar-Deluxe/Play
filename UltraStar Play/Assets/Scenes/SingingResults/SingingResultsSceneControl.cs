@@ -250,8 +250,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     {
         songAudioPlayer.LoadSongAudio(sceneData.SongMetas.LastOrDefault());
         songPreviewControl.previewDelayInSeconds = 0;
-        songPreviewControl.audioFadeInDurationInSeconds = 2;
-        songPreviewControl.videoFadeInDurationInSeconds = 2;
+        songPreviewControl.AudioFadeInDurationInSeconds = 2;
+        songPreviewControl.VideoFadeInDurationInSeconds = 2;
         songPreviewControl.StartSongPreview(sceneData.SongMetas.LastOrDefault());
     }
 
