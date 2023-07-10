@@ -1,11 +1,29 @@
 using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 public class EncodingTest
 {
     private static readonly string folderPath = Application.dataPath + "/Editor/Tests/TestSongs/";
 
+    [Test]
+    public void GetEncodingTest()
+    {
+        Assert.AreEqual(EncodingUtils.GetEncoding("utf8"), Encoding.UTF8);
+        Assert.AreEqual(EncodingUtils.GetEncoding("utf-8"), Encoding.UTF8);
+        Assert.AreEqual(EncodingUtils.GetEncoding("utf32"), Encoding.UTF32);
+        Assert.AreEqual(EncodingUtils.GetEncoding("utf-32"), Encoding.UTF32);
+        Assert.AreEqual(EncodingUtils.GetEncoding("utf16"), Encoding.Unicode);
+        Assert.AreEqual(EncodingUtils.GetEncoding("utf-16"), Encoding.Unicode);
+        Assert.AreEqual(EncodingUtils.GetEncoding("ascii"), Encoding.ASCII);
+        Assert.AreEqual(EncodingUtils.GetEncoding("ansi"), Encoding.ASCII);
+        Assert.AreEqual(EncodingUtils.GetEncoding("cp1252"), Encoding.GetEncoding("windows-1252"));
+        Assert.AreEqual(EncodingUtils.GetEncoding("windows1252"), Encoding.GetEncoding("WINDOWS-1252"));
+    }
+    
     [Test]
     public void TestUtf8Bom()
     {
@@ -88,6 +106,18 @@ public class EncodingTest
             "SongTitle");
     }
 
+    [Test]
+    public void TestInvalidExplicit()
+    {
+        LogAssert.Expect(LogType.Exception, new Regex(@"ArgumentException: 'InvalidEncoding'.+"));
+        LogAssert.Expect(LogType.Error, new Regex(@"Failed to use explicitly specified encoding 'InvalidEncoding'.+"));
+      
+        TestFile("TestSong-invalid-explicit-encoding.txt",
+            true,
+            "SongArtist",
+            "SongTitle");
+    }
+    
     private void TestFile(
         string fileName,
         bool useUniversalCharsetDetector = true,

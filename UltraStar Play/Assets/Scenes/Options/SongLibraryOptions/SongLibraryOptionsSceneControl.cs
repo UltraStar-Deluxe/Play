@@ -197,6 +197,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
+            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songsWithoutSingAlongDataInfo_title),
+                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songsWithoutSingAlongDataInfo) },
         };
         if (PlatformUtils.IsAndroid)
         {

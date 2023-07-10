@@ -59,17 +59,22 @@ public static class SongMetaBuilder
             }
 
             string tagValue = parts[1].TrimStart();
-            if (tagNameLowerCase.Equals("encoding", StringComparison.Ordinal))
+            if (tagNameLowerCase.Equals("encoding", StringComparison.Ordinal)
+                && !string.Equals(tagValue, "auto", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (tagValue.Equals("UTF8", StringComparison.Ordinal))
+                try
                 {
-                    tagValue = "UTF-8";
+                    Encoding newEncoding = EncodingUtils.GetEncoding(tagValue);
+                    if (!newEncoding.Equals(reader.CurrentEncoding))
+                    {
+                        reader.Dispose();
+                        return ParseFile(path, out songIssues, newEncoding, useUniversalCharsetDetector);
+                    }
                 }
-                Encoding newEncoding = Encoding.GetEncoding(tagValue);
-                if (!newEncoding.Equals(reader.CurrentEncoding))
+                catch (Exception ex)
                 {
-                    reader.Dispose();
-                    return ParseFile(path, out songIssues, newEncoding, useUniversalCharsetDetector);
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to use explicitly specified encoding '{tagValue}'. Using guessed encoding '{reader.CurrentEncoding}' instead. File '{path}'. Error message: {ex.Message}");
                 }
             }
             else if (requiredFields.ContainsKey(tagNameLowerCase))
@@ -248,12 +253,21 @@ public static class SongMetaBuilder
         }
     }
 
+    private static string NormalizeNumber(string s)
+    {
+        if (s.IsNullOrEmpty())
+        {
+            return s;
+        }
+        return s.Replace(",", ".").Trim();
+    }
+    
     private static float ConvertToFloat(string s)
     {
         // Some txt files use comma as decimal separator (e.g. "12,34" instead "12.34").
         // Convert this to English notation.
-        string sWithDotAsDecimalSeparator = s.Replace(",", ".");
-        if (float.TryParse(sWithDotAsDecimalSeparator, NumberStyles.Any, CultureInfo.InvariantCulture, out float res))
+        string sNormalized = NormalizeNumber(s);
+        if (float.TryParse(sNormalized, NumberStyles.Any, CultureInfo.InvariantCulture, out float res))
         {
             return res;
         }
@@ -270,9 +284,10 @@ public static class SongMetaBuilder
             return 0;
         }
 
+        string sNormalized = NormalizeNumber(s);
         try
         {
-            return Convert.ToUInt32(s, 10);
+            return Convert.ToUInt32(sNormalized, 10);
         }
         catch (FormatException e)
         {
@@ -287,9 +302,10 @@ public static class SongMetaBuilder
             return 0;
         }
 
+        string sNormalized = NormalizeNumber(s);
         try
         {
-            return Convert.ToInt32(s, 10);
+            return Convert.ToInt32(sNormalized, 10);
         }
         catch (FormatException e)
         {
