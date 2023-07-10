@@ -31,4 +31,14 @@ public class ParseSongFileHeaderTest
         Assert.AreEqual("English", songMeta.Language);
         Assert.AreEqual(2022, songMeta.Year);
     }
+    
+    [Test]
+    public void SpaceAroundNumberTest()
+    {
+        SongMeta songMeta = SongMetaBuilder.ParseFile(folderPath + "TestSong-SpaceAroundNumber.txt", out List<SongIssue> songIssues, null, true);
+        Assert.NotNull(songMeta);
+        Assert.AreEqual(200, songMeta.Bpm);
+        Assert.AreEqual(0.12f, songMeta.Gap, 0.001f);
+        Assert.AreEqual(2022, songMeta.Year);
+    }
 }

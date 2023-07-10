@@ -248,12 +248,21 @@ public static class SongMetaBuilder
         }
     }
 
+    private static string NormalizeNumber(string s)
+    {
+        if (s.IsNullOrEmpty())
+        {
+            return s;
+        }
+        return s.Replace(",", ".").Trim();
+    }
+    
     private static float ConvertToFloat(string s)
     {
         // Some txt files use comma as decimal separator (e.g. "12,34" instead "12.34").
         // Convert this to English notation.
-        string sWithDotAsDecimalSeparator = s.Replace(",", ".");
-        if (float.TryParse(sWithDotAsDecimalSeparator, NumberStyles.Any, CultureInfo.InvariantCulture, out float res))
+        string sNormalized = NormalizeNumber(s);
+        if (float.TryParse(sNormalized, NumberStyles.Any, CultureInfo.InvariantCulture, out float res))
         {
             return res;
         }
@@ -270,9 +279,10 @@ public static class SongMetaBuilder
             return 0;
         }
 
+        string sNormalized = NormalizeNumber(s);
         try
         {
-            return Convert.ToUInt32(s, 10);
+            return Convert.ToUInt32(sNormalized, 10);
         }
         catch (FormatException e)
         {
@@ -287,9 +297,10 @@ public static class SongMetaBuilder
             return 0;
         }
 
+        string sNormalized = NormalizeNumber(s);
         try
         {
-            return Convert.ToInt32(s, 10);
+            return Convert.ToInt32(sNormalized, 10);
         }
         catch (FormatException e)
         {
