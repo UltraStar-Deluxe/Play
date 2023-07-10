@@ -426,7 +426,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool CanHandleUrl(string url)
     {
-        if (settings.DisableWebView)
+        if (settings == null 
+            || settings.DisableWebView)
         {
             return false;
         }
