@@ -7,7 +7,6 @@ using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Vuplex.WebView;
 
@@ -16,7 +15,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     public static WebViewManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<WebViewManager>();
 
     [InjectedInInspector]
-    public CanvasWebViewPrefab webViewPrefab;
+    public CanvasWebViewPrefab webViewPrefabPrefab;
     
     [InjectedInInspector]
     public Canvas webViewCanvas;
@@ -141,6 +140,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     
     public bool IsWebViewCanvasControlEnabled => webViewCanvas.renderMode is RenderMode.ScreenSpaceOverlay;
 
+    private CanvasWebViewPrefab webViewPrefabInstance;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -162,6 +163,36 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             .Subscribe(_ => UpdateVolume())
             .AddTo(gameObject);
         RegisterInputActions();
+
+        if (!settings.DisableWebView)
+        {
+            InstantiateWebView();
+        }
+    }
+
+    protected override void OnDestroySingleton()
+    {
+        base.OnDestroySingleton();
+        if (webViewPrefabInstance != null)
+        {
+            webViewPrefabInstance.Initialized -= OnWebViewPrefabInstanceInitialized;
+        }
+    }
+
+    private void InstantiateWebView()
+    {
+        if (webViewPrefabInstance != null)
+        {
+            Debug.LogWarning("Cannot instantiate WebView. WebView already instantiated.");
+            return;
+        }
+        
+        foreach (Transform child in webViewCanvas.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        webViewPrefabInstance = Instantiate(webViewPrefabPrefab, webViewCanvas.transform);
+        webViewPrefabInstance.Initialized += OnWebViewPrefabInstanceInitialized;
     }
 
     private void OnBeforeSceneChanged()
@@ -209,11 +240,15 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private void SetWebViewInputEnabled(bool newValue)
     {
-        webViewPrefab.HoveringEnabled = newValue;
-        webViewPrefab.ClickingEnabled = newValue;
-        webViewPrefab.ScrollingEnabled = newValue;
-        webViewPrefab.KeyboardEnabled = newValue;
-        webViewPrefab.CursorIconsEnabled = newValue;
+        if (webViewPrefabInstance == null)
+        {
+            return;
+        }
+        webViewPrefabInstance.HoveringEnabled = newValue;
+        webViewPrefabInstance.ClickingEnabled = newValue;
+        webViewPrefabInstance.ScrollingEnabled = newValue;
+        webViewPrefabInstance.KeyboardEnabled = newValue;
+        webViewPrefabInstance.CursorIconsEnabled = newValue;
     }
     
     private void SetUiToolkitInputEnabled(bool newValue)
@@ -259,32 +294,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
     }
 
-    private void OnEnable()
+    private void OnWebViewPrefabInstanceInitialized(object sender, EventArgs e)
     {
-        webViewPrefab.Initialized += OnWebViewPrefabInitialized;
-        
-        UnityEngine.InputSystem.Keyboard keyboard = InputSystem.GetDevice<UnityEngine.InputSystem.Keyboard>();
-        if (keyboard != null)
-        {
-            keyboard.onTextInput += OnKeyboardTextInput;
-        }
-    }
-
-    private void OnDisable()
-    {
-        webViewPrefab.Initialized -= OnWebViewPrefabInitialized;
-        
-        UnityEngine.InputSystem.Keyboard keyboard = InputSystem.GetDevice<UnityEngine.InputSystem.Keyboard>();
-        if (keyboard != null)
-        {
-            keyboard.onTextInput -= OnKeyboardTextInput;
-        }
-    }
-    
-    private void OnWebViewPrefabInitialized(object sender, EventArgs e)
-    {
-        webView = webViewPrefab.WebView;
-        webViewPrefab.WebView.MessageEmitted += OnWebViewMessageReceived;
+        webView = webViewPrefabInstance.WebView;
+        webViewPrefabInstance.WebView.MessageEmitted += OnWebViewMessageReceived;
         webView.LoadProgressChanged += OnWebViewLoadProgressChanged;
         
         webView.LoadHtml(defaultWebViewHtml.text);
@@ -413,6 +426,11 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool CanHandleUrl(string url)
     {
+        if (settings.DisableWebView)
+        {
+            return false;
+        }
+        
         try
         {
             // Try to parse the URL to make sure it's valid.
@@ -525,6 +543,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     public void SetPlaybackPositionInMillis(double value)
     {
+        if (!IsWebViewInitialized)
+        {
+            return;
+        }
         webView.ExecuteJavaScript($"setPlaybackPositionInMillis({value})");
         receivedPlaybackPositionInMillis = value;
         estimatedPlaybackPositionInMillis = value;
@@ -636,15 +658,6 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                 iDisposable?.Dispose();
             });
         }
-    }
-
-    private void OnKeyboardTextInput(char newChar)
-    {
-        // if (IsWebViewInitialized
-        //     && IsWebViewCanvasControlEnabled)
-        // {
-        //     webView.SendKey(newChar.ToString());
-        // }
     }
 
     private static bool HostsMatch(string a, string b)

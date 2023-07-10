@@ -111,6 +111,7 @@ public class Settings : ISettings
     
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();
+    public bool DisableWebView { get; set; }
     
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();

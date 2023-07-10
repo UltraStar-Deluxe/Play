@@ -38,6 +38,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorPicker)]
     private ItemPicker useUniversalCharsetDetectorPicker;
 
+    [Inject(UxmlName = R.UxmlNames.disableWebViewPicker)]
+    private ItemPicker disableWebViewPicker;
+    
     [Inject(UxmlName = R.UxmlNames.connectionEndpointLabel)]
     private Label connectionEndpointLabel;
 
@@ -143,6 +146,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                     }
                     settings.DisableDynamicThemes = disableDynamicThemes;
                 });
+
+        new BoolPickerControl(disableWebViewPicker)
+            .Bind(() => settings.DisableWebView,
+                newValue => settings.DisableWebView = newValue);
 
         new BoolPickerControl(useUniversalCharsetDetectorPicker)
                     .Bind(() => settings.UseUniversalCharsetDetector,

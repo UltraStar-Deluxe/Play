@@ -155,6 +155,7 @@ public static partial class R
         public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
         public const string disableDynamicThemesPicker = "disableDynamicThemesPicker";
+        public const string disableWebViewPicker = "disableWebViewPicker";
         public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
@@ -564,6 +565,7 @@ public static partial class R
         public const string rem = "rem";
         public const string removeWebCamImageButton = "removeWebCamImageButton";
         public const string removeWebCamImageIcon = "removeWebCamImageIcon";
+        public const string requiresRestartLabel = "requiresRestartLabel";
         public const string resetMusicPlaybackSpeedButton = "resetMusicPlaybackSpeedButton";
         public const string resolutionPicker = "resolutionPicker";
         public const string restartButton = "restartButton";
