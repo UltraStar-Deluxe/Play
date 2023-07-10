@@ -21,7 +21,8 @@
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
         "LiteNetLib",
-        "com.whisper.unity"
+        "com.whisper.unity",
+        "FfmpegUnity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

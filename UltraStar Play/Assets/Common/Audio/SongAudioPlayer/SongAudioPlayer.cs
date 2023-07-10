@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using FfmpegUnity;
 using UniRx;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour
@@ -18,6 +21,9 @@ public class SongAudioPlayer : MonoBehaviour
     
     private readonly LazyFromComponent<VideoPlayer> videoPlayerLazy = new(ctx => ctx.GetComponentInChildren<VideoPlayer>());
     private VideoPlayer VideoPlayer => videoPlayerLazy.GetValue(this);
+
+    private readonly LazyFromComponent<FfplayCommand> ffplayCommandLazy = new(ctx => ctx.GetComponentInChildren<FfplayCommand>());
+    private FfplayCommand FfplayCommand => ffplayCommandLazy.GetValue(this);
 
     private readonly LazyFromComponent<WebViewManager> webViewManagerLazy = new(ctx => WebViewManager.Instance);
     private WebViewManager WebViewManager => webViewManagerLazy.GetValue(this);
@@ -72,7 +78,8 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (AudioPlayer == null
+            if (FfplayCommand == null
+                || AudioPlayer == null
                 || VideoPlayer == null
                 || WebViewManager == null
                 || !IsFullyLoaded)
@@ -113,7 +120,20 @@ public class SongAudioPlayer : MonoBehaviour
 
             float newTimeInSeconds = (float)(value / 1000.0);
             
-            if (HasAudio)
+            if (HasFfmpegAudio)
+            {
+                bool wasPaused = FfplayCommand.Paused;
+
+                // TODO: SeekTime is not reliable. It jumps back to position 0 after few frames sometimes.
+                FfplayCommand.SeekTime(newTimeInSeconds);
+                
+                // SeekTime seems to start the playback. Thus, pause again if it was paused before.
+                if (wasPaused)
+                {
+                    FfplayCommand.TogglePause();
+                }
+            }
+            else if (HasAudio)
             {
                 AudioPlayer.time = newTimeInSeconds;
             }
@@ -141,7 +161,11 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (HasAudio)
+            if (HasFfmpegAudio)
+            {
+                return FfplayCommand.CurrentTime * 1000.0;
+            }
+            else if (HasAudio)
             {
                 return ((double)AudioPlayer.timeSamples / (double)AudioPlayer.clip.frequency) * 1000.0;
             }
@@ -183,15 +207,17 @@ public class SongAudioPlayer : MonoBehaviour
         get
         {
             return !isPaused
-                   && (
-                       (HasAudio && AudioPlayer.isPlaying)
+                   && ((HasFfmpegAudio && FfplayCommand.IsRunning && !FfplayCommand.Paused)
+                       || (HasAudio && AudioPlayer.isPlaying)
                        || (HasVideo && VideoPlayer.isPlaying)
-                       || (HasWebView && WebViewManager.IsPlaying));
+                       || (HasWebView && WebViewManager.IsPlaying)
+                       || (HasFfmpegAudio && FfplayCommand.AudioSourceComponent.isPlaying));
         }
     }
 
-    public bool IsPartiallyLoaded => HasAudio || HasVideo || HasWebView;
-    public bool IsFullyLoaded => (HasAudio && AudioPlayer.clip.length > 0) 
+    public bool IsPartiallyLoaded => HasFfmpegAudio || HasAudio || HasVideo || HasWebView;
+    public bool IsFullyLoaded => (HasFfmpegAudio && FfplayCommand.Duration > 0) 
+                                 || (HasAudio && AudioPlayer.clip.length > 0) 
                                  || (HasVideo && VideoPlayer.length > 0)
                                  || (HasWebView && WebViewManager.DurationInMillis > 0);
     
@@ -205,6 +231,10 @@ public class SongAudioPlayer : MonoBehaviour
             {
                 return WebViewManager.VolumeInPercent / 100f;
             }
+            else if (HasFfmpegAudio)
+            {
+                return FfplayCommand.AudioSourceComponent.volume;
+            }
             else
             {
                 return AudioPlayer.volume;
@@ -215,6 +245,10 @@ public class SongAudioPlayer : MonoBehaviour
             if (HasWebView)
             {
                 WebViewManager.VolumeInPercent = (int)(value * 100);
+            }
+            else if (HasFfmpegAudio)
+            {
+                FfplayCommand.AudioSourceComponent.volume = value;
             }
             else
             {
@@ -227,7 +261,8 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (HasWebView)
+            if (HasWebView
+                || HasFfmpegAudio)
             {
                 return 1;
             }
@@ -235,7 +270,8 @@ public class SongAudioPlayer : MonoBehaviour
         }
         set
         {
-            if (HasWebView)
+            if (HasWebView
+                || HasFfmpegAudio)
             {
                 return;
             }
@@ -247,7 +283,8 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (HasWebView)
+            if (HasWebView
+                || HasFfmpegAudio)
             {
                 return 1;
             }
@@ -255,7 +292,8 @@ public class SongAudioPlayer : MonoBehaviour
         }
         set
         {
-            if (HasWebView)
+            if (HasWebView
+                || HasFfmpegAudio)
             {
                 return;
             }
@@ -283,6 +321,7 @@ public class SongAudioPlayer : MonoBehaviour
     }
 
     private bool HasAudio => AudioPlayer.clip != null;
+    private bool HasFfmpegAudio => FfplayCommand.AudioSourceComponent.clip != null;
     private bool HasVideo => !VideoPlayer.url.IsNullOrEmpty();
     private bool HasWebView => isWebViewAudio;
 
@@ -325,7 +364,7 @@ public class SongAudioPlayer : MonoBehaviour
         ResetAudioAndVideo();
         
         string fileExtension = Path.GetExtension(audioUri);
-        if (ApplicationUtils.IsSupportedVideoFormat(fileExtension))
+        if (ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension))
         {
             return LoadAsVideo(songMeta, audioUri, startPositionInMillis);
         }
@@ -333,19 +372,27 @@ public class SongAudioPlayer : MonoBehaviour
         {
             return LoadMidiAsAudio(songMeta, audioUri, startPositionInMillis);
         }
+        else if (ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
+        {
+            return LoadAsAudio(songMeta, audioUri, startPositionInMillis, streamAudio);
+        }
         else if (WebViewManager.CanHandleUrl(audioUri))
         {
             return LoadAsWebView(songMeta, audioUri, startPositionInMillis);
         }
         else
         {
-            return LoadAsAudio(songMeta, audioUri, startPositionInMillis, streamAudio);
+            return LoadAsFfmpegFormat(songMeta, audioUri, startPositionInMillis);
         }
     }
 
     private void ResetAudioAndVideo()
     {
         isWebViewAudio = false;
+        
+        FfplayCommand.Stop();
+        Destroy(FfplayCommand.AudioSourceComponent.clip);
+        FfplayCommand.AudioSourceComponent.clip = null;
         
         VideoPlayer.Stop();
         VideoPlayer.url = "";
@@ -448,6 +495,52 @@ public class SongAudioPlayer : MonoBehaviour
         });
     }
 
+    private IObservable<SongAudioLoadedEvent> LoadAsFfmpegFormat(SongMeta songMeta, string audioUri, double startPositionInMillis)
+    {
+        try
+        {
+            FfplayCommand.Stop();
+
+            FfplayCommand.InputPath = audioUri;
+            FfplayCommand.Play();
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                FfplayCommand.Stop();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to stop ffmpeg player after failing to load '{audioUri}' using ffmpeg");
+            }
+            
+            Debug.LogException(e);
+            Debug.LogError($"Failed to load '{audioUri}' using ffmpeg");
+            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+                new Exception($"Failed to load '{audioUri}'"));
+        }
+        
+        // The video is loaded asynchronously.
+        // The duration property indicates whether it has been loaded.
+        return Observable.Create<SongAudioLoadedEvent>(o =>
+        {
+            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
+                () => FfplayCommand.Duration > 0,
+                () =>
+                {
+                    double durationInSeconds = FfplayCommand.Duration;
+                    DurationOfSongInMillis = durationInSeconds * 1000.0;
+                    double startPositionInSeconds = startPositionInMillis / 1000.0;
+                    FfplayCommand.SeekTime(startPositionInSeconds);
+                    PauseAudio();
+                    FireLoadedEvent(o, songMeta, audioUri);
+                }));
+            return Disposable.Empty;
+        });
+    }
+    
     private IObservable<SongAudioLoadedEvent> LoadAsWebView(SongMeta songMeta, string audioUri,
         double startPositionInMillis)
     {
@@ -502,6 +595,7 @@ public class SongAudioPlayer : MonoBehaviour
 
     public void StopAudio()
     {
+        FfplayCommand.Stop();
         VideoPlayer.Stop();
         AudioPlayer.Stop();
         WebViewManager.PausePlayback();
@@ -514,6 +608,14 @@ public class SongAudioPlayer : MonoBehaviour
             return;
         }
 
+        if (HasFfmpegAudio)
+        {
+            if (FfplayCommand.IsRunning
+                && !FfplayCommand.Paused)
+            {
+                FfplayCommand.TogglePause();
+            }
+        }
         AudioPlayer.Pause();
         VideoPlayer.Pause();
         WebViewManager.PausePlayback();
@@ -529,7 +631,14 @@ public class SongAudioPlayer : MonoBehaviour
             return;
         }
 
-        if (HasAudio)
+        if (HasFfmpegAudio)
+        {
+            if (FfplayCommand.Paused)
+            {
+                FfplayCommand.TogglePause();
+            }
+        }
+        else if (HasAudio)
         {
             AudioPlayer.Play();
         }
