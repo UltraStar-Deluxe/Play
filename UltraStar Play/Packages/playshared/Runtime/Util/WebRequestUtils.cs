@@ -33,7 +33,7 @@ public static class WebRequestUtils
             yield break;
         }
 
-        onSuccess(downloadHandler.texture);
+        onSuccess?.Invoke(downloadHandler.texture);
     }
     
     public static IEnumerator LoadTextFromUri(string uri, Action<string> onSuccess, Action<UnityWebRequest> onFailure = null)
@@ -61,7 +61,7 @@ public static class WebRequestUtils
             yield break;
         }
 
-        onSuccess(webRequest.downloadHandler.text);
+        onSuccess?.Invoke(webRequest.downloadHandler.text);
     }
 
     public static bool IsHttpOrHttpsUri(string uri)

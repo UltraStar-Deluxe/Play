@@ -108,7 +108,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                             requestData.Context.Response.WriteJson(imageDto);
                             sendResponseComplete = true;
                         },
-                        failedUnityWebRequest =>
+                        () =>
                         {
                             requestData.Context.Response.WriteJson(new ErrorMessageDto("Failed to load song image"));
                             sendResponseComplete = true;

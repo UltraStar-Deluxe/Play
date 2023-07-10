@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using PrimeInputActions;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -33,7 +34,7 @@ public static class ImageManager
         spriteHolders.Remove(spriteHolder);
     }
 
-    public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
+    public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action onFailure = null)
     {
         if (!File.Exists(path))
         {
@@ -66,23 +67,34 @@ public static class ImageManager
             .ForEach(it => it.style.backgroundImage = new StyleBackground(sprite)));
     }
 
-    public static void LoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action<UnityWebRequest> onFailure = null)
+    public static void LoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action onFailure = null)
     {
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
-            && cachedSprite.Sprite != null)
+            && cachedSprite?.Sprite != null)
         {
-            onSuccess(cachedSprite.Sprite);
+            onSuccess?.Invoke(cachedSprite.Sprite);
             return;
         }
 
         void DoCacheSpriteThenOnSuccess(Texture2D loadedTexture)
         {
+            if (loadedTexture == null)
+            {
+                Debug.LogError($"Loaded texture is null for URI {uri}");
+                onFailure?.Invoke();
+                return;
+            }
             Sprite sprite = Sprite.Create(loadedTexture, new Rect(0, 0, loadedTexture.width, loadedTexture.height), new Vector2(0.5f, 0.5f), 100f, 0u,  SpriteMeshType.FullRect);
             AddSpriteToCache(sprite, uri);
-            onSuccess(sprite);
+            onSuccess?.Invoke(sprite);
         }
 
-        UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, onFailure));
+        void OnFailureOfUnityWebRequest(UnityWebRequest request)
+        {
+            onFailure?.Invoke();
+        }
+        
+        UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, OnFailureOfUnityWebRequest));
     }
 
     private static void AddSpriteToCache(Sprite sprite, string source)

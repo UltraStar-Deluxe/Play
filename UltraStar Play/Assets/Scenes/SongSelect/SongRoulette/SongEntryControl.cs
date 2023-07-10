@@ -325,7 +325,7 @@ public class SongEntryControl : INeedInjection, IInjectionFinishedListener, IDis
 
                 SetCoverImageWithoutColor(loadedSprite);
             },
-            _ =>
+            () =>
             {
                 if (coverSongMeta != songMeta)
                 {
