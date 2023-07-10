@@ -60,7 +60,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
                               $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.ToCsv(",", "", "")}"));
         }
         
-        string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
+        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
         // Create job to show in UI
         if (pitchDetectionJob == null)

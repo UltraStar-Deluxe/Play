@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using ICSharpCode.SharpZipLib;
 using Serilog.Events;
 using UnityEngine;
 
@@ -50,6 +51,7 @@ public class Settings : ISettings
     // Song library settings
     public List<string> SongDirs { get; set; } = new();
     public bool SearchAudioFilesWithoutSongMeta { get; set; }
+    public string GeneratedFolderPath { get; set; } = "";
     
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;

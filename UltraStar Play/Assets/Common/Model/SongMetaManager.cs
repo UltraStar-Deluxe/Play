@@ -203,7 +203,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
         // Thus, use the static instance.
-        string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
+        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(Settings);
         InitFolderIfNotDoneYet(generatedSongFolderAbsolutePath);
         
         List<string> txtFiles;

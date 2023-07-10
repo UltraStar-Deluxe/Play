@@ -131,7 +131,7 @@ public static class SongMetaUtils
         return songMeta.Directory + $"/{path}";
     }
 
-    public static bool IsGeneratedAndSaved(SongMeta songMeta)
+    public static bool IsGeneratedAndSaved(SongMeta songMeta, string generatedSongFolderAbsolutePath)
     {
         if (songMeta == null
             || songMeta.Directory.IsNullOrEmpty()
@@ -141,12 +141,11 @@ public static class SongMetaUtils
         }
 
         string songMetaAbsolutePath = new DirectoryInfo(songMeta.Directory).FullName;
-        string generatedSongFolderAbsolutePath = new DirectoryInfo(ApplicationUtils.GetGeneratedSongFolderAbsolutePath()).FullName;
         return songMetaAbsolutePath.Contains(generatedSongFolderAbsolutePath)
                && File.Exists(GetAbsoluteSongMetaFilePath(songMeta));
     }
 
-    public static bool IsGeneratedAndNotYetSaved(SongMeta songMeta)
+    public static bool IsGeneratedAndNotYetSaved(SongMeta songMeta, string generatedSongFolderAbsolutePath)
     {
         if (songMeta == null)
         {
@@ -160,7 +159,6 @@ public static class SongMetaUtils
         }
 
         string songMetaAbsolutePath = new DirectoryInfo(songMeta.Directory).FullName;
-        string generatedSongFolderAbsolutePath = new DirectoryInfo(ApplicationUtils.GetGeneratedSongFolderAbsolutePath()).FullName;
         return songMetaAbsolutePath.Contains(generatedSongFolderAbsolutePath)
                && !File.Exists(GetAbsoluteSongMetaFilePath(songMeta));
     }
@@ -808,9 +806,9 @@ public static class SongMetaUtils
         return scoreRelevantSongHash;
     }
 
-    public static bool HasNoSingAlongData(SongMeta songMeta)
+    public static bool HasNoSingAlongData(SongMeta songMeta, string generatedSongFolderAbsolutePath)
     {
-        if (!IsGeneratedAndNotYetSaved(songMeta))
+        if (!IsGeneratedAndNotYetSaved(songMeta, generatedSongFolderAbsolutePath))
         {
             // Song has saved UltraStar txt file.
             return false;

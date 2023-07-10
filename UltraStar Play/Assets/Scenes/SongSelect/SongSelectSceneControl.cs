@@ -973,7 +973,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Check that there is associated sing-along data. If not, ask to open song editor.
-        if (SongMetaUtils.HasNoSingAlongData(songMeta))
+        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
+        if (SongMetaUtils.HasNoSingAlongData(songMeta, generatedSongFolderAbsolutePath))
         {
             noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
             noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"

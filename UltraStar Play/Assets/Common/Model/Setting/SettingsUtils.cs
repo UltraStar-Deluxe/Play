@@ -109,4 +109,16 @@ public static class SettingsUtils
             true);
         return hyphenator;
     }
+    
+    public static string GetGeneratedSongFolderAbsolutePath(Settings settings)
+    {
+        if (settings.GeneratedFolderPath.IsNullOrEmpty())
+        {
+            return ApplicationUtils.GetPersistentDataPath($"{ApplicationUtils.GeneratedFolderName}/Songs");
+        }
+        else
+        {
+            return settings.GeneratedFolderPath;
+        }
+    }
 }

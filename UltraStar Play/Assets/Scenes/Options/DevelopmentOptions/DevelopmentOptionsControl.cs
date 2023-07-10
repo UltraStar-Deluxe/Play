@@ -101,6 +101,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.minimumLogLevelPicker)]
     private ItemPicker minimumLogLevelPicker;
     
+    [Inject(UxmlName = R.UxmlNames.generatedFolderPathTextField)]
+    private TextField generatedFolderPathTextField;
+
     protected override void Start()
     {
         base.Start();
@@ -108,6 +111,30 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(showFpsPicker)
             .Bind(() => settings.ShowFps,
                   newValue => settings.ShowFps = newValue);
+
+        FieldBindingUtils.Bind(generatedFolderPathTextField,
+            () => settings.GeneratedFolderPath,
+            newValue =>
+            {
+                if (newValue == settings.GeneratedFolderPath)
+                {
+                    return;
+                }
+                
+                if (newValue.IsNullOrEmpty())
+                {
+                    settings.GeneratedFolderPath = "";
+                }
+                else if (DirectoryUtils.Exists(newValue))
+                {
+                    settings.GeneratedFolderPath = newValue;
+                }
+                else
+                {
+                    generatedFolderPathTextField.value = settings.GeneratedFolderPath;
+                }
+            });
+        new TextFieldHintControl(generatedFolderPathTextField);
 
         List<LogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<LogEventLevel>()
             .OrderBy(logEventLevel => (int)logEventLevel)

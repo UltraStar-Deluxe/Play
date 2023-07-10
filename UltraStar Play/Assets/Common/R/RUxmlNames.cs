@@ -195,6 +195,8 @@ public static partial class R
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
+        public const string generatedFolderPathHintLabel = "generatedFolderPathHintLabel";
+        public const string generatedFolderPathTextField = "generatedFolderPathTextField";
         public const string genrePropertyToggle = "genrePropertyToggle";
         public const string globalSettingsContainer = "globalSettingsContainer";
         public const string globalSettingsLabel = "globalSettingsLabel";
