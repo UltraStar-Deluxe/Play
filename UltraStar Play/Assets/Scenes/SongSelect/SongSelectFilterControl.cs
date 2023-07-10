@@ -101,8 +101,9 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             return false;
         }
 
+        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
         if (nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value
-            && !SongMetaUtils.HasNoSingAlongData(songMeta))
+            && !SongMetaUtils.HasNoSingAlongData(songMeta, generatedSongFolderAbsolutePath))
         {
             return false;
         }

@@ -41,6 +41,9 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     {
         base.Start();
 
+        AudioFadeInDurationInSeconds = settings.PreviewFadeInDurationInSeconds;
+        VideoFadeInDurationInSeconds = settings.PreviewFadeInDurationInSeconds;
+
         songPreviewVideoImage.style.opacity = 0;
         StartSongPreviewEventStream.Subscribe(_ =>
         {

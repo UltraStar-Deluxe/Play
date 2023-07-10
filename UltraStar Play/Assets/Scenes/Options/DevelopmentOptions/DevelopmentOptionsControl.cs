@@ -38,6 +38,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorPicker)]
     private ItemPicker useUniversalCharsetDetectorPicker;
 
+    [Inject(UxmlName = R.UxmlNames.disableWebViewPicker)]
+    private ItemPicker disableWebViewPicker;
+    
     [Inject(UxmlName = R.UxmlNames.connectionEndpointLabel)]
     private Label connectionEndpointLabel;
 
@@ -98,6 +101,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.minimumLogLevelPicker)]
     private ItemPicker minimumLogLevelPicker;
     
+    [Inject(UxmlName = R.UxmlNames.generatedFolderPathTextField)]
+    private TextField generatedFolderPathTextField;
+
     protected override void Start()
     {
         base.Start();
@@ -105,6 +111,30 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(showFpsPicker)
             .Bind(() => settings.ShowFps,
                   newValue => settings.ShowFps = newValue);
+
+        FieldBindingUtils.Bind(generatedFolderPathTextField,
+            () => settings.GeneratedFolderPath,
+            newValue =>
+            {
+                if (newValue == settings.GeneratedFolderPath)
+                {
+                    return;
+                }
+                
+                if (newValue.IsNullOrEmpty())
+                {
+                    settings.GeneratedFolderPath = "";
+                }
+                else if (DirectoryUtils.Exists(newValue))
+                {
+                    settings.GeneratedFolderPath = newValue;
+                }
+                else
+                {
+                    generatedFolderPathTextField.value = settings.GeneratedFolderPath;
+                }
+            });
+        new TextFieldHintControl(generatedFolderPathTextField);
 
         List<LogEventLevel> logEventLevels = EnumUtils.GetValuesAsList<LogEventLevel>()
             .OrderBy(logEventLevel => (int)logEventLevel)
@@ -143,6 +173,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                     }
                     settings.DisableDynamicThemes = disableDynamicThemes;
                 });
+
+        new BoolPickerControl(disableWebViewPicker)
+            .Bind(() => settings.DisableWebView,
+                newValue => settings.DisableWebView = newValue);
 
         new BoolPickerControl(useUniversalCharsetDetectorPicker)
                     .Bind(() => settings.UseUniversalCharsetDetector,

@@ -155,6 +155,7 @@ public static partial class R
         public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
         public const string disableDynamicThemesPicker = "disableDynamicThemesPicker";
+        public const string disableWebViewPicker = "disableWebViewPicker";
         public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
@@ -194,6 +195,8 @@ public static partial class R
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameOptionsButton = "gameOptionsButton";
         public const string GameRoundModifierDialogUi = "GameRoundModifierDialogUi";
+        public const string generatedFolderPathHintLabel = "generatedFolderPathHintLabel";
+        public const string generatedFolderPathTextField = "generatedFolderPathTextField";
         public const string genrePropertyToggle = "genrePropertyToggle";
         public const string globalSettingsContainer = "globalSettingsContainer";
         public const string globalSettingsLabel = "globalSettingsLabel";
@@ -539,6 +542,7 @@ public static partial class R
         public const string playRecordedAudioToggle = "playRecordedAudioToggle";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
+        public const string previewFadeInDurationChooser = "previewFadeInDurationChooser";
         public const string previewMidiTrackAndChannelButton = "previewMidiTrackAndChannelButton";
         public const string previewVolumeChooser = "previewVolumeChooser";
         public const string previousDifficultyButton = "previousDifficultyButton";
@@ -564,6 +568,7 @@ public static partial class R
         public const string rem = "rem";
         public const string removeWebCamImageButton = "removeWebCamImageButton";
         public const string removeWebCamImageIcon = "removeWebCamImageIcon";
+        public const string requiresRestartLabel = "requiresRestartLabel";
         public const string resetMusicPlaybackSpeedButton = "resetMusicPlaybackSpeedButton";
         public const string resolutionPicker = "resolutionPicker";
         public const string restartButton = "restartButton";

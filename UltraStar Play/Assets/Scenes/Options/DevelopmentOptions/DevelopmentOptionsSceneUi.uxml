@@ -14,23 +14,28 @@
                 </ui:Button>
             </ui:VisualElement>
             <ItemPicker name="showFpsPicker" label="Show FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-            <ItemPicker name="minimumLogLevelPicker" label="Minimum Log Level" wrap-around="true" class="noBackgroundInHierarchy" />
-            <ItemPicker name="streamAudioInSingScenePicker" label="Stream audio for singing" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ui:TextField picking-mode="Ignore" label="Absolute path to folder&#10;with generated files¹" name="generatedFolderPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
+                <ui:Label tabindex="-1" text="Default path" display-tooltip-when-elided="true" name="generatedFolderPathHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;" />
+            </ui:TextField>
+            <ItemPicker name="minimumLogLevelPicker" label="Minimum Log Level¹" wrap-around="true" class="noBackgroundInHierarchy" />
+            <ItemPicker name="streamAudioInSingScenePicker" label="Load as streaming audio when singing" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
             <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
             <ItemPicker name="analyzeBeatsWithoutTargetNotePicker" label="Analyze Beats Without Target Note" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animatedBackgroundItemPicker" label="Animated Background" class="noBackgroundInHierarchy" />
-            <ItemPicker name="disableDynamicThemesPicker" label="Disable Dynamic Themes" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
-            <ItemPicker name="useUniversalCharsetDetectorPicker" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings." wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
-            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="searchAudioFilesWithoutSongMetaPicker" label="Search audio files&#10;without sing-along data" class="noBackgroundInHierarchy" style="flex-shrink: 0;" />
-            <ItemPicker name="customEventSystemOptInOnAndroidPicker" label="Use custom event system&#10;for input actions.&#10;This enables keyboard&#10;and gamepad control&#10;but can cause issues on Android" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+            <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="animatedBackgroundItemPicker" label="Animated Background¹" class="noBackgroundInHierarchy" />
+            <ItemPicker name="disableDynamicThemesPicker" label="Disable Themes¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+            <ItemPicker name="disableWebViewPicker" label="Disable embedded browser¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+            <ItemPicker name="useUniversalCharsetDetectorPicker" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+            <ItemPicker name="customEventSystemOptInOnAndroidPicker" label="Use custom event system&#10;for input actions.&#10;This enables keyboard&#10;and gamepad control&#10;but can cause issues on Android¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
             <ui:TextField text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
             <ui:TextField text="python -m spleeter" name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
-            <ui:IntegerField label="Connection Port&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />
+            <ui:IntegerField label="Connection Port¹&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />
             <ui:Label text="Connection endpoint: ????" name="connectionEndpointLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
-            <ui:TextField label="HTTP Server Host&#10;(leave empty for automatic value)" name="httpServerHostTextField" class="noBackgroundInHierarchy mb-3" />
-            <ui:IntegerField label="HTTP Server Port&#10;(default: 6789)" name="httpServerPortTextField" class="noBackgroundInHierarchy mb-3" />
+            <ui:TextField label="HTTP Server Host¹&#10;(leave empty for automatic value)" name="httpServerHostTextField" class="noBackgroundInHierarchy mb-3" />
+            <ui:IntegerField label="HTTP Server Port¹&#10;(default: 6789)" name="httpServerPortTextField" class="noBackgroundInHierarchy mb-3" />
             <ui:Label text="HTTP endpoint example: ????" name="httpEndpointExampleLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+            <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
+            <ui:Label tabindex="-1" text="¹ requires restart" display-tooltip-when-elided="true" name="requiresRestartLabel" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

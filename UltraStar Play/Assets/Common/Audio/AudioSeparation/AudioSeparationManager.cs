@@ -56,7 +56,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             return Observable.Empty<AudioSeparationResult>();
         }
         
-        string generatedSongFolderAbsolutePath = ApplicationUtils.GetGeneratedSongFolderAbsolutePath();
+        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
         // Create job to show in UI
         if (audioSeparationJob == null)
