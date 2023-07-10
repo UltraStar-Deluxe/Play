@@ -59,17 +59,22 @@ public static class SongMetaBuilder
             }
 
             string tagValue = parts[1].TrimStart();
-            if (tagNameLowerCase.Equals("encoding", StringComparison.Ordinal))
+            if (tagNameLowerCase.Equals("encoding", StringComparison.Ordinal)
+                && !string.Equals(tagValue, "auto", StringComparison.InvariantCultureIgnoreCase))
             {
-                if (tagValue.Equals("UTF8", StringComparison.Ordinal))
+                try
                 {
-                    tagValue = "UTF-8";
+                    Encoding newEncoding = EncodingUtils.GetEncoding(tagValue);
+                    if (!newEncoding.Equals(reader.CurrentEncoding))
+                    {
+                        reader.Dispose();
+                        return ParseFile(path, out songIssues, newEncoding, useUniversalCharsetDetector);
+                    }
                 }
-                Encoding newEncoding = Encoding.GetEncoding(tagValue);
-                if (!newEncoding.Equals(reader.CurrentEncoding))
+                catch (Exception ex)
                 {
-                    reader.Dispose();
-                    return ParseFile(path, out songIssues, newEncoding, useUniversalCharsetDetector);
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to use explicitly specified encoding '{tagValue}'. Using guessed encoding '{reader.CurrentEncoding}' instead. File '{path}'. Error message: {ex.Message}");
                 }
             }
             else if (requiredFields.ContainsKey(tagNameLowerCase))
