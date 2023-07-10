@@ -49,7 +49,8 @@ public class SongIssue
         string beatRangeInfo = StartBeat >= 0 && EndBeat >= 0
             ? $" (from beat {StartBeat}, until beat {EndBeat})"
             : "";
-        string logMessage = Message + beatRangeInfo;
+        string songMetaInfo = $" (in song '{SongMetaUtils.GetArtistDashTitle(SongMeta)}')";
+        string logMessage = $"{Message}{beatRangeInfo}{songMetaInfo}";
         if (Severity == ESongIssueSeverity.Warning)
         {
             Debug.LogWarning(logMessage);
