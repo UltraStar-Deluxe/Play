@@ -25,6 +25,7 @@ public class Settings : ISettings
     public bool PreferPortAudio { get; set; }
     public bool PlayRecordedAudio { get; set; }
     public string SoundfontPath { get; set; } = "";
+    public float PreviewFadeInDurationInSeconds { get; set; } = 2;
 
     // Game settings
     public SystemLanguage Language { get; set; } = SystemLanguage.English;

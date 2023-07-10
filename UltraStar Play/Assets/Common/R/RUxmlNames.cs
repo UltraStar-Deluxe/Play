@@ -542,6 +542,7 @@ public static partial class R
         public const string playRecordedAudioToggle = "playRecordedAudioToggle";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
+        public const string previewFadeInDurationChooser = "previewFadeInDurationChooser";
         public const string previewMidiTrackAndChannelButton = "previewMidiTrackAndChannelButton";
         public const string previewVolumeChooser = "previewVolumeChooser";
         public const string previousDifficultyButton = "previousDifficultyButton";

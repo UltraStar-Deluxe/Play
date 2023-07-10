@@ -37,6 +37,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.songBackgroundScaleModePicker)]
     private ItemPicker songBackgroundScaleModePicker;
     
+    [Inject(UxmlName = R.UxmlNames.previewFadeInDurationChooser)]
+    private ItemPicker previewFadeInDurationChooser;
+
     [Inject]
     private UiManager uiManager;
     
@@ -66,6 +69,11 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         new BoolPickerControl(showSongIndexInSongSelectPicker)
             .Bind(() => settings.ShowSongIndexInSongSelect, 
                 newValue => settings.ShowSongIndexInSongSelect = newValue);
+
+        LabeledItemPickerControl<float> audioPreviewFadeInDurationChooserControl = new(previewFadeInDurationChooser, NumberUtils.CreateFloatList(0.5f, 5f, 0.5f));
+        audioPreviewFadeInDurationChooserControl.Bind(() => settings.PreviewFadeInDurationInSeconds,
+            newValue => settings.PreviewFadeInDurationInSeconds = newValue);
+        audioPreviewFadeInDurationChooserControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture()} s";
 
         LabeledItemPickerControl<ESongBackgroundScaleMode> songBackgroundScaleModePickerControl = new LabeledItemPickerControl<ESongBackgroundScaleMode>(songBackgroundScaleModePicker, EnumUtils.GetValuesAsList<ESongBackgroundScaleMode>());
         songBackgroundScaleModePickerControl.Bind(() => settings.SongBackgroundScaleMode,

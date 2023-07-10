@@ -14,14 +14,11 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     public float previewDelayInSeconds = 0.5f;
     
     [InjectedInInspector]
-    public float audioFadeInDurationInSeconds = 5;
-    
-    [InjectedInInspector]
-    public float videoFadeInDurationInSeconds = 2;
-    
-    [InjectedInInspector]
     public bool stopOldImmediatelyOnStartNew;
     
+    public float AudioFadeInDurationInSeconds { get; set; } = 2;
+    public float VideoFadeInDurationInSeconds { get; set; } = 2;
+
     protected float fadeInStartTimeInSeconds;
     protected float videoFadeInStartTimeInSeconds;
     protected bool isFadeInStarted;
@@ -95,7 +92,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             videoFadeInStartTimeInSeconds = Time.time;
         }
 
-        float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / videoFadeInDurationInSeconds;
+        float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / Math.Max(VideoFadeInDurationInSeconds, 0.001f);
         videoFadeInPercent = NumberUtils.Limit(videoFadeInPercent, 0, 1);
         if (songVideoPlayer.HasLoadedVideo)
         {
@@ -111,7 +108,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual float UpdateAudioFadeIn()
     {
-        float audioFadeInFactor = (Time.time - fadeInStartTimeInSeconds) / audioFadeInDurationInSeconds;
+        float audioFadeInFactor = (Time.time - fadeInStartTimeInSeconds) / Math.Max(AudioFadeInDurationInSeconds, 0.001f);
         audioFadeInFactor = NumberUtils.Limit(audioFadeInFactor, 0, 1);
         float maxVolume = GetFinalPreviewVolume();
         songAudioPlayer.VolumeFactor = audioFadeInFactor * maxVolume;
