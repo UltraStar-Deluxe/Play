@@ -432,6 +432,10 @@ public static class SongMetaUtils
 
     public static string GetArtistDashTitle(SongMeta songMeta)
     {
+        if (songMeta == null)
+        {
+            return "";
+        }
         return GetArtistDashTitle(songMeta.Artist, songMeta.Title);
     }
 
