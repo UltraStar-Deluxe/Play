@@ -1,0 +1,26 @@
+fileFormatVersion: 2
+guid: 481388f987d0cb947bbebda5a7a8f7c7
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Noto Sans Sinhala
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 0343545d8c76c674b843482f5c819246, type: 3}
+  - {fileID: 12800000, guid: e2c031091c8edea43b951cf432b5128c, type: 3}
+  - {fileID: 12800000, guid: b3d23e5bc7fb4fc45b39f1c2124c68f8, type: 3}
+  - {fileID: 12800000, guid: 13db077dd25a2894db2842a1c7021b1a, type: 3}
+  - {fileID: 12800000, guid: 86503d8cc44b3814ea5b43fd2d66aa81, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
