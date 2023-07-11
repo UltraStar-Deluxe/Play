@@ -229,7 +229,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         
         try
         {
-            songAudioPlayer.LoadSongAudio(songMeta)
+            songAudioPlayer.LoadAndPlaySongAudio(songMeta)
                 .CatchIgnore((Exception error) =>
                 {
                     string errorMessage = $"Audio could not be loaded: {SongMetaUtils.GetArtistDashTitle(songMeta)}";

@@ -82,17 +82,15 @@ public static class ApplicationUtils
 
     public static readonly IReadOnlyCollection<string> unitySupportedVideoFiles = new HashSet<string>
     {
-        "avi",
+        // See https://docs.unity3d.com/Manual/VideoSources-FileCompatibility.html#CompatibilityWithTargetPlatforms
+#if !UNITY_STANDALONE_LINUX
         "mp4",
-        "mpg",
-        "mpeg",
+#endif
         "vp8",
+        "avi",
+        
+        // NOTE: webm is only supported by Unity when using VP8. webm with VP9 is not supported by Unity and will fail.
         "webm",
-        "m4v",
-        "mov",
-        "dv",
-        "afs",
-        "wmf",
     };
 
     public static readonly IReadOnlyCollection<string> supportedVideoFiles = unitySupportedVideoFiles

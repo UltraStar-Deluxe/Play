@@ -333,10 +333,22 @@ public class SongAudioPlayer : MonoBehaviour
             })
             .AddTo(gameObject);
 
+        MuteFfmpegAudioSource();
+
         // StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
         //     Debug.Log($"Pos in song: {PositionInSongInMillis}")));
     }
+
+    private void MuteFfmpegAudioSource()
+    {
+        ffplayCommand.AudioSourceComponent.mute = true;
+    }
     
+    private void UnmuteFfmpegAudioSource()
+    {
+        ffplayCommand.AudioSourceComponent.mute = false;
+    }
+
     private void Update()
     {
         if (IsPlaying)
@@ -355,7 +367,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public IObservable<SongAudioLoadedEvent> LoadSongAudio(SongMeta songMeta, double startPositionInMillis = 0, bool streamAudio = true)
+    public IObservable<SongAudioLoadedEvent> LoadAndPlaySongAudio(SongMeta songMeta, double startPositionInMillis = 0, bool streamAudio = true)
     {
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
@@ -375,7 +387,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
         {
-            return LoadMidiAsAudio(songMeta, audioUri, startPositionInMillis);
+            return LoadWithMidiManager(songMeta, audioUri, startPositionInMillis);
         }
         else if (ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
         {
@@ -395,6 +407,7 @@ public class SongAudioPlayer : MonoBehaviour
     {
         AudioSupportProvider = EAudioSupportProvider.None;
         
+        MuteFfmpegAudioSource();
         ffplayCommand.Stop();
         ffplayCommand.InputPath = "";
         ffplayCommand.Dispose();
@@ -410,7 +423,7 @@ public class SongAudioPlayer : MonoBehaviour
         DurationOfSongInMillis = 0;
     }
     
-    private IObservable<SongAudioLoadedEvent> LoadMidiAsAudio(SongMeta songMeta, string audioUri,
+    private IObservable<SongAudioLoadedEvent> LoadWithMidiManager(SongMeta songMeta, string audioUri,
         double startPositionInMillis)
     {
         AudioClip audioClip = MidiManager.CreateAudioClip(audioUri);
@@ -426,6 +439,7 @@ public class SongAudioPlayer : MonoBehaviour
             audioSource.clip = audioClip;
             DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
             PositionInSongInMillis = startPositionInMillis;
+            audioSource.Play();
             FireLoadedEvent(o, songMeta, audioUri);
             return Disposable.Empty;
         });
@@ -464,8 +478,7 @@ public class SongAudioPlayer : MonoBehaviour
         });
     }
 
-    private IObservable<SongAudioLoadedEvent> LoadWithVideoPlayer(SongMeta songMeta, string audioUri,
-        double startPositionInMillis)
+    private IObservable<SongAudioLoadedEvent> LoadWithVideoPlayer(SongMeta songMeta, string audioUri, double startPositionInMillis)
     {
         videoPlayer.url = audioUri;
         if (videoPlayer.url.IsNullOrEmpty())
@@ -477,13 +490,6 @@ public class SongAudioPlayer : MonoBehaviour
 
         AudioSupportProvider = EAudioSupportProvider.UnityVideoPlayer;
         
-        // Play the audio of the video player through the AudioSource.
-        videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
-        for (int trackIndex = 0; trackIndex < videoPlayer.audioTrackCount; trackIndex++)
-        {
-            videoPlayer.SetTargetAudioSource(0, audioSource);
-        }
-
         // Must play the video to trigger loading.
         videoPlayer.Play();
 
@@ -496,7 +502,16 @@ public class SongAudioPlayer : MonoBehaviour
                 {
                     DurationOfSongInMillis = 1000.0 * videoPlayer.length;
                     PositionInSongInMillis = startPositionInMillis;
-                    // PauseAudio();
+                    
+                    // Play the audio of the video player through the AudioSource.
+                    videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+                    for (ushort trackIndex = 0; trackIndex < videoPlayer.audioTrackCount; trackIndex++)
+                    {
+                        Debug.Log($"videoPlayer.SetTargetAudioSource: trackIndex: {trackIndex}, audioSource: {audioSource}");
+                        videoPlayer.SetTargetAudioSource(trackIndex, audioSource);
+                    }
+                    audioSource.Play();
+                    
                     FireLoadedEvent(o, songMeta, audioUri);
                 }));
             return Disposable.Empty;
@@ -510,6 +525,7 @@ public class SongAudioPlayer : MonoBehaviour
         {
             ffplayCommand.InputPath = audioUri;
             ffplayCommand.Play();
+            UnmuteFfmpegAudioSource();
             
             AudioSupportProvider = EAudioSupportProvider.Ffmpeg;
         }
@@ -606,7 +622,7 @@ public class SongAudioPlayer : MonoBehaviour
     
     public void ReloadAudio()
     {
-        LoadSongAudio(SongMeta);
+        LoadAndPlaySongAudio(SongMeta);
     }
 
     public void StopAudio()
@@ -621,7 +637,9 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
         {
+            // The audio output is redirected to the AudioSource. Thus, stop VideoPlayer and AudioSource.
             videoPlayer.Stop();
+            audioSource.Stop();
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
@@ -646,7 +664,9 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
         {
+            // The audio output is redirected to the AudioSource. Thus, pause VideoPlayer and AudioSource.
             videoPlayer.Pause();
+            audioSource.Pause();
         }
         else if (AudioSupportProvider is EAudioSupportProvider.WebView)
         {
@@ -681,7 +701,9 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
         {
+            // The audio output is redirected to the AudioSource. Thus, start VideoPlayer and AudioSource.
             videoPlayer.Play();
+            audioSource.Play();
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {

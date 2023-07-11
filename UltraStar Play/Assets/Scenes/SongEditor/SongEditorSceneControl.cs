@@ -149,7 +149,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
         InitSongEditorStyleSheet();
         
-        songAudioPlayer.LoadSongAudio(SongMeta, sceneData.PositionInSongInMillis)
+        songAudioPlayer.LoadAndPlaySongAudio(SongMeta, sceneData.PositionInSongInMillis)
             // Subscribe to trigger the (cold) observable.
             .Subscribe(_ =>
             {
