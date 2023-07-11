@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FfmpegUnity;
 using UniInject;
@@ -52,6 +53,8 @@ public class SongAudioPlayer : MonoBehaviour
     private readonly Subject<SongAudioLoadedEvent> loadedEventStream = new();
     public IObservable<SongAudioLoadedEvent> LoadedEventStream => loadedEventStream;
 
+    private readonly List<string> videoPlayerErrorMessages = new();
+    
     public IObservable<Pair<double>> JumpBackInSongEventStream
     {
         get
@@ -339,6 +342,16 @@ public class SongAudioPlayer : MonoBehaviour
         //     Debug.Log($"Pos in song: {PositionInSongInMillis}")));
     }
 
+    private void OnEnable()
+    {
+        videoPlayer.errorReceived += OnVideoPlayerErrorReceived;
+    }
+
+    private void OnDisable()
+    {
+        videoPlayer.errorReceived -= OnVideoPlayerErrorReceived;
+    }
+    
     private void MuteFfmpegAudioSource()
     {
         ffplayCommand.AudioSourceComponent.mute = true;
@@ -407,11 +420,14 @@ public class SongAudioPlayer : MonoBehaviour
     {
         AudioSupportProvider = EAudioSupportProvider.None;
         
+        StopAllCoroutines();
+        
         MuteFfmpegAudioSource();
         ffplayCommand.Stop();
         ffplayCommand.InputPath = "";
         ffplayCommand.Dispose();
         
+        videoPlayerErrorMessages.Clear();
         videoPlayer.Stop();
         videoPlayer.url = "";
 
@@ -492,14 +508,23 @@ public class SongAudioPlayer : MonoBehaviour
         
         // Must play the video to trigger loading.
         videoPlayer.Play();
-
+        
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => videoPlayer.length > 0,
+                () => videoPlayer.length > 0 || videoPlayerErrorMessages.Count > 0,
                 () =>
                 {
+                    if (videoPlayerErrorMessages.Count > 0)
+                    {
+                        ResetAudioAndVideo();
+                        Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with ffmpeg. URI: {audioUri}");
+                        LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis)
+                            .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
+                        return;
+                    }
+                    
                     DurationOfSongInMillis = 1000.0 * videoPlayer.length;
                     PositionInSongInMillis = startPositionInMillis;
                     
@@ -728,5 +753,11 @@ public class SongAudioPlayer : MonoBehaviour
             result = 0;
         }
         return result;
+    }
+
+    private void OnVideoPlayerErrorReceived(VideoPlayer source, string message)
+    {
+        Debug.LogError($"Received VideoPlayer error: {message}");
+        videoPlayerErrorMessages.Add(message);   
     }
 }

@@ -89,7 +89,8 @@ public static class ApplicationUtils
         "vp8",
         "avi",
         
-        // NOTE: webm is only supported by Unity when using VP8. webm with VP9 is not supported by Unity and will fail.
+        // NOTE: webm is only supported by Unity when using VP8.
+        // webm with VP9 is not supported by Unity and will fail, such that ffmpeg or similar should be used as fallback.
         "webm",
     };
 
