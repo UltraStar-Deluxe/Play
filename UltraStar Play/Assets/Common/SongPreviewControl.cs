@@ -87,7 +87,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
         if (songVideoPlayer.HasLoadedVideo
             && (songVideoPlayer.PositionInVideoInMillis <= 0
-                && !songVideoPlayer.IsWebViewVideo))
+                && songVideoPlayer.VideoSupportProvider is not EVideoSupportProvider.WebView))
         {
             videoFadeInStartTimeInSeconds = Time.time;
         }

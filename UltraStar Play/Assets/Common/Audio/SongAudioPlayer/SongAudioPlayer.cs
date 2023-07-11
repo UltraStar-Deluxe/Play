@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using FfmpegUnity;
+using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour
@@ -22,8 +21,8 @@ public class SongAudioPlayer : MonoBehaviour
     private readonly LazyFromComponent<VideoPlayer> videoPlayerLazy = new(ctx => ctx.GetComponentInChildren<VideoPlayer>());
     private VideoPlayer VideoPlayer => videoPlayerLazy.GetValue(this);
 
-    private readonly LazyFromComponent<FfplayCommand> ffplayCommandLazy = new(ctx => ctx.GetComponentInChildren<FfplayCommand>());
-    private FfplayCommand FfplayCommand => ffplayCommandLazy.GetValue(this);
+    [InjectedInInspector]
+    public FfplayCommand ffplayCommand;
 
     private readonly LazyFromComponent<WebViewManager> webViewManagerLazy = new(ctx => WebViewManager.Instance);
     private WebViewManager WebViewManager => webViewManagerLazy.GetValue(this);
@@ -78,7 +77,7 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (FfplayCommand == null
+            if (ffplayCommand == null
                 || AudioPlayer == null
                 || VideoPlayer == null
                 || WebViewManager == null
@@ -101,7 +100,8 @@ public class SongAudioPlayer : MonoBehaviour
 
         set
         {
-            if (DurationOfSongInMillis <= 0)
+            if (DurationOfSongInMillis <= 0
+                || double.IsNaN(value))
             {
                 return;
             }
@@ -117,40 +117,43 @@ public class SongAudioPlayer : MonoBehaviour
             }
 
             positionInSongInMillis = newPositionInSongInMillis;
+            lastSetPositionInSongInMillis = newPositionInSongInMillis;
+            lastSetPositionInSongInMillisUnityTimeInSeconds = Time.time;
 
-            float newTimeInSeconds = (float)(value / 1000.0);
+            float newPositionInSongInSeconds = (float)(newPositionInSongInMillis / 1000.0);
             
-            if (HasFfmpegAudio)
+            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
             {
-                bool wasPaused = FfplayCommand.Paused;
-
-                // TODO: SeekTime is not reliable. It jumps back to position 0 after few frames sometimes.
-                FfplayCommand.SeekTime(newTimeInSeconds);
-                
-                // SeekTime seems to start the playback. Thus, pause again if it was paused before.
-                if (wasPaused)
-                {
-                    FfplayCommand.TogglePause();
-                }
+                // TODO: SeekTime is inaccurate, notably in the song editor.
+                // Debug.Log($"SeekTime: {newPositionInSongInSeconds}");
+                ffplayCommand.SeekTime(newPositionInSongInSeconds);
             }
-            else if (HasAudio)
-            {
-                AudioPlayer.time = newTimeInSeconds;
-            }
-            else if (HasVideo)
-            {
-                 VideoPlayer.time = newTimeInSeconds;
-            }
-            else if (HasWebView)
+            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
                 WebViewManager.SetPlaybackPositionInMillis(newPositionInSongInMillis);
+            }
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
+            {
+                 VideoPlayer.time = newPositionInSongInSeconds;
+            }
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+            {
+                AudioPlayer.time = newPositionInSongInSeconds;
             }
 
             positionInSongEventStream.OnNext(positionInSongInMillis);
         }
     }
+    
+    // Workaround: SeekTime is not reliable. It jumps back to position 0 after few frames sometimes.
+    private double lastSetPositionInSongInMillis;
+    private float lastSetPositionInSongInMillisUnityTimeInSeconds;
 
-    public double PositionInSongInSeconds => positionInSongInMillis / 1000.0;
+    public double PositionInSongInSeconds
+    {
+        get => positionInSongInMillis / 1000.0;
+        set => PositionInSongInMillis = value * 1000.0;
+    }
 
     /**
      * Returns the exact position in the song based on current sample position.
@@ -161,21 +164,21 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (HasFfmpegAudio)
+            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
             {
-                return FfplayCommand.CurrentTime * 1000.0;
+                return ffplayCommand.CurrentTime * 1000.0;
             }
-            else if (HasAudio)
+            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
-                return ((double)AudioPlayer.timeSamples / (double)AudioPlayer.clip.frequency) * 1000.0;
+                return WebViewManager.EstimatedPlaybackPositionInMillis;
             }
-            else if (HasVideo)
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
             {
                 return VideoPlayer.time * 1000.0;
             }
-            else if (HasWebView)
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
             {
-                return WebViewManager.EstimatedPlaybackPositionInMillis;
+                return ((double)AudioPlayer.timeSamples / (double)AudioPlayer.clip.frequency) * 1000.0;
             }
 
             return 0;
@@ -207,19 +210,19 @@ public class SongAudioPlayer : MonoBehaviour
         get
         {
             return !isPaused
-                   && ((HasFfmpegAudio && FfplayCommand.IsRunning && !FfplayCommand.Paused)
-                       || (HasAudio && AudioPlayer.isPlaying)
-                       || (HasVideo && VideoPlayer.isPlaying)
-                       || (HasWebView && WebViewManager.IsPlaying)
-                       || (HasFfmpegAudio && FfplayCommand.AudioSourceComponent.isPlaying));
+                   && ((AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand.IsRunning && !ffplayCommand.Paused) 
+                       || (AudioSupportProvider is EAudioSupportProvider.WebView && WebViewManager.IsPlaying) 
+                       || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && VideoPlayer.isPlaying)
+                       || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && AudioPlayer.isPlaying));
         }
     }
+    private bool isPaused;
 
-    public bool IsPartiallyLoaded => HasFfmpegAudio || HasAudio || HasVideo || HasWebView;
-    public bool IsFullyLoaded => (HasFfmpegAudio && FfplayCommand.Duration > 0) 
-                                 || (HasAudio && AudioPlayer.clip.length > 0) 
-                                 || (HasVideo && VideoPlayer.length > 0)
-                                 || (HasWebView && WebViewManager.DurationInMillis > 0);
+    public bool IsPartiallyLoaded => AudioSupportProvider is not EAudioSupportProvider.None;
+    public bool IsFullyLoaded => (AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand.Duration > 0) 
+                                 || (AudioSupportProvider is EAudioSupportProvider.WebView && WebViewManager.DurationInMillis > 0)
+                                 || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && VideoPlayer.length > 0)
+                                 || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && AudioPlayer.clip.length > 0); 
     
     private SongMeta SongMeta { get; set; }
 
@@ -227,30 +230,32 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (HasWebView)
+            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+            {
+                return ffplayCommand.AudioSourceComponent.volume;
+            }
+            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
                 return WebViewManager.VolumeInPercent / 100f;
             }
-            else if (HasFfmpegAudio)
-            {
-                return FfplayCommand.AudioSourceComponent.volume;
-            }
-            else
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
             {
                 return AudioPlayer.volume;
             }
+
+            return 1;
         }
         set
         {
-            if (HasWebView)
+            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+            {
+                ffplayCommand.AudioSourceComponent.volume = value;
+            }
+            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
                 WebViewManager.VolumeInPercent = (int)(value * 100);
             }
-            else if (HasFfmpegAudio)
-            {
-                FfplayCommand.AudioSourceComponent.volume = value;
-            }
-            else
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
             {
                 AudioPlayer.volume = value;
             }
@@ -261,17 +266,15 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (HasWebView
-                || HasFfmpegAudio)
+            if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
             {
-                return 1;
+                return AudioPlayer.pitch;
             }
-            return AudioPlayer.pitch;
+            return 1;
         }
         set
         {
-            if (HasWebView
-                || HasFfmpegAudio)
+            if (AudioSupportProvider is EAudioSupportProvider.WebView or EAudioSupportProvider.Ffmpeg)
             {
                 return;
             }
@@ -283,22 +286,23 @@ public class SongAudioPlayer : MonoBehaviour
     {
         get
         {
-            if (HasWebView
-                || HasFfmpegAudio)
+            if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
             {
-                return 1;
+                return VideoPlayer.playbackSpeed;
             }
-            return AudioPlayer.pitch;
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+            {
+                return AudioPlayer.pitch;
+            }
+
+            return 1;
         }
+
         set
         {
-            if (HasWebView
-                || HasFfmpegAudio)
-            {
-                return;
-            }
-            
-            // Playback speed cannot be set randomly. Allowed (and useful) is a range of 0.5 to 1.5.
+            float oldPlaybackSpeed = PlaybackSpeed;
+
+            // Limit playback speed. Allowed (and useful) is a range of 0.5 to 1.5.
             float newPlaybackSpeed = value;
             if (newPlaybackSpeed < 0.5f)
             {
@@ -309,37 +313,45 @@ public class SongAudioPlayer : MonoBehaviour
                 newPlaybackSpeed = 1.5f;
             }
 
-            if (Math.Abs(newPlaybackSpeed - AudioPlayer.pitch) < 0.01f)
+            // Set playback speed
+            if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
             {
-                return;
+                VideoPlayer.playbackSpeed = newPlaybackSpeed;
             }
-            
-            AudioUtils.SetPitchWithPitchShifter(AudioPlayer, newPlaybackSpeed);
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+            {
+                if (Math.Abs(newPlaybackSpeed - AudioPlayer.pitch) < 0.01f)
+                {
+                    return;
+                }
+                
+                AudioUtils.SetPitchWithPitchShifter(AudioPlayer, newPlaybackSpeed);
+            }
 
-            playbackSpeedChangedEventStream.OnNext(newPlaybackSpeed);
+            // Fire change event
+            if (Math.Abs(PlaybackSpeed - oldPlaybackSpeed) > 0.01f)
+            {
+                playbackSpeedChangedEventStream.OnNext(newPlaybackSpeed);
+            }
         }
     }
 
-    private bool HasAudio => AudioPlayer.clip != null;
-    private bool HasFfmpegAudio => FfplayCommand.AudioSourceComponent.clip != null;
-    private bool HasVideo => !VideoPlayer.url.IsNullOrEmpty();
-    private bool HasWebView => isWebViewAudio;
-
-    private bool isPaused;
-
-    private bool isWebViewAudio;
+    public EAudioSupportProvider AudioSupportProvider { get; private set; } = EAudioSupportProvider.None;  
 
     private void Start()
     {
         SceneNavigator.BeforeSceneChangeEventStream
             .Subscribe(_ =>
             {
-                if (isWebViewAudio)
+                if (AudioSupportProvider is EAudioSupportProvider.WebView)
                 {
                     PauseAudio();
                 }
             })
             .AddTo(gameObject);
+
+        // StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
+        //     Debug.Log($"Pos in song: {PositionInSongInMillis}")));
     }
     
     private void Update()
@@ -347,6 +359,16 @@ public class SongAudioPlayer : MonoBehaviour
         if (IsPlaying)
         {
             positionInSongEventStream.OnNext(PositionInSongInMillis);
+
+            // Workaround: SeekTime is not reliable. It jumps back to position 0 after few frames sometimes.
+            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                && !TimeUtils.IsDurationAboveThresholdInSeconds(lastSetPositionInSongInMillisUnityTimeInSeconds, 1f)
+                && lastSetPositionInSongInMillis > 1000
+                && PositionInSongInMillis < 1000)
+            {
+                Debug.Log($"Setting position in song again. ffmpeg seems to have ignored the last set value of {lastSetPositionInSongInMillis} ms and is not at {PositionInSongInMillis} ms.");
+                ffplayCommand.SeekTime(lastSetPositionInSongInMillis / 1000.0);
+            }
         }
     }
 
@@ -366,7 +388,7 @@ public class SongAudioPlayer : MonoBehaviour
         string fileExtension = Path.GetExtension(audioUri);
         if (ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension))
         {
-            return LoadAsVideo(songMeta, audioUri, startPositionInMillis);
+            return LoadWithVideoPlayer(songMeta, audioUri, startPositionInMillis);
         }
         else if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
         {
@@ -374,25 +396,25 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else if (ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
         {
-            return LoadAsAudio(songMeta, audioUri, startPositionInMillis, streamAudio);
+            return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
         }
         else if (WebViewManager.CanHandleUrl(audioUri))
         {
-            return LoadAsWebView(songMeta, audioUri, startPositionInMillis);
+            return LoadWithWebView(songMeta, audioUri, startPositionInMillis);
         }
         else
         {
-            return LoadAsFfmpegFormat(songMeta, audioUri, startPositionInMillis);
+            return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
         }
     }
 
     private void ResetAudioAndVideo()
     {
-        isWebViewAudio = false;
+        AudioSupportProvider = EAudioSupportProvider.None;
         
-        FfplayCommand.Stop();
-        Destroy(FfplayCommand.AudioSourceComponent.clip);
-        FfplayCommand.AudioSourceComponent.clip = null;
+        ffplayCommand.Stop();
+        ffplayCommand.InputPath = "";
+        ffplayCommand.Dispose();
         
         VideoPlayer.Stop();
         VideoPlayer.url = "";
@@ -426,7 +448,7 @@ public class SongAudioPlayer : MonoBehaviour
         });
     }
     
-    private IObservable<SongAudioLoadedEvent> LoadAsAudio(
+    private IObservable<SongAudioLoadedEvent> LoadWithAudioSource(
         SongMeta songMeta,
         string audioUri,
         double startPositionInMillis,
@@ -434,6 +456,7 @@ public class SongAudioPlayer : MonoBehaviour
     {
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
+            AudioSupportProvider = EAudioSupportProvider.UnityAudioSource;
             AudioManager.LoadAudioClipFromUri(audioUri, streamAudio)
                 .CatchIgnore((Exception error) => o.OnError(error))
                 .Subscribe(loadedAudioClip =>
@@ -458,7 +481,7 @@ public class SongAudioPlayer : MonoBehaviour
         });
     }
 
-    private IObservable<SongAudioLoadedEvent> LoadAsVideo(SongMeta songMeta, string audioUri,
+    private IObservable<SongAudioLoadedEvent> LoadWithVideoPlayer(SongMeta songMeta, string audioUri,
         double startPositionInMillis)
     {
         VideoPlayer.url = audioUri;
@@ -468,6 +491,8 @@ public class SongAudioPlayer : MonoBehaviour
             return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
                 new Exception($"Failed to load video from {audioUri}"));
         }
+
+        AudioSupportProvider = EAudioSupportProvider.UnityVideoPlayer;
         
         // Play the audio of the video player through the AudioSource.
         VideoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
@@ -495,20 +520,21 @@ public class SongAudioPlayer : MonoBehaviour
         });
     }
 
-    private IObservable<SongAudioLoadedEvent> LoadAsFfmpegFormat(SongMeta songMeta, string audioUri, double startPositionInMillis)
+    private IObservable<SongAudioLoadedEvent> LoadWithFfmpeg(SongMeta songMeta, string audioUri, double startPositionInMillis)
     {
+        Debug.Log($"Loading audio via ffmpeg: '{audioUri}', start pos: {startPositionInMillis} ms");
         try
         {
-            FfplayCommand.Stop();
-
-            FfplayCommand.InputPath = audioUri;
-            FfplayCommand.Play();
+            ffplayCommand.InputPath = audioUri;
+            ffplayCommand.Play();
+            
+            AudioSupportProvider = EAudioSupportProvider.Ffmpeg;
         }
         catch (Exception e)
         {
             try
             {
-                FfplayCommand.Stop();
+                ffplayCommand.Stop();
             }
             catch (Exception ex)
             {
@@ -524,26 +550,33 @@ public class SongAudioPlayer : MonoBehaviour
         
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
+        float unityTimeInSecondsWhenStartedLoading = Time.time;
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => FfplayCommand.Duration > 0,
+                () => ffplayCommand.Duration > 0,
                 () =>
                 {
-                    double durationInSeconds = FfplayCommand.Duration;
+                    double durationInSeconds = ffplayCommand.Duration;
                     DurationOfSongInMillis = durationInSeconds * 1000.0;
-                    double startPositionInSeconds = startPositionInMillis / 1000.0;
-                    FfplayCommand.SeekTime(startPositionInSeconds);
-                    PauseAudio();
+
+                    if (unityTimeInSecondsWhenStartedLoading > lastSetPositionInSongInMillisUnityTimeInSeconds)
+                    {
+                        // Jump to the start position if no new position was set in the meantime.
+                        double startPositionInSeconds = startPositionInMillis / 1000.0;
+                        ffplayCommand.SeekTime(startPositionInSeconds);
+                    }
+                    
                     FireLoadedEvent(o, songMeta, audioUri);
                 }));
             return Disposable.Empty;
         });
     }
     
-    private IObservable<SongAudioLoadedEvent> LoadAsWebView(SongMeta songMeta, string audioUri,
+    private IObservable<SongAudioLoadedEvent> LoadWithWebView(SongMeta songMeta, string audioUri,
         double startPositionInMillis)
     {
+
         bool success = WebViewManager.LoadUrl(audioUri);
         if (!success)
         {
@@ -551,8 +584,8 @@ public class SongAudioPlayer : MonoBehaviour
                 new Exception($"Failed to load audio via WebView with URL {audioUri}"));
         }
         
-        isWebViewAudio = true;
-
+        AudioSupportProvider = EAudioSupportProvider.WebView;
+        
         // The WebView is loaded asynchronously. When the duration is available then the audio is loaded.
         long startTime = TimeUtils.GetUnixTimeMilliseconds();
         long timeoutInMillis = 5000;
@@ -595,10 +628,22 @@ public class SongAudioPlayer : MonoBehaviour
 
     public void StopAudio()
     {
-        FfplayCommand.Stop();
-        VideoPlayer.Stop();
-        AudioPlayer.Stop();
-        WebViewManager.PausePlayback();
+        if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+        {
+            ffplayCommand.Stop();
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.WebView)
+        {
+            WebViewManager.PausePlayback();
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
+        {
+            VideoPlayer.Stop();
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+        {
+            AudioPlayer.Stop();
+        }
     }
     
     public void PauseAudio()
@@ -608,17 +653,26 @@ public class SongAudioPlayer : MonoBehaviour
             return;
         }
 
-        if (HasFfmpegAudio)
+        if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
         {
-            if (FfplayCommand.IsRunning
-                && !FfplayCommand.Paused)
+            if (ffplayCommand.IsRunning
+                && !ffplayCommand.Paused)
             {
-                FfplayCommand.TogglePause();
+                ffplayCommand.TogglePause();
             }
         }
-        AudioPlayer.Pause();
-        VideoPlayer.Pause();
-        WebViewManager.PausePlayback();
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
+        {
+            VideoPlayer.Pause();
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.WebView)
+        {
+            WebViewManager.PausePlayback();
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+        {
+            AudioPlayer.Pause();
+        }
         isPaused = true;
         playbackStoppedEventStream.OnNext(PositionInSongInMillis);
     }
@@ -630,25 +684,25 @@ public class SongAudioPlayer : MonoBehaviour
         {
             return;
         }
-
-        if (HasFfmpegAudio)
+        
+        if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
         {
-            if (FfplayCommand.Paused)
+            if (ffplayCommand.Paused)
             {
-                FfplayCommand.TogglePause();
+                ffplayCommand.TogglePause();
             }
         }
-        else if (HasAudio)
+        else if (AudioSupportProvider is EAudioSupportProvider.WebView)
         {
-            AudioPlayer.Play();
+            WebViewManager.ResumePlayback();
         }
-        else if (HasVideo)
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
         {
             VideoPlayer.Play();
         }
-        else if (HasWebView)
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
-            WebViewManager.ResumePlayback();
+            AudioPlayer.Play();
         }
         isPaused = false;
         playbackStartedEventStream.OnNext(PositionInSongInMillis);

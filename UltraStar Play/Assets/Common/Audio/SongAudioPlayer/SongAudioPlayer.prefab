@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3574928268463972471}
-  - component: {fileID: 5995618392406142530}
+  - component: {fileID: 6779451199114605605}
   m_Layer: 0
   m_Name: SongAudioPlayerFfmpegPlayer
   m_TagString: Untagged
@@ -30,11 +30,11 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7558771116702158248}
-  - {fileID: 8452124514281366996}
+  - {fileID: 7470123208524660688}
   m_Father: {fileID: 7650755054248871620}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5995618392406142530
+--- !u!114 &6779451199114605605
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -50,7 +50,7 @@ MonoBehaviour:
   Options: 
   DefaultPath: 0
   InputPath: 
-  VideoTexture: {fileID: 4754143518895683155}
+  VideoTexture: {fileID: 4992240595650250815}
   AudioSourceComponent: {fileID: 7922528575501200543}
   PrintStdErr: 0
 --- !u!1 &3051613993728625028
@@ -167,7 +167,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -177,9 +177,9 @@ AudioSource:
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
+  BypassEffects: 1
+  BypassListenerEffects: 1
+  BypassReverbZones: 1
   rolloffCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -249,7 +249,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!1 &4624296890858059429
+--- !u!1 &6897927490978691707
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -257,8 +257,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8452124514281366996}
-  - component: {fileID: 4754143518895683155}
+  - component: {fileID: 7470123208524660688}
+  - component: {fileID: 4992240595650250815}
   m_Layer: 0
   m_Name: SongAudioPlayerFfmpegPlayerVideoTexture
   m_TagString: Untagged
@@ -266,34 +266,34 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8452124514281366996
+--- !u!4 &7470123208524660688
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4624296890858059429}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 310.12363, y: 353.77222, z: -110.334206}
+  m_GameObject: {fileID: 6897927490978691707}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3574928268463972471}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4754143518895683155
+--- !u!114 &4992240595650250815
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4624296890858059429}
+  m_GameObject: {fileID: 6897927490978691707}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e393a2f65c0d657488559839dbdf8e18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VideoTexture: {fileID: 8400000, guid: 340845d4b5e01784baa43299ea7f37e7, type: 2}
+  VideoTexture: {fileID: 0}
 --- !u!1 &7998560839839612125
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,6 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88ca229540b0d644ea7457192176f0fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ffplayCommand: {fileID: 6779451199114605605}
 --- !u!1 &8759987395057846207
 GameObject:
   m_ObjectHideFlags: 0

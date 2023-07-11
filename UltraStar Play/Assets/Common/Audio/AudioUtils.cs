@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -33,6 +30,12 @@ public static class AudioUtils
     // Use the cached version of the AudioManager for the normal game logic.
     public static AudioClip LoadUncachedAudioClipImmediately(string uri, bool streamAudio)
     {
+        if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
+        {
+            Debug.LogWarning($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.ToCsv()}");
+            return null;
+        }
+        
         Uri uriHandle = new Uri(uri);
         using UnityWebRequest webRequest = CreateAudioClipRequest(uriHandle, streamAudio);
         webRequest.SendWebRequest();
