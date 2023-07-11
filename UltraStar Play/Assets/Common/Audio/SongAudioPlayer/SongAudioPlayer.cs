@@ -265,26 +265,6 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public float Pitch
-    {
-        get
-        {
-            if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
-            {
-                return audioSource.pitch;
-            }
-            return 1;
-        }
-        set
-        {
-            if (AudioSupportProvider is EAudioSupportProvider.WebView or EAudioSupportProvider.Ffmpeg)
-            {
-                return;
-            }
-            audioSource.pitch = value;
-        }
-    }
-
     public float PlaybackSpeed
     {
         get
