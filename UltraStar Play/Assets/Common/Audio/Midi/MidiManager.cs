@@ -32,6 +32,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     private int audioFilterReadSampleRate;
 
     private bool isInitialized;
+    private bool isAudioSourceInitialized;
     private AudioSource audioSource;
 
     public bool IsPlayingMidiFile { get; private set; }
@@ -91,6 +92,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         // Deactivate until the MidiManager has been initialized.
         // This is to prevent OnAudioFilterRead to create weird noise (probably a Unity bug).
         gameObject.SetActive(false);
+        audioSource.enabled = false;
     }
 
     public void InitIfNotDoneYet()
@@ -105,12 +107,22 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
         onAudioFilterReadMidiSamplesGenerator = CreateOrUpdateMidiSamplesGenerator(audioClipMidiSamplesGenerator);
         audioClipMidiSamplesGenerator = CreateOrUpdateMidiSamplesGenerator(audioClipMidiSamplesGenerator);
         
-        audioSource.Play();
-
         isInitialized = true;
         gameObject.SetActive(true);
     }
-
+    
+    private void InitAudioSourceIfNotDoneYet()
+    {
+        if (isAudioSourceInitialized)
+        {
+            return;
+        }
+        isAudioSourceInitialized = true;
+        
+        audioSource.enabled = true;
+        audioSource.Play();
+    }
+    
     private void InitPatchBank()
     {
         if (FileUtils.Exists(settings.SoundfontPath))
@@ -164,6 +176,7 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     public void PlayMidiFile(MidiFile midiFile)
     {
         InitIfNotDoneYet();
+        InitAudioSourceIfNotDoneYet();
 
         if (onAudioFilterReadMidiSamplesGenerator.IsMidiLoaded)
         {
@@ -191,15 +204,10 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     public void PlayMidiNote(int midiNote)
     {
         InitIfNotDoneYet();
+        InitAudioSourceIfNotDoneYet();
+        
         isPlayingMidiNote = true;
         onAudioFilterReadMidiSamplesGenerator.NoteOn(0, midiNote, midiVelocity);
-    }
-
-    public void PlayMidiNoteForDuration(int midiNote, float durationInSeconds)
-    {
-        InitIfNotDoneYet();
-        onAudioFilterReadMidiSamplesGenerator.NoteOn(0, midiNote, midiVelocity);
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(durationInSeconds, () => StopMidiNote(midiNote)));
     }
 
     public void StopMidiNote(int midiNote)
@@ -243,7 +251,8 @@ public class MidiManager : AbstractSingletonBehaviour, INeedInjection
     //	so calling into many Unity functions from this function is not allowed ( a warning will show up ). 	
     private void OnAudioFilterRead(float[] data, int outputChannelCount)
     {
-        if (!isInitialized)
+        if (!isInitialized
+            || !isAudioSourceInitialized)
         {
             return;
         }

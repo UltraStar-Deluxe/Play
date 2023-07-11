@@ -86,6 +86,9 @@ JMO Assets.meta
 Vuplex/
 Vuplex.meta
 
+FfmpegUnity/
+FfmpegUnity.meta
+
 ######################################
 ## StreamingAssets
 StreamingAssets/Input/UltraStarPlayInputActions.inputactions

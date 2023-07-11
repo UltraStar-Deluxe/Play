@@ -1007,7 +1007,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.LoadSongAudio(songMeta)
+        songAudioPlayer.LoadAndPlaySongAudio(songMeta)
             .CatchIgnore((Exception error) =>
             {
                 string message = $"Audio file '{songMeta.Mp3}' could not be loaded.\n" +

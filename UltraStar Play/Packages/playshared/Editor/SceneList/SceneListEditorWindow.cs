@@ -20,7 +20,9 @@ public class SceneListEditorWindow : EditorWindow
         "CartoonVFX9X",
         "Confetti FX Pro",
         "Hovl Studio",
-        "JMO Assets"
+        "JMO Assets",
+        "Vuplex",
+        "FfmpegUnity",
     };
 
     private string fileNameRegEx = "";

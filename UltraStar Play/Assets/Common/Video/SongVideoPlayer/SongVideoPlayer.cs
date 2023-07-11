@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using FfmpegUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -19,6 +21,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     [InjectedInInspector]
     public VideoPlayer videoPlayer;
 
+    /**
+     * SongAudioPlayer to synchronize the video with.
+     */
+    [InjectedInInspector]
+    public SongAudioPlayer songAudioPlayer;
+    
     [Inject]
     private WebViewManager webViewManager;
     
@@ -50,10 +58,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     [Inject]
     private Settings settings;
     
-    // SongAudioPlayer to synchronize the playback position with.
-    [Inject]
-    private SongAudioPlayer songAudioPlayer;
-    
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -72,9 +76,66 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    public bool HasLoadedVideo { get; private set; }
+    public bool HasLoadedVideo => VideoSupportProvider is not EVideoSupportProvider.None;
     public bool HasLoadedBackgroundImage { get; private set; }
 
+    public float PlaybackSpeed
+    {
+        get
+        {
+            if (videoPlayer == null
+                || !HasLoadedVideo)
+            {
+                return 0;
+            }
+
+            if (VideoSupportProvider is EVideoSupportProvider.WebView)
+            {
+                return 1;
+            }
+            else if (VideoSupportProvider is EVideoSupportProvider.Ffmpeg)
+            {
+                return 1;
+            }
+            else  if (VideoSupportProvider is EVideoSupportProvider.UnityVideoPlayer)
+            {
+                return videoPlayer.playbackSpeed;
+            }
+
+            return 0;
+        }
+
+        set
+        {
+            if (videoPlayer == null
+                || !HasLoadedVideo
+                || float.IsNaN(value))
+            {
+                return;
+            }
+
+            if (VideoSupportProvider is EVideoSupportProvider.Ffmpeg)
+            {
+                // TODO: set playback speed to synchronize with audio
+            }
+            else if (VideoSupportProvider is EVideoSupportProvider.WebView)
+            {
+                // WebView is handled by the SongAudioPlayer exclusively.
+                return;
+            }
+            else  if (VideoSupportProvider is EVideoSupportProvider.UnityVideoPlayer)
+            {
+                videoPlayer.playbackSpeed = value;
+            }
+        }
+    }
+
+    public double PositionInVideoInSeconds
+    {
+        get => PositionInVideoInMillis / 1000.0;
+        set => PositionInVideoInMillis = value * 1000.0;
+    }
+    
     public double PositionInVideoInMillis
     {
         get
@@ -85,13 +146,49 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 return 0;
             }
 
-            if (IsWebViewVideo)
+            if (VideoSupportProvider is EVideoSupportProvider.Ffmpeg)
             {
+                // Video is handled by the SongAudioPlayer via ffmpeg
+                return songAudioPlayer.PositionInSongInMillis;
+            }
+            else if (VideoSupportProvider is EVideoSupportProvider.WebView)
+            {
+                // WebView is handled by the SongAudioPlayer exclusively.
                 return webViewManager.EstimatedPlaybackPositionInMillis;
             }
-            else
+            else  if (VideoSupportProvider is EVideoSupportProvider.UnityVideoPlayer)
             {
                 return videoPlayer.time * 1000;
+            }
+
+            return 0;
+        }
+
+        set
+        {
+            if (videoPlayer == null
+                || !HasLoadedVideo
+                || double.IsNaN(value))
+            {
+                return;
+            }
+
+            double newPositionInVideoInMillis = value;
+            double newPositionInVideoInSeconds = newPositionInVideoInMillis / 1000.0;
+
+            if (VideoSupportProvider is EVideoSupportProvider.Ffmpeg)
+            {
+                // Video is handled by the SongAudioPlayer via ffmpeg
+                return;
+            }
+            else if (VideoSupportProvider is EVideoSupportProvider.WebView)
+            {
+                // WebView is handled by the SongAudioPlayer exclusively.
+                return;
+            }
+            else  if (VideoSupportProvider is EVideoSupportProvider.UnityVideoPlayer)
+            {
+                videoPlayer.time = newPositionInVideoInSeconds;
             }
         }
     }
@@ -115,7 +212,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     }
     
     private RenderTexture originalWebViewCameraRenderTexture;
-    public bool IsWebViewVideo { get; private set; }
+    public EVideoSupportProvider VideoSupportProvider { get; private set; } = EVideoSupportProvider.None;
 
     public void OnInjectionFinished()
     {
@@ -201,18 +298,17 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         if (webViewManager.CanHandleUrl(uri))
         {
-            IsWebViewVideo = true;
-            SetWebViewRenderTextureToVideoRenderTexture();
-            HasLoadedVideo = true;
+            LoadWithWebView(uri);
+        }
+
+        string videoFileExtension = Path.GetExtension(uri);
+        if (ApplicationUtils.IsUnitySupportedVideoFormat(videoFileExtension))
+        {
+            LoadWithVideoPlayer(uri);
         }
         else
         {
-            IsWebViewVideo = false;
-            ResetWebViewRenderTexture();
-            
-            videoPlayer.url = ApplicationUtils.GetVideoPlayerUri(uri);
-            // The url is empty if loading the video failed.
-            HasLoadedVideo = !videoPlayer.url.IsNullOrEmpty();
+            LoadWithFfmpeg(uri);
         }
         
         // For now, only load the video. Starting it is done from the outside.
@@ -220,15 +316,45 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             return;
         }
-
+        
         if (videoImageVisualElement != null)
         {
             videoImageVisualElement.ShowByDisplay();
             videoImageVisualElement.style.opacity = 1;
         }
-        videoPlayer.Pause();
     }
 
+    private void LoadWithFfmpeg(string uri)
+    {
+        VideoSupportProvider = EVideoSupportProvider.Ffmpeg;
+        ResetWebViewRenderTexture();
+        SetFfmpegRenderTextureToVideoRenderTexture();
+    }
+    
+    private void LoadWithWebView(string uri)
+    {
+        VideoSupportProvider = EVideoSupportProvider.WebView;
+        ResetFfmpegRenderTexture();
+        SetWebViewRenderTextureToVideoRenderTexture();
+    }
+    
+    private void LoadWithVideoPlayer(string uri)
+    {
+        VideoSupportProvider = EVideoSupportProvider.UnityVideoPlayer;
+        ResetFfmpegRenderTexture();
+        ResetWebViewRenderTexture();
+
+        videoPlayer.url = ApplicationUtils.GetVideoPlayerUri(uri);
+        if (videoPlayer.url.IsNullOrEmpty())
+        {
+            // The url is empty if loading the video failed.
+            VideoSupportProvider = EVideoSupportProvider.None;
+            return;
+        }
+        
+        videoPlayer.Pause();
+    }
+    
     private void SetWebViewRenderTextureToVideoRenderTexture()
     {
         if (originalWebViewCameraRenderTexture == null)
@@ -255,13 +381,24 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
     
+    private void SetFfmpegRenderTextureToVideoRenderTexture()
+    {
+        songAudioPlayer.ffplayCommand.VideoTexture.VideoTexture = videoPlayer.targetTexture;
+    }
+
+    private void ResetFfmpegRenderTexture()
+    {
+        songAudioPlayer.ffplayCommand.VideoTexture.VideoTexture = null;
+    }
+
     private void UnloadVideo()
     {
         if (!HasLoadedVideo)
         {
             return;
         }
-        HasLoadedVideo = false;
+
+        VideoSupportProvider = EVideoSupportProvider.None;
         videoPlayer.Stop();
         videoPlayer.clip = null;
         videoPlayer.source = VideoSource.VideoClip;
@@ -289,7 +426,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         if (SongMeta.VideoGap > 0)
         {
             // Positive VideoGap, thus skip the start of the video
-            videoPlayer.time = SongMeta.VideoGap;
+            PositionInVideoInSeconds = SongMeta.VideoGap;
         }
 
         if (videoImageVisualElement != null)
@@ -346,7 +483,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         if (freezeVideo)
         {
-            videoPlayer.playbackSpeed = 0;
+            PlaybackSpeed = 0;
         }
         else
         {
@@ -355,14 +492,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             if (forceImmediateSync || Math.Abs(timeDifferenceInSeconds) > 3)
             {
                 // Correct the mismatch immediately.
-                videoPlayer.time = targetPositionInVideoInSeconds;
-                videoPlayer.playbackSpeed = 1f;
+                PositionInVideoInSeconds = targetPositionInVideoInSeconds;
+                PlaybackSpeed = 1f;
             }
             else
             {
                 // Smooth out the time difference over a duration of 2 seconds
                 float playbackSpeed = 1 + (float)(timeDifferenceInSeconds / 2.0);
-                videoPlayer.playbackSpeed = playbackSpeed;
+                PlaybackSpeed = playbackSpeed;
             }
         }
     }
@@ -529,5 +666,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 
                 break;
         }
+    }
+
+    public static void AddIgnoredVideoFile(string uri)
+    {
+        ignoredVideoFiles.Add(uri);
     }
 }

@@ -677,6 +677,20 @@ public class SongMetaManager : AbstractSingletonBehaviour
             songIssues.Add(SongIssue.CreateError(songMeta, $"Audio file resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetAudioUri(songMeta))}'"));
         }
 
+        // The ffmpeg integration in Unity can at the moment only play one file.
+        // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
+        bool isVideoEmptyOrSameAsAudio = songMeta.Video.IsNullOrEmpty()
+            || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
+        if (!isVideoEmptyOrSameAsAudio
+            && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
+            && !webViewManager.CanHandleUrl(songMeta.Video))
+        {
+            songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video file resource differs from audio file resource. This is only supported for the following formats: {ApplicationUtils.unitySupportedVideoFiles.ToCsv(",", "", "")}"));
+            
+            // Do not attempt to load this video file, it will not work.
+            SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
+        }
+
         // Log found issues
         songIssues.ForEach(songIssue => songIssue.Log());
 
