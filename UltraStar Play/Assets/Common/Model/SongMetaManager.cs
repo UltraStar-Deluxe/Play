@@ -53,47 +53,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
     
     private UiManager uiManager;
-    private UiManager UiManager
-    {
-        get
-        {
-            if (uiManager == null)
-            {
-                uiManager = UiManager.Instance;
-            }
-
-            return uiManager;
-        }
-    }
-    
     private Settings settings;
-    private Settings Settings
-    {
-        get
-        {
-            if (settings == null)
-            {
-                settings = SettingsManager.Instance.Settings;
-            }
-
-            return settings;
-        }
-    }
-
     private WebViewManager webViewManager;
-    private WebViewManager WebViewManager
-    {
-        get
-        {
-            if (webViewManager == null)
-            {
-                webViewManager = WebViewManager.Instance;
-            }
 
-            return webViewManager;
-        }
-    }
-    
     public static void ResetSongMetas()
     {
         lock (scanLock)
@@ -116,6 +78,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
         ScanFilesIfNotDoneYet();
     }
 
+    protected override void AwakeSingleton()
+    {
+        uiManager = UiManager.Instance;
+        settings = SettingsManager.Instance.Settings;
+        webViewManager = WebViewManager.Instance;
+    }
+
     protected override void StartSingleton()
     {
         RescanIfSongFoldersChanged();
@@ -127,14 +96,14 @@ public class SongMetaManager : AbstractSingletonBehaviour
         // Thus, use the static instance.
         if (lastSongDirs == null)
         {
-            lastSongDirs = new List<string>(Settings.SongDirs);
+            lastSongDirs = new List<string>(settings.SongDirs);
         }
 
         if (isSongScanFinished
-            && !lastSongDirs.SequenceEqual(Settings.SongDirs))
+            && !lastSongDirs.SequenceEqual(settings.SongDirs))
         {
             Debug.Log("SongDirs have changed since last scan. Start rescan.");
-            lastSongDirs = new List<string>(Settings.SongDirs);
+            lastSongDirs = new List<string>(settings.SongDirs);
             ResetSongMetas();
             ScanFilesIfNotDoneYet();
         }
@@ -201,14 +170,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
     {
         Debug.Log("ScanFilesAsynchronously");
 
-        // Load objects while still on the main thread.
-        UiManager loadedUiManager = UiManager;
-        WebViewManager loadedWebViewManager = WebViewManager;
-        Settings loadedSetting = Settings;
-
         // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
         // Thus, use the static instance.
-        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(Settings);
+        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
         InitFolderIfNotDoneYet(generatedSongFolderAbsolutePath);
         
         List<string> txtFiles;
@@ -364,7 +328,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private List<string> GetAudioFileExtensionPatterns()
     {
-        if (Settings.SearchAudioFilesWithoutSongMeta)
+        if (settings.SearchAudioFilesWithoutSongMeta)
         {
             return ApplicationUtils.supportedAudioFiles
                 .Select(fileExtension => $"*.{fileExtension}")
@@ -473,10 +437,10 @@ public class SongMetaManager : AbstractSingletonBehaviour
         songIssues = new List<SongIssue>();
         try
         {
-            SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues, null, Settings.UseUniversalCharsetDetector);
+            SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
             songIssues.AddRange(parseFileIssues);
 
-            List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(newSongMeta, WebViewManager);
+            List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(newSongMeta, webViewManager);
             songIssues.AddRange(mediaFormatIssues);
 
             if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
