@@ -169,17 +169,40 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     private void UpdateSongIssues()
     {
-        // Update icon
-        issuesIcon.RemoveFromClassList("error");
-        issuesIcon.RemoveFromClassList("warning");
+        bool HasIssue()
+        {
+            return issuesIcon.ClassListContains(R.UssClasses.errorFontColor)
+                   || issuesIcon.ClassListContains(R.UssClasses.warningFontColor);
+        }
+
+        bool oldHasIssue = HasIssue();
+
+        // Update icon style
+        issuesIcon.RemoveFromClassList(R.UssClasses.warningFontColor);
+        issuesIcon.RemoveFromClassList(R.UssClasses.errorFontColor);
         if (songMetaManager.GetSongErrors().Count > 0)
         {
-            issuesIcon.AddToClassList("error");
+            issuesIcon.AddToClassList(R.UssClasses.errorFontColor);
         }
         else if (songMetaManager.GetSongWarnings().Count > 0)
         {
-            issuesIcon.AddToClassList("warning");
+            issuesIcon.AddToClassList(R.UssClasses.warningFontColor);
         }
+
+        // Animate icon when there are new issues
+        bool newHasIssue = HasIssue();
+        if (!oldHasIssue && newHasIssue)
+        {
+            issuesIcon.style.scale = Vector2.zero;
+            LeanTween.value(gameObject, 0, 1, 1f)
+                .setOnUpdate(value =>
+                {
+                    issuesIcon.style.scale = new Vector2(value, value);
+                })
+                .setEaseSpring();
+        }
+
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesIcon);
     }
 
     public override bool HasHelpDialog => true;
