@@ -112,4 +112,9 @@ public static class GameObjectUtils
         // Every GameObject has a Transform component.
         return GameObject.FindObjectOfType<Transform>().gameObject;
     }
+
+    public static bool IsDestroyed(MonoBehaviour monoBehaviour)
+    {
+        return monoBehaviour == null;
+    }
 }

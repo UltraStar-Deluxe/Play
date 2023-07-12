@@ -69,7 +69,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     protected virtual void Update()
     {
-        if (this == null
+        if (GameObjectUtils.IsDestroyed(this)
             || !gameObject.activeInHierarchy)
         {
             return;
@@ -141,7 +141,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnBack()
     {
-        if (this == null
+        if (GameObjectUtils.IsDestroyed(this)
             || !gameObject.activeInHierarchy)
         {
             return;
@@ -175,7 +175,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnSubmit()
     {
-        if (this == null
+        if (GameObjectUtils.IsDestroyed(this)
             || !gameObject.activeInHierarchy)
         {
             return;
@@ -206,7 +206,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public virtual void OnNavigate(Vector2 navigationDirection, InputAction inputAction, InputControl inputControl)
     {
-        if (this == null
+        if (GameObjectUtils.IsDestroyed(this)
             || !gameObject.activeInHierarchy)
         {
             return;

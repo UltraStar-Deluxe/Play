@@ -39,9 +39,7 @@ public static class ApplicationUtils
     // Supported file formats of ffmpeg can be obtained via "ffmpeg -demuxers"
     // See also https://stackoverflow.com/questions/50069235/what-are-all-of-the-file-extensions-supported-by-ffmpeg
     // See also http://www.ffmpeg.org/general.html#toc-Supported-File-Formats_002c-Codecs-or-Features
-    public static readonly IReadOnlyCollection<string> ffmpegSupportedFileExtensions = Resources.Load<TextAsset>("ffmpeg-supported-common-file-extensions")
-        .text
-        .Split("\n")
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedFileExtensions = File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), System.Text.Encoding.UTF8)
         .Select(line => line.Trim())
         .Where(line => !line.IsNullOrEmpty())
         .ToHashSet();

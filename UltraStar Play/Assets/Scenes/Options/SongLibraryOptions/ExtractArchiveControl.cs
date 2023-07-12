@@ -104,7 +104,7 @@ public class ExtractArchiveControl : MonoBehaviour
 
         foreach (ZipEntry entry in zipFile)
         {
-            if (this == null)
+            if (GameObjectUtils.IsDestroyed(this))
             {
                 throw new Exception("Object destroyed");
             }

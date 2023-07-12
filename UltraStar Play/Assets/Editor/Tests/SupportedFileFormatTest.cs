@@ -39,7 +39,7 @@ public class SupportedFileFormatTest
             "mkv",
             "flv",
         };
-        List<string> supportedFormats = ApplicationUtils.ffmpegSupportedAudioFiles.ToList();
+        List<string> supportedFormats = ApplicationUtils.ffmpegSupportedVideoFiles.ToList();
         foreach (string expectedVideoFormat in expectedVideoFormats)
         {
             Assert.Contains(expectedVideoFormat, supportedFormats);

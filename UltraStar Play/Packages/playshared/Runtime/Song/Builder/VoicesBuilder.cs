@@ -55,12 +55,13 @@ public class VoicesBuilder
 
     private void ParseLine(string line, uint lineNumber)
     {
-        if (line.IsNullOrEmpty())
+        // Ignore empty lines
+        if (line.IsNullOrEmpty()
+            || line.TrimStart().IsNullOrEmpty())
         {
-            LogLineWarning(lineNumber, "Empty line");
             return;
         }
-        
+
         switch (line[0])
         {
             case '#':
@@ -174,12 +175,17 @@ public class VoicesBuilder
         // Remove the default voice for solo songs.
         voiceNameToVoiceMap.Remove(Voice.soloVoiceName);
 
-        // switch to or create new voice
-        if (!voiceNameToVoiceMap.TryGetValue(voiceName, out Voice nextVoice))
+        // Normalize voice name.
+        // Most use "P1", "P2", etc.
+        // But some use "P 1", "P 2", etc. (with spaces)
+        string normalizedVoiceName = voiceName.Replace(" ", "");
+
+        // Switch to or create new voice
+        if (!voiceNameToVoiceMap.TryGetValue(normalizedVoiceName, out Voice nextVoice))
         {
             // Voice has not been found, so create new one.
-            nextVoice = new Voice(voiceName);
-            voiceNameToVoiceMap.Add(voiceName, nextVoice);
+            nextVoice = new Voice(normalizedVoiceName);
+            voiceNameToVoiceMap.Add(normalizedVoiceName, nextVoice);
         }
         currentVoice = nextVoice;
         currentSentence = null;
