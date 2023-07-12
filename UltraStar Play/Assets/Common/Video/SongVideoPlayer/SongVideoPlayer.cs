@@ -290,7 +290,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         if (webViewManager.CanHandleUrl(uri))
         {
-            LoadWithWebView(uri);
+            return LoadWithWebView(uri);
         }
 
         string videoFileExtension = Path.GetExtension(uri);
@@ -635,16 +635,21 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         UnloadVideo();
 
-        if (localSongMeta == null
-            || localSongMeta.Video.IsNullOrEmpty()
-            || ignoredVideoFiles.Contains(localSongMeta.Video))
-        {
-            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
-                new SongVideoPlayerException($"Ignoring video resource: '{localSongMeta?.Video}'"));
-        }
-
         // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
         string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, webViewManager.CanHandleUrl);
+
+        if (videoUri.IsNullOrEmpty())
+        {
+            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+                new SongVideoPlayerException($"Ignoring empty video resource"));
+        }
+
+        if (ignoredVideoFiles.Contains(localSongMeta.Video))
+        {
+            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+                new SongVideoPlayerException($"Ignoring video resource: '{videoUri}'"));
+        }
+
         if (!SongMetaUtils.ResourceExists(localSongMeta, videoUri))
         {
             return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
