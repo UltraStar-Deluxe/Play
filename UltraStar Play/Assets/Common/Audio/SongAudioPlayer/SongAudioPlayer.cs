@@ -385,13 +385,13 @@ public class SongAudioPlayer : MonoBehaviour
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
-            Debug.Log($"Audio resource does not exist: {audioUri}");
-            return Observable.Throw<SongAudioLoadedEvent>(new Exception($"Audio resource does not exist: {audioUri}"));
+            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+                new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
         }
 
         SongMeta = songMeta;
         
-        ResetAudioAndVideo();
+        UnloadAudioAndVideo();
         
         string fileExtension = Path.GetExtension(audioUri);
         if (ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension))
@@ -416,7 +416,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    private void ResetAudioAndVideo()
+    private void UnloadAudioAndVideo()
     {
         AudioSupportProvider = EAudioSupportProvider.None;
         
@@ -447,7 +447,7 @@ public class SongAudioPlayer : MonoBehaviour
         {
             audioSource.Stop();
             return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
-                new Exception($"Failed to load audio clip from MIDI file {audioUri}"));
+                new SongAudioPlayerException($"Failed to load audio clip from MIDI file {audioUri}"));
         }
 
         return Observable.Create<SongAudioLoadedEvent>(o =>
@@ -479,7 +479,7 @@ public class SongAudioPlayer : MonoBehaviour
                         audioSource.Stop();
                         string errorMessage = $"Failed to load audio clip from {audioUri}";
                         Debug.LogError(errorMessage);
-                        o.OnError(new Exception(errorMessage));
+                        o.OnError(new SongAudioPlayerException(errorMessage));
                         return;
                     }
 
@@ -501,7 +501,7 @@ public class SongAudioPlayer : MonoBehaviour
         {
             videoPlayer.Stop();
             return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
-                new Exception($"Failed to load video from {audioUri}"));
+                new SongAudioPlayerException($"Failed to load video from {audioUri}"));
         }
 
         AudioSupportProvider = EAudioSupportProvider.UnityVideoPlayer;
@@ -518,7 +518,7 @@ public class SongAudioPlayer : MonoBehaviour
                 {
                     if (videoPlayerErrorMessages.Count > 0)
                     {
-                        ResetAudioAndVideo();
+                        UnloadAudioAndVideo();
                         Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with ffmpeg. URI: {audioUri}");
                         LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis)
                             .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
@@ -569,7 +569,7 @@ public class SongAudioPlayer : MonoBehaviour
             Debug.LogException(e);
             Debug.LogError($"Failed to load '{audioUri}' using ffmpeg");
             return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
-                new Exception($"Failed to load '{audioUri}'"));
+                new SongAudioPlayerException($"Failed to load '{audioUri}'"));
         }
         
         // The video is loaded asynchronously.
@@ -605,7 +605,7 @@ public class SongAudioPlayer : MonoBehaviour
         if (!success)
         {
             return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
-                new Exception($"Failed to load audio via WebView with URL {audioUri}"));
+                new SongAudioPlayerException($"Failed to load audio via WebView with URL {audioUri}"));
         }
         
         AudioSupportProvider = EAudioSupportProvider.WebView;
@@ -757,7 +757,7 @@ public class SongAudioPlayer : MonoBehaviour
 
     private void OnVideoPlayerErrorReceived(VideoPlayer source, string message)
     {
-        Debug.LogError($"Received VideoPlayer error: {message}");
+        Debug.LogError($"SongAudioPlayer received VideoPlayer error: {message}");
         videoPlayerErrorMessages.Add(message);   
     }
 }
