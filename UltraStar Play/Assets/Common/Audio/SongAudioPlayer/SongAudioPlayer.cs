@@ -5,7 +5,6 @@ using FfmpegUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour
@@ -253,6 +252,12 @@ public class SongAudioPlayer : MonoBehaviour
         }
         set
         {
+            float oldValue = VolumeFactor;
+            if (Math.Abs(oldValue - value) < 0.001f)
+            {
+                return;
+            }
+            
             if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
             {
                 ffplayCommand.AudioSourceComponent.volume = value;
@@ -336,6 +341,8 @@ public class SongAudioPlayer : MonoBehaviour
             })
             .AddTo(gameObject);
 
+        // Synchronize volume of ffmpeg AudioSource with normal AudioSource
+        ffplayCommand.AudioSourceComponent.volume = audioSource.volume;
         MuteFfmpegAudioSource();
 
         // StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
