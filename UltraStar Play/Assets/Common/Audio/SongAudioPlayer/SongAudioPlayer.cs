@@ -552,7 +552,8 @@ public class SongAudioPlayer : MonoBehaviour
 
     private IObservable<SongAudioLoadedEvent> LoadWithFfmpeg(SongMeta songMeta, string audioUri, double startPositionInMillis)
     {
-        Debug.Log($"Loading audio via ffmpeg: '{audioUri}', start pos: {startPositionInMillis} ms");
+        Debug.Log($"SongAudioPlayer loading audio via ffmpeg: '{audioUri}', start pos: {startPositionInMillis} ms");
+
         try
         {
             ffplayCommand.InputPath = audioUri;

@@ -306,6 +306,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private IObservable<SongVideoLoadedEvent> LoadWithFfmpeg(SongMeta localSongMeta, string uri)
     {
+        Debug.Log($"SongVideoPlayer loading video via ffmpeg: '{uri}'");
+        
         VideoSupportProvider = EVideoSupportProvider.Ffmpeg;
         ResetWebViewRenderTexture();
         SetFfmpegRenderTextureToVideoRenderTexture();
