@@ -75,7 +75,8 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
 
     public MicSampleRecorder GetOrCreateMicSampleRecorder(MicProfile micProfile)
     {
-        if (micProfile == null)
+        if (micProfile == null
+            || GameObjectUtils.IsDestroyed(this))
         {
             return null;
         }
