@@ -2,14 +2,15 @@
     "name": "USPlayEditorTests",
     "rootNamespace": "",
     "references": [
-        "Plugins",
-        "UniRx",
-        "UniInject",
-        "Common",
-        "Scenes",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "playshared"
+        "Plugins",
+        "UniRx",
+        "com.achimmihca.uniinject",
+        "playshared",
+        "playsharedui",
+        "Common",
+        "Scenes"
     ],
     "includePlatforms": [
         "Editor"
@@ -18,7 +19,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "Moq.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
