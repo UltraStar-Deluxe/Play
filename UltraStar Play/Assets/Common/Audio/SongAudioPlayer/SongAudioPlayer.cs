@@ -7,7 +7,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.Video;
 
-public class SongAudioPlayer : MonoBehaviour
+public class SongAudioPlayer : MonoBehaviour, INeedInjection
 {
     // The playback position increase in milliseconds from one frame to the next to be counted as "jump".
     // An event is fired when jumping forward in the song.
@@ -22,14 +22,9 @@ public class SongAudioPlayer : MonoBehaviour
     [InjectedInInspector]
     public FfplayCommand ffplayCommand;
 
-    private readonly Lazy<AudioManager> audioManagerLazy = new(() => AudioManager.Instance);
-    private AudioManager AudioManager => audioManagerLazy.Value;
-    
-    private readonly Lazy<WebViewManager> webViewManagerLazy = new(() => WebViewManager.Instance);
-    private WebViewManager WebViewManager => webViewManagerLazy.Value;
-    
-    private readonly Lazy<SceneNavigator> sceneNavigatorLazy = new(() => SceneNavigator.Instance);
-    private SceneNavigator SceneNavigator => sceneNavigatorLazy.Value;
+    private AudioManager audioManager;
+    private WebViewManager webViewManager;
+    private SceneNavigator sceneNavigator;
     
     private readonly Lazy<MidiManager> midiManagerLazy = new(() => MidiManager.Instance);
     private MidiManager MidiManager => midiManagerLazy.Value;
@@ -85,7 +80,7 @@ public class SongAudioPlayer : MonoBehaviour
             if (ffplayCommand == null
                 || audioSource == null
                 || videoPlayer == null
-                || WebViewManager == null
+                || webViewManager == null
                 || !IsFullyLoaded)
             {
                 return 0;
@@ -135,7 +130,7 @@ public class SongAudioPlayer : MonoBehaviour
             }
             else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
-                WebViewManager.SetPlaybackPositionInMillis(newPositionInSongInMillis);
+                webViewManager.SetPlaybackPositionInMillis(newPositionInSongInMillis);
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
             {
@@ -175,7 +170,7 @@ public class SongAudioPlayer : MonoBehaviour
             }
             else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
-                return WebViewManager.EstimatedPlaybackPositionInMillis;
+                return webViewManager.EstimatedPlaybackPositionInMillis;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
             {
@@ -216,7 +211,7 @@ public class SongAudioPlayer : MonoBehaviour
         {
             return !isPaused
                    && ((AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand.IsRunning && !ffplayCommand.Paused) 
-                       || (AudioSupportProvider is EAudioSupportProvider.WebView && WebViewManager.IsPlaying) 
+                       || (AudioSupportProvider is EAudioSupportProvider.WebView && webViewManager.IsPlaying)
                        || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && videoPlayer.isPlaying)
                        || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && audioSource.isPlaying));
         }
@@ -225,7 +220,7 @@ public class SongAudioPlayer : MonoBehaviour
 
     public bool IsPartiallyLoaded => AudioSupportProvider is not EAudioSupportProvider.None;
     public bool IsFullyLoaded => (AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand.Duration > 0) 
-                                 || (AudioSupportProvider is EAudioSupportProvider.WebView && WebViewManager.DurationInMillis > 0)
+                                 || (AudioSupportProvider is EAudioSupportProvider.WebView && webViewManager.DurationInMillis > 0)
                                  || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && videoPlayer.length > 0)
                                  || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && audioSource.clip != null && audioSource.clip.length > 0); 
     
@@ -241,7 +236,7 @@ public class SongAudioPlayer : MonoBehaviour
             }
             else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
-                return WebViewManager.VolumeInPercent / 100f;
+                return webViewManager.VolumeInPercent / 100f;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
             {
@@ -264,7 +259,7 @@ public class SongAudioPlayer : MonoBehaviour
             }
             else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
-                WebViewManager.VolumeInPercent = (int)(value * 100);
+                webViewManager.VolumeInPercent = (int)(value * 100);
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
             {
@@ -327,11 +322,21 @@ public class SongAudioPlayer : MonoBehaviour
         }
     }
 
-    public EAudioSupportProvider AudioSupportProvider { get; private set; } = EAudioSupportProvider.None;  
+    public EAudioSupportProvider AudioSupportProvider { get; private set; } = EAudioSupportProvider.None;
+
+    private void Awake()
+    {
+        // Early fetch of dependencies.
+        // This is needed because the SongAudioPlayer is called early in the scene setup.
+        // TODO: This is a hack. Find a better way to do this (e.g. inject objects in order of their dependencies).
+        audioManager = AudioManager.Instance;
+        webViewManager = WebViewManager.Instance;
+        sceneNavigator = SceneNavigator.Instance;
+    }
 
     private void Start()
     {
-        SceneNavigator.BeforeSceneChangeEventStream
+        sceneNavigator.BeforeSceneChangeEventStream
             .Subscribe(_ =>
             {
                 if (AudioSupportProvider is EAudioSupportProvider.WebView)
@@ -413,7 +418,7 @@ public class SongAudioPlayer : MonoBehaviour
         {
             return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
         }
-        else if (WebViewManager.CanHandleUrl(audioUri))
+        else if (webViewManager.CanHandleUrl(audioUri))
         {
             return LoadWithWebView(songMeta, audioUri, startPositionInMillis);
         }
@@ -441,7 +446,7 @@ public class SongAudioPlayer : MonoBehaviour
         audioSource.Stop();
         audioSource.clip = null;
         
-        WebViewManager.PausePlayback();
+        webViewManager.PausePlayback();
 
         DurationOfSongInMillis = 0;
     }
@@ -477,7 +482,7 @@ public class SongAudioPlayer : MonoBehaviour
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             AudioSupportProvider = EAudioSupportProvider.UnityAudioSource;
-            AudioManager.LoadAudioClipFromUri(audioUri, streamAudio)
+            audioManager.LoadAudioClipFromUri(audioUri, streamAudio)
                 .CatchIgnore((Exception error) => o.OnError(error))
                 .Subscribe(loadedAudioClip =>
                 {
@@ -609,7 +614,7 @@ public class SongAudioPlayer : MonoBehaviour
         double startPositionInMillis)
     {
 
-        bool success = WebViewManager.LoadUrl(audioUri);
+        bool success = webViewManager.LoadUrl(audioUri);
         if (!success)
         {
             return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
@@ -626,7 +631,7 @@ public class SongAudioPlayer : MonoBehaviour
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
                 () =>
                 {
-                    return WebViewManager.DurationInMillis > 0
+                    return webViewManager.DurationInMillis > 0
                            || TimeUtils.IsDurationAboveThresholdInMillis(startTime, timeoutInMillis);
                 },
                 () =>
@@ -637,7 +642,7 @@ public class SongAudioPlayer : MonoBehaviour
                         return;
                     }
                     
-                    DurationOfSongInMillis = WebViewManager.DurationInMillis;
+                    DurationOfSongInMillis = webViewManager.DurationInMillis;
                     PositionInSongInMillis = startPositionInMillis;
                     PauseAudio();
                     FireLoadedEvent(o, songMeta, audioUri);
@@ -666,7 +671,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else if (AudioSupportProvider is EAudioSupportProvider.WebView)
         {
-            WebViewManager.PausePlayback();
+            webViewManager.PausePlayback();
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
         {
@@ -703,7 +708,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else if (AudioSupportProvider is EAudioSupportProvider.WebView)
         {
-            WebViewManager.PausePlayback();
+            webViewManager.PausePlayback();
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
@@ -730,7 +735,7 @@ public class SongAudioPlayer : MonoBehaviour
         }
         else if (AudioSupportProvider is EAudioSupportProvider.WebView)
         {
-            WebViewManager.ResumePlayback();
+            webViewManager.ResumePlayback();
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
         {
