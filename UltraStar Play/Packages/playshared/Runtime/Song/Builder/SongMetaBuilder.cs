@@ -19,9 +19,9 @@ public static class SongMetaBuilder
 
         Dictionary<string, string> requiredFields = new()
         {
-            {"bpm", null},
-            {"mp3", null},
-            {"title", null}
+            { "bpm", null },
+            { "mp3", null },
+            { "title", null }
         };
         Dictionary<string, string> voiceNames = new();
         Dictionary<string, string> otherFields = new();
@@ -31,15 +31,23 @@ public static class SongMetaBuilder
         {
             ++lineNumber;
             string line = reader.ReadLine();
-            if (!line.StartsWith("#", StringComparison.Ordinal))
+            if (line.TrimStart().IsNullOrEmpty())
+            {
+                // Ignore empty line
+                continue;
+            }
+
+            if (!line.StartsWith("#", StringComparison.InvariantCultureIgnoreCase))
             {
                 if (lineNumber == 1)
                 {
                     throw new SongMetaBuilderException("Does not look like a song file; ignoring");
                 }
+
                 // Finished headers
                 break;
             }
+
             char[] separator = { ':' };
             string[] parts = line.Substring(1).Split(separator, 2);
             if (parts.Length < 2)
@@ -59,7 +67,13 @@ public static class SongMetaBuilder
             }
 
             string tagValue = parts[1].TrimStart();
-            if (tagNameLowerCase.Equals("encoding", StringComparison.Ordinal)
+            if (tagValue.TrimStart().IsNullOrEmpty())
+            {
+                // Ignore empty tags
+                continue;
+            }
+
+            if (string.Equals(tagNameLowerCase, "encoding", StringComparison.InvariantCultureIgnoreCase)
                 && !string.Equals(tagValue, "auto", StringComparison.InvariantCultureIgnoreCase))
             {
                 try
@@ -152,92 +166,48 @@ public static class SongMetaBuilder
                 artist = "";
             }
 
+            float bpm;
+            try
+            {
+                 bpm = ConvertToFloat(requiredFields["bpm"]);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                throw new SongMetaBuilderException($"Failed to parse BPM value {requiredFields["bpm"]}");
+            }
+
+            string audioFile = requiredFields["mp3"];
+            string title = requiredFields["title"];
             SongMeta songMeta = new(
                 directory,
                 filename,
                 songHash,
                 artist,
-                ConvertToFloat(requiredFields["bpm"]),
-                requiredFields["mp3"],
-                requiredFields["title"],
+                bpm,
+                audioFile,
+                title,
                 voiceNames,
                 reader.CurrentEncoding
             );
-            foreach (var item in otherFields)
+            foreach (KeyValuePair<string, string> item in otherFields)
             {
-                switch (item.Key)
+                try
                 {
-                    case "background":
-                        songMeta.Background = item.Value;
-                        break;
-                    case "cover":
-                        songMeta.Cover = item.Value;
-                        break;
-                    case "edition":
-                        songMeta.Edition = item.Value;
-                        break;
-                    case "end":
-                        songMeta.End = ConvertToFloat(item.Value);
-                        break;
-                    case "gap":
-                        songMeta.Gap = ConvertToFloat(item.Value);
-                        break;
-                    case "genre":
-                        songMeta.Genre = item.Value;
-                        break;
-                    case "language":
-                        songMeta.Language = item.Value;
-                        break;
-                    case "previewstart":
-                        songMeta.PreviewStart = ConvertToFloat(item.Value);
-                        break;
-                    case "previewend":
-                        songMeta.PreviewEnd = ConvertToFloat(item.Value);
-                        break;
-                    case "start":
-                        songMeta.Start = ConvertToFloat(item.Value);
-                        break;
-                    case "video":
-                        songMeta.Video = item.Value;
-                        break;
-                    case "videogap":
-                        songMeta.VideoGap = ConvertToFloat(item.Value);
-                        break;
-                    case "year":
-                        songMeta.Year = ConvertToUInt32(item.Value);
-                        break;
-                    case "medleystartbeat":
-                        songMeta.MedleyStartBeat = ConvertToInt32(item.Value);
-                        break;
-                    case "medleyendbeat":
-                        songMeta.MedleyEndBeat = ConvertToInt32(item.Value);
-                        break;
-                    case "audio":
-                        songMeta.Mp3 = item.Value;
-                        break;
-                    case "vocalsaudio":
-                        songMeta.VocalsAudio = item.Value;
-                        break;
-                    case "mbid_record":
-                        songMeta.MusicBrainzRecord = item.Value;
-                        break;
-                    case "instrumentalaudio":
-                        songMeta.InstrumentalAudio = item.Value;
-                        break;
-                    case "artist":
-                        songMeta.Artist = item.Value;
-                        break;
-                    case "title":
-                        songMeta.Title = item.Value;
-                        break;
-                    default:
-                        songMeta.SetUnknownHeaderEntry(item.Key, item.Value);
-                        break;
+                    ConsumeOptionalHeaderField(songMeta, item.Key, item.Value);
+                }
+                catch (Exception ex)
+                {
+                    string errorMessage = $"Failed to handle header field '{item.Key}' with value '{item.Value}'";
+                    Debug.LogException(ex);
+                    Debug.LogError(errorMessage);
+                    songIssues.Add(SongIssue.CreateWarning(songMeta, errorMessage));
                 }
             }
 
             // Recreate issues with proper SongMeta
-            songIssues = songIssues.Select(songIssue => new SongIssue(songIssue.Severity, songMeta, songIssue.Message, songIssue.StartBeat, songIssue.EndBeat))
+            songIssues = songIssues.Select(songIssue => new SongIssue(songIssue.Severity, songMeta, songIssue.Message,
+                    songIssue.StartBeat, songIssue.EndBeat))
                 .ToList();
             songIssues.ForEach(songIssue =>
             {
@@ -253,15 +223,89 @@ public static class SongMetaBuilder
         }
     }
 
+    private static void ConsumeOptionalHeaderField(SongMeta songMeta, string key, string value)
+    {
+        switch (key)
+        {
+            case "background":
+                songMeta.Background = value;
+                break;
+            case "cover":
+                songMeta.Cover = value;
+                break;
+            case "edition":
+                songMeta.Edition = value;
+                break;
+            case "end":
+                songMeta.End = ConvertToFloat(value);
+                break;
+            case "gap":
+                songMeta.Gap = ConvertToFloat(value);
+                break;
+            case "genre":
+                songMeta.Genre = value;
+                break;
+            case "language":
+                songMeta.Language = value;
+                break;
+            case "previewstart":
+                songMeta.PreviewStart = ConvertToFloat(value);
+                break;
+            case "previewend":
+                songMeta.PreviewEnd = ConvertToFloat(value);
+                break;
+            case "start":
+                songMeta.Start = ConvertToFloat(value);
+                break;
+            case "video":
+                songMeta.Video = value;
+                break;
+            case "videogap":
+                songMeta.VideoGap = ConvertToFloat(value);
+                break;
+            case "year":
+                songMeta.Year = ConvertToUInt32(value);
+                break;
+            case "medleystartbeat":
+                songMeta.MedleyStartBeat = ConvertToInt32(value);
+                break;
+            case "medleyendbeat":
+                songMeta.MedleyEndBeat = ConvertToInt32(value);
+                break;
+            case "audio":
+                songMeta.Mp3 = value;
+                break;
+            case "vocalsaudio":
+                songMeta.VocalsAudio = value;
+                break;
+            case "mbid_record":
+                songMeta.MusicBrainzRecord = value;
+                break;
+            case "instrumentalaudio":
+                songMeta.InstrumentalAudio = value;
+                break;
+            case "artist":
+                songMeta.Artist = value;
+                break;
+            case "title":
+                songMeta.Title = value;
+                break;
+            default:
+                songMeta.SetUnknownHeaderEntry(key, value);
+                break;
+        }
+    }
+
     private static string NormalizeNumber(string s)
     {
         if (s.IsNullOrEmpty())
         {
             return s;
         }
+
         return s.Replace(",", ".").Trim();
     }
-    
+
     private static float ConvertToFloat(string s)
     {
         // Some txt files use comma as decimal separator (e.g. "12,34" instead "12.34").
@@ -273,7 +317,7 @@ public static class SongMetaBuilder
         }
         else
         {
-            throw new SongMetaBuilderException("Could not convert " + s + " to a float.");
+            throw new SongMetaBuilderException($"Could not convert string '{s}' to a float.");
         }
     }
 
