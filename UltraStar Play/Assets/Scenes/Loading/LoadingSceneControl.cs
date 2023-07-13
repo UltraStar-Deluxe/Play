@@ -108,6 +108,8 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         MidiManager.Instance.InitIfNotDoneYet();
         
+        Debug.Log("Supported file extensions by ffmpeg: " + ApplicationUtils.ffmpegSupportedFileExtensions.ToCsv());
+
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () => FinishScene()));
     }
 

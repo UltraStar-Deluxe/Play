@@ -3873,6 +3873,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 873b73f7143ed08409c0d0bea0d91a59, type: 2}
   - {fileID: 11400000, guid: 68a216e4dee60b64686b671dc4468625, type: 2}
   - {fileID: 11400000, guid: ce323e5ee716195498e4da70940c8fd6, type: 2}
+  - {fileID: 11400000, guid: e553685075e1fa54b8bec50db510f7a7, type: 2}
   m_fontAssetCreationEditorSettings:
     sourceFontFileGUID: 93776954373661a4c8af856324b45275
     faceIndex: 0

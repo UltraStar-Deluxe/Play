@@ -51,7 +51,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Options/RecordingOptions/RecordingOptionsScene.unity
     guid: 1d45d77c510b46a4b84e3f412e45766d
   - enabled: 1
-    path: Assets/Scenes/Options/ContentDownload/ContentDownloadScene.unity
+    path: Assets/Scenes/Options/UnusedScene/UnusedScene.unity
     guid: 10cb82cf2be19ee46b443c17c2efc000
   - enabled: 1
     path: Assets/Scenes/Options/DesignOptions/DesignOptionsScene.unity
@@ -77,6 +77,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PartyMode/PartyModeScene.unity
     guid: 01b85e9ec2579374cbe4dca6e7c9ca46
+  - enabled: 1
+    path: Assets/PlayModeTests/MediaFileFormatTests/MediaFileFormatTestScene.unity
+    guid: 06c1affc9019c404d977d3d60a26fd37
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}

@@ -1,5 +1,7 @@
 ﻿public enum EScene
 {
+    OtherScene = -1,
+
     // base
     MainScene = 1,
     LoadingScene = 0,

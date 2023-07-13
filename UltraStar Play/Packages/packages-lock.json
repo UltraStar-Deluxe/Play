@@ -289,6 +289,22 @@
       "dependencies": {},
       "hash": "2ee62e21eded65257454d14d545f5db7484743b0"
     },
+    "nuget.castle-core": {
+      "version": "2.0.0-pre.4",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "nuget.moq": {
+      "version": "https://github.com/needle-mirror/nuget.moq.git#2.0.0-pre.2",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "nuget.castle-core": "2.0.0-pre.4"
+      },
+      "hash": "097a28dbb4ed7f1a138d65d09ef1f780b41bdb01"
+    },
     "playshared": {
       "version": "file:playshared",
       "depth": 0,

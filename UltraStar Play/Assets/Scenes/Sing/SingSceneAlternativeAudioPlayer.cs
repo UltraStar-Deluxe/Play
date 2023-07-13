@@ -112,13 +112,24 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
 
     private void PlayInstrumentalAndVocalsAudio()
     {
+        bool shouldSync = false;
+
         if (instrumentalAudioSource.clip != null
-            && vocalsAudioSource.clip != null
-            && (!instrumentalAudioSource.isPlaying
-                || !vocalsAudioSource.isPlaying))
+            && !instrumentalAudioSource.isPlaying)
         {
             instrumentalAudioSource.Play();
+            shouldSync = true;
+        }
+
+        if (vocalsAudioSource.clip != null
+            && !vocalsAudioSource.isPlaying)
+        {
             vocalsAudioSource.Play();
+            shouldSync = true;
+        }
+
+        if (shouldSync)
+        {
             SyncAudioPosition();
         }
     }

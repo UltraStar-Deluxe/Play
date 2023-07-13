@@ -18,7 +18,7 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
     private static readonly OrderedDictionary<string, string> aboutTextFilesInStreamingAssets = new()
     {
         { "Melody Mania", "InfoAndLegalTexts/Melody-Mania.txt" },
-        { "Licenses", "InfoAndLegalTexts/Licenses.txt" },
+        { "Licenses", "InfoAndLegalTexts/License-Overview.txt" },
         { "MIT License", "InfoAndLegalTexts/MIT-License.txt" },
         { "APL 2.0", "InfoAndLegalTexts/APL-2.0.txt" },
         { "MPL 1.1", "InfoAndLegalTexts/MPL-1.1.txt" },
@@ -27,6 +27,15 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
         { "Soundfont", "InfoAndLegalTexts/GeneralUser-GS-Soundfont-License.txt" },
         { "Pixabay", "InfoAndLegalTexts/Pixabay-Content-License.txt" },
         { "CEF", "InfoAndLegalTexts/Chromium-Embedded-Framework.txt" },
+
+        // Libraries used by "Ffmpeg for Unity"
+        { "BSD 2-Clause", "InfoAndLegalTexts/BSD-2-Clause.txt" },
+        { "BSD 3-Clause", "InfoAndLegalTexts/BSD-3-Clause.txt" },
+        { "LGPGv2.1", "InfoAndLegalTexts/lgpl-2.1.txt" },
+        { "LGPGv3", "InfoAndLegalTexts/lgpl-3.0.txt" },
+        { "openh264", "InfoAndLegalTexts/openh264-Binary-License.txt" },
+        { "png", "InfoAndLegalTexts/libpng-License.txt" },
+        { "zlib", "InfoAndLegalTexts/zlib-License.txt" },
     };
 
     [Inject]

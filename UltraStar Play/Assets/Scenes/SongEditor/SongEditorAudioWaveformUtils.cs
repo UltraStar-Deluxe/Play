@@ -31,6 +31,12 @@ public static class SongEditorAudioWaveformUtils
             // Cannot draw audio wave form of MIDI file.
             return null;
         }
+        
+        if (!ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
+        {
+            // Cannot load this format using Unity API.
+            return null;
+        }
 
         // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
         AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(audioUri, false);

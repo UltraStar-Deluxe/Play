@@ -87,7 +87,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
         if (songVideoPlayer.HasLoadedVideo
             && (songVideoPlayer.PositionInVideoInMillis <= 0
-                && !songVideoPlayer.IsWebViewVideo))
+                && songVideoPlayer.VideoSupportProvider is not EVideoSupportProvider.WebView))
         {
             videoFadeInStartTimeInSeconds = Time.time;
         }
@@ -229,7 +229,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         
         try
         {
-            songAudioPlayer.LoadSongAudio(songMeta)
+            songAudioPlayer.LoadAndPlaySongAudio(songMeta)
                 .CatchIgnore((Exception error) =>
                 {
                     string errorMessage = $"Audio could not be loaded: {SongMetaUtils.GetArtistDashTitle(songMeta)}";

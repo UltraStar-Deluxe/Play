@@ -125,4 +125,13 @@ public static class PathUtils
     {
         return Path.GetRelativePath(relativeTo, path);
     }
+
+    public static string GetExtensionWithoutDot(string path)
+    {
+        if (path.IsNullOrEmpty())
+        {
+            return "";
+        }
+        return Path.GetExtension(path).TrimStart('.');
+    }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using PortAudioForUnity;
 using ProTrans;
+using UnityEditor;
 using UnityEngine;
 
 public static class ApplicationUtils
@@ -16,33 +17,51 @@ public static class ApplicationUtils
     
     public const string GeneratedFolderName = "Generated";
 
-    public static readonly IReadOnlyList<string> supportedSoundfontFiles = new List<string>
+    public static readonly IReadOnlyCollection<string> supportedSoundfontFiles = new HashSet<string>
     {
         "sf2",
     };
     
-    public static readonly IReadOnlyList<string> supportedImageFiles = new List<string>
+    public static readonly IReadOnlyCollection<string> supportedImageFiles = new HashSet<string>
     {
         "png",
         "jpg",
         "jpeg",
     };
 
-    public static readonly IReadOnlyList<string> supportedMidiFiles = new List<string>
+    public static readonly IReadOnlyCollection<string> supportedMidiFiles = new HashSet<string>
     {
         "mid",
         "midi",
         "kar",
     };
     
-    public static readonly IReadOnlyList<string> supportedAudioFiles = new List<string>
+    // Supported file formats of ffmpeg can be obtained via "ffmpeg -demuxers"
+    // See also https://stackoverflow.com/questions/50069235/what-are-all-of-the-file-extensions-supported-by-ffmpeg
+    // See also http://www.ffmpeg.org/general.html#toc-Supported-File-Formats_002c-Codecs-or-Features
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedFileExtensions = File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), System.Text.Encoding.UTF8)
+        .Select(line => line.Trim())
+        .Where(line => !line.IsNullOrEmpty())
+        .ToHashSet();
+
+    // TODO: differentiate audio and video files that are supported by ffmpeg
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedAudioFiles = ffmpegSupportedFileExtensions;
+    
+    // TODO: differentiate audio and video files that are supported by ffmpeg
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedVideoFiles = ffmpegSupportedFileExtensions;
+
+    public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
     {
         "mp3",
-        "ogg",
-        "wav"
-    }.Union(supportedMidiFiles).ToList();
+        "ogg"
+    }.ToHashSet();
+    
+    public static readonly IReadOnlyCollection<string> supportedAudioFiles = unitySupportedAudioFiles
+        .Union(supportedMidiFiles)
+        .Union(ffmpegSupportedAudioFiles)
+        .ToHashSet();
 
-    public static readonly IReadOnlyList<string> supportedVocalsSeparationAudioFiles = new List<string>
+    public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
     {
         "wav",
         "mp3",
@@ -50,29 +69,32 @@ public static class ApplicationUtils
         "m4a",
         "wma",
         "flac",
-    }.Intersect(supportedAudioFiles).ToList();
+    }.Intersect(supportedAudioFiles).ToHashSet();
     
-    public static readonly IReadOnlyList<string> supportedBasicPitchDetectionAudioFiles = new List<string>
+    public static readonly IReadOnlyCollection<string> supportedBasicPitchDetectionAudioFiles = new HashSet<string>
     {
         "wav",
         "mp3",
         "ogg",
-    }.Intersect(supportedAudioFiles).ToList();
+    }.Intersect(supportedAudioFiles).ToHashSet();
 
-    public static readonly IReadOnlyList<string> supportedVideoFiles = new List<string>
+    public static readonly IReadOnlyCollection<string> unitySupportedVideoFiles = new HashSet<string>
     {
-        "avi",
+        // See https://docs.unity3d.com/Manual/VideoSources-FileCompatibility.html#CompatibilityWithTargetPlatforms
+#if !UNITY_STANDALONE_LINUX
         "mp4",
-        "mpg",
-        "mpeg",
+#endif
         "vp8",
+        "avi",
+        
+        // NOTE: webm is only supported by Unity when using VP8.
+        // webm with VP9 is not supported by Unity and will fail, such that ffmpeg or similar should be used as fallback.
         "webm",
-        "m4v",
-        "mov",
-        "dv",
-        "afs",
-        "wmf",
     };
+
+    public static readonly IReadOnlyCollection<string> supportedVideoFiles = unitySupportedVideoFiles
+        .Union(ffmpegSupportedVideoFiles)
+        .ToHashSet();
 
     public static void OpenDirectory(string path)
     {
@@ -83,7 +105,7 @@ public static class ApplicationUtils
     public static void QuitOrStopPlayMode()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+        EditorApplication.isPlaying = false;
 #else
         Application.Quit();
 #endif
@@ -127,10 +149,22 @@ public static class ApplicationUtils
         return supportedImageFiles.Contains(fileExtension);
     }
     
+    public static bool IsUnitySupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return unitySupportedAudioFiles.Contains(fileExtension);
+    }
+
     public static bool IsSupportedAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return supportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsUnitySupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return unitySupportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedVideoFormat(string fileExtension)

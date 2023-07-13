@@ -173,7 +173,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         // Only show this job in the UI if it takes a noticeable amount of time.
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(0.5f, () =>
         {
-            if (this == null)
+            if (GameObjectUtils.IsDestroyed(this))
             {
                 // Object was destroyed in the meantime
                 return;

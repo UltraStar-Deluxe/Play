@@ -85,11 +85,29 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             }
             
             Debug.Log("Initializing SteamClient");
-            SteamClient.Init(MelodyManiaSteamAppId);
-            if (!SteamClient.IsValid)
+
+            if (Application.isEditor)
             {
-                throw new SteamException("Steam client not valid");
+                // Steam is not expected to run in the editor. Only log a warning.
+                try
+                {
+                    SteamClient.Init(MelodyManiaSteamAppId);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning(ex.Message);
+                    return;
+                }
             }
+            else
+            {
+                SteamClient.Init(MelodyManiaSteamAppId);
+                if (!SteamClient.IsValid)
+                {
+                    throw new SteamException("Steam client not valid");
+                }
+            }
+
             PlayerName = SteamClient.Name;
             PlayerSteamId = SteamClient.SteamId;
             playerSteamIdString = PlayerSteamId.ToString();

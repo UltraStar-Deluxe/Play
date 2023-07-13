@@ -1,0 +1,10 @@
+﻿#TITLE:TestTitle
+#ARTIST:TestArtist
+#MP3:mpeg2-TestVideo.mpg
+#_VIDEO:TestVideo.mp4
+#BPM:200
+- 0
+: 4 3 9 Hel
+: 8 3 9  lo 
+: 12 3 9  world!
+E
