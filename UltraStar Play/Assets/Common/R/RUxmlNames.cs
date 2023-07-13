@@ -537,6 +537,8 @@ public static partial class R
         public const string playlistChooserTitle = "playlistChooserTitle";
         public const string playlistDropdownField = "playlistDropdownField";
         public const string playlistNameTextField = "playlistNameTextField";
+        public const string playModeTestLabel = "playModeTestLabel";
+        public const string playModeTestStatusLabel = "playModeTestStatusLabel";
         public const string playRecordedAudioInfoContainer = "playRecordedAudioInfoContainer";
         public const string playRecordedAudioInfoLabel = "playRecordedAudioInfoLabel";
         public const string playRecordedAudioToggle = "playRecordedAudioToggle";
