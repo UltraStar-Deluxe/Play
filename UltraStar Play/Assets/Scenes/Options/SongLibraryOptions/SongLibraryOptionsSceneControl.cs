@@ -35,6 +35,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private UIDocument uiDocument;
 
     [Inject]
+    private SongMediaFileConversionManager songMediaFileConversionManager;
+
+    [Inject]
     private UiManager uiManager;
 
     [Inject(UxmlName = R.UxmlNames.songFolderList)]
@@ -346,7 +349,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             // Add quick fix buttons
             if (songIssue.SongIssueData is FormatNotSupportedSongIssueData { MediaType: FormatNotSupportedSongIssueData.EMediaType.InstrumentalAudio })
             {
-                Action quickFixAction = () => ConvertInstrumentalAudioToSupportedFormat(songIssue.SongMeta);
+                Action quickFixAction = () => songMediaFileConversionManager.ConvertInstrumentalAudioToSupportedFormat(songIssue.SongMeta);
                 Button quickFixButton = CreateQuickFixButton("Convert vocals audio to ogg", quickFixAction);
                 quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData, quickFixAction));
                 accordionItem.Add(quickFixButton);
@@ -398,11 +401,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         button.RegisterCallbackButtonTriggered(_ => callback());
         button.text = title;
         return button;
-    }
-
-    private void ConvertInstrumentalAudioToSupportedFormat(SongMeta songMeta)
-    {
-        Debug.Log($"Convert vocals audio to supported format '{songMeta.InstrumentalAudio}'");
     }
 
     private static void RequestExternalStoragePermissionIfNeeded()

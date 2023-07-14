@@ -119,4 +119,5 @@ public class Settings : ISettings
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();
+    public bool LogFfmpegOutput { get; set; }
 }
