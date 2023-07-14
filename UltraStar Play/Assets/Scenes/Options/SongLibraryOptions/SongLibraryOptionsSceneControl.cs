@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -5,6 +6,7 @@ using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 #if UNITY_ANDROID
     using UnityEngine.Android;
@@ -242,55 +244,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     public override bool HasIssuesDialog => true;
     public override MessageDialogControl CreateIssuesDialogControl()
     {
-        void FillWithSongIssues(AccordionItem accordionItem, IReadOnlyList<SongIssue> songIssues)
-        {
-            if (songIssues.IsNullOrEmpty())
-            {
-                accordionItem.Add(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_noIssues)));
-                return;
-            }
-
-            List<SongIssue> sortedSongIssues = songIssues.ToList();
-            sortedSongIssues.Sort(SongIssue.compareBySongMetaArtistAndTitle);
-
-            string lastSongMetaPath = "";
-            sortedSongIssues.ForEach(songIssue =>
-            {
-                string songMetaArtistAndTitle = songIssue.SongMeta != null
-                    ? songIssue.SongMeta.Artist + " - " + songIssue.SongMeta.Title
-                    : "";
-                string songMetaPath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songIssue.SongMeta);
-                if (lastSongMetaPath != songMetaPath)
-                {
-                    if (!lastSongMetaPath.IsNullOrEmpty())
-                    {
-                        // Add empty line
-                        accordionItem.Add(new Label(""));
-                    }
-                    // Add label for song
-                    VisualElement visualElement = songIssueSongEntryUi.CloneTree().Children().First();
-                    visualElement.Q<Label>(R.UxmlNames.title).text = songMetaArtistAndTitle;
-                    Button openFolderButtonOfSongMeta = visualElement.Q<Button>(R.UxmlNames.openFolderButton);
-                    if (PlatformUtils.IsStandalone
-                        && !songIssue.SongMeta.Directory.IsNullOrEmpty()
-                        && Directory.Exists(songIssue.SongMeta.Directory))
-                    {
-                        openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
-                    }
-                    else
-                    {
-                        openFolderButtonOfSongMeta.HideByDisplay();
-                    }
-                    accordionItem.Add(visualElement);
-                }
-
-                Label songIssueLabel = new($"• {songIssue.Message}");
-                songIssueLabel.AddToClassList("songIssueMessage");
-                accordionItem.Add(songIssueLabel);
-                lastSongMetaPath = songMetaPath;
-            });
-        }
-
         VisualElement dialog = dialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialog);
 
@@ -303,21 +256,36 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         
         AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
         accordionGroup.Add(errorsAccordionItem);
-        FillWithSongIssues(errorsAccordionItem, songMetaManager.GetSongErrors());
+        FillWithSongIssues(errorsAccordionItem, songMetaManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
 
         AccordionItem warningsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings));
         accordionGroup.Add(warningsAccordionItem);
-        FillWithSongIssues(warningsAccordionItem, songMetaManager.GetSongWarnings());
+        FillWithSongIssues(warningsAccordionItem, songMetaManager.GetSongWarnings(), out List<QuickFixAction> warningQuickFixActions);
 
-        if (songMetaManager.GetSongErrors().Count > 0)
+        if (!songMetaManager.GetSongErrors().IsNullOrEmpty())
         {
             errorsAccordionItem.ShowAccordionContent();
         }
-        else if (songMetaManager.GetSongWarnings().Count > 0)
+        else if (!songMetaManager.GetSongWarnings().IsNullOrEmpty())
         {
             warningsAccordionItem.ShowAccordionContent();
         }
 
+        // Dialog button row
+        // Quick fix all buttons
+        if (!errorQuickFixActions.IsNullOrEmpty())
+        {
+            Button quickFixAllErrorsButton = CreateQuickFixAllButton("Auto-fix errors", errorQuickFixActions);
+            issuesDialogControl.AddButton(quickFixAllErrorsButton);
+        }
+
+        if (!warningQuickFixActions.IsNullOrEmpty())
+        {
+            Button quickFixAllWarningsButton = CreateQuickFixAllButton("Auto-fix warnings", warningQuickFixActions);
+            issuesDialogControl.AddButton(quickFixAllWarningsButton);
+        }
+
+        // Refresh button
         issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), _ =>
         {
             songMetaManager.ReloadSongMetas();
@@ -325,6 +293,116 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         });
 
         return issuesDialogControl;
+    }
+
+    private Button CreateQuickFixAllButton(string title, List<QuickFixAction> errorQuickFixActions)
+    {
+        Button button = new();
+        button.text = title;
+        button.AddToClassList("quickFixButton");
+        button.RegisterCallbackButtonTriggered(_ =>
+        {
+            Debug.Log($"Quick fixing {errorQuickFixActions.Count} issues");
+            foreach (QuickFixAction errorQuickFixAction in errorQuickFixActions)
+            {
+                Debug.Log("Quick fixing issue: " + errorQuickFixAction.songIssueData);
+                errorQuickFixAction.action();
+            }
+        });
+        return button;
+    }
+
+    private void FillWithSongIssues(AccordionItem accordionItem, IReadOnlyList<SongIssue> songIssues, out List<QuickFixAction> quickFixActions)
+    {
+        quickFixActions = new();
+        if (songIssues.IsNullOrEmpty())
+        {
+            accordionItem.Add(new Label(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_noIssues)));
+            return;
+        }
+
+        List<SongIssue> sortedSongIssues = songIssues.ToList();
+        sortedSongIssues.Sort(SongIssue.compareBySongMetaArtistAndTitle);
+
+        string lastSongMetaPath = "";
+        foreach (SongIssue songIssue in sortedSongIssues)
+        {
+            string songMetaPath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songIssue.SongMeta);
+            if (lastSongMetaPath != songMetaPath)
+            {
+                if (!lastSongMetaPath.IsNullOrEmpty())
+                {
+                    // Add empty line
+                    accordionItem.Add(new Label(""));
+                }
+
+                VisualElement songIssueListSongEntry = CreateAddSongIssueListSongEntry(songIssue);
+                accordionItem.Add(songIssueListSongEntry);
+            }
+
+            VisualElement songIssueUi = CreateSongIssueListIssueEntry(songIssue);
+            accordionItem.Add(songIssueUi);
+
+            // Add quick fix buttons
+            if (songIssue.SongIssueData is FormatNotSupportedSongIssueData { MediaType: FormatNotSupportedSongIssueData.EMediaType.InstrumentalAudio })
+            {
+                Action quickFixAction = () => ConvertInstrumentalAudioToSupportedFormat(songIssue.SongMeta);
+                Button quickFixButton = CreateQuickFixButton("Convert vocals audio to ogg", quickFixAction);
+                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData, quickFixAction));
+                accordionItem.Add(quickFixButton);
+            }
+
+            lastSongMetaPath = songMetaPath;
+        }
+    }
+
+    private VisualElement CreateAddSongIssueListSongEntry(SongIssue songIssue)
+    {
+        string songMetaArtistAndTitle = songIssue.SongMeta != null
+            ? songIssue.SongMeta.Artist + " - " + songIssue.SongMeta.Title
+            : "";
+
+        // Add label for song
+        VisualElement visualElement = songIssueSongEntryUi.CloneTree().Children().First();
+        visualElement.Q<Label>(R.UxmlNames.title).text = songMetaArtistAndTitle;
+        Button openFolderButtonOfSongMeta = visualElement.Q<Button>(R.UxmlNames.openFolderButton);
+        if (PlatformUtils.IsStandalone
+            && !songIssue.SongMeta.Directory.IsNullOrEmpty()
+            && Directory.Exists(songIssue.SongMeta.Directory))
+        {
+            openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
+        }
+        else
+        {
+            openFolderButtonOfSongMeta.HideByDisplay();
+        }
+
+        return visualElement;
+    }
+
+    private VisualElement CreateSongIssueListIssueEntry(SongIssue songIssue)
+    {
+        VisualElement visualElement = new();
+
+        Label label = new($"• {songIssue.Message}");
+        label.AddToClassList("songIssueMessage");
+        visualElement.Add(label);
+
+        return visualElement;
+    }
+
+    private Button CreateQuickFixButton(string title, Action callback)
+    {
+        Button button = new();
+        button.AddToClassList("quickFixButton");
+        button.RegisterCallbackButtonTriggered(_ => callback());
+        button.text = title;
+        return button;
+    }
+
+    private void ConvertInstrumentalAudioToSupportedFormat(SongMeta songMeta)
+    {
+        Debug.Log($"Convert vocals audio to supported format '{songMeta.InstrumentalAudio}'");
     }
 
     private static void RequestExternalStoragePermissionIfNeeded()
@@ -451,5 +529,17 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .ToList();
 
         songMetaManager.ReloadSongMetas();
+    }
+
+    private class QuickFixAction
+    {
+        public SongIssueData songIssueData { get; private set; }
+        public Action action { get; private set; }
+
+        public QuickFixAction(SongIssueData songIssueData, Action action)
+        {
+            this.songIssueData = songIssueData;
+            this.action = action;
+        }
     }
 }

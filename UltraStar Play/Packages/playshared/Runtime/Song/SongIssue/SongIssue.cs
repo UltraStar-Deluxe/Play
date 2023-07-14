@@ -13,7 +13,8 @@ public class SongIssue
             SongMetaUtils.GetArtistDashTitle(a.SongMeta),
             SongMetaUtils.GetArtistDashTitle(b.SongMeta), StringComparison.InvariantCulture);
 
-    public SongMeta SongMeta { get; set; }
+    public SongIssueData SongIssueData { get; private set; }
+    public SongMeta SongMeta => SongIssueData?.SongMeta;
     public ESongIssueSeverity Severity { get; private set; }
     public string Message { get; private set; }
     public int StartBeat { get; private set; }
@@ -23,24 +24,38 @@ public class SongIssue
     {
     }
 
-    public SongIssue(ESongIssueSeverity severity, SongMeta songMeta, string message, int startBeat, int endBeat)
+    public SongIssue(
+        ESongIssueSeverity severity,
+        SongIssueData songIssueData,
+        string message,
+        int startBeat,
+        int endBeat)
     {
         Severity = severity;
-        SongMeta = songMeta;
+        SongIssueData = songIssueData;
         Message = message;
         StartBeat = startBeat;
         EndBeat = endBeat;
+        SongIssueData = songIssueData;
     }
 
-    public static SongIssue CreateWarning(SongMeta songMeta, string message, int startBeat=-1, int endBeat=-1)
+    public static SongIssue CreateWarning(
+        SongMeta songMeta,
+        string message,
+        int startBeat = -1,
+        int endBeat = -1)
     {
-        SongIssue issue = new(ESongIssueSeverity.Warning, songMeta, message, startBeat, endBeat);
+        SongIssue issue = new(ESongIssueSeverity.Warning, new SongIssueData(songMeta), message, startBeat, endBeat);
         return issue;
     }
 
-    public static SongIssue CreateError(SongMeta songMeta, string message, int startBeat=-1, int endBeat=-1)
+    public static SongIssue CreateError(
+        SongMeta songMeta,
+        string message,
+        int startBeat = -1,
+        int endBeat = -1)
     {
-        SongIssue issue = new(ESongIssueSeverity.Error, songMeta, message, startBeat, endBeat);
+        SongIssue issue = new(ESongIssueSeverity.Error, new SongIssueData(songMeta), message, startBeat, endBeat);
         return issue;
     }
 

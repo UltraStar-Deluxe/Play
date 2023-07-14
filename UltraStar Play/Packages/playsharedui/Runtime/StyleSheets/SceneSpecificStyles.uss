@@ -597,6 +597,10 @@
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
+.quickFixButton {
+    align-self: flex-start;
+}
+
 #permissionsContainer .unity-toggle__label {
     min-width: 50;
     margin-right: 8px;
