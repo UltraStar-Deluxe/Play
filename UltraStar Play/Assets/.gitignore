@@ -105,3 +105,7 @@ StreamingAssets/SpeechRecognitionModels.meta
 
 StreamingAssets/DemoSongs/
 StreamingAssets/DemoSongs.meta
+
+######################################
+## Play Mode Tests
+InitTestScene*
