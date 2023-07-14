@@ -327,7 +327,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         viewLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
         {
-            ClipboardUtils.CopyToClipboard(Log.GetLogText(LogEventLevel.Verbose));
+            ClipboardUtils.CopyToClipboard(Log.GetLogHistoryAsText(LogEventLevel.Verbose));
             UiManager.CreateNotification("Copied log to clipboard");
         });
     }
