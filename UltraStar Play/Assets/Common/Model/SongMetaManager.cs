@@ -32,7 +32,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     static void StaticInit()
     {
         ResetSongMetas();
-        lastSongDirs = null;
+        lastEnabledSongFolders = null;
     }
 
     public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
@@ -40,7 +40,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private static readonly Dictionary<SongMeta, string> songMetaToScoreRelevantHash = new();
 
     // Static to be persisted across scenes.
-    private static List<string> lastSongDirs;
+    private static List<string> lastEnabledSongFolders;
     private static bool isSongScanStarted;
     private static bool isSongScanFinished;
     public static bool IsSongScanFinished => isSongScanFinished;
@@ -55,6 +55,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private UiManager uiManager;
     private Settings settings;
     private WebViewManager webViewManager;
+
+    private List<string> EnabledSongFolders => SettingsUtils.GetEnabledSongFolders(settings);
 
     public static void ResetSongMetas()
     {
@@ -94,16 +96,16 @@ public class SongMetaManager : AbstractSingletonBehaviour
     {
         // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
         // Thus, use the static instance.
-        if (lastSongDirs == null)
+        if (lastEnabledSongFolders == null)
         {
-            lastSongDirs = new List<string>(settings.SongDirs);
+            lastEnabledSongFolders = new List<string>(EnabledSongFolders);
         }
 
         if (isSongScanFinished
-            && !lastSongDirs.SequenceEqual(settings.SongDirs))
+            && !lastEnabledSongFolders.SequenceEqual(EnabledSongFolders))
         {
             Debug.Log("SongDirs have changed since last scan. Start rescan.");
-            lastSongDirs = new List<string>(settings.SongDirs);
+            lastEnabledSongFolders = new List<string>(EnabledSongFolders);
             ResetSongMetas();
             ScanFilesIfNotDoneYet();
         }
@@ -180,13 +182,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
         lock (scanLock)
         {
             // Find all txt and audio files in configured song folders and the generated song folder
-            List<string> allSongFolders = SettingsManager.Instance.Settings.SongDirs
+            List<string> allSongFolders = EnabledSongFolders
                 .Union(new List<string> { generatedSongFolderAbsolutePath })
                 .ToList();
             txtFiles = ScanForFiles(allSongFolders, new List<string> { "*.txt" });
 
             // Only search for audio files in configured song folders, not in the generated song folder
-            audioFiles = ScanForFiles(SettingsManager.Instance.Settings.SongDirs, GetAudioFileExtensionPatterns());
+            audioFiles = ScanForFiles(EnabledSongFolders, GetAudioFileExtensionPatterns());
 
             targetSongCount = txtFiles.Count;
         }

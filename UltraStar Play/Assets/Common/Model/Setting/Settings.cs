@@ -51,6 +51,7 @@ public class Settings : ISettings
 
     // Song library settings
     public List<string> SongDirs { get; set; } = new();
+    public List<string> DisabledSongFolders { get; set; } = new();
     public bool SearchAudioFilesWithoutSongMeta { get; set; }
     public string GeneratedFolderPath { get; set; } = "";
     

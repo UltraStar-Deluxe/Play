@@ -496,18 +496,35 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         SongFolderListEntryControl songFolderListEntryControl = injector
             .WithRootVisualElement(visualElement)
             .WithBinding(new Binding("initialPath", new ExistingInstanceProvider<string>(path)))
+            .WithBinding(new Binding("indexInList", new ExistingInstanceProvider<int>(indexInList)))
             .CreateAndInject<SongFolderListEntryControl>();
 
-        songFolderListEntryControl.ValueChangedEventStream.Subscribe(newValue =>
-        {
-            settings.SongDirs[indexInList] = newValue;
-
-            songFolderListEntryControls.ForEach(control => control.CheckPathIsValid());
-        });
+        songFolderListEntryControl.ValueChangedEventStream.Subscribe(newValue => OnSongFolderPathChanged(indexInList, newValue));
         songFolderListEntryControl.DeleteEventStream.Subscribe(_ => OnDeleteSongFolder(indexInList));
+        songFolderListEntryControl.SongFolderEnabledChangedEventStream.Subscribe(_ => OnSongFolderEnabledChanged(indexInList));
 
         songFolderListEntryControls.Add(songFolderListEntryControl);
         songFolderList.Add(visualElement);
+    }
+
+    private void OnSongFolderPathChanged(int indexInList, string newValue)
+    {
+        settings.SongDirs[indexInList] = newValue;
+        songFolderListEntryControls.ForEach(control => control.CheckPathIsValid());
+        UpdateDisabledSongFoldersInSettings();
+    }
+
+    private void UpdateDisabledSongFoldersInSettings()
+    {
+        settings.DisabledSongFolders = songFolderListEntryControls
+            .Where(it => !it.IsSongFolderEnabled)
+            .Select(it => it.SongFolderPath)
+            .ToList();
+    }
+
+    private void OnSongFolderEnabledChanged(int indexInList)
+    {
+        UpdateDisabledSongFoldersInSettings();
     }
 
     private void OnDeleteSongFolder(int indexInList)
@@ -521,6 +538,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         }
         
         DoDeleteSongFolder(indexInList);
+
+        UpdateDisabledSongFoldersInSettings();
     }
     
     public void OpenDeleteSongFolderDialog(int indexInList)

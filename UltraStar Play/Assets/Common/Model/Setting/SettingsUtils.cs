@@ -22,6 +22,13 @@ public static class SettingsUtils
         return new();
     }
 
+    public static List<string> GetEnabledSongFolders(Settings settings)
+    {
+        return settings.SongDirs
+            .Except(settings.DisabledSongFolders)
+            .ToList();
+    }
+
     public static void AddPermission(Settings settings, string clientId, HttpApiPermission permission)
     {
         if (!settings.HttpApiPermissions.ContainsKey(clientId))

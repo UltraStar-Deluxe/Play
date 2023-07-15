@@ -332,6 +332,7 @@ public static partial class R
         public const string loadedSceneTitle = "loadedSceneTitle";
         public const string loadingLabel = "loadingLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
+        public const string logFfmpegOutputPicker = "logFfmpegOutputPicker";
         public const string logo = "logo";
         public const string logoContainer = "logoContainer";
         public const string lrcImportDescription = "lrcImportDescription";
@@ -707,6 +708,8 @@ public static partial class R
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
         public const string songEntryNotSavedYetIcon = "songEntryNotSavedYetIcon";
         public const string songEntryUiRoot = "songEntryUiRoot";
+        public const string songFolderEnabledToggle = "songFolderEnabledToggle";
+        public const string songFolderInactiveOverlay = "songFolderInactiveOverlay";
         public const string songFolderList = "songFolderList";
         public const string songFolderListTitle = "songFolderListTitle";
         public const string songImage = "songImage";
