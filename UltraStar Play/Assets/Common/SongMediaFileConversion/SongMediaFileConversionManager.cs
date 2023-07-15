@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
+using System.Linq;
 using FfmpegUnity;
 using UniInject;
 using UnityEngine;
@@ -17,31 +19,126 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private SongMetaManager songMetaManager;
+
     protected override object GetInstance()
     {
         return Instance;
     }
 
-    public void ConvertInstrumentalAudioToSupportedFormat(SongMeta songMeta)
+    public void ConvertFileToSupportedFormat(
+        SongMeta songMeta,
+        string mediaDescription,
+        Func<string> pathGetter,
+        Action<string> pathSetter,
+        bool isAudio)
     {
-        Debug.Log($"Convert vocals audio to supported format '{SongMetaUtils.GetInstrumentalAudioUri(songMeta)}'");
+        string currentValue = pathGetter();
+        if (currentValue.IsNullOrEmpty())
+        {
+            return;
+        }
 
-        string jobTitle = $"Convert instrumental audio of '{SongMetaUtils.GetArtistDashTitle(songMeta)}'";
+        string sourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, currentValue);
+        if (!FileUtils.Exists(sourceFilePath))
+        {
+            string errorMessage = $"File not found '{sourceFilePath}'";
+            Debug.Log(errorMessage);
+            UiManager.CreateNotification(errorMessage);
+            return;
+        }
 
-        // string ffmpegArguments = "-y -i \"C:/Users/andre/Downloads/TestAudio.flac\" \"C:/Users/andre/Downloads/TestAudio.ogg\"";
-        string ffmpegArguments = "-y -i \"C:/Users/andre/Downloads/TestVideo2.mp4\" -c:v libvpx -c:a libvorbis \"C:/Users/andre/Downloads/TestVideo2.webm\"";
+        string targetFileExtension = isAudio ? "ogg" : "webm";
+        string sourceFileExtension = PathUtils.GetExtensionWithoutDot(currentValue);
+        if (string.Equals(sourceFileExtension, targetFileExtension, StringComparison.InvariantCultureIgnoreCase))
+        {
+            // Nothing to do
+            return;
+        }
+
+        bool canConvertToSupportedFormat = isAudio
+            ? ApplicationUtils.IsFfmpegSupportedAudioFormat(sourceFileExtension)
+            : ApplicationUtils.IsFfmpegSupportedVideoFormat(sourceFileExtension);
+        if (!canConvertToSupportedFormat)
+        {
+            string errorMessage = $"Cannot convert {mediaDescription} '{sourceFileExtension}' to supported format";
+            Debug.Log(errorMessage);
+            UiManager.CreateNotification(errorMessage);
+            return;
+        }
+
+        Debug.Log($"Converting {mediaDescription} of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to {targetFileExtension}");
+        string jobTitle = $"Convert {mediaDescription} of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to {targetFileExtension}";
+
+        string targetFilePath = Path.ChangeExtension(sourceFilePath, targetFileExtension);
+        string ffmpegArguments = isAudio
+            ? $"-y -i \"{sourceFilePath}\" \"{targetFilePath}\""
+            : $"-y -i \"{sourceFilePath}\" -c:v libvpx -c:a libvorbis \"{targetFilePath}\"";
         FfmpegCommand ffmpegCommand = CreateFfmpegCommandOnNewGameObject(jobTitle, ffmpegArguments);
 
+        // Create UI job
         Job uiJob = new(jobTitle);
         uiJob.OnCancel = () => ffmpegCommand.StopFfmpeg();
-
         jobManager.AddJob(uiJob);
 
-        StartCoroutine(RunFfmpegCommandCoroutine(ffmpegCommand, uiJob));
+        StartCoroutine(RunFfmpegCommandCoroutine(ffmpegCommand, uiJob, () =>
+        {
+            string relativeTargetFilePath = PathUtils.MakeRelativePath(songMeta.Directory, targetFilePath);
+            Debug.Log($"Setting {mediaDescription} of '{SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta)}' to '{relativeTargetFilePath}'");
+            songMeta.InstrumentalAudio = relativeTargetFilePath;
+            songMetaManager.SaveSong(songMeta, true);
+        }));
     }
 
-    private IEnumerator RunFfmpegCommandCoroutine(FfmpegCommand ffmpegCommand, Job uiJob)
+    public void ConvertVocalsAudioToSupportedFormat(SongMeta songMeta)
     {
+        ConvertFileToSupportedFormat(
+            songMeta,
+            "vocals audio",
+            () => songMeta.VocalsAudio,
+            newValue => songMeta.VocalsAudio = newValue,
+            true);
+    }
+
+    public void ConvertInstrumentalAudioToSupportedFormat(SongMeta songMeta)
+    {
+        ConvertFileToSupportedFormat(
+            songMeta,
+            "instrumental audio",
+            () => songMeta.InstrumentalAudio,
+            newValue => songMeta.InstrumentalAudio = newValue,
+            true);
+    }
+
+    public void ConvertAudioToSupportedFormat(SongMeta songMeta)
+    {
+        // The MP3 tag can also be used with a video file.
+        string fileExtension = PathUtils.GetExtensionWithoutDot(songMeta.Mp3);
+        bool isAudio = ApplicationUtils.audioFileExtensions.Contains(fileExtension);
+
+        ConvertFileToSupportedFormat(
+            songMeta,
+            "audio",
+            () => songMeta.Mp3,
+            newValue => songMeta.Mp3 = newValue,
+            isAudio);
+    }
+
+    public void ConvertVideoToSupportedFormat(SongMeta songMeta)
+    {
+        ConvertFileToSupportedFormat(
+            songMeta,
+            "video",
+            () => songMeta.Video,
+            newValue => songMeta.Video = newValue,
+            false);
+    }
+
+    private IEnumerator RunFfmpegCommandCoroutine(FfmpegCommand ffmpegCommand, Job uiJob, Action onSuccess)
+    {
+        Debug.Log($"Executing ffmpeg command '{ffmpegCommand.Options}'");
+
         uiJob.SetStatus(EJobStatus.Running);
         ffmpegCommand.StartFfmpeg();
         yield return new WaitForSeconds(0.1f);
@@ -66,6 +163,19 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
 
         Debug.Log($"FfmpegCommand finished: {uiJob.Name}");
         Destroy(ffmpegCommand.gameObject);
+
+        if (onSuccess != null)
+        {
+            try
+            {
+                onSuccess.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                Debug.LogError($"Failed to invoke onSuccess callback after running ffmpeg command '{ffmpegCommand.Options}'");
+            }
+        }
     }
 
     private FfmpegCommand CreateFfmpegCommandOnNewGameObject(string gameObjectName, string ffmpegArguments)
@@ -76,7 +186,8 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         ffmpegCommand.Options = ffmpegArguments;
         ffmpegCommand.ExecuteOnStart = false;
         ffmpegCommand.GetProgressOnScript = true;
-        ffmpegCommand.PrintStdErr = settings.LogFfmpegOutput;
+        // ffmpegCommand.PrintStdErr = settings.LogFfmpegOutput;
+        ffmpegCommand.PrintStdErr = true;
         return ffmpegCommand;
     }
 }

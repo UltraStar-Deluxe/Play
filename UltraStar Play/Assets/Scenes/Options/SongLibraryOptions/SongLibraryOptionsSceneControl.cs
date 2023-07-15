@@ -347,15 +347,47 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             accordionItem.Add(songIssueUi);
 
             // Add quick fix buttons
-            if (songIssue.SongIssueData is FormatNotSupportedSongIssueData { MediaType: FormatNotSupportedSongIssueData.EMediaType.InstrumentalAudio })
-            {
-                Action quickFixAction = () => songMediaFileConversionManager.ConvertInstrumentalAudioToSupportedFormat(songIssue.SongMeta);
-                Button quickFixButton = CreateQuickFixButton("Convert vocals audio to ogg", quickFixAction);
-                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData, quickFixAction));
-                accordionItem.Add(quickFixButton);
-            }
+            AddQuickFixButtons(accordionItem, songIssue, quickFixActions);
 
             lastSongMetaPath = songMetaPath;
+        }
+    }
+
+    private void AddQuickFixButtons(
+        VisualElement parent,
+        SongIssue songIssue,
+        List<QuickFixAction> quickFixActions)
+    {
+        if (songIssue.SongIssueData is FormatNotSupportedSongIssueData formatNotSupportedSongIssueData)
+        {
+            if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.InstrumentalAudio)
+            {
+                Action quickFixAction = () => songMediaFileConversionManager.ConvertInstrumentalAudioToSupportedFormat(songIssue.SongMeta);
+                Button quickFixButton = CreateQuickFixButton("Convert instrumental audio to supported format", quickFixAction);
+                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData, quickFixAction));
+                parent.Add(quickFixButton);
+            }
+            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.VocalsAudio)
+            {
+                Action quickFixAction = () => songMediaFileConversionManager.ConvertVocalsAudioToSupportedFormat(songIssue.SongMeta);
+                Button quickFixButton = CreateQuickFixButton("Convert vocals audio to supported format", quickFixAction);
+                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData, quickFixAction));
+                parent.Add(quickFixButton);
+            }
+            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.Audio)
+            {
+                Action quickFixAction = () => songMediaFileConversionManager.ConvertAudioToSupportedFormat(songIssue.SongMeta);
+                Button quickFixButton = CreateQuickFixButton("Convert audio to supported format", quickFixAction);
+                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData, quickFixAction));
+                parent.Add(quickFixButton);
+            }
+            else if (formatNotSupportedSongIssueData.MediaType == FormatNotSupportedSongIssueData.EMediaType.Video)
+            {
+                Action quickFixAction = () => songMediaFileConversionManager.ConvertVideoToSupportedFormat(songIssue.SongMeta);
+                Button quickFixButton = CreateQuickFixButton("Convert video to supported format", quickFixAction);
+                quickFixActions.Add(new QuickFixAction(songIssue.SongIssueData, quickFixAction));
+                parent.Add(quickFixButton);
+            }
         }
     }
 

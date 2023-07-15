@@ -35,20 +35,27 @@ public static class ApplicationUtils
         "midi",
         "kar",
     };
-    
+
+    public static readonly IReadOnlyCollection<string> audioFileExtensions = File.ReadAllLines(GetStreamingAssetsPath("audio-file-extensions.txt"), System.Text.Encoding.UTF8)
+        .Select(line => line.Trim().TrimStart('.'))
+        .Where(line => !line.IsNullOrEmpty())
+        .ToHashSet();
+
     // Supported file formats of ffmpeg can be obtained via "ffmpeg -demuxers"
     // See also https://stackoverflow.com/questions/50069235/what-are-all-of-the-file-extensions-supported-by-ffmpeg
     // See also http://www.ffmpeg.org/general.html#toc-Supported-File-Formats_002c-Codecs-or-Features
     public static readonly IReadOnlyCollection<string> ffmpegSupportedFileExtensions = File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), System.Text.Encoding.UTF8)
-        .Select(line => line.Trim())
+        .Select(line => line.Trim().TrimStart('.'))
         .Where(line => !line.IsNullOrEmpty())
         .ToHashSet();
 
-    // TODO: differentiate audio and video files that are supported by ffmpeg
-    public static readonly IReadOnlyCollection<string> ffmpegSupportedAudioFiles = ffmpegSupportedFileExtensions;
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedAudioFiles = ffmpegSupportedFileExtensions
+        .Where(fileExtension => audioFileExtensions.Contains(fileExtension))
+        .ToList();
     
-    // TODO: differentiate audio and video files that are supported by ffmpeg
-    public static readonly IReadOnlyCollection<string> ffmpegSupportedVideoFiles = ffmpegSupportedFileExtensions;
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedVideoFiles = ffmpegSupportedFileExtensions
+        .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
+        .ToList();
 
     public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
     {
@@ -153,6 +160,18 @@ public static class ApplicationUtils
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return unitySupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsFfmpegSupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return ffmpegSupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsFfmpegSupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return ffmpegSupportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedAudioFormat(string fileExtension)

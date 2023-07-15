@@ -549,6 +549,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         try
         {
             // Write the song data structure to the file.
+            Debug.Log($"Saving song {songFilePath}");
             UltraStarSongFileWriter.WriteFile(songFilePath, songMeta);
         }
         catch (Exception e)
