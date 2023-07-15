@@ -186,8 +186,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         ffmpegCommand.Options = ffmpegArguments;
         ffmpegCommand.ExecuteOnStart = false;
         ffmpegCommand.GetProgressOnScript = true;
-        // ffmpegCommand.PrintStdErr = settings.LogFfmpegOutput;
-        ffmpegCommand.PrintStdErr = true;
+        ffmpegCommand.PrintStdErr = settings.LogFfmpegOutput;
         return ffmpegCommand;
     }
 }
