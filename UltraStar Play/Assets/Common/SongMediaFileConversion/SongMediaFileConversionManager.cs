@@ -78,15 +78,25 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         FfmpegCommand ffmpegCommand = CreateFfmpegCommandOnNewGameObject(jobTitle, ffmpegArguments);
 
         // Create UI job
+        bool isCanceled = false;
         Job uiJob = new(jobTitle);
-        uiJob.OnCancel = () => ffmpegCommand.StopFfmpeg();
+        uiJob.OnCancel = () =>
+        {
+            isCanceled = true;
+            ffmpegCommand.StopFfmpeg();
+        };
         jobManager.AddJob(uiJob);
 
         StartCoroutine(RunFfmpegCommandCoroutine(ffmpegCommand, uiJob, () =>
         {
+            if (isCanceled)
+            {
+                return;
+            }
+
             string relativeTargetFilePath = PathUtils.MakeRelativePath(songMeta.Directory, targetFilePath);
             Debug.Log($"Setting {mediaDescription} of '{SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta)}' to '{relativeTargetFilePath}'");
-            songMeta.InstrumentalAudio = relativeTargetFilePath;
+            pathSetter(relativeTargetFilePath);
             songMetaManager.SaveSong(songMeta, true);
         }));
     }
