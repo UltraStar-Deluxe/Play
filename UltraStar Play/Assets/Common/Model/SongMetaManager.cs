@@ -626,19 +626,19 @@ public class SongMetaManager : AbstractSingletonBehaviour
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
             ESongIssueSeverity.Warning);
 
-        // The ffmpeg integration in Unity can at the moment only play one file.
-        // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
-        bool isVideoEmptyOrSameAsAudio = songMeta.Video.IsNullOrEmpty()
-                                         || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
-        if (!isVideoEmptyOrSameAsAudio
-            && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
-            && !webViewManager.CanHandleUrl(songMeta.Video))
-        {
-            songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video resource differs from audio resource. This is only supported for the formats {unitySupportedVideoFileExtensionsAsCsv}"));
-
-            // Do not attempt to load this video file, it will not work.
-            SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
-        }
+        // // The ffmpeg integration in Unity can at the moment only play one file.
+        // // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
+        // bool isVideoEmptyOrSameAsAudio = songMeta.Video.IsNullOrEmpty()
+        //                                  || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
+        // if (!isVideoEmptyOrSameAsAudio
+        //     && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
+        //     && !webViewManager.CanHandleUrl(songMeta.Video))
+        // {
+        //     songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video resource differs from audio resource. This is only supported for the formats {unitySupportedVideoFileExtensionsAsCsv}"));
+        //
+        //     // Do not attempt to load this video file, it will not work.
+        //     SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
+        // }
 
         // Check audio format.
         // Audio is mandatory. Without working audio file, the song cannot be played.

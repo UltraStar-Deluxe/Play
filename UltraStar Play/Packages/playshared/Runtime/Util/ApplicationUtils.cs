@@ -65,7 +65,7 @@ public static class ApplicationUtils
     
     public static readonly IReadOnlyCollection<string> supportedAudioFiles = unitySupportedAudioFiles
         .Union(supportedMidiFiles)
-        .Union(ffmpegSupportedAudioFiles)
+        // .Union(ffmpegSupportedAudioFiles)
         .ToHashSet();
 
     public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
@@ -91,7 +91,6 @@ public static class ApplicationUtils
 #if !UNITY_STANDALONE_LINUX
         "mp4",
 #endif
-        "vp8",
         "avi",
         
         // NOTE: webm is only supported by Unity when using VP8.
@@ -100,7 +99,7 @@ public static class ApplicationUtils
     };
 
     public static readonly IReadOnlyCollection<string> supportedVideoFiles = unitySupportedVideoFiles
-        .Union(ffmpegSupportedVideoFiles)
+        // .Union(ffmpegSupportedVideoFiles)
         .ToHashSet();
 
     public static void OpenDirectory(string path)
