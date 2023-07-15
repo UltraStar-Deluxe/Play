@@ -597,10 +597,6 @@
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
-.quickFixButton {
-    align-self: flex-start;
-}
-
 #permissionsContainer .unity-toggle__label {
     min-width: 50;
     margin-right: 8px;
@@ -712,6 +708,12 @@
 .songIssueMessage {
     font-size: var(--font-size-s);
     white-space: normal;
+    margin-bottom: 4px;
+}
+
+.quickFixButton {
+    align-self: flex-start;
+    margin-bottom: 16px;
 }
 
 #loadedSceneTitle {
