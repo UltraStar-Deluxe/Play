@@ -430,7 +430,11 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     {
         Button button = new();
         button.AddToClassList("quickFixButton");
-        button.RegisterCallbackButtonTriggered(_ => callback());
+        button.RegisterCallbackButtonTriggered(_ =>
+        {
+            callback();
+            button.SetEnabled(false);
+        });
         button.text = title;
         return button;
     }
