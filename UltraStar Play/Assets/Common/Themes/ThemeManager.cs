@@ -89,7 +89,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     private string lastThemeDynamicBackgroundJson;
-    
+
     protected override object GetInstance()
     {
         return Instance;
@@ -111,6 +111,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         // Apply theme to context menu popups
         ContextMenuControl.AnyContextMenuOpenedEventStream
             .Subscribe(contextMenuPopupControl => ApplyThemeToContextMenuPopup(contextMenuPopupControl));
+
+        // Apply theme specific styles for new dialogs
+        AbstractDialogControl.DialogInjectionFinishedEventStream
+            .Subscribe(dialogControl =>
+            {
+                // Apply theme specific styles now and in the next frame because the dialog may be changed after instantiation.
+                ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
+                StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
+                    () => ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement)));
+            })
+            .AddTo(gameObject);
     }
 
     private void ApplyThemeToContextMenuPopup(ContextMenuPopupControl contextMenuPopupControl)
