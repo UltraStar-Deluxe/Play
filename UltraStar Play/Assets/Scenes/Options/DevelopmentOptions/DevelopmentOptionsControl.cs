@@ -116,6 +116,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesPicker)]
     private ItemPicker useFfmpegToPlayMediaFilesPicker;
 
+    [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedPicker)]
+    private ItemPicker checkCodecIsSupportedPicker;
+
     protected override void Start()
     {
         base.Start();
@@ -307,6 +310,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new NumberPickerControl(maxConcurrentSongMediaConversionsPicker, settings.MaxConcurrentSongMediaConversions).Bind(
             () => settings.MaxConcurrentSongMediaConversions,
             newValue => settings.MaxConcurrentSongMediaConversions = (int)Math.Max(newValue, 0));
+
+        new BoolPickerControl(checkCodecIsSupportedPicker)
+            .Bind(() => settings.CheckCodecIsSupported,
+                newValue => settings.CheckCodecIsSupported = newValue);
     }
 
     private void UpdateLogEventLevel()

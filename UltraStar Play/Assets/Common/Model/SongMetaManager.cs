@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Serilog.Events;
 using UniRx;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -395,7 +396,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 Debug.LogException(ex);
             }
         }
-        Debug.Log($"Found {files.Count} files matching pattern {fileExtensionPatterns.ToCsv()} in folders: {folders.ToCsv()}");
+        Log.Verbose(() => $"Found {files.Count} files matching pattern {fileExtensionPatterns.ToCsv()} in folders: {folders.ToCsv()}");
         return files;
     }
 
@@ -445,7 +446,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
             SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
             songIssues.AddRange(parseFileIssues);
 
-            List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(newSongMeta, webViewManager, settings.UseFfmpegToPlayMediaFiles);
+            List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
+                newSongMeta,
+                webViewManager,
+                settings.UseFfmpegToPlayMediaFiles,
+                settings.CheckCodecIsSupported);
             songIssues.AddRange(mediaFormatIssues);
 
             if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
@@ -612,10 +617,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
         return allSongMetas.FirstOrDefault(songMeta => songMeta.Title == title);
     }
     
-    
     // Checks whether the audio and video file formats of the song are supported.
     // Returns true iff the audio file of the SongMeta exists and is supported.
-    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, WebViewManager webViewManager, bool useFfmpegToPlayMediaFiles)
+    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, WebViewManager webViewManager, bool useFfmpegToPlayMediaFiles, bool checkCodecIsSupported)
     {
         List<SongIssue> songIssues = new();
 
@@ -624,8 +628,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
             () => $"Video resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetVideoUri(songMeta))}'",
             ESongIssueSeverity.Warning);
 
-        CheckIsSupportedVideoFormat(songIssues, webViewManager, songMeta.Video,
-            () => $"Unsupported video format {GetUriOrExtensionWithoutDot(songMeta.Video)}. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+        CheckVideoFormatIsSupported(songIssues, webViewManager, songMeta.Video,
+            () => $"Unsupported video format '{GetUriOrExtensionWithoutDot(songMeta.Video)}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
             ESongIssueSeverity.Warning);
 
@@ -645,13 +649,17 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
             }
         }
+        else if (checkCodecIsSupported)
+        {
+            CheckVideoCodecsAreSupported(songIssues, songMeta);
+        }
 
         // Check audio format.
         // Audio is mandatory. Without working audio file, the song cannot be played.
         CheckResourceExists(songIssues, songMeta, songMeta.Mp3,
             () => $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetAudioUri(songMeta))}'",
             ESongIssueSeverity.Error);
-        CheckIsSupportedAudioOrVideoFormat(songIssues, webViewManager, songMeta.Mp3,
+        CheckAudioOrVideoFormatIsSupported(songIssues, webViewManager, songMeta.Mp3,
             () => $"Unsupported audio format '{GetUriOrExtensionWithoutDot(songMeta.Mp3)}'. Convert to one of {unitySupportedAudioFileExtensionsAsCsv}",
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
             ESongIssueSeverity.Error);
@@ -676,6 +684,67 @@ public class SongMetaManager : AbstractSingletonBehaviour
         songIssues.ForEach(songIssue => songIssue.Log());
 
         return songIssues;
+    }
+
+    private static void CheckVideoCodecsAreSupported(List<SongIssue> songIssues, SongMeta songMeta)
+    {
+        if (!songMeta.Mp3.IsNullOrEmpty())
+        {
+            CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Mp3,
+                codec => $"Unsupported video codec '{codec}' in '{songMeta.Mp3}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+                () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
+                ESongIssueSeverity.Error);
+        }
+
+        if (!songMeta.Video.IsNullOrEmpty())
+        {
+            CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Video,
+                codec => $"Unsupported video codec '{codec}' in '{songMeta.Video}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+                () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
+                ESongIssueSeverity.Warning);
+        }
+    }
+
+    private static void CheckVideoCodecIsSupported(
+        List<SongIssue> songIssues,
+        SongMeta songMeta,
+        string pathOrUri,
+        Func<string, string> errorMessageGetter,
+        Func<SongIssueData> songIssueDataGetter,
+        ESongIssueSeverity severity)
+    {
+        string videoFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, pathOrUri);
+        if (!FileUtils.Exists(videoFilePath))
+        {
+            return;
+        }
+
+        string videoFileExtension = PathUtils.GetExtensionWithoutDot(videoFilePath)
+            .ToLowerInvariant();
+        if (!ApplicationUtils.IsSupportedVideoFormat(videoFileExtension))
+        {
+            return;
+        }
+
+        if (videoFileExtension == "webm"
+            || videoFileExtension == "mp4")
+        {
+            string ffprobeArguments = "-v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 \"INPUT_FILE\"";
+            ProcessUtils.RunProcess(
+                ApplicationUtils.GetStreamingAssetsPath("ffmpeg/ffprobe.exe"),
+                ffprobeArguments.Replace("INPUT_FILE", videoFilePath),
+                out string ffprobeOutput,
+                out string ffprobeErrorOutput,
+                LogEventLevel.Verbose,
+                LogEventLevel.Verbose);
+
+            string codec = ffprobeOutput.Trim().ToLowerInvariant();
+            if (codec == "vp9"
+                || codec == "av1")
+            {
+                songIssues.Add(new SongIssue(severity, songIssueDataGetter(), errorMessageGetter(codec), -1, -1));
+            }
+        }
     }
 
     private static string GetUriOrExtensionWithoutDot(string pathOrUri)
@@ -723,7 +792,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
-    private static void CheckIsSupportedVideoFormat(
+    private static void CheckVideoFormatIsSupported(
         List<SongIssue> songIssues,
         WebViewManager webViewManager,
         string pathOrUri,
@@ -745,7 +814,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
-    private static void CheckIsSupportedAudioOrVideoFormat(
+    private static void CheckAudioOrVideoFormatIsSupported(
         List<SongIssue> songIssues,
         WebViewManager webViewManager,
         string pathOrUri,

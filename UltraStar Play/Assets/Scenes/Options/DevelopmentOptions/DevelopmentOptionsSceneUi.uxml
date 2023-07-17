@@ -15,6 +15,7 @@
             </ui:VisualElement>
             <ItemPicker name="showFpsPicker" label="Show FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="useFfmpegToPlayMediaFilesPicker" label="Use ffmpeg to play&#10;audio and video files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ItemPicker name="checkCodecIsSupportedPicker" label="Check codecs are supported.&#10;(impacts song search performance)" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="logFfmpegOutputPicker" label="Log ffmpeg output" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="maxConcurrentSongMediaConversionsPicker" label="Max concurrent conversions" wrap-around="true" min-value="0" max-value="100" step-value="1" class="noBackgroundInHierarchy" />
             <ui:TextField picking-mode="Ignore" label="ffmpeg conversion commands&#10;(JSON)" name="ffmpegConversionCommandsJsonPicker" is-delayed="true" multiline="true" class="noBackgroundInHierarchy multiline" style="align-items: center; flex-grow: 1; margin-bottom: 4px; min-height: 100px;" />

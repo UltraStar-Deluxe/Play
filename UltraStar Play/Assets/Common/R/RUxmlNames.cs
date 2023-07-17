@@ -84,6 +84,7 @@ public static partial class R
         public const string changeVoiceButton = "changeVoiceButton";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
+        public const string checkCodecIsSupportedPicker = "checkCodecIsSupportedPicker";
         public const string clientDiscoveryPortTextField = "clientDiscoveryPortTextField";
         public const string clientIcon = "clientIcon";
         public const string clientNameLabel = "clientNameLabel";

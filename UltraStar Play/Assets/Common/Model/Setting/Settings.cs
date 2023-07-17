@@ -135,4 +135,11 @@ public class Settings : ISettings
     };
     public bool LogFfmpegOutput { get; set; }
     public int MaxConcurrentSongMediaConversions { get; set; } = 3;
+
+    /**
+     * Check that VP9 is not used in webm files and AV1 is not used in mp4 files.
+     * These codecs are not supported by Unity.
+     * Note that these checks slow down the song search process significantly, thus disabled by default.
+     */
+    public bool CheckCodecIsSupported { get; set; }
 }
