@@ -298,9 +298,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             return LoadWithVideoPlayer(localSongMeta, uri);
         }
-        else
+        else if (settings.UseFfmpegToPlayMediaFiles)
         {
             return LoadWithFfmpeg(localSongMeta, uri);
+        }
+        else
+        {
+            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+                new SongAudioPlayerException($"Unsupported video resource '{uri}'."));
         }
     }
 

@@ -172,6 +172,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
     {
         Debug.Log("ScanFilesAsynchronously");
 
+        // Update supported file formats when ffmpeg is (not) used.
+        ApplicationUtils.UseFfmpegToPlayMediaFiles = settings.UseFfmpegToPlayMediaFiles;
+
         // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
         // Thus, use the static instance.
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
@@ -442,7 +445,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
             songIssues.AddRange(parseFileIssues);
 
-            List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(newSongMeta, webViewManager);
+            List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(newSongMeta, webViewManager, settings.UseFfmpegToPlayMediaFiles);
             songIssues.AddRange(mediaFormatIssues);
 
             if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
@@ -612,7 +615,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     
     // Checks whether the audio and video file formats of the song are supported.
     // Returns true iff the audio file of the SongMeta exists and is supported.
-    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, WebViewManager webViewManager)
+    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, WebViewManager webViewManager, bool useFfmpegToPlayMediaFiles)
     {
         List<SongIssue> songIssues = new();
 
@@ -626,19 +629,22 @@ public class SongMetaManager : AbstractSingletonBehaviour
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
             ESongIssueSeverity.Warning);
 
-        // // The ffmpeg integration in Unity can at the moment only play one file.
-        // // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
-        // bool isVideoEmptyOrSameAsAudio = songMeta.Video.IsNullOrEmpty()
-        //                                  || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
-        // if (!isVideoEmptyOrSameAsAudio
-        //     && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
-        //     && !webViewManager.CanHandleUrl(songMeta.Video))
-        // {
-        //     songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video resource differs from audio resource. This is only supported for the formats {unitySupportedVideoFileExtensionsAsCsv}"));
-        //
-        //     // Do not attempt to load this video file, it will not work.
-        //     SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
-        // }
+        if (useFfmpegToPlayMediaFiles)
+        {
+            // The ffmpeg integration in Unity can at the moment only play one file.
+            // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
+            bool isVideoEmptyOrSameAsAudio = songMeta.Video.IsNullOrEmpty()
+                                             || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
+            if (!isVideoEmptyOrSameAsAudio
+                && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
+                && !webViewManager.CanHandleUrl(songMeta.Video))
+            {
+                songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video resource differs from audio resource. This is only supported for the formats {unitySupportedVideoFileExtensionsAsCsv}"));
+
+                // Do not attempt to load this video file, it will not work.
+                SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
+            }
+        }
 
         // Check audio format.
         // Audio is mandatory. Without working audio file, the song cannot be played.

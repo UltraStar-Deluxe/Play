@@ -14,14 +14,31 @@ public static class ApplicationUtils
         ? Application.targetFrameRate
         // The refresh rate of the monitor is used
         : (int)Screen.currentResolution.refreshRateRatio.value);
-    
+
     public const string GeneratedFolderName = "Generated";
+
+    private static bool useFfmpegToPlayMediaFiles;
+    public static bool UseFfmpegToPlayMediaFiles
+    {
+        get => useFfmpegToPlayMediaFiles;
+        set
+        {
+            if (useFfmpegToPlayMediaFiles == value)
+            {
+                return;
+            }
+            Debug.Log($"use ffmpeg to play media files: {value}");
+            useFfmpegToPlayMediaFiles = value;
+            supportedAudioFiles = GetSupportedAudioFiles(useFfmpegToPlayMediaFiles);
+            supportedVideoFiles = GetSupportedVideoFiles(useFfmpegToPlayMediaFiles);
+        }
+    }
 
     public static readonly IReadOnlyCollection<string> supportedSoundfontFiles = new HashSet<string>
     {
         "sf2",
     };
-    
+
     public static readonly IReadOnlyCollection<string> supportedImageFiles = new HashSet<string>
     {
         "png",
@@ -52,7 +69,7 @@ public static class ApplicationUtils
     public static readonly IReadOnlyCollection<string> ffmpegSupportedAudioFiles = ffmpegSupportedFileExtensions
         .Where(fileExtension => audioFileExtensions.Contains(fileExtension))
         .ToList();
-    
+
     public static readonly IReadOnlyCollection<string> ffmpegSupportedVideoFiles = ffmpegSupportedFileExtensions
         .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
         .ToList();
@@ -62,11 +79,8 @@ public static class ApplicationUtils
         "mp3",
         "ogg"
     }.ToHashSet();
-    
-    public static readonly IReadOnlyCollection<string> supportedAudioFiles = unitySupportedAudioFiles
-        .Union(supportedMidiFiles)
-        // .Union(ffmpegSupportedAudioFiles)
-        .ToHashSet();
+
+    public static IReadOnlyCollection<string> supportedAudioFiles = GetSupportedAudioFiles(false);
 
     public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
     {
@@ -77,7 +91,7 @@ public static class ApplicationUtils
         "wma",
         "flac",
     }.Intersect(supportedAudioFiles).ToHashSet();
-    
+
     public static readonly IReadOnlyCollection<string> supportedBasicPitchDetectionAudioFiles = new HashSet<string>
     {
         "wav",
@@ -92,15 +106,13 @@ public static class ApplicationUtils
         "mp4",
 #endif
         "avi",
-        
+
         // NOTE: webm is only supported by Unity when using VP8.
         // webm with VP9 is not supported by Unity and will fail, such that ffmpeg or similar should be used as fallback.
         "webm",
     };
 
-    public static readonly IReadOnlyCollection<string> supportedVideoFiles = unitySupportedVideoFiles
-        // .Union(ffmpegSupportedVideoFiles)
-        .ToHashSet();
+    public static IReadOnlyCollection<string> supportedVideoFiles = GetSupportedVideoFiles(false);
 
     public static void OpenDirectory(string path)
     {
@@ -130,12 +142,12 @@ public static class ApplicationUtils
     {
         return Application.persistentDataPath + "/" + pathInPersistentDataFolder;
     }
-    
+
     public static Vector2 GetScreenSize()
     {
         return new Vector2(Screen.width, Screen.height);
     }
-    
+
     public static ScreenResolution GetScreenResolution()
     {
         // Screen.currentResolution in window mode returns the size of the desktop, not of the Unity application.
@@ -154,7 +166,7 @@ public static class ApplicationUtils
         fileExtension = NormalizeFileExtension(fileExtension);
         return supportedImageFiles.Contains(fileExtension);
     }
-    
+
     public static bool IsUnitySupportedAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
@@ -196,19 +208,19 @@ public static class ApplicationUtils
         fileExtension = NormalizeFileExtension(fileExtension);
         return supportedMidiFiles.Contains(fileExtension);
     }
-    
+
     public static bool IsSupportedVocalsSeparationAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return supportedVocalsSeparationAudioFiles.Contains(fileExtension);
     }
-    
+
     public static bool IsSupportedBasicPitchDetectionAudioFormat(string fileExtension)
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return supportedBasicPitchDetectionAudioFiles.Contains(fileExtension);
     }
-    
+
     private static string NormalizeFileExtension(string fileExtension)
     {
         if (fileExtension == null)
@@ -264,7 +276,7 @@ public static class ApplicationUtils
 
         return text;
     }
-    
+
     public static string GetGeneratedOutputFolderForSourceFilePath(string generatedFolderBasePath, string sourceFilePath)
     {
         // Include hash code of file path in the generated folder name
@@ -286,7 +298,7 @@ public static class ApplicationUtils
     {
         return GetStreamingAssetsPath("WebViewScripts");
     }
-    
+
     public static bool IsGeneratedAudioFile(string audioFile)
     {
         // Audio separation creates files called "vocals.ogg" and "instrumental.ogg"
@@ -304,7 +316,7 @@ public static class ApplicationUtils
         // TODO: Build PortAudio for Linux and macOS and include the compiled libs in PortAudioForUnity.
         return PlatformUtils.IsWindows;
     }
-    
+
     public static string GetVideoPlayerUri(string uri)
     {
         // Unity on Android MUST NOT use the file:// scheme for vp8/webm files.
@@ -316,5 +328,20 @@ public static class ApplicationUtils
         }
 #endif
         return uri;
+    }
+
+    private static IReadOnlyCollection<string> GetSupportedAudioFiles(bool includeFfmpegFormats)
+    {
+        return unitySupportedAudioFiles
+            .Union(supportedMidiFiles)
+            .Union(includeFfmpegFormats ? ffmpegSupportedAudioFiles : new List<string>())
+            .ToHashSet();
+    }
+
+    private static IReadOnlyCollection<string> GetSupportedVideoFiles(bool includeFfmpegFormats)
+    {
+        return unitySupportedVideoFiles
+            .Union(includeFfmpegFormats ? ffmpegSupportedVideoFiles : new List<string>())
+            .ToHashSet();
     }
 }

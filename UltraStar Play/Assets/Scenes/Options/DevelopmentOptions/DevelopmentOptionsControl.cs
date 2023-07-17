@@ -110,6 +110,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonPicker)]
     private TextField ffmpegConversionCommandsJsonPicker;
 
+    [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesPicker)]
+    private ItemPicker useFfmpegToPlayMediaFilesPicker;
+
     protected override void Start()
     {
         base.Start();
@@ -292,6 +295,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                         $"Failed to update ffmpeg conversion commands with the following JSON: '{newValueAsString}', error message: {ex.Message}");
                 }
             });
+
+
+        new BoolPickerControl(useFfmpegToPlayMediaFilesPicker)
+            .Bind(() => settings.UseFfmpegToPlayMediaFiles,
+                newValue => settings.UseFfmpegToPlayMediaFiles = newValue);
     }
 
     private void UpdateLogEventLevel()

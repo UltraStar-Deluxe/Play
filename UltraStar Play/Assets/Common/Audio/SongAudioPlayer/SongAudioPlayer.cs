@@ -25,7 +25,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private AudioManager audioManager;
     private WebViewManager webViewManager;
     private SceneNavigator sceneNavigator;
-    
+    private Settings settings;
+
     private readonly Lazy<MidiManager> midiManagerLazy = new(() => MidiManager.Instance);
     private MidiManager MidiManager => midiManagerLazy.Value;
     
@@ -332,6 +333,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         audioManager = AudioManager.Instance;
         webViewManager = WebViewManager.Instance;
         sceneNavigator = SceneNavigator.Instance;
+        settings = SettingsManager.Instance.Settings;
     }
 
     private void Start()
@@ -422,9 +424,14 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         {
             return LoadWithWebView(songMeta, audioUri, startPositionInMillis);
         }
-        else
+        else if (settings.UseFfmpegToPlayMediaFiles)
         {
             return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
+        }
+        else
+        {
+            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+                new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'."));
         }
     }
 

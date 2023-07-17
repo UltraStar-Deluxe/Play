@@ -63,6 +63,11 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         SongMeta songMeta = LoadSongMeta(songFilePath);
         SongAudioPlayer.LoadAndPlaySongAudio(songMeta)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Assert.Fail($"SongAudioPlayer failed to load song {songFilePath}: {ex.Message}");
+            })
             .Subscribe(evt =>
                 {
                     double durationOfSongInMillis = SongAudioPlayer.DurationOfSongInMillis;
@@ -77,11 +82,6 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
                     }
 
                     Debug.Log($"Successfully loaded song media {songMeta.Mp3} after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
-                },
-                ex =>
-                {
-                    Debug.LogException(ex);
-                    Assert.Fail($"SongAudioPlayer failed to load song {songFilePath}: {ex.Message}");
                 });
     }
 

@@ -119,6 +119,7 @@ public class Settings : ISettings
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();
+    public bool UseFfmpegToPlayMediaFiles { get; set; }
     public Dictionary<string, string> FileFormatToFfmpegConversionArguments { get; set; } = new()
     {
         // Copy mkv codec and convert to mp4 (very fast)

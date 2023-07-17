@@ -85,7 +85,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         }
         songMetaManager.ScanFilesIfNotDoneYet();
         songMetaManager.SongScanFinishedEventStream
-            .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()));
+            .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()))
+            .AddTo(gameObject);
 
         settings.ObserveEveryValueChanged(gameSettings => gameSettings.SongDirs)
             .Subscribe(onNext => UpdateSongFolderList())
@@ -302,7 +303,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     {
         Button button = new();
         button.text = title;
-        button.AddToClassList("quickFixButton");
+        button.AddToClassList("quickFixAllButton");
         button.RegisterCallbackButtonTriggered(_ => CreateQuickFixAllDialog(title, quickFixActions));
         return button;
     }

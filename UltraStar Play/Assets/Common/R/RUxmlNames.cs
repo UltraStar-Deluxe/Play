@@ -871,6 +871,7 @@ public static partial class R
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldHint = "urlTextFieldHint";
+        public const string useFfmpegToPlayMediaFilesPicker = "useFfmpegToPlayMediaFilesPicker";
         public const string usePortAudioToggle = "usePortAudioToggle";
         public const string useUniversalCharsetDetectorPicker = "useUniversalCharsetDetectorPicker";
         public const string useWebcamToggle = "useWebcamToggle";
