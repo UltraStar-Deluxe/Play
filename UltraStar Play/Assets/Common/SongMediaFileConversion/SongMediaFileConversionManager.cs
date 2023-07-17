@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using FfmpegUnity;
 using UniInject;
 using UnityEngine;
@@ -23,9 +25,32 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
     [Inject]
     private SongMetaManager songMetaManager;
 
+    private readonly List<IEnumerator> runningSongMediaConversionCoroutines = new();
+    private readonly List<IEnumerator> pendingSongMediaConversionCoroutines = new();
+
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    private void Update()
+    {
+        if (pendingSongMediaConversionCoroutines.Count > 0
+            && (runningSongMediaConversionCoroutines.Count < settings.MaxConcurrentSongMediaConversions
+                || settings.MaxConcurrentSongMediaConversions <= 0))
+        {
+            IEnumerator coroutine = pendingSongMediaConversionCoroutines[0];
+            pendingSongMediaConversionCoroutines.RemoveAt(0);
+            runningSongMediaConversionCoroutines.Add(coroutine);
+            Debug.Log($"Started conversion coroutine. Now running conversion coroutines: {runningSongMediaConversionCoroutines.Count}");
+
+            StartCoroutine(CoroutineUtils.Sequence(coroutine,
+                CoroutineUtils.ExecuteAction(() =>
+                {
+                    runningSongMediaConversionCoroutines.Remove(coroutine);
+                    Debug.Log($"Finished conversion coroutine. Now running conversion coroutines: {runningSongMediaConversionCoroutines.Count}");
+                })));
+        }
     }
 
     protected void ConvertSongMetaMediaFileToSupportedFormat(
@@ -123,24 +148,27 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         FfmpegCommand ffmpegCommand = CreateFfmpegCommandOnNewGameObject(jobTitle, ffmpegArguments);
 
         // Create UI job
-        bool isCanceled = false;
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         Job uiJob = new(jobTitle);
         uiJob.OnCancel = () =>
         {
-            isCanceled = true;
+            uiJob.SetResult(EJobResult.Error);
+            cancellationTokenSource.Cancel();
             ffmpegCommand.StopFfmpeg();
         };
         jobManager.AddJob(uiJob);
 
-        StartCoroutine(RunFfmpegCommandCoroutine(ffmpegCommand, uiJob, () =>
+        IEnumerator runFfmpegCommandCoroutine = RunFfmpegCommandCoroutine(ffmpegCommand, uiJob, cancellationTokenSource.Token, () =>
         {
-            if (isCanceled)
+            if (cancellationTokenSource.IsCancellationRequested)
             {
                 return;
             }
 
             onSuccess?.Invoke(targetFilePath);
-        }));
+        });
+
+        pendingSongMediaConversionCoroutines.Add(runFfmpegCommandCoroutine);
     }
 
     private string GetTargetFileExtensionFromFfmpegArgumentsTemplate(string ffmpegArguments)
@@ -204,8 +232,14 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             false);
     }
 
-    private IEnumerator RunFfmpegCommandCoroutine(FfmpegCommand ffmpegCommand, Job uiJob, Action onSuccess)
+    private IEnumerator RunFfmpegCommandCoroutine(FfmpegCommand ffmpegCommand, Job uiJob, CancellationToken cancellationToken, Action onSuccess)
     {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            Debug.Log($"Not executing ffmpeg command '{ffmpegCommand.Options}'. Cancelled.");
+            yield break;
+        }
+
         Debug.Log($"Executing ffmpeg command '{ffmpegCommand.Options}'");
 
         uiJob.SetStatus(EJobStatus.Running);
@@ -226,6 +260,12 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
                 uiJob.EstimatedCurrentProgressInPercent = newProgressInPercent;
             }
             yield return new WaitForSeconds(0.1f);
+        }
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            Debug.Log($"FfmpegCommand not finished: '{uiJob.Name}'. Cancelled.");
+            yield break;
         }
 
         uiJob.SetResult(EJobResult.Ok);

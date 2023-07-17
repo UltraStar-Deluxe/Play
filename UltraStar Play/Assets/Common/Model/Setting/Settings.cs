@@ -119,6 +119,8 @@ public class Settings : ISettings
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();
+
+    // Ffmpeg settings
     public bool UseFfmpegToPlayMediaFiles { get; set; }
     public Dictionary<string, string> FileFormatToFfmpegConversionArguments { get; set; } = new()
     {
@@ -132,4 +134,5 @@ public class Settings : ISettings
         {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -c:v libvpx -c:a libvorbis \"OUTPUT_FILE_WITHOUT_EXTENSION.webm\""},
     };
     public bool LogFfmpegOutput { get; set; }
+    public int MaxConcurrentSongMediaConversions { get; set; } = 3;
 }

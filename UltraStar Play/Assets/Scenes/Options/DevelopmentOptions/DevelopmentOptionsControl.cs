@@ -20,6 +20,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.logFfmpegOutputPicker)]
     private ItemPicker logFfmpegOutputPicker;
 
+    [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsPicker)]
+    private ItemPicker maxConcurrentSongMediaConversionsPicker;
+
     [Inject(UxmlName = R.UxmlNames.streamAudioInSingScenePicker)]
     private ItemPicker streamAudioInSingScenePicker;
 
@@ -300,6 +303,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(useFfmpegToPlayMediaFilesPicker)
             .Bind(() => settings.UseFfmpegToPlayMediaFiles,
                 newValue => settings.UseFfmpegToPlayMediaFiles = newValue);
+
+        new NumberPickerControl(maxConcurrentSongMediaConversionsPicker, settings.MaxConcurrentSongMediaConversions).Bind(
+            () => settings.MaxConcurrentSongMediaConversions,
+            newValue => settings.MaxConcurrentSongMediaConversions = (int)Math.Max(newValue, 0));
     }
 
     private void UpdateLogEventLevel()

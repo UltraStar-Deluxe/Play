@@ -350,6 +350,7 @@ public static partial class R
         public const string lyricsLabel = "lyricsLabel";
         public const string lyricsPropertyToggle = "lyricsPropertyToggle";
         public const string main = "main";
+        public const string maxConcurrentSongMediaConversionsPicker = "maxConcurrentSongMediaConversionsPicker";
         public const string menuOverlayInputLegend = "menuOverlayInputLegend";
         public const string menuScrollView = "menuScrollView";
         public const string messageBufferTimeTextField = "messageBufferTimeTextField";
