@@ -69,10 +69,24 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
 
         void OnSuccess(string targetFilePath)
         {
+            if (!FileUtils.Exists(targetFilePath))
+            {
+                Debug.LogError($"Failed to convert file. Target file not found: {targetFilePath}");
+                return;
+            }
+
+            int minFileSizeInBytes = 100 * 1024; // 100 KB
+            if (new FileInfo(targetFilePath).Length < minFileSizeInBytes)
+            {
+                Debug.LogError($"Failed to convert file. Target file is too small: {targetFilePath}");
+                return;
+            }
+
             string relativeTargetFilePath = PathUtils.MakeRelativePath(songMeta.Directory, targetFilePath);
             Debug.Log($"Setting {mediaDescription} of '{SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta)}' to '{relativeTargetFilePath}'");
             pathSetter(relativeTargetFilePath);
             songMetaManager.SaveSong(songMeta, true);
+            songMetaManager.ReloadSong(songMeta);
         }
 
         string sourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, currentValue);
