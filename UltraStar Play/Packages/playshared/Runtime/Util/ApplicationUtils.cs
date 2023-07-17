@@ -107,6 +107,7 @@ public static class ApplicationUtils
         "mp4",
 #endif
         "avi",
+        "mpg",
 
         // NOTE: webm is only supported by Unity when using VP8.
         // webm with VP9 is not supported by Unity and will fail, such that ffmpeg or similar should be used as fallback.
