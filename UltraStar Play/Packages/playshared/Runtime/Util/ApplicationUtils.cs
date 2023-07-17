@@ -77,7 +77,8 @@ public static class ApplicationUtils
     public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
     {
         "mp3",
-        "ogg"
+        "ogg",
+        "wav",
     }.ToHashSet();
 
     public static IReadOnlyCollection<string> supportedAudioFiles = GetSupportedAudioFiles(false);
