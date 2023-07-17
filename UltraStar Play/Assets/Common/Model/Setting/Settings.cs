@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using ICSharpCode.SharpZipLib;
 using Serilog.Events;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ public class Settings : ISettings
 {
     // Graphics settings
     public ScreenResolution ScreenResolution { get; set; } = new ScreenResolution(1280, 720, 60);
-    public FullScreenMode FullScreenMode { get; set; } = UnityEngine.FullScreenMode.Windowed;
+    public FullScreenMode FullScreenMode { get; set; } = FullScreenMode.Windowed;
     public int TargetFps { get; set; } = -1;
 
     // Audio settings
@@ -120,5 +119,11 @@ public class Settings : ISettings
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();
+    public Dictionary<string, string> FileFormatToFfmpegConversionArguments { get; set; } = new()
+    {
+        {"mkv", "-y -i \"INPUT_FILE\" -c copy \"INPUT_FILE_WITHOUT_EXTENSION.mp4\""},
+        {"ANY_AUDIO", "-y -i \"INPUT_FILE\" \"INPUT_FILE_WITHOUT_EXTENSION.ogg\""},
+        {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -c:v libvpx -c:a libvorbis \"OUTPUT_FILE_WITHOUT_EXTENSION.webm\""},
+    };
     public bool LogFfmpegOutput { get; set; }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using FfmpegUnity;
 using UniInject;
 using UnityEngine;
@@ -49,8 +50,27 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             return;
         }
 
-        string targetFileExtension = isAudio ? "ogg" : "webm";
         string sourceFileExtension = PathUtils.GetExtensionWithoutDot(currentValue);
+        if (!settings.FileFormatToFfmpegConversionArguments.TryGetValue(sourceFileExtension, out string ffmpegArguments))
+        {
+            if ((isAudio && !settings.FileFormatToFfmpegConversionArguments.TryGetValue("ANY_AUDIO", out ffmpegArguments))
+                || (!isAudio && !settings.FileFormatToFfmpegConversionArguments.TryGetValue("ANY_VIDEO", out ffmpegArguments)))
+            {
+                ffmpegArguments = isAudio
+                    ? $"-y -i \"INPUT_FILE\" \"INPUT_FILE_WITHOUT_EXTENSION.ogg\""
+                    : $"-y -i \"INPUT_FILE\" -c:v libvpx -c:a libvorbis \"INPUT_FILE_WITHOUT_EXTENSION.webm\"";
+            }
+        }
+
+        string targetFileExtension = GetTargetFileExtensionFromFfmpegArgumentsTemplate(ffmpegArguments);
+        if (targetFileExtension.IsNullOrEmpty())
+        {
+            string errorMessage = $"Unable to determine target file extension for '{sourceFilePath}'";
+            Debug.Log(errorMessage);
+            UiManager.CreateNotification(errorMessage);
+            return;
+        }
+
         if (string.Equals(sourceFileExtension, targetFileExtension, StringComparison.InvariantCultureIgnoreCase))
         {
             // Nothing to do
@@ -71,10 +91,14 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         Debug.Log($"Converting {mediaDescription} of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to {targetFileExtension}");
         string jobTitle = $"Convert {mediaDescription} of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to {targetFileExtension}";
 
-        string targetFilePath = Path.ChangeExtension(sourceFilePath, targetFileExtension);
-        string ffmpegArguments = isAudio
-            ? $"-y -i \"{sourceFilePath}\" \"{targetFilePath}\""
-            : $"-y -i \"{sourceFilePath}\" -c:v libvpx -c:a libvorbis \"{targetFilePath}\"";
+        string sourceFilePathWithoutExtension = $"{Path.GetDirectoryName(sourceFilePath)}/{Path.GetFileNameWithoutExtension(sourceFilePath)}";
+        string targetFilePathWithoutExtension = sourceFilePathWithoutExtension;
+        string targetFilePath = $"{targetFilePathWithoutExtension}.{targetFileExtension}";
+        ffmpegArguments = ffmpegArguments
+            // Replace longer placeholders first
+            .Replace("INPUT_FILE_WITHOUT_EXTENSION", $"{sourceFilePathWithoutExtension}")
+            .Replace("INPUT_FILE", sourceFilePath);
+
         FfmpegCommand ffmpegCommand = CreateFfmpegCommandOnNewGameObject(jobTitle, ffmpegArguments);
 
         // Create UI job
@@ -99,6 +123,19 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             pathSetter(relativeTargetFilePath);
             songMetaManager.SaveSong(songMeta, true);
         }));
+    }
+
+    private string GetTargetFileExtensionFromFfmpegArgumentsTemplate(string ffmpegArguments)
+    {
+        // Return the last found file extension
+        MatchCollection matches = Regex.Matches(ffmpegArguments, @"\.(?<extension>\w+)");
+        if (matches.Count == 0)
+        {
+            return "";
+        }
+
+        Match lastMatch = matches.LastOrDefault();
+        return lastMatch.Groups["extension"].Value.ToLowerInvariant();
     }
 
     public void ConvertVocalsAudioToSupportedFormat(SongMeta songMeta)

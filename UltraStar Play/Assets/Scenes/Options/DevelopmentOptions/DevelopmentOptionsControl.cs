@@ -91,7 +91,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     
     [Inject(UxmlName = R.UxmlNames.basicPitchCommandTextField)]
     private TextField basicPitchCommandTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.clientDiscoveryPortTextField)]
     private IntegerField clientDiscoveryPortTextField;
     
@@ -106,6 +106,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     
     [Inject(UxmlName = R.UxmlNames.generatedFolderPathTextField)]
     private TextField generatedFolderPathTextField;
+
+    [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonPicker)]
+    private TextField ffmpegConversionCommandsJsonPicker;
 
     protected override void Start()
     {
@@ -272,6 +275,23 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.HttpServerPort,
             newValue => settings.HttpServerPort = newValue);
         httpServerPortTextField.DisableChangeValueByDragging();
+
+        FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,
+            () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments),
+            newValueAsString =>
+            {
+                try
+                {
+                    Dictionary<string, string> newValueAsDict = JsonConverter.FromJson<Dictionary<string, string>>(newValueAsString);
+                    settings.FileFormatToFfmpegConversionArguments = newValueAsDict;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError(
+                        $"Failed to update ffmpeg conversion commands with the following JSON: '{newValueAsString}', error message: {ex.Message}");
+                }
+            });
     }
 
     private void UpdateLogEventLevel()
