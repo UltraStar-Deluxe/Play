@@ -277,7 +277,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         httpServerPortTextField.DisableChangeValueByDragging();
 
         FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,
-            () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments),
+            () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments, true),
             newValueAsString =>
             {
                 try
