@@ -126,12 +126,10 @@ public class Settings : ISettings
     {
         // Copy mkv codec and convert to mp4 (very fast)
         {"mkv", "-y -i \"INPUT_FILE\" -c copy \"INPUT_FILE_WITHOUT_EXTENSION.mp4\""},
-        // Convert webm to webm with vp8
-        {"webm", "-y -i \"INPUT_FILE\" -c:v libvpx -c:a libvorbis \"INPUT_FILE_WITHOUT_EXTENSION-vp8.webm\""},
         // Convert audio files to ogg
         {"ANY_AUDIO", "-y -i \"INPUT_FILE\" \"INPUT_FILE_WITHOUT_EXTENSION.ogg\""},
-        // Convert audio files to webm with vp8
-        {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -c:v libvpx -c:a libvorbis \"INPUT_FILE_WITHOUT_EXTENSION.webm\""},
+        // Convert video files to mp4
+        {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -qscale 0 \"INPUT_FILE_WITHOUT_EXTENSION.mp4\""},
     };
     public bool LogFfmpegOutput { get; set; }
     public int MaxConcurrentSongMediaConversions { get; set; } = 3;
