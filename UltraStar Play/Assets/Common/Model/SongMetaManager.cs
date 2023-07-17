@@ -59,6 +59,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private List<string> EnabledSongFolders => SettingsUtils.GetEnabledSongFolders(settings);
 
+    private static CancellationTokenSource songScanCancellationTokenSource;
+
     public static void ResetSongMetas()
     {
         lock (scanLock)
@@ -77,8 +79,17 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     public void ReloadSongMetas()
     {
-        ResetSongMetas();
-        ScanFilesIfNotDoneYet();
+        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
+        ThreadPool.QueueUserWorkItem(_ =>
+        {
+            CancelSongScanIfRunning();
+
+            lock (scanLock)
+            {
+                ResetSongMetas();
+                DoScanFilesIfNotDoneYet(generatedSongFolderAbsolutePath);
+            }
+        });
     }
 
     protected override void AwakeSingleton()
@@ -149,6 +160,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     public void ScanFilesIfNotDoneYet()
     {
+        DoScanFilesIfNotDoneYet(SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings));
+    }
+
+    private void DoScanFilesIfNotDoneYet(string generatedSongFolderAbsolutePath)
+    {
         // First check. If the songs have been scanned already,
         // then this will quickly return and allows multiple threads access.
         if (!isSongScanStarted)
@@ -163,13 +179,15 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 {
                     isSongScanStarted = true;
                     isSongScanFinished = false;
-                    ScanFilesAsynchronously();
+                    songScanCancellationTokenSource?.Cancel();
+                    songScanCancellationTokenSource = new();
+                    ScanFilesAsynchronously(generatedSongFolderAbsolutePath, songScanCancellationTokenSource.Token);
                 }
             }
         }
     }
 
-    private void ScanFilesAsynchronously()
+    private void ScanFilesAsynchronously(string generatedSongFolderAbsolutePath, CancellationToken cancellationToken)
     {
         Debug.Log("ScanFilesAsynchronously");
 
@@ -178,9 +196,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
         // Thus, use the static instance.
-        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
         InitFolderIfNotDoneYet(generatedSongFolderAbsolutePath);
-        
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
         List<string> txtFiles;
         List<string> audioFiles;
         lock (scanLock)
@@ -190,9 +212,17 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 .Union(new List<string> { generatedSongFolderAbsolutePath })
                 .ToList();
             txtFiles = ScanForFiles(allSongFolders, new List<string> { "*.txt" });
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
 
             // Only search for audio files in configured song folders, not in the generated song folder
             audioFiles = ScanForFiles(EnabledSongFolders, GetAudioFileExtensionPatterns());
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
 
             targetSongCount = txtFiles.Count;
         }
@@ -206,15 +236,21 @@ public class SongMetaManager : AbstractSingletonBehaviour
             Debug.Log("Started song-scan-thread.");
             lock (scanLock)
             {
-                // Split the txt files into chunks and load them in parallel
-                LoadAndAddSongMetasFromTxtFiles(txtFiles);
-                
-                // Generate song meta for audio files that do not have a corresponding SongMeta.
-                GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, audioFiles, allSongMetas.ToList());
-                
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    // Split the txt files into chunks and load them in parallel
+                    LoadAndAddSongMetasFromTxtFiles(txtFiles, cancellationToken);
+                }
+
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    // Generate song meta for audio files that do not have a corresponding SongMeta.
+                    GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, audioFiles, allSongMetas.ToList());
+                }
+
                 isSongScanFinished = true;
             }
-            
+
             stopwatch.Stop();
             Debug.Log($"Finished song-scan-thread after {stopwatch.ElapsedMilliseconds} ms. Loaded {allSongMetas.Count} songs. Errors: {SongErrors.Count}, Warnings: {SongWarnings.Count}.");
 
@@ -222,7 +258,10 @@ public class SongMetaManager : AbstractSingletonBehaviour
         });
     }
 
-    private void GenerateSongMetasForAudioFiles(string generatedSongFolderAbsolutePath, List<string> audioFiles, List<SongMeta> existingSongMetas)
+    private void GenerateSongMetasForAudioFiles(
+        string generatedSongFolderAbsolutePath,
+        List<string> audioFiles,
+        List<SongMeta> existingSongMetas)
     {
         if (audioFiles.IsNullOrEmpty())
         {
@@ -354,7 +393,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
-    private void LoadAndAddSongMetasFromTxtFiles(List<string> txtFiles)
+    private void LoadAndAddSongMetasFromTxtFiles(List<string> txtFiles, CancellationToken cancellationToken)
     {
         foreach (string path in txtFiles)
         {
@@ -363,6 +402,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 allSongMetas.Add(newSongMeta);
             }
             allSongIssues.AddRange(newSongIssues);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
         }
     }
     
@@ -851,5 +895,21 @@ public class SongMetaManager : AbstractSingletonBehaviour
         scoreRelevantHash = SongMetaUtils.GetScoreRelevantSongHash(songMeta);
         songMetaToScoreRelevantHash[songMeta] = scoreRelevantHash;
         return scoreRelevantHash;
+    }
+
+    protected override void OnDestroySingleton()
+    {
+        CancelSongScanIfRunning();
+    }
+
+    private void CancelSongScanIfRunning()
+    {
+        if (isSongScanStarted
+            && !isSongScanFinished
+            && songScanCancellationTokenSource != null)
+        {
+            Debug.Log($"Cancelling song-scan-thread.");
+            songScanCancellationTokenSource.Cancel();
+        }
     }
 }
