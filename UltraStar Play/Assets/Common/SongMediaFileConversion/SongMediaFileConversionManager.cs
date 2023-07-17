@@ -97,18 +97,33 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         }
 
         string sourceFileExtension = PathUtils.GetExtensionWithoutDot(sourceFilePath);
-        if (!settings.FileFormatToFfmpegConversionArguments.TryGetValue(sourceFileExtension, out string ffmpegArguments))
+        string sourceFilePathWithoutExtension = $"{Path.GetDirectoryName(sourceFilePath)}/{Path.GetFileNameWithoutExtension(sourceFilePath)}";
+        if (!settings.FileFormatToFfmpegConversionArguments.TryGetValue(sourceFileExtension, out string ffmpegArgumentsWithPlaceholders))
         {
-            if ((isAudio && !settings.FileFormatToFfmpegConversionArguments.TryGetValue("ANY_AUDIO", out ffmpegArguments))
-                || (!isAudio && !settings.FileFormatToFfmpegConversionArguments.TryGetValue("ANY_VIDEO", out ffmpegArguments)))
+            if ((isAudio && !settings.FileFormatToFfmpegConversionArguments.TryGetValue("ANY_AUDIO", out ffmpegArgumentsWithPlaceholders))
+                || (!isAudio && !settings.FileFormatToFfmpegConversionArguments.TryGetValue("ANY_VIDEO", out ffmpegArgumentsWithPlaceholders)))
             {
-                ffmpegArguments = isAudio
+                ffmpegArgumentsWithPlaceholders = isAudio
                     ? $"-y -i \"INPUT_FILE\" \"INPUT_FILE_WITHOUT_EXTENSION.ogg\""
                     : $"-y -i \"INPUT_FILE\" -c:v libvpx -c:a libvorbis \"INPUT_FILE_WITHOUT_EXTENSION.webm\"";
             }
         }
 
-        string targetFileExtension = GetTargetFileExtensionFromFfmpegArgumentsTemplate(ffmpegArguments);
+        string ffmpegArguments = ffmpegArgumentsWithPlaceholders
+            // Replace longer placeholders first
+            .Replace("INPUT_FILE_WITHOUT_EXTENSION", $"{sourceFilePathWithoutExtension}")
+            .Replace("INPUT_FILE", sourceFilePath);
+
+        string targetFileName = GetTargetFileNameFromFfmpegArguments(ffmpegArguments);
+        if (targetFileName.IsNullOrEmpty())
+        {
+            string errorMessage = $"Unable to determine target file name for '{sourceFilePath}'";
+            Debug.Log(errorMessage);
+            UiManager.CreateNotification(errorMessage);
+            return;
+        }
+
+        string targetFileExtension = PathUtils.GetExtensionWithoutDot(targetFileName);
         if (targetFileExtension.IsNullOrEmpty())
         {
             string errorMessage = $"Unable to determine target file extension for '{sourceFilePath}'";
@@ -135,16 +150,10 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             return;
         }
 
-        Debug.Log($"Converting {mediaDescription} of '{sourceFilePath}' to {targetFileExtension}");
+        string targetFolder = Path.GetDirectoryName(sourceFilePath);
+        string targetFilePath = $"{targetFolder}/{targetFileName}";
 
-        string sourceFilePathWithoutExtension = $"{Path.GetDirectoryName(sourceFilePath)}/{Path.GetFileNameWithoutExtension(sourceFilePath)}";
-        string targetFilePathWithoutExtension = sourceFilePathWithoutExtension;
-        string targetFilePath = $"{targetFilePathWithoutExtension}.{targetFileExtension}";
-        ffmpegArguments = ffmpegArguments
-            // Replace longer placeholders first
-            .Replace("INPUT_FILE_WITHOUT_EXTENSION", $"{sourceFilePathWithoutExtension}")
-            .Replace("INPUT_FILE", sourceFilePath);
-
+        Debug.Log($"Converting {mediaDescription} of '{sourceFilePath}' to '{targetFilePath}'");
         FfmpegCommand ffmpegCommand = CreateFfmpegCommandOnNewGameObject(jobTitle, ffmpegArguments);
 
         // Create UI job
@@ -171,17 +180,20 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         pendingSongMediaConversionCoroutines.Add(runFfmpegCommandCoroutine);
     }
 
-    private string GetTargetFileExtensionFromFfmpegArgumentsTemplate(string ffmpegArguments)
+    public static string GetTargetFileNameFromFfmpegArguments(string ffmpegArguments)
     {
-        // Return the last found file extension
-        MatchCollection matches = Regex.Matches(ffmpegArguments, @"\.(?<extension>\w+)");
+        // Return the last found file name
+        MatchCollection matches = Regex.Matches(ffmpegArguments, @"(/|\\)(?<fileNameWithoutExtension>[^/\\]+)\.(?<extension>\w+)");
         if (matches.Count == 0)
         {
             return "";
         }
 
         Match lastMatch = matches.LastOrDefault();
-        return lastMatch.Groups["extension"].Value.ToLowerInvariant();
+        string fileExtension = lastMatch.Groups["extension"].Value.ToLowerInvariant();
+        string fileNameWithoutExtension = lastMatch.Groups["fileNameWithoutExtension"].Value;
+        string fileName = $"{fileNameWithoutExtension}.{fileExtension}";
+        return fileName;
     }
 
     public void ConvertVocalsAudioToSupportedFormat(SongMeta songMeta)
@@ -191,7 +203,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             "vocals audio",
             () => songMeta.VocalsAudio,
             newValue => songMeta.VocalsAudio = newValue,
-            $"Convert vocals audio of {SongMetaUtils.GetArtistDashTitle(songMeta)} to supported format",
+            $"Convert vocals audio of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
             true);
     }
 
@@ -202,7 +214,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             "instrumental audio",
             () => songMeta.InstrumentalAudio,
             newValue => songMeta.InstrumentalAudio = newValue,
-            $"Convert instrumental audio of {SongMetaUtils.GetArtistDashTitle(songMeta)} to supported format",
+            $"Convert instrumental audio of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
             true);
     }
 
@@ -217,7 +229,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             "audio",
             () => songMeta.Mp3,
             newValue => songMeta.Mp3 = newValue,
-            $"Convert audio of {SongMetaUtils.GetArtistDashTitle(songMeta)} to supported format",
+            $"Convert audio of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
             isAudio);
     }
 
@@ -228,7 +240,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             "video",
             () => songMeta.Video,
             newValue => songMeta.Video = newValue,
-            $"Convert video audio of {SongMetaUtils.GetArtistDashTitle(songMeta)} to supported format",
+            $"Convert video of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
             false);
     }
 

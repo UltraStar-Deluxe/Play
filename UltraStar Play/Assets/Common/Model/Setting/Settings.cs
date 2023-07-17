@@ -131,7 +131,7 @@ public class Settings : ISettings
         // Convert audio files to ogg
         {"ANY_AUDIO", "-y -i \"INPUT_FILE\" \"INPUT_FILE_WITHOUT_EXTENSION.ogg\""},
         // Convert audio files to webm with vp8
-        {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -c:v libvpx -c:a libvorbis \"OUTPUT_FILE_WITHOUT_EXTENSION.webm\""},
+        {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -c:v libvpx -c:a libvorbis \"INPUT_FILE_WITHOUT_EXTENSION.webm\""},
     };
     public bool LogFfmpegOutput { get; set; }
     public int MaxConcurrentSongMediaConversions { get; set; } = 3;

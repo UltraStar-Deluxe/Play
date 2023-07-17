@@ -1,14 +1,24 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using NUnit.Framework.Constraints;
+using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.TestTools;
 using Assert = NUnit.Framework.Assert;
 
 public class FileFormatConversionTests : AbstractMediaFileFormatTests
 {
+    [Test]
+    public void GetTargetFileNameFromFfmpegArgumentsTest()
+    {
+        string targetFileName = SongMediaFileConversionManager.GetTargetFileNameFromFfmpegArguments(
+            "-y -i \"F:/Dev/UltraStar-Songs-Dev/Some Artist - Some Title/Some Artist - Some Title.mp4\" -c:v libvpx -c:a libvorbis \"F:/Dev/UltraStar-Songs-Dev/Some Artist - Some Title/Some Artist - Some Title-vp8.webm\"");
+        Assert.AreEqual("Some Artist - Some Title-vp8.webm", targetFileName);
+
+        string targetFileName2 = SongMediaFileConversionManager.GetTargetFileNameFromFfmpegArguments(
+            "-y -i \"F:\\Dev\\UltraStar-Songs-Dev\\Some Artist - Some Title\\Some Artist - Some Title.mp4\" -c:v libvpx -c:a libvorbis \"F:\\Dev\\UltraStar-Songs-Dev\\Some Artist - Some Title\\Some Artist - Some Title-vp8.webm\"");
+        Assert.AreEqual("Some Artist - Some Title-vp8.webm", targetFileName2);
+    }
+
     /////////////////////////////////////////////////////////
     // common audio formats supported by ffmpeg
     /////////////////////////////////////////////////////////
