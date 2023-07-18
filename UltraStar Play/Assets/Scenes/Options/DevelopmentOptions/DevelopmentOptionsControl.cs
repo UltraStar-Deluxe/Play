@@ -17,6 +17,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.showFpsPicker)]
     private ItemPicker showFpsPicker;
 
+    [Inject(UxmlName = R.UxmlNames.logFfmpegOutputPicker)]
+    private ItemPicker logFfmpegOutputPicker;
+
+    [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsPicker)]
+    private ItemPicker maxConcurrentSongMediaConversionsPicker;
+
     [Inject(UxmlName = R.UxmlNames.streamAudioInSingScenePicker)]
     private ItemPicker streamAudioInSingScenePicker;
 
@@ -88,7 +94,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     
     [Inject(UxmlName = R.UxmlNames.basicPitchCommandTextField)]
     private TextField basicPitchCommandTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.clientDiscoveryPortTextField)]
     private IntegerField clientDiscoveryPortTextField;
     
@@ -104,6 +110,15 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.generatedFolderPathTextField)]
     private TextField generatedFolderPathTextField;
 
+    [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonPicker)]
+    private TextField ffmpegConversionCommandsJsonPicker;
+
+    [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesPicker)]
+    private ItemPicker useFfmpegToPlayMediaFilesPicker;
+
+    [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedPicker)]
+    private ItemPicker checkCodecIsSupportedPicker;
+
     protected override void Start()
     {
         base.Start();
@@ -111,6 +126,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(showFpsPicker)
             .Bind(() => settings.ShowFps,
                   newValue => settings.ShowFps = newValue);
+
+        new BoolPickerControl(logFfmpegOutputPicker)
+            .Bind(() => settings.LogFfmpegOutput,
+                newValue => settings.LogFfmpegOutput = newValue);
 
         FieldBindingUtils.Bind(generatedFolderPathTextField,
             () => settings.GeneratedFolderPath,
@@ -265,6 +284,36 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.HttpServerPort,
             newValue => settings.HttpServerPort = newValue);
         httpServerPortTextField.DisableChangeValueByDragging();
+
+        FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,
+            () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments, true),
+            newValueAsString =>
+            {
+                try
+                {
+                    Dictionary<string, string> newValueAsDict = JsonConverter.FromJson<Dictionary<string, string>>(newValueAsString);
+                    settings.FileFormatToFfmpegConversionArguments = newValueAsDict;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError(
+                        $"Failed to update ffmpeg conversion commands with the following JSON: '{newValueAsString}', error message: {ex.Message}");
+                }
+            });
+
+
+        new BoolPickerControl(useFfmpegToPlayMediaFilesPicker)
+            .Bind(() => settings.UseFfmpegToPlayMediaFiles,
+                newValue => settings.UseFfmpegToPlayMediaFiles = newValue);
+
+        new NumberPickerControl(maxConcurrentSongMediaConversionsPicker, settings.MaxConcurrentSongMediaConversions).Bind(
+            () => settings.MaxConcurrentSongMediaConversions,
+            newValue => settings.MaxConcurrentSongMediaConversions = (int)Math.Max(newValue, 0));
+
+        new BoolPickerControl(checkCodecIsSupportedPicker)
+            .Bind(() => settings.CheckCodecIsSupported,
+                newValue => settings.CheckCodecIsSupported = newValue);
     }
 
     private void UpdateLogEventLevel()

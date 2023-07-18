@@ -106,6 +106,9 @@ StreamingAssets/SpeechRecognitionModels.meta
 StreamingAssets/DemoSongs/
 StreamingAssets/DemoSongs.meta
 
+StreamingAssets/ffmpeg/
+StreamingAssets/ffmpeg.meta
+
 ######################################
 ## Play Mode Tests
 InitTestScene*

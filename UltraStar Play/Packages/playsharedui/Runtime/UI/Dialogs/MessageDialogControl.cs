@@ -57,19 +57,25 @@ public class MessageDialogControl : AbstractModalDialogControl, IInjectionFinish
         dialogMessage.text = "";
     }
 
-    public Button AddButton(string text, EventCallback<EventBase> callback)
+    public void AddButton(Button button)
     {
-        Button button = new();
         dialogButtonContainer.Add(button);
 
-        button.text = text;
         button.focusable = true;
-        button.RegisterCallbackButtonTriggered(callback);
-
         button.Focus();
         // Sometimes Unity cannot focus the button until it has been rendered once.
         MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1,
             () => button.Focus()));
+    }
+
+    public Button AddButton(string text, EventCallback<EventBase> callback)
+    {
+        Button button = new();
+
+        button.text = text;
+        button.RegisterCallbackButtonTriggered(callback);
+
+        AddButton(button);
 
         return button;
     }

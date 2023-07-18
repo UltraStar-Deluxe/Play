@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public abstract class AbstractPlayModeTest
 {
-    protected virtual string TestSceneName => "TestSceneTemplate";
+    protected virtual string TestSceneName => "CommonTestScene";
 
     [OneTimeSetUp]
     public void OneTimeSetUp()

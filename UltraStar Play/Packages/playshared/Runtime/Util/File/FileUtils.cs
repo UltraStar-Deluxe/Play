@@ -48,4 +48,24 @@ public static class FileUtils
     {
         return !path.IsNullOrEmpty() && File.Exists(path);
     }
+
+    public static void Copy(string sourcePath, string targetPath, bool overwrite)
+    {
+        if (sourcePath.IsNullOrEmpty()
+            || targetPath.IsNullOrEmpty()
+            || (FileUtils.Exists(targetPath) && !overwrite)
+            || !File.Exists(sourcePath))
+        {
+            return;
+        }
+
+        string targetFolder = Path.GetDirectoryName(targetPath);
+        if (!targetFolder.IsNullOrEmpty()
+            && !Directory.Exists(targetFolder))
+        {
+            Directory.CreateDirectory(targetFolder);
+        }
+
+        File.Copy(sourcePath, targetPath, overwrite);
+    }
 }

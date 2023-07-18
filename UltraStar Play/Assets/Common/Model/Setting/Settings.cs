@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using ICSharpCode.SharpZipLib;
 using Serilog.Events;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ public class Settings : ISettings
 {
     // Graphics settings
     public ScreenResolution ScreenResolution { get; set; } = new ScreenResolution(1280, 720, 60);
-    public FullScreenMode FullScreenMode { get; set; } = UnityEngine.FullScreenMode.Windowed;
+    public FullScreenMode FullScreenMode { get; set; } = FullScreenMode.Windowed;
     public int TargetFps { get; set; } = -1;
 
     // Audio settings
@@ -51,6 +50,7 @@ public class Settings : ISettings
 
     // Song library settings
     public List<string> SongDirs { get; set; } = new();
+    public List<string> DisabledSongFolders { get; set; } = new();
     public bool SearchAudioFilesWithoutSongMeta { get; set; }
     public string GeneratedFolderPath { get; set; } = "";
     
@@ -119,4 +119,25 @@ public class Settings : ISettings
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();
+
+    // Ffmpeg settings
+    public bool UseFfmpegToPlayMediaFiles { get; set; }
+    public Dictionary<string, string> FileFormatToFfmpegConversionArguments { get; set; } = new()
+    {
+        // Copy mkv codec and convert to mp4 (very fast)
+        {"mkv", "-y -i \"INPUT_FILE\" -c copy \"INPUT_FILE_WITHOUT_EXTENSION.mp4\""},
+        // Convert audio files to ogg
+        {"ANY_AUDIO", "-y -i \"INPUT_FILE\" \"INPUT_FILE_WITHOUT_EXTENSION.ogg\""},
+        // Convert video files to mp4
+        {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -qscale 0 \"INPUT_FILE_WITHOUT_EXTENSION.mp4\""},
+    };
+    public bool LogFfmpegOutput { get; set; }
+    public int MaxConcurrentSongMediaConversions { get; set; } = 3;
+
+    /**
+     * Check that VP9 is not used in webm files and AV1 is not used in mp4 files.
+     * These codecs are not supported by Unity.
+     * Note that these checks slow down the song search process significantly, thus disabled by default.
+     */
+    public bool CheckCodecIsSupported { get; set; }
 }

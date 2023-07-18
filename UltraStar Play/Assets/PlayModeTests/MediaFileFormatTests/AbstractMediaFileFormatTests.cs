@@ -10,10 +10,10 @@ using UnityEngine.TestTools;
 
 public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
 {
-    private static readonly string audioFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/AudioFileFormatTests";
-    private static readonly string videoFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/VideoFileFormatTests";
-    private static readonly double targetDurationInMillis = 4000;
-    private static readonly double maxDistanteToTargetDurationInMillis = 500;
+    protected static readonly string audioFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/AudioFileFormatTests";
+    protected static readonly string videoFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/VideoFileFormatTests";
+    protected static readonly double targetDurationInMillis = 4000;
+    protected static readonly double maxDistanteToTargetDurationInMillis = 500;
 
     protected override string TestSceneName => "MediaFileFormatTestScene";
 
@@ -51,7 +51,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
 
         long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
 
-        string songFilePath = $"{folderPath}/{filePrefix}TestSong.txt";
+        string songFilePath = GetSongMetaFilePath(filePrefix, folderPath);
         SongAudioPlayerCanLoadFileTest(songFilePath);
 
         yield return new WaitUntil(() => SongAudioPlayer.DurationOfSongInMillis > 0
@@ -63,6 +63,11 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
         long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         SongMeta songMeta = LoadSongMeta(songFilePath);
         SongAudioPlayer.LoadAndPlaySongAudio(songMeta)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Assert.Fail($"SongAudioPlayer failed to load song {songFilePath}: {ex.Message}");
+            })
             .Subscribe(evt =>
                 {
                     double durationOfSongInMillis = SongAudioPlayer.DurationOfSongInMillis;
@@ -77,15 +82,15 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
                     }
 
                     Debug.Log($"Successfully loaded song media {songMeta.Mp3} after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
-                },
-                ex =>
-                {
-                    Debug.LogException(ex);
-                    Assert.Fail($"SongAudioPlayer failed to load song {songFilePath}: {ex.Message}");
                 });
     }
 
-    private SongMeta LoadSongMeta(string songFilePath)
+    protected string GetSongMetaFilePath(string filePrefix, string folderPath)
+    {
+        return $"{folderPath}/{filePrefix}TestSong.txt";
+    }
+
+    protected SongMeta LoadSongMeta(string songFilePath)
     {
         SongMeta songMeta = SongMetaBuilder.ParseFile(songFilePath, out List<SongIssue> songIssues, Encoding.UTF8, false);
         if (songMeta == null)

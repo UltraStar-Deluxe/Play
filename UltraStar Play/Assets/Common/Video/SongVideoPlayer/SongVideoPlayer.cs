@@ -298,9 +298,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             return LoadWithVideoPlayer(localSongMeta, uri);
         }
-        else
+        else if (settings.UseFfmpegToPlayMediaFiles)
         {
             return LoadWithFfmpeg(localSongMeta, uri);
+        }
+        else
+        {
+            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(
+                new SongAudioPlayerException($"Unsupported video resource '{uri}'."));
         }
     }
 
@@ -423,12 +428,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     
     private void SetFfmpegRenderTextureToVideoRenderTexture()
     {
-        songAudioPlayer.ffplayCommand.VideoTexture.VideoTexture = videoPlayer.targetTexture;
+        songAudioPlayer.FfmpegRenderTexture = videoPlayer.targetTexture;
     }
 
     private void ResetFfmpegRenderTexture()
     {
-        songAudioPlayer.ffplayCommand.VideoTexture.VideoTexture = null;
+        songAudioPlayer.FfmpegRenderTexture = null;
     }
 
     private void UnloadVideo()

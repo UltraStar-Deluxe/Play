@@ -118,6 +118,7 @@ public static partial class R_PlayShared
         public const string playerScoreLabel = "playerScoreLabel";
         public const string png = "png";
         public const string previousNoteLyrics = "previousNoteLyrics";
+        public const string quickFixButton = "quickFixButton";
         public const string radial_progress_bar = "radial-progress-bar";
         public const string radial_progress_bar__label = "radial-progress-bar__label";
         public const string roundCorners = "roundCorners";

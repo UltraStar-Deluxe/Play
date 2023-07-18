@@ -603,7 +603,12 @@
 }
 
 .inactiveOverlay {
+    background-color: rgba(0, 0, 0, 0.5);
     transition: background-color 0.5s;
+}
+
+.inactiveOverlay.hidden {
+    background-color: rgba(0, 0, 0, 0);
 }
 
 #playerProfileEntryContent {
@@ -703,6 +708,12 @@
 .songIssueMessage {
     font-size: var(--font-size-s);
     white-space: normal;
+    margin-bottom: 4px;
+}
+
+.quickFixButton {
+    align-self: flex-start;
+    margin-bottom: 16px;
 }
 
 #loadedSceneTitle {

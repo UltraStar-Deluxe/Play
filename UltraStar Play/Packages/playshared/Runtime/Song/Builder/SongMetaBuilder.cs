@@ -206,7 +206,7 @@ public static class SongMetaBuilder
             }
 
             // Recreate issues with proper SongMeta
-            songIssues = songIssues.Select(songIssue => new SongIssue(songIssue.Severity, songMeta, songIssue.Message,
+            songIssues = songIssues.Select(songIssue => new SongIssue(songIssue.Severity, new SongIssueData(songMeta), songIssue.Message,
                     songIssue.StartBeat, songIssue.EndBeat))
                 .ToList();
             songIssues.ForEach(songIssue =>

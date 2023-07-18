@@ -41,6 +41,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(AchievementEventStream.Instance);
         bb.BindExistingInstance(WebViewManager.Instance);
+        bb.BindExistingInstance(SongMediaFileConversionManager.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);

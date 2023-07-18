@@ -268,6 +268,13 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         {
             jobListElement.style.right = targetRight;
         }
+
+        // Show job list always on top of other elements
+        if (!jobsWithoutParent.IsNullOrEmpty()
+            || !fadingJobs.IsNullOrEmpty())
+        {
+            jobListElement.BringToFront();
+        }
     }
     
     private void OnSceneChanged()

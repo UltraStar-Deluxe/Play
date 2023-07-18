@@ -23,6 +23,7 @@ public class SceneListEditorWindow : EditorWindow
         "JMO Assets",
         "Vuplex",
         "FfmpegUnity",
+        "UnityStandaloneFileBrowser",
     };
 
     private string fileNameRegEx = "";
@@ -88,6 +89,12 @@ public class SceneListEditorWindow : EditorWindow
 
     private bool IsIgnored(string path)
     {
+        string fileName = Path.GetFileName(path);
+        if (fileName.StartsWith("InitTestScene"))
+        {
+            return true;
+        }
+
         string normalizedPath = path.Replace("\\", "/");
         return ignoredFolderNames.AnyMatch(ignoredFolderName => normalizedPath.Contains($"/{ignoredFolderName}/"));
     }
