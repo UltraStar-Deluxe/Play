@@ -1007,13 +1007,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Check that the used audio format can be loaded.
-        songAudioPlayer.LoadAndPlaySongAudio(songMeta)
-            .CatchIgnore((Exception error) =>
+        songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+            .CatchIgnore((Exception ex) =>
             {
                 string message = $"Audio file '{songMeta.Mp3}' could not be loaded.\n" +
                                  $"Please use one of {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}\n" +
                                  $"or a supported website URI.";
-                Debug.Log(message);
+                Debug.LogError(message);
                 UiManager.CreateNotification(message);
             })
             .Subscribe(_ => StartSingScene(songMeta));

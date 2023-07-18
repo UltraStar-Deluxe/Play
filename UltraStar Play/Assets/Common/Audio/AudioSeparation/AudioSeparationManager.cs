@@ -45,7 +45,14 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
     public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
 
-    public IObservable<AudioSeparationResult> ProcessSongMeta(SongMeta songMeta, Job audioSeparationJob = null)
+    public void ProcessSongMeta(SongMeta songMeta, Job audioSeparationJob = null)
+    {
+        ProcessSongMetaAsObservable(songMeta, audioSeparationJob)
+            // Subscribe to trigger the observable
+            .Subscribe(evt => Debug.Log($"Successfully separated audio: {evt}"));
+    }
+
+    public IObservable<AudioSeparationResult> ProcessSongMetaAsObservable(SongMeta songMeta, Job audioSeparationJob = null)
     {
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
@@ -78,9 +85,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
             ? $"\"{ApplicationUtils.GetStreamingAssetsPath("SpleeterMsvcExe/Spleeter.exe").Replace("/", "\\")}\""
             : "";
-        
-        Subject<AudioSeparationResult> processSongSubject = new();
-        DoProcessSongMetaAsObservable(
+
+        return DoProcessSongMetaAsObservable(
                 songMeta,
                 generatedSongFolderAbsolutePath,
                 cancellationTokenSource.Token,
@@ -92,20 +98,18 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             // Handle Exceptions
             .CatchIgnore((Exception ex) =>
             {
-                Debug.LogError(ex);
+                Debug.LogException(ex);
+                Debug.LogError($"Vocals isolation failed: {ex.Message}");
                 audioSeparationJob.SetResult(EJobResult.Error);
-                processSongSubject.OnError(ex);
+                throw ex;
             })
-            .Subscribe(audioSeparationResult =>
+            .Select(audioSeparationResult =>
             {
                 audioSeparationJob.SetResult(EJobResult.Ok);
-                processSongSubject.OnNext(audioSeparationResult);
-                processSongSubject.OnCompleted();
 
                 audioSeparationFinishedEventStream.OnNext(new AudioSeparationFinishedEvent(songMeta));
+                return audioSeparationResult;
             });
-
-        return processSongSubject;
     }
 
     private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta,

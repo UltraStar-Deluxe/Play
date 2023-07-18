@@ -46,16 +46,20 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
         jobNameLabel.text = job.Name;
 
         UpdateIcons();
-        job.Result.Subscribe(_ =>
-        {
-            UpdateIcons();
-            UpdateCancelJobButton();
-        });
-        job.Status.Subscribe(_ =>
-        {
-            UpdateIcons();
-            UpdateCancelJobButton();
-        });
+        job.Result
+            .ObserveOnMainThread()
+            .Subscribe(_ =>
+            {
+                UpdateIcons();
+                UpdateCancelJobButton();
+            });
+        job.Status
+            .ObserveOnMainThread()
+            .Subscribe(_ =>
+            {
+                UpdateIcons();
+                UpdateCancelJobButton();
+            });
 
         if (job.ParentJob != null)
         {
@@ -66,14 +70,18 @@ public class JobListEntryControl : INeedInjection, IInjectionFinishedListener, I
         {
             job.Cancel();
         });
-        job.IsCancelable.Subscribe(_ =>
-        {
-            UpdateCancelJobButton();
-        });
-        job.IsCanceled.Subscribe(_ =>
-        {
-            UpdateCancelJobButton();
-        });
+        job.IsCancelable
+            .ObserveOnMainThread()
+            .Subscribe(_ =>
+            {
+                UpdateCancelJobButton();
+            });
+        job.IsCanceled
+            .ObserveOnMainThread()
+            .Subscribe(_ =>
+            {
+                UpdateCancelJobButton();
+            });
         UpdateCancelJobButton();
     }
 

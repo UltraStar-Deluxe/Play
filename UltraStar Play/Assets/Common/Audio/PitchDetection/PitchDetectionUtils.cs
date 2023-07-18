@@ -24,22 +24,20 @@ public static class PitchDetectionUtils
         {
             pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of '{fileName}'");
         }
-        IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMeta(songMeta, pitchDetectionJob);
 
-        Subject<List<Note>> pitchDetectionResultSubject = new();
-        pitchDetectionObservable
+        return pitchDetectionManager.ProcessSongMetaAsObservable(songMeta, pitchDetectionJob)
             .CatchIgnore((Exception ex) =>
             {
                 pitchDetectionJob.SetResult(EJobResult.Error);
                 Debug.LogException(ex);
                 Debug.LogError("Pitch detection failed");
-                pitchDetectionResultSubject.OnError(ex);
+                throw ex;
             })
-            .Subscribe(result =>
+            .Select(basicPitchDetectionResult =>
             {
                 try
                 {
-                    MidiFile midiFile = MidiFileUtils.LoadMidiFile(result.MidiFilePath);
+                    MidiFile midiFile = MidiFileUtils.LoadMidiFile(basicPitchDetectionResult.MidiFilePath);
 
                     MidiFileUtils.CalculateMidiEventTimesInMillis(
                         midiFile,
@@ -55,16 +53,14 @@ public static class PitchDetectionUtils
                         true,
                         midiEventToDeltaTimeInMillis,
                         midiEventToAbsoluteDeltaTimeInMillis);
-                    pitchDetectionResultSubject.OnNext(loadedNotes);
-                    pitchDetectionResultSubject.OnCompleted();
+                    return loadedNotes;
                 }
                 catch (Exception ex)
                 {
                     pitchDetectionJob.SetResult(EJobResult.Error);
-                    pitchDetectionResultSubject.OnError(ex);
+                    throw ex;
                 }
             });
-        return pitchDetectionResultSubject;
     }
     
     public static void MoveNotesToDetectedPitchUsingPitchDetectionLayer(SongMeta songMeta, List<Note> notes, List<Note> pitchDetectionLayerNotes)

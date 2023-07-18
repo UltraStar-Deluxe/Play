@@ -411,7 +411,23 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    public IObservable<SongAudioLoadedEvent> LoadAndPlaySongAudio(SongMeta songMeta, double startPositionInMillis = 0, bool streamAudio = true)
+    public void LoadAndPlaySongAudio(
+        SongMeta songMeta,
+        double startPositionInMillis = 0,
+        bool streamAudio = true)
+    {
+        LoadAndPlaySongAudioAsObservable(
+                songMeta,
+                startPositionInMillis,
+                streamAudio)
+            // Subscribe to trigger observable
+            .Subscribe(evt => Debug.Log($"Successfully loaded song: {evt}"));
+    }
+
+    public IObservable<SongAudioLoadedEvent> LoadAndPlaySongAudioAsObservable(
+        SongMeta songMeta,
+        double startPositionInMillis = 0,
+        bool streamAudio = true)
     {
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))

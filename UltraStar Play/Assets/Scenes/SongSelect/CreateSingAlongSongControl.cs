@@ -67,17 +67,18 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         lastProcessSongJob = processSongJob;
 
         // (1) Run audio separation (vocals and instrumental audio)
-        IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMeta(songMeta, audioSeparationJob);
+        IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMetaAsObservable(songMeta, audioSeparationJob);
 
-        audioSeparationObservable
-            .CatchIgnore((Exception ex) =>
-            {
-                audioSeparationJob.SetResult(EJobResult.Error);
-            })
-            .Subscribe(_ =>
-            {
-                audioSeparationJob.SetResult(EJobResult.Ok);
-            });
+        // audioSeparationObservable
+        //     .CatchIgnore((Exception ex) =>
+        //     {
+        //         audioSeparationJob.SetResult(EJobResult.Error);
+        //     })
+        //     .Subscribe(evt =>
+        //     {
+        //         Debug.Log($"Successfully separated audio: {evt}");
+        //         audioSeparationJob.SetResult(EJobResult.Ok);
+        //     });
 
         SpeechRecognitionParameters speechRecognitionParameters = new(
             settings.SongEditorSettings.SpeechRecognitionModelPath,
@@ -85,7 +86,10 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             settings.SongEditorSettings.SpeechRecognitionPrompt);
         
         // Load speech recognition model in parallel while doing audio separation.
-        IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizer(speechRecognitionParameters, null);
+        IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsObservable(speechRecognitionParameters, null);
+
+        // Outer scope reference to variables that are used in multiple steps
+        List<Note> createdNotes = new List<Note>();
 
         // Continue when audio separation and loading speech recognition model have finished
         Observable.WhenAll<object>(
@@ -98,8 +102,10 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 pitchDetectionJob.SetResult(EJobResult.Error);
                 UiManager.CreateNotification($"Failed to create sing-along data.\n{ex.Message}");
             })
-            .Subscribe(_ =>
+            .SelectMany(_ =>
             {
+                audioSeparationJob.SetResult(EJobResult.Ok);
+
                 // (2) Run speech recognition on vocals audio
 
                 // Load vocals audio
@@ -108,99 +114,101 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                     
                 float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
-                SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
-                        monoAudioSamples,
-                        0,
-                        monoAudioSamples.Length - 1,
-                        vocalsAudioClip.frequency,
-                        speechRecognitionParameters,
-                        speechRecognitionJob,
-                        false,
-                        settings.SongEditorSettings.DefaultPitchForCreatedNotes,
+                return SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionAsObservable(
+                    monoAudioSamples,
+                    0,
+                    monoAudioSamples.Length - 1,
+                    vocalsAudioClip.frequency,
+                    speechRecognitionParameters,
+                    speechRecognitionJob,
+                    false,
+                    settings.SongEditorSettings.DefaultPitchForCreatedNotes,
+                    songMeta,
+                    0,
+                    SettingsUtils.CreateHyphenator(settings),
+                    settings.SongEditorSettings.SpaceBetweenNotesInMillis);
+            })
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Create sing-along song failed: {ex.Message}");
+                speechRecognitionJob.SetResult(EJobResult.Error);
+                pitchDetectionJob.SetResult(EJobResult.Error);
+                UiManager.CreateNotification(ex.Message);
+            })
+            .SelectMany(localCreatedNotes =>
+            {
+                createdNotes = localCreatedNotes;
+                speechRecognitionJob.SetResult(EJobResult.Ok);
+
+                // (3) Split created notes into sentences and assign to first player.
+                SongMetaUtils.RemoveAllNotes(songMeta);
+                List<List<Note>> noteBatches = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, createdNotes);
+                noteBatches.ForEach(noteBatch =>
+                    MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceName, false));
+
+                // (4) Add Space between notes
+                SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
+
+                // (5) Run pitch detection on vocals audio
+                pitchDetectionJob.SetStatus(EJobStatus.Running);
+                return PitchDetectionUtils.CreateNotesUsingBasicPitch(
+                    pitchDetectionManager,
+                    songMeta,
+                    pitchDetectionJob);
+            })
+            .CatchIgnore((Exception ex) =>
+            {
+                pitchDetectionJob.SetResult(EJobResult.Error);
+                Debug.LogException(ex);
+                string localErrorMessage = $"Pitch detection failed.";
+                Debug.LogError(localErrorMessage);
+                UiManager.CreateNotification(localErrorMessage);
+            })
+            .Subscribe(loadedPitchDetectionNotes =>
+            {
+                if (loadedPitchDetectionNotes.IsNullOrEmpty())
+                {
+                    pitchDetectionJob.SetResult(EJobResult.Error);
+                    string localErrorMessage = "Failed to load pitch detection result.";
+                    Debug.LogError(localErrorMessage);
+                    UiManager.CreateNotification(localErrorMessage);
+                    return;
+                }
+
+                try
+                {
+                    PitchDetectionUtils.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
                         songMeta,
-                        0,
-                        SettingsUtils.CreateHyphenator(settings),
-                        settings.SongEditorSettings.SpaceBetweenNotesInMillis)
-                    .CatchIgnore((Exception ex) =>
+                        createdNotes,
+                        loadedPitchDetectionNotes);
+                    pitchDetectionJob.SetResult(EJobResult.Ok);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    string localErrorMessage = "Failed to move notes to detected pitch";
+                    Debug.LogError(localErrorMessage);
+                    UiManager.CreateNotification(localErrorMessage);
+                }
+
+                try
+                {
+                    if (saveSongFile)
                     {
-                        Debug.LogError(ex);
-                        speechRecognitionJob.SetResult(EJobResult.Error);
-                        pitchDetectionJob.SetResult(EJobResult.Error);
-                        UiManager.CreateNotification(ex.Message);
-                    })
-                    .Subscribe(createdNotes =>
-                    {
-                        speechRecognitionJob.SetResult(EJobResult.Ok);
-
-                        // (3) Split created notes into sentences and assign to first player.
-                        SongMetaUtils.RemoveAllNotes(songMeta);
-                        List<List<Note>> noteBatches = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, createdNotes);
-                        noteBatches.ForEach(noteBatch =>
-                            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceName, false));
-
-                        // (4) Add Space between notes
-                        SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
-
-                        // (5) Run pitch detection on vocals audio
-                        pitchDetectionJob.SetStatus(EJobStatus.Running);
-                        PitchDetectionUtils.CreateNotesUsingBasicPitch(
-                                pitchDetectionManager,
-                                songMeta,
-                                pitchDetectionJob)
-                            .CatchIgnore((Exception ex) =>
-                            {
-                                pitchDetectionJob.SetResult(EJobResult.Error);
-                                Debug.LogException(ex);
-                                string localErrorMessage = $"Pitch detection failed.";
-                                Debug.LogError(localErrorMessage);
-                                UiManager.CreateNotification(localErrorMessage);
-                            })
-                            .Subscribe(loadedPitchDetectionNotes =>
-                            {
-                                if (loadedPitchDetectionNotes.IsNullOrEmpty())
-                                {
-                                    pitchDetectionJob.SetResult(EJobResult.Error);
-                                    string localErrorMessage = "Failed to load pitch detection result.";
-                                    Debug.LogError(localErrorMessage);
-                                    UiManager.CreateNotification(localErrorMessage);
-                                    return;
-                                }
-                            
-                                try
-                                {
-                                    PitchDetectionUtils.MoveNotesToDetectedPitchUsingPitchDetectionLayer(
-                                        songMeta,
-                                        createdNotes,
-                                        loadedPitchDetectionNotes);
-                                    pitchDetectionJob.SetResult(EJobResult.Ok);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Debug.LogException(ex);
-                                    string localErrorMessage = "Failed to move notes to detected pitch";
-                                    Debug.LogError(localErrorMessage);
-                                    UiManager.CreateNotification(localErrorMessage);
-                                }
-
-                                try
-                                {
-                                    if (saveSongFile)
-                                    {
-                                        // (6) Save and reload song
-                                        songMetaManager.SaveSong(songMeta, true);
-                                        songMetaManager.ReloadSong(songMeta);
-                                    }
-                                    createdSingAlongVersionEventStream.OnNext(songMeta);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Debug.LogException(ex);
-                                    string localErrorMessage = "Failed to save song with sing-along data";
-                                    Debug.LogError(localErrorMessage);
-                                    UiManager.CreateNotification(localErrorMessage);
-                                }
-                            });
-                    });
+                        // (6) Save and reload song
+                        songMetaManager.SaveSong(songMeta, true);
+                        songMetaManager.ReloadSong(songMeta);
+                    }
+                    createdSingAlongVersionEventStream.OnNext(songMeta);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    string localErrorMessage = "Failed to save song with sing-along data";
+                    Debug.LogError(localErrorMessage);
+                    UiManager.CreateNotification(localErrorMessage);
+                }
             });
 
         jobManager.AddJob(processSongJob);

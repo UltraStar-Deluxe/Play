@@ -69,48 +69,72 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters();
         
-        IObservable<SpeechRecognizer> loadSpeechRecognizerAsObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizer(
-            speechRecognitionParameters,
-            speechRecognitionJob);
-        loadSpeechRecognizerAsObservable.Subscribe(speechRecognizer =>
-        {
-            speechRecognitionJob.SetStatus(EJobStatus.Running);
+        SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsObservable(speechRecognitionParameters, speechRecognitionJob)
+            .SelectMany(speechRecognizer =>
+            {
+                speechRecognitionJob.SetStatus(EJobStatus.Running);
 
-            float[] monoAudioSamples =
-                AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
+                float[] monoAudioSamples =
+                    AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, minBeat, lengthInBeats, true);
 
-            SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
-                    monoAudioSamples,
-                    0,
-                    monoAudioSamples.Length - 1,
-                    audioClip.frequency,
-                    cancellationTokenSource.Token,
-                    onProgress,
-                    speechRecognizer,
-                    false)
-                // Execute on Background thread
-                .SubscribeOn(Scheduler.ThreadPool)
-                // Notify on Main thread
-                .ObserveOnMainThread()
-                .CatchIgnore((Exception ex) =>
+                return SpeechRecognitionUtils.DoSpeechRecognitionAsObservable(
+                        monoAudioSamples,
+                        0,
+                        monoAudioSamples.Length - 1,
+                        audioClip.frequency,
+                        cancellationTokenSource.Token,
+                        onProgress,
+                        speechRecognizer,
+                        false)
+                    // Execute on Background thread
+                    .SubscribeOn(Scheduler.ThreadPool)
+                    // Notify on Main thread
+                    .ObserveOnMainThread();
+            })
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Set text to analyzed speech failed: {ex.Message}");
+                speechRecognitionJob.SetResult(EJobResult.Error);
+            })
+            .Subscribe(speechRecognitionResult =>
+            {
+                speechRecognitionJob.SetResult(EJobResult.Ok);
+                SpeechRecognitionUtils.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words,
+                    selectedNotes, minBeat);
+                if (notify)
                 {
-                    Debug.LogError(ex);
-                    speechRecognitionJob.SetResult(EJobResult.Error);
-                })
-                .Subscribe(speechRecognitionResult =>
-                {
-                    speechRecognitionJob.SetResult(EJobResult.Ok);
-                    SpeechRecognitionUtils.MapSpeechRecognitionResultTextToNotes(songMeta, speechRecognitionResult.Words,
-                        selectedNotes, minBeat);
-                    if (notify)
-                    {
-                        songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
-                    }
-                });
-        });
+                    songMetaChangeEventStream.OnNext(new LyricsChangedEvent());
+                }
+            });
     }
 
-    public IObservable<List<Note>> CreateNotesFromSpeechRecognition(
+    public void CreateNotesFromSpeechRecognition(
+        float[] monoAudioSamples,
+        int startIndex,
+        int endIndex,
+        int sampleRate,
+        int spaceBetweenNotesInMillis,
+        bool notify,
+        SpeechRecognitionParameters speechRecognitionParameters,
+        bool continuous,
+        int offsetInBeats)
+    {
+        CreateNotesFromSpeechRecognitionAsObservable(
+                monoAudioSamples,
+                startIndex,
+                endIndex,
+                sampleRate,
+                spaceBetweenNotesInMillis,
+                notify,
+                speechRecognitionParameters,
+                continuous,
+                offsetInBeats)
+            // Subscribe to trigger observable
+            .Subscribe(createdNotes => Debug.Log($"Created notes from speech recognition: {createdNotes.Count}"));
+    }
+
+    public IObservable<List<Note>> CreateNotesFromSpeechRecognitionAsObservable(
         float[] monoAudioSamples,
         int startIndex,
         int endIndex,
@@ -131,8 +155,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
-        
-        IObservable<List<Note>> createNotesObservable = SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
+
+        return SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionAsObservable(
                 monoAudioSamples,
                 startIndex,
                 endIndex,
@@ -147,32 +171,53 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 settings.SongEditorSettings.SpaceBetweenNotesInMillis)
             .CatchIgnore((Exception ex) =>
             {
-                Debug.LogError(ex);
+                Debug.LogException(ex);
+                Debug.LogError($"Create notes from speech recognition failed: {ex.Message}");
                 UiManager.CreateNotification(ex.Message);
+            })
+            .Select(createdNotes =>
+            {
+                createdNotes.ForEach(createdNote =>
+                {
+                    createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.SpeechRecognition);
+                    songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
+                });
+
+                if (spaceBetweenNotesInMillis > 0)
+                {
+                    spaceBetweenNotesAction.Execute(songMeta, createdNotes, spaceBetweenNotesInMillis);
+                }
+
+                if (notify)
+                {
+                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+                }
+
+                return createdNotes;
             });
-
-        createNotesObservable.Subscribe(createdNotes =>
-        {
-            createdNotes.ForEach(createdNote =>
-            {
-                createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.SpeechRecognition);
-                songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
-            });
-
-            if (spaceBetweenNotesInMillis > 0)
-            {
-                spaceBetweenNotesAction.Execute(songMeta, createdNotes, spaceBetweenNotesInMillis);
-            }
-
-            if (notify)
-            {
-                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-            }
-        });
-        return createNotesObservable;
     }
-    
-    public IObservable<List<Note>> CreateNotesFromSpeechRecognition(
+
+    public void CreateNotesFromSpeechRecognition(
+        int startBeat,
+        int lengthInBeats,
+        ESongEditorSamplesSource speechRecognitionSampleSource,
+        int spaceBetweenNotesInMillis,
+        bool notify,
+        SpeechRecognitionParameters speechRecognitionParameters,
+        bool continuous)
+    {
+        CreateNotesFromSpeechRecognitionAsObservable(startBeat,
+                lengthInBeats,
+                speechRecognitionSampleSource,
+                spaceBetweenNotesInMillis,
+                notify,
+                speechRecognitionParameters,
+                continuous)
+            // Subscribe to trigger observable
+            .Subscribe(createdNotes => Debug.Log("Created notes from speech recognition: " + createdNotes.Count));
+    }
+
+    private IObservable<List<Note>> CreateNotesFromSpeechRecognitionAsObservable(
         int startBeat,
         int lengthInBeats,
         ESongEditorSamplesSource speechRecognitionSampleSource,
@@ -204,7 +249,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
         
-        IObservable<List<Note>> createNotesObservable = SpeechRecognitionUtils.CreateNotesFromSpeechRecognition(
+        return SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionAsObservable(
                 monoAudioSamples,
                 0,
                 monoAudioSamples.Length - 1,
@@ -217,31 +262,27 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 startBeat,
                 hyphenator,
                 settings.SongEditorSettings.SpaceBetweenNotesInMillis)
-            .CatchIgnore((Exception ex) =>
+            .SubscribeOn(Scheduler.MainThread)
+            .Select(createdNotes =>
             {
-                Debug.LogError(ex);
-                UiManager.CreateNotification(ex.Message);
+                createdNotes.ForEach(createdNote =>
+                {
+                    createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.SpeechRecognition);
+                    songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
+                });
+
+                if (spaceBetweenNotesInMillis > 0)
+                {
+                    spaceBetweenNotesAction.Execute(songMeta, createdNotes, spaceBetweenNotesInMillis);
+                }
+
+                if (notify)
+                {
+                    songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+                }
+
+                return createdNotes;
             });
-
-        createNotesObservable.Subscribe(createdNotes =>
-        {
-            createdNotes.ForEach(createdNote =>
-            {
-                createdNote.IsEditable = songEditorLayerManager.IsEnumLayerEditable(ESongEditorLayer.SpeechRecognition);
-                songEditorLayerManager.AddNoteToEnumLayer(ESongEditorLayer.SpeechRecognition, createdNote);
-            });
-
-            if (spaceBetweenNotesInMillis > 0)
-            {
-                spaceBetweenNotesAction.Execute(songMeta, createdNotes, spaceBetweenNotesInMillis);
-            }
-
-            if (notify)
-            {
-                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
-            }
-        });
-        return createNotesObservable;
     }
     
     public SpeechRecognitionParameters CreateSpeechRecognizerParameters()

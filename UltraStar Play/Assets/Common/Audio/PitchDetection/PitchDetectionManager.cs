@@ -45,7 +45,16 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
     private readonly Subject<PitchDetectionFinishedEvent> pitchDetectionFinishedEventStream = new();
     public Subject<PitchDetectionFinishedEvent> PitchDetectionFinishedEventStream => pitchDetectionFinishedEventStream;
 
-    public IObservable<BasicPitchDetectionResult> ProcessSongMeta(SongMeta songMeta, Job pitchDetectionJob = null)
+    public void ProcessSongMeta(SongMeta songMeta, Job pitchDetectionJob = null)
+    {
+        ProcessSongMetaAsObservable(songMeta, pitchDetectionJob)
+            // Subscribe to trigger observable
+            .Subscribe(evt => Debug.Log($"Successfully analyzed pitch: {evt}"));
+    }
+
+    public IObservable<BasicPitchDetectionResult> ProcessSongMetaAsObservable(
+        SongMeta songMeta,
+        Job pitchDetectionJob = null)
     {
         string vocalsAudioUri = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
         if (!FileUtils.Exists(vocalsAudioUri))
@@ -82,9 +91,8 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         string fallbackPitchDetectionCommand = PlatformUtils.IsWindows
             ? $"\"{ApplicationUtils.GetStreamingAssetsPath("BasicPitchExe/basic_pitch_exe.exe").Replace("/", "\\")}\" --onset_threshold 0.3 --frame_threshold 0.3"
             : "";
-        
-        Subject<BasicPitchDetectionResult> processSongSubject = new();
-        DoProcessSongMetaAsObservable(
+
+        return DoProcessSongMetaAsObservable(
                 songMeta,
                 generatedSongFolderAbsolutePath,
                 cancellationTokenSource.Token,
@@ -96,20 +104,18 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
             // Handle Exceptions
             .CatchIgnore((Exception ex) =>
             {
-                Debug.LogError(ex);
+                Debug.LogException(ex);
+                Debug.LogError($"Pitch detection failed: {ex.Message}");
                 pitchDetectionJob.SetResult(EJobResult.Error);
-                processSongSubject.OnError(ex);
+                throw ex;
             })
-            .Subscribe(pitchDetectionResult =>
+            .Select(pitchDetectionResult =>
             {
                 pitchDetectionJob.SetResult(EJobResult.Ok);
-                processSongSubject.OnNext(pitchDetectionResult);
-                processSongSubject.OnCompleted();
 
                 pitchDetectionFinishedEventStream.OnNext(new PitchDetectionFinishedEvent(songMeta));
+                return pitchDetectionResult;
             });
-
-        return processSongSubject;
     }
 
     private IObservable<BasicPitchDetectionResult> DoProcessSongMetaAsObservable(SongMeta songMeta,
