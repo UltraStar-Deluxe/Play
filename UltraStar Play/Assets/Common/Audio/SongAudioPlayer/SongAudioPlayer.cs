@@ -485,6 +485,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
+            AudioSupportProvider = EAudioSupportProvider.UnityAudioSource;
             audioSource.clip = audioClip;
             DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
             PositionInSongInMillis = startPositionInMillis;
@@ -650,20 +651,25 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     private void DestroyFfmpegPlayer()
     {
-        if (ffplayCommand != null)
+        if (ffplayCommand == null)
+        {
+            return;
+        }
+
+        if (ffplayCommand.AudioSourceComponent != null)
         {
             ffplayCommand.AudioSourceComponent.mute = true;
-            ffplayCommand.gameObject.SetActive(false);
-            if (Application.isEditor)
-            {
-                DestroyImmediate(ffplayCommand);
-            }
-            else
-            {
-                Destroy(ffplayCommand);
-            }
-            ffplayCommand = null;
         }
+        ffplayCommand.gameObject.SetActive(false);
+        if (Application.isEditor && !Application.isPlaying)
+        {
+            DestroyImmediate(ffplayCommand.gameObject);
+        }
+        else
+        {
+            Destroy(ffplayCommand.gameObject);
+        }
+        ffplayCommand = null;
     }
 
     private IObservable<SongAudioLoadedEvent> LoadWithWebView(SongMeta songMeta, string audioUri,

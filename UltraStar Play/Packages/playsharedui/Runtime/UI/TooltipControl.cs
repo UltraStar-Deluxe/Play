@@ -21,10 +21,17 @@ public class TooltipControl
     private IEnumerator closeTooltipCoroutine;
     private bool showTooltipByPointerDown;
 
-    public TooltipControl(VisualElement visualElement)
+    public bool ShowTooltipOnPointerDown { get; set; } = true;
+
+    public TooltipControl(
+        VisualElement visualElement,
+        string tooltipText = "",
+        bool showTooltipOnPointerDown = true)
     {
         this.visualElement = visualElement;
-        
+        this.TooltipText = tooltipText;
+        this.ShowTooltipOnPointerDown = showTooltipOnPointerDown;
+
         this.visualElement.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnter());
         this.visualElement.RegisterCallback<PointerLeaveEvent>(evt => OnPointerExit());
         this.visualElement.RegisterCallback<PointerDownEvent>(evt => OnPointerDown());
@@ -32,7 +39,8 @@ public class TooltipControl
 
     private void OnPointerDown()
     {
-        if (!Application.isPlaying)
+        if (!Application.isPlaying
+            || !ShowTooltipOnPointerDown)
         {
             return;
         }
