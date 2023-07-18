@@ -72,6 +72,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             if (!FileUtils.Exists(targetFilePath))
             {
                 Debug.LogError($"Failed to convert file. Target file not found: {targetFilePath}");
+                UiManager.CreateNotification($"Failed to convert '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.\nPlease try again.");
                 return;
             }
 
@@ -79,6 +80,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             if (new FileInfo(targetFilePath).Length < minFileSizeInBytes)
             {
                 Debug.LogError($"Failed to convert file. Target file is too small: {targetFilePath}");
+                UiManager.CreateNotification($"Failed to convert '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.\nPlease try again.");
                 return;
             }
 
@@ -87,6 +89,8 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             pathSetter(relativeTargetFilePath);
             songMetaManager.SaveSong(songMeta, true);
             songMetaManager.ReloadSong(songMeta);
+            Debug.Log($"Successfully converted {mediaDescription} of '{SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta)}' to '{relativeTargetFilePath}'");
+            UiManager.CreateNotification($"Successfully converted '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.");
         }
 
         string sourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, currentValue);
