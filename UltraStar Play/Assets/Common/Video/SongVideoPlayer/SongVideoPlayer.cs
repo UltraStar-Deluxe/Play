@@ -71,8 +71,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         set
         {
             songMeta = value;
-            LoadSongVideo(songMeta)
-                // Must subscribe to trigger the observable
+            LoadSongVideoAsObservable(songMeta)
+                // Subscribe to trigger the observable
                 .CatchIgnore((Exception ex) => Debug.LogException(ex))
                 .Subscribe(evt => Debug.Log($"Loaded video: {evt.VideoUri}"));
         }
@@ -286,7 +286,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
     }
 
-    private IObservable<SongVideoLoadedEvent> LoadVideo(SongMeta localSongMeta, string uri)
+    private IObservable<SongVideoLoadedEvent> LoadVideoAsObservable(SongMeta localSongMeta, string uri)
     {
         if (webViewManager.CanHandleUrl(uri))
         {
@@ -629,14 +629,14 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public void ReloadVideo()
     {
-        // This method is used in the SongEditor, but only on Standalone platform.
-        LoadSongVideo(songMeta)
+        // This method is used in the SongEditor. But only on Standalone platform when the video file changed.
+        LoadSongVideoAsObservable(songMeta)
             .CatchIgnore((Exception ex) => Debug.LogException(ex))
-            // Must subscribe to trigger the observable
+            // Subscribe to trigger the observable
             .Subscribe(evt => Debug.Log($"Loaded video: {evt.VideoUri}"));
     }
 
-    private IObservable<SongVideoLoadedEvent> LoadSongVideo(SongMeta localSongMeta)
+    private IObservable<SongVideoLoadedEvent> LoadSongVideoAsObservable(SongMeta localSongMeta)
     {
         UnloadVideo();
 
@@ -661,7 +661,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 new SongVideoPlayerException($"Video resource does not exist: {videoUri}"));
         }
 
-        return LoadVideo(localSongMeta, videoUri);
+        return LoadVideoAsObservable(localSongMeta, videoUri);
     }
 
     void OnEnable()

@@ -6,4 +6,9 @@
     {
         MidiFilePath = midiFilePath;
     }
+
+    public override string ToString()
+    {
+        return $"{nameof(BasicPitchDetectionResult)}(midiFilePath: {MidiFilePath})";
+    }
 }

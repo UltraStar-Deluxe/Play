@@ -68,8 +68,8 @@ public static class MicProfileUtils
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex);
-                continue;
+                Debug.LogException(ex);
+                Debug.LogError($"Create MicProfile faile: {ex.Message}");
             }
         }
 

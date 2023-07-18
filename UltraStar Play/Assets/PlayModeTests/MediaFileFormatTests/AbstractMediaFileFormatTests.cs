@@ -62,7 +62,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
     {
         long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         SongMeta songMeta = LoadSongMeta(songFilePath);
-        SongAudioPlayer.LoadAndPlaySongAudio(songMeta)
+        SongAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);

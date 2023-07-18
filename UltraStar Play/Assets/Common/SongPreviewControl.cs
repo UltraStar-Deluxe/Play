@@ -229,8 +229,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         
         try
         {
-            songAudioPlayer.LoadAndPlaySongAudio(songMeta)
-                .CatchIgnore((Exception error) =>
+            songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+                .CatchIgnore((Exception ex) =>
                 {
                     string errorMessage = $"Audio could not be loaded: {SongMetaUtils.GetArtistDashTitle(songMeta)}";
                     Debug.LogError(errorMessage);

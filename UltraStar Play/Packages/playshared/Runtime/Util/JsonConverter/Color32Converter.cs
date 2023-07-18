@@ -77,7 +77,8 @@ public class Color32Converter : fsConverter
         }
         catch (Exception ex)
         {
-            Debug.LogError(ex);
+            Debug.LogException(ex);
+            Debug.LogError($"ParseColor32FromDataAsDictionary failed: {ex.Message}");
             instance = Colors.white;
             return fsResult.Fail($"Unable to parse {data} into a Color32");
         }

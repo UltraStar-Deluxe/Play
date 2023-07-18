@@ -273,7 +273,8 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
         catch (Exception ex)
         {
-            Debug.LogError(ex);
+            Debug.LogException(ex);
+            Debug.LogError($"Load song rating sprite from theme failed: {ex.Message}");
             LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
         }
     }

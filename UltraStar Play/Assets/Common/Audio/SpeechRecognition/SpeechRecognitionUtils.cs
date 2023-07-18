@@ -4,10 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using NHyphenator;
-using NHyphenator.Loaders;
 using UniRx;
 using UnityEngine;
-using Whisper;
 using Debug = UnityEngine.Debug;
 
 public static class SpeechRecognitionUtils
@@ -31,7 +29,7 @@ public static class SpeechRecognitionUtils
         return (int)Math.Ceiling(lengthInMillis);
     }
 
-    public static IObservable<List<Note>> CreateNotesFromSpeechRecognition(
+    public static IObservable<List<Note>> CreateNotesFromSpeechRecognitionAsObservable(
         float[] monoAudioSamples,
         int startIndex,
         int endIndex,
@@ -61,21 +59,12 @@ public static class SpeechRecognitionUtils
             onProgress = null;
         }
 
-        Subject<List<Note>> createNotesFromSpeechRecognitionSubject = new();
+        return GetOrCreateSpeechRecognizerAsObservable(speechRecognitionParameters, null)
+            .SelectMany(speechRecognizer =>
+            {
+                speechRecognitionJob.SetStatus(EJobStatus.Running);
 
-        IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = GetOrCreateSpeechRecognizer(speechRecognitionParameters, null);
-        loadSpeechRecognizerObservable
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogError(ex);
-                speechRecognitionJob?.SetResult(EJobResult.Error);
-                createNotesFromSpeechRecognitionSubject.OnError(ex);
-            })
-            .Subscribe(speechRecognizer =>
-            {
-                speechRecognitionJob?.SetStatus(EJobStatus.Running);
-                
-                DoSpeechRecognitionAsObservable(
+                return DoSpeechRecognitionAsObservable(
                         monoAudioSamples,
                         startIndex,
                         endIndex,
@@ -87,31 +76,29 @@ public static class SpeechRecognitionUtils
                     // Execute on Background thread
                     .SubscribeOn(Scheduler.ThreadPool)
                     // Notify on Main thread
-                    .ObserveOnMainThread()
-                    // Handle Exceptions
-                    .CatchIgnore((Exception ex) =>
-                    {
-                        Debug.LogError(ex);
-                        speechRecognitionJob?.SetResult(EJobResult.Error);
-                        createNotesFromSpeechRecognitionSubject.OnError(ex);
-                        UiManager.CreateNotification(ex.Message);
-                    })
-                    .Subscribe(speechRecognitionResult =>
-                    {
-                        speechRecognitionJob?.SetResult(EJobResult.Ok);
-                        List<Note> createdNotes = speechRecognitionResult != null && !speechRecognitionResult.Words.IsNullOrEmpty()
-                            ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote, hyphenator, spaceInMillisBetweenNotes)
-                            : new List<Note>();
+                    .ObserveOnMainThread();
+            })
+            // Handle Exceptions
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Create notes from speech recognition failed: {ex.Message}");
+                speechRecognitionJob?.SetResult(EJobResult.Error);
+                UiManager.CreateNotification(ex.Message);
+                throw ex;
+            })
+            .Select(speechRecognitionResult =>
+            {
+                speechRecognitionJob?.SetResult(EJobResult.Ok);
+                List<Note> createdNotes = speechRecognitionResult != null && !speechRecognitionResult.Words.IsNullOrEmpty()
+                    ? CreateNotesFromSpeechRecognitionResult(speechRecognitionResult.Words, songMeta, offsetInBeats, midiNote, hyphenator, spaceInMillisBetweenNotes)
+                    : new List<Note>();
 
-                        createNotesFromSpeechRecognitionSubject.OnNext(createdNotes);
-                        createNotesFromSpeechRecognitionSubject.OnCompleted();
-                    });
+                return createdNotes;
             });
-
-        return createNotesFromSpeechRecognitionSubject;
     }
 
-    public static IObservable<SpeechRecognizer> GetOrCreateSpeechRecognizer(
+    public static IObservable<SpeechRecognizer> GetOrCreateSpeechRecognizerAsObservable(
         SpeechRecognitionParameters parameters,
         Job parentJob)
     {
@@ -148,8 +135,7 @@ public static class SpeechRecognitionUtils
             });
         }
 
-        Subject<SpeechRecognizer> loadSpeechRecognizerSubject = new();
-        LoadSpeechRecognizerAsObservable(parameters)
+        return LoadSpeechRecognizerAsObservable(parameters)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -157,17 +143,16 @@ public static class SpeechRecognitionUtils
             // Handle Exceptions
             .CatchIgnore((Exception ex) =>
             {
-                Debug.LogError(ex);
+                Debug.LogException(ex);
+                Debug.LogError($"Load speech recognizer failed: {ex.Message}");
                 loadSpeechRecognizerJob.SetResult(EJobResult.Error);
-                loadSpeechRecognizerSubject.OnError(ex);
+                throw ex;
             })
-            .Subscribe(speechRecognizer =>
+            .Select(speechRecognizer =>
             {
                 loadSpeechRecognizerJob.SetResult(EJobResult.Ok);
-                loadSpeechRecognizerSubject.OnNext(speechRecognizer);
-                loadSpeechRecognizerSubject.OnCompleted();
+                return speechRecognizer;
             });
-        return loadSpeechRecognizerSubject;
     }
 
     private static IObservable<SpeechRecognizer> LoadSpeechRecognizerAsObservable(

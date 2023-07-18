@@ -142,8 +142,8 @@ public class SettingsManager : AbstractSingletonBehaviour
             }
             catch (Exception ex)
             {
-                Debug.LogError("Failed to create initial song folder.");
-                Debug.LogError(ex);
+                Debug.LogException(ex);
+                Debug.LogError("Failed to create initial song folder: {ex.Message}");
             }
         }
 #endif

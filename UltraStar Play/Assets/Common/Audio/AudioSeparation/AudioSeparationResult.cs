@@ -10,4 +10,9 @@
         VocalsAudioPath = vocalsAudioPath;
         InstrumentalAudioPath = instrumentalAudioPath;
     }
+
+    public override string ToString()
+    {
+        return $"{nameof(AudioSeparationResult)}(original: '{OriginalAudioPath}', vocals: '{VocalsAudioPath}', instrumental: '{InstrumentalAudioPath}')";
+    }
 }
