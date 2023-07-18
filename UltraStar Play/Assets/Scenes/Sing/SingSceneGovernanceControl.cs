@@ -146,6 +146,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             UpdatePlaybackIcon();
         });
         songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => UpdatePlaybackIcon());
+        songAudioPlayer.LoadedEventStream.Subscribe(_ => UpdatePlaybackIcon());
         UpdatePlaybackIcon();
 
         bottomControlsContainer.RegisterCallback<PointerEnterEvent>(evt => isPointerOverBottomControls = true);
