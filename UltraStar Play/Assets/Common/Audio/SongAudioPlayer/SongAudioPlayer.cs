@@ -485,6 +485,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
+            AudioSupportProvider = EAudioSupportProvider.UnityAudioSource;
             audioSource.clip = audioClip;
             DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
             PositionInSongInMillis = startPositionInMillis;
