@@ -81,6 +81,8 @@ public class MicSampleRecorder : MonoBehaviour
     private bool continueRecordingOnAddListener;
     private bool continueRecordingOnEnable;
 
+    public string PortAudioOutputDeviceName { get; set; }
+
     private void Awake()
     {
         audioSource = GetComponentInChildren<AudioSource>();
@@ -163,7 +165,7 @@ public class MicSampleRecorder : MonoBehaviour
         Debug.Log($"Starting recording with '{MicProfile.GetDisplayNameWithChannel()}' at {FinalSampleRate} Hz");
 
         string outputDeviceName = playRecordedAudio && MicrophoneAdapter.UsePortAudio
-            ? PortAudioUtils.DefaultOutputDeviceInfo.Name
+            ? GetFinalPortAudioOutputDeviceName()
             : "";
 
         // Code for low-latency Unity microphone input taken from
@@ -197,6 +199,16 @@ public class MicSampleRecorder : MonoBehaviour
             audioSource.clip = micAudioClip;
             audioSource.loop = true;
         }
+    }
+
+    private string GetFinalPortAudioOutputDeviceName()
+    {
+        if (PortAudioOutputDeviceName.IsNullOrEmpty())
+        {
+            return PortAudioUtils.DefaultOutputDeviceInfo.Name;
+        }
+
+        return PortAudioOutputDeviceName;
     }
 
     public void StopRecording()

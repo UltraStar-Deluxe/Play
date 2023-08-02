@@ -15,7 +15,14 @@
             </ui:VisualElement>
             <ItemPicker name="showFpsPicker" label="Show FPS" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="portAudioHostApiPicker" label="PortAudio Host API¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-            <ui:Button text="Show PortAudio Input Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
+            <ItemPicker name="portAudioOutputDevicePicker" label="PortAudio output device" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+            <ui:Button text="Show PortAudio Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
+            <ui:Toggle name="playRecordedAudioToggle" label="Play recorded audio" style="margin-bottom: 0;" />
+            <ui:VisualElement name="playRecordedAudioInfoContainer" class="mb-3" style="flex-direction: row; align-items: center;">
+                <MaterialIcon tabindex="-1" name="infoIcon" icon="info_outline" class="smallFont mr-1 nBackgroundInHierarchy" />
+                <ui:Label tabindex="-1" text="Does not work with Companion App" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
+            </ui:VisualElement>
+            <ItemPicker name="micPlaybackVolumeChooser" label="Microphone Playback Volume" wrap-around="true" min-value="0" max-value="100" step-value="10" />
             <ItemPicker name="useFfmpegToPlayMediaFilesPicker" label="Use ffmpeg to play audio&#10;and video files (unstable)¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="checkCodecIsSupportedPicker" label="Check codecs are supported.&#10;(slower song search)" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="logFfmpegOutputPicker" label="Log ffmpeg output" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />

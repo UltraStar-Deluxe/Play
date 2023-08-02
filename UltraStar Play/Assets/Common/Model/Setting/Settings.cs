@@ -122,6 +122,7 @@ public class Settings : ISettings
 
      // PortAudio settings
      public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
+     public string PortAudioOutputDeviceName { get; set; } = "";
 
     // Ffmpeg settings
     public bool UseFfmpegToPlayMediaFiles { get; set; }

@@ -68,12 +68,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     [Inject(UxmlName = R.UxmlNames.usePortAudioToggle)]
     private Toggle usePortAudioToggle;
 
-    // [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
-    // private Toggle playRecordedAudioToggle;
-    
-    // [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
-    // private VisualElement playRecordedAudioInfoContainer;
-
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
 
@@ -227,21 +221,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
                         TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
                 }
             });
-
-        // Play recorded audio
-        // FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
-        //     () => settings.PlayRecordedAudio,
-        //     newValue => settings.PlayRecordedAudio = newValue);
-        //
-        // // Recorded audio playback volume
-        // PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
-        // micPlaybackVolumePickerControl.Bind(() => settings.MicrophonePlaybackVolumePercent,
-        //     newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
-        //
-        // // Only visible when play recorded audio is enabled
-        // settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
-        //     .Subscribe(newValue => micPlaybackVolumeChooser.SetVisibleByDisplay(newValue))
-        //     .AddTo(gameObject);
 
         // Use PortAudio
         if (ApplicationUtils.CanUsePortAudio())

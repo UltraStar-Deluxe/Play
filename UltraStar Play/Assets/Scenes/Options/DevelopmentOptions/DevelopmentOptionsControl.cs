@@ -7,6 +7,7 @@ using ProTrans;
 using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -18,6 +19,18 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 {
     [Inject(UxmlName = R.UxmlNames.showFpsPicker)]
     private ItemPicker showFpsPicker;
+
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
+    private Toggle playRecordedAudioToggle;
+
+    [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
+    private ItemPicker micPlaybackVolumeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
+    private VisualElement playRecordedAudioInfoContainer;
+
+    [Inject(UxmlName = R.UxmlNames.portAudioOutputDevicePicker)]
+    private ItemPicker portAudioOutputDevicePicker;
 
     [Inject(UxmlName = R.UxmlNames.portAudioHostApiPicker)]
     private ItemPicker portAudioHostApiPicker;
@@ -293,6 +306,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             newValue => settings.HttpServerPort = newValue);
         httpServerPortTextField.DisableChangeValueByDragging();
 
+        // Ffmpeg playback / conversion
         FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,
             () => JsonConverter.ToJson(settings.FileFormatToFfmpegConversionArguments, true),
             newValueAsString =>
@@ -310,7 +324,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 }
             });
 
-
         new BoolPickerControl(useFfmpegToPlayMediaFilesPicker)
             .Bind(() => settings.UseFfmpegToPlayMediaFiles,
                 newValue => settings.UseFfmpegToPlayMediaFiles = newValue);
@@ -323,11 +336,55 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.CheckCodecIsSupported,
                 newValue => settings.CheckCodecIsSupported = newValue);
 
-        portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioInputDeviceInfo());
+        // PortAudio device info
+        portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioDeviceInfo());
 
+        // PortAudio host API
         new LabeledItemPickerControl<PortAudioHostApi>(portAudioHostApiPicker, GetAvailablePortAudioHostApis())
             .Bind(() => settings.PortAudioHostApi,
                 newValue => settings.PortAudioHostApi = newValue);
+
+        // PortAudio output device
+        LabeledItemPickerControl<string> portAudioOutputDevicePickerControl = new LabeledItemPickerControl<string>(portAudioOutputDevicePicker, GetAvailablePortAudioOutputDeviceNames());
+        portAudioOutputDevicePickerControl.Bind(
+            () => settings.PortAudioOutputDeviceName,
+            newValue => settings.PortAudioOutputDeviceName = newValue);
+        portAudioOutputDevicePickerControl.GetLabelTextFunction = item => item.IsNullOrEmpty() ? "Default" : item;
+
+        settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
+            .Subscribe(newValue => portAudioOutputDevicePickerControl.Items = GetAvailablePortAudioOutputDeviceNames())
+            .AddTo(gameObject);
+
+        // Play recorded audio
+        FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
+            () => settings.PlayRecordedAudio,
+            newValue => settings.PlayRecordedAudio = newValue);
+
+        // Recorded audio playback volume
+        PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
+        micPlaybackVolumePickerControl.Bind(() => settings.MicrophonePlaybackVolumePercent,
+            newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
+
+        // Only visible when play recorded audio is enabled
+        settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
+            .Subscribe(newValue =>
+            {
+                micPlaybackVolumeChooser.SetVisibleByDisplay(newValue);
+            })
+            .AddTo(gameObject);
+    }
+
+    private List<string> GetAvailablePortAudioOutputDeviceNames()
+    {
+        return new List<string>()
+            {
+                "",
+            }
+            .Union(PortAudioUtils.DeviceInfos
+                .Where(deviceInfo => deviceInfo.MaxOutputChannels > 0
+                                     && deviceInfo.HostApi == MicrophoneAdapter.GetHostApi())
+                .Select(deviceInfo => deviceInfo.Name))
+            .ToList();
     }
 
     private List<PortAudioHostApi> GetAvailablePortAudioHostApis()
@@ -342,10 +399,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .ToList();
     }
 
-    private void ShowPortAudioInputDeviceInfo()
+    private void ShowPortAudioDeviceInfo()
     {
         MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("PortAudio input devices");
-        messageDialogControl.AddButton("Copy CSV", _ => CopyPortAudioInputDeviceListCsv());
+        messageDialogControl.AddButton("Copy CSV", _ => CopyPortAudioDeviceListCsv());
         messageDialogControl.AddButton("Close", _ => messageDialogControl.CloseDialog());
 
         Label defaultHostApiLabel = new Label();
@@ -361,8 +418,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             // Add label for each device of this host API
             foreach (DeviceInfo deviceInfo in PortAudioUtils.DeviceInfos)
             {
-                if (deviceInfo.HostApi != hostApiInfo.HostApi
-                    || deviceInfo.MaxInputChannels <= 0)
+                if (deviceInfo.HostApi != hostApiInfo.HostApi)
                 {
                     continue;
                 }
@@ -370,19 +426,41 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 Label deviceInfoLabel = new();
                 deviceInfoLabel.name = $"deviceInfoLabel";
                 deviceInfoLabel.AddToClassList("deviceInfoLabel");
-                deviceInfoLabel.text = $"• '{deviceInfo.Name}'," +
+                string inputOutputIcons = GetInputOutputIcons(deviceInfo);
+                deviceInfoLabel.text = $"{inputOutputIcons} '{deviceInfo.Name}'," +
                                        $" max input channels: {deviceInfo.MaxInputChannels}," +
+                                       $" max output channels: {deviceInfo.MaxOutputChannels}," +
                                        $" default sample rate: {deviceInfo.DefaultSampleRate.ToStringInvariantCulture("0")}," +
                                        $" default low input latency: {deviceInfo.DefaultLowInputLatency.ToStringInvariantCulture()}," +
                                        $" default high input latency: {deviceInfo.DefaultHighInputLatency.ToStringInvariantCulture()}," +
+                                       $" default low output latency: {deviceInfo.DefaultLowOutputLatency.ToStringInvariantCulture()}," +
+                                       $" default high output latency: {deviceInfo.DefaultHighOutputLatency.ToStringInvariantCulture()}," +
                                        $" host API device index: {deviceInfo.HostApiDeviceIndex}," +
                                        $" global device index: {deviceInfo.GlobalDeviceIndex}";
                 accordionItem.Add(deviceInfoLabel);
             }
+
+            // Add label for default input / output device
+            DeviceInfo defaultInputDevice = PortAudioUtils.DeviceInfos.FirstOrDefault(it => it.GlobalDeviceIndex == hostApiInfo.DefaultInputDeviceGlobalIndex);
+            DeviceInfo defaultOutputDevice = PortAudioUtils.DeviceInfos.FirstOrDefault(it => it.GlobalDeviceIndex == hostApiInfo.DefaultOutputDeviceGlobalIndex);
+            Label defaultDeviceLabel = new();
+            defaultDeviceLabel.text = $"Default input device: '{defaultInputDevice?.Name}', default output device: '{defaultOutputDevice?.Name}'";
+            accordionItem.Add(defaultDeviceLabel);
         }
     }
 
-    private void CopyPortAudioInputDeviceListCsv()
+    private string GetInputOutputIcons(DeviceInfo deviceInfo)
+    {
+        string inputIcon = deviceInfo.MaxInputChannels > 0
+            ? "🎤"
+            : "";
+        string outputIcon = deviceInfo.MaxOutputChannels > 0
+            ? "🔈"
+            : "";
+        return $"{inputIcon}{outputIcon}";
+    }
+
+    private void CopyPortAudioDeviceListCsv()
     {
         // TODO: use CSV lib with proper link between column header and values
         StringBuilder sb = new();
@@ -391,11 +469,15 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         List<string> headers = new()
         {
             "host API",
+            "input/output",
             "device name",
             "max input channels",
+            "max output channels",
             "default sample rate",
             "default low input latency",
             "default high input latency",
+            "default low output latency",
+            "default high output latency",
             "host API device index",
             "global device index",
         };
@@ -408,19 +490,18 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         // Add values
         foreach (DeviceInfo deviceInfo in PortAudioUtils.DeviceInfos)
         {
-            if (deviceInfo.MaxInputChannels <= 0)
-            {
-                continue;
-            }
-
             string nameWithoutLineBreaks = StringUtils.EscapeLineBreaks(deviceInfo.Name);
             List<string> values = new() {
                 deviceInfo.HostApi.ToString(),
+                GetInputOutputIcons(deviceInfo),
                 nameWithoutLineBreaks,
                 deviceInfo.MaxInputChannels.ToString(),
+                deviceInfo.MaxOutputChannels.ToString(),
                 deviceInfo.DefaultSampleRate.ToStringInvariantCulture("0"),
                 deviceInfo.DefaultLowInputLatency.ToStringInvariantCulture(),
                 deviceInfo.DefaultHighInputLatency.ToStringInvariantCulture(),
+                deviceInfo.DefaultLowOutputLatency.ToStringInvariantCulture(),
+                deviceInfo.DefaultHighOutputLatency.ToStringInvariantCulture(),
                 deviceInfo.HostApiDeviceIndex.ToString(),
                 deviceInfo.GlobalDeviceIndex.ToString(),
             };

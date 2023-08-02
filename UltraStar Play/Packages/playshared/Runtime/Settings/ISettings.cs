@@ -11,4 +11,5 @@ public interface ISettings
     public int MicrophonePlaybackVolumePercent { get; set; }
 
     public PortAudioHostApi PortAudioHostApi { get; set; }
+    public string PortAudioOutputDeviceName { get; set; }
 }

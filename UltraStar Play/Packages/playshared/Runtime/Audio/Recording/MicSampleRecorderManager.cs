@@ -70,6 +70,12 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
                 MicrophoneAdapter.SetHostApi(PortAudioConversionUtils.ConvertHostApi(newValue));
             });
 
+        settings.ObserveEveryValueChanged(it => it.PortAudioOutputDeviceName)
+            .Subscribe(newValue =>
+            {
+                micSampleRecorders.ForEach(it => it.PortAudioOutputDeviceName = newValue);
+            });
+
         Debug.Log($"Initial connected mic devices: {JsonConverter.ToJson(CurrentConnectedMicDevices)}");
         SetLastConnectedMicDevices(CurrentConnectedMicDevices);
     }
@@ -102,6 +108,7 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         micSampleRecorder = micSampleRecorderGameObject.AddComponent<MicSampleRecorder>();
         micSampleRecorder.MicProfile = micProfile;
         micSampleRecorder.PlayRecordedAudio = settings.PlayRecordedAudio;
+        micSampleRecorder.PortAudioOutputDeviceName = settings.PortAudioOutputDeviceName;
         micSampleRecorders.Add(micSampleRecorder);
         return micSampleRecorder;
     }
