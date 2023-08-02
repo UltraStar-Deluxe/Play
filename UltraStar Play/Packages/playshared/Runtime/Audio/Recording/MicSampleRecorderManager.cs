@@ -63,7 +63,13 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
                     it.Volume = finalVolume;
                 });
             });
-        
+
+        settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
+            .Subscribe(newValue =>
+            {
+                MicrophoneAdapter.SetHostApi(PortAudioConversionUtils.ConvertHostApi(newValue));
+            });
+
         Debug.Log($"Initial connected mic devices: {JsonConverter.ToJson(CurrentConnectedMicDevices)}");
         SetLastConnectedMicDevices(CurrentConnectedMicDevices);
     }

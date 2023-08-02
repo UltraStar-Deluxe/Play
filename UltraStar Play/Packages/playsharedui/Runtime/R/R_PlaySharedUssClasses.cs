@@ -43,6 +43,7 @@ public static partial class R_PlayShared
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
         public const string dangerButton = "dangerButton";
+        public const string deviceInfoLabel = "deviceInfoLabel";
         public const string dialogBackground = "dialogBackground";
         public const string dialogButton = "dialogButton";
         public const string dialogMessage = "dialogMessage";

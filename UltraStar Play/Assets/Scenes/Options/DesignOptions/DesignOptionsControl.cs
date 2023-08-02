@@ -73,7 +73,7 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         LabeledItemPickerControl<float> audioPreviewFadeInDurationChooserControl = new(previewFadeInDurationChooser, NumberUtils.CreateFloatList(0.5f, 5f, 0.5f));
         audioPreviewFadeInDurationChooserControl.Bind(() => settings.PreviewFadeInDurationInSeconds,
             newValue => settings.PreviewFadeInDurationInSeconds = newValue);
-        audioPreviewFadeInDurationChooserControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture()} s";
+        audioPreviewFadeInDurationChooserControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
 
         LabeledItemPickerControl<ESongBackgroundScaleMode> songBackgroundScaleModePickerControl = new LabeledItemPickerControl<ESongBackgroundScaleMode>(songBackgroundScaleModePicker, EnumUtils.GetValuesAsList<ESongBackgroundScaleMode>());
         songBackgroundScaleModePickerControl.Bind(() => settings.SongBackgroundScaleMode,

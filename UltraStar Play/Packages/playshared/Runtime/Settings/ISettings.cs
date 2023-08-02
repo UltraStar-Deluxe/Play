@@ -9,4 +9,6 @@ public interface ISettings
     
     public bool PlayRecordedAudio { get; set; }
     public int MicrophonePlaybackVolumePercent { get; set; }
+
+    public PortAudioHostApi PortAudioHostApi { get; set; }
 }

@@ -405,17 +405,10 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
         enabledToggle.value = micProfile.IsEnabled;
         UpdateRecordingDeviceInactiveOverlay();
-        
-        if (micProfile.IsConnected(serverSideConnectRequestManager))
-        {
-            notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
-            deleteButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
-        }
-        else
-        {
-            notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
-            deleteButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
-        }
+
+        bool isConnected = micProfile.IsConnected(serverSideConnectRequestManager);
+        notConnectedContainer.SetVisibleByDisplay(!isConnected);
+        deleteButton.SetVisibleByDisplay(!isConnected);
 
         micVisualizer.SetMicProfile(micProfile);
         calibrateMicDelayControl.MicProfile = micProfile;
