@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using PortAudioForUnity;
 using ProTrans;
 using Serilog.Events;
 using SimpleHttpServerForUnity;
@@ -16,6 +18,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 {
     [Inject(UxmlName = R.UxmlNames.showFpsPicker)]
     private ItemPicker showFpsPicker;
+
+    [Inject(UxmlName = R.UxmlNames.portAudioHostApiPicker)]
+    private ItemPicker portAudioHostApiPicker;
+
+    [Inject(UxmlName = R.UxmlNames.portAudioDeviceInfoButton)]
+    private Button portAudioDeviceInfoButton;
 
     [Inject(UxmlName = R.UxmlNames.logFfmpegOutputPicker)]
     private ItemPicker logFfmpegOutputPicker;
@@ -314,6 +322,118 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new BoolPickerControl(checkCodecIsSupportedPicker)
             .Bind(() => settings.CheckCodecIsSupported,
                 newValue => settings.CheckCodecIsSupported = newValue);
+
+        portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioInputDeviceInfo());
+
+        new LabeledItemPickerControl<PortAudioHostApi>(portAudioHostApiPicker, GetAvailablePortAudioHostApis())
+            .Bind(() => settings.PortAudioHostApi,
+                newValue => settings.PortAudioHostApi = newValue);
+    }
+
+    private List<PortAudioHostApi> GetAvailablePortAudioHostApis()
+    {
+        return new List<PortAudioHostApi>()
+            {
+                PortAudioHostApi.Default
+            }
+            .Union(PortAudioUtils.HostApis
+                .Select(portAudioHostApi => PortAudioConversionUtils.ConvertHostApi(portAudioHostApi))
+                .ToList())
+            .ToList();
+    }
+
+    private void ShowPortAudioInputDeviceInfo()
+    {
+        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("PortAudio input devices");
+        messageDialogControl.AddButton("Copy CSV", _ => CopyPortAudioInputDeviceListCsv());
+        messageDialogControl.AddButton("Close", _ => messageDialogControl.CloseDialog());
+
+        Label defaultHostApiLabel = new Label();
+        defaultHostApiLabel.text = $"Default host API: {PortAudioConversionUtils.GetDefaultHostApi()}";
+        messageDialogControl.AddVisualElement(defaultHostApiLabel);
+
+        foreach (HostApiInfo hostApiInfo in PortAudioUtils.HostApiInfos)
+        {
+            // Add group for this host API
+            AccordionItem accordionItem = new(StringUtils.EscapeLineBreaks(hostApiInfo.Name));
+            messageDialogControl.AddVisualElement(accordionItem);
+
+            // Add label for each device of this host API
+            foreach (DeviceInfo deviceInfo in PortAudioUtils.DeviceInfos)
+            {
+                if (deviceInfo.HostApi != hostApiInfo.HostApi
+                    || deviceInfo.MaxInputChannels <= 0)
+                {
+                    continue;
+                }
+
+                Label deviceInfoLabel = new();
+                deviceInfoLabel.name = $"deviceInfoLabel";
+                deviceInfoLabel.AddToClassList("deviceInfoLabel");
+                deviceInfoLabel.text = $"• '{deviceInfo.Name}'," +
+                                       $" max input channels: {deviceInfo.MaxInputChannels}," +
+                                       $" default sample rate: {deviceInfo.DefaultSampleRate.ToStringInvariantCulture("0")}," +
+                                       $" default low input latency: {deviceInfo.DefaultLowInputLatency.ToStringInvariantCulture()}," +
+                                       $" default high input latency: {deviceInfo.DefaultHighInputLatency.ToStringInvariantCulture()}," +
+                                       $" host API device index: {deviceInfo.HostApiDeviceIndex}," +
+                                       $" global device index: {deviceInfo.GlobalDeviceIndex}";
+                accordionItem.Add(deviceInfoLabel);
+            }
+        }
+    }
+
+    private void CopyPortAudioInputDeviceListCsv()
+    {
+        // TODO: use CSV lib with proper link between column header and values
+        StringBuilder sb = new();
+
+        // Add header
+        List<string> headers = new()
+        {
+            "host API",
+            "device name",
+            "max input channels",
+            "default sample rate",
+            "default low input latency",
+            "default high input latency",
+            "host API device index",
+            "global device index",
+        };
+        string headerCsv = headers
+            .Select(it => $"\"{it}\"")
+            .JoinWith(", ");
+        sb.Append(headerCsv);
+        sb.Append("\n");
+
+        // Add values
+        foreach (DeviceInfo deviceInfo in PortAudioUtils.DeviceInfos)
+        {
+            if (deviceInfo.MaxInputChannels <= 0)
+            {
+                continue;
+            }
+
+            string nameWithoutLineBreaks = StringUtils.EscapeLineBreaks(deviceInfo.Name);
+            List<string> values = new() {
+                deviceInfo.HostApi.ToString(),
+                nameWithoutLineBreaks,
+                deviceInfo.MaxInputChannels.ToString(),
+                deviceInfo.DefaultSampleRate.ToStringInvariantCulture("0"),
+                deviceInfo.DefaultLowInputLatency.ToStringInvariantCulture(),
+                deviceInfo.DefaultHighInputLatency.ToStringInvariantCulture(),
+                deviceInfo.HostApiDeviceIndex.ToString(),
+                deviceInfo.GlobalDeviceIndex.ToString(),
+            };
+            string valuesCsv = values
+                .Select(it => $"\"{it}\"")
+                .JoinWith(", ");
+            sb.Append(valuesCsv);
+            sb.Append("\n");
+        }
+
+        ClipboardUtils.CopyToClipboard(sb.ToString());
+
+        UiManager.CreateNotification("Copied to clipboard");
     }
 
     private void UpdateLogEventLevel()

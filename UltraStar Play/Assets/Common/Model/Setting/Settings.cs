@@ -120,6 +120,9 @@ public class Settings : ISettings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();
 
+     // PortAudio settings
+     public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
+
     // Ffmpeg settings
     public bool UseFfmpegToPlayMediaFiles { get; set; }
     public Dictionary<string, string> FileFormatToFfmpegConversionArguments { get; set; } = new()

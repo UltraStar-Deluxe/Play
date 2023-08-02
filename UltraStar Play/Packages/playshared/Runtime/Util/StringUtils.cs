@@ -4,6 +4,19 @@ public static class StringUtils
 {
     private static readonly Regex whitespaceRegex = new(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+    public static string EscapeLineBreaks(string text)
+    {
+        if (text.IsNullOrEmpty())
+        {
+            return text;
+        }
+
+        // return Regex.Replace(text, "\n", "\\n", RegexOptions.Multiline);
+        return text
+            .Replace("\r", "\\r")
+            .Replace("\n", "\\n");
+    }
+
     public static bool IsOnlyWhitespace(string newText)
     {
         return string.IsNullOrEmpty(newText) || whitespaceRegex.IsMatch(newText);
@@ -11,6 +24,11 @@ public static class StringUtils
     
     public static string ToTitleCase(string input)
     {
+        if (input.IsNullOrEmpty())
+        {
+            return input;
+        }
+
         if (input.Contains("_") || input.Contains("-"))
         {
             return SnakeCaseToTitleCase(input);
@@ -25,6 +43,11 @@ public static class StringUtils
      */
     public static string SnakeCaseToTitleCase(string input)
     {
+        if (input.IsNullOrEmpty())
+        {
+            return input;
+        }
+
         input = input
             .Replace("_", " ")
             .Replace("-", " ");
@@ -47,6 +70,11 @@ public static class StringUtils
      */
     public static string CamelCaseToTitleCase(string input)
     {
+        if (input.IsNullOrEmpty())
+        {
+            return input;
+        }
+
         string withFirstLetterUppercase = input.ToUpperInvariantFirstChar();
         string inputWithSpaces = Regex.Replace(withFirstLetterUppercase, @"([A-Z])", " $1");
         return inputWithSpaces.Trim();

@@ -163,7 +163,7 @@ public class MicSampleRecorder : MonoBehaviour
         Debug.Log($"Starting recording with '{MicProfile.GetDisplayNameWithChannel()}' at {FinalSampleRate} Hz");
 
         string outputDeviceName = playRecordedAudio && MicrophoneAdapter.UsePortAudio
-            ? PortAudioUtils.GetDefaultOutputDeviceName()
+            ? PortAudioUtils.DefaultOutputDeviceInfo.Name
             : "";
 
         // Code for low-latency Unity microphone input taken from

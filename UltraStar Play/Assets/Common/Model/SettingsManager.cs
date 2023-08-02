@@ -169,7 +169,7 @@ public class SettingsManager : AbstractSingletonBehaviour
             List<IConnectedClientHandler> connectedClientHandlers = new List<IConnectedClientHandler>();
             List<MicProfile> persistedMicProfiles = new();
             
-            defaultSettings.MicProfiles = MicProfileUtils.CreateMicProfiles(persistedMicProfiles, micProfileColors, connectedClientHandlers);
+            defaultSettings.MicProfiles = MicProfileUtils.CreateMicProfiles(persistedMicProfiles, micProfileColors, connectedClientHandlers, defaultSettings);
         }
         catch (Exception e)
         {

@@ -597,6 +597,10 @@
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
+.deviceInfoLabel {
+    margin-bottom: 16px;
+}
+
 #permissionsContainer .unity-toggle__label {
     min-width: 50;
     margin-right: 8px;
@@ -754,6 +758,11 @@
 }
 
 #loadedOptionsRoot > ScrollView > ItemPicker {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+#loadedOptionsRoot > ScrollView > Button {
     margin-bottom: 16px;
     height: auto;
 }

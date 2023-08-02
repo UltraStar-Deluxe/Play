@@ -546,6 +546,8 @@ public static partial class R
         public const string playRecordedAudioInfoContainer = "playRecordedAudioInfoContainer";
         public const string playRecordedAudioInfoLabel = "playRecordedAudioInfoLabel";
         public const string playRecordedAudioToggle = "playRecordedAudioToggle";
+        public const string portAudioDeviceInfoButton = "portAudioDeviceInfoButton";
+        public const string portAudioHostApiPicker = "portAudioHostApiPicker";
         public const string positionBeforeLyricsIndicator = "positionBeforeLyricsIndicator";
         public const string posLabel = "posLabel";
         public const string previewFadeInDurationChooser = "previewFadeInDurationChooser";
