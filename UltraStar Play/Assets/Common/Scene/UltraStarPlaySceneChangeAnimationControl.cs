@@ -54,7 +54,10 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         if (SettingsUtils.ShouldAnimateSceneChange(settings)
             && settings.SceneChangeAnimation is ESceneChangeAnimation.Fade)
         {
-            GetBackgroundVisualElement().style.opacity = 0;
+            if (TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background))
+            {
+                background.style.opacity = 0;
+            }
         }
     }
     
@@ -106,12 +109,20 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
                 return;
             }
 
-            VisualElement background = GetBackgroundVisualElement();
-            
-            // Fade-out is done here. It takes half of the total animation time. 
-            LeanTween.value(gameObject, 1, 0, animationTimeInSeconds / 2)
-                .setOnUpdate((float interpolatedValue) => background.style.opacity = interpolatedValue)
-                .setOnComplete(() => doLoadSceneAction());
+            // Fade-out is done here. It takes half of the total animation time.
+            if (TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background))
+            {
+                LeanTween.value(gameObject, 1, 0, animationTimeInSeconds / 2)
+                    .setOnUpdate((float interpolatedValue) =>
+                    {
+                        background.style.opacity = interpolatedValue;
+                    })
+                    .setOnComplete(() => doLoadSceneAction());
+            }
+            else
+            {
+                doLoadSceneAction();
+            }
         }
     }
 
@@ -135,9 +146,12 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             // Only the fade-in is done here. Thus, it takes only half of the total animation time.
             animationTimeInSeconds /= 2;
         }
-        
-        VisualElement background = GetBackgroundVisualElement();
-        StartCoroutine(SceneChangeAnimationCoroutine(animationTimeInSeconds, background));
+
+        if (TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background))
+        {
+            StopAllCoroutines();
+            StartCoroutine(SceneChangeAnimationCoroutine(animationTimeInSeconds, background));
+        }
     }
 
     private IEnumerator SceneChangeAnimationCoroutine(
@@ -147,9 +161,10 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
     {
         if (animationTimeInSeconds <= 0)
         {
+            onComplete?.Invoke();
             yield break;
         }
-        
+
         if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(true);
@@ -169,7 +184,8 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
                 // blending and avoid the one-frame flicker issue.
                 themeManager.backgroundShaderControl.SetTransitionAnimationTime(interpolatedValue);
             }
-            else if (settings.SceneChangeAnimation is ESceneChangeAnimation.Fade)
+            else if (settings.SceneChangeAnimation is ESceneChangeAnimation.Fade
+                     && background != null)
             {
                 background.style.opacity = interpolatedValue;
             }
@@ -182,7 +198,9 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
             yield return new WaitForEndOfFrame();
         }
         
-        if (settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
+        if (settings != null
+            && themeManager != null
+            && settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom)
         {
             themeManager.backgroundShaderControl.SetTransitionAnimationEnabled(false);
         }
@@ -199,8 +217,10 @@ public class UltraStarPlaySceneChangeAnimationControl : AbstractSingletonBehavio
         }
     }
 
-    private VisualElement GetBackgroundVisualElement()
+    private bool TryGetBackgroundVisualElementOrIsIrrelevant(out VisualElement background)
     {
-        return uiDocument.rootVisualElement.Q(R.UxmlNames.background);
+        background = uiDocument.rootVisualElement.Q(R.UxmlNames.background);
+        return background != null
+               || settings.SceneChangeAnimation is ESceneChangeAnimation.Zoom;
     }
 }
