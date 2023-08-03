@@ -401,7 +401,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     private void ShowPortAudioDeviceInfo()
     {
-        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("PortAudio input devices");
+        MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("PortAudio host APIs and devices");
         messageDialogControl.AddButton("Copy CSV", _ => CopyPortAudioDeviceListCsv());
         messageDialogControl.AddButton("Close", _ => messageDialogControl.CloseDialog());
 
