@@ -21,7 +21,7 @@ namespace Truncon.Collections
     /// It can be costly to insert a key/value pair because other key's indexes must be adjusted.
     /// It can be costly to remove a key/value pair because other keys' indexes must be adjusted.
     /// </remarks>
-    public sealed class OrderedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IList<KeyValuePair<TKey, TValue>>
+    public sealed class InsertionOrderedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IList<KeyValuePair<TKey, TValue>>
     {
         private readonly Dictionary<TKey, int> dictionary;
         private readonly List<TKey> keys;
@@ -31,7 +31,7 @@ namespace Truncon.Collections
         /// <summary>
         /// Initializes a new instance of an OrderedDictionary.
         /// </summary>
-        public OrderedDictionary()
+        public InsertionOrderedDictionary()
             : this(0, null)
         {
         }
@@ -41,7 +41,7 @@ namespace Truncon.Collections
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">The capacity is less than zero.</exception>
-        public OrderedDictionary(int capacity)
+        public InsertionOrderedDictionary(int capacity)
             : this(capacity, null)
         {
         }
@@ -50,7 +50,7 @@ namespace Truncon.Collections
         /// Initializes a new instance of an OrderedDictionary.
         /// </summary>
         /// <param name="comparer">The equality comparer to use to compare keys.</param>
-        public OrderedDictionary(IEqualityComparer<TKey> comparer)
+        public InsertionOrderedDictionary(IEqualityComparer<TKey> comparer)
             : this(0, comparer)
         {
         }
@@ -60,7 +60,7 @@ namespace Truncon.Collections
         /// </summary>
         /// <param name="capacity">The initial capacity of the dictionary.</param>
         /// <param name="comparer">The equality comparer to use to compare keys.</param>
-        public OrderedDictionary(int capacity, IEqualityComparer<TKey> comparer)
+        public InsertionOrderedDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
             dictionary = new Dictionary<TKey, int>(capacity, comparer ?? EqualityComparer<TKey>.Default);
             keys = new List<TKey>(capacity);

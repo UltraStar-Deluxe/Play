@@ -23,6 +23,8 @@ public class Settings : ISettings
     
     public bool PlayRecordedAudio { get; set; }
     public int MicrophonePlaybackVolumePercent { get; set; } = 100;
+    public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
+    public string PortAudioOutputDeviceName { get; set; } = "";
 
     // The settings use a list of deselected player such that players are selected by default.
     public List<string> DeselectedPlayerProfiles { get; private set; } = new();

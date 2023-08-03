@@ -39,15 +39,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
-    
-    [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
-    private Label semanticVersionText;
-
-    [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
-    private Label buildTimeStampText;
-
-    [Inject(UxmlName = R.UxmlNames.commitHashText)]
-    private Label commitHashText;
 
     [Inject(UxmlName = R.UxmlNames.toggleRecordingButton)]
     private Button toggleRecordingButton;
@@ -58,8 +49,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     [Inject(UxmlName = R.UxmlNames.recordingDeviceInfo)]
     private Label recordingDeviceInfo;
 
-    [Inject(UxmlName = R.UxmlNames.connectionInfoText)]
-    private Label connectionInfoText;
+    [Inject(UxmlName = R.UxmlNames.connectionInfoLabel)]
+    private Label connectionInfoLabel;
 
     [Inject(UxmlName = R.UxmlNames.clientNameTextField)]
     private TextField clientNameTextField;
@@ -174,11 +165,15 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private readonly InputSimulationControl inputSimulationControl = new();
     private readonly SongListControl songListControl = new();
-    
+    private readonly BuildInfoUiControl buildInfoUiControl = new();
+
     public void OnInjectionFinished()
     {
         injector.Inject(songListControl);
         injector.Inject(inputSimulationControl);
+        injector
+            .WithBindingForInstance(versionPropertiesTextAsset)
+            .Inject(buildInfoUiControl);
 
         mainGameHttpClient.Permissions
             .Subscribe(permissions => OnPermissionsChanged(permissions));
@@ -218,8 +213,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         clientSideConnectRequestManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus);
         
-        UpdateVersionInfoText();
-
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             audioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, audioWaveForm);
@@ -335,7 +328,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     private void OnDevModeEnabledChanged(bool isEnabled)
     {
         recordingDeviceInfo.SetVisibleByDisplay(isEnabled);
-        connectionInfoText.SetVisibleByDisplay(isEnabled);
+        connectionInfoLabel.SetVisibleByDisplay(isEnabled);
     }
 
     private void ShowMenu()
@@ -438,11 +431,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             connectionThroubleshootingText.HideByDisplay();
             serverErrorResponseText.HideByDisplay();
             toggleRecordingButton.Focus();
-            connectionInfoText.text = $"Connected to {connectEvent.ServerIpEndPoint.Address}:{connectEvent.ServerIpEndPoint.Port}";
+            connectionInfoLabel.text = $"Connected to {connectEvent.ServerIpEndPoint.Address}:{connectEvent.ServerIpEndPoint.Port}";
         }
         else
         {
-            connectionInfoText.text = "Not connected";
+            connectionInfoLabel.text = "Not connected";
             connectionStatusText.text = connectEvent.ConnectRequestCount > 0
                 ? TranslationManager.GetTranslation(R.Messages.companionApp_connectingWithFailedAttempts, "count", connectEvent.ConnectRequestCount)
                 : TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
@@ -473,23 +466,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         {
             clientSideMicDataSender.StartRecording();
         }
-    }
-
-    private void UpdateVersionInfoText()
-    {
-        Dictionary<string, string> versionProperties = PropertiesFileParser.ParseText(versionPropertiesTextAsset.text);
-
-        // Show the release number (e.g. release date, or some version number)
-        versionProperties.TryGetValue("release", out string release);
-        semanticVersionText.text = TranslationManager.GetTranslation(R.Messages.version, "value", release);
-
-        // Show the commit hash of the build
-        versionProperties.TryGetValue("commit_hash", out string commitHash);
-        commitHashText.text = TranslationManager.GetTranslation(R.Messages.commit, "value", commitHash);
-        
-        // Show the build time stamp
-        versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-        buildTimeStampText.text = TranslationManager.GetTranslation(R.Messages.buildTimeStamp, "value", buildTimeStamp);
     }
 
     public List<IBinding> GetBindings()

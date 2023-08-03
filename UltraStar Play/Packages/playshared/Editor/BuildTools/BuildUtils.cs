@@ -505,4 +505,9 @@ public static class BuildUtils
         };
         Process.Start(info);
     }
+
+    public static string GetUnityVersion()
+    {
+        return Application.unityVersion;
+    }
 }
