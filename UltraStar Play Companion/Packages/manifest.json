@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.achimmihca.portaudioforunity": "https://github.com/achimmihca/PortAudioForUnity.git?path=PortAudioForUnity/Packages/com.achimmihca.portaudioforunity#aecfeada37655cbea1cbc7e1f7cfa0a5a48b260a",
+    "com.achimmihca.portaudioforunity": "https://github.com/achimmihca/PortAudioForUnity.git?path=PortAudioForUnity/Packages/com.achimmihca.portaudioforunity#6eb81f072fcf907364738bd2a18dd67a15e603db",
     "com.achimmihca.primeinputactions": "https://github.com/achimmihca/PrimeInputActions.git?path=PrimeInputActions/Packages/com.achimmihca.primeinputactions#v1.0.0",
     "com.achimmihca.protrans": "https://github.com/achimmihca/ProTrans.git?path=ProTrans/Packages/com.achimmihca.ProTrans#v1.0.0",
     "com.achimmihca.simplehttpserverforunity": "https://github.com/achimmihca/SimpleHttpServerForUnity.git?path=SimpleHttpServerForUnity/Packages/com.achimmihca.simplehttpserverforunity#v1.0.0",
