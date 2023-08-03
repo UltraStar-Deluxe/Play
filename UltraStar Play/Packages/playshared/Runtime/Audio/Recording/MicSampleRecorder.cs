@@ -210,7 +210,7 @@ public class MicSampleRecorder : MonoBehaviour
     {
         if (PortAudioOutputDeviceName.IsNullOrEmpty())
         {
-            return PortAudioUtils.DefaultOutputDeviceInfo.Name;
+            return MicrophoneAdapter.DefaultOutputDeviceInfo.Name;
         }
 
         return PortAudioOutputDeviceName;
