@@ -116,11 +116,16 @@ public class OverviewAreaControl : IInjectionFinishedListener
 
         if (audioWaveFormVisualization == null)
         {
-            audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, overviewAreaWaveform)
-            {
-                // Waveform color is same as text color
-                WaveformColor = overviewAreaLabel.resolvedStyle.color
-            };
+            int textureWidth = 1024;
+            int textureHeight = 128;
+            audioWaveFormVisualization = new AudioWaveFormVisualization(
+                songEditorSceneControl.gameObject,
+                overviewAreaWaveform,
+                textureWidth,
+                textureHeight,
+                "song editor overview area audio visualization");
+            // Waveform color is same as text color
+            audioWaveFormVisualization.WaveformColor = overviewAreaLabel.resolvedStyle.color;
         }
 
         AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, audioManager, settings);

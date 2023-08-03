@@ -11,9 +11,14 @@ public class AudioWaveFormVisualization : INeedInjection, IDisposable
 
     private FixLengthList<MinMax> minMaxValues;
     
-    public AudioWaveFormVisualization(GameObject gameObject, VisualElement visualElement)
+    public AudioWaveFormVisualization(
+        GameObject gameObject,
+        VisualElement visualElement,
+        int textureWidth = -1,
+        int textureHeight = -1,
+        string name = null)
     {
-        dynTexture = new DynamicTexture(gameObject, visualElement);
+        dynTexture = new DynamicTexture(gameObject, visualElement, textureWidth, textureHeight, name);
     }
 
     public void Dispose()

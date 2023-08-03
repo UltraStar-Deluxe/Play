@@ -215,7 +215,14 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            audioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, audioWaveForm);
+            int textureWidth = 512;
+            int textureHeight = 256;
+            audioWaveFormVisualization = new AudioWaveFormVisualization(
+                gameObject,
+                audioWaveForm,
+                textureWidth,
+                textureHeight,
+                "main scene audio wave form visualization");
         });
         
         mouseSensitivityFloatField.value = settings.MousePadSensitivity;

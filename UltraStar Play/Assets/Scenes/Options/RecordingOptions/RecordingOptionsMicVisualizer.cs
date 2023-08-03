@@ -35,7 +35,14 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
             .AddTo(gameObject);
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
-            audioWaveFormVisualization = new AudioWaveFormVisualization(this.gameObject, audioWaveForm);
+            int textureWidth = 256;
+            int textureHeight = 128;
+            audioWaveFormVisualization = new AudioWaveFormVisualization(
+                gameObject,
+                audioWaveForm,
+                textureWidth,
+                textureHeight,
+                "recording options audio visualization");
         });
     }
 
