@@ -67,14 +67,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     [Inject(UxmlName = R.UxmlNames.createSongButton)]
     private Button createSongButton;
 
-    [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
-    private Label semanticVersionText;
+    [Inject(UxmlName = R.UxmlNames.semanticVersionLabel)]
+    private Label semanticVersionLabel;
     
-    [Inject(UxmlName = R.UxmlNames.commitHashText)]
-    private Label commitHashText;
+    [Inject(UxmlName = R.UxmlNames.commitHashLabel)]
+    private Label commitHashLabel;
     
-    [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
-    private Label buildTimeStampText;
+    [Inject(UxmlName = R.UxmlNames.buildTimeStampLabel)]
+    private Label buildTimeStampLabel;
+
+    [Inject(UxmlName = R.UxmlNames.unityVersionLabel)]
+    private Label unityVersionLabel;
 
     [Inject(UxmlName = R.UxmlNames.versionDetailsContainer)]
     private VisualElement versionDetailsContainer;
@@ -130,7 +133,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             })
             .setEaseSpring();
 
-        semanticVersionText.RegisterCallback<PointerDownEvent>(_ =>
+        semanticVersionLabel.RegisterCallback<PointerDownEvent>(_ =>
         {
             versionDetailsContainer.ShowByDisplay();
             StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10, () => versionDetailsContainer.HideByDisplay()));
@@ -188,14 +191,23 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
         versionProperties.TryGetValue("release", out string release);
         versionProperties.TryGetValue("name", out string releaseName);
         string displayName = releaseName.IsNullOrEmpty() ? release : releaseName;
-        semanticVersionText.text = "Version: " + displayName;
+        semanticVersionLabel.text = $"Version: {displayName}";
 
         // Show the commit hash of the build
         versionProperties.TryGetValue("commit_hash", out string commitHash);
-        commitHashText.text = "Commit: " + commitHash;
+        commitHashLabel.text = $"Commit: {commitHash}";
         
         versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-        buildTimeStampText.text = "Build timestamp: " + buildTimeStamp;
+        buildTimeStampLabel.text = $"Build timestamp: {buildTimeStamp}";
+
+        versionProperties.TryGetValue("unity_version", out string unityVersion);
+        if (!Application.isEditor
+            && unityVersion != Application.unityVersion)
+        {
+            Debug.LogWarning("Unity version in VERSION.txt info file does not match the current Unity version. " +
+                             $"VERSION.txt: '{unityVersion}', Application.unityVersion: '{Application.unityVersion}'");
+        }
+        unityVersionLabel.text = $"Unity version: {Application.unityVersion}";
     }
 
     public void CloseQuitGameDialog()

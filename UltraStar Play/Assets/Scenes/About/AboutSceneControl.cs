@@ -15,7 +15,7 @@ using UnityEngine.UIElements;
 
 public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
 {
-    private static readonly OrderedDictionary<string, string> aboutTextFilesInStreamingAssets = new()
+    private static readonly InsertionOrderedDictionary<string, string> aboutTextFilesInStreamingAssets = new()
     {
         { "Melody Mania", "InfoAndLegalTexts/Melody-Mania.txt" },
         { "Licenses", "InfoAndLegalTexts/License-Overview.txt" },

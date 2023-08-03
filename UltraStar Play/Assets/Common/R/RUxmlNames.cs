@@ -64,7 +64,7 @@ public static partial class R
         public const string btn_cfxr3 = "btn_cfxr3";
         public const string btn_cfxr4 = "btn_cfxr4";
         public const string btn_cfxrbundle = "btn_cfxrbundle";
-        public const string buildTimeStampText = "buildTimeStampText";
+        public const string buildTimeStampLabel = "buildTimeStampLabel";
         public const string buttonContainer = "buttonContainer";
         public const string buttonRecordingButtonTextField = "buttonRecordingButtonTextField";
         public const string buttonRecordingGroup = "buttonRecordingGroup";
@@ -100,7 +100,7 @@ public static partial class R
         public const string colorPicker = "colorPicker";
         public const string column = "column";
         public const string commentLabel = "commentLabel";
-        public const string commitHashText = "commitHashText";
+        public const string commitHashLabel = "commitHashLabel";
         public const string commonScoreIcon = "commonScoreIcon";
         public const string commonScoreSentenceRatingContainer = "commonScoreSentenceRatingContainer";
         public const string confirmDeletePlaylistButton = "confirmDeletePlaylistButton";
@@ -642,7 +642,7 @@ public static partial class R
         public const string selectRandomSongIcon = "selectRandomSongIcon";
         public const string selectSoundfontButton = "selectSoundfontButton";
         public const string selectSoundfontIcon = "selectSoundfontIcon";
-        public const string semanticVersionText = "semanticVersionText";
+        public const string semanticVersionLabel = "semanticVersionLabel";
         public const string sentence = "sentence";
         public const string sentenceImage = "sentenceImage";
         public const string sentenceLabel = "sentenceLabel";
@@ -873,6 +873,7 @@ public static partial class R
         public const string undoButton = "undoButton";
         public const string unexpectedErrorContainer = "unexpectedErrorContainer";
         public const string unexpectedErrorLabel = "unexpectedErrorLabel";
+        public const string unityVersionLabel = "unityVersionLabel";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldHint = "urlTextFieldHint";

@@ -1,4 +1,5 @@
-release = 1.0.2
-build_timestamp = 2307101216
-commit_hash = 4a4712d69
+release = 1.1.0-beta7
+commit_hash = 23d2be889
+unity_version = 2022.3.6f1
+build_timestamp = 2308031149
 website_link = https://melodymania.org/get
