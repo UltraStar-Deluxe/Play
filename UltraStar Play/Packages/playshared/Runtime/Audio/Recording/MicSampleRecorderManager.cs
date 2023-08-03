@@ -57,11 +57,16 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         settings.ObserveEveryValueChanged(it => it.MicrophonePlaybackVolumePercent)
             .Subscribe(newValue =>
             {
-                micSampleRecorders.ForEach(it =>
+                float outputAmplificationFactor = NumberUtils.PercentToFactor(newValue);
+                foreach (MicSampleRecorder it in micSampleRecorders)
                 {
-                    float finalVolume = NumberUtils.PercentToFactor(newValue);
-                    it.OutputVolume = finalVolume;
-                });
+                    it.OutputVolume = outputAmplificationFactor;
+                }
+
+                foreach (DeviceInfo deviceInfo in PortAudioUtils.DeviceInfos)
+                {
+                    PortAudioUtils.SetOutputAmplificationFactor(deviceInfo, outputAmplificationFactor);
+                }
             });
 
         settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
