@@ -60,7 +60,7 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
                 micSampleRecorders.ForEach(it =>
                 {
                     float finalVolume = NumberUtils.PercentToFactor(newValue);
-                    it.Volume = finalVolume;
+                    it.OutputVolume = finalVolume;
                 });
             });
 
@@ -109,6 +109,7 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         micSampleRecorder.MicProfile = micProfile;
         micSampleRecorder.PlayRecordedAudio = settings.PlayRecordedAudio;
         micSampleRecorder.PortAudioOutputDeviceName = settings.PortAudioOutputDeviceName;
+        micSampleRecorder.OutputVolume = NumberUtils.PercentToFactor(settings.MicrophonePlaybackVolumePercent);
         micSampleRecorders.Add(micSampleRecorder);
         return micSampleRecorder;
     }
