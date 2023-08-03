@@ -64,10 +64,15 @@ public class MicSampleRecorder : MonoBehaviour
         }
     }
 
-    public float Volume
+    private float outputVolume = 1;
+    public float OutputVolume
     {
-        get => audioSource.volume;
-        set => audioSource.volume = value;
+        get => outputVolume;
+        set
+        {
+            outputVolume = value;
+            audioSource.volume = value;
+        }
     }
 
     private readonly CountSubject<RecordingEvent> recordingEventStream = new();
@@ -173,7 +178,7 @@ public class MicSampleRecorder : MonoBehaviour
         DestroyAudioClips();
         using DisposableStopwatch d = new($"MicrophoneAdapter.Start took <ms> with {MicProfile.GetDisplayNameWithChannel()}");
         {
-            micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName);
+            micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName, OutputVolume);
         }
         
         if (!MicrophoneAdapter.UsePortAudio)
