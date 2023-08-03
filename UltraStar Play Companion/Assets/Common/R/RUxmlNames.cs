@@ -9,13 +9,13 @@ public static partial class R
         public const string backButton = "backButton";
         public const string background = "background";
         public const string backIcon = "backIcon";
-        public const string buildTimeStampText = "buildTimeStampText";
+        public const string buildTimeStampLabel = "buildTimeStampLabel";
         public const string buttonRow = "buttonRow";
         public const string clientNameTextField = "clientNameTextField";
         public const string closeMenuButton = "closeMenuButton";
         public const string column = "column";
-        public const string commitHashText = "commitHashText";
-        public const string connectionInfoText = "connectionInfoText";
+        public const string commitHashLabel = "commitHashLabel";
+        public const string connectionInfoLabel = "connectionInfoLabel";
         public const string connectionServerAddressTextField = "connectionServerAddressTextField";
         public const string connectionServerPortTextField = "connectionServerPortTextField";
         public const string connectionStatusText = "connectionStatusText";
@@ -91,7 +91,7 @@ public static partial class R
         public const string scrollWheelArea = "scrollWheelArea";
         public const string searchIcon = "searchIcon";
         public const string selectedToggle = "selectedToggle";
-        public const string semanticVersionText = "semanticVersionText";
+        public const string semanticVersionLabel = "semanticVersionLabel";
         public const string serverErrorResponseText = "serverErrorResponseText";
         public const string showInputSimulationButton = "showInputSimulationButton";
         public const string showKeyboardSimulationButton = "showKeyboardSimulationButton";
@@ -162,6 +162,7 @@ public static partial class R
         public const string toggleRecordingButtonContainer = "toggleRecordingButtonContainer";
         public const string triangleDown = "triangleDown";
         public const string triangleUp = "triangleUp";
+        public const string unityVersionLabel = "unityVersionLabel";
         public const string viewLogButton = "viewLogButton";
         public const string visualizeAudioToggle = "visualizeAudioToggle";
         public const string visualizeAudioToggleContainer = "visualizeAudioToggleContainer";

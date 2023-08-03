@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
+public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, ITranslator, IBinder
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -103,10 +101,18 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
+    private readonly BuildInfoUiControl buildInfoUiControl = new();
 
     private bool IsNewSongDialogOpen => newSongDialogControl != null;
     private bool IsQuitGameDialogOpen => quitGameDialogControl != null;
     private bool IsAnyDialogOpen => IsNewSongDialogOpen || IsQuitGameDialogOpen || newVersionChecker.IsNewVersionAvailableDialogOpen;
+
+    public void OnInjectionFinished()
+    {
+        injector
+            .WithBindingForInstance(versionPropertiesTextAsset)
+            .Inject(buildInfoUiControl);
+    }
 
     private void Start()
     {
@@ -139,8 +145,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10, () => versionDetailsContainer.HideByDisplay()));
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
         });
-
-        UpdateVersionInfoText();
 
         InitInputActions();
 
@@ -181,33 +185,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     {
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
-    }
-
-    private void UpdateVersionInfoText()
-    {
-        Dictionary<string, string> versionProperties = PropertiesFileParser.ParseText(versionPropertiesTextAsset.text);
-
-        // Show the release number (e.g. release date, or some version number)
-        versionProperties.TryGetValue("release", out string release);
-        versionProperties.TryGetValue("name", out string releaseName);
-        string displayName = releaseName.IsNullOrEmpty() ? release : releaseName;
-        semanticVersionLabel.text = $"Version: {displayName}";
-
-        // Show the commit hash of the build
-        versionProperties.TryGetValue("commit_hash", out string commitHash);
-        commitHashLabel.text = $"Commit: {commitHash}";
-        
-        versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-        buildTimeStampLabel.text = $"Build timestamp: {buildTimeStamp}";
-
-        versionProperties.TryGetValue("unity_version", out string unityVersion);
-        if (!Application.isEditor
-            && unityVersion != Application.unityVersion)
-        {
-            Debug.LogWarning("Unity version in VERSION.txt info file does not match the current Unity version. " +
-                             $"VERSION.txt: '{unityVersion}', Application.unityVersion: '{Application.unityVersion}'");
-        }
-        unityVersionLabel.text = $"Unity version: {Application.unityVersion}";
     }
 
     public void CloseQuitGameDialog()
