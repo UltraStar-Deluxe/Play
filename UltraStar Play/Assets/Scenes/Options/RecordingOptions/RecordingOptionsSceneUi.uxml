@@ -25,7 +25,7 @@
                 <ui:VisualElement name="globalSettingsContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                     <ui:Label tabindex="-1" text="Global Settings" display-tooltip-when-elided="true" name="globalSettingsLabel" class="noBackgroundInHierarchy" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />
                     <ui:Toggle name="playRecordedAudioToggle" label="Play recorded audio" class="noBackgroundInHierarchy" style="display: none;" />
-                    <ui:Toggle name="usePortAudioToggle" label="Enable multi-channel&#10;and low-latency support" class="noBackgroundInHierarchy mt-3" style="-unity-text-align: upper-center;" />
+                    <ui:Toggle name="usePortAudioToggle" label="Enable multi-channel&#10;and low-latency support" class="noBackgroundInHierarchy mt-3" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:ScrollView>
