@@ -75,6 +75,7 @@ public class Settings : ISettings
     public bool ShowStaticLyrics { get; set; } = true;
     public bool ShowPitchIndicator { get; set; }
     public bool ShowLyricsOnNotes { get; set; }
+    public bool ShowPlayerInfoNextToNotes { get; set; }
     public bool ShowPlayerNames { get; set; } = true;
     public bool ShowScoreNumbers { get; set; } = true;
     public bool ShowSongProgress { get; set; } = true;

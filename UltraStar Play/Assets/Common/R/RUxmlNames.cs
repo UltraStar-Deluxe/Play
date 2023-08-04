@@ -533,6 +533,7 @@ public static partial class R
         public const string PlayerUi = "PlayerUi";
         public const string playerUiContainer = "playerUiContainer";
         public const string playerUiContainerPlaceholder = "playerUiContainerPlaceholder";
+        public const string playerUiRoot = "playerUiRoot";
         public const string playIcon = "playIcon";
         public const string playlistChooserDropdownContainer = "playlistChooserDropdownContainer";
         public const string playlistChooserDropdownOverlay = "playlistChooserDropdownOverlay";

@@ -270,7 +270,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         FieldBindingUtils.Bind(showStaticLyricsToggle,
             () => settings.ShowStaticLyrics,
             newValue => settings.ShowStaticLyrics = newValue);
-        
+
+        Toggle showPlayerInfoNextToNotesToggle = new("Player near notes¹");
+        contextMenuPopup.AddVisualElement(showPlayerInfoNextToNotesToggle);
+        FieldBindingUtils.Bind(showPlayerInfoNextToNotesToggle,
+            () => settings.ShowPlayerInfoNextToNotes,
+            newValue => settings.ShowPlayerInfoNextToNotes = newValue);
+
         Toggle showSongProgress = new("Progress");
         contextMenuPopup.AddVisualElement(showSongProgress);
         FieldBindingUtils.Bind(showSongProgress,
