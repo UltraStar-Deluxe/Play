@@ -8,7 +8,15 @@ public class SineToneAudioGenerator : MonoBehaviour
     private AudioSource audioSource;
     private int sampleRate;
     private int totalMonoSampleIndex;
-    
+
+    public bool SkipOnAudioFilterRead { get; set; }
+
+    public bool Mute
+    {
+        get => audioSource.mute;
+        set => audioSource.mute = value;
+    }
+
     private void Awake()
     {
         sampleRate = AudioSettings.outputSampleRate;
@@ -36,6 +44,11 @@ public class SineToneAudioGenerator : MonoBehaviour
      */
     private void OnAudioFilterRead(float[] data, int channelCount)
     {
+        if (SkipOnAudioFilterRead)
+        {
+            return;
+        }
+
         FillBuffer(data, channelCount);
     }
 
