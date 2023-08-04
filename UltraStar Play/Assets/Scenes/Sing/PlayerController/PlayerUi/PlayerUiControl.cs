@@ -113,6 +113,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         // Show rating and score after each sentence
         playerScoreLabel.text = "";
+        playerScoreProgressBar.ProgressInPercent = 0;
         if (singSceneControl.IsIndividualScore)
         {
             ShowTotalScore(playerScoreControl.TotalScore);
