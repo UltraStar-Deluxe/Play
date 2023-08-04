@@ -706,6 +706,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
             ESongIssueSeverity.Error);
 
+        // Check WebView URI is supported
+        if (!songMeta.Website.IsNullOrEmpty()
+            && !WebViewUtils.CanHandleWebViewUrl(songMeta.Website))
+        {
+            songIssues.Add(SongIssue.CreateWarning(songMeta, $"Unsupported website '{songMeta.Website}'. Support can be added with custom JavaScript file."));
+        }
+
         // Vocals audio and instrumental audio must use formats that are supported by Unity. Ffmpeg can only be used for the main audio.
         CheckResourceExists(songIssues, songMeta, songMeta.VocalsAudio,
             () => $"Vocals audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetVocalsAudioUri(songMeta))}'",
