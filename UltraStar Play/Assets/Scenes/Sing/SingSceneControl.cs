@@ -113,6 +113,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     [Inject(UxmlName = R.UxmlNames.songTimeProgressBar)]
     private ProgressBar songTimeProgressBar;
 
+    [Inject(UxmlName = R.UxmlNames.detailedTimeBar)]
+    private VisualElement detailedTimeBar;
+
+    [Inject(UxmlName = R.UxmlNames.governanceOverlayDetailedTimeBar)]
+    private VisualElement governanceOverlayDetailedTimeBar;
+
     [Inject(UxmlClass = R.UssClasses.playerInfoUiList)]
     private List<VisualElement> playerInfoUiLists;
     
@@ -174,6 +180,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private SingingLyricsControl bottomSingingLyricsControl;
 
     private readonly TimeBarControl timeBarControl = new();
+    private readonly TimeBarControl governanceOverlayTimeBarControl = new();
 
     private MessageDialogControl dialogControl;
 
@@ -199,7 +206,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     
     public void OnInjectionFinished()
     {
-        injector.Inject(timeBarControl);
+        injector
+            .WithRootVisualElement(detailedTimeBar)
+            .Inject(timeBarControl);
+        injector
+            .WithRootVisualElement(governanceOverlayDetailedTimeBar)
+            .Inject(governanceOverlayTimeBarControl);
         injector.Inject(commonScoreControl);
         injector.Inject(countdownControl);
         injector.Inject(medleyControl);
@@ -291,13 +303,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             double progressInPercent = 100 * (songAudioPlayer.PositionInSongInMillis / songAudioPlayer.DurationOfSongInMillis);
             songTimeProgressBar.value = (float) progressInPercent;
         });
-        settings.ObserveEveryValueChanged(it => it.ShowSongProgress)
-            .Subscribe(newValue => songTimeProgressBar.SetVisibleByDisplay(newValue));
+        settings.ObserveEveryValueChanged(it => it.ShowSongProgressBar)
+            .Subscribe(newValue =>
+            {
+                songTimeProgressBar.SetVisibleByDisplay(newValue is ESongProgressBar.Plain);
+                detailedTimeBar.SetVisibleByDisplay(newValue is ESongProgressBar.Detailed);
+            });
 
         // Update TimeBar every second
         StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(1f, () =>
         {
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
+            governanceOverlayTimeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
         
         // Start medley if needed
@@ -594,7 +611,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 playerControl.UpdateUi();
             }
         });
-        timeBarControl.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
+        timeBarControl?.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
+        governanceOverlayTimeBarControl?.UpdatePositionIndicator(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         topSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
         bottomSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
 
@@ -1104,7 +1122,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             })
             .Subscribe(_ =>
             {
-                timeBarControl.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
+                timeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
+                governanceOverlayTimeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
                 songAudioPlayer.PlayAudio();
             });
 

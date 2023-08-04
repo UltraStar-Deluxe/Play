@@ -138,6 +138,7 @@ public static partial class R
         public const string deletePlaylistButton = "deletePlaylistButton";
         public const string deleteTeamButton = "deleteTeamButton";
         public const string designOptionsButton = "designOptionsButton";
+        public const string detailedTimeBar = "detailedTimeBar";
         public const string detectBpmButton = "detectBpmButton";
         public const string detectBpmLabel = "detectBpmLabel";
         public const string developerOptionsButton = "developerOptionsButton";
@@ -207,6 +208,7 @@ public static partial class R
         public const string goToIssueButton = "goToIssueButton";
         public const string goToLastPlaybackPositionToggle = "goToLastPlaybackPositionToggle";
         public const string governanceOverlay = "governanceOverlay";
+        public const string governanceOverlayDetailedTimeBar = "governanceOverlayDetailedTimeBar";
         public const string graphicsOptionsButton = "graphicsOptionsButton";
         public const string gridGroup = "gridGroup";
         public const string gridSizeTextField = "gridSizeTextField";
@@ -258,7 +260,6 @@ public static partial class R
         public const string importSongsLabel = "importSongsLabel";
         public const string infoIcon = "infoIcon";
         public const string innerSongEntryUi = "innerSongEntryUi";
-        public const string innerTimeBar = "innerTimeBar";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputDeviceIconContainer = "inputDeviceIconContainer";
         public const string InputDeviceIconContainer = "InputDeviceIconContainer";
@@ -824,7 +825,7 @@ public static partial class R
         public const string threePlayerLayout = "threePlayerLayout";
         public const string timeBarAndLabelContainer = "timeBarAndLabelContainer";
         public const string timeBarPositionIndicator = "timeBarPositionIndicator";
-        public const string timeBars = "timeBars";
+        public const string timeBarsContainer = "timeBarsContainer";
         public const string timeLabelFormatPicker = "timeLabelFormatPicker";
         public const string timeValueLabel = "timeValueLabel";
         public const string title = "title";
