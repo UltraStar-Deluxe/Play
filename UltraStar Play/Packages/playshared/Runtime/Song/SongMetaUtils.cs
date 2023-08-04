@@ -27,14 +27,14 @@ public static class SongMetaUtils
         return ResourceExists(songMeta, songMeta.Background);
     }
 
-    public static bool VideoResourceExists(SongMeta songMeta)
+    public static bool VideoResourceExists(SongMeta songMeta, Func<string, bool> canHandleUri)
     {
-        return ResourceExists(songMeta, songMeta.Video);
+        return ResourceExists(songMeta, GetVideoUriPreferAudioUriIfWebView(songMeta, canHandleUri));
     }
 
     public static bool AudioResourceExists(SongMeta songMeta)
     {
-        return ResourceExists(songMeta, songMeta.Mp3);
+        return ResourceExists(songMeta, GetAudioUri(songMeta));
     }
 
     public static bool VocalsAudioResourceExists(SongMeta songMeta)
@@ -62,9 +62,28 @@ public static class SongMetaUtils
         return GetUri(songMeta, songMeta.Video);
     }
 
-    public static string GetAudioUri(SongMeta songMeta)
+    public static string GetLocalAudioUri(SongMeta songMeta)
     {
         return GetUri(songMeta, songMeta.Mp3);
+    }
+
+    public static string GetWebPageUri(SongMeta songMeta)
+    {
+        return GetUri(songMeta, songMeta.WebPage);
+    }
+
+    public static string GetAudioUri(SongMeta songMeta)
+    {
+        string absoluteLocalAudioFilePath = GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+        if (FileUtils.Exists(absoluteLocalAudioFilePath)
+            || songMeta.WebPage.IsNullOrEmpty())
+        {
+            return GetLocalAudioUri(songMeta);
+        }
+        else
+        {
+            return GetWebPageUri(songMeta);
+        }
     }
 
     public static string GetVocalsAudioUri(SongMeta songMeta)
@@ -749,10 +768,11 @@ public static class SongMetaUtils
         {
             return "";
         }
-        
-        string videoUri = WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3) && canHandleUri.Invoke(songMeta.Mp3)
-            ? SongMetaUtils.GetAudioUri(songMeta)
-            : SongMetaUtils.GetVideoUri(songMeta);
+
+        string audioUri = GetAudioUri(songMeta);
+        string videoUri = WebRequestUtils.IsHttpOrHttpsUri(audioUri) && canHandleUri.Invoke(audioUri)
+            ? GetAudioUri(songMeta)
+            : GetVideoUri(songMeta);
         return videoUri;
     }
     

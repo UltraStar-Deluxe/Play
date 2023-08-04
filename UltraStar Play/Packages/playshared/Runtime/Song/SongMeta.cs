@@ -42,9 +42,14 @@ public class SongMeta
     public float Bpm { get; set; }
 
     /**
-     * Path to the audio file.
+     * Path to the local audio file.
      */
     public string Mp3 { get; set; } = "";
+
+    /**
+     * URI to load the song in the embedded WebView.
+     */
+    public string WebPage { get; set; } = "";
 
     /**
      * Path to the audio file that contains only the voice of the singers.

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using ProTrans;
 using Serilog.Events;
 using UniRx;
 using UnityEngine;
@@ -700,7 +701,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // Check audio format.
         // Audio is mandatory. Without working audio file, the song cannot be played.
-        CheckResourceExists(songIssues, songMeta, songMeta.Mp3,
+        CheckResourceExists(songIssues, songMeta, SongMetaUtils.GetAudioUri(songMeta),
             () => $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetAudioUri(songMeta))}'",
             ESongIssueSeverity.Error);
         CheckAudioOrVideoFormatIsSupported(songIssues, webViewManager, songMeta.Mp3,
