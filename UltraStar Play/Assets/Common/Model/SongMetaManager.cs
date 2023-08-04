@@ -56,7 +56,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
     
     private UiManager uiManager;
     private Settings settings;
-    private WebViewManager webViewManager;
 
     private List<string> EnabledSongFolders => SettingsUtils.GetEnabledSongFolders(settings);
 
@@ -97,7 +96,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
     {
         uiManager = UiManager.Instance;
         settings = SettingsManager.Instance.Settings;
-        webViewManager = WebViewManager.Instance;
     }
 
     protected override void StartSingleton()
@@ -493,7 +491,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
             List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
                 newSongMeta,
-                webViewManager,
                 settings.UseFfmpegToPlayMediaFiles,
                 settings.CheckCodecIsSupported);
             songIssues.AddRange(mediaFormatIssues);
@@ -664,7 +661,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     
     // Checks whether the audio and video file formats of the song are supported.
     // Returns true iff the audio file of the SongMeta exists and is supported.
-    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, WebViewManager webViewManager, bool useFfmpegToPlayMediaFiles, bool checkCodecIsSupported)
+    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, bool useFfmpegToPlayMediaFiles, bool checkCodecIsSupported)
     {
         List<SongIssue> songIssues = new();
 
@@ -673,7 +670,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             () => $"Video resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetVideoUri(songMeta))}'",
             ESongIssueSeverity.Warning);
 
-        CheckVideoFormatIsSupported(songIssues, webViewManager, songMeta.Video,
+        CheckVideoFormatIsSupported(songIssues, songMeta.Video,
             () => $"Unsupported video format '{GetUriOrExtensionWithoutDot(songMeta.Video)}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
             ESongIssueSeverity.Warning);
@@ -686,7 +683,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                                              || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
             if (!isVideoEmptyOrSameAsAudio
                 && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
-                && !webViewManager.CanHandleUrl(songMeta.Video))
+                && !WebViewUtils.CanHandleWebViewUrl(songMeta.Video))
             {
                 songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video resource differs from audio resource. This is only supported for the formats {unitySupportedVideoFileExtensionsAsCsv}"));
 
@@ -704,7 +701,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         CheckResourceExists(songIssues, songMeta, SongMetaUtils.GetAudioUri(songMeta),
             () => $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetAudioUri(songMeta))}'",
             ESongIssueSeverity.Error);
-        CheckAudioOrVideoFormatIsSupported(songIssues, webViewManager, songMeta.Mp3,
+        CheckAudioOrVideoFormatIsSupported(songIssues, songMeta.Mp3,
             () => $"Unsupported audio format '{GetUriOrExtensionWithoutDot(songMeta.Mp3)}'. Convert to one of {unitySupportedAudioFileExtensionsAsCsv}",
             () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
             ESongIssueSeverity.Error);
@@ -839,7 +836,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static void CheckVideoFormatIsSupported(
         List<SongIssue> songIssues,
-        WebViewManager webViewManager,
         string pathOrUri,
         Func<string> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
@@ -851,7 +847,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         if (!ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(pathOrUri))
-            && !webViewManager.CanHandleUrl(pathOrUri))
+            && !WebViewUtils.CanHandleWebViewUrl(pathOrUri))
         {
             songIssues.Add(new SongIssue(severity, songIssueDataGetter(), errorMessageGetter(), -1, -1));
             // Do not attempt to load this file
@@ -861,7 +857,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static void CheckAudioOrVideoFormatIsSupported(
         List<SongIssue> songIssues,
-        WebViewManager webViewManager,
         string pathOrUri,
         Func<string> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
@@ -875,7 +870,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         string fileExtension = Path.GetExtension(pathOrUri);
         if (!ApplicationUtils.IsSupportedAudioFormat(fileExtension)
             && !ApplicationUtils.IsSupportedVideoFormat(fileExtension)
-            && !webViewManager.CanHandleUrl(pathOrUri))
+            && !WebViewUtils.CanHandleWebViewUrl(pathOrUri))
         {
             songIssues.Add(new SongIssue(severity, songIssueDataGetter(), errorMessageGetter(), -1, -1));
         }

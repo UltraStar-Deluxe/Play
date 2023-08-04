@@ -206,7 +206,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
 
         // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
-        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewManager.CanHandleUrl);
+        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
         if (songVideoPlayer == null
             || !SongMetaUtils.ResourceExists(songMeta, videoUri))
         {

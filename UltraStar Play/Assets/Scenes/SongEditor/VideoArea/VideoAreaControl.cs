@@ -35,9 +35,6 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     [Inject(UxmlName = R.UxmlNames.videoAreaLabel)]
     private Label videoAreaLabel;
 
-    [Inject]
-    private WebViewManager webViewManager;
-
     [Inject(UxmlName = R.UxmlNames.songCoverImage)]
     private VisualElement songCoverImage;
 
@@ -68,7 +65,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     public void OnInjectionFinished()
     {
         videoAreaLabel.HideByDisplay();
-        if (SongMetaUtils.VideoResourceExists(songMeta, webViewManager.CanHandleUrl))
+        if (SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl))
         {
             ShowVideoImage();
         }
@@ -190,8 +187,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void ShowVideoImage()
     {
-        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta, webViewManager.CanHandleUrl));
-        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta, webViewManager.CanHandleUrl));
+        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
+        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
         songBackgroundImage.HideByDisplay();
         songCoverImage.HideByDisplay();
     }

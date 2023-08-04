@@ -288,7 +288,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private IObservable<SongVideoLoadedEvent> LoadVideoAsObservable(SongMeta localSongMeta, string uri)
     {
-        if (webViewManager.CanHandleUrl(uri))
+        if (WebViewUtils.CanHandleWebViewUrl(uri))
         {
             return LoadWithWebView(uri);
         }
@@ -641,7 +641,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         UnloadVideo();
 
         // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
-        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, webViewManager.CanHandleUrl);
+        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
 
         if (videoUri.IsNullOrEmpty())
         {
