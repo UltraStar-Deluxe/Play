@@ -28,7 +28,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private VisualElement nextSentenceContainer;
 
     [Inject(UxmlName = R.UxmlNames.positionBeforeLyricsIndicator)]
-    private VisualElement positionBeforeLyricsIndicator;
+    private MaterialIcon positionBeforeLyricsIndicator;
 
     [Inject]
     private Settings settings;
@@ -67,7 +67,26 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
 
-        GetCurrentNoteLyricsColor().IfNotDefault(color => positionBeforeLyricsIndicator.style.color = new StyleColor(color));
+        // Before lyrics indicator
+        GetCurrentNoteLyricsColor().IfNotDefault(color =>
+        {
+            positionBeforeLyricsIndicator.style.color = new StyleColor(color);
+            positionBeforeLyricsIndicator.style.unityBackgroundImageTintColor = new StyleColor(color);
+        });
+        themeManager.GetCurrentTheme().ThemeJson.beforeLyricsIndicatorImage.IfNotNull(path =>
+        {
+            if (path.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(themeManager.GetCurrentTheme(), path);
+            ImageManager.LoadSpriteFromUri(absolutePath, loadedSprite =>
+            {
+                positionBeforeLyricsIndicator.style.backgroundImage = new StyleBackground(loadedSprite);
+                positionBeforeLyricsIndicator.Icon = "";
+            });
+        });
     }
 
     private Color32 GetPlayerControlColor()
