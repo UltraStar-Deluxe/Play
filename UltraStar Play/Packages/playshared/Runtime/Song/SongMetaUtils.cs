@@ -11,7 +11,7 @@ public static class SongMetaUtils
         o => o?.GetHashCode() ?? 0,
         new Vector2(0.4f, 1f),
         new Vector2(0.7f, 1f));
-    
+
     public static bool SongMetaFileExists(SongMeta songMeta)
     {
         return ResourceExists(songMeta, songMeta.FileName);
@@ -30,6 +30,11 @@ public static class SongMetaUtils
     public static bool VideoResourceExists(SongMeta songMeta, Func<string, bool> canHandleUri)
     {
         return ResourceExists(songMeta, GetVideoUriPreferAudioUriIfWebView(songMeta, canHandleUri));
+    }
+
+    public static bool LocalAudioResourceExists(SongMeta songMeta)
+    {
+        return ResourceExists(songMeta, GetLocalAudioUri(songMeta));
     }
 
     public static bool AudioResourceExists(SongMeta songMeta)
@@ -419,7 +424,7 @@ public static class SongMetaUtils
 
         return lyrics;
     }
-    
+
     public static string GetLyrics(Voice voice, bool removeTilde = false)
     {
         StringBuilder sb = new();
@@ -468,7 +473,7 @@ public static class SongMetaUtils
         {
             return title;
         }
-        
+
         if (title.IsNullOrEmpty())
         {
             return artist;
@@ -476,7 +481,7 @@ public static class SongMetaUtils
 
         return $"{artist} - {title}";
     }
-    
+
     public static int MinBeat(List<Note> notes)
     {
         if (notes.IsNullOrEmpty())
@@ -622,7 +627,7 @@ public static class SongMetaUtils
         string relativePath = PathUtils.MakeRelativePath(songMeta.Directory, path);
         return relativePath;
     }
-    
+
     public static string GetAttributionText(SongMeta selectedSong)
     {
         string GetAttributionText(string title, string author, string license, string source)
@@ -640,7 +645,7 @@ public static class SongMetaUtils
             {
                 parts.Add($"Source: {source}");
             }
-            
+
             if (parts.IsNullOrEmpty())
             {
                 return "";
@@ -648,7 +653,7 @@ public static class SongMetaUtils
 
             return parts.ToCsv("\n   ", $"• {title}: ", "");
         }
-        
+
         string audioAuthor = selectedSong.GetUnknownHeaderEntry($"AUDIOAUTHOR");
         if (audioAuthor.IsNullOrEmpty())
         {
@@ -656,23 +661,23 @@ public static class SongMetaUtils
         }
         string audioLicense = selectedSong.GetUnknownHeaderEntry($"AUDIOLICENSE");
         string audioSource = selectedSong.GetUnknownHeaderEntry($"AUDIOSOURCE");
-        
+
         string lyricsAuthor = selectedSong.GetUnknownHeaderEntry($"LYRICSAUTHOR");
         string lyricsLicense = selectedSong.GetUnknownHeaderEntry($"LYRICSLICENSE");
         string lyricsSource = selectedSong.GetUnknownHeaderEntry($"LYRICSSOURCE");
-        
+
         string backgroundAuthor = selectedSong.GetUnknownHeaderEntry($"BACKGROUNDAUTHOR");
         string backgroundLicense = selectedSong.GetUnknownHeaderEntry($"BACKGROUNDLICENSE");
         string backgroundSource = selectedSong.GetUnknownHeaderEntry($"BACKGROUNDSOURCE");
-        
+
         string coverAuthor = selectedSong.GetUnknownHeaderEntry($"COVERAUTHOR");
         string coverLicense = selectedSong.GetUnknownHeaderEntry($"COVERLICENSE");
         string coverSource = selectedSong.GetUnknownHeaderEntry($"COVERSOURCE");
-        
+
         string videoAuthor = selectedSong.GetUnknownHeaderEntry($"VIDEOAUTHOR");
         string videoLicense = selectedSong.GetUnknownHeaderEntry($"VIDEOLICENSE");
         string videoSource = selectedSong.GetUnknownHeaderEntry($"VIDEOSOURCE");
-        
+
         return new List<string>()
         {
             GetAttributionText("Audio", audioAuthor, audioLicense, audioSource),
@@ -689,7 +694,7 @@ public static class SongMetaUtils
         {
             return voices.FirstOrDefault();
         }
-        
+
         Voice mergedVoice = new();
         foreach (Voice voice in voices.ToList())
         {
@@ -697,13 +702,13 @@ public static class SongMetaUtils
             {
                 // Add the sentence if there is none yet.
                 Sentence overlappingSentence = mergedVoice.Sentences
-                    .FirstOrDefault(existingSentence => IsBeatInSentence(existingSentence, newSentence.MinBeat, true, false) 
+                    .FirstOrDefault(existingSentence => IsBeatInSentence(existingSentence, newSentence.MinBeat, true, false)
                                                         || IsBeatInSentence(existingSentence, newSentence.MaxBeat, true, false));
                 if (overlappingSentence != null)
                 {
                     Debug.Log($"{newSentence} overlaps with {overlappingSentence}");
                 }
-                
+
                 if (overlappingSentence == null)
                 {
                     Sentence newSentenceClone = newSentence.CloneDeep();
@@ -711,7 +716,7 @@ public static class SongMetaUtils
                 }
             }
         }
-        
+
         // Minimize sentences to make sure that they do not overlap
         foreach (Sentence mergedSentence in mergedVoice.Sentences)
         {
@@ -722,7 +727,7 @@ public static class SongMetaUtils
         List<Sentence> sortedSentences = mergedVoice.Sentences.ToList();
         sortedSentences.Sort(Sentence.comparerByStartBeat);
         mergedVoice.SetSentences(sortedSentences);
-        
+
         return mergedVoice;
     }
 
@@ -732,7 +737,7 @@ public static class SongMetaUtils
         {
             return;
         }
-        
+
         AddTrailingSpaceToLastNoteOfSentence(sentence.Notes.LastOrDefault());
     }
 
@@ -742,17 +747,17 @@ public static class SongMetaUtils
         {
             return;
         }
-        
+
         notes.ForEach(note => AddTrailingSpaceToLastNoteOfSentence(note));
     }
-    
+
     public static void AddTrailingSpaceToLastNoteOfSentence(Note note)
     {
         if (note == null)
         {
             return;
         }
-        
+
         // Add space at end of note if it was the last note in the sentence. Otherwise, formerly separate words might be merged.
         if (!note.Text.EndsWith(" ")
             && note.Sentence != null
@@ -775,7 +780,7 @@ public static class SongMetaUtils
             : GetVideoUri(songMeta);
         return videoUri;
     }
-    
+
     public static Color32 CreateColorForSongMeta(SongMeta songMeta)
     {
         string artistDashTitle = GetArtistDashTitle(songMeta);
@@ -783,7 +788,7 @@ public static class SongMetaUtils
         {
             return Color.white;
         }
-        
+
         return colorGenerator.ToColor(artistDashTitle);
     }
 
@@ -791,17 +796,17 @@ public static class SongMetaUtils
     {
         StringBuilder sb = new();
         sb.Append("{");
-        
+
         sb.Append("BPM:");
         sb.Append(songMeta.Bpm.ToStringInvariantCulture("0.00"));
-        
+
         int voiceIndex = 1;
         foreach (Voice voice in songMeta.GetVoices())
         {
             sb.Append("|");
             sb.Append("P");
             sb.Append(voiceIndex);
-            
+
             IEnumerable<Note> scoreRelevantNotes = voice.Sentences.SelectMany(sentence => sentence.Notes)
                 .Where(n => n.Type is not ENoteType.Freestyle)
                 .OrderBy(n => n.StartBeat);
@@ -818,7 +823,7 @@ public static class SongMetaUtils
             }
             voiceIndex++;
         }
-        
+
         sb.Append("}");
 
         string scoreRelevantSongHash = Hashing.Md5(Encoding.UTF8.GetBytes(sb.ToString()));
@@ -853,7 +858,7 @@ public static class SongMetaUtils
             distanceInMillis = 0;
             return false;
         }
-        
+
         int distanceInBeats = Math.Abs(a.StartBeat - b.EndBeat);
         distanceInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, distanceInBeats);
         return true;
