@@ -36,8 +36,9 @@ public class ThemeJson
     public Color32 videoPreviewColor;
     
     public string backgroundMusic;
-    
+
     public GradientConfig lyricsContainerGradient;
+    public string beforeLyricsIndicatorImage;
     public bool lyricsShadow = true;
     public Color32 lyricsColor;
     public Color32 nextLyricsColor;

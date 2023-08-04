@@ -65,7 +65,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     public void OnInjectionFinished()
     {
         videoAreaLabel.HideByDisplay();
-        if (SongMetaUtils.VideoResourceExists(songMeta))
+        if (SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl))
         {
             ShowVideoImage();
         }
@@ -187,8 +187,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void ShowVideoImage()
     {
-        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta));
-        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta));
+        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
+        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
         songBackgroundImage.HideByDisplay();
         songCoverImage.HideByDisplay();
     }

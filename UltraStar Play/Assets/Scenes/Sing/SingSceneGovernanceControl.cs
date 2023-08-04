@@ -40,7 +40,10 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     
     [Inject(UxmlName = R.UxmlNames.titleLabel)]
     private Label titleLabel;
-    
+
+    [Inject(UxmlName = R.UxmlNames.governanceOverlayDetailedTimeBar)]
+    private VisualElement governanceOverlayDetailedTimeBar;
+
     [Inject]
     private Injector injector;
     
@@ -86,7 +89,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private bool isContextMenuOpenedFromInputAction;
 
     private InputAction showOverlayInputAction;
-    
+
     public void OnInjectionFinished()
     {
         showOverlayInputAction = InputManager.GetInputAction(R.InputActions.usplay_singSceneShowGovernanceOverlay).InputAction;
@@ -124,7 +127,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
                     volumeSlider.value = newValue;
                 }
             });
-        
+
         togglePlaybackButton.RegisterCallbackButtonTriggered(_ => TogglePlayPause());
         governanceOverlay.RegisterCallback<PointerDownEvent>(evt =>
         {
@@ -258,7 +261,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         new NoteDisplayModeItemPickerControl(noteDisplayModePicker)
             .Bind(() => settings.NoteDisplayMode,
                  newValue => settings.NoteDisplayMode = newValue);
-        
+
+        ItemPicker showSongProgressBarPicker = new("Progress Bar");
+        contextMenuPopup.AddVisualElement(showSongProgressBarPicker);
+        new LabeledItemPickerControl<ESongProgressBar>(showSongProgressBarPicker, EnumUtils.GetValuesAsList<ESongProgressBar>())
+            .Bind(() => settings.ShowSongProgressBar,
+                newValue => settings.ShowSongProgressBar = newValue);
+
         Toggle showLyricsOnNotesToggle = new("Lyrics on Notes¹");
         contextMenuPopup.AddVisualElement(showLyricsOnNotesToggle);
         FieldBindingUtils.Bind(showLyricsOnNotesToggle,
@@ -270,13 +279,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         FieldBindingUtils.Bind(showStaticLyricsToggle,
             () => settings.ShowStaticLyrics,
             newValue => settings.ShowStaticLyrics = newValue);
-        
-        Toggle showSongProgress = new("Progress");
-        contextMenuPopup.AddVisualElement(showSongProgress);
-        FieldBindingUtils.Bind(showSongProgress,
-            () => settings.ShowSongProgress,
-            newValue => settings.ShowSongProgress = newValue);
-        
+
+        Toggle showPlayerInfoNextToNotesToggle = new("Player near notes¹");
+        contextMenuPopup.AddVisualElement(showPlayerInfoNextToNotesToggle);
+        FieldBindingUtils.Bind(showPlayerInfoNextToNotesToggle,
+            () => settings.ShowPlayerInfoNextToNotes,
+            newValue => settings.ShowPlayerInfoNextToNotes = newValue);
+
         Toggle showPitchIndicatorToggle = new("Pitch Arrow");
         contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
         FieldBindingUtils.Bind(showPitchIndicatorToggle,

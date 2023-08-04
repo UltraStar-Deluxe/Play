@@ -28,7 +28,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static Dictionary<string, List<string>> directoryToImageFiles = new();
     private static List<string> imageFileExtensionPatterns;
-    
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
@@ -52,10 +52,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
-    
+
     private UiManager uiManager;
     private Settings settings;
-    private WebViewManager webViewManager;
 
     private List<string> EnabledSongFolders => SettingsUtils.GetEnabledSongFolders(settings);
 
@@ -96,7 +95,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
     {
         uiManager = UiManager.Instance;
         settings = SettingsManager.Instance.Settings;
-        webViewManager = WebViewManager.Instance;
     }
 
     protected override void StartSingleton()
@@ -267,7 +265,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         {
             return;
         }
-        
+
         // Exclude audio files that are used in UltraStar txt files
         List<string> existingSongMetaAudioFiles = existingSongMetas
             .SelectMany(songMeta => GetAbsoluteAudioFilePaths(songMeta))
@@ -302,7 +300,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private List<string> GetAbsoluteAudioFilePaths(SongMeta songMeta)
     {
         List<string> result = new List<string>();
-        
+
         void TryAddAudioFilePath(string audioFilePath)
         {
             if (SongMetaUtils.ResourceExists(songMeta, audioFilePath))
@@ -311,7 +309,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 result.Add(PathUtils.NormalizePath(absoluteFilePath));
             }
         }
-        
+
         TryAddAudioFilePath(songMeta.Mp3);
         TryAddAudioFilePath(songMeta.VocalsAudio);
         TryAddAudioFilePath(songMeta.InstrumentalAudio);
@@ -348,20 +346,20 @@ public class SongMetaManager : AbstractSingletonBehaviour
         {
             songMeta.Cover = coverImage;
         }
-        
+
         if (songMeta.Background.IsNullOrEmpty()
             && TryFindBackgroundImageInSameFolder(audioFileDirectory, out string backgroundImage))
         {
             songMeta.Background = backgroundImage;
         }
-        
+
         // Load lyrics and notes from MIDI file
         string fileExtension = Path.GetExtension(new Uri(audioFile).LocalPath);
         if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
         {
             songMeta.onPostProcessLoadedVoices = () => MidiToSongMetaUtils.FillSongMetaWithMidiLyricsAndNotes(songMeta);
         }
-        
+
         Debug.Log("Generated SongMeta: " + songMeta);
         return songMeta;
     }
@@ -379,7 +377,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 .Select(fileExtension => $"*.{fileExtension}")
                 .ToList();
         }
-        
+
         // Only search MIDI files with lyrics
         return new List<string> { "*.mid", "*.kar" };
     }
@@ -409,7 +407,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             }
         }
     }
-    
+
     private void LoadSongMetasFromTxtFiles(List<string> txtFiles, out List<SongMeta> songMetas, out List<SongIssue> songIssues)
     {
         songMetas = new();
@@ -492,7 +490,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
             List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
                 newSongMeta,
-                webViewManager,
                 settings.UseFfmpegToPlayMediaFiles,
                 settings.CheckCodecIsSupported);
             songIssues.AddRange(mediaFormatIssues);
@@ -500,19 +497,19 @@ public class SongMetaManager : AbstractSingletonBehaviour
             if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
             {
                 // No issues or only warnings, thus ok.
-                
+
                 if (newSongMeta.Cover.IsNullOrEmpty()
                     && TryFindCoverImageInSameFolder(newSongMeta.Directory, out string coverImage))
                 {
                     newSongMeta.Cover = Path.GetFileName(coverImage);
                 }
-                
+
                 if (newSongMeta.Background.IsNullOrEmpty()
                     && TryFindCoverImageInSameFolder(newSongMeta.Directory, out string backgroundImage))
                 {
                     newSongMeta.Background = Path.GetFileName(backgroundImage);
                 }
-                
+
                 songMeta = newSongMeta;
                 return true;
             }
@@ -547,7 +544,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         return !imageFiles.IsNullOrEmpty();
     }
-    
+
     private bool TryFindCoverImageInSameFolder(string folder, out string imageFile)
     {
         if (!TryFindImagesFiles(folder, out List<string> imageFiles))
@@ -555,7 +552,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             imageFile = "";
             return false;
         }
-        
+
         // Prefer image files that have "cover" or similar in their name.
         List<string> searchTerms = new List<string>() { "cover", "front", "album", "co" };
         imageFile = imageFiles
@@ -564,7 +561,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             .OrIfNull(imageFiles.FirstOrDefault());
         return true;
     }
-    
+
     private bool TryFindBackgroundImageInSameFolder(string folder, out string imageFile)
     {
         if (!TryFindImagesFiles(folder, out List<string> imageFiles))
@@ -572,7 +569,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             imageFile = "";
             return false;
         }
-        
+
         // Prefer image files that have "background" or similar in their name.
         List<string> searchTerms = new List<string>() { "background", "back", "bg" };
         imageFile = imageFiles
@@ -590,14 +587,14 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 .Select(fileExtension => "*." + fileExtension)
                 .ToList();
         }
-        
+
         return ScanForFiles(folders, imageFileExtensionPatterns);
     }
 
     public void SaveSong(SongMeta songMeta, bool isAutoSave)
     {
         songMetaToScoreRelevantHash.Remove(songMeta);
-        
+
         SongMetaUtils.CreateDirectory(songMeta);
         string songFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
         try
@@ -643,14 +640,14 @@ public class SongMetaManager : AbstractSingletonBehaviour
         SongMeta matchingSongMeta = allSongMetas.FirstOrDefault(songMeta => songMeta.SongHash == songId);
         return matchingSongMeta;
     }
-    
+
     public List<SongMeta> GetSongMetasByIds(List<string> songIds)
     {
         if (songIds.IsNullOrEmpty())
         {
             return new();
         }
-        
+
         return songIds
             .Select(id => GetSongMetaById(id))
             .ToList();
@@ -660,22 +657,26 @@ public class SongMetaManager : AbstractSingletonBehaviour
     {
         return allSongMetas.FirstOrDefault(songMeta => songMeta.Title == title);
     }
-    
+
     // Checks whether the audio and video file formats of the song are supported.
     // Returns true iff the audio file of the SongMeta exists and is supported.
-    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, WebViewManager webViewManager, bool useFfmpegToPlayMediaFiles, bool checkCodecIsSupported)
+    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, bool useFfmpegToPlayMediaFiles, bool checkCodecIsSupported)
     {
         List<SongIssue> songIssues = new();
 
         // Check video exists and uses a supported format.
-        CheckResourceExists(songIssues, songMeta, songMeta.Video,
-            () => $"Video resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetVideoUri(songMeta))}'",
-            ESongIssueSeverity.Warning);
+        if (SongMetaUtils.GetWebsiteUri(songMeta).IsNullOrEmpty())
+        {
+            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
+            CheckResourceExists(songIssues, songMeta, videoUri,
+                () => $"Video resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(videoUri)}'",
+                ESongIssueSeverity.Warning);
 
-        CheckVideoFormatIsSupported(songIssues, webViewManager, songMeta.Video,
-            () => $"Unsupported video format '{GetUriOrExtensionWithoutDot(songMeta.Video)}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
-            () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
-            ESongIssueSeverity.Warning);
+            CheckVideoFormatIsSupported(songIssues, videoUri,
+                () => $"Unsupported video format '{GetUriOrExtensionWithoutDot(videoUri)}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+                () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
+                ESongIssueSeverity.Warning);
+        }
 
         if (useFfmpegToPlayMediaFiles)
         {
@@ -685,7 +686,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                                              || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
             if (!isVideoEmptyOrSameAsAudio
                 && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
-                && !webViewManager.CanHandleUrl(songMeta.Video))
+                && !WebViewUtils.CanHandleWebViewUrl(songMeta.Video))
             {
                 songIssues.Add(SongIssue.CreateWarning(songMeta, $"Video resource differs from audio resource. This is only supported for the formats {unitySupportedVideoFileExtensionsAsCsv}"));
 
@@ -700,13 +701,29 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // Check audio format.
         // Audio is mandatory. Without working audio file, the song cannot be played.
-        CheckResourceExists(songIssues, songMeta, songMeta.Mp3,
-            () => $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetAudioUri(songMeta))}'",
-            ESongIssueSeverity.Error);
-        CheckAudioOrVideoFormatIsSupported(songIssues, webViewManager, songMeta.Mp3,
-            () => $"Unsupported audio format '{GetUriOrExtensionWithoutDot(songMeta.Mp3)}'. Convert to one of {unitySupportedAudioFileExtensionsAsCsv}",
-            () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
-            ESongIssueSeverity.Error);
+        string audioUri = SongMetaUtils.GetAudioUri(songMeta);
+        if (SongMetaUtils.GetWebsiteUri(songMeta).IsNullOrEmpty())
+        {
+            // Must have local audio file in supported format because no website is specified.
+            CheckResourceExists(songIssues, songMeta, audioUri,
+                () => $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetAudioUri(songMeta))}'",
+                ESongIssueSeverity.Error);
+            CheckAudioOrVideoFormatIsSupported(songIssues, audioUri,
+                () => $"Unsupported audio format '{GetUriOrExtensionWithoutDot(audioUri)}'. Convert to one of {unitySupportedAudioFileExtensionsAsCsv}",
+                () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Audio),
+                ESongIssueSeverity.Error);
+        }
+        // Check WebView URI is supported when specified
+        else if (!WebViewUtils.CanHandleWebViewUrl(songMeta.Website))
+        {
+            if (!SongMetaUtils.LocalAudioResourceExists(songMeta))
+            {
+                // Cannot use the local audio file and not the website. This song cannot be played.
+                songIssues.Add(SongIssue.CreateError(songMeta,
+                    $"Audio resource does not exist '{ApplicationUtils.ReplacePathsWithDisplayString(SongMetaUtils.GetLocalAudioUri(songMeta))}' and website is not supported '{songMeta.Website}'. " +
+                          $"Add the local audio file or provide JavaScript code to integrate the website in the embedded browser."));
+            }
+        }
 
         // Vocals audio and instrumental audio must use formats that are supported by Unity. Ffmpeg can only be used for the main audio.
         CheckResourceExists(songIssues, songMeta, songMeta.VocalsAudio,
@@ -838,7 +855,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static void CheckVideoFormatIsSupported(
         List<SongIssue> songIssues,
-        WebViewManager webViewManager,
         string pathOrUri,
         Func<string> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
@@ -850,7 +866,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         if (!ApplicationUtils.IsSupportedVideoFormat(Path.GetExtension(pathOrUri))
-            && !webViewManager.CanHandleUrl(pathOrUri))
+            && !WebViewUtils.CanHandleWebViewUrl(pathOrUri))
         {
             songIssues.Add(new SongIssue(severity, songIssueDataGetter(), errorMessageGetter(), -1, -1));
             // Do not attempt to load this file
@@ -860,7 +876,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static void CheckAudioOrVideoFormatIsSupported(
         List<SongIssue> songIssues,
-        WebViewManager webViewManager,
         string pathOrUri,
         Func<string> errorMessageGetter,
         Func<SongIssueData> songIssueDataGetter,
@@ -874,7 +889,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         string fileExtension = Path.GetExtension(pathOrUri);
         if (!ApplicationUtils.IsSupportedAudioFormat(fileExtension)
             && !ApplicationUtils.IsSupportedVideoFormat(fileExtension)
-            && !webViewManager.CanHandleUrl(pathOrUri))
+            && !WebViewUtils.CanHandleWebViewUrl(pathOrUri))
         {
             songIssues.Add(new SongIssue(severity, songIssueDataGetter(), errorMessageGetter(), -1, -1));
         }
@@ -886,7 +901,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         {
             return "";
         }
-        
+
         if (songMetaToScoreRelevantHash.TryGetValue(songMeta, out string scoreRelevantHash))
         {
             return scoreRelevantHash;

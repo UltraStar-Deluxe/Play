@@ -453,7 +453,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         {
             return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
         }
-        else if (webViewManager.CanHandleUrl(audioUri))
+        else if (WebViewUtils.CanHandleWebViewUrl(audioUri))
         {
             return LoadWithWebView(songMeta, audioUri, startPositionInMillis);
         }

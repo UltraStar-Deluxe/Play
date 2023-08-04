@@ -207,6 +207,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
         calibrateDelayButton.RegisterCallbackButtonTriggered(_ => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
+            .ObserveOnMainThread()
             .Subscribe(calibrationResult =>
             {
                 if (calibrationResult.IsSuccess)
@@ -365,6 +366,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             return;
         }
 
+        micPitchTracker.MicProfile = micProfile;
         amplificationPickerControl.TrySelectItem(micProfile.Amplification);
         noiseSuppressionPickerControl.TrySelectItem(micProfile.NoiseSuppression);
         delayPickerControl.SelectItem(micProfile.DelayInMillis);
@@ -390,7 +392,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         deleteButton.SetVisibleByDisplay(!isConnected);
 
         micVisualizer.SetMicProfile(micProfile);
-        calibrateMicDelayControl.MicProfile = micProfile;
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
         
         // playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);

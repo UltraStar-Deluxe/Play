@@ -63,5 +63,7 @@
         "leadSinger": "icons/usdx/[score]rating_5.png",
         "superstar": "icons/usdx/[score]rating_6.png",
         "ultrastar": "icons/usdx/[score]rating_7.png"
-    }
+    },
+
+    "beforeLyricsIndicatorImage": "icons/usdx/[sing]lyricsHelpBar.png",
 }

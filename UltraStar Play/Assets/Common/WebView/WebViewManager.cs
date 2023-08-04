@@ -43,11 +43,6 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private bool IsWebViewInitialized => webView != null;
     private readonly Subject<bool> webViewInitializedEventStream = new();
 
-    private bool hasScannedJavaScriptFiles;
-    private readonly Dictionary<string, string> hostToWebViewScript = new();
-    private readonly Dictionary<string, CachedWebViewScript> hostToCachedWebViewScript = new();
-    private readonly Dictionary<string, CachedWebViewScript> urlToCachedWebViewScript = new();
-
     private bool isPlaying;
     public bool IsPlaying
     {
@@ -424,36 +419,15 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public bool CanHandleUrl(string url)
+    public bool LoadUrl(string url)
     {
-        if (settings == null 
+        if (settings == null
             || settings.DisableWebView)
         {
             return false;
         }
-        
-        try
-        {
-            // Try to parse the URL to make sure it's valid.
-            string host = new Uri(url).Host;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-        
-        if (!hasScannedJavaScriptFiles)
-        {
-            ScanJavaScriptFiles();
-        }
-        
-        string webViewScript = GetWebViewScript(url);
-        return !webViewScript.IsNullOrEmpty();
-    }
 
-    public bool LoadUrl(string url)
-    {
-        if (!CanHandleUrl(url))
+        if (!WebViewUtils.CanHandleWebViewUrl(url))
         {
             Debug.Log($"Cannot handle URL: {url}");
             return false;
@@ -485,7 +459,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private bool DoLoadUrl(string url)
     {
-        string webViewScript = GetWebViewScript(url);
+        string webViewScript = WebViewUtils.GetWebViewScript(url);
         if (webViewScript.IsNullOrEmpty())
         {
             Debug.LogError($"Failed to load WebView script code for url: {url}");
@@ -578,72 +552,6 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         webView.ExecuteJavaScript("stopPlayback()");
     }
 
-    private void ScanJavaScriptFiles()
-    {
-        if (hasScannedJavaScriptFiles)
-        {
-            return;
-        }
-        hasScannedJavaScriptFiles = true;
-        
-        string webViewScriptsFolder = ApplicationUtils.GetWebViewScriptsAbsolutePath();
-        DirectoryUtils.CreateDirectory(webViewScriptsFolder);
-        
-        string[] webViewScriptPaths = Directory.GetFiles(webViewScriptsFolder, "*.js");
-        foreach (string webViewScriptPath in webViewScriptPaths)
-        {
-            string host = Path.GetFileNameWithoutExtension(webViewScriptPath);
-            hostToWebViewScript[host] = webViewScriptPath;
-        }
-    }
-
-    private string GetWebViewScript(string url)
-    {
-        // Try get cached template for the specific URL.
-        if (urlToCachedWebViewScript.TryGetValue(url, out CachedWebViewScript cachedWebViewScript))
-        {
-            return cachedWebViewScript.Content;
-        }
-        
-        // Try get cached template for the host.
-        string urlHost = new Uri(url).Host;
-        if (!hostToCachedWebViewScript.TryGetValue(urlHost, out cachedWebViewScript))
-        {
-            // Load and remember the template for the host.
-            cachedWebViewScript = LoadAndCacheWebViewScriptForHost(urlHost);
-        }
-
-        if (cachedWebViewScript == null)
-        {
-            return "";
-        }
-        
-        // Remember the template for the specific URL.
-        urlToCachedWebViewScript[url] = cachedWebViewScript;
-        
-        return cachedWebViewScript.Content;
-    }
-
-    private CachedWebViewScript LoadAndCacheWebViewScriptForHost(string urlHost)
-    {
-        List<KeyValuePair<string, string>> matches = hostToWebViewScript
-            .Where(entry => HostsMatch(entry.Key, urlHost))
-            .ToList();
-        if (matches.IsNullOrEmpty())
-        {
-            return null;
-        }
-
-        string filePath = matches.FirstOrDefault().Value;
-        string fileContent = File.ReadAllText(filePath);
-        
-        Debug.Log($"Found WebView script for host '{urlHost}' in file '{filePath}'");
-        
-        CachedWebViewScript cachedWebViewScript = new CachedWebViewScript(fileContent);
-        hostToCachedWebViewScript[urlHost] = cachedWebViewScript;
-        return cachedWebViewScript;
-    }
-
     private void RunWhenWebViewInitialized(Action action)
     {
         if (IsWebViewInitialized)
@@ -660,32 +568,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             });
         }
     }
-
-    private static bool HostsMatch(string a, string b)
-    {
-        string aWithoutWww = a.Replace("www.", "");
-        string bWithoutWww = b.Replace("www.", "");
-        return aWithoutWww.ToLowerInvariant() == bWithoutWww.ToLowerInvariant();
-    }
     
     public void ReloadScripts()
     {
-        hostToWebViewScript.Clear();
-        hostToCachedWebViewScript.Clear();
-        urlToCachedWebViewScript.Clear();
+        WebViewUtils.ClearCache();
         loadedUrl = null;
-        hasScannedJavaScriptFiles = false;
         javaScriptCanLoadUrl = false;
         Debug.Log("Reloaded WebView scripts by clearing cache.");
-    }
-
-    private class CachedWebViewScript
-    {
-        public string Content { get; private set; }
-
-        public CachedWebViewScript(string content)
-        {
-            this.Content = content;
-        }
     }
 }
