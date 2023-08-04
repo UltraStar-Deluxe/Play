@@ -49,7 +49,7 @@ public class SongMeta
     /**
      * URI to load the song in the embedded WebView.
      */
-    public string WebPage { get; set; } = "";
+    public string Website { get; set; } = "";
 
     /**
      * Path to the audio file that contains only the voice of the singers.

@@ -67,22 +67,22 @@ public static class SongMetaUtils
         return GetUri(songMeta, songMeta.Mp3);
     }
 
-    public static string GetWebPageUri(SongMeta songMeta)
+    public static string GetWebsiteUri(SongMeta songMeta)
     {
-        return GetUri(songMeta, songMeta.WebPage);
+        return GetUri(songMeta, songMeta.Website);
     }
 
     public static string GetAudioUri(SongMeta songMeta)
     {
         string absoluteLocalAudioFilePath = GetAbsoluteFilePath(songMeta, songMeta.Mp3);
         if (FileUtils.Exists(absoluteLocalAudioFilePath)
-            || songMeta.WebPage.IsNullOrEmpty())
+            || songMeta.Website.IsNullOrEmpty())
         {
             return GetLocalAudioUri(songMeta);
         }
         else
         {
-            return GetWebPageUri(songMeta);
+            return GetWebsiteUri(songMeta);
         }
     }
 
