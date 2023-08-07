@@ -35,15 +35,15 @@ public class Settings : ISettings
     public int DefaultMedleyTargetDurationInSeconds { get; set; } = 30;
     public int ReducedAudioVolumePercent { get; set; } = 1;
     public float PassTheMicTimeInSeconds { get; set; } = 20;
-    
+
     // Player profile settings
     public List<PlayerProfile> PlayerProfiles { get; set; } = new();
-    
+
     // Recording device settings
     public List<MicProfile> MicProfiles { get; set; } = new();
     public string LastMicProfileNameInRecordingOptionsScene { get; set; } = "";
     public int LastMicProfileChannelIndexInRecordingOptionsScene { get; set; }
-    
+
     // Webcam settings
     public string CurrentWebcamDeviceName { get; set; }
     public bool UseWebcamAsBackgroundInSingScene { get; set; }
@@ -53,14 +53,14 @@ public class Settings : ISettings
     public List<string> DisabledSongFolders { get; set; } = new();
     public bool SearchAudioFilesWithoutSongMeta { get; set; }
     public string GeneratedFolderPath { get; set; } = "";
-    
+
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
     public bool DisableDynamicThemes { get; set; }
     // Screen.currentResolution may only be called from Start() and Awake(), thus use a dummy here.
     public bool AnimatedBackground { get; set; } = true;
     public int BackgroundLightIndex { get; set; } = 4;
-    
+
     // Design / presentation settings
     public ESceneChangeAnimation SceneChangeAnimation { get; set; } = ESceneChangeAnimation.Zoom;
     public float SceneChangeDurationInSeconds { get; set; } = 0.4f;
@@ -69,10 +69,11 @@ public class Settings : ISettings
     public bool ShowScrollBarInSongSelect { get; set; }
     public bool ShowSongIndexInSongSelect { get; set; }
     public ESongBackgroundScaleMode SongBackgroundScaleMode { get; set; } = ESongBackgroundScaleMode.FitOutside;
-    
+
     // Sing scene settings
     public ENoteDisplayMode NoteDisplayMode { get; set; } = ENoteDisplayMode.SentenceBySentence;
     public bool ShowStaticLyrics { get; set; } = true;
+    public bool WipeLyrics { get; set; } = true;
     public bool ShowPitchIndicator { get; set; }
     public bool ShowLyricsOnNotes { get; set; }
     public bool ShowPlayerInfoNextToNotes { get; set; }
@@ -112,11 +113,11 @@ public class Settings : ISettings
     public string HttpServerHost { get; set; } = new("");
     public Dictionary<string, List<HttpApiPermission>> HttpApiPermissions { get; set; } = new();
     public int ConnectedClientMessageBufferTimeInMillis { get; set; } = 150;
-    
+
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();
     public bool DisableWebView { get; set; }
-    
+
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
     public SongEditorSettings SongEditorSettings { get; set; } = new();

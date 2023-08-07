@@ -24,6 +24,12 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.currentSentenceContainer)]
     private VisualElement currentSentenceContainer;
 
+    [Inject(UxmlName = R.UxmlNames.plainLabelContainer)]
+    private VisualElement plainLabelContainer;
+
+    [Inject(UxmlName = R.UxmlNames.highlightLabelContainer)]
+    private VisualElement highlightLabelContainer;
+
     [Inject(UxmlName = R.UxmlNames.nextSentenceContainer)]
     private VisualElement nextSentenceContainer;
 
@@ -44,9 +50,11 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private ThemeManager themeManager;
-    
+
     private Sentence previousSentence;
-    private readonly Dictionary<Note, Label> currentSentenceNoteToLabelMap = new();
+    private readonly Dictionary<Note, Label> currentSentenceNoteToPlainLabelMap = new();
+    private readonly Dictionary<Note, Label> currentSentenceNoteToHighlightLabelMap = new();
+    private readonly Dictionary<Note, Label> nextSentenceNoteToPlainLabelMap = new();
 
     public Voice Voice => playerControl.Voice;
 
@@ -61,9 +69,10 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             SetNextSentence(nextSentence);
         });
 
-        ClearSentenceContainer(currentSentenceContainer);
+        ClearSentenceContainer(plainLabelContainer);
+        ClearSentenceContainer(highlightLabelContainer);
         ClearSentenceContainer(nextSentenceContainer);
-        
+
         SetCurrentSentence(playerControl.GetSentence(0));
         SetNextSentence(playerControl.GetSentence(1));
 
@@ -98,7 +107,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
         return Colors.clearBlack;
     }
-    
+
     private Color32 GetCurrentNoteLyricsColor()
     {
         return themeManager.GetCurrentTheme().ThemeJson.currentNoteLyricsColor
@@ -110,7 +119,7 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         return themeManager.GetCurrentTheme().ThemeJson.previousNoteLyricsColor
             .OrIfDefault(GetPlayerControlColor());
     }
-    
+
     public void Update(double positionInSongInMillis)
     {
         UpdateNoteHighlighting(positionInSongInMillis);
@@ -144,13 +153,13 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         // Find start position of label
         Note firstNote = SortedNotes[0];
         if (positionBeforeLyricsPercent is < 0 or > 1
-            || !currentSentenceNoteToLabelMap.TryGetValue(firstNote, out Label firstLabel))
+            || !currentSentenceNoteToPlainLabelMap.TryGetValue(firstNote, out Label currentSentenceFirstLabel))
         {
             positionBeforeLyricsIndicator.HideByDisplay();
             return;
         }
 
-        float labelMinX = firstLabel.worldBound.xMin;
+        float labelMinX = currentSentenceFirstLabel.worldBound.xMin;
         float containerMinX = currentSentenceContainer.worldBound.xMin;
         float labelMinXRelativeToContainer = labelMinX - containerMinX;
         float positionBeforeLyricsPx = (float)(labelMinXRelativeToContainer * positionBeforeLyricsPercent);
@@ -160,13 +169,13 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateNoteHighlighting(double positionInSongInMillis)
     {
-        Note currentNote = SortedNotes
-            .FirstOrDefault(note => BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat) <= positionInSongInMillis
-                                    && positionInSongInMillis <= BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat));
-        HighlightNoteLyrics(currentNote);
+        Note currentNote = SortedNotes.FirstOrDefault(note =>
+            BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat) <= positionInSongInMillis
+            && positionInSongInMillis < BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat));
+        HighlightNoteLyrics(positionInSongInMillis, currentNote);
     }
 
-    private void HighlightNoteLyrics(Note currentNote)
+    private void HighlightNoteLyrics(double positionInSongInMillis, Note currentNote)
     {
         if (CurrentSentence == null)
         {
@@ -174,42 +183,82 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
 
         List<Note> sortedNotes = CurrentSentence.Notes.ToList();
-        sortedNotes.Sort(Note.comparerByStartBeat);
         int currentNoteIndex = sortedNotes.IndexOf(currentNote);
         if (currentNoteIndex < 0)
         {
             return;
         }
+        sortedNotes.Sort(Note.comparerByStartBeat);
+
+        float maxHighlightLabelXMax = -1;
 
         for (int i = 0; i < sortedNotes.Count && i <= currentNoteIndex; i++)
         {
             Note note = sortedNotes[i];
-            if (!currentSentenceNoteToLabelMap.TryGetValue(note, out Label label))
+            if (!currentSentenceNoteToHighlightLabelMap.TryGetValue(note, out Label label)
+                || !currentSentenceNoteToPlainLabelMap.TryGetValue(note, out Label plainLabel))
             {
                 continue;
             }
+
+            // Use world bound of plain label because it has the correct world position.
+            Rect plainLabelWorldBound = plainLabel.worldBound;
 
             if (i < currentNoteIndex)
             {
                 label.AddToClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
-                
+
                 GetPreviousNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
+
+                maxHighlightLabelXMax = Mathf.Max(maxHighlightLabelXMax, plainLabelWorldBound.xMax);
             }
             else if (i == currentNoteIndex)
             {
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.AddToClassList(R.UssClasses.currentNoteLyrics);
-                
+
                 GetCurrentNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
+
+                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+                double noteEndInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat);
+                double noteDurationInMillis = noteEndInMillis - noteStartInMillis;
+                double noteDoneInMillis = positionInSongInMillis - noteStartInMillis;
+                if (noteDurationInMillis > 0
+                    && noteDoneInMillis > 0)
+                {
+                    double noteDoneFactor = noteDoneInMillis / noteDurationInMillis;
+                    noteDoneFactor = NumberUtils.Limit(noteDoneFactor, 0, 1);
+
+                    double labelDoneX = plainLabelWorldBound.xMin + (noteDoneFactor * plainLabelWorldBound.width);
+                    maxHighlightLabelXMax = Mathf.Ceil(Mathf.Max(maxHighlightLabelXMax, (float)labelDoneX));
+                }
             }
             else
             {
                 label.RemoveFromClassList(R.UssClasses.previousNoteLyrics);
                 label.RemoveFromClassList(R.UssClasses.currentNoteLyrics);
-                
+
                 GetPreviousNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
             }
+        }
+
+        // Update width of label container for wipe effect
+        if (settings.WipeLyrics)
+        {
+            if (maxHighlightLabelXMax > 0)
+            {
+                float highlightLabelContainerWidth = maxHighlightLabelXMax - highlightLabelContainer.worldBound.x;
+                highlightLabelContainer.style.width = Mathf.Ceil(highlightLabelContainerWidth);
+            }
+            else
+            {
+                highlightLabelContainer.style.width = 0;
+            }
+        }
+        else
+        {
+            highlightLabelContainer.style.width = new StyleLength(StyleKeyword.Auto);
         }
     }
 
@@ -221,8 +270,10 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         {
             SortedNotes = new List<Note>(sentence.Notes);
             SortedNotes.Sort(Note.comparerByStartBeat);
-            FillSentenceContainer(currentSentenceContainer, CurrentSentence, false);
-            UpdateFontSize(currentSentenceContainer);
+            FillSentenceContainer(plainLabelContainer, CurrentSentence, false, currentSentenceNoteToPlainLabelMap);
+            FillSentenceContainer(highlightLabelContainer, CurrentSentence, false, currentSentenceNoteToHighlightLabelMap);
+            UpdateFontSize(plainLabelContainer);
+            UpdateFontSize(highlightLabelContainer);
         }
         else
         {
@@ -236,19 +287,21 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void UpdateFontSize(VisualElement visualElement)
+    private void UpdateFontSize(VisualElement labelContainer)
     {
-        List<Label> labels = visualElement.Query<Label>().ToList();
+        List<Label> labels = labelContainer.Query<Label>().ToList();
         if (labels.IsNullOrEmpty())
         {
             return;
         }
 
+        float availableWidth = currentSentenceContainer.resolvedStyle.width;
+
         // When all labels are ready (i.e. they have well defined geometry) then update their font size.
         List<Label> labelsWithoutGeometry = labels.Where(label => !VisualElementUtils.HasGeometry(label)).ToList();
         if (labelsWithoutGeometry.IsNullOrEmpty())
         {
-            DoUpdateFontSize(visualElement, labels);
+            DoUpdateFontSize(labels, availableWidth);
         }
         else
         {
@@ -259,17 +312,17 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                     labelsWithoutGeometry.Remove(label);
                     if (labelsWithoutGeometry.IsNullOrEmpty())
                     {
-                        DoUpdateFontSize(visualElement, labels);
+                        DoUpdateFontSize(labels, availableWidth);
                     }
                 });
             }
         }
     }
-    
+
     /**
      * Reduces the font size until all labels fit in the container
      */
-    private void DoUpdateFontSize(VisualElement visualElement, List<Label> labels)
+    private void DoUpdateFontSize(List<Label> labels, float availableWidth)
     {
         if (labels.IsNullOrEmpty())
         {
@@ -278,12 +331,11 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
 
         float fontSize = labels.FirstOrDefault().resolvedStyle.fontSize;
-        float containerWidth = visualElement.contentRect.width;
         // TODO: binary search for better performance.
         for (int iteration = 0; iteration < MaxFontSizeIterations; iteration++)
         {
             float totalLabelWidth = GetTotalLabelWidth(labels);
-            if (totalLabelWidth > containerWidth)
+            if (totalLabelWidth > availableWidth)
             {
                 if (fontSize <= MinFontSize)
                 {
@@ -314,24 +366,14 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
     private void ClearSentenceContainer(VisualElement visualElement)
     {
-        visualElement.Query<Label>()
-            .ForEach(label =>
-            {
-                if (label != positionBeforeLyricsIndicator)
-                {
-                    label.RemoveFromHierarchy();
-                }
-            });
+        visualElement.Clear();
     }
-    
-    private void FillSentenceContainer(VisualElement visualElement, Sentence sentence, bool isNextSentence)
+
+    private void FillSentenceContainer(VisualElement visualElement, Sentence sentence, bool isNextSentence, Dictionary<Note, Label> noteToLabel)
     {
         ClearSentenceContainer(visualElement);
-        
-        if (visualElement == currentSentenceContainer)
-        {
-            currentSentenceNoteToLabelMap.Clear();
-        }
+
+        noteToLabel.Clear();
 
         if (sentence == null
             || sentence.Notes.IsNullOrEmpty())
@@ -352,6 +394,8 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 : displayText.Trim();
 
             Label label = new(richText);
+            noteToLabel.Add(note, label);
+
             label.enableRichText = true;
 
             if (displayText.StartsWith(" "))
@@ -367,7 +411,6 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             if (visualElement == currentSentenceContainer)
             {
                 label.AddToClassList(R.UssClasses.currentLyrics);
-                currentSentenceNoteToLabelMap.Add(note, label);
             }
             else if (visualElement == nextSentenceContainer)
             {
@@ -392,14 +435,14 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             {
                 label.style.textShadow = new StyleTextShadow();
             }
-            
+
             visualElement.Add(label);
         });
     }
 
     private void SetNextSentence(Sentence sentence)
     {
-        FillSentenceContainer(nextSentenceContainer, sentence, true);
+        FillSentenceContainer(nextSentenceContainer, sentence, true, nextSentenceNoteToPlainLabelMap);
         UpdateFontSize(nextSentenceContainer);
     }
 

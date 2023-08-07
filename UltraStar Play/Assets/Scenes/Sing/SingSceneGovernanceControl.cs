@@ -287,11 +287,11 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             () => settings.ShowStaticLyrics,
             newValue => settings.ShowStaticLyrics = newValue);
 
-        Toggle showPlayerInfoNextToNotesToggle = new("Player alongside notes¹");
-        contextMenuPopup.AddVisualElement(showPlayerInfoNextToNotesToggle);
-        FieldBindingUtils.Bind(showPlayerInfoNextToNotesToggle,
-            () => settings.ShowPlayerInfoNextToNotes,
-            newValue => settings.ShowPlayerInfoNextToNotes = newValue);
+        Toggle wipeLyricsToggle = new("Wipe lyrics");
+        contextMenuPopup.AddVisualElement(wipeLyricsToggle);
+        FieldBindingUtils.Bind(wipeLyricsToggle,
+            () => settings.WipeLyrics,
+            newValue => settings.WipeLyrics = newValue);
 
         Toggle showPitchIndicatorToggle = new("Pitch Arrow");
         contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
@@ -310,6 +310,12 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         FieldBindingUtils.Bind(showScoreNumbers,
             () => settings.ShowScoreNumbers,
             newValue => settings.ShowScoreNumbers = newValue);
+
+        Toggle showPlayerInfoNextToNotesToggle = new("Player alongside notes¹");
+        contextMenuPopup.AddVisualElement(showPlayerInfoNextToNotesToggle);
+        FieldBindingUtils.Bind(showPlayerInfoNextToNotesToggle,
+            () => settings.ShowPlayerInfoNextToNotes,
+            newValue => settings.ShowPlayerInfoNextToNotes = newValue);
 
         if (webcamControl.WebcamsAvailable())
         {

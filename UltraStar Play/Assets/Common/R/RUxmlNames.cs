@@ -79,6 +79,7 @@ public static partial class R
         public const string cancelJobIcon = "cancelJobIcon";
         public const string categoryNameContainer = "categoryNameContainer";
         public const string categoryNameLabel = "categoryNameLabel";
+        public const string centerContainer = "centerContainer";
         public const string centerContent = "centerContent";
         public const string centerControls = "centerControls";
         public const string changeVoiceButton = "changeVoiceButton";
@@ -221,6 +222,7 @@ public static partial class R
         public const string hiddenContinueButton = "hiddenContinueButton";
         public const string hiddenHideModifiersOverlayArea = "hiddenHideModifiersOverlayArea";
         public const string hiddenHideSongQueueOverlayArea = "hiddenHideSongQueueOverlayArea";
+        public const string highlightLabelContainer = "highlightLabelContainer";
         public const string highscoreEntry = "highscoreEntry";
         public const string HighscoreEntry = "HighscoreEntry";
         public const string highscoreEntryList = "highscoreEntryList";
@@ -499,6 +501,7 @@ public static partial class R
         public const string pitchIndicatorIcon = "pitchIndicatorIcon";
         public const string pitchLabel = "pitchLabel";
         public const string pitchLabelFormatPicker = "pitchLabelFormatPicker";
+        public const string plainLabelContainer = "plainLabelContainer";
         public const string playbackAudioPicker = "playbackAudioPicker";
         public const string player = "player";
         public const string playerEntry = "playerEntry";
