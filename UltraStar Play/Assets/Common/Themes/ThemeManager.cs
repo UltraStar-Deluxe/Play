@@ -22,33 +22,33 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
     private const string StaticBackgroundImageElementName = "staticBackgroundImage";
     private readonly Color defaultGoldenColor = Colors.CreateColor("#DACD4A");
-    
+
     public static ThemeManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ThemeManager>();
 
     [InjectedInInspector]
     public Material backgroundMaterial;
-    
+
     [InjectedInInspector]
     public Material particleMaterial;
-    
+
     [InjectedInInspector]
     public ParticleSystem backgroundParticleSystem;
 
     [InjectedInInspector]
     public BackgroundShaderControl backgroundShaderControl;
-    
+
     [InjectedInInspector]
     public SceneRecipeManager sceneRecipeManager;
-    
+
     [InjectedInInspector]
     public Camera backgroundParticlesCamera;
-    
+
     [InjectedInInspector]
     public bool renderUiWithBackgroundShader = true;
 
     [InjectedInInspector]
     public bool applyThemeSpecificStyles = true;
-    
+
     [InjectedInInspector]
     public VideoPlayer backgroundVideoPlayer;
 
@@ -70,13 +70,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private bool anyThemeLoaded;
 
     private bool isDropdownMenuOpened;
-    
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -85,7 +85,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     [Inject]
     private BackgroundLightManager backgroundLightManager;
-    
+
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     private string lastThemeDynamicBackgroundJson;
@@ -105,7 +105,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             .AddTo(gameObject);
 
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
-        
+
         CopyExampleThemeToUserDefinedThemesFolder();
 
         // Apply theme to context menu popups
@@ -132,9 +132,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             return;
         }
-        
+
         // Only apply font color
-        themeJson.primaryFontColor.IfNotDefault(color => 
+        themeJson.primaryFontColor.IfNotDefault(color =>
             root.Query().ForEach(element =>
             {
                 element.style.color = new StyleColor(color);
@@ -154,7 +154,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             return;
         }
-        
+
         string exampleThemeFileName = Path.GetFileName(ExampleThemeFilePathInStreamingAssets);
         string targetExampleThemeFilePath = $"{GetAbsoluteUserDefinedThemesFolder()}/{exampleThemeFileName}";
         if (!FileUtils.Exists(targetExampleThemeFilePath))
@@ -191,18 +191,18 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             // The UIDocument is rendered into a RenderTexture, which is then blended into the background shader.
             // particleRenderTexture may use a smaller resolution than the screen.
-            renderTextureManager.GetOrCreateScreenAspectRatioRenderTexture(ParticleRenderTextureName, 
+            renderTextureManager.GetOrCreateScreenAspectRatioRenderTexture(ParticleRenderTextureName,
                 particleRenderTexture =>
                 {
                     backgroundParticlesCamera.targetTexture = particleRenderTexture;
                 });
-            
+
             // uiRenderTexture should use the exact screen size.
-            renderTextureManager.GetOrCreateScreenSizedRenderTexture(UiRenderTextureName, 
+            renderTextureManager.GetOrCreateScreenSizedRenderTexture(UiRenderTextureName,
                 uiRenderTexture =>
                 {
                     RenderTexture particleRenderTexture = renderTextureManager.GetExistingRenderTexture(ParticleRenderTextureName);
-                    
+
                     uiDocument.panelSettings.targetTexture = uiRenderTexture;
                     backgroundShaderControl.SetUiTextures(
                         uiRenderTexture,
@@ -270,7 +270,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         Image backgroundElement = uiDocument.rootVisualElement.Q<Image>(name);
         return backgroundElement;
     }
-    
+
     private Image GetOrCreateStaticBackgroundElement(string name)
     {
         Image backgroundElement = GetExistingStaticBackgroundElement(name);
@@ -278,7 +278,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             return backgroundElement;
         }
-        
+
         backgroundElement = new Image();
         backgroundElement.name = name;
         backgroundElement.AddToClassList("overlay");
@@ -286,7 +286,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         uiDocument.rootVisualElement.AddAsFirstChild(backgroundElement);
         return backgroundElement;
     }
-    
+
     private void ApplyThemeStaticBackgroundImage(ThemeMeta themeMeta)
     {
         EScene currentScene = GetCurrentScene();
@@ -295,13 +295,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             DisableStaticBackground();
             return;
         }
-        
+
         Image backgroundElement = GetOrCreateStaticBackgroundElement(StaticBackgroundImageElementName);
         if (backgroundElement == null)
         {
             return;
         }
-        
+
         StaticBackgroundJson staticBackgroundJson = ThemeMetaUtils.GetStaticBackgroundJsonForScene(themeMeta, currentScene);
         string absoluteImageFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
         if (ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
@@ -317,14 +317,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             backgroundElement.style.backgroundImage = null;
         }
     }
-    
+
     private void StopVideoPlayer(VideoPlayer videoPlayer)
     {
         videoPlayer.Stop();
         videoPlayer.url = "";
         videoPlayer.playbackSpeed = 1;
     }
-    
+
     private void StartVideoPlayer(VideoPlayer videoPlayer, string videoUrl, float playbackSpeed = 0)
     {
         if (videoPlayer.url != videoUrl)
@@ -345,7 +345,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             videoPlayer.playbackSpeed = finalPlaybackSpeed;
         }
     }
-    
+
     private void ApplyThemeDynamicBackground(ThemeMeta themeMeta)
     {
         EScene currentScene = GetCurrentScene();
@@ -474,7 +474,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         ApplyThemeBaseBackground(themeMeta, backgroundJson);
         ApplyThemeLightBackground(themeMeta, backgroundJson);
-        
+
         lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
@@ -493,7 +493,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             StopVideoPlayer(backgroundLightVideoPlayer);
             backgroundShaderControl.SetBaseTextureEnabled(false);
-            
+
             // Try to use static image as base background
             string absoluteImageFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.imagePath);
             if (!absoluteImageFilePath.IsNullOrEmpty()
@@ -524,14 +524,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             string uri = WebRequestUtils.AbsoluteFilePathToUri(absoluteLightVideoFilePath);
             string videoPlayerUrl = ApplicationUtils.GetVideoPlayerUri(uri);
             StartVideoPlayer(backgroundLightVideoPlayer, videoPlayerUrl, backgroundJson.lightVideoPlaybackSpeed);
-            
+
             // Use the video as background lights instead of the bokeh particle system
             backgroundLightManager.IsBackgroundLightEnabled = false;
         }
         else
         {
             StopVideoPlayer(backgroundLightVideoPlayer);
-            
+
             // Use the bokeh particle system as background lights
             backgroundLightManager.IsBackgroundLightEnabled = true;
         }
@@ -641,14 +641,14 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             return;
         }
-        
+
         ThemeManager themeManager = Instance;
         if (themeManager != null)
         {
             themeManager.DoApplyThemeSpecificStylesToVisualElements(root);
         }
     }
-    
+
     private void DoApplyThemeSpecificStylesToVisualElements(VisualElement root)
     {
         if (!applyThemeSpecificStyles)
@@ -657,7 +657,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         // using DisposableStopwatch d = new("ThemeManager.DoApplyThemeSpecificStylesToVisualElements");
-        
+
         if (settings.DisableDynamicThemes)
         {
             DisableDynamicBackground();
@@ -678,21 +678,21 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
         ThemeJson themeJson = themeMeta.ThemeJson;
-        
+
         ControlStyleConfig defaultControlStyleConfig = themeMeta.ThemeJson.defaultControl;
-        
+
         // Scene specific elements
         ApplyThemeSpecificStylesToVisualElements(root, GetCurrentScene());
-        
+
         // Basic font colors
         ApplyThemeStyleUtils.ApplyPrimaryFontColor(themeJson.primaryFontColor, root);
         ApplyThemeStyleUtils.ApplySecondaryFontColor(themeJson.secondaryFontColor, root);
         ApplyThemeStyleUtils.ApplyWarningFontColor(themeJson.warningFontColor, root);
         ApplyThemeStyleUtils.ApplyErrorFontColor(themeJson.errorFontColor, root);
-        
+
         // Text shadow of elements without a background
         ApplyThemeStyleUtils.ApplyNoBackgroundInHierarchyTextShadow(themeJson.noBackgroundInHierarchyTextShadow, root);
-        
+
         // Buttons
         root.Query<Button>().ForEach(button =>
         {
@@ -721,8 +721,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     ApplyThemeStyleUtils.ApplyGradient(controlsRow, null);
                 }
 
-                ;
-                
                 defaultControlStyleConfig.fontColor.IfNotDefault(fontColor =>
                 {
                     controlsRow.Query<Label>().ForEach(label =>
@@ -736,17 +734,17 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 });
             });
         }
-        
+
         // Toggle
         root.Query<Toggle>().ForEach(toggle =>
         {
             VisualElement styleTarget = toggle.Q(null, "unity-toggle__input");
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, toggle);
             ApplyControlColorConfigToVisualElement(toggle, styleConfig, styleTarget);
-            
+
             RegisterDefaultButtonSfxCallback(toggle);
         });
-        
+
         // SlideToggle
         root.Query<SlideToggle>().ForEach(slideToggle =>
         {
@@ -754,7 +752,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, slideToggle);
             ApplyControlColorConfigToVisualElement(slideToggle, styleConfig, styleTarget);
         });
-        
+
         // Dropdown menus
         if (defaultControlStyleConfig != null)
         {
@@ -771,7 +769,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                         ApplyControlColorConfigToVisualElement(styleTarget, defaultControlStyleConfig);
                     });
             });
-            
+
             root.Query<DropdownField>().ForEach(RegisterOpenDropdownMenuCallback);
             root.Query<EnumField>().ForEach(RegisterOpenDropdownMenuCallback);
             if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController, out VisualElement unityBaseDropdown))
@@ -787,24 +785,24 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 });
             }
         }
-        
+
         // ListViews
         root.Query<ListView>().ForEach(listView => ApplyThemeStyleUtils.UpdateStylesOnListViewSelectionChanged(listView));
         root.Query<ListViewH>().ForEach(listView => ApplyThemeStyleUtils.UpdateStylesOnListViewSelectionChanged(listView));
-        
+
         // Panels
         root.Query<VisualElement>(null, "dynamicPanel").ForEach(visualElement =>
         {
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, visualElement);
             ApplyControlColorConfigToVisualElement(visualElement, styleConfig);
         });
-        
+
         root.Query<VisualElement>(null, "staticPanel").ForEach(visualElement =>
         {
             ControlStyleConfig styleConfig = GetColorStyleConfig(themeMeta, visualElement);
             ApplyControlColorConfigToVisualElement(visualElement, styleConfig);
         });
-        
+
         // Remove borders
         List<string> ussClassNamesForRemoveBorder = new()
         {
@@ -851,7 +849,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 themeMeta.ThemeJson.textOnlyButton,
                 themeMeta.ThemeJson.defaultControl);
         }
-        
+
         if (visualElement.ClassListContains("textOnlyButton"))
         {
             return ObjectUtils.FirstNonDefault(
@@ -866,8 +864,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 themeMeta.ThemeJson.dangerButton,
                 themeMeta.ThemeJson.defaultControl);
         }
-        
-        if (visualElement.ClassListContains("transparentBackgroundColor")) 
+
+        if (visualElement.ClassListContains("transparentBackgroundColor"))
         {
             return new ControlStyleConfig()
             {
@@ -878,28 +876,28 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 disabledBackgroundColor = Color.clear,
             };
         }
-        
-        if (visualElement.ClassListContains("dynamicPanel")) 
+
+        if (visualElement.ClassListContains("dynamicPanel"))
         {
             return ObjectUtils.FirstNonDefault(
                 themeMeta.ThemeJson.dynamicPanel,
                 themeMeta.ThemeJson.defaultControl);
         }
-        
-        if (visualElement.ClassListContains("staticPanel")) 
+
+        if (visualElement.ClassListContains("staticPanel"))
         {
             return ObjectUtils.FirstNonDefault(
                 themeMeta.ThemeJson.staticPanel,
                 themeMeta.ThemeJson.defaultControl);
         }
-        
+
         if (visualElement is SlideToggle)
         {
             return ObjectUtils.FirstNonDefault(
                 themeMeta.ThemeJson.slideToggleOff,
                 themeMeta.ThemeJson.defaultControl);
         }
-        
+
         if (visualElement is Toggle)
         {
             return ObjectUtils.FirstNonDefault(
@@ -917,7 +915,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
         alreadyProcessedVisualElements.Add(visualElement);
-            
+
         visualElement.RegisterCallback<NavigationSubmitEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
         visualElement.RegisterCallback<ClickEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
         visualElement.RegisterCallback<PointerDownEvent>(evt => OnOpenDropdownMenu(), TrickleDown.TrickleDown);
@@ -937,9 +935,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     element.style.backgroundImage = GradientManager.GetGradientTexture(gradient);
                     element.style.backgroundColor = new StyleColor(StyleKeyword.None);
                 }));
-            
-            currentThemeMeta.ThemeJson.primaryFontColor.IfNotDefault(color =>
-                root.Query(R.UxmlNames.timeBarPositionIndicator).ForEach(it => it.style.backgroundColor = new StyleColor(color)));
         }
 
         if (currentScene is EScene.SongSelectScene)
@@ -961,7 +956,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             "hiddenContinueButton"
         };
-        
+
         foreach (string excludedNameOrClass in ignoredUxmlNamesAndUssClasses)
         {
             if (visualElement.ClassListContains(excludedNameOrClass) || visualElement.name == excludedNameOrClass)
@@ -972,7 +967,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         return false;
     }
-    
+
     private void ApplyControlColorConfigToVisualElement(VisualElement visualElement, ControlStyleConfig controlStyleConfig, VisualElement styleTarget=null)
     {
         if (controlStyleConfig == null
@@ -1018,7 +1013,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     {
         return ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName);
     }
-    
+
     private void DisableDynamicBackground()
     {
         backgroundVideoPlayer.Stop();
@@ -1041,7 +1036,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             themeJson = GetCurrentTheme()?.ThemeJson;
         }
-        
+
         List<Color32> themeMicrophoneColors = themeJson?.microphoneColors;
         if (!themeMicrophoneColors.IsNullOrEmpty())
         {
@@ -1063,7 +1058,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             Colors.CreateColor("#0AEFFF"),
         };
     }
-    
+
     public Dictionary<ESentenceRating, Color32> GetSentenceRatingColors()
     {
         Dictionary<ESentenceRating, Color32> result = new()
@@ -1074,7 +1069,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             { ESentenceRating.NotBad, Colors.CreateColor("#E7B41C7F")},
             { ESentenceRating.Bad, Colors.CreateColor("#961CE77F")},
         };
-    
+
         Dictionary<string, Color32> ratingNameToColor = GetCurrentTheme()?.ThemeJson?.phraseRatingColors;
         if (ratingNameToColor.IsNullOrEmpty())
         {
@@ -1090,7 +1085,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         });
         return result;
     }
-    
+
     public Dictionary<string, Color32> GetSongEditorLayerColors()
     {
         Dictionary<string, Color32> result = new()

@@ -273,7 +273,7 @@
     border-radius: 50%;
     border-color: #2e8418;
     border-width: 5%;
-    /* for perfect circle: width and height = 100% + (4 * border-width%) */ 
+    /* for perfect circle: width and height = 100% + (4 * border-width%) */
     width: 112%;
     height: 112%;
 }
@@ -340,6 +340,14 @@
     background-color: #344054;
     border-radius: 4px;
 }
+
+#detailedTimeBar #timeBarPositionIndicator {
+    background-color: #737372;
+}
+
+/*#detailedTimeBar #innerTimeBarSentenceEntryContainer {*/
+/*    background-color: rgba(0, 0, 0, 0);*/
+/*}*/
 
 #timeBarPositionIndicator {
     background-color: var(--font-color);

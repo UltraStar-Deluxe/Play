@@ -16,28 +16,28 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 {
     [Inject(UxmlName = R.UxmlNames.governanceOverlay)]
     private VisualElement governanceOverlay;
-    
+
     [Inject(UxmlName = R.UxmlNames.togglePlaybackButton)]
     private Button togglePlaybackButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.playIcon)]
     private VisualElement playIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.pauseIcon)]
     private VisualElement pauseIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.volumeSlider)]
     private SliderInt volumeSlider;
-    
+
     [Inject(UxmlName = R.UxmlNames.openControlsMenuButton)]
     private Button openControlsMenuButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.bottomControlsContainer)]
     private VisualElement bottomControlsContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.artistLabel)]
     private Label artistLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.titleLabel)]
     private Label titleLabel;
 
@@ -46,28 +46,31 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private SongMeta songMeta;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private AudioSeparationManager audioSeparationManager;
-    
+
     [Inject]
     private SingSceneControl singSceneControl;
-    
+
     [Inject]
     private SingSceneWebcamControl webcamControl;
-    
+
     [Inject]
     private VolumeControl volumeControl;
-    
+
     [Inject]
     private SongAudioPlayer songAudioPlayer;
-    
+
+    [Inject]
+    private ThemeManager themeManager;
+
     private ContextMenuControl contextMenuControl;
 
     private Vector2 lastPointerPosition;
@@ -78,7 +81,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private bool isPointerOverBottomControls;
     private bool playbackJustStarted;
     private float playbackStartTimeInSeconds;
-    
+
     private bool isPopupMenuOpen;
     private float popupMenuClosedTimeInSeconds;
 
@@ -93,14 +96,18 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     public void OnInjectionFinished()
     {
         showOverlayInputAction = InputManager.GetInputAction(R.InputActions.usplay_singSceneShowGovernanceOverlay).InputAction;
-        
+
         contextMenuControl = injector
             .WithRootVisualElement(openControlsMenuButton)
             .CreateAndInject<ContextMenuControl>();
         contextMenuControl.FillContextMenuAction = FillContextMenu;
         contextMenuControl.ContextMenuOpenedEventStream.Subscribe(OnContextMenuOpened);
         contextMenuControl.ContextMenuClosedEventStream.Subscribe(OnContextMenuClosed);
-        
+
+        themeManager.GetCurrentTheme().ThemeJson.primaryFontColor.IfNotDefault(color =>
+            governanceOverlayDetailedTimeBar.Query(R.UxmlNames.timeBarPositionIndicator)
+                .ForEach(it => it.style.backgroundColor = new StyleColor(color)));
+
         openControlsMenuButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (isPopupMenuOpen
@@ -111,7 +118,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
             contextMenuControl.OpenContextMenu(Vector2.zero);
         });
-        
+
         volumeSlider.RegisterValueChangedCallback(evt =>
         {
             if (settings.VolumePercent != evt.newValue)
@@ -136,7 +143,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             {
                 return;
             }
-            
+
             if (evt.button == 0)
             {
                 TogglePlayPause();
@@ -160,10 +167,10 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             endColor = Colors.clearBlack,
         }));
         bottomControlsContainer.style.backgroundColor = new StyleColor(Colors.clearBlack);
-        
+
         artistLabel.text = songMeta.Artist;
         titleLabel.text = songMeta.Title;
-        
+
         // Hide by default, show on mouse move or key press.
         doNotShowOverlayBeforeTimeInSeconds = Time.time + 0.5f;
         lastPointerPosition = Input.mousePosition;
@@ -228,7 +235,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     {
         Cursor.visible = true;
     }
-    
+
     private void TogglePlayPause()
     {
         singSceneControl.TogglePlayPause();
@@ -273,7 +280,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         FieldBindingUtils.Bind(showLyricsOnNotesToggle,
             () => settings.ShowLyricsOnNotes,
             newValue => settings.ShowLyricsOnNotes = newValue);
-        
+
         Toggle showStaticLyricsToggle = new("Lyrics Box¹");
         contextMenuPopup.AddVisualElement(showStaticLyricsToggle);
         FieldBindingUtils.Bind(showStaticLyricsToggle,
@@ -291,19 +298,19 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         FieldBindingUtils.Bind(showPitchIndicatorToggle,
             () => settings.ShowPitchIndicator,
                 newValue => settings.ShowPitchIndicator = newValue);
-        
+
         Toggle showPlayerNamesToggle = new("Player Name");
         contextMenuPopup.AddVisualElement(showPlayerNamesToggle);
         FieldBindingUtils.Bind(showPlayerNamesToggle,
             () => settings.ShowPlayerNames,
             newValue => settings.ShowPlayerNames = newValue);
-        
+
         Toggle showScoreNumbers = new("Player Score");
         contextMenuPopup.AddVisualElement(showScoreNumbers);
         FieldBindingUtils.Bind(showScoreNumbers,
             () => settings.ShowScoreNumbers,
             newValue => settings.ShowScoreNumbers = newValue);
-        
+
         if (webcamControl.WebcamsAvailable())
         {
             Toggle webcamToggle = new("Webcam");
@@ -312,7 +319,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
                 () => settings.UseWebcamAsBackgroundInSingScene,
                 newValue => webcamControl.SetUseAsBackgroundInSingScene(newValue));
         }
-        
+
         contextMenuPopup.AddSeparator();
         contextMenuPopup.AddVisualElement(new Label("¹ Requires restart"));
         contextMenuPopup.AddButton("Restart Now", "replay",
@@ -325,7 +332,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             () => singSceneControl.SkipToNextSingableNoteOrEndOfSong());
         contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart), "replay",
             () => singSceneControl.Restart());
-        
+
         contextMenuPopup.AddButton("Appearance", "filter_b_and_w", () =>
         {
             bool wasContextMenuOpenedFromInputAction = isContextMenuOpenedFromInputAction;
@@ -334,20 +341,20 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             isContextMenuOpenedFromInputAction = wasContextMenuOpenedFromInputAction;
             contextMenuControl.OpenContextMenu(Vector2.zero);
         });
-        
+
         contextMenuPopup.AddButton("Attribution", "info_outline", () =>
         {
             singSceneControl.Pause();
             ShowSongInfoDialog();
         });
-        
+
         if (!singSceneControl.HasPartyModeSceneData)
         {
-            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor), "edit", 
+            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor), "edit",
                 () => singSceneControl.OpenSongInEditor());
         }
 
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong), "logout", 
+        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong), "logout",
             () => singSceneControl.FinishScene(false, false));
 
         contextMenuPopup.AddSeparator();
@@ -370,7 +377,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         }
         else
         {
-            contextMenuPopup.AddButton("Separate audio", "call_split", 
+            contextMenuPopup.AddButton("Separate audio", "call_split",
                 () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta));
         }
     }
@@ -388,13 +395,13 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         isContextMenuOpenedFromInputAction = false;
         popupMenuClosedTimeInSeconds = Time.time;
     }
-    
+
     private void OnContextMenuOpened(ContextMenuPopupControl contextMenuPopupControl)
     {
         isPopupMenuOpen = true;
         new AnchoredPopupControl(contextMenuPopupControl.VisualElement, openControlsMenuButton, Corner2D.TopRight);
         contextMenuPopupControl.VisualElement.AddToClassList("singSceneContextMenu");
-        
+
         if (isContextMenuOpenedFromInputAction)
         {
             FocusFirstButton(contextMenuPopupControl);
