@@ -287,7 +287,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             () => settings.ShowStaticLyrics,
             newValue => settings.ShowStaticLyrics = newValue);
 
-        Toggle showPlayerInfoNextToNotesToggle = new("Player near notes¹");
+        Toggle showPlayerInfoNextToNotesToggle = new("Player alongside notes¹");
         contextMenuPopup.AddVisualElement(showPlayerInfoNextToNotesToggle);
         FieldBindingUtils.Bind(showPlayerInfoNextToNotesToggle,
             () => settings.ShowPlayerInfoNextToNotes,
