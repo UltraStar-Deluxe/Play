@@ -14,10 +14,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private PlayerScoreControl playerScoreControl;
-    
+
     [Inject]
     private ThemeManager themeManager;
-    
+
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement RootVisualElement { get; private set; }
 
@@ -41,13 +41,13 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerImageContainer)]
     private VisualElement playerImageContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerImageBorder)]
     private VisualElement playerImageBorder;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerNameLabel)]
     private Label playerNameLabel;
 
@@ -56,13 +56,13 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.playerScoreProgressBar)]
     private RadialProgressBar playerScoreProgressBar;
-    
+
     [Inject(UxmlName = R.UxmlNames.nextPlayerNameLabel)]
     private Label nextPlayerNameLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.noteContainer)]
     private VisualElement noteContainer;
-    
+
     [Inject]
     private Settings settings;
 
@@ -77,19 +77,19 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private SingSceneData sceneData;
-    
+
     [Inject]
     private GameObject gameObject;
 
     [Inject]
     private AchievementEventStream achievementEventStream;
-    
+
     private AbstractSingSceneNoteDisplayer noteDisplayer;
     public AbstractSingSceneNoteDisplayer NoteDisplayer => noteDisplayer;
 
     private PlayerProfile nextPlayerProfile;
     private float displayNextPlayerProfileTimeInSeconds;
-    
+
     private int totalScoreAnimationId;
     private int micDisconnectedAnimationId;
     private int leadingPlayerIconAnimationId;
@@ -99,9 +99,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     private readonly PlayerProfileImageControl playerProfileImageControl = new();
     private readonly PlayerPitchIndicatorControl playerPitchIndicatorControl = new();
-    
+
     private float setNextPlayerProfileAnimTimeInSeconds = 1.5f;
-    
+
     public void OnInjectionFinished()
     {
         InitPlayerNameAndImage();
@@ -113,7 +113,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         // Show rating and score after each sentence
         playerScoreLabel.text = "";
-        playerScoreProgressBar.ProgressInPercent = 0;
+
         if (singSceneControl.IsIndividualScore)
         {
             ShowTotalScore(playerScoreControl.TotalScore);
@@ -122,6 +122,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 ShowTotalScore(playerScoreControl.TotalScore);
                 ShowSentenceRating(sentenceScoreEvent.SentenceRating, sentenceRatingContainer);
             });
+        }
+        else if (settings.ScoreMode is EScoreMode.None)
+        {
+            // TODO: setting `ProgressInPercent = 0` here causes a crash in RadialProgressBar.OnGenerateVisualContent. Thus, use HideByDisplay instead.
+            playerScoreProgressBar.HideByDisplay();
         }
 
         // Show an effect for perfectly sung notes
@@ -157,7 +162,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         playerScoreControl.SentenceScoreEventStream
             .Where(x => x.SentenceRating == SentenceRating.perfect)
             .Subscribe(xs => CreateSinglePerfectSentenceEffect());
-        
+
         ChangeLayoutByPlayerCount();
 
         sentenceRatingColors = themeManager.GetSentenceRatingColors();
@@ -197,7 +202,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         settings.ObserveEveryValueChanged(it => it.ShowPlayerNames)
             .Subscribe(newValue => playerNameLabel.SetVisibleByDisplay(newValue));
-        
+
         settings.ObserveEveryValueChanged(it => it.ShowScoreNumbers)
             .Subscribe(newValue => playerScoreLabel.SetVisibleByDisplay(newValue));
     }
@@ -216,7 +221,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         playerPitchIndicatorControl.Update();
         UpdateNextPlayerProfileLabel();
     }
-    
+
     private void UpdateNextPlayerProfileLabel()
     {
         if (nextPlayerProfile == null)
@@ -245,7 +250,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-        
+
         if (connectionChangedEvent.IsConnected)
         {
             HideMicDisconnectedInfo();
@@ -253,7 +258,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         else
         {
             ShowMicDisconnectedInfo();
-            
+
             // Trigger achievement
             achievementEventStream.OnNext(AchievementId.disconnectCompanionAppWhenSinging);
         }
@@ -296,7 +301,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         label.style.color = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         // visualElement.style.unityBackgroundImageTintColor = new StyleColor(sentenceRatingColors[sentenceRating.EnumValue]);
         parentContainer.Add(visualElement);
-        
+
         visualElement.style.scale = Vector2.zero;
         LeanTween.value(singSceneControl.gameObject, 0, 1, 0.5f)
             .setEaseSpring()
@@ -353,7 +358,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-        
+
         EParticleEffect noteAreaEffect = RandomUtils.RandomOfItems(
             EParticleEffect.FireworksEffect2D_Firework5_BlueStar,
             EParticleEffect.FireworksEffect2D_Firework6_YellowStar);
@@ -371,7 +376,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-        
+
         VfxManager.CreateParticleEffect(new ParticleEffectConfig()
         {
             particleEffect = EParticleEffect.ShinyItemLoop,
@@ -379,7 +384,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             scale = 0.2f,
         });
     }
-    
+
     private void CreatePerfectNoteEffect(Note perfectNote)
     {
         noteDisplayer.CreatePerfectNoteEffect(perfectNote);
@@ -440,8 +445,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     {
         leadingPlayerIcon.HideByVisibility();
     }
-    
-    
+
+
     public void FadeOutNotes(float animTimeInSeconds)
     {
         noteDisplayer.FadeOut(animTimeInSeconds);
