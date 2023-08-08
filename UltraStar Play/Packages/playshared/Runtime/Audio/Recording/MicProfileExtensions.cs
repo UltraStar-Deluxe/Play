@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading;
 using PortAudioForUnity;
 
 public static class MicProfileExtensions
@@ -30,14 +31,23 @@ public static class MicProfileExtensions
                 return $"{micProfile.Name} - Channel {micProfile.ChannelIndex}";
             }
 
-            // Add channel to mic profile name only if the device is connected and has more than one channel.
-            if (MicrophoneAdapter.Devices.Contains(micProfile.Name))
+            if (ThreadUtils.IsMainThread())
             {
-                MicrophoneAdapter.GetDeviceCaps(micProfile.Name, out int minSampleRate, out int maxSampleRate, out int channelCount);
-                if (channelCount > 1)
+                // Add channel to mic profile name only if the device is connected and has more than one channel.
+                if (MicrophoneAdapter.Devices.Contains(micProfile.Name))
                 {
-                    return $"{micProfile.Name} - Channel {micProfile.ChannelIndex}";
+                    MicrophoneAdapter.GetDeviceCaps(micProfile.Name, out int minSampleRate, out int maxSampleRate, out int channelCount);
+                    if (channelCount > 1)
+                    {
+                        return $"{micProfile.Name} - Channel {micProfile.ChannelIndex}";
+                    }
                 }
+            }
+            else
+            {
+                // Microphone.devices can only be called from the main thread.
+                // Thus, assume this is debug output and add the channel to the result.
+                return $"{micProfile.Name} - Channel {micProfile.ChannelIndex}";
             }
         }
 
