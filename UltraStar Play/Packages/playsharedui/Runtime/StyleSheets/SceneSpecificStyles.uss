@@ -337,9 +337,10 @@
     padding: 0;
 }
 
-.innerTimeBarSentenceEntryContainer {
+#innerTimeBarSentenceEntryContainer {
     background-color: #344054;
     border-radius: 4px;
+    overflow: hidden;
 }
 
 #detailedTimeBar #timeBarPositionIndicator {

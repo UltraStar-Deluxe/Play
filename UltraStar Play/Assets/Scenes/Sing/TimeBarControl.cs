@@ -18,6 +18,12 @@ public class TimeBarControl : INeedInjection
     [Inject]
     private SingSceneMedleyControl medleyControl;
 
+    [Inject]
+    private SongMeta songMeta;
+
+    private double LateStartInSongInMillis => songMeta != null ? (songMeta.Start * 1000.0) : 0;
+    private double EarlyEndInSongInMillis => songMeta != null ? songMeta.End : 0;
+
     public void UpdateTimeValueLabel(double positionInSongInMillis, double durationOfSongInMillis)
     {
         if (positionInSongInMillis < 0
@@ -28,7 +34,13 @@ public class TimeBarControl : INeedInjection
         }
         timeValueLabel.ShowByVisibility();
 
-        double remainingTimeInSeconds = (durationOfSongInMillis - positionInSongInMillis) / 1000;
+        double positionInSongConsideringStartTag = positionInSongInMillis - LateStartInSongInMillis;
+        double durationOfSongInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
+            ? Math.Min(durationOfSongInMillis, EarlyEndInSongInMillis)
+            : durationOfSongInMillis;
+        double durationOfSongInMillisConsideringStartAndEndTag = durationOfSongInMillisConsideringEndTag - LateStartInSongInMillis;
+
+        double remainingTimeInSeconds = (durationOfSongInMillisConsideringStartAndEndTag - positionInSongConsideringStartTag) / 1000;
         if (remainingTimeInSeconds < 0)
         {
             timeValueLabel.text = "00:00";
@@ -40,26 +52,29 @@ public class TimeBarControl : INeedInjection
         int secs = (int)Math.Floor(remainingTimeInSeconds % 60);
         string secsPadding = (secs < 10) ? "0" : "";
         timeValueLabel.text = $"{minsPadding}{mins}:{secsPadding}{secs}";
-
-        // int progressPercent = (int)(100 * positionInSongInMillis / durationOfSongInMillis);
-        // timeValueLabel.text = $"{progressPercent} %";
     }
 
     public void UpdatePositionIndicator(double positionInSongInMillis, double durationOfSongInMillis)
     {
-        float positionInPercent = (float)(100 * positionInSongInMillis / durationOfSongInMillis);
+        double positionInSongConsideringStartTag = positionInSongInMillis - LateStartInSongInMillis;
+        double durationOfSongInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
+            ? Math.Min(durationOfSongInMillis, EarlyEndInSongInMillis)
+            : durationOfSongInMillis;
+        double durationOfSongInMillisConsideringStartAndEndTag = durationOfSongInMillisConsideringEndTag - LateStartInSongInMillis;
+
+        float positionInPercent = (float)(100 * positionInSongConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
         timeBarPositionIndicator.style.width = new StyleLength(new Length(positionInPercent, LengthUnit.Percent));
     }
 
     public void UpdateTimeBarRectangles(SongMeta songMeta, List<PlayerControl> playerControls, double durationOfSongInMillis)
     {
         innerTimeBarSentenceEntryContainer.Clear();
-        
+
         if (durationOfSongInMillis <= 0)
         {
             return;
         }
-        
+
         int playerControlIndex = 0;
         foreach (PlayerControl playerControl in playerControls)
         {
@@ -79,6 +94,7 @@ public class TimeBarControl : INeedInjection
 
             double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
             double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
+
             if (playerCount <= 3)
             {
                 // Show individual rectangles for each player
@@ -97,8 +113,26 @@ public class TimeBarControl : INeedInjection
 
     private void CreateRectangle(MicProfile micProfile, double startPosInMillis, double endPosInMillis, double durationOfSongInMillis, float topPercent, float heightPercent)
     {
-        float startPosPercentage = (float)(100 * startPosInMillis / durationOfSongInMillis);
-        float endPosPercentage = (float)(100 * endPosInMillis / durationOfSongInMillis);
+        double durationOfSongInMillisConsideringEndTag = EarlyEndInSongInMillis > 0
+            ? Math.Min(durationOfSongInMillis, EarlyEndInSongInMillis)
+            : durationOfSongInMillis;
+        double durationOfSongInMillisConsideringStartAndEndTag = durationOfSongInMillisConsideringEndTag - LateStartInSongInMillis;
+        double startPosInMillisConsideringStartTag = startPosInMillis - LateStartInSongInMillis;
+        double endPosInMillisConsideringStartTag = endPosInMillis - LateStartInSongInMillis;
+
+        float startPosPercentage = (float)(100 * startPosInMillisConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
+        float endPosPercentage = (float)(100 * endPosInMillisConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
+
+        if (endPosPercentage < 0
+            || startPosPercentage > 100)
+        {
+            // Outside of visible area
+            return;
+        }
+
+        // Fit into parent
+        NumberUtils.Limit(startPosPercentage, 0, 100);
+        NumberUtils.Limit(endPosPercentage, 0, 100);
 
         VisualElement rectangle = new();
         rectangle.style.position = new StyleEnum<Position>(Position.Absolute);
