@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5931140112734334179}
   - component: {fileID: 283603916767145877}
-  - component: {fileID: 8106366048071729876}
+  - component: {fileID: 1396898852338396518}
   m_Layer: 0
   m_Name: SineToneAudioGenerator
   m_TagString: Untagged
@@ -129,7 +129,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &8106366048071729876
+--- !u!114 &1396898852338396518
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -138,9 +138,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4219181020205439292}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84c92cc5bc5843aba215ca83d4986c0c, type: 3}
+  m_Script: {fileID: 11500000, guid: f79bdc0fdf1b4e878f9fbb2dd6ef3eb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UsePortAudio: 0
+  hostApi: -1
 --- !u!1 &9201570461547644148
 GameObject:
   m_ObjectHideFlags: 0
