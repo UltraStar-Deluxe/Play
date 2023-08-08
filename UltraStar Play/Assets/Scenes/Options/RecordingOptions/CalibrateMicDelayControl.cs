@@ -18,7 +18,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     public List<MidiNoteAndFrequency> midiNoteNameAndFrequencies;
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildrenIncludeInactive)]
-    private SineToneAudioGenerator sineToneAudioGenerator;
+    private SineToneAudioSource sineToneAudioSource;
 
     [Inject]
     private NewestSamplesMicPitchTracker micPitchTracker;
@@ -28,6 +28,9 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private BackgroundMusicManager backgroundMusicManager;
+
+    [Inject]
+    private Settings settings;
 
     private enum ECalibrationPhase
     {
@@ -52,7 +55,11 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         {
             throw new UnityException("No notes configured for calibration");
         }
-        sineToneAudioGenerator.gameObject.SetActive(false);
+        sineToneAudioSource.gameObject.SetActive(false);
+
+        settings.ObserveEveryValueChanged(it => it.PreferPortAudio)
+            .Subscribe(_ => sineToneAudioSource.UsePortAudio = settings.PreferPortAudio)
+            .AddTo(gameObject);
 
         // Stop sine tone after calibration
         calibrationResultEventStream
@@ -76,9 +83,9 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
             oldBackgroundMusicVolume = backgroundMusicManager.BackgroundMusicAudioSource.volume;
         }
         backgroundMusicManager.BackgroundMusicAudioSource.volume = 0;
-        sineToneAudioGenerator.gameObject.SetActive(true);
-        sineToneAudioGenerator.SkipOnAudioFilterRead = true;
-        sineToneAudioGenerator.Play();
+        sineToneAudioSource.gameObject.SetActive(true);
+        sineToneAudioSource.SkipAudioOutput = true;
+        sineToneAudioSource.Play();
 
         await Task.Run(CalibrateAsync);
     }
@@ -222,26 +229,26 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
     private void MuteSineTone()
     {
-        sineToneAudioGenerator.SkipOnAudioFilterRead = true;
+        sineToneAudioSource.SkipAudioOutput = true;
     }
 
     private void UnmuteSineTone()
     {
-        sineToneAudioGenerator.SkipOnAudioFilterRead = false;
+        sineToneAudioSource.SkipAudioOutput = false;
     }
 
     private void DeactivateSineTone()
     {
         Debug.Log("Stopping sine tone");
-        sineToneAudioGenerator.Stop();
-        sineToneAudioGenerator.gameObject.SetActive(false);
+        sineToneAudioSource.Stop();
+        sineToneAudioSource.gameObject.SetActive(false);
         backgroundMusicManager.BackgroundMusicAudioSource.volume = oldBackgroundMusicVolume;
     }
 
     private void PlayNextSineTone(int frequency)
     {
         Debug.Log($"Playing sine tone with {frequency} Hz");
-        sineToneAudioGenerator.Frequency = frequency;
+        sineToneAudioSource.Frequency = frequency;
         UnmuteSineTone();
     }
 
@@ -268,7 +275,7 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         public string midiNoteName;
         public int frequency;
     }
-    
+
     public class CalibrationResult
     {
         public bool IsSuccess { get; private set; }

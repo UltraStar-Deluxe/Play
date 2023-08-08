@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using NHyphenator;
 using NHyphenator.Loaders;
@@ -7,6 +6,12 @@ using UnityEngine;
 
 public static class SettingsUtils
 {
+    public static bool ShouldUsePortAudio(Settings settings)
+    {
+        return settings.PreferPortAudio
+               && ApplicationUtils.CanUsePortAudio();
+    }
+
     public static List<HttpApiPermission> GetPermissions(Settings settings, string clientId)
     {
         if (clientId.IsNullOrEmpty())
@@ -46,7 +51,7 @@ public static class SettingsUtils
         }
         settings.HttpApiPermissions[clientId].Remove(permission);
     }
-    
+
     public static PlayerProfile GetPlayerProfile(Settings settings, string profileName)
     {
         return settings.PlayerProfiles.FirstOrDefault(playerProfile => playerProfile.Name == profileName);
@@ -58,7 +63,7 @@ public static class SettingsUtils
             .Where(micProfile => micProfile.Name == profileName)
             .ToList();
     }
-    
+
     public static MicProfile GetMicProfile(Settings settings, string profileName, int channelIndex)
     {
         return settings.MicProfiles
@@ -70,7 +75,7 @@ public static class SettingsUtils
     {
         return settings.SceneChangeDurationInSeconds > 0;
     }
-    
+
     public static List<MicProfile> GetAvailableMicProfiles(Settings settings, ThemeManager themeManager, ServerSideConnectRequestManager serverSideConnectRequestManager)
     {
         List<MicProfile> allMicProfiles = MicProfileUtils.CreateAndPersistMicProfiles(settings, themeManager, serverSideConnectRequestManager);
@@ -79,7 +84,7 @@ public static class SettingsUtils
             .Where(it => it.IsEnabledAndConnected(serverSideConnectRequestManager))
             .ToList();
     }
-    
+
     public static void IncreaseVolume(Settings settings)
     {
         settings.VolumePercent += 10;
@@ -106,7 +111,7 @@ public static class SettingsUtils
             Debug.LogWarning("No hyphenation patterns found for language: " + speechRecognitionLanguage);
             return null;
         }
-        
+
         Hyphenator hyphenator = new Hyphenator(
             hyphenatePatternsLoader,
             EditLyricsUtils.syllableSeparator,
@@ -116,7 +121,7 @@ public static class SettingsUtils
             true);
         return hyphenator;
     }
-    
+
     public static string GetGeneratedSongFolderAbsolutePath(Settings settings)
     {
         if (settings.GeneratedFolderPath.IsNullOrEmpty())
