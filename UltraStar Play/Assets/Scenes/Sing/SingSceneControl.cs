@@ -34,7 +34,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         completedSongCountSinceAppStart = 0;
     }
     private static int completedSongCountSinceAppStart;
-    
+
     [InjectedInInspector]
     public PlayerControl playerControlPrefab;
 
@@ -82,7 +82,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private UiManager uiManager;
 
@@ -106,7 +106,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.playerUiContainer)]
     private VisualElement playerUiContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerUiContainerPlaceholder)]
     private VisualElement playerUiContainerPlaceholder;
 
@@ -121,13 +121,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     [Inject(UxmlClass = R.UssClasses.playerInfoUiList)]
     private List<VisualElement> playerInfoUiLists;
-    
+
     [Inject]
     private UIDocument uiDocument;
 
     [Inject]
     private ThemeManager themeManager;
-    
+
     [Inject]
     private AudioSeparationManager audioSeparationManager;
 
@@ -200,7 +200,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private bool hasRecordedSongFinishedStatistics;
 
     private bool hasFinishedScene;
-    
+
     public void OnInjectionFinished()
     {
         injector
@@ -223,7 +223,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         startTimeInSeconds = Time.time;
 
         injector.Inject(singSceneGovernanceControl);
-        
+
         // Prepare player UI layout (depends on player count)
         PreparePlayerUiLayout();
 
@@ -251,7 +251,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                     // This is a medley (or short song), select score data for this medley entry song
                     playerControl.PlayerScoreControl.ScoreData = scoreDatas[sceneData.MedleySongIndex];
                 }
-                
+
                 if (playerControl.PlayerScoreControl.ScoreData != null)
                 {
                     playerControl.PlayerUiControl.ShowTotalScore(playerControl.PlayerScoreControl.ScoreData.TotalScore, false);
@@ -265,7 +265,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                     .Subscribe(_ => UpdateLeadingPlayerIcon());
             }
         }
-        
+
         AddPlayerUisToUiDocument();
 
         // Handle dummy singers
@@ -286,7 +286,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         InitSingingLyricsControls();
 
         StartAudioPlayback();
-        
+
         StartVideoOrShowBackgroundImage();
 
         // Input legend (in pause overlay)
@@ -313,7 +313,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             timeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
             governanceOverlayTimeBarControl?.UpdateTimeValueLabel(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis);
         }));
-        
+
         // Start medley if needed
         if (sceneData.IsMedley)
         {
@@ -355,7 +355,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             return;
         }
-        
+
         string playerNameCsv = playerProfilesWithoutMic
             .Select(it => it.Name)
             .ToList()
@@ -368,7 +368,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         dialogControl.DialogClosedEventStream.Subscribe(_ => dialogControl = null);
         dialogControl.Message = message;
 
-        ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);   
+        ThemeManager.ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement);
     }
 
     public void OnDestroy()
@@ -377,7 +377,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         singSceneGovernanceControl?.Dispose();
         audioFadeInControl?.Dispose();
     }
-    
+
     private void InitDummySingers()
     {
         bool includeInactive = false;
@@ -404,9 +404,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .Where(it => it.name != R.UxmlNames.commonScoreSentenceRatingContainer)
             .ToList()
             .ForEach(it => it.RemoveFromHierarchy());
-        
+
         UpdatePlayerUiContainerHeight();
-        
+
         playerInfoUiLists.ForEach(playerInfoUiList => playerInfoUiList.Clear());
         if (playerCount <= 1)
         {
@@ -466,7 +466,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             return new List<PlayerControl>();
         }
-        
+
         if (voiceToPlayerControlsMap.Keys.Count >= 2)
         {
             // There are two different sets of lyrics that need to be displayed
@@ -492,10 +492,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             return voiceToPlayerControlsMap.Values.FirstOrDefault();
         }
-        
+
         return new List<PlayerControl>();
     }
-    
+
     private void InitSingingLyricsControls()
     {
         if (PlayerControls.IsNullOrEmpty()
@@ -573,11 +573,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private void StartVideoOrShowBackgroundImage()
     {
-        songVideoPlayer.SongMeta = SongMeta;
+        songVideoPlayer.LoadAndPlaySongVideo(SongMeta);
         string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
         if (!SongMetaUtils.ResourceExists(SongMeta, videoUri))
         {
-            songVideoPlayer.ShowBackgroundImage();
+            songVideoPlayer.ShowBackgroundImage(SongMeta);
         }
         else
         {
@@ -614,7 +614,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         bottomSingingLyricsControl?.Update(songAudioPlayer.PositionInSongInMillis);
 
         UpdateSongStartedStats();
-        
+
         singSceneGovernanceControl.Update();
 
         if (sceneData.IsMedley)
@@ -650,7 +650,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .Where(nextSingableNote => nextSingableNote != null)
             .Select(nextSingableNote => nextSingableNote.StartBeat)
             .ToList();
-        
+
         if (nextSingableNotes.IsNullOrEmpty())
         {
             // Skip to end of the audio if last note has been finished.
@@ -769,12 +769,12 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private void TriggerAchievementsAfterEndOfSong()
     {
         achievementEventStream.OnNext(AchievementId.completeSong);
-        
+
         if (settings.VocalsAudioVolumePercent <= 0)
         {
             achievementEventStream.OnNext(AchievementId.completeSongWithVocalsVolumeZero);
         }
-        
+
         completedSongCountSinceAppStart++;
         if (completedSongCountSinceAppStart > 10)
         {
@@ -954,7 +954,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             statistics.RecordSongStarted(SongMeta);
         }
     }
-    
+
     private void UpdateSongFinishedStats(List<HighScoreEntry> highScoreEntries)
     {
         if (hasRecordedSongFinishedStatistics
@@ -986,7 +986,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         PlayerControls.Add(playerControl);
 
         playerControl.PlayerMicPitchTracker.InitPitchDetection();
-        
+
         return playerControl;
     }
 
@@ -996,18 +996,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         // This corresponds with the positioning of the player profile UI and lyrics boxes.
         List<PlayerControl> playerControlsUsingFirstVoice = GetPlayerControlsOfVoice(true);
         List<PlayerControl> playerControlsUsingSecondVoice = GetPlayerControlsOfVoice(false);
-        
+
         foreach (PlayerControl playerControl in playerControlsUsingFirstVoice)
         {
             AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, PlayerControls.IndexOf(playerControl));
         }
-        
+
         foreach (PlayerControl playerControl in playerControlsUsingSecondVoice)
         {
             AddPlayerUi(playerControl.PlayerUiControl.RootVisualElement, PlayerControls.IndexOf(playerControl));
         }
     }
-    
+
     private void AddPlayerUi(VisualElement visualElement, int playerIndex)
     {
         int playerCount = sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count;
@@ -1037,7 +1037,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             {
                 return Voice.mergedVoiceName;
             }
-            
+
             // The given value could be "P1" / "P2" (i.e. a voiceName) or the performer's name (e.g. "Elvis").
             string matchingVoiceName = SongMeta.VoiceNames
                 .Where(entry => entry.Key == voiceNameOrPerformerName
@@ -1062,24 +1062,24 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             return;
         }
-        
+
         songAudioPlayer.PauseAudio();
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.StopRecording());
-        
+
         // Trigger achievement
         if (songAudioPlayer.PositionInSongInMillis > 60000)
         {
             achievementEventStream.OnNext(AchievementId.pauseSingingAfterOneMinute);
         }
     }
-    
+
     public void Unpause()
     {
         if (!IsPaused)
         {
             return;
         }
-        
+
         songAudioPlayer.PlayAudio();
         PlayerControls.ForEach(playerControl =>
         {
@@ -1087,7 +1087,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
         });
     }
-    
+
     public void TogglePlayPause()
     {
         if (songAudioPlayer.IsPlaying)
@@ -1109,7 +1109,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         double startPositionInSongInMillis = GetStartPositionInSongInMillis();
-        
+
         songAudioPlayer.LoadAndPlaySongAudioAsObservable(SongMeta, startPositionInSongInMillis, settings.StreamAudioInSingScene)
             .CatchIgnore((Exception ex) =>
             {
@@ -1176,13 +1176,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private Voice GetVoice(PlayerProfile playerProfile)
     {
         List<Voice> voices = SongMeta.GetVoices().ToList();
-        
+
         string voiceName = GetVoiceName(playerProfile);
         if (voiceName == Voice.mergedVoiceName)
         {
             return SongMetaUtils.CreateMergedVoice(voices);
         }
-        
+
         Voice matchingVoice = voices.FirstOrDefault(it => Voice.VoiceNameEquals(it.Name, voiceName));
         if (matchingVoice != null)
         {

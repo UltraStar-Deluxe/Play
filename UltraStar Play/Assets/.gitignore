@@ -91,6 +91,9 @@ Vuplex.meta
 FfmpegUnity/
 FfmpegUnity.meta
 
+VLCUnity/
+VLCUnity.meta
+
 ######################################
 ## StreamingAssets
 StreamingAssets/Input/UltraStarPlayInputActions.inputactions
