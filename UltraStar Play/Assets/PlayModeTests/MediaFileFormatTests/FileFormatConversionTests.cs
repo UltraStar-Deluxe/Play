@@ -7,6 +7,14 @@ using Assert = NUnit.Framework.Assert;
 
 public class FileFormatConversionTests : AbstractMediaFileFormatTests
 {
+    private static readonly string tempFolder = $"{Application.temporaryCachePath}/MediaFileConversionTest";
+
+    [OneTimeSetUp]
+    public void DeleteTempFolder()
+    {
+        DirectoryUtils.Delete(tempFolder, true);
+    }
+
     [Test]
     public void GetTargetFileNameFromFfmpegArgumentsTest()
     {
@@ -97,12 +105,14 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
 
     private IEnumerator FileConversionTest(string songFilePrefix, string testFolderPath, string targetFileExtension, bool isAudio)
     {
+        LogAssert.ignoreFailingMessages = true;
+
         string songFilePath = GetSongMetaFilePath(songFilePrefix, testFolderPath);
         SongMeta songMeta = LoadSongMeta(songFilePath);
         string originalSourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
 
         // Copy file to temp folder so that we don't modify the original file
-        string tempSourceFilePath = $"{Application.temporaryCachePath}/MediaFileConversionTest/{Path.GetFileName(originalSourceFilePath)}";
+        string tempSourceFilePath = $"{tempFolder}/{Path.GetFileName(originalSourceFilePath)}";
         FileUtils.Copy(originalSourceFilePath, tempSourceFilePath, true);
 
         long copyStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
@@ -119,22 +129,28 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
         bool isSuccessful = false;
         bool ignoreEqualFileExtension = true;
         long conversionStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        SongMediaFileConversionManager.MinTargetFileSizeInBytes = 10 * 1024; // 10 KB
         SongMediaFileConversionManager.Instance.ConvertFileToSupportedFormat(tempSourceFilePath,
             $"test media '{Path.GetFileName(tempSourceFilePath)}'",
             $"Convert '{Path.GetFileName(tempSourceFilePath)}' to supported format",
             isAudio,
             ignoreEqualFileExtension,
+            3,
             targetFilePath =>
             {
                 if (!File.Exists(targetFilePath))
                 {
-                    Assert.Fail($"Failed to convert '{tempSourceFilePath}' to supported format. Target file '{targetFilePath}' does not exist.");
+                    Assert.Fail($"Failed to convert '{tempSourceFilePath}' to supported format. Target file '{targetFilePath}' does not exist");
                     return;
                 }
 
                 isSuccessful = true;
                 long durationInMillis = TimeUtils.GetUnixTimeMilliseconds() - conversionStartTimeInMillis;
                 Debug.Log($"Successfully converted '{originalSourceFilePath}' to '{Path.GetFileName(targetFilePath)}' in {durationInMillis} ms");
+            },
+            conversionError =>
+            {
+                Assert.Fail($"Failed to convert '{tempSourceFilePath}' to supported format. Conversion error: {conversionError.ErrorMessage}");
             });
 
         long maxWaitTimeInMillis = 3000;

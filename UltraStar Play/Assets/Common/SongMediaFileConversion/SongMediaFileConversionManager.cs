@@ -8,6 +8,7 @@ using System.Threading;
 using FfmpegUnity;
 using UniInject;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -15,6 +16,15 @@ using UnityEngine;
 public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static SongMediaFileConversionManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMediaFileConversionManager>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        MinTargetFileSizeInBytes = DefaultMinTargetFileSizeInBytes;
+    }
+
+    private const int DefaultMinTargetFileSizeInBytes = 100 * 1024; // 100 KB
+    private const int MaxConversionRetry = 3;
 
     [Inject]
     private JobManager jobManager;
@@ -27,6 +37,8 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
 
     private readonly List<IEnumerator> runningSongMediaConversionCoroutines = new();
     private readonly List<IEnumerator> pendingSongMediaConversionCoroutines = new();
+
+    public static int MinTargetFileSizeInBytes { get; set; } = DefaultMinTargetFileSizeInBytes;
 
     protected override object GetInstance()
     {
@@ -53,7 +65,24 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         }
     }
 
-    protected void ConvertSongMetaMediaFileToSupportedFormat(
+    private void ConvertSongMetaMediaFileToSupportedFormat(
+        SongMeta songMeta,
+        string mediaDescription,
+        Func<string> pathGetter,
+        Action<string> pathSetter,
+        string jobTitle,
+        bool isAudio)
+    {
+        ConvertSongMetaMediaFileToSupportedFormatWithRetry(
+            songMeta,
+            mediaDescription,
+            pathGetter,
+            pathSetter,
+            jobTitle,
+            isAudio);
+    }
+
+    private void ConvertSongMetaMediaFileToSupportedFormatWithRetry(
         SongMeta songMeta,
         string mediaDescription,
         Func<string> pathGetter,
@@ -67,23 +96,15 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             return;
         }
 
+        string sourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, currentValue);
+        if (!FileUtils.Exists(sourceFilePath))
+        {
+            Debug.LogError($"Cannot convert file '{sourceFilePath}', file does not exist");
+            return;
+        }
+
         void OnSuccess(string targetFilePath)
         {
-            if (!FileUtils.Exists(targetFilePath))
-            {
-                Debug.LogError($"Failed to convert file. Target file not found: {targetFilePath}");
-                UiManager.CreateNotification($"Failed to convert '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.\nPlease try again.");
-                return;
-            }
-
-            int minFileSizeInBytes = 100 * 1024; // 100 KB
-            if (new FileInfo(targetFilePath).Length < minFileSizeInBytes)
-            {
-                Debug.LogError($"Failed to convert file. Target file is too small: {targetFilePath}");
-                UiManager.CreateNotification($"Failed to convert '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.\nPlease try again.");
-                return;
-            }
-
             string relativeTargetFilePath = PathUtils.MakeRelativePath(songMeta.Directory, targetFilePath);
             Debug.Log($"Setting {mediaDescription} of '{SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta)}' to '{relativeTargetFilePath}'");
             pathSetter(relativeTargetFilePath);
@@ -93,9 +114,43 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
             UiManager.CreateNotification($"Successfully converted '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.");
         }
 
-        string sourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, currentValue);
+        void OnFailure(ConversionError conversionError)
+        {
+            UiManager.CreateNotification($"Failed to convert '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format.\nPlease try again.");
+        }
 
-        ConvertFileToSupportedFormat(sourceFilePath, mediaDescription, jobTitle, isAudio, true, OnSuccess);
+        ConvertFileToSupportedFormat(sourceFilePath,
+            mediaDescription,
+             jobTitle,
+            isAudio,
+            true,
+            MaxConversionRetry,
+            OnSuccess,
+            OnFailure);
+    }
+
+    private static ConversionError GetConversionError(string sourceFilePath, string targetFilePath)
+    {
+        if (!FileUtils.Exists(targetFilePath))
+        {
+            return new ConversionError(
+                sourceFilePath,
+                targetFilePath,
+                $"Failed to convert file '{sourceFilePath}'. Target file not found: {targetFilePath}",
+                false);
+        }
+
+        long targetFileSizeInBytes = new FileInfo(targetFilePath).Length;
+        if (targetFileSizeInBytes < MinTargetFileSizeInBytes)
+        {
+            return new ConversionError(
+                sourceFilePath,
+                targetFilePath,
+                $"Failed to convert file '{sourceFilePath}'. Target file is too small: '{targetFilePath}', size in bytes: {targetFileSizeInBytes}",
+                true);
+        }
+
+        return null;
     }
 
     public void ConvertFileToSupportedFormat(
@@ -104,7 +159,9 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         string jobTitle,
         bool isAudio,
         bool ignoreEqualFileExtension,
-        Action<string> onSuccess)
+        int maxRetry,
+        Action<string> onSuccess,
+        Action<ConversionError> onFailure)
     {
         if (!FileUtils.Exists(sourceFilePath))
         {
@@ -192,7 +249,40 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
                 return;
             }
 
-            onSuccess?.Invoke(targetFilePath);
+            ConversionError conversionError = GetConversionError(sourceFilePath, targetFilePath);
+            if (conversionError == null)
+            {
+                onSuccess?.Invoke(targetFilePath);
+            }
+            else
+            {
+                if (conversionError.CanRetry
+                    && maxRetry > 0)
+                {
+                    Debug.LogError($"{conversionError.ErrorMessage}. Remaining retry count: {maxRetry}. Attempting retry.");
+                    ConvertFileToSupportedFormat(
+                        sourceFilePath,
+                        mediaDescription,
+                        jobTitle,
+                        isAudio,
+                        ignoreEqualFileExtension,
+                        maxRetry - 1,
+                        onSuccess,
+                        onFailure);
+                    return;
+                }
+                else if (conversionError.CanRetry
+                         && maxRetry <= 0)
+                {
+                    Debug.LogError($"{conversionError.ErrorMessage}. Failed last retry.");
+                    onFailure?.Invoke(conversionError);
+                }
+                else
+                {
+                    Debug.LogError($"{conversionError.ErrorMessage}. Cannot retry.");
+                    onFailure?.Invoke(conversionError);
+                }
+            }
         });
 
         pendingSongMediaConversionCoroutines.Add(runFfmpegCommandCoroutine);
@@ -327,5 +417,25 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
         ffmpegCommand.GetProgressOnScript = true;
         ffmpegCommand.PrintStdErr = settings.LogFfmpegOutput;
         return ffmpegCommand;
+    }
+
+    public class ConversionError
+    {
+        public string SourceFilePath { get; private set; }
+        public string TargetFilePath { get; private set; }
+        public string ErrorMessage { get; private set; }
+        public bool CanRetry { get; private set; }
+
+        public ConversionError(
+            string sourceFilePath,
+            string targetFilePath,
+            string errorMessage,
+            bool canRetry)
+        {
+            SourceFilePath = sourceFilePath;
+            TargetFilePath = targetFilePath;
+            ErrorMessage = errorMessage;
+            CanRetry = canRetry;
+        }
     }
 }
