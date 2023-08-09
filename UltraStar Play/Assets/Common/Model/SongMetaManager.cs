@@ -191,6 +191,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // Update supported file formats when ffmpeg is (not) used.
         ApplicationUtils.UseFfmpegToPlayMediaFiles = settings.UseFfmpegToPlayMediaFiles;
+        ApplicationUtils.UseVlcToPlayMediaFiles = settings.UseVlcToPlayMediaFiles;
 
         // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
         // Thus, use the static instance.
@@ -491,6 +492,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
                 newSongMeta,
                 settings.UseFfmpegToPlayMediaFiles,
+                settings.UseVlcToPlayMediaFiles,
                 settings.CheckCodecIsSupported);
             songIssues.AddRange(mediaFormatIssues);
 
@@ -660,7 +662,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     // Checks whether the audio and video file formats of the song are supported.
     // Returns true iff the audio file of the SongMeta exists and is supported.
-    public static List<SongIssue> GetSupportedMediaFormatIssues(SongMeta songMeta, bool useFfmpegToPlayMediaFiles, bool checkCodecIsSupported)
+    public static List<SongIssue> GetSupportedMediaFormatIssues(
+        SongMeta songMeta,
+        bool useFfmpegToPlayMediaFiles,
+        bool useVlcToPlayMediaFiles,
+        bool checkCodecIsSupported)
     {
         List<SongIssue> songIssues = new();
 
@@ -678,7 +684,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 ESongIssueSeverity.Warning);
         }
 
-        if (useFfmpegToPlayMediaFiles)
+        if (useFfmpegToPlayMediaFiles
+            || useVlcToPlayMediaFiles)
         {
             // The ffmpeg integration in Unity can at the moment only play one file.
             // Thus, check video file is either same as audio file or ffmpeg is not used to play it.

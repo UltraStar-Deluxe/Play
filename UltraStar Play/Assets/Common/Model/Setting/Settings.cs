@@ -126,7 +126,12 @@ public class Settings : ISettings
      public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
      public string PortAudioOutputDeviceName { get; set; } = "";
 
+    // Vlc settings
+    public bool LogVlcOutput { get; set; }
+    public bool UseVlcToPlayMediaFiles { get; set; } = true;
+
     // Ffmpeg settings
+    public bool LogFfmpegOutput { get; set; }
     public bool UseFfmpegToPlayMediaFiles { get; set; }
     public Dictionary<string, string> FileFormatToFfmpegConversionArguments { get; set; } = new()
     {
@@ -137,7 +142,6 @@ public class Settings : ISettings
         // Convert video files to mp4
         {"ANY_VIDEO", "-y -i \"INPUT_FILE\" -qscale 0 \"INPUT_FILE_WITHOUT_EXTENSION.mp4\""},
     };
-    public bool LogFfmpegOutput { get; set; }
     public int MaxConcurrentSongMediaConversions { get; set; } = 3;
 
     /**

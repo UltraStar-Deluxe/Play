@@ -29,8 +29,25 @@ public static class ApplicationUtils
             }
             Debug.Log($"use ffmpeg to play media files: {value}");
             useFfmpegToPlayMediaFiles = value;
-            supportedAudioFiles = GetSupportedAudioFiles(useFfmpegToPlayMediaFiles);
-            supportedVideoFiles = GetSupportedVideoFiles(useFfmpegToPlayMediaFiles);
+            supportedAudioFiles = GetSupportedAudioFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
+            supportedVideoFiles = GetSupportedVideoFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
+        }
+    }
+
+    private static bool useVlcToPlayMediaFiles;
+    public static bool UseVlcToPlayMediaFiles
+    {
+        get => useVlcToPlayMediaFiles;
+        set
+        {
+            if (useVlcToPlayMediaFiles == value)
+            {
+                return;
+            }
+            Debug.Log($"use vlc to play media files: {value}");
+            useVlcToPlayMediaFiles = value;
+            supportedAudioFiles = GetSupportedAudioFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
+            supportedVideoFiles = GetSupportedVideoFiles(useFfmpegToPlayMediaFiles, useVlcToPlayMediaFiles);
         }
     }
 
@@ -74,6 +91,10 @@ public static class ApplicationUtils
         .Where(fileExtension => !audioFileExtensions.Contains(fileExtension))
         .ToList();
 
+    public static readonly IReadOnlyCollection<string> vlcSupportedFileExtensions = ffmpegSupportedFileExtensions;
+    public static readonly IReadOnlyCollection<string> vlcSupportedAudioFiles = ffmpegSupportedAudioFiles;
+    public static readonly IReadOnlyCollection<string> vlcSupportedVideoFiles = ffmpegSupportedVideoFiles;
+
     public static readonly IReadOnlyCollection<string> unitySupportedAudioFiles = new HashSet<string>
     {
         "mp3",
@@ -81,7 +102,7 @@ public static class ApplicationUtils
         "wav",
     }.ToHashSet();
 
-    public static IReadOnlyCollection<string> supportedAudioFiles = GetSupportedAudioFiles(false);
+    public static IReadOnlyCollection<string> supportedAudioFiles = GetSupportedAudioFiles(false, false);
 
     public static readonly IReadOnlyCollection<string> supportedVocalsSeparationAudioFiles = new HashSet<string>
     {
@@ -114,7 +135,7 @@ public static class ApplicationUtils
         "webm",
     };
 
-    public static IReadOnlyCollection<string> supportedVideoFiles = GetSupportedVideoFiles(false);
+    public static IReadOnlyCollection<string> supportedVideoFiles = GetSupportedVideoFiles(false, false);
 
     public static void OpenDirectory(string path)
     {
@@ -185,6 +206,18 @@ public static class ApplicationUtils
     {
         fileExtension = NormalizeFileExtension(fileExtension);
         return ffmpegSupportedVideoFiles.Contains(fileExtension);
+    }
+
+    public static bool IsVlcSupportedAudioFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return vlcSupportedAudioFiles.Contains(fileExtension);
+    }
+
+    public static bool IsVlcSupportedVideoFormat(string fileExtension)
+    {
+        fileExtension = NormalizeFileExtension(fileExtension);
+        return vlcSupportedVideoFiles.Contains(fileExtension);
     }
 
     public static bool IsSupportedAudioFormat(string fileExtension)
@@ -332,18 +365,20 @@ public static class ApplicationUtils
         return uri;
     }
 
-    private static IReadOnlyCollection<string> GetSupportedAudioFiles(bool includeFfmpegFormats)
+    private static IReadOnlyCollection<string> GetSupportedAudioFiles(bool includeFfmpegFormats, bool includeVlcFormats)
     {
         return unitySupportedAudioFiles
             .Union(supportedMidiFiles)
             .Union(includeFfmpegFormats ? ffmpegSupportedAudioFiles : new List<string>())
+            .Union(includeVlcFormats ? ffmpegSupportedAudioFiles : new List<string>())
             .ToHashSet();
     }
 
-    private static IReadOnlyCollection<string> GetSupportedVideoFiles(bool includeFfmpegFormats)
+    private static IReadOnlyCollection<string> GetSupportedVideoFiles(bool includeFfmpegFormats, bool includeVlcFormats)
     {
         return unitySupportedVideoFiles
             .Union(includeFfmpegFormats ? ffmpegSupportedVideoFiles : new List<string>())
+            .Union(includeVlcFormats ? vlcSupportedVideoFiles : new List<string>())
             .ToHashSet();
     }
 }

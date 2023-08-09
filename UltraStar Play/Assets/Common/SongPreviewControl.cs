@@ -12,10 +12,10 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
     public float previewDelayInSeconds = 0.5f;
-    
+
     [InjectedInInspector]
     public bool stopOldImmediatelyOnStartNew;
-    
+
     public float AudioFadeInDurationInSeconds { get; set; } = 2;
     public float VideoFadeInDurationInSeconds { get; set; } = 2;
 
@@ -216,7 +216,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         VideoFadeIn.Value = 0;
         BackgroundImageFadeIn.Value = 0;
 
-        songVideoPlayer.SongMeta = songMeta;
+        songVideoPlayer.LoadAndPlaySongVideo(songMeta);
         songVideoPlayer.StartVideoOrShowBackgroundImage();
     }
 
@@ -226,7 +226,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         {
             return;
         }
-        
+
         try
         {
             songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)

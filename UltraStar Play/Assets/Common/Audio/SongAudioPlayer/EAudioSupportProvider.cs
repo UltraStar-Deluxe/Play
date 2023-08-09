@@ -5,4 +5,5 @@
     UnityVideoPlayer,
     WebView,
     Ffmpeg,
+    Vlc,
 }

@@ -340,6 +340,7 @@ public static partial class R
         public const string logFfmpegOutputPicker = "logFfmpegOutputPicker";
         public const string logo = "logo";
         public const string logoContainer = "logoContainer";
+        public const string logVlcOutputPicker = "logVlcOutputPicker";
         public const string lrcImportDescription = "lrcImportDescription";
         public const string lrcImportIcon = "lrcImportIcon";
         public const string lrcImportLyricsContainer = "lrcImportLyricsContainer";
@@ -885,6 +886,7 @@ public static partial class R
         public const string useFfmpegToPlayMediaFilesPicker = "useFfmpegToPlayMediaFilesPicker";
         public const string usePortAudioToggle = "usePortAudioToggle";
         public const string useUniversalCharsetDetectorPicker = "useUniversalCharsetDetectorPicker";
+        public const string useVlcToPlayMediaFilesPicker = "useVlcToPlayMediaFilesPicker";
         public const string useWebcamToggle = "useWebcamToggle";
         public const string versionDetailsContainer = "versionDetailsContainer";
         public const string versionInfoContainer = "versionInfoContainer";

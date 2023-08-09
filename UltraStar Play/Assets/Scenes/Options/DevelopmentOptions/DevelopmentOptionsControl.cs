@@ -38,9 +38,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.portAudioDeviceInfoButton)]
     private Button portAudioDeviceInfoButton;
 
-    [Inject(UxmlName = R.UxmlNames.logFfmpegOutputPicker)]
-    private ItemPicker logFfmpegOutputPicker;
-
     [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsPicker)]
     private ItemPicker maxConcurrentSongMediaConversionsPicker;
 
@@ -67,7 +64,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.disableWebViewPicker)]
     private ItemPicker disableWebViewPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.connectionEndpointLabel)]
     private Label connectionEndpointLabel;
 
@@ -82,10 +79,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.openPersistentDataPathButton)]
     private Button openPersistentDataPathButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.openWebViewScriptsPathButton)]
     private Button openWebViewScriptsPathButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.messageBufferTimeTextField)]
     private IntegerField messageBufferTimeTextField;
 
@@ -103,31 +100,31 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject]
     private UltraStarPlayHttpServer httpServer;
-    
+
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
 
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
-    
+
     [Inject(UxmlName = R.UxmlNames.audioSeparationCommandTextField)]
     private TextField audioSeparationCommandTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.basicPitchCommandTextField)]
     private TextField basicPitchCommandTextField;
 
     [Inject(UxmlName = R.UxmlNames.clientDiscoveryPortTextField)]
     private IntegerField clientDiscoveryPortTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.httpServerHostTextField)]
     private TextField httpServerHostTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.httpServerPortTextField)]
     private IntegerField httpServerPortTextField;
 
     [Inject(UxmlName = R.UxmlNames.minimumLogLevelPicker)]
     private ItemPicker minimumLogLevelPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.generatedFolderPathTextField)]
     private TextField generatedFolderPathTextField;
 
@@ -137,20 +134,25 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesPicker)]
     private ItemPicker useFfmpegToPlayMediaFilesPicker;
 
+    [Inject(UxmlName = R.UxmlNames.logFfmpegOutputPicker)]
+    private ItemPicker logFfmpegOutputPicker;
+
+    [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesPicker)]
+    private ItemPicker useVlcToPlayMediaFilesPicker;
+
+    [Inject(UxmlName = R.UxmlNames.logVlcOutputPicker)]
+    private ItemPicker logVlcOutputPicker;
+
     [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedPicker)]
     private ItemPicker checkCodecIsSupportedPicker;
 
     protected override void Start()
     {
         base.Start();
-        
+
         new BoolPickerControl(showFpsPicker)
             .Bind(() => settings.ShowFps,
                   newValue => settings.ShowFps = newValue);
-
-        new BoolPickerControl(logFfmpegOutputPicker)
-            .Bind(() => settings.LogFfmpegOutput,
-                newValue => settings.LogFfmpegOutput = newValue);
 
         FieldBindingUtils.Bind(generatedFolderPathTextField,
             () => settings.GeneratedFolderPath,
@@ -160,7 +162,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 {
                     return;
                 }
-                
+
                 if (newValue.IsNullOrEmpty())
                 {
                     settings.GeneratedFolderPath = "";
@@ -186,7 +188,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                       settings.MinimumLogLevel = newValue;
                       UpdateLogEventLevel();
                   });
-        
+
         new BoolPickerControl(streamAudioInSingScenePicker)
             .Bind(() => settings.StreamAudioInSingScene,
                 newValue => settings.StreamAudioInSingScene = newValue);
@@ -262,7 +264,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         {
             openPersistentDataPathButton.HideByDisplay();
         }
-        
+
         // Open WebView scripts path
         if (PlatformUtils.IsStandalone)
         {
@@ -272,35 +274,35 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         {
             openWebViewScriptsPathButton.HideByDisplay();
         }
-        
+
         // Message delay
         FieldBindingUtils.Bind(messageBufferTimeTextField,
             () => settings.ConnectedClientMessageBufferTimeInMillis,
             newValue => settings.ConnectedClientMessageBufferTimeInMillis = newValue);
         messageBufferTimeTextField.DisableChangeValueByDragging();
-        
+
         // Spleeter command (audio separation)
         audioSeparationCommandTextField.DisableParseEscapeSequences();
         FieldBindingUtils.Bind(audioSeparationCommandTextField,
             () => settings.SongEditorSettings.AudioSeparationCommand,
             newValue => settings.SongEditorSettings.AudioSeparationCommand = newValue);
-        
+
         // Basic Pitch command (pitch detection)
         basicPitchCommandTextField.DisableParseEscapeSequences();
         FieldBindingUtils.Bind(basicPitchCommandTextField,
             () => settings.SongEditorSettings.BasicPitchCommand,
             newValue => settings.SongEditorSettings.BasicPitchCommand = newValue);
-        
+
         // Network config
         FieldBindingUtils.Bind(clientDiscoveryPortTextField,
             () => settings.ConnectionServerPort,
             newValue => settings.ConnectionServerPort = newValue);
         clientDiscoveryPortTextField.DisableChangeValueByDragging();
-        
+
         FieldBindingUtils.Bind(httpServerHostTextField,
             () => settings.HttpServerHost,
             newValue => settings.HttpServerHost = newValue);
-        
+
         FieldBindingUtils.Bind(httpServerPortTextField,
             () => settings.HttpServerPort,
             newValue => settings.HttpServerPort = newValue);
@@ -324,17 +326,33 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 }
             });
 
+        // VLC
+        new BoolPickerControl(useVlcToPlayMediaFilesPicker)
+            .Bind(() => settings.UseVlcToPlayMediaFiles,
+                newValue => settings.UseVlcToPlayMediaFiles = newValue);
+
+        new BoolPickerControl(logVlcOutputPicker)
+            .Bind(() => settings.LogVlcOutput,
+                newValue => settings.LogVlcOutput = newValue);
+
+
+        // ffmpeg
         new BoolPickerControl(useFfmpegToPlayMediaFilesPicker)
             .Bind(() => settings.UseFfmpegToPlayMediaFiles,
                 newValue => settings.UseFfmpegToPlayMediaFiles = newValue);
 
-        new NumberPickerControl(maxConcurrentSongMediaConversionsPicker, settings.MaxConcurrentSongMediaConversions).Bind(
-            () => settings.MaxConcurrentSongMediaConversions,
-            newValue => settings.MaxConcurrentSongMediaConversions = (int)Math.Max(newValue, 0));
+        new BoolPickerControl(logFfmpegOutputPicker)
+            .Bind(() => settings.LogFfmpegOutput,
+                newValue => settings.LogFfmpegOutput = newValue);
 
+        // Media file conversion
         new BoolPickerControl(checkCodecIsSupportedPicker)
             .Bind(() => settings.CheckCodecIsSupported,
                 newValue => settings.CheckCodecIsSupported = newValue);
+
+        new NumberPickerControl(maxConcurrentSongMediaConversionsPicker, settings.MaxConcurrentSongMediaConversions).Bind(
+            () => settings.MaxConcurrentSongMediaConversions,
+            newValue => settings.MaxConcurrentSongMediaConversions = (int)Math.Max(newValue, 0));
 
         // PortAudio device info
         portAudioDeviceInfoButton.RegisterCallbackButtonTriggered(_ => ShowPortAudioDeviceInfo());
@@ -523,24 +541,24 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         {
             return;
         }
-        
+
         Log.MinimumLogLevel = settings.MinimumLogLevel;
-                      
+
         Debug.Log("Changed minimum log level to " + settings.MinimumLogLevel + ". The following is for testing log levels...");
-        
+
         Log.Verbose(() => "Serilog verbose log message");
-        
+
         Log.Debug(() => "Serilog debug log message");
-        
+
         Log.Information(() => "Serilog info log message");
         Debug.Log("Unity info log message");
-        
+
         Log.Warning(() => "Serilog warning log message");
         Debug.LogWarning("Unity warning log message");
-        
+
         Log.Error(() => "Serilog error log message");
         Debug.LogError("Unity error log message");
-        
+
         Log.Exception(() => new Exception("Serilog exception log message"));
         Debug.LogException(new Exception("Unity exception message"));
     }
