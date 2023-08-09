@@ -408,7 +408,8 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             }
 
             label.AddToClassList(R.UssClasses.singingLyrics);
-            if (visualElement == currentSentenceContainer)
+            if (visualElement == plainLabelContainer
+                || visualElement == highlightLabelContainer)
             {
                 label.AddToClassList(R.UssClasses.currentLyrics);
             }
