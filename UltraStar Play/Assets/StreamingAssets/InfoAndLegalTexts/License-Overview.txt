@@ -29,7 +29,7 @@ See https://opensource.org/license/MIT/
 
 - SharpZipLib
     - https://github.com/icsharpcode/SharpZipLib
-    
+
 - UniRX
     - https://github.com/neuecc/UniRx
 
@@ -102,6 +102,19 @@ See https://www.mozilla.org/en-US/MPL/1.1 respectively https://www.mozilla.org/e
 Chromium Embedded Framework (CEF) License
 -----------------------------------------
 See https://github.com/chromiumembedded/cef/blob/master/LICENSE.txt
+
+
+VLC for Unity
+-------------
+See https://assetstore.unity.com/packages/tools/video/vlc-for-unity-windows-133979
+
+VLC for Unity makes use of the following libraries,
+which are loaded at runtime from DLL files.
+To swap their implementation, replace the related DLL files in `Melody Mania_Data/Managed` or `Melody Mania_Data/Plugins`.
+
+A. LibVLC [LGPL 2.1+, Copyright © VLC authors and VideoLAN]
+B. LibVLCSharp [LGPL 2.1+, Copyright © VLC authors and VideoLAN]
+C. LiberationSans Fonts [SIL Open Font License, Copyright © SIL International]
 
 
 ffmpeg for Unity
