@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Codice.Utils;
 using UnityEngine;
+using UnityEngine.Networking;
 using Util;
 
 public static class PathUtils
@@ -117,7 +117,7 @@ public static class PathUtils
             }
 
             // Decode percent encoded characters
-            string relativeNormalizedUriDecoded = HttpUtility.UrlDecode(relativeNormalizedUri);
+            string relativeNormalizedUriDecoded = UnityWebRequest.UnEscapeURL(relativeNormalizedUri);
             string relativeNormalizedPath = UriUtils.ReplacePlaceholdersWithReservedCharacters(relativeNormalizedUriDecoded);
             return relativeNormalizedPath;
         }
