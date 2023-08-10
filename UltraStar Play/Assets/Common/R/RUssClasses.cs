@@ -38,6 +38,7 @@ public static partial class R
         public const string fontColor = "fontColor";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
         public const string gridLine = "gridLine";
+        public const string hidden = "hidden";
         public const string horizontalGridLine = "horizontalGridLine";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string hyperlink = "hyperlink";
