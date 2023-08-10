@@ -796,6 +796,7 @@ public static partial class R
         public const string submitEditPlaylistButton = "submitEditPlaylistButton";
         public const string sum = "sum";
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
+        public const string systemAudioBackendDelayPicker = "systemAudioBackendDelayPicker";
         public const string takeWebCamImageButton = "takeWebCamImageButton";
         public const string takeWebCamImageIcon = "takeWebCamImageIcon";
         public const string targetFpsPicker = "targetFpsPicker";

@@ -23,6 +23,7 @@
                 <ui:Label tabindex="-1" text="Does not work with Companion App" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
             </ui:VisualElement>
             <ItemPicker name="micPlaybackVolumeChooser" label="Microphone Playback Volume" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
+            <ItemPicker name="systemAudioBackendDelayPicker" label="System audio backend delay" wrap-around="true" min-value="0" max-value="500" step-value="10" />
             <ItemPicker name="useVlcToPlayMediaFilesPicker" label="Use VLC to play audio&#10;and video files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="logVlcOutputPicker" label="Log VLC output" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="useFfmpegToPlayMediaFilesPicker" label="Use ffmpeg to play audio&#10;and video files (unstable)¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />

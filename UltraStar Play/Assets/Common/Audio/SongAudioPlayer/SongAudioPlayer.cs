@@ -201,33 +201,41 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         get
         {
+            double rawResult;
             if (AudioSupportProvider is EAudioSupportProvider.Vlc
                 && vlcMediaPlayer != null)
             {
-                return vlcMediaPlayer.Time;
+                rawResult = vlcMediaPlayer.Time;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
                 && ffplayCommand != null)
             {
-                return ffplayCommand.CurrentTime * 1000.0;
+                rawResult = ffplayCommand.CurrentTime * 1000.0;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
-                return webViewManager.EstimatedPlaybackPositionInMillis;
+                rawResult = webViewManager.EstimatedPlaybackPositionInMillis;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
             {
-                return videoPlayer.time * 1000.0;
+                rawResult = videoPlayer.time * 1000.0;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
             {
                 int positionInSamples = SettingsUtils.ShouldUsePortAudio(settings) && portAudioPlaybackManager.IsLoaded
                     ? portAudioPlaybackManager.PositionInMonoSamples
                     : audioSource.timeSamples;
-                return ((double)positionInSamples / (double)audioSource.clip.frequency) * 1000.0;
+                rawResult = ((double)positionInSamples / (double)audioSource.clip.frequency) * 1000.0;
+            }
+            else
+            {
+                return 0;
             }
 
-            return 0;
+            double result = IsPlaying
+                ? rawResult - settings.SystemAudioBackendDelayInMillis
+                : rawResult;
+            return Math.Max(0, result);
         }
     }
 

@@ -26,6 +26,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
     private ItemPicker micPlaybackVolumeChooser;
 
+    [Inject(UxmlName = R.UxmlNames.systemAudioBackendDelayPicker)]
+    private ItemPicker systemAudioBackendDelayPicker;
+
     [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
     private VisualElement playRecordedAudioInfoContainer;
 
@@ -380,7 +383,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         // Recorded audio playback volume
         PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
-        micPlaybackVolumePickerControl.Bind(() => settings.MicrophonePlaybackVolumePercent,
+        micPlaybackVolumePickerControl.Bind(
+            () => settings.MicrophonePlaybackVolumePercent,
             newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
 
         // Only visible when play recorded audio is enabled
@@ -390,6 +394,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 micPlaybackVolumeChooser.SetVisibleByDisplay(newValue);
             })
             .AddTo(gameObject);
+
+        // System audio backend delay
+        UnitNumberPickerControl systemAudioBackendDelayPickerControl = new(systemAudioBackendDelayPicker, "ms");
+        systemAudioBackendDelayPickerControl.Bind(
+            () => settings.SystemAudioBackendDelayInMillis,
+            newValue => settings.SystemAudioBackendDelayInMillis = (int)newValue);
     }
 
     private List<string> GetAvailablePortAudioOutputDeviceNames()

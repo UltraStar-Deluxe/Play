@@ -26,6 +26,24 @@ public class Settings : ISettings
     public string SoundfontPath { get; set; } = "";
     public float PreviewFadeInDurationInSeconds { get; set; } = 2;
 
+    /**
+     * Delay of the system audio backend until the samples are audible on the speaker.
+     * Unity does not consider this in its time calculation. And the delay can be significant (audible) at least on Windows.
+     * See also https://forum.unity.com/threads/use-wasapi-audio-backend-on-windows-for-low-latency-audio-output.1471044/
+     *
+     * Example:
+     * - Unity returns a time position of 120ms in an AudioSource because these samples have been sent to the system.
+     * - The samples have a delay until they are played on the speaker. This is the system audio backend delay.
+     * - Assuming a system audio backend delay of 50ms in this example, the user hears the AudioSource at position 70ms.
+     */
+    public int SystemAudioBackendDelayInMillis { get; set; } =
+#if UNITY_STANDALONE_WIN
+        50
+#else
+        0
+#endif
+        ;
+
     // Game settings
     public SystemLanguage Language { get; set; } = SystemLanguage.English;
     public EScoreMode ScoreMode { get; set; } = EScoreMode.Individual;
