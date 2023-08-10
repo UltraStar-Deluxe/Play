@@ -1299,7 +1299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
+  m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
@@ -8998,7 +8998,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 048c3cbb87e745e46afa5a568b7e9626, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderTexture: {fileID: 0}
 --- !u!1 &8818085272773697541
 GameObject:
   m_ObjectHideFlags: 0
