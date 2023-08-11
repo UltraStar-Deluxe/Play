@@ -27,10 +27,12 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
             if (maxMicDelayInMillis < 0
                 && !singSceneControl.PlayerControls.IsNullOrEmpty())
             {
-                maxMicDelayInMillis = singSceneControl.PlayerControls
+                List<int> micDelays = singSceneControl.PlayerControls
                     .Where(it => it.MicProfile != null)
                     .Select(it => it.MicProfile.DelayInMillis)
-                    .Max();
+                    .ToList();
+                maxMicDelayInMillis = !micDelays.IsNullOrEmpty() ? micDelays.Max() : 0;
+                return maxMicDelayInMillis;
             }
 
             return maxMicDelayInMillis;
