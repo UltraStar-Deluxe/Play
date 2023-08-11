@@ -152,7 +152,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void UpdateVideo()
     {
-        songVideoPlayer.LoadAndPlaySongVideo(songMeta);
+        songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(songMeta);
     }
 
     private void UpdateCoverAndBackgroundImage()
