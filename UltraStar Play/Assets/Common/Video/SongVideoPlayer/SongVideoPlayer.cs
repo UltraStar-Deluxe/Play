@@ -546,10 +546,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return;
         }
 
-        if (webViewManager.webViewCamera.targetTexture != videoPlayer.targetTexture)
-        {
-            webViewManager.webViewCamera.targetTexture = videoPlayer.targetTexture;
-        }
+        webViewManager.SetWebViewRenderTexture(videoPlayer.targetTexture);
     }
 
     private void ResetWebViewRenderTexture()
