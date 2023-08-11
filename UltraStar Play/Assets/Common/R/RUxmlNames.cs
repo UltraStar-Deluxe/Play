@@ -792,7 +792,6 @@ public static partial class R
         public const string statusBarSongInfoLabel = "statusBarSongInfoLabel";
         public const string statusLabel = "statusLabel";
         public const string stopMidiPreviewIcon = "stopMidiPreviewIcon";
-        public const string streamAudioInSingScenePicker = "streamAudioInSingScenePicker";
         public const string submitEditPlaylistButton = "submitEditPlaylistButton";
         public const string sum = "sum";
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";

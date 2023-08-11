@@ -44,9 +44,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsPicker)]
     private ItemPicker maxConcurrentSongMediaConversionsPicker;
 
-    [Inject(UxmlName = R.UxmlNames.streamAudioInSingScenePicker)]
-    private ItemPicker streamAudioInSingScenePicker;
-
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
     private ItemPicker pitchDetectionAlgorithmPicker;
 
@@ -191,10 +188,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                       settings.MinimumLogLevel = newValue;
                       UpdateLogEventLevel();
                   });
-
-        new BoolPickerControl(streamAudioInSingScenePicker)
-            .Bind(() => settings.StreamAudioInSingScene,
-                newValue => settings.StreamAudioInSingScene = newValue);
 
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmPicker)
             .Bind(() => settings.PitchDetectionAlgorithm,

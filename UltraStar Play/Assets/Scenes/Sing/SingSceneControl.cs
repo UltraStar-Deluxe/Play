@@ -1117,7 +1117,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         double startPositionInSongInMillis = GetStartPositionInSongInMillis();
 
-        songAudioPlayer.LoadAndPlaySongAudioAsObservable(SongMeta, startPositionInSongInMillis, settings.StreamAudioInSingScene)
+        songAudioPlayer.LoadAndPlaySongAudioAsObservable(SongMeta, startPositionInSongInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 // Loading the audio failed.
