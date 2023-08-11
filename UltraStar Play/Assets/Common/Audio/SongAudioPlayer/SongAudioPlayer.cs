@@ -6,6 +6,7 @@ using LibVLCSharp;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour, INeedInjection
@@ -185,6 +186,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private double lastSetPositionInSongInMillis;
     private float lastSetPositionInSongInMillisUnityTimeInSeconds;
 
+    private float lastAudioListenerVolume;
+
     public double PositionInSongInSeconds
     {
         get => positionInSongInMillis / 1000.0;
@@ -281,28 +284,12 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     private SongMeta SongMeta { get; set; }
 
+    private float volumeFactor = 1;
     public float VolumeFactor
     {
         get
         {
-            if (AudioSupportProvider is EAudioSupportProvider.Vlc)
-            {
-                return vlcMediaPlayer.Volume / 100f;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
-            {
-                return ffplayCommand.AudioSourceComponent.volume;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
-            {
-                return webViewManager.VolumeInPercent / 100f;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
-            {
-                return audioSource.volume;
-            }
-
-            return 1;
+            return volumeFactor;
         }
         set
         {
@@ -312,24 +299,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 return;
             }
 
-            if (AudioSupportProvider is EAudioSupportProvider.Vlc
-                && ffplayCommand != null)
-            {
-                vlcMediaPlayer.SetVolume((int)(value * 100));
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
-                     && ffplayCommand != null)
-            {
-                ffplayCommand.AudioSourceComponent.volume = value;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
-            {
-                webViewManager.VolumeInPercent = (int)(value * 100);
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
-            {
-                audioSource.volume = value;
-            }
+            volumeFactor = value;
+            ApplyVolumeFactorToAudioSupportProvider(volumeFactor);
         }
     }
 
@@ -459,6 +430,14 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 Debug.Log($"Setting position in song again. ffmpeg seems to have ignored the last set value of {lastSetPositionInSongInMillis} ms and is not at {PositionInSongInMillis} ms.");
                 ffplayCommand.SeekTime(lastSetPositionInSongInMillis / 1000.0);
             }
+        }
+
+        // Update vlc volume when AudioListener.volume changes
+        if (AudioSupportProvider == EAudioSupportProvider.Vlc
+            && Math.Abs(AudioListener.volume - lastAudioListenerVolume) > 0.01f)
+        {
+            ApplyVolumeFactorToAudioSupportProvider(volumeFactor);
+            lastAudioListenerVolume = AudioListener.volume;
         }
     }
 
@@ -1043,5 +1022,27 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         Debug.LogError($"SongAudioPlayer received VideoPlayer error: {message}");
         videoPlayerErrorMessages.Add(message);
+    }
+
+    private void ApplyVolumeFactorToAudioSupportProvider(float value)
+    {
+        if (AudioSupportProvider is EAudioSupportProvider.Vlc
+            && vlcMediaPlayer != null)
+        {
+            vlcMediaPlayer.SetVolume((int)(value * AudioListener.volume * 100));
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                 && ffplayCommand != null)
+        {
+            ffplayCommand.AudioSourceComponent.volume = value;
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.WebView)
+        {
+            webViewManager.VolumeInPercent = (int)(value * 100);
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
+        {
+            audioSource.volume = value;
+        }
     }
 }

@@ -48,6 +48,10 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
         mediaPlayer.Stop();
+
+        // TODO: There seems to be a bug that mutes all audio when the volume is set to 0
+        mediaPlayer.SetVolume(100);
+
         mediaPlayer.Dispose();
     }
 
