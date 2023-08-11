@@ -95,6 +95,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return Instance;
     }
 
+    protected override void AwakeSingleton()
+    {
+        // Disable particle camera until a corresponding particle configuration has been loaded.
+        backgroundParticlesCamera.gameObject.SetActive(false);
+    }
+
     protected override void StartSingleton()
     {
         DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedThemesFolder());
@@ -214,7 +220,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             // The UIDocument is rendered directly to the screen by Unity.
             uiDocument.panelSettings.targetTexture = null;
-            backgroundParticlesCamera.gameObject.SetActive(false);
         }
 
         if (!anyThemeLoaded)
@@ -446,6 +451,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         if (!backgroundJson.particleFile.IsNullOrEmpty())
         {
             backgroundParticleSystem.gameObject.SetActive(true);
+            backgroundParticlesCamera.gameObject.SetActive(true);
             string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.particleFile);
             if (File.Exists(particlePath))
             {
@@ -464,6 +470,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         else
         {
             backgroundParticleSystem.gameObject.SetActive(false);
+            backgroundParticlesCamera.gameObject.SetActive(false);
         }
 
         ParticleSystem.MainModule main = backgroundParticleSystem.main;
