@@ -807,7 +807,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: OS_MUTEX
+    Android: OS_MUTEX;VUPLEX_STANDALONE
     Standalone: OS_MUTEX;VUPLEX_STANDALONE
     WebGL: OS_MUTEX
     iPhone: OS_MUTEX
