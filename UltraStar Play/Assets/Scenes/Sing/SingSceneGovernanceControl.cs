@@ -153,11 +153,11 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         {
             playbackStartTimeInSeconds = Time.time;
             hideDelayInSeconds = shortHideDelayInSeconds;
-            UpdatePlaybackIcon();
+            UpdatePlaybackIcon(true);
         });
-        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => UpdatePlaybackIcon());
-        songAudioPlayer.LoadedEventStream.Subscribe(_ => UpdatePlaybackIcon());
-        UpdatePlaybackIcon();
+        songAudioPlayer.PlaybackStoppedEventStream.Subscribe(_ => UpdatePlaybackIcon(false));
+        songAudioPlayer.LoadedEventStream.Subscribe(_ => UpdatePlaybackIcon(true));
+        UpdatePlaybackIcon(false);
 
         bottomControlsContainer.RegisterCallback<PointerEnterEvent>(evt => isPointerOverBottomControls = true);
         bottomControlsContainer.RegisterCallback<PointerLeaveEvent>(evt => isPointerOverBottomControls = false);
@@ -239,13 +239,12 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     private void TogglePlayPause()
     {
         singSceneControl.TogglePlayPause();
-        UpdatePlaybackIcon();
     }
 
-    private void UpdatePlaybackIcon()
+    private void UpdatePlaybackIcon(bool isPlaying)
     {
-        playIcon.SetVisibleByDisplay(!songAudioPlayer.IsPlaying);
-        pauseIcon.SetVisibleByDisplay(songAudioPlayer.IsPlaying);
+        playIcon.SetVisibleByDisplay(!isPlaying);
+        pauseIcon.SetVisibleByDisplay(isPlaying);
     }
 
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)

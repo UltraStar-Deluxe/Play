@@ -6,7 +6,6 @@ using LibVLCSharp;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour, INeedInjection
