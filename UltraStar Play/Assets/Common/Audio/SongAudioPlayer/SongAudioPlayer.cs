@@ -473,7 +473,18 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         string fileExtension = Path.GetExtension(audioUri);
         if (ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension))
         {
-            return LoadWithVideoPlayer(songMeta, audioUri, startPositionInMillis);
+            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
+            }
+            else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
+            }
+            else
+            {
+                return LoadWithVideoPlayer(songMeta, audioUri, startPositionInMillis);
+            }
         }
         else if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
         {
@@ -481,17 +492,28 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
         {
-            return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
+            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
+            }
+            else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
+            }
+            else
+            {
+                return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
+            }
         }
         else if (WebViewUtils.CanHandleWebViewUrl(audioUri))
         {
             return LoadWithWebView(songMeta, audioUri, startPositionInMillis);
         }
-        else if (settings.UseVlcToPlayMediaFiles)
+        else if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
         {
             return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
         }
-        else if (settings.UseFfmpegToPlayMediaFiles)
+        else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
         {
             return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
         }
@@ -617,13 +639,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                     {
                         UnloadAudioAndVideo();
 
-                        if (settings.UseVlcToPlayMediaFiles)
+                        if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
                         {
                             Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with vlc. URI: {audioUri}");
                             LoadWithVlc(songMeta, audioUri, startPositionInMillis)
                                 .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
                         }
-                        else if (settings.UseFfmpegToPlayMediaFiles)
+                        else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
                         {
                             Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with ffmpeg. URI: {audioUri}");
                             LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis)

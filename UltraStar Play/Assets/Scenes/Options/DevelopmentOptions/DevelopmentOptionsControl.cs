@@ -323,9 +323,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             });
 
         // VLC
-        new BoolPickerControl(useVlcToPlayMediaFilesPicker)
-            .Bind(() => settings.UseVlcToPlayMediaFiles,
-                newValue => settings.UseVlcToPlayMediaFiles = newValue);
+        new LabeledItemPickerControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesPicker, EnumUtils.GetValuesAsList<EThirdPartyLibraryUsage>())
+            .Bind(() => settings.VlcToPlayMediaFilesUsage,
+                newValue => settings.VlcToPlayMediaFilesUsage = newValue);
 
         new BoolPickerControl(logVlcOutputPicker)
             .Bind(() => settings.LogVlcOutput,
@@ -333,9 +333,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
 
         // ffmpeg
-        new BoolPickerControl(useFfmpegToPlayMediaFilesPicker)
-            .Bind(() => settings.UseFfmpegToPlayMediaFiles,
-                newValue => settings.UseFfmpegToPlayMediaFiles = newValue);
+        new LabeledItemPickerControl<EThirdPartyLibraryUsage>(useFfmpegToPlayMediaFilesPicker, EnumUtils.GetValuesAsList<EThirdPartyLibraryUsage>())
+            .Bind(() => settings.FfmpegToPlayMediaFilesUsage,
+                newValue => settings.FfmpegToPlayMediaFilesUsage = newValue);
 
         new BoolPickerControl(logFfmpegOutputPicker)
             .Bind(() => settings.LogFfmpegOutput,

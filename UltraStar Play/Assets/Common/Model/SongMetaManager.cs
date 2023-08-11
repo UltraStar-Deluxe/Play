@@ -190,8 +190,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
         Debug.Log("ScanFilesAsynchronously");
 
         // Update supported file formats when ffmpeg is (not) used.
-        ApplicationUtils.UseFfmpegToPlayMediaFiles = settings.UseFfmpegToPlayMediaFiles;
-        ApplicationUtils.UseVlcToPlayMediaFiles = settings.UseVlcToPlayMediaFiles;
+        ApplicationUtils.UseFfmpegToPlayMediaFiles = settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
+        ApplicationUtils.UseVlcToPlayMediaFiles = settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;
 
         // Scene injection may not have finished here because DefaultSceneDataProviders may trigger a song scan.
         // Thus, use the static instance.
@@ -491,8 +491,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
             List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
                 newSongMeta,
-                settings.UseFfmpegToPlayMediaFiles,
-                settings.UseVlcToPlayMediaFiles,
+                settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never,
+                settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never,
                 settings.CheckCodecIsSupported);
             songIssues.AddRange(mediaFormatIssues);
 

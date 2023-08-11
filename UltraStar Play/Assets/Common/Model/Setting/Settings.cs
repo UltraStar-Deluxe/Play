@@ -145,11 +145,11 @@ public class Settings : ISettings
 
     // Vlc settings
     public bool LogVlcOutput { get; set; }
-    public bool UseVlcToPlayMediaFiles { get; set; } = true;
+    public EThirdPartyLibraryUsage VlcToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
 
     // Ffmpeg settings
     public bool LogFfmpegOutput { get; set; }
-    public bool UseFfmpegToPlayMediaFiles { get; set; }
+    public EThirdPartyLibraryUsage FfmpegToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.Never;
     public Dictionary<string, string> FileFormatToFfmpegConversionArguments { get; set; } = new()
     {
         // Copy mkv codec and convert to mp4 (very fast)

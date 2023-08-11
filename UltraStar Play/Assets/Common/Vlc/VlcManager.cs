@@ -62,7 +62,7 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        if (!settings.UseVlcToPlayMediaFiles)
+        if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Never)
         {
             throw new Exception("Not creating libVLC instance because VLC is not selected for media file playback.");
         }

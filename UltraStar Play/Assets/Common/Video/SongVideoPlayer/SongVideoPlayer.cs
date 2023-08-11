@@ -340,13 +340,24 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         string videoFileExtension = Path.GetExtension(videoUri);
         if (ApplicationUtils.IsUnitySupportedVideoFormat(videoFileExtension))
         {
-            return LoadWithVideoPlayer(songMeta, videoUri);
+            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithVlc(songMeta, videoUri);
+            }
+            else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithFfmpeg(songMeta, videoUri);
+            }
+            else
+            {
+                return LoadWithVideoPlayer(songMeta, videoUri);
+            }
         }
-        else if (settings.UseVlcToPlayMediaFiles)
+        else if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
         {
             return LoadWithVlc(songMeta, videoUri);
         }
-        else if (settings.UseFfmpegToPlayMediaFiles)
+        else if (settings.FfmpegToPlayMediaFilesUsage  is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
         {
             return LoadWithFfmpeg(songMeta, videoUri);
         }
@@ -487,20 +498,20 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                     if (videoPlayerErrorMessages.Count > 0)
                     {
                         UnloadVideo();
-                        if (settings.UseVlcToPlayMediaFiles)
+                        if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
                         {
                             Debug.Log($"Trying to load video with vlc because Unity's VideoPlayer failed: '{uri}'");
                             LoadWithVlc(songMeta, uri)
                                 .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
                         }
-                        else if (settings.UseFfmpegToPlayMediaFiles
+                        else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
                             && string.Equals(songMeta.Mp3, songMeta.Video, StringComparison.InvariantCultureIgnoreCase))
                         {
                             Debug.Log($"Trying to load video with ffmpeg because Unity's VideoPlayer failed: '{uri}'");
                             LoadWithFfmpeg(songMeta, uri)
                                 .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
                         }
-                        else if (settings.UseFfmpegToPlayMediaFiles)
+                        else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
                         {
                             Debug.LogError($"Failed to load video with Unity's VideoPlayer and cannot use ffmpeg because the video and audio resource are not equal. Video URI: '{uri}', Video: '{songMeta.Video}', Audio URI: '{songMeta.Mp3}'");
                         }
