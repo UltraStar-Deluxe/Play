@@ -323,7 +323,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             });
 
         // VLC
-        new LabeledItemPickerControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesPicker, EnumUtils.GetValuesAsList<EThirdPartyLibraryUsage>())
+        new EnumItemPickerControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesPicker)
             .Bind(() => settings.VlcToPlayMediaFilesUsage,
                 newValue => settings.VlcToPlayMediaFilesUsage = newValue);
 
@@ -333,7 +333,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
 
         // ffmpeg
-        new LabeledItemPickerControl<EThirdPartyLibraryUsage>(useFfmpegToPlayMediaFilesPicker, EnumUtils.GetValuesAsList<EThirdPartyLibraryUsage>())
+        new EnumItemPickerControl<EThirdPartyLibraryUsage>(useFfmpegToPlayMediaFilesPicker)
             .Bind(() => settings.FfmpegToPlayMediaFilesUsage,
                 newValue => settings.FfmpegToPlayMediaFilesUsage = newValue);
 

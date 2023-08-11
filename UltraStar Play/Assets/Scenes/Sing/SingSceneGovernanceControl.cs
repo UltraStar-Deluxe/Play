@@ -270,7 +270,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
         ItemPicker showSongProgressBarPicker = new("Progress Bar");
         contextMenuPopup.AddVisualElement(showSongProgressBarPicker);
-        new LabeledItemPickerControl<ESongProgressBar>(showSongProgressBarPicker, EnumUtils.GetValuesAsList<ESongProgressBar>())
+        new EnumItemPickerControl<ESongProgressBar>(showSongProgressBarPicker)
             .Bind(() => settings.ShowSongProgressBar,
                 newValue => settings.ShowSongProgressBar = newValue);
 
