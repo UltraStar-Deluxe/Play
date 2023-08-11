@@ -361,6 +361,7 @@ public static partial class R
         public const string messageBufferTimeTextField = "messageBufferTimeTextField";
         public const string micButton = "micButton";
         public const string micCheckIcon = "micCheckIcon";
+        public const string micConfigurationContainer = "micConfigurationContainer";
         public const string micDelayTextField = "micDelayTextField";
         public const string micDeviceItemPicker = "micDeviceItemPicker";
         public const string micDisconnectedIcon = "micDisconnectedIcon";
@@ -424,6 +425,9 @@ public static partial class R
         public const string noConnectedClientsContainer = "noConnectedClientsContainer";
         public const string noConnectedClientsIcon = "noConnectedClientsIcon";
         public const string noConnectedClientsLabel = "noConnectedClientsLabel";
+        public const string noConnectedMicsContainer = "noConnectedMicsContainer";
+        public const string noConnectedMicsIcon = "noConnectedMicsIcon";
+        public const string noConnectedMicsLabel = "noConnectedMicsLabel";
         public const string noCoopIcon = "noCoopIcon";
         public const string noiseSuppressionPicker = "noiseSuppressionPicker";
         public const string noMicCheckIcon = "noMicCheckIcon";
@@ -875,6 +879,7 @@ public static partial class R
         public const string totalScoreLabel = "totalScoreLabel";
         public const string trackAndChannelDropdownField = "trackAndChannelDropdownField";
         public const string tryAddSongsLabel = "tryAddSongsLabel";
+        public const string tryConnectMicLabel = "tryConnectMicLabel";
         public const string twoPlayerLayout = "twoPlayerLayout";
         public const string undoButton = "undoButton";
         public const string unexpectedErrorContainer = "unexpectedErrorContainer";

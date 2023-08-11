@@ -18,13 +18,13 @@ using UnityEngine.UIElements;
 public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
 {
     private static readonly string songArchiveInfoJsonUrl = "https://melodymania.org/downloads/song-archives-info.json";
-    
+
     [InjectedInInspector]
     public VisualTreeAsset songFolderListEntryUi;
 
     [InjectedInInspector]
     public VisualTreeAsset downloadSongArchiveUi;
-    
+
     [InjectedInInspector]
     public VisualTreeAsset dialogUi;
 
@@ -48,16 +48,16 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     [Inject(UxmlName = R.UxmlNames.downloadSongArchiveButton)]
     private Button downloadSongArchiveButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintContainer)]
     private VisualElement androidSongFolderHintContainer;
 
     [Inject(UxmlName = R.UxmlNames.androidSongFolderHintLabel)]
     private Label androidSongFolderHintLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.issuesIcon)]
     private VisualElement issuesIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaPicker)]
     private ItemPicker searchAudioFilesWithoutSongMetaPicker;
 
@@ -69,12 +69,12 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     [Inject]
     private OptionsOverviewSceneControl optionsOverviewSceneControl;
-    
+
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
     private readonly List<DownloadSongArchiveUiControl> downloadSongArchiveUiControls = new();
 
     private MessageDialogControl deleteSongFolderDialog;
-    
+
     protected override void Start()
     {
         base.Start();
@@ -98,7 +98,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         new BoolPickerControl(searchAudioFilesWithoutSongMetaPicker)
             .Bind(() => settings.SearchAudioFilesWithoutSongMeta,
                 newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
-        
+
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
             && AndroidUtils.GetAppSpecificStorageAbsolutePath(true).IsNullOrEmpty())
@@ -131,7 +131,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             if (newValue)
             {
                 downloadSongArchiveUiControls.Remove(downloadSongArchiveUiControl);
-                
+
                 // Add new song folder if needed
                 string targetFolder = downloadSongArchiveUiControl.TargetFolder;
                 if (!targetFolder.IsNullOrEmpty()
@@ -139,7 +139,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 {
                     settings.SongDirs.Add(targetFolder);
                 }
-                
+
                 // Fade out the download UI, then remove it
                 LeanTween
                     .value(gameObject, visualElement.resolvedStyle.opacity, 0, 1f)
@@ -154,7 +154,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             downloadSongArchiveUiControl.CancelDownload();
             UpdateSongFolderList();
         });
-        
+
         downloadSongArchiveUiControls.Add(downloadSongArchiveUiControl);
 
         UpdateSongFolderList();
@@ -199,13 +199,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         bool newHasIssue = HasIssue();
         if (!oldHasIssue && newHasIssue)
         {
-            issuesIcon.style.scale = Vector2.zero;
-            LeanTween.value(gameObject, 0, 1, 1f)
-                .setOnUpdate(value =>
-                {
-                    issuesIcon.style.scale = new Vector2(value, value);
-                })
-                .setEaseSpring();
+            AnimationUtils.HighlightIconWithBounce(gameObject, issuesIcon);
         }
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(issuesIcon);
@@ -244,7 +238,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToAddAndCreateSongs)));
         return helpDialogControl;
     }
-    
+
     public override bool HasIssuesDialog => true;
     public override MessageDialogControl CreateIssuesDialogControl()
     {
@@ -257,7 +251,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         AccordionGroup accordionGroup = new();
         issuesDialogControl.AddVisualElement(accordionGroup);
-        
+
         AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
         accordionGroup.Add(errorsAccordionItem);
         FillWithSongIssues(errorsAccordionItem, songMetaManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
@@ -539,12 +533,12 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 index++;
             });
         }
-        
+
         downloadSongArchiveUiControls.ForEach(downloadSongArchiveUiControl =>
         {
             songFolderList.Add(downloadSongArchiveUiControl.VisualElement);
         });
-        
+
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(songFolderList);
     }
 
@@ -594,12 +588,12 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             OpenDeleteSongFolderDialog(indexInList);
             return;
         }
-        
+
         DoDeleteSongFolder(indexInList);
 
         UpdateDisabledSongFoldersInSettings();
     }
-    
+
     public void OpenDeleteSongFolderDialog(int indexInList)
     {
         if (deleteSongFolderDialog != null)
@@ -617,7 +611,7 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             deleteSongFolderDialog.CloseDialog();
             DoDeleteSongFolder(indexInList);
         });
-        
+
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(deleteSongFolderDialog.DialogRootVisualElement);
     }
 
@@ -626,14 +620,14 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         settings.SongDirs.RemoveAt(indexInList);
         UpdateSongFolderList();
     }
-    
+
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        
+
         issuesIcon.RemoveFromClassList("error");
         issuesIcon.RemoveFromClassList("warning");
-        
+
         // Remove duplicate song folders
         settings.SongDirs = settings.SongDirs
             .Distinct()

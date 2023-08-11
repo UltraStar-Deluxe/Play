@@ -34,11 +34,11 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     private UiManager uiManager;
 
     private readonly List<ConnectedClientListEntryControl> connectedClientListEntryControls = new();
-    
+
     protected override void Start()
     {
         base.Start();
-        
+
         UpdateConnectedClients();
         serverSideConnectRequestManager.ClientConnectionChangedEventStream
             .Subscribe(_ => UpdateConnectedClients())
@@ -57,9 +57,14 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
 
         connectedClientCountLabel.text = TranslationManager.GetTranslation(R.Messages.options_connectedClientCount,
             "count", serverSideConnectRequestManager.ConnectedClientCount);
-        
-        noConnectedClientsContainer.SetVisibleByDisplay(serverSideConnectRequestManager.ConnectedClientCount <= 0);
-        
+
+        bool noConnectedClients = serverSideConnectRequestManager.ConnectedClientCount <= 0;
+        noConnectedClientsContainer.SetVisibleByDisplay(noConnectedClients);
+        if (noConnectedClients)
+        {
+            HighlightHelpIcon();
+        }
+
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(connectedClientList);
     }
 
