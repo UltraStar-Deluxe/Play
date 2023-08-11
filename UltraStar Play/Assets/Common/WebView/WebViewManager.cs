@@ -514,6 +514,10 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         webViewCamera.gameObject.SetActive(
             webViewCamera.targetTexture != null
             || IsWebViewCanvasControlEnabled);
+        if (!webViewCamera.gameObject.activeSelf)
+        {
+            RenderTextureUtils.Clear(webViewCamera.targetTexture);
+        }
     }
 
     public void ResumePlayback()

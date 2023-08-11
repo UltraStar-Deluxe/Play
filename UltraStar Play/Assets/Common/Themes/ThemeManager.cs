@@ -471,6 +471,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             backgroundParticleSystem.gameObject.SetActive(false);
             backgroundParticlesCamera.gameObject.SetActive(false);
+            RenderTextureUtils.Clear(backgroundParticlesCamera.targetTexture);
         }
 
         ParticleSystem.MainModule main = backgroundParticleSystem.main;

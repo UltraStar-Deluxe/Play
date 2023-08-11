@@ -593,7 +593,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoPlayer.clip = null;
             videoPlayer.source = VideoSource.VideoClip;
         }
-        ClearOutRenderTexture(videoPlayer.targetTexture);
+        RenderTextureUtils.Clear(videoPlayer.targetTexture);
         VideoSupportProvider = EVideoSupportProvider.None;
 
         loadedSongMeta = null;
@@ -838,7 +838,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private void OnDestroy()
     {
-        ClearOutRenderTexture(videoPlayer.targetTexture);
+        RenderTextureUtils.Clear(videoPlayer.targetTexture);
         Destroy(vlcTexture);
         DestroyVlcMediaPlayer();
     }
@@ -847,24 +847,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     {
         Debug.LogError($"SongVideoPlayer received VideoPlayer error: {message}");
         videoPlayerErrorMessages.Add(message);
-    }
-
-    // If not cleared, then the RenderTexture will keep its last viewed frame until it is overwritten by a new video.
-    // This would cause the last played video to show up for a moment
-    // before a new video is loaded and applied to the RenderTexture.
-    // Thus, the texture should be cleared before showing a new video.
-    private void ClearOutRenderTexture(RenderTexture renderTexture)
-    {
-        if (renderTexture == null)
-        {
-            return;
-        }
-
-        // See https://answers.unity.com/questions/1511295/how-do-i-reset-a-render-texture-to-black-when-i-st.html
-        RenderTexture rt = RenderTexture.active;
-        RenderTexture.active = renderTexture;
-        GL.Clear(true, true, Color.clear);
-        RenderTexture.active = rt;
     }
 
     private void UpdateBackgroundScaleMode()

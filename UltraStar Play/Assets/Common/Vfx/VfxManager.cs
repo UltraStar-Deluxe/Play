@@ -134,6 +134,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
             && cam.transform.childCount <= 0)
         {
             cam.gameObject.SetActive(false);
+            RenderTextureUtils.Clear(cam.targetTexture);
         }
         else if (!cam.gameObject.activeSelf
                  && cam.transform.childCount > 0)
