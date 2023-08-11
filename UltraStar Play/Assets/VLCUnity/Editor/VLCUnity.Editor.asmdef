@@ -1,0 +1,18 @@
+{
+    "name": "VLCUnity.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:02771b68413040e4a895c2903eddd37c"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

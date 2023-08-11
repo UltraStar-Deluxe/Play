@@ -5,6 +5,7 @@ using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -13,15 +14,18 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
 {
     [Inject]
     protected SceneNavigator sceneNavigator;
-    
+
     [Inject]
     protected TranslationManager translationManager;
 
     [Inject]
     protected Settings settings;
-    
+
+    [Inject(UxmlName = R.UxmlNames.helpIcon, Optional = true)]
+    protected VisualElement helpIcon;
+
     protected readonly List<IDisposable> disposables = new();
-    
+
 	protected virtual void Start() {
         disposables.Add(InputManager.GetInputAction(R.InputActions.usplay_back)
             .PerformedAsObservable(5)
@@ -45,6 +49,17 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
     {
         disposables.ForEach(it => it.Dispose());
         disposables.Clear();
+    }
+
+    public void HighlightHelpIcon()
+    {
+        if (!HasHelpDialog
+            || helpIcon == null)
+        {
+            return;
+        }
+
+        AnimationUtils.HighlightIconWithBounce(gameObject, helpIcon);
     }
 
     public virtual bool HasHelpDialog => false;

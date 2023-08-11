@@ -44,9 +44,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.maxConcurrentSongMediaConversionsPicker)]
     private ItemPicker maxConcurrentSongMediaConversionsPicker;
 
-    [Inject(UxmlName = R.UxmlNames.streamAudioInSingScenePicker)]
-    private ItemPicker streamAudioInSingScenePicker;
-
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
     private ItemPicker pitchDetectionAlgorithmPicker;
 
@@ -192,10 +189,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                       UpdateLogEventLevel();
                   });
 
-        new BoolPickerControl(streamAudioInSingScenePicker)
-            .Bind(() => settings.StreamAudioInSingScene,
-                newValue => settings.StreamAudioInSingScene = newValue);
-
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmPicker)
             .Bind(() => settings.PitchDetectionAlgorithm,
                 newValue => settings.PitchDetectionAlgorithm = newValue);
@@ -330,9 +323,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             });
 
         // VLC
-        new BoolPickerControl(useVlcToPlayMediaFilesPicker)
-            .Bind(() => settings.UseVlcToPlayMediaFiles,
-                newValue => settings.UseVlcToPlayMediaFiles = newValue);
+        new EnumItemPickerControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesPicker)
+            .Bind(() => settings.VlcToPlayMediaFilesUsage,
+                newValue => settings.VlcToPlayMediaFilesUsage = newValue);
 
         new BoolPickerControl(logVlcOutputPicker)
             .Bind(() => settings.LogVlcOutput,
@@ -340,9 +333,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
 
         // ffmpeg
-        new BoolPickerControl(useFfmpegToPlayMediaFilesPicker)
-            .Bind(() => settings.UseFfmpegToPlayMediaFiles,
-                newValue => settings.UseFfmpegToPlayMediaFiles = newValue);
+        new EnumItemPickerControl<EThirdPartyLibraryUsage>(useFfmpegToPlayMediaFilesPicker)
+            .Bind(() => settings.FfmpegToPlayMediaFilesUsage,
+                newValue => settings.FfmpegToPlayMediaFilesUsage = newValue);
 
         new BoolPickerControl(logFfmpegOutputPicker)
             .Bind(() => settings.LogFfmpegOutput,

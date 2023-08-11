@@ -573,15 +573,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private void StartVideoOrShowBackgroundImage()
     {
-        songVideoPlayer.LoadAndPlaySongVideo(SongMeta);
-        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
-        if (!SongMetaUtils.ResourceExists(SongMeta, videoUri))
+        try
         {
-            songVideoPlayer.ShowBackgroundImage(SongMeta);
+            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(SongMeta, WebViewUtils.CanHandleWebViewUrl);
+            if (SongMetaUtils.ResourceExists(SongMeta, videoUri))
+            {
+                songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(SongMeta);
+            }
+            else
+            {
+                songVideoPlayer.ShowBackgroundImage(SongMeta);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            songVideoPlayer.StartVideoOrShowBackgroundImage();
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to start background video or show image: {ex.Message}");
         }
     }
 
@@ -1110,7 +1117,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         double startPositionInSongInMillis = GetStartPositionInSongInMillis();
 
-        songAudioPlayer.LoadAndPlaySongAudioAsObservable(SongMeta, startPositionInSongInMillis, settings.StreamAudioInSingScene)
+        songAudioPlayer.LoadAndPlaySongAudioAsObservable(SongMeta, startPositionInSongInMillis)
             .CatchIgnore((Exception ex) =>
             {
                 // Loading the audio failed.

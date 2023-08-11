@@ -6,7 +6,7 @@ using LibVLCSharp;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.Rendering;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour, INeedInjection
@@ -186,6 +186,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private double lastSetPositionInSongInMillis;
     private float lastSetPositionInSongInMillisUnityTimeInSeconds;
 
+    private float lastAudioListenerVolume;
+
     public double PositionInSongInSeconds
     {
         get => positionInSongInMillis / 1000.0;
@@ -282,28 +284,12 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     private SongMeta SongMeta { get; set; }
 
+    private float volumeFactor = 1;
     public float VolumeFactor
     {
         get
         {
-            if (AudioSupportProvider is EAudioSupportProvider.Vlc)
-            {
-                return vlcMediaPlayer.Volume / 100f;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
-            {
-                return ffplayCommand.AudioSourceComponent.volume;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
-            {
-                return webViewManager.VolumeInPercent / 100f;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
-            {
-                return audioSource.volume;
-            }
-
-            return 1;
+            return volumeFactor;
         }
         set
         {
@@ -313,24 +299,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 return;
             }
 
-            if (AudioSupportProvider is EAudioSupportProvider.Vlc
-                && ffplayCommand != null)
-            {
-                vlcMediaPlayer.SetVolume((int)(value * 100));
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
-                     && ffplayCommand != null)
-            {
-                ffplayCommand.AudioSourceComponent.volume = value;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
-            {
-                webViewManager.VolumeInPercent = (int)(value * 100);
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
-            {
-                audioSource.volume = value;
-            }
+            volumeFactor = value;
+            ApplyVolumeFactorToAudioSupportProvider(volumeFactor);
         }
     }
 
@@ -461,6 +431,14 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 ffplayCommand.SeekTime(lastSetPositionInSongInMillis / 1000.0);
             }
         }
+
+        // Update vlc volume when AudioListener.volume changes
+        if (AudioSupportProvider == EAudioSupportProvider.Vlc
+            && Math.Abs(AudioListener.volume - lastAudioListenerVolume) > 0.01f)
+        {
+            ApplyVolumeFactorToAudioSupportProvider(volumeFactor);
+            lastAudioListenerVolume = AudioListener.volume;
+        }
     }
 
     public void LoadAndPlaySongAudio(
@@ -495,7 +473,18 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         string fileExtension = Path.GetExtension(audioUri);
         if (ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension))
         {
-            return LoadWithVideoPlayer(songMeta, audioUri, startPositionInMillis);
+            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
+            }
+            else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
+            }
+            else
+            {
+                return LoadWithVideoPlayer(songMeta, audioUri, startPositionInMillis);
+            }
         }
         else if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
         {
@@ -503,17 +492,28 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
         {
-            return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
+            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
+            }
+            else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
+            }
+            else
+            {
+                return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
+            }
         }
         else if (WebViewUtils.CanHandleWebViewUrl(audioUri))
         {
             return LoadWithWebView(songMeta, audioUri, startPositionInMillis);
         }
-        else if (settings.UseVlcToPlayMediaFiles)
+        else if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
         {
             return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
         }
-        else if (settings.UseFfmpegToPlayMediaFiles)
+        else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
         {
             return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
         }
@@ -639,13 +639,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                     {
                         UnloadAudioAndVideo();
 
-                        if (settings.UseVlcToPlayMediaFiles)
+                        if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
                         {
                             Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with vlc. URI: {audioUri}");
                             LoadWithVlc(songMeta, audioUri, startPositionInMillis)
                                 .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
                         }
-                        else if (settings.UseFfmpegToPlayMediaFiles)
+                        else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.WhenUnsupportedByUnity)
                         {
                             Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with ffmpeg. URI: {audioUri}");
                             LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis)
@@ -1044,5 +1044,27 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         Debug.LogError($"SongAudioPlayer received VideoPlayer error: {message}");
         videoPlayerErrorMessages.Add(message);
+    }
+
+    private void ApplyVolumeFactorToAudioSupportProvider(float value)
+    {
+        if (AudioSupportProvider is EAudioSupportProvider.Vlc
+            && vlcMediaPlayer != null)
+        {
+            vlcMediaPlayer.SetVolume((int)(value * AudioListener.volume * 100));
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                 && ffplayCommand != null)
+        {
+            ffplayCommand.AudioSourceComponent.volume = value;
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.WebView)
+        {
+            webViewManager.VolumeInPercent = (int)(value * 100);
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
+        {
+            audioSource.volume = value;
+        }
     }
 }

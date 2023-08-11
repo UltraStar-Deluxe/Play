@@ -31,7 +31,7 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
 
     [Inject(UxmlName = R.UxmlNames.roundCountItemPicker)]
     private ItemPicker roundCountItemPicker;
-    
+
     public void OnInjectionFinished()
     {
         // Round count
@@ -41,8 +41,7 @@ public class PartyModeSongSelectionConfigControl : INeedInjection, IInjectionFin
             newValue => partyModeSettings.RoundCount = (int)newValue);
 
         // Selection mode (random or manual)
-        LabeledItemPickerControl<EPartyModeSongSelectionMode> songSelectionItemPickerControl =
-            new(songSelectionItemPicker, EnumUtils.GetValuesAsList<EPartyModeSongSelectionMode>());
+        EnumItemPickerControl<EPartyModeSongSelectionMode> songSelectionItemPickerControl = new(songSelectionItemPicker);
         songSelectionItemPickerControl.Bind(
             () => partyModeSettings.SongSelectionSettings.SongSelectionMode,
             newValue =>

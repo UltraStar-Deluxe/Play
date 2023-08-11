@@ -35,7 +35,6 @@
                 <ui:Label tabindex="-1" text="Default path" display-tooltip-when-elided="true" name="generatedFolderPathHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;" />
             </ui:TextField>
             <ItemPicker name="minimumLogLevelPicker" label="Minimum Log Level¹" wrap-around="true" class="noBackgroundInHierarchy" />
-            <ItemPicker name="streamAudioInSingScenePicker" label="Load as streaming audio when singing" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
             <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
             <ItemPicker name="analyzeBeatsWithoutTargetNotePicker" label="Analyze Beats Without Target Note" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />

@@ -16,28 +16,28 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     [InjectedInInspector]
     public CanvasWebViewPrefab webViewPrefabPrefab;
-    
+
     [InjectedInInspector]
     public Canvas webViewCanvas;
-    
+
     [InjectedInInspector]
     public Camera webViewCamera;
-    
+
     [InjectedInInspector]
     public TextAsset defaultWebViewHtml;
-    
+
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject]
     private UiManager uiManager;
-    
+
     [Inject]
     private Settings settings;
-    
+
     private IWebView webView;
 
     private bool IsWebViewInitialized => webView != null;
@@ -55,7 +55,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return isPlaying;
         }
     }
-    
+
     private double durationInMillis;
     public double DurationInMillis
     {
@@ -73,7 +73,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private long receivedPlaybackPositionUpdatedTimeInMillis;
     private double receivedPlaybackPositionInMillis;
-    
+
     private int estimatedPlaybackPositionUpdatedFrameCount;
     private long estimatedPlaybackPositionUpdatedTimeInMillis;
     private double estimatedPlaybackPositionInMillis;
@@ -89,7 +89,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return estimatedPlaybackPositionInMillis;
         }
     }
-    
+
     public int volumeInPercent;
     public int VolumeInPercent
     {
@@ -104,12 +104,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         set
         {
             volumeInPercent = value;
-            
+
             if (!IsWebViewInitialized)
             {
                 return;
             }
-            
+
             // The embedded browser does not consider AudioListener.volume. Thus, this must be considered here explicitly.
             float jsVolume = AudioListener.volume * NumberUtils.PercentToFactor(volumeInPercent) * 100;
             webView.ExecuteJavaScript($"setVolume({jsVolume})");
@@ -128,11 +128,11 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return isContentLoaded;
         }
     }
-    
+
     private string loadedUrl;
 
     private bool javaScriptCanLoadUrl;
-    
+
     public bool IsWebViewCanvasControlEnabled => webViewCanvas.renderMode is RenderMode.ScreenSpaceOverlay;
 
     private CanvasWebViewPrefab webViewPrefabInstance;
@@ -148,6 +148,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         // Explicitly allow playback of video or audio without user interaction.
         // This must be called early, e.g. in Awake.
         Web.SetAutoplayEnabled(true);
+
+        // Disable camera until WebView texture requested
+        webViewCamera.gameObject.SetActive(false);
     }
 
     protected override void StartSingleton()
@@ -181,7 +184,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             Debug.LogWarning("Cannot instantiate WebView. WebView already instantiated.");
             return;
         }
-        
+
         foreach (Transform child in webViewCanvas.transform)
         {
             Destroy(child.gameObject);
@@ -205,7 +208,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_toggleWebViewControl).PerformedAsObservable()
             .Subscribe(_ => ToggleWebViewControl())
             .AddTo(gameObject);
-        
+
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(200)
             .Subscribe(_ =>
             {
@@ -231,6 +234,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             SetWebViewInputEnabled(true);
             SetUiToolkitInputEnabled(false);
         }
+        UpdateWebViewCameraActive();
     }
 
     private void SetWebViewInputEnabled(bool newValue)
@@ -245,12 +249,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         webViewPrefabInstance.KeyboardEnabled = newValue;
         webViewPrefabInstance.CursorIconsEnabled = newValue;
     }
-    
+
     private void SetUiToolkitInputEnabled(bool newValue)
     {
         uiDocument.rootVisualElement.SetVisibleByDisplay(newValue);
     }
-    
+
     private void Update()
     {
         if (!IsWebViewInitialized)
@@ -294,9 +298,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         webView = webViewPrefabInstance.WebView;
         webViewPrefabInstance.WebView.MessageEmitted += OnWebViewMessageReceived;
         webView.LoadProgressChanged += OnWebViewLoadProgressChanged;
-        
+
         webView.LoadHtml(defaultWebViewHtml.text);
-        
+
         webViewInitializedEventStream.OnNext(true);
     }
 
@@ -351,7 +355,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             {
                 Debug.LogError($"Failed to parse WebViewMessageDto: {json}");
             }
-    
+
             if (WebViewMessageDto.TryParseType(webViewMessageDto.type, out WebViewMessageType webViewMessageType))
             {
                 switch (webViewMessageType)
@@ -361,16 +365,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                         NumberWebViewMessageDto numberWebViewMessageDto = JsonConverter.FromJson<NumberWebViewMessageDto>(json);
 
                         long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-                        
-                        // Log how far away from the actual time the estimate has become. 
+
+                        // Log how far away from the actual time the estimate has become.
                         // double oldEstimatedPlaybackPositionInMillis = EstimatedPlaybackPositionInMillis;
                         // double oldEstimatedPlaybackPositionInMillisOffset = numberWebViewMessageDto.value -
                         //                                                     oldEstimatedPlaybackPositionInMillis;
                         // Log.Verbose(() => $"Received new playback position. Old estimate offset: {oldEstimatedPlaybackPositionInMillisOffset}");
-                        
+
                         receivedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
                         receivedPlaybackPositionInMillis = numberWebViewMessageDto.value;
-                        
+
                         estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
                         estimatedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
                         estimatedPlaybackPositionInMillis = receivedPlaybackPositionInMillis;
@@ -438,13 +442,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             return DoLoadUrl(url);
         }
-        
+
         MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("Open in Embedded Browser");
         messageDialogControl.Message = $"The song file references an external website.\n"
                                        + $"Do you want to open {host} in the embedded browser?";
 
         messageDialogControl.AddInformationMessage($"You can open the embedded browser anytime by pressing F8 or Ctrl+B.");
-        
+
         messageDialogControl.AddButton("Yes, do not ask again", _ =>
         {
             messageDialogControl.CloseDialog();
@@ -465,7 +469,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             Debug.LogError($"Failed to load WebView script code for url: {url}");
             return false;
         }
-        
+
         if (isPlaying)
         {
             PausePlayback();
@@ -483,7 +487,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             isContentLoaded = false;
         }
-        
+
         loadedUrl = url;
         RunWhenWebViewInitialized(() =>
         {
@@ -503,7 +507,15 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         });
         return true;
     }
-    
+
+    private void UpdateWebViewCameraActive()
+    {
+        // Only render the WebView with the camera when it is visible to the user.
+        webViewCamera.gameObject.SetActive(
+            webViewCamera.targetTexture != null
+            || IsWebViewCanvasControlEnabled);
+    }
+
     public void ResumePlayback()
     {
         if (!IsWebViewInitialized)
@@ -535,7 +547,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         isPlaying = false;
         webView.ExecuteJavaScript("pausePlayback()");
         webView.ExecuteJavaScript("setVolume(0)");
@@ -547,7 +559,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         isPlaying = false;
         webView.ExecuteJavaScript("stopPlayback()");
     }
@@ -568,12 +580,21 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             });
         }
     }
-    
+
     public void ReloadScripts()
     {
         WebViewUtils.ClearCache();
         loadedUrl = null;
         javaScriptCanLoadUrl = false;
         Debug.Log("Reloaded WebView scripts by clearing cache.");
+    }
+
+    public void SetWebViewRenderTexture(RenderTexture targetTexture)
+    {
+        if (webViewCamera.targetTexture != targetTexture)
+        {
+            webViewCamera.targetTexture = targetTexture;
+            UpdateWebViewCameraActive();
+        }
     }
 }

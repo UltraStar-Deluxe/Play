@@ -21,53 +21,53 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     [Inject(UxmlName = R.UxmlNames.sceneChangeDurationPicker)]
     private ItemPicker sceneChangeDurationPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.backgroundLightItemPicker)]
     private ItemPicker backgroundLightItemPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.vfxEnabledPicker)]
     private ItemPicker vfxEnabledPicker;
 
     [Inject(UxmlName = R.UxmlNames.showScrollBarInSongSelectPicker)]
     private ItemPicker showScrollBarInSongSelectPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.showSongIndexInSongSelectPicker)]
     private ItemPicker showSongIndexInSongSelectPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.songBackgroundScaleModePicker)]
     private ItemPicker songBackgroundScaleModePicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.previewFadeInDurationChooser)]
     private ItemPicker previewFadeInDurationChooser;
 
     [Inject]
     private UiManager uiManager;
-    
+
     [Inject]
     private BackgroundLightManager backgroundLightManager;
 
     protected override void Start()
     {
         base.Start();
-        
+
         new BoolPickerControl(imageAsCursorPicker)
             .Bind(() => settings.UseImageAsCursor,
                 newValue => settings.UseImageAsCursor = newValue);
 
-        new LabeledItemPickerControl<ESceneChangeAnimation>(sceneChangeAnimationPicker, EnumUtils.GetValuesAsList<ESceneChangeAnimation>())
+        new EnumItemPickerControl<ESceneChangeAnimation>(sceneChangeAnimationPicker)
             .Bind(() => settings.SceneChangeAnimation,
                 newValue => settings.SceneChangeAnimation = newValue);
 
         new BoolPickerControl(vfxEnabledPicker)
-            .Bind(() => settings.EnableVfx, 
+            .Bind(() => settings.EnableVfx,
                 newValue => settings.EnableVfx = newValue);
 
         new BoolPickerControl(showScrollBarInSongSelectPicker)
-            .Bind(() => settings.ShowScrollBarInSongSelect, 
+            .Bind(() => settings.ShowScrollBarInSongSelect,
                 newValue => settings.ShowScrollBarInSongSelect = newValue);
-        
+
         new BoolPickerControl(showSongIndexInSongSelectPicker)
-            .Bind(() => settings.ShowSongIndexInSongSelect, 
+            .Bind(() => settings.ShowSongIndexInSongSelect,
                 newValue => settings.ShowSongIndexInSongSelect = newValue);
 
         LabeledItemPickerControl<float> audioPreviewFadeInDurationChooserControl = new(previewFadeInDurationChooser, NumberUtils.CreateFloatList(0.5f, 5f, 0.5f));
@@ -75,7 +75,7 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
             newValue => settings.PreviewFadeInDurationInSeconds = newValue);
         audioPreviewFadeInDurationChooserControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
 
-        LabeledItemPickerControl<ESongBackgroundScaleMode> songBackgroundScaleModePickerControl = new LabeledItemPickerControl<ESongBackgroundScaleMode>(songBackgroundScaleModePicker, EnumUtils.GetValuesAsList<ESongBackgroundScaleMode>());
+        EnumItemPickerControl<ESongBackgroundScaleMode> songBackgroundScaleModePickerControl = new EnumItemPickerControl<ESongBackgroundScaleMode>(songBackgroundScaleModePicker);
         songBackgroundScaleModePickerControl.Bind(() => settings.SongBackgroundScaleMode,
             newValue => settings.SongBackgroundScaleMode = newValue);
         songBackgroundScaleModePickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
@@ -84,11 +84,11 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         sceneChangeDurationPickerControl.Bind(() => settings.SceneChangeDurationInSeconds,
                 newValue => settings.SceneChangeDurationInSeconds = newValue);
         sceneChangeDurationPickerControl.GetLabelTextFunction = newValue => $"{newValue.ToStringInvariantCulture("0.00")} s";
-        
+
         new LabeledItemPickerControl<int>(backgroundLightItemPicker, NumberUtils.CreateIntList(0, backgroundLightManager.BackgroundLightInstancesCount))
             .Bind(() => settings.BackgroundLightIndex,
                 newValue => settings.BackgroundLightIndex = newValue);
-        
+
         // Load available themes:
         List<ThemeMeta> themeMetas = themeManager.GetThemeMetas();
         LabeledItemPickerControl<ThemeMeta> themePickerControl = new(themePicker, themeMetas);
