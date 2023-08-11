@@ -358,8 +358,13 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     {
         return labels.Select(label =>
         {
-            Vector2 preferredTextSize = label.GetPreferredTextSize();
             IResolvedStyle resolvedStyle = label.resolvedStyle;
+            if (label.ClassListContains(R.UssClasses.singingLyricsSpace))
+            {
+                return resolvedStyle.width;
+            }
+
+            Vector2 preferredTextSize = label.GetPreferredTextSize();
             return resolvedStyle.marginLeft + preferredTextSize.x + resolvedStyle.marginRight;
         }).Sum();
     }
@@ -382,6 +387,20 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
+        List<string> labelUssClasses = new()
+        {
+            R.UssClasses.singingLyrics,
+        };
+        if (visualElement == plainLabelContainer
+            || visualElement == highlightLabelContainer)
+        {
+            labelUssClasses.Add(R.UssClasses.currentLyrics);
+        }
+        else if (visualElement == nextSentenceContainer)
+        {
+            labelUssClasses.Add(R.UssClasses.nextLyrics);
+        }
+
         List<Note> sortedNotes = sentence.Notes.ToList();
         sortedNotes.Sort(Note.comparerByStartBeat);
         sortedNotes.ForEach(note =>
@@ -394,28 +413,21 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 : displayText.Trim();
 
             Label label = new(richText);
+            Label spaceLabel = null;
+
+            labelUssClasses.ForEach(ussClass => label.AddToClassList(ussClass));
+
             noteToLabel.Add(note, label);
 
             label.enableRichText = true;
 
-            if (displayText.StartsWith(" "))
+            if (displayText.StartsWith(" ")
+                || displayText.EndsWith(" "))
             {
-                label.style.marginLeft = SpaceWidthInPx;
-            }
-            if (displayText.EndsWith(" "))
-            {
-                label.style.marginRight = SpaceWidthInPx;
-            }
-
-            label.AddToClassList(R.UssClasses.singingLyrics);
-            if (visualElement == plainLabelContainer
-                || visualElement == highlightLabelContainer)
-            {
-                label.AddToClassList(R.UssClasses.currentLyrics);
-            }
-            else if (visualElement == nextSentenceContainer)
-            {
-                label.AddToClassList(R.UssClasses.nextLyrics);
+                spaceLabel = new("");
+                labelUssClasses.ForEach(ussClass => spaceLabel.AddToClassList(ussClass));
+                spaceLabel.AddToClassList(R.UssClasses.singingLyricsSpace);
+                visualElement.Add(spaceLabel);
             }
 
             ThemeMeta currentThemeMeta = themeManager.GetCurrentTheme();
@@ -437,7 +449,17 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
                 label.style.textShadow = new StyleTextShadow();
             }
 
+            if (spaceLabel != null
+                && displayText.StartsWith(" "))
+            {
+                visualElement.Add(spaceLabel);
+            }
             visualElement.Add(label);
+            if (spaceLabel != null
+                && displayText.EndsWith(" "))
+            {
+                visualElement.Add(spaceLabel);
+            }
         });
     }
 

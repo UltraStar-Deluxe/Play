@@ -129,6 +129,7 @@ public static partial class R_PlayShared
         public const string secondaryFontColor = "secondaryFontColor";
         public const string settingsProblemHintIcon = "settingsProblemHintIcon";
         public const string singingLyrics = "singingLyrics";
+        public const string singingLyricsSpace = "singingLyricsSpace";
         public const string singingResults = "singingResults";
         public const string singingResultsPlayerUiColumn = "singingResultsPlayerUiColumn";
         public const string singingResultUi_3 = "singingResultUi-3";

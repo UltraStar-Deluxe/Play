@@ -312,6 +312,10 @@
     font-size: var(--font-size);
 }
 
+.singingLyricsSpace{
+    width: 8px;
+}
+
 .currentNoteLyrics {
     color: var(--control-color);
 }
