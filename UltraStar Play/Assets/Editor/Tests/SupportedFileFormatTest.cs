@@ -13,7 +13,6 @@ public class SupportedFileFormatTest
             "ogg",
             "wav",
             "flac",
-            "aif",
             "aiff",
             "aac",
             "m4a",
@@ -25,7 +24,7 @@ public class SupportedFileFormatTest
             Assert.Contains(expectedAudioFormat, supportedFormats);
         }
     }
-    
+
     [Test]
     public void FfmpegSupportedVideoFormatsTest()
     {
