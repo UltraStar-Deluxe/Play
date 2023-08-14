@@ -65,6 +65,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.enableWebViewToggle)]
     private Toggle enableWebViewToggle;
 
+    [Inject(UxmlName = R.UxmlNames.wipeLyricsEffectToggle)]
+    private Toggle wipeLyricsEffectToggle;
+
     [Inject(UxmlName = R.UxmlNames.connectionEndpointLabel)]
     private Label connectionEndpointLabel;
 
@@ -393,6 +396,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         systemAudioBackendDelayPickerControl.Bind(
             () => settings.SystemAudioBackendDelayInMillis,
             newValue => settings.SystemAudioBackendDelayInMillis = (int)newValue);
+
+        // Wipe lyrics
+        FieldBindingUtils.Bind(wipeLyricsEffectToggle,
+            () => settings.WipeLyrics,
+            newValue => settings.WipeLyrics = newValue);
     }
 
     private List<string> GetAvailablePortAudioOutputDeviceNames()

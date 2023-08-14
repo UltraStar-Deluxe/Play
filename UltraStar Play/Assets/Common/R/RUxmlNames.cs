@@ -926,6 +926,7 @@ public static partial class R
         public const string webcamRenderContainer = "webcamRenderContainer";
         public const string webcamRenderContainerParent = "webcamRenderContainerParent";
         public const string wideIcon = "wideIcon";
+        public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
         public const string yearPropertyToggle = "yearPropertyToggle";
     }
 }

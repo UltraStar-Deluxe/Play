@@ -286,11 +286,11 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             () => settings.ShowStaticLyrics,
             newValue => settings.ShowStaticLyrics = newValue);
 
-        Toggle wipeLyricsToggle = new("Wipe lyrics");
-        contextMenuPopup.AddVisualElement(wipeLyricsToggle);
-        FieldBindingUtils.Bind(wipeLyricsToggle,
-            () => settings.WipeLyrics,
-            newValue => settings.WipeLyrics = newValue);
+        // Toggle wipeLyricsToggle = new("Wipe lyrics");
+        // contextMenuPopup.AddVisualElement(wipeLyricsToggle);
+        // FieldBindingUtils.Bind(wipeLyricsToggle,
+        //     () => settings.WipeLyrics,
+        //     newValue => settings.WipeLyrics = newValue);
 
         Toggle showPitchIndicatorToggle = new("Pitch Arrow");
         contextMenuPopup.AddVisualElement(showPitchIndicatorToggle);
