@@ -1,7 +1,5 @@
 ﻿using System;
 using FullSerializer;
-using NUnit.Framework.Constraints;
-using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
 /**
@@ -21,7 +19,7 @@ public class EnumDefaultValueFallbackConverter : fsConverter
     {
         if (!storageType.IsEnum)
         {
-            throw new InvalidOperationException($"EnumDefaultValueFallbackConverter.TrySerialize -- Storage type {storageType} is not an enum");
+            throw new JsonConverterException($"EnumDefaultValueFallbackConverter.TrySerialize -- Storage type {storageType} is not an enum");
         }
 
         Enum instanceAsEnum = instance as Enum;
@@ -34,7 +32,7 @@ public class EnumDefaultValueFallbackConverter : fsConverter
     {
         if (!storageType.IsEnum)
         {
-            throw new InvalidOperationException($"EnumDefaultValueFallbackConverter.TryDeserialize -- Storage type {storageType} is not an enum");
+            throw new JsonConverterException($"EnumDefaultValueFallbackConverter.TryDeserialize -- Storage type {storageType} is not an enum");
         }
 
         return ParseEnumFromDataAsString(data, ref instance, storageType);
@@ -52,7 +50,7 @@ public class EnumDefaultValueFallbackConverter : fsConverter
         Array enumValues = Enum.GetValues(storageType);
         if (enumValues.Length <= 0)
         {
-            throw new JsonException($"Cannot deserialize enum, no enum values for type {storageType}");
+            throw new JsonConverterException($"Cannot deserialize enum, no enum values for type {storageType}");
         }
 
         Enum fallbackValue = enumValues.GetValue(0) as Enum;

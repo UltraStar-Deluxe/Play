@@ -10,7 +10,7 @@ public class ReactivePropertyConverter : fsConverter
     {
         typeof(IReactiveProperty<string>),
     };
-    
+
     public override bool CanProcess(Type type)
     {
         return type.IsGenericType
@@ -105,10 +105,10 @@ public class ReactivePropertyConverter : fsConverter
                 Serializer.TryDeserialize(data, deserializedValueType, ref deserializedValue);
             }
         }
-        
+
         if (instance == null)
         {
-            throw new InvalidOperationException("Cannot deserialize, instance is null");
+            throw new JsonConverterException("Cannot deserialize, instance is null");
         }
 
         // Set the value via reflection
