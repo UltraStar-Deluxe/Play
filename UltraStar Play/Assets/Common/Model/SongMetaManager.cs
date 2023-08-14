@@ -685,7 +685,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         if (useFfmpegToPlayMediaFiles
-            || useVlcToPlayMediaFiles)
+            && !useVlcToPlayMediaFiles)
         {
             // The ffmpeg integration in Unity can at the moment only play one file.
             // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
@@ -701,9 +701,12 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 SongVideoPlayer.AddIgnoredVideoFile(songMeta.Video);
             }
         }
-        else if (checkCodecIsSupported)
+
+        if (checkCodecIsSupported
+            && !useFfmpegToPlayMediaFiles
+            && !useVlcToPlayMediaFiles)
         {
-            CheckVideoCodecsAreSupported(songIssues, songMeta);
+            CheckVideoCodecsAreSupportedByUnity(songIssues, songMeta);
         }
 
         // Check audio format.
@@ -754,7 +757,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         return songIssues;
     }
 
-    private static void CheckVideoCodecsAreSupported(List<SongIssue> songIssues, SongMeta songMeta)
+    private static void CheckVideoCodecsAreSupportedByUnity(List<SongIssue> songIssues, SongMeta songMeta)
     {
         if (!songMeta.Mp3.IsNullOrEmpty())
         {

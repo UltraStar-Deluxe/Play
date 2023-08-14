@@ -21,7 +21,7 @@ public class SetVideoGapAction : INeedInjection
     public void Execute(float newVideoGap)
     {
         songMeta.VideoGap = newVideoGap;
-        songVideoPlayer.SyncVideoWithMusic(songAudioPlayer.PositionInSongInMillis, songAudioPlayer.DurationOfSongInMillis, true);
+        songVideoPlayer.SyncVideoPositionWithAudio(true);
     }
 
     public void ExecuteAndNotify(float newVideoGap)

@@ -168,4 +168,43 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         VideoOrientation? orientation = tracks[0]?.Data.Video.Orientation;
         return orientation;
     }
+
+    public void DisableMediaPlayerAudioOutput(MediaPlayer mediaPlayer)
+    {
+        if (mediaPlayer == null)
+        {
+            return;
+        }
+
+        mediaPlayer.SetAudioCallbacks(OnVlcAudioPlayMuted, OnVlcAudioPauseMuted, OnVlcAudioResumeMuted, OnVlcAudioFlushMuted, OnVlcAudioDrainMuted);
+
+        // TODO: Muting a single VLC MediaPlayer does not work.
+        // mediaPlayer.Mute = true;
+        // mediaPlayer.SetVolume(0);
+    }
+
+    private void OnVlcAudioDrainMuted(IntPtr data)
+    {
+        // Muted => do nothing
+    }
+
+    private void OnVlcAudioFlushMuted(IntPtr data, long pts)
+    {
+        // Muted => do nothing
+    }
+
+    private void OnVlcAudioResumeMuted(IntPtr data, long pts)
+    {
+        // Muted => do nothing
+    }
+
+    private void OnVlcAudioPauseMuted(IntPtr data, long pts)
+    {
+        // Muted => do nothing
+    }
+
+    private void OnVlcAudioPlayMuted(IntPtr data, IntPtr samples, uint count, long pts)
+    {
+        // Muted => do nothing
+    }
 }

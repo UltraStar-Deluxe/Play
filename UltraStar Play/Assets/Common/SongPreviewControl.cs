@@ -85,7 +85,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         // The video has an additional delay to load.
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
-        if (songVideoPlayer.HasLoadedVideo
+        if (songVideoPlayer.IsLoaded
             && (songVideoPlayer.PositionInVideoInMillis <= 0
                 && songVideoPlayer.VideoSupportProvider is not EVideoSupportProvider.WebView))
         {
@@ -94,7 +94,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / Math.Max(VideoFadeInDurationInSeconds, 0.001f);
         videoFadeInPercent = NumberUtils.Limit(videoFadeInPercent, 0, 1);
-        if (songVideoPlayer.HasLoadedVideo)
+        if (songVideoPlayer.IsLoaded)
         {
             VideoFadeIn.Value = videoFadeInPercent;
         }
