@@ -29,7 +29,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     [Inject]
     protected Settings settings;
-    
+
     public bool focusLastElementIfNothingFocused;
 
     public LogEventLevel logLevel = LogEventLevel.Debug;
@@ -51,7 +51,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
     public Func<NoNavigationTargetFoundEvent, bool> NoNavigationTargetFoundInListViewCallback { get; set; }
     public Func<NavigationParameters, bool> BeforeNavigationInListViewCallback { get; set; }
-    
+
     public virtual void OnInjectionFinished()
     {
         if (!PlatformUtils.IsAndroid
@@ -125,7 +125,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             return;
         }
-        
+
         List<VisualElement> focusableElements = GetFocusableVisualElementsInDescendants(visualElement, filter);
         if (focusableElements.IsNullOrEmpty())
         {
@@ -146,7 +146,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             return;
         }
-        
+
         if (PlatformUtils.IsAndroid
             && !settings.EnableEventSystemOnAndroid)
         {
@@ -180,7 +180,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             return;
         }
-        
+
         if (PlatformUtils.IsAndroid
             && !settings.EnableEventSystemOnAndroid)
         {
@@ -211,13 +211,13 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             return;
         }
-        
+
         if (PlatformUtils.IsAndroid
             && !settings.EnableEventSystemOnAndroid)
         {
             return;
         }
-        
+
         VisualElement focusedVisualElement = FocusedVisualElement;
         if (focusedVisualElement == null)
         {
@@ -257,33 +257,33 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             NavigateDropdownList(focusedVisualElement, navigationDirection);
             return;
         }
-        
+
         if (focusedVisualElement is ListView listView
             && TryNavigateListView(listView, navigationDirection))
         {
             return;
         }
-        
+
         if (focusedVisualElement is ListViewH listViewH
             && TryNavigateListView(listViewH, navigationDirection))
         {
             return;
         }
-        
+
         ListViewH parentListViewH = focusedVisualElement.GetFirstAncestorOfType<ListViewH>();
         if ((parentListViewH != null)
             && TryNavigateListView(parentListViewH, navigationDirection))
         {
             return;
         }
-        
+
         VisualElement parentVisualElement = focusedVisualElement.GetParent(parent => parent.ClassListContains(R.UssClasses.focusableNavigatorPriorityParent));
         if (parentVisualElement != null
             && TryNavigateInVisualElement(parentVisualElement, focusedVisualElement, navigationDirection))
         {
             return;
         }
-        
+
         ScrollView parentScrollView = focusedVisualElement.GetFirstAncestorOfType<ScrollView>();
         if (parentScrollView != null
             && TryNavigateInVisualElement(parentScrollView, focusedVisualElement, navigationDirection))
@@ -312,7 +312,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             return false;
         }
-        
+
         int selectedIndex = listView.selectedIndex;
         if (navigationDirection.y > 0
             && selectedIndex > 0)
@@ -353,7 +353,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             return false;
         }
-        
+
         if (BeforeNavigationInListViewCallback != null)
         {
             bool isHandled = BeforeNavigationInListViewCallback(new NavigationParameters()
@@ -366,7 +366,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
                 return true;
             }
         }
-        
+
         int selectedIndex = listView.selectedIndex;
         if (navigationDirection.x < 0
             && selectedIndex > 0)
@@ -398,7 +398,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
 
         return false;
     }
-    
+
     private void TryFocusSelectedListViewItem(ListView listView)
     {
         VisualElement selectedVisualElement = listView.GetSelectedVisualElement();
@@ -432,7 +432,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             firstFocusableVisualElement.Focus();
         }
     }
-    
+
     private void NavigateDropdownList(
         VisualElement focusedVisualElement,
         Vector2 navigationDirection)
@@ -448,7 +448,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             focusedVisualElement.SendEvent(NavigationMoveEvent.GetPooled(NavigationMoveEvent.Direction.Down));
         }
     }
-    
+
     private void NavigateToBestMatchingNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
     {
         // Find eligible elements for navigation, i.e., all descendants of the current focusableNavigatorRootVisualElement.
@@ -523,7 +523,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             TryFocusSelectedListViewItem(focusedListView);
         }
-        
+
         if (visualElement is ListViewH focusedListViewH)
         {
             TryFocusSelectedListViewItem(focusedListViewH);
@@ -535,14 +535,14 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             parentListView.Focus();
             parentListView.ScrollToSelf();
-            
+
             TryFocusSelectedListViewItem(parentListView);
         }
         else if (parentListViewH != null)
         {
             parentListViewH.Focus();
             parentListViewH.ScrollToSelf();
-            
+
             TryFocusSelectedListViewItem(parentListViewH);
         }
         else
@@ -550,10 +550,10 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             visualElement.Focus();
             visualElement.ScrollToSelf();
         }
-        
+
         triedToFocusLastVisualElement = false;
     }
-    
+
     private bool TryNavigateToCustomNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)
     {
         CustomNavigationTarget customNavigationTarget = customNavigationTargets.FirstOrDefault(customNavigationTarget =>
@@ -648,7 +648,7 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
         {
             return null;
         }
-        
+
         List<VisualElement> descendants = rootVisualElement.Query<VisualElement>()
             .Where(descendant => filter == null || filter(descendant))
             .Where(descendant => descendant.tabIndex > 0
@@ -756,18 +756,23 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     private bool IsAllAncestorsFocusableNow(VisualElement visualElement)
     {
         List<VisualElement> ancestors = visualElement.GetAncestors();
-        
+
         bool isInHierarchy = ancestors.AnyMatch(ancestor => ancestor == uiDocument.rootVisualElement);
         if (!isInHierarchy)
         {
             return false;
         }
-        
+
         return ancestors.AllMatch(ancestor =>
         {
+            Rect ancestorWorldBound = ancestor.worldBound;
             return ancestor.IsVisibleByDisplay()
-                   && !float.IsNaN(ancestor.worldBound.center.x)
-                   && !float.IsNaN(ancestor.worldBound.center.y)
+                   && !float.IsNaN(ancestorWorldBound.center.x)
+                   && !float.IsNaN(ancestorWorldBound.center.y)
+                   && !float.IsNaN(ancestorWorldBound.width)
+                   && !float.IsNaN(ancestorWorldBound.height)
+                   && ancestorWorldBound.width > 0
+                   && ancestorWorldBound.height > 0
                    && ancestor.enabledInHierarchy
                    && !ancestor.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
                    && !ancestor.ClassListContains(VisualElementSlideInControl.SlideOutClassName);
