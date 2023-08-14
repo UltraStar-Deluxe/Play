@@ -43,6 +43,7 @@ public static partial class R_PlayShared
         public const string currentLyrics = "currentLyrics";
         public const string currentNoteLyrics = "currentNoteLyrics";
         public const string dangerButton = "dangerButton";
+        public const string deviceInfoLabel = "deviceInfoLabel";
         public const string dialogBackground = "dialogBackground";
         public const string dialogButton = "dialogButton";
         public const string dialogMessage = "dialogMessage";
@@ -71,7 +72,6 @@ public static partial class R_PlayShared
         public const string iconImageTextSized = "iconImageTextSized";
         public const string ignoreTheme = "ignoreTheme";
         public const string inactiveOverlay = "inactiveOverlay";
-        public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputLegendBar = "inputLegendBar";
         public const string inputLegendLabel = "inputLegendLabel";
         public const string intermediateTeamResults = "intermediateTeamResults";
@@ -118,6 +118,7 @@ public static partial class R_PlayShared
         public const string playerScoreLabel = "playerScoreLabel";
         public const string png = "png";
         public const string previousNoteLyrics = "previousNoteLyrics";
+        public const string quickFixButton = "quickFixButton";
         public const string radial_progress_bar = "radial-progress-bar";
         public const string radial_progress_bar__label = "radial-progress-bar__label";
         public const string roundCorners = "roundCorners";
@@ -128,6 +129,7 @@ public static partial class R_PlayShared
         public const string secondaryFontColor = "secondaryFontColor";
         public const string settingsProblemHintIcon = "settingsProblemHintIcon";
         public const string singingLyrics = "singingLyrics";
+        public const string singingLyricsSpace = "singingLyricsSpace";
         public const string singingResults = "singingResults";
         public const string singingResultsPlayerUiColumn = "singingResultsPlayerUiColumn";
         public const string singingResultUi_3 = "singingResultUi-3";

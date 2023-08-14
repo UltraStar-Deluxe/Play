@@ -83,14 +83,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     private void UpdatePlayerProfileInactiveOverlay(PlayerProfile playerProfile, VisualElement playerProfileInactiveOverlay)
     {
         playerProfileInactiveOverlay.ShowByDisplay();
-        if (playerProfile.IsEnabled)
-        {
-            playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(Colors.clearBlack);
-        }
-        else
-        {
-            playerProfileInactiveOverlay.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.5f));
-        }
+        playerProfileInactiveOverlay.SetInClassList("hidden", playerProfile.IsEnabled);
     }
     
     private int GetIndexInList(PlayerProfile playerProfile)

@@ -57,13 +57,30 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         settings.ObserveEveryValueChanged(it => it.MicrophonePlaybackVolumePercent)
             .Subscribe(newValue =>
             {
-                micSampleRecorders.ForEach(it =>
+                float outputAmplificationFactor = NumberUtils.PercentToFactor(newValue);
+                foreach (MicSampleRecorder it in micSampleRecorders)
                 {
-                    float finalVolume = NumberUtils.PercentToFactor(newValue);
-                    it.Volume = finalVolume;
-                });
+                    it.OutputVolume = outputAmplificationFactor;
+                }
+
+                foreach (DeviceInfo deviceInfo in PortAudioUtils.DeviceInfos)
+                {
+                    PortAudioUtils.SetOutputAmplificationFactor(deviceInfo, outputAmplificationFactor);
+                }
             });
-        
+
+        settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
+            .Subscribe(newValue =>
+            {
+                MicrophoneAdapter.SetHostApi(PortAudioConversionUtils.ConvertHostApi(newValue));
+            });
+
+        settings.ObserveEveryValueChanged(it => it.PortAudioOutputDeviceName)
+            .Subscribe(newValue =>
+            {
+                micSampleRecorders.ForEach(it => it.PortAudioOutputDeviceName = newValue);
+            });
+
         Debug.Log($"Initial connected mic devices: {JsonConverter.ToJson(CurrentConnectedMicDevices)}");
         SetLastConnectedMicDevices(CurrentConnectedMicDevices);
     }
@@ -96,6 +113,8 @@ public class MicSampleRecorderManager : AbstractSingletonBehaviour, INeedInjecti
         micSampleRecorder = micSampleRecorderGameObject.AddComponent<MicSampleRecorder>();
         micSampleRecorder.MicProfile = micProfile;
         micSampleRecorder.PlayRecordedAudio = settings.PlayRecordedAudio;
+        micSampleRecorder.PortAudioOutputDeviceName = settings.PortAudioOutputDeviceName;
+        micSampleRecorder.OutputVolume = NumberUtils.PercentToFactor(settings.MicrophonePlaybackVolumePercent);
         micSampleRecorders.Add(micSampleRecorder);
         return micSampleRecorder;
     }

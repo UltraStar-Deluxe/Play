@@ -19,7 +19,7 @@ public static class BuildUtils
     private const string KeystorePasswordEnvironmentVariable = "UNITY_KEYSTORE_PASSWORD";
     private const string KeystoreKeyAliasEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS";
     private const string KeystoreKeyAliasPasswordEnvironmentVariable = "UNITY_KEYSTORE_KEY_ALIAS_PASSWORD";
-    
+
     private const string SteamVdfFilePathEnvironmentVariable = "STEAM_UPLOAD_VDF_FILE";
     private const string SteamUsernameEnvironmentVariable = "STEAM_USERNAME";
     private const string SteamPasswordEnvironmentVariable = "STEAM_PASSWORD";
@@ -36,21 +36,21 @@ public static class BuildUtils
         "Assets/StreamingAssets/BasicPitchExe",
         "Assets/StreamingAssets/SpeechRecognitionModels",
     };
-    
+
     private static string IgnoredAssetsOfMobileBuildFolder => "IgnoredAssetsOfMobileBuild";
-    
+
     public static void PerformCustomBuild(CustomBuildOptions options)
     {
         CopyFilesBeforeBuild();
 
-        bool isMobileBuild = options.buildTarget is BuildTarget.Android or BuildTarget.iOS; 
+        bool isMobileBuild = options.buildTarget is BuildTarget.Android or BuildTarget.iOS;
         try
         {
             if (isMobileBuild)
             {
                 ExcludeAssetsBeforeMobileBuild();
             }
-            
+
             AssetDatabase.Refresh();
             DoPerformCustomBuild(options);
         }
@@ -65,7 +65,7 @@ public static class BuildUtils
 
     private static void DoPerformCustomBuild(CustomBuildOptions options)
     {
-        string executableName = GetExecutableName(options.appName, options.buildTarget, 
+        string executableName = GetExecutableName(options.appName, options.buildTarget,
             options.buildAppBundleForGooglePlay, options.configureKeystoreForAndroidBuild);
         string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
         string executableFileInOutputFolder = !executableName.IsNullOrEmpty() ? $"/{executableName}" : "";
@@ -169,7 +169,7 @@ public static class BuildUtils
         }
 
         string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
-        
+
         // Get app version
         string bundleVersion = BuildUtils.GetPlayerSettingsFileBundleVersion();
         string timeStamp = DateTime.Now.ToString("yyMMddHHmm", CultureInfo.InvariantCulture);
@@ -180,7 +180,7 @@ public static class BuildUtils
         string steamUsername = GetEnvironmentVariableOrThrow(SteamUsernameEnvironmentVariable);
         string steamPassword = GetEnvironmentVariableOrThrow(SteamPasswordEnvironmentVariable);
         string steamContentFolder = GetEnvironmentVariableOrThrow(SteamContentFolderEnvironmentVariable);
-        
+
         // Update Steam VDF file
         string vdfFileContent = File.ReadAllText(vdfFilePath);
         // Update desc filed
@@ -189,23 +189,23 @@ public static class BuildUtils
         vdfFileContent = Regex.Replace(vdfFileContent, "\"desc\" \"[^\"]*\"", $"\"desc\" \"{description}\"");
         File.WriteAllText(vdfFilePath, vdfFileContent);
         Debug.Log($"Updated VDF file {vdfFilePath} with content:\n{vdfFileContent}");
-        
+
         // Remove BurstDebugInformation folder from build output path.
         foreach (DirectoryInfo directoryInfo in new DirectoryInfo(outputFolderPath).GetDirectories())
         {
             if (directoryInfo.Name.Contains("BurstDebugInformation") || directoryInfo.Name.Contains("DoNotShip"))
             {
                 Debug.Log($"Removing debug folder from build output path: {directoryInfo.FullName}");
-                DirectoryUtils.Delete(directoryInfo.FullName);
+                DirectoryUtils.Delete(directoryInfo.FullName, true);
             }
         }
-        
+
         // Copy build output to target folder.
         string source = outputFolderPath;
         string destination = steamContentFolder;
         DirectoryUtils.CopyAll(source, destination);
         Debug.Log("Copied Unity build output to Steam content path.");
-        
+
         // Run Steam upload tool
         if (!ProcessUtils.RunProcess($"steamcmd.exe",
                 $"+login {steamUsername} {steamPassword} +run_app_build \"{vdfFilePath}\" +quit",
@@ -230,7 +230,7 @@ public static class BuildUtils
                 Debug.LogWarning("Cannot copy file. File does not exist: " + entry.Key);
                 continue;
             }
-            
+
             DirectoryUtils.CreateDirectory(new FileInfo(entry.Value).Directory.FullName);
             FileUtils.MoveFileOverwriteIfExists(entry.Key, entry.Value);
             if (!FileUtils.Exists(entry.Value))
@@ -238,7 +238,7 @@ public static class BuildUtils
                 throw new Exception($"Failed to copy {entry.Key} to {entry.Value}");
             }
         }
-        
+
         // Wait for file operations to complete.
         Thread.Sleep(100);
     }
@@ -256,7 +256,7 @@ public static class BuildUtils
                 Debug.LogWarning("Cannot move directory. Directory does not exist: " + src);
                 continue;
             }
-            
+
             DirectoryUtils.CreateDirectory(new DirectoryInfo(dest).Parent.FullName);
             Directory.Move(src, dest);
             try
@@ -267,10 +267,10 @@ public static class BuildUtils
             {
                 Debug.LogWarning("Failed to move .meta file: " + e.Message);
             }
-            
+
             // Wait for file operation to complete
             Thread.Sleep(100);
-            
+
             // Delete empty directory if needed.
             if (Directory.Exists(src)
                 && Directory.GetFiles(src).IsNullOrEmpty())
@@ -293,7 +293,7 @@ public static class BuildUtils
                 Debug.LogWarning("Cannot move directory. Directory does not exist: " + src);
                 continue;
             }
-            
+
             DirectoryUtils.CreateDirectory(new DirectoryInfo(dest).Parent.FullName);
             Directory.Move(src, dest);
             try
@@ -304,7 +304,7 @@ public static class BuildUtils
             {
                 Debug.LogWarning("Failed to move .meta file: " + e.Message);
             }
-            
+
             // Delete empty directory if needed.
             if (Directory.Exists(src)
                 && Directory.GetFiles(src).IsNullOrEmpty())
@@ -478,17 +478,17 @@ public static class BuildUtils
                     || !Directory.Exists(androidSdkRoot))
                 {
                     Debug.LogError($"No Android SDK found");
-                    return;         
+                    return;
                 }
                 PlayerPrefs.SetString("AndroidSdkRoot", androidSdkRoot);
             }
         }
-        
+
         string adbLocation = androidSdkRoot + "/platform-tools/adb";
 #if UNITY_EDITOR_WIN
         adbLocation += ".exe";
 #endif
-        
+
         if (adbLocation.IsNullOrEmpty()
             || !File.Exists(adbLocation))
         {
@@ -504,5 +504,10 @@ public static class BuildUtils
             WorkingDirectory = Path.GetDirectoryName(adbLocation),
         };
         Process.Start(info);
+    }
+
+    public static string GetUnityVersion()
+    {
+        return Application.unityVersion;
     }
 }

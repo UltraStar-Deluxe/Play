@@ -39,7 +39,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
     {
         string fileName = Path.GetFileName(songMeta.Mp3);
         Job pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of '{fileName}'");
-        IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMeta(songMeta, pitchDetectionJob);
+        IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMetaAsObservable(songMeta, pitchDetectionJob);
 
         pitchDetectionObservable
             .CatchIgnore((Exception ex) =>

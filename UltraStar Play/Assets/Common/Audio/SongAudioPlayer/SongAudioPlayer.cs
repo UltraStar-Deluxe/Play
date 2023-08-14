@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using FfmpegUnity;
+using LibVLCSharp;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour, INeedInjection
@@ -15,20 +17,29 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     [InjectedInInspector]
     public AudioSource audioSource;
-    
+
     [InjectedInInspector]
     public VideoPlayer videoPlayer;
 
     [InjectedInInspector]
-    public FfplayCommand ffplayCommand;
+    public FfplayCommand ffplayCommandPrefab;
 
+    private MediaPlayer vlcMediaPlayer;
+    public MediaPlayer VlcMediaPlayer => vlcMediaPlayer;
+
+    private FfplayCommand ffplayCommand;
+    private FfmpegPlayerVideoTexture ffmpegPlayerVideoTexture;
+
+    private Settings settings;
     private AudioManager audioManager;
     private WebViewManager webViewManager;
     private SceneNavigator sceneNavigator;
-    
+    private PortAudioPlaybackManager portAudioPlaybackManager;
+    private VlcManager vlcManager;
+
     private readonly Lazy<MidiManager> midiManagerLazy = new(() => MidiManager.Instance);
     private MidiManager MidiManager => midiManagerLazy.Value;
-    
+
     // The last frame in which the position in the song was calculated
     private int positionInSongInMillisFrame;
 
@@ -40,7 +51,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     private readonly Subject<double> positionInSongEventStream = new();
     public IObservable<double> PositionInSongEventStream => positionInSongEventStream;
-    
+
     private readonly Subject<float> playbackSpeedChangedEventStream = new();
     public IObservable<float> PlaybackSpeedChangedEventStream => playbackSpeedChangedEventStream;
 
@@ -48,7 +59,22 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     public IObservable<SongAudioLoadedEvent> LoadedEventStream => loadedEventStream;
 
     private readonly List<string> videoPlayerErrorMessages = new();
-    
+
+    private Texture ffmpegRenderTexture;
+    public Texture FfmpegRenderTexture
+    {
+        get => ffmpegRenderTexture;
+        set
+        {
+            ffmpegRenderTexture = value;
+            if (ffplayCommand != null
+                && ffplayCommand.VideoTexture != null)
+            {
+                ffplayCommand.VideoTexture.VideoTexture = ffmpegRenderTexture;
+            }
+        }
+    }
+
     public IObservable<Pair<double>> JumpBackInSongEventStream
     {
         get
@@ -77,8 +103,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         get
         {
-            if (ffplayCommand == null
-                || audioSource == null
+            if (audioSource == null
                 || videoPlayer == null
                 || webViewManager == null
                 || !IsFullyLoaded)
@@ -116,13 +141,19 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 newPositionInSongInMillis = DurationOfSongInMillis - 1;
             }
 
+            lastVlcMediaPlayerTime = newPositionInSongInMillis;
             positionInSongInMillis = newPositionInSongInMillis;
             lastSetPositionInSongInMillis = newPositionInSongInMillis;
             lastSetPositionInSongInMillisUnityTimeInSeconds = Time.time;
 
             float newPositionInSongInSeconds = (float)(newPositionInSongInMillis / 1000.0);
-            
-            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+            if (AudioSupportProvider is EAudioSupportProvider.Vlc
+                && vlcMediaPlayer != null)
+            {
+                vlcMediaPlayer.SetTime((long)newPositionInSongInMillis);
+            }
+            else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                && ffplayCommand != null)
             {
                 // TODO: SeekTime is inaccurate, notably in the song editor.
                 // Debug.Log($"SeekTime: {newPositionInSongInSeconds}");
@@ -138,16 +169,25 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
             {
-                audioSource.time = newPositionInSongInSeconds;
+                if (SettingsUtils.ShouldUsePortAudio(settings) && portAudioPlaybackManager.IsLoaded)
+                {
+                    portAudioPlaybackManager.PositionInSeconds = newPositionInSongInSeconds;
+                }
+                else
+                {
+                    audioSource.time = newPositionInSongInSeconds;
+                }
             }
 
             positionInSongEventStream.OnNext(positionInSongInMillis);
         }
     }
-    
+
     // Workaround: SeekTime is not reliable. It jumps back to position 0 after few frames sometimes.
     private double lastSetPositionInSongInMillis;
     private float lastSetPositionInSongInMillisUnityTimeInSeconds;
+
+    private float lastAudioListenerVolume;
 
     public double PositionInSongInSeconds
     {
@@ -164,26 +204,53 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         get
         {
-            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+            double rawResult;
+            if (AudioSupportProvider is EAudioSupportProvider.Vlc
+                && vlcMediaPlayer != null)
             {
-                return ffplayCommand.CurrentTime * 1000.0;
+                // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
+                if (vlcMediaPlayer.IsPlaying)
+                {
+                    rawResult = vlcMediaPlayer.Time;
+                    lastVlcMediaPlayerTime = rawResult;
+                }
+                else
+                {
+                    return lastVlcMediaPlayerTime;
+                }
+            }
+            else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                && ffplayCommand != null)
+            {
+                rawResult = ffplayCommand.CurrentTime * 1000.0;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.WebView)
             {
-                return webViewManager.EstimatedPlaybackPositionInMillis;
+                rawResult = webViewManager.EstimatedPlaybackPositionInMillis;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
             {
-                return videoPlayer.time * 1000.0;
+                rawResult = videoPlayer.time * 1000.0;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
             {
-                return ((double)audioSource.timeSamples / (double)audioSource.clip.frequency) * 1000.0;
+                int positionInSamples = SettingsUtils.ShouldUsePortAudio(settings) && portAudioPlaybackManager.IsLoaded
+                    ? portAudioPlaybackManager.PositionInMonoSamples
+                    : audioSource.timeSamples;
+                rawResult = ((double)positionInSamples / (double)audioSource.clip.frequency) * 1000.0;
+            }
+            else
+            {
+                return 0;
             }
 
-            return 0;
+            double result = IsPlaying
+                ? rawResult - settings.SystemAudioBackendDelayInMillis
+                : rawResult;
+            return Math.Max(0, result);
         }
     }
+    private double lastVlcMediaPlayerTime;
 
     public double DurationOfSongInMillis { get; private set; }
     public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
@@ -210,40 +277,30 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         get
         {
             return !isPaused
-                   && ((AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand.IsRunning && !ffplayCommand.Paused) 
+                   && ((AudioSupportProvider is EAudioSupportProvider.Vlc && vlcMediaPlayer != null && vlcMediaPlayer.IsPlaying)
+                       || (AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand != null && ffplayCommand.IsRunning && !ffplayCommand.Paused)
                        || (AudioSupportProvider is EAudioSupportProvider.WebView && webViewManager.IsPlaying)
                        || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && videoPlayer.isPlaying)
-                       || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && audioSource.isPlaying));
+                       || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && (audioSource.isPlaying || portAudioPlaybackManager.IsPlaying)));
         }
     }
     private bool isPaused;
 
     public bool IsPartiallyLoaded => AudioSupportProvider is not EAudioSupportProvider.None;
-    public bool IsFullyLoaded => (AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand.Duration > 0) 
+    public bool IsFullyLoaded => (AudioSupportProvider is EAudioSupportProvider.Vlc && vlcMediaPlayer != null && vlcMediaPlayer.Media != null && vlcMediaPlayer.Media.Duration > 0)
+                                 || (AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand != null && ffplayCommand.Duration > 0)
                                  || (AudioSupportProvider is EAudioSupportProvider.WebView && webViewManager.DurationInMillis > 0)
                                  || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && videoPlayer.length > 0)
-                                 || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && audioSource.clip != null && audioSource.clip.length > 0); 
-    
+                                 || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && audioSource.clip != null && audioSource.clip.length > 0);
+
     private SongMeta SongMeta { get; set; }
 
+    private float volumeFactor = 1;
     public float VolumeFactor
     {
         get
         {
-            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
-            {
-                return ffplayCommand.AudioSourceComponent.volume;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
-            {
-                return webViewManager.VolumeInPercent / 100f;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
-            {
-                return audioSource.volume;
-            }
-
-            return 1;
+            return volumeFactor;
         }
         set
         {
@@ -252,19 +309,9 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             {
                 return;
             }
-            
-            if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
-            {
-                ffplayCommand.AudioSourceComponent.volume = value;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.WebView)
-            {
-                webViewManager.VolumeInPercent = (int)(value * 100);
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
-            {
-                audioSource.volume = value;
-            }
+
+            volumeFactor = value;
+            ApplyVolumeFactorToAudioSupportProvider(volumeFactor);
         }
     }
 
@@ -310,7 +357,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 {
                     return;
                 }
-                
+
                 AudioUtils.SetPitchWithPitchShifter(audioSource, newPlaybackSpeed);
             }
 
@@ -328,10 +375,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         // Early fetch of dependencies.
         // This is needed because the SongAudioPlayer is called early in the scene setup.
-        // TODO: This is a hack. Find a better way to do this (e.g. inject objects in order of their dependencies).
+        // TODO: This is not making use of UniInject. Find a better way to do this (e.g. inject objects in order of their dependencies).
         audioManager = AudioManager.Instance;
         webViewManager = WebViewManager.Instance;
         sceneNavigator = SceneNavigator.Instance;
+        settings = SettingsManager.Instance.Settings;
+        portAudioPlaybackManager = PortAudioPlaybackManager.Instance;
+        vlcManager = VlcManager.Instance;
     }
 
     private void Start()
@@ -346,10 +396,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             })
             .AddTo(gameObject);
 
-        // Synchronize volume of ffmpeg AudioSource with normal AudioSource
-        ffplayCommand.AudioSourceComponent.volume = audioSource.volume;
-        MuteFfmpegAudioSource();
-
         // StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
         //     Debug.Log($"Pos in song: {PositionInSongInMillis}")));
     }
@@ -363,25 +409,31 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         videoPlayer.errorReceived -= OnVideoPlayerErrorReceived;
     }
-    
-    private void MuteFfmpegAudioSource()
+
+    private void OnDestroy()
     {
-        ffplayCommand.AudioSourceComponent.mute = true;
-    }
-    
-    private void UnmuteFfmpegAudioSource()
-    {
-        ffplayCommand.AudioSourceComponent.mute = false;
+        DestroyFfmpegPlayer();
+        DestroyVlcMediaPlayer();
     }
 
     private void Update()
     {
+        // Set the video texture. Ffmpeg resets this sometimes (dont know why).
+        if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+            && ffplayCommand != null
+            && ffmpegRenderTexture != null
+            && ffmpegPlayerVideoTexture.VideoTexture != ffmpegRenderTexture)
+        {
+            ffmpegPlayerVideoTexture.VideoTexture = ffmpegRenderTexture;
+        }
+
         if (IsPlaying)
         {
             positionInSongEventStream.OnNext(PositionInSongInMillis);
 
             // Workaround: SeekTime is not reliable. It jumps back to position 0 after few frames sometimes.
             if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                && ffplayCommand != null
                 && !TimeUtils.IsDurationAboveThresholdInSeconds(lastSetPositionInSongInMillisUnityTimeInSeconds, 1f)
                 && lastSetPositionInSongInMillis > 1000
                 && PositionInSongInMillis < 1000)
@@ -390,9 +442,33 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 ffplayCommand.SeekTime(lastSetPositionInSongInMillis / 1000.0);
             }
         }
+
+        // Update vlc volume when AudioListener.volume changes
+        if (AudioSupportProvider == EAudioSupportProvider.Vlc
+            && Math.Abs(AudioListener.volume - lastAudioListenerVolume) > 0.01f)
+        {
+            ApplyVolumeFactorToAudioSupportProvider(volumeFactor);
+            lastAudioListenerVolume = AudioListener.volume;
+        }
     }
 
-    public IObservable<SongAudioLoadedEvent> LoadAndPlaySongAudio(SongMeta songMeta, double startPositionInMillis = 0, bool streamAudio = true)
+    public void LoadAndPlaySongAudio(
+        SongMeta songMeta,
+        double startPositionInMillis = 0,
+        bool streamAudio = true)
+    {
+        LoadAndPlaySongAudioAsObservable(
+                songMeta,
+                startPositionInMillis,
+                streamAudio)
+            // Subscribe to trigger observable
+            .Subscribe(evt => Debug.Log($"Successfully loaded audio of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"));
+    }
+
+    public IObservable<SongAudioLoadedEvent> LoadAndPlaySongAudioAsObservable(
+        SongMeta songMeta,
+        double startPositionInMillis = 0,
+        bool streamAudio = true)
     {
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
@@ -402,55 +478,93 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
 
         SongMeta = songMeta;
-        
+
         UnloadAudioAndVideo();
-        
+
         string fileExtension = Path.GetExtension(audioUri);
-        if (ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension))
-        {
-            return LoadWithVideoPlayer(songMeta, audioUri, startPositionInMillis);
-        }
-        else if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
+        if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
         {
             return LoadWithMidiManager(songMeta, audioUri, startPositionInMillis);
         }
+        else if (ApplicationUtils.IsUnitySupportedVideoFormat(fileExtension))
+        {
+            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
+            }
+            else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
+            }
+            else
+            {
+                return LoadWithVideoPlayer(songMeta, audioUri, startPositionInMillis);
+            }
+        }
         else if (ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
         {
-            return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
+            if (settings.VlcToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
+            }
+            else if (settings.FfmpegToPlayMediaFilesUsage is EThirdPartyLibraryUsage.Always)
+            {
+                return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
+            }
+            else
+            {
+                return LoadWithAudioSource(songMeta, audioUri, startPositionInMillis, streamAudio);
+            }
         }
-        else if (webViewManager.CanHandleUrl(audioUri))
+        else if (WebViewUtils.CanHandleWebViewUrl(audioUri))
         {
             return LoadWithWebView(songMeta, audioUri, startPositionInMillis);
         }
-        else
+        else if (settings.VlcToPlayMediaFilesUsage
+                 is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
+                 or EThirdPartyLibraryUsage.Always)
+        {
+            return LoadWithVlc(songMeta, audioUri, startPositionInMillis);
+        }
+        else if (settings.FfmpegToPlayMediaFilesUsage
+                 is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
+                 or EThirdPartyLibraryUsage.Always)
         {
             return LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis);
+        }
+        else
+        {
+            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+                new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'."));
         }
     }
 
     private void UnloadAudioAndVideo()
     {
         AudioSupportProvider = EAudioSupportProvider.None;
-        
+
         StopAllCoroutines();
-        
-        MuteFfmpegAudioSource();
-        ffplayCommand.Stop();
-        ffplayCommand.InputPath = "";
-        ffplayCommand.Dispose();
-        
+
+        if (vlcMediaPlayer != null)
+        {
+            vlcMediaPlayer.Stop();
+        }
+
+        DestroyFfmpegPlayer();
+
         videoPlayerErrorMessages.Clear();
         videoPlayer.Stop();
         videoPlayer.url = "";
 
         audioSource.Stop();
         audioSource.clip = null;
-        
+        portAudioPlaybackManager.Unload();
+
         webViewManager.PausePlayback();
 
         DurationOfSongInMillis = 0;
     }
-    
+
     private IObservable<SongAudioLoadedEvent> LoadWithMidiManager(SongMeta songMeta, string audioUri,
         double startPositionInMillis)
     {
@@ -464,6 +578,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
+            AudioSupportProvider = EAudioSupportProvider.UnityAudioSource;
             audioSource.clip = audioClip;
             DurationOfSongInMillis = 1000.0 * audioClip.samples / audioClip.frequency;
             PositionInSongInMillis = startPositionInMillis;
@@ -472,7 +587,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return Disposable.Empty;
         });
     }
-    
+
     private IObservable<SongAudioLoadedEvent> LoadWithAudioSource(
         SongMeta songMeta,
         string audioUri,
@@ -495,13 +610,20 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                         return;
                     }
 
+                    // Play audio using PortAudio for low-latency
+                    // if (SettingsUtils.ShouldUsePortAudio(settings)
+                    //     && !streamAudio)
+                    // {
+                    //     portAudioPlaybackManager.LoadAudioClip(loadedAudioClip);
+                    // }
+
                     audioSource.clip = loadedAudioClip;
                     DurationOfSongInMillis = 1000.0 * loadedAudioClip.samples / loadedAudioClip.frequency;
                     PositionInSongInMillis = startPositionInMillis;
                     FireLoadedEvent(o, songMeta, audioUri);
                 })
                 .AddTo(gameObject);
-            
+
             return Disposable.Empty;
         });
     }
@@ -517,10 +639,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
 
         AudioSupportProvider = EAudioSupportProvider.UnityVideoPlayer;
-        
+
         // Must play the video to trigger loading.
         videoPlayer.Play();
-        
+
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
@@ -531,15 +653,33 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                     if (videoPlayerErrorMessages.Count > 0)
                     {
                         UnloadAudioAndVideo();
-                        Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with ffmpeg. URI: {audioUri}");
-                        LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis)
-                            .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
+
+                        if (settings.VlcToPlayMediaFilesUsage
+                            is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
+                            or EThirdPartyLibraryUsage.Always)
+                        {
+                            Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with vlc. URI: {audioUri}");
+                            LoadWithVlc(songMeta, audioUri, startPositionInMillis)
+                                .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
+                        }
+                        else if (settings.FfmpegToPlayMediaFilesUsage
+                                 is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
+                                 or EThirdPartyLibraryUsage.Always)
+                        {
+                            Debug.Log($"Failed to load audio with Unity's VideoPlayer. Trying to load it with ffmpeg. URI: {audioUri}");
+                            LoadWithFfmpeg(songMeta, audioUri, startPositionInMillis)
+                                .Subscribe(o.OnNext, o.OnError, o.OnCompleted);
+                        }
+                        else
+                        {
+                            Debug.Log($"Failed to load audio with Unity's VideoPlayer. URI: {audioUri}");
+                        }
                         return;
                     }
-                    
+
                     DurationOfSongInMillis = 1000.0 * videoPlayer.length;
                     PositionInSongInMillis = startPositionInMillis;
-                    
+
                     // Play the audio of the video player through the AudioSource.
                     videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
                     for (ushort trackIndex = 0; trackIndex < videoPlayer.audioTrackCount; trackIndex++)
@@ -548,7 +688,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                         videoPlayer.SetTargetAudioSource(trackIndex, audioSource);
                     }
                     audioSource.Play();
-                    
+
                     FireLoadedEvent(o, songMeta, audioUri);
                 }));
             return Disposable.Empty;
@@ -561,39 +701,56 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         try
         {
+            // Destroy old ffmpeg player
+            DestroyFfmpegPlayer();
+
+            // Instantiate new ffmpeg player
+            ffplayCommand = Instantiate(ffplayCommandPrefab, transform);
+            ffmpegPlayerVideoTexture = ffplayCommand.GetComponentInChildren<FfmpegPlayerVideoTexture>();
             ffplayCommand.InputPath = audioUri;
+            ffplayCommand.AudioSourceComponent.volume = VolumeFactor;
+            if (FfmpegRenderTexture != null
+                && ffplayCommand.VideoTexture != null)
+            {
+                ffplayCommand.VideoTexture.VideoTexture = FfmpegRenderTexture;
+            }
             ffplayCommand.Play();
-            UnmuteFfmpegAudioSource();
-            
+
             AudioSupportProvider = EAudioSupportProvider.Ffmpeg;
         }
         catch (Exception e)
         {
             try
             {
-                ffplayCommand.Stop();
+                ffplayCommand?.Stop();
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to stop ffmpeg player after failing to load '{audioUri}' using ffmpeg");
             }
-            
+
             Debug.LogException(e);
             Debug.LogError($"Failed to load '{audioUri}' using ffmpeg");
             return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Failed to load '{audioUri}'"));
         }
-        
+
         // The video is loaded asynchronously.
         // The duration property indicates whether it has been loaded.
         float unityTimeInSecondsWhenStartedLoading = Time.time;
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => ffplayCommand.Duration > 0,
+                () => ffplayCommand == null || ffplayCommand.Duration > 0,
                 () =>
                 {
+                    if (ffplayCommand == null)
+                    {
+                        o.OnError(new SongAudioPlayerException("Failed to load file with ffmpeg. FfplayCommand is null"));
+                        return;
+                    }
+
                     double durationInSeconds = ffplayCommand.Duration;
                     DurationOfSongInMillis = durationInSeconds * 1000.0;
 
@@ -603,13 +760,110 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                         double startPositionInSeconds = startPositionInMillis / 1000.0;
                         ffplayCommand.SeekTime(startPositionInSeconds);
                     }
-                    
+
                     FireLoadedEvent(o, songMeta, audioUri);
                 }));
             return Disposable.Empty;
         });
     }
-    
+
+    private IObservable<SongAudioLoadedEvent> LoadWithVlc(SongMeta songMeta, string audioUri, double startPositionInMillis)
+    {
+        Debug.Log($"SongAudioPlayer loading audio via vlc: '{audioUri}', start pos: {startPositionInMillis} ms");
+
+        try
+        {
+            // Instantiate new vlc player
+            if (vlcMediaPlayer == null)
+            {
+                vlcMediaPlayer = vlcManager.CreateMediaPlayer();
+            }
+
+            if (vlcMediaPlayer.Media != null)
+            {
+                vlcMediaPlayer.Media.Dispose();
+            }
+
+            vlcMediaPlayer.Media = new Media(new Uri(audioUri));
+            vlcMediaPlayer.Play();
+
+            AudioSupportProvider = EAudioSupportProvider.Vlc;
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                DestroyVlcMediaPlayer();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to destroy vlc player after failing to load '{audioUri}' using vlc");
+            }
+
+            Debug.LogException(e);
+            Debug.LogError($"Failed to load '{audioUri}' using vlc");
+            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+                new SongAudioPlayerException($"Failed to load '{audioUri}'"));
+        }
+
+        // The video is loaded asynchronously.
+        // The duration property indicates whether it has been loaded.
+        float unityTimeInSecondsWhenStartedLoading = Time.time;
+        return Observable.Create<SongAudioLoadedEvent>(o =>
+        {
+            StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
+                () => vlcMediaPlayer.Media != null && vlcMediaPlayer.Media.Duration > 0,
+                () =>
+                {
+                    DurationOfSongInMillis = vlcMediaPlayer.Media.Duration;
+
+                    if (unityTimeInSecondsWhenStartedLoading > lastSetPositionInSongInMillisUnityTimeInSeconds)
+                    {
+                        // Jump to the start position if no new position was set in the meantime.
+                        vlcMediaPlayer.SetTime((long)startPositionInMillis);
+                    }
+
+                    FireLoadedEvent(o, songMeta, audioUri);
+                }));
+            return Disposable.Empty;
+        });
+    }
+
+    private void DestroyVlcMediaPlayer()
+    {
+        if (vlcMediaPlayer == null)
+        {
+            return;
+        }
+
+        VlcManager.DestroyMediaPlayer(vlcMediaPlayer);
+        vlcMediaPlayer = null;
+    }
+
+    private void DestroyFfmpegPlayer()
+    {
+        if (ffplayCommand == null)
+        {
+            return;
+        }
+
+        if (ffplayCommand.AudioSourceComponent != null)
+        {
+            ffplayCommand.AudioSourceComponent.mute = true;
+        }
+        ffplayCommand.gameObject.SetActive(false);
+        if (Application.isEditor && !Application.isPlaying)
+        {
+            DestroyImmediate(ffplayCommand.gameObject);
+        }
+        else
+        {
+            Destroy(ffplayCommand.gameObject);
+        }
+        ffplayCommand = null;
+    }
+
     private IObservable<SongAudioLoadedEvent> LoadWithWebView(SongMeta songMeta, string audioUri,
         double startPositionInMillis)
     {
@@ -620,9 +874,9 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Failed to load audio via WebView with URL {audioUri}"));
         }
-        
+
         AudioSupportProvider = EAudioSupportProvider.WebView;
-        
+
         // The WebView is loaded asynchronously. When the duration is available then the audio is loaded.
         long startTime = TimeUtils.GetUnixTimeMilliseconds();
         long timeoutInMillis = 5000;
@@ -641,7 +895,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                         Debug.Log("Loading audio using WebView timed out.");
                         return;
                     }
-                    
+
                     DurationOfSongInMillis = webViewManager.DurationInMillis;
                     PositionInSongInMillis = startPositionInMillis;
                     PauseAudio();
@@ -657,7 +911,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         o.OnNext(new SongAudioLoadedEvent(songMeta, audioUri));
         loadedEventStream.OnNext(new SongAudioLoadedEvent(songMeta, audioUri));
     }
-    
+
     public void ReloadAudio()
     {
         LoadAndPlaySongAudio(SongMeta);
@@ -665,7 +919,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public void StopAudio()
     {
-        if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+        if (AudioSupportProvider is EAudioSupportProvider.Vlc
+            && vlcMediaPlayer != null)
+        {
+            vlcMediaPlayer.Stop();
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                 && ffplayCommand != null)
         {
             ffplayCommand.Stop();
         }
@@ -681,10 +941,14 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
+            if (portAudioPlaybackManager.IsLoaded)
+            {
+                portAudioPlaybackManager.StopPlayback();
+            }
             audioSource.Stop();
         }
     }
-    
+
     public void PauseAudio()
     {
         if (!IsPlaying)
@@ -692,7 +956,16 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+        if (AudioSupportProvider is EAudioSupportProvider.Vlc
+            && vlcMediaPlayer != null)
+        {
+            if (vlcMediaPlayer.IsPlaying)
+            {
+                vlcMediaPlayer.Pause();
+            }
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                 && ffplayCommand != null)
         {
             if (ffplayCommand.IsRunning
                 && !ffplayCommand.Paused)
@@ -712,6 +985,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
+            if (portAudioPlaybackManager.IsLoaded)
+            {
+                portAudioPlaybackManager.PausePlayback();
+            }
             audioSource.Pause();
         }
         isPaused = true;
@@ -725,8 +1002,17 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         {
             return;
         }
-        
-        if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+
+        if (AudioSupportProvider is EAudioSupportProvider.Vlc
+            && vlcMediaPlayer != null)
+        {
+            if (!vlcMediaPlayer.IsPlaying)
+            {
+                vlcMediaPlayer.Play();
+            }
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                 && ffplayCommand != null)
         {
             if (ffplayCommand.Paused)
             {
@@ -745,7 +1031,15 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
-            audioSource.Play();
+            if (SettingsUtils.ShouldUsePortAudio(settings)
+                && portAudioPlaybackManager.IsLoaded)
+            {
+                portAudioPlaybackManager.StartPlayback();
+            }
+            else
+            {
+                audioSource.Play();
+            }
         }
         isPaused = false;
         playbackStartedEventStream.OnNext(PositionInSongInMillis);
@@ -771,6 +1065,28 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private void OnVideoPlayerErrorReceived(VideoPlayer source, string message)
     {
         Debug.LogError($"SongAudioPlayer received VideoPlayer error: {message}");
-        videoPlayerErrorMessages.Add(message);   
+        videoPlayerErrorMessages.Add(message);
+    }
+
+    private void ApplyVolumeFactorToAudioSupportProvider(float value)
+    {
+        if (AudioSupportProvider is EAudioSupportProvider.Vlc
+            && vlcMediaPlayer != null)
+        {
+            vlcMediaPlayer.SetVolume((int)(value * AudioListener.volume * 100));
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
+                 && ffplayCommand != null)
+        {
+            ffplayCommand.AudioSourceComponent.volume = value;
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.WebView)
+        {
+            webViewManager.VolumeInPercent = (int)(value * 100);
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
+        {
+            audioSource.volume = value;
+        }
     }
 }

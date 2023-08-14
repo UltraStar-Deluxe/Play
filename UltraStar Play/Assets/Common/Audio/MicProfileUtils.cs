@@ -14,7 +14,7 @@ public static class MicProfileUtils
         List<MicProfile> persistedMicProfiles = settings.MicProfiles;
         List<Color32> microphoneColors = themeManager.GetMicrophoneColors();
         List<IConnectedClientHandler> connectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
-        List<MicProfile> micProfiles = CreateMicProfiles(persistedMicProfiles, microphoneColors, connectedClientHandlers);
+        List<MicProfile> micProfiles = CreateMicProfiles(persistedMicProfiles, microphoneColors, connectedClientHandlers, settings);
         micProfiles.Sort(MicProfile.compareByName);
         
         List<MicProfile> newMicProfiles = micProfiles
@@ -33,13 +33,12 @@ public static class MicProfileUtils
         return micProfiles;
     }
     
-    public static List<MicProfile> CreateMicProfiles(List<MicProfile> persistedMicProfiles, List<Color32> micProfileColors, List<IConnectedClientHandler> connectedClientHandlers)
+    public static List<MicProfile> CreateMicProfiles(List<MicProfile> persistedMicProfiles, List<Color32> micProfileColors, List<IConnectedClientHandler> connectedClientHandlers, Settings settings)
     {
         // Create list of connected and loaded microphones without duplicates.
         // A loaded microphone might have been created with hardware that is not connected now.
 
-        // PortAudio returns too many recording devices. Thus, explicitly use the Unity API here to get available recording device names.
-        List<string> connectedMicNames = Microphone.devices.ToList();
+        List<string> connectedMicNames = GetConnectedMicrophoneNames();
         List<MicProfile> micProfiles = new(persistedMicProfiles);
         List<Color32> usedMicProfileColors = persistedMicProfiles.Select(it => it.Color).ToList();
         
@@ -68,8 +67,8 @@ public static class MicProfileUtils
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex);
-                continue;
+                Debug.LogException(ex);
+                Debug.LogError($"Create MicProfile failed: {ex.Message}");
             }
         }
 
@@ -87,6 +86,16 @@ public static class MicProfileUtils
         micProfiles.Sort(MicProfile.compareByName);
 
         return micProfiles;
+    }
+
+    private static List<string> GetConnectedMicrophoneNames()
+    {
+        // Some obscure devices contain weird characters that may cause issues.
+        // Example: 'Input (@System32\drivers\bthhfenum.sys,#4;%1 Hands-Free HF Audio%0\r\n;(Galaxy S10e))'
+        return MicrophoneAdapter.Devices
+            .Where(deviceName => !deviceName.Contains("\r")
+                                 && !deviceName.Contains("\n"))
+            .ToList();
     }
 
     private static Color32 GetUnusedMicProfileColor(List<Color32> micProfileColors, List<Color32> usedMicProfileColors)

@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
+public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, ITranslator, IBinder
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -67,14 +65,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     [Inject(UxmlName = R.UxmlNames.createSongButton)]
     private Button createSongButton;
 
-    [Inject(UxmlName = R.UxmlNames.semanticVersionText)]
-    private Label semanticVersionText;
+    [Inject(UxmlName = R.UxmlNames.semanticVersionLabel)]
+    private Label semanticVersionLabel;
     
-    [Inject(UxmlName = R.UxmlNames.commitHashText)]
-    private Label commitHashText;
+    [Inject(UxmlName = R.UxmlNames.commitHashLabel)]
+    private Label commitHashLabel;
     
-    [Inject(UxmlName = R.UxmlNames.buildTimeStampText)]
-    private Label buildTimeStampText;
+    [Inject(UxmlName = R.UxmlNames.buildTimeStampLabel)]
+    private Label buildTimeStampLabel;
+
+    [Inject(UxmlName = R.UxmlNames.unityVersionLabel)]
+    private Label unityVersionLabel;
 
     [Inject(UxmlName = R.UxmlNames.versionDetailsContainer)]
     private VisualElement versionDetailsContainer;
@@ -100,10 +101,18 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
+    private readonly BuildInfoUiControl buildInfoUiControl = new();
 
     private bool IsNewSongDialogOpen => newSongDialogControl != null;
     private bool IsQuitGameDialogOpen => quitGameDialogControl != null;
     private bool IsAnyDialogOpen => IsNewSongDialogOpen || IsQuitGameDialogOpen || newVersionChecker.IsNewVersionAvailableDialogOpen;
+
+    public void OnInjectionFinished()
+    {
+        injector
+            .WithBindingForInstance(versionPropertiesTextAsset)
+            .Inject(buildInfoUiControl);
+    }
 
     private void Start()
     {
@@ -130,14 +139,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
             })
             .setEaseSpring();
 
-        semanticVersionText.RegisterCallback<PointerDownEvent>(_ =>
+        semanticVersionLabel.RegisterCallback<PointerDownEvent>(_ =>
         {
             versionDetailsContainer.ShowByDisplay();
             StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10, () => versionDetailsContainer.HideByDisplay()));
             Debug.Log("Version info: " + versionPropertiesTextAsset.text);
         });
-
-        UpdateVersionInfoText();
 
         InitInputActions();
 
@@ -178,24 +185,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBin
     {
         startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
         partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
-    }
-
-    private void UpdateVersionInfoText()
-    {
-        Dictionary<string, string> versionProperties = PropertiesFileParser.ParseText(versionPropertiesTextAsset.text);
-
-        // Show the release number (e.g. release date, or some version number)
-        versionProperties.TryGetValue("release", out string release);
-        versionProperties.TryGetValue("name", out string releaseName);
-        string displayName = releaseName.IsNullOrEmpty() ? release : releaseName;
-        semanticVersionText.text = "Version: " + displayName;
-
-        // Show the commit hash of the build
-        versionProperties.TryGetValue("commit_hash", out string commitHash);
-        commitHashText.text = "Commit: " + commitHash;
-        
-        versionProperties.TryGetValue("build_timestamp", out string buildTimeStamp);
-        buildTimeStampText.text = "Build timestamp: " + buildTimeStamp;
     }
 
     public void CloseQuitGameDialog()

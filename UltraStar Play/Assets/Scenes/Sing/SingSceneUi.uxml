@@ -39,6 +39,10 @@
         <ui:VisualElement name="bottomBarsOverlay" style="background-color: rgba(0, 0, 0, 0); position: absolute; bottom: 0; left: 0; width: 100%;">
             <ui:ProgressBar value="80" name="passTheMicProgressBar" class="singSceneOverlayProgressBar" />
             <ui:ProgressBar value="40" name="songTimeProgressBar" high-value="100" class="singSceneOverlayProgressBar" />
+            <ui:VisualElement name="detailedTimeBar" style="justify-content: center; height: 3px;">
+                <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
+                <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;" />
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="governanceOverlay" style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: flex-start;">
             <ui:VisualElement name="centerControls" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; justify-content: center; align-items: center;">
@@ -64,9 +68,9 @@
                     <ui:VisualElement name="verticalSeparator" class="fontColor mx-2" style="background-color: rgb(188, 188, 188); width: 2px; height: 75%; opacity: 0.5; color: rgb(255, 255, 255); flex-shrink: 0;" />
                     <ui:VisualElement name="timeBarAndLabelContainer" class="tinyFont timeBar" style="flex-direction: row; display: flex; flex-grow: 1; align-items: center; justify-content: space-around;">
                         <ui:Label text="99:99" display-tooltip-when-elided="true" name="timeValueLabel" class="mr-1" style="min-width: 30px;" />
-                        <ui:VisualElement name="timeBars" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; justify-content: center;">
-                            <ui:VisualElement name="innerTimeBar" style="justify-content: center; height: 5px;">
-                                <ui:VisualElement name="innerTimeBarSentenceEntryContainer" class="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
+                        <ui:VisualElement name="timeBarsContainer" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; justify-content: center;">
+                            <ui:VisualElement name="governanceOverlayDetailedTimeBar" style="justify-content: center; height: 5px;">
+                                <ui:VisualElement name="innerTimeBarSentenceEntryContainer" style="flex-grow: 1;" />
                                 <ui:VisualElement name="timeBarPositionIndicator" style="position: absolute; width: 4px;" />
                             </ui:VisualElement>
                         </ui:VisualElement>

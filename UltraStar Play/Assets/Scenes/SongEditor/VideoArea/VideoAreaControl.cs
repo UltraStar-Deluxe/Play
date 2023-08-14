@@ -28,7 +28,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private SongVideoPlayer songVideoPlayer;
 
@@ -65,7 +65,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     public void OnInjectionFinished()
     {
         videoAreaLabel.HideByDisplay();
-        if (SongMetaUtils.VideoResourceExists(songMeta))
+        if (SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl))
         {
             ShowVideoImage();
         }
@@ -87,7 +87,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
         // Change video via file dialog
         RegisterCallbackToSetFilePath(noVideoImage, () => OpenDialogToSetVideo());
-        
+
         showVideoButton.RegisterCallbackButtonTriggered(_ => ShowVideoImage());
         showBackgroundButton.RegisterCallbackButtonTriggered(_ => ShowBackgroundImage());
         showCoverButton.RegisterCallbackButtonTriggered(_ => ShowCoverImage());
@@ -100,7 +100,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
         videoImage.RegisterCallback<PointerEnterEvent>(evt => cursorManager.SetCursorHorizontal());
         videoImage.RegisterCallback<PointerLeaveEvent>(evt => cursorManager.SetDefaultCursor());
-        
+
         videoImageContextMenuControl = injector
             .WithRootVisualElement(videoImage)
             .CreateAndInject<ContextMenuControl>();
@@ -120,7 +120,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
                 UpdateCoverAndBackgroundImage();
             });
     }
-    
+
     private void OpenDialogToSetBackgroundImage()
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
@@ -149,10 +149,10 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
                 ShowVideoImage();
             });
     }
-    
+
     private void UpdateVideo()
     {
-        songVideoPlayer.SongMeta = songMeta;
+        songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(songMeta);
     }
 
     private void UpdateCoverAndBackgroundImage()
@@ -161,7 +161,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         {
             ImageManager.LoadSpriteFromUri(SongMetaUtils.GetBackgroundUri(songMeta), sprite => songBackgroundImage.style.backgroundImage = new StyleBackground(sprite));
         }
-        
+
         if (SongMetaUtils.CoverResourceExists(songMeta))
         {
             ImageManager.LoadSpriteFromUri(SongMetaUtils.GetCoverUri(songMeta), sprite => songCoverImage.style.backgroundImage = new StyleBackground(sprite));
@@ -174,7 +174,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
         {
             return;
         }
-        
+
         visualElement.RegisterCallback<PointerDownEvent>(_ => callback());
         CursorManager.SetCursorForVisualElement(visualElement, ECursor.Hand);
     }
@@ -187,8 +187,8 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private void ShowVideoImage()
     {
-        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta));
-        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta));
+        videoImage.SetVisibleByDisplay(SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
+        noVideoImage.SetVisibleByDisplay(!SongMetaUtils.VideoResourceExists(songMeta, WebViewUtils.CanHandleWebViewUrl));
         songBackgroundImage.HideByDisplay();
         songCoverImage.HideByDisplay();
     }

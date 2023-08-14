@@ -10,6 +10,14 @@ public class CoroutineUtils
         yield return null;
     }
 
+    public static IEnumerator Sequence(params IEnumerator[] coroutines)
+    {
+        foreach (IEnumerator coroutine in coroutines)
+        {
+            yield return coroutine;
+        }
+    }
+
     public static IEnumerator ExecuteWhenConditionIsTrue(Func<bool> condition, Action action)
     {
         while (!condition())
@@ -43,10 +51,5 @@ public class CoroutineUtils
             action();
             yield return new WaitForSeconds(delayInSeconds);
         }
-    }
-
-    public static IEnumerator NoOperation()
-    {
-        yield return null;
     }
 }

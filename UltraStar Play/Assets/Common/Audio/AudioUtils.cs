@@ -15,7 +15,7 @@ public static class AudioUtils
             Debug.LogWarning("Cannot set pitch with PitchShifter because the AudioSource is not set up correctly.");
             return;
         }
-        
+
         // Setting the pitch of an AudioPlayer will change tempo and pitch.
         audioSource.pitch = pitch;
 
@@ -25,7 +25,7 @@ public static class AudioUtils
         // See here for how the pitch value of the Pitch Shifter effect is made available for scripting: https://learn.unity.com/tutorial/audio-mixing#5c7f8528edbc2a002053b506
         audioSource.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - pitch));
     }
-    
+
     // This method should only be called from tests.
     // Use the cached version of the AudioManager for the normal game logic.
     public static AudioClip LoadUncachedAudioClipImmediately(string uri, bool streamAudio)
@@ -35,7 +35,7 @@ public static class AudioUtils
             Debug.LogWarning($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.ToCsv(", ", "", "")}");
             return null;
         }
-        
+
         Uri uriHandle = new Uri(uri);
         using UnityWebRequest webRequest = CreateAudioClipRequest(uriHandle, streamAudio);
         webRequest.SendWebRequest();
@@ -98,14 +98,14 @@ public static class AudioUtils
     {
         int lengthInSamples = endIndex - startIndex;
         short[] shortSampleArray = new short[lengthInSamples];
-        
+
         if (startIndex < 0
             || endIndex < 0)
         {
             Debug.LogError($"ToShortSampleArray called with invalid index. startIndex: {startIndex}, endIndex: {endIndex}");
             return shortSampleArray;
         }
-        
+
         for (int i = 0; i < lengthInSamples && i + startIndex < floatSampleArray.Length; i++)
         {
             shortSampleArray[i] = (short)Math.Floor(floatSampleArray[i + startIndex] * short.MaxValue);
@@ -146,7 +146,7 @@ public static class AudioUtils
             return samplesStereo;
         }
     }
-    
+
     public static float[] GetSamplesOfBeatRangeFromAudioClip(
         SongMeta songMeta,
         AudioClip audioClip,
@@ -179,5 +179,37 @@ public static class AudioUtils
         }
 
         return result;
+    }
+
+    public static float[] Resample(float[] source, int oldSampleRate, int newSampleRate)
+    {
+        if (oldSampleRate == newSampleRate)
+        {
+            return source;
+        }
+
+        using DisposableStopwatch d = new($"Resample of {source.Length} samples to {newSampleRate} from {oldSampleRate} took <ms>");
+
+        int sourceArrayLength = source.Length;
+        int newArrayLength = (int)(sourceArrayLength * ((double)newSampleRate / (double)oldSampleRate));
+        return ResampleByLength(source, newArrayLength);
+    }
+
+    private static float[] ResampleByLength(float[] source, int n)
+    {
+        // https://stackoverflow.com/questions/28874894/float-array-resampling
+        // n destination length
+        int m = source.Length; // source length
+        float[] destination = new float[n];
+        destination[0] = source[0];
+        destination[n-1] = source[m-1];
+
+        for (int i = 1; i < n-1; i++)
+        {
+            float jd = ((float)i * (float)(m - 1) / (float)(n - 1));
+            int j = (int)jd;
+            destination[i] = source[j] + (source[j + 1] - source[j]) * (jd - (float)j);
+        }
+        return destination;
     }
 }

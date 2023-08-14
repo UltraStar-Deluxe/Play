@@ -142,8 +142,8 @@ public class SettingsManager : AbstractSingletonBehaviour
             }
             catch (Exception ex)
             {
-                Debug.LogError("Failed to create initial song folder.");
-                Debug.LogError(ex);
+                Debug.LogException(ex);
+                Debug.LogError("Failed to create initial song folder: {ex.Message}");
             }
         }
 #endif
@@ -169,7 +169,7 @@ public class SettingsManager : AbstractSingletonBehaviour
             List<IConnectedClientHandler> connectedClientHandlers = new List<IConnectedClientHandler>();
             List<MicProfile> persistedMicProfiles = new();
             
-            defaultSettings.MicProfiles = MicProfileUtils.CreateMicProfiles(persistedMicProfiles, micProfileColors, connectedClientHandlers);
+            defaultSettings.MicProfiles = MicProfileUtils.CreateMicProfiles(persistedMicProfiles, micProfileColors, connectedClientHandlers, defaultSettings);
         }
         catch (Exception e)
         {

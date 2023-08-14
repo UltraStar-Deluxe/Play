@@ -6,17 +6,37 @@ using UnityEngine;
 public class JsonConverterTests
 {
     [Test]
+    public void DeserializeEnumDefaultValueAsFallbackTest()
+    {
+        ESide2D originalEnum = RandomUtils.RandomOf(EnumUtils.GetValuesAsList<ESide2D>());
+        EnumTypeHolder original = new EnumTypeHolder()
+        {
+            side = originalEnum,
+        };
+
+        string json = JsonConverter.ToJson(original);
+        EnumTypeHolder parsed = JsonConverter.FromJson<EnumTypeHolder>(json, true);
+        Assert.AreNotSame(original, parsed);
+        Assert.AreEqual(original.side, parsed.side);
+
+        // when enum string value invalid, should return default enum value
+        string jsonWithInvalidEnumValue = json.Replace(originalEnum.ToString(), "SOMETHING_ELSE");
+        EnumTypeHolder parsedInvalid = JsonConverter.FromJson<EnumTypeHolder>(jsonWithInvalidEnumValue, true);
+        Assert.AreEqual(default(ESide2D), parsedInvalid.side);
+    }
+
+    [Test]
     public void FillReactivePropertyReferenceTest()
     {
         ReactivePropertyUserTypeHolder original = CreateReactivePropertyUserTypeHolder();
 
         PlayerProfile observedPlayerProfileValue = null;
         original.ReactivePropertyUserType.Subscribe(newValue => observedPlayerProfileValue = newValue);
-        
+
         ReactiveProperty<PlayerProfile> originalReactiveProperty = original.ReactivePropertyUserType;
         PlayerProfile originalPlayerProfile = original.ReactivePropertyUserType.Value;
         string json = JsonConverter.ToJson(original);
-        
+
         JsonConverter.FillFromJson(json, original);
         ReactiveProperty<PlayerProfile> filledReactiveProperty = original.ReactivePropertyUserType;
 
@@ -34,7 +54,7 @@ public class JsonConverterTests
             && !json.ToLowerInvariant().Contains("value"),
             "string serialized to JSON with fields instead of only the value");
     }
-    
+
     [Test]
     public void RoundTripReactivePropertyString()
     {
@@ -55,7 +75,7 @@ public class JsonConverterTests
     //     Assert.IsNotNull(deserialized.ReactivePropertyString, "Deserializing null value has removed the ReactiveProperty");
     //     Assert.IsNull(deserialized.ReactivePropertyString.Value, "Deserialized null value but the ReactiveProperty has a value");
     // }
-    
+
     [Test]
     public void SerializeReactivePropertyUserType()
     {
@@ -66,7 +86,7 @@ public class JsonConverterTests
                       && !json.ToLowerInvariant().Contains("value"),
             "user type serialized to JSON with fields instead of only the value");
     }
-    
+
     [Test]
     public void RoundTripReactivePropertyUserType()
     {
@@ -78,7 +98,7 @@ public class JsonConverterTests
             original.ReactivePropertyUserType.Value.Name,
             deserialized.ReactivePropertyUserType.Value.Name);
     }
-    
+
     [Test]
     public void SerializeReactivePropertyEnum()
     {
@@ -89,7 +109,7 @@ public class JsonConverterTests
             && !json.ToLowerInvariant().Contains("value"),
             "enum serialized to JSON with fields instead of only the value");
     }
-    
+
     [Test]
     public void RoundTripReactivePropertyEnum()
     {
@@ -99,7 +119,7 @@ public class JsonConverterTests
         Assert.NotNull(deserialized.ReactivePropertyEnum.Value, "deserialized enum is null");
         Assert.AreEqual(deserialized.ReactivePropertyEnum.Value, FullScreenMode.Windowed);
     }
-    
+
     [Test]
     public void RoundTripReactivePropertyInt()
     {
@@ -108,7 +128,7 @@ public class JsonConverterTests
         ReactivePropertyIntHolder deserialized = JsonConverter.FromJson<ReactivePropertyIntHolder>(json);
         Assert.AreEqual(deserialized.ReactivePropertyInt.Value, 42);
     }
-    
+
     [Test]
     public void RoundTripReactivePropertyFloat()
     {
@@ -117,7 +137,7 @@ public class JsonConverterTests
         ReactivePropertyFloatHolder deserialized = JsonConverter.FromJson<ReactivePropertyFloatHolder>(json);
         Assert.AreEqual(deserialized.ReactivePropertyFloat.Value, 42.5f);
     }
-    
+
     [Test]
     public void SerializeReactivePropertyList()
     {
@@ -128,7 +148,7 @@ public class JsonConverterTests
             && !json.ToLowerInvariant().Contains("value"),
             "list serialized to JSON with fields instead of only the value");
     }
-    
+
     [Test]
     public void RoundTripReactivePropertyList()
     {
@@ -147,7 +167,7 @@ public class JsonConverterTests
                 deserialized.ReactivePropertyList.Value[i].Name);
         }
     }
-    
+
     [Test]
     public void RoundTripReactivePropertyDictionary()
     {
@@ -165,14 +185,14 @@ public class JsonConverterTests
                 deserialized.ReactivePropertyDictionary.Value[key]);
         }
     }
-    
+
     private ReactivePropertyStringHolder CreateReactivePropertyStringHolder()
     {
         ReactivePropertyStringHolder result = new();
         result.ReactivePropertyString.Value = "Some string";
         return result;
     }
-    
+
     private ReactivePropertyListHolder CreateReactivePropertyListHolder()
     {
         ReactivePropertyListHolder result = new();
@@ -182,14 +202,14 @@ public class JsonConverterTests
         };
         return result;
     }
-    
+
     private ReactivePropertyUserTypeHolder CreateReactivePropertyUserTypeHolder()
     {
         ReactivePropertyUserTypeHolder result = new();
         result.ReactivePropertyUserType.Value = new PlayerProfile("Dummy Player Profile", EDifficulty.Medium);
         return result;
     }
-    
+
     private ReactivePropertyDictionaryHolder CreateReactivePropertyDictionaryHolder()
     {
         ReactivePropertyDictionaryHolder result = new();
@@ -200,58 +220,63 @@ public class JsonConverterTests
         };
         return result;
     }
-    
+
     private ReactivePropertyEnumHolder CreateReactivePropertyEnumHolder()
     {
         ReactivePropertyEnumHolder result = new();
         result.ReactivePropertyEnum.Value = FullScreenMode.Windowed;
         return result;
     }
-    
+
     private ReactivePropertyIntHolder CreateReactivePropertyIntHolder()
     {
         ReactivePropertyIntHolder result = new();
         result.ReactivePropertyInt.Value = 42;
         return result;
     }
-    
+
     private ReactivePropertyFloatHolder CreateReactivePropertyFloatHolder()
     {
         ReactivePropertyFloatHolder result = new();
         result.ReactivePropertyFloat.Value = 42.5f;
         return result;
     }
-    
+
+    private class EnumTypeHolder
+    {
+        public ESide2D side { get; set; }
+    }
+
     private class ReactivePropertyStringHolder
     {
         public ReactiveProperty<string> ReactivePropertyString { get; set; } = new();
     }
-    
+
     private class ReactivePropertyListHolder
     {
         public ReactiveProperty<List<PlayerProfile>> ReactivePropertyList { get; set; } = new();
     }
-    
+
     private class ReactivePropertyDictionaryHolder
     {
         public ReactiveProperty<Dictionary<string, int>> ReactivePropertyDictionary { get; set; } = new();
     }
-    
+
     private class ReactivePropertyUserTypeHolder
     {
         public ReactiveProperty<PlayerProfile> ReactivePropertyUserType { get; set; } = new();
     }
-    
+
     private class ReactivePropertyEnumHolder
     {
         public ReactiveProperty<FullScreenMode> ReactivePropertyEnum { get; set; } = new();
     }
-    
+
     private class ReactivePropertyIntHolder
     {
         public ReactiveProperty<int> ReactivePropertyInt { get; set; } = new();
     }
-    
+
     private class ReactivePropertyFloatHolder
     {
         public ReactiveProperty<float> ReactivePropertyFloat { get; set; } = new();

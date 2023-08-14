@@ -1,13 +1,13 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
-        <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="searchAudioFilesWithoutSongMetaPicker" label="Search audio files&#10;without sing-along data" class="noBackgroundInHierarchy" style="flex-shrink: 0;" />
+        <ui:Toggle wrap-around="true" min-value="0" max-value="100" step-value="10" name="searchAudioFilesWithoutSongMetaToggle" label="Search audio files&#10;without sing-along data" class="noBackgroundInHierarchy" style="flex-shrink: 0;" />
         <ui:Label tabindex="-1" text="Song Folders" name="songFolderListTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold;" />
         <ui:VisualElement name="androidSongFolderHintContainer" style="width: 100%; margin-bottom: 10px; flex-shrink: 0;">
             <ui:Label text="Android requires songs to be stored in the folder ..." display-tooltip-when-elided="true" name="androidSongFolderHintLabel" class="noBackgroundInHierarchy" style="width: 100%; white-space: normal;" />
         </ui:VisualElement>
         <ui:VisualElement name="songListContainer" style="width: 100%; flex-grow: 1;">
-            <ui:VisualElement name="songFolderList" />
-            <ui:VisualElement name="row" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: center;">
+            <ui:ScrollView name="songFolderList" />
+            <ui:VisualElement name="row" class="mt-3" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: center; flex-shrink: 0;">
                 <ui:Button display-tooltip-when-elided="true" name="addSongFolderButton" style="flex-direction: row;">
                     <MaterialIcon tabindex="-1" name="addSongFolderIcon" icon="create_new_folder" class="mx-2" style="font-size: 24px;" />
                     <ui:Label tabindex="-1" text="Add Song Folder" display-tooltip-when-elided="true" name="downloadSongsButtonLabel" />

@@ -80,6 +80,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/PlayModeTests/MediaFileFormatTests/MediaFileFormatTestScene.unity
     guid: 06c1affc9019c404d977d3d60a26fd37
+  - enabled: 1
+    path: Assets/PlayModeTests/CommonTestScene.unity
+    guid: 66fc6d4da1adfef4088faf459cb96a44
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}

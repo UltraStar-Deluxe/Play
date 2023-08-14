@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
+using Util;
 
 public static class PathUtils
 {
@@ -92,22 +95,31 @@ public static class PathUtils
         }
 
         // https://stackoverflow.com/questions/37361309/normalize-a-relative-path
+        string pathNoReservedCharacters = UriUtils.ReplaceReservedCharactersWithPlaceholders(path);
+
         string dummyBasePath = "c:/dummy-base-path/";
         Uri baseUri = new Uri(dummyBasePath);
-        if (Uri.TryCreate(baseUri, path, out Uri normalizedUri))
+        if (Uri.TryCreate(baseUri, pathNoReservedCharacters, out Uri normalizedUri))
         {
+            string relativeNormalizedUri;
             if (normalizedUri.AbsolutePath.StartsWith($"/{dummyBasePath}"))
             {
                 // On Unix systems, a leading slash is added for the root folder
-                return normalizedUri.AbsolutePath.Substring(dummyBasePath.Length + 1);
+                relativeNormalizedUri = normalizedUri.AbsolutePath.Substring(dummyBasePath.Length + 1);
             }
-
-            if (normalizedUri.AbsolutePath.StartsWith(dummyBasePath))
+            else if (normalizedUri.AbsolutePath.StartsWith(dummyBasePath))
             {
-                return normalizedUri.AbsolutePath.Substring(dummyBasePath.Length);
+                relativeNormalizedUri = normalizedUri.AbsolutePath.Substring(dummyBasePath.Length);
+            }
+            else
+            {
+                relativeNormalizedUri = normalizedUri.AbsolutePath;
             }
 
-            return normalizedUri.AbsolutePath;
+            // Decode percent encoded characters
+            string relativeNormalizedUriDecoded = UnityWebRequest.UnEscapeURL(relativeNormalizedUri);
+            string relativeNormalizedPath = UriUtils.ReplacePlaceholdersWithReservedCharacters(relativeNormalizedUriDecoded);
+            return relativeNormalizedPath;
         }
         else
         {
@@ -120,7 +132,7 @@ public static class PathUtils
     {
         return Path.GetFullPath(pathA) == Path.GetFullPath(pathB);
     }
-    
+
     public static string MakeRelativePath(string relativeTo, string path)
     {
         return Path.GetRelativePath(relativeTo, path);

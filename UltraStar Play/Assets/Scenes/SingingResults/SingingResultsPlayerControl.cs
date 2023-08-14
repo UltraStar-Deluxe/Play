@@ -23,10 +23,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject]
     private Statistics statistics;
-    
+
     [Inject]
     private SingingResultsSceneData sceneData;
-    
+
     [Inject(UxmlName = R.UxmlNames.normalNoteScore)]
     private VisualElement normalNoteScoreContainer;
 
@@ -59,7 +59,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.songRatingStarIcon)]
     private List<VisualElement> songRatingStarIcons;
-    
+
     [Inject]
     private SongRating songRating;
 
@@ -80,7 +80,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private float TotalScoreAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float) playerScoreData.TotalScore / PlayerScoreControl.maxScore);
 
     private readonly List<int> animationIds = new();
-    
+
     public void OnInjectionFinished()
     {
         // Player name and image
@@ -100,7 +100,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
                 .setOnUpdate(s => newHighscoreContainer.style.scale = new StyleScale(new Scale(new Vector2(s, s))))
                 .setDelay(TotalScoreAnimTimeInSeconds);
         }
-        
+
         // Song rating
         LoadSongRatingSprite(songRating.EnumValue, songRatingSprite =>
         {
@@ -144,7 +144,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds);
         LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.TotalScore, TotalScoreAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
-        
+
         // Score bar (animated)
         if (micProfile != null)
         {
@@ -164,7 +164,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
         // Stars (animated)
         // AnimateStarRatingIcons();
-        
+
         UpdateTranslation();
     }
 
@@ -184,12 +184,12 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     {
         songRatingStarIcons.ForEach(it => it.style.scale = Vector2.zero);
         int starCount = SongSelectSongRatingIconControl.GetStarCount(playerScoreData.TotalScore);
-        
+
         // Skip the center star if even number of stars visible
         List<VisualElement> visibleStarIcons = starCount % 2 == 1
             ? songRatingStarIcons.Take(starCount).ToList()
             : songRatingStarIcons.Skip(1).Take(starCount).ToList();
-        
+
         float starIconAnimationTimeInSeconds = TotalScoreAnimTimeInSeconds;
         for (int i = 0; i < visibleStarIcons.Count; i++)
         {
@@ -208,7 +208,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         {
             return false;
         }
-        
+
         SongStatistics songStatistics = statistics.GetLocalStatistics(sceneData.SongMetas.LastOrDefault());
         if (songStatistics == null
             || songStatistics.HighScoreRecord == null
@@ -224,13 +224,13 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         {
             return false;
         }
-        
+
         return highScoreEntry.Score == playerScoreData.TotalScore;
     }
 
     private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
     {
-        if (settings.DisableDynamicThemes
+        if (!settings.EnableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
             LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
@@ -238,7 +238,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
         LoadSongRatingSpriteFromTheme(songRatingEnumValue, onSuccess);
     }
-    
+
     private string GetTeamName()
     {
         PartyModeTeamSettings teamSettings = PartyModeUtils.GetTeam(singingResultsSceneControl.PartyModeSceneData, PlayerProfile);
@@ -273,7 +273,8 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
         catch (Exception ex)
         {
-            Debug.LogError(ex);
+            Debug.LogException(ex);
+            Debug.LogError($"Load song rating sprite from theme failed: {ex.Message}");
             LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
         }
     }

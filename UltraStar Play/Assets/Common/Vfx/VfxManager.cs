@@ -15,28 +15,28 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 
     public const string BackgroundVfxRenderTextureName = "VfxManager.BackgroundVfxRenderTexture";
     public const string ForegroundVfxRenderTextureName = "VfxManager.ForegroundVfxRenderTexture";
-    
+
     [InjectedInInspector]
     public Camera foregroundVfxCamera;
-    
+
     [InjectedInInspector]
     public Camera backgroundVfxCamera;
-    
+
     // Tip: with a z coordinate near the rendered canvas,
     // the scene view camera in isometric mode renders similar to the game view.
     // Can be useful to check particle effects in the scene view (e.g. the shape of the particle system).
     [InjectedInInspector]
     public float particleZ = 19.99f;
-    
+
     [InjectedInInspector]
     public int foregroundVfxLayer = 1;
 
     [InjectedInInspector]
     public int backgroundVfxLayer = 1;
-    
+
     [InjectedInInspector]
     public EParticleEffect testParticleEffect = EParticleEffect.FireworkCyanPurple;
-    
+
     [InjectedInInspector]
     public float testParticleScale = 0.5f;
 
@@ -48,19 +48,19 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject]
     private PanelHelper panelHelper;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private RenderTextureManager renderTextureManager;
-    
+
     private Image foregroundVfxElement;
     private Image backgroundVfxElement;
 
@@ -84,7 +84,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         {
             Destroy(child.gameObject);
         }
-        
+
         foreach (Transform child in backgroundVfxCamera.transform)
         {
             Destroy(child.gameObject);
@@ -97,7 +97,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         InitParticleEffectToPrefabMap();
         InitVfxElement();
     }
-    
+
     private void InitCameraTargetTextures()
     {
         renderTextureManager.GetOrCreateScreenAspectRatioRenderTexture(ForegroundVfxRenderTextureName,
@@ -106,9 +106,13 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                 backgroundRenderTexture => backgroundVfxCamera.targetTexture = backgroundRenderTexture);
     }
 
-#if UNITY_EDITOR
     private void Update()
     {
+        // Performance: Disable cameras when there are not particles to render.
+        UpdateVfxCameraActive(foregroundVfxCamera);
+        UpdateVfxCameraActive(backgroundVfxCamera);
+
+#if UNITY_EDITOR
         if (Application.isEditor
             && Keyboard.current.rightCtrlKey.wasPressedThisFrame)
         {
@@ -121,9 +125,24 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                 isBackground = testParticleIsBackground
             });
         }
-    }
 #endif
-    
+    }
+
+    private void UpdateVfxCameraActive(Camera cam)
+    {
+        if (cam.gameObject.activeSelf
+            && cam.transform.childCount <= 0)
+        {
+            cam.gameObject.SetActive(false);
+            RenderTextureUtils.Clear(cam.targetTexture);
+        }
+        else if (!cam.gameObject.activeSelf
+                 && cam.transform.childCount > 0)
+        {
+            cam.gameObject.SetActive(true);
+        }
+    }
+
     private void InitVfxElement()
     {
         foregroundVfxElement = uiDocument.rootVisualElement.Q<Image>("foregroundVfxElement");
@@ -138,7 +157,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         foregroundVfxElement.image = foregroundVfxCamera.targetTexture;
         foregroundVfxElement.pickingMode = PickingMode.Ignore;
         uiDocument.rootVisualElement.Add(foregroundVfxElement);
-        
+
         backgroundVfxElement = new Image();
         backgroundVfxElement.name = "backgroundVfxElement";
         backgroundVfxElement.AddToClassList("overlay");
@@ -153,23 +172,23 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         if (vfxManager == null)
         {
             return;
-        } 
+        }
         vfxManager.DoCreateParticleEffect(particleEffectConfig);
     }
-    
+
     private void DoCreateParticleEffect(ParticleEffectConfig particleEffectConfig)
     {
         if (!settings.EnableVfx)
         {
             return;
         }
-        
+
         if (!particleEffectToPrefabMap.TryGetValue(particleEffectConfig.particleEffect, out GameObject particleSystemPrefab)
             || particleSystemPrefab == null)
         {
             return;
         }
-        
+
         Transform newParent = particleEffectConfig.isBackground
             ? backgroundVfxCamera.transform
             : foregroundVfxCamera.transform;
@@ -180,7 +199,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 
         UpdateParticleEffectMainModule(particleSystemInstance,
             mainModule => mainModule.loop = particleEffectConfig.loop);
-        
+
         UpdateParticleEffectLayer(particleEffectConfig, particleSystemInstance);
 
         Vector3 scale = new Vector3(particleEffectConfig.scale, particleEffectConfig.scale, particleEffectConfig.scale);
@@ -191,7 +210,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
             UpdateParticleEffectMainModule(particleSystemInstance,
                 mainModule => mainModule.maxParticles = particleEffectConfig.maxParticles);
         }
-        
+
         if (particleEffectConfig.rateOverTime > 0)
         {
             UpdateParticleEffectEmissionModule(particleSystemInstance,
@@ -203,9 +222,9 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
             UpdateParticleEffectMainModule(particleSystemInstance,
                 mainModule => mainModule.simulationSpeed = particleEffectConfig.simulationSpeed);
         }
-        
+
         DoUpdateParticleSystemWithTarget(particleEffectConfig, particleSystemInstance);
-        
+
         RegisterTargetCallbacks(particleEffectConfig, particleSystemInstance);
     }
 
@@ -218,7 +237,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                 callback(localParticleSystem.emission);
             });
     }
-    
+
     private void UpdateParticleEffectMainModule(GameObject particleSystemInstance, Action<ParticleSystem.MainModule> callback)
     {
         particleSystemInstance
@@ -235,7 +254,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         Vector3 worldPos = foregroundVfxCamera.ScreenToWorldPoint(screenPos.WithZ(particleZ));
         return worldPos;
     }
-    
+
     private void RegisterTargetCallbacks(ParticleEffectConfig particleEffectConfig, GameObject particleSystemInstance)
     {
         VisualElement target = particleEffectConfig.target;
@@ -251,7 +270,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                 target.UnregisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
                 return;
             }
-            
+
             Destroy(particleSystemInstance);
         }
 
@@ -262,7 +281,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                 target.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
                 return;
             }
-            
+
             if (!VisualElementUtils.HasGeometry(target))
             {
                 return;
@@ -270,7 +289,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
 
             DoUpdateParticleSystemWithTarget(particleEffectConfig, particleSystemInstance);
         }
-        
+
         if (particleEffectConfig.destroyWithTarget)
         {
             target.RegisterCallback<DetachFromPanelEvent>(OnDetachFromPanel);
@@ -295,7 +314,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
                                    && target.resolvedStyle.height > 0;
             particleSystemInstance.SetActive(isTargetVisible);
         }
-            
+
         if (particleEffectConfig.moveWithTargetPanelPosProducer != null)
         {
             Vector2 panelPos = particleEffectConfig.moveWithTargetPanelPosProducer();
@@ -315,7 +334,7 @@ public class VfxManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         ParticleSystem particleSystemComponent = particleSystemInstance.GetComponent<ParticleSystem>();
         ParticleSystem.ShapeModule shape = particleSystemComponent.shape;
         shape.scale = particleEffectConfig.scaleBoxShapeWithTargetFactor * target.worldBound.size;

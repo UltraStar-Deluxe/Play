@@ -268,6 +268,13 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         {
             jobListElement.style.right = targetRight;
         }
+
+        // Show job list always on top of other elements
+        if (!jobsWithoutParent.IsNullOrEmpty()
+            || !fadingJobs.IsNullOrEmpty())
+        {
+            jobListElement.BringToFront();
+        }
     }
     
     private void OnSceneChanged()
@@ -302,7 +309,13 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
     {
         Job job = new(jobName, parentJob);
         observable
-            .CatchIgnore((Exception ex) => job.SetResult(EJobResult.Error))
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Job '{jobName}' failed: {ex.Message}");
+                job.SetResult(EJobResult.Error);
+                throw ex;
+            })
             .Subscribe(_ => job.SetStatus(EJobStatus.Finished));
         return job;
     }

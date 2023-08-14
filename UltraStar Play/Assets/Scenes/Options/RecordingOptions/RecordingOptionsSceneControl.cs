@@ -40,7 +40,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     [Inject]
     private ThemeManager themeManager;
-    
+
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
 
@@ -64,15 +64,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     [Inject(UxmlName = R.UxmlNames.enabledToggle)]
     private SlideToggle enabledToggle;
-    
+
     [Inject(UxmlName = R.UxmlNames.usePortAudioToggle)]
     private Toggle usePortAudioToggle;
-
-    // [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
-    // private Toggle playRecordedAudioToggle;
-    
-    // [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
-    // private VisualElement playRecordedAudioInfoContainer;
 
     [Inject(UxmlName = R.UxmlNames.notConnectedContainer)]
     private VisualElement notConnectedContainer;
@@ -94,9 +88,21 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     [Inject(UxmlName = R.UxmlNames.recordingDeviceInactiveOverlay)]
     private VisualElement recordingDeviceInactiveOverlay;
-    
-    // [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
-    // private ItemPicker micPlaybackVolumeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.noConnectedMicsContainer)]
+    private VisualElement noConnectedMicsContainer;
+
+    [Inject(UxmlName = R.UxmlNames.micConfigurationContainer)]
+    private VisualElement micConfigurationContainer;
+
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
+    private Toggle playRecordedAudioToggle;
+
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
+    private VisualElement playRecordedAudioInfoContainer;
+
+    [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
+    private ItemPicker micPlaybackVolumeChooser;
 
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
@@ -115,13 +121,17 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     protected override void Start()
     {
         base.Start();
-        
+
+        List<MicProfile> micProfiles = CreateAndPersistMicProfiles();
+        UpdateNoConnectedMicsContainer(micProfiles);
+
         new AutoFitLabelControl(devicePicker.ItemLabel, 10, 15);
-        
-        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, CreateAndPersistMicProfiles());
+
+        devicePickerControl = new LabeledItemPickerControl<MicProfile>(devicePicker, micProfiles);
         devicePickerControl.AutoSmallFont = false;
         devicePickerControl.GetLabelTextFunction = item => item != null ? item.GetDisplayNameWithChannel() : "";
-        if (!TryReSelectLastMicProfile())
+        if (!TryReSelectLastMicProfile()
+            && !devicePickerControl.Items.IsNullOrEmpty())
         {
             devicePickerControl.Selection.Value = devicePickerControl.Items[0];
         }
@@ -147,7 +157,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         sampleRatePickerControl.GetLabelTextFunction = _ => GetSampleRateLabel();
         enabledToggle.RegisterValueChangedCallback(evt => SetSelectedRecordingDeviceEnabled(evt.newValue));
         deleteButton.RegisterCallbackButtonTriggered(_ => DeleteSelectedRecordingDevice());
-        
+
         // Select random color via context menu
         VisualElement colorPickerColorElement = colorPicker.Q<VisualElement>(null, R_PlayShared.UssClasses.itemPickerItemLabel);
         if (colorPickerColorElement != null)
@@ -167,26 +177,46 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         devicePickerControl.Selection.Subscribe(newValue => OnRecordingDeviceSelected(newValue));
         amplificationPickerControl.Selection.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.Amplification = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
         noiseSuppressionPickerControl.Selection.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.NoiseSuppression = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
         delayPickerControl.Selection.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.DelayInMillis = (int)newValue;
             SendSelectedMicProfileToConnectedClient();
         });
         colorPickerControl.Selection.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.Color = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
         sampleRatePickerControl.Selection.Subscribe(newValue =>
         {
+            if (SelectedMicProfile == null)
+            {
+                return;
+            }
             SelectedMicProfile.SampleRate = newValue;
             SendSelectedMicProfileToConnectedClient();
         });
@@ -213,6 +243,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
         calibrateDelayButton.RegisterCallbackButtonTriggered(_ => calibrateMicDelayControl.StartCalibration());
         calibrateMicDelayControl.CalibrationResultEventStream
+            .ObserveOnMainThread()
             .Subscribe(calibrationResult =>
             {
                 if (calibrationResult.IsSuccess)
@@ -227,21 +258,6 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
                         TranslationManager.GetTranslation(R.Messages.options_delay_calibrate_timeout));
                 }
             });
-
-        // Play recorded audio
-        // FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
-        //     () => settings.PlayRecordedAudio,
-        //     newValue => settings.PlayRecordedAudio = newValue);
-        //
-        // // Recorded audio playback volume
-        // PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
-        // micPlaybackVolumePickerControl.Bind(() => settings.MicrophonePlaybackVolumePercent,
-        //     newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
-        //
-        // // Only visible when play recorded audio is enabled
-        // settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
-        //     .Subscribe(newValue => micPlaybackVolumeChooser.SetVisibleByDisplay(newValue))
-        //     .AddTo(gameObject);
 
         // Use PortAudio
         if (ApplicationUtils.CanUsePortAudio())
@@ -264,6 +280,20 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         {
             usePortAudioToggle.HideByDisplay();
         }
+
+        // Play recorded audio
+        FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
+            () => settings.PlayRecordedAudio,
+            newValue => settings.PlayRecordedAudio = newValue);
+
+        PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
+        micPlaybackVolumePickerControl.Bind(
+            () => settings.MicrophonePlaybackVolumePercent,
+            newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
+
+        settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
+            .Subscribe(newValue => micPlaybackVolumeChooser.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
     }
 
     private void OnConnectedMicDevicesChanged()
@@ -275,8 +305,9 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     {
         micPitchTracker.StopRecording();
 
+        List<MicProfile> micProfiles = CreateAndPersistMicProfiles();
         MicProfile lastMicProfile = SelectedMicProfile;
-        devicePickerControl.Items = CreateAndPersistMicProfiles();
+        devicePickerControl.Items = micProfiles;
         Debug.Log($"MicProfiles: {devicePickerControl.Items.ToCsv()}");
         if (devicePickerControl.Items.Count > 0)
         {
@@ -299,14 +330,21 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
             OnRecordingDeviceSelected(nextSelectedMicProfile);
         }
+
+        UpdateNoConnectedMicsContainer(micProfiles);
     }
 
-    // private void Update()
-    // {
-    //     // Read messages from client since last time the reader thread was active.
-    //     IConnectedClientHandler connectedClientHandler = GetConnectedClientHandler();
-    //     connectedClientHandler?.ReadMessagesFromClient();
-    // }
+    private void UpdateNoConnectedMicsContainer(List<MicProfile> micProfiles)
+    {
+        bool noMics = micProfiles.IsNullOrEmpty();
+        noConnectedMicsContainer.SetVisibleByDisplay(noMics);
+        micConfigurationContainer.SetVisibleByDisplay(!noMics);
+
+        if (noMics)
+        {
+            HighlightHelpIcon();
+        }
+    }
 
     private void UpdateSampleRateLabel()
     {
@@ -315,6 +353,11 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
     private string GetSampleRateLabel()
     {
+        if (SelectedMicProfile == null)
+        {
+            return "";
+        }
+
         int item = sampleRatePickerControl.SelectedItem;
         if (item <= 0)
         {
@@ -335,7 +378,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         }
 
         MicProfile lastMicProfile = devicePickerControl.Items
-            .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene 
+            .FirstOrDefault(micProfile => micProfile.Name == settings.LastMicProfileNameInRecordingOptionsScene
                                           && micProfile.ChannelIndex == settings.LastMicProfileChannelIndexInRecordingOptionsScene);
         if (lastMicProfile == null)
         {
@@ -357,7 +400,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         {
             settings.MicProfiles.AddIfNotContains(SelectedMicProfile);
         }
-        
+
         UpdateRecordingDeviceInactiveOverlay();
     }
 
@@ -386,10 +429,11 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
             return;
         }
 
+        micPitchTracker.MicProfile = micProfile;
         amplificationPickerControl.TrySelectItem(micProfile.Amplification);
         noiseSuppressionPickerControl.TrySelectItem(micProfile.NoiseSuppression);
         delayPickerControl.SelectItem(micProfile.DelayInMillis);
-    
+
         Color32 micProfileColor = micProfile.Color
             .OrIfDefault(colorPickerControl.Items.FirstOrDefault());
         if (colorPickerControl.Items.Contains(micProfileColor))
@@ -405,24 +449,16 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
 
         enabledToggle.value = micProfile.IsEnabled;
         UpdateRecordingDeviceInactiveOverlay();
-        
-        if (micProfile.IsConnected(serverSideConnectRequestManager))
-        {
-            notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
-            deleteButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.None);
-        }
-        else
-        {
-            notConnectedContainer.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
-            deleteButton.style.display = new StyleEnum<DisplayStyle>(DisplayStyle.Flex);
-        }
+
+        bool isConnected = micProfile.IsConnected(serverSideConnectRequestManager);
+        notConnectedContainer.SetVisibleByDisplay(!isConnected);
+        deleteButton.SetVisibleByDisplay(!isConnected);
 
         micVisualizer.SetMicProfile(micProfile);
-        calibrateMicDelayControl.MicProfile = micProfile;
         noteLabel.text = TranslationManager.GetTranslation(R.Messages.options_note, "value", "?");
-        
+
         // playRecordedAudioInfoContainer.SetVisibleByDisplay(micProfile.IsInputFromConnectedClient);
-        
+
         UpdateSampleRateLabel();
         InitPitchDetectionFromConnectionClient();
     }

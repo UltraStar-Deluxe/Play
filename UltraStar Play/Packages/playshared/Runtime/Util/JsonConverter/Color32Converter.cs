@@ -14,7 +14,7 @@ public class Color32Converter : fsConverter
     {
         if (instance is not Color32 color)
         {
-            throw new InvalidOperationException("FullSerializer Internal Error -- Unexpected serialization type");
+            throw new JsonConverterException("FullSerializer Internal Error -- Unexpected serialization type");
         }
 
         serialized = new fsData($"#{Colors.ToHexColor(color)}");
@@ -25,7 +25,7 @@ public class Color32Converter : fsConverter
     {
         if (storageType != typeof(Color32))
         {
-            throw new InvalidOperationException("FullSerializer Internal Error -- Unexpected deserialization type");
+            throw new JsonConverterException("FullSerializer Internal Error -- Unexpected deserialization type");
         }
 
         if (!data.IsString)
@@ -77,7 +77,8 @@ public class Color32Converter : fsConverter
         }
         catch (Exception ex)
         {
-            Debug.LogError(ex);
+            Debug.LogException(ex);
+            Debug.LogError($"ParseColor32FromDataAsDictionary failed: {ex.Message}");
             instance = Colors.white;
             return fsResult.Fail($"Unable to parse {data} into a Color32");
         }

@@ -1,4 +1,0 @@
-release = 1.0.0
-build_timestamp = 2306171122
-commit_hash = 453b8bbb
-website_link = https://melodymania.org

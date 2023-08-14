@@ -37,6 +37,12 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
     [Inject(UxmlName = R.UxmlNames.driveButton)]
     private Button driveButton;
 
+    [Inject(UxmlName = R.UxmlNames.songFolderEnabledToggle)]
+    private SlideToggle songFolderEnabledToggle;
+
+    [Inject(UxmlName = R.UxmlNames.songFolderInactiveOverlay)]
+    private VisualElement songFolderInactiveOverlay;
+
     private readonly string androidSdCardPath;
     private readonly string androidInternalStoragePath;
     private readonly ReactiveProperty<string> androidDrivePath = new("");
@@ -49,6 +55,12 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
 
     private readonly Subject<bool> deleteEventStream = new();
     public IObservable<bool> DeleteEventStream => deleteEventStream;
+
+    private readonly Subject<bool> songFolderEnabledChangedEventStream = new();
+    public IObservable<bool> SongFolderEnabledChangedEventStream => songFolderEnabledChangedEventStream;
+
+    public bool IsSongFolderEnabled { get; private set; }
+    public string SongFolderPath => FullPath;
 
     public SongFolderListEntryControl()
     {
@@ -114,12 +126,27 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         androidDrivePath.Subscribe(_ => valueChangedEventStream.OnNext(FullPath));
         UpdateButtons();
         CheckPathIsValid();
+
+        IsSongFolderEnabled = !settings.DisabledSongFolders.Contains(initialPath);
+        songFolderEnabledToggle.value = IsSongFolderEnabled;
+        songFolderEnabledToggle.RegisterValueChangedCallback(evt =>
+        {
+            IsSongFolderEnabled = evt.newValue;
+            UpdateInactiveOverlay();
+            songFolderEnabledChangedEventStream.OnNext(evt.newValue);
+        });
+        UpdateInactiveOverlay();
     }
 
     private void UpdateButtons()
     {
         openSongFolderButton.SetEnabled(!FullPath.IsNullOrEmpty() 
                                         && DirectoryUtils.Exists(FullPath));
+    }
+
+    private void UpdateInactiveOverlay()
+    {
+        songFolderInactiveOverlay.SetInClassList("hidden", IsSongFolderEnabled);
     }
 
     private void OpenSelectFolderDialog()

@@ -30,6 +30,17 @@
     "warningFontColor":  "#FEC84B",
     "errorFontColor": "#F97066",
 
+    // Lyrics
+    "lyricsContainerGradient": "#000000, #1E232B",
+    "beforeLyricsIndicatorImage": "icons/usdx/[sing]lyricsHelpBar.png",
+    "lyricsShadow": true,
+    "lyricsColor": "#E1E1E1E5",
+    "nextLyricsColor": "#E1E1E1E5",
+    "lyricsOutlineColor": "#00000000",
+    "currentNoteLyricsColor": "#FF0000",
+    "previousNoteLyricsColor": "#00FF00",
+    "goldenColor": "FF00FF",
+
     // Drop shadow to make elements without a background more readable.
     "noBackgroundInHierarchyTextShadow": {
         "color": "#a0a0a0",

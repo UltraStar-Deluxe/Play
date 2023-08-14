@@ -1,8 +1,7 @@
-﻿public class PercentNumberPickerControl : NumberPickerControl
+﻿public class PercentNumberPickerControl : UnitNumberPickerControl
 {
     public PercentNumberPickerControl(ItemPicker itemPicker, double initialValue = 0)
-        : base(itemPicker, initialValue)
+        : base(itemPicker, "%", initialValue)
     {
-        GetLabelTextFunction = item => item + " %";
     }
 }

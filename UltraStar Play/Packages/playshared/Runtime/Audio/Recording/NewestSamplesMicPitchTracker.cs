@@ -22,9 +22,14 @@ public class NewestSamplesMicPitchTracker : AbstractMicPitchTracker
     {
         base.OnInjectionFinished();
 
+        RecordingEventStream
+            .Subscribe(evt => OnRecordingEvent(evt))
+            .AddTo(gameObject);
+
         // Update label in inspector for debugging.
-        pitchEventStream.Subscribe(UpdateLastMidiNoteFields);
-        RecordingEventStream.Subscribe(evt => OnRecordingEvent(evt));
+        pitchEventStream
+            .Subscribe(UpdateLastMidiNoteFields)
+            .AddTo(gameObject);
     }
 
     private void OnRecordingEvent(RecordingEvent recordingEvent)

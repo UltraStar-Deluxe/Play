@@ -55,10 +55,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [InjectedInInspector]
     public SongEditorMicSampleRecorder songEditorMicSampleRecorder;
-    
+
     [InjectedInInspector]
     public StyleSheet songEditorSmallScreenStyleSheet;
-    
+
     [Inject]
     private Injector injector;
 
@@ -85,10 +85,10 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     [Inject]
     private ApplicationManager applicationManager;
-    
+
     [Inject]
     private CursorManager cursorManager;
-    
+
     [Inject]
     private AchievementEventStream achievementEventStream;
 
@@ -148,8 +148,8 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         Debug.Log($"Start editing of '{SongMeta.Title}' at {sceneData.PositionInSongInMillis} ms.");
 
         InitSongEditorStyleSheet();
-        
-        songAudioPlayer.LoadAndPlaySongAudio(SongMeta, sceneData.PositionInSongInMillis)
+
+        songAudioPlayer.LoadAndPlaySongAudioAsObservable(SongMeta, sceneData.PositionInSongInMillis, false)
             // Subscribe to trigger the (cold) observable.
             .Subscribe(_ =>
             {
@@ -162,7 +162,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         songAudioPlayer.PlaybackStoppedEventStream
             .Subscribe(_ => OnAudioPlaybackStopped());
 
-        songVideoPlayer.SongMeta = SongMeta;
+        songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(SongMeta);
 
         HideEditLyricsPopup();
 
@@ -179,7 +179,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     private void InitSongEditorStyleSheet()
     {
         uiDocument.rootVisualElement.AddToClassList(R.UssClasses.songEditorRoot);
-        
+
         if (ApplicationUtils.IsSmallScreen()
             && songEditorSmallScreenStyleSheet != null)
         {
@@ -378,7 +378,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         }
         ContinueToSongSelectScene();
     }
-    
+
     public void ToggleAudioPlayPause()
     {
         if (songAudioPlayer.IsPlaying)
@@ -390,7 +390,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
             songAudioPlayer.PlayAudio();
         }
     }
-    
+
     public void StartEditingSelectedNoteText()
     {
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();

@@ -109,10 +109,15 @@ public class SongEditorBackgroundAudioWaveFormControl : INeedInjection, IInjecti
 
         if (audioWaveFormVisualization == null)
         {
-            audioWaveFormVisualization = new AudioWaveFormVisualization(songEditorSceneControl.gameObject, TargetElement)
-            {
-                WaveformColor = Colors.darkSlateGrey
-            };
+            int textureWidth = 1024;
+            int textureHeight = 128;
+            audioWaveFormVisualization = new AudioWaveFormVisualization(
+                songEditorSceneControl.gameObject,
+                TargetElement,
+                textureWidth,
+                textureHeight,
+                "song editor background audio visualization");
+            audioWaveFormVisualization.WaveformColor = Colors.darkSlateGrey;
         }
 
         AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, audioManager, settings);

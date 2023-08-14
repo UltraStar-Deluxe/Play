@@ -256,10 +256,15 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
     {
         if (recordedAudioWaveFormVisualization == null)
         {
-            recordedAudioWaveFormVisualization = new AudioWaveFormVisualization(gameObject, overviewAreaRecordedAudioWaveform)
-            {
-                WaveformColor = Colors.red,
-            };
+            int textureWidth = 1024;
+            int textureHeight = 128;
+            recordedAudioWaveFormVisualization = new AudioWaveFormVisualization(
+                gameObject,
+                overviewAreaRecordedAudioWaveform,
+                textureWidth,
+                textureHeight,
+                "song editor recorded audio visualization");
+            recordedAudioWaveFormVisualization.WaveformColor = Colors.red;
         }
 
         recordedAudioWaveFormVisualization.DrawWaveFormMinAndMaxValues(RecordingBuffer);

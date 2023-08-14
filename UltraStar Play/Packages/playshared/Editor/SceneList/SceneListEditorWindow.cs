@@ -19,15 +19,17 @@ public class SceneListEditorWindow : EditorWindow
         "Background Bokeh VFX",
         "CartoonVFX9X",
         "Confetti FX Pro",
+        "FfmpegUnity",
         "Hovl Studio",
         "JMO Assets",
+        "UnityStandaloneFileBrowser",
+        "VLCUnity",
         "Vuplex",
-        "FfmpegUnity",
     };
 
     private string fileNameRegEx = "";
     private string lastFilterText = "";
-    
+
     [MenuItem("Window/Scene List")]
     public static void ShowWindow()
     {
@@ -71,7 +73,7 @@ public class SceneListEditorWindow : EditorWindow
     {
         scenePaths = FindScenePaths(sortAlphabetically);
     }
-    
+
     private void DrawSceneButtons()
     {
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
@@ -88,6 +90,12 @@ public class SceneListEditorWindow : EditorWindow
 
     private bool IsIgnored(string path)
     {
+        string fileName = Path.GetFileName(path);
+        if (fileName.StartsWith("InitTestScene"))
+        {
+            return true;
+        }
+
         string normalizedPath = path.Replace("\\", "/");
         return ignoredFolderNames.AnyMatch(ignoredFolderName => normalizedPath.Contains($"/{ignoredFolderName}/"));
     }
@@ -98,11 +106,11 @@ public class SceneListEditorWindow : EditorWindow
         {
             return true;
         }
-        
+
         string fileName = Path.GetFileNameWithoutExtension(path);
         return Regex.IsMatch(fileName, fileNameRegEx, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     }
-    
+
     private List<string> FindScenePaths(bool sortAlphabetically)
     {
         string assetsFolder = "Assets";

@@ -273,7 +273,7 @@
     border-radius: 50%;
     border-color: #2e8418;
     border-width: 5%;
-    /* for perfect circle: width and height = 100% + (4 * border-width%) */ 
+    /* for perfect circle: width and height = 100% + (4 * border-width%) */
     width: 112%;
     height: 112%;
 }
@@ -312,6 +312,10 @@
     font-size: var(--font-size);
 }
 
+.singingLyricsSpace{
+    width: 8px;
+}
+
 .currentNoteLyrics {
     color: var(--control-color);
 }
@@ -330,16 +334,26 @@
     margin-right: 0;
     margin-top: 0;
     margin-bottom: 0;
+    -unity-text-align: middle-left;
 }
 
 #timeBar {
     padding: 0;
 }
 
-.innerTimeBarSentenceEntryContainer {
+#innerTimeBarSentenceEntryContainer {
     background-color: #344054;
     border-radius: 4px;
+    overflow: hidden;
 }
+
+#detailedTimeBar #timeBarPositionIndicator {
+    background-color: #737372;
+}
+
+/*#detailedTimeBar #innerTimeBarSentenceEntryContainer {*/
+/*    background-color: rgba(0, 0, 0, 0);*/
+/*}*/
 
 #timeBarPositionIndicator {
     background-color: var(--font-color);
@@ -597,13 +611,22 @@
 /**************************************************/
 /* OPTIONS SCENES */
 /**************************************************/
+.deviceInfoLabel {
+    margin-bottom: 16px;
+}
+
 #permissionsContainer .unity-toggle__label {
     min-width: 50;
     margin-right: 8px;
 }
 
 .inactiveOverlay {
+    background-color: rgba(0, 0, 0, 0.5);
     transition: background-color 0.5s;
+}
+
+.inactiveOverlay.hidden {
+    background-color: rgba(0, 0, 0, 0);
 }
 
 #playerProfileEntryContent {
@@ -703,6 +726,12 @@
 .songIssueMessage {
     font-size: var(--font-size-s);
     white-space: normal;
+    margin-bottom: 4px;
+}
+
+.quickFixButton {
+    align-self: flex-start;
+    margin-bottom: 16px;
 }
 
 #loadedSceneTitle {
@@ -743,6 +772,16 @@
 }
 
 #loadedOptionsRoot > ScrollView > ItemPicker {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+#loadedOptionsRoot > ScrollView > Button {
+    margin-bottom: 16px;
+    height: auto;
+}
+
+#loadedOptionsRoot > ScrollView > Toggle {
     margin-bottom: 16px;
     height: auto;
 }

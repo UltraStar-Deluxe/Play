@@ -36,26 +36,47 @@ public class DynamicTexture : IDisposable
     private readonly GameObject gameObject;
     private readonly string name;
 
-    public DynamicTexture(GameObject gameObject, VisualElement visualElement, string name = null)
+    public DynamicTexture(
+        GameObject gameObject,
+        VisualElement visualElement,
+        int textureWidth = -1,
+        int textureHeight = -1,
+        string name = null)
     {
         this.gameObject = gameObject;
         this.name = !name.IsNullOrEmpty()
             ? name
             : $"DynamicTexture on VisualElement '{visualElement.name}', associated with GameObject '{gameObject.name}'";
 
-        if (visualElement.resolvedStyle.width <= 0
-            || visualElement.resolvedStyle.height <= 0)
+        if ((textureWidth <= 0
+             && (visualElement.resolvedStyle.width <= 0 || float.IsNaN(visualElement.resolvedStyle.width)))
+            || (textureHeight <= 0
+                && (visualElement.resolvedStyle.height <= 0 || float.IsNaN(visualElement.resolvedStyle.height))))
         {
-            throw new UnityException("VisualElement has no size. Consider calling Init from GeometryChangedEvent.");
+            throw new UnityException("VisualElement has no size. Specify a size or wait for a GeometryChangedEvent.");
         }
 
-        UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
-        Vector2 visualElementSize = new PanelHelper(uiDocument).PanelToScreen(visualElement.worldBound).size;
-        Init((int)visualElementSize.x, (int)visualElementSize.y);
+        if (textureWidth <= 0
+            || textureHeight <= 0)
+        {
+            // Use the device pixel size of the VisualElement. Note that this size can differ from its size in reference resolution.
+            UIDocument uiDocument = GameObject.FindObjectOfType<UIDocument>();
+            Vector2 visualElementSize = new PanelHelper(uiDocument).PanelToScreen(visualElement.worldBound).size;
+            if (textureWidth <= 0)
+            {
+                textureWidth = (int)visualElementSize.x;
+            }
+            if (textureHeight <= 0)
+            {
+                textureHeight = (int)visualElementSize.y;
+            }
+        }
+
+        SetTextureSize(textureWidth, textureHeight);
         visualElement.style.backgroundImage = new StyleBackground(texture);
     }
 
-    public void Init(int textureWidth, int textureHeight)
+    public void SetTextureSize(int textureWidth, int textureHeight)
     {
         DestroyTexture();
 

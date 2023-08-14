@@ -74,6 +74,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     private SongMeta songMeta;
 
     [Inject]
+    private Settings settings;
+
+    [Inject]
     private AchievementEventStream achievementEventStream;
 
     private int displaySentenceIndex;
@@ -91,10 +94,14 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         // Create UI
         VisualElement playerUiVisualElement = playerUi.CloneTree().Children().First();
         playerUiVisualElement.userData = this;
-        VisualElement playerInfoUiVisualElement = playerInfoUi.CloneTree().Children().First();
+        VisualElement playerInfoUiVisualElement = playerUiVisualElement.Q(R.UxmlNames.playerInfoContainer);
         playerInfoUiVisualElement.userData = this;
-        AddPlayerInfoUiToUiDocument(playerInfoUiVisualElement);
-        
+        if (!settings.ShowPlayerInfoNextToNotes)
+        {
+            // Move player info UI to top / bottom
+            AddPlayerInfoUiToTopOrBottom(playerInfoUiVisualElement);
+        }
+
         // Inject all children.
         // The injector hierarchy is searched from the bottom up.
         // Thus, we can create an injection hierarchy with elements that are not necessarily in the same VisualElement hierarchy.
@@ -134,7 +141,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         });
     }
 
-    private void AddPlayerInfoUiToUiDocument(VisualElement playerInfoUiVisualElement)
+    private void AddPlayerInfoUiToTopOrBottom(VisualElement playerInfoUiVisualElement)
     {
         bool hasTopPlayerInfoUiRow = (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 1 
                                       && sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Values

@@ -64,10 +64,15 @@ public class MicSampleRecorder : MonoBehaviour
         }
     }
 
-    public float Volume
+    private float outputVolume = 1;
+    public float OutputVolume
     {
-        get => audioSource.volume;
-        set => audioSource.volume = value;
+        get => outputVolume;
+        set
+        {
+            outputVolume = value;
+            audioSource.volume = value;
+        }
     }
 
     private readonly CountSubject<RecordingEvent> recordingEventStream = new();
@@ -80,6 +85,8 @@ public class MicSampleRecorder : MonoBehaviour
 
     private bool continueRecordingOnAddListener;
     private bool continueRecordingOnEnable;
+
+    public string PortAudioOutputDeviceName { get; set; }
 
     private void Awake()
     {
@@ -163,7 +170,7 @@ public class MicSampleRecorder : MonoBehaviour
         Debug.Log($"Starting recording with '{MicProfile.GetDisplayNameWithChannel()}' at {FinalSampleRate} Hz");
 
         string outputDeviceName = playRecordedAudio && MicrophoneAdapter.UsePortAudio
-            ? PortAudioUtils.GetDefaultOutputDeviceName()
+            ? GetFinalPortAudioOutputDeviceName()
             : "";
 
         // Code for low-latency Unity microphone input taken from
@@ -171,7 +178,7 @@ public class MicSampleRecorder : MonoBehaviour
         DestroyAudioClips();
         using DisposableStopwatch d = new($"MicrophoneAdapter.Start took <ms> with {MicProfile.GetDisplayNameWithChannel()}");
         {
-            micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName);
+            micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName, OutputVolume);
         }
         
         if (!MicrophoneAdapter.UsePortAudio)
@@ -197,6 +204,16 @@ public class MicSampleRecorder : MonoBehaviour
             audioSource.clip = micAudioClip;
             audioSource.loop = true;
         }
+    }
+
+    private string GetFinalPortAudioOutputDeviceName()
+    {
+        if (PortAudioOutputDeviceName.IsNullOrEmpty())
+        {
+            return MicrophoneAdapter.DefaultOutputDeviceInfo.Name;
+        }
+
+        return PortAudioOutputDeviceName;
     }
 
     public void StopRecording()

@@ -12,10 +12,10 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
     public float previewDelayInSeconds = 0.5f;
-    
+
     [InjectedInInspector]
     public bool stopOldImmediatelyOnStartNew;
-    
+
     public float AudioFadeInDurationInSeconds { get; set; } = 2;
     public float VideoFadeInDurationInSeconds { get; set; } = 2;
 
@@ -85,7 +85,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         // The video has an additional delay to load.
         // As long as no frame is ready yet, the VideoPlayer.time is 0.
-        if (songVideoPlayer.HasLoadedVideo
+        if (songVideoPlayer.IsLoaded
             && (songVideoPlayer.PositionInVideoInMillis <= 0
                 && songVideoPlayer.VideoSupportProvider is not EVideoSupportProvider.WebView))
         {
@@ -94,7 +94,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         float videoFadeInPercent = (Time.time - videoFadeInStartTimeInSeconds) / Math.Max(VideoFadeInDurationInSeconds, 0.001f);
         videoFadeInPercent = NumberUtils.Limit(videoFadeInPercent, 0, 1);
-        if (songVideoPlayer.HasLoadedVideo)
+        if (songVideoPlayer.IsLoaded)
         {
             VideoFadeIn.Value = videoFadeInPercent;
         }
@@ -206,7 +206,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
 
         // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
-        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewManager.CanHandleUrl);
+        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
         if (songVideoPlayer == null
             || !SongMetaUtils.ResourceExists(songMeta, videoUri))
         {
@@ -216,8 +216,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         VideoFadeIn.Value = 0;
         BackgroundImageFadeIn.Value = 0;
 
-        songVideoPlayer.SongMeta = songMeta;
-        songVideoPlayer.StartVideoOrShowBackgroundImage();
+        songVideoPlayer.LoadAndPlaySongVideoOrShowBackgroundImage(songMeta);
     }
 
     protected virtual void StartAudioPreview(SongMeta songMeta, int previewStartInMillis)
@@ -226,11 +225,11 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         {
             return;
         }
-        
+
         try
         {
-            songAudioPlayer.LoadAndPlaySongAudio(songMeta)
-                .CatchIgnore((Exception error) =>
+            songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+                .CatchIgnore((Exception ex) =>
                 {
                     string errorMessage = $"Audio could not be loaded: {SongMetaUtils.GetArtistDashTitle(songMeta)}";
                     Debug.LogError(errorMessage);

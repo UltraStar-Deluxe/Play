@@ -105,24 +105,33 @@ public static class SongMetaBuilder
             }
             else if (tagNameLowerCase.StartsWith("p", StringComparison.Ordinal)
                      && tagNameLowerCase.Length == 2
-                     && Char.IsDigit(tagNameLowerCase, 1))
+                     && char.IsDigit(tagNameLowerCase, 1))
             {
+                otherFields.Add(tagNameLowerCase, tagValue);
                 if (!voiceNames.ContainsKey(tagNameLowerCase.ToUpperInvariant()))
                 {
                     voiceNames.Add(tagNameLowerCase.ToUpperInvariant(), tagValue);
                 }
-                // silently ignore already set voiceNames
+                else
+                {
+                    // silently ignore already set voiceNames
+                }
             }
             else if (tagNameLowerCase.StartsWith("duetsingerp", StringComparison.Ordinal)
                      && tagNameLowerCase.Length == 12
-                     && Char.IsDigit(tagNameLowerCase, 11))
+                     && char.IsDigit(tagNameLowerCase, 11))
             {
-                string shorttag = tagNameLowerCase.Substring(10).ToUpperInvariant();
-                if (!voiceNames.ContainsKey(shorttag))
+                otherFields.Add(tagNameLowerCase, tagValue);
+                // Get P1 / P2 from DUETSINGERP1 / DUETSINGERP2
+                string shortTag = tagNameLowerCase.Substring(10).ToUpperInvariant();
+                if (!voiceNames.ContainsKey(shortTag))
                 {
-                    voiceNames.Add(shorttag, tagValue);
+                    voiceNames.Add(shortTag, tagValue);
                 }
-                // silently ignore already set voiceNames
+                else
+                {
+                    // silently ignore already set voiceNames
+                }
             }
             else
             {
@@ -206,7 +215,7 @@ public static class SongMetaBuilder
             }
 
             // Recreate issues with proper SongMeta
-            songIssues = songIssues.Select(songIssue => new SongIssue(songIssue.Severity, songMeta, songIssue.Message,
+            songIssues = songIssues.Select(songIssue => new SongIssue(songIssue.Severity, new SongIssueData(songMeta), songIssue.Message,
                     songIssue.StartBeat, songIssue.EndBeat))
                 .ToList();
             songIssues.ForEach(songIssue =>
@@ -277,6 +286,9 @@ public static class SongMetaBuilder
                 break;
             case "vocalsaudio":
                 songMeta.VocalsAudio = value;
+                break;
+            case "website":
+                songMeta.Website = value;
                 break;
             case "mbid_record":
                 songMeta.MusicBrainzRecord = value;

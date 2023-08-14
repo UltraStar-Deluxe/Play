@@ -16,37 +16,32 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     [InjectedInInspector]
     public CanvasWebViewPrefab webViewPrefabPrefab;
-    
+
     [InjectedInInspector]
     public Canvas webViewCanvas;
-    
+
     [InjectedInInspector]
     public Camera webViewCamera;
-    
+
     [InjectedInInspector]
     public TextAsset defaultWebViewHtml;
-    
+
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private SceneNavigator sceneNavigator;
 
     [Inject]
     private UiManager uiManager;
-    
+
     [Inject]
     private Settings settings;
-    
+
     private IWebView webView;
 
     private bool IsWebViewInitialized => webView != null;
     private readonly Subject<bool> webViewInitializedEventStream = new();
-
-    private bool hasScannedJavaScriptFiles;
-    private readonly Dictionary<string, string> hostToWebViewScript = new();
-    private readonly Dictionary<string, CachedWebViewScript> hostToCachedWebViewScript = new();
-    private readonly Dictionary<string, CachedWebViewScript> urlToCachedWebViewScript = new();
 
     private bool isPlaying;
     public bool IsPlaying
@@ -60,7 +55,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return isPlaying;
         }
     }
-    
+
     private double durationInMillis;
     public double DurationInMillis
     {
@@ -78,7 +73,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private long receivedPlaybackPositionUpdatedTimeInMillis;
     private double receivedPlaybackPositionInMillis;
-    
+
     private int estimatedPlaybackPositionUpdatedFrameCount;
     private long estimatedPlaybackPositionUpdatedTimeInMillis;
     private double estimatedPlaybackPositionInMillis;
@@ -94,7 +89,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return estimatedPlaybackPositionInMillis;
         }
     }
-    
+
     public int volumeInPercent;
     public int VolumeInPercent
     {
@@ -109,12 +104,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         set
         {
             volumeInPercent = value;
-            
+
             if (!IsWebViewInitialized)
             {
                 return;
             }
-            
+
             // The embedded browser does not consider AudioListener.volume. Thus, this must be considered here explicitly.
             float jsVolume = AudioListener.volume * NumberUtils.PercentToFactor(volumeInPercent) * 100;
             webView.ExecuteJavaScript($"setVolume({jsVolume})");
@@ -133,11 +128,11 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return isContentLoaded;
         }
     }
-    
+
     private string loadedUrl;
 
     private bool javaScriptCanLoadUrl;
-    
+
     public bool IsWebViewCanvasControlEnabled => webViewCanvas.renderMode is RenderMode.ScreenSpaceOverlay;
 
     private CanvasWebViewPrefab webViewPrefabInstance;
@@ -153,6 +148,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         // Explicitly allow playback of video or audio without user interaction.
         // This must be called early, e.g. in Awake.
         Web.SetAutoplayEnabled(true);
+
+        // Disable camera until WebView texture requested
+        webViewCamera.gameObject.SetActive(false);
     }
 
     protected override void StartSingleton()
@@ -164,7 +162,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             .AddTo(gameObject);
         RegisterInputActions();
 
-        if (!settings.DisableWebView)
+        if (settings.EnableWebView)
         {
             InstantiateWebView();
         }
@@ -186,7 +184,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             Debug.LogWarning("Cannot instantiate WebView. WebView already instantiated.");
             return;
         }
-        
+
         foreach (Transform child in webViewCanvas.transform)
         {
             Destroy(child.gameObject);
@@ -210,7 +208,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.usplay_toggleWebViewControl).PerformedAsObservable()
             .Subscribe(_ => ToggleWebViewControl())
             .AddTo(gameObject);
-        
+
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable(200)
             .Subscribe(_ =>
             {
@@ -236,6 +234,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             SetWebViewInputEnabled(true);
             SetUiToolkitInputEnabled(false);
         }
+        UpdateWebViewCameraActive();
     }
 
     private void SetWebViewInputEnabled(bool newValue)
@@ -250,12 +249,12 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         webViewPrefabInstance.KeyboardEnabled = newValue;
         webViewPrefabInstance.CursorIconsEnabled = newValue;
     }
-    
+
     private void SetUiToolkitInputEnabled(bool newValue)
     {
         uiDocument.rootVisualElement.SetVisibleByDisplay(newValue);
     }
-    
+
     private void Update()
     {
         if (!IsWebViewInitialized)
@@ -299,9 +298,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         webView = webViewPrefabInstance.WebView;
         webViewPrefabInstance.WebView.MessageEmitted += OnWebViewMessageReceived;
         webView.LoadProgressChanged += OnWebViewLoadProgressChanged;
-        
+
         webView.LoadHtml(defaultWebViewHtml.text);
-        
+
         webViewInitializedEventStream.OnNext(true);
     }
 
@@ -356,7 +355,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             {
                 Debug.LogError($"Failed to parse WebViewMessageDto: {json}");
             }
-    
+
             if (WebViewMessageDto.TryParseType(webViewMessageDto.type, out WebViewMessageType webViewMessageType))
             {
                 switch (webViewMessageType)
@@ -366,16 +365,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                         NumberWebViewMessageDto numberWebViewMessageDto = JsonConverter.FromJson<NumberWebViewMessageDto>(json);
 
                         long currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-                        
-                        // Log how far away from the actual time the estimate has become. 
+
+                        // Log how far away from the actual time the estimate has become.
                         // double oldEstimatedPlaybackPositionInMillis = EstimatedPlaybackPositionInMillis;
                         // double oldEstimatedPlaybackPositionInMillisOffset = numberWebViewMessageDto.value -
                         //                                                     oldEstimatedPlaybackPositionInMillis;
                         // Log.Verbose(() => $"Received new playback position. Old estimate offset: {oldEstimatedPlaybackPositionInMillisOffset}");
-                        
+
                         receivedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
                         receivedPlaybackPositionInMillis = numberWebViewMessageDto.value;
-                        
+
                         estimatedPlaybackPositionUpdatedFrameCount = Time.frameCount;
                         estimatedPlaybackPositionUpdatedTimeInMillis = currentTimeInMillis;
                         estimatedPlaybackPositionInMillis = receivedPlaybackPositionInMillis;
@@ -424,36 +423,15 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public bool CanHandleUrl(string url)
-    {
-        if (settings == null 
-            || settings.DisableWebView)
-        {
-            return false;
-        }
-        
-        try
-        {
-            // Try to parse the URL to make sure it's valid.
-            string host = new Uri(url).Host;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-        
-        if (!hasScannedJavaScriptFiles)
-        {
-            ScanJavaScriptFiles();
-        }
-        
-        string webViewScript = GetWebViewScript(url);
-        return !webViewScript.IsNullOrEmpty();
-    }
-
     public bool LoadUrl(string url)
     {
-        if (!CanHandleUrl(url))
+        if (settings == null
+            || !settings.EnableWebView)
+        {
+            return false;
+        }
+
+        if (!WebViewUtils.CanHandleWebViewUrl(url))
         {
             Debug.Log($"Cannot handle URL: {url}");
             return false;
@@ -464,13 +442,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             return DoLoadUrl(url);
         }
-        
+
         MessageDialogControl messageDialogControl = uiManager.CreateDialogControl("Open in Embedded Browser");
         messageDialogControl.Message = $"The song file references an external website.\n"
                                        + $"Do you want to open {host} in the embedded browser?";
 
         messageDialogControl.AddInformationMessage($"You can open the embedded browser anytime by pressing F8 or Ctrl+B.");
-        
+
         messageDialogControl.AddButton("Yes, do not ask again", _ =>
         {
             messageDialogControl.CloseDialog();
@@ -485,13 +463,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private bool DoLoadUrl(string url)
     {
-        string webViewScript = GetWebViewScript(url);
+        string webViewScript = WebViewUtils.GetWebViewScript(url);
         if (webViewScript.IsNullOrEmpty())
         {
             Debug.LogError($"Failed to load WebView script code for url: {url}");
             return false;
         }
-        
+
         if (isPlaying)
         {
             PausePlayback();
@@ -509,7 +487,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             isContentLoaded = false;
         }
-        
+
         loadedUrl = url;
         RunWhenWebViewInitialized(() =>
         {
@@ -529,7 +507,19 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         });
         return true;
     }
-    
+
+    private void UpdateWebViewCameraActive()
+    {
+        // Only render the WebView with the camera when it is visible to the user.
+        webViewCamera.gameObject.SetActive(
+            webViewCamera.targetTexture != null
+            || IsWebViewCanvasControlEnabled);
+        if (!webViewCamera.gameObject.activeSelf)
+        {
+            RenderTextureUtils.Clear(webViewCamera.targetTexture);
+        }
+    }
+
     public void ResumePlayback()
     {
         if (!IsWebViewInitialized)
@@ -561,7 +551,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         isPlaying = false;
         webView.ExecuteJavaScript("pausePlayback()");
         webView.ExecuteJavaScript("setVolume(0)");
@@ -573,75 +563,9 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         isPlaying = false;
         webView.ExecuteJavaScript("stopPlayback()");
-    }
-
-    private void ScanJavaScriptFiles()
-    {
-        if (hasScannedJavaScriptFiles)
-        {
-            return;
-        }
-        hasScannedJavaScriptFiles = true;
-        
-        string webViewScriptsFolder = ApplicationUtils.GetWebViewScriptsAbsolutePath();
-        DirectoryUtils.CreateDirectory(webViewScriptsFolder);
-        
-        string[] webViewScriptPaths = Directory.GetFiles(webViewScriptsFolder, "*.js");
-        foreach (string webViewScriptPath in webViewScriptPaths)
-        {
-            string host = Path.GetFileNameWithoutExtension(webViewScriptPath);
-            hostToWebViewScript[host] = webViewScriptPath;
-        }
-    }
-
-    private string GetWebViewScript(string url)
-    {
-        // Try get cached template for the specific URL.
-        if (urlToCachedWebViewScript.TryGetValue(url, out CachedWebViewScript cachedWebViewScript))
-        {
-            return cachedWebViewScript.Content;
-        }
-        
-        // Try get cached template for the host.
-        string urlHost = new Uri(url).Host;
-        if (!hostToCachedWebViewScript.TryGetValue(urlHost, out cachedWebViewScript))
-        {
-            // Load and remember the template for the host.
-            cachedWebViewScript = LoadAndCacheWebViewScriptForHost(urlHost);
-        }
-
-        if (cachedWebViewScript == null)
-        {
-            return "";
-        }
-        
-        // Remember the template for the specific URL.
-        urlToCachedWebViewScript[url] = cachedWebViewScript;
-        
-        return cachedWebViewScript.Content;
-    }
-
-    private CachedWebViewScript LoadAndCacheWebViewScriptForHost(string urlHost)
-    {
-        List<KeyValuePair<string, string>> matches = hostToWebViewScript
-            .Where(entry => HostsMatch(entry.Key, urlHost))
-            .ToList();
-        if (matches.IsNullOrEmpty())
-        {
-            return null;
-        }
-
-        string filePath = matches.FirstOrDefault().Value;
-        string fileContent = File.ReadAllText(filePath);
-        
-        Debug.Log($"Found WebView script for host '{urlHost}' in file '{filePath}'");
-        
-        CachedWebViewScript cachedWebViewScript = new CachedWebViewScript(fileContent);
-        hostToCachedWebViewScript[urlHost] = cachedWebViewScript;
-        return cachedWebViewScript;
     }
 
     private void RunWhenWebViewInitialized(Action action)
@@ -661,31 +585,20 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private static bool HostsMatch(string a, string b)
-    {
-        string aWithoutWww = a.Replace("www.", "");
-        string bWithoutWww = b.Replace("www.", "");
-        return aWithoutWww.ToLowerInvariant() == bWithoutWww.ToLowerInvariant();
-    }
-    
     public void ReloadScripts()
     {
-        hostToWebViewScript.Clear();
-        hostToCachedWebViewScript.Clear();
-        urlToCachedWebViewScript.Clear();
+        WebViewUtils.ClearCache();
         loadedUrl = null;
-        hasScannedJavaScriptFiles = false;
         javaScriptCanLoadUrl = false;
         Debug.Log("Reloaded WebView scripts by clearing cache.");
     }
 
-    private class CachedWebViewScript
+    public void SetWebViewRenderTexture(RenderTexture targetTexture)
     {
-        public string Content { get; private set; }
-
-        public CachedWebViewScript(string content)
+        if (webViewCamera.targetTexture != targetTexture)
         {
-            this.Content = content;
+            webViewCamera.targetTexture = targetTexture;
+            UpdateWebViewCameraActive();
         }
     }
 }

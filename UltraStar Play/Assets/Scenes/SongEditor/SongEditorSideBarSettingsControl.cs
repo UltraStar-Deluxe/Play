@@ -19,10 +19,10 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.spaceBetweenNotesTimeInMillisTextField)]
     private IntegerField spaceBetweenNotesTimeInMillisTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.addSpaceBetweenNotesButton)]
     private Button addSpaceBetweenNotesButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.goToLastPlaybackPositionToggle)]
     private Toggle goToLastPlaybackPositionToggle;
 
@@ -34,22 +34,22 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.resetMusicPlaybackSpeedButton)]
     private Button resetMusicPlaybackSpeedButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.selectModelPathButton)]
     private Button selectModelPathButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.speechRecognitionLanguageChooser)]
     private EnumField speechRecognitionLanguageChooser;
 
     [Inject(UxmlName = R.UxmlNames.speechRecognitionPromptTextField)]
     private TextField speechRecognitionPromptTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.micDeviceItemPicker)]
     private ItemPicker micDeviceItemPicker;
 
     [Inject(UxmlName = R.UxmlNames.drawNoteLayerPicker)]
     private ItemPicker drawNoteLayerPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.micDelayTextField)]
     private TextField micDelayTextField;
 
@@ -58,13 +58,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.buttonRecordingLyricsTextField)]
     private TextField buttonRecordingLyricsTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.buttonRecordingPitchTextField)]
     private TextField buttonRecordingPitchTextField;
 
     [Inject(UxmlName = R.UxmlNames.micRecordingPitchTextField)]
     private TextField micRecordingPitchTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.buttonRecordingButtonTextField)]
     private TextField buttonRecordingButtonTextField;
 
@@ -82,7 +82,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.showRightSideBarToggle)]
     private Toggle showRightSideBarToggle;
-    
+
     [Inject(UxmlName = R.UxmlNames.showAudioWaveformInBackgroundToggle)]
     private Toggle showAudioWaveformInBackgroundToggle;
 
@@ -121,7 +121,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.importMidiFileButton)]
     private Button importMidiFileButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.speechRecognitionModelPathTextField)]
     private TextField speechRecognitionModelPathTextField;
 
@@ -145,25 +145,25 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject(UxmlName = R.UxmlNames.timeLabelFormatPicker)]
     private ItemPicker timeLabelFormatPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.pitchLabelFormatPicker)]
     private ItemPicker pitchLabelFormatPicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.settingsSideBarContainer)]
     private VisualElement settingsSideBarContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.splitSyllablesAfterSpeechRecognitionToggle)]
     private Toggle splitSyllablesAfterSpeechRecognitionToggle;
-        
+
     [Inject(UxmlName = R.UxmlNames.splitSyllablesInSelectionButton)]
     private Button splitSyllablesInSelectionButton;
-    
+
     [Inject]
     private SongMeta songMeta;
 
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
 
@@ -184,36 +184,34 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
 
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private SongEditorSelectionControl selectionControl;
-    
+
     [Inject]
     private SpaceBetweenNotesAction spaceBetweenNotesAction;
 
     [Inject]
     private HyphenateNotesAction hyphenateNotesAction;
-    
+
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
-    private LabeledItemPickerControl<ESongEditorRecordingSource> recordingSourceItemPickerControl;
     private LabeledItemPickerControl<MicProfile> micDeviceItemPickerControl;
-    private LabeledItemPickerControl<ESongEditorSamplesSource> playbackAudioItemPickerControl;
-    private LabeledItemPickerControl<ESongEditorSamplesSource> speechRecognitionAudioItemPickerControl;
-    private LabeledItemPickerControl<ESongEditorSamplesSource> pitchDetectionAudioItemPickerControl;
-    private LabeledItemPickerControl<ERecordNotesOrAudio> recordNotesOrAudioItemPickerControl;
-    private LabeledItemPickerControl<ESongEditorDrawNoteLayer> drawNoteLayerPickerControl;
+    private EnumItemPickerControl<ESongEditorSamplesSource> playbackAudioItemPickerControl;
+    private EnumItemPickerControl<ESongEditorSamplesSource> speechRecognitionAudioItemPickerControl;
+    private EnumItemPickerControl<ESongEditorSamplesSource> pitchDetectionAudioItemPickerControl;
+    private EnumItemPickerControl<ESongEditorDrawNoteLayer> drawNoteLayerPickerControl;
 
     private readonly ImportMidiFileDialogControl importMidiFileDialogControl = new();
-    
+
     public void OnInjectionFinished()
     {
         injector.Inject(importMidiFileDialogControl);
 
         // Fold all AccordionItems
         settingsSideBarContainer.Query<AccordionItem>().ForEach(it => it.HideAccordionContent());
-        
+
         // Editing settings
         Bind(adjustFollowingNotesToggle,
             () => settings.SongEditorSettings.AdjustFollowingNotes,
@@ -232,19 +230,19 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MusicVolumePercent,
             newValue => settings.SongEditorSettings.MusicVolumePercent = (int) newValue);
 
-        drawNoteLayerPickerControl = new(drawNoteLayerPicker, EnumUtils.GetValuesAsList<ESongEditorDrawNoteLayer>());
+        drawNoteLayerPickerControl = new(drawNoteLayerPicker);
         drawNoteLayerPickerControl.GetLabelTextFunction = item => StringUtils.ToTitleCase(ObjectUtils.NullableToString(item, ""));
         drawNoteLayerPickerControl.Bind(
             () => settings.SongEditorSettings.DrawNoteLayer,
             newValue => settings.SongEditorSettings.DrawNoteLayer = newValue);
-        
+
         // Add space between notes
         Bind(spaceBetweenNotesTimeInMillisTextField,
             () => settings.SongEditorSettings.SpaceBetweenNotesInMillis,
             newValue => settings.SongEditorSettings.SpaceBetweenNotesInMillis = newValue);
 
         addSpaceBetweenNotesButton.RegisterCallbackButtonTriggered(_ => AddSpaceBetweenNotesInSelection());
-        
+
         // Playback speed
         songAudioPlayer.PlaybackSpeed = nonPersistentSettings.SongEditorMusicPlaybackSpeed.Value;
         Bind(musicPlaybackSpeedSlider,
@@ -257,7 +255,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             musicPlaybackSpeedSlider.value = 1;
         });
 
-        playbackAudioItemPickerControl = new(playbackAudioPicker, EnumUtils.GetValuesAsList<ESongEditorSamplesSource>());
+        playbackAudioItemPickerControl = new(playbackAudioPicker);
         playbackAudioItemPickerControl.Bind(
             () => settings.SongEditorSettings.PlaybackSamplesSource,
             newValue => settings.SongEditorSettings.PlaybackSamplesSource = newValue);
@@ -278,7 +276,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
             () => settings.SongEditorSettings.MicProfile,
             newValue => settings.SongEditorSettings.MicProfile = newValue);
         new AutoFitLabelControl(micDeviceItemPickerControl.ItemPicker.ItemLabel, 8, 15);
-        
+
         micRecordingPitchTextField.DisableParseEscapeSequences();
         Bind(micRecordingPitchTextField,
             () => MidiUtils.GetAbsoluteName(settings.SongEditorSettings.DefaultPitchForCreatedNotes),
@@ -296,7 +294,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(buttonRecordingLyricsTextField,
             () => settings.SongEditorSettings.ButtonRecordingLyrics,
             newValue => settings.SongEditorSettings.ButtonRecordingLyrics = newValue);
-        
+
         micDelayTextField.DisableParseEscapeSequences();
         Bind(micDelayTextField,
             () => settings.SongEditorSettings.MicDelayInMillis.ToString(),
@@ -318,7 +316,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                     settings.SongEditorSettings.DefaultPitchForCreatedNotes = newMidiNote;
                 }
             });
-        
+
         buttonRecordingButtonTextField.DisableParseEscapeSequences();
         Bind(buttonRecordingButtonTextField,
             () => settings.SongEditorSettings.ButtonDisplayNameForButtonRecording,
@@ -328,15 +326,15 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(midiNotePlayAlongToggle,
             () => settings.SongEditorSettings.MidiSoundPlayAlongEnabled,
             newValue => settings.SongEditorSettings.MidiSoundPlayAlongEnabled = newValue);
-        
+
         Bind(midiGainSlider,
             () => settings.SongEditorSettings.MidiGain,
             newValue => settings.SongEditorSettings.MidiGain = newValue);
-        
+
         Bind(midiVelocitySlider,
             () => settings.SongEditorSettings.MidiVelocity,
             newValue => settings.SongEditorSettings.MidiVelocity = (int)newValue);
-        
+
         midiDelayTextField.DisableParseEscapeSequences();
         Bind(midiDelayTextField,
             () => settings.SongEditorSettings.MidiPlaybackOffsetInMillis.ToString(),
@@ -355,21 +353,21 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 return EWhisperLanguage.English;
             },
             newValue => settings.SongEditorSettings.SpeechRecognitionLanguage = newValue.ToString());
-        
+
         Bind(speechRecognitionPromptTextField,
             () => settings.SongEditorSettings.SpeechRecognitionPrompt,
             newValue => settings.SongEditorSettings.SpeechRecognitionPrompt = newValue);
-        
+
         sentenceLineSizeTextField.DisableParseEscapeSequences();
         Bind(speechRecognitionModelPathTextField,
             () => settings.SongEditorSettings.SpeechRecognitionModelPath,
             newValue => settings.SongEditorSettings.SpeechRecognitionModelPath = newValue);
-        
+
         speechRecognitionPhrasesTextField.DisableParseEscapeSequences();
         Bind(speechRecognitionPhrasesTextField,
             () => settings.SongEditorSettings.SpeechRecognitionPhrases,
             newValue => settings.SongEditorSettings.SpeechRecognitionPhrases = newValue);
-        
+
         if (PlatformUtils.IsStandalone)
         {
             selectModelPathButton.RegisterCallbackButtonTriggered(_ =>
@@ -410,20 +408,20 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(splitSyllablesAfterSpeechRecognitionToggle,
             () => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition,
             newValue => settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition = newValue);
-        
+
         splitSyllablesInSelectionButton.RegisterCallbackButtonTriggered(_ => SplitSyllablesInSelection());
-        
+
         // Pitch detection
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmItemPicker)
             .Bind(() => settings.SongEditorSettings.PitchDetectionAlgorithm,
                 newValue => settings.SongEditorSettings.PitchDetectionAlgorithm = newValue);
         new AutoFitLabelControl(pitchDetectionAlgorithmItemPicker.ItemLabel, 8, 15);
-        
+
         pitchDetectionAudioItemPickerControl = new(pitchDetectionAudioPicker, speechAndPitchAnalysisSampleSources);
         pitchDetectionAudioItemPickerControl.Bind(
             () => settings.SongEditorSettings.PitchDetectionSamplesSource,
             newValue => settings.SongEditorSettings.PitchDetectionSamplesSource = newValue);
-        
+
         audioSeparationButton.RegisterCallbackButtonTriggered(_ =>
         {
             if (SongMetaUtils.VocalsAudioResourceExists(songMeta)
@@ -482,18 +480,18 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         Bind(gridSizeTextField,
             () => settings.SongEditorSettings.GridSizeInPx.ToString(CultureInfo.InvariantCulture),
             newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.GridSizeInPx = newFloatValue));
-        
+
         sentenceLineSizeTextField.DisableParseEscapeSequences();
         Bind(sentenceLineSizeTextField,
             () => settings.SongEditorSettings.SentenceLineSizeInPx.ToString(CultureInfo.InvariantCulture),
             newValue => PropertyUtils.TrySetFloatFromString(newValue, newFloatValue => settings.SongEditorSettings.SentenceLineSizeInPx = newFloatValue));
-        
+
         // Labels
-        new LabeledItemPickerControl<ESongEditorTimeLabelFormat>(timeLabelFormatPicker, EnumUtils.GetValuesAsList<ESongEditorTimeLabelFormat>())
+        new EnumItemPickerControl<ESongEditorTimeLabelFormat>(timeLabelFormatPicker)
             .Bind(() => settings.SongEditorSettings.TimeLabelFormat,
                 newValue => settings.SongEditorSettings.TimeLabelFormat = newValue);
-        
-        new LabeledItemPickerControl<ESongEditorPitchLabelFormat>(pitchLabelFormatPicker, EnumUtils.GetValuesAsList<ESongEditorPitchLabelFormat>())
+
+        new EnumItemPickerControl<ESongEditorPitchLabelFormat>(pitchLabelFormatPicker)
             .Bind(() => settings.SongEditorSettings.PitchLabelFormat,
                 newValue => settings.SongEditorSettings.PitchLabelFormat = newValue);
     }
@@ -505,7 +503,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         {
             return;
         }
-        
+
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
         if (selectedNotes.IsNullOrEmpty())
         {
@@ -523,13 +521,13 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
         {
             return;
         }
-        
+
         List<Note> selectedNotes = selectionControl.GetSelectedNotes();
         if (selectedNotes.IsNullOrEmpty())
         {
             return;
         }
-        
+
         spaceBetweenNotesAction.ExecuteAndNotify(songMeta, selectedNotes, spaceInMillis);
     }
 

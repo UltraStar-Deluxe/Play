@@ -62,7 +62,14 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable
             {
                 audioWaveFormLabel.text = "";
             }
-            audioWaveFormVisualizer = new AudioWaveFormVisualization(gameObject, audioWaveForm);
+            int textureWidth = 256;
+            int textureHeight = 128;
+            audioWaveFormVisualizer = new AudioWaveFormVisualization(
+                gameObject,
+                audioWaveForm,
+                textureWidth,
+                textureHeight,
+                $"song select mic audio visualization of '{micProfile.GetDisplayNameWithChannel()}'");
         });
     }
 

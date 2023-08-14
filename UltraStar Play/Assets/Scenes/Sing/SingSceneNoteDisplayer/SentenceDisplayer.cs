@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -13,15 +14,71 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
     [Inject]
     private PlayerControl playerControl;
 
+    [Inject]
+    private SongAudioPlayer songAudioPlayer;
+
     private Sentence currentSentence;
-    
+
+    private double maxMicDelayInMillis = -1;
+    private double MaxMicDelayInMillis
+    {
+        get
+        {
+            if (maxMicDelayInMillis < 0
+                && !singSceneControl.PlayerControls.IsNullOrEmpty())
+            {
+                List<int> micDelays = singSceneControl.PlayerControls
+                    .Where(it => it.MicProfile != null)
+                    .Select(it => it.MicProfile.DelayInMillis)
+                    .ToList();
+                maxMicDelayInMillis = !micDelays.IsNullOrEmpty() ? micDelays.Max() : 0;
+                return maxMicDelayInMillis;
+            }
+
+            return maxMicDelayInMillis;
+        }
+    }
+    private PlayerControl.EnterSentenceEvent lastEnterSentenceEvent;
+
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
-        playerControl.EnterSentenceEventStream.Subscribe(enterSentenceEvent =>
+        playerControl.EnterSentenceEventStream
+            .Subscribe(evt => OnEnterSentence(evt))
+            .AddTo(gameObject);
+    }
+
+    private void OnEnterSentence(PlayerControl.EnterSentenceEvent evt)
+    {
+        lastEnterSentenceEvent = evt;
+        Sentence sentence = evt.Sentence;
+
+        // Delay displaying next sentence for the mic delay if possible.
+        double delayInMillis = 0;
+        if (sentence != null)
         {
-            DisplaySentence(enterSentenceEvent.Sentence);
-        });
+            double positionInSongInMillis = songAudioPlayer.PositionInSongInMillis;
+            double durationInMillisUntilSentenceStart = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat) - positionInSongInMillis;
+            delayInMillis = Math.Min(durationInMillisUntilSentenceStart, MaxMicDelayInMillis);
+        }
+
+        if (delayInMillis > 0)
+        {
+            float delayInSeconds = (float)(delayInMillis / 1000);
+            MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(
+                delayInSeconds, () =>
+                {
+                    // Only show the sentence if there was no other event in the meantime.
+                    if (lastEnterSentenceEvent == evt)
+                    {
+                        DisplaySentence(sentence);
+                    }
+                }));
+        }
+        else
+        {
+            DisplaySentence(sentence);
+        }
     }
 
     private void DisplaySentence(Sentence sentence)
@@ -33,7 +90,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
             // Afterwards, fade out notes, then remove notes.
             if (playerControl != null)
             {
-                playerControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, 
+                playerControl.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f,
                     () =>
                     {
                         currentSentence = sentence;
@@ -47,7 +104,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
             currentSentence = sentence;
             RemoveAllDisplayedNotes();
         }
-        
+
         if (sentence == null
             || !medleyControl.IsSentenceInMedleyRange(sentence))
         {
@@ -92,7 +149,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
 
         base.DisplayRecordedNote(recordedNote);
     }
-    
+
     protected override void UpdateTargetNoteControl(TargetNoteControl targetNoteControl, int indexInList)
     {
         UpdateNotePosition(targetNoteControl.VisualElement, targetNoteControl.Note.MidiNote, targetNoteControl.Note.StartBeat, targetNoteControl.Note.EndBeat);
@@ -105,7 +162,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         {
             return 0;
         }
-        
+
         int sentenceStartBeat = currentSentence.MinBeat;
         int sentenceLengthInBeat = currentSentence.LengthInBeats;
         double sentenceStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentenceStartBeat);
@@ -121,7 +178,7 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
             result = Rect.zero;
             return false;
         }
-        
+
         int sentenceStartBeat = currentSentence.MinBeat;
         int sentenceEndBeat = currentSentence.MaxBeat;
         int beatsInSentence = sentenceEndBeat - sentenceStartBeat;

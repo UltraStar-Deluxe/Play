@@ -13,7 +13,7 @@ public static class DirectoryUtils
             Directory.CreateDirectory(path);
         }
     }
-    
+
     public static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
     {
         List<string> result = new();
@@ -27,7 +27,7 @@ public static class DirectoryUtils
             .Distinct()
             .ToList();
     }
-    
+
     public static bool IsSubDirectory(string potentialSubDirectory, string potentialAncestorDirectory)
     {
         string potentialAncestorDirectoryFullName = new DirectoryInfo(potentialAncestorDirectory).FullName;
@@ -40,17 +40,17 @@ public static class DirectoryUtils
         return !directory.IsNullOrEmpty() && Directory.Exists(directory);
     }
 
-    public static void Delete(string path)
+    public static void Delete(string path, bool recusive)
     {
         if (path.IsNullOrEmpty()
             || !Exists(path))
         {
             return;
         }
-        
-        Directory.Delete(path, true);
+
+        Directory.Delete(path, recusive);
     }
-    
+
     public static void CopyAll(string sourceDirectory, string targetDirectory, LogEventLevel logEventLevel = LogEventLevel.Verbose)
     {
         if (sourceDirectory.IsNullOrEmpty()
@@ -58,9 +58,9 @@ public static class DirectoryUtils
         {
             return;
         }
-    
+
         Debug.Log($"Copying folder '{sourceDirectory}' to '{targetDirectory}'");
-         
+
         DirectoryInfo diSource = new DirectoryInfo(sourceDirectory);
         DirectoryInfo diTarget = new DirectoryInfo(targetDirectory);
 
@@ -75,8 +75,8 @@ public static class DirectoryUtils
         {
             return;
         }
-        Log.WithLevel(logEventLevel, () => $"Copying folder '{source}' to '{target}'"); 
-        
+        Log.WithLevel(logEventLevel, () => $"Copying folder '{source}' to '{target}'");
+
         Directory.CreateDirectory(target.FullName);
 
         // Copy each file into the new directory.

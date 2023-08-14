@@ -18,9 +18,6 @@ public class SongSelectSongPreviewControl : SongPreviewControl
     private SongSelectSceneControl songSelectSceneControl;
 
     [Inject]
-    private WebViewManager webViewManager;
-    
-    [Inject]
     private ThemeManager themeManager;
     
     [Inject(UxmlName = R.UxmlNames.songPreviewVideoImage)]
@@ -52,7 +49,7 @@ public class SongSelectSongPreviewControl : SongPreviewControl
                 return;
             }
 
-            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(currentSongEntryControl.SongMeta, webViewManager.CanHandleUrl);
+            string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(currentSongEntryControl.SongMeta, WebViewUtils.CanHandleWebViewUrl);
             if (SongMetaUtils.ResourceExists(currentSongEntryControl.SongMeta, videoUri))
             {
                 songPreviewVideoImage.ShowByDisplay();
