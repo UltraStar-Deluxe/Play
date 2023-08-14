@@ -781,6 +781,11 @@
     height: auto;
 }
 
+#loadedOptionsRoot > ScrollView > Toggle {
+    margin-bottom: 16px;
+    height: auto;
+}
+
 /**************************************************/
 /* ABOUT SCENE */
 /**************************************************/

@@ -53,8 +53,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.animatedBackgroundItemToggle)]
     private Toggle animatedBackgroundItemToggle;
 
-    [Inject(UxmlName = R.UxmlNames.disableDynamicThemesToggle)]
-    private Toggle disableDynamicThemesToggle;
+    [Inject(UxmlName = R.UxmlNames.enableDynamicThemesToggle)]
+    private Toggle enableDynamicThemesToggle;
 
     [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidToggle)]
     private Toggle customEventSystemOptInOnAndroidToggle;
@@ -201,15 +201,15 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.AnimatedBackground,
             newValue => settings.AnimatedBackground = newValue);
 
-        FieldBindingUtils.Bind(disableDynamicThemesToggle,
-            () => settings.DisableDynamicThemes,
-            disableDynamicThemes =>
+        FieldBindingUtils.Bind(enableDynamicThemesToggle,
+            () => settings.EnableDynamicThemes,
+            enableDynamicThemes =>
                 {
-                    if (disableDynamicThemes)
+                    if (!enableDynamicThemes)
                     {
                         themeManager.SetCurrentTheme(themeManager.GetDefaultTheme());
                     }
-                    settings.DisableDynamicThemes = disableDynamicThemes;
+                    settings.EnableDynamicThemes = enableDynamicThemes;
                 });
 
         FieldBindingUtils.Bind(disableWebViewToggle,

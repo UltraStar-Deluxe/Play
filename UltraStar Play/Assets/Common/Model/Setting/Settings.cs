@@ -74,7 +74,7 @@ public class Settings : ISettings
 
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
-    public bool DisableDynamicThemes { get; set; }
+    public bool EnableDynamicThemes { get; set; } = true;
     // Screen.currentResolution may only be called from Start() and Awake(), thus use a dummy here.
     public bool AnimatedBackground { get; set; } = true;
     public int BackgroundLightIndex { get; set; } = 4;

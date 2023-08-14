@@ -39,7 +39,7 @@
             <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
             <ui:Toggle name="analyzeBeatsWithoutTargetNoteToggle" label="Analyze Beats Without Target Note" class="noBackgroundInHierarchy" />
             <ui:Toggle name="animatedBackgroundItemToggle" label="Animated Background¹" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="disableDynamicThemesToggle" label="Disable Themes¹" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="enableDynamicThemesToggle" label="Enable Themes¹" class="noBackgroundInHierarchy" />
             <ui:Toggle name="disableWebViewToggle" label="Disable embedded browser¹" wrapAround="true" class="noBackgroundInHierarchy" />
             <ui:Toggle name="useUniversalCharsetDetectorToggle" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
             <ui:Toggle name="customEventSystemOptInOnAndroidToggle" label="Use custom event system&#10;for input actions.&#10;This enables keyboard&#10;and gamepad control&#10;but can cause issues on Android¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />

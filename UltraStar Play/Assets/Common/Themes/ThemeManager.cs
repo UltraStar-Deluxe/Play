@@ -230,7 +230,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void LoadCurrentTheme()
     {
-        if (settings.DisableDynamicThemes)
+        if (!settings.EnableDynamicThemes)
         {
             DisableDynamicBackground();
             return;
@@ -666,7 +666,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         // using DisposableStopwatch d = new("ThemeManager.DoApplyThemeSpecificStylesToVisualElements");
 
-        if (settings.DisableDynamicThemes)
+        if (!settings.EnableDynamicThemes)
         {
             DisableDynamicBackground();
             return;

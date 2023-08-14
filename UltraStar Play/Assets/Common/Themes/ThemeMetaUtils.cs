@@ -31,9 +31,9 @@ public static class ThemeMetaUtils
             // No theme background in sing scene
             return false;
         }
-        
+
         StaticBackgroundJson staticBackgroundJson = GetStaticBackgroundJsonForScene(themeMeta, scene);
-        return !settings.DisableDynamicThemes
+        return settings.EnableDynamicThemes
                && (staticBackgroundJson != null
                    && !staticBackgroundJson.imagePath.IsNullOrEmpty());
     }
@@ -46,7 +46,7 @@ public static class ThemeMetaUtils
         {
             return staticAndDynamicBackgroundJson.staticBackground;
         }
-        
+
         return themeMeta.ThemeJson.staticBackground;
     }
 
@@ -59,7 +59,7 @@ public static class ThemeMetaUtils
         }
 
         DynamicBackgroundJson dynamicBackgroundJson = GetDynamicBackgroundJsonForScene(themeMeta, scene);
-        return !settings.DisableDynamicThemes
+        return settings.EnableDynamicThemes
                 && dynamicBackgroundJson != null;
     }
 
@@ -71,7 +71,7 @@ public static class ThemeMetaUtils
         {
             return staticAndDynamicBackgroundJson.dynamicBackground;
         }
-        
+
         return themeMeta.ThemeJson.dynamicBackground;
     }
 }
