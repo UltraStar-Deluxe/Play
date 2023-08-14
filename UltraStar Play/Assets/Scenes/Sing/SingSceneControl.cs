@@ -297,7 +297,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         songTimeProgressBar.value = 0;
         songAudioPlayer.PositionInSongEventStream.Subscribe(_ =>
         {
-            double progressInPercent = 100 * (songAudioPlayer.PositionInSongInMillis / songAudioPlayer.DurationOfSongInMillis);
+            double startTagInMillis = SongMeta.Start * 1000;
+            double endTagInMillis = SongMeta.End;
+            double positionInSongInMillisConsideringStartTag = songAudioPlayer.PositionInSongInMillis - startTagInMillis;
+            double durationOfSongInMillisConsideringStartAndEndTag = songAudioPlayer.DurationOfSongInMillis - startTagInMillis - endTagInMillis;
+            double progressInPercent = 100 * (positionInSongInMillisConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
             songTimeProgressBar.value = (float) progressInPercent;
         });
         settings.ObserveEveryValueChanged(it => it.ShowSongProgressBar)
