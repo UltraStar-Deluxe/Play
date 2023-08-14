@@ -95,8 +95,14 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
     [Inject(UxmlName = R.UxmlNames.micConfigurationContainer)]
     private VisualElement micConfigurationContainer;
 
-    // [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
-    // private ItemPicker micPlaybackVolumeChooser;
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
+    private Toggle playRecordedAudioToggle;
+
+    [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
+    private VisualElement playRecordedAudioInfoContainer;
+
+    [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
+    private ItemPicker micPlaybackVolumeChooser;
 
     private SampleRatePickerControl sampleRatePickerControl;
     private LabeledItemPickerControl<MicProfile> devicePickerControl;
@@ -274,6 +280,20 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         {
             usePortAudioToggle.HideByDisplay();
         }
+
+        // Play recorded audio
+        FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
+            () => settings.PlayRecordedAudio,
+            newValue => settings.PlayRecordedAudio = newValue);
+
+        PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
+        micPlaybackVolumePickerControl.Bind(
+            () => settings.MicrophonePlaybackVolumePercent,
+            newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
+
+        settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
+            .Subscribe(newValue => micPlaybackVolumeChooser.SetVisibleByDisplay(newValue))
+            .AddTo(gameObject);
     }
 
     private void OnConnectedMicDevicesChanged()

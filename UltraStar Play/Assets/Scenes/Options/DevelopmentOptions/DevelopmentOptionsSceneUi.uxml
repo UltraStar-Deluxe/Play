@@ -17,12 +17,6 @@
             <ItemPicker name="portAudioHostApiPicker" label="PortAudio Host API¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="portAudioOutputDevicePicker" label="PortAudio Output Device" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ui:Button text="Show PortAudio Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
-            <ui:Toggle name="playRecordedAudioToggle" label="Play Recorded Audio" style="margin-bottom: 0;" />
-            <ui:VisualElement name="playRecordedAudioInfoContainer" class="mb-3" style="flex-direction: row; align-items: center;">
-                <MaterialIcon tabindex="-1" name="infoIcon" icon="info_outline" class="smallFont mr-1 nBackgroundInHierarchy" />
-                <ui:Label tabindex="-1" text="Does not work with Companion App" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
-            </ui:VisualElement>
-            <ItemPicker name="micPlaybackVolumeChooser" label="Microphone Playback Volume" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
             <ItemPicker name="systemAudioBackendDelayPicker" label="System Audio Backend Delay" wrap-around="true" min-value="0" max-value="500" step-value="10" />
             <ItemPicker name="useVlcToPlayMediaFilesPicker" label="Use VLC to Play Audio&#10;and Video Files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy" />

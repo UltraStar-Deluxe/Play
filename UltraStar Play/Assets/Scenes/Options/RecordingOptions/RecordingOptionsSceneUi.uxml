@@ -30,8 +30,13 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="globalSettingsContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                         <ui:Label tabindex="-1" text="Global Settings" display-tooltip-when-elided="true" name="globalSettingsLabel" class="noBackgroundInHierarchy" style="width: 100%; -unity-text-align: upper-center; -unity-font-style: bold; margin-top: 10px; margin-bottom: 10px;" />
-                        <ui:Toggle name="playRecordedAudioToggle" label="Play recorded audio" class="noBackgroundInHierarchy" style="display: none;" />
-                        <ui:Toggle name="usePortAudioToggle" label="Multi-channel&#10;and low-latency support" class="noBackgroundInHierarchy mt-3" />
+                        <ui:Toggle name="usePortAudioToggle" label="Multi-channel&#10;and low-latency support" class="noBackgroundInHierarchy mt-3 mb-3" />
+                        <ui:Toggle name="playRecordedAudioToggle" label="Play Recorded Audio" style="margin-bottom: 0;" />
+                        <ui:VisualElement name="playRecordedAudioInfoContainer" style="flex-direction: row; align-items: center;">
+                            <MaterialIcon tabindex="-1" name="infoIcon" icon="info_outline" class="smallFont mr-1 nBackgroundInHierarchy" />
+                            <ui:Label tabindex="-1" text="Experimental, does not work with Companion App" name="playRecordedAudioInfoLabel" class="smallFont playRecordedAudioInfoContainer" />
+                        </ui:VisualElement>
+                        <ItemPicker name="micPlaybackVolumeChooser" label="Microphone Playback Volume" wrap-around="true" min-value="0" max-value="1000" step-value="10" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:ScrollView>

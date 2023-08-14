@@ -20,17 +20,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.showFpsToggle)]
     private Toggle showFpsToggle;
 
-    [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
-    private Toggle playRecordedAudioToggle;
-
-    [Inject(UxmlName = R.UxmlNames.micPlaybackVolumeChooser)]
-    private ItemPicker micPlaybackVolumeChooser;
-
     [Inject(UxmlName = R.UxmlNames.systemAudioBackendDelayPicker)]
     private ItemPicker systemAudioBackendDelayPicker;
-
-    [Inject(UxmlName = R.UxmlNames.playRecordedAudioInfoContainer)]
-    private VisualElement playRecordedAudioInfoContainer;
 
     [Inject(UxmlName = R.UxmlNames.portAudioOutputDevicePicker)]
     private ItemPicker portAudioOutputDevicePicker;
@@ -370,25 +361,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
         settings.ObserveEveryValueChanged(it => it.PortAudioHostApi)
             .Subscribe(newValue => portAudioOutputDevicePickerControl.Items = GetAvailablePortAudioOutputDeviceNames())
-            .AddTo(gameObject);
-
-        // Play recorded audio
-        FieldBindingUtils.Bind(gameObject, playRecordedAudioToggle,
-            () => settings.PlayRecordedAudio,
-            newValue => settings.PlayRecordedAudio = newValue);
-
-        // Recorded audio playback volume
-        PercentNumberPickerControl micPlaybackVolumePickerControl = new(micPlaybackVolumeChooser);
-        micPlaybackVolumePickerControl.Bind(
-            () => settings.MicrophonePlaybackVolumePercent,
-            newValue => settings.MicrophonePlaybackVolumePercent = (int)newValue);
-
-        // Only visible when play recorded audio is enabled
-        settings.ObserveEveryValueChanged(it => it.PlayRecordedAudio)
-            .Subscribe(newValue =>
-            {
-                micPlaybackVolumeChooser.SetVisibleByDisplay(newValue);
-            })
             .AddTo(gameObject);
 
         // System audio backend delay
