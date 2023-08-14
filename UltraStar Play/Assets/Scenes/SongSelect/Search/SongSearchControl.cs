@@ -15,10 +15,10 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 {
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
 
@@ -27,19 +27,22 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     [Inject(UxmlName = R.UxmlNames.searchPropertyButton)]
     private Button searchPropertyButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.filterActiveIcon)]
     private VisualElement filterActiveIcon;
 
+    [Inject(UxmlName = R.UxmlNames.resetActiveFiltersButton)]
+    private Button resetActiveFiltersButton;
+
     [Inject(UxmlName = R.UxmlNames.filterInactiveIcon)]
     private VisualElement filterInactiveIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
 
     [Inject(UxmlName = R.UxmlNames.playlistDropdownField)]
     private DropdownField playlistDropdownField;
-    
+
     [Inject(UxmlName = R.UxmlNames.artistPropertyToggle)]
     private Toggle artistPropertyToggle;
 
@@ -63,19 +66,22 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     [Inject(UxmlName = R.UxmlNames.searchErrorIcon)]
     private VisualElement searchErrorIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownContainer)]
     private VisualElement searchPropertyDropdownContainer;
+
+    [Inject]
+    private SongSelectionPlaylistChooserControl playlistChooserControl;
 
     [Inject]
     private Injector injector;
 
     [Inject]
     private SongRouletteControl songRouletteControl;
-    
+
     [Inject]
     private SongSelectFilterControl songSelectFilterControl;
-    
+
     [Inject]
     private PlaylistManager playlistManager;
 
@@ -95,11 +101,11 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     public IObservable<bool> SubmitEventStream => submitEventStream;
 
     private bool isInjectionFinished;
-    
+
     public void OnInjectionFinished()
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSearchControl.OnInjectionFinished");
-        
+
         isInjectionFinished = true;
         searchProperties = new HashSet<ESearchProperty>(settings.SearchProperties);
         searchTextField.RegisterValueChangedCallback(evt =>
@@ -111,7 +117,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         new TextFieldHintControl(searchTextFieldHint);
 
         songSelectSceneInputControl.FuzzySearchText.Subscribe(newValue => searchTextFieldHint.SetVisibleByVisibility(newValue.IsNullOrEmpty()));
-        
+
         searchErrorIcon.HideByDisplay();
         searchErrorIconTooltipControl = new(searchErrorIcon);
 
@@ -131,17 +137,18 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
         filterActiveIcon.HideByDisplay();
         nonPersistentSettings.PlaylistName
-            .Subscribe(_ => UpdateFilterActiveIcon());
+            .Subscribe(_ => UpdateAnyFiltersActive());
         playlistManager.PlaylistChangeEventStream
-            .Subscribe(_ => UpdateFilterActiveIcon());
+            .Subscribe(_ => UpdateAnyFiltersActive());
         songSelectFilterControl.FiltersChangedEventStream
-            .Subscribe(_ => UpdateFilterActiveIcon());
+            .Subscribe(_ => UpdateAnyFiltersActive());
+        resetActiveFiltersButton.RegisterCallbackButtonTriggered(_ => ResetActiveFilters());
 
         if (!nonPersistentSettings.ActiveSearchPropertyFilters.IsNullOrEmpty())
         {
             songSelectFilterControl.InitFilters();
         }
-        
+
         RegisterToggleSearchPropertyCallback(artistPropertyToggle, ESearchProperty.Artist);
         RegisterToggleSearchPropertyCallback(titlePropertyToggle, ESearchProperty.Title);
         RegisterToggleSearchPropertyCallback(genrePropertyToggle, ESearchProperty.Genre);
@@ -167,13 +174,20 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         });
     }
 
-    private void UpdateFilterActiveIcon()
+    private void ResetActiveFilters()
+    {
+        playlistChooserControl.Reset();
+        songSelectFilterControl.Reset();
+        searchTextField.value = "";
+    }
+
+    private void UpdateAnyFiltersActive()
     {
         IPlaylist activePlaylist = playlistManager.GetPlaylistByName(nonPersistentSettings.PlaylistName.Value);
         bool isAnyFilterOrPlaylistActive = songSelectFilterControl.IsAnyFilterActive
                                            || (activePlaylist != null &&
                                                activePlaylist is not UltraStarAllSongsPlaylist);
-                
+
         filterActiveIcon.SetVisibleByDisplay(isAnyFilterOrPlaylistActive);
         filterInactiveIcon.SetVisibleByDisplay(!isAnyFilterOrPlaylistActive);
     }
@@ -407,7 +421,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         {
             return;
         }
-        
+
         artistPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_artist);
         titlePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_title);
         editionPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_edition);

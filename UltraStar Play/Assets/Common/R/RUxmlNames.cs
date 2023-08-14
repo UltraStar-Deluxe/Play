@@ -588,6 +588,7 @@ public static partial class R
         public const string removeWebCamImageButton = "removeWebCamImageButton";
         public const string removeWebCamImageIcon = "removeWebCamImageIcon";
         public const string requiresRestartLabel = "requiresRestartLabel";
+        public const string resetActiveFiltersButton = "resetActiveFiltersButton";
         public const string resetMusicPlaybackSpeedButton = "resetMusicPlaybackSpeedButton";
         public const string resolutionPicker = "resolutionPicker";
         public const string restartButton = "restartButton";
@@ -624,6 +625,7 @@ public static partial class R
         public const string searchPreviousIcon = "searchPreviousIcon";
         public const string searchPropertyAccordionItem = "searchPropertyAccordionItem";
         public const string searchPropertyButton = "searchPropertyButton";
+        public const string searchPropertyDialogRoot = "searchPropertyDialogRoot";
         public const string searchPropertyDropdownContainer = "searchPropertyDropdownContainer";
         public const string searchPropertyDropdownOverlay = "searchPropertyDropdownOverlay";
         public const string searchPropertyScrollView = "searchPropertyScrollView";
