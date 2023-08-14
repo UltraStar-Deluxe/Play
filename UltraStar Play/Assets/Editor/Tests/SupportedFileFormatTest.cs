@@ -9,13 +9,13 @@ public class SupportedFileFormatTest
     {
         List<string> expectedAudioFormats = new List<string>()
         {
+            "aac",
+            "aiff",
+            "flac",
+            "m4a",
             "mp3",
             "ogg",
             "wav",
-            "flac",
-            "aiff",
-            "aac",
-            "m4a",
             "wma",
         };
         List<string> supportedFormats = ApplicationUtils.ffmpegSupportedAudioFiles.ToList();
@@ -30,13 +30,15 @@ public class SupportedFileFormatTest
     {
         List<string> expectedVideoFormats = new List<string>()
         {
-            "webm",
-            "mp4",
-            "mov",
-            "wmv",
             "avi",
-            "mkv",
+            "f4v",
             "flv",
+            "mkv",
+            "mov",
+            "mp4",
+            "mpg",
+            "webm",
+            "wmv",
         };
         List<string> supportedFormats = ApplicationUtils.ffmpegSupportedVideoFiles.ToList();
         foreach (string expectedVideoFormat in expectedVideoFormats)

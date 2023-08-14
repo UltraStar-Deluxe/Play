@@ -53,4 +53,16 @@ public class AudioFileFormatTests : AbstractMediaFileFormatTests
     {
         return AudioFileTest("flac-");
     }
+
+    [UnityTest]
+    public IEnumerator M4aTest()
+    {
+        return AudioFileTest("m4a-");
+    }
+
+    [UnityTest]
+    public IEnumerator WmaTest()
+    {
+        return AudioFileTest("wma-");
+    }
 }
