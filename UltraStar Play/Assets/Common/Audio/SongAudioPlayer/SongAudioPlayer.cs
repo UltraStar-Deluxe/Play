@@ -777,8 +777,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             if (vlcMediaPlayer == null)
             {
                 vlcMediaPlayer = vlcManager.CreateMediaPlayer();
-                vlcMediaPlayer.Mute = false;
-                vlcMediaPlayer.SetVolume(100);
             }
 
             if (vlcMediaPlayer.Media != null)

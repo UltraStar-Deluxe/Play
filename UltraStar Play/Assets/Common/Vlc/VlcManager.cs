@@ -177,10 +177,6 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         mediaPlayer.SetAudioCallbacks(OnVlcAudioPlayMuted, OnVlcAudioPauseMuted, OnVlcAudioResumeMuted, OnVlcAudioFlushMuted, OnVlcAudioDrainMuted);
-
-        // TODO: Muting a single VLC MediaPlayer does not work.
-        // mediaPlayer.Mute = true;
-        // mediaPlayer.SetVolume(0);
     }
 
     private void OnVlcAudioDrainMuted(IntPtr data)

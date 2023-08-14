@@ -452,7 +452,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             // Instantiate new vlc player
             if (vlcMediaPlayer == null
-                || vlcMediaPlayer == songAudioPlayer.VlcMediaPlayer)
+                || IsVlcMediaPlayerFromSongAudioPlayer)
             {
                 vlcMediaPlayer = vlcManager.CreateMediaPlayer();
                 vlcManager.DisableMediaPlayerAudioOutput(vlcMediaPlayer);
