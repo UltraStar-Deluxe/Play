@@ -29,11 +29,11 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
     [Inject(UxmlName = R.UxmlNames.teamList)]
     private VisualElement teamList;
 
-    [Inject(UxmlName = R.UxmlNames.freeForAllItemPicker)]
-    private ItemPicker freeForAllItemPicker;
+    [Inject(UxmlName = R.UxmlNames.freeForAllItemToggle)]
+    private Toggle freeForAllItemToggle;
 
-    [Inject(UxmlName = R.UxmlNames.knockOutTournamentItemPicker)]
-    private ItemPicker knockOutTournamentItemPicker;
+    [Inject(UxmlName = R.UxmlNames.knockOutTournamentItemToggle)]
+    private Toggle knockOutTournamentItemToggle;
 
     [Inject(UxmlName = R.UxmlNames.addTeamButton)]
     private Button addTeamButton;
@@ -43,7 +43,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     [Inject(UxmlName = R.UxmlNames.teamColumnsContainer)]
     private VisualElement teamColumnsContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.teamConfigUiRoot)]
     private VisualElement teamConfigUiRoot;
 
@@ -52,13 +52,13 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
 
     public void OnInjectionFinished()
     {
-        new BoolPickerControl(freeForAllItemPicker)
-            .Bind(() => partyModeSettings.TeamSettings.IsFreeForAll,
-                newValue => partyModeSettings.TeamSettings.IsFreeForAll = newValue);
+        FieldBindingUtils.Bind(freeForAllItemToggle,
+            () => partyModeSettings.TeamSettings.IsFreeForAll,
+            newValue => partyModeSettings.TeamSettings.IsFreeForAll = newValue);
 
-        new BoolPickerControl(knockOutTournamentItemPicker)
-            .Bind(() => partyModeSettings.TeamSettings.IsKnockOutTournament, 
-                newValue => partyModeSettings.TeamSettings.IsKnockOutTournament = newValue);
+        FieldBindingUtils.Bind(knockOutTournamentItemToggle,
+            () => partyModeSettings.TeamSettings.IsKnockOutTournament,
+            newValue => partyModeSettings.TeamSettings.IsKnockOutTournament = newValue);
 
         partyModeSettings.ObserveEveryValueChanged(it => it.TeamSettings.IsFreeForAll)
             .Subscribe(_ => UpdateTeams());
@@ -106,7 +106,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
         playerToVisualElement.Clear();
 
         partyModeSettings.TeamSettings.Teams.ForEach(team => CreateTeamUi(team));
-        
+
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(teamList);
     }
 
@@ -217,7 +217,7 @@ public class PartyModeTeamConfigControl : INeedInjection, IInjectionFinishedList
             MovePlayerToRightTeam(team, playerProfile, isGuest);
             // Focus new button
             playerToVisualElement[playerProfile]?.Q<Button>(R.UxmlNames.rightButton)?.Focus();
-            
+
         });
     }
 

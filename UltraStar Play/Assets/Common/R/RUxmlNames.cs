@@ -24,10 +24,10 @@ public static partial class R
         public const string advancedSearchAccordionItem = "advancedSearchAccordionItem";
         public const string allCharactersContainer = "allCharactersContainer";
         public const string amplificationPicker = "amplificationPicker";
-        public const string analyzeBeatsWithoutTargetNotePicker = "analyzeBeatsWithoutTargetNotePicker";
+        public const string analyzeBeatsWithoutTargetNoteToggle = "analyzeBeatsWithoutTargetNoteToggle";
         public const string androidSongFolderHintContainer = "androidSongFolderHintContainer";
         public const string androidSongFolderHintLabel = "androidSongFolderHintLabel";
-        public const string animatedBackgroundItemPicker = "animatedBackgroundItemPicker";
+        public const string animatedBackgroundItemToggle = "animatedBackgroundItemToggle";
         public const string animateSceneChangeVolumePicker = "animateSceneChangeVolumePicker";
         public const string applyResolutionButton = "applyResolutionButton";
         public const string appOptionsButton = "appOptionsButton";
@@ -85,7 +85,7 @@ public static partial class R
         public const string changeVoiceButton = "changeVoiceButton";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
-        public const string checkCodecIsSupportedPicker = "checkCodecIsSupportedPicker";
+        public const string checkCodecIsSupportedToggle = "checkCodecIsSupportedToggle";
         public const string clientDiscoveryPortTextField = "clientDiscoveryPortTextField";
         public const string clientIcon = "clientIcon";
         public const string clientNameLabel = "clientNameLabel";
@@ -129,7 +129,7 @@ public static partial class R
         public const string creditsSummaryLabel = "creditsSummaryLabel";
         public const string currentDifficultyLabel = "currentDifficultyLabel";
         public const string currentSentenceContainer = "currentSentenceContainer";
-        public const string customEventSystemOptInOnAndroidPicker = "customEventSystemOptInOnAndroidPicker";
+        public const string customEventSystemOptInOnAndroidToggle = "customEventSystemOptInOnAndroidToggle";
         public const string dateLabel = "dateLabel";
         public const string defaultMedleyTargetDurationPicker = "defaultMedleyTargetDurationPicker";
         public const string delayPicker = "delayPicker";
@@ -157,8 +157,8 @@ public static partial class R
         public const string difficultyChooser = "difficultyChooser";
         public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
-        public const string disableDynamicThemesPicker = "disableDynamicThemesPicker";
-        public const string disableWebViewPicker = "disableWebViewPicker";
+        public const string disableDynamicThemesToggle = "disableDynamicThemesToggle";
+        public const string disableWebViewToggle = "disableWebViewToggle";
         public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
@@ -194,7 +194,7 @@ public static partial class R
         public const string filtersAccordionItem = "filtersAccordionItem";
         public const string firstPlaceTrophyImage = "firstPlaceTrophyImage";
         public const string firstTeamUi = "firstTeamUi";
-        public const string freeForAllItemPicker = "freeForAllItemPicker";
+        public const string freeForAllItemToggle = "freeForAllItemToggle";
         public const string fullscreenModePicker = "fullscreenModePicker";
         public const string fuzzySearchTextLabel = "fuzzySearchTextLabel";
         public const string gameOptionsButton = "gameOptionsButton";
@@ -296,7 +296,7 @@ public static partial class R
         public const string jobStatusIconContainer = "jobStatusIconContainer";
         public const string knockOutLabel = "knockOutLabel";
         public const string knockOutLabelOverlay = "knockOutLabelOverlay";
-        public const string knockOutTournamentItemPicker = "knockOutTournamentItemPicker";
+        public const string knockOutTournamentItemToggle = "knockOutTournamentItemToggle";
         public const string label = "label";
         public const string labelContainer = "labelContainer";
         public const string labels = "labels";
@@ -337,10 +337,10 @@ public static partial class R
         public const string loadedSceneTitle = "loadedSceneTitle";
         public const string loadingLabel = "loadingLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
-        public const string logFfmpegOutputPicker = "logFfmpegOutputPicker";
+        public const string logFfmpegOutputToggle = "logFfmpegOutputToggle";
         public const string logo = "logo";
         public const string logoContainer = "logoContainer";
-        public const string logVlcOutputPicker = "logVlcOutputPicker";
+        public const string logVlcOutputToggle = "logVlcOutputToggle";
         public const string lrcImportDescription = "lrcImportDescription";
         public const string lrcImportIcon = "lrcImportIcon";
         public const string lrcImportLyricsContainer = "lrcImportLyricsContainer";
@@ -614,7 +614,7 @@ public static partial class R
         public const string scoreValue = "scoreValue";
         public const string scrollView = "scrollView";
         public const string ScrollView = "ScrollView";
-        public const string searchAudioFilesWithoutSongMetaPicker = "searchAudioFilesWithoutSongMetaPicker";
+        public const string searchAudioFilesWithoutSongMetaToggle = "searchAudioFilesWithoutSongMetaToggle";
         public const string searchBarContainer = "searchBarContainer";
         public const string searchContainer = "searchContainer";
         public const string searchErrorIcon = "searchErrorIcon";
@@ -679,7 +679,7 @@ public static partial class R
         public const string showCoverButton = "showCoverButton";
         public const string showCoverIcon = "showCoverIcon";
         public const string showCurrentResultsButton = "showCurrentResultsButton";
-        public const string showFpsPicker = "showFpsPicker";
+        public const string showFpsToggle = "showFpsToggle";
         public const string showHighscoreButton = "showHighscoreButton";
         public const string showLogButton = "showLogButton";
         public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
@@ -892,7 +892,7 @@ public static partial class R
         public const string urlTextFieldHint = "urlTextFieldHint";
         public const string useFfmpegToPlayMediaFilesPicker = "useFfmpegToPlayMediaFilesPicker";
         public const string usePortAudioToggle = "usePortAudioToggle";
-        public const string useUniversalCharsetDetectorPicker = "useUniversalCharsetDetectorPicker";
+        public const string useUniversalCharsetDetectorToggle = "useUniversalCharsetDetectorToggle";
         public const string useVlcToPlayMediaFilesPicker = "useVlcToPlayMediaFilesPicker";
         public const string useWebcamToggle = "useWebcamToggle";
         public const string versionDetailsContainer = "versionDetailsContainer";

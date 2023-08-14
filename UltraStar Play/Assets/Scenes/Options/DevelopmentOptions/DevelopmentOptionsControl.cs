@@ -17,8 +17,8 @@ using IBinding = UniInject.IBinding;
 
 public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
 {
-    [Inject(UxmlName = R.UxmlNames.showFpsPicker)]
-    private ItemPicker showFpsPicker;
+    [Inject(UxmlName = R.UxmlNames.showFpsToggle)]
+    private Toggle showFpsToggle;
 
     [Inject(UxmlName = R.UxmlNames.playRecordedAudioToggle)]
     private Toggle playRecordedAudioToggle;
@@ -47,23 +47,23 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
     private ItemPicker pitchDetectionAlgorithmPicker;
 
-    [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNotePicker)]
-    private ItemPicker analyzeBeatsWithoutTargetNotePicker;
+    [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNoteToggle)]
+    private Toggle analyzeBeatsWithoutTargetNoteToggle;
 
-    [Inject(UxmlName = R.UxmlNames.animatedBackgroundItemPicker)]
-    private ItemPicker animatedBackgroundItemPicker;
+    [Inject(UxmlName = R.UxmlNames.animatedBackgroundItemToggle)]
+    private Toggle animatedBackgroundItemToggle;
 
-    [Inject(UxmlName = R.UxmlNames.disableDynamicThemesPicker)]
-    private ItemPicker disableDynamicThemesPicker;
+    [Inject(UxmlName = R.UxmlNames.disableDynamicThemesToggle)]
+    private Toggle disableDynamicThemesToggle;
 
-    [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidPicker)]
-    private ItemPicker customEventSystemOptInOnAndroidPicker;
+    [Inject(UxmlName = R.UxmlNames.customEventSystemOptInOnAndroidToggle)]
+    private Toggle customEventSystemOptInOnAndroidToggle;
 
-    [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorPicker)]
-    private ItemPicker useUniversalCharsetDetectorPicker;
+    [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorToggle)]
+    private Toggle useUniversalCharsetDetectorToggle;
 
-    [Inject(UxmlName = R.UxmlNames.disableWebViewPicker)]
-    private ItemPicker disableWebViewPicker;
+    [Inject(UxmlName = R.UxmlNames.disableWebViewToggle)]
+    private Toggle disableWebViewToggle;
 
     [Inject(UxmlName = R.UxmlNames.connectionEndpointLabel)]
     private Label connectionEndpointLabel;
@@ -134,25 +134,25 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesPicker)]
     private ItemPicker useFfmpegToPlayMediaFilesPicker;
 
-    [Inject(UxmlName = R.UxmlNames.logFfmpegOutputPicker)]
-    private ItemPicker logFfmpegOutputPicker;
+    [Inject(UxmlName = R.UxmlNames.logFfmpegOutputToggle)]
+    private Toggle logFfmpegOutputToggle;
 
     [Inject(UxmlName = R.UxmlNames.useVlcToPlayMediaFilesPicker)]
     private ItemPicker useVlcToPlayMediaFilesPicker;
 
-    [Inject(UxmlName = R.UxmlNames.logVlcOutputPicker)]
-    private ItemPicker logVlcOutputPicker;
+    [Inject(UxmlName = R.UxmlNames.logVlcOutputToggle)]
+    private Toggle logVlcOutputToggle;
 
-    [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedPicker)]
-    private ItemPicker checkCodecIsSupportedPicker;
+    [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedToggle)]
+    private Toggle checkCodecIsSupportedToggle;
 
     protected override void Start()
     {
         base.Start();
 
-        new BoolPickerControl(showFpsPicker)
-            .Bind(() => settings.ShowFps,
-                  newValue => settings.ShowFps = newValue);
+        FieldBindingUtils.Bind(showFpsToggle,
+            () => settings.ShowFps,
+            newValue => settings.ShowFps = newValue);
 
         FieldBindingUtils.Bind(generatedFolderPathTextField,
             () => settings.GeneratedFolderPath,
@@ -193,17 +193,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.PitchDetectionAlgorithm,
                 newValue => settings.PitchDetectionAlgorithm = newValue);
 
-        new BoolPickerControl(analyzeBeatsWithoutTargetNotePicker)
-            .Bind(() => settings.AnalyzeBeatsWithoutTargetNote,
-                newValue => settings.AnalyzeBeatsWithoutTargetNote = newValue);
+        FieldBindingUtils.Bind(analyzeBeatsWithoutTargetNoteToggle,
+            () => settings.AnalyzeBeatsWithoutTargetNote,
+            newValue => settings.AnalyzeBeatsWithoutTargetNote = newValue);
 
-        new BoolPickerControl(animatedBackgroundItemPicker)
-            .Bind(() => settings.AnimatedBackground,
-                newValue => settings.AnimatedBackground = newValue);
+        FieldBindingUtils.Bind(animatedBackgroundItemToggle,
+            () => settings.AnimatedBackground,
+            newValue => settings.AnimatedBackground = newValue);
 
-        new BoolPickerControl(disableDynamicThemesPicker)
-            .Bind(() => settings.DisableDynamicThemes,
-                disableDynamicThemes =>
+        FieldBindingUtils.Bind(disableDynamicThemesToggle,
+            () => settings.DisableDynamicThemes,
+            disableDynamicThemes =>
                 {
                     if (disableDynamicThemes)
                     {
@@ -212,25 +212,25 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                     settings.DisableDynamicThemes = disableDynamicThemes;
                 });
 
-        new BoolPickerControl(disableWebViewPicker)
-            .Bind(() => settings.DisableWebView,
-                newValue => settings.DisableWebView = newValue);
+        FieldBindingUtils.Bind(disableWebViewToggle,
+            () => settings.DisableWebView,
+            newValue => settings.DisableWebView = newValue);
 
-        new BoolPickerControl(useUniversalCharsetDetectorPicker)
-                    .Bind(() => settings.UseUniversalCharsetDetector,
-                        newValue => settings.UseUniversalCharsetDetector = newValue);
+        FieldBindingUtils.Bind(useUniversalCharsetDetectorToggle,
+            () => settings.UseUniversalCharsetDetector,
+            newValue => settings.UseUniversalCharsetDetector = newValue);
 
-        customEventSystemOptInOnAndroidPicker.SetVisibleByDisplay(PlatformUtils.IsAndroid);
-        new BoolPickerControl(customEventSystemOptInOnAndroidPicker)
-            .Bind(() => settings.EnableEventSystemOnAndroid,
-                newValue =>
+        customEventSystemOptInOnAndroidToggle.SetVisibleByDisplay(PlatformUtils.IsAndroid);
+        FieldBindingUtils.Bind(customEventSystemOptInOnAndroidToggle,
+            () => settings.EnableEventSystemOnAndroid,
+            newValue =>
+            {
+                if (newValue != settings.EnableEventSystemOnAndroid)
                 {
-                    if (newValue != settings.EnableEventSystemOnAndroid)
-                    {
-                        settings.EnableEventSystemOnAndroid = newValue;
-                        RestartScene();
-                    }
-                });
+                    settings.EnableEventSystemOnAndroid = newValue;
+                    RestartScene();
+                }
+            });
 
         connectionEndpointLabel.text = $"Connection endpoint: {serverSideConnectRequestManager.GetConnectionEndpoint()}";
 
@@ -327,9 +327,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.VlcToPlayMediaFilesUsage,
                 newValue => settings.VlcToPlayMediaFilesUsage = newValue);
 
-        new BoolPickerControl(logVlcOutputPicker)
-            .Bind(() => settings.LogVlcOutput,
-                newValue => settings.LogVlcOutput = newValue);
+        FieldBindingUtils.Bind(logVlcOutputToggle,
+            () => settings.LogVlcOutput,
+            newValue => settings.LogVlcOutput = newValue);
 
 
         // ffmpeg
@@ -337,14 +337,14 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.FfmpegToPlayMediaFilesUsage,
                 newValue => settings.FfmpegToPlayMediaFilesUsage = newValue);
 
-        new BoolPickerControl(logFfmpegOutputPicker)
-            .Bind(() => settings.LogFfmpegOutput,
-                newValue => settings.LogFfmpegOutput = newValue);
+        FieldBindingUtils.Bind(logFfmpegOutputToggle,
+            () => settings.LogFfmpegOutput,
+            newValue => settings.LogFfmpegOutput = newValue);
 
         // Media file conversion
-        new BoolPickerControl(checkCodecIsSupportedPicker)
-            .Bind(() => settings.CheckCodecIsSupported,
-                newValue => settings.CheckCodecIsSupported = newValue);
+        FieldBindingUtils.Bind(checkCodecIsSupportedToggle,
+            () => settings.CheckCodecIsSupported,
+            newValue => settings.CheckCodecIsSupported = newValue);
 
         new NumberPickerControl(maxConcurrentSongMediaConversionsPicker, settings.MaxConcurrentSongMediaConversions).Bind(
             () => settings.MaxConcurrentSongMediaConversions,
@@ -573,9 +573,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     public void UpdateTranslation()
     {
-        showFpsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_showFps);
+        showFpsToggle.label = TranslationManager.GetTranslation(R.Messages.options_showFps);
         pitchDetectionAlgorithmPicker.Label = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
-        analyzeBeatsWithoutTargetNotePicker.Label = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
+        analyzeBeatsWithoutTargetNoteToggle.label = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
     }
 
     public List<IBinding> GetBindings()
