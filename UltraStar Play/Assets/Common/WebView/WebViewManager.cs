@@ -162,7 +162,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             .AddTo(gameObject);
         RegisterInputActions();
 
-        if (!settings.DisableWebView)
+        if (settings.EnableWebView)
         {
             InstantiateWebView();
         }
@@ -426,7 +426,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     public bool LoadUrl(string url)
     {
         if (settings == null
-            || settings.DisableWebView)
+            || !settings.EnableWebView)
         {
             return false;
         }

@@ -62,8 +62,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.useUniversalCharsetDetectorToggle)]
     private Toggle useUniversalCharsetDetectorToggle;
 
-    [Inject(UxmlName = R.UxmlNames.disableWebViewToggle)]
-    private Toggle disableWebViewToggle;
+    [Inject(UxmlName = R.UxmlNames.enableWebViewToggle)]
+    private Toggle enableWebViewToggle;
 
     [Inject(UxmlName = R.UxmlNames.connectionEndpointLabel)]
     private Label connectionEndpointLabel;
@@ -212,9 +212,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                     settings.EnableDynamicThemes = enableDynamicThemes;
                 });
 
-        FieldBindingUtils.Bind(disableWebViewToggle,
-            () => settings.DisableWebView,
-            newValue => settings.DisableWebView = newValue);
+        FieldBindingUtils.Bind(enableWebViewToggle,
+            () => settings.EnableWebView,
+            newValue => settings.EnableWebView = newValue);
 
         FieldBindingUtils.Bind(useUniversalCharsetDetectorToggle,
             () => settings.UseUniversalCharsetDetector,

@@ -157,7 +157,6 @@ public static partial class R
         public const string difficultyChooser = "difficultyChooser";
         public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
-        public const string disableWebViewToggle = "disableWebViewToggle";
         public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
@@ -183,6 +182,7 @@ public static partial class R
         public const string effectsContainer = "effectsContainer";
         public const string enabledToggle = "enabledToggle";
         public const string enableDynamicThemesToggle = "enableDynamicThemesToggle";
+        public const string enableWebViewToggle = "enableWebViewToggle";
         public const string enqueueIcon = "enqueueIcon";
         public const string entriesContainer = "entriesContainer";
         public const string entryContainer = "entryContainer";
