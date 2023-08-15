@@ -225,49 +225,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     }
 
     private bool isPlaying;
-    private bool IsPlaying
-    {
-        get => isPlaying;
-        set
-        {
-            isPlaying = value;
-
-            if (VideoSupportProvider is EVideoSupportProvider.Vlc
-                && vlcMediaPlayer != null
-                && !IsVlcMediaPlayerFromSongAudioPlayer)
-            {
-                if (value)
-                {
-                    vlcMediaPlayer.Play();
-                }
-                else
-                {
-                    vlcMediaPlayer.Pause();
-                }
-            }
-            else if (VideoSupportProvider is EVideoSupportProvider.Ffmpeg)
-            {
-                // Handled by SongAudioPlayer
-                return;
-            }
-            else if (VideoSupportProvider is EVideoSupportProvider.WebView)
-            {
-                // Handled by SongAudioPlayer
-                return;
-            }
-            else if (VideoSupportProvider is EVideoSupportProvider.UnityVideoPlayer)
-            {
-                if (value)
-                {
-                    videoPlayer.Play();
-                }
-                else
-                {
-                    videoPlayer.Pause();
-                }
-            }
-        }
-    }
+    public bool IsPlaying => isPlaying;
 
     private bool IsVlcMediaPlayerFromSongAudioPlayer => vlcMediaPlayer != null
                                                     && vlcMediaPlayer == songAudioPlayer.VlcMediaPlayer;
@@ -331,10 +289,12 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     void Update()
     {
-        if (!IsLoaded)
+        if (!IsFullyLoaded)
         {
             return;
         }
+
+        ApplyPlaybackStateToVideoProvider();
 
         if (songAudioPlayer != null)
         {
@@ -443,7 +403,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             return Observable.Create<SongVideoLoadedEvent>(o =>
             {
                 DurationInMillis = (int)vlcMediaPlayer.Length;
-                FireLoadedEvent(o, songMeta, videoUri);
+                PlayAndFireLoadedEvent(o, songMeta, videoUri);
                 return Disposable.Empty;
             });
         }
@@ -500,7 +460,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                     }
 
                     DurationInMillis = (int)vlcMediaPlayer.Length;
-                    FireLoadedEvent(o, songMeta, videoUri);
+                    PlayAndFireLoadedEvent(o, songMeta, videoUri);
                 }));
             return Disposable.Empty;
         });
@@ -517,7 +477,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         return Observable.Create<SongVideoLoadedEvent>(o =>
         {
             DurationInMillis = songAudioPlayer.DurationOfSongInMillis;
-            FireLoadedEvent(o, songMeta, videoUri);
+            PlayAndFireLoadedEvent(o, songMeta, videoUri);
             return Disposable.Empty;
         });
     }
@@ -531,7 +491,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         return Observable.Create<SongVideoLoadedEvent>(o =>
         {
             DurationInMillis = songAudioPlayer.DurationOfSongInMillis;
-            FireLoadedEvent(o, songMeta, videoUri);
+            PlayAndFireLoadedEvent(o, songMeta, videoUri);
             return Disposable.Empty;
         });
     }
@@ -547,8 +507,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             // The url is empty if loading the video failed.
             VideoSupportProvider = EVideoSupportProvider.None;
+            return ObservableUtils.LogErrorThenThrow<SongVideoLoadedEvent>(new SongVideoPlayerException($"Unable to load video '{uri}' with Unity's VideoPlayer"));
         }
 
+        // Start VideoPlayer to trigger loading
         videoPlayer.Play();
 
         // The video is loaded asynchronously. The length property of the VideoPlayer indicates whether it has been loaded.
@@ -589,15 +551,16 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
                     DurationInMillis = videoPlayer.length * 1000.0;
                     videoPlayer.time = songAudioPlayer.PositionInSongInSeconds;
-                    FireLoadedEvent(o, songMeta, uri);
+                    PlayAndFireLoadedEvent(o, songMeta, uri);
                 }));
             return Disposable.Empty;
         });
     }
 
-    private void FireLoadedEvent(IObserver<SongVideoLoadedEvent> o, SongMeta songMeta, string uri)
+    private void PlayAndFireLoadedEvent(IObserver<SongVideoLoadedEvent> o, SongMeta songMeta, string uri)
     {
-        isPlaying = true;
+        Play();
+
         o.OnNext(new SongVideoLoadedEvent(songMeta, uri));
         loadedEventStream.OnNext(new SongVideoLoadedEvent(songMeta, uri));
     }
@@ -684,7 +647,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private void SyncVideoPlayPauseWithAudio()
     {
         if (!IsFullyLoaded
-            || !videoPlayer.gameObject.activeInHierarchy)
+            || !gameObject.activeInHierarchy)
         {
             return;
         }
@@ -698,7 +661,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 && !IsLooping)
             || FreezeVideo)
         {
-            IsPlaying = false;
+            Pause();
         }
         else if (songAudioPlayerIsPlaying
                  && !IsPlaying)
@@ -706,7 +669,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         {
             if (!IsWaitingForVideoGap(songAudioPlayer.PositionInSongInMillis, loadedSongMeta.VideoGap * 1000))
             {
-                IsPlaying = true;
+                Play();
                 SyncVideoPositionWithAudio(true);
             }
         }
@@ -969,6 +932,105 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                 }
 
                 break;
+        }
+    }
+
+    private void ApplyPlaybackStateToVideoProvider()
+    {
+        if (!IsFullyLoaded)
+        {
+            return;
+        }
+
+        if (VideoSupportProvider is EVideoSupportProvider.Vlc
+            && vlcMediaPlayer != null
+            && !IsVlcMediaPlayerFromSongAudioPlayer)
+        {
+            if (IsPlaying
+                && !vlcMediaPlayer.IsPlaying)
+            {
+                Debug.Log("SongVideoPlayer should be playing, but vlcMediaPlayer is not. Starting its playback now.");
+                vlcMediaPlayer.Play();
+            }
+            else if (!IsPlaying
+                     && vlcMediaPlayer.IsPlaying)
+            {
+                Debug.Log("SongVideoPlayer should not be playing, but vlcMediaPlayer is. Pausing its playback now.");
+                vlcMediaPlayer.Pause();
+            }
+        }
+        else if (VideoSupportProvider is EVideoSupportProvider.Ffmpeg)
+        {
+            // Handled by SongAudioPlayer
+        }
+        else if (VideoSupportProvider is EVideoSupportProvider.WebView)
+        {
+            // Handled by SongAudioPlayer
+        }
+        else if (VideoSupportProvider is EVideoSupportProvider.UnityVideoPlayer
+                 && videoPlayer != null)
+        {
+            if (IsPlaying
+                && !videoPlayer.isPlaying)
+            {
+                Debug.Log("SongVideoPlayer should be playing, but Unity VideoPlayer is not. Starting its playback now.");
+                videoPlayer.Play();
+            }
+            else if (!IsPlaying
+                     && videoPlayer.isPlaying)
+            {
+                Debug.Log("SongVideoPlayer should not be playing, but Unity VideoPlayer is. Pausing its playback now.");
+                videoPlayer.Pause();
+            }
+        }
+    }
+
+    private void Play()
+    {
+        SetPlaying(true);
+    }
+
+    private void Pause()
+    {
+        SetPlaying(false);
+    }
+
+    private void SetPlaying(bool value)
+    {
+        isPlaying = value;
+        if (VideoSupportProvider is EVideoSupportProvider.Vlc
+            && vlcMediaPlayer != null
+            && !IsVlcMediaPlayerFromSongAudioPlayer)
+        {
+            if (isPlaying)
+            {
+                vlcMediaPlayer.Play();
+            }
+            else
+            {
+                vlcMediaPlayer.Pause();
+            }
+        }
+        else if (VideoSupportProvider is EVideoSupportProvider.Ffmpeg)
+        {
+            // Handled by SongAudioPlayer
+            return;
+        }
+        else if (VideoSupportProvider is EVideoSupportProvider.WebView)
+        {
+            // Handled by SongAudioPlayer
+            return;
+        }
+        else if (VideoSupportProvider is EVideoSupportProvider.UnityVideoPlayer)
+        {
+            if (isPlaying)
+            {
+                videoPlayer.Play();
+            }
+            else
+            {
+                videoPlayer.Pause();
+            }
         }
     }
 
