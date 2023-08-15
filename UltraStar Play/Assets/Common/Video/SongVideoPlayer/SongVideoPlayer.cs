@@ -588,7 +588,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                     }
 
                     DurationInMillis = videoPlayer.length * 1000.0;
-                    videoPlayer.time = songAudioPlayer.DurationOfSongInSeconds;
+                    videoPlayer.time = songAudioPlayer.PositionInSongInSeconds;
                     FireLoadedEvent(o, songMeta, uri);
                 }));
             return Disposable.Empty;
