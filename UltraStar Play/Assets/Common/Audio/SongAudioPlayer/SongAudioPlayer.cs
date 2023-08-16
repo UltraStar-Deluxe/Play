@@ -140,7 +140,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 newPositionInSongInMillis = DurationOfSongInMillis - 1;
             }
 
-            lastVlcMediaPlayerTime = newPositionInSongInMillis;
             positionInSongInMillis = newPositionInSongInMillis;
             lastSetPositionInSongInMillis = newPositionInSongInMillis;
             lastSetPositionInSongInMillisUnityTimeInSeconds = Time.time;
@@ -202,16 +201,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             if (AudioSupportProvider is EAudioSupportProvider.Vlc
                 && vlcMediaPlayer != null)
             {
-                // VLC MediaPlayer continues time even if not playing. Workaround: return old time if not playing.
-                if (vlcMediaPlayer.IsPlaying)
-                {
-                    rawResult = vlcMediaPlayer.Time;
-                    lastVlcMediaPlayerTime = rawResult;
-                }
-                else
-                {
-                    return lastVlcMediaPlayerTime;
-                }
+                rawResult = vlcMediaPlayer.Time;
             }
             else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
                 && ffplayCommand != null)
@@ -242,7 +232,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return Math.Max(0, result);
         }
     }
-    private double lastVlcMediaPlayerTime;
 
     public double DurationOfSongInMillis { get; private set; }
     public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
