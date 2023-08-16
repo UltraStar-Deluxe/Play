@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using LibVLCSharp;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -47,12 +48,14 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        mediaPlayer.Stop();
 
-        // TODO: There seems to be a bug that mutes all audio when the volume is set to 0
-        mediaPlayer.SetVolume(100);
-
-        mediaPlayer.Dispose();
+        Task.Run(async () =>
+        {
+            Log.Verbose(() => "DestroyVlcMediaPlayerAsync - Stop");
+            await mediaPlayer.StopAsync();
+            Log.Verbose(() => "DestroyVlcMediaPlayerAsync - Dispose");
+            mediaPlayer.Dispose();
+        });
     }
 
     private void InitVlcIfNotDoneYet()
