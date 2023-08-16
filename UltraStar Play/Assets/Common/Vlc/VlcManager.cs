@@ -49,11 +49,8 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        ThreadPool.QueueUserWorkItem(_ =>
-        {
-            Log.Verbose(() => "Disposing Vlc MediaPlayer");
-            mediaPlayer.Dispose();
-        });
+        Log.Verbose(() => "Disposing Vlc MediaPlayer");
+        mediaPlayer.Dispose();
     }
 
     private void InitVlcIfNotDoneYet()
