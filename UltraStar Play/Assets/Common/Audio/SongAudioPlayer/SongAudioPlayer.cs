@@ -272,19 +272,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    public bool IsPlaying
-    {
-        get
-        {
-            return !isPaused
-                   && ((AudioSupportProvider is EAudioSupportProvider.Vlc && vlcMediaPlayer != null && vlcMediaPlayer.IsPlaying)
-                       || (AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand != null && ffplayCommand.IsRunning && !ffplayCommand.Paused)
-                       || (AudioSupportProvider is EAudioSupportProvider.WebView && webViewManager.IsPlaying)
-                       || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && videoPlayer.isPlaying)
-                       || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && (audioSource.isPlaying || portAudioPlaybackManager.IsPlaying)));
-        }
-    }
-    private bool isPaused;
+    private bool isPlaying;
+    public bool IsPlaying => isPlaying;
 
     public bool IsPartiallyLoaded => AudioSupportProvider is not EAudioSupportProvider.None;
     public bool IsFullyLoaded => (AudioSupportProvider is EAudioSupportProvider.Vlc && vlcMediaPlayer != null && vlcMediaPlayer.Media != null && vlcMediaPlayer.Media.Duration > 0)
@@ -450,6 +439,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             ApplyVolumeFactorToAudioSupportProvider(volumeFactor);
             lastAudioListenerVolume = AudioListener.volume;
         }
+
+        ApplyPlaybackStateToAudioProvider();
     }
 
     public void LoadAndPlaySongAudio(
@@ -919,6 +910,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public void StopAudio()
     {
+        Debug.Log("StopAudio");
         if (AudioSupportProvider is EAudioSupportProvider.Vlc
             && vlcMediaPlayer != null)
         {
@@ -956,6 +948,9 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return;
         }
 
+        Debug.Log("PauseAudio");
+
+        isPlaying = false;
         if (AudioSupportProvider is EAudioSupportProvider.Vlc
             && vlcMediaPlayer != null)
         {
@@ -991,7 +986,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             }
             audioSource.Pause();
         }
-        isPaused = true;
         playbackStoppedEventStream.OnNext(PositionInSongInMillis);
     }
 
@@ -1003,6 +997,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             return;
         }
 
+        isPlaying = true;
         if (AudioSupportProvider is EAudioSupportProvider.Vlc
             && vlcMediaPlayer != null)
         {
@@ -1041,8 +1036,96 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 audioSource.Play();
             }
         }
-        isPaused = false;
         playbackStartedEventStream.OnNext(PositionInSongInMillis);
+    }
+
+    private void ApplyPlaybackStateToAudioProvider()
+    {
+        if (!IsFullyLoaded)
+        {
+            return;
+        }
+
+        if (AudioSupportProvider is EAudioSupportProvider.Vlc
+            && vlcMediaPlayer != null)
+        {
+            if (IsPlaying
+                && !vlcMediaPlayer.IsPlaying)
+            {
+                Debug.Log("SongAudioPlayer should be playing, but vlcMediaPlayer is not. Starting its playback now.");
+                vlcMediaPlayer.Play();
+            }
+            else if (!IsPlaying
+                     && vlcMediaPlayer.IsPlaying)
+            {
+                Debug.Log("SongAudioPlayer should not be playing, but vlcMediaPlayer is. Pausing its playback now.");
+                vlcMediaPlayer.Pause();
+            }
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg)
+        {
+            if (IsPlaying
+                && ffplayCommand.Paused)
+            {
+                Debug.Log("SongAudioPlayer should be playing, but ffmpeg is not. Starting its playback now.");
+                ffplayCommand.TogglePause();
+            }
+            else if (!IsPlaying
+                     && !ffplayCommand.Paused)
+            {
+                Debug.Log("SongAudioPlayer should not be playing, but ffmpeg is. Pausing its playback now.");
+                ffplayCommand.TogglePause();
+            }
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.WebView)
+        {
+            if (IsPlaying
+                && !webViewManager.IsPlaying)
+            {
+                Debug.Log("SongAudioPlayer should be playing, but WebView is not. Starting its playback now.");
+                webViewManager.ResumePlayback();
+            }
+            else if(!IsPlaying
+                    && webViewManager.IsPlaying)
+            {
+                Debug.Log("SongAudioPlayer should not be playing, but WebView is. Pausing its playback now.");
+                webViewManager.PausePlayback();
+            }
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer
+                 && videoPlayer != null)
+        {
+            if (IsPlaying
+                && !videoPlayer.isPlaying)
+            {
+                Debug.Log("SongAudioPlayer should be playing, but Unity VideoPlayer is not. Starting its playback now.");
+                videoPlayer.Play();
+                audioSource.Play();
+            }
+            else if (!IsPlaying
+                     && videoPlayer.isPlaying)
+            {
+                Debug.Log("SongAudioPlayer should not be playing, but Unity VideoPlayer is. Pausing its playback now.");
+                videoPlayer.Pause();
+                audioSource.Pause();
+            }
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource
+                 && audioSource != null)
+        {
+            if (IsPlaying
+                && !audioSource.isPlaying)
+            {
+                Debug.Log("SongAudioPlayer should be playing, but Unity AudioSource is not. Starting its playback now.");
+                audioSource.Play();
+            }
+            else if (!IsPlaying
+                     && audioSource.isPlaying)
+            {
+                Debug.Log("SongAudioPlayer should not be playing, but Unity AudioSource is. Pausing its playback now.");
+                audioSource.Pause();
+            }
+        }
     }
 
     public double GetCurrentBeat(bool allowNegativeResult)
