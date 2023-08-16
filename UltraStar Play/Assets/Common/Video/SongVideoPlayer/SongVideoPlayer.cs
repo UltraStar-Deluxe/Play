@@ -347,7 +347,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             MediaPlayer mediaPlayer = UseVlcMediaPlayerOfSongAudioPlayer
                 ? songAudioPlayer.VlcMediaPlayer
                 : vlcMediaPlayer;
-            if (mediaPlayer == null)
+            if (mediaPlayer == null
+                || !mediaPlayer.IsPlaying)
             {
                 return;
             }
