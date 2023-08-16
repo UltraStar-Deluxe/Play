@@ -173,7 +173,8 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     public virtual void StopSongPreview()
     {
         StopAllCoroutines();
-        songAudioPlayer.PauseAudio();
+        songAudioPlayer.UnloadAudio();
+        songVideoPlayer.UnloadVideo();
         isFadeInStarted = false;
         stopSongPreviewEventStream.OnNext(currentPreviewSongMeta);
     }
@@ -200,6 +201,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
     protected virtual void StartVideoPreview(SongMeta songMeta)
     {
         if (!gameObject.activeInHierarchy
+            || songVideoPlayer == null
             || songMeta == null)
         {
             return;
@@ -207,9 +209,9 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         // Use the audio URL as video if the WebView can handle it (e.g. a YouTube video).
         string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
-        if (songVideoPlayer == null
-            || !SongMetaUtils.ResourceExists(songMeta, videoUri))
+        if (!SongMetaUtils.ResourceExists(songMeta, videoUri))
         {
+            songVideoPlayer.UnloadVideo();
             return;
         }
 

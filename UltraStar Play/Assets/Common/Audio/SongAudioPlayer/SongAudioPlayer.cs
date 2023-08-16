@@ -149,7 +149,9 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             if (AudioSupportProvider is EAudioSupportProvider.Vlc
                 && vlcMediaPlayer != null)
             {
-                vlcMediaPlayer.SetTime((long)newPositionInSongInMillis);
+                // VLC MediaPlayer jumps to the end of the song when time is 0
+                double vlcNewPositionInSongInMillis = (long)Math.Max(1, newPositionInSongInMillis);
+                vlcMediaPlayer.SetTime((long)vlcNewPositionInSongInMillis);
             }
             else if (AudioSupportProvider is EAudioSupportProvider.Ffmpeg
                 && ffplayCommand != null)
@@ -244,7 +246,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public double DurationOfSongInMillis { get; private set; }
     public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
-    public double DurationOfSongInBeats => BpmUtils.MillisecondInSongToBeat(SongMeta, DurationOfSongInMillis);
+    public double DurationOfSongInBeats => BpmUtils.MillisecondInSongToBeat(loadedSongMeta, DurationOfSongInMillis);
 
     /**
      * Position in the song from 0 (start of song) to 1 (end of song).
@@ -265,6 +267,13 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private bool isPlaying;
     public bool IsPlaying => isPlaying;
 
+    public bool IsPlayingOfAudioProvider =>
+        (AudioSupportProvider is EAudioSupportProvider.Vlc && vlcMediaPlayer != null && vlcMediaPlayer.IsPlaying)
+        || (AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand != null && ffplayCommand.IsRunning && !ffplayCommand.Paused)
+        || (AudioSupportProvider is EAudioSupportProvider.WebView && webViewManager.IsPlaying)
+        || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && videoPlayer.isPlaying)
+        || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && audioSource.isPlaying);
+
     public bool IsPartiallyLoaded => AudioSupportProvider is not EAudioSupportProvider.None;
     public bool IsFullyLoaded => (AudioSupportProvider is EAudioSupportProvider.Vlc && vlcMediaPlayer != null && vlcMediaPlayer.Media != null && vlcMediaPlayer.Media.Duration > 0)
                                  || (AudioSupportProvider is EAudioSupportProvider.Ffmpeg && ffplayCommand != null && ffplayCommand.Duration > 0)
@@ -272,7 +281,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                                  || (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer && videoPlayer.length > 0)
                                  || (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource && audioSource.clip != null && audioSource.clip.length > 0);
 
-    private SongMeta SongMeta { get; set; }
+    private SongMeta loadedSongMeta;
 
     private float volumeFactor = 1;
     public float VolumeFactor
@@ -349,6 +358,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     }
 
     public EAudioSupportProvider AudioSupportProvider { get; private set; } = EAudioSupportProvider.None;
+
+    private float lastApplyPlaybackStateToAudioProviderTimeInSeconds;
 
     private void Awake()
     {
@@ -429,7 +440,20 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             lastAudioListenerVolume = AudioListener.volume;
         }
 
-        ApplyPlaybackStateToAudioProvider();
+        if (TimeUtils.IsDurationAboveThresholdInSeconds(lastApplyPlaybackStateToAudioProviderTimeInSeconds, 1))
+        {
+            lastApplyPlaybackStateToAudioProviderTimeInSeconds = Time.time;
+            if (DurationOfSongInMillis > 0
+                && PositionInSongInMillis < DurationOfSongInMillis - 100)
+            {
+                ApplyPlaybackStateToAudioProvider();
+            }
+            else
+            {
+                // The audio players stop automatically at the end of the song. This needs to be monitored.
+                isPlaying = IsPlayingOfAudioProvider;
+            }
+        }
     }
 
     public void LoadAndPlaySongAudio(
@@ -457,9 +481,9 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
         }
 
-        SongMeta = songMeta;
+        loadedSongMeta = songMeta;
 
-        UnloadAudioAndVideo();
+        UnloadAudio();
 
         string fileExtension = Path.GetExtension(audioUri);
         if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
@@ -519,29 +543,21 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
-    private void UnloadAudioAndVideo()
+    public void UnloadAudio()
     {
         AudioSupportProvider = EAudioSupportProvider.None;
 
         StopAllCoroutines();
-
-        if (vlcMediaPlayer != null)
-        {
-            vlcMediaPlayer.Stop();
-        }
-
-        DestroyFfmpegPlayer();
-
-        videoPlayerErrorMessages.Clear();
-        videoPlayer.Stop();
-        videoPlayer.url = "";
-
-        audioSource.Stop();
+        StopAudio();
         audioSource.clip = null;
 
-        webViewManager.PausePlayback();
+        DestroyFfmpegPlayer();
+        DestroyVlcMediaPlayer();
+        RenderTextureUtils.Clear(videoPlayer.targetTexture);
 
         DurationOfSongInMillis = 0;
+
+        videoPlayerErrorMessages.Clear();
     }
 
     private IObservable<SongAudioLoadedEvent> LoadWithMidiManager(SongMeta songMeta, string audioUri,
@@ -631,7 +647,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
                 {
                     if (videoPlayerErrorMessages.Count > 0)
                     {
-                        UnloadAudioAndVideo();
+                        UnloadAudio();
 
                         if (settings.VlcToPlayMediaFilesUsage
                             is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
@@ -757,6 +773,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             {
                 vlcMediaPlayer = vlcManager.CreateMediaPlayer();
             }
+            else
+            {
+                vlcMediaPlayer.Stop();
+            }
 
             if (vlcMediaPlayer.Media != null)
             {
@@ -764,7 +784,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             }
 
             vlcMediaPlayer.Media = new Media(new Uri(audioUri));
-            vlcMediaPlayer.Play();
+            vlcMediaPlayer.PlayAsync();
 
             AudioSupportProvider = EAudioSupportProvider.Vlc;
         }
@@ -792,12 +812,15 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
-                () => vlcMediaPlayer.Media != null && vlcMediaPlayer.Media.Duration > 0,
+                () => vlcMediaPlayer != null
+                      && vlcMediaPlayer.Media != null
+                      && vlcMediaPlayer.Media.Duration > 0,
                 () =>
                 {
                     DurationOfSongInMillis = vlcMediaPlayer.Media.Duration;
 
-                    if (unityTimeInSecondsWhenStartedLoading > lastSetPositionInSongInMillisUnityTimeInSeconds)
+                    if (unityTimeInSecondsWhenStartedLoading > lastSetPositionInSongInMillisUnityTimeInSeconds
+                        && startPositionInMillis > 0)
                     {
                         // Jump to the start position if no new position was set in the meantime.
                         vlcMediaPlayer.SetTime((long)startPositionInMillis);
@@ -893,12 +916,11 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public void ReloadAudio()
     {
-        LoadAndPlaySongAudio(SongMeta);
+        LoadAndPlaySongAudio(loadedSongMeta);
     }
 
-    public void StopAudio()
+    private void StopAudio()
     {
-        Debug.Log("StopAudio");
         if (AudioSupportProvider is EAudioSupportProvider.Vlc
             && vlcMediaPlayer != null)
         {
@@ -915,8 +937,9 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
         {
-            // The audio output is redirected to the AudioSource. Thus, stop VideoPlayer and AudioSource.
             videoPlayer.Stop();
+            videoPlayer.url = "";
+            // The audio output is redirected to the AudioSource. Thus, stop VideoPlayer and AudioSource.
             audioSource.Stop();
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
@@ -931,8 +954,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         {
             return;
         }
-
-        Debug.Log("PauseAudio");
 
         isPlaying = false;
         if (AudioSupportProvider is EAudioSupportProvider.Vlc
@@ -1108,7 +1129,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
 
         double millisInSong = PositionInSongInMillis;
-        double result = BpmUtils.MillisecondInSongToBeat(SongMeta, millisInSong);
+        double result = BpmUtils.MillisecondInSongToBeat(loadedSongMeta, millisInSong);
         if (result < 0
             && !allowNegativeResult)
         {
