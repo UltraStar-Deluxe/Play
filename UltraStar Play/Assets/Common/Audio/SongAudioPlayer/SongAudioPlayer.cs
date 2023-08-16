@@ -34,7 +34,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private AudioManager audioManager;
     private WebViewManager webViewManager;
     private SceneNavigator sceneNavigator;
-    private PortAudioPlaybackManager portAudioPlaybackManager;
     private VlcManager vlcManager;
 
     private readonly Lazy<MidiManager> midiManagerLazy = new(() => MidiManager.Instance);
@@ -169,14 +168,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
             {
-                if (SettingsUtils.ShouldUsePortAudio(settings) && portAudioPlaybackManager.IsLoaded)
-                {
-                    portAudioPlaybackManager.PositionInSeconds = newPositionInSongInSeconds;
-                }
-                else
-                {
-                    audioSource.time = newPositionInSongInSeconds;
-                }
+                audioSource.time = newPositionInSongInSeconds;
             }
 
             positionInSongEventStream.OnNext(positionInSongInMillis);
@@ -234,9 +226,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             }
             else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
             {
-                int positionInSamples = SettingsUtils.ShouldUsePortAudio(settings) && portAudioPlaybackManager.IsLoaded
-                    ? portAudioPlaybackManager.PositionInMonoSamples
-                    : audioSource.timeSamples;
+                int positionInSamples = audioSource.timeSamples;
                 rawResult = ((double)positionInSamples / (double)audioSource.clip.frequency) * 1000.0;
             }
             else
@@ -369,7 +359,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         webViewManager = WebViewManager.Instance;
         sceneNavigator = SceneNavigator.Instance;
         settings = SettingsManager.Instance.Settings;
-        portAudioPlaybackManager = PortAudioPlaybackManager.Instance;
         vlcManager = VlcManager.Instance;
     }
 
@@ -549,7 +538,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         audioSource.Stop();
         audioSource.clip = null;
-        portAudioPlaybackManager.Unload();
 
         webViewManager.PausePlayback();
 
@@ -933,10 +921,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
-            if (portAudioPlaybackManager.IsLoaded)
-            {
-                portAudioPlaybackManager.StopPlayback();
-            }
             audioSource.Stop();
         }
     }
@@ -980,10 +964,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
-            if (portAudioPlaybackManager.IsLoaded)
-            {
-                portAudioPlaybackManager.PausePlayback();
-            }
             audioSource.Pause();
         }
         playbackStoppedEventStream.OnNext(PositionInSongInMillis);
@@ -1026,15 +1006,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
         {
-            if (SettingsUtils.ShouldUsePortAudio(settings)
-                && portAudioPlaybackManager.IsLoaded)
-            {
-                portAudioPlaybackManager.StartPlayback();
-            }
-            else
-            {
-                audioSource.Play();
-            }
+            audioSource.Play();
         }
         playbackStartedEventStream.OnNext(PositionInSongInMillis);
     }
