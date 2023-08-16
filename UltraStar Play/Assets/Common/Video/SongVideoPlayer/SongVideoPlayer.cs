@@ -402,8 +402,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             VideoSupportProvider = EVideoSupportProvider.Vlc;
             return Observable.Create<SongVideoLoadedEvent>(o =>
             {
-                DurationInMillis = (int)vlcMediaPlayer.Length;
-                PlayAndFireLoadedEvent(o, songMeta, videoUri);
+                StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
+                    () => vlcMediaPlayer.Media != null && vlcMediaPlayer.Media.Duration > 0,
+                    () =>
+                    {
+                        DurationInMillis = (int)vlcMediaPlayer.Length;
+                        PlayAndFireLoadedEvent(o, songMeta, videoUri);
+                    }));
                 return Disposable.Empty;
             });
         }
