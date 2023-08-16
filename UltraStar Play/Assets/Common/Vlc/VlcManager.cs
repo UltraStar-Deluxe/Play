@@ -49,11 +49,9 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        Task.Run(async () =>
+        ThreadPool.QueueUserWorkItem(_ =>
         {
-            Log.Verbose(() => "DestroyVlcMediaPlayerAsync - Stop");
-            await mediaPlayer.StopAsync();
-            Log.Verbose(() => "DestroyVlcMediaPlayerAsync - Dispose");
+            Log.Verbose(() => "Disposing Vlc MediaPlayer");
             mediaPlayer.Dispose();
         });
     }
