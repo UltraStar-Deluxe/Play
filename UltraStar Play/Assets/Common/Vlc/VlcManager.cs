@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using LibVLCSharp;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -47,11 +48,8 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        mediaPlayer.Stop();
 
-        // TODO: There seems to be a bug that mutes all audio when the volume is set to 0
-        mediaPlayer.SetVolume(100);
-
+        Log.Verbose(() => "Disposing Vlc MediaPlayer");
         mediaPlayer.Dispose();
     }
 
@@ -72,6 +70,8 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
 
         Core.Initialize(Application.dataPath); // Load VLC dlls
         libVLC = new LibVLC(enableDebugLogs: true);
+
+        Debug.Log($"Initialized libVLC, changeset: {libVLC.Changeset}, LibVLCSharp version: {typeof(LibVLC).Assembly.GetName().Version}");
 
         // Setup Error Logging
         libVLC.Log += (s, e) =>

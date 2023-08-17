@@ -21,10 +21,10 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
 
     [Inject]
     private SingSceneControl singSceneControl;
-    
+
     [Inject]
     private SongAudioPlayer songAudioPlayer;
-    
+
     [Inject]
     private SongVideoPlayer songVideoPlayer;
 
@@ -84,7 +84,7 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
                 {
                     IsSongFinished = true;
                     songVideoPlayer.FreezeVideo = true;
-                    songAudioPlayer.StopAudio();
+                    songAudioPlayer.PauseAudio();
                 }
                 else
                 {
