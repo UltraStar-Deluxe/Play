@@ -772,7 +772,6 @@ Transform:
   - {fileID: 5679655992247309606}
   - {fileID: 1054933196838542567}
   - {fileID: 4725083428892299482}
-  - {fileID: 2314660379067576058}
   - {fileID: 8210014063461271944}
   - {fileID: 3855433877842653761}
   - {fileID: 4351641984961804500}
@@ -7042,50 +7041,6 @@ MonoBehaviour:
     prefab: {fileID: 1192747361093344, guid: aff6a710ec8f92c40a014dd9e63452bf, type: 3}
   - effectEnum: 18
     prefab: {fileID: 1181904839995218, guid: da3641b8950cf8e47acbcfa22869b53e, type: 3}
---- !u!1 &4136838613680857638
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2314660379067576058}
-  - component: {fileID: 3599233844049322592}
-  m_Layer: 0
-  m_Name: PortAudioPlaybackManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2314660379067576058
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4136838613680857638}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5483831765678408185}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3599233844049322592
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4136838613680857638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a935ba7c3b0893b4bb70370885c8db5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4282200778323342461
 GameObject:
   m_ObjectHideFlags: 0
