@@ -140,10 +140,17 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedToggle)]
     private Toggle checkCodecIsSupportedToggle;
 
+    [Inject(UxmlClass = "accordionItem")]
+    private List<AccordionItem> accordionItems;
+
     protected override void Start()
     {
         base.Start();
 
+        // Fold accordion items
+        accordionItems.ForEach(it => it.HideAccordionContent());
+
+        // Bind fields
         FieldBindingUtils.Bind(showFpsToggle,
             () => settings.ShowFps,
             newValue => settings.ShowFps = newValue);

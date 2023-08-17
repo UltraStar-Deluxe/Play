@@ -86,6 +86,7 @@ public static partial class R
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
         public const string characterQuickJumpCharacterButton = "characterQuickJumpCharacterButton";
         public const string checkCodecIsSupportedToggle = "checkCodecIsSupportedToggle";
+        public const string clientConnectionGroup = "clientConnectionGroup";
         public const string clientDiscoveryPortTextField = "clientDiscoveryPortTextField";
         public const string clientIcon = "clientIcon";
         public const string clientNameLabel = "clientNameLabel";
@@ -187,6 +188,7 @@ public static partial class R
         public const string entriesContainer = "entriesContainer";
         public const string entryContainer = "entryContainer";
         public const string exitSceneButton = "exitSceneButton";
+        public const string externalToolsGroup = "externalToolsGroup";
         public const string ffmpegConversionCommandsJsonPicker = "ffmpegConversionCommandsJsonPicker";
         public const string filterActiveIcon = "filterActiveIcon";
         public const string filterInactiveIcon = "filterInactiveIcon";
@@ -263,6 +265,7 @@ public static partial class R
         public const string infoIcon = "infoIcon";
         public const string innerSongEntryUi = "innerSongEntryUi";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
+        public const string inputAndPitchDetectionGroup = "inputAndPitchDetectionGroup";
         public const string inputDeviceIconContainer = "inputDeviceIconContainer";
         public const string InputDeviceIconContainer = "InputDeviceIconContainer";
         public const string inputDeviceIconGamepad = "inputDeviceIconGamepad";
@@ -356,6 +359,7 @@ public static partial class R
         public const string lyricsPropertyToggle = "lyricsPropertyToggle";
         public const string main = "main";
         public const string maxConcurrentSongMediaConversionsPicker = "maxConcurrentSongMediaConversionsPicker";
+        public const string mediaFileFormatGroup = "mediaFileFormatGroup";
         public const string menuOverlayInputLegend = "menuOverlayInputLegend";
         public const string menuScrollView = "menuScrollView";
         public const string messageBufferTimeTextField = "messageBufferTimeTextField";
@@ -495,6 +499,7 @@ public static partial class R
         public const string passTheMicTimeItemPicker = "passTheMicTimeItemPicker";
         public const string pathTextField = "pathTextField";
         public const string pauseIcon = "pauseIcon";
+        public const string performanceAndEffectsGroup = "performanceAndEffectsGroup";
         public const string permissionsContainer = "permissionsContainer";
         public const string phraseBonusScore = "phraseBonusScore";
         public const string pitchDetectionAlgorithmItemPicker = "pitchDetectionAlgorithmItemPicker";
@@ -925,6 +930,7 @@ public static partial class R
         public const string webcamOptionsButton = "webcamOptionsButton";
         public const string webcamRenderContainer = "webcamRenderContainer";
         public const string webcamRenderContainerParent = "webcamRenderContainerParent";
+        public const string webViewGroup = "webViewGroup";
         public const string wideIcon = "wideIcon";
         public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
         public const string yearPropertyToggle = "yearPropertyToggle";

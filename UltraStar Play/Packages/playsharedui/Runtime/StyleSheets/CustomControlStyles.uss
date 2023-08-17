@@ -406,6 +406,7 @@ AccordionGroup > AccordionItem.lastChild {
 #accordionItemRoot {
     width: 100%;
     border-width: 0;
+    margin-bottom: 0;
 }
 
 #accordionItemContent {
