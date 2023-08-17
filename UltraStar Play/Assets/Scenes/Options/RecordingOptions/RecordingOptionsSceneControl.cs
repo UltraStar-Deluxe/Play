@@ -399,6 +399,17 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
         if (isEnabled)
         {
             settings.MicProfiles.AddIfNotContains(SelectedMicProfile);
+            if (!micPitchTracker.IsRecording.Value)
+            {
+                micPitchTracker.StartRecording();
+            }
+        }
+        else
+        {
+            if (micPitchTracker.IsRecording.Value)
+            {
+                micPitchTracker.StopRecording();
+            }
         }
 
         UpdateRecordingDeviceInactiveOverlay();

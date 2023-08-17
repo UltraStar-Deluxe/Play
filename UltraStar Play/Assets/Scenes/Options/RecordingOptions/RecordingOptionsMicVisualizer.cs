@@ -9,12 +9,15 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     [Inject]
     private NewestSamplesMicPitchTracker micPitchTracker;
 
+    [Inject]
+    private Settings settings;
+
     [Inject(UxmlName = R.UxmlNames.noteLabel)]
     private Label noteLabel;
 
     [Inject(UxmlName = R.UxmlNames.pitchIndicator)]
     private VisualElement pitchIndicator;
-    
+
     [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
 
@@ -24,7 +27,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
     private AudioWaveFormVisualization audioWaveFormVisualization;
 
     private readonly float[] emptySamplesArray = new float[16000];
-    
+
     private void Start()
     {
         micPitchTracker.PitchEventStream
@@ -85,7 +88,7 @@ public class RecordingOptionsMicVisualizer : MonoBehaviour, INeedInjection
         micPitchTracker.MicProfile = micProfile;
         if (!micProfile.Name.IsNullOrEmpty()
             && !micProfile.IsInputFromConnectedClient
-            && micProfile.IsConnected(ServerSideConnectRequestManager.Instance))
+            && micProfile.IsEnabledAndConnected(ServerSideConnectRequestManager.Instance))
         {
             micPitchTracker.StartRecording();
         }
