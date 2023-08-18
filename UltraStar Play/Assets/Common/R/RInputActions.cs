@@ -49,6 +49,7 @@ public static partial class R
         public static readonly string usplay_back = "usplay/back";
         public static readonly string usplay_closeContextMenu = "usplay/closeContextMenu";
         public static readonly string usplay_enter = "usplay/enter";
+        public static readonly string usplay_navigateToParentFolder = "usplay/navigateToParentFolder";
         public static readonly string usplay_nextCharacterQuickJumpCharacter = "usplay/nextCharacterQuickJumpCharacter";
         public static readonly string usplay_nextSong = "usplay/nextSong";
         public static readonly string usplay_openContextMenu = "usplay/openContextMenu";

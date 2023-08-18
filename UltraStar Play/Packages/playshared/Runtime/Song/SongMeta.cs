@@ -10,7 +10,8 @@ public class SongMeta
     /**
      * Path of the directory of the song's txt file.
      */
-    public string Directory { get; set; } = "";
+    public string Directory { get; private set; } = "";
+    public DirectoryInfo DirectoryInfo { get; private set; }
 
     /**
      * File name of the song's txt file (not including any directories).
@@ -29,7 +30,7 @@ public class SongMeta
      * See https://musicbrainz.org/doc/MusicBrainz_Identifier
      */
     public string MusicBrainzRecord { get; set; } = "";
-    
+
     /**
      * Artist of the song.
      */
@@ -186,7 +187,7 @@ public class SongMeta
     public bool FailedToLoadVoices { get; private set; }
 
     public Action onPostProcessLoadedVoices;
-    
+
     private readonly Dictionary<string, string> unknownHeaderEntries = new();
     public IReadOnlyDictionary<string, string> UnknownHeaderEntries
     {
@@ -216,6 +217,7 @@ public class SongMeta
     )
     {
         Directory = directory ?? throw new ArgumentNullException(nameof(directory));
+        DirectoryInfo = new DirectoryInfo(Directory);
         FileName = filename ?? throw new ArgumentNullException(nameof(filename));
         SongHash = songHash ?? throw new ArgumentNullException(nameof(songHash));
 
@@ -274,7 +276,7 @@ public class SongMeta
         voices.Remove(voice);
         voiceNames.Remove(voice.Name);
     }
-    
+
     private void DoLoadVoices()
     {
         string path = Directory + Path.DirectorySeparatorChar + FileName;
@@ -283,15 +285,15 @@ public class SongMeta
             VoicesBuilder voicesBuilder = new(path, Encoding, Relative, false);
             voices = new List<Voice>(voicesBuilder.GetVoices());
         }
-        
+
         onPostProcessLoadedVoices?.Invoke();
     }
-    
+
     public void SetUnknownHeaderEntry(string key, string value)
     {
         unknownHeaderEntries[key.ToLowerInvariant()] = value;
     }
-    
+
     public string GetUnknownHeaderEntry(string key)
     {
         return unknownHeaderEntries.TryGetValue(key.ToLowerInvariant(), out string value)

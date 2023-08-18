@@ -86,6 +86,7 @@ public class Settings : ISettings
     public bool EnableVfx { get; set; } = true;
     public bool ShowScrollBarInSongSelect { get; set; }
     public bool ShowSongIndexInSongSelect { get; set; }
+    public bool NavigateByFoldersInSongSelect { get; set; }
     public ESongBackgroundScaleMode SongBackgroundScaleMode { get; set; } = ESongBackgroundScaleMode.FitOutside;
 
     // Sing scene settings

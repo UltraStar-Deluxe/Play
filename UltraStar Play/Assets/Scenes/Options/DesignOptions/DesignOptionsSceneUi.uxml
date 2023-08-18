@@ -10,6 +10,7 @@
             <ItemPicker name="previewFadeInDurationChooser" label="Preview Fade-in Duration" wrap-around="true" min-value="0" max-value="5" step-value="0.5" class="noBackgroundInHierarchy" />
             <ItemPicker name="showScrollBarInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Scroll Bar in Song Select" class="noBackgroundInHierarchy" />
             <ItemPicker name="showSongIndexInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Index in Song Select" class="noBackgroundInHierarchy" />
+            <ItemPicker name="navigateFoldersInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Navigate Folders in Song Select" class="noBackgroundInHierarchy" />
             <ItemPicker name="songBackgroundScaleModePicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Song Background Scale Mode" class="noBackgroundInHierarchy" />
         </ui:ScrollView>
     </ui:VisualElement>

@@ -160,7 +160,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
         new UseAvailableScreenHeightControl(searchPropertyDropdownContainer);
 
-        songRouletteControl.SongListChangedEventStream.Subscribe(songList =>
+        songRouletteControl.EntryListChangedEventStream.Subscribe(songList =>
         {
             if (songList.IsNullOrEmpty()
                 && !GetRawSearchText().IsNullOrEmpty())
