@@ -34,6 +34,9 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.showSongIndexInSongSelectPicker)]
     private ItemPicker showSongIndexInSongSelectPicker;
 
+    [Inject(UxmlName = R.UxmlNames.navigateFoldersInSongSelectPicker)]
+    private ItemPicker navigateFoldersInSongSelectPicker;
+
     [Inject(UxmlName = R.UxmlNames.songBackgroundScaleModePicker)]
     private ItemPicker songBackgroundScaleModePicker;
 
@@ -69,6 +72,10 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         new BoolPickerControl(showSongIndexInSongSelectPicker)
             .Bind(() => settings.ShowSongIndexInSongSelect,
                 newValue => settings.ShowSongIndexInSongSelect = newValue);
+
+        new BoolPickerControl(navigateFoldersInSongSelectPicker)
+            .Bind(() => settings.NavigateByFoldersInSongSelect,
+                newValue => settings.NavigateByFoldersInSongSelect = newValue);
 
         LabeledItemPickerControl<float> audioPreviewFadeInDurationChooserControl = new(previewFadeInDurationChooser, NumberUtils.CreateFloatList(0.5f, 5f, 0.5f));
         audioPreviewFadeInDurationChooserControl.Bind(() => settings.PreviewFadeInDurationInSeconds,

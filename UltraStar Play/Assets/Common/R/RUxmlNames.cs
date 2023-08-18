@@ -404,6 +404,8 @@ public static partial class R
         public const string nameCharacterContainer = "nameCharacterContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
+        public const string navigateFoldersInSongSelectPicker = "navigateFoldersInSongSelectPicker";
+        public const string navigateFolderUpButton = "navigateFolderUpButton";
         public const string newHighscoreContainer = "newHighscoreContainer";
         public const string newHighscoreIcon = "newHighscoreIcon";
         public const string newHighscoreLabel = "newHighscoreLabel";
@@ -879,6 +881,7 @@ public static partial class R
         public const string topCenterContent = "topCenterContent";
         public const string topContainer = "topContainer";
         public const string topContent = "topContent";
+        public const string topLeftContent = "topLeftContent";
         public const string topLyricsContainer = "topLyricsContainer";
         public const string topRightContent = "topRightContent";
         public const string topRow = "topRow";

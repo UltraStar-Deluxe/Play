@@ -12,6 +12,7 @@ public class SettingsManager : AbstractSingletonBehaviour
     {
         settingsPath = null;
         settings = null;
+        nonPersistentSettings = null;
         initializedResolution = false;
     }
 
@@ -35,7 +36,7 @@ public class SettingsManager : AbstractSingletonBehaviour
             return settings;
         }
     }
-    
+
     private static NonPersistentSettings nonPersistentSettings;
     public NonPersistentSettings NonPersistentSettings
     {
@@ -158,17 +159,17 @@ public class SettingsManager : AbstractSingletonBehaviour
         // Add player profiles
         defaultSettings.PlayerProfiles.Add(new PlayerProfile("Player01", EDifficulty.Medium, "01-UltraStar-chan/ultrastar-chan-f-closeup.png"));
         defaultSettings.PlayerProfiles.Add(new PlayerProfile("Player02", EDifficulty.Medium, "01-UltraStar-chan/ultrastar-chan-m-closeup.png"));
-        
+
         // Add mic profiles
         try
         {
             ThemeManager themeManager = ThemeManager.Instance;
             ThemeJson defaultThemeJson = themeManager.GetDefaultTheme().ThemeJson;
             List<Color32> micProfileColors = themeManager.GetMicrophoneColors(defaultThemeJson);
-            
+
             List<IConnectedClientHandler> connectedClientHandlers = new List<IConnectedClientHandler>();
             List<MicProfile> persistedMicProfiles = new();
-            
+
             defaultSettings.MicProfiles = MicProfileUtils.CreateMicProfiles(persistedMicProfiles, micProfileColors, connectedClientHandlers, defaultSettings);
         }
         catch (Exception e)
@@ -176,7 +177,7 @@ public class SettingsManager : AbstractSingletonBehaviour
             Debug.LogException(e);
             Debug.LogError("Failed to create initial mic profiles");
         }
-        
+
         // Set first player profile name to Steam account name.
         SteamManager steamManager = SteamManager.Instance;
         if (steamManager.IsConnectedToSteam)
@@ -198,7 +199,7 @@ public class SettingsManager : AbstractSingletonBehaviour
             defaultSettings.SongEditorSettings.SpeechRecognitionModelPath =
                 ApplicationUtils.GetStreamingAssetsPath("SpeechRecognitionModels/WhisperModels/ggml-tiny.bin");
         }
-        
+
         return defaultSettings;
     }
 

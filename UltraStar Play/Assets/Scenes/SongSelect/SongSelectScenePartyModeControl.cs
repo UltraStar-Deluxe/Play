@@ -38,10 +38,10 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     [Inject]
     private SongSelectSceneData sceneData;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
 
@@ -115,7 +115,7 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
     public void SelectRandomSong()
     {
         RandomlySelectedSong = GetRandomSong();
-        songRouletteControl.SelectSong(RandomlySelectedSong);
+        songRouletteControl.SelectEntryBySongMeta(RandomlySelectedSong);
         sceneData.SongMeta = RandomlySelectedSong;
         Debug.Log($"Selected random song: {RandomlySelectedSong}");
     }
@@ -178,14 +178,14 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
         {
             CloseAskToUseJokerDialog();
             RandomlySelectedSong = songMeta;
-            songRouletteControl.SelectSong(songMeta);
+            songRouletteControl.SelectEntryBySongMeta(songMeta);
             ReduceJokerCount();
             onYes?.Invoke();
         });
         askToUseJokerControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ =>
         {
             CloseAskToUseJokerDialog();
-            songRouletteControl.SelectSong(RandomlySelectedSong);
+            songRouletteControl.SelectEntryBySongMeta(RandomlySelectedSong);
         });
 
         askToUseJokerControl.AddVisualElement(CreateJokerList());

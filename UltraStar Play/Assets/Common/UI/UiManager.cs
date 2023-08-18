@@ -33,7 +33,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
     [InjectedInInspector]
     public VisualTreeAsset micWithNameUi;
-    
+
     [InjectedInInspector]
     public Sprite fallbackPlayerProfileImage;
 
@@ -45,13 +45,16 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
     [InjectedInInspector]
     public VisualTreeAsset songQueueEntryUi;
-    
+
     [InjectedInInspector]
     public VisualTreeAsset songQueuePlayerEntryUi;
-    
+
     [InjectedInInspector]
     public Sprite defaultSongImage;
-    
+
+    [InjectedInInspector]
+    public Sprite defaultFolderImage;
+
     [Inject]
     private Injector injector;
 
@@ -129,7 +132,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         return dialogControl;
     }
-    
+
     public MessageDialogControl CreateConfirmationDialogControl(
         string dialogTitle,
         string dialogMessage,
@@ -156,7 +159,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         });
         return messageDialogControl;
     }
-    
+
     public MessageDialogControl CreateHelpDialogControl(
         string dialogTitle,
         Dictionary<string, string> titleToContentMap)
@@ -164,7 +167,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialogVisualElement);
         dialogVisualElement.AddToClassList("wordWrap");
-        
+
         MessageDialogControl dialogControl = injector
             .WithRootVisualElement(dialogVisualElement)
             .CreateAndInject<MessageDialogControl>();
@@ -172,7 +175,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         AccordionGroup accordionGroup = new();
         dialogControl.AddVisualElement(accordionGroup);
-            
+
         void AddChapter(string title, string content)
         {
             AccordionItem accordionItem = new(title);
@@ -198,7 +201,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             return playerProfile.ImagePath;
         }
     }
-    
+
     public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
     {
         if (imagePath.IsNullOrEmpty())
@@ -242,7 +245,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         }
 
     }
-    
+
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();
