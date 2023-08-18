@@ -367,11 +367,19 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         string backgroundJsonAsString = JsonConverter.ToJson(backgroundJson);
-        if (backgroundJsonAsString == lastThemeDynamicBackgroundJson)
+        if (backgroundJsonAsString != lastThemeDynamicBackgroundJson)
         {
-            return;
+            ApplyThemeParticleBackground(themeMeta, backgroundJson);
         }
 
+        ApplyThemeBaseBackground(themeMeta, backgroundJson);
+        ApplyThemeLightBackground(themeMeta, backgroundJson);
+
+        lastThemeDynamicBackgroundJson = backgroundJsonAsString;
+    }
+
+    private void ApplyThemeParticleBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    {
         // Material
         if (!backgroundJson.gradientRampFile.IsNullOrEmpty())
         {
@@ -479,11 +487,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
-
-        ApplyThemeBaseBackground(themeMeta, backgroundJson);
-        ApplyThemeLightBackground(themeMeta, backgroundJson);
-
-        lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
     private void ApplyThemeBaseBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
@@ -499,7 +502,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         else
         {
-            StopVideoPlayer(backgroundLightVideoPlayer);
+            StopVideoPlayer(backgroundVideoPlayer);
             backgroundShaderControl.SetBaseTextureEnabled(false);
 
             // Try to use static image as base background
