@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UniInject;
 using UnityEngine.InputSystem;
+using UnityEngine.Video;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -82,6 +83,9 @@ public class StandbyModeControl : AbstractSingletonBehaviour, INeedInjection
         FindObjectsOfType<SongAudioPlayer>().ForEach(it => it.PauseAudio());
         FindObjectsOfType<AudioSource>().ForEach(it => it.Pause());
 
+        // Pause video
+        FindObjectsOfType<VideoPlayer>().ForEach(it => it.Pause());
+
         // Hide UI
         uiDocument.rootVisualElement.HideByDisplay();
         settings.AnimatedBackground = false;
@@ -107,7 +111,24 @@ public class StandbyModeControl : AbstractSingletonBehaviour, INeedInjection
 
         // Reset audio
         FindObjectsOfType<SongAudioPlayer>().ForEach(it => it.PlayAudio());
-        FindObjectsOfType<AudioSource>().ForEach(it => it.Play());
+        FindObjectsOfType<AudioSource>().ForEach(it =>
+        {
+            if (it.clip != null
+                && it.clip.length > 0)
+            {
+                it.Play();
+            }
+        });
+
+        // Reset video
+        FindObjectsOfType<VideoPlayer>().ForEach(it =>
+        {
+            if (!it.url.IsNullOrEmpty()
+                && it.length > 0)
+            {
+                it.Play();
+            }
+        });
 
         // Reset UI
         uiDocument.rootVisualElement.ShowByDisplay();
