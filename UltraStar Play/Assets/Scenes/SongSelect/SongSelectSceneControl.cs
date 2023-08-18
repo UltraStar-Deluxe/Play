@@ -1347,6 +1347,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(VirtualRootFolderName);
         }
+        else if (!settings.NavigateByFoldersInSongSelect
+                 && nonPersistentSettings.SongSelectDirectoryInfo != null)
+        {
+            nonPersistentSettings.SongSelectDirectoryInfo = null;
+        }
 
         List<SongMeta> filteredSongMetas = GetFilteredSongMetas();
         if (!filteredSongMetas.IsNullOrEmpty()
@@ -1360,7 +1365,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         List<SongSelectEntry> newEntries = new();
 
-        // Add folders
+        // Add folder entries
         if (settings.NavigateByFoldersInSongSelect)
         {
             List<DirectoryInfo> directoryInfos = GetFilteredDirectoryInfos();
