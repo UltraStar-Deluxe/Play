@@ -244,7 +244,7 @@ public static partial class R
         public const string ignoreAllFutureVersionsButton = "ignoreAllFutureVersionsButton";
         public const string ignoreThisVersionButton = "ignoreThisVersionButton";
         public const string image = "image";
-        public const string imageAsCursorPicker = "imageAsCursorPicker";
+        public const string imageAsCursorToggle = "imageAsCursorToggle";
         public const string img_title = "img_title";
         public const string importLrcDialogOverlay = "importLrcDialogOverlay";
         public const string ImportLrcDialogUi = "ImportLrcDialogUi";
@@ -404,7 +404,7 @@ public static partial class R
         public const string nameCharacterContainer = "nameCharacterContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";
-        public const string navigateFoldersInSongSelectPicker = "navigateFoldersInSongSelectPicker";
+        public const string navigateFoldersInSongSelectToggle = "navigateFoldersInSongSelectToggle";
         public const string navigateFolderUpButton = "navigateFolderUpButton";
         public const string newHighscoreContainer = "newHighscoreContainer";
         public const string newHighscoreIcon = "newHighscoreIcon";
@@ -693,10 +693,10 @@ public static partial class R
         public const string showOnlyDuetsToggle = "showOnlyDuetsToggle";
         public const string showOnlyFilesWithoutSingAlongDataToggle = "showOnlyFilesWithoutSingAlongDataToggle";
         public const string showRightSideBarToggle = "showRightSideBarToggle";
-        public const string showScrollBarInSongSelectPicker = "showScrollBarInSongSelectPicker";
+        public const string showScrollBarInSongSelectToggle = "showScrollBarInSongSelectToggle";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";
         public const string showSearchExpressionInfoTitle = "showSearchExpressionInfoTitle";
-        public const string showSongIndexInSongSelectPicker = "showSongIndexInSongSelectPicker";
+        public const string showSongIndexInSongSelectToggle = "showSongIndexInSongSelectToggle";
         public const string showStatusBarToggle = "showStatusBarToggle";
         public const string showTeamResultsButton = "showTeamResultsButton";
         public const string showVideoAreaToggle = "showVideoAreaToggle";
@@ -909,7 +909,7 @@ public static partial class R
         public const string verticalGridLabelContainer = "verticalGridLabelContainer";
         public const string verticalGridLineContainer = "verticalGridLineContainer";
         public const string verticalSeparator = "verticalSeparator";
-        public const string vfxEnabledPicker = "vfxEnabledPicker";
+        public const string vfxEnabledToggle = "vfxEnabledToggle";
         public const string videoArea = "videoArea";
         public const string videoAreaContent = "videoAreaContent";
         public const string videoAreaLabel = "videoAreaLabel";

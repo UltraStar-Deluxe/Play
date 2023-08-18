@@ -41,6 +41,7 @@
             <AccordionItem name="performanceAndEffectsGroup" label="Performance And Effects" class="child-mb-3">
                 <ui:Toggle name="showFpsToggle" label="Show FPS" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="animatedBackgroundItemToggle" label="Enable Animated Background¹" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="vfxEnabledToggle" label="Enable Visual Effects" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="enableDynamicThemesToggle" label="Enable Themes¹" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="wipeLyricsEffectToggle" label="Wipe Lyrics Effect" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="analyzeBeatsWithoutTargetNoteToggle" label="Analyze Beats Without Target Note" class="noBackgroundInHierarchy" />

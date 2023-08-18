@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ProTrans;
 using UniInject;
+using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -13,8 +14,8 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.themePicker)]
     private ItemPicker themePicker;
 
-    [Inject(UxmlName = R.UxmlNames.imageAsCursorPicker)]
-    private ItemPicker imageAsCursorPicker;
+    [Inject(UxmlName = R.UxmlNames.imageAsCursorToggle)]
+    private Toggle imageAsCursorToggle;
 
     [Inject(UxmlName = R.UxmlNames.sceneChangeAnimationPicker)]
     private ItemPicker sceneChangeAnimationPicker;
@@ -25,17 +26,14 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     [Inject(UxmlName = R.UxmlNames.backgroundLightItemPicker)]
     private ItemPicker backgroundLightItemPicker;
 
-    [Inject(UxmlName = R.UxmlNames.vfxEnabledPicker)]
-    private ItemPicker vfxEnabledPicker;
+    [Inject(UxmlName = R.UxmlNames.showScrollBarInSongSelectToggle)]
+    private Toggle showScrollBarInSongSelectToggle;
 
-    [Inject(UxmlName = R.UxmlNames.showScrollBarInSongSelectPicker)]
-    private ItemPicker showScrollBarInSongSelectPicker;
+    [Inject(UxmlName = R.UxmlNames.showSongIndexInSongSelectToggle)]
+    private Toggle showSongIndexInSongSelectToggle;
 
-    [Inject(UxmlName = R.UxmlNames.showSongIndexInSongSelectPicker)]
-    private ItemPicker showSongIndexInSongSelectPicker;
-
-    [Inject(UxmlName = R.UxmlNames.navigateFoldersInSongSelectPicker)]
-    private ItemPicker navigateFoldersInSongSelectPicker;
+    [Inject(UxmlName = R.UxmlNames.navigateFoldersInSongSelectToggle)]
+    private Toggle navigateFoldersInSongSelectToggle;
 
     [Inject(UxmlName = R.UxmlNames.songBackgroundScaleModePicker)]
     private ItemPicker songBackgroundScaleModePicker;
@@ -53,29 +51,25 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     {
         base.Start();
 
-        new BoolPickerControl(imageAsCursorPicker)
-            .Bind(() => settings.UseImageAsCursor,
-                newValue => settings.UseImageAsCursor = newValue);
+        FieldBindingUtils.Bind(imageAsCursorToggle,
+            () => settings.UseImageAsCursor,
+            newValue => settings.UseImageAsCursor = newValue);
 
         new EnumItemPickerControl<ESceneChangeAnimation>(sceneChangeAnimationPicker)
             .Bind(() => settings.SceneChangeAnimation,
                 newValue => settings.SceneChangeAnimation = newValue);
 
-        new BoolPickerControl(vfxEnabledPicker)
-            .Bind(() => settings.EnableVfx,
-                newValue => settings.EnableVfx = newValue);
+        FieldBindingUtils.Bind(showScrollBarInSongSelectToggle,
+            () => settings.ShowScrollBarInSongSelect,
+            newValue => settings.ShowScrollBarInSongSelect = newValue);
 
-        new BoolPickerControl(showScrollBarInSongSelectPicker)
-            .Bind(() => settings.ShowScrollBarInSongSelect,
-                newValue => settings.ShowScrollBarInSongSelect = newValue);
+        FieldBindingUtils.Bind(showSongIndexInSongSelectToggle,
+            () => settings.ShowSongIndexInSongSelect,
+            newValue => settings.ShowSongIndexInSongSelect = newValue);
 
-        new BoolPickerControl(showSongIndexInSongSelectPicker)
-            .Bind(() => settings.ShowSongIndexInSongSelect,
-                newValue => settings.ShowSongIndexInSongSelect = newValue);
-
-        new BoolPickerControl(navigateFoldersInSongSelectPicker)
-            .Bind(() => settings.NavigateByFoldersInSongSelect,
-                newValue => settings.NavigateByFoldersInSongSelect = newValue);
+        FieldBindingUtils.Bind(navigateFoldersInSongSelectToggle,
+            () => settings.NavigateByFoldersInSongSelect,
+            newValue => settings.NavigateByFoldersInSongSelect = newValue);
 
         LabeledItemPickerControl<float> audioPreviewFadeInDurationChooserControl = new(previewFadeInDurationChooser, NumberUtils.CreateFloatList(0.5f, 5f, 0.5f));
         audioPreviewFadeInDurationChooserControl.Bind(() => settings.PreviewFadeInDurationInSeconds,
@@ -118,7 +112,6 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     public void UpdateTranslation()
     {
         themePicker.Label = TranslationManager.GetTranslation(R.Messages.options_design_theme);
-        imageAsCursorPicker.Label = TranslationManager.GetTranslation(R.Messages.options_useImageAsCursor);
     }
 
     public override bool HasHelpDialog => true;

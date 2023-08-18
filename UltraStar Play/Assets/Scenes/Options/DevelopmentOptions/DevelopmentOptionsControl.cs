@@ -140,6 +140,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedToggle)]
     private Toggle checkCodecIsSupportedToggle;
 
+    [Inject(UxmlName = R.UxmlNames.vfxEnabledToggle)]
+    private Toggle vfxEnabledToggle;
+
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
 
@@ -380,6 +383,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(wipeLyricsEffectToggle,
             () => settings.WipeLyrics,
             newValue => settings.WipeLyrics = newValue);
+
+        // Vfx enabled
+        FieldBindingUtils.Bind(vfxEnabledToggle,
+            () => settings.EnableVfx,
+            newValue => settings.EnableVfx = newValue);
     }
 
     private List<string> GetAvailablePortAudioOutputDeviceNames()
