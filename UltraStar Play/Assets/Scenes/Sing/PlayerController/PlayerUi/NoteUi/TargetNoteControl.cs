@@ -33,13 +33,13 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.targetNoteBorder)]
     private VisualElement targetNoteBorder;
-    
+
     [Inject(Optional = true)]
     private MicProfile micProfile;
 
     [Inject]
     private SingSceneControl singSceneControl;
-    
+
     [Inject]
     private ThemeManager themeManager;
 
@@ -53,7 +53,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
     {
         targetNote.ShowByDisplay();
         recordedNote.HideByDisplay();
-        
+
         targetNoteLyricsContainer.Add(Label);
         Label.HideByVisibility();
         // new AutoFitLabelControl(Label, 4, 14);
@@ -66,6 +66,12 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         }
 
         SetStyleByMicProfile();
+
+        // hide freestyle notes
+        if (Note.Type is ENoteType.Freestyle)
+        {
+            VisualElement.HideByVisibility();
+        }
     }
 
     private void SetStyleByMicProfile()
@@ -75,15 +81,9 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        Color color = Note.IsGolden 
+        Color color = Note.IsGolden
             ? themeManager.GetGoldenColor()
             : micProfile.Color;
-
-        // hide freestyle notes
-        if (Note.Type is ENoteType.Freestyle)
-        {
-            VisualElement.HideByVisibility();
-        }
 
         image.style.unityBackgroundImageTintColor = color;
         image.SetBorderColor(color);
@@ -144,7 +144,7 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
         AutoFitLabelControl.SetBestFitFontSize(Label, 4, 14, 20);
     }
-    
+
     public void UpdateLabelPosition()
     {
         if (!Label.IsVisibleByDisplay()
@@ -152,13 +152,13 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
         {
             return;
         }
-        
+
         Label.SetVisibleByVisibility(VisualElement.IsVisibleByDisplay() && VisualElementUtils.HasGeometry(VisualElement));
         if (!Label.IsVisibleByVisibility())
         {
             return;
         }
-        
+
         // The note label is in another VisualElement to be fully visible (not truncated by the parent).
         // Thus, its position needs to be updated manually.
         Label.style.position = new StyleEnum<Position>(Position.Absolute);
