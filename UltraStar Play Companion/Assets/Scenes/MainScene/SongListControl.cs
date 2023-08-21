@@ -68,6 +68,8 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     private Vector2 songListViewScrollPosBeforeHide = new Vector2(-1, -1);
     private bool lastIsSongListVisibleByDisplay;
 
+    private List<VisualElement> songListViewAncestors;
+
     public void OnInjectionFinished()
     {
         injector
@@ -78,6 +80,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
             .Inject(songQueueUiControl);
 
         songListViewScrollView = songListView.Q<ScrollView>();
+        songListViewAncestors = songListView.GetAncestors();
 
         tabGroupControl.AddTabGroupButton(showSongSearchButton, songSearchContainer);
         tabGroupControl.AddTabGroupButton(showSongQueueButton, songQueueContainer);
@@ -105,8 +108,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     public void LateUpdate()
     {
         bool isSongListVisibleByDisplay = songListView.IsVisibleByDisplay()
-                                        && songListContainer.IsVisibleByDisplay()
-                                        && songViewContainer.IsVisibleByDisplay();
+            && songListViewAncestors.AllMatch(ancestor => ancestor.IsVisibleByDisplay());
 
         // Restore last scroll position when list gets visible.
         // Sadly required because Unity does not handle this: https://forum.unity.com/threads/scrollview-loses-scroll-position-after-hide-and-show-display-none-display-flex.1084706/
