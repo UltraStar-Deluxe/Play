@@ -135,13 +135,13 @@ public class SongMeta
     public bool Relative { get; set; }
 
     /**
-     * Beat at which a preview of the song should begin.
-     * Thus, this beat should start the most memorable part of a song as a preview.
+     * Time in seconds at which the preview of the song should begin.
      */
     public float PreviewStart { get; set; }
 
     /**
-     * Beat at which the preview should end.
+     * Time in seconds (or beat?) at which the preview should end.
+     * Not implemented.
      */
     public float PreviewEnd { get; set; }
 

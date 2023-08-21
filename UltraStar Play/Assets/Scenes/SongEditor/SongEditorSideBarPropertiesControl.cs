@@ -107,11 +107,11 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             PropertyUtils.CreateStringGetterFromFloatGetter(() => songMeta.VideoGap, true, "0.00"),
             PropertyUtils.CreateStringSetterFromFloatSetter(newValue => songMeta.VideoGap = newValue));
         CreateSongPropertiesInputControl(ESongProperty.PreviewStart,
-            "Preview Start (beat)",
+            "Preview Start (s)",
             PropertyUtils.CreateStringGetterFromFloatGetter(() => songMeta.PreviewStart, true, "0.00"),
             PropertyUtils.CreateStringSetterFromFloatSetter(newValue => songMeta.PreviewStart = newValue));
         CreateSongPropertiesInputControl(ESongProperty.PreviewEnd,
-            "Preview End (beat)",
+            "Preview End (s)",
             PropertyUtils.CreateStringGetterFromFloatGetter(() => songMeta.PreviewEnd, true, "0.00"),
             PropertyUtils.CreateStringSetterFromFloatSetter(newValue => songMeta.PreviewEnd = newValue));
         CreateSongPropertiesInputControl(ESongProperty.MedleyStart,
@@ -146,7 +146,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             "Instrumental Audio",
             () => songMeta.InstrumentalAudio,
             newValue => songMeta.InstrumentalAudio = newValue);
-        
+
         songMeta.UnknownHeaderEntries.ForEach(entry =>
         {
             CreateSongPropertiesInputControl(ESongProperty.Other,
