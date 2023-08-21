@@ -67,6 +67,7 @@ public static partial class R
         public const string MicrophoneUi = "MicrophoneUi";
         public const string microphoneUiRoot = "microphoneUiRoot";
         public const string micViewContainer = "micViewContainer";
+        public const string minimumLogLevelPicker = "minimumLogLevelPicker";
         public const string modifierChipsCombo = "modifierChipsCombo";
         public const string modifierContainer = "modifierContainer";
         public const string modifierDialogOverlay = "modifierDialogOverlay";

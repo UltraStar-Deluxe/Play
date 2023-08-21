@@ -23,10 +23,10 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private UnityWebRequestManager webRequestManager;
- 
+
     [Inject]
     private Settings settings;
-    
+
     private readonly Subject<bool> connectionEventStream = new();
     public IObservable<bool> ConnectionEventStream => connectionEventStream;
 
@@ -58,7 +58,8 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
                 }
             });
 
-        Permissions.Subscribe(newPermissions => Debug.Log($"Permissions changed: {newPermissions.ToCsv()}"));
+        Permissions.Subscribe(newPermissions =>
+            Debug.Log($"Permissions changed: {newPermissions.ToCsv()}"));
     }
 
     public string GetUri(string path)
@@ -110,7 +111,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
         UnityWebRequest unityWebRequest = UnityWebRequest.Delete(uri);
         SendRequest(unityWebRequest, onSuccess, onError);
     }
-    
+
     private void SendRequest(
         UnityWebRequest unityWebRequest,
         Action<string> onSuccess,

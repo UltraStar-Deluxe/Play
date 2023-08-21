@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using LiteNetLib;
@@ -15,7 +16,7 @@ using IBinding = UniInject.IBinding;
 public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInjectionFinishedListener, IBinder
 {
     private const int ConnectRequestCountShowTroubleshootingHintThreshold = 3;
-    
+
     [InjectedInInspector]
     public VisualTreeAsset playerSelectPlayerEntryUi;
 
@@ -36,7 +37,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private InGameDebugConsoleManager inGameDebugConsoleManager;
 
@@ -57,13 +58,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.visualizeAudioToggle)]
     private Toggle visualizeAudioToggle;
-    
+
     [Inject(UxmlName = R.UxmlNames.audioWaveForm)]
     private VisualElement audioWaveForm;
 
     [Inject(UxmlName = R.UxmlNames.connectionThroubleshootingText)]
     private Label connectionThroubleshootingText;
-    
+
     [Inject(UxmlName = R.UxmlNames.serverErrorResponseText)]
     private Label serverErrorResponseText;
 
@@ -101,10 +102,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.devModePicker)]
     private ItemPicker devModePicker;
-    
+
     [Inject(UxmlName = R.UxmlNames.targetFpsPicker)]
     private ItemPicker targetFpsPicker;
-    
+
+    [Inject(UxmlName = R.UxmlNames.minimumLogLevelPicker)]
+    private ItemPicker minimumLogLevelPicker;
+
     [Inject]
     private TranslationManager translationManager;
 
@@ -134,28 +138,28 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     [Inject(UxmlName = R.UxmlNames.connectionServerPortTextField)]
     private IntegerField connectionServerPortTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.connectionServerAddressTextField)]
     private TextField connectionServerAddressTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.micDataDeliveryMethodField)]
     private EnumField micDataDeliveryMethodField;
-    
+
     [Inject(UxmlName = R.UxmlNames.tabGroup)]
     private VisualElement tabGroup;
-    
+
     [Inject]
     private Injector injector;
-    
+
     [Inject(UxmlName = R.UxmlNames.viewLogButton)]
     private Button viewLogButton;
-    
+
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
 
     [Inject(UxmlName = R.UxmlNames.copyLogButton)]
     private Button copyLogButton;
-    
+
     private LabeledItemPickerControl<string> recordingDevicePickerControl;
     private LabeledItemPickerControl<SystemLanguage> languagePickerControl;
     private BoolPickerControl devModePickerControl;
@@ -177,7 +181,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
         mainGameHttpClient.Permissions
             .Subscribe(permissions => OnPermissionsChanged(permissions));
-        
+
         // Select recording device if none.
         if (settings.MicProfile.Name.IsNullOrEmpty()
             || !Microphone.devices.Contains(settings.MicProfile.Name))
@@ -186,7 +190,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         }
 
         menuOverlay.ShowByDisplay();
-        
+
         clientSideMicDataSender.IsRecording.Subscribe(OnRecordingStateChanged);
         clientSideMicDataSender.FinalSampleRate.Subscribe(_ => UpdateRecordingDeviceInfo());
 
@@ -195,13 +199,13 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         onlyVisibleWhenNotConnected.ForEach(it => it.ShowByDisplay());
         connectionThroubleshootingText.HideByDisplay();
         serverErrorResponseText.HideByDisplay();
-        
+
         toggleRecordingButton.RegisterCallbackButtonTriggered(_ => ToggleRecording());
 
         clientNameTextField.value = settings.ClientName;
         clientNameTextField.RegisterCallback<NavigationSubmitEvent>(_ => OnClientNameTextFieldSubmit());
         clientNameTextField.RegisterCallback<BlurEvent>(_ => OnClientNameTextFieldSubmit());
-        
+
         visualizeAudioToggle.value = settings.ShowAudioWaveForm;
         audioWaveForm.SetVisibleByVisibility(settings.ShowAudioWaveForm);
         visualizeAudioToggle.RegisterValueChangedCallback(changeEvent =>
@@ -209,10 +213,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             audioWaveForm.SetVisibleByVisibility(changeEvent.newValue);
             settings.ShowAudioWaveForm = changeEvent.newValue;
         });
-        
+
         clientSideConnectRequestManager.ConnectEventStream
             .Subscribe(UpdateConnectionStatus);
-        
+
         audioWaveForm.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             int textureWidth = 512;
@@ -224,10 +228,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
                 textureHeight,
                 "main scene audio wave form visualization");
         });
-        
+
         mouseSensitivityFloatField.value = settings.MousePadSensitivity;
         mouseSensitivityFloatField.RegisterValueChangedCallback(evt => settings.MousePadSensitivity = evt.newValue);
-        
+
         // Only show some controls when dev mode is enabled.
         UpdateDevModeControlsVisibility();
         settings.ObserveEveryValueChanged(it => it.IsDevModeEnabled)
@@ -243,7 +247,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         settings.ObserveEveryValueChanged(it => it.MicProfile)
             .Subscribe(_ => OnMicProfileChanged());
     }
-    
+
     private void UpdateDevModeControlsVisibility()
     {
         onlyVisibleWhenDevModeEnabled.ForEach(it => it.SetVisibleByDisplay(settings.IsDevModeEnabled));
@@ -296,6 +300,15 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             .ObserveEveryValueChanged(it => it.IsDevModeEnabled)
             .Subscribe(newValue => OnDevModeEnabledChanged(newValue));
 
+        // Minimum log level
+        new EnumItemPickerControl<LogEventLevel>(minimumLogLevelPicker).Bind(
+            () => settings.MinimumLogLevel,
+            newValue =>
+            {
+                settings.MinimumLogLevel = newValue;
+                Log.MinimumLogLevel = newValue;
+            });
+
         // Target FPS
         LabeledItemPickerControl<int> targetFpsPickerControl = new(targetFpsPicker, new List<int> { -1, 5, 10, 15, 20, 30, 60, 90, 120 });
         targetFpsPickerControl.GetLabelTextFunction = item => item > 0 ? $"{item}" : "Auto";
@@ -308,11 +321,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             () => settings.ConnectionServerPort,
             newValue => settings.ConnectionServerPort = newValue);
         connectionServerPortTextField.DisableChangeValueByDragging();
-            
+
         FieldBindingUtils.Bind(connectionServerAddressTextField,
             () => settings.ConnectionServerAddress,
             newValue => settings.ConnectionServerAddress = newValue);
-        
+
         FieldBindingUtils.Bind(micDataDeliveryMethodField,
             () => settings.MicDataDeliveryMethod,
             newValue => settings.MicDataDeliveryMethod = (DeliveryMethod)newValue);
@@ -322,7 +335,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         showMenuButton.RegisterCallbackButtonTriggered(_ => ShowMenu());
         hiddenCloseMenuButton.RegisterCallbackButtonTriggered(_ => HideMenu());
         closeMenuButton.RegisterCallbackButtonTriggered(_ => HideMenu());
-        
+
         // View and copy log
         viewLogButton.RegisterCallbackButtonTriggered(_ => inGameDebugConsoleManager.ShowConsole());
         copyLogButton.RegisterCallbackButtonTriggered(_ =>
@@ -372,6 +385,11 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
         {
             audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(clientSideMicDataSender.MicSamples);
         }
+    }
+
+    private void LateUpdate()
+    {
+        songListControl?.LateUpdate();
     }
 
     private void OnClientNameTextFieldSubmit()
@@ -446,7 +464,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
             connectionStatusText.text = connectEvent.ConnectRequestCount > 0
                 ? TranslationManager.GetTranslation(R.Messages.companionApp_connectingWithFailedAttempts, "count", connectEvent.ConnectRequestCount)
                 : TranslationManager.GetTranslation(R.Messages.companionApp_connecting);
-            
+
             onlyVisibleWhenConnected.ForEach(it => it.HideByDisplay());
             onlyVisibleWhenNotConnected.ForEach(it => it.ShowByDisplay());
             if (connectEvent.ConnectRequestCount > ConnectRequestCountShowTroubleshootingHintThreshold)
