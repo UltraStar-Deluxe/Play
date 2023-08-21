@@ -10,10 +10,10 @@ using UnityEngine.UIElements;
 public class SongListControl : INeedInjection, IInjectionFinishedListener, ITranslator, IDisposable
 {
     private IComparer<SongDto> songDtoComparer = new SongListSongDtoComparer();
-    
+
     [Inject(Key = nameof(songListEntryUi))]
     private VisualTreeAsset songListEntryUi;
-    
+
     [Inject(UxmlName = R.UxmlNames.songSearchTextField)]
     private TextField songSearchTextField;
 
@@ -22,31 +22,37 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
 
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private ListView songListView;
-    
+
+    [Inject(UxmlName = R.UxmlNames.songListContainer)]
+    private VisualElement songListContainer;
+
+    [Inject(UxmlName = R.UxmlNames.songViewContainer)]
+    private VisualElement songViewContainer;
+
     [Inject(UxmlName = R.UxmlNames.showSongSearchButton)]
     private Button showSongSearchButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.showSongQueueButton)]
     private Button showSongQueueButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.songSearchContainer)]
     private VisualElement songSearchContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.songQueueContainer)]
     private VisualElement songQueueContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
     private VisualElement songDetailsContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.songListStatusLabel)]
     private Label songListStatusLabel;
-    
+
     [Inject]
     private SongListRequestor songListRequestor;
 
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
-    
+
     [Inject]
     private Injector injector;
 
@@ -57,7 +63,11 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     private List<SongQueueEntryDto> SongQueueEntryDtos => songQueueUiControl.SongQueueEntryControls
         .Select(control => control.SongQueueEntryDto)
         .ToList();
-    
+
+    private ScrollView songListViewScrollView;
+    private Vector2 songListViewScrollPosBeforeHide = new Vector2(-1, -1);
+    private bool lastIsSongListVisibleByDisplay;
+
     public void OnInjectionFinished()
     {
         injector
@@ -67,11 +77,13 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
             .WithRootVisualElement(songQueueContainer)
             .Inject(songQueueUiControl);
 
+        songListViewScrollView = songListView.Q<ScrollView>();
+
         tabGroupControl.AddTabGroupButton(showSongSearchButton, songSearchContainer);
         tabGroupControl.AddTabGroupButton(showSongQueueButton, songQueueContainer);
         tabGroupControl.ShowContainer(songSearchContainer);
         showSongQueueButton.RegisterCallbackButtonTriggered(_ => UpdateSongQueue());
-        
+
         songListRequestor.SongListEventStream.Subscribe(evt => HandleSongListEvent(evt));
 
         songSearchTextField.RegisterValueChangedCallback(evt =>
@@ -81,13 +93,38 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
         });
 
         mainGameHttpClient.Permissions.Subscribe(_ => UpdateSongQueue());
-        
+
         songQueueUiControl.OnDelete = entry => DeleteSongQueueEntry(entry);
         songQueueUiControl.OnToggleMedley = entry => ToggleMedley(entry);
-        
+
         songListView.makeItem = OnMakeItem;
         songListView.bindItem = OnBindItem;
         songListView.unbindItem = OnUnbindItem;
+    }
+
+    public void LateUpdate()
+    {
+        bool isSongListVisibleByDisplay = songListView.IsVisibleByDisplay()
+                                        && songListContainer.IsVisibleByDisplay()
+                                        && songViewContainer.IsVisibleByDisplay();
+
+        // Restore last scroll position when list gets visible.
+        // Sadly required because Unity does not handle this: https://forum.unity.com/threads/scrollview-loses-scroll-position-after-hide-and-show-display-none-display-flex.1084706/
+        // LateUpdate is used, because the ScrollView does not populate its content immediately when the style changes.
+        if (isSongListVisibleByDisplay
+            && !lastIsSongListVisibleByDisplay
+            && songListViewScrollPosBeforeHide.x >= 0
+            && songListViewScrollPosBeforeHide.y >= 0)
+        {
+            songListViewScrollView.scrollOffset = songListViewScrollPosBeforeHide;
+            songListViewScrollPosBeforeHide = new Vector2(-1, -1);
+        }
+        else if (isSongListVisibleByDisplay)
+        {
+            songListViewScrollPosBeforeHide = songListViewScrollView.scrollOffset;
+        }
+
+        lastIsSongListVisibleByDisplay = isSongListVisibleByDisplay;
     }
 
     private void OnBindItem(VisualElement visualElement, int index)
@@ -99,7 +136,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
             songListEntryControl.SongDto = songDtos[index];
         }
     }
-    
+
     private void OnUnbindItem(VisualElement visualElement, int index)
     {
         if (visualElement.userData is SongListEntryControl songListEntryControl)
@@ -111,12 +148,12 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
     private VisualElement OnMakeItem()
     {
         VisualElement songListEntry = songListEntryUi.CloneTreeAndGetFirstChild();
-        
+
         injector
             .WithRootVisualElement(songListEntry)
             .WithBindingForInstance(songDetailsControl)
             .CreateAndInject<SongListEntryControl>();
-        
+
         return songListEntry;
     }
 
@@ -150,11 +187,11 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
                 UpdateSongQueue();
             });
     }
-    
+
     private void UpdateSongQueue()
     {
         songQueueUiControl.Clear();
-        
+
         if (!mainGameHttpClient.IsConnected)
         {
             return;
@@ -171,12 +208,12 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
                 }
 
                 songQueueUiControl.SetSongQueueEntryDtos(listDto.Items);
-                
+
                 if (!mainGameHttpClient.Permissions.Value.Contains(HttpApiPermission.WriteSongQueue))
                 {
                     songQueueUiControl.HideControls();
                 }
-            }, 
+            },
             ex =>
             {
                 songQueueContainer.Add(new Label("Failed to load song queue."));
@@ -200,7 +237,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
 
         songListView.itemsSource = songDtos;
         songListView.RefreshItems();
-        
+
         if (songListRequestor.LoadedSongsDto.IsSongScanFinished)
         {
             SetSongListStatus("");
@@ -210,7 +247,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
             SetSongListStatus("Loading song list...");
         }
     }
-    
+
     private bool SongSearchMatches(SongDto songDto)
     {
         string searchText = songSearchTextField.value.ToLowerInvariant();
@@ -258,11 +295,11 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
             ShowSongList();
         }
     }
-    
+
     private void ShowSongList()
     {
         songSearchTextField.value = "";
-                
+
         if (!songListRequestor.SuccessfullyLoadedAllSongs)
         {
             ClearSongList();
@@ -276,7 +313,7 @@ public class SongListControl : INeedInjection, IInjectionFinishedListener, ITran
         songListStatusLabel.SetVisibleByDisplay(!text.IsNullOrEmpty());
         songListStatusLabel.text = text;
     }
-    
+
     public void Dispose()
     {
         songDetailsControl.Dispose();
