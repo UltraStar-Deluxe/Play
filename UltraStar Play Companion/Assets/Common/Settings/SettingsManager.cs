@@ -32,7 +32,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             if (settings == null)
             {
-                Reload();
+                LoadSettings();
             }
             return settings;
         }
@@ -61,7 +61,7 @@ public class SettingsManager : AbstractSingletonBehaviour
     {
         Save();
     }
-    
+
     private void OnApplicationPause(bool isApplicationPaused)
     {
         if (isApplicationPaused)
@@ -76,7 +76,7 @@ public class SettingsManager : AbstractSingletonBehaviour
         File.WriteAllText(GetSettingsPath(), json);
     }
 
-    public void Reload()
+    private void LoadSettings()
     {
         using (new DisposableStopwatch("Loading the settings took <millis> ms"))
         {
@@ -101,6 +101,9 @@ public class SettingsManager : AbstractSingletonBehaviour
             nonStaticSettings = settings;
             OverwriteSettingsWithCommandLineArguments();
             Debug.Log($"ClientId: {settings.ClientId}");
+
+            // Update log level
+            Log.MinimumLogLevel = settings.MinimumLogLevel;
         }
     }
 
