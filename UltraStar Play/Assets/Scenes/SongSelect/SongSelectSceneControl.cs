@@ -1248,7 +1248,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                             || playlist.HasSongEntry(songMeta))
             .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
             .Where(songMeta => nonPersistentSettings.SongSelectDirectoryInfo == null
-                               || songMeta.DirectoryInfo.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
+                               // Typically each song has its own folder. Thus, show a song if its PARENT folder matches the selected folder.
+                               || songMeta?.DirectoryInfo?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
             .ToList();
         return filteredSongs;
@@ -1395,8 +1396,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 .ToList();
         }
 
+        // Typically each song has its own folder.
+        // Thus, songs are shown if the PARENT folder matches the selected folder. This moves the songs one level up.
+        // As a result, a folder should only be shown when it has further subfolders.
         List<DirectoryInfo> directoryInfos = nonPersistentSettings.SongSelectDirectoryInfo
             .EnumerateDirectories()
+            .Where(childDirectoryInfo => childDirectoryInfo.EnumerateDirectories().Any())
             .ToList();
 
         string searchText = songSearchControl.GetSearchText();
