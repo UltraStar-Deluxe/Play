@@ -1089,10 +1089,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return false;
         }
 
-        DirectoryInfo currentDirectoryInfo = nonPersistentSettings.SongSelectDirectoryInfo;
-        if (currentDirectoryInfo == null
-            || currentDirectoryInfo.Parent == null
-            || currentDirectoryInfo.Name == VirtualRootFolderName)
+        DirectoryInfo oldDirectoryInfo = nonPersistentSettings.SongSelectDirectoryInfo;
+        if (oldDirectoryInfo == null
+            || oldDirectoryInfo.Parent == null
+            || oldDirectoryInfo.Name == VirtualRootFolderName)
         {
             return false;
         }
@@ -1100,16 +1100,25 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Select virtual root folder when configured song folder reached
         if (settings.SongDirs.AnyMatch(songFolder =>
                 !settings.DisabledSongFolders.Contains(songFolder)
-                && new DirectoryInfo(songFolder).FullName == currentDirectoryInfo.FullName))
+                && new DirectoryInfo(songFolder).FullName == oldDirectoryInfo.FullName))
         {
             nonPersistentSettings.SongSelectDirectoryInfo = new DirectoryInfo(VirtualRootFolderName);
         }
         else
         {
-            nonPersistentSettings.SongSelectDirectoryInfo = currentDirectoryInfo.Parent;
+            nonPersistentSettings.SongSelectDirectoryInfo = oldDirectoryInfo.Parent;
         }
 
         UpdateFilteredSongs();
+
+        // Select entry of previous folder
+        SongSelectEntry entryOfOldFolder = songRouletteControl.Entries
+            .FirstOrDefault(entry => entry is SongSelectFolderEntry folderEntry
+                                     && folderEntry.DirectoryInfo?.FullName == oldDirectoryInfo.FullName);
+        if (entryOfOldFolder != null)
+        {
+            songRouletteControl.SelectEntry(entryOfOldFolder);
+        }
 
         return true;
     }
