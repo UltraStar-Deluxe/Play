@@ -419,6 +419,7 @@
 
 .unity-base-slider--vertical .unity-base-slider__dragger {
     width: 10px;
+    min-height: 25px;
     margin: 0;
     left: auto;
     right: auto;
@@ -451,6 +452,7 @@
 
 .unity-base-slider--horizontal .unity-base-slider__dragger {
     height: 10px;
+    min-width: 25px;
     margin: 0;
     left: auto;
     right: auto;
