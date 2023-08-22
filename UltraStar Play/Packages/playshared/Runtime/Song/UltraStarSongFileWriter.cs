@@ -147,6 +147,15 @@ public static class UltraStarSongFileWriter
             AppendHeaderField(sb, "previewend", songMeta.PreviewEnd.ToString(CultureInfo.InvariantCulture));
         }
 
+        if (songMeta.MedleyStartBeat != 0)
+        {
+            AppendHeaderField(sb, "medleystartbeat", songMeta.MedleyStartBeat.ToString(CultureInfo.InvariantCulture));
+        }
+        if (songMeta.MedleyEndBeat != 0)
+        {
+            AppendHeaderField(sb, "medleyendbeat", songMeta.MedleyEndBeat.ToString(CultureInfo.InvariantCulture));
+        }
+
         songMeta.UnknownHeaderEntries.ForEach(entry => AppendHeaderField(sb, entry.Key, entry.Value));
     }
 
