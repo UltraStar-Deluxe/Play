@@ -174,13 +174,13 @@ public class SongMeta
      * First beat to sing when the song was started as medley.
      * A countdown is shown before this beat.
      */
-    public int MedleyStartBeat { get; set; } = -1;
+    public int MedleyStartBeat { get; set; }
 
     /**
      * Last beat to sing when the song was started as medley.
      * Afterwards, the next medley song will be started.
      */
-    public int MedleyEndBeat { get; set; } = -1;
+    public int MedleyEndBeat { get; set; }
 
     private List<Voice> voices = new();
 
