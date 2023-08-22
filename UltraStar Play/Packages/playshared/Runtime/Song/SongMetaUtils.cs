@@ -539,7 +539,7 @@ public static class SongMetaUtils
 
     public static int GetMedleyStartBeat(SongMeta songMeta)
     {
-        if (songMeta.MedleyStartBeat >= 0)
+        if (songMeta.MedleyStartBeat > 0)
         {
             return songMeta.MedleyStartBeat;
         }
@@ -551,7 +551,7 @@ public static class SongMetaUtils
 
     public static int GetMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
     {
-        if (songMeta.MedleyEndBeat >= 0)
+        if (songMeta.MedleyEndBeat > 0)
         {
             return songMeta.MedleyEndBeat;
         }
