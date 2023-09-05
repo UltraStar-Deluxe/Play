@@ -19,7 +19,8 @@
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
         "LiteNetLib",
-        "com.whisper.unity"
+        "com.whisper.unity",
+        "OneJS"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

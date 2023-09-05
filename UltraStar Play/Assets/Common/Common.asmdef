@@ -23,7 +23,8 @@
         "LiteNetLib",
         "com.whisper.unity",
         "FfmpegUnity",
-        "VLCUnity"
+        "VLCUnity",
+        "OneJS"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
