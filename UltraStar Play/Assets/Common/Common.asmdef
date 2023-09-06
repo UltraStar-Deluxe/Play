@@ -35,7 +35,8 @@
         "Flurl.dll",
         "Flurl.Http.dll",
         "HtmlAgilityPack.dll",
-        "LibVLCSharp.dll"
+        "LibVLCSharp.dll",
+        "Mono.CSharp.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
