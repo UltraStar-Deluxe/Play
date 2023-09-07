@@ -1,4 +1,4 @@
-﻿// inspiration: 
+﻿// inspiration:
 // https://gist.github.com/SeargeDP/967f007ac896accfc214
 // http://blog.davidebbo.com/2012/02/quick-fun-with-monos-csharp-compiler-as.html
 // https://www.reddit.com/r/gamedev/comments/2zvlm1/sandbox_solution_for_c_scripts_using_monocsharp/
@@ -16,12 +16,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using Mono.CSharp;
-using UnityEngine;
 using Attribute = System.Attribute;
 using Delegate = System.Delegate;
 using Enum = System.Enum;
-using Object = System.Object;
-using Random = System.Random;
 
 public class CompilerWrapper
 {
@@ -43,19 +40,20 @@ public class CompilerWrapper
 
         this._evaluator = new Evaluator(_context);
 
-        ImportAllowedTypes(BuiltInTypes, AdditionalTypes, QuestionableTypes);
+        // ImportAllowedTypes(BuiltInTypes, AdditionalTypes, QuestionableTypes);
+        ImportAllowedTypes(BuiltInTypes, AdditionalTypes);
     }
 
     public void ReferenceCurrentAssembly()
     {
         this._evaluator.ReferenceAssembly(Assembly.GetExecutingAssembly());
     }
-    
+
     public void ReferenceAssembly(Assembly assembly)
     {
         this._evaluator.ReferenceAssembly(assembly);
     }
-    
+
     /// <summary> Loads user code. Returns true on successful evaluation, or false on errors. </summary>
     public bool Execute (string path) {
         _report.Length = 0;
@@ -87,7 +85,7 @@ public class CompilerWrapper
         var importTypes = importer.GetType().GetMethod(
             "ImportTypes", BindingFlags.Instance | BindingFlags.NonPublic, null, CallingConventions.Any,
             new Type[] { typeof(Type[]), typeof(Namespace), typeof(bool) }, null);
-        
+
         foreach (Type[] types in allowedTypeArrays)
         {
             importTypes.Invoke(importer, new object[] { types, module.GlobalRootNamespace, false });
@@ -135,7 +133,7 @@ public class CompilerWrapper
     };
 
     /// <summary>
-    /// These types may be useful in scripts but they're not strictly necessary and 
+    /// These types may be useful in scripts but they're not strictly necessary and
     /// should be edited as desired.
     /// </summary>
     private static Type[] AdditionalTypes = new Type[] {
@@ -203,9 +201,9 @@ public class CompilerWrapper
         typeof(TypeCode),
         typeof(Version),
         typeof(WeakReference),
-        
+
         // mscorlib System.Collections
-        
+
         typeof(BitArray),
         typeof(ICollection),
         typeof(IComparer),
@@ -233,7 +231,7 @@ public class CompilerWrapper
         typeof(KeyNotFoundException),
         typeof(KeyValuePair<,>),
         typeof(List<>),
-        
+
         // mscorlib System.Collections.ObjectModel
 
         typeof(Collection<>),
@@ -270,10 +268,6 @@ public class CompilerWrapper
         typeof(IQueryProvider),
         typeof(Lookup<,>),
         typeof(Queryable),
-        
-        // UnityEngine
-        typeof(UnityEngine.Random),
-        typeof(Debug),
     };
 
     /// <summary>
@@ -282,9 +276,9 @@ public class CompilerWrapper
     /// Proceed with caution.
     /// </summary>
     private static Type[] QuestionableTypes = new Type[] {
-        
+
         //// mscorlib System
-        
+
         //typeof(System.AsyncCallback),
         //typeof(System.BitConverter),
         //typeof(System.Buffer),
@@ -301,7 +295,7 @@ public class CompilerWrapper
         //typeof(System.TimeZoneNotFoundException),
 
         //// mscorlib System.IO
-        
+
         //typeof(System.IO.BinaryReader),
         //typeof(System.IO.BinaryWriter),
         //typeof(System.IO.BufferedStream),
@@ -321,7 +315,7 @@ public class CompilerWrapper
         //typeof(System.IO.TextWriter),
 
         //// mscorlib System.Text
-        
+
         //typeof(System.Text.ASCIIEncoding),
         //typeof(System.Text.Decoder),
         //typeof(System.Text.Encoder),
@@ -334,7 +328,7 @@ public class CompilerWrapper
         //typeof(System.Text.UTF8Encoding),
 
         //// mscorlib System.Globalization
-        
+
         //typeof(System.Globalization.CharUnicodeInfo),
         //typeof(System.Globalization.CultureInfo),
         //typeof(System.Globalization.DateTimeFormatInfo),
@@ -346,13 +340,13 @@ public class CompilerWrapper
         //typeof(System.Globalization.TextElementEnumerator),
         //typeof(System.Globalization.TextInfo),
         //typeof(System.Globalization.UnicodeCategory),
-       
+
         //// System System.IO.Compression
-        
+
         //typeof(System.IO.Compression.CompressionMode),
         //typeof(System.IO.Compression.DeflateStream),
         //typeof(System.IO.Compression.GZipStream),
-        
+
         //// System System.Text.RegularExpressions
 
         //typeof(System.Text.RegularExpressions.Capture),

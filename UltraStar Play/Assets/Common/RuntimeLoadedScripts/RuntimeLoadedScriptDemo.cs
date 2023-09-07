@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UniInject;
+using UniInject.Extensions;
 using UnityEngine;
 
 public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
@@ -10,66 +13,115 @@ public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
     [Inject]
     private Injector injector;
 
+    [InjectedInInspector]
+    public string runtimeLoadedScriptsFolder;
+
+    [InjectedInInspector]
+    public readonly List<string> exposedAssemblyNamePatterns = new()
+    {
+        "System.*",
+        "UnityEngine.*",
+        "com.achimmihca.*",
+        "playshared",
+        "playsharedui",
+        "Common",
+        "Scenes",
+    };
+
     private void Start()
     {
         CompilerWrapper compilerWrapper = CreateCompilerWrapper();
 
         // load text files and run them
-        string runtimeLoadedScriptsFolder = ApplicationUtils.GetStreamingAssetsPath("RuntimeLoadedScripts");
-        string[] csFiles = Directory.GetFiles(runtimeLoadedScriptsFolder, "*.cs");
-        foreach (var file in csFiles)
+        string[] csFilePaths = Directory.GetFiles(runtimeLoadedScriptsFolder, "*.cs");
+        foreach (string filePath in csFilePaths)
         {
-            compilerWrapper.Execute(file);
+            if (IsIgnoredCsFile(filePath))
+            {
+                continue;
+            }
 
-            string fileName = Path.GetFileName(file);
+            compilerWrapper.Execute(filePath);
+
+            string fileName = Path.GetFileName(filePath);
             string report = compilerWrapper.GetReport();
             if (!report.IsNullOrEmpty())
             {
-                string logMessage = $"{fileName}  {report}";
+                string logMessage = $"{fileName} {report}";
                 if (compilerWrapper.ErrorsCount > 0)
                 {
-                    Debug.LogError($"Error in '{fileName}': {logMessage}");
+                    Debug.LogError($"Error in '{fileName}'. Compilation output:\n{logMessage}");
                 }
                 else
                 {
-                    Debug.Log($"Successfully compiled file '{fileName}'. {logMessage}");
+                    Debug.Log($"Successfully compiled file '{fileName}'. Compilation output:\n{logMessage}");
                 }
             }
         }
 
-        // See what we got! this includes built-ins as well as loaded ones
+        // Create instances. This includes built-ins as well as loaded ones.
         if (compilerWrapper.ErrorsCount > 0)
         {
             return;
         }
 
-        List<IHighscoreProvider> highscoreProviders = compilerWrapper.CreateInstancesOf<IHighscoreProvider>().ToList();
-        highscoreProviders = GetNewestImplementations(highscoreProviders);
-        IHighscoreProvider highscoreProvider = highscoreProviders.LastOrDefault();
-        injector.Inject(highscoreProvider);
+        List<IRuntimeLoadedRunnable> runtimeLoadedRunnables = compilerWrapper
+            .CreateInstancesOf<IRuntimeLoadedRunnable>()
+            .ToList();
 
-        SongMetaManager.Instance.ScanFilesIfNotDoneYet();
-        SongMetaManager.Instance.WaitUntilSongScanFinished();
-        Debug.Log($"HighscoreProvider {highscoreProvider.GetType()}, score: {highscoreProvider.GetScore()}, note count: {highscoreProvider.GetNoteCount(SongMetaManager.Instance.GetFirstSongMeta())}");
+        RuntimeLoadedScriptContext runtimeLoadedScriptContext = new(runtimeLoadedScriptsFolder);
+
+        Injector childInjector = injector
+            .CreateChildInjector()
+            .WithBindingForInstance(runtimeLoadedScriptContext);
+        foreach (IRuntimeLoadedRunnable runtimeLoadedRunnable in GetNewestImplementations(runtimeLoadedRunnables))
+        {
+            childInjector.Inject(runtimeLoadedRunnable);
+            runtimeLoadedRunnable.Run();
+        }
+    }
+
+    private bool IsIgnoredCsFile(string filePath)
+    {
+        return false;
     }
 
     private CompilerWrapper CreateCompilerWrapper()
     {
         CompilerWrapper result = new();
 
-        // UniInject
-        result.ReferenceAssembly(Assembly.GetAssembly(typeof(InjectAttribute)));
-        // PlayShared
-        result.ReferenceAssembly(Assembly.GetAssembly(typeof(SongMeta)));
-        // PlayShared.UI
-        result.ReferenceAssembly(Assembly.GetAssembly(typeof(VisualElementUtils)));
-        // Common
-        result.ReferenceAssembly(Assembly.GetAssembly(typeof(ApplicationManager)));
+        LoadExposedAppDomainAssemblies(result);
+
+        // External DLL files
+        string[] externalDllFiles = Directory.GetFiles(runtimeLoadedScriptsFolder, "*.dll", SearchOption.AllDirectories);
+        foreach (string dllFile in externalDllFiles)
+        {
+            Assembly assembly = Assembly.LoadFile(dllFile);
+            result.ReferenceAssembly(assembly);
+        }
 
         return result;
     }
 
-    public static List<T> GetNewestImplementations<T>(List<T> instances)
+    private bool IsIgnoredDllFile(string dllFile)
+    {
+        string fileName = Path.GetFileName(dllFile);
+        if (fileName.Contains("UnityEngine", StringComparison.InvariantCultureIgnoreCase))
+        {
+            return true;
+        }
+
+        HashSet<string> ignoredDllFileNames = new()
+        {
+            "playshared",
+            "playsharedui",
+            "Common",
+            "Scenes",
+        };
+        return ignoredDllFileNames.Contains(fileName);
+    }
+
+    private static List<T> GetNewestImplementations<T>(List<T> instances)
     {
         // Multiple implementations of the same class can be loaded, e.g. during development.
         // These implementations cannot be unloaded without unloading the whole AppDomain.
@@ -77,5 +129,27 @@ public class RuntimeLoadedScriptDemo : MonoBehaviour, INeedInjection
         return instances.GroupBy(highscoreProvider => highscoreProvider.GetType().Name)
             .Select(group => group.Last())
             .ToList();
+    }
+
+    private void LoadExposedAppDomainAssemblies(CompilerWrapper compilerWrapper)
+    {
+        List<Assembly> exposedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(assembly => IsExposedAssembly(assembly))
+            .ToList();
+        string exposedAssemblyNameCsv = exposedAssemblies
+            .Select(it => it.GetName().Name)
+            .OrderBy(it => it)
+            .ToCsv("\n");
+        Debug.Log($"Exposed assemblies: {exposedAssemblyNameCsv}");
+        foreach (Assembly assembly in exposedAssemblies)
+        {
+            compilerWrapper.ReferenceAssembly(assembly);
+        }
+    }
+
+    private bool IsExposedAssembly(Assembly assembly)
+    {
+        return exposedAssemblyNamePatterns.AnyMatch(pattern =>
+            Regex.IsMatch(assembly.GetName().Name, pattern));
     }
 }
