@@ -396,6 +396,9 @@ public static partial class R
         public const string modifierDialogOverlayInnerContainer = "modifierDialogOverlayInnerContainer";
         public const string modifiersActiveIcon = "modifiersActiveIcon";
         public const string modifiersInactiveIcon = "modifiersInactiveIcon";
+        public const string modList = "modList";
+        public const string modListEntryInactiveOverlay = "modListEntryInactiveOverlay";
+        public const string modNameLabel = "modNameLabel";
         public const string musicGroup = "musicGroup";
         public const string musicNoteIcon = "musicNoteIcon";
         public const string musicPlaybackSpeedSlider = "musicPlaybackSpeedSlider";
@@ -607,6 +610,7 @@ public static partial class R
         public const string root = "root";
         public const string roundCountItemPicker = "roundCountItemPicker";
         public const string row = "row";
+        public const string runtimeLoadedScriptOptionsButton = "runtimeLoadedScriptOptionsButton";
         public const string sampleRatePicker = "sampleRatePicker";
         public const string saveButton = "saveButton";
         public const string sceneChangeAnimationPicker = "sceneChangeAnimationPicker";

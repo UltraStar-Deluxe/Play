@@ -83,6 +83,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/PlayModeTests/CommonTestScene.unity
     guid: 66fc6d4da1adfef4088faf459cb96a44
+  - enabled: 1
+    path: Assets/Scenes/Options/RuntimeLoadedScriptOptions/RuntimeLoadedScriptOptionsScene.unity
+    guid: d6bc9d8165e73974d96c7856d7de748b
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 14252c98bd239904da98289cb5928ea0,
       type: 2}

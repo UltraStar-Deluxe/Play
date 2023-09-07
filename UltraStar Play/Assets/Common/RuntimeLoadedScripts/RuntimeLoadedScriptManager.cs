@@ -14,6 +14,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 {
     public static RuntimeLoadedScriptManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<RuntimeLoadedScriptManager>();
 
+    private const string RuntimeLoadedScriptsFolderName = "RuntimeLoadedScripts";
+
     [Inject]
     private Injector injector;
 
@@ -29,29 +31,41 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     protected override void StartSingleton()
     {
+        DirectoryUtils.CreateDirectory(GetAbsoluteDefaultRuntimeLoadedScriptsFolder());
+        DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder());
+
         if (settings.EnabledRuntimeLoadedMods.IsNullOrEmpty())
         {
             return;
         }
 
-        List<string> modParentFolders = new()
+        List<string> modFolders = GetModFolders();
+        foreach (string modFolder in modFolders)
         {
-            ApplicationUtils.GetStreamingAssetsPath("RuntimeLoadedScripts"),
-            ApplicationUtils.GetPersistentDataPath("RuntimeLoadedScripts"),
-        };
-
-        foreach (string modParentFolder in modParentFolders)
-        {
-            string[] modFolders = Directory.GetDirectories(modParentFolder);
-            foreach (string modFolder in modFolders)
+            Debug.Log($"Loading scripts from {modFolder}");
+            if (IsModEnabled(modFolder))
             {
-                Debug.Log($"Loading scripts from {modFolder}");
-                if (settings.EnabledRuntimeLoadedMods.Contains(modFolder))
-                {
-                    InstantiateScripts(modFolder);
-                }
+                InstantiateScripts(modFolder);
             }
         }
+    }
+
+    public bool IsModEnabled(string modFolder)
+    {
+        return settings.EnabledRuntimeLoadedMods.Contains(GetModName(modFolder));
+    }
+
+    public List<string> GetModFolders()
+    {
+        List<string> modParentFolders = new()
+        {
+            GetAbsoluteDefaultRuntimeLoadedScriptsFolder(),
+            GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder(),
+        };
+
+        return modParentFolders
+            .SelectMany(modParentFolder => Directory.GetDirectories(modParentFolder))
+            .ToList();
     }
 
     public List<T> GetCurrentRuntimeLoadedInstances<T>()
@@ -181,5 +195,20 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private bool IsExposedAssembly(Assembly assembly)
     {
         return settings.RuntimeLoadedScriptExposedAssemblyNames.Contains(assembly.GetName().Name);
+    }
+
+    public static string GetAbsoluteDefaultRuntimeLoadedScriptsFolder()
+    {
+        return ApplicationUtils.GetStreamingAssetsPath(RuntimeLoadedScriptsFolderName);
+    }
+
+    public static string GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()
+    {
+        return ApplicationUtils.GetPersistentDataPath(RuntimeLoadedScriptsFolderName);
+    }
+
+    public static string GetModName(string modFolder)
+    {
+        return Path.GetFileName(modFolder);
     }
 }

@@ -10,6 +10,7 @@ public static partial class R
         public static readonly string action_longPress = "action_longPress";
         public static readonly string action_navigateRight = "action_navigateRight";
         public static readonly string action_openContextMenu = "action_openContextMenu";
+        public static readonly string action_openRuntimeLoadedScriptsFolder = "action_openRuntimeLoadedScriptsFolder";
         public static readonly string action_openSongEditor = "action_openSongEditor";
         public static readonly string action_openSongFolder = "action_openSongFolder";
         public static readonly string action_openSongMenu = "action_openSongMenu";
@@ -174,6 +175,17 @@ public static partial class R
         public static readonly string options_recording_helpDialog_title = "options_recording_helpDialog_title";
         public static readonly string options_recording_title = "options_recording_title";
         public static readonly string options_resolution = "options_resolution";
+        public static readonly string options_runtimeLoadedScripts_button = "options_runtimeLoadedScripts_button";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_developMods = "options_runtimeLoadedScripts_helpDialog_developMods";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_developMods_title = "options_runtimeLoadedScripts_helpDialog_developMods_title";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_install = "options_runtimeLoadedScripts_helpDialog_install";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_install_title = "options_runtimeLoadedScripts_helpDialog_install_title";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_intro = "options_runtimeLoadedScripts_helpDialog_intro";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_intro_title = "options_runtimeLoadedScripts_helpDialog_intro_title";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_loadOrder = "options_runtimeLoadedScripts_helpDialog_loadOrder";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_loadOrder_title = "options_runtimeLoadedScripts_helpDialog_loadOrder_title";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_title = "options_runtimeLoadedScripts_helpDialog_title";
+        public static readonly string options_runtimeLoadedScripts_title = "options_runtimeLoadedScripts_title";
         public static readonly string options_sampleRate = "options_sampleRate";
         public static readonly string options_sampleRate_auto = "options_sampleRate_auto";
         public static readonly string options_scoreMode = "options_scoreMode";
@@ -327,6 +339,7 @@ public static partial class R
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
         public static readonly string uri_howToCompanionApp = "uri_howToCompanionApp";
         public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
+        public static readonly string uri_howToRuntimeLoadedScripts = "uri_howToRuntimeLoadedScripts";
         public static readonly string uri_howToSongEditor = "uri_howToSongEditor";
         public static readonly string uri_logFiles = "uri_logFiles";
         public static readonly string uri_songEditorVideoTutorials = "uri_songEditorVideoTutorials";

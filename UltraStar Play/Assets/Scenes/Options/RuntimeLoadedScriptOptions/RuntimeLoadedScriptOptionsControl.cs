@@ -1,0 +1,87 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using ProTrans;
+using UniInject;
+using UniInject.Extensions;
+using UniRx;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, INeedInjection
+{
+    [InjectedInInspector]
+    public VisualTreeAsset modEntryUi;
+
+    [Inject]
+    private Injector injector;
+
+    [Inject]
+    private UiManager uiManager;
+
+    [Inject]
+    private RuntimeLoadedScriptManager runtimeLoadedScriptManager;
+
+    [Inject(UxmlName = R.UxmlNames.modList)]
+    private VisualElement modList;
+
+    private readonly List<ModListEntryControl> modListEntryControls = new();
+
+    private void Start()
+    {
+        UpdateModList();
+    }
+
+    private void UpdateModList()
+    {
+        modList.Clear();
+
+        List<string> modFolders = runtimeLoadedScriptManager.GetModFolders();
+        modFolders.ForEach(modFolder =>
+        {
+            ModListEntryControl modListEntryControl = CreateModListEntry(modFolder);
+            modList.Add(modListEntryControl.VisualElement);
+            modListEntryControls.Add(modListEntryControl);
+        });
+    }
+
+    private ModListEntryControl CreateModListEntry(string modFolder)
+    {
+        VisualElement modEntryVisualElement = modEntryUi.CloneTreeAndGetFirstChild();
+        ModListEntryControl modListEntryControl = injector
+            .CreateChildInjector()
+            .WithRootVisualElement(modEntryVisualElement)
+            .WithBinding(new Binding("modFolder", new ExistingInstanceProvider<string>(modFolder)))
+            .CreateAndInject<ModListEntryControl>();
+
+        return modListEntryControl;
+    }
+
+    public override bool HasHelpDialog => true;
+    public override MessageDialogControl CreateHelpDialogControl()
+    {
+        Dictionary<string, string> titleToContentMap = new()
+        {
+            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_intro_title),
+                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_intro) },
+            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_install_title),
+                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_install,
+                    "modsFolderPath", RuntimeLoadedScriptManager.GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()) },
+            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods_title),
+                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods) },
+            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_loadOrder_title),
+                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_loadOrder) },
+        };
+        MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
+            TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_title),
+            titleToContentMap);
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.action_openRuntimeLoadedScriptsFolder),
+            _ => ApplicationUtils.OpenDirectory(RuntimeLoadedScriptManager.GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()));
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToRuntimeLoadedScripts)));
+        return helpDialogControl;
+    }
+}
