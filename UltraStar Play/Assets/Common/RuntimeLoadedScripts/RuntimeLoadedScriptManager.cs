@@ -25,6 +25,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private readonly Dictionary<IRuntimeLoadedScript,RuntimeLoadedScriptContext> scriptToContext = new();
     private readonly Dictionary<Type, string> typeToSourceFile = new();
     private readonly Dictionary<Type, string> typeToModFolder = new();
+    private readonly Dictionary<string, ModContext> modFolderToModContext = new();
 
     private List<string> lastEnabledMods = new();
 
@@ -358,7 +359,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             RuntimeLoadedScriptContext runtimeLoadedScriptContext = scriptToContext[runtimeLoadedScript];
 
             string modFolder = GetModFolder(runtimeLoadedScript);
-            ModContext modContext = new(modFolder);
+            ModContext modContext = GetOrCreateModContext(modFolder);
 
             Injector childInjector = injector
                 .CreateChildInjector()
@@ -381,6 +382,17 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
                 runtimeLoadedRunnable.Run();
             }
         }
+    }
+
+    private ModContext GetOrCreateModContext(string modFolder)
+    {
+        if (!modFolderToModContext.TryGetValue(modFolder, out ModContext modContext))
+        {
+            modContext = new(modFolder);
+            modFolderToModContext[modFolder] = modContext;
+        }
+
+        return modContext;
     }
 
     private void LoadModSettings(IModSettings modSettings)
