@@ -5,6 +5,7 @@ public class ModInfoJson
     public string name;
     public string version;
     public string description;
+    public string license;
     public string website;
     public List<string> authors;
     public List<string> requires;

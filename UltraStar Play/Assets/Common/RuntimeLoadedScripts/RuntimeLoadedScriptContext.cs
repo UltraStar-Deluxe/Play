@@ -1,11 +1,11 @@
 ﻿public class RuntimeLoadedScriptContext
 {
-    public string FolderPath { get; private set; }
+    public string ModFolder { get; private set; }
     public bool IsInstanceObsolete { get; private set; }
 
-    public RuntimeLoadedScriptContext(string folderPath, bool isInstanceObsolete)
+    public RuntimeLoadedScriptContext(string modFolder, bool isInstanceObsolete)
     {
-        FolderPath = folderPath;
+        ModFolder = modFolder;
         IsInstanceObsolete = isInstanceObsolete;
     }
 

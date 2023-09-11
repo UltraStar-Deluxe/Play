@@ -1,4 +1,5 @@
-﻿using ProTrans;
+﻿using System.Collections.Generic;
+using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -74,8 +75,48 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         });
 
         modInfoButton.RegisterCallbackButtonTriggered(_ => ShowModInfoDialog());
+        modSettingsButton.RegisterCallbackButtonTriggered(_ => ShowModSettingsDialog());
 
         UpdateInactiveOverlay();
+    }
+
+    private void ShowModSettingsDialog()
+    {
+        if (!IsModEnabled)
+        {
+            UiManager.CreateNotification("Cannot access settings of a disabled mod.");
+            return;
+        }
+
+        if (modSettingsDialogControl != null)
+        {
+            return;
+        }
+
+        List<IModSettings> allModSettings = runtimeLoadedScriptManager.GetCurrentRuntimeLoadedInstances<IModSettings>(ModFolder);
+        if (allModSettings.IsNullOrEmpty())
+        {
+            UiManager.CreateNotification("This mod has no settings.");
+            return;
+        }
+
+        modSettingsDialogControl = uiManager.CreateDialogControl($"{modName} Settings");
+        modSettingsDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+            _ => modSettingsDialogControl.CloseDialog());
+        modSettingsDialogControl.DialogClosedEventStream.Subscribe(_ => modSettingsDialogControl = null);
+
+        VisualElement modControlContainer = new();
+        modSettingsDialogControl.AddVisualElement(modControlContainer);
+        modControlContainer.AddToClassList("child-mb-3");
+
+        foreach (IModSettings currentModSettings in allModSettings)
+        {
+            List<IModSettingControl> modSettingControls = currentModSettings.GetModSettingControls();
+            foreach (IModSettingControl modSettingControl in modSettingControls)
+            {
+                modControlContainer.Add(modSettingControl.CreateVisualElement());
+            }
+        }
     }
 
     private void ShowModInfoDialog()
@@ -88,10 +129,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         modInfoDialogControl = uiManager.CreateDialogControl($"{modName}");
         modInfoDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
             _ => modInfoDialogControl.CloseDialog());
-        modInfoDialogControl.DialogClosedEventStream.Subscribe(_ =>
-        {
-            modInfoDialogControl = null;
-        });
+        modInfoDialogControl.DialogClosedEventStream.Subscribe(_ => modInfoDialogControl = null);
 
         ModInfoJson modInfoJson = RuntimeLoadedScriptManager.GetModInfo(ModFolder);
         if (modInfoJson == null)
@@ -113,6 +151,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         SetTextOrHideLabel(descriptionLabel, "",modInfoJson.description);
         SetTextOrHideLabel(versionLabel, "Version: " , modInfoJson.version);
         SetTextOrHideLabel(websiteLabel, "Website: " , modInfoJson.website);
+        SetTextOrHideLabel(websiteLabel, "License: " , modInfoJson.license);
         SetTextOrHideLabel(authorsLabel, "Authors: " , modInfoJson.authors.ToCsv(", ", "", ""));
 
         modDependenciesContainer.Clear();

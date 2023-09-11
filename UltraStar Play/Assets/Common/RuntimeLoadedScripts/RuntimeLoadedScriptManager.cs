@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Serilog.Events;
+using Flurl.Http.Configuration;
 using UniInject;
 using UniInject.Extensions;
 using UnityEngine;
@@ -25,7 +25,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private readonly Dictionary<IRuntimeLoadedScript,RuntimeLoadedScriptContext> scriptToContext = new();
 
-    private static readonly List<string> defaultExposedAssemblyNames = new()
+    private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
         "com.achimmihca.portaudioforunity",
         "com.achimmihca.primeinputactions",
@@ -65,7 +65,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         DirectoryUtils.CreateDirectory(GetAbsoluteDefaultRuntimeLoadedScriptsFolder());
         DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder());
 
-        CopyDemoModToPersistentDataPath();
+        // CopyDefaultModToPersistentDataPath("DemoMod");
 
         if (settings.EnabledRuntimeLoadedMods.IsNullOrEmpty())
         {
@@ -83,27 +83,35 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
-    private void CopyDemoModToPersistentDataPath()
+    private void CopyDefaultModToPersistentDataPath(string modName)
     {
-        string demoModSourceFolder = $"{GetAbsoluteDefaultRuntimeLoadedScriptsFolder()}/DemoMod";
-        string demoModTargetFolder = $"{GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()}/DemoMod";
-        if (Directory.Exists(demoModSourceFolder)
-            && (!Directory.Exists(demoModTargetFolder) || Application.isEditor))
+        try
         {
-            Debug.Log($"Copying demo mod to persistentDataPath (from: '{demoModSourceFolder}', to: '{demoModTargetFolder}')");
-            DirectoryUtils.CopyAll(demoModSourceFolder, demoModTargetFolder,
-                CopyDirectoryFilter.Exclude(path =>
-                {
-                    string fileNameToLower = Path.GetFileName(path).ToLowerInvariant();
-                    return fileNameToLower.EndsWith(".meta")
-                        || fileNameToLower.EndsWith(".sln")
-                        || fileNameToLower == "bin"
-                        || fileNameToLower == "obj";
-                }));
+            string demoModSourceFolder = $"{GetAbsoluteDefaultRuntimeLoadedScriptsFolder()}/{modName}";
+            string demoModTargetFolder = $"{GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()}/{modName}";
+            if (Directory.Exists(demoModSourceFolder)
+                && !Directory.Exists(demoModTargetFolder))
+            {
+                Debug.Log($"Copying default mod '{modName}' to persistentDataPath (from: '{demoModSourceFolder}', to: '{demoModTargetFolder}')");
+                DirectoryUtils.CopyAll(demoModSourceFolder, demoModTargetFolder,
+                    CopyDirectoryFilter.Exclude(path =>
+                    {
+                        string fileNameToLower = Path.GetFileName(path).ToLowerInvariant();
+                        return fileNameToLower.EndsWith(".meta")
+                            || fileNameToLower.EndsWith(".sln")
+                            || fileNameToLower == "bin"
+                            || fileNameToLower == "obj";
+                    }));
+            }
+            else
+            {
+                Debug.Log($"Not copying default mod '{modName}' to persistentDataPath because the target folder already exists.");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Debug.Log("Not copying demo mod to persistentDataPath because the target folder already exists.");
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to copy default mod '{modName}' to persistentDataPath.");
         }
     }
 
@@ -124,10 +132,12 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             .ToList();
     }
 
-    public List<T> GetCurrentRuntimeLoadedInstances<T>()
+    public List<T> GetCurrentRuntimeLoadedInstances<T>(string modFolder = null)
         where T : IRuntimeLoadedScript
     {
         return scriptToContext
+            .Where(entry => modFolder == null
+                || modFolder == entry.Value.ModFolder)
             .Where(entry => !entry.Value.IsInstanceObsolete
                             && entry.Key is T)
             .Select(entry => (T)entry.Key)
@@ -136,8 +146,13 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private void InstantiateScripts(string modFolder)
     {
+        List<string> exposedAssemblyNames = defaultExposedAssemblyNames.ToList();
         ModInfoJson modInfoJson = GetModInfo(modFolder);
-        List<string> exposedAssemblyNames = modInfoJson?.requires;
+        if (modInfoJson != null
+            && !modInfoJson.requires.IsNullOrEmpty())
+        {
+            exposedAssemblyNames.AddRange(modInfoJson.requires);
+        }
 
         CompilerWrapper compilerWrapper = CreateCompilerWrapper(modFolder, exposedAssemblyNames);
         if (compilerWrapper == null)
@@ -157,14 +172,41 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             .Where(entry => !currentRuntimeLoadedScripts.Contains(entry.Key))
             .ForEach(entry => entry.Value.SetObsolete());
 
-        // Inject instantiated objects
+        // Create context for new instances
         foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
         {
             RuntimeLoadedScriptContext runtimeLoadedScriptContext = new(modFolder, false);
+            scriptToContext[runtimeLoadedScript] = runtimeLoadedScriptContext;
+        }
+
+        // Load mod settings
+        foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
+        {
+            if (runtimeLoadedScript is IModSettings modSettings)
+            {
+                LoadModSettings(modFolder, modSettings);
+            }
+        }
+
+        // Inject instantiated objects
+        ModContext modContext = new(modFolder);
+
+        // Bind then inject runtime loaded scripts
+        List<IAutoBoundRuntimeLoadedScript> autoBoundScripts = currentRuntimeLoadedScripts
+            .OfType<IAutoBoundRuntimeLoadedScript>()
+            .ToList();
+        foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
+        {
+            RuntimeLoadedScriptContext runtimeLoadedScriptContext = scriptToContext[runtimeLoadedScript];
             Injector childInjector = injector
                 .CreateChildInjector()
+                .WithBindingForInstance(modContext)
                 .WithBindingForInstance(runtimeLoadedScriptContext);
-            scriptToContext[runtimeLoadedScript] = runtimeLoadedScriptContext;
+            foreach (IAutoBoundRuntimeLoadedScript autoBoundScript in autoBoundScripts)
+            {
+                ExistingInstanceProvider<object> modSettingsProvider = new(autoBoundScript);
+                childInjector.AddBinding(new Binding(autoBoundScript.GetType(), modSettingsProvider));
+            }
 
             childInjector.Inject(runtimeLoadedScript);
         }
@@ -176,6 +218,46 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             {
                 runtimeLoadedRunnable.Run();
             }
+        }
+    }
+
+    private void LoadModSettings(string modFolder, IModSettings modSettings)
+    {
+        string modSettingsPath = GetModSettingsPath(modFolder);
+        try
+        {
+            if (File.Exists(modSettingsPath))
+            {
+                Debug.Log($"Reading mod settings of type {modSettings.GetType()} from file '{modSettingsPath}'");
+                string json = File.ReadAllText(modSettingsPath);
+                JsonConverter.FillFromJsonCopy(json, modSettings, false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load mod settings from '{modSettingsPath}'. Object type to deserialize: {modSettings.GetType().FullName}");
+        }
+    }
+
+    private void SaveModSettings(string modFolder, IRuntimeLoadedScript modSettings)
+    {
+        if (modSettings == null)
+        {
+            return;
+        }
+
+        string modSettingsPath = GetModSettingsPath(modFolder);
+        try
+        {
+            Debug.Log($"Writing mod settings of type {modSettings.GetType()} to file '{modSettingsPath}'");
+            string json = JsonConverter.ToJson(modSettings);
+            File.WriteAllText(modSettingsPath, json);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to save mod settings to '{modSettingsPath}'. Object type to serialize: {modSettings.GetType().FullName}");
         }
     }
 
@@ -266,6 +348,11 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         return ApplicationUtils.GetPersistentDataPath(RuntimeLoadedScriptsFolderName);
     }
 
+    public static string GetModSettingsPath(string modFolder)
+    {
+        return $"{modFolder}/modsettings.json";
+    }
+
     public static string GetModName(string modFolder)
     {
         ModInfoJson modInfoJson = GetModInfo(modFolder);
@@ -297,5 +384,26 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             Debug.LogError($"Failed to load mod info from '{modInfoPath}': {ex.Message}");
             return null;
         }
+    }
+
+    protected override void OnDestroySingleton()
+    {
+        SaveAllModSettings();
+    }
+
+    private void SaveAllModSettings()
+    {
+        scriptToContext
+            .Where(entry => !entry.Value.IsInstanceObsolete)
+            .Select(entry => entry.Key)
+            .OfType<IModSettings>()
+            .ForEach(modSettings =>
+            {
+                if (scriptToContext.TryGetValue(modSettings, out RuntimeLoadedScriptContext context)
+                    && !context.IsInstanceObsolete)
+                {
+                    SaveModSettings(context.ModFolder, modSettings);
+                }
+            });
     }
 }
