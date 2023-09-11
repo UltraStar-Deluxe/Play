@@ -26,6 +26,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private readonly Dictionary<Type, string> typeToSourceFile = new();
     private readonly Dictionary<Type, string> typeToModFolder = new();
 
+    private List<string> lastEnabledMods = new();
+
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
         "com.achimmihca.portaudioforunity",
@@ -68,13 +70,72 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
         // CopyDefaultModToPersistentDataPath("DemoMod");
 
+        lastEnabledMods = settings.EnabledMods.ToList();
+
+        LoadAndInstantiateScripts();
+    }
+
+    private void Update()
+    {
+        if (!lastEnabledMods.SequenceEqual(settings.EnabledMods))
+        {
+            List<string> newlyEnabledModNames = settings.EnabledMods
+                .Except(lastEnabledMods)
+                .ToList();
+            List<string> newlyDisabledModNames = lastEnabledMods
+                .Except(settings.EnabledMods)
+                .ToList();
+            lastEnabledMods = settings.EnabledMods.ToList();
+            if (!newlyDisabledModNames.IsNullOrEmpty())
+            {
+                OnDisableMods(newlyDisabledModNames);
+            }
+
+            if (!newlyEnabledModNames.IsNullOrEmpty())
+            {
+                OnEnableMods(newlyEnabledModNames);
+            }
+        }
+    }
+
+    private void OnEnableMods(List<string> newlyEnabledModNames)
+    {
+        Debug.Log($"Reloading mods because of newly enabled: {newlyEnabledModNames.ToCsv()}");
+        LoadAndInstantiateScripts();
+    }
+
+    private void OnDisableMods(List<string> newlyDisabledModNames)
+    {
+        newlyDisabledModNames.ForEach(modName => OnDisableMod(modName));
+    }
+
+    private void OnDisableMod(string modName)
+    {
+        string modFolder = GetModFolderByModName(modName);
+        List<IDisableModHandler> disableModHandlers = GetCurrentRuntimeLoadedInstances<IDisableModHandler>(modFolder);
+        disableModHandlers.ForEach(disableModHandler =>
+        {
+            try
+            {
+                disableModHandler.OnDisableMod();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to call {disableModHandler.GetType()}.{nameof(disableModHandler.OnDisableMod)}");
+            }
+        });
+    }
+
+    private void LoadAndInstantiateScripts()
+    {
         LoadScriptsIntoAppDomain();
         InstantiateScripts();
     }
 
     private void LoadScriptsIntoAppDomain()
     {
-        if (settings.EnabledRuntimeLoadedMods.IsNullOrEmpty())
+        if (settings.EnabledMods.IsNullOrEmpty())
         {
             return;
         }
@@ -124,7 +185,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     public bool IsModEnabled(string modFolder)
     {
-        return settings.EnabledRuntimeLoadedMods.Contains(GetModName(modFolder));
+        return settings.EnabledMods.Contains(GetModName(modFolder));
     }
 
     public List<string> GetModFolders()
@@ -163,6 +224,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private void LoadScriptsIntoAppDomain(string modFolder)
     {
+        using DisposableStopwatch d = new($"Loading mod '{GetModName(modFolder)}' into app domain took <ms>");
+
         List<string> exposedAssemblyNames = defaultExposedAssemblyNames.ToList();
         ModInfoJson modInfoJson = GetModInfo(modFolder);
         if (modInfoJson != null
@@ -188,33 +251,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         string[] csFilePaths = Directory.GetFiles(modFolder, "*.cs");
         foreach (string filePath in csFilePaths)
         {
-            try
-            {
-                // Find the runtime loaded types that are instantiated by this file.
-                List<Type> runtimeLoadedTypesBefore = CompilerWrapper
-                    .CreateInstancesOf<IRuntimeLoadedScript>()
-                    .Select(it => it.GetType())
-                    .ToList();
-
-                compilerWrapper.Execute(filePath);
-
-                List<Type> runtimeLoadedTypesAfter = CompilerWrapper
-                    .CreateInstancesOf<IRuntimeLoadedScript>()
-                    .Select(it => it.GetType())
-                    .ToList();
-                List<Type> newRuntimeLoadedTypes = runtimeLoadedTypesAfter.Except(runtimeLoadedTypesBefore).ToList();
-                foreach (Type type in newRuntimeLoadedTypes)
-                {
-                    typeToSourceFile[type] = filePath;
-                    typeToModFolder[type] = modFolder;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to load '{filePath}': {ex.Message}");
-                return;
-            }
+            LoadScriptFileIntoAppDomain(modFolder, filePath, compilerWrapper);
         }
 
         // Check compilation was successful
@@ -229,8 +266,62 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
+    private void LoadScriptFileIntoAppDomain(string modFolder, string filePath, CompilerWrapper compilerWrapper)
+    {
+        // Find the runtime loaded types that are instantiated by this file.
+        List<Type> runtimeLoadedTypesBefore;
+        try
+        {
+            runtimeLoadedTypesBefore = CompilerWrapper
+                .CreateInstancesOf<IRuntimeLoadedScript>()
+                .Select(it => it.GetType())
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to instantiate runtime loaded scripts: {ex.Message}");
+            throw ex;
+        }
+
+        try
+        {
+            compilerWrapper.Execute(filePath);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load '{filePath}': {ex.Message}");
+            return;
+        }
+
+        List<Type> runtimeLoadedTypesAfter = new();
+        try
+        {
+            runtimeLoadedTypesAfter = CompilerWrapper
+                .CreateInstancesOf<IRuntimeLoadedScript>()
+                .Select(it => it.GetType())
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to instantiate runtime loaded scripts: {ex.Message}");
+            throw ex;
+        }
+
+        List<Type> newRuntimeLoadedTypes = runtimeLoadedTypesAfter.Except(runtimeLoadedTypesBefore).ToList();
+        foreach (Type type in newRuntimeLoadedTypes)
+        {
+            typeToSourceFile[type] = filePath;
+            typeToModFolder[type] = modFolder;
+        }
+    }
+
     private void InstantiateScripts()
     {
+        using DisposableStopwatch d = new($"Instantiate runtime loaded scripts took <ms>");
+
         // Instantiate new objects
         List<IRuntimeLoadedScript> currentAndObsoleteRuntimeLoadedScripts = CompilerWrapper.CreateInstancesOf<IRuntimeLoadedScript>();
 
@@ -383,6 +474,14 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     public static string GetModSettingsPath(string modFolder)
     {
         return $"{modFolder}/modsettings.json";
+    }
+
+    public string GetModFolderByModName(string modName)
+    {
+        return typeToModFolder
+            .Values
+            .Distinct()
+            .FirstOrDefault(modFolder => GetModName(modFolder) == modName);
     }
 
     public static string GetModName(string modFolder)

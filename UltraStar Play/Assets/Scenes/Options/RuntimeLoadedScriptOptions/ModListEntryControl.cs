@@ -66,10 +66,10 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         enabledToggle.value = IsModEnabled;
         enabledToggle.RegisterValueChangedCallback(evt =>
         {
-            settings.EnabledRuntimeLoadedMods.Remove(ModName);
+            settings.EnabledMods.Remove(ModName);
             if (evt.newValue)
             {
-                settings.EnabledRuntimeLoadedMods.Add(ModName);
+                settings.EnabledMods.Add(ModName);
             }
             UpdateInactiveOverlay();
         });

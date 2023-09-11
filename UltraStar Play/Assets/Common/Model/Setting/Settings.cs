@@ -170,5 +170,5 @@ public class Settings : ISettings
     public bool CheckCodecIsSupported { get; set; }
 
     // Runtime loaded scripts
-    public List<string> EnabledRuntimeLoadedMods { get; private set; } = new();
+    public List<string> EnabledMods { get; private set; } = new();
 }
