@@ -1,8 +1,26 @@
 ﻿using System;
 using System.Globalization;
+using System.Reflection;
 
 public static class PropertyUtils
 {
+    public static void CopyProperties<T>(T source, T target)
+    {
+        BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        FieldInfo[] fields = source.GetType().GetFields(bindingFlags);
+        PropertyInfo[] properties = source.GetType().GetProperties(bindingFlags);
+
+        foreach (FieldInfo field in fields)
+        {
+            field.SetValue(target, field.GetValue(source));
+        }
+
+        foreach (PropertyInfo property in properties)
+        {
+            property.SetValue(target, property.GetValue(source));
+        }
+    }
+
     public static Func<string> CreateStringGetterFromUintGetter(Func<uint> valueGetter, bool zeroToEmpty)
     {
         return () =>
