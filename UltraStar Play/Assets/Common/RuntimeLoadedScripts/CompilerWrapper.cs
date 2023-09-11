@@ -62,7 +62,7 @@ public class CompilerWrapper
     }
 
     /// <summary> Creates new instances of types that are children of the specified type. </summary>
-    public IEnumerable<T> CreateInstancesOf<T> () {
+    public static List<T> CreateInstancesOf<T> () {
         var parent = typeof(T);
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
         var types = assemblies.SelectMany(assembly => {
@@ -70,7 +70,9 @@ public class CompilerWrapper
                 return !(type.IsAbstract || type.IsInterface) && parent.IsAssignableFrom(type);
             });
         });
-        return types.Select(type => (T)Activator.CreateInstance(type));
+        return types
+            .Select(type => (T)Activator.CreateInstance(type))
+            .ToList();
     }
 
     private void ImportAllowedTypes (params Type[][] allowedTypeArrays) {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Flurl.Http.Configuration;
 using UniInject;
 using UniInject.Extensions;
 using UnityEngine;
@@ -24,6 +23,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private Settings settings;
 
     private readonly Dictionary<IRuntimeLoadedScript,RuntimeLoadedScriptContext> scriptToContext = new();
+    private readonly Dictionary<Type, string> typeToSourceFile = new();
+    private readonly Dictionary<Type, string> typeToModFolder = new();
 
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
@@ -67,6 +68,12 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
         // CopyDefaultModToPersistentDataPath("DemoMod");
 
+        LoadScriptsIntoAppDomain();
+        InstantiateScripts();
+    }
+
+    private void LoadScriptsIntoAppDomain()
+    {
         if (settings.EnabledRuntimeLoadedMods.IsNullOrEmpty())
         {
             return;
@@ -78,7 +85,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             Debug.Log($"Loading scripts from {modFolder}");
             if (IsModEnabled(modFolder))
             {
-                InstantiateScripts(modFolder);
+                LoadScriptsIntoAppDomain(modFolder);
             }
         }
     }
@@ -132,6 +139,16 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             .ToList();
     }
 
+    private string GetModFolder(IRuntimeLoadedScript script)
+    {
+        if (typeToModFolder.TryGetValue(script.GetType(), out string modFolder))
+        {
+            return modFolder;
+        }
+
+        return "";
+    }
+
     public List<T> GetCurrentRuntimeLoadedInstances<T>(string modFolder = null)
         where T : IRuntimeLoadedScript
     {
@@ -144,7 +161,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             .ToList();
     }
 
-    private void InstantiateScripts(string modFolder)
+    private void LoadScriptsIntoAppDomain(string modFolder)
     {
         List<string> exposedAssemblyNames = defaultExposedAssemblyNames.ToList();
         ModInfoJson modInfoJson = GetModInfo(modFolder);
@@ -154,16 +171,68 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             exposedAssemblyNames.AddRange(modInfoJson.requires);
         }
 
-        CompilerWrapper compilerWrapper = CreateCompilerWrapper(modFolder, exposedAssemblyNames);
-        if (compilerWrapper == null)
+        CompilerWrapper compilerWrapper = new();
+
+        // Load AppDomain libraries
+        LoadExposedAppDomainAssemblies(compilerWrapper, exposedAssemblyNames);
+
+        // Load libraries in folder
+        string[] externalDllFiles = Directory.GetFiles(modFolder, "*.dll", SearchOption.AllDirectories);
+        foreach (string dllFile in externalDllFiles)
         {
-            return;
+            Assembly assembly = Assembly.LoadFile(dllFile);
+            compilerWrapper.ReferenceAssembly(assembly);
         }
 
+        // Load C# files in folder
+        string[] csFilePaths = Directory.GetFiles(modFolder, "*.cs");
+        foreach (string filePath in csFilePaths)
+        {
+            try
+            {
+                // Find the runtime loaded types that are instantiated by this file.
+                List<Type> runtimeLoadedTypesBefore = CompilerWrapper
+                    .CreateInstancesOf<IRuntimeLoadedScript>()
+                    .Select(it => it.GetType())
+                    .ToList();
+
+                compilerWrapper.Execute(filePath);
+
+                List<Type> runtimeLoadedTypesAfter = CompilerWrapper
+                    .CreateInstancesOf<IRuntimeLoadedScript>()
+                    .Select(it => it.GetType())
+                    .ToList();
+                List<Type> newRuntimeLoadedTypes = runtimeLoadedTypesAfter.Except(runtimeLoadedTypesBefore).ToList();
+                foreach (Type type in newRuntimeLoadedTypes)
+                {
+                    typeToSourceFile[type] = filePath;
+                    typeToModFolder[type] = modFolder;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to load '{filePath}': {ex.Message}");
+                return;
+            }
+        }
+
+        // Check compilation was successful
+        string report = compilerWrapper.GetReport();
+        if (compilerWrapper.ErrorsCount > 0)
+        {
+            Debug.LogError($"Failed to load scripts in '{modFolder}'. Compilation output:\n{report}");
+        }
+        else
+        {
+            Debug.Log($"Successfully loaded scripts in {modFolder}. Compilation output:\n{report}");
+        }
+    }
+
+    private void InstantiateScripts()
+    {
         // Instantiate new objects
-        List<IRuntimeLoadedScript> currentAndObsoleteRuntimeLoadedScripts = compilerWrapper
-            .CreateInstancesOf<IRuntimeLoadedScript>()
-            .ToList();
+        List<IRuntimeLoadedScript> currentAndObsoleteRuntimeLoadedScripts = CompilerWrapper.CreateInstancesOf<IRuntimeLoadedScript>();
 
         List<IRuntimeLoadedScript> currentRuntimeLoadedScripts = GetNewestImplementations(currentAndObsoleteRuntimeLoadedScripts);
 
@@ -175,6 +244,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         // Create context for new instances
         foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
         {
+            string modFolder = GetModFolder(runtimeLoadedScript);
             RuntimeLoadedScriptContext runtimeLoadedScriptContext = new(modFolder, false);
             scriptToContext[runtimeLoadedScript] = runtimeLoadedScriptContext;
         }
@@ -184,12 +254,9 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         {
             if (runtimeLoadedScript is IModSettings modSettings)
             {
-                LoadModSettings(modFolder, modSettings);
+                LoadModSettings(modSettings);
             }
         }
-
-        // Inject instantiated objects
-        ModContext modContext = new(modFolder);
 
         // Bind then inject runtime loaded scripts
         List<IAutoBoundRuntimeLoadedScript> autoBoundScripts = currentRuntimeLoadedScripts
@@ -198,6 +265,10 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
         {
             RuntimeLoadedScriptContext runtimeLoadedScriptContext = scriptToContext[runtimeLoadedScript];
+
+            string modFolder = GetModFolder(runtimeLoadedScript);
+            ModContext modContext = new(modFolder);
+
             Injector childInjector = injector
                 .CreateChildInjector()
                 .WithBindingForInstance(modContext)
@@ -221,8 +292,14 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
-    private void LoadModSettings(string modFolder, IModSettings modSettings)
+    private void LoadModSettings(IModSettings modSettings)
     {
+        string modFolder = GetModFolder(modSettings);
+        if (modFolder.IsNullOrEmpty())
+        {
+            return;
+        }
+
         string modSettingsPath = GetModSettingsPath(modFolder);
         try
         {
@@ -240,9 +317,10 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
-    private void SaveModSettings(string modFolder, IRuntimeLoadedScript modSettings)
+    private void SaveModSettings(IRuntimeLoadedScript modSettings)
     {
-        if (modSettings == null)
+        string modFolder = GetModFolder(modSettings);
+        if (modFolder.IsNullOrEmpty())
         {
             return;
         }
@@ -259,52 +337,6 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             Debug.LogException(ex);
             Debug.LogError($"Failed to save mod settings to '{modSettingsPath}'. Object type to serialize: {modSettings.GetType().FullName}");
         }
-    }
-
-    private CompilerWrapper CreateCompilerWrapper(string scriptsFolder, List<string> exposedAssemblyNames)
-    {
-        CompilerWrapper compilerWrapper = new();
-
-        // Load AppDomain libraries
-        LoadExposedAppDomainAssemblies(compilerWrapper, exposedAssemblyNames);
-
-        // Load libraries in folder
-        string[] externalDllFiles = Directory.GetFiles(scriptsFolder, "*.dll", SearchOption.AllDirectories);
-        foreach (string dllFile in externalDllFiles)
-        {
-            Assembly assembly = Assembly.LoadFile(dllFile);
-            compilerWrapper.ReferenceAssembly(assembly);
-        }
-
-        // Load C# files in folder
-        string[] csFilePaths = Directory.GetFiles(scriptsFolder, "*.cs");
-        foreach (string filePath in csFilePaths)
-        {
-            try
-            {
-                compilerWrapper.Execute(filePath);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to load '{filePath}': {ex.Message}");
-                return null;
-            }
-        }
-
-        // Check compilation was successful
-        string report = compilerWrapper.GetReport();
-        if (compilerWrapper.ErrorsCount > 0)
-        {
-            Debug.LogError($"Failed to load scripts in '{scriptsFolder}'. Compilation output:\n{report}");
-            return null;
-        }
-        else
-        {
-            Debug.Log($"Successfully loaded scripts in {scriptsFolder}. Compilation output:\n{report}");
-        }
-
-        return compilerWrapper;
     }
 
     private static List<T> GetNewestImplementations<T>(List<T> instances)
@@ -397,13 +429,6 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             .Where(entry => !entry.Value.IsInstanceObsolete)
             .Select(entry => entry.Key)
             .OfType<IModSettings>()
-            .ForEach(modSettings =>
-            {
-                if (scriptToContext.TryGetValue(modSettings, out RuntimeLoadedScriptContext context)
-                    && !context.IsInstanceObsolete)
-                {
-                    SaveModSettings(context.ModFolder, modSettings);
-                }
-            });
+            .ForEach(modSettings => SaveModSettings(modSettings));
     }
 }
