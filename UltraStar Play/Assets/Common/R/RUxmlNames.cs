@@ -399,6 +399,8 @@ public static partial class R
         public const string modList = "modList";
         public const string modListEntryInactiveOverlay = "modListEntryInactiveOverlay";
         public const string modNameLabel = "modNameLabel";
+        public const string modTrustWarningContainer = "modTrustWarningContainer";
+        public const string modTrustWarningLabel = "modTrustWarningLabel";
         public const string musicGroup = "musicGroup";
         public const string musicNoteIcon = "musicNoteIcon";
         public const string musicPlaybackSpeedSlider = "musicPlaybackSpeedSlider";

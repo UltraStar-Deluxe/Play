@@ -170,6 +170,7 @@ public static partial class R
         public const string warningFontColor = "warningFontColor";
         public const string wide = "wide";
         public const string wideControl = "wideControl";
+        public const string wordWrap = "wordWrap";
         public const string xxlFont = "xxlFont";
     }
 }

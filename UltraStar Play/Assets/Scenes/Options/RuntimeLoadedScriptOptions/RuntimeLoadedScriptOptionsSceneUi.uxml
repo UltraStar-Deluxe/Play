@@ -1,6 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1">
+            <ui:VisualElement name="modTrustWarningContainer" class="mb-3">
+                <ui:VisualElement name="row" style="align-items: center;">
+                    <MaterialIcon tabindex="-1" name="warningIcon" icon="warning" class="rounded mr-1" />
+                    <ui:Label tabindex="-1" text="Mods can be a security risk or steal sensitive information. Only enable trusted mods." parse-escape-sequences="true" display-tooltip-when-elided="true" name="modTrustWarningLabel" class="wordWrap" />
+                </ui:VisualElement>
+            </ui:VisualElement>
             <ui:VisualElement name="modList" />
         </ui:ScrollView>
     </ui:VisualElement>

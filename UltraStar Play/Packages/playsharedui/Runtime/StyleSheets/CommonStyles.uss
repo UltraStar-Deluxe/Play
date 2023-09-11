@@ -378,10 +378,12 @@ Toggle.smallControl {
 
 .wordWrap {
     white-space: normal;
+    flex-shrink: 1;
 }
 
 .wordWrap Label {
     white-space: normal;
+    flex-shrink: 1;
 }
 
 .backgroundTransition {
