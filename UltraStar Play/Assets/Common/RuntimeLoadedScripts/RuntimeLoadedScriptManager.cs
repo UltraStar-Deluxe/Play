@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using IngameDebugConsole;
 using UniInject;
 using UniInject.Extensions;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
+using Pointer = UnityEngine.InputSystem.Pointer;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -71,6 +75,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
         // CopyDefaultModToPersistentDataPath("DemoMod");
 
+        AddDebugLogConsoleCommand();
+
         lastEnabledMods = settings.EnabledMods.ToList();
 
         LoadAndInstantiateScripts();
@@ -78,25 +84,61 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private void Update()
     {
-        if (!lastEnabledMods.SequenceEqual(settings.EnabledMods))
-        {
-            List<string> newlyEnabledModNames = settings.EnabledMods
-                .Except(lastEnabledMods)
-                .ToList();
-            List<string> newlyDisabledModNames = lastEnabledMods
-                .Except(settings.EnabledMods)
-                .ToList();
-            lastEnabledMods = settings.EnabledMods.ToList();
-            if (!newlyDisabledModNames.IsNullOrEmpty())
-            {
-                OnDisableMods(newlyDisabledModNames);
-            }
+        UpdateEnabledMods();
+    }
 
-            if (!newlyEnabledModNames.IsNullOrEmpty())
-            {
-                OnEnableMods(newlyEnabledModNames);
-            }
+    private void UpdateEnabledMods()
+    {
+        if (lastEnabledMods.SequenceEqual(settings.EnabledMods))
+        {
+            return;
         }
+
+        List<string> newlyEnabledModNames = settings.EnabledMods
+            .Except(lastEnabledMods)
+            .ToList();
+        List<string> newlyDisabledModNames = lastEnabledMods
+            .Except(settings.EnabledMods)
+            .ToList();
+        lastEnabledMods = settings.EnabledMods.ToList();
+        if (!newlyDisabledModNames.IsNullOrEmpty())
+        {
+            OnDisableMods(newlyDisabledModNames);
+        }
+
+        if (!newlyEnabledModNames.IsNullOrEmpty())
+        {
+            OnEnableMods(newlyEnabledModNames);
+        }
+    }
+
+    private void AddDebugLogConsoleCommand()
+    {
+        DebugLogConsole.AddCommand("mods.path", "Copy and log path to folders with runtime loaded scripts",
+            () =>
+            {
+                string text = GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder();
+                ClipboardUtils.CopyToClipboard(text);
+                Debug.Log($"Mods folder: {text}");
+            });
+
+        DebugLogConsole.AddCommand("mods.assemblies", "Show all assemblies in current app domain",
+            () =>
+            {
+                string text = AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(assembly => assembly.GetName().Name)
+                    .ToCsv();
+                ClipboardUtils.CopyToClipboard(text);
+                Debug.Log($"Copy and log assemblies in app domain: {text}");
+            });
+
+        DebugLogConsole.AddCommand("mods.assemblies.exposed", "Copy and log all assemblies in current app domain that are exposed to mods by default",
+            () =>
+            {
+                string text = defaultExposedAssemblyNames.ToCsv();
+                ClipboardUtils.CopyToClipboard(text);
+                Debug.Log($"Assemblies exposed to mods by default: {text}");
+            });
     }
 
     private void OnEnableMods(List<string> newlyEnabledModNames)

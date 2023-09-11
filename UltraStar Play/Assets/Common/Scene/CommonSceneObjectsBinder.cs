@@ -43,6 +43,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(WebViewManager.Instance);
         bb.BindExistingInstance(SongMediaFileConversionManager.Instance);
         bb.BindExistingInstance(RuntimeLoadedScriptManager.Instance);
+        bb.BindExistingInstance(RuntimeUiInspectionManager.Instance);
         bb.BindExistingInstance(VlcManager.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
 
