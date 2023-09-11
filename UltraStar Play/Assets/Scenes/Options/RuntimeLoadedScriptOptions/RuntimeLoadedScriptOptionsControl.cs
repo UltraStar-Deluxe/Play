@@ -72,8 +72,8 @@ public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, IN
                     "modsFolderPath", RuntimeLoadedScriptManager.GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()) },
             { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods_title),
                 TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods) },
-            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_loadOrder_title),
-                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_loadOrder) },
+            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_scriptLoading_title),
+                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_scriptLoading) },
         };
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_title),

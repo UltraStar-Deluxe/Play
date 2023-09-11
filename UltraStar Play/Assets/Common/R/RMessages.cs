@@ -182,8 +182,8 @@ public static partial class R
         public static readonly string options_runtimeLoadedScripts_helpDialog_install_title = "options_runtimeLoadedScripts_helpDialog_install_title";
         public static readonly string options_runtimeLoadedScripts_helpDialog_intro = "options_runtimeLoadedScripts_helpDialog_intro";
         public static readonly string options_runtimeLoadedScripts_helpDialog_intro_title = "options_runtimeLoadedScripts_helpDialog_intro_title";
-        public static readonly string options_runtimeLoadedScripts_helpDialog_loadOrder = "options_runtimeLoadedScripts_helpDialog_loadOrder";
-        public static readonly string options_runtimeLoadedScripts_helpDialog_loadOrder_title = "options_runtimeLoadedScripts_helpDialog_loadOrder_title";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_scriptLoading = "options_runtimeLoadedScripts_helpDialog_scriptLoading";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_scriptLoading_title = "options_runtimeLoadedScripts_helpDialog_scriptLoading_title";
         public static readonly string options_runtimeLoadedScripts_helpDialog_title = "options_runtimeLoadedScripts_helpDialog_title";
         public static readonly string options_runtimeLoadedScripts_title = "options_runtimeLoadedScripts_title";
         public static readonly string options_sampleRate = "options_sampleRate";
