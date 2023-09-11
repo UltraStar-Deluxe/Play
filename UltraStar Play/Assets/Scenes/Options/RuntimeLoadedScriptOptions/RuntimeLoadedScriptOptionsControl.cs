@@ -7,14 +7,18 @@ using UniInject.Extensions;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using IBinding = UniInject.IBinding;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, INeedInjection
+public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, INeedInjection, IBinder
 {
     [InjectedInInspector]
     public VisualTreeAsset modEntryUi;
+
+    [InjectedInInspector]
+    public VisualTreeAsset modInfoDialogUi;
 
     [Inject]
     private Injector injector;
@@ -83,5 +87,14 @@ public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, IN
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToRuntimeLoadedScripts)));
         return helpDialogControl;
+    }
+
+    public List<IBinding> GetBindings()
+    {
+        BindingBuilder bb = new();
+        bb.BindExistingInstance(this);
+        bb.BindExistingInstance(gameObject);
+        bb.Bind(nameof(modInfoDialogUi)).ToExistingInstance(modInfoDialogUi);
+        return bb.GetBindings();
     }
 }

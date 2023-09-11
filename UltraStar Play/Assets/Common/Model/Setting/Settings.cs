@@ -171,36 +171,4 @@ public class Settings : ISettings
 
     // Runtime loaded scripts
     public List<string> EnabledRuntimeLoadedMods { get; private set; } = new();
-    public List<string> RuntimeLoadedScriptExposedAssemblyNames { get; private set; }= new()
-    {
-        "com.achimmihca.portaudioforunity",
-        "com.achimmihca.primeinputactions",
-        "com.achimmihca.protrans",
-        "com.achimmihca.scenechangeanimations",
-        "com.achimmihca.simplehttpserverforunity",
-        "com.achimmihca.uniinject",
-        "com.achimmihca.utfunknownunity",
-        "Common",
-        "playshared",
-        "playsharedui",
-        "Scenes",
-        "System",
-        "System.Collections",
-        "System.IO",
-        "System.Text.Encoding",
-        "System.Threading.Tasks",
-        "System.Threading.Tasks.Extensions",
-        "System.Xml",
-        "System.Xml.Linq",
-        "System.Xml.ReaderWriter",
-        "UnityEngine",
-        "UnityEngine.AudioModule",
-        "UnityEngine.CoreModule",
-        "UnityEngine.InputLegacyModule",
-        "UnityEngine.InputModule",
-        "UnityEngine.UI",
-        "UnityEngine.UIElementsModule",
-        "UnityEngine.UIModule",
-        "UnityEngine.VideoModule",
-    };
 }

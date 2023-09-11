@@ -46,3 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   modEntryUi: {fileID: 9197481963319205126, guid: d967db7483b2f744e9b059cf7c75436a,
     type: 3}
+  modInfoDialogUi: {fileID: 9197481963319205126, guid: 8efc34a64adc84f48966cc833fc764b0,
+    type: 3}

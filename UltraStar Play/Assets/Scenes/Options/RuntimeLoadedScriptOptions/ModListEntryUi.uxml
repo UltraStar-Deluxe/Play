@@ -2,8 +2,14 @@
     <ui:VisualElement name="root">
         <ui:VisualElement name="row" style="align-items: center;">
             <ui:Label tabindex="-1" text="My Custom Mod Name" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modNameLabel" class="mr-auto ml-1 mt-1 mb-1" />
+            <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="modSettingsButton" class="squareButton mr-2">
+                <MaterialIcon tabindex="-1" name="modSettingsIcon" icon="settings" />
+            </ui:Button>
             <ui:VisualElement name="modListEntryInactiveOverlay" picking-mode="Ignore" class="inactiveOverlay overlay roundCorners" style="width: 100%;" />
-            <SlideToggle name="enabledToggle" class="m-1" style="margin-left: 4px; margin-right: 4px; margin-top: 4px; margin-bottom: 4px;" />
+            <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="modInfoButton" class="squareButton">
+                <MaterialIcon tabindex="-1" name="modInfoIcon" icon="info_outline" />
+            </ui:Button>
+            <SlideToggle name="enabledToggle" class="m-1" style="margin-left: 8px; margin-right: 4px; margin-top: 4px; margin-bottom: 4px;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

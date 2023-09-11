@@ -25,6 +25,36 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private readonly Dictionary<IRuntimeLoadedScript,RuntimeLoadedScriptContext> scriptToContext = new();
 
+    private static readonly List<string> defaultExposedAssemblyNames = new()
+    {
+        "com.achimmihca.portaudioforunity",
+        "com.achimmihca.primeinputactions",
+        "com.achimmihca.protrans",
+        "com.achimmihca.scenechangeanimations",
+        "com.achimmihca.simplehttpserverforunity",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.utfunknownunity",
+        "UniRx",
+        "Common",
+        "playshared",
+        "playsharedui",
+        "Scenes",
+        "System",
+        "System.Collections",
+        "System.Collections.ObjectModel",
+        "System.Collections.Generic",
+        "System.Linq",
+        "UnityEngine",
+        "UnityEngine.AudioModule",
+        "UnityEngine.CoreModule",
+        "UnityEngine.InputLegacyModule",
+        "UnityEngine.InputModule",
+        "UnityEngine.UI",
+        "UnityEngine.UIElementsModule",
+        "UnityEngine.UIModule",
+        "UnityEngine.VideoModule",
+    };
+
     protected override object GetInstance()
     {
         return Instance;
@@ -58,7 +88,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         string demoModSourceFolder = $"{GetAbsoluteDefaultRuntimeLoadedScriptsFolder()}/DemoMod";
         string demoModTargetFolder = $"{GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()}/DemoMod";
         if (Directory.Exists(demoModSourceFolder)
-            && !Directory.Exists(demoModTargetFolder))
+            && (!Directory.Exists(demoModTargetFolder) || Application.isEditor))
         {
             Debug.Log($"Copying demo mod to persistentDataPath (from: '{demoModSourceFolder}', to: '{demoModTargetFolder}')");
             DirectoryUtils.CopyAll(demoModSourceFolder, demoModTargetFolder,
@@ -104,9 +134,12 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             .ToList();
     }
 
-    private void InstantiateScripts(string scriptsFolder)
+    private void InstantiateScripts(string modFolder)
     {
-        CompilerWrapper compilerWrapper = CreateCompilerWrapper(scriptsFolder);
+        ModInfoJson modInfoJson = GetModInfo(modFolder);
+        List<string> exposedAssemblyNames = modInfoJson?.requires;
+
+        CompilerWrapper compilerWrapper = CreateCompilerWrapper(modFolder, exposedAssemblyNames);
         if (compilerWrapper == null)
         {
             return;
@@ -127,7 +160,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         // Inject instantiated objects
         foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
         {
-            RuntimeLoadedScriptContext runtimeLoadedScriptContext = new(scriptsFolder, false);
+            RuntimeLoadedScriptContext runtimeLoadedScriptContext = new(modFolder, false);
             Injector childInjector = injector
                 .CreateChildInjector()
                 .WithBindingForInstance(runtimeLoadedScriptContext);
@@ -146,12 +179,12 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
-    private CompilerWrapper CreateCompilerWrapper(string scriptsFolder)
+    private CompilerWrapper CreateCompilerWrapper(string scriptsFolder, List<string> exposedAssemblyNames)
     {
         CompilerWrapper compilerWrapper = new();
 
         // Load AppDomain libraries
-        LoadExposedAppDomainAssemblies(compilerWrapper);
+        LoadExposedAppDomainAssemblies(compilerWrapper, exposedAssemblyNames);
 
         // Load libraries in folder
         string[] externalDllFiles = Directory.GetFiles(scriptsFolder, "*.dll", SearchOption.AllDirectories);
@@ -202,10 +235,15 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             .ToList();
     }
 
-    private void LoadExposedAppDomainAssemblies(CompilerWrapper compilerWrapper)
+    private void LoadExposedAppDomainAssemblies(CompilerWrapper compilerWrapper, List<string> exposedAssemblyNames)
     {
+        if (exposedAssemblyNames.IsNullOrEmpty())
+        {
+            return;
+        }
+
         List<Assembly> exposedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(assembly => IsExposedAssembly(assembly))
+            .Where(assembly => exposedAssemblyNames.Contains(assembly.GetName().Name))
             .ToList();
         string exposedAssemblyNameCsv = exposedAssemblies
             .Select(it => it.GetName().Name)
@@ -216,11 +254,6 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         {
             compilerWrapper.ReferenceAssembly(assembly);
         }
-    }
-
-    private bool IsExposedAssembly(Assembly assembly)
-    {
-        return settings.RuntimeLoadedScriptExposedAssemblyNames.Contains(assembly.GetName().Name);
     }
 
     public static string GetAbsoluteDefaultRuntimeLoadedScriptsFolder()
@@ -235,6 +268,34 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     public static string GetModName(string modFolder)
     {
+        ModInfoJson modInfoJson = GetModInfo(modFolder);
+        if (modInfoJson != null
+            && !modInfoJson.name.IsNullOrEmpty())
+        {
+            return modInfoJson.name;
+        }
         return Path.GetFileName(modFolder);
+    }
+
+    public static ModInfoJson GetModInfo(string modFolder)
+    {
+        string modInfoPath = $"{modFolder}/modinfo.json";
+        if (!FileUtils.Exists(modInfoPath))
+        {
+            return null;
+        }
+
+        try
+        {
+            string modInfoString = File.ReadAllText(modInfoPath);
+            ModInfoJson modInfoJson = JsonConverter.FromJson<ModInfoJson>(modInfoString);
+            return modInfoJson;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load mod info from '{modInfoPath}': {ex.Message}");
+            return null;
+        }
     }
 }
