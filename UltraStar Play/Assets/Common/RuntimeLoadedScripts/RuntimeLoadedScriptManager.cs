@@ -19,6 +19,9 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     public static RuntimeLoadedScriptManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<RuntimeLoadedScriptManager>();
 
     private const string RuntimeLoadedScriptsFolderName = "RuntimeLoadedScripts";
+    private const string TemplateModName = "TemplateMod";
+    private const string TemplateModNamePlaceholder = "MODNAME";
+    private const string TemplateModDllFolderPlaceholder = "DEFAULT_DLL_FOLDER";
 
     [Inject]
     private Injector injector;
@@ -114,7 +117,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private void AddDebugLogConsoleCommand()
     {
-        DebugLogConsole.AddCommand("mods.path", "Copy and log path to folders with runtime loaded scripts",
+        DebugLogConsole.AddCommand("mod.path", "Copy and log path to folders with runtime loaded scripts",
             () =>
             {
                 string text = GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder();
@@ -122,7 +125,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
                 Debug.Log($"Mods folder: {text}");
             });
 
-        DebugLogConsole.AddCommand("mods.assemblies", "Show all assemblies in current app domain",
+        DebugLogConsole.AddCommand("mod.assemblies", "Show all assemblies in current app domain",
             () =>
             {
                 string text = AppDomain.CurrentDomain.GetAssemblies()
@@ -132,13 +135,74 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
                 Debug.Log($"Copy and log assemblies in app domain: {text}");
             });
 
-        DebugLogConsole.AddCommand("mods.assemblies.exposed", "Copy and log all assemblies in current app domain that are exposed to mods by default",
+        DebugLogConsole.AddCommand("mod.assemblies.exposed", "Copy and log all assemblies in current app domain that are exposed to mods by default",
             () =>
             {
                 string text = defaultExposedAssemblyNames.ToCsv();
                 ClipboardUtils.CopyToClipboard(text);
                 Debug.Log($"Assemblies exposed to mods by default: {text}");
             });
+
+        DebugLogConsole.AddCommand("mod.create", "Create a new mod with the given name from template",
+            (string modName) => CreateModFromTemplate(modName),
+            "name");
+    }
+
+    private void CreateModFromTemplate(string modName)
+    {
+        string targetModFolder = $"{GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()}/{modName}";
+        if (new DirectoryInfo(targetModFolder).Exists)
+        {
+            Debug.Log($"Directory already exists: '{targetModFolder}'");
+            UiManager.CreateNotification("A mod with this name already exists.");
+            return;
+        }
+
+        string templateModFolder = ApplicationUtils.GetStreamingAssetsPath($"{RuntimeLoadedScriptsFolderName}/{TemplateModName}");
+        if (!Directory.Exists(templateModFolder))
+        {
+            throw new Exception($"Template mod folder not found: '{templateModFolder}'");
+        }
+
+        DirectoryUtils.CopyAll(templateModFolder, targetModFolder,
+            CopyDirectoryFilter.Exclude(path =>
+            {
+                string fileNameToLower = Path.GetFileName(path).ToLowerInvariant();
+                return fileNameToLower.EndsWith(".meta")
+                       || fileNameToLower.EndsWith(".sln")
+                       || fileNameToLower == "bin"
+                       || fileNameToLower == "obj";
+            }));
+
+        // Replace placeholders in created files
+        foreach (FileInfo fileInfo in new DirectoryInfo(targetModFolder).GetFiles())
+        {
+            try
+            {
+                if (fileInfo.Extension.TrimStart('.')
+                    is "txt"
+                    or "json"
+                    or "xml"
+                    or "cs")
+                {
+                    string fileContentWithPlaceholders = File.ReadAllText(fileInfo.FullName);
+                    string fileContentNoPlaceholders = ReplaceTemplateModPlaceholders(fileContentWithPlaceholders, modName);
+                    File.WriteAllText(fileInfo.FullName, fileContentNoPlaceholders);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to replace template mod placeholders in file {fileInfo}");
+            }
+        }
+    }
+
+    private string ReplaceTemplateModPlaceholders(string text, string modName)
+    {
+        return text
+            .Replace(TemplateModNamePlaceholder, modName)
+            .Replace(TemplateModDllFolderPlaceholder, $"{Application.dataPath}/Managed");
     }
 
     private void OnEnableMods(List<string> newlyEnabledModNames)
@@ -229,6 +293,13 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     public bool IsModEnabled(string modFolder)
     {
         return settings.EnabledMods.Contains(GetModName(modFolder));
+    }
+
+    public List<string> GetModNames()
+    {
+        return GetModFolders()
+            .Select(modFolder => GetModName(modFolder))
+            .ToList();
     }
 
     public List<string> GetModFolders()
