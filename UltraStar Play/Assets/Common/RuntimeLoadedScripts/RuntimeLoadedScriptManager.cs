@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Serilog.Events;
 using UniInject;
 using UniInject.Extensions;
 using UnityEngine;
@@ -34,6 +35,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         DirectoryUtils.CreateDirectory(GetAbsoluteDefaultRuntimeLoadedScriptsFolder());
         DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder());
 
+        CopyDemoModToPersistentDataPath();
+
         if (settings.EnabledRuntimeLoadedMods.IsNullOrEmpty())
         {
             return;
@@ -50,6 +53,30 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
+    private void CopyDemoModToPersistentDataPath()
+    {
+        string demoModSourceFolder = $"{GetAbsoluteDefaultRuntimeLoadedScriptsFolder()}/DemoMod";
+        string demoModTargetFolder = $"{GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()}/DemoMod";
+        if (Directory.Exists(demoModSourceFolder)
+            && !Directory.Exists(demoModTargetFolder))
+        {
+            Debug.Log($"Copying demo mod to persistentDataPath (from: '{demoModSourceFolder}', to: '{demoModTargetFolder}')");
+            DirectoryUtils.CopyAll(demoModSourceFolder, demoModTargetFolder,
+                CopyDirectoryFilter.Exclude(path =>
+                {
+                    string fileNameToLower = Path.GetFileName(path).ToLowerInvariant();
+                    return fileNameToLower.EndsWith(".meta")
+                        || fileNameToLower.EndsWith(".sln")
+                        || fileNameToLower == "bin"
+                        || fileNameToLower == "obj";
+                }));
+        }
+        else
+        {
+            Debug.Log("Not copying demo mod to persistentDataPath because the target folder already exists.");
+        }
+    }
+
     public bool IsModEnabled(string modFolder)
     {
         return settings.EnabledRuntimeLoadedMods.Contains(GetModName(modFolder));
@@ -59,7 +86,6 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     {
         List<string> modParentFolders = new()
         {
-            GetAbsoluteDefaultRuntimeLoadedScriptsFolder(),
             GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder(),
         };
 
