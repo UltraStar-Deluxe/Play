@@ -33,6 +33,9 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.modSettingsButton)]
     private Button modSettingsButton;
 
+    [Inject(UxmlName = R.UxmlNames.openModFolderButton)]
+    private Button openModFolderButton;
+
     [Inject(Key = "modFolder")]
     public string ModFolder { get; private set; }
 
@@ -76,6 +79,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
 
         modInfoButton.RegisterCallbackButtonTriggered(_ => ShowModInfoDialog());
         modSettingsButton.RegisterCallbackButtonTriggered(_ => ShowModSettingsDialog());
+        openModFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(ModFolder));
 
         UpdateInactiveOverlay();
     }

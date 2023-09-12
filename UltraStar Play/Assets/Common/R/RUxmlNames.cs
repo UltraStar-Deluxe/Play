@@ -489,6 +489,8 @@ public static partial class R
         public const string openFolderButton = "openFolderButton";
         public const string openFolderIcon = "openFolderIcon";
         public const string openImportLrcDialogButton = "openImportLrcDialogButton";
+        public const string openModFolderButton = "openModFolderButton";
+        public const string openModFolderIcon = "openModFolderIcon";
         public const string openPersistentDataPathButton = "openPersistentDataPathButton";
         public const string openPersistentDataPathLabel = "openPersistentDataPathLabel";
         public const string openSongFolderButton = "openSongFolderButton";

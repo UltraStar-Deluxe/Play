@@ -6,6 +6,9 @@
                 <MaterialIcon tabindex="-1" name="modSettingsIcon" icon="settings" />
             </ui:Button>
             <ui:VisualElement name="modListEntryInactiveOverlay" picking-mode="Ignore" class="inactiveOverlay overlay roundCorners" style="width: 100%;" />
+            <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="openModFolderButton" class="squareButton mr-2">
+                <MaterialIcon tabindex="-1" name="openModFolderIcon" icon="open_in_new" />
+            </ui:Button>
             <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="modInfoButton" class="squareButton">
                 <MaterialIcon tabindex="-1" name="modInfoIcon" icon="info_outline" />
             </ui:Button>
