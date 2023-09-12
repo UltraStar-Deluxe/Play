@@ -405,3 +405,13 @@ Toggle.smallControl {
 .horizontalScrollBarTop ScrollView {
     flex-direction: column-reverse;
 }
+
+#runtimeUiInspectionFrame {
+    background-color: rgba(184, 226, 243, 0.2);
+}
+
+#runtimeUiInspectionLabel {
+    font-size: 8px;
+    bottom: 0;
+    left: 0;
+}
