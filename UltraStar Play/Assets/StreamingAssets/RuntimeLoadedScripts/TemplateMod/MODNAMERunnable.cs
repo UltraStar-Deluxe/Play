@@ -9,8 +9,7 @@ using System.Collections.Generic;
 // code completion, error markers, parameter hints, go to definition, etc.
 // ---
 // A mod must implement subtypes of IRuntimeLoadedScript.
-// This example mod implements two subtypes in this file and mod settings in another file.
-// Other available interfaces can be found by executing 'mod.interfaces' in the game's console.
+// Available interfaces can be found by executing 'mod.interfaces' in the game's console.
 // ---
 // IRuntimeLoadedRunnable.Run is called on game start or when the mod is enabled.
 // Methods of other IRuntimeLoadedScript subtypes are called when needed, e.g.,
@@ -31,9 +30,9 @@ public class MODNAMERunnable : IRuntimeLoadedRunnable, IOnDisableMod
     [Inject]
     private ModContext modContext;
 
-    // IModSettings implement IAutoBoundRuntimeLoadedScript, which makes an instance available via Inject attribute
+    // Mod settings implement IAutoBoundRuntimeLoadedScript, which makes an instance available here via Inject attribute
     [Inject]
-    private MODNAMEModSettings demoModSettings;
+    private MODNAMEModSettings modSettings;
 
     private readonly List<IDisposable> disposables = new List<IDisposable>();
 

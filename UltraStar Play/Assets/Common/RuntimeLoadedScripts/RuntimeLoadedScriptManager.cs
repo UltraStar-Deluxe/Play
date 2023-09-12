@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -49,6 +48,10 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
+    private bool shouldReloadChangedMods;
+    private readonly Dictionary<string, FileSystemWatcher> modFolderToFileSystemWatcher = new();
+    private readonly List<string> changedCsFiles = new();
+
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
         "com.achimmihca.portaudioforunity",
@@ -93,14 +96,53 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
         AddDebugLogConsoleCommand();
 
+        CreateOrUpdateModFolderFileSystemWatchers();
+
         lastEnabledMods = settings.EnabledMods.ToList();
 
         LoadAndInstantiateScripts();
     }
 
+    private void CreateOrUpdateModFolderFileSystemWatchers()
+    {
+        foreach (string modFolder in GetModFolders())
+        {
+            CreateOrUpdateModFolderFileSystemWatcher(modFolder);
+        }
+    }
+
+    private void CreateOrUpdateModFolderFileSystemWatcher(string modFolder)
+    {
+        if (modFolderToFileSystemWatcher.ContainsKey(modFolder))
+        {
+            return;
+        }
+
+        FileSystemWatcher fileSystemWatcher = FileSystemWatcherUtils.CreateFileSystemWatcher(modFolder, "*.cs",
+            (sender, args) => OnCsFileChanged(modFolder, args.FullPath));
+        modFolderToFileSystemWatcher[modFolder] = fileSystemWatcher;
+    }
+
+    private void OnCsFileChanged(string modFolder, string filePath)
+    {
+        if (!shouldReloadChangedMods)
+        {
+            return;
+        }
+
+        changedCsFiles.Add(filePath);
+    }
+
     private void Update()
     {
         UpdateEnabledMods();
+
+        if (!changedCsFiles.IsNullOrEmpty())
+        {
+            Debug.Log($"Reloading mods because of changed files: {changedCsFiles.ToCsv()}");
+            changedCsFiles.Clear();
+            LoadAndInstantiateScripts();
+        }
     }
 
     private void UpdateEnabledMods()
@@ -167,6 +209,13 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
                 string text = runtimeLoadedScriptSubtypes.Select(type => type.Name).ToCsv(", ", "", "");
                 ClipboardUtils.CopyToClipboard(text);
                 Debug.Log($"Subtypes of IRuntimeLoadedScript: {text}");
+            });
+
+        DebugLogConsole.AddCommand("mod.reloadOnChange", "Toggle auto reload of mods when a .cs file in a mod folder changes.",
+            () =>
+            {
+                shouldReloadChangedMods = !shouldReloadChangedMods;
+                Debug.Log($"Reload changed mods: {shouldReloadChangedMods}");
             });
     }
 
@@ -258,6 +307,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private void OnEnableMods(List<string> newlyEnabledModNames)
     {
         Debug.Log($"Reloading mods because of newly enabled: {newlyEnabledModNames.ToCsv()}");
+        CreateOrUpdateModFolderFileSystemWatchers();
         LoadAndInstantiateScripts();
     }
 
@@ -269,7 +319,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private void OnDisableMod(string modName)
     {
         string modFolder = GetModFolderByModName(modName);
-        List<IOnDisableMod> disableModHandlers = GetCurrentRuntimeLoadedInstances<IOnDisableMod>(modFolder);
+        List<IOnDisableMod> disableModHandlers = GetCurrentRuntimeLoadedInstances<IOnDisableMod>(modFolder, false);
         disableModHandlers.ForEach(disableModHandler =>
         {
             try
@@ -399,7 +449,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         return "";
     }
 
-    public List<T> GetCurrentRuntimeLoadedInstances<T>(string modFolder = null)
+    public List<T> GetCurrentRuntimeLoadedInstances<T>(string modFolder = null, bool onlyFromEnabledMods = true)
         where T : IRuntimeLoadedScript
     {
         return scriptToContext
@@ -407,14 +457,14 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
                 || modFolder == entry.Value.ModFolder)
             .Where(entry => !entry.Value.IsInstanceObsolete
                             && entry.Key is T)
-            .Where(entry => IsModEnabled(entry.Key))
+            .Where(entry => !onlyFromEnabledMods || IsModEnabled(entry.Key))
             .Select(entry => (T)entry.Key)
             .ToList();
     }
 
     private void LoadScriptsIntoAppDomain(string modFolder)
     {
-        using DisposableStopwatch d = new($"Loading mod '{GetModName(modFolder)}' into app domain took <ms>");
+        using DisposableStopwatch d = new($"Loading mod '{GetModName(modFolder)}' into app domain took <ms> ms");
 
         List<string> exposedAssemblyNames = defaultExposedAssemblyNames.ToList();
         ModInfoJson modInfoJson = GetModInfo(modFolder);
@@ -540,7 +590,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private void InstantiateScripts()
     {
-        using DisposableStopwatch d = new($"Instantiate runtime loaded scripts took <ms>");
+        using DisposableStopwatch d = new($"Instantiate runtime loaded scripts took <ms> ms");
 
         // Instantiate new objects
         List<IRuntimeLoadedScript> currentAndObsoleteRuntimeLoadedScripts;
@@ -772,6 +822,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     protected override void OnDestroySingleton()
     {
         SaveAllModSettings();
+        modFolderToFileSystemWatcher.ForEach(entry => entry.Value.Dispose());
+        modFolderToFileSystemWatcher.Clear();
     }
 
     private void SaveAllModSettings()
