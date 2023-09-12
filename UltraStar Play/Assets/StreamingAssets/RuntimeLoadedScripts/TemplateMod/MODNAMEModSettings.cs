@@ -1,6 +1,9 @@
+using System.Collections.Generic;
+
 // Add settings to your mod by implementing IModSettings.
 // IModSettings extends IAutoBoundRuntimeLoadedScript,
 // which makes an object of the type available in other scripts via Inject attribute.
+// Mod settings are saved to file when the app is closed.
 public class MODNAMEModSettings : IModSettings
 {
     public bool myBool = true;
@@ -13,8 +16,8 @@ public class MODNAMEModSettings : IModSettings
         return new List<IModSettingControl>()
         {
             new BoolModSettingControl(() => myBool, newValue => myBool = newValue) { Label = "My Bool" },
-            new IntModSettingControl(() => myDouble, newValue => myDouble = newValue) { Label = "My Double" },
-            new DoubleModSettingControl(() => myInt, newValue => myInt = newValue) { Label = "My Int" },
+            new DoubleModSettingControl(() => myDouble, newValue => myDouble = newValue) { Label = "My Double" },
+            new IntModSettingControl(() => myInt, newValue => myInt = newValue) { Label = "My Int" },
             new StringModSettingControl(() => myString, newValue => myString = newValue) { Label = "My String" },
         };
     }

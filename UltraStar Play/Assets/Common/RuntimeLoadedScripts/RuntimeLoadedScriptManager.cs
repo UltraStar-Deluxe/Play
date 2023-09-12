@@ -7,9 +7,6 @@ using IngameDebugConsole;
 using UniInject;
 using UniInject.Extensions;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
-using Pointer = UnityEngine.InputSystem.Pointer;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -146,12 +143,31 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         DebugLogConsole.AddCommand("mod.create", "Create a new mod with the given name from template",
             (string modName) => CreateModFromTemplate(modName),
             "name");
+
+        DebugLogConsole.AddCommand("mod.interfaces", "Copy and log all IRuntimeLoadedScript subtypes that can be implemented in a mod.",
+            () =>
+            {
+                List<Type> runtimeLoadedScriptSubtypes = GetRuntimeLoadedScriptSubtypes();
+                string text = runtimeLoadedScriptSubtypes.Select(type => type.Name).ToCsv(", ", "", "");
+                ClipboardUtils.CopyToClipboard(text);
+                Debug.Log($"Subtypes of IRuntimeLoadedScript: {text}");
+            });
+    }
+
+    private List<Type> GetRuntimeLoadedScriptSubtypes()
+    {
+        return AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(domainAssembly => domainAssembly.GetTypes())
+            .Where(type => type.IsInterface
+                           && typeof(IRuntimeLoadedScript).IsAssignableFrom(type))
+            .ToList();
     }
 
     private void CreateModFromTemplate(string modName)
     {
         string targetModFolder = $"{GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()}/{modName}";
-        if (new DirectoryInfo(targetModFolder).Exists)
+        DirectoryInfo targetModFolderInfo = new(targetModFolder);
+        if (targetModFolderInfo.Exists)
         {
             Debug.Log($"Directory already exists: '{targetModFolder}'");
             UiManager.CreateNotification("A mod with this name already exists.");
@@ -175,15 +191,12 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             }));
 
         // Replace placeholders in created files
-        foreach (FileInfo fileInfo in new DirectoryInfo(targetModFolder).GetFiles())
+        List<string> textFileExtensions = new() { "txt", "json", "xml", "csproj", "cs", };
+        foreach (FileInfo fileInfo in targetModFolderInfo.GetFiles())
         {
             try
             {
-                if (fileInfo.Extension.TrimStart('.')
-                    is "txt"
-                    or "json"
-                    or "xml"
-                    or "cs")
+                if (textFileExtensions.Contains(fileInfo.Extension.TrimStart('.')))
                 {
                     string fileContentWithPlaceholders = File.ReadAllText(fileInfo.FullName);
                     string fileContentNoPlaceholders = ReplaceTemplateModPlaceholders(fileContentWithPlaceholders, modName);
@@ -193,16 +206,37 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to replace template mod placeholders in file {fileInfo}");
+                Debug.LogError($"Failed to replace template mod placeholders in file content {fileInfo}");
+            }
+        }
+
+        // Replace mod name placeholder in file name
+        foreach (FileInfo fileInfo in targetModFolderInfo.GetFiles())
+        {
+            try
+            {
+                string fileNameNoPlaceholders = ReplaceTemplateModPlaceholders(fileInfo.Name, modName);
+                if (fileNameNoPlaceholders != fileInfo.Name)
+                {
+                    File.Move(fileInfo.FullName, $"{fileInfo.DirectoryName}/{fileNameNoPlaceholders}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to replace template mod placeholders in file name {fileInfo}");
             }
         }
     }
 
     private string ReplaceTemplateModPlaceholders(string text, string modName)
     {
+        string dataPath = Application.isEditor
+            ? new DirectoryInfo(Application.dataPath + "/../../Build/Windows/Melody Mania_Data").FullName
+            : Application.dataPath;
         return text
             .Replace(TemplateModNamePlaceholder, modName)
-            .Replace(TemplateModDllFolderPlaceholder, $"{Application.dataPath}/Managed");
+            .Replace(TemplateModDllFolderPlaceholder, $"{dataPath}/Managed");
     }
 
     private void OnEnableMods(List<string> newlyEnabledModNames)
@@ -219,7 +253,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private void OnDisableMod(string modName)
     {
         string modFolder = GetModFolderByModName(modName);
-        List<IDisableModHandler> disableModHandlers = GetCurrentRuntimeLoadedInstances<IDisableModHandler>(modFolder);
+        List<IOnDisableMod> disableModHandlers = GetCurrentRuntimeLoadedInstances<IOnDisableMod>(modFolder);
         disableModHandlers.ForEach(disableModHandler =>
         {
             try
@@ -575,11 +609,13 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         List<Assembly> exposedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(assembly => exposedAssemblyNames.Contains(assembly.GetName().Name))
             .ToList();
-        string exposedAssemblyNameCsv = exposedAssemblies
-            .Select(it => it.GetName().Name)
-            .OrderBy(it => it)
-            .ToCsv("\n");
-        Debug.Log($"Exposed assemblies: {exposedAssemblyNameCsv}");
+
+        // string exposedAssemblyNameCsv = exposedAssemblies
+        //     .Select(it => it.GetName().Name)
+        //     .OrderBy(it => it)
+        //     .ToCsv("\n");
+        // Debug.Log($"Exposed assemblies: {exposedAssemblyNameCsv}");
+
         foreach (Assembly assembly in exposedAssemblies)
         {
             compilerWrapper.ReferenceAssembly(assembly);

@@ -155,9 +155,16 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         SetTextOrHideLabel(authorsLabel, "Authors: " , modInfoJson.authors.ToCsv(", ", "", ""));
 
         modDependenciesContainer.Clear();
-        foreach (string require in modInfoJson.requires)
+        if (modInfoJson.requires.IsNullOrEmpty())
         {
-            modDependenciesContainer.Add(new Label($"• {require}"));
+            modDependenciesContainer.Add(new Label($"Requires only default app domain libraries."));
+        }
+        else
+        {
+            foreach (string require in modInfoJson.requires)
+            {
+                modDependenciesContainer.Add(new Label($"• {require}"));
+            }
         }
     }
 
