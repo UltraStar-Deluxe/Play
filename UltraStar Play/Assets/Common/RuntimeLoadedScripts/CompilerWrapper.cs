@@ -34,7 +34,15 @@ public class CompilerWrapper
         // create new settings that will *not* load up all of standard lib by default
         // see: https://github.com/mono/mono/blob/master/mcs/mcs/settings.cs
 
-        CompilerSettings settings = new CompilerSettings { LoadDefaultReferences = false, StdLib = false };
+        CompilerSettings settings = new CompilerSettings
+        {
+            LoadDefaultReferences = false,
+            StdLib = false,
+            Encoding = Encoding.UTF8,
+            EnhancedWarnings = true,
+            Checked = true,
+            Stacktrace = true,
+        };
         this._report = new StringBuilder();
         this._context = new CompilerContext(settings, new StreamReportPrinter(new StringWriter(_report)));
 
@@ -62,7 +70,7 @@ public class CompilerWrapper
     }
 
     /// <summary> Creates new instances of types that are children of the specified type. </summary>
-    public static List<T> CreateInstancesOf<T> () {
+    public static List<T> CreateInstancesOf<T> (Func<Type, bool> typeFilter = null) {
         var parent = typeof(T);
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
         var types = assemblies.SelectMany(assembly => {
@@ -71,6 +79,7 @@ public class CompilerWrapper
             });
         });
         return types
+            .Where(type => typeFilter == null || typeFilter(type))
             .Select(type => (T)Activator.CreateInstance(type))
             .ToList();
     }

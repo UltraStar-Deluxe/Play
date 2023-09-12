@@ -270,8 +270,18 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private void LoadAndInstantiateScripts()
     {
-        LoadScriptsIntoAppDomain();
-        InstantiateScripts();
+        try
+        {
+            LoadScriptsIntoAppDomain();
+            InstantiateScripts();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load mods: {ex.Message}");
+            UiManager.CreateNotification($"Failed to load mods. Check log for details.\n" +
+                                         $"Try to disable mods and restart the app.");
+        }
     }
 
     private void LoadScriptsIntoAppDomain()
@@ -284,9 +294,9 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         List<string> modFolders = GetModFolders();
         foreach (string modFolder in modFolders)
         {
-            Debug.Log($"Loading scripts from {modFolder}");
             if (IsModEnabled(modFolder))
             {
+                Debug.Log($"Loading scripts from {modFolder}");
                 LoadScriptsIntoAppDomain(modFolder);
             }
         }
@@ -329,6 +339,21 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         return settings.EnabledMods.Contains(GetModName(modFolder));
     }
 
+    private bool IsModEnabled(Type type)
+    {
+        if (!typeToModFolder.TryGetValue(type, out string modFolder))
+        {
+            return false;
+        }
+
+        return IsModEnabled(modFolder);
+    }
+
+    private bool IsModEnabled(IRuntimeLoadedScript runtimeLoadedScript)
+    {
+        return IsModEnabled(runtimeLoadedScript.GetType());
+    }
+
     public List<string> GetModNames()
     {
         return GetModFolders()
@@ -366,6 +391,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
                 || modFolder == entry.Value.ModFolder)
             .Where(entry => !entry.Value.IsInstanceObsolete
                             && entry.Key is T)
+            .Where(entry => IsModEnabled(entry.Key))
             .Select(entry => (T)entry.Key)
             .ToList();
     }
@@ -421,15 +447,13 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         try
         {
             runtimeLoadedTypesBefore = CompilerWrapper
-                .CreateInstancesOf<IRuntimeLoadedScript>()
+                .CreateInstancesOf<IRuntimeLoadedScript>(IsModEnabled)
                 .Select(it => it.GetType())
                 .ToList();
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to instantiate runtime loaded scripts: {ex.Message}");
-            throw ex;
+            throw new LoadModException($"Failed to instantiate runtime loaded scripts: {ex.Message}", ex);
         }
 
         try
@@ -438,24 +462,20 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to load '{filePath}': {ex.Message}");
-            return;
+            throw new LoadModException($"Failed to load '{filePath}': {ex.Message}", ex);
         }
 
         List<Type> runtimeLoadedTypesAfter = new();
         try
         {
             runtimeLoadedTypesAfter = CompilerWrapper
-                .CreateInstancesOf<IRuntimeLoadedScript>()
+                .CreateInstancesOf<IRuntimeLoadedScript>(IsModEnabled)
                 .Select(it => it.GetType())
                 .ToList();
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to instantiate runtime loaded scripts: {ex.Message}");
-            throw ex;
+            throw new LoadModException($"Failed to instantiate runtime loaded scripts: {ex.Message}", ex);
         }
 
         List<Type> newRuntimeLoadedTypes = runtimeLoadedTypesAfter.Except(runtimeLoadedTypesBefore).ToList();
@@ -471,7 +491,15 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         using DisposableStopwatch d = new($"Instantiate runtime loaded scripts took <ms>");
 
         // Instantiate new objects
-        List<IRuntimeLoadedScript> currentAndObsoleteRuntimeLoadedScripts = CompilerWrapper.CreateInstancesOf<IRuntimeLoadedScript>();
+        List<IRuntimeLoadedScript> currentAndObsoleteRuntimeLoadedScripts;
+        try
+        {
+            currentAndObsoleteRuntimeLoadedScripts = CompilerWrapper.CreateInstancesOf<IRuntimeLoadedScript>(IsModEnabled);
+        }
+        catch (Exception ex)
+        {
+            throw new LoadModException($"Failed to instantiate runtime loaded scripts: {ex.Message}", ex);
+        }
 
         List<IRuntimeLoadedScript> currentRuntimeLoadedScripts = GetNewestImplementations(currentAndObsoleteRuntimeLoadedScripts);
 
@@ -493,7 +521,15 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         {
             if (runtimeLoadedScript is IModSettings modSettings)
             {
-                LoadModSettings(modSettings);
+                try
+                {
+                    LoadModSettings(modSettings);
+                }
+                catch (LoadModSettingsException ex)
+                {
+                    Debug.LogException(ex);
+                    UiManager.CreateNotification($"Failed to load settings of mod '{GetModName(ex.ModFolder)}'");
+                }
             }
         }
 
@@ -562,8 +598,11 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to load mod settings from '{modSettingsPath}'. Object type to deserialize: {modSettings.GetType().FullName}");
+            throw new LoadModSettingsException($"Failed to load mod settings from '{modSettingsPath}'. Object type to deserialize: {modSettings.GetType().FullName}", ex)
+            {
+                ModSettingsPath = modSettingsPath,
+                ModFolder = modFolder,
+            };
         }
     }
 
