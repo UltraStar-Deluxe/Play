@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -27,11 +28,26 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private Settings settings;
 
     private readonly Dictionary<IRuntimeLoadedScript,RuntimeLoadedScriptContext> scriptToContext = new();
-    private readonly Dictionary<Type, string> typeToSourceFile = new();
     private readonly Dictionary<Type, string> typeToModFolder = new();
     private readonly Dictionary<string, ModContext> modFolderToModContext = new();
 
     private List<string> lastEnabledMods = new();
+
+    private bool appDomainTypesChanged = true;
+    private List<Type> runtimeLoadedScriptImplementations = new();
+    private List<Type> RuntimeLoadedScriptImplementations
+    {
+        get
+        {
+            if (appDomainTypesChanged)
+            {
+                appDomainTypesChanged = false;
+                runtimeLoadedScriptImplementations = GetRuntimeLoadedScriptImplementations(true);
+            }
+
+            return runtimeLoadedScriptImplementations;
+        }
+    }
 
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
@@ -147,14 +163,14 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         DebugLogConsole.AddCommand("mod.interfaces", "Copy and log all IRuntimeLoadedScript subtypes that can be implemented in a mod.",
             () =>
             {
-                List<Type> runtimeLoadedScriptSubtypes = GetRuntimeLoadedScriptSubtypes();
+                List<Type> runtimeLoadedScriptSubtypes = GetRuntimeLoadedScriptInterfaces();
                 string text = runtimeLoadedScriptSubtypes.Select(type => type.Name).ToCsv(", ", "", "");
                 ClipboardUtils.CopyToClipboard(text);
                 Debug.Log($"Subtypes of IRuntimeLoadedScript: {text}");
             });
     }
 
-    private List<Type> GetRuntimeLoadedScriptSubtypes()
+    private List<Type> GetRuntimeLoadedScriptInterfaces()
     {
         return AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(domainAssembly => domainAssembly.GetTypes())
@@ -412,6 +428,10 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
         // Load AppDomain libraries
         LoadExposedAppDomainAssemblies(compilerWrapper, exposedAssemblyNames);
+        appDomainTypesChanged = true;
+
+        // Find types that are loaded from this mod folder
+        List<Type> typesBefore = GetRuntimeLoadedScriptImplementations(false);
 
         // Load libraries in folder
         string[] externalDllFiles = Directory.GetFiles(modFolder, "*.dll", SearchOption.AllDirectories);
@@ -419,71 +439,103 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         {
             Assembly assembly = Assembly.LoadFile(dllFile);
             compilerWrapper.ReferenceAssembly(assembly);
+            appDomainTypesChanged = true;
         }
 
         // Load C# files in folder
         string[] csFilePaths = Directory.GetFiles(modFolder, "*.cs");
         foreach (string filePath in csFilePaths)
         {
-            LoadScriptFileIntoAppDomain(modFolder, filePath, compilerWrapper);
+            LoadScriptFileIntoAppDomain(filePath, compilerWrapper);
+        }
+
+        // Find types that are loaded from this mod folder
+        List<Type> typesAfter = GetRuntimeLoadedScriptImplementations(false);
+        foreach (Type type in typesAfter.Except(typesBefore))
+        {
+            typeToModFolder[type] = modFolder;
         }
 
         // Check compilation was successful
         string report = compilerWrapper.GetReport();
         if (compilerWrapper.ErrorsCount > 0)
         {
-            Debug.LogError($"Failed to load scripts in '{modFolder}'. Compilation output:\n{report}");
+            Debug.LogError($"Failed to load scripts of '{GetModName(modFolder)}'. Compilation output:\n{report}");
         }
         else
         {
-            Debug.Log($"Successfully loaded scripts in {modFolder}. Compilation output:\n{report}");
+            Debug.Log($"Successfully loaded scripts of '{GetModName(modFolder)}'. Compilation output:\n{report}");
         }
     }
 
-    private void LoadScriptFileIntoAppDomain(string modFolder, string filePath, CompilerWrapper compilerWrapper)
+    private void LoadScriptFileIntoAppDomain(string filePath, CompilerWrapper compilerWrapper)
     {
-        // Find the runtime loaded types that are instantiated by this file.
-        List<Type> runtimeLoadedTypesBefore;
-        try
-        {
-            runtimeLoadedTypesBefore = CompilerWrapper
-                .CreateInstancesOf<IRuntimeLoadedScript>(IsModEnabled)
-                .Select(it => it.GetType())
-                .ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new LoadModException($"Failed to instantiate runtime loaded scripts: {ex.Message}", ex);
-        }
-
+        // Find the types that are implemented by this file.
         try
         {
             compilerWrapper.Execute(filePath);
+            appDomainTypesChanged = true;
         }
         catch (Exception ex)
         {
             throw new LoadModException($"Failed to load '{filePath}': {ex.Message}", ex);
         }
+    }
 
-        List<Type> runtimeLoadedTypesAfter = new();
-        try
+    private List<IRuntimeLoadedScript> CreateInstancesOfRuntimeLoadedScripts()
+    {
+        Type parent = typeof(IRuntimeLoadedScript);
+        return RuntimeLoadedScriptImplementations
+            .Where(type => parent.IsAssignableFrom(type))
+            .Select(type => (IRuntimeLoadedScript)Activator.CreateInstance(type))
+            .ToList();
+    }
+
+    private List<Type> GetRuntimeLoadedScriptImplementations(bool logExceptions)
+    {
+        Type parent = typeof(IRuntimeLoadedScript);
+        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        List<ReflectionTypeLoadException> exceptions = new();
+
+        List<Type> types = assemblies.SelectMany(assembly =>
         {
-            runtimeLoadedTypesAfter = CompilerWrapper
-                .CreateInstancesOf<IRuntimeLoadedScript>(IsModEnabled)
-                .Select(it => it.GetType())
-                .ToList();
-        }
-        catch (Exception ex)
+            Type[] typesOfAssembly;
+            try
+            {
+                typesOfAssembly = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                exceptions.Add(ex);
+
+                // Careful: types that could not be loaded are null in the array.
+                typesOfAssembly = ex.Types;
+            }
+
+            return typesOfAssembly.Where(type => type != null
+                                                 && !type.IsAbstract
+                                                 && !type.IsInterface
+                                                 && parent.IsAssignableFrom(type));
+        }).ToList();
+
+        if (logExceptions)
         {
-            throw new LoadModException($"Failed to instantiate runtime loaded scripts: {ex.Message}", ex);
+            // Only log duplicate messages once.
+            HashSet<string> loggedErrorMessages = new();
+            exceptions
+                .Distinct()
+                .ForEach(ex =>
+                {
+                    if (loggedErrorMessages.Contains(ex.Message))
+                    {
+                        return;
+                    }
+                    Debug.LogException(ex);
+                    loggedErrorMessages.Add(ex.Message);
+                });
         }
 
-        List<Type> newRuntimeLoadedTypes = runtimeLoadedTypesAfter.Except(runtimeLoadedTypesBefore).ToList();
-        foreach (Type type in newRuntimeLoadedTypes)
-        {
-            typeToSourceFile[type] = filePath;
-            typeToModFolder[type] = modFolder;
-        }
+        return types;
     }
 
     private void InstantiateScripts()
@@ -494,7 +546,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         List<IRuntimeLoadedScript> currentAndObsoleteRuntimeLoadedScripts;
         try
         {
-            currentAndObsoleteRuntimeLoadedScripts = CompilerWrapper.CreateInstancesOf<IRuntimeLoadedScript>(IsModEnabled);
+            currentAndObsoleteRuntimeLoadedScripts = CreateInstancesOfRuntimeLoadedScripts();
         }
         catch (Exception ex)
         {
