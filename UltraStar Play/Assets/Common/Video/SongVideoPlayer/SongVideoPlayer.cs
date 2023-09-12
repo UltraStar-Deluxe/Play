@@ -72,7 +72,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     private SongMeta loadedSongMeta;
 
     public bool IsLoaded => VideoSupportProvider is not EVideoSupportProvider.None;
-    public bool IsFullyLoaded => IsLoaded && DurationInMillis > 0;
+    public bool IsFullyLoaded => IsLoaded && DurationInMillis > 0 && loadedSongMeta != null;
 
     public double DurationInMillis { get; private set; }
 
@@ -570,6 +570,8 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                     if (videoPlayerErrorMessages.Count > 0)
                     {
                         UnloadVideo();
+                        loadedSongMeta = songMeta;
+
                         if (settings.VlcToPlayMediaFilesUsage
                             is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
                             or EThirdPartyLibraryUsage.Always)
