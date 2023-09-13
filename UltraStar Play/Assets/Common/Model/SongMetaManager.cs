@@ -425,13 +425,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static List<string> ScanForFiles(List<string> folders, List<string> fileExtensionPatterns)
     {
-        FolderScanner folderScanner = new(fileExtensionPatterns);
+        FileScanner fileScanner = new(fileExtensionPatterns, true, true);
         List<string> files = new();
         foreach (string songDir in folders)
         {
             try
             {
-                List<string> txtFilesInSongDir = folderScanner.GetFiles(songDir, true);
+                List<string> txtFilesInSongDir = fileScanner.GetFiles(songDir, true);
                 files.AddRange(txtFilesInSongDir);
             }
             catch (Exception ex)
@@ -468,8 +468,10 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return false;
         }
 
-        FolderScanner txtScanner = new("*.txt");
-        List<string> txtFiles = txtScanner.GetFiles(songFolder, true);
+        FileScanner txtScanner = new("*.txt", true, true);
+        List<string> txtFiles = txtScanner.GetFiles(songFolder, true)
+            .Where(txtFile => !string.Equals(Path.GetFileName(txtFile), "license.txt"))
+            .ToList();
 
         LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
         allSongMetas.AddRange(newSongMetas);
