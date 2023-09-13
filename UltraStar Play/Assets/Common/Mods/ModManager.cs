@@ -450,13 +450,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return IsModEnabled(mod.GetType());
     }
 
-    public List<string> GetModNames()
-    {
-        return GetModFolders()
-            .Select(modFolder => GetModName(modFolder))
-            .ToList();
-    }
-
     public List<string> GetModFolders()
     {
         List<string> modParentFolders = new()
@@ -482,6 +475,11 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     public List<T> GetModObjects<T>(string modFolder = null, bool onlyFromEnabledMods = true)
         where T : IMod
     {
+        if (settings.EnabledMods.IsNullOrEmpty())
+        {
+            return new List<T>();
+        }
+
         return modObjectToContext
             .Where(entry => modFolder == null
                 || modFolder == entry.Value.ModFolder)
