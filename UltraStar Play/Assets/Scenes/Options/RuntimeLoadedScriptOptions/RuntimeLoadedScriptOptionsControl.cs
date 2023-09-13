@@ -73,16 +73,16 @@ public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, IN
                 TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_intro) },
             { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_install_title),
                 TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_install,
-                    "modsFolderPath", RuntimeLoadedScriptManager.GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()) },
+                    "modsRootFolderPath", RuntimeLoadedScriptManager.GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()) },
             { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods_title),
                 TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods) },
-            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_scriptLoading_title),
-                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_scriptLoading) },
+            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_modLoading_title),
+                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_modLoading) },
         };
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_title),
             titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.action_openRuntimeLoadedScriptsFolder),
+        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.action_openModsRootFolder),
             _ => ApplicationUtils.OpenDirectory(RuntimeLoadedScriptManager.GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()));
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToRuntimeLoadedScripts)));

@@ -10,7 +10,7 @@ public static partial class R
         public static readonly string action_longPress = "action_longPress";
         public static readonly string action_navigateRight = "action_navigateRight";
         public static readonly string action_openContextMenu = "action_openContextMenu";
-        public static readonly string action_openRuntimeLoadedScriptsFolder = "action_openRuntimeLoadedScriptsFolder";
+        public static readonly string action_openModsRootFolder = "action_openModsRootFolder";
         public static readonly string action_openSongEditor = "action_openSongEditor";
         public static readonly string action_openSongFolder = "action_openSongFolder";
         public static readonly string action_openSongMenu = "action_openSongMenu";
@@ -182,8 +182,8 @@ public static partial class R
         public static readonly string options_runtimeLoadedScripts_helpDialog_install_title = "options_runtimeLoadedScripts_helpDialog_install_title";
         public static readonly string options_runtimeLoadedScripts_helpDialog_intro = "options_runtimeLoadedScripts_helpDialog_intro";
         public static readonly string options_runtimeLoadedScripts_helpDialog_intro_title = "options_runtimeLoadedScripts_helpDialog_intro_title";
-        public static readonly string options_runtimeLoadedScripts_helpDialog_scriptLoading = "options_runtimeLoadedScripts_helpDialog_scriptLoading";
-        public static readonly string options_runtimeLoadedScripts_helpDialog_scriptLoading_title = "options_runtimeLoadedScripts_helpDialog_scriptLoading_title";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_modLoading = "options_runtimeLoadedScripts_helpDialog_modLoading";
+        public static readonly string options_runtimeLoadedScripts_helpDialog_modLoading_title = "options_runtimeLoadedScripts_helpDialog_modLoading_title";
         public static readonly string options_runtimeLoadedScripts_helpDialog_title = "options_runtimeLoadedScripts_helpDialog_title";
         public static readonly string options_runtimeLoadedScripts_title = "options_runtimeLoadedScripts_title";
         public static readonly string options_sampleRate = "options_sampleRate";
