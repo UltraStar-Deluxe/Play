@@ -22,13 +22,17 @@ using Enum = System.Enum;
 
 public class CompilerWrapper
 {
-    private Evaluator _evaluator;
-    private CompilerContext _context;
-    private StringBuilder _report;
+    private readonly Evaluator evaluator;
+    private readonly CompilerContext context;
+    private readonly CompilerWrapperReportPrinter reportPrinter;
 
-    public int ErrorsCount { get { return _context.Report.Printer.ErrorsCount; } }
-    public int WarningsCount { get { return _context.Report.Printer.WarningsCount; } }
-    public string GetReport () { return _report.ToString(); }
+    public string PartialReport => reportPrinter.PartialReport;
+    public int PartialReportErrorCount => reportPrinter.PartialReportErrorCount;
+    public int PartialReportWarningCount => reportPrinter.PartialReportWarningCount;
+
+    public string FullReport => reportPrinter.FullReport;
+    public int FullReportErrorCount => reportPrinter.FullReportErrorCount;
+    public int FullReportWarningCount => reportPrinter.FullReportWarningCount;
 
     public CompilerWrapper () {
         // create new settings that will *not* load up all of standard lib by default
@@ -42,55 +46,40 @@ public class CompilerWrapper
             EnhancedWarnings = true,
             Checked = true,
             Stacktrace = true,
+            // GenerateDebugInfo = true,
         };
-        this._report = new StringBuilder();
-        this._context = new CompilerContext(settings, new StreamReportPrinter(new StringWriter(_report)));
+        this.reportPrinter = new CompilerWrapperReportPrinter();
+        this.context = new CompilerContext(settings, reportPrinter);
 
-        this._evaluator = new Evaluator(_context);
+        this.evaluator = new Evaluator(context);
 
         // ImportAllowedTypes(BuiltInTypes, AdditionalTypes, QuestionableTypes);
         ImportAllowedTypes(BuiltInTypes, AdditionalTypes);
     }
 
-    public void ReferenceCurrentAssembly()
-    {
-        this._evaluator.ReferenceAssembly(Assembly.GetExecutingAssembly());
-    }
-
     public void ReferenceAssembly(Assembly assembly)
     {
-        this._evaluator.ReferenceAssembly(assembly);
+        this.evaluator.ReferenceAssembly(assembly);
     }
 
-    /// <summary> Loads user code. Returns true on successful evaluation, or false on errors. </summary>
-    public bool Execute (string path) {
-        _report.Length = 0;
-        var code = File.ReadAllText(path);
-        return _evaluator.Run(code);
+    /// <summary> Evaluates code. Returns true on successful evaluation, or false on errors. </summary>
+    public bool EvaluateCode(string code)
+    {
+        return evaluator.Run(code);
     }
 
-    /// <summary> Creates new instances of types that are children of the specified type. </summary>
-    public static List<T> CreateInstancesOf<T> (Func<Type, bool> typeFilter = null) {
-        var parent = typeof(T);
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-        var types = assemblies.SelectMany(assembly => {
-            return assembly.GetTypes().Where(type => {
-                return !(type.IsAbstract || type.IsInterface) && parent.IsAssignableFrom(type);
-            });
-        });
-        return types
-            .Where(type => typeFilter == null || typeFilter(type))
-            .Select(type => (T)Activator.CreateInstance(type))
-            .ToList();
+    public void StartNewPartialReport()
+    {
+        reportPrinter.StartNewPartialReport();
     }
 
     private void ImportAllowedTypes (params Type[][] allowedTypeArrays) {
         // expose Evaluator.importer and Evaluator.module
         var evtype = typeof(Evaluator);
         var importer = (ReflectionImporter)evtype
-            .GetField("importer", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(_evaluator);
+            .GetField("importer", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(evaluator);
         var module = (ModuleContainer)evtype
-            .GetField("module", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(_evaluator);
+            .GetField("module", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(evaluator);
 
         // expose MetadataImporter.ImportTypes(Type[], RootNamespace, bool)
         var importTypes = importer.GetType().GetMethod(
@@ -373,4 +362,41 @@ public class CompilerWrapper
 
     };
     #endregion
+
+    private class CompilerWrapperReportPrinter : ReportPrinter
+    {
+        private readonly ReportPrinter fullReportPrinter;
+        private readonly StringBuilder fullReportStringBuilder;
+
+        private StringBuilder partialReportStringBuilder;
+        private ReportPrinter partialReportPrinter;
+
+        public string FullReport => fullReportStringBuilder.ToString();
+        public int FullReportErrorCount => fullReportPrinter.ErrorsCount;
+        public int FullReportWarningCount => fullReportPrinter.WarningsCount;
+
+        public string PartialReport => partialReportStringBuilder.ToString();
+        public int PartialReportErrorCount => partialReportPrinter.ErrorsCount;
+        public int PartialReportWarningCount => partialReportPrinter.WarningsCount;
+
+        public CompilerWrapperReportPrinter()
+        {
+            fullReportStringBuilder = new StringBuilder();
+            fullReportPrinter = new StreamReportPrinter(new StringWriter(fullReportStringBuilder));
+
+            StartNewPartialReport();
+        }
+
+        public override void Print(AbstractMessage msg, bool showFullPath)
+        {
+            fullReportPrinter.Print(msg, showFullPath);
+            partialReportPrinter.Print(msg, showFullPath);
+        }
+
+        public void StartNewPartialReport()
+        {
+            partialReportStringBuilder = new StringBuilder();
+            partialReportPrinter = new StreamReportPrinter(new StringWriter(partialReportStringBuilder));
+        }
+    }
 }

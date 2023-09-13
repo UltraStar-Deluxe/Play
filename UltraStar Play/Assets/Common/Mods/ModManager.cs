@@ -41,7 +41,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             if (appDomainTypesChanged)
             {
                 appDomainTypesChanged = false;
-                modTypes = GetModTypes(true);
+                modTypes = GetModTypes(false);
             }
 
             return modTypes;
@@ -51,6 +51,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     private bool shouldReloadChangedMods;
     private readonly Dictionary<string, FileSystemWatcher> modFolderToFileSystemWatcher = new();
     private readonly List<string> changedCsFiles = new();
+
+    private readonly HashSet<string> failedToLoadModFolders = new();
 
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
@@ -306,7 +308,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnEnableMods(List<string> newlyEnabledModNames)
     {
-        Debug.Log($"Reloading mods because of newly enabled: {newlyEnabledModNames.ToCsv()}");
+        Debug.Log($"Reloading mods because of newly enabled mod: {newlyEnabledModNames.ToCsv()}");
         CreateOrUpdateModFolderFileSystemWatchers();
         LoadAndInstantiateScripts();
     }
@@ -318,6 +320,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnDisableMod(string modName)
     {
+        Debug.Log($"Calling OnDisableMod for mod '{modName}'");
         string modFolder = GetModFolderByModName(modName);
         List<IOnDisableMod> disableModHandlers = GetModObjects<IOnDisableMod>(modFolder, false);
         disableModHandlers.ForEach(disableModHandler =>
@@ -338,8 +341,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     {
         try
         {
-            LoadModIntoAppDomain();
-            InstantiateScripts();
+            LoadModsIntoAppDomain();
+            UpdateModObjects();
         }
         catch (Exception ex)
         {
@@ -350,34 +353,46 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void LoadModIntoAppDomain()
+    private void LoadModsIntoAppDomain()
     {
         if (settings.EnabledMods.IsNullOrEmpty())
         {
             return;
         }
 
+        failedToLoadModFolders.Clear();
+
         List<string> modFolders = GetModFolders();
         foreach (string modFolder in modFolders)
         {
             if (IsModEnabled(modFolder))
             {
-                Debug.Log($"Loading scripts from {modFolder}");
-                LoadModIntoAppDomain(modFolder);
+                string modName = GetModName(modFolder);
+
+                try
+                {
+                    LoadModIntoAppDomain(modFolder, modName);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to load mod '{modName}' into app domain: {ex.Message}");
+                    failedToLoadModFolders.Add(modFolder);
+                }
             }
         }
     }
 
-    private void CopyDefaultModToPersistentDataPath(string modName)
+    private void CopyDefaultModToPersistentDataPath(string modFolderName)
     {
         try
         {
-            string demoModSourceFolder = $"{GetAbsoluteDefaultModsRootFolder()}/{modName}";
-            string demoModTargetFolder = $"{GetAbsoluteUserDefinedModsRootFolder()}/{modName}";
+            string demoModSourceFolder = $"{GetAbsoluteDefaultModsRootFolder()}/{modFolderName}";
+            string demoModTargetFolder = $"{GetAbsoluteUserDefinedModsRootFolder()}/{modFolderName}";
             if (Directory.Exists(demoModSourceFolder)
                 && !Directory.Exists(demoModTargetFolder))
             {
-                Debug.Log($"Copying default mod '{modName}' to persistentDataPath (from: '{demoModSourceFolder}', to: '{demoModTargetFolder}')");
+                Debug.Log($"Copying default mod '{modFolderName}' to persistentDataPath (from: '{demoModSourceFolder}', to: '{demoModTargetFolder}')");
                 DirectoryUtils.CopyAll(demoModSourceFolder, demoModTargetFolder,
                     CopyDirectoryFilter.Exclude(path =>
                     {
@@ -390,13 +405,13 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             }
             else
             {
-                Debug.Log($"Not copying default mod '{modName}' to persistentDataPath because the target folder already exists.");
+                Debug.Log($"Not copying default mod '{modFolderName}' to persistentDataPath because the target folder already exists.");
             }
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError($"Failed to copy default mod '{modName}' to persistentDataPath.");
+            Debug.LogError($"Failed to copy default mod '{modFolderName}' to persistentDataPath.");
         }
     }
 
@@ -413,6 +428,21 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         return IsModEnabled(modFolder);
+    }
+
+    public bool IsModLoadedSuccessfully(string modFolder)
+    {
+        return !failedToLoadModFolders.Contains(modFolder);
+    }
+
+    private bool IsModLoadedSuccessfully(Type type)
+    {
+        if (!typeToModFolder.TryGetValue(type, out string modFolder))
+        {
+            return false;
+        }
+
+        return IsModLoadedSuccessfully(modFolder);
     }
 
     private bool IsModEnabled(IMod mod)
@@ -462,9 +492,10 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             .ToList();
     }
 
-    private void LoadModIntoAppDomain(string modFolder)
+    private void LoadModIntoAppDomain(string modFolder, string modName)
     {
-        using DisposableStopwatch d = new($"Loading mod '{GetModName(modFolder)}' into app domain took <ms> ms");
+        Debug.Log($"Loading mod '{modName}' into app domain");
+        using DisposableStopwatch d = new($"Loading mod '{modName}' into app domain took <ms> ms");
 
         List<string> exposedAssemblyNames = defaultExposedAssemblyNames.ToList();
         ModInfoJson modInfoJson = GetModInfo(modFolder);
@@ -496,7 +527,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         string[] csFilePaths = Directory.GetFiles(modFolder, "*.cs");
         foreach (string filePath in csFilePaths)
         {
-            LoadScriptFileIntoAppDomain(filePath, compilerWrapper);
+            LoadScriptFileIntoAppDomain(modName, filePath, compilerWrapper);
         }
 
         // Find types that are loaded from this mod folder
@@ -507,43 +538,58 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Check compilation was successful
-        string report = compilerWrapper.GetReport();
-        if (compilerWrapper.ErrorsCount > 0)
+        string fullReport = compilerWrapper.FullReport;
+        if (compilerWrapper.FullReportErrorCount > 0)
         {
-            Debug.LogError($"Failed to load scripts of '{GetModName(modFolder)}'. Compilation output:\n{report}");
+            Debug.LogError($"Failed to load scripts of mod '{modName}'. Full compilation output:\n{fullReport}");
         }
         else
         {
-            Debug.Log($"Successfully loaded scripts of '{GetModName(modFolder)}'. Compilation output:\n{report}");
+            Debug.Log($"Successfully loaded scripts of mod '{modName}'. Full compilation output:\n{fullReport}");
         }
     }
 
-    private void LoadScriptFileIntoAppDomain(string filePath, CompilerWrapper compilerWrapper)
+    private void LoadScriptFileIntoAppDomain(string modName, string filePath, CompilerWrapper compilerWrapper)
     {
-        // Find the types that are implemented by this file.
+        string fileName = Path.GetFileName(filePath);
+
         try
         {
-            compilerWrapper.Execute(filePath);
-            appDomainTypesChanged = true;
+            compilerWrapper.StartNewPartialReport();
+
+            string code = File.ReadAllText(filePath);
+            compilerWrapper.EvaluateCode(code);
         }
         catch (Exception ex)
         {
-            throw new LoadModException($"Failed to load '{filePath}': {ex.Message}", ex);
+            throw new LoadModException($"Failed to load file '{fileName}' of mod '{modName}'. " +
+                                       $"Compilation output of the file:\n{compilerWrapper.PartialReport}", ex);
+        }
+
+        if (compilerWrapper.PartialReportErrorCount > 0)
+        {
+            throw new LoadModException($"Errors in file '{fileName}' of mod '{modName}'. " +
+                                       $"Compilation output of the file:\n{compilerWrapper.PartialReport}");
         }
     }
 
-    private List<IMod> CreateEnabledModTypeInstances()
+    private List<IMod> CreateModObjects()
     {
         Type parent = typeof(IMod);
         return ModTypes
-            .Where(type => parent.IsAssignableFrom(type))
-            .Where(type => IsModEnabled(type))
+            .Where(type => parent.IsAssignableFrom(type)
+                           && IsModEnabled(type)
+                           && IsModLoadedSuccessfully(type))
             .Select(type => (IMod)Activator.CreateInstance(type))
             .ToList();
     }
 
     private List<Type> GetModTypes(bool logExceptions)
     {
+        Debug.Log("Searching mod types in app domain.");
+
+        using DisposableStopwatch d = new($"Searching mod types in app domain took <ms> ms");
+
         Type parent = typeof(IMod);
         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
         List<ReflectionTypeLoadException> exceptions = new();
@@ -589,7 +635,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return types;
     }
 
-    private void InstantiateScripts()
+    private void UpdateModObjects()
     {
         using DisposableStopwatch d = new($"Instantiate runtime loaded scripts took <ms> ms");
 
@@ -597,7 +643,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         List<IMod> currentAndObsoleteModObjects;
         try
         {
-            currentAndObsoleteModObjects = CreateEnabledModTypeInstances();
+            currentAndObsoleteModObjects = CreateModObjects();
         }
         catch (Exception ex)
         {

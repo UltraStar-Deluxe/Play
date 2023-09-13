@@ -9,7 +9,7 @@ public class MODNAMEModSettings : IModSettings
     public bool myBool = true;
     public double myDouble = 12.34;
     public int myInt = 42;
-    public string myString = "some text";
+    public string myString = "text";
 
     public List<IModSettingControl> GetModSettingControls()
     {
