@@ -48,7 +48,17 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static int targetSongCount;
     public static int LoadedSongsCount => allSongMetas.Count;
-    public static double LoadedSongsPercent => 100.0 * allSongMetas.Count / targetSongCount;
+    public static double LoadedSongsPercent
+    {
+        get
+        {
+            if (targetSongCount <= 0)
+            {
+                return 0;
+            }
+            return 100.0 * allSongMetas.Count / targetSongCount;
+        }
+    }
 
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
@@ -64,6 +74,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     {
         lock (scanLock)
         {
+            targetSongCount = 0;
             allSongMetas = new ConcurrentBag<SongMeta>();
             allSongIssues = new ConcurrentBag<SongIssue>();
             isSongScanStarted = false;
@@ -202,30 +213,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return;
         }
 
-        List<string> txtFiles;
-        List<string> audioFiles;
-        lock (scanLock)
-        {
-            // Find all txt and audio files in configured song folders and the generated song folder
-            List<string> allSongFolders = EnabledSongFolders
-                .Union(new List<string> { generatedSongFolderAbsolutePath })
-                .ToList();
-            txtFiles = ScanForFiles(allSongFolders, new List<string> { "*.txt" });
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
-            // Only search for audio files in configured song folders, not in the generated song folder
-            audioFiles = ScanForFiles(EnabledSongFolders, GetAudioFileExtensionPatterns());
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
-            targetSongCount = txtFiles.Count;
-        }
-
         // Load the txt files in a background thread
         ThreadPool.QueueUserWorkItem(poolHandle =>
         {
@@ -233,18 +220,39 @@ public class SongMetaManager : AbstractSingletonBehaviour
             stopwatch.Start();
 
             Debug.Log("Started song-scan-thread.");
+
             lock (scanLock)
             {
-                if (!cancellationToken.IsCancellationRequested)
+                // Find all txt and audio files in configured song folders and the generated song folder
+                List<string> allSongFolders = EnabledSongFolders
+                    .Union(new List<string> { generatedSongFolderAbsolutePath })
+                    .ToList();
+                List<string> txtFiles = ScanForFiles(allSongFolders, new List<string> { "*.txt" });
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    // Split the txt files into chunks and load them in parallel
-                    LoadAndAddSongMetasFromTxtFiles(txtFiles, cancellationToken);
+                    return;
                 }
+                targetSongCount += txtFiles.Count;
 
                 if (!cancellationToken.IsCancellationRequested)
                 {
-                    // Generate song meta for audio files that do not have a corresponding SongMeta.
-                    GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, audioFiles, allSongMetas.ToList());
+                    LoadAndAddSongMetasFromTxtFiles(txtFiles, cancellationToken);
+                }
+
+                // Only search for audio files in configured song folders, not in the generated song folder
+                if (settings.SearchAudioFilesWithoutSongMeta)
+                {
+                    List<string> audioFiles = ScanForFiles(EnabledSongFolders, GetAudioFileExtensionPatterns());
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        // Generate song meta for audio files that do not have a corresponding SongMeta.
+                        GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, audioFiles, allSongMetas.ToList());
+                    }
                 }
 
                 isSongScanFinished = true;
@@ -427,19 +435,20 @@ public class SongMetaManager : AbstractSingletonBehaviour
     {
         FileScanner fileScanner = new(fileExtensionPatterns, true, true);
         List<string> files = new();
-        foreach (string songDir in folders)
+        foreach (string folder in folders)
         {
             try
             {
-                List<string> txtFilesInSongDir = fileScanner.GetFiles(songDir, true);
+                List<string> txtFilesInSongDir = fileScanner.GetFiles(folder, true);
                 files.AddRange(txtFilesInSongDir);
+
+                Log.Debug(() => $"Found {txtFilesInSongDir.Count} files matching patterns {fileExtensionPatterns.ToCsv(", ")} in folder: '{folder}'");
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
             }
         }
-        Log.Verbose(() => $"Found {files.Count} files matching pattern {fileExtensionPatterns.ToCsv()} in folders: {folders.ToCsv()}");
         return files;
     }
 
@@ -516,7 +525,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 }
 
                 if (newSongMeta.Background.IsNullOrEmpty()
-                    && TryFindCoverImageInSameFolder(newSongMeta.Directory, out string backgroundImage))
+                    && TryFindBackgroundImageInSameFolder(newSongMeta.Directory, out string backgroundImage))
                 {
                     newSongMeta.Background = Path.GetFileName(backgroundImage);
                 }
@@ -558,7 +567,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private bool TryFindCoverImageInSameFolder(string folder, out string imageFile)
     {
-        if (!TryFindImagesFiles(folder, out List<string> imageFiles))
+        if (!settings.SearchMissingCoverAndBackgroundImageInSongFolder
+            || !TryFindImagesFiles(folder, out List<string> imageFiles))
         {
             imageFile = "";
             return false;
@@ -575,7 +585,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private bool TryFindBackgroundImageInSameFolder(string folder, out string imageFile)
     {
-        if (!TryFindImagesFiles(folder, out List<string> imageFiles))
+        if (!settings.SearchMissingCoverAndBackgroundImageInSongFolder
+            || !TryFindImagesFiles(folder, out List<string> imageFiles))
         {
             imageFile = "";
             return false;
