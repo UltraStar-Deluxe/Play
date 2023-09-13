@@ -12,7 +12,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, INeedInjection, IBinder
+public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IBinder
 {
     [InjectedInInspector]
     public VisualTreeAsset modEntryUi;
@@ -75,23 +75,23 @@ public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, IN
     {
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_intro_title),
-                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_intro) },
-            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_install_title),
-                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_install,
+            { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_intro_title),
+                TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_intro) },
+            { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_install_title),
+                TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_install,
                     "modsRootFolderPath", ModManager.GetAbsoluteUserDefinedModsRootFolder()) },
-            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods_title),
-                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods) },
-            { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_modLoading_title),
-                TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_modLoading) },
+            { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_developMods_title),
+                TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_developMods) },
+            { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_modLoading_title),
+                TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_modLoading) },
         };
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_title),
+            TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.action_openModsRootFolder),
             _ => ApplicationUtils.OpenDirectory(ModManager.GetAbsoluteUserDefinedModsRootFolder()));
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToRuntimeLoadedScripts)));
+            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToMods)));
         return helpDialogControl;
     }
 

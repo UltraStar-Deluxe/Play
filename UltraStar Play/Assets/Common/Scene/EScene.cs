@@ -26,7 +26,7 @@
     CompanionAppOptionsScene = 19,
     SongLibraryOptionsScene = 20,
     WebcamOptionsSecene = 22,
-    RuntimeLoadedScriptOptionsScene = 26,
+    ModOptionsScene = 26,
 
     // sing
     SingScene = 11,

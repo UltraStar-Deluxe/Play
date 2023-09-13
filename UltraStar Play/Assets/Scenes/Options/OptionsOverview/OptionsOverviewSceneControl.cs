@@ -61,8 +61,8 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.webcamOptionsButton)]
     private ToggleButton webcamOptionsButton;
 
-    [Inject(UxmlName = R.UxmlNames.runtimeLoadedScriptOptionsButton)]
-    private ToggleButton runtimeLoadedScriptOptionsButton;
+    [Inject(UxmlName = R.UxmlNames.modOptionsButton)]
+    private ToggleButton modOptionsButton;
 
     [Inject(UxmlName = R.UxmlNames.songSettingsProblemHintIcon)]
     private VisualElement songSettingsProblemHintIcon;
@@ -301,7 +301,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToShortNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_button));
         sceneToShortNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_button));
         sceneToShortNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_button));
-        sceneToShortNameMap.Add(EScene.RuntimeLoadedScriptOptionsScene, TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_button));
+        sceneToShortNameMap.Add(EScene.ModOptionsScene, TranslationManager.GetTranslation(R.Messages.options_mod_button));
 
         sceneToLongNameMap.Clear();
         sceneToLongNameMap.Add(EScene.OptionsGameScene, TranslationManager.GetTranslation(R.Messages.options_game_title));
@@ -315,7 +315,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToLongNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_title));
         sceneToLongNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_title));
         sceneToLongNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_title));
-        sceneToLongNameMap.Add(EScene.RuntimeLoadedScriptOptionsScene, TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_title));
+        sceneToLongNameMap.Add(EScene.ModOptionsScene, TranslationManager.GetTranslation(R.Messages.options_mod_title));
     }
 
     private void UpdateSceneToButtonMap()
@@ -331,7 +331,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToButtonMap.Add(EScene.CompanionAppOptionsScene, appOptionsButton);
         sceneToButtonMap.Add(EScene.DevelopmentOptionsScene, developerOptionsButton);
         sceneToButtonMap.Add(EScene.WebcamOptionsSecene, webcamOptionsButton);
-        sceneToButtonMap.Add(EScene.RuntimeLoadedScriptOptionsScene, runtimeLoadedScriptOptionsButton);
+        sceneToButtonMap.Add(EScene.ModOptionsScene, modOptionsButton);
     }
 
     public List<IBinding> GetBindings()

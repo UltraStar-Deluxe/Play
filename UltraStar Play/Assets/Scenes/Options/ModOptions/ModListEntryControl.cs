@@ -161,10 +161,11 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         modDependenciesContainer.Clear();
         if (modInfoJson.requires.IsNullOrEmpty())
         {
-            modDependenciesContainer.Add(new Label($"Requires only default app domain libraries."));
+            modDependenciesContainer.Add(new Label($"Requires default app domain libraries."));
         }
         else
         {
+            modDependenciesContainer.Add(new Label($"Requires default app domain libraries and the following"));
             foreach (string require in modInfoJson.requires)
             {
                 modDependenciesContainer.Add(new Label($"• {require}"));

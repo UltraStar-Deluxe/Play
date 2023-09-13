@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8964551586559057805}
   - component: {fileID: 695200022125145158}
   m_Layer: 0
-  m_Name: RuntimeLoadedScriptOptionsControl
+  m_Name: ModOptionsControl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -408,6 +408,7 @@ public static partial class R
         public const string modList = "modList";
         public const string modListEntryInactiveOverlay = "modListEntryInactiveOverlay";
         public const string modNameLabel = "modNameLabel";
+        public const string modOptionsButton = "modOptionsButton";
         public const string modSettingsButton = "modSettingsButton";
         public const string modSettingsIcon = "modSettingsIcon";
         public const string modTrustWarningContainer = "modTrustWarningContainer";
@@ -627,7 +628,6 @@ public static partial class R
         public const string root = "root";
         public const string roundCountItemPicker = "roundCountItemPicker";
         public const string row = "row";
-        public const string runtimeLoadedScriptOptionsButton = "runtimeLoadedScriptOptionsButton";
         public const string sampleRatePicker = "sampleRatePicker";
         public const string saveButton = "saveButton";
         public const string sceneChangeAnimationPicker = "sceneChangeAnimationPicker";

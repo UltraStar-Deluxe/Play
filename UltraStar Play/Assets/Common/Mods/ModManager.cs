@@ -666,9 +666,9 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         // Load mod settings
-        foreach (IMod runtimeLoadedScript in currentModObjects)
+        foreach (IMod modObject in currentModObjects)
         {
-            if (runtimeLoadedScript is IModSettings modSettings)
+            if (modObject is IModSettings modSettings)
             {
                 try
                 {
@@ -686,11 +686,11 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         List<IAutoBoundMod> autoBoundScripts = currentModObjects
             .OfType<IAutoBoundMod>()
             .ToList();
-        foreach (IMod runtimeLoadedScript in currentModObjects)
+        foreach (IMod modObject in currentModObjects)
         {
-            ModObjectContext modObjectContext = modObjectToContext[runtimeLoadedScript];
+            ModObjectContext modObjectContext = modObjectToContext[modObject];
 
-            string modFolder = GetModFolder(runtimeLoadedScript);
+            string modFolder = GetModFolder(modObject);
             ModContext modContext = GetOrCreateModContext(modFolder);
 
             Injector childInjector = injector
@@ -703,7 +703,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 childInjector.AddBinding(new Binding(autoBoundScript.GetType(), modSettingsProvider));
             }
 
-            childInjector.Inject(runtimeLoadedScript);
+            childInjector.Inject(modObject);
         }
 
         // Execute mod actions
