@@ -469,9 +469,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         FileScanner txtScanner = new("*.txt", true, true);
-        List<string> txtFiles = txtScanner.GetFiles(songFolder, true)
-            .Where(txtFile => !string.Equals(Path.GetFileName(txtFile), "license.txt"))
-            .ToList();
+        List<string> txtFiles = txtScanner.GetFiles(songFolder, true);
 
         LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
         allSongMetas.AddRange(newSongMetas);
@@ -485,6 +483,15 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private bool TryLoadSongMetaFromFile(string path, out SongMeta songMeta, out List<SongIssue> songIssues)
     {
+        string fileName = Path.GetFileName(path);
+        List<string> ignoredFileNames = new() { "license.txt" };
+        if (ignoredFileNames.AnyMatch(ignoredFileName => string.Equals(fileName, ignoredFileName)))
+        {
+            songMeta = null;
+            songIssues = new List<SongIssue>();
+            return false;
+        }
+
         songIssues = new List<SongIssue>();
         try
         {
