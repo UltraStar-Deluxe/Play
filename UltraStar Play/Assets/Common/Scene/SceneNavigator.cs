@@ -37,9 +37,11 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private SceneRecipeManager sceneRecipeManager;
-    
+
     public bool logSceneChangeDuration;
-    
+
+    public EScene CurrentScene => sceneRecipeManager.GetCurrentScene();
+
     protected override object GetInstance()
     {
         return Instance;
@@ -99,7 +101,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     private void DoChangeScene(EScene currentScene, EScene targetScene)
     {
         sceneRecipeManager.UnloadScene();
-        
+
         SceneRecipe sceneRecipe = sceneRecipeManager.GetSceneRecipe(targetScene);
         if (sceneRecipe != null
             && currentScene != EScene.SongEditorScene)
