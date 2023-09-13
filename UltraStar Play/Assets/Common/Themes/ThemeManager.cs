@@ -307,9 +307,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private StyleSheet LoadAndCacheStyleSheet(string styleSheetFile)
     {
         string styleSheetContent = File.ReadAllText(styleSheetFile);
-        StyleSheet styleSheet = new();
-        new CustomStyleSheetImporterImpl().BuildStyleSheet(styleSheet, styleSheetContent);
-
+        StyleSheet styleSheet = StyleSheetUtils.CreateStyleSheet(styleSheetContent);
         filePathToStyleSheet[styleSheetFile] = styleSheet;
 
         AddStyleSheetFileSystemWatcher(styleSheetFile, styleSheet);
