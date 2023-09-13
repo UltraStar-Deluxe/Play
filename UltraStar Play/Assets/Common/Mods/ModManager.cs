@@ -475,7 +475,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     public List<T> GetModObjects<T>(string modFolder = null, bool onlyFromEnabledMods = true)
         where T : IMod
     {
-        if (settings.EnabledMods.IsNullOrEmpty())
+        if (settings.EnabledMods.IsNullOrEmpty()
+            && onlyFromEnabledMods)
         {
             return new List<T>();
         }
