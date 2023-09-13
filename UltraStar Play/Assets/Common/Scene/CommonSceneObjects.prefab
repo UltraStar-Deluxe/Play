@@ -849,7 +849,7 @@ GameObject:
   - component: {fileID: 2864457408354748035}
   - component: {fileID: 8533154349211823810}
   m_Layer: 5
-  m_Name: RuntimeLoadedScriptManager
+  m_Name: ModManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

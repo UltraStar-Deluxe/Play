@@ -27,7 +27,7 @@ public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, IN
     private UiManager uiManager;
 
     [Inject]
-    private RuntimeLoadedScriptManager runtimeLoadedScriptManager;
+    private ModManager modManager;
 
     [Inject(UxmlName = R.UxmlNames.modList)]
     private VisualElement modList;
@@ -43,7 +43,13 @@ public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, IN
     {
         modList.Clear();
 
-        List<string> modFolders = runtimeLoadedScriptManager.GetModFolders();
+        List<string> modFolders = modManager.GetModFolders();
+        if (modFolders.IsNullOrEmpty())
+        {
+            modList.Add(new Label("No mods found."));
+            return;
+        }
+
         modFolders.ForEach(modFolder =>
         {
             ModListEntryControl modListEntryControl = CreateModListEntry(modFolder);
@@ -73,7 +79,7 @@ public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, IN
                 TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_intro) },
             { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_install_title),
                 TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_install,
-                    "modsRootFolderPath", RuntimeLoadedScriptManager.GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()) },
+                    "modsRootFolderPath", ModManager.GetAbsoluteUserDefinedModsRootFolder()) },
             { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods_title),
                 TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_developMods) },
             { TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_modLoading_title),
@@ -83,7 +89,7 @@ public class RuntimeLoadedScriptOptionsControl : AbstractOptionsSceneControl, IN
             TranslationManager.GetTranslation(R.Messages.options_runtimeLoadedScripts_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.action_openModsRootFolder),
-            _ => ApplicationUtils.OpenDirectory(RuntimeLoadedScriptManager.GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()));
+            _ => ApplicationUtils.OpenDirectory(ModManager.GetAbsoluteUserDefinedModsRootFolder()));
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToRuntimeLoadedScripts)));
         return helpDialogControl;

@@ -10,7 +10,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     public Settings settings;
 
     [Inject]
-    public RuntimeLoadedScriptManager runtimeLoadedScriptManager;
+    public ModManager modManager;
 
     [Inject]
     public UiManager uiManager;
@@ -49,14 +49,14 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         {
             if (modName.IsNullOrEmpty())
             {
-                modName = RuntimeLoadedScriptManager.GetModName(ModFolder);
+                modName = ModManager.GetModName(ModFolder);
             }
 
             return modName;
         }
     }
 
-    private bool IsModEnabled => runtimeLoadedScriptManager.IsModEnabled(ModFolder);
+    private bool IsModEnabled => modManager.IsModEnabled(ModFolder);
 
     private MessageDialogControl modInfoDialogControl;
     private MessageDialogControl modSettingsDialogControl;
@@ -97,7 +97,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        List<IModSettings> allModSettings = runtimeLoadedScriptManager.GetCurrentRuntimeLoadedInstances<IModSettings>(ModFolder);
+        List<IModSettings> allModSettings = modManager.GetModObjects<IModSettings>(ModFolder);
         if (allModSettings.IsNullOrEmpty())
         {
             UiManager.CreateNotification("This mod has no settings.");
@@ -135,7 +135,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             _ => modInfoDialogControl.CloseDialog());
         modInfoDialogControl.DialogClosedEventStream.Subscribe(_ => modInfoDialogControl = null);
 
-        ModInfoJson modInfoJson = RuntimeLoadedScriptManager.GetModInfo(ModFolder);
+        ModInfoJson modInfoJson = ModManager.GetModInfo(ModFolder);
         if (modInfoJson == null)
         {
             string noModInfoText = "No description available." +

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public interface IModSettings : IAutoBoundRuntimeLoadedScript
+public interface IModSettings : IAutoBoundMod
 {
     public List<IModSettingControl> GetModSettingControls();
 }

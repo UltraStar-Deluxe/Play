@@ -11,11 +11,11 @@ using UnityEngine;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjection
+public class ModManager : AbstractSingletonBehaviour, INeedInjection
 {
-    public static RuntimeLoadedScriptManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<RuntimeLoadedScriptManager>();
+    public static ModManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ModManager>();
 
-    private const string RuntimeLoadedScriptsFolderName = "RuntimeLoadedScripts";
+    private const string ModsRootFolderName = "Mods";
     private const string TemplateModName = "TemplateMod";
     private const string TemplateModNamePlaceholder = "MODNAME";
     private const string TemplateModDllFolderPlaceholder = "DEFAULT_DLL_FOLDER";
@@ -26,25 +26,25 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     [Inject]
     private Settings settings;
 
-    private readonly Dictionary<IRuntimeLoadedScript,RuntimeLoadedScriptContext> scriptToContext = new();
+    private readonly Dictionary<IMod, ModObjectContext> modObjectToContext = new();
     private readonly Dictionary<Type, string> typeToModFolder = new();
     private readonly Dictionary<string, ModContext> modFolderToModContext = new();
 
     private List<string> lastEnabledMods = new();
 
     private bool appDomainTypesChanged = true;
-    private List<Type> runtimeLoadedScriptImplementations = new();
-    private List<Type> RuntimeLoadedScriptImplementations
+    private List<Type> modTypes = new();
+    private List<Type> ModTypes
     {
         get
         {
             if (appDomainTypesChanged)
             {
                 appDomainTypesChanged = false;
-                runtimeLoadedScriptImplementations = GetRuntimeLoadedScriptImplementations(true);
+                modTypes = GetModTypes(true);
             }
 
-            return runtimeLoadedScriptImplementations;
+            return modTypes;
         }
     }
 
@@ -89,8 +89,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     protected override void StartSingleton()
     {
-        DirectoryUtils.CreateDirectory(GetAbsoluteDefaultRuntimeLoadedScriptsFolder());
-        DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder());
+        DirectoryUtils.CreateDirectory(GetAbsoluteDefaultModsRootFolder());
+        DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedModsRootFolder());
 
         // CopyDefaultModToPersistentDataPath("DemoMod");
 
@@ -175,7 +175,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         DebugLogConsole.AddCommand("mod.path", "Copy and log path to folders with runtime loaded scripts",
             () =>
             {
-                string text = GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder();
+                string text = GetAbsoluteUserDefinedModsRootFolder();
                 ClipboardUtils.CopyToClipboard(text);
                 Debug.Log($"Mods folder: {text}");
             });
@@ -199,16 +199,16 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             });
 
         DebugLogConsole.AddCommand("mod.create", "Create a new mod with the given name from template",
-            (string modName) => CreateModFromTemplate(modName),
+            (string modName) => CreateModFolderFromTemplate(modName),
             "name");
 
-        DebugLogConsole.AddCommand("mod.interfaces", "Copy and log all IRuntimeLoadedScript subtypes that can be implemented in a mod.",
+        DebugLogConsole.AddCommand("mod.interfaces", "Copy and log all mod interfaces.",
             () =>
             {
-                List<Type> runtimeLoadedScriptSubtypes = GetRuntimeLoadedScriptInterfaces();
-                string text = runtimeLoadedScriptSubtypes.Select(type => type.Name).ToCsv(", ", "", "");
+                List<Type> modTypes = GetModInterfaces();
+                string text = modTypes.Select(type => type.Name).ToCsv(", ", "", "");
                 ClipboardUtils.CopyToClipboard(text);
-                Debug.Log($"Subtypes of IRuntimeLoadedScript: {text}");
+                Debug.Log($"Mod interfaces: {text}");
             });
 
         DebugLogConsole.AddCommand("mod.reloadOnChange", "Toggle auto reload of mods when a .cs file in a mod folder changes.",
@@ -219,18 +219,18 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             });
     }
 
-    private List<Type> GetRuntimeLoadedScriptInterfaces()
+    private List<Type> GetModInterfaces()
     {
         return AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(domainAssembly => domainAssembly.GetTypes())
             .Where(type => type.IsInterface
-                           && typeof(IRuntimeLoadedScript).IsAssignableFrom(type))
+                           && typeof(IMod).IsAssignableFrom(type))
             .ToList();
     }
 
-    private void CreateModFromTemplate(string modName)
+    private void CreateModFolderFromTemplate(string modName)
     {
-        string targetModFolder = $"{GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()}/{modName}";
+        string targetModFolder = $"{GetAbsoluteUserDefinedModsRootFolder()}/{modName}";
         DirectoryInfo targetModFolderInfo = new(targetModFolder);
         if (targetModFolderInfo.Exists)
         {
@@ -239,7 +239,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             return;
         }
 
-        string templateModFolder = ApplicationUtils.GetStreamingAssetsPath($"{RuntimeLoadedScriptsFolderName}/{TemplateModName}");
+        string templateModFolder = ApplicationUtils.GetStreamingAssetsPath($"{ModsRootFolderName}/{TemplateModName}");
         if (!Directory.Exists(templateModFolder))
         {
             throw new Exception($"Template mod folder not found: '{templateModFolder}'");
@@ -319,7 +319,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     private void OnDisableMod(string modName)
     {
         string modFolder = GetModFolderByModName(modName);
-        List<IOnDisableMod> disableModHandlers = GetCurrentRuntimeLoadedInstances<IOnDisableMod>(modFolder, false);
+        List<IOnDisableMod> disableModHandlers = GetModObjects<IOnDisableMod>(modFolder, false);
         disableModHandlers.ForEach(disableModHandler =>
         {
             try
@@ -338,7 +338,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     {
         try
         {
-            LoadScriptsIntoAppDomain();
+            LoadModIntoAppDomain();
             InstantiateScripts();
         }
         catch (Exception ex)
@@ -350,7 +350,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
-    private void LoadScriptsIntoAppDomain()
+    private void LoadModIntoAppDomain()
     {
         if (settings.EnabledMods.IsNullOrEmpty())
         {
@@ -363,7 +363,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             if (IsModEnabled(modFolder))
             {
                 Debug.Log($"Loading scripts from {modFolder}");
-                LoadScriptsIntoAppDomain(modFolder);
+                LoadModIntoAppDomain(modFolder);
             }
         }
     }
@@ -372,8 +372,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     {
         try
         {
-            string demoModSourceFolder = $"{GetAbsoluteDefaultRuntimeLoadedScriptsFolder()}/{modName}";
-            string demoModTargetFolder = $"{GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()}/{modName}";
+            string demoModSourceFolder = $"{GetAbsoluteDefaultModsRootFolder()}/{modName}";
+            string demoModTargetFolder = $"{GetAbsoluteUserDefinedModsRootFolder()}/{modName}";
             if (Directory.Exists(demoModSourceFolder)
                 && !Directory.Exists(demoModTargetFolder))
             {
@@ -415,9 +415,9 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         return IsModEnabled(modFolder);
     }
 
-    private bool IsModEnabled(IRuntimeLoadedScript runtimeLoadedScript)
+    private bool IsModEnabled(IMod mod)
     {
-        return IsModEnabled(runtimeLoadedScript.GetType());
+        return IsModEnabled(mod.GetType());
     }
 
     public List<string> GetModNames()
@@ -431,7 +431,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
     {
         List<string> modParentFolders = new()
         {
-            GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder(),
+            GetAbsoluteUserDefinedModsRootFolder(),
         };
 
         return modParentFolders
@@ -439,7 +439,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             .ToList();
     }
 
-    private string GetModFolder(IRuntimeLoadedScript script)
+    private string GetModFolder(IMod script)
     {
         if (typeToModFolder.TryGetValue(script.GetType(), out string modFolder))
         {
@@ -449,20 +449,20 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         return "";
     }
 
-    public List<T> GetCurrentRuntimeLoadedInstances<T>(string modFolder = null, bool onlyFromEnabledMods = true)
-        where T : IRuntimeLoadedScript
+    public List<T> GetModObjects<T>(string modFolder = null, bool onlyFromEnabledMods = true)
+        where T : IMod
     {
-        return scriptToContext
+        return modObjectToContext
             .Where(entry => modFolder == null
                 || modFolder == entry.Value.ModFolder)
-            .Where(entry => !entry.Value.IsInstanceObsolete
+            .Where(entry => !entry.Value.IsObsolete
                             && entry.Key is T)
             .Where(entry => !onlyFromEnabledMods || IsModEnabled(entry.Key))
             .Select(entry => (T)entry.Key)
             .ToList();
     }
 
-    private void LoadScriptsIntoAppDomain(string modFolder)
+    private void LoadModIntoAppDomain(string modFolder)
     {
         using DisposableStopwatch d = new($"Loading mod '{GetModName(modFolder)}' into app domain took <ms> ms");
 
@@ -481,7 +481,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         appDomainTypesChanged = true;
 
         // Find types that are loaded from this mod folder
-        List<Type> typesBefore = GetRuntimeLoadedScriptImplementations(false);
+        List<Type> typesBefore = GetModTypes(false);
 
         // Load libraries in folder
         string[] externalDllFiles = Directory.GetFiles(modFolder, "*.dll", SearchOption.AllDirectories);
@@ -500,7 +500,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
 
         // Find types that are loaded from this mod folder
-        List<Type> typesAfter = GetRuntimeLoadedScriptImplementations(false);
+        List<Type> typesAfter = GetModTypes(false);
         foreach (Type type in typesAfter.Except(typesBefore))
         {
             typeToModFolder[type] = modFolder;
@@ -532,18 +532,19 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
-    private List<IRuntimeLoadedScript> CreateInstancesOfRuntimeLoadedScripts()
+    private List<IMod> CreateEnabledModTypeInstances()
     {
-        Type parent = typeof(IRuntimeLoadedScript);
-        return RuntimeLoadedScriptImplementations
+        Type parent = typeof(IMod);
+        return ModTypes
             .Where(type => parent.IsAssignableFrom(type))
-            .Select(type => (IRuntimeLoadedScript)Activator.CreateInstance(type))
+            .Where(type => IsModEnabled(type))
+            .Select(type => (IMod)Activator.CreateInstance(type))
             .ToList();
     }
 
-    private List<Type> GetRuntimeLoadedScriptImplementations(bool logExceptions)
+    private List<Type> GetModTypes(bool logExceptions)
     {
-        Type parent = typeof(IRuntimeLoadedScript);
+        Type parent = typeof(IMod);
         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
         List<ReflectionTypeLoadException> exceptions = new();
 
@@ -593,33 +594,33 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         using DisposableStopwatch d = new($"Instantiate runtime loaded scripts took <ms> ms");
 
         // Instantiate new objects
-        List<IRuntimeLoadedScript> currentAndObsoleteRuntimeLoadedScripts;
+        List<IMod> currentAndObsoleteModObjects;
         try
         {
-            currentAndObsoleteRuntimeLoadedScripts = CreateInstancesOfRuntimeLoadedScripts();
+            currentAndObsoleteModObjects = CreateEnabledModTypeInstances();
         }
         catch (Exception ex)
         {
             throw new LoadModException($"Failed to instantiate runtime loaded scripts: {ex.Message}", ex);
         }
 
-        List<IRuntimeLoadedScript> currentRuntimeLoadedScripts = GetNewestImplementations(currentAndObsoleteRuntimeLoadedScripts);
+        List<IMod> currentModObjects = GetNewestImplementations(currentAndObsoleteModObjects);
 
         // Mark context of old instances as obsolete
-        scriptToContext
-            .Where(entry => !currentRuntimeLoadedScripts.Contains(entry.Key))
+        modObjectToContext
+            .Where(entry => !currentModObjects.Contains(entry.Key))
             .ForEach(entry => entry.Value.SetObsolete());
 
         // Create context for new instances
-        foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
+        foreach (IMod modObject in currentModObjects)
         {
-            string modFolder = GetModFolder(runtimeLoadedScript);
-            RuntimeLoadedScriptContext runtimeLoadedScriptContext = new(modFolder, false);
-            scriptToContext[runtimeLoadedScript] = runtimeLoadedScriptContext;
+            string modFolder = GetModFolder(modObject);
+            ModObjectContext modObjectContext = new(modFolder, false);
+            modObjectToContext[modObject] = modObjectContext;
         }
 
         // Load mod settings
-        foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
+        foreach (IMod runtimeLoadedScript in currentModObjects)
         {
             if (runtimeLoadedScript is IModSettings modSettings)
             {
@@ -636,12 +637,12 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
 
         // Bind then inject runtime loaded scripts
-        List<IAutoBoundRuntimeLoadedScript> autoBoundScripts = currentRuntimeLoadedScripts
-            .OfType<IAutoBoundRuntimeLoadedScript>()
+        List<IAutoBoundMod> autoBoundScripts = currentModObjects
+            .OfType<IAutoBoundMod>()
             .ToList();
-        foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
+        foreach (IMod runtimeLoadedScript in currentModObjects)
         {
-            RuntimeLoadedScriptContext runtimeLoadedScriptContext = scriptToContext[runtimeLoadedScript];
+            ModObjectContext modObjectContext = modObjectToContext[runtimeLoadedScript];
 
             string modFolder = GetModFolder(runtimeLoadedScript);
             ModContext modContext = GetOrCreateModContext(modFolder);
@@ -649,8 +650,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             Injector childInjector = injector
                 .CreateChildInjector()
                 .WithBindingForInstance(modContext)
-                .WithBindingForInstance(runtimeLoadedScriptContext);
-            foreach (IAutoBoundRuntimeLoadedScript autoBoundScript in autoBoundScripts)
+                .WithBindingForInstance(modObjectContext);
+            foreach (IAutoBoundMod autoBoundScript in autoBoundScripts)
             {
                 ExistingInstanceProvider<object> modSettingsProvider = new(autoBoundScript);
                 childInjector.AddBinding(new Binding(autoBoundScript.GetType(), modSettingsProvider));
@@ -659,12 +660,12 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
             childInjector.Inject(runtimeLoadedScript);
         }
 
-        // Run runnables
-        foreach (IRuntimeLoadedScript runtimeLoadedScript in currentRuntimeLoadedScripts)
+        // Execute mod actions
+        foreach (IMod modObject in currentModObjects)
         {
-            if (runtimeLoadedScript is IRuntimeLoadedRunnable runtimeLoadedRunnable)
+            if (modObject is IModAction modAction)
             {
-                runtimeLoadedRunnable.Run();
+                modAction.Invoke();
             }
         }
     }
@@ -708,7 +709,7 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
-    private void SaveModSettings(IRuntimeLoadedScript modSettings)
+    private void SaveModSettings(IMod modSettings)
     {
         string modFolder = GetModFolder(modSettings);
         if (modFolder.IsNullOrEmpty())
@@ -763,14 +764,14 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
         }
     }
 
-    public static string GetAbsoluteDefaultRuntimeLoadedScriptsFolder()
+    public static string GetAbsoluteDefaultModsRootFolder()
     {
-        return ApplicationUtils.GetStreamingAssetsPath(RuntimeLoadedScriptsFolderName);
+        return ApplicationUtils.GetStreamingAssetsPath(ModsRootFolderName);
     }
 
-    public static string GetAbsoluteUserDefinedRuntimeLoadedScriptsFolder()
+    public static string GetAbsoluteUserDefinedModsRootFolder()
     {
-        return ApplicationUtils.GetPersistentDataPath(RuntimeLoadedScriptsFolderName);
+        return ApplicationUtils.GetPersistentDataPath(ModsRootFolderName);
     }
 
     public static string GetModSettingsPath(string modFolder)
@@ -828,8 +829,8 @@ public class RuntimeLoadedScriptManager : AbstractSingletonBehaviour, INeedInjec
 
     private void SaveAllModSettings()
     {
-        scriptToContext
-            .Where(entry => !entry.Value.IsInstanceObsolete)
+        modObjectToContext
+            .Where(entry => !entry.Value.IsObsolete)
             .Select(entry => entry.Key)
             .OfType<IModSettings>()
             .ForEach(modSettings => SaveModSettings(modSettings));
