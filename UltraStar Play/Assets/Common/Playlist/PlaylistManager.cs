@@ -56,8 +56,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new();
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
 
-    private string FavoritesPlaylistFilePath => $"{PlaylistFolder}/{favoritesPlaylistName}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
-    private string PlaylistFolder => $"{Application.persistentDataPath}/Playlists";
+    private string favoritesPlaylistFilePath;
+    private string playlistFolder;
 
     [Inject]
     private Settings settings;
@@ -72,18 +72,20 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void AwakeSingleton()
     {
+        playlistFolder = $"{Application.persistentDataPath}/Playlists";
+        favoritesPlaylistFilePath = $"{playlistFolder}/{favoritesPlaylistName}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
         CreateFavoritePlaylistIfNotExist();
     }
 
     private void CreateFavoritePlaylistIfNotExist()
     {
-        if (!Directory.Exists(PlaylistFolder))
+        if (!Directory.Exists(playlistFolder))
         {
-            Directory.CreateDirectory(PlaylistFolder);
+            Directory.CreateDirectory(playlistFolder);
         }
-        if (!File.Exists(FavoritesPlaylistFilePath))
+        if (!File.Exists(favoritesPlaylistFilePath))
         {
-            File.WriteAllText(FavoritesPlaylistFilePath, "# UltraStar playlist");
+            File.WriteAllText(favoritesPlaylistFilePath, "# UltraStar playlist");
         }
     }
 
@@ -104,21 +106,27 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     private void ScanPlaylists()
     {
+        Debug.Log("Scanning playlists");
         using DisposableStopwatch d = new("Scanning playlists took <ms> ms");
 
         playlists = new List<IPlaylist>();
 
-        ScanPlaylistsInFolder(PlaylistFolder);
+        ScanPlaylistsInFolder(playlistFolder);
 
-        List<string> songFolders = SettingsUtils.GetEnabledSongFolders(settings);
-        foreach (string songFolder in songFolders)
+        // Scan for playlists in song folders on background thread.
+        ThreadPool.QueueUserWorkItem(_ =>
         {
-            ScanPlaylistsInFolder(songFolder);
-        }
+            List<string> songFolders = SettingsUtils.GetEnabledSongFolders(settings);
+            foreach (string songFolder in songFolders)
+            {
+                ScanPlaylistsInFolder(songFolder);
+            }
+        });
     }
 
     private void ScanPlaylistsInFolder(string folder)
     {
+        Debug.Log($"Scanning playlists in folder '{folder}'");
         using DisposableStopwatch d2 = new($"Scanning playlists in folder '{folder}' took <ms> ms");
 
         ScanUltraStarPlaylistsInFolder(folder);
@@ -158,7 +166,8 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         playlists.Add(playlist);
 
-        if (Path.GetFullPath(FavoritesPlaylistFilePath) == Path.GetFullPath(filePath))
+        if (playlist is UltraStarPlaylist
+            && Path.GetFullPath(favoritesPlaylistFilePath) == Path.GetFullPath(filePath))
         {
             // This is the special playlist for the favorite songs.
             favoritesPlaylist = playlist as UltraStarPlaylist;
@@ -329,7 +338,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
     public UltraStarPlaylist CreateNewPlaylist(string initialName)
     {
         string newPlaylistName = GetNewUniquePlaylistName(initialName);
-        string newPlaylistPath = $"{PlaylistFolder}/{newPlaylistName}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
+        string newPlaylistPath = $"{playlistFolder}/{newPlaylistName}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
 
         // Create playlist file
         File.WriteAllText(newPlaylistPath, "# UltraStar playlist");
