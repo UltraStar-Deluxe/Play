@@ -659,7 +659,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void DoApplyThemeSpecificStylesToVisualElements(VisualElement root)
     {
-        if (!applyThemeSpecificStyles)
+        if (!applyThemeSpecificStyles
+            // Settings can be null when running a specific scene in the Unity editor
+            // and injection did not finish yet.
+            || settings == null)
         {
             return;
         }
