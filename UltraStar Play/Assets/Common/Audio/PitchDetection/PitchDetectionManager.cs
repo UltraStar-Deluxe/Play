@@ -36,9 +36,6 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
 
     [Inject]
     private SongMetaManager songMetaManager;
-    
-    [Inject]
-    private AudioManager audioManager;
 
     private readonly List<Job> pitchDetectionJobs = new();
 
@@ -65,10 +62,10 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         if (!ApplicationUtils.IsSupportedBasicPitchDetectionAudioFormat(Path.GetExtension(vocalsAudioUri)))
         {
             return Observable.Throw<BasicPitchDetectionResult>(
-                new Exception($"Pitch Detection using Basic Pitch not supported for this audio file.\n" + 
+                new Exception($"Pitch Detection using Basic Pitch not supported for this audio file.\n" +
                               $"Requires one of {ApplicationUtils.supportedBasicPitchDetectionAudioFiles.ToCsv(",", "", "")}"));
         }
-        
+
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
         // Create job to show in UI
@@ -79,7 +76,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         }
         pitchDetectionJob.SetStatus(EJobStatus.Running);
 
-        AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(vocalsAudioUri, true);
+        AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(vocalsAudioUri, true);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         pitchDetectionJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 3.0);
 
@@ -141,7 +138,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
                     UpdateBasicPitchRunnerConfig(fallbackCommand);
 
                     string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Mp3);
-                    
+
                     BasicPitchParameters basicPitchParameters = new();
                     basicPitchParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
                     basicPitchParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}";

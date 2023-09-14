@@ -22,7 +22,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
     private const string MusicAudioMixerName = "Music";
     private const string SfxAudioMixerName = "Sfx";
     private const string VolumeParameterName = "Volume";
-    
+
     private static readonly int criticalCacheSize = 10;
     private static readonly Dictionary<string, CachedAudioClip> audioClipCache = new();
 
@@ -35,19 +35,19 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
     [InjectedInInspector]
     public AudioClip defaultButtonSound;
-    
+
     [InjectedInInspector]
     public AudioClip songSelectSound;
-    
+
     [InjectedInInspector]
     public AudioClip singingResultsRatingPopupSound;
-    
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private UnityWebRequestManager unityWebRequestManager;
-    
+
     protected override object GetInstance()
     {
         return Instance;
@@ -81,7 +81,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         GameObject sfxInstance = new GameObject($"Sfx '{clip.name}'");
 
         AudioSource source = sfxInstance.AddComponent<AudioSource>();
@@ -95,7 +95,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         // destroy after clip length
         Destroy(sfxInstance, clip.length);
     }
-    
+
     public static AudioMixerGroup GetAudioMixerGroup(string groupName)
     {
         AudioManager audioManager = Instance;
@@ -163,7 +163,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         }
         return GetLinearValue(decibelValue);
     }
-    
+
     public static void PlayButtonSound()
     {
         AudioManager audioManager = Instance;
@@ -172,7 +172,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
 
         PlaySoundEffect(audioManager.defaultButtonSound, 0.5f);
     }
-    
+
     public static void PlaySongSelectSound()
     {
         AudioManager audioManager = Instance;
@@ -191,7 +191,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         PlaySoundEffect(audioManager.singingResultsRatingPopupSound, 0.5f);
     }
 
-    public AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio)
+    public static AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio)
     {
         if (uri.IsNullOrEmpty())
         {
@@ -224,13 +224,13 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
             Debug.LogError($"Failed to load AudioClip from URI '{uri}'");
             return null;
         }
-        
+
         cachedAudioClip = new(uri, loadedAudioClip, Time.frameCount, streamAudio);
         audioClipCache[uri] = cachedAudioClip;
         return loadedAudioClip;
     }
 
-    public IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio = true)
+    public static IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio = true)
     {
         if (uri.IsNullOrEmpty())
         {
@@ -269,31 +269,31 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         }
         audioClipCache.Clear();
     }
-    
-    private IObservable<AudioClip> LoadAndCacheAudioClip(string uri, bool streamAudio)
+
+    private static IObservable<AudioClip> LoadAndCacheAudioClip(string uri, bool streamAudio)
     {
         if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
         {
             return Observable.Throw<AudioClip>(new IllegalStateException(
                 $"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.ToCsv(", ", "", "")}"));
         }
-        
+
         return Observable.Create<AudioClip>(o =>
         {
             Uri uriHandle = new Uri(uri);
             UnityWebRequest webRequest = AudioUtils.CreateAudioClipRequest(uriHandle, streamAudio);
             webRequest.SendWebRequest();
-            unityWebRequestManager.AddUnityWebRequest(webRequest, 
-                downloadHandler => 
+            UnityWebRequestManager.Instance.AddUnityWebRequest(webRequest,
+                downloadHandler =>
                 {
                     if (downloadHandler is DownloadHandlerAudioClip downloadHandlerAudioClip)
-                    { 
+                    {
                         AudioClip audioClip = downloadHandlerAudioClip.audioClip;
                         AddAudioClipToCache(uri, audioClip, streamAudio);
                         o.OnNext(audioClip);
                     }
-                }, 
-                error => 
+                },
+                error =>
                 {
                     Debug.LogException(error);
                     Debug.LogError($"Failed to load AudioClip from URI: '{uri}': {error.Message}");
@@ -405,7 +405,7 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
             }
         }
     }
-    
+
     private class AudioClipRequestData
     {
         public string uri;

@@ -18,9 +18,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
     private JobManager jobManager;
 
     [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
     private SongMetaManager songMetaManager;
 
     [Inject]
@@ -28,7 +25,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private PitchDetectionManager pitchDetectionManager;
 
@@ -84,7 +81,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             settings.SongEditorSettings.SpeechRecognitionModelPath,
             "auto",
             settings.SongEditorSettings.SpeechRecognitionPrompt);
-        
+
         // Load speech recognition model in parallel while doing audio separation.
         IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsObservable(speechRecognitionParameters, null);
 
@@ -109,9 +106,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 // (2) Run speech recognition on vocals audio
 
                 // Load vocals audio
-                AudioClip vocalsAudioClip = audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
+                AudioClip vocalsAudioClip = AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
                 int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * BpmUtils.GetBeatsPerSecond(songMeta));
-                    
+
                 float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
                 return SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionAsObservable(

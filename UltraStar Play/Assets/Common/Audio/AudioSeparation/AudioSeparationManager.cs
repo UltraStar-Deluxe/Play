@@ -26,9 +26,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     public static AudioSeparationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioSeparationManager>();
 
     [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
     private UiManager uiManager;
 
     [Inject]
@@ -73,7 +70,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
 
-        AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(audioUri, false);
+        AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(audioUri, false);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
 

@@ -23,9 +23,6 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     private SongMetaManager songMetaManager;
 
     [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
     private PlaylistManager playlistManager;
 
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
@@ -142,7 +139,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
                 && !ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(SongMetaUtils.GetAudioUri(songMeta))))
             {
                 // Load as streaming audio
-                audioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta)).Subscribe(
+                AudioManager.LoadAudioClipFromUri(SongMetaUtils.GetAudioUri(songMeta)).Subscribe(
                     loadedAudioClip => Debug.Log($"Preloaded AudioClip {loadedAudioClip.name}"));
             }
 

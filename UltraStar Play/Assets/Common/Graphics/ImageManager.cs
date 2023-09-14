@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using PrimeInputActions;
+using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
 
 // Handles loading and caching of images.
-public static class ImageManager
+public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -18,12 +17,19 @@ public static class ImageManager
         ClearCache();
     }
 
+    public static ImageManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ImageManager>();
+
     private static readonly HashSet<ISpriteHolder> spriteHolders = new();
 
     // When the cache has reached the critical size, then unused sprites are searched in the scene
     // and removed from memory.
     private static readonly int criticalCacheSize = 50;
     private static readonly Dictionary<string, CachedSprite> spriteCache = new();
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
 
     public static void AddSpriteHolder(ISpriteHolder spriteHolder)
     {
@@ -99,7 +105,7 @@ public static class ImageManager
             onFailure?.Invoke();
         }
 
-        UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, OnFailureOfUnityWebRequest));
+        Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, OnFailureOfUnityWebRequest));
     }
 
     private static void AddSpriteToCache(Sprite sprite, string source)

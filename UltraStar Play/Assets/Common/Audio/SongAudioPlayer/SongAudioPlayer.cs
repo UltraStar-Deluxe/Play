@@ -31,7 +31,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private FfmpegPlayerVideoTexture ffmpegPlayerVideoTexture;
 
     private Settings settings;
-    private AudioManager audioManager;
     private WebViewManager webViewManager;
     private SceneNavigator sceneNavigator;
     private VlcManager vlcManager;
@@ -366,7 +365,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         // Early fetch of dependencies.
         // This is needed because the SongAudioPlayer is called early in the scene setup.
         // TODO: This is not making use of UniInject. Find a better way to do this (e.g. inject objects in order of their dependencies).
-        audioManager = AudioManager.Instance;
         webViewManager = WebViewManager.Instance;
         sceneNavigator = SceneNavigator.Instance;
         settings = SettingsManager.Instance.Settings;
@@ -592,7 +590,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             AudioSupportProvider = EAudioSupportProvider.UnityAudioSource;
-            audioManager.LoadAudioClipFromUri(audioUri, streamAudio)
+            AudioManager.LoadAudioClipFromUri(audioUri, streamAudio)
                 .CatchIgnore((Exception error) => o.OnError(error))
                 .Subscribe(loadedAudioClip =>
                 {

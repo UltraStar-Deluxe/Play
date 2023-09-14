@@ -22,9 +22,6 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     private UiManager uiManager;
 
     [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
     private Settings settings;
 
     [Inject]
@@ -131,7 +128,7 @@ public class SongEditorAlternativeAudioPlayer : MonoBehaviour, INeedInjection
             return null;
         }
 
-        AudioClip loadedAudioClip = audioManager.LoadAudioClipFromUriImmediately(audioClipUri, false);
+        AudioClip loadedAudioClip = AudioManager.LoadAudioClipFromUriImmediately(audioClipUri, false);
         if (loadedAudioClip == null)
         {
             UiManager.CreateNotification($"Failed to load {audioClipUri}");

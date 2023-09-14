@@ -20,9 +20,6 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
     private SongAudioPlayer songAudioPlayer;
 
     [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
     private AudioSeparationManager audioSeparationManager;
 
     [Inject]
@@ -56,7 +53,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         audioFadeInControl.FadeInVolumePercent
             .Subscribe(_ => UpdateAudioSources())
             .AddTo(gameObject);
-        
+
         settings.ObserveEveryValueChanged(it => it.MusicVolumePercent)
             .Subscribe(_ => UpdateAudioSources())
             .AddTo(gameObject);
@@ -80,7 +77,7 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         songAudioPlayer.JumpBackInSongEventStream
             .Subscribe(_ => SyncAudioPosition())
             .AddTo(gameObject);
-        
+
         Init();
     }
 
@@ -170,8 +167,8 @@ public class SingSceneAlternativeAudioPlayer : MonoBehaviour, INeedInjection
         if (!hasLoadedInstrumentalAndVocalsAudio)
         {
             hasLoadedInstrumentalAndVocalsAudio = true;
-            instrumentalAudioSource.clip = audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetInstrumentalAudioUri(songMeta), true);
-            vocalsAudioSource.clip = audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), true);
+            instrumentalAudioSource.clip = AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetInstrumentalAudioUri(songMeta), true);
+            vocalsAudioSource.clip = AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), true);
         }
 
         songAudioPlayer.VolumeFactor = 0;
