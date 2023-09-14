@@ -45,9 +45,6 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
-    [Inject]
-    private UnityWebRequestManager unityWebRequestManager;
-
     protected override object GetInstance()
     {
         return Instance;
@@ -283,22 +280,29 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
             Uri uriHandle = new Uri(uri);
             UnityWebRequest webRequest = AudioUtils.CreateAudioClipRequest(uriHandle, streamAudio);
             webRequest.SendWebRequest();
-            UnityWebRequestManager.Instance.AddUnityWebRequest(webRequest,
+            Instance.StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
                 downloadHandler =>
                 {
-                    if (downloadHandler is DownloadHandlerAudioClip downloadHandlerAudioClip)
+                    if (downloadHandler is DownloadHandlerAudioClip downloadHandlerAudioClip
+                        && downloadHandlerAudioClip.audioClip != null)
                     {
                         AudioClip audioClip = downloadHandlerAudioClip.audioClip;
                         AddAudioClipToCache(uri, audioClip, streamAudio);
+
                         o.OnNext(audioClip);
+                        o.OnCompleted();
+                    }
+                    else
+                    {
+                        o.OnError(new LoadAudioException($"Failed to load AudioClip from URI: '{uri}'"));
                     }
                 },
-                error =>
+                ex =>
                 {
-                    Debug.LogException(error);
-                    Debug.LogError($"Failed to load AudioClip from URI: '{uri}': {error.Message}");
-                    o.OnError(error);
-                });
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to load AudioClip from URI: '{uri}': {ex.Message}");
+                    o.OnError(ex);
+                }));
 
             return Disposable.Empty;
         });

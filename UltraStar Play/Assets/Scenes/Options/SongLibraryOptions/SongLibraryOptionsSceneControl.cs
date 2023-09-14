@@ -7,6 +7,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.UIElements;
 #if UNITY_ANDROID
     using UnityEngine.Android;
@@ -123,8 +124,16 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .WithRootVisualElement(visualElement)
             .CreateAndInject<DownloadSongArchiveUiControl>();
 
-        StartCoroutine(WebRequestUtils.LoadTextFromUri(songArchiveInfoJsonUrl,
-            json => downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(json)));
+        // Send web request
+        UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl));
+        webRequest.SendWebRequest();
+        StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
+            downloadHandler =>
+            {
+                downloadSongArchiveUiControl.SongArchiveEntries =
+                    JsonConverter.FromJson<List<SongArchiveEntry>>(downloadHandler.text);
+            },
+            ex => Debug.LogException(ex)));
 
         downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
         {

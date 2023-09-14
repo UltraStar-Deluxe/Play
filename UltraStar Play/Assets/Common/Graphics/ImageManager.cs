@@ -41,21 +41,6 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         spriteHolders.Remove(spriteHolder);
     }
 
-    public static IObservable<Sprite> LoadSpriteFromUri(string path)
-    {
-        return Observable.Create<Sprite>(o =>
-        {
-            DoLoadSpriteFromUri(path,
-                loadedSprite =>
-                {
-                    o.OnNext(loadedSprite);
-                    o.OnCompleted();
-                },
-                () => o.OnError(new LoadImageException($"Failed to load sprite: {path}")));
-            return Disposable.Empty;
-        });
-    }
-
     public static void ReloadImage(string uri, UIDocument uiDocument)
     {
         if (!spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
@@ -74,38 +59,60 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         // Remove from cache before reloading.
         RemoveCachedSprite(cachedSprite);
 
-        DoLoadSpriteFromUri(uri, sprite => visualElementsUsingTheSprite
-            .ForEach(it => it.style.backgroundImage = new StyleBackground(sprite)));
+        LoadSpriteFromUri(uri)
+            .Subscribe(sprite =>
+            {
+                visualElementsUsingTheSprite.ForEach(it => it.style.backgroundImage = new StyleBackground(sprite));
+            });
     }
 
-    private static void DoLoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action onFailure = null)
+    public static IObservable<Sprite> LoadSpriteFromUri(string uri)
     {
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             && cachedSprite?.Sprite != null)
         {
-            onSuccess?.Invoke(cachedSprite.Sprite);
-            return;
+            return Observable.Return<Sprite>(cachedSprite.Sprite);
         }
 
-        void DoCacheSpriteThenOnSuccess(Texture2D loadedTexture)
+        return Observable.Create<Sprite>(o =>
         {
-            if (loadedTexture == null)
-            {
-                Debug.LogError($"Loaded texture is null for URI {uri}");
-                onFailure?.Invoke();
-                return;
-            }
-            Sprite sprite = Sprite.Create(loadedTexture, new Rect(0, 0, loadedTexture.width, loadedTexture.height), new Vector2(0.5f, 0.5f), 100f, 0u,  SpriteMeshType.FullRect);
-            AddSpriteToCache(sprite, uri);
-            onSuccess?.Invoke(sprite);
-        }
+            // Send web request
+            UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(new Uri(uri));
+            webRequest.SendWebRequest();
 
-        void OnFailureOfUnityWebRequest(UnityWebRequest request)
-        {
-            onFailure?.Invoke();
-        }
+            // Check web request result in coroutine
+            Instance.StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
+                downloadHandler =>
+                {
+                    if (webRequest.downloadHandler is DownloadHandlerTexture downloadHandlerTexture
+                        && downloadHandlerTexture.texture != null)
+                    {
+                        Texture2D loadedTexture = downloadHandlerTexture.texture;
+                        Sprite sprite = Sprite.Create(
+                            loadedTexture,
+                            new Rect(0, 0, loadedTexture.width, loadedTexture.height),
+                            new Vector2(0.5f, 0.5f),
+                            100f,
+                            0u,
+                            SpriteMeshType.FullRect);
+                        AddSpriteToCache(sprite, uri);
 
-        Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, OnFailureOfUnityWebRequest));
+                        o.OnNext(sprite);
+                        o.OnCompleted();
+                    }
+                    else
+                    {
+                        o.OnError(new LoadImageException($"Failed to load Texture2D from URI: '{uri}'."));
+                    }
+                },
+                ex =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to load Texture2D from URI: '{uri}': {ex.Message}");
+                    o.OnError(ex);
+                }));
+            return Disposable.Empty;
+        });
     }
 
     private static void AddSpriteToCache(Sprite sprite, string source)

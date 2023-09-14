@@ -1,9 +1,39 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class CoroutineUtils
 {
+    public static IEnumerator WebRequestCoroutine(
+        UnityWebRequest webRequest,
+        Action<DownloadHandler> onSuccess,
+        Action<Exception> onError)
+    {
+        bool isDone = false;
+        do
+        {
+            if (webRequest.result
+                is UnityWebRequest.Result.ConnectionError
+                or UnityWebRequest.Result.ProtocolError
+                or UnityWebRequest.Result.DataProcessingError)
+            {
+                isDone = true;
+                onError?.Invoke(new UnityWebRequestException(webRequest));
+            }
+            else if (webRequest.result is UnityWebRequest.Result.Success)
+            {
+                isDone = true;
+                onSuccess?.Invoke(webRequest.downloadHandler);
+            }
+
+            // Wait for next frame
+            yield return null;
+        } while (!isDone);
+
+        webRequest.Dispose();
+    }
+
     public static IEnumerator ExecuteAction(Action action)
     {
         action();
