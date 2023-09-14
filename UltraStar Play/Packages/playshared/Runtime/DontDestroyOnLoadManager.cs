@@ -18,6 +18,7 @@ public class DontDestroyOnLoadManager : AbstractSingletonBehaviour
                 if (instanceInScene != null)
                 {
                     GameObjectUtils.TryInitSingleInstanceWithDontDestroyOnLoad(ref instance, ref instanceInScene);
+                    return instanceInScene;
                 }
             }
             return instance;
