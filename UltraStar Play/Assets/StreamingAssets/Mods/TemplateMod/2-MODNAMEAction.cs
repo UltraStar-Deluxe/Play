@@ -43,7 +43,7 @@ public class MODNAMEAction : IModAction, IOnDisableMod
         // You can do anything here, for example ...
 
         // ... change audio clips
-        // audioManager.defaultButtonSound = audioManager.LoadAudioClipFromUriImmediately($"{modContext.ModFolder}/sounds/cartoon-jump-6462.mp3");
+        // audioManager.defaultButtonSound = AudioManager.LoadAudioClipFromUriImmediately($"{modContext.ModFolder}/sounds/cartoon-jump-6462.mp3");
 
         // ... change UI elements
         // uiDocument.rootVisualElement.Query<VisualElement>().ForEach(element =>
