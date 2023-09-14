@@ -66,8 +66,27 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
             });
     }
 
+    public static Sprite LoadSpriteFromUriImmediately(string uri)
+    {
+        Sprite result = null;
+        // Load with busy waiting
+        LoadSpriteFromUri(uri, true)
+            .Subscribe(sprite => result = sprite);
+        return result;
+    }
+
     public static IObservable<Sprite> LoadSpriteFromUri(string uri)
     {
+        return LoadSpriteFromUri(uri, false);
+    }
+
+    private static IObservable<Sprite> LoadSpriteFromUri(string uri, bool busyWaiting)
+    {
+        if (uri.IsNullOrEmpty())
+        {
+            return ObservableUtils.LogErrorThenThrow<Sprite>(new NullReferenceException("Cannot load Sprite, URI is null or empty"));
+        }
+
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             && cachedSprite?.Sprite != null)
         {
@@ -77,7 +96,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
         return Observable.Create<Sprite>(o =>
         {
             // Send web request
-            UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(new Uri(uri));
+            UnityWebRequest webRequest = ImageUtils.CreateTextureRequest(new Uri(uri));
             webRequest.SendWebRequest();
 
             // Check web request result in coroutine
@@ -88,13 +107,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
                         && downloadHandlerTexture.texture != null)
                     {
                         Texture2D loadedTexture = downloadHandlerTexture.texture;
-                        Sprite sprite = Sprite.Create(
-                            loadedTexture,
-                            new Rect(0, 0, loadedTexture.width, loadedTexture.height),
-                            new Vector2(0.5f, 0.5f),
-                            100f,
-                            0u,
-                            SpriteMeshType.FullRect);
+                        Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
                         AddSpriteToCache(sprite, uri);
 
                         o.OnNext(sprite);
@@ -110,7 +123,8 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
                     Debug.LogException(ex);
                     Debug.LogError($"Failed to load Texture2D from URI: '{uri}': {ex.Message}");
                     o.OnError(ex);
-                }));
+                },
+                busyWaiting));
             return Disposable.Empty;
         });
     }

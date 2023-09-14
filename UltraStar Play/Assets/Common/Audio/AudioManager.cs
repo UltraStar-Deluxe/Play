@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -188,18 +189,30 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         PlaySoundEffect(audioManager.singingResultsRatingPopupSound, 0.5f);
     }
 
-    public static AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio)
+    public static AudioClip LoadAudioClipFromUriImmediately(string uri, bool streamAudio = true)
+    {
+        AudioClip result = null;
+        // Load with busy waiting
+        LoadAudioClipFromUri(uri, streamAudio, true)
+            .Subscribe(audioClip => result = audioClip);
+        return result;
+    }
+
+    public static IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio = true)
+    {
+        return LoadAudioClipFromUri(uri, streamAudio, false);
+    }
+
+    private static IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio, bool busyWaiting)
     {
         if (uri.IsNullOrEmpty())
         {
-            Debug.LogError("Cannot load AudioClip, URI is null or empty");
-            return null;
+            return ObservableUtils.LogErrorThenThrow<AudioClip>(new NullReferenceException("Cannot load AudioClip, URI is null or empty"));
         }
 
         if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
         {
-            Debug.LogError($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.ToCsv(", ", "", "")}");
-            return null;
+            return Observable.Throw<AudioClip>(new IllegalArgumentException($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.ToCsv(", ", "", "")}"));
         }
 
         if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
@@ -207,79 +220,21 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
         {
             if (streamAudio && cachedAudioClip.StreamedAudioClip != null)
             {
-                return cachedAudioClip.StreamedAudioClip;
+                return Observable.Return<AudioClip>(cachedAudioClip.StreamedAudioClip);
             }
             else if (!streamAudio && cachedAudioClip.FullAudioClip != null)
             {
-                return cachedAudioClip.FullAudioClip;
+                return Observable.Return<AudioClip>(cachedAudioClip.FullAudioClip);
             }
-        }
-
-        AudioClip loadedAudioClip = AudioUtils.LoadUncachedAudioClipImmediately(uri, streamAudio);
-        if (loadedAudioClip == null)
-        {
-            Debug.LogError($"Failed to load AudioClip from URI '{uri}'");
-            return null;
-        }
-
-        cachedAudioClip = new(uri, loadedAudioClip, Time.frameCount, streamAudio);
-        audioClipCache[uri] = cachedAudioClip;
-        return loadedAudioClip;
-    }
-
-    public static IObservable<AudioClip> LoadAudioClipFromUri(string uri, bool streamAudio = true)
-    {
-        if (uri.IsNullOrEmpty())
-        {
-            return ObservableUtils.LogErrorThenThrow<AudioClip>(new NullReferenceException("Cannot load AudioClip, URI is null or empty"));
         }
 
         return Observable.Create<AudioClip>(o =>
         {
-            if (audioClipCache.TryGetValue(uri, out CachedAudioClip cachedAudioClip)
-                && (cachedAudioClip.StreamedAudioClip != null || cachedAudioClip.FullAudioClip))
-            {
-                if (streamAudio && cachedAudioClip.StreamedAudioClip != null)
-                {
-                    o.OnNext(cachedAudioClip.StreamedAudioClip);
-                    return Disposable.Empty;
-                }
-                else if (!streamAudio && cachedAudioClip.FullAudioClip != null)
-                {
-                    o.OnNext(cachedAudioClip.FullAudioClip);
-                    return Disposable.Empty;
-                }
-            }
-
-            LoadAndCacheAudioClip(uri, streamAudio)
-                .CatchIgnore((Exception error) => o.OnError(error))
-                .Subscribe(loadedAudioClip => o.OnNext(loadedAudioClip));
-            return Disposable.Empty;
-        });
-    }
-
-    public static void ClearCache()
-    {
-        foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
-        {
-            RemoveCachedAudioClip(cachedAudioClip);
-        }
-        audioClipCache.Clear();
-    }
-
-    private static IObservable<AudioClip> LoadAndCacheAudioClip(string uri, bool streamAudio)
-    {
-        if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
-        {
-            return Observable.Throw<AudioClip>(new IllegalStateException(
-                $"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.ToCsv(", ", "", "")}"));
-        }
-
-        return Observable.Create<AudioClip>(o =>
-        {
-            Uri uriHandle = new Uri(uri);
-            UnityWebRequest webRequest = AudioUtils.CreateAudioClipRequest(uriHandle, streamAudio);
+            // Send web request
+            UnityWebRequest webRequest = AudioUtils.CreateAudioClipRequest(new Uri(uri), streamAudio);
             webRequest.SendWebRequest();
+
+            // Check web request result in coroutine
             Instance.StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
                 downloadHandler =>
                 {
@@ -302,12 +257,21 @@ public class AudioManager : AbstractSingletonBehaviour, INeedInjection
                     Debug.LogException(ex);
                     Debug.LogError($"Failed to load AudioClip from URI: '{uri}': {ex.Message}");
                     o.OnError(ex);
-                }));
+                },
+                busyWaiting));
 
             return Disposable.Empty;
         });
     }
 
+    public static void ClearCache()
+    {
+        foreach (CachedAudioClip cachedAudioClip in new List<CachedAudioClip>(audioClipCache.Values))
+        {
+            RemoveCachedAudioClip(cachedAudioClip);
+        }
+        audioClipCache.Clear();
+    }
 
     private static void AddAudioClipToCache(string path, AudioClip audioClip, bool streamAudio)
     {
