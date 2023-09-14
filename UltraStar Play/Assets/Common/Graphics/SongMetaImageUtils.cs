@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public static class SongMetaImageUtils
@@ -63,19 +65,20 @@ public static class SongMetaImageUtils
             return;
         }
 
-        ImageManager.LoadSpriteFromUri(uri,
-            loadedSprite =>
+        ImageManager.LoadSpriteFromUri(uri)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                SetDefaultSongImage(visualElements);
+                SetDefaultSongImageColor(songMeta, visualElements);
+            })
+            .Subscribe(loadedSprite =>
             {
                 foreach (VisualElement visualElement in visualElements)
                 {
                     visualElement.style.backgroundImage = new StyleBackground(loadedSprite);
                     visualElement.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
                 }
-            },
-            () =>
-            {
-                SetDefaultSongImage(visualElements);
-                SetDefaultSongImageColor(songMeta, visualElements);
             });
     }
 

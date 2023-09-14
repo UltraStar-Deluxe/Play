@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -202,12 +203,11 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         }
     }
 
-    public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
+    public IObservable<Sprite> LoadPlayerProfileImage(string imagePath)
     {
         if (imagePath.IsNullOrEmpty())
         {
-            onSuccess(fallbackPlayerProfileImage);
-            return;
+            return Observable.Return<Sprite>(fallbackPlayerProfileImage);
         }
 
         string relativePathNormalized = PathUtils.NormalizePath(imagePath);
@@ -216,14 +216,14 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
             return absolutePathNormalized.EndsWith(relativePathNormalized);
         });
+
         if (matchingFullPath.IsNullOrEmpty())
         {
             Debug.LogWarning($"Cannot load player profile image with path '{imagePath}' (normalized: '{relativePathNormalized}'), no corresponding image file found.");
-            onSuccess(fallbackPlayerProfileImage);
-            return;
+            return Observable.Return(fallbackPlayerProfileImage);
         }
 
-        ImageManager.LoadSpriteFromUri(matchingFullPath, onSuccess);
+        return ImageManager.LoadSpriteFromUri(matchingFullPath);
     }
 
     public List<string> GetAbsolutePlayerProfileImagePaths()

@@ -404,11 +404,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         string absoluteImageFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
         if (ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
         {
-            ImageManager.LoadSpriteFromUri(absoluteImageFilePath, loadedSprite =>
-            {
-                backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.imageScaleMode);
-            });
+            ImageManager.LoadSpriteFromUri(absoluteImageFilePath)
+                .Subscribe(loadedSprite =>
+                {
+                    backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
+                    ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.imageScaleMode);
+                });
         }
         else
         {
@@ -482,12 +483,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 TextureWrapMode textureWrapMode = backgroundJson.gradientScrollingSpeed > 0
                     ? TextureWrapMode.Repeat
                     : TextureWrapMode.Clamp;
-                ImageManager.LoadSpriteFromFile(gradientPath, gradientSprite =>
-                {
-                    loadedSprites.Add(gradientSprite);
-                    gradientSprite.texture.wrapMode = textureWrapMode;
-                    backgroundMaterial.SetTexture("_ColorRampTex", gradientSprite.texture);
-                });
+                ImageManager.LoadSpriteFromUri(gradientPath)
+                    .Subscribe(gradientSprite =>
+                    {
+                        loadedSprites.Add(gradientSprite);
+                        gradientSprite.texture.wrapMode = textureWrapMode;
+                        backgroundMaterial.SetTexture("_ColorRampTex", gradientSprite.texture);
+                    });
             }
             else
             {
@@ -511,12 +513,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.patternFile);
             if (File.Exists(patternPath))
             {
-                ImageManager.LoadSpriteFromFile(patternPath, patternSprite =>
-                {
-                    loadedSprites.Add(patternSprite);
-                    patternSprite.texture.wrapMode = TextureWrapMode.Repeat;
-                    backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
-                });
+                ImageManager.LoadSpriteFromUri(patternPath)
+                    .Subscribe(patternSprite =>
+                    {
+                        loadedSprites.Add(patternSprite);
+                        patternSprite.texture.wrapMode = TextureWrapMode.Repeat;
+                        backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
+                    });
 
                 patternColor = backgroundJson.patternColor;
             }
@@ -556,12 +559,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.particleFile);
             if (File.Exists(particlePath))
             {
-                ImageManager.LoadSpriteFromFile(particlePath, particleSprite =>
-                {
-                    loadedSprites.Add(particleSprite);
-                    particleSprite.texture.wrapMode = TextureWrapMode.Clamp;
-                    particleMaterial.mainTexture = particleSprite.texture;
-                });
+                ImageManager.LoadSpriteFromUri(particlePath)
+                    .Subscribe(particleSprite =>
+                    {
+                        loadedSprites.Add(particleSprite);
+                        particleSprite.texture.wrapMode = TextureWrapMode.Clamp;
+                        particleMaterial.mainTexture = particleSprite.texture;
+                    });
             }
             else
             {
@@ -603,12 +607,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             if (!absoluteImageFilePath.IsNullOrEmpty()
                 && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
             {
-                ImageManager.LoadSpriteFromFile(absoluteImageFilePath, loadedSprite =>
-                {
-                    dynamicBackgroundStaticImageSprite = loadedSprite;
-                    backgroundShaderControl.SetBaseTexture(loadedSprite.texture);
-                    backgroundShaderControl.SetBaseTextureEnabled(true);
-                });
+                ImageManager.LoadSpriteFromUri(absoluteImageFilePath)
+                    .Subscribe(loadedSprite =>
+                    {
+                        dynamicBackgroundStaticImageSprite = loadedSprite;
+                        backgroundShaderControl.SetBaseTexture(loadedSprite.texture);
+                        backgroundShaderControl.SetBaseTextureEnabled(true);
+                    });
             }
             else
             {

@@ -336,8 +336,19 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        ImageManager.LoadSpriteFromUri(uri,
-            loadedSprite =>
+        ImageManager.LoadSpriteFromUri(uri)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                if (coverSongMeta != songEntry.SongMeta)
+                {
+                    // The associated song has changed in the meantime.
+                    return;
+                }
+
+                SetDefaultSongCoverImageWithColor();
+            })
+            .Subscribe(loadedSprite =>
             {
                 if (coverSongMeta != songEntry.SongMeta)
                 {
@@ -346,16 +357,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 }
 
                 SetCoverImageWithoutColor(loadedSprite);
-            },
-            () =>
-            {
-                if (coverSongMeta != songEntry.SongMeta)
-                {
-                    // The associated song has changed in the meantime.
-                    return;
-                }
-
-                SetDefaultSongCoverImageWithColor();
             });
     }
 

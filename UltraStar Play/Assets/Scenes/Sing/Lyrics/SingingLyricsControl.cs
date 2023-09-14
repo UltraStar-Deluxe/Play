@@ -90,11 +90,12 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             }
 
             string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(themeManager.GetCurrentTheme(), path);
-            ImageManager.LoadSpriteFromUri(absolutePath, loadedSprite =>
-            {
-                positionBeforeLyricsIndicator.style.backgroundImage = new StyleBackground(loadedSprite);
-                positionBeforeLyricsIndicator.Icon = "";
-            });
+            ImageManager.LoadSpriteFromUri(absolutePath)
+                .Subscribe(loadedSprite =>
+                {
+                    positionBeforeLyricsIndicator.style.backgroundImage = new StyleBackground(loadedSprite);
+                    positionBeforeLyricsIndicator.Icon = "";
+                });
         });
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PrimeInputActions;
+using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
@@ -34,15 +35,19 @@ public static class ImageManager
         spriteHolders.Remove(spriteHolder);
     }
 
-    public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action onFailure = null)
+    public static IObservable<Sprite> LoadSpriteFromUri(string path)
     {
-        if (!File.Exists(path))
+        return Observable.Create<Sprite>(o =>
         {
-            Debug.LogError("Image file does not exist: " + path);
-            return;
-        }
-
-        LoadSpriteFromUri(path, onSuccess, onFailure);
+            DoLoadSpriteFromUri(path,
+                loadedSprite =>
+                {
+                    o.OnNext(loadedSprite);
+                    o.OnCompleted();
+                },
+                () => o.OnError(new LoadImageException($"Failed to load sprite: {path}")));
+            return Disposable.Empty;
+        });
     }
 
     public static void ReloadImage(string uri, UIDocument uiDocument)
@@ -63,11 +68,11 @@ public static class ImageManager
         // Remove from cache before reloading.
         RemoveCachedSprite(cachedSprite);
 
-        LoadSpriteFromUri(uri, sprite => visualElementsUsingTheSprite
+        DoLoadSpriteFromUri(uri, sprite => visualElementsUsingTheSprite
             .ForEach(it => it.style.backgroundImage = new StyleBackground(sprite)));
     }
 
-    public static void LoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action onFailure = null)
+    private static void DoLoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action onFailure = null)
     {
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             && cachedSprite?.Sprite != null)
@@ -93,7 +98,7 @@ public static class ImageManager
         {
             onFailure?.Invoke();
         }
-        
+
         UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, OnFailureOfUnityWebRequest));
     }
 
@@ -147,7 +152,7 @@ public static class ImageManager
         List<CachedSprite> unusedSprites = spriteCache.Values
             .Where(cachedSprite => !usedSprites.Contains(cachedSprite.Sprite))
             .ToList();
-        
+
         Debug.Log($"Removing {unusedSprites.Count} unused sprites from cache.");
         unusedSprites.ForEach(RemoveCachedSprite);
     }

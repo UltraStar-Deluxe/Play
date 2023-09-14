@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -102,34 +103,35 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
 
         // Song rating
-        LoadSongRatingSprite(songRating.EnumValue, songRatingSprite =>
-        {
-            if (songRatingSprite == null)
+        LoadSongRatingSprite(songRating.EnumValue)
+            .Subscribe(songRatingSprite =>
             {
-                return;
-            }
+                if (songRatingSprite == null)
+                {
+                    return;
+                }
 
-            ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
-            // Bouncy size animation
-            ratingLabel.style.scale = new StyleScale(new Scale(Vector2.zero));
-            ratingImage.style.scale = new StyleScale(new Scale(Vector2.zero));
-            LeanTween.value(singingResultsSceneControl.gameObject, Vector2.one, Vector2.one * 0.5f, bounceAnimTimeInSeconds)
-                .setEasePunch()
-                .setOnStart(() =>
-                {
-                    if (TotalScoreAnimTimeInSeconds > 0)
+                ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
+                // Bouncy size animation
+                ratingLabel.style.scale = new StyleScale(new Scale(Vector2.zero));
+                ratingImage.style.scale = new StyleScale(new Scale(Vector2.zero));
+                LeanTween.value(singingResultsSceneControl.gameObject, Vector2.one, Vector2.one * 0.5f, bounceAnimTimeInSeconds)
+                    .setEasePunch()
+                    .setOnStart(() =>
                     {
-                        PlaySingingResultsRatingPopupSound();
-                    }
-                })
-                .setOnUpdate(s =>
-                {
-                    Vector2 scale = new Vector2(s, s);
-                    ratingLabel.style.scale = new StyleScale(new Scale(scale));
-                    ratingImage.style.scale = new StyleScale(new Scale(scale));
-                })
-                .setDelay(TotalScoreAnimTimeInSeconds);
-        });
+                        if (TotalScoreAnimTimeInSeconds > 0)
+                        {
+                            PlaySingingResultsRatingPopupSound();
+                        }
+                    })
+                    .setOnUpdate(s =>
+                    {
+                        Vector2 scale = new Vector2(s, s);
+                        ratingLabel.style.scale = new StyleScale(new Scale(scale));
+                        ratingImage.style.scale = new StyleScale(new Scale(scale));
+                    })
+                    .setDelay(TotalScoreAnimTimeInSeconds);
+            });
         ratingLabel.text = songRating.Text;
 
         // Score texts (animated)
@@ -228,15 +230,14 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         return highScoreEntry.Score == playerScoreData.TotalScore;
     }
 
-    private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private IObservable<Sprite> LoadSongRatingSprite(ESongRating songRatingEnumValue)
     {
         if (!settings.EnableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
-            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
-            return;
+            return LoadDefaultSongRatingSprite(songRatingEnumValue);
         }
-        LoadSongRatingSpriteFromTheme(songRatingEnumValue, onSuccess);
+        return LoadSongRatingSpriteFromTheme(songRatingEnumValue);
     }
 
     private string GetTeamName()
@@ -256,7 +257,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         return teamSettings != null;
     }
 
-    private void LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private IObservable<Sprite> LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue)
     {
         try
         {
@@ -264,26 +265,25 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
             if (valueForSongRating.IsNullOrEmpty())
             {
-                LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
-                return;
+                return LoadDefaultSongRatingSprite(songRatingEnumValue);
             }
 
             string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
-            ImageManager.LoadSpriteFromUri(imagePath, onSuccess);
+            return ImageManager.LoadSpriteFromUri(imagePath);
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
             Debug.LogError($"Load song rating sprite from theme failed: {ex.Message}");
-            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
+            return LoadDefaultSongRatingSprite(songRatingEnumValue);
         }
     }
 
-    private void LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private IObservable<Sprite> LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue)
     {
         SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
             .FirstOrDefault(it => it.songRating == songRatingEnumValue);
-        onSuccess(songRatingImageReference?.sprite);
+        return Observable.Return<Sprite>(songRatingImageReference?.sprite);
     }
 
     public void UpdateTranslation()

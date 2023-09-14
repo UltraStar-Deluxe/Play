@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -46,7 +47,7 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
         }
 
         ItemPicker.ItemLabel.SetBorderRadius(Length.Percent(50));
-        
+
         if (imagePath == PlayerProfile.WebcamImagePath
             && webCamManager != null)
         {
@@ -56,10 +57,8 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
                 takeWebCamImageButton.HideByDisplay();
                 removeWebCamImageButton.ShowByDisplay();
 
-                uiManager.LoadPlayerProfileImage(webCamImagePath, loadedSprite =>
-                {
-                    ItemPicker.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite);
-                });
+                uiManager.LoadPlayerProfileImage(webCamImagePath)
+                    .Subscribe(loadedSprite => ItemPicker.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite));
             }
             else
             {
@@ -74,10 +73,8 @@ public class PlayerProfileImagePickerControl : PicturedItemPickerControl<string>
 
         takeWebCamImageButton.HideByDisplay();
         removeWebCamImageButton.HideByDisplay();
-        uiManager.LoadPlayerProfileImage(imagePath, loadedSprite =>
-        {
-            ItemPicker.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite);
-        });
+        uiManager.LoadPlayerProfileImage(imagePath)
+            .Subscribe(loadedSprite => ItemPicker.ItemLabel.style.backgroundImage = new StyleBackground(loadedSprite));
     }
 
     protected override StyleBackground GetBackgroundImageValue(string item)
