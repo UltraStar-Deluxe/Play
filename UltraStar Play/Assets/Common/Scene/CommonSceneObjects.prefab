@@ -770,6 +770,7 @@ Transform:
   - {fileID: 280779799394265030}
   - {fileID: 5543064232540367519}
   - {fileID: 5679655992247309606}
+  - {fileID: 6146376116107555922}
   - {fileID: 1054933196838542567}
   - {fileID: 4725083428892299482}
   - {fileID: 8210014063461271944}
@@ -8909,6 +8910,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   whisperManagerPrefab: {fileID: 4159576471388054935, guid: cbc5e63d248305843853deae3bbaa2db,
     type: 3}
+--- !u!1 &8646227477907933101
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6146376116107555922}
+  - component: {fileID: 2295275382819325487}
+  m_Layer: 5
+  m_Name: SongMetaMissingImageProviderManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6146376116107555922
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8646227477907933101}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2295275382819325487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8646227477907933101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2ed9ee268764b05b7a42bc8c4566dfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8811285264585202488
 GameObject:
   m_ObjectHideFlags: 0

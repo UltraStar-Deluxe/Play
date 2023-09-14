@@ -14,6 +14,7 @@
                 </ui:Button>
             </ui:VisualElement>
             <ui:Toggle name="showFpsToggle" label="Show FPS" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="searchMissingImageFilesToggle" label="Search missing cover&#10;and background image&#10;in folder of song" class="noBackgroundInHierarchy" />
             <ItemPicker name="portAudioHostApiPicker" label="PortAudio Host API¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ItemPicker name="portAudioOutputDevicePicker" label="PortAudio Output Device" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
             <ui:Button text="Show PortAudio Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
