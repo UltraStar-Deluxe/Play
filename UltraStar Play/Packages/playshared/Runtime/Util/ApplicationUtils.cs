@@ -51,6 +51,9 @@ public static class ApplicationUtils
         }
     }
 
+    public static readonly string ultraStarPlaylistFileExtension = "upl";
+    public static readonly string m3uPlaylistFileExtension = "m3u";
+
     public static readonly IReadOnlyCollection<string> supportedSoundfontFiles = new HashSet<string>
     {
         "sf2",

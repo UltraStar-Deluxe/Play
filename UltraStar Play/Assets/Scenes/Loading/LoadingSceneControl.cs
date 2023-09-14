@@ -18,13 +18,16 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 {
     [InjectedInInspector]
     public int preloadSongCount = 10;
-    
+
     [Inject]
     private SongMetaManager songMetaManager;
-    
+
     [Inject]
     private AudioManager audioManager;
-    
+
+    [Inject]
+    private PlaylistManager playlistManager;
+
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
     private Label unexpectedErrorLabel;
 
@@ -57,7 +60,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         {
             settings.SongDirs = CreateInitialSongFolders();
         }
-        
+
         // Create custom player profile images folder
         DirectoryUtils.CreateDirectory(PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder());
 
@@ -79,6 +82,10 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         // Keep mobile devices from turning off the screen while the game is running.
         Screen.sleepTimeout = (int)0f;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+        // Load playlists
+        Debug.Log($"Preloading playlists");
+        playlistManager.GetPlaylists(true, true);
 
         // The SongMetas are loaded on access.
         songMetaManager.ScanFilesIfNotDoneYet();
@@ -107,7 +114,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
         }
 
         MidiManager.Instance.InitIfNotDoneYet();
-        
+
         Debug.Log("Supported file extensions by ffmpeg: " + ApplicationUtils.ffmpegSupportedFileExtensions.ToCsv());
 
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () => FinishScene()));
@@ -154,7 +161,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             }
 
             // Video resource of the song does not need to be cached.
-            
+
             // Parse whole file by reading the voices.
             songMeta.GetVoices();
         }

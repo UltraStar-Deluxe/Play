@@ -769,10 +769,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateSongScanLabels(bool isSongScanFinished)
     {
-        if (SongMetaManager.LoadedSongsCount > 0)
-        {
-            songScanInProgressProgressLabel.text = $"{SongMetaManager.LoadedSongsPercent:00} %";
-        }
+        songScanInProgressProgressLabel.text = $"{SongMetaManager.LoadedSongsPercent:00} %";
 
         if (isSongScanFinished)
         {
