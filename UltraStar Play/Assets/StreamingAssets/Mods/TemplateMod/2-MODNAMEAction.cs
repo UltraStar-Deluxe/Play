@@ -30,7 +30,7 @@ public class MODNAMEAction : IModAction, IOnDisableMod
     [Inject]
     private ModContext modContext;
 
-    // Mod settings implement IAutoBoundRuntimeLoadedScript, which makes an instance available here via Inject attribute
+    // Mod settings implement IAutoBoundMod, which makes an instance available here via Inject attribute
     [Inject]
     private MODNAMEModSettings modSettings;
 
