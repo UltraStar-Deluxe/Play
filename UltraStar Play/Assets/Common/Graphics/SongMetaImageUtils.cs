@@ -1,63 +1,85 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public static class SongMetaImageUtils
 {
-    public static string GetBackgroundOrCoverImageUri(SongMeta songMeta)
+    public static IObservable<string> GetBackgroundOrCoverImageUri(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetBackgroundUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return uri;
+            return Observable.Return(uri);
         }
 
         // Try the cover image as fallback
         uri = SongMetaUtils.GetCoverUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return uri;
+            return Observable.Return(uri);
         }
 
-        // Try to find an image in the song's folder
-        if (SongMetaMissingImageProviderManager.TryFindBackgroundImageInFolder(songMeta.Directory, out uri)
-            && SongMetaUtils.ResourceExists(songMeta, uri))
+        // Try to find an image via mods
+        List<ISongBackgroundImageProvider> songBackgroundImageProviders = ModManager.GetModObjects<ISongBackgroundImageProvider>();
+        if (songBackgroundImageProviders.IsNullOrEmpty())
         {
-            return uri;
+            return Observable.Empty<string>();
         }
+        return songBackgroundImageProviders
+            .Select(it => it.GetBackgroundImageUri(songMeta).FirstOrDefault())
+            .FirstOrDefault();
 
-        return null;
+        // if (SongMetaMissingImageProviderManager.TryFindBackgroundImageInFolder(songMeta.Directory, out uri)
+        //     && SongMetaUtils.ResourceExists(songMeta, uri))
+        // {
+        //     return Observable.Return(uri);
+        // }
     }
 
-    public static string GetCoverOrBackgroundImageUri(SongMeta songMeta)
+    public static IObservable<string> GetCoverOrBackgroundImageUri(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetCoverUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return uri;
+            return Observable.Return(uri);
         }
 
         // Try the background image as fallback
         uri = SongMetaUtils.GetBackgroundUri(songMeta);
         if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return uri;
+            return Observable.Return(uri);
         }
 
-        // Try to find an image in the song's folder
-        if (SongMetaMissingImageProviderManager.TryFindCoverImageInFolder(songMeta.Directory, out uri)
-            && SongMetaUtils.ResourceExists(songMeta, uri))
+        // Try to find an image via mods
+        List<ISongCoverImageProvider> songCoverImageProviders = ModManager.GetModObjects<ISongCoverImageProvider>();
+        if (songCoverImageProviders.IsNullOrEmpty())
         {
-            return uri;
+            return Observable.Empty<string>();
         }
+        return songCoverImageProviders
+            .Select(it => it.GetCoverImageUri(songMeta).FirstOrDefault())
+            .FirstOrDefault();
 
-        return null;
+        // // Try to find an image in the song's folder
+        // if (SongMetaMissingImageProviderManager.TryFindCoverImageInFolder(songMeta.Directory, out uri)
+        //     && SongMetaUtils.ResourceExists(songMeta, uri))
+        // {
+        //     return uri;
+        // }
     }
 
     public static void SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
     {
-        string uri = GetCoverOrBackgroundImageUri(songMeta);
+        GetCoverOrBackgroundImageUri(songMeta)
+            .Subscribe(uri => SetCoverOrBackgroundImageFromUri(songMeta, uri, visualElements));
+    }
+
+    private static void SetCoverOrBackgroundImageFromUri(SongMeta songMeta, string uri, params VisualElement[] visualElements)
+    {
         if (uri.IsNullOrEmpty())
         {
             SetDefaultSongImage(visualElements);

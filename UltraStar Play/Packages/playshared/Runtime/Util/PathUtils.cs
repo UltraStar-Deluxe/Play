@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -7,6 +6,16 @@ using Util;
 
 public static class PathUtils
 {
+    public static string GetFileName(string path)
+    {
+        if (path.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        return Path.GetFileName(path);
+    }
+
     public static string CombinePaths(string firstPart, string secondPart)
     {
         bool EndsWithSeparator(string path)

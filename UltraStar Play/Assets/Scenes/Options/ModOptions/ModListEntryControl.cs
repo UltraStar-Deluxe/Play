@@ -7,13 +7,13 @@ using UnityEngine.UIElements;
 public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
-    public Settings settings;
+    private Settings settings;
 
     [Inject]
-    public ModManager modManager;
+    private ModManager modManager;
 
     [Inject]
-    public UiManager uiManager;
+    private UiManager uiManager;
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
@@ -97,7 +97,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        List<IModSettings> allModSettings = modManager.GetModObjects<IModSettings>(ModFolder);
+        List<IModSettings> allModSettings = ModManager.GetModObjects<IModSettings>(ModFolder);
         if (allModSettings.IsNullOrEmpty())
         {
             UiManager.CreateNotification("This mod has no settings.");

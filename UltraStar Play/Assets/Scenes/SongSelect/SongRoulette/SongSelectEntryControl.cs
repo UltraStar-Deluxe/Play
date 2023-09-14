@@ -329,13 +329,27 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void UpdateSongCover(SongSelectSongEntry songEntry)
     {
         SongMeta coverSongMeta = songEntry.SongMeta;
-        string uri = SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta);
+        SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta)
+            .Subscribe(uri =>
+            {
+                if (coverSongMeta != songEntry.SongMeta)
+                {
+                    // The associated song has changed in the meantime.
+                    return;
+                }
+                UpdateSongCoverFromUri(songEntry, uri);
+            });
+    }
+
+    private void UpdateSongCoverFromUri(SongSelectSongEntry songEntry, string uri)
+    {
         if (uri.IsNullOrEmpty())
         {
             SetDefaultSongCoverImageWithColor();
             return;
         }
 
+        SongMeta coverSongMeta = songEntry.SongMeta;
         ImageManager.LoadSpriteFromUri(uri)
             .CatchIgnore((Exception ex) =>
             {

@@ -172,6 +172,7 @@ public class CompilerWrapper
         typeof(IEquatable<>),
         typeof(IFormatProvider),
         typeof(IFormattable),
+        typeof(IObservable<>),
         typeof(IndexOutOfRangeException),
         typeof(InvalidCastException),
         typeof(InvalidOperationException),

@@ -9,9 +9,6 @@ public class ContextMenuModManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static ContextMenuModManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ContextMenuModManager>();
 
-    [Inject]
-    private ModManager modManager;
-
     protected override object GetInstance()
     {
         return Instance;
@@ -25,7 +22,7 @@ public class ContextMenuModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnContextMenuOpened(ContextMenuPopupControl contextMenu)
     {
-        List<IContextMenuMod> contextMenuMods = modManager.GetModObjects<IContextMenuMod>();
+        List<IContextMenuMod> contextMenuMods = ModManager.GetModObjects<IContextMenuMod>();
         foreach (IContextMenuMod contextMenuMod in contextMenuMods)
         {
             contextMenuMod.FillContextMenu(contextMenu);

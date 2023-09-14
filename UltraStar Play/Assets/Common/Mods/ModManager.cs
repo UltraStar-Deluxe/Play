@@ -56,23 +56,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
-        "com.achimmihca.portaudioforunity",
-        "com.achimmihca.primeinputactions",
-        "com.achimmihca.protrans",
-        "com.achimmihca.scenechangeanimations",
-        "com.achimmihca.simplehttpserverforunity",
-        "com.achimmihca.uniinject",
-        "com.achimmihca.utfunknownunity",
-        "UniRx",
-        "Common",
-        "playshared",
-        "playsharedui",
-        "Scenes",
-        "System",
-        "System.Collections",
-        "System.Collections.ObjectModel",
-        "System.Collections.Generic",
-        "System.Linq",
+        // Unity engine
         "UnityEngine",
         "UnityEngine.AudioModule",
         "UnityEngine.CoreModule",
@@ -82,6 +66,24 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         "UnityEngine.UIElementsModule",
         "UnityEngine.UIModule",
         "UnityEngine.VideoModule",
+
+        // Third Party Packages
+        "com.achimmihca.portaudioforunity",
+        "com.achimmihca.primeinputactions",
+        "com.achimmihca.protrans",
+        "com.achimmihca.scenechangeanimations",
+        "com.achimmihca.simplehttpserverforunity",
+        "com.achimmihca.uniinject",
+        "com.achimmihca.utfunknownunity",
+        "playshared",
+        "playsharedui",
+
+        // Plugins
+        "UniRx",
+
+        // Project Libraries
+        "Common",
+        "Scenes",
     };
 
     protected override object GetInstance()
@@ -322,7 +324,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     {
         Debug.Log($"Calling OnDisableMod for mod '{modName}'");
         string modFolder = GetModFolderByModName(modName);
-        List<IOnDisableMod> disableModHandlers = GetModObjects<IOnDisableMod>(modFolder, false);
+        List<IOnDisableMod> disableModHandlers = DoGetModObjects<IOnDisableMod>(modFolder, false);
         disableModHandlers.ForEach(disableModHandler =>
         {
             try
@@ -472,7 +474,19 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return "";
     }
 
-    public List<T> GetModObjects<T>(string modFolder = null, bool onlyFromEnabledMods = true)
+    public static List<T> GetModObjects<T>(string modFolder = null, bool onlyFromEnabledMods = true)
+        where T : IMod
+    {
+        ModManager instance = Instance;
+        if (instance == null)
+        {
+            return new List<T>();
+        }
+
+        return instance.DoGetModObjects<T>(modFolder, onlyFromEnabledMods);
+    }
+
+    private List<T> DoGetModObjects<T>(string modFolder = null, bool onlyFromEnabledMods = true)
         where T : IMod
     {
         if (settings.EnabledMods.IsNullOrEmpty()

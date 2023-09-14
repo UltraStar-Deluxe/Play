@@ -787,18 +787,18 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoImageVisualElement.style.opacity = 0;
         }
 
-        string imageUri = SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta);
-        LoadBackgroundImage(imageUri);
+        SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta)
+            .Subscribe(uri => SetBackgroundImageFromUri(uri));
     }
 
-    private void LoadBackgroundImage(string imageUri)
+    private void SetBackgroundImageFromUri(string uri)
     {
-        if (imageUri.IsNullOrEmpty())
+        if (uri.IsNullOrEmpty())
         {
             return;
         }
 
-        ImageManager.LoadSpriteFromUri(imageUri)
+        ImageManager.LoadSpriteFromUri(uri)
             .Subscribe(loadedSprite =>
             {
                 if (backgroundImageVisualElement != null)
