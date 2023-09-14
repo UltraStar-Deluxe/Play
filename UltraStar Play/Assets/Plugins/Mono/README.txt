@@ -1,2 +1,2 @@
-This is Mono.CSharp.dll as found in Unity2017.4.40f1\Unity\Editor\Data\MonoBleedingEdge\lib\mono\4.5
+This is Mono.CSharp.dll as found in UnityEditor/2022.3.9f1/Editor/Data/MonoBleedingEdge/lib/mono/4.8-api
 It can be used for runtime loaded scripts as described in https://somasim.com/blog/2017/12/27/tech-notes-unity-game-modding/
