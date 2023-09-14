@@ -72,6 +72,7 @@ public class Settings : ISettings
     public bool SearchAudioFilesWithoutSongMeta { get; set; }
     public bool SearchMissingCoverAndBackgroundImageInFolderOfSong { get; set; }
     public string GeneratedFolderPath { get; set; } = "";
+    public bool SaveVocalsAndInstrumentalAudioInFolderOfSong { get; set; }
 
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;

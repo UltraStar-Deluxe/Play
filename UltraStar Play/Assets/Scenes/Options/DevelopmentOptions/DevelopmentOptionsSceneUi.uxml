@@ -29,6 +29,7 @@
             <ui:TextField picking-mode="Ignore" label="Absolute Path to Folder&#10;with Generated Files¹" name="generatedFolderPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
                 <ui:Label tabindex="-1" text="Default path" display-tooltip-when-elided="true" name="generatedFolderPathHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;" />
             </ui:TextField>
+            <ui:Toggle name="saveVocalsAndInstrumentalAudioInFolderOfSongToggle" label="Save vocals and instrumental audio&#10;in folder of song" class="noBackgroundInHierarchy" />
             <ItemPicker name="minimumLogLevelPicker" label="Minimum Log Level¹" wrap-around="true" class="noBackgroundInHierarchy" />
             <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
             <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
