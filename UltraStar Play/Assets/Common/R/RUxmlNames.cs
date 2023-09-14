@@ -630,6 +630,7 @@ public static partial class R
         public const string row = "row";
         public const string sampleRatePicker = "sampleRatePicker";
         public const string saveButton = "saveButton";
+        public const string saveVocalsAndInstrumentalAudioInFolderOfSongToggle = "saveVocalsAndInstrumentalAudioInFolderOfSongToggle";
         public const string sceneChangeAnimationPicker = "sceneChangeAnimationPicker";
         public const string sceneChangeDurationPicker = "sceneChangeDurationPicker";
         public const string sceneSubtitle = "sceneSubtitle";
@@ -646,6 +647,7 @@ public static partial class R
         public const string searchBarContainer = "searchBarContainer";
         public const string searchContainer = "searchContainer";
         public const string searchErrorIcon = "searchErrorIcon";
+        public const string searchMissingImageFilesToggle = "searchMissingImageFilesToggle";
         public const string searchNextButton = "searchNextButton";
         public const string searchNextIcon = "searchNextIcon";
         public const string searchOverlay = "searchOverlay";

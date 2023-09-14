@@ -43,7 +43,7 @@ public class UltraStarPlaylist : IPlaylist
     public void SetFileName(string newValue)
     {
         string directoryPath = Path.GetDirectoryName(FilePath);
-        FilePath = directoryPath + $"/{newValue}{PlaylistManager.ultraStarPlaylistFileExtension}";
+        FilePath = directoryPath + $"/{newValue}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
         headerFields.Remove("NAME");
     }
 
@@ -89,14 +89,14 @@ public class UltraStarPlaylist : IPlaylist
     {
         return songHashes.Contains(GetHash(artist, title));
     }
-    
+
     public bool HasSongEntry(SongMeta songMeta)
     {
         if (songMeta == null)
         {
             return false;
         }
-        
+
         return HasSongEntry(songMeta.Artist, songMeta.Title);
     }
 

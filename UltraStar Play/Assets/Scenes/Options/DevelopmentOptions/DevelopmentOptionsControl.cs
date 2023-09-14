@@ -38,6 +38,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
     private ItemPicker pitchDetectionAlgorithmPicker;
 
+    [Inject(UxmlName = R.UxmlNames.searchMissingImageFilesToggle)]
+    private Toggle searchMissingImageFilesToggle;
+
+    [Inject(UxmlName = R.UxmlNames.saveVocalsAndInstrumentalAudioInFolderOfSongToggle)]
+    private Toggle saveVocalsAndInstrumentalAudioInFolderOfSongToggle;
+
     [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNoteToggle)]
     private Toggle analyzeBeatsWithoutTargetNoteToggle;
 
@@ -157,6 +163,14 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(showFpsToggle,
             () => settings.ShowFps,
             newValue => settings.ShowFps = newValue);
+
+        FieldBindingUtils.Bind(searchMissingImageFilesToggle,
+            () => settings.SearchMissingCoverAndBackgroundImageInFolderOfSong,
+            newValue => settings.SearchMissingCoverAndBackgroundImageInFolderOfSong = newValue);
+
+        FieldBindingUtils.Bind(saveVocalsAndInstrumentalAudioInFolderOfSongToggle,
+            () => settings.SaveVocalsAndInstrumentalAudioInFolderOfSong,
+            newValue => settings.SaveVocalsAndInstrumentalAudioInFolderOfSong = newValue);
 
         FieldBindingUtils.Bind(generatedFolderPathTextField,
             () => settings.GeneratedFolderPath,

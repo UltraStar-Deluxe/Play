@@ -19,7 +19,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         hasLoggedVersionInfo = false;
     }
     private static bool hasLoggedVersionInfo;
-    
+
     [InjectedInInspector]
     public TextAsset versionPropertiesTextAsset;
 
@@ -67,10 +67,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     [Inject(UxmlName = R.UxmlNames.semanticVersionLabel)]
     private Label semanticVersionLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.commitHashLabel)]
     private Label commitHashLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.buildTimeStampLabel)]
     private Label buildTimeStampLabel;
 
@@ -79,22 +79,22 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     [Inject(UxmlName = R.UxmlNames.versionDetailsContainer)]
     private VisualElement versionDetailsContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.logo)]
     private VisualElement logo;
-    
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private SceneNavigator sceneNavigator;
-    
+
     [Inject]
     private ThemeManager themeManager;
 
     [Inject]
     private UiManager uiManager;
-    
+
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
 
@@ -147,8 +147,6 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         });
 
         InitInputActions();
-
-        songMetaManager.ScanFilesIfNotDoneYet();
 
         settingsProblemHintControl = new SettingsProblemHintControl(
             settingsProblemHintIcon,
@@ -212,7 +210,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => CloseQuitGameDialog());
         quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
-        
+
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(quitGameDialogControl.DialogRootVisualElement);
     }
 

@@ -62,7 +62,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                                          $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}");
             return Observable.Empty<AudioSeparationResult>();
         }
-        
+
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
         // Create job to show in UI
@@ -135,7 +135,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
 
                     string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Mp3);
-                    
+
                     SpleeterParameters spleeterParameters = new();
                     spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
                     spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
@@ -202,9 +202,13 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         bool songMetaChanged = false;
 
         // Prepare directory to move created audio files.
-        string destinationFolder = DirectoryUtils.IsSubDirectory(songMeta.Directory, generatedSongFolderAbsolutePath)
-            ? songMeta.Directory
-            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, songMeta.Directory);
+        string destinationFolder = songMeta.Directory;
+        if (!settings.SaveVocalsAndInstrumentalAudioInFolderOfSong
+            && !DirectoryUtils.IsSubDirectory(songMeta.Directory, generatedSongFolderAbsolutePath))
+        {
+            destinationFolder = ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, songMeta.Directory);
+        }
+
         if (!destinationFolder.IsNullOrEmpty()
             && !Directory.Exists(destinationFolder))
         {
@@ -224,6 +228,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             FileUtils.MoveFileOverwriteIfExists(vocalsAudioPath, destinationVocalsAudioPath);
 
             songMeta.VocalsAudio = destinationVocalsAudioPath;
+            if (destinationFolder == songMeta.Directory)
+            {
+                songMeta.VocalsAudio = PathUtils.MakeRelativePath(songMeta.Directory, songMeta.VocalsAudio);
+            }
             songMetaChanged = true;
         }
         else
@@ -244,6 +252,11 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             FileUtils.MoveFileOverwriteIfExists(instrumentalAudioPath, destinationInstrumentalAudioPath);
 
             songMeta.InstrumentalAudio = destinationInstrumentalAudioPath;
+            if (destinationFolder == songMeta.Directory)
+            {
+                songMeta.InstrumentalAudio = PathUtils.MakeRelativePath(songMeta.Directory, songMeta.InstrumentalAudio);
+            }
+
             songMetaChanged = true;
         }
         else

@@ -545,8 +545,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public void UnloadAudio()
     {
-        AudioSupportProvider = EAudioSupportProvider.None;
-
         StopAllCoroutines();
         StopAudio();
         audioSource.clip = null;
@@ -558,6 +556,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         DurationOfSongInMillis = 0;
 
         videoPlayerErrorMessages.Clear();
+
+        AudioSupportProvider = EAudioSupportProvider.None;
     }
 
     private IObservable<SongAudioLoadedEvent> LoadWithMidiManager(SongMeta songMeta, string audioUri,

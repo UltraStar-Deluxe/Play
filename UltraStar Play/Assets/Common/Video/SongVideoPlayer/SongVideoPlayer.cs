@@ -786,48 +786,19 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoImageVisualElement.HideByDisplay();
             videoImageVisualElement.style.opacity = 0;
         }
-        if (songMeta.Background.IsNullOrEmpty())
-        {
-            ShowCoverImageAsBackground(songMeta);
-            return;
-        }
 
-        string backgroundUri = SongMetaUtils.GetBackgroundUri(songMeta);
-        if (!SongMetaUtils.BackgroundResourceExists(songMeta))
-        {
-            Debug.LogWarning("Showing cover image because background image resource does not exist: " + backgroundUri);
-            ShowCoverImageAsBackground(songMeta);
-            return;
-        }
-
-        LoadBackgroundImage(backgroundUri);
+        string imageUri = SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta);
+        LoadBackgroundImage(imageUri);
     }
 
-    private void ShowCoverImageAsBackground(SongMeta songMeta)
+    private void LoadBackgroundImage(string imageUri)
     {
-        string coverUri = SongMetaUtils.GetCoverUri(songMeta);
-        if (coverUri.IsNullOrEmpty())
+        if (imageUri.IsNullOrEmpty())
         {
             return;
         }
 
-        if (!SongMetaUtils.CoverResourceExists(songMeta))
-        {
-            Debug.LogWarning("Cover image resource does not exist: " + coverUri);
-            return;
-        }
-
-        LoadBackgroundImage(coverUri);
-    }
-
-    private void LoadBackgroundImage(string backgroundUri)
-    {
-        if (backgroundUri.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        ImageManager.LoadSpriteFromUri(backgroundUri, loadedSprite =>
+        ImageManager.LoadSpriteFromUri(imageUri, loadedSprite =>
         {
             if (backgroundImageVisualElement != null)
             {
