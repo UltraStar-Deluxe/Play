@@ -17,7 +17,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public const string ModInfoFileName = "modinfo.yml";
     private const string ModsRootFolderName = "Mods";
-    private const string TemplateModName = "TemplateMod";
+    private const string TemplateModFolderName = "TemplateMod";
     private const string TemplateModNamePlaceholder = "MODNAME";
     private const string TemplateModDllFolderPlaceholder = "DEFAULT_DLL_FOLDER";
 
@@ -278,7 +278,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        string templateModFolder = ApplicationUtils.GetStreamingAssetsPath($"{ModsRootFolderName}/{TemplateModName}");
+        string templateModFolder = ApplicationUtils.GetStreamingAssetsPath($"{ModsRootFolderName}/{TemplateModFolderName}");
         if (!Directory.Exists(templateModFolder))
         {
             throw new Exception($"Template mod folder not found: '{templateModFolder}'");
@@ -491,11 +491,18 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     {
         List<string> modParentFolders = new()
         {
+            GetAbsoluteDefaultModsRootFolder(),
             GetAbsoluteUserDefinedModsRootFolder(),
+        };
+
+        HashSet<string> ignoredFolderNames = new HashSet<string>()
+        {
+            TemplateModFolderName,
         };
 
         return modParentFolders
             .SelectMany(modParentFolder => Directory.GetDirectories(modParentFolder))
+            .Where(modFolder => !ignoredFolderNames.Contains(Path.GetFileName(modFolder)))
             .ToList();
     }
 
