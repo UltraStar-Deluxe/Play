@@ -13,13 +13,13 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
 
     [InjectedInInspector]
     public GameObject inputManagerPrefab;
-    
+
     [InjectedInInspector]
     public List<SceneRecipe> sceneRecipes;
 
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private DontDestroyOnLoadManager dontDestroyOnLoadManager;
 
@@ -27,7 +27,7 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
     private UltraStarPlayInputManager ultraStarPlayInputManager;
 
     private SceneRecipe loadedSceneRecipe;
-        
+
     protected override object GetInstance()
     {
         return Instance;
@@ -60,7 +60,7 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
         List<GameObject> loadedGameObjectsAndDontDestroyOnLoadManager = loadedGameObjects
             .Union(new List<GameObject> { dontDestroyOnLoadManager.gameObject })
             .ToList();
-        
+
         // Add new bindings from loaded objects.
         Injector loadedSceneInjector = UniInjectUtils.CreateInjector()
             .WithRootVisualElement(loadedSceneVisualElement);
@@ -95,7 +95,8 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
                 sceneInjectionFinishedListener.OnSceneInjectionFinished();
             }
         }
-        
+        UltraStarPlaySceneInjectionManager.FireSceneInjectionFinishedEvent(loadedSceneInjector);
+
         // Update translations
         foreach (GameObject loadedGameObject in loadedGameObjects)
         {
@@ -119,12 +120,12 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
             }
             Destroy(loadedGameObject);
         }
-        
+
         // Unregister InputActions. Therefor, destroy and recreate InputManager.
         DestroyImmediate(InputManager.Instance.gameObject);
         CommonSceneObjects commonSceneObjects = CommonSceneObjects.Instance;
         Instantiate(inputManagerPrefab, commonSceneObjects.transform);
-        
+
         loadedSceneRecipe = null;
     }
 
@@ -138,10 +139,10 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
     {
         if (loadedSceneRecipe != null)
         {
-            // Something else may have been loaded into the original scene. 
+            // Something else may have been loaded into the original scene.
             return loadedSceneRecipe.scene;
         }
-        
+
         return ESceneUtils.GetSceneByBuildIndex(SceneManager.GetActiveScene().buildIndex);
     }
 }
