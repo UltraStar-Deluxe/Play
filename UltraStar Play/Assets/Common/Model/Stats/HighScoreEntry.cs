@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FullSerializer;
 
 [Serializable]
 public class HighScoreEntry
@@ -10,28 +11,41 @@ public class HighScoreEntry
     public int Score { get; private set; }
     public DateTime DateTime { get; private set; }
 
-    public HighScoreEntry(string playerName, EDifficulty difficulty, int score, EScoreMode scoreMode)
+    /**
+     * Identifies the remote source of a highscore entry,
+     * for example the online server where it was found.
+     */
+    [fsIgnore]
+    public string RemoteSource { get; private set; }
+
+    public HighScoreEntry(
+        string playerName,
+        EDifficulty difficulty,
+        int score,
+        EScoreMode scoreMode,
+        string remoteSource = "")
     {
         this.PlayerName = playerName;
         this.Difficulty = difficulty;
         this.Score = score;
         this.DateTime = DateTime.Now;
         this.ScoreMode = scoreMode;
+        this.RemoteSource = remoteSource;
     }
-}
 
-public class CompareBySongScoreAscending : IComparer<HighScoreEntry>
-{
-    public int Compare(HighScoreEntry x, HighScoreEntry y)
+    public class CompareByScoreAscending : IComparer<HighScoreEntry>
     {
-        return x.Score.CompareTo(y.Score);
+        public int Compare(HighScoreEntry x, HighScoreEntry y)
+        {
+            return x.Score.CompareTo(y.Score);
+        }
     }
-}
 
-public class CompareBySongScoreDescending: IComparer<HighScoreEntry>
-{
-    public int Compare(HighScoreEntry x, HighScoreEntry y)
+    public class CompareByScoreDescending: IComparer<HighScoreEntry>
     {
-        return -x.Score.CompareTo(y.Score);
+        public int Compare(HighScoreEntry x, HighScoreEntry y)
+        {
+            return -x.Score.CompareTo(y.Score);
+        }
     }
 }

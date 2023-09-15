@@ -211,7 +211,8 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             return false;
         }
 
-        SongStatistics songStatistics = statistics.GetLocalStatistics(sceneData.SongMetas.LastOrDefault());
+        SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
+        SongStatistics songStatistics = StatisticsUtils.GetLocalSongStatistics(statistics, songMeta);
         if (songStatistics == null
             || songStatistics.HighScoreRecord == null
             || songStatistics.HighScoreRecord.HighScoreEntries.IsNullOrEmpty())
@@ -219,8 +220,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             return false;
         }
 
-        HighScoreEntry highScoreEntry = songStatistics.HighScoreRecord
-            .GetTopScores(1, PlayerProfile.Difficulty)
+        HighScoreEntry highScoreEntry = StatisticsUtils.GetTopScores(
+                songStatistics.HighScoreRecord.HighScoreEntries,
+                1,
+                PlayerProfile.Difficulty)
             .FirstOrDefault();
         if (highScoreEntry == null)
         {

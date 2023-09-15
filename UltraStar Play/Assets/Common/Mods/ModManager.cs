@@ -81,6 +81,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
         // Plugins
         "UniRx",
+        "Plugins",
 
         // Project Libraries
         "Common",

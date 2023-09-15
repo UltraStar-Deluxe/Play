@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// Handles storage and operation over the song statistic entries themselves
 [Serializable]
 public class HighScoreRecord
 {
@@ -10,7 +9,7 @@ public class HighScoreRecord
 
     public HighScoreRecord()
     {
-        HighScoreEntries = new SortedSet<HighScoreEntry>(new CompareBySongScoreDescending());
+        HighScoreEntries = new SortedSet<HighScoreEntry>(new HighScoreEntry.CompareByScoreDescending());
     }
 
     public void AddRecord(HighScoreEntry record)
@@ -21,17 +20,5 @@ public class HighScoreRecord
     public void RemoveRecord(HighScoreEntry record)
     {
         HighScoreEntries.Remove(record);
-    }
-
-    public List<HighScoreEntry> GetTopScores(int count, EDifficulty difficulty)
-    {
-        if (HighScoreEntries.IsNullOrEmpty())
-        {
-            return new List<HighScoreEntry>();
-        }
-        return HighScoreEntries
-            .Where(it => it.Difficulty == difficulty)
-            .Take(count)
-            .ToList();
     }
 }

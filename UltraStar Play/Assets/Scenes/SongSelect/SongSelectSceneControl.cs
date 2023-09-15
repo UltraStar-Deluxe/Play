@@ -318,7 +318,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(it =>
             {
-                if (songOrderDropdownField.value is ESongOrder.Highscore)
+                if (songOrderDropdownField.value is ESongOrder.LocalHighScore)
                 {
                     UpdateFilteredSongs();
                 }
@@ -1277,9 +1277,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 return SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
             case ESongOrder.Year:
                 return songMeta.Year;
-            case ESongOrder.Highscore:
+            case ESongOrder.LocalHighScore:
                 // Return negative value to sort descending
-                return -statistics.GetLocalHighscore(songMeta, settings.Difficulty);
+                return -StatisticsUtils.GetLocalHighScore(statistics, songMeta, settings.Difficulty);
             default:
                 Debug.LogWarning("Unknown order for songs: " + songOrderDropdownField.value);
                 return songMeta.Artist;

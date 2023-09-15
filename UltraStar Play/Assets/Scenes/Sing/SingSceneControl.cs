@@ -962,7 +962,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 && songSingingDuration >= songDurationInSeconds / 2))
         {
             hasRecordedSongStartedStatistics = true;
-            statistics.RecordSongStarted(SongMeta);
+            StatisticsUtils.RecordSongStarted(statistics, SongMeta);
         }
     }
 
@@ -977,7 +977,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         hasRecordedSongFinishedStatistics = true;
-        statistics.RecordSongFinished(SongMeta, highScoreEntries);
+        StatisticsUtils.RecordSongFinished(statistics, SongMeta, highScoreEntries);
     }
 
     private PlayerControl CreatePlayerControl(PlayerProfile playerProfile, MicProfile micProfile, int playerIndex)

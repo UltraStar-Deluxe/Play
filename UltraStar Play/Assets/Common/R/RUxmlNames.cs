@@ -156,7 +156,6 @@ public static partial class R
         public const string dialogTitleImage = "dialogTitleImage";
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string difficultyChooser = "difficultyChooser";
-        public const string difficultyLabel = "difficultyLabel";
         public const string difficultyPicker = "difficultyPicker";
         public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
@@ -225,8 +224,6 @@ public static partial class R
         public const string hiddenHideModifiersOverlayArea = "hiddenHideModifiersOverlayArea";
         public const string hiddenHideSongQueueOverlayArea = "hiddenHideSongQueueOverlayArea";
         public const string highlightLabelContainer = "highlightLabelContainer";
-        public const string highscoreEntry = "highscoreEntry";
-        public const string HighscoreEntry = "HighscoreEntry";
         public const string highscoreEntryList = "highscoreEntryList";
         public const string highscoreEntryUiRoot = "highscoreEntryUiRoot";
         public const string highscoresContainer = "highscoresContainer";
@@ -430,7 +427,6 @@ public static partial class R
         public const string newHighscoreLabel = "newHighscoreLabel";
         public const string nextDifficultyButton = "nextDifficultyButton";
         public const string nextGameRoundInfoPlayerEntryUiRoot = "nextGameRoundInfoPlayerEntryUiRoot";
-        public const string NextGameRoundInfoUi = "NextGameRoundInfoUi";
         public const string nextGameRoundInfoUiRoot = "nextGameRoundInfoUiRoot";
         public const string nextGameRoundModifierActiveIcon = "nextGameRoundModifierActiveIcon";
         public const string nextGameRoundPlayerEntryLabel = "nextGameRoundPlayerEntryLabel";
@@ -439,7 +435,6 @@ public static partial class R
         public const string nextGameRoundSongInfoContainer = "nextGameRoundSongInfoContainer";
         public const string nextGameRoundSongInfoLabel = "nextGameRoundSongInfoLabel";
         public const string nextItemIcon = "nextItemIcon";
-        public const string nextItemLabel = "nextItemLabel";
         public const string nextLabel = "nextLabel";
         public const string nextPlayerNameLabel = "nextPlayerNameLabel";
         public const string NextRoundInfoPlayerEntryUi = "NextRoundInfoPlayerEntryUi";
@@ -633,13 +628,11 @@ public static partial class R
         public const string saveVocalsAndInstrumentalAudioInFolderOfSongToggle = "saveVocalsAndInstrumentalAudioInFolderOfSongToggle";
         public const string sceneChangeAnimationPicker = "sceneChangeAnimationPicker";
         public const string sceneChangeDurationPicker = "sceneChangeDurationPicker";
-        public const string sceneSubtitle = "sceneSubtitle";
         public const string sceneTitle = "sceneTitle";
         public const string scoreContainer = "scoreContainer";
         public const string scoreIcon = "scoreIcon";
         public const string scoreLabel = "scoreLabel";
         public const string scoreName = "scoreName";
-        public const string scoreRow = "scoreRow";
         public const string scoreValue = "scoreValue";
         public const string scrollView = "scrollView";
         public const string ScrollView = "ScrollView";

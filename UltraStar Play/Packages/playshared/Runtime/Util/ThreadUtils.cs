@@ -13,4 +13,9 @@ public static class ThreadUtils
     {
         MainThreadDispatcher.Send(_ => action(), null);
     }
+
+    public static void Sleep(int millis)
+    {
+        Thread.Sleep(millis);
+    }
 }
