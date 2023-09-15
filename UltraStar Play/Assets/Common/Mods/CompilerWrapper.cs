@@ -13,8 +13,11 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using Mono.CSharp;
 using Attribute = System.Attribute;
 using Delegate = System.Delegate;
@@ -53,9 +56,15 @@ public class CompilerWrapper
 
         this.evaluator = new Evaluator(context);
 
-        evaluator.ImportTypes(false, BuiltInTypes);
-        evaluator.ImportTypes(false, AdditionalTypes);
+        evaluator.ImportTypes(true, BuiltInTypes);
+        evaluator.ImportTypes(true, AsynchronousFunctionSupportTypes);
+        evaluator.ImportTypes(true, AdditionalTypes);
         // evaluator.ImportTypes(false, QuestionableTypes);
+    }
+
+    public void ImportTypes(Type[] types)
+    {
+        this.evaluator.ImportTypes(true, types);
     }
 
     public void ReferenceAssembly(Assembly assembly)
@@ -81,12 +90,59 @@ public class CompilerWrapper
     /// </summary>
     private static Type[] BuiltInTypes = new Type[]
     {
-        typeof(Array), typeof(Attribute), typeof(bool), typeof(byte), typeof(char), typeof(decimal),
-        typeof(Delegate), typeof(double), typeof(Enum), typeof(Exception), typeof(float), typeof(IDisposable),
-        typeof(IEnumerable), typeof(IEnumerator), typeof(int), typeof(IntPtr), typeof(long),
-        typeof(MulticastDelegate), typeof(object), typeof(OutAttribute), typeof(ParamArrayAttribute),
-        typeof(RuntimeFieldHandle), typeof(RuntimeTypeHandle), typeof(sbyte), typeof(short), typeof(string),
-        typeof(Type), typeof(uint), typeof(UIntPtr), typeof(ulong), typeof(ushort), typeof(ValueType), typeof(void),
+        typeof(Array),
+        typeof(Attribute),
+        // typeof(BinaryPromotionsTypes),
+        typeof(bool),
+        typeof(byte),
+        typeof(char),
+        typeof(decimal),
+        typeof(Delegate),
+        typeof(double),
+        // typeof(Dynamic),
+        typeof(Enum),
+        typeof(Exception),
+        typeof(float),
+        typeof(IDisposable),
+        typeof(IEnumerable),
+        typeof(IEnumerator),
+        typeof(int),
+        typeof(IntPtr),
+        typeof(long),
+        typeof(MulticastDelegate),
+        typeof(object),
+        typeof(ParamArrayAttribute),
+        // typeof(PredefinedOperator[] OperatorsBinaryEquality),
+        // typeof(PredefinedOperator[] OperatorsBinaryStandard),
+        // typeof(PredefinedOperator[] OperatorsBinaryUnsafe),
+        // typeof(OperatorsUnary),
+        // typeof(OperatorsUnaryMutator),
+        typeof(OutAttribute),
+        typeof(RuntimeFieldHandle),
+        typeof(RuntimeTypeHandle),
+        typeof(sbyte),
+        typeof(short),
+        typeof(string),
+        typeof(Type),
+        typeof(uint),
+        typeof(UIntPtr),
+        typeof(ulong),
+        typeof(ushort),
+        typeof(ValueType),
+        typeof(void),
+    };
+
+    private static Type[] AsynchronousFunctionSupportTypes = new Type[]
+    {
+        // https://stackoverflow.com/questions/17969603/what-is-the-minimum-set-of-types-required-to-compile-async-code#17969731
+        typeof(IAsyncStateMachine),
+        typeof(INotifyCompletion),
+        typeof(ICriticalNotifyCompletion),
+        typeof(AsyncVoidMethodBuilder),
+        typeof(AsyncTaskMethodBuilder), typeof(AsyncTaskMethodBuilder<>),
+        typeof(AsyncValueTaskMethodBuilder), typeof(AsyncValueTaskMethodBuilder<>),
+        typeof(Task),
+        typeof(Task<>),
     };
 
     /// <summary>
@@ -121,7 +177,7 @@ public class CompilerWrapper
 
         // mscorlib System.Collections.Generic
 
-        typeof(IEnumerator), typeof(IEnumerable), typeof(Comparer<>), typeof(Dictionary<,>), typeof(EqualityComparer<>),
+        typeof(Comparer<>), typeof(Dictionary<,>), typeof(EqualityComparer<>),
         typeof(ICollection<>), typeof(IComparer<>), typeof(IDictionary<,>), typeof(IReadOnlyDictionary<,>),
         typeof(IEnumerable<>), typeof(IEnumerator<>), typeof(IEqualityComparer<>), typeof(IList<>),
         typeof(IReadOnlyList<>), typeof(KeyNotFoundException), typeof(KeyValuePair<,>), typeof(List<>),
@@ -148,6 +204,15 @@ public class CompilerWrapper
         typeof(Enumerable), typeof(IGrouping<,>), typeof(ILookup<,>), typeof(IOrderedEnumerable<>),
         typeof(IOrderedQueryable), typeof(IOrderedQueryable<>), typeof(IQueryable), typeof(IQueryable<>),
         typeof(IQueryProvider), typeof(Lookup<,>), typeof(Queryable),
+
+        // System.Xml
+        typeof(XDocument), typeof(XElement),
+
+        // System.Xml.Linq
+        typeof (Extensions),
+
+        // System.Xml.XPath
+        typeof (System.Xml.XPath.Extensions),
     };
 
     /// <summary>
