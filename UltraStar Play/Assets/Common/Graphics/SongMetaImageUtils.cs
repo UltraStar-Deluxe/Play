@@ -30,13 +30,8 @@ public static class SongMetaImageUtils
         }
         return songBackgroundImageProviders
             .Select(it => it.GetBackgroundImageUri(songMeta).FirstOrDefault())
-            .FirstOrDefault();
-
-        // if (SongMetaMissingImageProviderManager.TryFindBackgroundImageInFolder(songMeta.Directory, out uri)
-        //     && SongMetaUtils.ResourceExists(songMeta, uri))
-        // {
-        //     return Observable.Return(uri);
-        // }
+            .FirstOrDefault()
+            .ObserveOnMainThread();
     }
 
     public static IObservable<string> GetCoverOrBackgroundImageUri(SongMeta songMeta)
@@ -62,20 +57,13 @@ public static class SongMetaImageUtils
         }
         return songCoverImageProviders
             .Select(it => it.GetCoverImageUri(songMeta).FirstOrDefault())
-            .FirstOrDefault();
-
-        // // Try to find an image in the song's folder
-        // if (SongMetaMissingImageProviderManager.TryFindCoverImageInFolder(songMeta.Directory, out uri)
-        //     && SongMetaUtils.ResourceExists(songMeta, uri))
-        // {
-        //     return uri;
-        // }
+            .FirstOrDefault()
+            .ObserveOnMainThread();
     }
 
     public static void SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
     {
         GetCoverOrBackgroundImageUri(songMeta)
-            .ObserveOnMainThread()
             .Subscribe(uri => SetCoverOrBackgroundImageFromUri(songMeta, uri, visualElements));
     }
 

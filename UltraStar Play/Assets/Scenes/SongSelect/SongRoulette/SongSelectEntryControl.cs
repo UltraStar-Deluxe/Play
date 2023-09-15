@@ -330,7 +330,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     {
         SongMeta coverSongMeta = songEntry.SongMeta;
         SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta)
-            .ObserveOnMainThread()
             .Subscribe(uri =>
             {
                 if (coverSongMeta != songEntry.SongMeta)

@@ -788,7 +788,6 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         }
 
         SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta)
-            .ObserveOnMainThread()
             .Subscribe(uri => SetBackgroundImageFromUri(uri));
     }
 
