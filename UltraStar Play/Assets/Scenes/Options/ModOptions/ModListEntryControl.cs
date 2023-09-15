@@ -135,11 +135,11 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             _ => modInfoDialogControl.CloseDialog());
         modInfoDialogControl.DialogClosedEventStream.Subscribe(_ => modInfoDialogControl = null);
 
-        ModInfoJson modInfoJson = ModManager.GetModInfo(ModFolder);
-        if (modInfoJson == null)
+        ModInfo modInfo = ModManager.GetModInfo(ModFolder);
+        if (modInfo == null)
         {
             string noModInfoText = "No description available." +
-                                   "\nAdd a modinfo.json file to provide information about the mod.";
+                                   $"\nAdd a {ModManager.ModInfoFileName} file to provide information about the mod.";
             modInfoDialogControl.AddVisualElement(new Label(noModInfoText));
             return;
         }
@@ -152,21 +152,21 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         Label authorsLabel = modInfoDialogVisualElement.Q<Label>(R.UxmlNames.modAuthorsLabel);
         VisualElement modDependenciesContainer = modInfoDialogVisualElement.Q<VisualElement>(R.UxmlNames.modDependenciesContainer);
 
-        SetTextOrHideLabel(descriptionLabel, "",modInfoJson.description);
-        SetTextOrHideLabel(versionLabel, "Version: " , modInfoJson.version);
-        SetTextOrHideLabel(websiteLabel, "Website: " , modInfoJson.website);
-        SetTextOrHideLabel(websiteLabel, "License: " , modInfoJson.license);
-        SetTextOrHideLabel(authorsLabel, "Authors: " , modInfoJson.authors.ToCsv(", ", "", ""));
+        SetTextOrHideLabel(descriptionLabel, "",modInfo.description);
+        SetTextOrHideLabel(versionLabel, "Version: " , modInfo.version);
+        SetTextOrHideLabel(websiteLabel, "Website: " , modInfo.website);
+        SetTextOrHideLabel(websiteLabel, "License: " , modInfo.license);
+        SetTextOrHideLabel(authorsLabel, "Authors: " , modInfo.authors.ToCsv(", ", "", ""));
 
         modDependenciesContainer.Clear();
-        if (modInfoJson.requiredAssemblies.IsNullOrEmpty())
+        if (modInfo.requiredAssemblies.IsNullOrEmpty())
         {
             modDependenciesContainer.Add(new Label($"Requires default app domain libraries."));
         }
         else
         {
             modDependenciesContainer.Add(new Label($"Requires default app domain libraries and the following"));
-            foreach (string require in modInfoJson.requiredAssemblies)
+            foreach (string require in modInfo.requiredAssemblies)
             {
                 modDependenciesContainer.Add(new Label($"• {require}"));
             }

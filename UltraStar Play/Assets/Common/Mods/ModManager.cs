@@ -15,6 +15,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static ModManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ModManager>();
 
+    public const string ModInfoFileName = "modinfo.yml";
     private const string ModsRootFolderName = "Mods";
     private const string TemplateModName = "TemplateMod";
     private const string TemplateModNamePlaceholder = "MODNAME";
@@ -545,18 +546,18 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         using DisposableStopwatch d = new($"Loading mod '{modName}' into app domain took <ms> ms");
 
         List<string> exposedAssemblyNames = defaultExposedAssemblyNames.ToList();
-        ModInfoJson modInfoJson = GetModInfo(modFolder);
-        if (modInfoJson != null
-            && !modInfoJson.requiredAssemblies.IsNullOrEmpty())
+        ModInfo modInfo = GetModInfo(modFolder);
+        if (modInfo != null
+            && !modInfo.requiredAssemblies.IsNullOrEmpty())
         {
-            exposedAssemblyNames.AddRange(modInfoJson.requiredAssemblies);
+            exposedAssemblyNames.AddRange(modInfo.requiredAssemblies);
         }
 
         List<string> exposedTypeNames = new List<string>();
-        if (modInfoJson != null
-            && !modInfoJson.requiredTypes.IsNullOrEmpty())
+        if (modInfo != null
+            && !modInfo.requiredTypes.IsNullOrEmpty())
         {
-            exposedTypeNames.AddRange(modInfoJson.requiredTypes);
+            exposedTypeNames.AddRange(modInfo.requiredTypes);
         }
 
         CompilerWrapper compilerWrapper = new();
@@ -930,18 +931,18 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public static string GetModName(string modFolder)
     {
-        ModInfoJson modInfoJson = GetModInfo(modFolder);
-        if (modInfoJson != null
-            && !modInfoJson.name.IsNullOrEmpty())
+        ModInfo modInfo = GetModInfo(modFolder);
+        if (modInfo != null
+            && !modInfo.name.IsNullOrEmpty())
         {
-            return modInfoJson.name;
+            return modInfo.name;
         }
         return Path.GetFileName(modFolder);
     }
 
-    public static ModInfoJson GetModInfo(string modFolder)
+    public static ModInfo GetModInfo(string modFolder)
     {
-        string modInfoPath = $"{modFolder}/modinfo.json";
+        string modInfoPath = $"{modFolder}/{ModInfoFileName}";
         if (!FileUtils.Exists(modInfoPath))
         {
             return null;
@@ -950,8 +951,9 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         try
         {
             string modInfoString = File.ReadAllText(modInfoPath);
-            ModInfoJson modInfoJson = JsonConverter.FromJson<ModInfoJson>(modInfoString);
-            return modInfoJson;
+            ModInfo modInfo = YamlConverter.FromYaml<ModInfo>(modInfoString);
+
+            return modInfo;
         }
         catch (Exception ex)
         {

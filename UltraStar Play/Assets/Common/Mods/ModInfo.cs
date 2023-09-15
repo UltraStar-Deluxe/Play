@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class ModInfoJson
+public class ModInfo
 {
     public string name;
     public string version;
