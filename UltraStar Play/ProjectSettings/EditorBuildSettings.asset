@@ -30,7 +30,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Options/PlayerProfileOptions/PlayerProfileOptionsScene.unity
     guid: f509dae09ad85ac4e9c41ff79fa95d6d
   - enabled: 1
-    path: Assets/Scenes/Highscore/HighscoreScene.unity
+    path: Assets/Scenes/UnusedScenes/UnusedScene-1.unity
     guid: 4aae204a79a088d488888b1ce72c2dda
   - enabled: 1
     path: Assets/Scenes/SingingResults/SingingResultsScene.unity
