@@ -357,13 +357,13 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnDisableMod(string modName)
     {
-        Debug.Log($"Calling OnDisableMod for mod '{modName}'");
         string modFolder = GetModFolderByModName(modName);
         List<IOnDisableMod> disableModHandlers = DoGetModObjects<IOnDisableMod>(modFolder, false);
         disableModHandlers.ForEach(disableModHandler =>
         {
             try
             {
+                Debug.Log($"Calling {disableModHandler.GetType().Name}.OnDisableMod");
                 disableModHandler.OnDisableMod();
             }
             catch (Exception ex)
@@ -774,6 +774,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         {
             if (modObject is IModAction modAction)
             {
+                Debug.Log($"Calling {modObject.GetType().Name}.Invoke");
                 modAction.Invoke();
             }
         }
