@@ -75,6 +75,7 @@ public static class SongMetaImageUtils
     public static void SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
     {
         GetCoverOrBackgroundImageUri(songMeta)
+            .ObserveOnMainThread()
             .Subscribe(uri => SetCoverOrBackgroundImageFromUri(songMeta, uri, visualElements));
     }
 

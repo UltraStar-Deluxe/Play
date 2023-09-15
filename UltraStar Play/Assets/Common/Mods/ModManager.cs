@@ -513,15 +513,23 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         List<string> exposedAssemblyNames = defaultExposedAssemblyNames.ToList();
         ModInfoJson modInfoJson = GetModInfo(modFolder);
         if (modInfoJson != null
-            && !modInfoJson.requires.IsNullOrEmpty())
+            && !modInfoJson.requiredAssemblies.IsNullOrEmpty())
         {
-            exposedAssemblyNames.AddRange(modInfoJson.requires);
+            exposedAssemblyNames.AddRange(modInfoJson.requiredAssemblies);
+        }
+
+        List<string> exposedTypeNames = new List<string>();
+        if (modInfoJson != null
+            && !modInfoJson.requiredTypes.IsNullOrEmpty())
+        {
+            exposedTypeNames.AddRange(modInfoJson.requiredTypes);
         }
 
         CompilerWrapper compilerWrapper = new();
 
         // Load AppDomain libraries
-        LoadExposedAppDomainAssemblies(compilerWrapper, exposedAssemblyNames);
+        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        LoadExposedAppDomainAssembliesAndTypes(compilerWrapper, assemblies, exposedAssemblyNames, exposedTypeNames);
         appDomainTypesChanged = true;
 
         // Find types that are loaded from this mod folder
@@ -800,26 +808,66 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             .ToList();
     }
 
-    private void LoadExposedAppDomainAssemblies(CompilerWrapper compilerWrapper, List<string> exposedAssemblyNames)
+    private void LoadExposedAppDomainAssembliesAndTypes(
+        CompilerWrapper compilerWrapper,
+        Assembly[] assemblies,
+        List<string> exposedAssemblyNames,
+        List<string> exposedTypeNames)
     {
-        if (exposedAssemblyNames.IsNullOrEmpty())
+        if (exposedAssemblyNames.IsNullOrEmpty()
+            && exposedTypeNames.IsNullOrEmpty())
         {
             return;
         }
 
-        List<Assembly> exposedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(assembly => exposedAssemblyNames.Contains(assembly.GetName().Name))
-            .ToList();
-
-        // string exposedAssemblyNameCsv = exposedAssemblies
-        //     .Select(it => it.GetName().Name)
-        //     .OrderBy(it => it)
-        //     .ToCsv("\n");
-        // Debug.Log($"Exposed assemblies: {exposedAssemblyNameCsv}");
-
-        foreach (Assembly assembly in exposedAssemblies)
+        if (!exposedAssemblyNames.IsNullOrEmpty())
         {
-            compilerWrapper.ReferenceAssembly(assembly);
+            List<Assembly> exposedAssemblies = assemblies
+                .Where(assembly => exposedAssemblyNames.Contains(assembly.GetName().Name))
+                .ToList();
+            foreach (Assembly assembly in exposedAssemblies)
+            {
+                compilerWrapper.ReferenceAssembly(assembly);
+            }
+        }
+
+        if (!exposedTypeNames.IsNullOrEmpty())
+        {
+            HashSet<string> remainingTypeNames = new HashSet<string>(exposedTypeNames);
+            List<Type> foundTypes = new List<Type>();
+            foreach (Assembly assembly in assemblies)
+            {
+                foreach (string typeName in remainingTypeNames)
+                {
+                    try
+                    {
+                        Type type = assembly.GetType(typeName, false, false);
+                        if (type != null)
+                        {
+                            foundTypes.Add(type);
+                            remainingTypeNames.Remove(typeName);
+                            if (remainingTypeNames.IsNullOrEmpty())
+                            {
+                                // All types done
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Ignore
+                    }
+                }
+            }
+
+            if (!remainingTypeNames.IsNullOrEmpty())
+            {
+                throw new LoadModException($"Required types not found in app domain: {remainingTypeNames.ToCsv(", ", "", "")}");
+            }
+            else
+            {
+                compilerWrapper.ImportTypes(foundTypes.ToArray());
+            }
         }
     }
 

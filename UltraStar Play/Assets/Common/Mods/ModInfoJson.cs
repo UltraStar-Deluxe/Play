@@ -8,5 +8,6 @@ public class ModInfoJson
     public string license;
     public string website;
     public List<string> authors;
-    public List<string> requires;
+    public List<string> requiredAssemblies;
+    public List<string> requiredTypes;
 }
