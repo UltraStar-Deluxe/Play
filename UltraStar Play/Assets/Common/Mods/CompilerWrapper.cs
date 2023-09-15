@@ -78,6 +78,11 @@ public class CompilerWrapper
         return evaluator.Run(code);
     }
 
+    public object EvaluateExpression(string code, out object result, out bool isResultSet)
+    {
+        return evaluator.Evaluate(code, out result, out isResultSet);
+    }
+
     public void StartNewPartialReport()
     {
         reportPrinter.StartNewPartialReport();

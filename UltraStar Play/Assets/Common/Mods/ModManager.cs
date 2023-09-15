@@ -86,6 +86,24 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         "Scenes",
     };
 
+    private CompilerWrapper evalCompilerWrapper;
+    private CompilerWrapper EvalCompilerWrapper
+    {
+        get
+        {
+            if (evalCompilerWrapper == null)
+            {
+                evalCompilerWrapper = new();
+                LoadExposedAppDomainAssembliesAndTypes(evalCompilerWrapper,
+                    AppDomain.CurrentDomain.GetAssemblies(),
+                    defaultExposedAssemblyNames,
+                    new List<string>());
+            }
+
+            return evalCompilerWrapper;
+        }
+    }
+
     protected override object GetInstance()
     {
         return Instance;
@@ -221,6 +239,22 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 shouldReloadChangedMods = !shouldReloadChangedMods;
                 Debug.Log($"Reload changed mods: {shouldReloadChangedMods}");
             });
+
+        DebugLogConsole.AddCommand("mod.eval", "Evaluate C# code in the current context. " +
+                                               "Previous statements such as using statements become part of the context. " +
+                                               "Surround the expression with braces to allow spaces in the expression.",
+            (string expression) => EvaluateExpression(expression),
+            "name");
+    }
+
+    private void EvaluateExpression(string expression)
+    {
+        Debug.Log($"> {expression}");
+        EvalCompilerWrapper.EvaluateExpression(expression, out object result, out bool isResultSet);
+        if (isResultSet)
+        {
+            Debug.Log(result);
+        }
     }
 
     private List<Type> GetModInterfaces()
@@ -811,8 +845,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     private void LoadExposedAppDomainAssembliesAndTypes(
         CompilerWrapper compilerWrapper,
         Assembly[] assemblies,
-        List<string> exposedAssemblyNames,
-        List<string> exposedTypeNames)
+        IReadOnlyList<string> exposedAssemblyNames,
+        IReadOnlyList<string> exposedTypeNames)
     {
         if (exposedAssemblyNames.IsNullOrEmpty()
             && exposedTypeNames.IsNullOrEmpty())
