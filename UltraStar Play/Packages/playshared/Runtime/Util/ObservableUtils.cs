@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 
@@ -9,6 +10,54 @@ public class ObservableUtils
     {
         Debug.LogError(exception.Message);
         return Observable.Throw<T>(exception);
+    }
+
+    public static IObservable<T> RunOnNewTaskAsObservable<T>(Func<T> function, IDisposable disposable)
+    {
+        return Observable.Create<T>(o =>
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    T result = function();
+                    o.OnNext(result);
+                    o.OnCompleted();
+                }
+                catch (Exception ex)
+                {
+                    o.OnError(ex);
+                }
+
+                return disposable;
+            });
+
+            return disposable;
+        });
+    }
+
+    public static IObservable<T> RunOnNewTaskAsObservable<T>(Func<Task<T>> function, IDisposable disposable)
+    {
+        return Observable.Create<T>(o =>
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    T result = await function();
+                    o.OnNext(result);
+                    o.OnCompleted();
+                }
+                catch (Exception ex)
+                {
+                    o.OnError(ex);
+                }
+
+                return disposable;
+            });
+
+            return disposable;
+        });
     }
 
     public static IObservable<List<T>> AllItemsUntilErrorOrCompleted<T>(IObservable<T> observable, bool logError = true)
