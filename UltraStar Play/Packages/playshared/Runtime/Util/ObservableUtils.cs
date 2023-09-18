@@ -21,7 +21,10 @@ public class ObservableUtils
                 try
                 {
                     T result = function();
-                    o.OnNext(result);
+                    if (result != null)
+                    {
+                        o.OnNext(result);
+                    }
                     o.OnCompleted();
                 }
                 catch (Exception ex)
@@ -45,7 +48,10 @@ public class ObservableUtils
                 try
                 {
                     T result = await function();
-                    o.OnNext(result);
+                    if (result != null)
+                    {
+                        o.OnNext(result);
+                    }
                     o.OnCompleted();
                 }
                 catch (Exception ex)
