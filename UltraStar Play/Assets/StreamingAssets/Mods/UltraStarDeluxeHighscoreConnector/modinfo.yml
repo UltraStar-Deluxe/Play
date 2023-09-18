@@ -5,3 +5,5 @@ description: |
   Write new high scores to your local USDX database.
 authors: 
   - email@melodymania.org
+requiredAssemblies:
+  - System.Data
