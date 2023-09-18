@@ -35,6 +35,13 @@
       "dependencies": {},
       "hash": "5b6e02e899a69af2aa5eb22d49927697bfbd8a38"
     },
+    "com.achimmihca.sqliteunity": {
+      "version": "https://github.com/achimmihca/SQLiteUnity.git?path=SQLiteUnity/Packages/com.achimmihca.sqliteunity#019de045b6080fb15544b244900a96fe7ce00459",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "019de045b6080fb15544b244900a96fe7ce00459"
+    },
     "com.achimmihca.uniinject": {
       "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#f8c6f93dabc03137957588f7d9e572fc623272b0",
       "depth": 0,
