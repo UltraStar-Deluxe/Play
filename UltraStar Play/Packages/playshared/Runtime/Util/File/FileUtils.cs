@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using UnityEngine;
@@ -81,6 +82,27 @@ public static class FileUtils
                && !TimeUtils.IsDurationAboveThresholdInMillis(startTime, maxWaitTimeInMillis))
         {
             Thread.Sleep(10);
+        }
+    }
+
+    public static void Delete(string dbPath, long maxWaitTineInMillis = 100)
+    {
+        if (!File.Exists(dbPath))
+        {
+            return;
+        }
+
+        File.Delete(dbPath);
+        long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        while (File.Exists(dbPath)
+               && !TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTineInMillis))
+        {
+            Thread.Sleep(1);
+        }
+
+        if (File.Exists(dbPath))
+        {
+            throw new IOException($"Failed to delete file {dbPath} within {maxWaitTineInMillis}");
         }
     }
 }
