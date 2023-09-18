@@ -227,6 +227,7 @@ public static partial class R
         public const string highscoreEntryList = "highscoreEntryList";
         public const string highscoreEntryUiRoot = "highscoreEntryUiRoot";
         public const string highscoresContainer = "highscoresContainer";
+        public const string highScoreSourceIcon = "highScoreSourceIcon";
         public const string highscoresRoot = "highscoresRoot";
         public const string highscoreTitleButton = "highscoreTitleButton";
         public const string highscoreValueLabel = "highscoreValueLabel";
