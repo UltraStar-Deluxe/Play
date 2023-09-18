@@ -29,7 +29,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private readonly Dictionary<IMod, ModObjectContext> modObjectToContext = new();
     private readonly Dictionary<Type, string> typeToModFolder = new();
-    private readonly Dictionary<string, ModContext> modFolderToModContext = new();
 
     private List<string> lastEnabledMods = new();
 
@@ -728,12 +727,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         {
             ModObjectContext modObjectContext = modObjectToContext[modObject];
 
-            string modFolder = GetModFolder(modObject);
-            ModContext modContext = GetOrCreateModContext(modFolder);
-
             Injector childInjector = injector
                 .CreateChildInjector()
-                .WithBindingForInstance(modContext)
                 .WithBindingForInstance(modObjectContext);
             foreach (IAutoBoundMod autoBoundScript in autoBoundScripts)
             {
@@ -753,17 +748,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 modAction.OnLoadMod();
             }
         }
-    }
-
-    private ModContext GetOrCreateModContext(string modFolder)
-    {
-        if (!modFolderToModContext.TryGetValue(modFolder, out ModContext modContext))
-        {
-            modContext = new(modFolder);
-            modFolderToModContext[modFolder] = modContext;
-        }
-
-        return modContext;
     }
 
     private void LoadModSettings(IModSettings modSettings)
