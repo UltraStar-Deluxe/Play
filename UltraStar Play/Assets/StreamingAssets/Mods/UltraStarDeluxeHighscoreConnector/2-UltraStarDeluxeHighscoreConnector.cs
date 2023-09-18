@@ -64,21 +64,23 @@ public class UltraStarDeluxeHighscoreConnector : IHighscoreConnector, IOnDisable
 
     private async Task<HighScoreRecord> ReadHighScoreRecordAsync(SongMeta songMeta)
     {
+        string artistEscaped = EscapeSqlStringArgument(songMeta.Artist);
+        string titleEscaped = EscapeSqlStringArgument(songMeta.Title);
         string sql = $"SELECT us_scores.songid, us_scores.player, us_scores.difficulty, us_scores.score " +
                 $"FROM us_scores " +
                 $"INNER JOIN us_songs ON us_songs.id=us_scores.songid " +
-                $"WHERE us_songs.artist LIKE '{songMeta.Artist}' AND us_songs.title LIKE '{songMeta.Title}' ";
-        Debug.Log($"Executing SQL: {sql}");
+                $"WHERE us_songs.artist LIKE '{artistEscaped}' AND us_songs.title LIKE '{titleEscaped}' ";
+        Log.Verbose(() => $"Executing SQL: {sql}");
         IDataReader dbReader = DbConnection.ExecuteQuery(sql);
 
         List<ScoreRecordQueryData> dbRecords = dbReader.ToList<ScoreRecordQueryData>();
         if (dbRecords.IsNullOrEmpty())
         {
-            // Debug.Log($"No USDX high score found for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+            Log.Verbose(() => $"No USDX high score found for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
             return null;
         }
 
-        // Debug.Log($"Found USDX high scores found for '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {dbRecords.Count}, {JsonConverter.ToJson(dbRecords)}");
+        Log.Verbose(() => $"Found USDX high scores found for '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {dbRecords.Count}, {JsonConverter.ToJson(dbRecords)}");
         HighScoreRecord highScoreRecord = new HighScoreRecord();
         foreach(ScoreRecordQueryData dbRecord in dbRecords)
         {
@@ -86,6 +88,11 @@ public class UltraStarDeluxeHighscoreConnector : IHighscoreConnector, IOnDisable
         }
 
         return highScoreRecord;
+    }
+
+    private string EscapeSqlStringArgument(string text)
+    {
+        return text.Replace("'", "''");
     }
 
     private HighScoreEntry ToHighScoreEntry(ScoreRecordQueryData dbRecord)
