@@ -7,19 +7,12 @@ public class MODNAMESceneMod : ISceneMod
 {
     // Get common objects from the app environment via Inject attribute.
     [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
     private UIDocument uiDocument;
 
     [Inject]
     private SceneNavigator sceneNavigator;
 
-    // The ModContext object is the same for every script in the mod folder.
-    [Inject]
-    private ModContext modContext;
-
-    // Mod settings implement IAutoBoundMod, which makes an instance available here via Inject attribute
+    // Mod settings implement IAutoBoundMod, which makes an instance available via Inject attribute
     [Inject]
     private MODNAMEModSettings modSettings;
 
@@ -27,11 +20,21 @@ public class MODNAMESceneMod : ISceneMod
 
     public void OnSceneEntered(SceneEnteredContext sceneEnteredContext)
     {
+        // You can do anything here, for example ...
+
+        // ... show a message
         UiManager.CreateNotification($"Welcome to {sceneEnteredContext.Scene}!");
 
-        // Add Unity GameObject with MonoBehaviour
+        // ... change UI elements
+        // uiDocument.rootVisualElement.Query<VisualElement>().ForEach(element =>
+        // {
+        //     element.style.borderTopColor = new StyleColor(Color.red);
+        //     element.style.borderTopWidth = 1;
+        // });
+
+        // ... create new Unity GameObjects with custom behaviour.
         GameObject gameObject = new GameObject();
-        gameObject.name = "MODNAMEMonoBehaviour";
+        gameObject.name = nameof(MODNAMEMonoBehaviour);
         MODNAMEMonoBehaviour behaviour = gameObject.AddComponent<MODNAMEMonoBehaviour>();
         sceneEnteredContext.SceneInjector.Inject(behaviour);
     }
@@ -42,17 +45,24 @@ public class MODNAMEMonoBehaviour : MonoBehaviour, INeedInjection
     // Awake is called once after instantiation
     private void Awake()
     {
-        Debug.Log($"{GetType().Name}.Awake");
+        Debug.Log($"{nameof(MODNAMEMonoBehaviour)}.Awake");
     }
 
     // Start is called once before Update
     private void Start()
     {
-        Debug.Log($"{GetType().Name}.Start");
+        Debug.Log($"{nameof(MODNAMEMonoBehaviour)}.Start");
     }
 
     // Update is called once per frame
     private void Update()
     {
+    }
+
+    private void OnDestroy()
+    {
+        Debug.Log($"{nameof(MODNAMEMonoBehaviour)}.OnDestroy");
+        // GameObjects are destroyed before the next scene is loaded.
+        // To persist a GameObject across scene changes, make it a child of DontDestroyOnLoadManager.
     }
 }

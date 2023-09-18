@@ -8,6 +8,8 @@ using UnityEngine.TestTools;
 
 public class ModTests : AbstractPlayModeTest
 {
+    private const string TestModName = "TESTMOD";
+
     private static string testModFolder;
 
     [TearDown]
@@ -28,7 +30,7 @@ public class ModTests : AbstractPlayModeTest
 
         ModManager modManager = ModManager.Instance;
 
-        testModFolder = modManager.CreateModFolderFromTemplate("TESTMOD");
+        testModFolder = modManager.CreateModFolderFromTemplate(TestModName);
         Assert.IsNotNull(testModFolder);
         Assert.IsTrue(Directory.Exists(testModFolder));
 

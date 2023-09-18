@@ -339,11 +339,12 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private string ReplaceTemplateModPlaceholders(string text, string modName)
     {
+        string modNameNoSpaces = modName.Replace(" ", "");
         string dataPath = Application.isEditor
             ? new DirectoryInfo(Application.dataPath + "/../../Build/Windows/Melody Mania_Data").FullName
             : Application.dataPath;
         return text
-            .Replace(TemplateModNamePlaceholder, modName)
+            .Replace(TemplateModNamePlaceholder, modNameNoSpaces)
             .Replace(TemplateModDllFolderPlaceholder, $"{dataPath}/Managed");
     }
 

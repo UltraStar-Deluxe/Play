@@ -5,7 +5,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class JukeboxAndSing : ISceneMod
+public class JukeboxAndSingSceneMod : ISceneMod
 {
     public void OnSceneEntered(SceneEnteredContext sceneEnteredContext)
     {
@@ -13,7 +13,7 @@ public class JukeboxAndSing : ISceneMod
         {
             return;
         }
-        Debug.Log("JukeboxAndSing - entered sing scene");
+        Debug.Log("JukeboxAndSingSceneMod - entered sing scene");
 
         // Wait one frame for scene setup to finish
         MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => 
