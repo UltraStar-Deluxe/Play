@@ -27,16 +27,4 @@ public static class DbConnectionExtensions
         IDataReader reader = dbCommand.ExecuteReader();
         return reader;
     }
-
-    public static List<Dictionary<string, object>> ToDictionaryList(this IDataReader reader)
-    {
-        List<Dictionary<string, object>> result = new();
-        while (reader.Read())
-        {
-            Dictionary<string,object> dictionary = Enumerable.Range(0, reader.FieldCount)
-                .ToDictionary(reader.GetName, reader.GetValue);
-            result.Add(dictionary);
-        }
-        return result;
-    }
 }

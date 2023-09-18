@@ -25,22 +25,29 @@ namespace Editor.Tests
 
             // Read data
             IDataReader dataReader = dbConnection.ExecuteQuery("SELECT * FROM my_table");
-            List<Dictionary<string, object>> dictionaryList = dataReader.ToDictionaryList();
+            List<PersonDb> records = dataReader.ToList<PersonDb>();
 
             // Assert data is as expected
-            if (dictionaryList.Count != 2)
+            if (records.Count != 2)
             {
                 Assert.Fail("Unexpected number of rows returned");
             }
-            Dictionary<string, object> firstRecord = dictionaryList[0];
-            Assert.AreEqual(1, firstRecord["id"]);
-            Assert.AreEqual("Alice", firstRecord["name"]);
-            Assert.AreEqual(42, firstRecord["age"]);
+            PersonDb firstRecord = records[0];
+            Assert.AreEqual(1, firstRecord.id);
+            Assert.AreEqual("Alice", firstRecord.name);
+            Assert.AreEqual(42, firstRecord.age);
 
-            Dictionary<string, object> secondRecord = dictionaryList[1];
-            Assert.AreEqual(2, secondRecord["id"]);
-            Assert.AreEqual("Bob", secondRecord["name"]);
-            Assert.AreEqual(33, secondRecord["age"]);
+            PersonDb secondRecord = records[1];
+            Assert.AreEqual(2, secondRecord.id);
+            Assert.AreEqual("Bob", secondRecord.name);
+            Assert.AreEqual(33, secondRecord.age);
         }
+    }
+
+    public class PersonDb
+    {
+        public long id;
+        public string name;
+        public long age;
     }
 }
