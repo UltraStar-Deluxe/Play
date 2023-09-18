@@ -57,7 +57,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
-        // Unity engine
+        // Unity Engine
         "UnityEngine",
         "UnityEngine.AudioModule",
         "UnityEngine.CoreModule",
@@ -68,18 +68,12 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         "UnityEngine.UIModule",
         "UnityEngine.VideoModule",
 
-        // Third Party Packages
-        "com.achimmihca.portaudioforunity",
-        "com.achimmihca.primeinputactions",
-        "com.achimmihca.protrans",
-        "com.achimmihca.scenechangeanimations",
-        "com.achimmihca.simplehttpserverforunity",
+        // From Unity Packages
         "com.achimmihca.uniinject",
-        "com.achimmihca.utfunknownunity",
         "playshared",
         "playsharedui",
 
-        // Plugins
+        // From Plugins folder
         "UniRx",
         "Plugins",
 
@@ -790,7 +784,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         try
         {
             Debug.Log($"Writing mod settings of type {modSettings.GetType()} to file '{modSettingsPath}'");
-            string json = JsonConverter.ToJson(modSettings);
+            string json = JsonConverter.ToJson(modSettings, true);
             File.WriteAllText(modSettingsPath, json);
         }
         catch (Exception ex)
