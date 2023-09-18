@@ -54,6 +54,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     private readonly List<string> changedCsFiles = new();
 
     private readonly HashSet<string> failedToLoadModFolders = new();
+    public IReadOnlyCollection<string> FailedToLoadModFolders => failedToLoadModFolders;
 
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
@@ -124,7 +125,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
         lastEnabledMods = settings.EnabledMods.ToList();
 
-        LoadAndInstantiateScripts();
+        LoadAndInstantiateMods();
     }
 
     private void CreateOrUpdateModFolderFileSystemWatchers()
@@ -165,7 +166,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         {
             Debug.Log($"Reloading mods because of changed files: {changedCsFiles.ToCsv()}");
             changedCsFiles.Clear();
-            LoadAndInstantiateScripts();
+            LoadAndInstantiateMods();
         }
     }
 
@@ -196,7 +197,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void AddDebugLogConsoleCommand()
     {
-        DebugLogConsole.AddCommand("mod.path", "Copy and log path to folders with runtime loaded scripts",
+        DebugLogConsole.AddCommand("mod.path", "Copy and log path to folder with mods",
             () =>
             {
                 string text = GetAbsoluteUserDefinedModsRootFolder();
@@ -268,7 +269,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             .ToList();
     }
 
-    private void CreateModFolderFromTemplate(string modName)
+    public string CreateModFolderFromTemplate(string modName)
     {
         string targetModFolder = $"{GetAbsoluteUserDefinedModsRootFolder()}/{modName}";
         DirectoryInfo targetModFolderInfo = new(targetModFolder);
@@ -276,7 +277,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         {
             Debug.Log($"Directory already exists: '{targetModFolder}'");
             UiManager.CreateNotification("A mod with this name already exists.");
-            return;
+            return "";
         }
 
         string templateModFolder = ApplicationUtils.GetStreamingAssetsPath($"{ModsRootFolderName}/{TemplateModFolderName}");
@@ -332,6 +333,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.LogError($"Failed to replace template mod placeholders in file name {fileInfo}");
             }
         }
+
+        return targetModFolder;
     }
 
     private string ReplaceTemplateModPlaceholders(string text, string modName)
@@ -348,7 +351,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     {
         Debug.Log($"Reloading mods because of newly enabled mod: {newlyEnabledModNames.ToCsv()}");
         CreateOrUpdateModFolderFileSystemWatchers();
-        LoadAndInstantiateScripts();
+        LoadAndInstantiateMods();
     }
 
     private void OnDisableMods(List<string> newlyDisabledModNames)
@@ -375,12 +378,12 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         });
     }
 
-    private void LoadAndInstantiateScripts()
+    public void LoadAndInstantiateMods(bool onlyEnabledMods = true)
     {
         try
         {
-            LoadModsIntoAppDomain();
-            UpdateModObjects();
+            LoadModsIntoAppDomain(onlyEnabledMods);
+            UpdateModObjects(onlyEnabledMods);
         }
         catch (Exception ex)
         {
@@ -391,9 +394,10 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void LoadModsIntoAppDomain()
+    private void LoadModsIntoAppDomain(bool onlyEnabledMods)
     {
-        if (settings.EnabledMods.IsNullOrEmpty())
+        if (onlyEnabledMods
+            && settings.EnabledMods.IsNullOrEmpty())
         {
             return;
         }
@@ -403,7 +407,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         List<string> modFolders = GetModFolders();
         foreach (string modFolder in modFolders)
         {
-            if (IsModEnabled(modFolder))
+            if (!onlyEnabledMods
+                || IsModEnabled(modFolder))
             {
                 string modName = GetModName(modFolder);
 
@@ -418,38 +423,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                     failedToLoadModFolders.Add(modFolder);
                 }
             }
-        }
-    }
-
-    private void CopyDefaultModToPersistentDataPath(string modFolderName)
-    {
-        try
-        {
-            string demoModSourceFolder = $"{GetAbsoluteDefaultModsRootFolder()}/{modFolderName}";
-            string demoModTargetFolder = $"{GetAbsoluteUserDefinedModsRootFolder()}/{modFolderName}";
-            if (Directory.Exists(demoModSourceFolder)
-                && !Directory.Exists(demoModTargetFolder))
-            {
-                Debug.Log($"Copying default mod '{modFolderName}' to persistentDataPath (from: '{demoModSourceFolder}', to: '{demoModTargetFolder}')");
-                DirectoryUtils.CopyAll(demoModSourceFolder, demoModTargetFolder,
-                    CopyDirectoryFilter.Exclude(path =>
-                    {
-                        string fileNameToLower = Path.GetFileName(path).ToLowerInvariant();
-                        return fileNameToLower.EndsWith(".meta")
-                            || fileNameToLower.EndsWith(".sln")
-                            || fileNameToLower == "bin"
-                            || fileNameToLower == "obj";
-                    }));
-            }
-            else
-            {
-                Debug.Log($"Not copying default mod '{modFolderName}' to persistentDataPath because the target folder already exists.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to copy default mod '{modFolderName}' to persistentDataPath.");
         }
     }
 
@@ -517,7 +490,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return "";
     }
 
-    public static List<T> GetModObjects<T>(string modFolder = null, bool onlyFromEnabledMods = true)
+    public static List<T> GetModObjects<T>(string modFolder = null, bool onlyEnabledMods = true)
         where T : IMod
     {
         ModManager instance = Instance;
@@ -526,14 +499,14 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             return new List<T>();
         }
 
-        return instance.DoGetModObjects<T>(modFolder, onlyFromEnabledMods);
+        return instance.DoGetModObjects<T>(modFolder, onlyEnabledMods);
     }
 
-    private List<T> DoGetModObjects<T>(string modFolder = null, bool onlyFromEnabledMods = true)
+    private List<T> DoGetModObjects<T>(string modFolder = null, bool onlyEnabledMods = true)
         where T : IMod
     {
         if (settings.EnabledMods.IsNullOrEmpty()
-            && onlyFromEnabledMods)
+            && onlyEnabledMods)
         {
             return new List<T>();
         }
@@ -543,7 +516,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 || modFolder == entry.Value.ModFolder)
             .Where(entry => !entry.Value.IsObsolete
                             && entry.Key is T)
-            .Where(entry => !onlyFromEnabledMods || IsModEnabled(entry.Key))
+            .Where(entry => !onlyEnabledMods || IsModEnabled(entry.Key))
             .Select(entry => (T)entry.Key)
             .ToList();
     }
@@ -637,12 +610,12 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private List<IMod> CreateModObjects()
+    private List<IMod> CreateModObjects(bool onlyEnabledMods)
     {
         Type parent = typeof(IMod);
         return ModTypes
             .Where(type => parent.IsAssignableFrom(type)
-                           && IsModEnabled(type)
+                           && (!onlyEnabledMods || IsModEnabled(type))
                            && IsModLoadedSuccessfully(type))
             .Select(type => (IMod)Activator.CreateInstance(type))
             .ToList();
@@ -699,19 +672,19 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return types;
     }
 
-    private void UpdateModObjects()
+    private void UpdateModObjects(bool onlyEnabledMods)
     {
-        using DisposableStopwatch d = new($"Instantiate runtime loaded scripts took <ms> ms");
+        using DisposableStopwatch d = new($"Instantiate mod objects took <ms> ms");
 
         // Instantiate new objects
         List<IMod> currentAndObsoleteModObjects;
         try
         {
-            currentAndObsoleteModObjects = CreateModObjects();
+            currentAndObsoleteModObjects = CreateModObjects(onlyEnabledMods);
         }
         catch (Exception ex)
         {
-            throw new LoadModException($"Failed to instantiate runtime loaded scripts: {ex.Message}", ex);
+            throw new LoadModException($"Failed to instantiate mod objects: {ex.Message}", ex);
         }
 
         List<IMod> currentModObjects = GetNewestImplementations(currentAndObsoleteModObjects);
@@ -746,7 +719,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             }
         }
 
-        // Bind then inject runtime loaded scripts
+        // Bind then inject mod objects
         List<IAutoBoundMod> autoBoundScripts = currentModObjects
             .OfType<IAutoBoundMod>()
             .ToList();
@@ -770,13 +743,13 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             childInjector.Inject(modObject);
         }
 
-        // Execute mod actions
+        // Execute mod loaded callback
         foreach (IMod modObject in currentModObjects)
         {
-            if (modObject is IModAction modAction)
+            if (modObject is IOnLoadMod modAction)
             {
-                Debug.Log($"Calling {modObject.GetType().Name}.Invoke");
-                modAction.Invoke();
+                Debug.Log($"Calling {modObject.GetType().Name}.OnLoadMod");
+                modAction.OnLoadMod();
             }
         }
     }

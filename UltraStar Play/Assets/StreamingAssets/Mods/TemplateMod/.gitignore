@@ -4,4 +4,4 @@ obj/
 *.sln
 
 # Ignore Unity meta files
-*.*.meta
+*.meta

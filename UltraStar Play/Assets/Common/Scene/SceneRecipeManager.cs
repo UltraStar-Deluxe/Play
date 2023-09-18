@@ -95,7 +95,7 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
                 sceneInjectionFinishedListener.OnSceneInjectionFinished();
             }
         }
-        UltraStarPlaySceneInjectionManager.FireSceneInjectionFinishedEvent(loadedSceneInjector);
+        UltraStarPlaySceneInjectionManager.FireSceneInjectionFinishedEvent(new SceneInjectionFinishedEvent(loadedSceneInjector));
 
         // Update translations
         foreach (GameObject loadedGameObject in loadedGameObjects)

@@ -15,13 +15,14 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
-        staticSceneDatas.Clear();
+        sceneEnumToSceneData.Clear();
     }
 
     public static SceneNavigator Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SceneNavigator>();
 
     /// Static map to store and load SceneData instances across scenes.
-    private static readonly Dictionary<System.Type, SceneData> staticSceneDatas = new();
+    private static readonly Dictionary<Type, SceneData> sceneDataTypeToSceneData = new();
+    private static readonly Dictionary<EScene, SceneData> sceneEnumToSceneData = new();
 
     private readonly Subject<BeforeSceneChangeEvent> beforeSceneChangeEventStream = new();
     public IObservable<BeforeSceneChangeEvent> BeforeSceneChangeEventStream => beforeSceneChangeEventStream;
@@ -115,9 +116,10 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void AddSceneData(SceneData sceneData)
+    private void AddSceneData(EScene scene, SceneData sceneData)
     {
-        staticSceneDatas[sceneData.GetType()] = sceneData;
+        sceneDataTypeToSceneData[sceneData.GetType()] = sceneData;
+        sceneEnumToSceneData[scene] = sceneData;
     }
 
     public void LoadScene(EScene scene, SceneData sceneData, bool skipAnimation=false)
@@ -126,7 +128,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         {
             throw new Exception("SceneData cannot be null. Use LoadScene(EScene) if no SceneData is required.");
         }
-        AddSceneData(sceneData);
+        AddSceneData(scene, sceneData);
         LoadScene(scene, skipAnimation);
     }
 
@@ -140,9 +142,21 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
         return GetSceneData<T>(null);
     }
 
+    public static SceneData GetSceneData(EScene scene)
+    {
+        if (sceneEnumToSceneData.TryGetValue(scene, out SceneData sceneData))
+        {
+            return sceneData;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public static T GetSceneData<T>(T defaultValue) where T : SceneData
     {
-        if (staticSceneDatas.TryGetValue(typeof(T), out SceneData sceneData))
+        if (sceneDataTypeToSceneData.TryGetValue(typeof(T), out SceneData sceneData))
         {
             if (sceneData is T)
             {

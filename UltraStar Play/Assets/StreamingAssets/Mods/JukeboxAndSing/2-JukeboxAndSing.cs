@@ -5,27 +5,14 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class JukeboxAndSing : IModAction, IOnDisableMod
+public class JukeboxAndSing : ISceneMod
 {
-    private List<IDisposable> disposables = new List<IDisposable>();
-
-    [Inject]
-    private SceneNavigator sceneNavigator;
-
-    public void Invoke()
+    public void OnSceneEntered(SceneEnteredContext sceneEnteredContext)
     {
-        disposables.Add(UltraStarPlaySceneInjectionManager.SceneInjectionFinishedEventStream
-            .Subscribe(injector =>
-            {
-                if (sceneNavigator.CurrentScene == EScene.SingScene)
-                {
-                    OnSingSceneInjectionFinished(injector);
-                }
-            }));
-    }
-
-    private void OnSingSceneInjectionFinished(Injector injector)
-    {
+        if (sceneEnteredContext.Scene != EScene.SingScene)
+        {
+            return;
+        }
         Debug.Log("JukeboxAndSing - entered sing scene");
 
         // Wait one frame for scene setup to finish
@@ -34,12 +21,7 @@ public class JukeboxAndSing : IModAction, IOnDisableMod
             GameObject gameObject = new GameObject();
             JukeboxAndSingControl monoBehaviour = gameObject.AddComponent<JukeboxAndSingControl>();
             monoBehaviour.name = "JukeboxAndSingControl";
-            injector.Inject(monoBehaviour);
+            sceneEnteredContext.SceneInjector.Inject(monoBehaviour);
         }));
-    }
-
-    public void OnDisableMod()
-    {
-        disposables.ForEach(it => it.Dispose());
     }
 }

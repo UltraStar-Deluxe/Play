@@ -13,8 +13,8 @@ public class UltraStarPlaySceneInjectionManager : SceneInjectionManager
     {
         sceneInjectionFinishedEventStream = new();
     }
-    private static Subject<Injector> sceneInjectionFinishedEventStream = new();
-    public static IObservable<Injector> SceneInjectionFinishedEventStream => sceneInjectionFinishedEventStream;
+    private static Subject<SceneInjectionFinishedEvent> sceneInjectionFinishedEventStream = new();
+    public static IObservable<SceneInjectionFinishedEvent> SceneInjectionFinishedEventStream => sceneInjectionFinishedEventStream;
 
     public static UltraStarPlaySceneInjectionManager Instance => GameObjectUtils.FindComponentWithTag<UltraStarPlaySceneInjectionManager>("SceneInjectionManager");
 
@@ -28,11 +28,11 @@ public class UltraStarPlaySceneInjectionManager : SceneInjectionManager
     public override void DoSceneInjection()
     {
         base.DoSceneInjection();
-        FireSceneInjectionFinishedEvent(SceneInjector);
+        FireSceneInjectionFinishedEvent(new SceneInjectionFinishedEvent(SceneInjector));
     }
 
-    public static void FireSceneInjectionFinishedEvent(Injector sceneInjector)
+    public static void FireSceneInjectionFinishedEvent(SceneInjectionFinishedEvent evt)
     {
-        sceneInjectionFinishedEventStream.OnNext(sceneInjector);
+        sceneInjectionFinishedEventStream.OnNext(evt);
     }
 }
