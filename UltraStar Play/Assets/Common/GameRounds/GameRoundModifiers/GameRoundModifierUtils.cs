@@ -29,7 +29,7 @@ public static class GameRoundModifierUtils
         }
 
         return GetGameRoundModifiers()
-            .Where(modifier => modifierIds.Contains(modifier.Id))
+            .Where(modifier => modifierIds.Contains(modifier.GetId()))
             .ToList();
     }
 
@@ -41,7 +41,7 @@ public static class GameRoundModifierUtils
         }
 
         return modifiers
-            .Select(modifier => modifier.Id)
+            .Select(modifier => modifier.GetId())
             .ToList();
     }
 }

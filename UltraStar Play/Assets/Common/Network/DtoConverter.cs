@@ -150,7 +150,7 @@ public static class DtoConverter
     {
         GameRoundModifierDto dto = new()
         {
-            Id = modifier.Id,
+            Id = modifier.GetId(),
             DisplayName = modifier.DisplayName,
             DisplayOrder = modifier.DisplayOrder,
         };

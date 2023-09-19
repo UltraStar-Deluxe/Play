@@ -13,20 +13,20 @@ public class GameRoundModifierDialogEntryControl
         this.GameRoundSettings = gameRoundSettings;
 
         VisualElement = new();
-        VisualElement.name = $"{modifier.Id}Container";
+        VisualElement.name = $"{modifier.GetId()}Container";
         VisualElement.AddToClassList("gameRoundModifierConfigurationRoot");
 
         VisualElement modifierConfigVisualElement = modifier.CreateConfigurationVisualElement();
         if (modifierConfigVisualElement != null)
         {
-            modifierConfigVisualElement.name = $"{modifier.Id}Configuration";
+            modifierConfigVisualElement.name = $"{modifier.GetId()}Configuration";
             modifierConfigVisualElement.AddToClassList("gameRoundModifierConfiguration");
             modifierConfigVisualElement.AddToClassList("child-mb-1");
             modifierConfigVisualElement.SetVisibleByDisplay(GameRoundSettings.modifiers.Contains(modifier));
         }
 
         toggle = new();
-        toggle.name = $"{modifier.Id}Toggle";
+        toggle.name = $"{modifier.GetId()}Toggle";
         toggle.AddToClassList("gameRoundModifierToggle");
         toggle.label = modifier.DisplayName;
         FieldBindingUtils.Bind(toggle,
