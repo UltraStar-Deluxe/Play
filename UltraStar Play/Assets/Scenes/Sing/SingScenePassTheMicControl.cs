@@ -51,8 +51,8 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
 
     public void Update()
     {
-        if (!singSceneControl.IsPassTheMic
-            || !isInjectionFinished)
+        if (!isInjectionFinished
+            || !singSceneControl.IsPassTheMic)
         {
             return;
         }
