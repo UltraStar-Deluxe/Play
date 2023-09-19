@@ -85,10 +85,10 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
     private readonly HashSet<Label> initializedNoteLabelWidth = new();
 
     private readonly Subject<TargetNoteControlCreatedEvent> targetNoteControlCreatedEventStream = new();
-    private IObservable<TargetNoteControlCreatedEvent> TargetNoteControlCreatedEventStream => targetNoteControlCreatedEventStream;
+    public IObservable<TargetNoteControlCreatedEvent> TargetNoteControlCreatedEventStream => targetNoteControlCreatedEventStream;
 
     private readonly Subject<RecordedNoteControlCreatedEvent> recordedNoteControlCreatedEventStream = new();
-    private IObservable<RecordedNoteControlCreatedEvent> RecordedNoteControlCreatedEventStream => recordedNoteControlCreatedEventStream;
+    public IObservable<RecordedNoteControlCreatedEvent> RecordedNoteControlCreatedEventStream => recordedNoteControlCreatedEventStream;
 
     protected abstract bool TryGetNotePositionInPercent(VisualElement visualElement, int midiNote, double noteStartBeat, double noteEndBeat, out Rect result);
 
