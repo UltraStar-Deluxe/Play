@@ -213,7 +213,7 @@ public static class CollectionExtensions
         }
         return minElement;
     }
-    
+
     public static T FindMaxElement<T>(this IEnumerable<T> enumerable, Func<T, float> valueFunction)
     {
         T maxElement = default(T);
@@ -245,7 +245,7 @@ public static class CollectionExtensions
         }
         return maxElement;
     }
-    
+
     public static Dictionary<TValue, TKey> ToInvertedDictionary<TKey, TValue>(this IDictionary<TKey, TValue> source)
     {
         Dictionary<TValue, TKey> result = new();
@@ -259,6 +259,11 @@ public static class CollectionExtensions
     public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> enumerable)
     {
         enumerable.ForEach(item => hashSet.Add(item));
+    }
+
+    public static void RemoveRange<T>(this HashSet<T> hashSet, IEnumerable<T> enumerable)
+    {
+        enumerable.ForEach(item => hashSet.Remove(item));
     }
 
     public static void Replace<T>(this List<T> list, T item, T replacement)
@@ -284,7 +289,7 @@ public static class CollectionExtensions
             list.RemoveAt(0);
         }
     }
-    
+
     public static void RemoveLast<T>(this List<T> list)
     {
         if (!list.IsNullOrEmpty())

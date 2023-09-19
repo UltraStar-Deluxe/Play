@@ -68,6 +68,19 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
+    public double CurrentTimeInSongInPercentConsideringMedley
+    {
+        get
+        {
+            if (!IsMedley)
+            {
+                return songAudioPlayer.PositionInSongInPercent;
+            }
+            return (songAudioPlayer.PositionInSongInMillis - MedleyStartWithCountdownInMillis)
+                            / MedleyDurationWithCountdownInMillis;
+        }
+    }
+
     public void StartCurrentMedleySong()
     {
         if (!IsMedley)
@@ -85,7 +98,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             });
             return;
         }
-        
+
         DoStartCurrentMedleySong();
     }
 
@@ -96,7 +109,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         countdownControl.StartCountdown(CountDownTimeInSeconds);
         audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds);
     }
-    
+
     private double CalculateMedleyStartWithCountdownInMillis()
     {
         if (!IsMedley)

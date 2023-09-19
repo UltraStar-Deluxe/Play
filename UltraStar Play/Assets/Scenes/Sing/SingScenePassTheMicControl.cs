@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -13,7 +14,7 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
 
     [Inject]
     private Settings settings;
-    
+
     [Inject(UxmlName = R.UxmlNames.passTheMicProgressBar)]
     private ProgressBar passTheMicProgressBar;
 
@@ -23,8 +24,11 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
     private readonly Dictionary<PartyModeTeamSettings, PlayerProfile> teamToNextPlayerProfile = new();
     private readonly Dictionary<PartyModeTeamSettings, List<PlayerProfile>> teamToUsedPlayerProfiles = new();
 
+    private bool isInjectionFinished;
+
     public void OnInjectionFinished()
     {
+        isInjectionFinished = true;
         passTheMicProgressBar.SetVisibleByDisplay(singSceneControl.IsPassTheMic);
         if (!singSceneControl.HasPartyModeSceneData
             || !singSceneControl.IsPassTheMic)
@@ -45,14 +49,15 @@ public class SingScenePassTheMicControl : INeedInjection, IInjectionFinishedList
         ChooseInitialNextPlayers();
     }
 
-    public void Update(float deltaTimeInSeconds)
+    public void Update()
     {
-        if (!singSceneControl.IsPassTheMic)
+        if (!singSceneControl.IsPassTheMic
+            || !isInjectionFinished)
         {
             return;
         }
 
-        passTheMicTimeInSeconds += deltaTimeInSeconds;
+        passTheMicTimeInSeconds += Time.deltaTime;
         if (passTheMicTimeInSeconds >= settings.PassTheMicTimeInSeconds)
         {
             passTheMicTimeInSeconds -= settings.PassTheMicTimeInSeconds;

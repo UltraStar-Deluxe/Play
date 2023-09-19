@@ -415,3 +415,24 @@ Toggle.smallControl {
     bottom: 0;
     left: 0;
 }
+
+.gameRoundModifierConfigurationRoot
+{
+    margin-bottom: 8px;
+}
+
+.gameRoundModifierConfiguration
+{
+    margin-bottom: 8px;
+}
+
+.gameRoundModifierToggle
+{
+    margin-bottom: 4px;
+}
+
+.gameRoundModifierConfiguration .controlLabel
+{
+    width: auto;
+    margin-right: 16px;
+}

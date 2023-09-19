@@ -197,9 +197,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
     private Button previousDifficultyButton;
 
-    [Inject(UxmlName = R_PlayShared.UxmlNames.passTheMicToggle)]
-    private Toggle passTheMicToggle;
-
     private readonly SongSearchControl songSearchControl = new();
 
     public SongMeta SelectedSong
@@ -427,11 +424,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
         toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.ToggleVisible());
         closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.SlideOut());
-        modifierDialogControl.GetAvailableModifiersFunction = GetAvailableModifiers;
 
         // Modifier active icon
         modifiersActiveIcon.HideByDisplay();
-        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
+        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierActive)
             .Subscribe(_ => UpdateModifiersActiveIcon());
 
         // Delay initialization of modifier dialog control
@@ -453,37 +449,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Inject(modifierDialogControl);
         modifierDialogControl.OpenDialog(nonPersistentSettings.GameRoundSettings);
         modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
-
-        // Disable 'pass the mic' toggle if needed. It requires a team with at least 2 players
-        if (!HasPartyModeSceneData
-            || PartyModeSettings.TeamSettings.Teams.AllMatch(team =>
-                team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
-        {
-            passTheMicToggle.value = false;
-            passTheMicToggle.SetEnabled(false);
-            passTheMicToggle.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.newValue)
-                {
-                    UiManager.CreateNotification("'Pass the mic' requires a team with more than one player");
-                    StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => passTheMicToggle.value = false));
-                }
-            });
-        }
-        else
-        {
-            passTheMicToggle.SetEnabled(true);
-        }
-    }
-
-    private List<EGameRoundModifier> GetAvailableModifiers()
-    {
-        List<EGameRoundModifier> availableModifiers = EnumUtils.GetValuesAsList<EGameRoundModifier>();
-        if (!HasPartyModeSceneData)
-        {
-            availableModifiers.Remove(EGameRoundModifier.PassTheMic);
-        }
-        return availableModifiers;
     }
 
     private void UpdateSongQueue()
@@ -506,8 +471,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateModifiersActiveIcon()
     {
-        modifiersActiveIcon.SetVisibleByDisplay(nonPersistentSettings.GameRoundSettings.AnyModifierOrFinishConditionActive);
-        modifiersInactiveIcon.SetVisibleByDisplay(!nonPersistentSettings.GameRoundSettings.AnyModifierOrFinishConditionActive);
+        modifiersActiveIcon.SetVisibleByDisplay(nonPersistentSettings.GameRoundSettings.AnyModifierActive);
+        modifiersInactiveIcon.SetVisibleByDisplay(!nonPersistentSettings.GameRoundSettings.AnyModifierActive);
     }
 
     private void UpdateMicCheckButton()
@@ -675,7 +640,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SongQueueEntryDto songQueueEntryDto = new();
         songQueueEntryDto.SongDto = DtoConverter.ToDto(songMeta);
         songQueueEntryDto.SingScenePlayerDataDto = DtoConverter.ToDto(CreateSingScenePlayerData());
-        songQueueEntryDto.GameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
+        songQueueEntryDto.GameRoundSettingsDto = new GameRoundSettingsDto()
+        {
+            ModifierDtos = DtoConverter.ToDto(nonPersistentSettings.GameRoundSettings.modifiers),
+        };
         return songQueueEntryDto;
     }
 
@@ -898,7 +866,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         singSceneData.gameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
 
         if (singSceneData.gameRoundSettings != null
-            && singSceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
+            && singSceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier is ShortSongGameRoundModifier))
         {
             // Set as medley song to play shortened version
             singSceneData.MedleySongIndex = 0;

@@ -9,25 +9,25 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
 {
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
-    
+
     [Inject(Key = nameof(songQueuePlayerEntryUi))]
     private VisualTreeAsset songQueuePlayerEntryUi;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.songArtist)]
     private Label songArtist;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.songTitle)]
     private Label songTitle;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.songQueueEntryModifierActiveIcon)]
     private VisualElement songQueueEntryModifierActiveIcon;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.playerEntryList)]
     private VisualElement playerEntryList;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.isMedleyIcon)]
     private VisualElement isMedleyIcon;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.isNoMedleyIcon)]
     private VisualElement isNoMedleyIcon;
 
@@ -38,18 +38,18 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
     [Inject(UxmlName = R_PlayShared.UxmlNames.deleteButton)]
     private Button deleteButton;
     public Button DeleteButton => deleteButton;
-    
+
     [Inject]
     public SongQueueEntryDto SongQueueEntryDto { get; private set; }
 
     public Action OnDelete { get; set; }
     public Action OnToggleMedley { get; set; }
-    
+
     public void OnInjectionFinished()
     {
         deleteButton.RegisterCallbackButtonTriggered(_ => OnDelete?.Invoke());
         toggleMedleyButton.RegisterCallbackButtonTriggered(_ => OnToggleMedley?.Invoke());
-        
+
         // Is medley or not
         isMedleyIcon.SetVisibleByDisplay(SongQueueEntryDto.IsMedleyWithPreviousEntry);
         isNoMedleyIcon.SetVisibleByDisplay(!SongQueueEntryDto.IsMedleyWithPreviousEntry);
@@ -57,11 +57,11 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
         // Add song entries
         songArtist.text = SongQueueEntryDto.SongDto.Artist;
         songTitle.text = SongQueueEntryDto.SongDto.Title;
-        
+
         // Any modifier active
         songQueueEntryModifierActiveIcon.SetVisibleByDisplay(
             !SongQueueEntryDto.IsMedleyWithPreviousEntry
-            && SongQueueEntryDto.GameRoundSettings.AnyModifierOrFinishConditionActive);
+            && SongQueueEntryDto.GameRoundSettingsDto.AnyModifierActive);
 
         // Add player entries
         playerEntryList.Clear();
@@ -82,7 +82,7 @@ public class SongQueueEntryUiControl : INeedInjection, IInjectionFinishedListene
             }
         });
     }
-    
+
     public void HideToggleMedleyButton()
     {
         toggleMedleyButton.HideByDisplay();

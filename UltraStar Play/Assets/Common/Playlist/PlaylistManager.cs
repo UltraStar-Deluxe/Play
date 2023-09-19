@@ -50,19 +50,15 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    [Inject]
-    private SongMetaManager songMetaManager;
-
     private readonly Subject<PlaylistChangeEvent> playlistChangeEventStream = new();
     public IObservable<PlaylistChangeEvent> PlaylistChangeEventStream => playlistChangeEventStream;
 
     private string favoritesPlaylistFilePath;
     private string playlistFolder;
 
-    [Inject]
+    // TODO: Should be injected
+    private SongMetaManager songMetaManager;
     private Settings settings;
-
-    [Inject]
     private NonPersistentSettings nonPersistentSettings;
 
     protected override object GetInstance()
@@ -72,6 +68,11 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void AwakeSingleton()
     {
+        // TODO: Should be injected
+        songMetaManager = SongMetaManager.Instance;
+        settings = SettingsManager.Instance.Settings;
+        nonPersistentSettings = SettingsManager.Instance.NonPersistentSettings;
+
         playlistFolder = $"{Application.persistentDataPath}/Playlists";
         favoritesPlaylistFilePath = $"{playlistFolder}/{favoritesPlaylistName}.{ApplicationUtils.ultraStarPlaylistFileExtension}";
         CreateFavoritePlaylistIfNotExist();

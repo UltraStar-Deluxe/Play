@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic;
+using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -282,6 +283,16 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private bool SongMetaMatchesSearchedProperties(SongMeta songMeta, string searchText)
     {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        if (searchText.IsNullOrEmpty())
+        {
+             return true;
+        }
+
         if (searchProperties.Contains(ESearchProperty.Artist)
             && !songMeta.Artist.IsNullOrEmpty()
             && songMeta.Artist.ToLowerInvariant().Contains(searchText))
@@ -327,6 +338,16 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private bool SongMetaMatchesLyrics(SongMeta songMeta, string searchText)
     {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        if (searchText.IsNullOrEmpty())
+        {
+            return true;
+        }
+
         // TODO: Implement search on separate thread and concurrent update of search result.
         string searchTextLower = searchText.ToLowerInvariant();
         return songMeta.GetVoices()

@@ -31,10 +31,10 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private SceneNavigator sceneNavigator;
-    
+
     [Inject]
     private SongMetaManager songMetaManager;
-    
+
     [Inject]
     private Settings settings;
 
@@ -42,7 +42,7 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
     {
         return Instance;
     }
-    
+
     public void AddSongQueueEntry(SongQueueEntryDto songQueueEntryDto)
     {
         songQueueEntryDtos.Add(songQueueEntryDto);
@@ -54,13 +54,13 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         songQueueEntryDtos.Remove(songQueueEntryDto);
         songQueueChangedEventStream.OnNext(new SongQueueChangedEvent(songQueueEntryDto));
     }
-    
+
     public void RemoveSongQueueEntries(List<SongQueueEntryDto> entries)
     {
         songQueueEntryDtos.RemoveAll(entries);
         songQueueChangedEventStream.OnNext(new SongQueueChangedEvent(entries));
     }
-    
+
     public void ToggleMedley(SongQueueEntryDto songQueueEntryDto)
     {
         songQueueEntryDto.IsMedleyWithPreviousEntry = !songQueueEntryDto.IsMedleyWithPreviousEntry;
@@ -79,27 +79,27 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         {
             return null;
         }
-        
+
         RemoveSongQueueEntries(nextEntries);
 
         List<SongMeta> songMetas = nextEntries
             .Select(entry => songMetaManager.GetSongMetaById(entry.SongDto.Hash))
             .ToList();
-        
+
         SongQueueEntryDto firstEntry = nextEntries.FirstOrDefault();
 
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = songMetas;
         singSceneData.SingScenePlayerData = DtoConverter.FromDto(firstEntry.SingScenePlayerDataDto, settings);
-        singSceneData.gameRoundSettings = firstEntry.GameRoundSettings;
+        singSceneData.gameRoundSettings = DtoConverter.FromDto(firstEntry.GameRoundSettingsDto);
         singSceneData.partyModeSceneData = partyModeSceneData;
         if (nextEntries.Count > 1)
         {
             // This is a medley
             singSceneData.MedleySongIndex = 0;
         }
-        else if (singSceneData.gameRoundSettings != null 
-                 && singSceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
+        else if (singSceneData.gameRoundSettings != null
+                 && singSceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier is ShortSongGameRoundModifier))
         {
             // Set as medley song to play shortened version
             singSceneData.MedleySongIndex = 0;
@@ -134,7 +134,7 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         {
             return "Missing song queue entry";
         }
-        
+
         if (songQueueEntryDto.SingScenePlayerDataDto == null)
         {
             return "Missing player data";
@@ -144,13 +144,13 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         {
             return "Missing player profiles";
         }
-        
+
         if (songQueueEntryDto.SongDto == null
             || songQueueEntryDto.SongDto.Hash.IsNullOrEmpty())
         {
             return "Missing songs";
         }
-        
+
         return "";
     }
 
@@ -160,12 +160,12 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         oldSongQueueEntryDto.SongDto = newSongQueueEntryDto.SongDto;
         oldSongQueueEntryDto.SingScenePlayerDataDto = newSongQueueEntryDto.SingScenePlayerDataDto;
-        oldSongQueueEntryDto.GameRoundSettings = newSongQueueEntryDto.GameRoundSettings;
+        oldSongQueueEntryDto.GameRoundSettingsDto = newSongQueueEntryDto.GameRoundSettingsDto;
         oldSongQueueEntryDto.IsMedleyWithPreviousEntry = newSongQueueEntryDto.IsMedleyWithPreviousEntry;
-        
+
         songQueueChangedEventStream.OnNext(new (oldSongQueueEntryDto));
     }
 }

@@ -171,7 +171,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public bool HasPartyModeSceneData => PartyModeSceneData != null;
     public PartyModeSettings PartyModeSettings => sceneData.partyModeSceneData.PartyModeSettings;
     public bool IsPassTheMic => HasPartyModeSceneData &&
-                                sceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.PassTheMic);
+                                sceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier is PassTheMicGameRoundModifier);
 
     private SingingLyricsControl topSingingLyricsControl;
     private SingingLyricsControl bottomSingingLyricsControl;
@@ -186,7 +186,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private readonly SingSceneCountdownControl countdownControl = new();
     private readonly SingSceneAudioFadeInControl audioFadeInControl = new();
     private readonly SingSceneMedleyControl medleyControl = new();
-    private readonly SingSceneModifierControl modifierControl = new();
+    private readonly SingScenePassTheMicControl passTheMicControl = new();
 
     public bool IsCommonScore => settings.ScoreMode == EScoreMode.CommonAverage
                                  && sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count >= 2;
@@ -200,6 +200,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private bool hasRecordedSongFinishedStatistics;
 
     private bool hasFinishedScene;
+
+    public ReactiveProperty<int> ModifiedVolumePercent { get; private set; } = new(100);
 
     public void OnInjectionFinished()
     {
@@ -324,10 +326,48 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             medleyControl.StartCurrentMedleySong();
         }
 
-        // Init modifierControl after all playerControls are initialized
-        injector.Inject(modifierControl);
+        // Instantiate game round modifier controls
+        CreateGameRoundModifiers();
+
+        // Set up 'pass the mic' control
+        if (sceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier is PassTheMicGameRoundModifier))
+        {
+            injector.Inject(passTheMicControl);
+        }
 
         TriggerAchievementsAtSongStart();
+    }
+
+    private void CreateGameRoundModifiers()
+    {
+        List<IGameRoundModifier> modifiers = sceneData.gameRoundSettings.modifiers;
+        foreach (IGameRoundModifier modifier in modifiers)
+        {
+            try
+            {
+                GameRoundModifierControl modifierControl = modifier.CreateControl();
+                if (modifierControl == null)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    injector.Inject(modifierControl);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to inject control for modifier {modifier}");
+                }
+                Debug.Log($"Created control for modifier {modifier}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to create control for modifier {modifier}");
+            }
+        }
     }
 
     private void TriggerAchievementsAtSongStart()
@@ -633,8 +673,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             medleyControl.Update();
         }
 
-        modifierControl.Update();
-
         if (!IsPaused)
         {
             countdownControl.Update(Time.deltaTime);
@@ -644,6 +682,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             achievementEventStream.OnNext(AchievementId.useWebcamInSingScene);
         }
+
+        passTheMicControl.Update();
 
         UpdatePlayerUiContainerHeight();
     }
@@ -1172,7 +1212,6 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         bb.BindExistingInstance(countdownControl);
         bb.BindExistingInstance(medleyControl);
         bb.BindExistingInstance(audioFadeInControl);
-        bb.BindExistingInstance(modifierControl);
         bb.BindExistingInstance(alternativeAudioPlayer);
         bb.Bind(nameof(playerUi)).ToExistingInstance(playerUi);
         bb.Bind(nameof(playerInfoUi)).ToExistingInstance(playerInfoUi);

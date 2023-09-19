@@ -29,6 +29,11 @@ public static class SettingsUtils
 
     public static List<string> GetEnabledSongFolders(Settings settings)
     {
+        if (settings == null)
+        {
+            return new List<string>();
+        }
+
         return settings.SongDirs
             .Except(settings.DisabledSongFolders)
             .ToList();

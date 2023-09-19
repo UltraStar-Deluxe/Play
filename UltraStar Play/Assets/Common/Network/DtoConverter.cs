@@ -13,12 +13,12 @@ public static class DtoConverter
         };
         return dto;
     }
-    
+
     public static SongMeta FromDto(SongDto dto, SongMetaManager songMetaManager)
     {
         return songMetaManager.GetSongMetaById(dto.Hash);
     }
-    
+
     public static MicProfileDto ToDto(MicProfile micProfile)
     {
         MicProfileDto dto = new()
@@ -49,19 +49,19 @@ public static class DtoConverter
         };
         return micProfile;
     }
-    
+
     public static SingScenePlayerDataDto ToDto(SingScenePlayerData singScenePlayerData)
     {
         List<string> playerProfileNames = singScenePlayerData.SelectedPlayerProfiles
             .Select(it => it.Name)
             .ToList();
-        
+
         Dictionary<string, MicProfileDto> playerProfileNameToMicProfileDto = new();
         singScenePlayerData.PlayerProfileToMicProfileMap.ForEach(entry =>
         {
             playerProfileNameToMicProfileDto[entry.Key.Name] = ToDto(entry.Value);
         });
-        
+
         Dictionary<string, string> playerProfileNameToVoiceNameMap = new();
         singScenePlayerData.PlayerProfileToVoiceNameMap.ForEach(entry =>
         {
@@ -76,14 +76,14 @@ public static class DtoConverter
         };
         return dto;
     }
-    
+
     public static SingScenePlayerData FromDto(SingScenePlayerDataDto dto, Settings settings)
     {
         if (dto == null)
         {
             return null;
         }
-        
+
         SingScenePlayerData singScenePlayerData = new();
         singScenePlayerData.SelectedPlayerProfiles = dto.PlayerProfileNames
             .Select(playerProfileName => SettingsUtils.GetPlayerProfile(settings, playerProfileName))
@@ -110,5 +110,50 @@ public static class DtoConverter
             }
         });
         return singScenePlayerData;
+    }
+
+    public static GameRoundSettings FromDto(GameRoundSettingsDto dto)
+    {
+        if (dto == null)
+        {
+            return null;
+        }
+
+        List<IGameRoundModifier> gameRoundModifiers = DtoConverter.FromDto(dto.ModifierDtos);
+        return new GameRoundSettings()
+        {
+            modifiers = gameRoundModifiers,
+        };
+    }
+
+    private static List<IGameRoundModifier> FromDto(List<GameRoundModifierDto> dtos)
+    {
+        if (dtos.IsNullOrEmpty())
+        {
+            return new List<IGameRoundModifier>();
+        }
+
+        List<string> modifierIds = dtos
+            .Select(dto => dto.Id)
+            .ToList();
+        return GameRoundModifierUtils.GetGameRoundModifiersById(modifierIds);
+    }
+
+    public static List<GameRoundModifierDto> ToDto(List<IGameRoundModifier> modifiers)
+    {
+        return modifiers
+            .Select(modifier => ToDto(modifier))
+            .ToList();
+    }
+
+    private static GameRoundModifierDto ToDto(IGameRoundModifier modifier)
+    {
+        GameRoundModifierDto dto = new()
+        {
+            Id = modifier.Id,
+            DisplayName = modifier.DisplayName,
+            DisplayOrder = modifier.DisplayOrder,
+        };
+        return dto;
     }
 }

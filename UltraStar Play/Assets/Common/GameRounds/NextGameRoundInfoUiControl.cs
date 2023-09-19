@@ -20,13 +20,13 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.nextGameRoundPlayerEntryList)]
     private VisualElement nextGameRoundPlayerEntryList;
-    
+
     [Inject(UxmlName = R.UxmlNames.nextGameRoundModifierActiveIcon)]
     private VisualElement nextGameRoundModifierActiveIcon;
-    
+
     [Inject]
     private SongQueueManager songQueueManager;
-    
+
     [Inject]
     private SongMetaManager songMetaManager;
 
@@ -50,10 +50,10 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
         {
             VisualElement playerEntryVisualElement = nextGameRoundInfoPlayerEntryUi.CloneTree().Children().FirstOrDefault();
             nextGameRoundPlayerEntryList.Add(playerEntryVisualElement);
-            
+
             Label playerNameLabel = playerEntryVisualElement.Q<Label>(R.UxmlNames.nextGameRoundPlayerEntryLabel);
             playerNameLabel.text = playerProfileName;
-            
+
             VisualElement micVisualElement = playerEntryVisualElement.Q<VisualElement>(R.UxmlNames.nextGameRoundPlayerEntryMicImage);
             if (songQueueEntryDto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap.TryGetValue(playerProfileName, out MicProfileDto micProfileDto))
             {
@@ -67,8 +67,8 @@ public class NextGameRoundUiControl : INeedInjection, IInjectionFinishedListener
                 micVisualElement.HideByDisplay();
             }
         });
-        
-        nextGameRoundModifierActiveIcon.SetVisibleByDisplay(songQueueEntryDto.GameRoundSettings.AnyModifierOrFinishConditionActive);
+
+        nextGameRoundModifierActiveIcon.SetVisibleByDisplay(songQueueEntryDto.GameRoundSettingsDto.AnyModifierActive);
     }
 
     public void HideNextGameRoundUi()
