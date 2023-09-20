@@ -224,7 +224,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             {
                 rawResult = videoPlayer.time * 1000.0;
             }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource
+                     && audioSource.clip != null)
             {
                 int positionInSamples = audioSource.timeSamples;
                 rawResult = ((double)positionInSamples / (double)audioSource.clip.frequency) * 1000.0;
