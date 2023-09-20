@@ -6,7 +6,24 @@ using UnityEngine;
 
 public static class StatisticsUtils
 {
-    public static IObservable<List<HighScoreEntry>> GetCompletedLocalAndRemoteHighScoreEntries(
+    public static IObservable<List<HighScoreEntry>> GetLocalHighScoreEntries(
+        Statistics statistics,
+        SongMeta songMeta)
+    {
+        SongStatistics localSongStatistics = GetLocalSongStatistics(statistics, songMeta);
+        SortedSet<HighScoreEntry> highScoreEntries = localSongStatistics?.HighScoreRecord?.HighScoreEntries;
+        if (highScoreEntries.IsNullOrEmpty())
+        {
+            return Observable.Empty<List<HighScoreEntry>>();
+        }
+        else
+        {
+            List<HighScoreEntry> highScoreEntriesAsList = highScoreEntries.ToList();
+            return Observable.Return<List<HighScoreEntry>>(highScoreEntriesAsList);
+        }
+    }
+
+    public static IObservable<List<HighScoreEntry>> GetLocalAndRemoteHighScoreEntriesAllAtOnce(
         Statistics statistics,
         SongMeta songMeta)
     {

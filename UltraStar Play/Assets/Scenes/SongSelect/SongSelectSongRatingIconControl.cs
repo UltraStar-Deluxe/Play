@@ -19,7 +19,7 @@ public class SongSelectSongRatingIconControl : INeedInjection
 
     public void UpdateSongRatingIcons(SongMeta songMeta, EDifficulty difficulty)
     {
-        StatisticsUtils.GetCompletedLocalAndRemoteHighScoreEntries(statistics, songMeta)
+        StatisticsUtils.GetLocalHighScoreEntries(statistics, songMeta)
             .Subscribe(highScoreEntries =>
             {
                 UpdateSongRatingIcons(highScoreEntries, difficulty);

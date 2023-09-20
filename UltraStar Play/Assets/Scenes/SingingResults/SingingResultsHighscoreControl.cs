@@ -82,7 +82,7 @@ public class SingingResultsHighscoreControl : INeedInjection
         highscoreEntryList.Clear();
 
         SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
-        StatisticsUtils.GetCompletedLocalAndRemoteHighScoreEntries(statistics, songMeta)
+        StatisticsUtils.GetLocalAndRemoteHighScoreEntriesAllAtOnce(statistics, songMeta)
             .Subscribe(scoreEntries =>
             {
                 List<HighScoreEntry> scoreEntriesOfCurrentDifficulty = scoreEntries
