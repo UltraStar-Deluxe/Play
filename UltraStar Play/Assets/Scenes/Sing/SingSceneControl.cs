@@ -239,7 +239,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             {
                 playerProfilesWithoutMic.Add(playerProfile);
             }
-            PlayerControl playerControl = CreatePlayerControl(playerProfile, micProfile, i);
+
+            PlayerControl playerControl;
+            try
+            {
+                playerControl = CreatePlayerControl(playerProfile, micProfile, i);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to create player control for player '{playerProfile.Name}': {ex.Message}");
+                continue;
+            }
 
             if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<PlayerScoreControlData> scoreDatas))
             {
