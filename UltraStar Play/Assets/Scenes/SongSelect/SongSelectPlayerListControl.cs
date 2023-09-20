@@ -465,7 +465,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.ForEach(entry =>
         {
             entry.ShowVoiceSelection(songMeta, voiceIndex);
-            voiceIndex = (voiceIndex + 1) % songMeta.Voices.Count;
+            voiceIndex = (voiceIndex + 1) % songMeta.VoiceCount;
         });
     }
 

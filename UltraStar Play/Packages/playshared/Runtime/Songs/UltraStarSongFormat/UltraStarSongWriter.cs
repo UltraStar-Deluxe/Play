@@ -156,7 +156,7 @@ public static class UltraStarFormatWriter
             AppendHeaderField(sb, "medleyendbeat", songMeta.MedleyEndBeat.ToString(CultureInfo.InvariantCulture));
         }
 
-        songMeta.UnknownHeaderEntries.ForEach(entry => AppendHeaderField(sb, entry.Key, entry.Value));
+        songMeta.AdditionalHeaderEntries.ForEach(entry => AppendHeaderField(sb, entry.Key, entry.Value));
     }
 
     private static void AppendHeaderField(StringBuilder sb, string key, string value)

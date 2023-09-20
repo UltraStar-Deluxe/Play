@@ -49,7 +49,7 @@ public class LoadAndSaveSongTest
         Assert.AreEqual("42,5", originalSongMeta.GetUnknownHeaderEntry("NUMBERWITHCOMMA"));
         Assert.AreEqual("43.2", originalSongMeta.GetUnknownHeaderEntry("NUMBERWITHDOT"));
         Assert.AreEqual("SomeOtherValue", originalSongMeta.GetUnknownHeaderEntry("UNSUPPORTEDFIELD"));
-        Assert.IsTrue(originalSongMeta.UnknownHeaderEntries.SequenceEqual(savedSongMeta.UnknownHeaderEntries), "UnknownHeaderEntries not equal");
+        Assert.IsTrue(originalSongMeta.AdditionalHeaderEntries.SequenceEqual(savedSongMeta.AdditionalHeaderEntries), "UnknownHeaderEntries not equal");
     }
 
     private SongMeta LoadSong(string path)

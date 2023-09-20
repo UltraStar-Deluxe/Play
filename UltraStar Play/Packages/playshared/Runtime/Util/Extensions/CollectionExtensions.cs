@@ -266,6 +266,16 @@ public static class CollectionExtensions
         enumerable.ForEach(item => hashSet.Remove(item));
     }
 
+    public static void AddRange<K, V>(this Dictionary<K, V> targetDictionary, IReadOnlyDictionary<K, V> sourceDictionary)
+    {
+        sourceDictionary.ForEach(entry => targetDictionary[entry.Key] = entry.Value);
+    }
+
+    public static void RemoveRange<K, V>(this Dictionary<K, V> targetDictionary, IReadOnlyDictionary<K, V> sourceDictionary)
+    {
+        sourceDictionary.ForEach(entry => targetDictionary.Remove(entry.Key));
+    }
+
     public static void Replace<T>(this List<T> list, T item, T replacement)
     {
         int index = list.IndexOf(item);

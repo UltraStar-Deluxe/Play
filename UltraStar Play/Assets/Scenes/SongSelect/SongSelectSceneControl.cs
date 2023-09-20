@@ -692,7 +692,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return lyricsLabel;
         }
 
-        if (songMeta.Voices.Count < 2)
+        if (songMeta.VoiceCount < 2)
         {
             string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceId);
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(lyrics));

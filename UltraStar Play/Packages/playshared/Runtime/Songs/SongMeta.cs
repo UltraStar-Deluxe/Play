@@ -143,7 +143,23 @@ public abstract class SongMeta
      */
     public virtual int MedleyEndBeat { get; set; }
 
-    public bool FailedToLoadVoices { get; set; }
+    /**
+     *
+     */
+    private readonly Dictionary<string, string> additionalHeaderEntries = new();
+    public IReadOnlyDictionary<string, string> AdditionalHeaderEntries
+    {
+        get
+        {
+            return additionalHeaderEntries;
+        }
+    }
+
+    /**
+     * Mapping from generic voice IDs ("P1", "P2", "P3", ...)
+     * to performer names ("Elvis Presley", "Shakira")
+     */
+    protected readonly Dictionary<string, string> voiceIdToDisplayName = new();
 
     private List<Voice> voices = new();
     public virtual IReadOnlyList<Voice> Voices
@@ -155,7 +171,7 @@ public abstract class SongMeta
             {
                 // When there is an Exception, then this field is not reset.
                 FailedToLoadVoices = true;
-                voices = DoLoadVoices();
+                voices = LoadVoices();
                 FailedToLoadVoices = false;
 
                 loadedVoicesEventStream.OnNext(true);
@@ -164,33 +180,22 @@ public abstract class SongMeta
         }
     }
 
-    /** Mapping from generic singer names ("P1", "P2", "P3", ...)
-     * to custom names ("Elvis Presley", "Shakira")
-     */
-    protected Dictionary<string, string> voiceIdToDisplayName;
-
-    protected abstract List<Voice> DoLoadVoices();
-
-    private readonly Dictionary<string, string> unknownHeaderEntries = new();
-    public IReadOnlyDictionary<string, string> UnknownHeaderEntries
-    {
-        get
-        {
-            return unknownHeaderEntries;
-        }
-    }
+    public bool FailedToLoadVoices { get; private set; }
+    public virtual int VoiceCount => Voices.Count;
 
     private Subject<bool> loadedVoicesEventStream = new();
     public IObservable<bool> LoadedVoicesEventStream => loadedVoicesEventStream;
 
+    protected abstract List<Voice> LoadVoices();
+
     public void SetUnknownHeaderEntry(string key, string value)
     {
-        unknownHeaderEntries[key.ToLowerInvariant()] = value;
+        additionalHeaderEntries[key.ToLowerInvariant()] = value;
     }
 
     public string GetUnknownHeaderEntry(string key)
     {
-        return unknownHeaderEntries.TryGetValue(key.ToLowerInvariant(), out string value)
+        return additionalHeaderEntries.TryGetValue(key.ToLowerInvariant(), out string value)
             ? value
             : null;
     }

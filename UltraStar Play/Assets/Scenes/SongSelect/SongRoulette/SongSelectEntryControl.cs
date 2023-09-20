@@ -424,7 +424,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void UpdateSongIcons(SongSelectSongEntry songEntry)
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songEntry.SongMeta));
-        duetIcon.SetVisibleByDisplay(songEntry.SongMeta.Voices.Count > 1);
+        duetIcon.SetVisibleByDisplay(songEntry.SongMeta.VoiceCount > 1);
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
         notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songEntry.SongMeta, generatedSongFolderAbsolutePath));
         songRatingIconControl.UpdateSongRatingIcons(songEntry.SongMeta, settings.Difficulty);

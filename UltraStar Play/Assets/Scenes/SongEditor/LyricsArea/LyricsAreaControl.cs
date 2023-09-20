@@ -226,9 +226,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateVoiceButtons()
     {
-        int voiceCount = songMeta.Voices.Count;
-        lyricsAreaVoice1Button.SetEnabled(voiceCount >= 1);
-        lyricsAreaVoice2Button.SetEnabled(voiceCount >= 2);
+        lyricsAreaVoice1Button.SetEnabled(songMeta.VoiceCount >= 1);
+        lyricsAreaVoice2Button.SetEnabled(songMeta.VoiceCount >= 2);
         lyricsAreaVoice1Button.SetActive(voice == SongMetaUtils.GetVoiceById(songMeta, Voice.firstVoiceId));
         lyricsAreaVoice2Button.SetActive(voice == SongMetaUtils.GetVoiceById(songMeta, Voice.secondVoiceId));
     }

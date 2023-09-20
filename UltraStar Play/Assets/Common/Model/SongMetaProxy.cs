@@ -47,7 +47,7 @@ public class SongMetaProxy : SongMeta
         preloadedHeaderFields.Remove(key);
     }
 
-    protected override List<Voice> DoLoadVoices()
+    protected override List<Voice> LoadVoices()
     {
         return new List<Voice>();
     }

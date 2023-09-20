@@ -131,7 +131,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         }
 
         if (nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value
-            && songMeta.Voices.Count < 2)
+            && songMeta.VoiceCount < 2)
         {
             return false;
         }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class UltraStarSongMeta : SongMeta
 {
+    public override int VoiceCount => voiceIdToDisplayName.Count;
+
     public UltraStarSongMeta(
         string artist,
         string title,
@@ -15,10 +17,14 @@ public class UltraStarSongMeta : SongMeta
         Mp3 = audioFile ?? throw new ArgumentNullException(nameof(audioFile));
         Title = title ?? throw new ArgumentNullException(nameof(title));
 
-        this.voiceIdToDisplayName = voiceIdToDisplayName ?? throw new ArgumentNullException(nameof(voiceIdToDisplayName));
+        if (voiceIdToDisplayName == null)
+        {
+            throw new ArgumentNullException(nameof(voiceIdToDisplayName));
+        }
+        this.voiceIdToDisplayName.AddRange(voiceIdToDisplayName);
     }
 
-    protected override List<Voice> DoLoadVoices()
+    protected override List<Voice> LoadVoices()
     {
         if (FileInfo == null
             || !FileInfo.Exists)
