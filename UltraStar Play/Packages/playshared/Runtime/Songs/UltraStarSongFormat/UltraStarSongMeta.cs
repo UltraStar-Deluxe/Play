@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 public class UltraStarSongMeta : SongMeta
 {
-    public override int VoiceCount => voiceIdToDisplayName.Count;
+    public override int VoiceCount => !voiceIdToDisplayName.IsNullOrEmpty()
+        ? voiceIdToDisplayName.Count
+        : Voices.Count;
 
     public UltraStarSongMeta(
         string artist,

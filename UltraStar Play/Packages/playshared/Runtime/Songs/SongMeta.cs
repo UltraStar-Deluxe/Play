@@ -181,7 +181,7 @@ public abstract class SongMeta
     }
 
     public bool FailedToLoadVoices { get; private set; }
-    public virtual int VoiceCount => Voices.Count;
+    public virtual int VoiceCount => Math.Max(1, Voices.Count);
 
     private Subject<bool> loadedVoicesEventStream = new();
     public IObservable<bool> LoadedVoicesEventStream => loadedVoicesEventStream;
