@@ -168,10 +168,23 @@ public static class BuildUtils
             throw new Exception($"Cannot upload to Steam with build target {options.buildTarget}");
         }
 
+        bool shouldUpload = EditorUtility.DisplayDialog(
+            "Upload to Steam",
+            "Upload latest build result to Steam?",
+            "Yes",
+            "No");
+        if (!shouldUpload)
+        {
+            Debug.Log("Canceled upload to Steam");
+            return;
+        }
+        Debug.Log("Uploading build to Steam...");
+
+        // Get path to latest build
         string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
 
         // Get app version
-        string bundleVersion = BuildUtils.GetPlayerSettingsFileBundleVersion();
+        string bundleVersion = GetPlayerSettingsFileBundleVersion();
         string timeStamp = DateTime.Now.ToString("yyMMddHHmm", CultureInfo.InvariantCulture);
         string commitShortHash = GitUtils.GetCurrentCommitShortHash();
 
