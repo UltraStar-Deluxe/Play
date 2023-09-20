@@ -2,7 +2,7 @@
 
 public interface ISongRepository : IMod
 {
-    public List<SongMetaProxy> SearchSongs(string searchTerm);
-    public List<SongMetaProxy> GetDefaultSongs();
-    public List<SongMetaProxy> GetRandomSongs();
+    public List<SongMeta> SearchSongs(string searchTerm);
+    public List<SongMeta> GetDefaultSongs();
+    public List<SongMeta> GetRandomSongs();
 }
