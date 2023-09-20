@@ -34,7 +34,7 @@ public class UltraStarSongMeta : SongMeta
             return new List<Voice>();
         }
 
-        bool.TryParse(GetUnknownHeaderEntry("relative"), out bool isRelativeSongFormat);
+        bool.TryParse(GetAdditionalHeaderEntry("relative"), out bool isRelativeSongFormat);
 
         return UltraStarSongVoicesParser.ParseSongFile(
             FileInfo.FullName,

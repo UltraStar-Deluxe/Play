@@ -305,7 +305,7 @@ public static class UltraStarSongParser
                 songMeta.Title = value;
                 break;
             default:
-                songMeta.SetUnknownHeaderEntry(key, value);
+                songMeta.SetAdditionalHeaderEntry(key, value);
                 break;
         }
     }

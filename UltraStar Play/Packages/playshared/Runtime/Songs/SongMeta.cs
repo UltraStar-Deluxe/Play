@@ -188,12 +188,12 @@ public abstract class SongMeta
 
     protected abstract List<Voice> LoadVoices();
 
-    public void SetUnknownHeaderEntry(string key, string value)
+    public void SetAdditionalHeaderEntry(string key, string value)
     {
         additionalHeaderEntries[key.ToLowerInvariant()] = value;
     }
 
-    public string GetUnknownHeaderEntry(string key)
+    public string GetAdditionalHeaderEntry(string key)
     {
         return additionalHeaderEntries.TryGetValue(key.ToLowerInvariant(), out string value)
             ? value

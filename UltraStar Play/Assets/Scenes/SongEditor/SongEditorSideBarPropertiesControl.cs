@@ -152,7 +152,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             CreateSongPropertiesInputControl(ESongProperty.Other,
                 entry.Key,
                 () => songMeta.AdditionalHeaderEntries[entry.Key],
-                newValue => songMeta.SetUnknownHeaderEntry(entry.Key, newValue));
+                newValue => songMeta.SetAdditionalHeaderEntry(entry.Key, newValue));
         });
     }
 
