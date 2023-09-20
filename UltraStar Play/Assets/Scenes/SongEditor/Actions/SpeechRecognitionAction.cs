@@ -7,7 +7,6 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

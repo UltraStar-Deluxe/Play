@@ -8,7 +8,6 @@ using System.Threading;
 using FfmpegUnity;
 using UniInject;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

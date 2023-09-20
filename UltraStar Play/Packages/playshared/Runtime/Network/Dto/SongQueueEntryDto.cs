@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-public class SongQueueEntryDto : JsonSerializable
+﻿public class SongQueueEntryDto : JsonSerializable
 {
     public SongDto SongDto { get; set; }
     public SingScenePlayerDataDto SingScenePlayerDataDto { get; set; } = new();

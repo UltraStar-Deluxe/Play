@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 using UniInject;
 using UnityEngine;
 using Whisper;
-using Object = UnityEngine.Object;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

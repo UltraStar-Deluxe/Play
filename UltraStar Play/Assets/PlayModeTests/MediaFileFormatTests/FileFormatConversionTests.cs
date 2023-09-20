@@ -3,7 +3,6 @@ using System.IO;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Assert = NUnit.Framework.Assert;
 
 public class FileFormatConversionTests : AbstractMediaFileFormatTests
 {

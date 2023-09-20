@@ -5,7 +5,6 @@ using PortAudioForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem.EnhancedTouch;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

@@ -4,7 +4,6 @@ using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

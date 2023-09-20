@@ -5,7 +5,6 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
