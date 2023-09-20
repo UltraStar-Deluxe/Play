@@ -351,7 +351,7 @@ public static class MidiToSongMetaUtils
     public static void AssignNotesToVoice(
         SongMeta songMeta,
         List<Note> loadedNotes,
-        string voiceName,
+        string voiceId,
         MidiTrack track,
         Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
         Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis)
@@ -401,7 +401,7 @@ public static class MidiToSongMetaUtils
 
         noteGroups.ForEach(notesGroup =>
         {
-            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, notesGroup, voiceName, false);
+            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, notesGroup, voiceId, false);
         });
     }
 

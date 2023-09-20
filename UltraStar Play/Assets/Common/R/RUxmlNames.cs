@@ -939,7 +939,7 @@ public static partial class R
         public const string vinylImage = "vinylImage";
         public const string virtualPiano = "virtualPiano";
         public const string vocalsAudioVolumeChooser = "vocalsAudioVolumeChooser";
-        public const string voiceNameLabel = "voiceNameLabel";
+        public const string voiceIdLabel = "voiceIdLabel";
         public const string volumeChooser = "volumeChooser";
         public const string volumeIcon = "volumeIcon";
         public const string volumeSlider = "volumeSlider";

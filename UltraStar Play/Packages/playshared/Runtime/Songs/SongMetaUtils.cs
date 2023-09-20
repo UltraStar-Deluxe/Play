@@ -269,10 +269,10 @@ public static class SongMetaUtils
         return sentences.FirstOrDefault(sentence => sentence.ContainsBeatRange(note.StartBeat, note.EndBeat));
     }
 
-    public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceName)
+    public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceId)
     {
         Voice matchingVoice = songMeta.Voices
-            .FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceName));
+            .FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceId));
         if (matchingVoice != null)
         {
             return matchingVoice;
@@ -286,7 +286,7 @@ public static class SongMetaUtils
             soloVoice.SetId(Voice.firstVoiceId);
         }
 
-        Voice newVoice = new(voiceName);
+        Voice newVoice = new(voiceId);
         songMeta.AddVoice(newVoice);
 
         return newVoice;

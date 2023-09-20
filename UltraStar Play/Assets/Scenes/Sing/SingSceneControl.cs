@@ -384,8 +384,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private void TriggerAchievementsAtSongStart()
     {
         // Two players with different lyrics
-        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Count == 2
-            && sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Values.Distinct().Count() > 1)
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Count == 2
+            && sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Values.Distinct().Count() > 1)
         {
             achievementEventStream.OnNext(AchievementId.startDuetWithDifferentLyrics);
         }
@@ -1108,20 +1108,21 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return Voice.soloVoiceId;
         }
 
-        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceIdOrPerformerName))
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.TryGetValue(playerProfile, out string voiceIdOrPerformerName))
         {
             if (voiceIdOrPerformerName == Voice.mergedVoiceId)
             {
                 return Voice.mergedVoiceId;
             }
 
-            // The given value could be "P1" / "P2" (i.e. a voiceName) or the performer's name (e.g. "Elvis").
-            string matchingVoiceName = voiceIdToDisplayName
+            // The given value could be "P1" / "P2" (i.e. a voice id) or the performer's name (e.g. "Elvis").
+            string matchingVoiceId = voiceIdToDisplayName
                 .Where(entry => entry.Key == voiceIdOrPerformerName
                     || entry.Value == voiceIdOrPerformerName)
                 .Select(entry => entry.Key)
-                .FirstOrDefault();
-            return matchingVoiceName;
+                .FirstOrDefault()
+                .OrIfNull(Voice.soloVoiceId);
+            return matchingVoiceId;
         }
 
         if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count == 1)

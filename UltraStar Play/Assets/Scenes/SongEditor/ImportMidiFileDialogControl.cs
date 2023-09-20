@@ -282,16 +282,16 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         StopPreview();
 
-        string voiceName = null;
+        string voiceId = null;
         if (assignToPlayerToggle.value
             && midiAssignToPlayerPickerControl.SelectedItem is EVoiceId.P1)
         {
-            voiceName = Voice.firstVoiceId;
+            voiceId = Voice.firstVoiceId;
         }
         else if (assignToPlayerToggle.value
                  && midiAssignToPlayerPickerControl.SelectedItem is EVoiceId.P2)
         {
-            voiceName = Voice.secondVoiceId;
+            voiceId = Voice.secondVoiceId;
         }
 
         midiFileImporter.ImportMidiFile(
@@ -300,7 +300,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             midiTrackIndexPickerControl.SelectedItem.channelIndex,
             importMidiLyricsToggle.value,
             importMidiNotesToggle.value,
-            voiceName,
+            voiceId,
             true,
             ESongEditorLayer.Import);
         UiManager.CreateNotification("Loaded MIDI file successfully");

@@ -143,9 +143,9 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
         UpdateVoiceButtons();
     }
 
-    private void TrySetVoice(string voiceName)
+    private void TrySetVoice(string voiceId)
     {
-        Voice newVoice = SongMetaUtils.GetVoiceById(songMeta, voiceName);
+        Voice newVoice = SongMetaUtils.GetVoiceById(songMeta, voiceId);
         if (newVoice == null)
         {
             return;

@@ -1,14 +1,14 @@
 public class SongEditorVoiceLayer : AbstractSongEditorLayer
 {
-    public string VoiceName { get; private set; }
+    public string VoiceId { get; private set; }
 
-    public SongEditorVoiceLayer(string voiceName)
+    public SongEditorVoiceLayer(string voiceId)
     {
-        this.VoiceName = voiceName;
+        this.VoiceId = voiceId;
     }
 
     public override string GetDisplayName()
     {
-        return VoiceName.Replace("P", "Player ");
+        return VoiceId.Replace("P", "Player ");
     }
 }

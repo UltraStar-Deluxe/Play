@@ -4,7 +4,7 @@ public class SingScenePlayerData
 {
     public List<PlayerProfile> SelectedPlayerProfiles { get; set; } = new();
     public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
-    public Dictionary<PlayerProfile, string> PlayerProfileToVoiceNameMap { get; set; } = new();
+    public Dictionary<PlayerProfile, string> PlayerProfileToVoiceIdMap { get; set; } = new();
 
     public SingScenePlayerData()
     {
@@ -14,6 +14,6 @@ public class SingScenePlayerData
     {
         SelectedPlayerProfiles = new(other.SelectedPlayerProfiles);
         PlayerProfileToMicProfileMap = new(other.PlayerProfileToMicProfileMap);
-        PlayerProfileToVoiceNameMap = new(other.PlayerProfileToVoiceNameMap);
+        PlayerProfileToVoiceIdMap = new(other.PlayerProfileToVoiceIdMap);
     }
 }

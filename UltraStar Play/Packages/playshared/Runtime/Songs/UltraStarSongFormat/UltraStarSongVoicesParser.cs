@@ -173,11 +173,11 @@ public class UltraStarSongVoicesParser
         }
     }
 
-    private void ParseVoiceStart(string voiceName, uint lineNumber)
+    private void ParseVoiceStart(string voiceId, uint lineNumber)
     {
-        if (voiceName.IsNullOrEmpty())
+        if (voiceId.IsNullOrEmpty())
         {
-            ThrowLineError(lineNumber, "Voice name is empty");
+            ThrowLineError(lineNumber, "Voice id is null or empty, should be 'P1' or 'P2' for example");
         }
 
         // Remove the default voice for solo songs.
@@ -186,14 +186,14 @@ public class UltraStarSongVoicesParser
         // Normalize voice name.
         // Most use "P1", "P2", etc.
         // But some use "P 1", "P 2", etc. (with spaces)
-        string normalizedVoiceName = voiceName.Replace(" ", "");
+        string normalizedVoiceId = voiceId.Replace(" ", "");
 
         // Switch to or create new voice
-        if (!voiceIdToVoiceMap.TryGetValue(normalizedVoiceName, out Voice nextVoice))
+        if (!voiceIdToVoiceMap.TryGetValue(normalizedVoiceId, out Voice nextVoice))
         {
             // Voice has not been found, so create new one.
-            nextVoice = new Voice(normalizedVoiceName);
-            voiceIdToVoiceMap.Add(normalizedVoiceName, nextVoice);
+            nextVoice = new Voice(normalizedVoiceId);
+            voiceIdToVoiceMap.Add(normalizedVoiceId, nextVoice);
         }
         currentVoice = nextVoice;
         currentSentence = null;

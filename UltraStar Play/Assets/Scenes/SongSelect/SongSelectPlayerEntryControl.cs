@@ -85,8 +85,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     [Inject(UxmlName = R.UxmlNames.teamLabel)]
     private Label teamLabel;
 
-    [Inject(UxmlName = R.UxmlNames.voiceNameLabel)]
-    private Label voiceNameLabel;
+    [Inject(UxmlName = R.UxmlNames.voiceIdLabel)]
+    private Label voiceIdLabel;
 
     // The MicProfile can be null to indicate that this player does not have a mic (yet).
     private MicProfile micProfile;
@@ -118,9 +118,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    private readonly ReactiveProperty<string> selectedVoiceName = new(Voice.firstVoiceId);
-    public string VoiceName => changeVoiceButton.IsVisibleByDisplay()
-        ? selectedVoiceName.Value
+    private readonly ReactiveProperty<string> selectedVoiceId = new(Voice.firstVoiceId);
+    public string VoiceId => changeVoiceButton.IsVisibleByDisplay()
+        ? selectedVoiceId.Value
         : null;
 
     private NewestSamplesMicPitchTracker micPitchTracker;
@@ -182,27 +182,27 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private void InitVoiceSelection()
     {
-        selectedVoiceName.Subscribe(_ => UpdateChangeVoiceButtonText());
+        selectedVoiceId.Subscribe(_ => UpdateChangeVoiceButtonText());
         changeVoiceButton.RegisterCallbackButtonTriggered(_ =>
         {
-            selectedVoiceName.Value = Voice.GetNextVoiceId(selectedVoiceName.Value);
+            selectedVoiceId.Value = Voice.GetNextVoiceId(selectedVoiceId.Value);
         });
     }
 
     private void UpdateChangeVoiceButtonText()
     {
         if (!voiceIdToDisplayName.IsNullOrEmpty()
-            && voiceIdToDisplayName.ContainsKey(selectedVoiceName.Value))
+            && voiceIdToDisplayName.ContainsKey(selectedVoiceId.Value))
         {
-            voiceNameLabel.text = voiceIdToDisplayName[selectedVoiceName.Value];
+            voiceIdLabel.text = voiceIdToDisplayName[selectedVoiceId.Value];
         }
-        else if (selectedVoiceName.Value == Voice.mergedVoiceId)
+        else if (selectedVoiceId.Value == Voice.mergedVoiceId)
         {
-            voiceNameLabel.text = "Both";
+            voiceIdLabel.text = "Both";
         }
         else
         {
-            voiceNameLabel.text = selectedVoiceName.Value;
+            voiceIdLabel.text = selectedVoiceId.Value;
         }
     }
 
@@ -382,7 +382,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         voiceIdToDisplayName = SongMetaUtils.GetVoiceIdToDisplayName(songMeta);
         changeVoiceButton.ShowByDisplay();
         UpdateChangeVoiceButtonText();
-        selectedVoiceName.Value = selectedVoiceIndex == 0
+        selectedVoiceId.Value = selectedVoiceIndex == 0
             ? Voice.firstVoiceId
             : Voice.secondVoiceId;
     }

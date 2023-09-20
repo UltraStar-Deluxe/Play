@@ -144,7 +144,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     private void AddPlayerInfoUiToTopOrBottom(VisualElement playerInfoUiVisualElement)
     {
         bool hasTopPlayerInfoUiRow = (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 1
-                                      && sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Values
+                                      && sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Values
                                           .Distinct()
                                           .Count() > 1)
                                      || sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 8;

@@ -334,20 +334,20 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         return result;
     }
 
-    public Dictionary<PlayerProfile,string> GetSelectedPlayerProfileToVoiceNameMap()
+    public Dictionary<PlayerProfile,string> GetSelectedPlayerProfileToVoiceIdMap()
     {
-        Dictionary<PlayerProfile,string> selectedPlayerProfileToVoiceNameMap = new();
+        Dictionary<PlayerProfile,string> result = new();
         playerEntryControls.ForEach(entry =>
         {
             if (entry.IsSelected.Value)
             {
-                string voiceName = !entry.VoiceName.IsNullOrEmpty()
-                    ? entry.VoiceName
+                string voiceId = !entry.VoiceId.IsNullOrEmpty()
+                    ? entry.VoiceId
                     : Voice.soloVoiceId;
-                selectedPlayerProfileToVoiceNameMap.Add(entry.PlayerProfile, voiceName);
+                result.Add(entry.PlayerProfile, voiceId);
             }
         });
-        return selectedPlayerProfileToVoiceNameMap;
+        return result;
     }
 
     public void ToggleSelectedPlayers()

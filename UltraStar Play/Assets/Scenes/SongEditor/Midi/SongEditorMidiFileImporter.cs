@@ -19,7 +19,7 @@ public class SongEditorMidiFileImporter : INeedInjection
 
     [Inject]
     private SongEditorLayerManager layerManager;
-    
+
     [Inject]
     private EditorNoteDisplayer editorNoteDisplayer;
 
@@ -34,14 +34,14 @@ public class SongEditorMidiFileImporter : INeedInjection
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
-    
+
     public void ImportMidiFile(
         string midiFilePath,
         int trackIndex,
         int channelIndex,
         bool importLyrics,
         bool importNotes,
-        string voiceName,
+        string voiceId,
         bool shiftNotesToPlaybackPosition,
         ESongEditorLayer layer)
     {
@@ -50,7 +50,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         {
             return;
         }
-        
+
         if (!File.Exists(midiFilePath))
         {
             Debug.Log($"File does not exist: {midiFilePath}");
@@ -61,23 +61,23 @@ public class SongEditorMidiFileImporter : INeedInjection
         // Remove old notes
         editorNoteDisplayer.ClearNotesInLayer(layer);
         layerManager.ClearEnumLayer(layer);
-        
+
         MidiFile midiFile = MidiFileUtils.LoadMidiFile(midiFilePath);
         if (midiFile == null)
         {
             throw new UnityException("Loading midi file failed.");
         }
-        
+
         try
         {
             MidiFileUtils.CalculateMidiEventTimesInMillis(
                 midiFile,
                 out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
                 out Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis);
-            
+
             List<Note> loadedNotes = MidiToSongMetaUtils.LoadNotesFromMidiFile(songMeta, midiFile, trackIndex, channelIndex, importLyrics, importNotes, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
-            
-            if (voiceName == null)
+
+            if (voiceId == null)
             {
                 // Add all notes to dedicated layer
                 layerManager.ClearEnumLayer(layer);
@@ -91,7 +91,7 @@ public class SongEditorMidiFileImporter : INeedInjection
             {
                 // Assign notes to player
                 MidiTrack track = midiFile.Tracks[trackIndex];
-                MidiToSongMetaUtils.AssignNotesToVoice(songMeta, loadedNotes, voiceName, track, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
+                MidiToSongMetaUtils.AssignNotesToVoice(songMeta, loadedNotes, voiceId, track, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
             }
 
             if (shiftNotesToPlaybackPosition)

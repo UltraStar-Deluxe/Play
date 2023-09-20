@@ -135,7 +135,7 @@ public static class UltraStarSongParser
                 }
                 else
                 {
-                    // silently ignore already set voiceNames
+                    // silently ignore already set voice names
                 }
             }
             else if (tagNameLowerCase.StartsWith("duetsingerp", StringComparison.Ordinal)
@@ -151,7 +151,7 @@ public static class UltraStarSongParser
                 }
                 else
                 {
-                    // silently ignore already set voiceNames
+                    // silently ignore already set voice names
                 }
             }
             else
