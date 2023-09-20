@@ -249,7 +249,11 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             throw new ConnectRequestException($"Malformed ConnectResponse: wrong ClientId. Is {connectResponseDto.ClientId}, expected {settings.ClientId}");
         }
 
-        connectEventStream.OnNext(new ConnectEvent(connectResponseDto.HttpServerPort, ServerPeer.EndPoint, connectResponseDto.Permissions));
+        connectEventStream.OnNext(new ConnectEvent(
+            connectResponseDto.HttpServerPort,
+            ServerPeer.EndPoint,
+            connectResponseDto.Permissions,
+            connectResponseDto.AvailableGameRoundModifierDtos));
         connectRequestCount = 0;
     }
 

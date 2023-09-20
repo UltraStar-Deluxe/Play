@@ -7,6 +7,7 @@ public static partial class R
         public const string controlWithLabelVertical = "controlWithLabelVertical";
         public const string ellipsis = "ellipsis";
         public const string fontColorBorder = "fontColorBorder";
+        public const string gameRoundModifierToggle = "gameRoundModifierToggle";
         public const string horizontalSeparatorLine = "horizontalSeparatorLine";
         public const string jpg = "jpg";
         public const string largeFont = "largeFont";

@@ -36,7 +36,7 @@ public class Settings : ISettings
     public string ConnectionServerAddress { get; set; } = "";
     public DeliveryMethod MicDataDeliveryMethod { get; set; } = DeliveryMethod.ReliableOrdered;
 
-    public GameRoundSettings GameRoundSettings { get; set; } = new();
+    public GameRoundSettingsDto GameRoundSettingsDto { get; set; } = new();
 
     public void CreateAndSetClientId()
     {

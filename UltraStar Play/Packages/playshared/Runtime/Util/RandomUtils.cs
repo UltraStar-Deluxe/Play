@@ -12,7 +12,13 @@ public static class RandomUtils
         }
         return RandomOf(values.ToList());
     }
-    
+
+    public static bool RandomTrue(int probabilityOfTrueInPercent = 50)
+    {
+        // Random.Range: first parameter 0 is inclusive, second parameter 100 is exclusive
+        return Random.Range(0, 100) < probabilityOfTrueInPercent;
+    }
+
     public static T RandomOf<T>(IReadOnlyList<T> values)
     {
         if (values.IsNullOrEmpty())
@@ -40,7 +46,7 @@ public static class RandomUtils
         }
         return result;
     }
-    
+
     public static Color32 RandomColor()
     {
         int r = Random.Range(0, 255);

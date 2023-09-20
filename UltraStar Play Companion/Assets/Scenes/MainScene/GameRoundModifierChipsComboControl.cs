@@ -6,16 +6,16 @@ public class GameRoundModifierChipsComboControl
 {
 	public ChipsCombo ChipsCombo { get; private set; }
 
-    public GameRoundSettingsDto gameRoundSettings;
-    public GameRoundSettingsDto GameRoundSettings
+    public GameRoundSettingsDto gameRoundSettingsDto;
+    public GameRoundSettingsDto GameRoundSettingsDto
     {
         get
         {
-            return gameRoundSettings;
+            return gameRoundSettingsDto;
         }
         set
         {
-            gameRoundSettings = value;
+            gameRoundSettingsDto = value;
             UpdateChipsComboEntries();
         }
     }
@@ -34,14 +34,14 @@ public class GameRoundModifierChipsComboControl
     public void UpdateChipsComboEntries()
     {
         ChipsCombo.ChipsList.Clear();
-
-        if (GameRoundSettings == null)
+        if (GameRoundSettingsDto == null
+            || GameRoundSettingsDto.ModifierDtos.IsNullOrEmpty())
         {
             return;
         }
 
-        // Add chips for modifiers
-        CreateGameRoundModifierChipsEntry(EGameRoundModifier.HideLyrics, "Hide lyrics");
+        GameRoundSettingsDto.ModifierDtos.ForEach(modifierDto =>
+            CreateChipsComboEntry(modifierDto.DisplayName, () => GameRoundSettingsDto.ModifierDtos.Remove(modifierDto)));
     }
 
     private void CreateChipsComboEntry(string labelText, Action onRemove = null)
@@ -58,20 +58,12 @@ public class GameRoundModifierChipsComboControl
             button.RegisterCallbackButtonTriggered(_ =>
             {
                 onRemove();
-                gameRoundSettingsChangedEventStream.OnNext(gameRoundSettings);
+                gameRoundSettingsChangedEventStream.OnNext(gameRoundSettingsDto);
             });
         }
         else
         {
             button.HideByDisplay();
-        }
-    }
-
-    private void CreateGameRoundModifierChipsEntry(EGameRoundModifier gameRoundModifier, string labelText)
-    {
-        if (GameRoundSettings.modifiers.Contains(gameRoundModifier))
-        {
-            CreateChipsComboEntry(labelText, () => GameRoundSettings.modifiers.Remove(gameRoundModifier));
         }
     }
 }

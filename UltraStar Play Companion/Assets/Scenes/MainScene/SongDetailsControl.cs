@@ -92,16 +92,16 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
     private readonly List<PlayerSelectPlayerEntryControl> playerEntryControls = new();
 
-    private readonly GameRoundSettingsUiControl gameRoundSettingsUiControl = new();
+    private readonly GameRoundSettingsDtoUiControl gameRoundSettingsDtoUiControl = new();
 
     public void OnInjectionFinished()
     {
-        injector.Inject(gameRoundSettingsUiControl);
+        injector.Inject(gameRoundSettingsDtoUiControl);
 
-        gameRoundSettingsUiControl.GameRoundSettings = settings.GameRoundSettings;
-        VisualElementUtils.RegisterDirectClickCallback(modifierDialogOverlay, () => gameRoundSettingsUiControl.CloseModifierDialog());
+        gameRoundSettingsDtoUiControl.GameRoundSettingsDto = settings.GameRoundSettingsDto;
+        VisualElementUtils.RegisterDirectClickCallback(modifierDialogOverlay, () => gameRoundSettingsDtoUiControl.CloseModifierDialog());
 
-        gameRoundSettingsUiControl
+        gameRoundSettingsDtoUiControl
             .DialogClosedEventStream
             .Subscribe(_ => enqueueSettingsAccordionItem.UpdateTargetHeight());
 
@@ -209,7 +209,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             }
         });
 
-        dto.GameRoundSettings = settings.GameRoundSettings;
+        dto.GameRoundSettingsDto = settings.GameRoundSettingsDto;
         return dto;
     }
 

@@ -19,13 +19,13 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     public static ServerSideConnectRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ServerSideConnectRequestManager>();
 
     public int ConnectedClientCount => liteNetLibServer.ConnectedPeersCount;
-    
+
     private readonly Subject<ClientConnectionChangedEvent> clientConnectionChangedEventStream = new();
     public IObservable<ClientConnectionChangedEvent> ClientConnectionChangedEventStream => clientConnectionChangedEventStream.ObserveOnMainThread();
-    
+
     private readonly Subject<MicProfile> connectedClientMicProfileChangedEventStream = new();
     public IObservable<MicProfile> ConnectedClientMicProfileChangedEventStream => connectedClientMicProfileChangedEventStream;
-    
+
     [Inject]
     private HttpServer httpServer;
 
@@ -66,26 +66,26 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     {
         NetDebug.Logger = null;
         liteNetLibServer?.Stop();
-        
+
         if (Instance == this)
         {
             RemoveAllConnectedClientHandlers();
         }
     }
-    
+
 
     private void Update()
     {
         liteNetLibServer.PollEvents();
     }
-    
+
     public void OnClientConnectionChanged(ClientConnectionChangedEvent clientConnectionChangedEvent)
     {
         if (!clientConnectionChangedEvent.IsConnected)
         {
             return;
         }
-        
+
         settings.MicProfiles
             .ForEach(micProfile =>
             {
@@ -98,7 +98,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                 }
             });
     }
-    
+
     private void RemoveAllConnectedClientHandlers()
     {
         foreach (NetPeer peer in liteNetLibServer.ConnectedPeerList.ToList())
@@ -156,21 +156,23 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             Debug.LogError($"Peer connected without ConnectRequest data: {peer.EndPoint}");
             return;
         }
-        
+
         Debug.Log($"Peer connected {peer.EndPoint} with ConnectRequest: {connectRequestDto.ToJson()}. Sending ConnectResponse.");
-        
+
         // Send connect response
         List<HttpApiPermission> permissions = SettingsUtils.GetPermissions(settings, connectRequestDto.ClientId);
+        List<GameRoundModifierDto> availableGameRoundModifierDtos = DtoConverter.ToDto(GameRoundModifierUtils.GetGameRoundModifiers());
         ConnectResponseDto connectResponseDto = new()
         {
             ClientName = connectRequestDto.ClientName,
             ClientId = connectRequestDto.ClientId,
             HttpServerPort = httpServer.port,
             Permissions = permissions,
+            AvailableGameRoundModifierDtos = availableGameRoundModifierDtos,
         };
         Debug.Log($"Sending ConnectResponse to {peer.EndPoint}");
         peer.Send(connectResponseDto, DeliveryMethod.ReliableOrdered);
-        
+
         // Send MicProfile
         MicProfile micProfileOfClient = settings.MicProfiles
             .FirstOrDefault(micProfile => micProfile.ConnectedClientId == connectRequestDto.ClientId);
@@ -207,9 +209,9 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         {
             return;
         }
-        
+
         Log.Verbose(() => $"Received message from client {peer.EndPoint}: {message}");
-        
+
         if (peerToConnectedClientHandler.TryGetValue(peer, out IConnectedClientHandler connectedClientHandler))
         {
             connectedClientHandler.HandleMessageFromClient(message);
@@ -244,7 +246,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             Debug.LogError("Missing connection request");
             return;
         }
-        
+
         string message = request.Data.GetString();
         if (message.IsNullOrEmpty())
         {
@@ -258,7 +260,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             {
                 throw new Exception($"Malformed connection request: wrong message type");
             }
-            
+
             ConnectRequestDto connectRequestDto = JsonConverter.FromJson<ConnectRequestDto>(message);
             if (connectRequestDto.ProtocolVersion != ProtocolVersions.ProtocolVersion)
             {
@@ -273,10 +275,10 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             {
                 throw new ConnectRequestException($"Malformed connection request: missing ClientId.");
             }
-            
+
             Debug.Log($"Accepted connection request from {remoteEndPoint}");
             NetPeer peer = request.Accept();
-            
+
             // Register client
             peerToConnectRequestDto[peer] = connectRequestDto;
             ConnectedClientHandler newConnectedClientHandler = RegisterConnectedClient(peer, connectRequestDto.ClientName, connectRequestDto.ClientId);
