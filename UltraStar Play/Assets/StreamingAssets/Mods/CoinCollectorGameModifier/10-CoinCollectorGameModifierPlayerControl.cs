@@ -10,6 +10,8 @@ public class CoinCollectorGameModifierPlayerControl : INeedInjection, IInjection
 {
     public string modFolder;
 
+    private const int CollectedCoinCountBonusThreshold = 10;
+
     [Inject]
     private GameObject gameObject;
 
@@ -22,13 +24,17 @@ public class CoinCollectorGameModifierPlayerControl : INeedInjection, IInjection
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
 
+    [Inject(UxmlName = R.UxmlNames.playerScoreLabel)]
+    private VisualElement playerScoreLabel;
+
     private List<CoinControl> coinControls = new List<CoinControl>();
     private List<RecordedNoteControl> recordedNoteControls = new List<RecordedNoteControl>();
 
     private VisualElement coinCountContainer;
     private Label coinCountLabel;
 
-    private int collectedCoinCount;
+    private int totalCollectedCoinCount;
+    private int collectedCoinCountSinceLastBonus;
 
     public void OnInjectionFinished()
     {
@@ -60,7 +66,7 @@ public class CoinCollectorGameModifierPlayerControl : INeedInjection, IInjection
 
     private void UpdateCoinsLabel()
     {
-        coinCountLabel.text = $"{collectedCoinCount}";
+        coinCountLabel.text = $"{collectedCoinCountSinceLastBonus}";
     }
 
     public void Update()
@@ -103,8 +109,27 @@ public class CoinCollectorGameModifierPlayerControl : INeedInjection, IInjection
         coinControl.VisualElement.RemoveFromHierarchy();
         coinControls.Remove(coinControl);
 
-        collectedCoinCount++;
+        collectedCoinCountSinceLastBonus++;
+        totalCollectedCoinCount++;
+        if (collectedCoinCountSinceLastBonus >= CollectedCoinCountBonusThreshold)
+        {
+            GiveCoinBonusPoints();
+        }
         UpdateCoinsLabel();
+    }
+
+    private void GiveCoinBonusPoints()
+    {
+        collectedCoinCountSinceLastBonus -= CollectedCoinCountBonusThreshold;
+        playerControl.PlayerScoreControl.ModTotalScore += 100;
+        playerControl.PlayerUiControl.ShowTotalScore(playerControl.PlayerScoreControl.TotalScore);
+        
+        Debug.Log($"Added 100 points to score of player '{playerControl.PlayerProfile?.Name}'");
+
+        // Highlight with Animation
+
+        AnimationUtils.BounceVisualElementSize(gameObject, coinCountContainer, 1.5f);
+        AnimationUtils.BounceVisualElementSize(gameObject, playerScoreLabel, 1.5f);
     }
 
     private void OnCreatedTargetNoteControl(TargetNoteControl targetNoteControl, PlayerControl playerControl)

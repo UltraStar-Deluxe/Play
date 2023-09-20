@@ -391,6 +391,7 @@ public static partial class R
         public const string minimumLogLevelPicker = "minimumLogLevelPicker";
         public const string mitPitchIndicatorContainer = "mitPitchIndicatorContainer";
         public const string modAuthorsLabel = "modAuthorsLabel";
+        public const string modBonusScore = "modBonusScore";
         public const string modDependenciesAccordionItem = "modDependenciesAccordionItem";
         public const string modDependenciesContainer = "modDependenciesContainer";
         public const string modDependencyLabel = "modDependencyLabel";

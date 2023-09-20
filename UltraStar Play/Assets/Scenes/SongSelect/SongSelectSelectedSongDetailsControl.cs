@@ -131,6 +131,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
             SongMetas = new List<SongMeta> { SelectedSong },
             partyModeSceneData = sceneData.partyModeSceneData,
             lastSceneData = sceneData,
+            GameRoundSettings = new(),
         };
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }

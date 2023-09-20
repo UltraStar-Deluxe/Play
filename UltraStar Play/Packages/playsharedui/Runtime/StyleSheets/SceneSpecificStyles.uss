@@ -508,6 +508,11 @@
     background-color: #F04438;
 }
 
+#modBonusScore > #scoreIcon {
+    background-color: #ed68f2;
+}
+
+
 #totalScore > #scoreIcon {
     visibility: hidden;
 }

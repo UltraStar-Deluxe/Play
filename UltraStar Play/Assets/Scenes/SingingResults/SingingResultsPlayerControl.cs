@@ -37,6 +37,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     [Inject(UxmlName = R.UxmlNames.phraseBonusScore)]
     private VisualElement phraseBonusScoreContainer;
 
+    [Inject(UxmlName = R.UxmlNames.modBonusScore)]
+    private VisualElement modBonusScoreContainer;
+
     [Inject(UxmlName = R.UxmlNames.totalScoreLabel)]
     private Label totalScoreLabel;
 
@@ -78,7 +81,8 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private float NormalNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.NormalNotesTotalScore / PlayerScoreControl.maxScore);
     private float GoldenNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.GoldenNoteLengthTotal / PlayerScoreControl.maxScore);
     private float PerfectSentenceBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.PerfectSentenceBonusTotalScore / PlayerScoreControl.maxScore);
-    private float TotalScoreAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float) playerScoreData.TotalScore / PlayerScoreControl.maxScore);
+    private float ModBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)Math.Abs(playerScoreData.ModTotalScore) / PlayerScoreControl.maxScore);
+    private float TotalScoreAnimTimeInSeconds => NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds + ModBonusAnimTimeInSeconds;
 
     private readonly List<int> animationIds = new();
 
@@ -144,6 +148,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.PerfectSentenceBonusTotalScore, PerfectSentenceBonusAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(phraseBonusScoreContainer, interpolatedValue))
             .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds);
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.ModTotalScore, ModBonusAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(modBonusScoreContainer, interpolatedValue))
+            .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds);
         LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.TotalScore, TotalScoreAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
 
@@ -180,6 +187,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         SetScoreRowLabelText(normalNoteScoreContainer, 0);
         SetScoreRowLabelText(goldenNoteScoreContainer, 0);
         SetScoreRowLabelText(phraseBonusScoreContainer, 0);
+        SetScoreRowLabelText(modBonusScoreContainer, 0);
     }
 
     private void AnimateStarRatingIcons()
@@ -206,7 +214,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private bool IsNewHighscore()
     {
-        if (playerScoreData.TotalScore <= 0)
+        if (playerScoreData.TotalScore <= 0
+            || sceneData.GameRoundSettings == null
+            || sceneData.GameRoundSettings.AnyModifierActive)
         {
             return false;
         }
@@ -322,5 +332,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
                     hideAndShowWithTarget = true,
                 });
             }));
+    }
+
+    public void SetModScoreVisible(bool isVisible)
+    {
+        modBonusScoreContainer.SetVisibleByDisplay(isVisible);
     }
 }
