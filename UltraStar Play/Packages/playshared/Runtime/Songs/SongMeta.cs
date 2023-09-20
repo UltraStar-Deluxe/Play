@@ -143,9 +143,6 @@ public abstract class SongMeta
      */
     public virtual int MedleyEndBeat { get; set; }
 
-    /**
-     *
-     */
     private readonly Dictionary<string, string> additionalHeaderEntries = new();
     public IReadOnlyDictionary<string, string> AdditionalHeaderEntries
     {
@@ -162,7 +159,7 @@ public abstract class SongMeta
     protected readonly Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
 
     private List<Voice> voices = new();
-    public virtual IReadOnlyList<Voice> Voices
+    public IReadOnlyList<Voice> Voices
     {
         get
         {
@@ -183,24 +180,24 @@ public abstract class SongMeta
     public bool FailedToLoadVoices { get; private set; }
     public virtual int VoiceCount => Math.Max(1, Voices.Count);
 
-    private Subject<bool> loadedVoicesEventStream = new();
+    protected readonly Subject<bool> loadedVoicesEventStream = new();
     public IObservable<bool> LoadedVoicesEventStream => loadedVoicesEventStream;
 
     protected abstract List<Voice> LoadVoices();
 
-    public void SetAdditionalHeaderEntry(string key, string value)
+    public virtual void SetAdditionalHeaderEntry(string key, string value)
     {
         additionalHeaderEntries[key.ToLowerInvariant()] = value;
     }
 
-    public string GetAdditionalHeaderEntry(string key)
+    public virtual string GetAdditionalHeaderEntry(string key)
     {
         return additionalHeaderEntries.TryGetValue(key.ToLowerInvariant(), out string value)
             ? value
             : null;
     }
 
-    public string GetVoiceDisplayName(EVoiceId voiceId)
+    public virtual string GetVoiceDisplayName(EVoiceId voiceId)
     {
         if (voiceIdToDisplayName == null
             || !voiceIdToDisplayName.TryGetValue(voiceId, out string displayName))
@@ -216,7 +213,7 @@ public abstract class SongMeta
         return $"{nameof(SongMeta)}(artist: '{Artist}', title: '{Title}', file: '{FileInfo}')";
     }
 
-    public void SetFileInfo(string filePath, Encoding encoding = null)
+    public virtual void SetFileInfo(string filePath, Encoding encoding = null)
     {
         FileInfo = new FileInfo(filePath);
         FileEncoding = encoding;
@@ -248,7 +245,7 @@ public abstract class SongMeta
         Year = other.Year;
     }
 
-    public void AddVoice(Voice newVoice)
+    public virtual void AddVoice(Voice newVoice)
     {
         if (Voices.Contains(newVoice))
         {
@@ -258,7 +255,7 @@ public abstract class SongMeta
         voices.Add(newVoice);
     }
 
-    public void RemoveVoice(Voice voice)
+    public virtual void RemoveVoice(Voice voice)
     {
         if (!Voices.Contains(voice))
         {
