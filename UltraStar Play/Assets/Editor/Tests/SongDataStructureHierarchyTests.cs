@@ -49,7 +49,7 @@ public class SongDataStructureHierarchyTests
     public void SetVoiceOnSentenceUpdatesOtherReferences()
     {
         Sentence sentence = new();
-        Voice voice1 = new(new List<Sentence> { sentence }, "");
+        Voice voice1 = new("", new List<Sentence> { sentence });
         Assert.AreEqual(1, voice1.Sentences.Count);
 
         Voice voice2 = new();
@@ -63,7 +63,7 @@ public class SongDataStructureHierarchyTests
     public void AddSentenceToVoiceUpdatesOtherReferences()
     {
         Sentence sentence = new();
-        Voice voice1 = new(new List<Sentence> { sentence }, "");
+        Voice voice1 = new("", new List<Sentence> { sentence });
         Assert.AreEqual(1, voice1.Sentences.Count);
 
         Voice voice2 = new();
@@ -77,7 +77,7 @@ public class SongDataStructureHierarchyTests
     public void RemoveSentenceFromVoiceUpdatesOtherReferences()
     {
         Sentence sentence = new();
-        Voice voice1 = new(new List<Sentence> { sentence }, "");
+        Voice voice1 = new("", new List<Sentence> { sentence });
         Assert.AreEqual(1, voice1.Sentences.Count);
 
         voice1.RemoveSentence(sentence);

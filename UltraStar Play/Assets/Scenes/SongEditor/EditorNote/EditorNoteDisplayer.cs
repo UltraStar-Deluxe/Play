@@ -211,13 +211,13 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     {
         // Remove notes of hidden voices
         List<Note> notVisibleNotes = noteToControlMap.Keys
-            .Where(note => !songEditorLayerManager.IsVoiceLayerVisible(note.Sentence?.Voice.Name))
+            .Where(note => !songEditorLayerManager.IsVoiceLayerVisible(note.Sentence?.Voice.Id))
             .ToList();
         notVisibleNotes.ForEach(note => RemoveNoteControl(note));
 
         // Remove sentences of hidden voices
         List<Sentence> notVisibleSentences = sentenceToControlMap.Keys
-            .Where(sentence => !songEditorLayerManager.IsVoiceLayerVisible(sentence.Voice.Name))
+            .Where(sentence => !songEditorLayerManager.IsVoiceLayerVisible(sentence.Voice.Id))
             .ToList();
         notVisibleSentences.ForEach(sentence => RemoveSentence(sentence));
 
@@ -237,7 +237,7 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
     public void ReloadSentences()
     {
         voiceToSortedSentencesMap.Clear();
-        IEnumerable<Voice> voices = songMeta.GetVoices();
+        IEnumerable<Voice> voices = songMeta.Voices;
         foreach (Voice voice in voices)
         {
             List<Sentence> sortedSentences = new(voice.Sentences);
@@ -265,8 +265,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void UpdateSentenceControls()
     {
-        List<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
+        List<Voice> visibleVoices = songMeta.Voices
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Id))
             .ToList();
 
         visibleVoices.ForEach(voice => CreateSentenceControlForVoice(voice));
@@ -294,8 +294,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
+        List<Voice> visibleVoices = songMeta.Voices
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Id))
             .ToList();
 
         sentenceLinesContainer.Clear();
@@ -463,8 +463,8 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
 
     private void DrawNotesInSongFile()
     {
-        IEnumerable<Voice> visibleVoices = songMeta.GetVoices()
-            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Name))
+        IEnumerable<Voice> visibleVoices = songMeta.Voices
+            .Where(voice => songEditorLayerManager.IsVoiceLayerVisible(voice.Id))
             .ToList();
         visibleVoices.ForEach(voice => DrawNotesInVoice(voice));
     }
@@ -506,14 +506,14 @@ public class EditorNoteDisplayer : MonoBehaviour, INeedInjection
         // Update color
         if (sentence.Voice != null)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Id);
             editorSentenceControl.SetColor(color);
 
             // Make sentence rectangles alternating light/dark
             bool isDark = (sentenceIndex % 2) == 0;
             if (isDark)
             {
-                Color darkColor = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Name).Multiply(0.66f);
+                Color darkColor = songEditorLayerManager.GetVoiceLayerColor(sentence.Voice.Id).Multiply(0.66f);
                 editorSentenceControl.SetColor(darkColor);
             }
         }

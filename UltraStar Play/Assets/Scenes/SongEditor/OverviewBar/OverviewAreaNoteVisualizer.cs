@@ -63,9 +63,9 @@ public class OverviewAreaNoteVisualizer : INeedInjection, IInjectionFinishedList
         }
 
         dynamicTexture.ClearTexture();
-        foreach (Voice voice in songMeta.GetVoices())
+        foreach (Voice voice in songMeta.Voices)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(voice.Id);
             DrawNotes(voice, color);
         }
         dynamicTexture.ApplyTexture();

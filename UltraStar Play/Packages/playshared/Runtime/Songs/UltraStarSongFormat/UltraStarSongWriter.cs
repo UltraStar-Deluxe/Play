@@ -4,30 +4,30 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-public static class UltraStarSongFileWriter
+public static class UltraStarFormatWriter
 {
     public static void WriteFile(string absolutePath, SongMeta songMeta)
     {
-        string txtFileContent = GetTxtFileContent(songMeta);
-        File.WriteAllText(absolutePath, txtFileContent, Encoding.UTF8);
+        string ultraStarFormat = ToUltraStarSongFormat(songMeta);
+        File.WriteAllText(absolutePath, ultraStarFormat, Encoding.UTF8);
     }
 
-    private static string GetTxtFileContent(SongMeta songMeta)
+    public static string ToUltraStarSongFormat(SongMeta songMeta)
     {
         StringBuilder sb = new();
         AppendHeader(sb, songMeta);
-        List<Voice> nonEmptyVoices = songMeta.GetVoices().Where(voice => IsNotEmpty(voice)).ToList();
-        nonEmptyVoices.Sort(Voice.comparerByName);
+        List<Voice> nonEmptyVoices = songMeta.Voices.Where(voice => IsNotEmpty(voice)).ToList();
+        nonEmptyVoices.Sort(Voice.comparerById);
         foreach (Voice voice in nonEmptyVoices)
         {
-            string voiceName = voice.Name;
+            string voiceName = voice.Id;
             if (nonEmptyVoices.Count == 1)
             {
-                voiceName = Voice.soloVoiceName;
+                voiceName = Voice.soloVoiceId;
             }
-            else if (voiceName == Voice.soloVoiceName)
+            else if (voiceName == Voice.soloVoiceId)
             {
-                voiceName = Voice.firstVoiceName;
+                voiceName = Voice.firstVoiceId;
             }
 
             AppendVoice(sb, voice, voiceName);
@@ -92,7 +92,7 @@ public static class UltraStarSongFileWriter
             case ENoteType.Rap: return "R";
             case ENoteType.RapGolden: return "G";
             default:
-                throw new UltraStarSongFileWriterException("Unknown note type '" + noteType + "'.");
+                throw new UltraStarSongWriterException($"Unknown note type '{noteType}'.");
         }
     }
 

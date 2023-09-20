@@ -197,9 +197,9 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         }
 
         // Prepare directory to move created audio files.
-        string destinationFolder = DirectoryUtils.IsSubDirectory(songMeta.Directory, generatedSongFolderAbsolutePath)
-            ? songMeta.Directory
-            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, songMeta.Directory);
+        string destinationFolder = DirectoryUtils.IsSubDirectory(SongMetaUtils.GetDirectoryPath(songMeta), generatedSongFolderAbsolutePath)
+            ? SongMetaUtils.GetDirectoryPath(songMeta)
+            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, SongMetaUtils.GetDirectoryPath(songMeta));
         if (!destinationFolder.IsNullOrEmpty()
             && !Directory.Exists(destinationFolder))
         {

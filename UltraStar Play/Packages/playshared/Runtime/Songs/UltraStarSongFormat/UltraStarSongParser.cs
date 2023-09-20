@@ -6,16 +6,31 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public static class SongMetaBuilder
+public static class UltraStarSongParser
 {
-    public static SongMeta ParseFile(string path, out List<SongIssue> songIssues, Encoding enc, bool useUniversalCharsetDetector)
+    public static UltraStarSongMeta ParseSongFile(string filePath, out List<SongIssue> songIssues, Encoding encoding, bool useUniversalCharsetDetector)
     {
-        using StreamReader reader = TxtReader.GetFileStreamReader(path, enc, useUniversalCharsetDetector);
+        try
+        {
+            using StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, encoding, useUniversalCharsetDetector);
+            UltraStarSongMeta songMeta = ParseSong(reader, out songIssues);
 
+            songMeta.SetFileInfo(filePath, reader.CurrentEncoding);
+
+            // Log issues
+            songIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in file '{filePath}'"));
+
+            return songMeta;
+        }
+        catch (ExplicitEncodingMismatchException ex)
+        {
+            return ParseSongFile(filePath, out songIssues, ex.ExplicitlyDefinedEncoding, useUniversalCharsetDetector);
+        }
+    }
+
+    public static UltraStarSongMeta ParseSong(StreamReader reader, out List<SongIssue> songIssues)
+    {
         songIssues = new();
-
-        string directory = new FileInfo(path).Directory.FullName;
-        string filename = new FileInfo(path).Name;
 
         Dictionary<string, string> requiredFields = new()
         {
@@ -23,7 +38,7 @@ public static class SongMetaBuilder
             { "mp3", null },
             { "title", null }
         };
-        Dictionary<string, string> voiceNames = new();
+        Dictionary<string, string> voiceIdToDisplayName = new();
         Dictionary<string, string> otherFields = new();
 
         uint lineNumber = 0;
@@ -41,7 +56,7 @@ public static class SongMetaBuilder
             {
                 if (lineNumber == 1)
                 {
-                    throw new SongMetaBuilderException("Does not look like a song file; ignoring");
+                    throw new UltraStarSongParserException("Does not look like a song file; ignoring");
                 }
 
                 // Finished headers
@@ -76,19 +91,25 @@ public static class SongMetaBuilder
             if (string.Equals(tagNameLowerCase, "encoding", StringComparison.InvariantCultureIgnoreCase)
                 && !string.Equals(tagValue, "auto", StringComparison.InvariantCultureIgnoreCase))
             {
+                Encoding explicitlyDefinedEncoding;
                 try
                 {
-                    Encoding newEncoding = EncodingUtils.GetEncoding(tagValue);
-                    if (!newEncoding.Equals(reader.CurrentEncoding))
-                    {
-                        reader.Dispose();
-                        return ParseFile(path, out songIssues, newEncoding, useUniversalCharsetDetector);
-                    }
+                    explicitlyDefinedEncoding = EncodingUtils.GetEncoding(tagValue);
                 }
                 catch (Exception ex)
                 {
                     Debug.LogException(ex);
-                    Debug.LogError($"Failed to use explicitly specified encoding '{tagValue}'. Using guessed encoding '{reader.CurrentEncoding}' instead. File '{path}'. Error message: {ex.Message}");
+                    Debug.LogError($"Failed to find encoding for explicitly specified encoding name '{tagValue}'. " +
+                                   $"Using guessed encoding '{reader.CurrentEncoding}' instead. " +
+                                   $"Error message: {ex.Message}");
+                    explicitlyDefinedEncoding = null;
+                }
+
+                if (explicitlyDefinedEncoding != null
+                    && !explicitlyDefinedEncoding.Equals(reader.CurrentEncoding))
+                {
+                    reader.Dispose();
+                    throw new ExplicitEncodingMismatchException(explicitlyDefinedEncoding, reader.CurrentEncoding);
                 }
             }
             else if (requiredFields.ContainsKey(tagNameLowerCase))
@@ -108,9 +129,9 @@ public static class SongMetaBuilder
                      && char.IsDigit(tagNameLowerCase, 1))
             {
                 otherFields.Add(tagNameLowerCase, tagValue);
-                if (!voiceNames.ContainsKey(tagNameLowerCase.ToUpperInvariant()))
+                if (!voiceIdToDisplayName.ContainsKey(tagNameLowerCase.ToUpperInvariant()))
                 {
-                    voiceNames.Add(tagNameLowerCase.ToUpperInvariant(), tagValue);
+                    voiceIdToDisplayName.Add(tagNameLowerCase.ToUpperInvariant(), tagValue);
                 }
                 else
                 {
@@ -124,9 +145,9 @@ public static class SongMetaBuilder
                 otherFields.Add(tagNameLowerCase, tagValue);
                 // Get P1 / P2 from DUETSINGERP1 / DUETSINGERP2
                 string shortTag = tagNameLowerCase.Substring(10).ToUpperInvariant();
-                if (!voiceNames.ContainsKey(shortTag))
+                if (!voiceIdToDisplayName.ContainsKey(shortTag))
                 {
-                    voiceNames.Add(shortTag, tagValue);
+                    voiceIdToDisplayName.Add(shortTag, tagValue);
                 }
                 else
                 {
@@ -151,21 +172,9 @@ public static class SongMetaBuilder
         {
             if (requiredFieldName.Value == null)
             {
-                throw new SongMetaBuilderException("Required tag '" + requiredFieldName.Key + "' was not set");
+                throw new UltraStarSongParserException("Required tag '" + requiredFieldName.Key + "' was not set");
             }
         }
-
-        //Read the song file body
-        StringBuilder songBody = new();
-        string bodyLine;
-        while ((bodyLine = reader.ReadLine()) != null)
-        {
-            // Ignoring the newlines for the hash
-            songBody.Append(bodyLine);
-        }
-
-        //Hash the song file body
-        string songHash = Hashing.Md5(Encoding.UTF8.GetBytes(songBody.ToString()));
 
         try
         {
@@ -183,22 +192,17 @@ public static class SongMetaBuilder
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                throw new SongMetaBuilderException($"Failed to parse BPM value {requiredFields["bpm"]}");
+                throw new UltraStarSongParserException($"Failed to parse BPM value {requiredFields["bpm"]}");
             }
 
             string audioFile = requiredFields["mp3"];
             string title = requiredFields["title"];
-            SongMeta songMeta = new(
-                directory,
-                filename,
-                songHash,
+            UltraStarSongMeta songMeta = new(
                 artist,
+                title,
                 bpm,
                 audioFile,
-                title,
-                voiceNames,
-                reader.CurrentEncoding
-            );
+                voiceIdToDisplayName);
             foreach (KeyValuePair<string, string> item in otherFields)
             {
                 try
@@ -215,24 +219,21 @@ public static class SongMetaBuilder
             }
 
             // Recreate issues with proper SongMeta
-            songIssues = songIssues.Select(songIssue => new SongIssue(songIssue.Severity, new SongIssueData(songMeta), songIssue.Message,
-                    songIssue.StartBeat, songIssue.EndBeat))
+            songIssues = songIssues.Select(songIssue =>
+                    new SongIssue(songIssue.Severity, new SongIssueData(songMeta),
+                        songIssue.Message, songIssue.StartBeat, songIssue.EndBeat))
                 .ToList();
-            songIssues.ForEach(songIssue =>
-            {
-                Debug.LogWarning($"{songIssue.Message} in file {path}");
-            });
 
             return songMeta;
         }
         catch (ArgumentNullException e)
         {
             // if you get these with e.ParamName == "s", it's probably one of the non-nullable things (ie, float, uint, etc)
-            throw new SongMetaBuilderException("Required tag '" + e.ParamName + "' was not set");
+            throw new UltraStarSongParserException("Required tag '" + e.ParamName + "' was not set");
         }
     }
 
-    private static void ConsumeOptionalHeaderField(SongMeta songMeta, string key, string value)
+    private static void ConsumeOptionalHeaderField(UltraStarSongMeta songMeta, string key, string value)
     {
         switch (key)
         {
@@ -329,7 +330,7 @@ public static class SongMetaBuilder
         }
         else
         {
-            throw new SongMetaBuilderException($"Could not convert string '{s}' to a float.");
+            throw new UltraStarSongParserException($"Could not convert string '{s}' to a float.");
         }
     }
 
@@ -347,7 +348,7 @@ public static class SongMetaBuilder
         }
         catch (FormatException e)
         {
-            throw new SongMetaBuilderException("Could not convert " + s + " to an uint. Reason: " + e.Message, e);
+            throw new UltraStarSongParserException("Could not convert " + s + " to an uint. Reason: " + e.Message, e);
         }
     }
 
@@ -365,21 +366,19 @@ public static class SongMetaBuilder
         }
         catch (FormatException e)
         {
-            throw new SongMetaBuilderException("Could not convert " + s + " to an int. Reason: " + e.Message, e);
+            throw new UltraStarSongParserException("Could not convert " + s + " to an int. Reason: " + e.Message, e);
         }
     }
-}
 
-[Serializable]
-public class SongMetaBuilderException : Exception
-{
-    public SongMetaBuilderException(string message)
-        : base(message)
+    public class ExplicitEncodingMismatchException : Exception
     {
-    }
+        public Encoding ExplicitlyDefinedEncoding { get; private set; }
 
-    public SongMetaBuilderException(string message, Exception innerException)
-        : base(message, innerException)
-    {
+        public ExplicitEncodingMismatchException(Encoding explicitlyDefinedEncoding, Encoding otherEncoding)
+            : base($"Encoding used to parse song '{otherEncoding}' " +
+                   $"does not match explicitly defined encoding '{explicitlyDefinedEncoding}'")
+        {
+            ExplicitlyDefinedEncoding = explicitlyDefinedEncoding;
+        }
     }
 }

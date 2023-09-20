@@ -249,7 +249,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             () => songSelectSceneControl.StartSongEditorScene());
         if (PlatformUtils.IsStandalone)
         {
-            if (DirectoryUtils.Exists(songEntry.SongMeta.Directory))
+            if (DirectoryUtils.Exists(SongMetaUtils.GetDirectoryPath(songEntry.SongMeta)))
             {
                 contextMenuPopup.AddButton("Open Folder", "open_in_new",
                     () => SongMetaUtils.OpenDirectory(songEntry.SongMeta));
@@ -424,7 +424,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void UpdateSongIcons(SongSelectSongEntry songEntry)
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songEntry.SongMeta));
-        duetIcon.SetVisibleByDisplay(songEntry.SongMeta.VoiceNames.Count > 1);
+        duetIcon.SetVisibleByDisplay(songEntry.SongMeta.Voices.Count > 1);
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
         notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songEntry.SongMeta, generatedSongFolderAbsolutePath));
         songRatingIconControl.UpdateSongRatingIcons(songEntry.SongMeta, settings.Difficulty);

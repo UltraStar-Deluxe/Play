@@ -463,10 +463,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         visualElement.Q<Label>(R.UxmlNames.title).text = songMetaArtistAndTitle;
         Button openFolderButtonOfSongMeta = visualElement.Q<Button>(R.UxmlNames.openFolderButton);
         if (PlatformUtils.IsStandalone
-            && !songIssue.SongMeta.Directory.IsNullOrEmpty()
-            && Directory.Exists(songIssue.SongMeta.Directory))
+            && DirectoryUtils.Exists(SongMetaUtils.GetDirectoryPath(songIssue.SongMeta)))
         {
-            openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
+            openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(SongMetaUtils.GetDirectoryPath(songIssue.SongMeta)));
         }
         else
         {

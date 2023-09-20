@@ -100,7 +100,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         }
 
         // Paste to original voice
-        songMeta.GetVoices().ForEach(voice =>
+        songMeta.Voices.ForEach(voice =>
         {
             List<Note> copiedNotesFromVoice = copyPasteData.copiedNotes
                 .Where(copiedNote => !copyPasteData.copiedNoteToLayerMap.ContainsKey(copiedNote)
@@ -118,7 +118,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
                 return pastedNote;
             }).ToList();
             
-            moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, pastedNotesFromVoice, voice.Name);
+            moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, pastedNotesFromVoice, voice.Id);
             pastedNotes.AddRange(pastedNotesFromVoice);
         });
 
@@ -131,7 +131,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             }
             else
             {
-                string voiceName = pastedNote.Sentence?.Voice?.Name;
+                string voiceName = pastedNote.Sentence?.Voice?.Id;
                 pastedNote.IsEditable = layerManager.IsVoiceLayerEditable(voiceName);
             }
         });

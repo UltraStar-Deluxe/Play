@@ -48,7 +48,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
-    
+
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
@@ -104,7 +104,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         int lengthInBeats = maxBeat - minBeat;
 
         contextMenu.AddSeparator();
-        
+
         contextMenu.AddButton($"Speech recognition on {settings.SongEditorSettings.SpeechRecognitionSamplesSource} audio",
             () => speechRecognitionAction.SetTextToAnalyzedSpeech(selectedNotes, settings.SongEditorSettings.SpeechRecognitionSamplesSource, true));
         contextMenu.AddButton($"Move to detected pitch",
@@ -114,7 +114,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
     private void FillContextMenuToMergeAndAddSpaceBetweenNotes(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
         contextMenu.AddSeparator();
-        
+
         if (mergeNotesAction.CanExecute(selectedNotes))
         {
             contextMenu.AddButton("Merge Notes", () => mergeNotesAction.ExecuteAndNotify(selectedNotes, noteControl.Note));
@@ -169,13 +169,13 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     private void FillContextMenuToMoveToOtherSentenceOrVoice(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
-        bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.soloVoiceName, Voice.firstVoiceName);
-        bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.secondVoiceName);
+        bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.soloVoiceId, Voice.firstVoiceId);
+        bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.secondVoiceId);
         if (canMoveToVoice1)
         {
             contextMenu.AddSeparator();
             contextMenu.AddButton("Assign to player 1",
-                () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.firstVoiceName));
+                () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.firstVoiceId));
         }
         if (!canMoveToVoice1 && canMoveToVoice2)
         {
@@ -184,14 +184,14 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         if (canMoveToVoice2)
         {
             contextMenu.AddButton("Assign to player 2",
-                () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.secondVoiceName));
+                () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.secondVoiceId));
         }
 
         if (moveNoteToOwnSentenceAction.CanMoveToOwnSentence(selectedNotes))
         {
             contextMenu.AddButton("Assign to own phrase", () => moveNoteToOwnSentenceAction.MoveToOwnSentenceAndNotify(selectedNotes));
         }
-        
+
         bool canMoveToPreviousSentence = moveNoteToAdjacentSentenceAction.CanMoveToPreviousSentence(selectedNotes, noteControl.Note);
         bool canMoveToNextSentence = moveNoteToAdjacentSentenceAction.CanMoveToNextSentence(selectedNotes, noteControl.Note);
         if (canMoveToPreviousSentence)

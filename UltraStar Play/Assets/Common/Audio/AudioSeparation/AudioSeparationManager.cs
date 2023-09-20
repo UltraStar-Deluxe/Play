@@ -195,15 +195,20 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             return;
         }
 
+        if (!DirectoryUtils.Exists(SongMetaUtils.GetDirectoryPath(songMeta)))
+        {
+            return;
+        }
+
         // Save the SongMeta if it changed
         bool songMetaChanged = false;
 
         // Prepare directory to move created audio files.
-        string destinationFolder = songMeta.Directory;
+        string destinationFolder = SongMetaUtils.GetDirectoryPath(songMeta);
         if (!settings.SaveVocalsAndInstrumentalAudioInFolderOfSong
-            && !DirectoryUtils.IsSubDirectory(songMeta.Directory, generatedSongFolderAbsolutePath))
+            && !DirectoryUtils.IsSubDirectory(SongMetaUtils.GetDirectoryPath(songMeta), generatedSongFolderAbsolutePath))
         {
-            destinationFolder = ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, songMeta.Directory);
+            destinationFolder = ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, SongMetaUtils.GetDirectoryPath(songMeta));
         }
 
         if (!destinationFolder.IsNullOrEmpty()
@@ -225,9 +230,9 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             FileUtils.MoveFileOverwriteIfExists(vocalsAudioPath, destinationVocalsAudioPath);
 
             songMeta.VocalsAudio = destinationVocalsAudioPath;
-            if (destinationFolder == songMeta.Directory)
+            if (destinationFolder == SongMetaUtils.GetDirectoryPath(songMeta))
             {
-                songMeta.VocalsAudio = PathUtils.MakeRelativePath(songMeta.Directory, songMeta.VocalsAudio);
+                songMeta.VocalsAudio = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), songMeta.VocalsAudio);
             }
             songMetaChanged = true;
         }
@@ -249,9 +254,9 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             FileUtils.MoveFileOverwriteIfExists(instrumentalAudioPath, destinationInstrumentalAudioPath);
 
             songMeta.InstrumentalAudio = destinationInstrumentalAudioPath;
-            if (destinationFolder == songMeta.Directory)
+            if (destinationFolder == SongMetaUtils.GetDirectoryPath(songMeta))
             {
-                songMeta.InstrumentalAudio = PathUtils.MakeRelativePath(songMeta.Directory, songMeta.InstrumentalAudio);
+                songMeta.InstrumentalAudio = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), songMeta.InstrumentalAudio);
             }
 
             songMetaChanged = true;

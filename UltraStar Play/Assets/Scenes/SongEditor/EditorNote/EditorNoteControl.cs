@@ -150,7 +150,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         pitchLabel.text = MidiUtils.GetAbsoluteName(Note.MidiNote);
         if (Note.Sentence != null && Note.Sentence.Voice != null)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(Note.Sentence.Voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(Note.Sentence.Voice.Id);
             SetColor(color);
         }
     }

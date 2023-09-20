@@ -9,10 +9,10 @@ using UniInject;
 public class PlaylistRestControl : AbstractRestControl, INeedInjection
 {
     public static PlaylistRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<PlaylistRestControl>();
-    
+
     [Inject]
     private SongMetaManager songMetaManager;
-    
+
     [Inject]
     private PlaylistManager playlistManager;
 
@@ -20,7 +20,7 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
     {
         return Instance;
     }
-    
+
     protected override void StartSingleton()
     {
         httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.PlaylistFavorites)
@@ -35,7 +35,7 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
                     {
                         Artist = songMeta.Artist,
                         Title = songMeta.Title,
-                        Hash = songMeta.SongHash,
+                        Hash = SongMetaManager.GetAndCacheUniqueHash(songMeta),
                     })
                     .ToList();
                 requestData.Context.Response.WriteJson(songListDto);

@@ -15,31 +15,31 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     }
     private static MicSelectionDialogControl micSelectionDialogControl;
     public static MicSelectionDialogControl MicSelectionDialogControl => micSelectionDialogControl;
-    
+
     [Inject(Key = nameof(micPitchTrackerPrefab))]
     private NewestSamplesMicPitchTracker micPitchTrackerPrefab;
-    
+
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     private VisualElement visualElement;
 
     [Inject(Key = nameof(messageDialogUi))]
     private VisualTreeAsset messageDialogUi;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.micButton)]
     private Button micButton;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.micIcon)]
     private VisualElement micIcon;
 
     [Inject(UxmlName = R.UxmlNames.noMicIcon)]
     private VisualElement noMicIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.nameLabel)]
     private Label nameLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerImage)]
     private VisualElement playerImage;
-    
+
     [Inject(UxmlName = R.UxmlNames.togglePlayerSelectedButton)]
     private Button togglePlayerSelectedButton;
 
@@ -48,46 +48,46 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     [Inject(UxmlName = R.UxmlNames.changeVoiceButton)]
     private Button changeVoiceButton;
-    
+
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private ThemeManager themeManager;
-    
+
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
-    
+
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
-    
+
     [Inject]
     private FocusableNavigator focusableNavigator;
-    
+
     [Inject]
     private SongSelectPlayerListControl selectPlayerListControl;
-    
+
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
-    
+
     // The PlayerProfile is set in Init and must not be null.
     public PlayerProfile PlayerProfile { get; private set; }
 
     [Inject(Optional = true)]
     private SongSelectSceneControl songSelectSceneControl;
-    
+
     [Inject(Optional = true)]
     private PartyModeTeamSettings partyModeTeamSettings;
-    
+
     [Inject(UxmlName = R.UxmlNames.teamLabel)]
     private Label teamLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.voiceNameLabel)]
     private Label voiceNameLabel;
-    
+
     // The MicProfile can be null to indicate that this player does not have a mic (yet).
     private MicProfile micProfile;
     public MicProfile MicProfile
@@ -118,7 +118,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    private readonly ReactiveProperty<string> selectedVoiceName = new(Voice.firstVoiceName);
+    private readonly ReactiveProperty<string> selectedVoiceName = new(Voice.firstVoiceId);
     public string VoiceName => changeVoiceButton.IsVisibleByDisplay()
         ? selectedVoiceName.Value
         : null;
@@ -129,17 +129,17 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     public ReactiveProperty<bool> IsSelected {get; private set; } = new(false);
 
-    private Dictionary<string, string> voiceNames;
-    
+    private Dictionary<string, string> voiceIdToDisplayName;
+
     private readonly PlayerProfileImageControl playerProfileImageControl = new();
-    
+
     private readonly Subject<MicSelectionDialogControl.MicProfileChangedEvent> micProfileChangedEventStream = new();
     public IObservable<MicSelectionDialogControl.MicProfileChangedEvent> MicProfileChangedEventStream => micProfileChangedEventStream;
 
     public Action<MicProfile> OnMicProfileSelected { get; set; }
 
     private int lastUpdateAllMicPitchTrackersFrameCount;
-    
+
     public void OnInjectionFinished()
     {
         InitVoiceSelection();
@@ -151,12 +151,12 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
         togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ => IsSelected.Value = !IsSelected.Value);
         micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
-        
+
         focusableNavigator.AddCustomNavigationTarget(micButton, Vector2.left, togglePlayerSelectedButton, true);
         focusableNavigator.AddCustomNavigationTarget(micButton, Vector2.up, songListView);
         focusableNavigator.AddCustomNavigationTarget(togglePlayerSelectedButton, Vector2.up, songListView);
         focusableNavigator.AddCustomNavigationTarget(togglePlayerSelectedButton, Vector2.down, changeVoiceButton, true);
-        
+
         IsSelected.Subscribe(newValue =>
         {
             if (newValue)
@@ -185,18 +185,18 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         selectedVoiceName.Subscribe(_ => UpdateChangeVoiceButtonText());
         changeVoiceButton.RegisterCallbackButtonTriggered(_ =>
         {
-            selectedVoiceName.Value = Voice.GetNextVoiceName(selectedVoiceName.Value);
+            selectedVoiceName.Value = Voice.GetNextVoiceId(selectedVoiceName.Value);
         });
     }
 
     private void UpdateChangeVoiceButtonText()
     {
-        if (!voiceNames.IsNullOrEmpty()
-            && voiceNames.ContainsKey(selectedVoiceName.Value))
+        if (!voiceIdToDisplayName.IsNullOrEmpty()
+            && voiceIdToDisplayName.ContainsKey(selectedVoiceName.Value))
         {
-            voiceNameLabel.text = voiceNames[selectedVoiceName.Value];
+            voiceNameLabel.text = voiceIdToDisplayName[selectedVoiceName.Value];
         }
-        else if (selectedVoiceName.Value == Voice.mergedVoiceName)
+        else if (selectedVoiceName.Value == Voice.mergedVoiceId)
         {
             voiceNameLabel.text = "Both";
         }
@@ -221,7 +221,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             if (songSelectSceneControl.PartyModeSettings.TeamSettings.IsFreeForAll)
             {
                 teamLabel.HideByDisplay();
-            }    
+            }
             else
             {
                 teamLabel.ShowByDisplay();
@@ -276,7 +276,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         });
         micSelectionDialogControl.OnMicProfileSelected = OnMicSelected;
         micSelectionDialogControl.MicProfiles = GetAvailableMicProfiles();
-        
+
         // Start recording to select microphone
         StartRecordingWithAllMicrophones();
     }
@@ -295,11 +295,11 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
         SendStartRecordingMessageToAllConnectedClients();
     }
-    
+
     private void StopRecordingWithAllMicrophones()
     {
         Debug.Log($"StopRecordingWithAllMicrophones: frame: {Time.frameCount}");
-        
+
         foreach (MicProfile availableMicProfile in GetAvailableMicProfiles())
         {
             MicSampleRecorder micSampleRecorder = micSampleRecorderManager.GetOrCreateMicSampleRecorder(availableMicProfile);
@@ -322,7 +322,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     {
         return serverSideConnectRequestManager.GetConnectedClientHandlers(GetAvailableMicProfiles());
     }
-    
+
     private void SendStopRecordingMessageToAllConnectedClients()
     {
         GetConnectedClientHandlers().ForEach(it => it.ConnectedClientHandler.SendMessageToClient(new StopRecordingMessageDto()));
@@ -332,7 +332,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
     {
         GetConnectedClientHandlers().ForEach(it => it.ConnectedClientHandler.SendMessageToClient(new StartRecordingMessageDto()));
     }
-    
+
     private ConnectedClientHandlerAndMicProfile GetConnectedClientHandler()
     {
         if (micProfile == null)
@@ -341,7 +341,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
         return serverSideConnectRequestManager.GetConnectedClientHandlers(new List<MicProfile> { micProfile }).FirstOrDefault();
     }
-    
+
     private void SendStopRecordingMessageToConnectedClient()
     {
         if (micProfile != null
@@ -359,7 +359,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
             GetConnectedClientHandler()?.ConnectedClientHandler.SendMessageToClient(new StartRecordingMessageDto());
         }
     }
-    
+
     public void SetSelected(bool newValue, bool force)
     {
         if (partyModeTeamSettings != null
@@ -377,14 +377,14 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         changeVoiceButton.HideByDisplay();
     }
 
-    public void ShowVoiceSelection(SongMeta selectedSong, int selectedVoiceIndex)
+    public void ShowVoiceSelection(SongMeta songMeta, int selectedVoiceIndex)
     {
-        voiceNames = selectedSong.VoiceNames;
+        voiceIdToDisplayName = SongMetaUtils.GetVoiceIdToDisplayName(songMeta);
         changeVoiceButton.ShowByDisplay();
         UpdateChangeVoiceButtonText();
         selectedVoiceName.Value = selectedVoiceIndex == 0
-            ? Voice.firstVoiceName
-            : Voice.secondVoiceName;
+            ? Voice.firstVoiceId
+            : Voice.secondVoiceId;
     }
 
     private void InitMicPitchTracker()
@@ -401,26 +401,26 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         {
             return;
         }
-        
+
         songSelectSceneControl.playerListControl.PlayerEntryControls
             .ForEach(it => it.UpdateMicPitchTracker());
 
         lastUpdateAllMicPitchTrackersFrameCount = Time.frameCount;
     }
-    
+
     public void UpdateMicPitchTracker()
     {
         if (micPitchTracker == null)
         {
             return;
         }
-        
+
         micPitchTracker.MicProfile = micProfile;
         if (micProfile == null)
         {
             return;
         }
-        
+
         if (nonPersistentSettings.MicTestActive.Value
             || micSelectionDialogControl != null)
         {

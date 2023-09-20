@@ -515,7 +515,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             // There are two different sets of lyrics that need to be displayed
             List<Voice> voices = voiceToPlayerControlsMap.Keys
-                .OrderBy(voice => Voice.NormalizeVoiceName(voice?.Name))
+                .OrderBy(voice => Voice.NormalizeVoiceId(voice?.Id))
                 .ToList();
             Voice firstVoice = voices.FirstOrDefault();
             Voice secondVoice = voices.LastOrDefault();
@@ -1088,26 +1088,26 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         column.Add(visualElement);
     }
 
-    private string GetVoiceName(PlayerProfile playerProfile)
+    private string GetVoiceId(PlayerProfile playerProfile)
     {
-        List<string> voiceNames = new(SongMeta.VoiceNames.Keys);
-        int voiceNameCount = voiceNames.Count;
-        if (voiceNameCount <= 1)
+        Dictionary<string,string> voiceIdToDisplayName = SongMetaUtils.GetVoiceIdToDisplayName(SongMeta);
+        List<string> voiceIds = voiceIdToDisplayName.Keys.ToList();
+        if (voiceIds.Count <= 1)
         {
-            return Voice.soloVoiceName;
+            return Voice.soloVoiceId;
         }
 
-        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceNameOrPerformerName))
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceIdOrPerformerName))
         {
-            if (voiceNameOrPerformerName == Voice.mergedVoiceName)
+            if (voiceIdOrPerformerName == Voice.mergedVoiceId)
             {
-                return Voice.mergedVoiceName;
+                return Voice.mergedVoiceId;
             }
 
             // The given value could be "P1" / "P2" (i.e. a voiceName) or the performer's name (e.g. "Elvis").
-            string matchingVoiceName = SongMeta.VoiceNames
-                .Where(entry => entry.Key == voiceNameOrPerformerName
-                    || entry.Value == voiceNameOrPerformerName)
+            string matchingVoiceName = voiceIdToDisplayName
+                .Where(entry => entry.Key == voiceIdOrPerformerName
+                    || entry.Value == voiceIdOrPerformerName)
                 .Select(entry => entry.Key)
                 .FirstOrDefault();
             return matchingVoiceName;
@@ -1115,11 +1115,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count == 1)
         {
-            return Voice.soloVoiceName;
+            return Voice.soloVoiceId;
         }
 
-        int voiceIndex = sceneData.SingScenePlayerData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNames.Count;
-        return voiceNames[voiceIndex];
+        int voiceIndex = sceneData.SingScenePlayerData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceIds.Count;
+        return voiceIds[voiceIndex];
     }
 
     public void Pause()
@@ -1240,24 +1240,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private Voice GetVoice(PlayerProfile playerProfile)
     {
-        List<Voice> voices = SongMeta.GetVoices().ToList();
-
-        string voiceName = GetVoiceName(playerProfile);
-        if (voiceName == Voice.mergedVoiceName)
+        string voiceId = GetVoiceId(playerProfile);
+        Voice voice = SongMetaUtils.GetVoiceById(SongMeta, voiceId);
+        if (voice == null)
         {
-            return SongMetaUtils.CreateMergedVoice(voices);
+            string voiceIdCsv = SongMeta.Voices.Select(it => it.Id).ToCsv();
+            Debug.LogError($"The song data does not contain a voice with id {voiceId}."
+                           + $" Available voice ids: {voiceIdCsv}");
         }
-
-        Voice matchingVoice = voices.FirstOrDefault(it => Voice.VoiceNameEquals(it.Name, voiceName));
-        if (matchingVoice != null)
-        {
-            return matchingVoice;
-        }
-
-        string voiceNameCsv = voices.Select(it => it.Name).ToCsv();
-        Debug.LogError($"The song data does not contain a voice with name {voiceName}."
-                       + $" Available voice names: {voiceNameCsv}");
-        return voices.FirstOrDefault();
+        return voice;
     }
 
     private void UpdateInputLegend()

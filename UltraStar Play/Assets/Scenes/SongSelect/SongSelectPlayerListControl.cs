@@ -343,7 +343,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             {
                 string voiceName = !entry.VoiceName.IsNullOrEmpty()
                     ? entry.VoiceName
-                    : Voice.soloVoiceName;
+                    : Voice.soloVoiceId;
                 selectedPlayerProfileToVoiceNameMap.Add(entry.PlayerProfile, voiceName);
             }
         });
@@ -465,7 +465,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.ForEach(entry =>
         {
             entry.ShowVoiceSelection(songMeta, voiceIndex);
-            voiceIndex = (voiceIndex + 1) % songMeta.VoiceNames.Count;
+            voiceIndex = (voiceIndex + 1) % songMeta.Voices.Count;
         });
     }
 
@@ -473,7 +473,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         SongMeta selectedSong = songSelectSceneControl.SelectedSong;
         bool hasMultipleVoices = selectedSong != null
-            && selectedSong.VoiceNames.Count > 1;
+            && selectedSong.Voices.Count > 1;
         if (hasMultipleVoices)
         {
             ShowVoiceSelection(selectedSong);

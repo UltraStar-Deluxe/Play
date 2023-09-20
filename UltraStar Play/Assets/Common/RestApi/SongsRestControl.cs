@@ -137,9 +137,9 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
     private Dictionary<string,string> CreateVoiceNameToLyricsMap(SongMeta songMeta)
     {
         Dictionary<string, string> voiceNameToLyricsMap = new();
-        foreach (Voice voice in songMeta.GetVoices())
+        foreach (Voice voice in songMeta.Voices)
         {
-            string voiceDisplayName = songMeta.VoiceNames[voice.Name];
+            string voiceDisplayName = voice.Id;
             voiceNameToLyricsMap.Add(voiceDisplayName, SongMetaUtils.GetLyrics(voice, true));
         }
         return voiceNameToLyricsMap;
@@ -157,7 +157,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 {
                     Artist = songMeta.Artist,
                     Title = songMeta.Title,
-                    Hash = songMeta.SongHash,
+                    Hash = SongMetaManager.GetAndCacheUniqueHash(songMeta),
                 })
                 .ToList()
         }.ToJson());

@@ -692,17 +692,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return lyricsLabel;
         }
 
-        if (songMeta.GetVoices().Count < 2)
+        if (songMeta.Voices.Count < 2)
         {
-            string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
+            string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceId);
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(lyrics));
         }
         else
         {
-            string firstVoiceLyrics = $"<i><b>{songMeta.VoiceNames.FirstOrDefault().Value}</b></i>\n\n"
-                                      + SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
-            string secondVoiceLyrics = $"<i><b>{songMeta.VoiceNames.LastOrDefault().Value}</b></i>\n\n"
-                                       + SongMetaUtils.GetLyrics(songMeta, Voice.secondVoiceName);
+            string firstVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(Voice.firstVoiceId)}</b></i>\n\n"
+                                      + SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceId);
+            string secondVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(Voice.secondVoiceId)}</b></i>\n\n"
+                                       + SongMetaUtils.GetLyrics(songMeta, Voice.secondVoiceId);
 
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
@@ -1223,7 +1223,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
             .Where(songMeta => nonPersistentSettings.SongSelectDirectoryInfo == null
                                // Typically each song has its own folder. Thus, show a song if its PARENT folder matches the selected folder.
-                               || songMeta?.DirectoryInfo?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
+                               || SongMetaUtils.GetDirectoryInfo(songMeta)?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
             .ToList();
         return filteredSongs;

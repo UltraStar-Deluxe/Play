@@ -4,33 +4,31 @@ using System.Globalization;
 using UnityEngine;
 
 [Serializable]
-public class Voice : ISerializationCallbackReceiver
+public class Voice
 {
-    public static readonly string soloVoiceName = "";
-    public static readonly string firstVoiceName = "P1";
-    public static readonly string secondVoiceName = "P2";
-    public static readonly string mergedVoiceName = "MERGED";
-    public static readonly IReadOnlyList<string> voiceNames = new List<string> { firstVoiceName, secondVoiceName, };
+    public static readonly string soloVoiceId = "";
+    public static readonly string firstVoiceId = EVoiceId.P1.ToString();
+    public static readonly string secondVoiceId = EVoiceId.P2.ToString();
+    public static readonly string mergedVoiceId = "MERGED";
 
-    public static readonly IComparer<Voice> comparerByName = new VoiceComparerByName();
+    public static readonly IComparer<Voice> comparerById = new VoiceComparerById();
 
-    public string Name { get; private set; } = soloVoiceName;
+    public string Id { get; private set; } = soloVoiceId;
 
     private readonly HashSet<Sentence> sentences = new();
     public IReadOnlyCollection<Sentence> Sentences { get { return sentences; } }
 
-    public Voice()
+    public Voice() : this(soloVoiceId)
     {
     }
 
-    public Voice(string name)
+    public Voice(string id)
     {
-        SetName(name);
+        SetId(id);
     }
 
-    public Voice(IEnumerable<Sentence> sentences, string name)
+    public Voice(string id, IEnumerable<Sentence> sentences) : this(id)
     {
-        SetName(name);
         SetSentences(sentences);
     }
 
@@ -83,14 +81,9 @@ public class Voice : ISerializationCallbackReceiver
         sentence.SetVoice(null);
     }
 
-    public void SetName(string name)
+    public void SetId(string newId)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
-    }
-
-    public void OnBeforeSerialize()
-    {
-        // Do nothing. Implementation of ISerializationCallbackReceiver
+        Id = newId ?? throw new ArgumentNullException(nameof(newId));
     }
 
     public void OnAfterDeserialize()
@@ -103,7 +96,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public Voice CloneDeep()
     {
-        Voice clone = new(Name);
+        Voice clone = new(Id);
         foreach (Sentence sentence in Sentences)
         {
             Sentence sentenceCopy = sentence.CloneDeep();
@@ -112,7 +105,7 @@ public class Voice : ISerializationCallbackReceiver
         return clone;
     }
 
-    public class VoiceComparerByName : IComparer<Voice>
+    public class VoiceComparerById : IComparer<Voice>
     {
         public int Compare(Voice x, Voice y)
         {
@@ -128,38 +121,38 @@ public class Voice : ISerializationCallbackReceiver
             {
                 return 1;
             }
-            return string.Compare(x.Name, y.Name, true, CultureInfo.InvariantCulture);
+            return string.Compare(x.Id, y.Id, true, CultureInfo.InvariantCulture);
         }
     }
 
-    public static bool VoiceNameEquals(string a, string b)
+    public static bool VoiceIdEquals(string a, string b)
     {
         return a == b
                || (a.IsNullOrEmpty() && b.IsNullOrEmpty())
-               || (a == firstVoiceName && b == soloVoiceName)
-               || (a == soloVoiceName && b == firstVoiceName);
+               || (a == firstVoiceId && b == soloVoiceId)
+               || (a == soloVoiceId && b == firstVoiceId);
     }
 
-    public static string NormalizeVoiceName(string voiceName)
+    public static string NormalizeVoiceId(string voiceId)
     {
-        return voiceName.IsNullOrEmpty() || voiceName == soloVoiceName
-            ? firstVoiceName
-            : voiceName;
+        return voiceId.IsNullOrEmpty() || voiceId == soloVoiceId
+            ? firstVoiceId
+            : voiceId;
     }
 
-    public static string GetNextVoiceName(string currentVoiceName)
+    public static string GetNextVoiceId(string currentVoiceId)
     {
-        if (currentVoiceName == Voice.firstVoiceName)
+        if (currentVoiceId == firstVoiceId)
         {
-            return Voice.secondVoiceName;
+            return secondVoiceId;
         }
-        else if (currentVoiceName == Voice.secondVoiceName)
+        else if (currentVoiceId == secondVoiceId)
         {
-            return Voice.mergedVoiceName;
+            return mergedVoiceId;
         }
         else
         {
-            return Voice.firstVoiceName;
+            return firstVoiceId;
         }
     }
 }

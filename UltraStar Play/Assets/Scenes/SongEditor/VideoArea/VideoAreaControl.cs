@@ -112,7 +112,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Cover Image",
-            songMeta.Directory,
+            SongMetaUtils.GetDirectoryPath(songMeta),
             FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
             () => songMeta.Cover,
             newValue =>
@@ -126,7 +126,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Background Image",
-            songMeta.Directory,
+            SongMetaUtils.GetDirectoryPath(songMeta),
             FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
             () => songMeta.Background,
             newValue =>
@@ -140,7 +140,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Video",
-            songMeta.Directory,
+            SongMetaUtils.GetDirectoryPath(songMeta),
             FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.supportedVideoFiles),
             () => songMeta.Video,
             newValue =>

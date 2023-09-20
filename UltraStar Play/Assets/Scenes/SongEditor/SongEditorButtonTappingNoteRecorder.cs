@@ -32,7 +32,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.buttonRecordingLyricsTextField)]
     private TextField buttonRecordingLyricsTextField;
-    
+
     private List<Note> upcomingSortedRecordedNotes = new();
 
     private int lastPitchDetectedFrame;
@@ -175,7 +175,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         {
             return "";
         }
-        
+
         string remainingButtonTappingLyrics = buttonTappingLyrics.Substring(cursorIndex);
         int indexOfFirstSpaceOrNewline = StringUtils.MinIndexOf(remainingButtonTappingLyrics, 0, ' ', '\n');
         if (indexOfFirstSpaceOrNewline < 0)

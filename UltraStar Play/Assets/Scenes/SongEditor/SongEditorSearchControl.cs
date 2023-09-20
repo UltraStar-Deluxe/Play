@@ -172,11 +172,11 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         HashSet<Note> matchingNotes = new();
         int searchStartIndex = 0;
         
-        songMeta.GetVoices().ForEach(voice =>
+        songMeta.Voices.ForEach(voice =>
         {
             try
             {
-                if (!layerManager.IsVoiceLayerVisible(voice.Name))
+                if (!layerManager.IsVoiceLayerVisible(voice.Id))
                 {
                     return;
                 }

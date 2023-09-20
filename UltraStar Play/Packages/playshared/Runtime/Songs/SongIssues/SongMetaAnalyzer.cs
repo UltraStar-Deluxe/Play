@@ -8,7 +8,7 @@ public static class SongMetaAnalyzer
         int maxSongIssueCountPerMessage)
     {
         Dictionary<string, List<SongIssue>> messageToIssues = new();
-        foreach (Voice voice in songMeta.GetVoices())
+        foreach (Voice voice in songMeta.Voices)
         {
             AnalyzeSentencesInVoice(songMeta, voice, messageToIssues, maxSongIssueCountPerMessage);
         }

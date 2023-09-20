@@ -14,7 +14,7 @@ public class LoadAndSaveSongTest
         SongMeta originalSongMeta = LoadSong(originalFilePath);
 
         string savedFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Saved.txt";
-        UltraStarSongFileWriter.WriteFile(savedFilePath, originalSongMeta);
+        UltraStarFormatWriter.WriteFile(savedFilePath, originalSongMeta);
 
         SongMeta savedSongMeta = LoadSong(savedFilePath);
 
@@ -34,7 +34,6 @@ public class LoadAndSaveSongTest
         Assert.AreEqual(originalSongMeta.MedleyEndBeat, savedSongMeta.MedleyEndBeat);
         Assert.AreEqual(originalSongMeta.MedleyStartBeat, savedSongMeta.MedleyStartBeat);
         Assert.AreEqual(originalSongMeta.PreviewStart, savedSongMeta.PreviewStart);
-        Assert.AreEqual(originalSongMeta.Relative, savedSongMeta.Relative);
         Assert.AreEqual(originalSongMeta.Start, savedSongMeta.Start);
         Assert.AreEqual(originalSongMeta.Title, savedSongMeta.Title);
         Assert.AreEqual(originalSongMeta.Video, savedSongMeta.Video);
@@ -42,9 +41,10 @@ public class LoadAndSaveSongTest
         Assert.AreEqual(originalSongMeta.VocalsAudio, savedSongMeta.VocalsAudio);
         Assert.AreEqual(originalSongMeta.Year, savedSongMeta.Year);
 
-        Assert.AreEqual("First Vocals", originalSongMeta.VoiceNames["P1"]);
-        Assert.AreEqual("Second Vocals", originalSongMeta.VoiceNames["P2"]);
-        Assert.IsTrue(originalSongMeta.VoiceNames.SequenceEqual(savedSongMeta.VoiceNames), "VoiceNames not equal");
+        Assert.AreEqual("First Vocals", originalSongMeta.GetVoiceDisplayName(Voice.firstVoiceId));
+        Assert.AreEqual("Second Vocals", originalSongMeta.GetVoiceDisplayName(Voice.secondVoiceId));
+        Assert.AreEqual("First Vocals", savedSongMeta.GetVoiceDisplayName(Voice.firstVoiceId));
+        Assert.AreEqual("Second Vocals", savedSongMeta.GetVoiceDisplayName(Voice.secondVoiceId));
 
         Assert.AreEqual("42,5", originalSongMeta.GetUnknownHeaderEntry("NUMBERWITHCOMMA"));
         Assert.AreEqual("43.2", originalSongMeta.GetUnknownHeaderEntry("NUMBERWITHDOT"));
@@ -54,6 +54,6 @@ public class LoadAndSaveSongTest
 
     private SongMeta LoadSong(string path)
     {
-        return SongMetaBuilder.ParseFile(path, out List<SongIssue> songIssues, null, true);
+        return UltraStarSongParser.ParseSongFile(path, out List<SongIssue> songIssues, null, true);
     }
 }

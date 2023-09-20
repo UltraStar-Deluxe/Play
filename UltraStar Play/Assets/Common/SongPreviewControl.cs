@@ -152,7 +152,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
         }
 
         // Fallback: find some lyrics approx. 1/3 into the song.
-        Voice voice = songMeta.GetVoices().FirstOrDefault();
+        Voice voice = songMeta.Voices.FirstOrDefault();
         if (voice == null)
         {
             return 0;

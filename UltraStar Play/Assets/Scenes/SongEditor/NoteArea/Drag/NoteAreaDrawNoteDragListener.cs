@@ -12,7 +12,7 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
 {
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
-    
+
     [Inject]
     private SongEditorSelectionControl selectionControl;
 
@@ -36,22 +36,22 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
 
     [Inject]
     private MoveNotesToOtherVoiceAction moveNotesToOtherVoiceAction;
-    
+
     [Inject]
     private Settings settings;
 
     [Inject]
     private SongMeta songMeta;
-    
+
     private bool isCanceled;
     private NoteAreaDragEvent lastDragEvent;
 
     private Note noteUnderConstruction;
-    
+
     public void OnInjectionFinished()
     {
         noteAreaDragControl.AddListener(this);
-        
+
         noteAreaControl.VisualElement.RegisterCallback<KeyDownEvent>(_ => UpdateCursor());
         noteAreaControl.VisualElement.RegisterCallback<KeyUpEvent>(_ => UpdateCursor());
         noteAreaControl.VisualElement.RegisterCallback<PointerMoveEvent>(_ => UpdateCursor());
@@ -114,7 +114,7 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
         lastDragEvent = dragEvent;
 
         UpdateNoteUnderConstruction(dragEvent);
-        
+
         if (Touch.activeTouches.Count > 1)
         {
             CancelDrag();
@@ -139,14 +139,14 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
             startBeat = dragEvent.PositionInSongInBeatsDragStart + reducedDistanceInBeats;
             endBeat = dragEvent.PositionInSongInBeatsDragStart;
         }
-        
+
         int lengthInBeats = endBeat - startBeat;
         if (lengthInBeats < 1
             && noteUnderConstruction == null)
         {
             return;
         }
-        
+
         if (noteUnderConstruction == null)
         {
             noteUnderConstruction = new Note(ENoteType.Normal,
@@ -158,12 +158,12 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
             layerManager.AddNoteToEnumLayer(ESongEditorLayer.ButtonRecording, noteUnderConstruction);
             if (settings.SongEditorSettings.DrawNoteLayer == ESongEditorDrawNoteLayer.P1)
             {
-                moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, new List<Note>() { noteUnderConstruction }, Voice.firstVoiceName, false);
+                moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, new List<Note>() { noteUnderConstruction }, Voice.firstVoiceId, false);
                 editorNoteDisplayer.ReloadSentences();
             }
             else if (settings.SongEditorSettings.DrawNoteLayer == ESongEditorDrawNoteLayer.P2)
             {
-                moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, new List<Note>() { noteUnderConstruction }, Voice.secondVoiceName, false);
+                moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, new List<Note>() { noteUnderConstruction }, Voice.secondVoiceId, false);
                 editorNoteDisplayer.ReloadSentences();
             }
         }
@@ -172,7 +172,7 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
         {
             noteUnderConstruction.SetStartAndEndBeat(startBeat, endBeat);
         }
-        
+
         editorNoteDisplayer.UpdateNotes();
     }
 
@@ -189,7 +189,7 @@ public class NoteAreaDrawNoteDragListener : INeedInjection, IInjectionFinishedLi
         {
             return;
         }
-        
+
         noteUnderConstruction = null;
         songMetaChangeEventStream.OnNext(new NotesChangedEvent());
     }

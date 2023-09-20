@@ -139,7 +139,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private void SaveVoices(SongEditorMemento memento)
     {
-        IEnumerable<Voice> voices = songMeta.GetVoices();
+        IEnumerable<Voice> voices = songMeta.Voices;
         foreach (Voice voice in voices)
         {
             Voice voiceCopy = voice.CloneDeep();
@@ -177,12 +177,12 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private void LoadVoices(SongEditorMemento undoState)
     {
-        IReadOnlyCollection<Voice> voicesInSongMeta = songMeta.GetVoices();
+        IReadOnlyCollection<Voice> voicesInSongMeta = songMeta.Voices;
         // Add / update voices from memento
         foreach (Voice voiceMemento in undoState.Voices)
         {
             Voice matchingVoiceInSongMeta = voicesInSongMeta
-                .FirstOrDefault(voice => Voice.VoiceNameEquals(voice.Name, voiceMemento.Name));
+                .FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceMemento.Id));
             if (matchingVoiceInSongMeta == null)
             {
                 // Create new voice
@@ -206,7 +206,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         foreach (Voice voiceInSongMeta in new List<Voice>(voicesInSongMeta))
         {
             Voice matchingVoiceMemento = undoState.Voices
-                .FirstOrDefault(voice => Voice.VoiceNameEquals(voice.Name, voiceInSongMeta.Name));
+                .FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceInSongMeta.Id));
             if (matchingVoiceMemento == null)
             {
                 songMeta.RemoveVoice(voiceInSongMeta);

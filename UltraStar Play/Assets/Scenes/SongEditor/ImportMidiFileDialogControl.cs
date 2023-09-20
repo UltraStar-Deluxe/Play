@@ -13,64 +13,64 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 {
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private SongMeta songMeta;
-    
+
     [Inject(UxmlName = R.UxmlNames.importMidiFileDialogOverlay)]
     private VisualElement importMidiFileDialogOverlay;
-    
+
     [Inject(UxmlName = R.UxmlNames.midiFilePathTextField)]
     private TextField midiFilePathTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.midiFileIssueContainer)]
     private VisualElement midiFileIssueContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.midiFileIssueLabel)]
     private Label midiFileIssueLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.trackAndChannelDropdownField)]
     private DropdownField trackAndChannelDropdownField;
-    
+
     [Inject(UxmlName = R.UxmlNames.bestMatchnigTrackAndChannelLabel)]
     private Label bestMatchnigTrackAndChannelLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.startMidiPreviewIcon)]
     private VisualElement startMidiPreviewIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.stopMidiPreviewIcon)]
     private VisualElement stopMidiPreviewIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.previewMidiTrackAndChannelButton)]
     private Button previewMidiTrackAndChannelButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.midiLyricsTextField)]
     private TextField midiLyricsTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.importMidiLyricsToggle)]
     private Toggle importMidiLyricsToggle;
-    
+
     [Inject(UxmlName = R.UxmlNames.importMidiNotesToggle)]
     private Toggle importMidiNotesToggle;
-    
+
     [Inject(UxmlName = R.UxmlNames.assignToPlayerToggle)]
     private Toggle assignToPlayerToggle;
-    
+
     [Inject(UxmlName = R.UxmlNames.assignToPlayerDropdownField)]
     private DropdownField assignToPlayerDropdownField;
-    
+
     [Inject(UxmlName = R.UxmlNames.closeImportMidiDialogButton)]
     private Button closeImportMidiDialogButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.importMidiFileDialogButton)]
     private Button importMidiFileDialogButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.selectMidiFileButton)]
     private Button selectMidiFileButton;
-    
+
     [Inject]
     private MidiManager midiManager;
 
@@ -78,7 +78,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     private SongEditorMidiFileImporter midiFileImporter;
 
     private DropdownFieldControl<TrackAndChannel> midiTrackIndexPickerControl;
-    private DropdownFieldControl<EVoice> midiAssignToPlayerPickerControl;
+    private DropdownFieldControl<EVoiceId> midiAssignToPlayerPickerControl;
 
     private MidiFile midiFile;
     private MidiTrack SelectedTrack
@@ -117,7 +117,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     public void OnInjectionFinished()
     {
         stopMidiPreviewIcon.HideByDisplay();
-        
+
         closeImportMidiDialogButton.RegisterCallbackButtonTriggered(_ => CloseDialog());
         previewMidiTrackAndChannelButton.RegisterCallbackButtonTriggered(_ =>
         {
@@ -136,7 +136,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             CloseDialog();
         });
         VisualElementUtils.RegisterDirectClickCallback(importMidiFileDialogOverlay, CloseDialog);
-        
+
         midiTrackIndexPickerControl = new(trackAndChannelDropdownField, new List<TrackAndChannel>(), null,
             trackAndChannel => GetDisplayName(trackAndChannel));
         midiTrackIndexPickerControl.Selection.Subscribe(_ =>
@@ -149,14 +149,14 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             }
         });
 
-        midiAssignToPlayerPickerControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoice>(), EVoice.P1, voice => GetDisplayName(voice));
-        midiAssignToPlayerPickerControl.SetSelection(EVoice.P1);
+        midiAssignToPlayerPickerControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoiceId>(), EVoiceId.P1, voice => GetDisplayName(voice));
+        midiAssignToPlayerPickerControl.SetSelection(EVoiceId.P1);
 
         midiFilePathTextField.DisableParseEscapeSequences();
         midiFilePathTextField.RegisterValueChangedCallback(evt => UpdateControls());
 
         midiLyricsTextField.DisableParseEscapeSequences();
-        
+
         if (PlatformUtils.IsStandalone)
         {
             selectMidiFileButton.RegisterCallbackButtonTriggered(_ => OpenMidiFileDialog());
@@ -165,7 +165,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         {
             selectMidiFileButton.HideByDisplay();
         }
-        
+
         CloseDialog();
     }
 
@@ -192,20 +192,20 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             return $"{trackAndChannel}";
         }
     }
-    
-    private string GetDisplayName(EVoice voice)
+
+    private string GetDisplayName(EVoiceId voiceId)
     {
-        if (voice is EVoice.P1)
+        if (voiceId is EVoiceId.P1)
         {
             return "Player 01";
         }
-        else if (voice is EVoice.P2)
+        else if (voiceId is EVoiceId.P2)
         {
             return "Player 02";
         }
         else
         {
-            return ObjectUtils.NullableToString(voice, "-");
+            return ObjectUtils.NullableToString(voiceId, "-");
         }
     }
 
@@ -213,7 +213,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Midi File",
-            songMeta.Directory,
+            SongMetaUtils.GetDirectoryPath(songMeta),
             FileSystemDialogUtils.CreateExtensionFilters("Midi Files", ApplicationUtils.supportedMidiFiles),
             () => MidiFilePath,
             newValue =>
@@ -228,10 +228,10 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         {
             return;
         }
-        
+
         startMidiPreviewIcon.ShowByDisplay();
         stopMidiPreviewIcon.HideByDisplay();
-        
+
         Debug.Log("Stopping preview of midi file");
         midiManager.StopMidiFile();
     }
@@ -246,14 +246,14 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         startMidiPreviewIcon.HideByDisplay();
         stopMidiPreviewIcon.ShowByDisplay();
-        
+
         Debug.Log("Starting preview of midi file");
         try
         {
             int trackIndex = midiTrackIndexPickerControl.SelectedItem.trackIndex;
             int channelIndex = midiTrackIndexPickerControl.SelectedItem.channelIndex;
             MidiFile midiFileCopy = MidiFileUtils.LoadMidiFile(MidiFilePath);
-            
+
             MidiFileUtils.CalculateMidiEventTimesInMillis(
                 midiFileCopy,
                 out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
@@ -284,16 +284,16 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         string voiceName = null;
         if (assignToPlayerToggle.value
-            && midiAssignToPlayerPickerControl.SelectedItem is EVoice.P1)
+            && midiAssignToPlayerPickerControl.SelectedItem is EVoiceId.P1)
         {
-            voiceName = Voice.firstVoiceName;
+            voiceName = Voice.firstVoiceId;
         }
         else if (assignToPlayerToggle.value
-                 && midiAssignToPlayerPickerControl.SelectedItem is EVoice.P2)
+                 && midiAssignToPlayerPickerControl.SelectedItem is EVoiceId.P2)
         {
-            voiceName = Voice.secondVoiceName;
+            voiceName = Voice.secondVoiceId;
         }
-        
+
         midiFileImporter.ImportMidiFile(
             midiFilePathTextField.value,
             midiTrackIndexPickerControl.SelectedItem.trackIndex,
@@ -305,7 +305,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             ESongEditorLayer.Import);
         UiManager.CreateNotification("Loaded MIDI file successfully");
     }
-    
+
     public void OpenDialog()
     {
         MidiFilePath = settings.SongEditorSettings.LastMidiFilePath;
@@ -317,7 +317,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         StopPreview();
         importMidiFileDialogOverlay.HideByDisplay();
     }
-    
+
     private void UpdateControls()
     {
         string errorMessage = GetMidiFileErrorMessage();
@@ -337,7 +337,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             SetErrorMessage($"Import failed: {e.Message}");
             return;
         }
-        
+
         UpdateTrackIndexPicker();
         UpdateMidiLyrics();
     }
@@ -377,7 +377,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
     {
         List<TrackAndChannel> trackAndChannels = MidiFileUtils.GetTracksAndChannels(midiFile);
         midiTrackIndexPickerControl.Items = trackAndChannels;
-        
+
         MidiFileUtils.CalculateMidiEventTimesInMillis(
             midiFile,
             out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
@@ -403,7 +403,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         {
             return "Enter path to MIDI or KAR file";
         }
-        
+
         if (!FileUtils.Exists(MidiFilePath))
         {
             return "File does not exist";
@@ -415,7 +415,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         {
             return "Unsupported file format";
         }
-        
+
         return "";
     }
 }

@@ -28,7 +28,7 @@ public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
         }
 
         // Calculate start and end beat of all notes and sentences using the new bpm
-        songMeta.GetVoices().ForEach(voice => AdjustNoteLength(voice, newBpm, songMeta.Bpm));
+        songMeta.Voices.ForEach(voice => AdjustNoteLength(voice, newBpm, songMeta.Bpm));
         songMeta.Bpm = newBpm;
     }
 

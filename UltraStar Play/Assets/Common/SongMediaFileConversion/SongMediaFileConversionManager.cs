@@ -105,7 +105,7 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
 
         void OnSuccess(string targetFilePath)
         {
-            string relativeTargetFilePath = PathUtils.MakeRelativePath(songMeta.Directory, targetFilePath);
+            string relativeTargetFilePath = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), targetFilePath);
             Debug.Log($"Setting {mediaDescription} of '{SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta)}' to '{relativeTargetFilePath}'");
             pathSetter(relativeTargetFilePath);
             songMetaManager.SaveSong(songMeta, true);

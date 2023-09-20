@@ -297,7 +297,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public List<Note> GetAllVisibleNotes()
     {
         List<Note> result = new();
-        List<Note> notesInVoices = SongMeta.GetVoices()
+        List<Note> notesInVoices = SongMeta.Voices
             // Second voice is drawn on top of first voice. Thus, start with second voice.
             .Reverse()
             .SelectMany(voice => voice.Sentences)
