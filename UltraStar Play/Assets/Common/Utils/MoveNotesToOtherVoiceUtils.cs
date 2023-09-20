@@ -7,7 +7,7 @@ public static class MoveNotesToOtherVoiceUtils
     public static MoveNotesToVoiceResult MoveNotesToVoice(
         SongMeta songMeta,
         List<Note> selectedNotes,
-        string voiceId,
+        EVoiceId voiceId,
         bool preventMergingIntoSingleWord)
     {
         Voice targetVoice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceId);

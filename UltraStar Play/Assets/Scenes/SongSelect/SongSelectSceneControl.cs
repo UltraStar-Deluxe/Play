@@ -694,15 +694,15 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         if (songMeta.VoiceCount < 2)
         {
-            string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceId);
+            string lyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(lyrics));
         }
         else
         {
-            string firstVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(Voice.firstVoiceId)}</b></i>\n\n"
-                                      + SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceId);
-            string secondVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(Voice.secondVoiceId)}</b></i>\n\n"
-                                       + SongMetaUtils.GetLyrics(songMeta, Voice.secondVoiceId);
+            string firstVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(EVoiceId.P1)}</b></i>\n\n"
+                                      + SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
+            string secondVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(EVoiceId.P2)}</b></i>\n\n"
+                                       + SongMetaUtils.GetLyrics(songMeta, EVoiceId.P2);
 
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
@@ -886,7 +886,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
         singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
         singScenePlayerData.PlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
-        singScenePlayerData.PlayerProfileToVoiceIdMap = playerListControl.GetSelectedPlayerProfileToVoiceIdMap();
+        singScenePlayerData.PlayerProfileToVoiceIdMap = playerListControl.GetSelectedPlayerProfileToExtendedVoiceIdMap();
         return singScenePlayerData;
     }
 

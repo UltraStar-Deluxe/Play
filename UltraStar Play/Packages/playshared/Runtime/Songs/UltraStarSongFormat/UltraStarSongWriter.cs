@@ -20,28 +20,15 @@ public static class UltraStarFormatWriter
         nonEmptyVoices.Sort(Voice.comparerById);
         foreach (Voice voice in nonEmptyVoices)
         {
-            string voiceId = voice.Id;
-            if (nonEmptyVoices.Count == 1)
-            {
-                voiceId = Voice.soloVoiceId;
-            }
-            else if (voiceId == Voice.soloVoiceId)
-            {
-                voiceId = Voice.firstVoiceId;
-            }
-
-            AppendVoice(sb, voice, voiceId);
+            AppendVoice(sb, voice);
         }
         sb.Append("E");
         return sb.ToString();
     }
 
-    private static void AppendVoice(StringBuilder sb, Voice voice, string voiceId)
+    private static void AppendVoice(StringBuilder sb, Voice voice)
     {
-        if (!voiceId.IsNullOrEmpty())
-        {
-            sb.AppendLine(voiceId);
-        }
+        sb.AppendLine(voice.Id.ToString());
         List<Sentence> sortedSentences = new(voice.Sentences);
         sortedSentences.Sort(Sentence.comparerByStartBeat);
         foreach (Sentence sentence in sortedSentences)

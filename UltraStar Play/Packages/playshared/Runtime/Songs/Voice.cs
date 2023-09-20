@@ -1,33 +1,27 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using UnityEngine;
 
 [Serializable]
 public class Voice
 {
-    public static readonly string soloVoiceId = "";
-    public static readonly string firstVoiceId = EVoiceId.P1.ToString();
-    public static readonly string secondVoiceId = EVoiceId.P2.ToString();
-    public static readonly string mergedVoiceId = "MERGED";
-
     public static readonly IComparer<Voice> comparerById = new VoiceComparerById();
 
-    public string Id { get; private set; } = soloVoiceId;
+    public EVoiceId Id { get; private set; } = EVoiceId.P1;
 
     private readonly HashSet<Sentence> sentences = new();
     public IReadOnlyCollection<Sentence> Sentences { get { return sentences; } }
 
-    public Voice() : this(soloVoiceId)
+    public Voice() : this(EVoiceId.P1)
     {
     }
 
-    public Voice(string id)
+    public Voice(EVoiceId id)
     {
         SetId(id);
     }
 
-    public Voice(string id, IEnumerable<Sentence> sentences) : this(id)
+    public Voice(EVoiceId id, IEnumerable<Sentence> sentences) : this(id)
     {
         SetSentences(sentences);
     }
@@ -81,9 +75,9 @@ public class Voice
         sentence.SetVoice(null);
     }
 
-    public void SetId(string newId)
+    public void SetId(EVoiceId newId)
     {
-        Id = newId ?? throw new ArgumentNullException(nameof(newId));
+        Id = newId;
     }
 
     public void OnAfterDeserialize()
@@ -121,38 +115,12 @@ public class Voice
             {
                 return 1;
             }
-            return string.Compare(x.Id, y.Id, true, CultureInfo.InvariantCulture);
+            return x.Id.CompareTo(y.Id);
         }
     }
 
-    public static bool VoiceIdEquals(string a, string b)
+    public static bool VoiceIdEquals(EVoiceId a, EVoiceId b)
     {
-        return a == b
-               || (a.IsNullOrEmpty() && b.IsNullOrEmpty())
-               || (a == firstVoiceId && b == soloVoiceId)
-               || (a == soloVoiceId && b == firstVoiceId);
-    }
-
-    public static string NormalizeVoiceId(string voiceId)
-    {
-        return voiceId.IsNullOrEmpty() || voiceId == soloVoiceId
-            ? firstVoiceId
-            : voiceId;
-    }
-
-    public static string GetNextVoiceId(string currentVoiceId)
-    {
-        if (currentVoiceId == firstVoiceId)
-        {
-            return secondVoiceId;
-        }
-        else if (currentVoiceId == secondVoiceId)
-        {
-            return mergedVoiceId;
-        }
-        else
-        {
-            return firstVoiceId;
-        }
+        return a == b;
     }
 }

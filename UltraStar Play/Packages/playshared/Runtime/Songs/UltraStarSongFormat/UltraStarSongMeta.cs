@@ -12,7 +12,7 @@ public class UltraStarSongMeta : SongMeta
         string title,
         float bpm,
         string audioFile,
-        Dictionary<string, string> voiceIdToDisplayName)
+        Dictionary<EVoiceId, string> voiceIdToDisplayName)
     {
         Artist = artist ?? throw new ArgumentNullException(nameof(artist));
         Bpm = bpm;

@@ -38,7 +38,7 @@ public static class UltraStarSongParser
             { "mp3", null },
             { "title", null }
         };
-        Dictionary<string, string> voiceIdToDisplayName = new();
+        Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
         Dictionary<string, string> otherFields = new();
 
         uint lineNumber = 0;
@@ -126,12 +126,13 @@ public static class UltraStarSongParser
             }
             else if (tagNameLowerCase.StartsWith("p", StringComparison.Ordinal)
                      && tagNameLowerCase.Length == 2
-                     && char.IsDigit(tagNameLowerCase, 1))
+                     && char.IsDigit(tagNameLowerCase, 1)
+                     && Enum.TryParse(tagNameLowerCase.ToUpperInvariant(), out EVoiceId pTagVoiceId))
             {
                 otherFields.Add(tagNameLowerCase, tagValue);
-                if (!voiceIdToDisplayName.ContainsKey(tagNameLowerCase.ToUpperInvariant()))
+                if (!voiceIdToDisplayName.ContainsKey(pTagVoiceId))
                 {
-                    voiceIdToDisplayName.Add(tagNameLowerCase.ToUpperInvariant(), tagValue);
+                    voiceIdToDisplayName[pTagVoiceId] = tagValue;
                 }
                 else
                 {
@@ -140,14 +141,14 @@ public static class UltraStarSongParser
             }
             else if (tagNameLowerCase.StartsWith("duetsingerp", StringComparison.Ordinal)
                      && tagNameLowerCase.Length == 12
-                     && char.IsDigit(tagNameLowerCase, 11))
+                     && char.IsDigit(tagNameLowerCase, 11)
+                    // Get P1 resp. P2 from DUETSINGERP1 resp. DUETSINGERP2
+                     && Enum.TryParse(tagNameLowerCase.Substring(10).ToUpperInvariant(), out EVoiceId duetSingerPTagVoiceId))
             {
                 otherFields.Add(tagNameLowerCase, tagValue);
-                // Get P1 / P2 from DUETSINGERP1 / DUETSINGERP2
-                string shortTag = tagNameLowerCase.Substring(10).ToUpperInvariant();
-                if (!voiceIdToDisplayName.ContainsKey(shortTag))
+                if (!voiceIdToDisplayName.ContainsKey(duetSingerPTagVoiceId))
                 {
-                    voiceIdToDisplayName.Add(shortTag, tagValue);
+                    voiceIdToDisplayName.Add(duetSingerPTagVoiceId, tagValue);
                 }
                 else
                 {

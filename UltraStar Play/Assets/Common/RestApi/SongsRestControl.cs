@@ -53,7 +53,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 {
                     SongId = songId,
                     IsFavorite = isFavorite,
-                    VoiceIdToLyricsMap = CreateVoiceIdToLyricsMap(songMeta),
+                    VoiceNameToLyricsMap = CreateVoiceDisplayNameToLyricsMap(songMeta),
                 };
 
                 Debug.Log($"Returning song details for song {songId}");
@@ -134,12 +134,12 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
             });
 	}
 
-    private Dictionary<string,string> CreateVoiceIdToLyricsMap(SongMeta songMeta)
+    private Dictionary<string, string> CreateVoiceDisplayNameToLyricsMap(SongMeta songMeta)
     {
         Dictionary<string, string> voiceIdToLyricsMap = new();
         foreach (Voice voice in songMeta.Voices)
         {
-            string voiceDisplayName = voice.Id;
+            string voiceDisplayName = songMeta.GetVoiceDisplayName(voice.Id);
             voiceIdToLyricsMap.Add(voiceDisplayName, SongMetaUtils.GetLyrics(voice, true));
         }
         return voiceIdToLyricsMap;

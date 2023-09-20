@@ -149,7 +149,7 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
             }
         });
 
-        midiAssignToPlayerPickerControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoiceId>(), EVoiceId.P1, voice => GetDisplayName(voice));
+        midiAssignToPlayerPickerControl = new(assignToPlayerDropdownField, EnumUtils.GetValuesAsList<EVoiceId>(), EVoiceId.P1, voice => GetVoiceDisplayName(voice));
         midiAssignToPlayerPickerControl.SetSelection(EVoiceId.P1);
 
         midiFilePathTextField.DisableParseEscapeSequences();
@@ -193,20 +193,19 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
         }
     }
 
-    private string GetDisplayName(EVoiceId voiceId)
+    private string GetVoiceDisplayName(EVoiceId voiceId)
     {
         if (voiceId is EVoiceId.P1)
         {
-            return "Player 01";
+            return "Player 1";
         }
-        else if (voiceId is EVoiceId.P2)
+
+        if (voiceId is EVoiceId.P2)
         {
-            return "Player 02";
+            return "Player 2";
         }
-        else
-        {
-            return ObjectUtils.NullableToString(voiceId, "-");
-        }
+
+        return voiceId.ToString();
     }
 
     private void OpenMidiFileDialog()
@@ -282,16 +281,20 @@ public class ImportMidiFileDialogControl : INeedInjection, IInjectionFinishedLis
 
         StopPreview();
 
-        string voiceId = null;
+        EVoiceId voiceId;
         if (assignToPlayerToggle.value
             && midiAssignToPlayerPickerControl.SelectedItem is EVoiceId.P1)
         {
-            voiceId = Voice.firstVoiceId;
+            voiceId = EVoiceId.P1;
         }
         else if (assignToPlayerToggle.value
                  && midiAssignToPlayerPickerControl.SelectedItem is EVoiceId.P2)
         {
-            voiceId = Voice.secondVoiceId;
+            voiceId = EVoiceId.P2;
+        }
+        else
+        {
+            voiceId = EVoiceId.P1;
         }
 
         midiFileImporter.ImportMidiFile(

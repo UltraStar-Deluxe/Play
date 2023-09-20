@@ -269,21 +269,13 @@ public static class SongMetaUtils
         return sentences.FirstOrDefault(sentence => sentence.ContainsBeatRange(note.StartBeat, note.EndBeat));
     }
 
-    public static Voice GetOrCreateVoice(SongMeta songMeta, string voiceId)
+    public static Voice GetOrCreateVoice(SongMeta songMeta, EVoiceId voiceId)
     {
         Voice matchingVoice = songMeta.Voices
             .FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceId));
         if (matchingVoice != null)
         {
             return matchingVoice;
-        }
-
-        // Create new voice.
-        // Set voice identifier for solo voice because this is not a solo song anymore.
-        Voice soloVoice = songMeta.Voices.FirstOrDefault(it => it.Id == Voice.soloVoiceId);
-        if (soloVoice != null)
-        {
-            soloVoice.SetId(Voice.firstVoiceId);
         }
 
         Voice newVoice = new(voiceId);
@@ -413,7 +405,7 @@ public static class SongMetaUtils
         ApplicationUtils.OpenDirectory(directoryInfo.FullName);
     }
 
-    public static string GetLyrics(SongMeta songMeta, string voiceId, bool removeTilde = false)
+    public static string GetLyrics(SongMeta songMeta, EVoiceId voiceId, bool removeTilde = false)
     {
         Voice voice = songMeta.Voices.FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceId));
         if (voice == null)
@@ -580,7 +572,7 @@ public static class SongMetaUtils
     {
         // Search for lyrics about the middle of the song, approx. 20 seconds afterwards.
         int middleBeat = GetMiddleBeat(songMeta);
-        Voice voice = GetVoiceById(songMeta, Voice.firstVoiceId);
+        Voice voice = GetVoiceById(songMeta, EVoiceId.P1);
         List<Sentence> sentences = voice.Sentences.ToList();
         List<Sentence> sentencesBeforeMiddleBeat = sentences
             .Where(sentence => sentence.ExtendedMaxBeat < middleBeat)
@@ -603,7 +595,7 @@ public static class SongMetaUtils
         int targetDurationInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetDurationInSeconds * 1000);
         int targetEndBeat = medleyStartBeta + targetDurationInBeats;
 
-        List<Sentence> sentencesAfterMedleyStart = GetVoiceById(songMeta, Voice.firstVoiceId)
+        List<Sentence> sentencesAfterMedleyStart = GetVoiceById(songMeta, EVoiceId.P1)
             .Sentences
             .Where(sentence => sentence.MinBeat > medleyStartBeta)
             .ToList();
@@ -716,7 +708,7 @@ public static class SongMetaUtils
             return voices.FirstOrDefault();
         }
 
-        Voice mergedVoice = new();
+        MergedVoice mergedVoice = new(voices);
         foreach (Voice voice in voices.ToList())
         {
             foreach (Sentence newSentence in voice.Sentences.ToList())
@@ -897,7 +889,7 @@ public static class SongMetaUtils
         return true;
     }
 
-    public static Voice GetVoiceById(SongMeta songMeta, string voiceId)
+    public static Voice GetVoiceById(SongMeta songMeta, EVoiceId voiceId)
     {
         if (songMeta == null)
         {
@@ -910,24 +902,19 @@ public static class SongMetaUtils
             return null;
         }
 
-        if (voiceId == Voice.mergedVoiceId)
-        {
-            return CreateMergedVoice(voices);
-        }
-
         return voices.FirstOrDefault(voice =>
             Voice.VoiceIdEquals(voice.Id, voiceId));
     }
 
-    public static Dictionary<string,string> GetVoiceIdToDisplayName(SongMeta songMeta)
+    public static Dictionary<EVoiceId, string> GetVoiceIdToDisplayName(SongMeta songMeta)
     {
         if (songMeta == null)
         {
-            return new Dictionary<string, string>();
+            return new Dictionary<EVoiceId, string>();
         }
 
-        Dictionary<string, string> result = new();
-        foreach (string voiceId in new List<string> { Voice.firstVoiceId, Voice.secondVoiceId })
+        Dictionary<EVoiceId, string> result = new();
+        foreach (EVoiceId voiceId in EnumUtils.GetValuesAsList<EVoiceId>())
         {
             string displayName = songMeta.GetVoiceDisplayName(voiceId);
             result[voiceId] = displayName;

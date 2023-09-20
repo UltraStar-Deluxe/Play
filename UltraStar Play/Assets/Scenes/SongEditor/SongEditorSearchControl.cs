@@ -14,32 +14,32 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
 {
     [Inject]
     private SongAudioPlayer songAudioPlayer;
-    
+
     [Inject]
     private SongMeta songMeta;
 
     [Inject]
     private SongEditorLayerManager layerManager;
-    
+
     [Inject]
     private Injector injector;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchOverlay)]
     private VisualElement searchOverlay;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchContainer)]
     private VisualElement searchContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchTextField)]
     private TextField searchTextField;
     public TextField SearchTextField => searchTextField;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchPreviousButton)]
     private Button searchPreviousButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchNextButton)]
     private Button searchNextButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchResultLabel)]
     private Label searchResultLabel;
 
@@ -53,16 +53,16 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
     private SongEditorSearchResult lastSearchResult;
 
     private int lastSearchFrameCount;
-    
+
     public void OnInjectionFinished()
     {
         HideSearchOverlay();
         UpdateSearchResult();
-        
+
         searchTextField.RegisterValueChangedCallback(evt => UpdateSearchResult());
         searchTextField.RegisterCallback<NavigationSubmitEvent>(_ => SearchNext());
         searchTextField.DisableParseEscapeSequences();
-        
+
         searchPreviousButton.RegisterCallbackButtonTriggered(_ => SearchPrevious());
         searchNextButton.RegisterCallbackButtonTriggered(_ => SearchNext());
 
@@ -103,7 +103,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         }
 
         lastSearchFrameCount = Time.frameCount;
-        
+
         List<Note> matchingNotes = lastSearchResult.MatchingNotes.ToList();
 
         // Reduce search result to notes in direction
@@ -121,7 +121,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
                 .Where(note => (note.StartBeat - 1) > currentBeat)
                 .ToList();
         }
-        
+
         // Find first note in direction
         Note note = null;
         matchingNotesInDirection.Sort(Note.comparerByStartBeat);
@@ -133,7 +133,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         {
             note = matchingNotesInDirection.FirstOrDefault();
         }
-        
+
         // Wrap around
         if (note == null
             && !matchingNotes.IsNullOrEmpty())
@@ -149,7 +149,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
                 note = matchingNotesSorted.FirstOrDefault();
             }
         }
-        
+
         if (note != null)
         {
             songAudioPlayer.PositionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
@@ -168,19 +168,19 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         {
             return new List<Note>();
         }
-        
+
         HashSet<Note> matchingNotes = new();
         int searchStartIndex = 0;
-        
+
         songMeta.Voices.ForEach(voice =>
         {
             try
             {
-                if (!layerManager.IsVoiceLayerVisible(voice.Id))
+                if (!layerManager.IsVoiceLayerVisible(voice))
                 {
                     return;
                 }
-                
+
                 List<Note> notesOfVoice = voice.Sentences
                     .SelectMany(sentence => sentence.Notes)
                     .ToList();
@@ -189,7 +189,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
                 {
                     return;
                 }
-                
+
                 int index;
                 do
                 {
@@ -210,7 +210,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
                 searchResultLabel.text = "Invalid search syntax";
             }
         });
-        
+
         List<Note> sortedMatchingNotes = new(matchingNotes);
         sortedMatchingNotes.Sort(Note.comparerByStartBeat);
         return sortedMatchingNotes;
@@ -235,7 +235,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
         searchTextField.SelectAll();
         UpdateSearchResult();
     }
-    
+
     public void HideSearchOverlay()
     {
         searchOverlay.HideByDisplay();
@@ -265,7 +265,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
                     string noteText = note.Text.ToLowerInvariant();
                     sb.Append(noteText);
                     int newLength = sb.Length;
-                    
+
                     for (int i = oldLength; i < newLength; i++)
                     {
                         lyricsIndexToNote[i] = note;
@@ -278,9 +278,9 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
     public class SongEditorSearchResult
     {
         public static readonly SongEditorSearchResult emptyResult = new("", new List<Note>());
-        
+
         public string SearchText { get; private set; } = "";
-        
+
         private readonly List<Note> matchingNotes = new();
         public IReadOnlyCollection<Note> MatchingNotes => matchingNotes;
 

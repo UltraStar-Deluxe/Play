@@ -300,7 +300,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             case ESearchProperty.Edition:
                 return songMeta.Edition;
             case ESearchProperty.Lyrics:
-                return SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceId, true);
+                return SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1, true);
             default:
                 return null;
         }

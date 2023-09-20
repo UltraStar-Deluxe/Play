@@ -169,13 +169,13 @@ public class EditorNoteContextMenuControl : ContextMenuControl
 
     private void FillContextMenuToMoveToOtherSentenceOrVoice(ContextMenuPopupControl contextMenu, List<Note> selectedNotes)
     {
-        bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.soloVoiceId, Voice.firstVoiceId);
-        bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, Voice.secondVoiceId);
+        bool canMoveToVoice1 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, EVoiceId.P1);
+        bool canMoveToVoice2 = moveNotesToOtherVoiceAction.CanMoveNotesToVoice(selectedNotes, EVoiceId.P2);
         if (canMoveToVoice1)
         {
             contextMenu.AddSeparator();
             contextMenu.AddButton("Assign to player 1",
-                () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.firstVoiceId));
+                () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P1));
         }
         if (!canMoveToVoice1 && canMoveToVoice2)
         {
@@ -184,7 +184,7 @@ public class EditorNoteContextMenuControl : ContextMenuControl
         if (canMoveToVoice2)
         {
             contextMenu.AddButton("Assign to player 2",
-                () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, Voice.secondVoiceId));
+                () => moveNotesToOtherVoiceAction.MoveNotesToVoiceAndNotify(songMeta, selectedNotes, EVoiceId.P2));
         }
 
         if (moveNoteToOwnSentenceAction.CanMoveToOwnSentence(selectedNotes))

@@ -9,7 +9,7 @@ public class MutableVoiceTests
     [SetUp]
     public void TestInit()
     {
-        mv = new Voice("");
+        mv = new Voice(EVoiceId.P1);
     }
 
     [Test]

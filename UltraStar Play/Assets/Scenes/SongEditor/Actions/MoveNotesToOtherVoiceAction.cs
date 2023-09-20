@@ -12,12 +12,12 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
 
     // The notes can be moved if there exists a note
     // that is not yet inside a voice with one of the given voice names.
-    public bool CanMoveNotesToVoice(List<Note> selectedNotes, params string[] voiceIds)
+    public bool CanMoveNotesToVoice(List<Note> selectedNotes, params EVoiceId[] voiceIds)
     {
         return selectedNotes.AnyMatch(note => !HasVoice(note, voiceIds));
     }
 
-    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceId, bool smartSplit = true)
+    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, EVoiceId voiceId, bool smartSplit = true)
     {
         if (smartSplit
             && ShouldSplit(songMeta, selectedNotes))
@@ -59,13 +59,13 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         return isVeryLong;
     }
 
-    public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, string voiceId)
+    public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, EVoiceId voiceId)
     {
         MovedNotesToVoiceEvent movedNotesToVoiceEvent = MoveNotesToVoice(songMeta, selectedNotes, voiceId);
         songMetaChangeEventStream.OnNext(movedNotesToVoiceEvent);
     }
 
-    private static bool HasVoice(Note note, string[] voiceIds)
+    private static bool HasVoice(Note note, EVoiceId[] voiceIds)
     {
         if (voiceIds.IsNullOrEmpty()
             || note == null)

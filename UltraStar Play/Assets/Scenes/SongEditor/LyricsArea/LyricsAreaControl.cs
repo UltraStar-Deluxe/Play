@@ -138,12 +138,12 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
             textField.SetValueWithoutNotify(visibleWhiteSpaceText);
         });
 
-        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(_ => TrySetVoice(Voice.firstVoiceId));
-        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(_ => TrySetVoice(Voice.secondVoiceId));
+        lyricsAreaVoice1Button.RegisterCallbackButtonTriggered(_ => TrySetVoice(EVoiceId.P1));
+        lyricsAreaVoice2Button.RegisterCallbackButtonTriggered(_ => TrySetVoice(EVoiceId.P2));
         UpdateVoiceButtons();
     }
 
-    private void TrySetVoice(string voiceId)
+    private void TrySetVoice(EVoiceId voiceId)
     {
         Voice newVoice = SongMetaUtils.GetVoiceById(songMeta, voiceId);
         if (newVoice == null)
@@ -228,8 +228,8 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
     {
         lyricsAreaVoice1Button.SetEnabled(songMeta.VoiceCount >= 1);
         lyricsAreaVoice2Button.SetEnabled(songMeta.VoiceCount >= 2);
-        lyricsAreaVoice1Button.SetActive(voice == SongMetaUtils.GetVoiceById(songMeta, Voice.firstVoiceId));
-        lyricsAreaVoice2Button.SetActive(voice == SongMetaUtils.GetVoiceById(songMeta, Voice.secondVoiceId));
+        lyricsAreaVoice1Button.SetActive(voice == SongMetaUtils.GetVoiceById(songMeta, EVoiceId.P1));
+        lyricsAreaVoice2Button.SetActive(voice == SongMetaUtils.GetVoiceById(songMeta, EVoiceId.P2));
     }
 
     public void UpdateLyrics()

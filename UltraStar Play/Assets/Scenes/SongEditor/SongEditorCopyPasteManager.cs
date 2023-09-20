@@ -131,7 +131,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             }
             else
             {
-                string voiceId = pastedNote.Sentence?.Voice?.Id;
+                EVoiceId voiceId = pastedNote.Sentence?.Voice?.Id ?? EVoiceId.P1;
                 pastedNote.IsEditable = layerManager.IsVoiceLayerEditable(voiceId);
             }
         });

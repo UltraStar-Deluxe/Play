@@ -118,10 +118,10 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         }
     }
 
-    private readonly ReactiveProperty<string> selectedVoiceId = new(Voice.firstVoiceId);
-    public string VoiceId => changeVoiceButton.IsVisibleByDisplay()
+    private readonly ReactiveProperty<EExtendedVoiceId> selectedVoiceId = new(EExtendedVoiceId.P1);
+    public EExtendedVoiceId VoiceId => changeVoiceButton.IsVisibleByDisplay()
         ? selectedVoiceId.Value
-        : null;
+        : EExtendedVoiceId.P1;
 
     private NewestSamplesMicPitchTracker micPitchTracker;
 
@@ -129,7 +129,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     public ReactiveProperty<bool> IsSelected {get; private set; } = new(false);
 
-    private Dictionary<string, string> voiceIdToDisplayName;
+    private Dictionary<EVoiceId, string> voiceIdToDisplayName;
 
     private readonly PlayerProfileImageControl playerProfileImageControl = new();
 
@@ -185,24 +185,25 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         selectedVoiceId.Subscribe(_ => UpdateChangeVoiceButtonText());
         changeVoiceButton.RegisterCallbackButtonTriggered(_ =>
         {
-            selectedVoiceId.Value = Voice.GetNextVoiceId(selectedVoiceId.Value);
+            selectedVoiceId.Value = GetNextExtendedVoiceId(selectedVoiceId.Value);
         });
     }
 
     private void UpdateChangeVoiceButtonText()
     {
-        if (!voiceIdToDisplayName.IsNullOrEmpty()
-            && voiceIdToDisplayName.ContainsKey(selectedVoiceId.Value))
-        {
-            voiceIdLabel.text = voiceIdToDisplayName[selectedVoiceId.Value];
-        }
-        else if (selectedVoiceId.Value == Voice.mergedVoiceId)
+        if (selectedVoiceId.Value is EExtendedVoiceId.Merged)
         {
             voiceIdLabel.text = "Both";
         }
+        else if (selectedVoiceId.Value.TryGetVoiceId(out EVoiceId voiceId)
+                 && !voiceIdToDisplayName.IsNullOrEmpty()
+                 && voiceIdToDisplayName.ContainsKey(voiceId))
+        {
+            voiceIdLabel.text = voiceIdToDisplayName[voiceId];
+        }
         else
         {
-            voiceIdLabel.text = selectedVoiceId.Value;
+            voiceIdLabel.text = selectedVoiceId.Value.ToString();
         }
     }
 
@@ -383,8 +384,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         changeVoiceButton.ShowByDisplay();
         UpdateChangeVoiceButtonText();
         selectedVoiceId.Value = selectedVoiceIndex == 0
-            ? Voice.firstVoiceId
-            : Voice.secondVoiceId;
+            ? EExtendedVoiceId.P1
+            : EExtendedVoiceId.P2;
     }
 
     private void InitMicPitchTracker()
@@ -451,5 +452,21 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         GameObject.Destroy(micPitchTracker);
         micProgressBarRecordingControl.Dispose();
         focusableNavigator.RemoveCustomNavigationTarget(micButton, Vector2.left, true);
+    }
+
+    private static EExtendedVoiceId GetNextExtendedVoiceId(EExtendedVoiceId currentVoiceId)
+    {
+        if (currentVoiceId is EExtendedVoiceId.P1)
+        {
+            return EExtendedVoiceId.P2;
+        }
+        else if (currentVoiceId is EExtendedVoiceId.P2)
+        {
+            return EExtendedVoiceId.Merged;
+        }
+        else
+        {
+            return EExtendedVoiceId.P1;
+        }
     }
 }

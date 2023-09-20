@@ -46,7 +46,7 @@ public static class MidiToSongMetaUtils
         AssignNotesToVoice(
             songMeta,
             loadedNotes,
-            Voice.firstVoiceId,
+            EVoiceId.P1,
             track,
             midiEventToDeltaTimeInMillis,
             midiEventToAbsoluteDeltaTimeInMillis);
@@ -351,7 +351,7 @@ public static class MidiToSongMetaUtils
     public static void AssignNotesToVoice(
         SongMeta songMeta,
         List<Note> loadedNotes,
-        string voiceId,
+        EVoiceId voiceId,
         MidiTrack track,
         Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
         Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis)

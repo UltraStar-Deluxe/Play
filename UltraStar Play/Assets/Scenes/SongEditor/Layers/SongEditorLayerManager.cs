@@ -11,7 +11,7 @@ using UnityEngine;
 public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjectionFinishedListener
 {
     private Dictionary<ESongEditorLayer, SongEditorEnumLayer> layerEnumToLayerMap;
-    private Dictionary<string, SongEditorVoiceLayer> voiceIdToLayerMap;
+    private Dictionary<EVoiceId, SongEditorVoiceLayer> voiceIdToLayerMap;
 
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
@@ -34,7 +34,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     {
         songEditorLayerNameToColor = themeManager.GetSongEditorLayerColors();
         layerEnumToLayerMap = CreateLayerEnumToLayerMap();
-        voiceIdToLayerMap = CreateVoiceNameToLayerMap();songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
+        voiceIdToLayerMap = CreateVoiceIdToLayerMap();songMetaChangeEventStream.Subscribe(OnSongMetaChanged);
     }
 
     private void OnSongMetaChanged(SongMetaChangeEvent changeEvent)
@@ -62,9 +62,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return layerEnumToLayerMap[layerEnum].GetNotes();
     }
 
-    public List<Note> GetVoiceLayerNotes(string voiceId)
+    public List<Note> GetVoiceLayerNotes(EVoiceId voiceId)
     {
-        voiceId = Voice.NormalizeVoiceId(voiceId);
         return SongMetaUtils.GetAllNotes(SongMetaUtils.GetVoiceById(songMeta, voiceId));
     }
 
@@ -73,9 +72,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return layerEnumToLayerMap[layerEnum].Color;
     }
 
-    public Color GetVoiceLayerColor(string voiceId)
+    public Color GetVoiceLayerColor(EVoiceId voiceId)
     {
-        voiceId = Voice.NormalizeVoiceId(voiceId);
         if (voiceIdToLayerMap.TryGetValue(voiceId, out SongEditorVoiceLayer layer))
         {
             return layer.Color;
@@ -99,9 +97,18 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         layerChangedEventStream.OnNext(new LayerChangedEvent(layerEnum));
     }
 
-    public bool IsVoiceLayerVisible(string voiceId)
+    public bool IsVoiceLayerVisible(Voice voice)
     {
-        voiceId = Voice.NormalizeVoiceId(voiceId);
+        if (voice == null)
+        {
+            return false;
+        }
+
+        return IsVoiceLayerVisible(voice.Id);
+    }
+
+    public bool IsVoiceLayerVisible(EVoiceId voiceId)
+    {
         if (voiceIdToLayerMap.TryGetValue(voiceId, out SongEditorVoiceLayer layer))
         {
             return layer.IsVisible;
@@ -109,9 +116,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return true;
     }
 
-    public void SetVoiceLayerVisible(string voiceId, bool newValue)
+    public void SetVoiceLayerVisible(EVoiceId voiceId, bool newValue)
     {
-        voiceId = Voice.NormalizeVoiceId(voiceId);
         if (newValue == voiceIdToLayerMap[voiceId].IsVisible)
         {
             return;
@@ -121,9 +127,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         layerChangedEventStream.OnNext(new LayerChangedEvent(voiceId));
     }
 
-    public bool IsVoiceLayerEditable(string voiceId)
+    public bool IsVoiceLayerEditable(EVoiceId voiceId)
     {
-        voiceId = Voice.NormalizeVoiceId(voiceId);
         if (voiceIdToLayerMap.TryGetValue(voiceId, out SongEditorVoiceLayer layer))
         {
             return layer.IsEditable;
@@ -131,9 +136,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return true;
     }
 
-    public void SetVoiceLayerEditable(string voiceId, bool newValue)
+    public void SetVoiceLayerEditable(EVoiceId voiceId, bool newValue)
     {
-        voiceId = Voice.NormalizeVoiceId(voiceId);
         if (newValue == voiceIdToLayerMap[voiceId].IsEditable)
         {
             return;
@@ -176,16 +180,16 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return new List<SongEditorVoiceLayer>(voiceIdToLayerMap.Values);
     }
 
-    private Dictionary<string,SongEditorVoiceLayer> CreateVoiceNameToLayerMap()
+    private Dictionary<EVoiceId, SongEditorVoiceLayer> CreateVoiceIdToLayerMap()
     {
-        Dictionary<string, SongEditorVoiceLayer> result = new();
-        List<string> voiceIds = new() { Voice.firstVoiceId, Voice.secondVoiceId };
-        foreach (string voiceId in voiceIds)
+        Dictionary<EVoiceId, SongEditorVoiceLayer> result = new();
+        List<EVoiceId> voiceIds = new() { EVoiceId.P1, EVoiceId.P2 };
+        foreach (EVoiceId voiceId in voiceIds)
         {
             result.Add(voiceId, new SongEditorVoiceLayer(voiceId));
         }
-        result[Voice.firstVoiceId].Color =  GetSongEditorLayerColor(Voice.firstVoiceId);
-        result[Voice.secondVoiceId].Color =  GetSongEditorLayerColor(Voice.secondVoiceId);
+        result[EVoiceId.P1].Color =  GetSongEditorLayerColor(EVoiceId.P1);
+        result[EVoiceId.P2].Color =  GetSongEditorLayerColor(EVoiceId.P2);
 
         return result;
     }
@@ -246,7 +250,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     {
         if (note.Sentence?.Voice != null)
         {
-            return IsVoiceLayerVisible(note.Sentence.Voice.Id);
+            return IsVoiceLayerVisible(note.Sentence.Voice);
         }
 
         if (TryGetEnumLayer(note, out SongEditorEnumLayer layer))
@@ -327,7 +331,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     {
         if (note.Sentence != null
             && note.Sentence.Voice != null
-            && voiceIdToLayerMap.TryGetValue(Voice.NormalizeVoiceId(note.Sentence.Voice.Id), out SongEditorVoiceLayer voiceLayer))
+            && voiceIdToLayerMap.TryGetValue(note.Sentence.Voice.Id, out SongEditorVoiceLayer voiceLayer))
         {
             layerEnum = ESongEditorLayer.ButtonRecording;
             return false;
@@ -351,7 +355,7 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
     {
         if (note.Sentence != null
             && note.Sentence.Voice != null
-            && voiceIdToLayerMap.TryGetValue(Voice.NormalizeVoiceId(note.Sentence.Voice.Id), out SongEditorVoiceLayer voiceLayer))
+            && voiceIdToLayerMap.TryGetValue(note.Sentence.Voice.Id, out SongEditorVoiceLayer voiceLayer))
         {
             return voiceLayer;
         }
@@ -386,9 +390,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         return true;
     }
 
-    private bool IsVoiceLayerMidiSoundPlayAlongEnabled(string voiceId)
+    private bool IsVoiceLayerMidiSoundPlayAlongEnabled(EVoiceId voiceId)
     {
-        voiceId = Voice.NormalizeVoiceId(voiceId);
         if (voiceIdToLayerMap.TryGetValue(voiceId, out SongEditorVoiceLayer layer))
         {
             return layer.IsMidiSoundPlayAlongEnabled;
@@ -413,9 +416,8 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
         }
     }
 
-    private void SetVoiceLayerMidiSoundPlayAlongEnabled(string voiceId, bool newValue)
+    private void SetVoiceLayerMidiSoundPlayAlongEnabled(EVoiceId voiceId, bool newValue)
     {
-        voiceId = Voice.NormalizeVoiceId(voiceId);
         if (newValue == voiceIdToLayerMap[voiceId].IsMidiSoundPlayAlongEnabled)
         {
             return;
@@ -461,10 +463,10 @@ public class SongEditorLayerManager : MonoBehaviour, INeedInjection, ISceneInjec
             .Value;
     }
 
-    private Color32 GetSongEditorLayerColor(string voiceId)
+    private Color32 GetSongEditorLayerColor(EVoiceId voiceId)
     {
         return songEditorLayerNameToColor
-            .FirstOrDefault(entry => string.Equals(entry.Key, voiceId, StringComparison.InvariantCultureIgnoreCase))
+            .FirstOrDefault(entry => string.Equals(entry.Key, voiceId.ToString(), StringComparison.InvariantCultureIgnoreCase))
             .Value;
     }
 }

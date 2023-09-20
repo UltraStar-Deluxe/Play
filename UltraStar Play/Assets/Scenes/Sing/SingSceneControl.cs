@@ -526,7 +526,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             // There are two different sets of lyrics that need to be displayed
             List<Voice> voices = voiceToPlayerControlsMap.Keys
-                .OrderBy(voice => Voice.NormalizeVoiceId(voice?.Id))
+                .OrderBy(voice => voice.Id)
                 .ToList();
             Voice firstVoice = voices.FirstOrDefault();
             Voice secondVoice = voices.LastOrDefault();
@@ -1099,39 +1099,28 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         column.Add(visualElement);
     }
 
-    private string GetVoiceId(PlayerProfile playerProfile)
+    private EExtendedVoiceId GetExtendedVoiceId(PlayerProfile playerProfile)
     {
-        Dictionary<string,string> voiceIdToDisplayName = SongMetaUtils.GetVoiceIdToDisplayName(SongMeta);
-        List<string> voiceIds = voiceIdToDisplayName.Keys.ToList();
+        Dictionary<EVoiceId, string> voiceIdToDisplayName = SongMetaUtils.GetVoiceIdToDisplayName(SongMeta);
+        List<EVoiceId> voiceIds = voiceIdToDisplayName.Keys.ToList();
         if (voiceIds.Count <= 1)
         {
-            return Voice.soloVoiceId;
+            return EExtendedVoiceId.P1;
         }
 
-        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.TryGetValue(playerProfile, out string voiceIdOrPerformerName))
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.TryGetValue(playerProfile, out EExtendedVoiceId voiceId))
         {
-            if (voiceIdOrPerformerName == Voice.mergedVoiceId)
-            {
-                return Voice.mergedVoiceId;
-            }
-
-            // The given value could be "P1" / "P2" (i.e. a voice id) or the performer's name (e.g. "Elvis").
-            string matchingVoiceId = voiceIdToDisplayName
-                .Where(entry => entry.Key == voiceIdOrPerformerName
-                    || entry.Value == voiceIdOrPerformerName)
-                .Select(entry => entry.Key)
-                .FirstOrDefault()
-                .OrIfNull(Voice.soloVoiceId);
-            return matchingVoiceId;
+            return voiceId;
         }
 
         if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count == 1)
         {
-            return Voice.soloVoiceId;
+            return EExtendedVoiceId.P1;
         }
 
         int voiceIndex = sceneData.SingScenePlayerData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceIds.Count;
-        return voiceIds[voiceIndex];
+        List<EExtendedVoiceId> extendedVoiceIds = EnumUtils.GetValuesAsList<EExtendedVoiceId>();
+        return extendedVoiceIds[voiceIndex];
     }
 
     public void Pause()
@@ -1252,8 +1241,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private Voice GetVoice(PlayerProfile playerProfile)
     {
-        string voiceId = GetVoiceId(playerProfile);
-        Voice voice = SongMetaUtils.GetVoiceById(SongMeta, voiceId);
+        EExtendedVoiceId voiceId = GetExtendedVoiceId(playerProfile);
+        Voice voice = GetVoiceByExtendedVoiceId(voiceId);
         if (voice == null)
         {
             string voiceIdCsv = SongMeta.Voices.Select(it => it.Id).ToCsv();
@@ -1261,6 +1250,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                            + $" Available voice ids: {voiceIdCsv}");
         }
         return voice;
+    }
+
+    private Voice GetVoiceByExtendedVoiceId(EExtendedVoiceId extendedVoiceId)
+    {
+        if (extendedVoiceId is EExtendedVoiceId.Merged)
+        {
+            return SongMetaUtils.CreateMergedVoice(SongMeta.Voices.ToList());
+        }
+
+        if (extendedVoiceId.TryGetVoiceId(out EVoiceId voiceId))
+        {
+            return SongMetaUtils.GetVoiceById(SongMeta, voiceId);
+        }
+
+        Debug.LogWarning($"Failed to find voice for extended voice id: {extendedVoiceId}");
+        return SongMeta.Voices.FirstOrDefault();
     }
 
     private void UpdateInputLegend()

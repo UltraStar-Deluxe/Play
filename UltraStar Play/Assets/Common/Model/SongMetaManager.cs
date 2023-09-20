@@ -346,7 +346,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         // TODO: use https://github.com/Zeugma440/atldotnet to read meta tags.
         float bpm = 300;
 
-        Dictionary<string, string> voiceIdToDisplayName = new();
+        Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
         SongMeta songMeta = new UltraStarSongMeta(
             artist,
             title,

@@ -141,7 +141,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 SongMetaUtils.RemoveAllNotes(songMeta);
                 List<List<Note>> noteBatches = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, createdNotes);
                 noteBatches.ForEach(noteBatch =>
-                    MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceId, false));
+                    MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, EVoiceId.P1, false));
 
                 // (4) Add Space between notes
                 SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);

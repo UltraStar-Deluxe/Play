@@ -12,7 +12,7 @@ public class UltraStarSongVoicesParser
     private Sentence currentSentence;
     private bool endFound;
 
-    private readonly Dictionary<string, Voice> voiceIdToVoiceMap = new();
+    private readonly Dictionary<EVoiceId, Voice> voiceIdToVoiceMap = new();
 
     private readonly bool isRelativeSongFormat;
     // The last beat is only relevant for relative song files. Any beat will be relative to this.
@@ -31,8 +31,8 @@ public class UltraStarSongVoicesParser
         this.filePath = filePath;
         this.encoding = encoding;
         this.isRelativeSongFormat = isRelativeSongFormat;
-        currentVoice = new Voice(Voice.soloVoiceId);
-        voiceIdToVoiceMap.Add(Voice.soloVoiceId, currentVoice);
+        currentVoice = new Voice(EVoiceId.P1);
+        voiceIdToVoiceMap.Add(EVoiceId.P1, currentVoice);
 
         if (filePath == null
             || !File.Exists(filePath))
@@ -173,27 +173,29 @@ public class UltraStarSongVoicesParser
         }
     }
 
-    private void ParseVoiceStart(string voiceId, uint lineNumber)
+    private void ParseVoiceStart(string voiceIdString, uint lineNumber)
     {
-        if (voiceId.IsNullOrEmpty())
+        if (voiceIdString.IsNullOrEmpty())
         {
             ThrowLineError(lineNumber, "Voice id is null or empty, should be 'P1' or 'P2' for example");
         }
 
-        // Remove the default voice for solo songs.
-        voiceIdToVoiceMap.Remove(Voice.soloVoiceId);
-
         // Normalize voice name.
         // Most use "P1", "P2", etc.
         // But some use "P 1", "P 2", etc. (with spaces)
-        string normalizedVoiceId = voiceId.Replace(" ", "");
+        string normalizedVoiceIdString = voiceIdString.Replace(" ", "");
+
+        if (!Enum.TryParse(normalizedVoiceIdString, out EVoiceId voiceId))
+        {
+            ThrowLineError(lineNumber, $"Failed to parse voice id '{voiceIdString}', should be 'P1' or 'P2' for example");
+        }
 
         // Switch to or create new voice
-        if (!voiceIdToVoiceMap.TryGetValue(normalizedVoiceId, out Voice nextVoice))
+        if (!voiceIdToVoiceMap.TryGetValue(voiceId, out Voice nextVoice))
         {
             // Voice has not been found, so create new one.
-            nextVoice = new Voice(normalizedVoiceId);
-            voiceIdToVoiceMap.Add(normalizedVoiceId, nextVoice);
+            nextVoice = new Voice(voiceId);
+            voiceIdToVoiceMap.Add(voiceId, nextVoice);
         }
         currentVoice = nextVoice;
         currentSentence = null;

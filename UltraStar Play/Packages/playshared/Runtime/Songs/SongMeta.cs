@@ -159,7 +159,7 @@ public abstract class SongMeta
      * Mapping from generic voice IDs ("P1", "P2", "P3", ...)
      * to performer names ("Elvis Presley", "Shakira")
      */
-    protected readonly Dictionary<string, string> voiceIdToDisplayName = new();
+    protected readonly Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
 
     private List<Voice> voices = new();
     public virtual IReadOnlyList<Voice> Voices
@@ -200,12 +200,12 @@ public abstract class SongMeta
             : null;
     }
 
-    public string GetVoiceDisplayName(string voiceId)
+    public string GetVoiceDisplayName(EVoiceId voiceId)
     {
         if (voiceIdToDisplayName == null
             || !voiceIdToDisplayName.TryGetValue(voiceId, out string displayName))
         {
-            return voiceId;
+            return voiceId.ToString();
         }
 
         return displayName;

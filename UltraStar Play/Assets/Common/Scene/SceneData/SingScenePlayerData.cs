@@ -4,7 +4,7 @@ public class SingScenePlayerData
 {
     public List<PlayerProfile> SelectedPlayerProfiles { get; set; } = new();
     public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
-    public Dictionary<PlayerProfile, string> PlayerProfileToVoiceIdMap { get; set; } = new();
+    public Dictionary<PlayerProfile, EExtendedVoiceId> PlayerProfileToVoiceIdMap { get; set; } = new();
 
     public SingScenePlayerData()
     {

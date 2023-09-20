@@ -98,8 +98,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private double positionInSongInMillisWhenPlaybackStarted;
 
-    private readonly Dictionary<string, Color> voiceIdToColorMap = new();
-
     private bool audioWaveFormInitialized;
 
     public double StopPlaybackAfterPositionInSongInMillis { get; set; }
@@ -308,22 +306,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         result.AddRange(notesInLayers);
         result.AddRange(notesInVoices);
         return result;
-    }
-
-    private void CreateVoiceToColorMap()
-    {
-        List<Color> colors = new()
-        {
-            Colors.CreateColor("#"),
-            Colors.CreateColor("#"),
-        };
-        int index = 0;
-        foreach (Color color in colors)
-        {
-            string voiceId = "P" + (index + 1);
-            voiceIdToColorMap[voiceId] = colors[index];
-            index++;
-        }
     }
 
     private void DoAutoSaveIfEnabled()

@@ -334,20 +334,11 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         return result;
     }
 
-    public Dictionary<PlayerProfile,string> GetSelectedPlayerProfileToVoiceIdMap()
+    public Dictionary<PlayerProfile, EExtendedVoiceId> GetSelectedPlayerProfileToExtendedVoiceIdMap()
     {
-        Dictionary<PlayerProfile,string> result = new();
-        playerEntryControls.ForEach(entry =>
-        {
-            if (entry.IsSelected.Value)
-            {
-                string voiceId = !entry.VoiceId.IsNullOrEmpty()
-                    ? entry.VoiceId
-                    : Voice.soloVoiceId;
-                result.Add(entry.PlayerProfile, voiceId);
-            }
-        });
-        return result;
+        return playerEntryControls
+            .Where(entry => entry.IsSelected.Value)
+            .ToDictionary(entry => entry.PlayerProfile, entry => entry.VoiceId);
     }
 
     public void ToggleSelectedPlayers()

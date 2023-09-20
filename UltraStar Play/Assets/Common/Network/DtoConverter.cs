@@ -62,7 +62,7 @@ public static class DtoConverter
             playerProfileNameToMicProfileDto[entry.Key.Name] = ToDto(entry.Value);
         });
 
-        Dictionary<string, string> playerProfileNameToVoiceIdMap = new();
+        Dictionary<string, EExtendedVoiceId> playerProfileNameToVoiceIdMap = new();
         singScenePlayerData.PlayerProfileToVoiceIdMap.ForEach(entry =>
         {
             playerProfileNameToVoiceIdMap[entry.Key.Name] = entry.Value;

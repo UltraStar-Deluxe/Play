@@ -132,7 +132,7 @@ public class EncodingTest
 
         if (!wordsInLyrics.IsNullOrEmpty())
         {
-            string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceId);
+            string lyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
             wordsInLyrics.ForEach(word => Assert.IsTrue(lyrics.Contains(word), $"Lyrics did not contain the word '{word}'. Lyrics:\n{lyrics}"));
         }
     }

@@ -41,10 +41,10 @@ public class LoadAndSaveSongTest
         Assert.AreEqual(originalSongMeta.VocalsAudio, savedSongMeta.VocalsAudio);
         Assert.AreEqual(originalSongMeta.Year, savedSongMeta.Year);
 
-        Assert.AreEqual("First Vocals", originalSongMeta.GetVoiceDisplayName(Voice.firstVoiceId));
-        Assert.AreEqual("Second Vocals", originalSongMeta.GetVoiceDisplayName(Voice.secondVoiceId));
-        Assert.AreEqual("First Vocals", savedSongMeta.GetVoiceDisplayName(Voice.firstVoiceId));
-        Assert.AreEqual("Second Vocals", savedSongMeta.GetVoiceDisplayName(Voice.secondVoiceId));
+        Assert.AreEqual("First Vocals", originalSongMeta.GetVoiceDisplayName(EVoiceId.P1));
+        Assert.AreEqual("Second Vocals", originalSongMeta.GetVoiceDisplayName(EVoiceId.P2));
+        Assert.AreEqual("First Vocals", savedSongMeta.GetVoiceDisplayName(EVoiceId.P1));
+        Assert.AreEqual("Second Vocals", savedSongMeta.GetVoiceDisplayName(EVoiceId.P2));
 
         Assert.AreEqual("42,5", originalSongMeta.GetUnknownHeaderEntry("NUMBERWITHCOMMA"));
         Assert.AreEqual("43.2", originalSongMeta.GetUnknownHeaderEntry("NUMBERWITHDOT"));

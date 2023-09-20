@@ -41,7 +41,7 @@ public class SongEditorMidiFileImporter : INeedInjection
         int channelIndex,
         bool importLyrics,
         bool importNotes,
-        string voiceId,
+        EVoiceId? voiceId,
         bool shiftNotesToPlaybackPosition,
         ESongEditorLayer layer)
     {
@@ -87,11 +87,11 @@ public class SongEditorMidiFileImporter : INeedInjection
                     loadedNote.IsEditable = layerManager.IsLayerEditable(layerManager.GetEnumLayer(layer));
                 });
             }
-            else
+            else if (voiceId is { } nonNullVoiceId)
             {
                 // Assign notes to player
                 MidiTrack track = midiFile.Tracks[trackIndex];
-                MidiToSongMetaUtils.AssignNotesToVoice(songMeta, loadedNotes, voiceId, track, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
+                MidiToSongMetaUtils.AssignNotesToVoice(songMeta, loadedNotes, nonNullVoiceId, track, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
             }
 
             if (shiftNotesToPlaybackPosition)
