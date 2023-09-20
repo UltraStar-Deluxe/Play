@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -198,6 +197,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private float startTimeInSeconds;
     private bool hasRecordedSongStartedStatistics;
     private bool hasRecordedSongFinishedStatistics;
+    private bool hasRecordedHighScoreStatistics;
 
     private bool hasFinishedScene;
 
@@ -869,6 +869,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         singingResultsSceneData.IsMedley = sceneData.IsMedley;
         singingResultsSceneData.SongDurationInMillis = (int)songAudioPlayer.DurationOfSongInMillis;
         singingResultsSceneData.partyModeSceneData = sceneData.partyModeSceneData;
+        singingResultsSceneData.GameRoundSettings = sceneData.gameRoundSettings;
 
         // Add scores, either for individual players, or as one common score.
         List<HighScoreEntry> highScoreEntries = new();
@@ -936,10 +937,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 isAfterLastNote = false;
             }
         });
-        if (isAfterLastNote
-            && !highScoreEntries.IsNullOrEmpty())
+        if (isAfterLastNote)
         {
-            UpdateSongFinishedStats(highScoreEntries);
+            UpdateSongFinishedStatistics();
+            UpdateHighScoreStatistics(highScoreEntries);
         }
 
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.SendStopRecordingMessageToConnectedClient());
@@ -1006,18 +1007,32 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
     }
 
-    private void UpdateSongFinishedStats(List<HighScoreEntry> highScoreEntries)
+    private void UpdateSongFinishedStatistics()
     {
         if (hasRecordedSongFinishedStatistics
-            || sceneData.IsMedley
-            || HasPartyModeSceneData)
+            || sceneData.IsMedley)
         {
             // Medleys and party mode are not recorded
             return;
         }
 
         hasRecordedSongFinishedStatistics = true;
-        StatisticsUtils.RecordSongFinished(statistics, SongMeta, highScoreEntries);
+        StatisticsUtils.RecordSongFinished(statistics, SongMeta);
+    }
+
+    private void UpdateHighScoreStatistics(List<HighScoreEntry> highScoreEntries)
+    {
+        if (hasRecordedHighScoreStatistics
+            || sceneData.IsMedley
+            || sceneData.gameRoundSettings.AnyModifierActive
+            || highScoreEntries.IsNullOrEmpty())
+        {
+            // Medleys and game modifiers do not record any high score
+            return;
+        }
+
+        hasRecordedHighScoreStatistics = true;
+        StatisticsUtils.RecordSongHighScore(statistics, SongMeta, highScoreEntries);
     }
 
     private PlayerControl CreatePlayerControl(PlayerProfile playerProfile, MicProfile micProfile, int playerIndex)

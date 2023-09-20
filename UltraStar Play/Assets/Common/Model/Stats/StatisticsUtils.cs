@@ -106,21 +106,37 @@ public static class StatisticsUtils
         statistics.IsDirty = true;
     }
 
-    public static void RecordSongFinished(Statistics statistics, SongMeta songMeta, List<HighScoreEntry> highScoreEntries)
+    public static void RecordSongFinished(
+        Statistics statistics,
+        SongMeta songMeta)
     {
-        if (statistics == null)
+        if (statistics == null
+            || songMeta == null)
         {
             return;
         }
 
-        Debug.Log($"Recording song finished stats for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+        Debug.Log($"Recording song finished for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
         SongStatistics songStatistics = CreateLocalStatistics(statistics, songMeta);
         songStatistics.IncrementSongFinished();
-        foreach (HighScoreEntry highScoreEntry in highScoreEntries)
+        statistics.IsDirty = true;
+    }
+
+    public static void RecordSongHighScore(
+        Statistics statistics,
+        SongMeta songMeta,
+        List<HighScoreEntry> highScoreEntries)
+    {
+        if (statistics == null
+            || songMeta == null
+            || highScoreEntries.IsNullOrEmpty())
         {
-            songStatistics.AddHighScore(highScoreEntry);
+            return;
         }
 
+        Debug.Log($"Recording high score entries for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+        SongStatistics songStatistics = CreateLocalStatistics(statistics, songMeta);
+        highScoreEntries.ForEach(songStatistics.AddHighScore);
         statistics.IsDirty = true;
     }
 
