@@ -6,7 +6,7 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class UltraStarDeluxeHighscoreConnector : IHighscoreConnector, IOnDisableMod
+public class UltraStarDeluxeHighscoreConnector : IHighScoreReader, IOnDisableMod
 {
     private Dictionary<SongMeta, HighScoreRecord> songMetaToHighScoreRecordCache = new Dictionary<SongMeta, HighScoreRecord>();
 

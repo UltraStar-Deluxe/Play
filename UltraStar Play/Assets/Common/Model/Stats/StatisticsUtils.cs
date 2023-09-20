@@ -43,13 +43,13 @@ public static class StatisticsUtils
         SongMeta songMeta)
     {
         HighScoreRecord localHighScoreRecord = GetLocalSongStatistics(statistics, songMeta)?.HighScoreRecord;
-        List<IHighscoreConnector> highscoreConnectors = ModManager.GetModObjects<IHighscoreConnector>();
+        List<IHighScoreReader> highscoreReaders = ModManager.GetModObjects<IHighScoreReader>();
         IObservable<HighScoreRecord> localHighScoreRecordObservable = localHighScoreRecord != null
             ? Observable.Return(localHighScoreRecord)
             : Observable.Empty<HighScoreRecord>();
 
-        IObservable<HighScoreRecord> remoteHighScoreRecordObservables = highscoreConnectors
-            .Select(highscoreConnector => highscoreConnector.ReadHighScoreRecord(songMeta))
+        IObservable<HighScoreRecord> remoteHighScoreRecordObservables = highscoreReaders
+            .Select(highscoreReader => highscoreReader.ReadHighScoreRecord(songMeta))
             .Merge();
 
         return localHighScoreRecordObservable
@@ -144,6 +144,15 @@ public static class StatisticsUtils
         SongMeta songMeta,
         List<HighScoreEntry> highScoreEntries)
     {
+        RecordSongHighScoreLocally(statistics, songMeta, highScoreEntries);
+        RecordSongHighScoreUsingMods(statistics, songMeta, highScoreEntries);
+    }
+
+    private static void RecordSongHighScoreLocally(
+            Statistics statistics,
+            SongMeta songMeta,
+            List<HighScoreEntry> highScoreEntries)
+        {
         if (statistics == null
             || songMeta == null
             || highScoreEntries.IsNullOrEmpty())
@@ -155,6 +164,49 @@ public static class StatisticsUtils
         SongStatistics songStatistics = CreateLocalStatistics(statistics, songMeta);
         highScoreEntries.ForEach(songStatistics.AddHighScore);
         statistics.IsDirty = true;
+    }
+
+    private static void RecordSongHighScoreUsingMods(
+        Statistics statistics,
+        SongMeta songMeta,
+        List<HighScoreEntry> highScoreEntries)
+    {
+        if (statistics == null
+            || songMeta == null
+            || highScoreEntries.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        try
+        {
+            List<IHighScoreWriter> highScoreWriters = ModManager.GetModObjects<IHighScoreWriter>();
+            if (highScoreWriters.IsNullOrEmpty())
+            {
+                return;
+            }
+            HighScoreRecord highScoreRecord = new();
+            highScoreEntries.ForEach(highScoreEntry => highScoreRecord.AddRecord(highScoreEntry));
+            foreach (IHighScoreWriter highScoreWriter in highScoreWriters)
+            {
+                try
+                {
+                    Debug.Log($"Recording high score entries for '{SongMetaUtils.GetArtistDashTitle(songMeta)}' using mod object of type {highScoreWriter.GetType().Name}");
+                    highScoreWriter.WriteHighScoreRecord(highScoreRecord, songMeta);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError(
+                        $"Failed to write high score using mod object of type {highScoreWriter.GetType().Name}: {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError("Failed to write high scores using mods");
+        }
     }
 
     private static SongStatistics CreateLocalStatistics(Statistics statistics, SongMeta songMeta)
