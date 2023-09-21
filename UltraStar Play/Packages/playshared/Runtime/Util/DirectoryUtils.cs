@@ -14,13 +14,47 @@ public static class DirectoryUtils
         }
     }
 
-    public static List<string> GetFilesInFolder(string folderPath, params string[] fileExtensions)
+    public static List<string> GetDirectories(string folderPath, bool recursive, params string[] searchPatterns)
     {
-        List<string> result = new();
-        foreach (string fileExtension in fileExtensions)
+        SearchOption searchOption = recursive
+            ? SearchOption.AllDirectories
+            : SearchOption.TopDirectoryOnly;
+
+        if (searchPatterns.IsNullOrEmpty())
         {
-            string[] files = Directory.GetFiles(folderPath, fileExtension, SearchOption.AllDirectories);
-            result.AddRange(files);
+            return Directory.GetDirectories(folderPath, "*", searchOption)
+                .ToList();
+        }
+
+        List<string> result = new();
+        foreach (string searchPattern in searchPatterns)
+        {
+             string[] paths = Directory.GetDirectories(folderPath, searchPattern, searchOption);
+            result.AddRange(paths);
+        }
+
+        return result
+            .Distinct()
+            .ToList();
+    }
+
+    public static List<string> GetFiles(string folderPath, bool recursive, params string[] searchPatterns)
+    {
+        SearchOption searchOption = recursive
+            ? SearchOption.AllDirectories
+            : SearchOption.TopDirectoryOnly;
+
+        if (searchPatterns.IsNullOrEmpty())
+        {
+            return Directory.GetFiles(folderPath, "*", searchOption)
+                .ToList();
+        }
+
+        List<string> result = new();
+        foreach (string searchPattern in searchPatterns)
+        {
+            string[] paths = Directory.GetFiles(folderPath, searchPattern, searchOption);
+            result.AddRange(paths);
         }
 
         return result

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 public interface ISongRepository : IMod
 {
-    public List<SongMeta> SearchSongs(string searchTerm);
-    public List<SongMeta> GetDefaultSongs();
-    public List<SongMeta> GetRandomSongs();
+    public IObservable<SongMeta> SearchSongs(SongSearchParameters searchParameters);
+    // public IObservable<SongMeta> GetDefaultSongs();
+    // public IObservable<SongMeta> GetRandomSongs();
 }

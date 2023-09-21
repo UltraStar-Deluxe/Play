@@ -1185,6 +1185,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.OnSearchTextChanged");
 
+        // Search songs in song repositories
+        SongSearchParameters searchParameters = new(
+            songSearchControl.GetSearchText());
+        SongRepositoryUtils.SearchSongs(searchParameters)
+            .ThrottleFirst(TimeSpan.FromMilliseconds(500))
+            .Subscribe(songMeta =>
+            {
+                if (!songMetas.Contains(songMeta))
+                {
+                    songMetas.Add(songMeta);
+                }
+                UpdateFilteredSongs();
+            });
+
         SongSelectEntry lastSelectedEntry = songRouletteControl.SelectedEntry;
         string rawSearchText = songSearchControl.GetRawSearchText();
 
@@ -1215,7 +1229,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    public List<SongMeta> GetFilteredSongMetas()
+    private List<SongMeta> GetFilteredSongMetas()
     {
         // Ignore prefix for special search syntax
         IPlaylist playlist = SongSelectionPlaylistChooserControl.Selection.Value;
@@ -1310,7 +1324,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    public void UpdateFilteredSongs()
+    private void UpdateFilteredSongs()
     {
         if (!SongMetaManager.IsSongScanFinished)
         {

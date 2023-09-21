@@ -135,7 +135,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
-    private void AddSongMeta(SongMeta songMeta)
+    public void AddSongMeta(SongMeta songMeta)
     {
         if (songMeta == null)
         {

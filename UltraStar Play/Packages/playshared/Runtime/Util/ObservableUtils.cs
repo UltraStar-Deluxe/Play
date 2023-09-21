@@ -39,6 +39,60 @@ public class ObservableUtils
         });
     }
 
+    public static IObservable<T> RunOnNewTaskAsObservableElements<T>(Func<List<T>> function, IDisposable disposable)
+    {
+        return Observable.Create<T>(o =>
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    List<T> resultList = function();
+                    if (!resultList.IsNullOrEmpty())
+                    {
+                        resultList.ForEach(result => o.OnNext(result));
+                    }
+                    o.OnCompleted();
+                }
+                catch (Exception ex)
+                {
+                    o.OnError(ex);
+                }
+
+                return disposable;
+            });
+
+            return disposable;
+        });
+    }
+
+    public static IObservable<T> RunOnNewTaskAsObservableElements<T>(Func<Task<List<T>>> function, IDisposable disposable)
+    {
+        return Observable.Create<T>(o =>
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    List<T> resultList = await function();
+                    if (!resultList.IsNullOrEmpty())
+                    {
+                        resultList.ForEach(result => o.OnNext(result));
+                    }
+                    o.OnCompleted();
+                }
+                catch (Exception ex)
+                {
+                    o.OnError(ex);
+                }
+
+                return disposable;
+            });
+
+            return disposable;
+        });
+    }
+
     public static IObservable<T> RunOnNewTaskAsObservable<T>(Func<Task<T>> function, IDisposable disposable)
     {
         return Observable.Create<T>(o =>
@@ -66,7 +120,7 @@ public class ObservableUtils
         });
     }
 
-    public static IObservable<List<T>> AllItemsUntilErrorOrCompleted<T>(IObservable<T> observable, bool logError = true)
+    public static IObservable<List<T>> AllAtOnceUntilErrorOrCompleted<T>(IObservable<T> observable, bool logError = true)
     {
         return Observable.Create<List<T>>(o =>
         {

@@ -105,7 +105,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         }
 
         modSettingsDialogControl = uiManager.CreateDialogControl($"{modName} Settings");
-        modSettingsDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+        modSettingsDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok),
             _ => modSettingsDialogControl.CloseDialog());
         modSettingsDialogControl.DialogClosedEventStream.Subscribe(_ => modSettingsDialogControl = null);
 

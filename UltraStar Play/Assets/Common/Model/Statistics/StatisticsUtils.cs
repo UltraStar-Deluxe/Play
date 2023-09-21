@@ -35,7 +35,7 @@ public static class StatisticsUtils
         IObservable<HighScoreEntry> highScoreRecordObservable = GetLocalAndRemoteHighScoreRecords(statistics, songMeta)
             .SelectMany(highScoreRecord => highScoreRecord.HighScoreEntries)
             .ObserveOnMainThread();
-        return ObservableUtils.AllItemsUntilErrorOrCompleted(highScoreRecordObservable);
+        return ObservableUtils.AllAtOnceUntilErrorOrCompleted(highScoreRecordObservable);
     }
 
     private static IObservable<HighScoreRecord> GetLocalAndRemoteHighScoreRecords(
