@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class UltraStarSongMeta : SongMeta
+public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
 {
-    public bool HasFailedToLoadVoices { get; protected set; }
-    protected bool hasLoadedVoices;
-
-    protected bool ShouldLoadVoices => !hasLoadedVoices && !HasFailedToLoadVoices;
-
     /**
      * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
      * Example: a BPM value of 60 in a txt file would define a beat every 0.25 seconds (60*4=240 beats-per-minute).
@@ -111,42 +107,10 @@ public class UltraStarSongMeta : SongMeta
         ? voiceIdToDisplayName.Count
         : Voices.Count;
 
-    public override string GetVoiceDisplayName(EVoiceId voiceId)
-    {
-        if (voiceIdToDisplayName.IsNullOrEmpty()
-            && ShouldLoadVoices)
-        {
-            LoadVoicesFromFile();
-        }
-        return base.GetVoiceDisplayName(voiceId);
-    }
-
-    public override IReadOnlyCollection<Voice> Voices
-    {
-        get
-        {
-            if (ShouldLoadVoices)
-            {
-                LoadVoicesFromFile();
-            }
-
-            return base.Voices;
-        }
-    }
-
-    public override bool TryGetVoice(EVoiceId voiceId, out Voice voice)
-    {
-        if (ShouldLoadVoices)
-        {
-            LoadVoicesFromFile();
-        }
-
-        return base.TryGetVoice(voiceId, out voice);
-    }
-
     public UltraStarSongMeta(SongMeta other)
     {
         CopyValues(other);
+        OnLoadVoices = DoLoadVoices;
     }
 
     public UltraStarSongMeta(
@@ -166,32 +130,17 @@ public class UltraStarSongMeta : SongMeta
             throw new ArgumentNullException(nameof(voiceIdToDisplayName));
         }
         this.voiceIdToDisplayName.AddRange(voiceIdToDisplayName);
+
+        OnLoadVoices = DoLoadVoices;
     }
 
-    public override void AddVoice(Voice voice)
+    private void DoLoadVoices()
     {
-        base.AddVoice(voice);
-
-        // No need to load the voices anymore.
-        hasLoadedVoices = true;
-    }
-
-    protected virtual void LoadVoicesFromFile()
-    {
-        if (HasFailedToLoadVoices)
-        {
-            return;
-        }
-
-        // Do not attempt to load voices again.
-        hasLoadedVoices = true;
-
-        // This field is not reset if any errors occurred.
-        HasFailedToLoadVoices = true;
-
         if (FileInfo == null
             || !FileInfo.Exists)
         {
+            Debug.LogError($"Failed to lazy load voices of {GetType().Name} '{SongMetaUtils.GetArtistDashTitle(this)}' because no file reference is set." +
+                           $"Try adding the voices manually or set another {nameof(OnLoadVoices)} callback.");
             return;
         }
 
@@ -203,8 +152,5 @@ public class UltraStarSongMeta : SongMeta
             isRelativeSongFormat,
             false);
         voices.ForEach(voice => AddVoice(voice));
-
-        // All done without errors.
-        HasFailedToLoadVoices = false;
     }
 }

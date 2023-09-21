@@ -28,6 +28,13 @@ public static class UltraStarSongParser
         }
     }
 
+    public static UltraStarSongMeta ParseString(string text, out List<SongIssue> songIssues)
+    {
+        MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);
+        return ParseStreamReader(streamReader, out songIssues);
+    }
+
     public static UltraStarSongMeta ParseStreamReader(StreamReader reader, out List<SongIssue> songIssues)
     {
         songIssues = new();

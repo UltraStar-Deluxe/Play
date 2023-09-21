@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class MidiFileSongMeta : UltraStarSongMeta
 {
-    public MidiFileSongMeta(SongMeta other) : base(other)
+    public MidiFileSongMeta(SongMeta other)
+        : base(other)
     {
+        OnLoadVoices = DoLoadVoices;
     }
 
     public MidiFileSongMeta(
@@ -15,24 +16,11 @@ public class MidiFileSongMeta : UltraStarSongMeta
         Dictionary<EVoiceId, string> voiceIdToDisplayName)
             : base(artist, title, txtFileBpm, audioFile, voiceIdToDisplayName)
     {
+        OnLoadVoices = DoLoadVoices;
     }
 
-    protected override void LoadVoicesFromFile()
+    private void DoLoadVoices()
     {
-        if (HasFailedToLoadVoices)
-        {
-            return;
-        }
-
-        // Do not attempt to load voices again.
-        hasLoadedVoices = true;
-
-        // This field is not reset if any errors occurred.
-        HasFailedToLoadVoices = true;
-
         MidiToSongMetaUtils.FillSongMetaWithMidiLyricsAndNotes(this);
-
-        // All done without errors.
-        HasFailedToLoadVoices = false;
     }
 }

@@ -28,6 +28,13 @@ public class UltraStarSongVoicesParser
         return new List<Voice>(voices);
     }
 
+    public static List<Voice> ParseString(string text, bool isRelativeSongFormat)
+    {
+        MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);
+        return ParseStreamReader(streamReader, isRelativeSongFormat);
+    }
+
     public static List<Voice> ParseStreamReader(StreamReader reader, bool isRelativeSongFormat)
     {
         UltraStarSongVoicesParser parser = new(reader, isRelativeSongFormat);
