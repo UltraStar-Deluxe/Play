@@ -271,16 +271,18 @@ public static class SongMetaUtils
 
     public static Voice GetOrCreateVoice(SongMeta songMeta, EVoiceId voiceId)
     {
-        Voice matchingVoice = songMeta.Voices
-            .FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceId));
-        if (matchingVoice != null)
+        if (songMeta == null)
         {
-            return matchingVoice;
+            return null;
+        }
+
+        if (songMeta.TryGetVoice(voiceId, out Voice existingVoice))
+        {
+            return existingVoice;
         }
 
         Voice newVoice = new(voiceId);
         songMeta.AddVoice(newVoice);
-
         return newVoice;
     }
 
@@ -407,8 +409,7 @@ public static class SongMetaUtils
 
     public static string GetLyrics(SongMeta songMeta, EVoiceId voiceId, bool removeTilde = false)
     {
-        Voice voice = songMeta.Voices.FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceId));
-        if (voice == null)
+        if (!songMeta.TryGetVoice(voiceId, out Voice voice))
         {
             return "";
         }
@@ -703,7 +704,12 @@ public static class SongMetaUtils
 
     public static Voice CreateMergedVoice(List<Voice> voices)
     {
-        if (voices.Count <= 1)
+        if (voices.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        if (voices.Count == 1)
         {
             return voices.FirstOrDefault();
         }
@@ -896,14 +902,12 @@ public static class SongMetaUtils
             return null;
         }
 
-        List<Voice> voices = songMeta.Voices.ToList();
-        if (voices.IsNullOrEmpty())
+        if (songMeta.TryGetVoice(voiceId, out Voice voice))
         {
-            return null;
+            return voice;
         }
 
-        return voices.FirstOrDefault(voice =>
-            Voice.VoiceIdEquals(voice.Id, voiceId));
+        return null;
     }
 
     public static Dictionary<EVoiceId, string> GetVoiceIdToDisplayName(SongMeta songMeta)
@@ -925,22 +929,32 @@ public static class SongMetaUtils
     public static void AddVoice(SongMeta songMeta, Voice voice)
     {
         if (songMeta == null
-            || songMeta is not UltraStarSongMeta ultraStarSongMeta)
+            || voice == null)
         {
             return;
         }
 
-        ultraStarSongMeta.AddVoice(voice);
+        songMeta.AddVoice(voice);
+    }
+
+    public static void RemoveVoice(SongMeta songMeta, EVoiceId voiceId)
+    {
+        if (songMeta == null)
+        {
+            return;
+        }
+
+        songMeta.RemoveVoice(voiceId);
     }
 
     public static void RemoveVoice(SongMeta songMeta, Voice voice)
     {
         if (songMeta == null
-            || songMeta is not UltraStarSongMeta ultraStarSongMeta)
+            || voice == null)
         {
             return;
         }
 
-        ultraStarSongMeta.RemoveVoice(voice);
+        RemoveVoice(songMeta, voice.Id);
     }
 }

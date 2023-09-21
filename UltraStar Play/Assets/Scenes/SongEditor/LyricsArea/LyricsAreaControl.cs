@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -61,7 +62,7 @@ public class LyricsAreaControl : INeedInjection, IInjectionFinishedListener
 
     public void OnInjectionFinished()
     {
-        voice = songMeta.Voices[0];
+        voice = songMeta.Voices.FirstOrDefault();
         EnterViewMode();
 
         textField.DisableParseEscapeSequences();

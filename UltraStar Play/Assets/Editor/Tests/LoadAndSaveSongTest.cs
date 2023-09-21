@@ -54,6 +54,6 @@ public class LoadAndSaveSongTest
 
     private SongMeta LoadSong(string path)
     {
-        return UltraStarSongParser.ParseSongFile(path, out List<SongIssue> songIssues, null, true);
+        return UltraStarSongParser.ParseFile(path, out List<SongIssue> songIssues, null, true);
     }
 }

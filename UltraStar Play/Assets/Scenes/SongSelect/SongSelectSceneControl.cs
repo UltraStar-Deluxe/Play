@@ -908,7 +908,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta)
     {
-        if (songMeta.FailedToLoadVoices)
+        if (songMeta is UltraStarSongMeta ultraStarSongMeta
+            && ultraStarSongMeta.HasFailedToLoadVoices)
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
@@ -929,7 +930,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        if (songMeta.FailedToLoadVoices)
+        if (songMeta is UltraStarSongMeta ultraStarSongMeta
+            && ultraStarSongMeta.HasFailedToLoadVoices)
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;

@@ -347,7 +347,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         float bpm = 300;
 
         Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
-        SongMeta songMeta = new UltraStarSongMeta(
+        UltraStarSongMeta songMeta = new UltraStarSongMeta(
             artist,
             title,
             bpm,
@@ -479,7 +479,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         songIssues = new List<SongIssue>();
         try
         {
-            SongMeta newSongMeta = UltraStarSongParser.ParseSongFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
+            SongMeta newSongMeta = UltraStarSongParser.ParseFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
             songIssues.AddRange(parseFileIssues);
 
             List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
@@ -541,7 +541,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         string absoluteFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
         try
         {
-            SongMeta other = UltraStarSongParser.ParseSongFile(absoluteFilePath, out List<SongIssue> _, songMeta.FileEncoding, false);
+            SongMeta other = UltraStarSongParser.ParseFile(absoluteFilePath, out List<SongIssue> _, songMeta.FileEncoding, false);
             songMeta.CopyValues(other);
         }
         catch (Exception e)

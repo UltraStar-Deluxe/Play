@@ -92,7 +92,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
 
     protected SongMeta LoadSongMeta(string songFilePath)
     {
-        SongMeta songMeta = UltraStarSongParser.ParseSongFile(songFilePath, out List<SongIssue> songIssues, Encoding.UTF8, false);
+        SongMeta songMeta = UltraStarSongParser.ParseFile(songFilePath, out List<SongIssue> songIssues, Encoding.UTF8, false);
         if (songMeta == null)
         {
             Assert.Fail($"Failed to load song from path '{songFilePath}'");

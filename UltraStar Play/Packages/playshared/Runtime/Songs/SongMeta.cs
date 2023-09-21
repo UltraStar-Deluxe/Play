@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using UniRx;
 
 [Serializable]
-public abstract class SongMeta
+public class SongMeta
 {
     /**
      * File name of the song's txt file (not including any directories).
@@ -143,6 +141,28 @@ public abstract class SongMeta
      */
     public virtual int MedleyEndBeat { get; set; }
 
+    /**
+     * Mapping from voice IDs ("P1", "P2", "P3", ...)
+     * to performer names ("Elvis Presley", "Shakira")
+     */
+    protected readonly Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
+
+    /**
+     * Mapping from voice IDs ("P1", "P2", "P3", ...)
+     * to the voice data structure.
+     */
+    protected readonly Dictionary<EVoiceId, Voice> voiceIdToVoice = new();
+    public virtual IReadOnlyCollection<Voice> Voices => voiceIdToVoice.Values;
+
+    /**
+     * Number of available voices.
+     */
+    public virtual int VoiceCount => voiceIdToVoice.Count;
+
+    /**
+     * Values that does not have a dedicated field in
+     * this data structure can be added here.
+     */
     private readonly Dictionary<string, string> additionalHeaderEntries = new();
     public IReadOnlyDictionary<string, string> AdditionalHeaderEntries
     {
@@ -151,39 +171,6 @@ public abstract class SongMeta
             return additionalHeaderEntries;
         }
     }
-
-    /**
-     * Mapping from generic voice IDs ("P1", "P2", "P3", ...)
-     * to performer names ("Elvis Presley", "Shakira")
-     */
-    protected readonly Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
-
-    private List<Voice> voices = new();
-    public IReadOnlyList<Voice> Voices
-    {
-        get
-        {
-            if (voices.IsNullOrEmpty()
-                && !FailedToLoadVoices)
-            {
-                // When there is an Exception, then this field is not reset.
-                FailedToLoadVoices = true;
-                voices = LoadVoices();
-                FailedToLoadVoices = false;
-
-                loadedVoicesEventStream.OnNext(true);
-            }
-            return voices;
-        }
-    }
-
-    public bool FailedToLoadVoices { get; private set; }
-    public virtual int VoiceCount => Math.Max(1, Voices.Count);
-
-    protected readonly Subject<bool> loadedVoicesEventStream = new();
-    public IObservable<bool> LoadedVoicesEventStream => loadedVoicesEventStream;
-
-    protected abstract List<Voice> LoadVoices();
 
     public virtual void SetAdditionalHeaderEntry(string key, string value)
     {
@@ -245,23 +232,23 @@ public abstract class SongMeta
         Year = other.Year;
     }
 
-    public virtual void AddVoice(Voice newVoice)
+    public virtual bool TryGetVoice(EVoiceId voiceId, out Voice voice)
     {
-        if (Voices.Contains(newVoice))
-        {
-            return;
-        }
-
-        voices.Add(newVoice);
+        return voiceIdToVoice.TryGetValue(voiceId, out voice);
     }
 
-    public virtual void RemoveVoice(Voice voice)
+    public virtual void AddVoice(Voice voice)
     {
-        if (!Voices.Contains(voice))
+        if (voice == null)
         {
             return;
         }
 
-        voices.Remove(voice);
+        voiceIdToVoice[voice.Id] = voice;
+    }
+
+    public virtual void RemoveVoice(EVoiceId voiceId)
+    {
+        voiceIdToVoice.Remove(voiceId);
     }
 }

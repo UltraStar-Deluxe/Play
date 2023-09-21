@@ -6,58 +6,64 @@ using UnityEngine;
 
 public class UltraStarSongVoicesParser
 {
+    private readonly StreamReader streamReader;
+    private readonly bool isRelativeSongFormat;
     private readonly string filePath;
-    private readonly Encoding encoding;
+
+    private readonly Dictionary<EVoiceId, Voice> voiceIdToVoiceMap = new();
+
     private Voice currentVoice;
     private Sentence currentSentence;
     private bool endFound;
 
-    private readonly Dictionary<EVoiceId, Voice> voiceIdToVoiceMap = new();
-
-    private readonly bool isRelativeSongFormat;
     // The last beat is only relevant for relative song files. Any beat will be relative to this.
     private int lastBeat;
 
-    public static List<Voice> ParseSongFile(string filePath, Encoding fileEncoding, bool isRelativeSongFormat, bool useUniversalCharsetDetector)
+    public static List<Voice> ParseFile(string filePath, Encoding fileEncoding, bool isRelativeSongFormat, bool useUniversalCharsetDetector)
     {
         using IDisposable d = new DisposableStopwatch($"Parsing voices of '{filePath}' took <millis> ms");
-        UltraStarSongVoicesParser parser = new(filePath, fileEncoding, isRelativeSongFormat, useUniversalCharsetDetector);
-        IReadOnlyList<Voice> voices = parser.GetVoices();
+        StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, fileEncoding, useUniversalCharsetDetector);
+        UltraStarSongVoicesParser parser = new(reader, isRelativeSongFormat, filePath);
+        IReadOnlyList<Voice> voices = parser.Parse();
         return new List<Voice>(voices);
     }
 
-    private UltraStarSongVoicesParser(string filePath, Encoding encoding, bool isRelativeSongFormat, bool useUniversalCharsetDetector)
+    public static List<Voice> ParseStreamReader(StreamReader reader, bool isRelativeSongFormat)
     {
-        this.filePath = filePath;
-        this.encoding = encoding;
+        UltraStarSongVoicesParser parser = new(reader, isRelativeSongFormat);
+        IReadOnlyList<Voice> voices = parser.Parse();
+        return new List<Voice>(voices);
+    }
+
+    private UltraStarSongVoicesParser(
+        StreamReader reader,
+        bool isRelativeSongFormat,
+        string filePath = null)
+    {
+        this.streamReader = reader;
         this.isRelativeSongFormat = isRelativeSongFormat;
+        this.filePath = filePath.NullToEmpty();
         currentVoice = new Voice(EVoiceId.P1);
         voiceIdToVoiceMap.Add(EVoiceId.P1, currentVoice);
+    }
 
-        if (filePath == null
-            || !File.Exists(filePath))
+    private IReadOnlyList<Voice> Parse()
+    {
+        try
         {
-            // Nothing to load. This could be a generated song meta.
-            return;
+            uint lineNumber = 0;
+            while (!endFound && !streamReader.EndOfStream)
+            {
+                lineNumber++;
+                string line = streamReader.ReadLine();
+                ParseLine(line, lineNumber);
+            }
+
+            return new List<Voice>(voiceIdToVoiceMap.Values);
         }
-
-        using StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, encoding, useUniversalCharsetDetector);
-        ParseStreamReader(reader);
-    }
-
-    private IReadOnlyList<Voice> GetVoices()
-    {
-        return new List<Voice>(voiceIdToVoiceMap.Values);
-    }
-
-    private void ParseStreamReader(StreamReader reader)
-    {
-        uint lineNumber = 0;
-        while (!endFound && !reader.EndOfStream)
+        finally
         {
-            lineNumber++;
-            string line = reader.ReadLine();
-            ParseLine(line, lineNumber);
+            streamReader.Close();
         }
     }
 
@@ -263,16 +269,14 @@ public class UltraStarSongVoicesParser
     private void ThrowLineError(uint lineNumber, string message, Exception innerException = null)
     {
         throw new UltraStarSongParserException(
-            $"{message} (path: '{filePath}', line: {lineNumber}, encoding: {encoding})",
+            $"{message} (path: '{filePath}', line: {lineNumber}, encoding: {streamReader.CurrentEncoding})",
             innerException);
     }
 
     private void LogLineWarning(uint lineNumber, string message)
     {
-        Debug.LogWarning(message
-                         + " (path: '" + filePath + "', " +
-                         "line: " + lineNumber + ", " +
-                         "encoding: " + encoding + ")");
+        Debug.LogWarning(
+            $"{message} (path: '{filePath}', line: {lineNumber}, encoding: {streamReader.CurrentEncoding})");
     }
 
     private static int ConvertToInt32(string s)

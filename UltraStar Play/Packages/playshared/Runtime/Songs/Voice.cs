@@ -118,9 +118,4 @@ public class Voice
             return x.Id.CompareTo(y.Id);
         }
     }
-
-    public static bool VoiceIdEquals(EVoiceId a, EVoiceId b)
-    {
-        return a == b;
-    }
 }

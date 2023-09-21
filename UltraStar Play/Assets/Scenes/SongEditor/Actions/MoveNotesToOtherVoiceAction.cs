@@ -74,7 +74,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         }
         return note.Sentence != null
                && note.Sentence.Voice != null
-               && voiceIds.AnyMatch(voiceId => Voice.VoiceIdEquals(note.Sentence.Voice.Id, voiceId));
+               && voiceIds.AnyMatch(voiceId => note.Sentence.Voice.Id == voiceId);
     }
 
     private class SentenceWithRange

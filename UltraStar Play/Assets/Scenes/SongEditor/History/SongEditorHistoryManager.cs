@@ -182,12 +182,12 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         foreach (Voice voiceMemento in undoState.Voices)
         {
             Voice matchingVoiceInSongMeta = voicesInSongMeta
-                .FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceMemento.Id));
+                .FirstOrDefault(voice => voice.Id == voiceMemento.Id);
             if (matchingVoiceInSongMeta == null)
             {
                 // Create new voice
                 Voice voiceMementoClone = voiceMemento.CloneDeep();
-                songMeta.AddVoice(voiceMementoClone);
+                SongMetaUtils.AddVoice(songMeta, voiceMementoClone);
             }
             else
             {
@@ -206,10 +206,10 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
         foreach (Voice voiceInSongMeta in new List<Voice>(voicesInSongMeta))
         {
             Voice matchingVoiceMemento = undoState.Voices
-                .FirstOrDefault(voice => Voice.VoiceIdEquals(voice.Id, voiceInSongMeta.Id));
+                .FirstOrDefault(voice => voice.Id == voiceInSongMeta.Id);
             if (matchingVoiceMemento == null)
             {
-                songMeta.RemoveVoice(voiceInSongMeta);
+                SongMetaUtils.RemoveVoice(songMeta, voiceInSongMeta);
             }
         }
     }

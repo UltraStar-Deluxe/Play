@@ -1264,7 +1264,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return SongMetaUtils.GetVoiceById(SongMeta, voiceId);
         }
 
-        Debug.LogWarning($"Failed to find voice for extended voice id: {extendedVoiceId}");
+        Debug.LogWarning($"Failed to find voice for extended voice id: {extendedVoiceId}. Using first voice instead.");
         return SongMeta.Voices.FirstOrDefault();
     }
 

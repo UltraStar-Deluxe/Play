@@ -8,12 +8,12 @@ using UnityEngine;
 
 public static class UltraStarSongParser
 {
-    public static UltraStarSongMeta ParseSongFile(string filePath, out List<SongIssue> songIssues, Encoding encoding, bool useUniversalCharsetDetector)
+    public static UltraStarSongMeta ParseFile(string filePath, out List<SongIssue> songIssues, Encoding encoding, bool useUniversalCharsetDetector)
     {
         try
         {
             using StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, encoding, useUniversalCharsetDetector);
-            UltraStarSongMeta songMeta = ParseSong(reader, out songIssues);
+            UltraStarSongMeta songMeta = ParseStreamReader(reader, out songIssues);
 
             songMeta.SetFileInfo(filePath, reader.CurrentEncoding);
 
@@ -24,11 +24,11 @@ public static class UltraStarSongParser
         }
         catch (ExplicitEncodingMismatchException ex)
         {
-            return ParseSongFile(filePath, out songIssues, ex.ExplicitlyDefinedEncoding, useUniversalCharsetDetector);
+            return ParseFile(filePath, out songIssues, ex.ExplicitlyDefinedEncoding, useUniversalCharsetDetector);
         }
     }
 
-    public static UltraStarSongMeta ParseSong(StreamReader reader, out List<SongIssue> songIssues)
+    public static UltraStarSongMeta ParseStreamReader(StreamReader reader, out List<SongIssue> songIssues)
     {
         songIssues = new();
 
