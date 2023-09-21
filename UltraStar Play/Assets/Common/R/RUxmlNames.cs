@@ -750,6 +750,7 @@ public static partial class R
         public const string songEntryDuetIcon = "songEntryDuetIcon";
         public const string songEntryFavoriteIcon = "songEntryFavoriteIcon";
         public const string songEntryNotSavedYetIcon = "songEntryNotSavedYetIcon";
+        public const string songEntryRemoteSourceIcon = "songEntryRemoteSourceIcon";
         public const string songEntryUiRoot = "songEntryUiRoot";
         public const string songFolderEnabledToggle = "songFolderEnabledToggle";
         public const string songFolderInactiveOverlay = "songFolderInactiveOverlay";

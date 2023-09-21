@@ -181,7 +181,8 @@ public static class SongMetaUtils
 
     public static bool IsGeneratedAndNotYetSaved(SongMeta songMeta, string generatedSongFolderAbsolutePath)
     {
-        if (songMeta == null)
+        if (songMeta == null
+            || !songMeta.RemoteSource.IsNullOrEmpty())
         {
             return false;
         }

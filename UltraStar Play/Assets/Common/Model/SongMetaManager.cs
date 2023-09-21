@@ -135,6 +135,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
+    public void AddSongIssue(SongIssue songIssue)
+    {
+        allSongIssues.Add(songIssue);
+    }
+
     public void AddSongMeta(SongMeta songMeta)
     {
         if (songMeta == null)

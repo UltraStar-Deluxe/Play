@@ -1,7 +1,6 @@
 name: Folder Song Repository
 version: 1.0.0
 description : |
-  Dynamically loads songs from a local folder.
-  Can be used as alternative to a regular song folder when there are lots of songs.
+  Dynamically loads songs from a local folder when searching.
 authors: 
   - email@melodymania.org

@@ -174,6 +174,7 @@ public class LocalFolderSongRepository : ISongRepository
         try
         {
             SongMeta songMeta = UltraStarSongParser.ParseFile(txtFile, out List<SongIssue> songIssues, null, true);
+            songMeta.RemoteSource = nameof(LocalFolderSongRepository);
             txtFileToSongMetaCache[txtFile] = songMeta;
             return songMeta;
         }

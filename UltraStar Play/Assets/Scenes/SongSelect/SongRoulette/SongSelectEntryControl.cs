@@ -40,6 +40,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.songEntryNotSavedYetIcon)]
     private VisualElement notSavedYetIcon;
 
+    [Inject(UxmlName = R.UxmlNames.songEntryRemoteSourceIcon)]
+    private VisualElement songEntryRemoteSourceIcon;
+
     [Inject(UxmlName = R.UxmlNames.songEntryUiRoot)]
     private VisualElement songEntryUiRoot;
 
@@ -63,6 +66,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private Settings settings;
+
+    private TooltipControl songEntryRemoteSourceIconTooltipControl;
 
     /**
      * Name for debugging purpose
@@ -134,6 +139,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         isInitialized = true;
 
         injector.Inject(songRatingIconControl);
+
+        songEntryRemoteSourceIconTooltipControl = new(songEntryRemoteSourceIcon);
 
         InitSongMenu();
 
@@ -389,6 +396,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             favoriteIcon.HideByDisplay();
             duetIcon.HideByDisplay();
             notSavedYetIcon.HideByDisplay();
+            songEntryRemoteSourceIcon.HideByDisplay();
+            songEntryRemoteSourceIconTooltipControl.TooltipText = "";
             songRatingIconControl.HideSongRatingIcons();
         }
     }
@@ -399,6 +408,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         duetIcon.SetVisibleByDisplay(songEntry.SongMeta.VoiceCount > 1);
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
         notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songEntry.SongMeta, generatedSongFolderAbsolutePath));
+        songEntryRemoteSourceIcon.SetVisibleByDisplay(!songEntry.SongMeta.RemoteSource.IsNullOrEmpty());
+        songEntryRemoteSourceIconTooltipControl.TooltipText = songEntry.SongMeta.RemoteSource.NullToEmpty();
         songRatingIconControl.UpdateSongRatingIcons(songEntry.SongMeta, settings.Difficulty);
     }
 
