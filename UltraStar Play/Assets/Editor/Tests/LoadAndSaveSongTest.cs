@@ -23,8 +23,8 @@ public class LoadAndSaveSongTest
         Assert.AreEqual(originalSongMeta.BeatsPerMinute, savedSongMeta.BeatsPerMinute);
         Assert.AreEqual(originalSongMeta.Cover, savedSongMeta.Cover);
         Assert.AreEqual(originalSongMeta.Edition, savedSongMeta.Edition);
-        Assert.AreEqual(originalSongMeta.End, savedSongMeta.End);
-        Assert.AreEqual(originalSongMeta.Gap, savedSongMeta.Gap);
+        Assert.AreEqual(originalSongMeta.EndInMillis, savedSongMeta.EndInMillis);
+        Assert.AreEqual(originalSongMeta.GapInMillis, savedSongMeta.GapInMillis);
         Assert.AreEqual(originalSongMeta.Genre, savedSongMeta.Genre);
         Assert.AreEqual(originalSongMeta.InstrumentalAudio, savedSongMeta.InstrumentalAudio);
         Assert.AreEqual(originalSongMeta.Language, savedSongMeta.Language);
@@ -33,14 +33,14 @@ public class LoadAndSaveSongTest
         Assert.AreEqual(originalSongMeta.MusicBrainzRelease, savedSongMeta.MusicBrainzRelease);
         Assert.AreEqual(originalSongMeta.MusicBrainzReleaseGroup, savedSongMeta.MusicBrainzReleaseGroup);
         Assert.AreEqual(originalSongMeta.MusicBrainzArtist, savedSongMeta.MusicBrainzArtist);
-        Assert.AreEqual(originalSongMeta.PreviewEnd, savedSongMeta.PreviewEnd);
-        Assert.AreEqual(originalSongMeta.MedleyEndBeat, savedSongMeta.MedleyEndBeat);
-        Assert.AreEqual(originalSongMeta.MedleyStartBeat, savedSongMeta.MedleyStartBeat);
-        Assert.AreEqual(originalSongMeta.PreviewStart, savedSongMeta.PreviewStart);
-        Assert.AreEqual(originalSongMeta.Start, savedSongMeta.Start);
+        Assert.AreEqual(originalSongMeta.PreviewEndInMillis, savedSongMeta.PreviewEndInMillis);
+        Assert.AreEqual(originalSongMeta.MedleyEndInMillis, savedSongMeta.MedleyEndInMillis);
+        Assert.AreEqual(originalSongMeta.MedleyStartInMillis, savedSongMeta.MedleyStartInMillis);
+        Assert.AreEqual(originalSongMeta.PreviewStartInMillis, savedSongMeta.PreviewStartInMillis);
+        Assert.AreEqual(originalSongMeta.StartInMillis, savedSongMeta.StartInMillis);
         Assert.AreEqual(originalSongMeta.Title, savedSongMeta.Title);
         Assert.AreEqual(originalSongMeta.Video, savedSongMeta.Video);
-        Assert.AreEqual(originalSongMeta.VideoGap, savedSongMeta.VideoGap);
+        Assert.AreEqual(originalSongMeta.VideoGapInMillis, savedSongMeta.VideoGapInMillis);
         Assert.AreEqual(originalSongMeta.VocalsAudio, savedSongMeta.VocalsAudio);
         Assert.AreEqual(originalSongMeta.Year, savedSongMeta.Year);
 

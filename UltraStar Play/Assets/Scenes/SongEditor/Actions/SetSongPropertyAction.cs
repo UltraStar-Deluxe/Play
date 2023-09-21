@@ -23,13 +23,13 @@ public class SetSongPropertyAction : INeedInjection
     public void SetMedleyStart(double positionInSongInMillis)
     {
         int beat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
-        songMeta.MedleyStartBeat = beat;
+        songMeta.MedleyStartInMillis = beat;
     }
     
     public void SetMedleyEnd(double positionInSongInMillis)
     {
         int beat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
-        songMeta.MedleyEndBeat = beat;
+        songMeta.MedleyEndInMillis = beat;
     }
 
     public void SetMedleyStartAndNotify(double positionInSongInMillis)

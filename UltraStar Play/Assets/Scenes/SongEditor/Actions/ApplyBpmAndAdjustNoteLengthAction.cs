@@ -1,4 +1,5 @@
-﻿using UniInject;
+﻿using System;
+using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -14,9 +15,9 @@ public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    public void Execute(float newBpm)
+    public void Execute(double newBpm)
     {
-        if (newBpm == songMeta.BeatsPerMinute)
+        if (Math.Abs(newBpm - songMeta.BeatsPerMinute) < 0.01)
         {
             return;
         }
@@ -32,12 +33,12 @@ public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
         songMeta.BeatsPerMinute = newBpm;
     }
 
-    private void AdjustNoteLength(Voice voice, float newBpm, float oldBpm)
+    private void AdjustNoteLength(Voice voice, double newBpm, double oldBpm)
     {
         voice.Sentences.ForEach(sentence => AdjustNoteLength(sentence, newBpm, oldBpm));
     }
 
-    private void AdjustNoteLength(Sentence sentence, float newBpm, float oldBpm)
+    private void AdjustNoteLength(Sentence sentence, double newBpm, double oldBpm)
     {
         int newLinebreakBeat = (int)(sentence.LinebreakBeat * (newBpm / oldBpm));
         sentence.Notes.ForEach(note => AdjustNoteLength(note, newBpm, oldBpm));
@@ -45,7 +46,7 @@ public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
         sentence.SetLinebreakBeat(newLinebreakBeat);
     }
 
-    private void AdjustNoteLength(Note note, float newBpm, float oldBpm)
+    private void AdjustNoteLength(Note note, double newBpm, double oldBpm)
     {
         int newStartBeat = (int)(note.StartBeat * (newBpm / oldBpm));
         int newEndBeat = (int)(note.EndBeat * (newBpm / oldBpm));
@@ -56,7 +57,7 @@ public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
         note.SetStartAndEndBeat(newStartBeat, newEndBeat);
     }
 
-    public void ExecuteAndNotify(float newBpm)
+    public void ExecuteAndNotify(double newBpm)
     {
         Execute(newBpm);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.Bpm));

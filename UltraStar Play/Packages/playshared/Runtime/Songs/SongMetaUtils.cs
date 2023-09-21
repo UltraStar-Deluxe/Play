@@ -547,9 +547,9 @@ public static class SongMetaUtils
 
     public static int GetMedleyStartBeat(SongMeta songMeta)
     {
-        if (songMeta.MedleyStartBeat > 0)
+        if (songMeta.MedleyStartInMillis > 0)
         {
-            return songMeta.MedleyStartBeat;
+            return (int)BpmUtils.MillisecondInSongToBeat(songMeta, songMeta.MedleyStartInMillis);
         }
         else
         {
@@ -559,9 +559,9 @@ public static class SongMetaUtils
 
     public static int GetMedleyEndBeat(SongMeta songMeta, int targetDurationInSeconds)
     {
-        if (songMeta.MedleyEndBeat > 0)
+        if (songMeta.MedleyEndInMillis > 0)
         {
-            return songMeta.MedleyEndBeat;
+            return (int)BpmUtils.MillisecondInSongToBeat(songMeta, songMeta.MedleyEndInMillis);
         }
         else
         {

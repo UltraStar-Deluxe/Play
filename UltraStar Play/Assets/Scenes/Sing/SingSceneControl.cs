@@ -310,8 +310,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         songTimeProgressBar.value = 0;
         songAudioPlayer.PositionInSongEventStream.Subscribe(_ =>
         {
-            double startTagInMillis = SongMeta.Start * 1000;
-            double endTagInMillis = SongMeta.End;
+            double startTagInMillis = SongMeta.StartInMillis;
+            double endTagInMillis = SongMeta.EndInMillis;
             double positionInSongInMillisConsideringStartTag = songAudioPlayer.PositionInSongInMillis - startTagInMillis;
             double durationOfSongInMillisConsideringStartAndEndTag = songAudioPlayer.DurationOfSongInMillis - startTagInMillis - endTagInMillis;
             double progressInPercent = 100 * (positionInSongInMillisConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
@@ -1201,10 +1201,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return sceneData.PositionInSongInMillis;
         }
 
-        if (SongMeta.Start > 0)
+        if (SongMeta.StartInMillis > 0)
         {
-            // #START tag in txt file is in seconds (but #END is in milliseconds).
-            return SongMeta.Start * 1000.0;
+            return SongMeta.StartInMillis;
         }
 
         return 0;

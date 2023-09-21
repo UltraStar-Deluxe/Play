@@ -46,7 +46,7 @@ public class ChangeBpmAction : INeedInjection
         {
             DivideBpm(voice, factor);
         }
-        float newBpm = songMeta.BeatsPerMinute / factor;
+        double newBpm = songMeta.BeatsPerMinute / factor;
         songMeta.BeatsPerMinute = newBpm;
     }
 
@@ -86,7 +86,7 @@ public class ChangeBpmAction : INeedInjection
         {
             MultiplyBpm(voice, factor);
         }
-        float newBpm = songMeta.BeatsPerMinute * factor;
+        double newBpm = songMeta.BeatsPerMinute * factor;
         songMeta.BeatsPerMinute = newBpm;
     }
 

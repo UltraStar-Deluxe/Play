@@ -29,7 +29,7 @@ public class EditorIssueDisplayer : MonoBehaviour, INeedInjection, IInjectionFin
     private VisualElement noteAreaIssues;
 
     private ViewportEvent lastViewportEvent;
-    private float lastSongMetaBpm;
+    private double lastSongMetaBpm;
 
     private IReadOnlyCollection<SongIssue> lastIssues;
 

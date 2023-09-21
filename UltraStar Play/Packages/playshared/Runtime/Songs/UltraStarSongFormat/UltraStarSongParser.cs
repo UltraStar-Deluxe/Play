@@ -238,6 +238,12 @@ public static class UltraStarSongParser
     {
         switch (key)
         {
+            case "artist":
+                songMeta.Artist = value;
+                break;
+            case "audio":
+                songMeta.Audio = value;
+                break;
             case "background":
                 songMeta.Background = value;
                 break;
@@ -248,43 +254,55 @@ public static class UltraStarSongParser
                 songMeta.Edition = value;
                 break;
             case "end":
-                songMeta.End = ConvertToFloat(value);
+                songMeta.TxtFileEndInMillis = ConvertToFloat(value);
                 break;
             case "gap":
-                songMeta.Gap = ConvertToFloat(value);
+                songMeta.GapInMillis = ConvertToFloat(value);
                 break;
             case "genre":
                 songMeta.Genre = value;
                 break;
+            case "instrumentalaudio":
+                songMeta.InstrumentalAudio = value;
+                break;
             case "language":
                 songMeta.Language = value;
                 break;
-            case "previewstart":
-                songMeta.PreviewStart = ConvertToFloat(value);
+            case "medleyendbeat":
+                songMeta.TxtFileMedleyEndBeat = ConvertToInt32(value);
+                break;
+            case "medleystartbeat":
+                songMeta.TxtFileMedleyStartBeat = ConvertToInt32(value);
+                break;
+            case "musicbrainzartist":
+                songMeta.MusicBrainzArtist = value;
+                break;
+            case "musicbrainzrecord":
+                songMeta.MusicBrainzRecord = value;
+                break;
+            case "musicbrainzrelease":
+                songMeta.MusicBrainzRelease = value;
+                break;
+            case "musicbrainzreleasegroup":
+                songMeta.MusicBrainzReleaseGroup = value;
                 break;
             case "previewend":
-                songMeta.PreviewEnd = ConvertToFloat(value);
+                songMeta.TxtFilePreviewEndInSeconds = ConvertToFloat(value);
+                break;
+            case "previewstart":
+                songMeta.TxtFilePreviewStartInSeconds = ConvertToFloat(value);
                 break;
             case "start":
-                songMeta.Start = ConvertToFloat(value);
+                songMeta.TxtFileStartInSeconds = ConvertToFloat(value);
+                break;
+            case "title":
+                songMeta.Title = value;
                 break;
             case "video":
                 songMeta.Video = value;
                 break;
             case "videogap":
-                songMeta.VideoGap = ConvertToFloat(value);
-                break;
-            case "year":
-                songMeta.Year = ConvertToUInt32(value);
-                break;
-            case "medleystartbeat":
-                songMeta.MedleyStartBeat = ConvertToInt32(value);
-                break;
-            case "medleyendbeat":
-                songMeta.MedleyEndBeat = ConvertToInt32(value);
-                break;
-            case "audio":
-                songMeta.Audio = value;
+                songMeta.TxtFileVideoGapInSeconds = ConvertToFloat(value);
                 break;
             case "vocalsaudio":
                 songMeta.VocalsAudio = value;
@@ -292,17 +310,8 @@ public static class UltraStarSongParser
             case "website":
                 songMeta.Website = value;
                 break;
-            case "mbid_record":
-                songMeta.MusicBrainzRecord = value;
-                break;
-            case "instrumentalaudio":
-                songMeta.InstrumentalAudio = value;
-                break;
-            case "artist":
-                songMeta.Artist = value;
-                break;
-            case "title":
-                songMeta.Title = value;
+            case "year":
+                songMeta.Year = ConvertToUInt32(value);
                 break;
             default:
                 songMeta.SetAdditionalHeaderEntry(key, value);

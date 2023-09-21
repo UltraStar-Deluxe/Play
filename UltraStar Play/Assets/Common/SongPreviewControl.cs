@@ -146,9 +146,9 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual int GetPreviewStartInMillis(SongMeta songMeta)
     {
-        if (songMeta.PreviewStart > 0)
+        if (songMeta.PreviewStartInMillis > 0)
         {
-            return (int)(songMeta.PreviewStart * 1000);
+            return (int)songMeta.PreviewStartInMillis;
         }
 
         // Fallback: find some lyrics approx. 1/3 into the song.

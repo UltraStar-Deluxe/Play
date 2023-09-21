@@ -706,7 +706,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                  && !IsPlaying)
 
         {
-            if (!IsWaitingForVideoGap(songAudioPlayer.PositionInSongInMillis, loadedSongMeta.VideoGap * 1000))
+            if (!IsWaitingForVideoGap(songAudioPlayer.PositionInSongInMillis, loadedSongMeta.VideoGapInMillis))
             {
                 PlayVideo();
                 SyncVideoPositionWithAudio(true);
@@ -724,7 +724,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         double positionInAudioInMillis = songAudioPlayer.PositionInSongInMillis;
         double durationOfAudioInMillis = songAudioPlayer.DurationOfSongInMillis;
-        if (IsWaitingForVideoGap(positionInAudioInMillis, loadedSongMeta.VideoGap * 1000))
+        if (IsWaitingForVideoGap(positionInAudioInMillis, loadedSongMeta.VideoGapInMillis))
         {
             return;
         }
@@ -735,7 +735,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         // Both, the smooth sync and immediate sync need some time.
         nextSyncTimeInSeconds = Time.time + 1;
 
-        double targetPositionInVideoInMillis = (loadedSongMeta.VideoGap * 1000) + positionInAudioInMillis;
+        double targetPositionInVideoInMillis = (loadedSongMeta.VideoGapInMillis) + positionInAudioInMillis;
         if (IsLooping)
         {
             targetPositionInVideoInMillis %= DurationInMillis;
@@ -833,10 +833,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             {
                 Debug.Log($"Successfully loaded video of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
 
-                if (loadedSongMeta.VideoGap > 0)
+                if (loadedSongMeta.VideoGapInMillis > 0)
                 {
                     // Positive VideoGap, thus skip the start of the video
-                    PositionInVideoInSeconds = loadedSongMeta.VideoGap;
+                    PositionInVideoInMillis = loadedSongMeta.VideoGapInMillis;
                 }
 
                 ShowVideoImageVisualElement();

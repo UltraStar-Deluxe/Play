@@ -13,17 +13,98 @@ public class UltraStarSongMeta : SongMeta
      * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
      * Example: a BPM value of 60 in a txt file would define a beat every 0.25 seconds (60*4=240 beats-per-minute).
      */
-    public float TxtFileBpm { get; private set; }
-    public override float BeatsPerMinute {
+    public double TxtFileBpm {
         get
         {
-            // UltraStar BPM is not "beats per minute" but "bars per minute" in four-four-time.
-            // To get the common "beats per minute", one has to multiply with 4.
-            return TxtFileBpm * 4;
+            return BeatsPerMinute / 4.0;
         }
         set
         {
-            TxtFileBpm = value / 4;
+            BeatsPerMinute = value * 4.0;
+        }
+    }
+
+    public double TxtFilePreviewStartInSeconds
+    {
+        get
+        {
+            return PreviewStartInMillis / 1000.0;
+        }
+        set
+        {
+            PreviewStartInMillis = value * 1000.0;
+        }
+    }
+
+    public double TxtFilePreviewEndInSeconds
+    {
+        get
+        {
+            return PreviewEndInMillis / 1000.0;
+        }
+        set
+        {
+            PreviewEndInMillis = value * 1000.0;
+        }
+    }
+
+    public double TxtFileStartInSeconds
+    {
+        get
+        {
+            return StartInMillis / 1000.0;
+        }
+        set
+        {
+            StartInMillis = value * 1000.0;
+        }
+    }
+
+    public double TxtFileEndInMillis
+    {
+        get
+        {
+            return EndInMillis;
+        }
+        set
+        {
+            EndInMillis = value;
+        }
+    }
+
+    public double TxtFileVideoGapInSeconds
+    {
+        get
+        {
+            return VideoGapInMillis / 1000.0;
+        }
+        set
+        {
+            VideoGapInMillis = value * 1000.0;
+        }
+    }
+
+    public double TxtFileMedleyStartBeat
+    {
+        get
+        {
+            return BpmUtils.MillisecondInSongToBeat(this, MedleyStartInMillis);
+        }
+        set
+        {
+            MedleyStartInMillis = BpmUtils.BeatToMillisecondsInSong(this, value);
+        }
+    }
+
+    public double TxtFileMedleyEndBeat
+    {
+        get
+        {
+            return (int)BpmUtils.MillisecondInSongToBeat(this, MedleyEndInMillis);
+        }
+        set
+        {
+            MedleyEndInMillis = (int)BpmUtils.BeatToMillisecondsInSong(this, value);
         }
     }
 

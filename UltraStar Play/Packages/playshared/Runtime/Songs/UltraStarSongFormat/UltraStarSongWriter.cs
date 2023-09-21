@@ -17,23 +17,23 @@ public static class UltraStarFormatWriter
 
     private static void WriteFile(string absolutePath, UltraStarSongMeta songMeta)
     {
-        string ultraStarFormat = ToUltraStarSongFormat(songMeta);
+        string ultraStarFormat = ToUltraStarSongFormat(songMeta, Encoding.UTF8);
         File.WriteAllText(absolutePath, ultraStarFormat, Encoding.UTF8);
     }
 
-    public static string ToUltraStarSongFormat(SongMeta songMeta)
+    public static string ToUltraStarSongFormat(SongMeta songMeta, Encoding encoding = null)
     {
         if (songMeta is not UltraStarSongMeta ultraStarSongMeta)
         {
             ultraStarSongMeta = new(songMeta);
         }
-        return ToUltraStarSongFormat(ultraStarSongMeta);
+        return ToUltraStarSongFormat(ultraStarSongMeta, encoding);
     }
 
-    private static string ToUltraStarSongFormat(UltraStarSongMeta songMeta)
+    private static string ToUltraStarSongFormat(UltraStarSongMeta songMeta, Encoding encoding = null)
     {
         StringBuilder sb = new();
-        AppendHeader(sb, songMeta);
+        AppendHeader(sb, songMeta, encoding);
         List<Voice> nonEmptyVoices = songMeta.Voices.Where(voice => IsNotEmpty(voice)).ToList();
         nonEmptyVoices.Sort(Voice.comparerById);
         foreach (Voice voice in nonEmptyVoices)
@@ -101,9 +101,19 @@ public static class UltraStarFormatWriter
         }
     }
 
-    private static void AppendHeader(StringBuilder sb, UltraStarSongMeta songMeta)
+    private static void AppendHeader(StringBuilder sb, UltraStarSongMeta songMeta, Encoding encoding = null)
     {
-        AppendHeaderField(sb, "encoding", "UTF8");
+        if (encoding != null)
+        {
+            if (Equals(encoding, Encoding.UTF8))
+            {
+                AppendHeaderField(sb, "encoding", "UTF8");
+            }
+            else
+            {
+                throw new IllegalArgumentException("Unsupported encoding. Use UTF8 instead.");
+            }
+        }
 
         AppendHeaderField(sb, "title", songMeta.Title);
         AppendHeaderField(sb, "artist", songMeta.Artist);
@@ -114,57 +124,30 @@ public static class UltraStarFormatWriter
         AppendHeaderField(sb, "MusicBrainzRelease", songMeta.MusicBrainzRelease);
         AppendHeaderField(sb, "MusicBrainzReleaseGroup", songMeta.MusicBrainzReleaseGroup);
         AppendHeaderField(sb, "MusicBrainzArtist", songMeta.MusicBrainzArtist);
-        AppendHeaderField(sb, "bpm", songMeta.TxtFileBpm.ToString(CultureInfo.InvariantCulture));
-        if (songMeta.Gap != 0)
-        {
-            AppendHeaderField(sb, "gap", songMeta.Gap.ToString(CultureInfo.InvariantCulture));
-        }
+        AppendNumberHeaderField(sb, "bpm", songMeta.TxtFileBpm);
+        AppendNumberHeaderField(sb, "gap", songMeta.GapInMillis);
 
         AppendHeaderField(sb, "cover", songMeta.Cover);
         AppendHeaderField(sb, "background", songMeta.Background);
 
         AppendHeaderField(sb, "video", songMeta.Video);
-        if (songMeta.VideoGap != 0)
-        {
-            AppendHeaderField(sb, "videogap", songMeta.VideoGap.ToString(CultureInfo.InvariantCulture));
-        }
+        AppendNumberHeaderField(sb, "videogap", songMeta.TxtFileVideoGapInSeconds);
 
         AppendHeaderField(sb, "genre", songMeta.Genre);
-        if (songMeta.Year > 0)
-        {
-            AppendHeaderField(sb, "year", songMeta.Year.ToString());
-        }
+        AppendNumberHeaderField(sb, "year", songMeta.Year);
 
         AppendHeaderField(sb, "language", songMeta.Language);
         AppendHeaderField(sb, "edition", songMeta.Edition);
 
-        if (songMeta.Start != 0)
-        {
-            AppendHeaderField(sb, "start", songMeta.Start.ToString(CultureInfo.InvariantCulture));
-        }
-        if (songMeta.End != 0)
-        {
-            AppendHeaderField(sb, "end", songMeta.End.ToString(CultureInfo.InvariantCulture));
-        }
-        if (songMeta.PreviewStart != 0)
-        {
-            AppendHeaderField(sb, "previewstart", songMeta.PreviewStart.ToString(CultureInfo.InvariantCulture));
-        }
-        if (songMeta.PreviewEnd != 0)
-        {
-            AppendHeaderField(sb, "previewend", songMeta.PreviewEnd.ToString(CultureInfo.InvariantCulture));
-        }
+        AppendNumberHeaderField(sb, "start", songMeta.TxtFileStartInSeconds);
+        AppendNumberHeaderField(sb, "end", songMeta.TxtFileEndInMillis);
+        AppendNumberHeaderField(sb, "previewstart", songMeta.TxtFilePreviewStartInSeconds);
+        AppendNumberHeaderField(sb, "previewend", songMeta.TxtFilePreviewEndInSeconds);
+        AppendNumberHeaderField(sb, "medleystartbeat", (int)songMeta.TxtFileMedleyStartBeat);
+        AppendNumberHeaderField(sb, "medleyendbeat", (int)songMeta.TxtFileMedleyEndBeat);
 
-        if (songMeta.MedleyStartBeat != 0)
-        {
-            AppendHeaderField(sb, "medleystartbeat", songMeta.MedleyStartBeat.ToString(CultureInfo.InvariantCulture));
-        }
-        if (songMeta.MedleyEndBeat != 0)
-        {
-            AppendHeaderField(sb, "medleyendbeat", songMeta.MedleyEndBeat.ToString(CultureInfo.InvariantCulture));
-        }
-
-        songMeta.AdditionalHeaderEntries.ForEach(entry => AppendHeaderField(sb, entry.Key, entry.Value));
+        songMeta.AdditionalHeaderEntries.ForEach(entry =>
+            AppendHeaderField(sb, entry.Key, entry.Value));
     }
 
     private static void AppendHeaderField(StringBuilder sb, string key, string value)
@@ -172,6 +155,22 @@ public static class UltraStarFormatWriter
         if (!value.IsNullOrEmpty())
         {
             sb.AppendLine($"#{key.ToUpper(CultureInfo.InvariantCulture)}:{value}");
+        }
+    }
+
+    private static void AppendNumberHeaderField(StringBuilder sb, string key, int value)
+    {
+        if (value != 0)
+        {
+            AppendHeaderField(sb, key, value.ToString());
+        }
+    }
+
+    private static void AppendNumberHeaderField(StringBuilder sb, string key, double value)
+    {
+        if (value != 0)
+        {
+            AppendHeaderField(sb, key, value.ToStringInvariantCulture());
         }
     }
 }

@@ -23,7 +23,7 @@ public class SetMusicGapAction : INeedInjection
 
     public void Execute(double positionInSongInMillis)
     {
-        songMeta.Gap = (float)positionInSongInMillis;
+        songMeta.GapInMillis = (float)positionInSongInMillis;
     }
 
     public void ExecuteAndNotify(double positionInSongInMillis)

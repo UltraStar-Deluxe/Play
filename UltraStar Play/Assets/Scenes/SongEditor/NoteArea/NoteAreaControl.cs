@@ -112,7 +112,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
         if (songAudioPlayer.PositionInSongInMillis == 0)
         {
-            songAudioPlayer.PositionInSongInMillis = songMeta.Gap - DefaultViewportWidthInMillis * 0.25f;
+            songAudioPlayer.PositionInSongInMillis = songMeta.GapInMillis - DefaultViewportWidthInMillis * 0.25f;
         }
 
         songAudioPlayer.LoadedEventStream.Subscribe(_ => InitializeViewport());

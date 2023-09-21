@@ -21,8 +21,8 @@ public class TimeBarControl : INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    private double LateStartInSongInMillis => songMeta != null ? (songMeta.Start * 1000.0) : 0;
-    private double EarlyEndInSongInMillis => songMeta != null ? songMeta.End : 0;
+    private double LateStartInSongInMillis => songMeta?.StartInMillis ?? 0;
+    private double EarlyEndInSongInMillis => songMeta?.EndInMillis ?? 0;
 
     public void UpdateTimeValueLabel(double positionInSongInMillis, double durationOfSongInMillis)
     {

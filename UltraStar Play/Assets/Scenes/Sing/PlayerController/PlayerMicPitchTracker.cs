@@ -394,7 +394,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         PositionInSongDto positionInSongDto = new PositionInSongDto
         {
             SongBpm = songMeta.BeatsPerMinute,
-            SongGap = songMeta.Gap,
+            SongGap = songMeta.GapInMillis,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
         };
         Log.Verbose(() => $"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");

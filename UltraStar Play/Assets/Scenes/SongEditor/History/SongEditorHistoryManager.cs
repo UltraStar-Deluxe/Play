@@ -149,8 +149,8 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private void SaveSongMetaTags(SongEditorMemento memento)
     {
-        memento.Bpm = songMeta.BeatsPerMinute;
-        memento.MusicGap = songMeta.Gap;
+        memento.BeatsPerMinute = songMeta.BeatsPerMinute;
+        memento.GapInMillis = songMeta.GapInMillis;
     }
 
     private void LoadUndoState(SongEditorMemento undoState, bool loadVoices)
@@ -171,8 +171,8 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private void LoadSongMetaTags(SongEditorMemento memento)
     {
-        songMeta.BeatsPerMinute = memento.Bpm;
-        songMeta.Gap = memento.MusicGap;
+        songMeta.BeatsPerMinute = memento.BeatsPerMinute;
+        songMeta.GapInMillis = memento.GapInMillis;
     }
 
     private void LoadVoices(SongEditorMemento undoState)

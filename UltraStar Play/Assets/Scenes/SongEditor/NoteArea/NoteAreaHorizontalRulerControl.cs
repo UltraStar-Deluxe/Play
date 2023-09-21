@@ -13,10 +13,10 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     [Inject]
     private SongMeta songMeta;
-    
+
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
-    
+
     [Inject]
     private NoteAreaControl noteAreaControl;
 
@@ -40,7 +40,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private ViewportEvent lastViewportEvent;
 
-    private float lastSongMetaBpm;
+    private double lastSongMetaBpm;
 
     private readonly VisualElementPool<Label> labelPool = new();
 
@@ -57,7 +57,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInPx)
             .Subscribe(_ => UpdateLines())
             .AddTo(gameObject);
-        
+
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.TimeLabelFormat)
             .Subscribe(_ => UpdateLabelTexts())
             .AddTo(gameObject);
@@ -79,7 +79,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         {
             return;
         }
-        
+
         labelPool.ForEach(label =>
         {
             if (label == null)

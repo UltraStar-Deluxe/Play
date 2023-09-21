@@ -81,12 +81,17 @@ public class SongMeta
     public virtual string Language { get; set; } = "";
 
     /**
+     * Path or URI to a background video.
+     */
+    public virtual string Video { get; set; } = "";
+
+    /**
      * Beats per minute of the audio.
      * This defines the grid for positioning note.
      * Further, pitch detection is done per beat when singing.
      * Thus, changing the BPM value can impact the singing score.
      */
-    public virtual float BeatsPerMinute { get; set; }
+    public virtual double BeatsPerMinute { get; set; }
 
     /**
      * The time to first lyrics in millisecond.
@@ -94,50 +99,48 @@ public class SongMeta
      * In a well done UltraStar song, the first note starts at beat 0
      * and the song uses a corresponding GAP.
      */
-    public virtual float Gap { get; set; }
+    public virtual double GapInMillis { get; set; }
 
     /**
-     * Time in seconds at which the preview of the song should begin.
+     * Delay in milliseconds for the video playback relative to the audio.
+     * A positive value will skip this part of the video.
+     * A negative value will wait before playing the video.
      */
-    public virtual float PreviewStart { get; set; }
+    public virtual double VideoGapInMillis { get; set; }
 
     /**
-     * Time in seconds (or beat?) at which the preview should end.
+     * Time in milliseconds at which the preview of the song should begin.
+     */
+    public virtual double PreviewStartInMillis { get; set; }
+
+    /**
+     * Time in milliseconds (or beat?) at which the preview should end.
      * Not implemented.
      */
-    public virtual float PreviewEnd { get; set; }
+    public virtual double PreviewEndInMillis { get; set; }
 
     /**
-     * Path or URI to a background video.
+     * Start in milliseconds to skip the beginning of the audio.
      */
-    public virtual string Video { get; set; } = "";
+    public virtual double StartInMillis { get; set; }
 
     /**
-     * Delay in seconds for the video playback relative to the audio.
+     * End in milliseconds to skip the ending of the audio.
      */
-    public virtual float VideoGap { get; set; }
+    public virtual double EndInMillis { get; set; }
 
     /**
-     * Start in SECONDS to skip the beginning of the audio .
+     * Time in milliseconds where the singing should begin when playing a medley.
+     * A countdown is shown before this time
+     * (i.e. the audio is started before this time, but scoring starts here).
      */
-    public virtual float Start { get; set; }
+    public virtual double MedleyStartInMillis { get; set; }
 
     /**
-     * End in MILLISECONDS to skip the ending of the audio.
-     */
-    public virtual float End { get; set; }
-
-    /**
-     * First beat to sing when the song was started as medley.
-     * A countdown is shown before this beat.
-     */
-    public virtual int MedleyStartBeat { get; set; }
-
-    /**
-     * Last beat to sing when the song was started as medley.
+     * Time in milliseconds where the singing should end when playing a medley.
      * Afterwards, the next medley song will be started.
      */
-    public virtual int MedleyEndBeat { get; set; }
+    public virtual double MedleyEndInMillis { get; set; }
 
     /**
      * MusicBrainz identifier for the Recording.
@@ -262,15 +265,15 @@ public class SongMeta
         Background = other.Background;
         Cover = other.Cover;
         Edition = other.Edition;
-        End = other.End;
-        Gap = other.Gap;
+        EndInMillis = other.EndInMillis;
+        GapInMillis = other.GapInMillis;
         Genre = other.Genre;
         Language = other.Language;
-        Start = other.Start;
-        PreviewStart = other.PreviewStart;
-        PreviewEnd = other.PreviewEnd;
+        StartInMillis = other.StartInMillis;
+        PreviewStartInMillis = other.PreviewStartInMillis;
+        PreviewEndInMillis = other.PreviewEndInMillis;
         Video = other.Video;
-        VideoGap = other.VideoGap;
+        VideoGapInMillis = other.VideoGapInMillis;
         Year = other.Year;
     }
 }

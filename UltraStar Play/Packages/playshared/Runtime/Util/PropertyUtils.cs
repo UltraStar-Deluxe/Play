@@ -60,7 +60,21 @@ public static class PropertyUtils
             {
                 return "";
             }
-            return value.ToString(null, CultureInfo.InvariantCulture);
+            return value.ToString(toStringFormat, CultureInfo.InvariantCulture);
+        };
+    }
+
+    public static Func<string> CreateStringGetterFromDoubleGetter(Func<double> valueGetter, bool zeroToEmpty, string toStringFormat)
+    {
+        return () =>
+        {
+            double value = valueGetter();
+            if (zeroToEmpty
+                && value == 0)
+            {
+                return "";
+            }
+            return value.ToString(toStringFormat, CultureInfo.InvariantCulture);
         };
     }
 
@@ -72,6 +86,22 @@ public static class PropertyUtils
                 && float.TryParse(newValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float newValueFloat))
             {
                 valueSetter(newValueFloat);
+            }
+            else
+            {
+                valueSetter(0);
+            }
+        };
+    }
+
+    public static Action<string> CreateStringSetterFromDoubleSetter(Action<double> valueSetter)
+    {
+        return (newValue) =>
+        {
+            if (!newValue.IsNullOrEmpty()
+                && double.TryParse(newValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double newValueDouble))
+            {
+                valueSetter(newValueDouble);
             }
             else
             {
