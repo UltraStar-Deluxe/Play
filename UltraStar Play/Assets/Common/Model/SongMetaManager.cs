@@ -347,23 +347,33 @@ public class SongMetaManager : AbstractSingletonBehaviour
         float txtFileBpm = 300;
 
         Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
-        UltraStarSongMeta songMeta = new UltraStarSongMeta(
-            artist,
-            title,
-            txtFileBpm,
-            audioFile,
-            voiceIdToDisplayName);
+
+        SongMeta songMeta;
+
+        string fileExtension = Path.GetExtension(new Uri(audioFile).LocalPath);
+        if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
+        {
+            // Load lyrics and notes from MIDI file
+            songMeta = new MidiFileSongMeta(
+                artist,
+                title,
+                txtFileBpm,
+                audioFile,
+                voiceIdToDisplayName);
+        }
+        else
+        {
+            songMeta = new UltraStarSongMeta(
+                artist,
+                title,
+                txtFileBpm,
+                audioFile,
+                voiceIdToDisplayName);
+        }
 
         string absoluteSongMetaFilePath = GetAbsoluteGeneratedSongMetaFilePathForAudioFile(generatedSongFolderAbsolutePath, audioFile);
         songMeta.SetFileInfo(absoluteSongMetaFilePath);
 
-        // Load lyrics and notes from MIDI file
-        string fileExtension = Path.GetExtension(new Uri(audioFile).LocalPath);
-        if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
-        {
-            songMeta.LoadedVoicesEventStream
-                .Subscribe(_ => MidiToSongMetaUtils.FillSongMetaWithMidiLyricsAndNotes(songMeta));
-        }
 
         Debug.Log("Generated SongMeta: " + songMeta);
         return songMeta;

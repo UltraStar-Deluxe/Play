@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using UniRx;
 
 public class UltraStarSongMeta : SongMeta
 {
-    public bool HasFailedToLoadVoices { get; private set; }
-    private bool hasLoadedVoices;
+    public bool HasFailedToLoadVoices { get; protected set; }
+    protected bool hasLoadedVoices;
 
-    private bool ShouldLoadVoices => !hasLoadedVoices && !HasFailedToLoadVoices;
+    protected bool ShouldLoadVoices => !hasLoadedVoices && !HasFailedToLoadVoices;
 
     /**
      * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
@@ -145,9 +144,6 @@ public class UltraStarSongMeta : SongMeta
         return base.TryGetVoice(voiceId, out voice);
     }
 
-    private readonly Subject<bool> loadedVoicesEventStream = new();
-    public IObservable<bool> LoadedVoicesEventStream => loadedVoicesEventStream;
-
     public UltraStarSongMeta(SongMeta other)
     {
         CopyValues(other);
@@ -180,7 +176,7 @@ public class UltraStarSongMeta : SongMeta
         hasLoadedVoices = true;
     }
 
-    private void LoadVoicesFromFile()
+    protected virtual void LoadVoicesFromFile()
     {
         if (HasFailedToLoadVoices)
         {
@@ -211,10 +207,4 @@ public class UltraStarSongMeta : SongMeta
         // All done without errors.
         HasFailedToLoadVoices = false;
     }
-
-    // public override void CopyValues(SongMeta other)
-    // {
-    //     base.CopyValues(other);
-    //     TxtFileBpm = other.BeatsPerMinute / 4;
-    // }
 }
