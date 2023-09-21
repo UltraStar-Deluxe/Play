@@ -57,7 +57,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         if (!FileUtils.Exists(vocalsAudioUri))
         {
             return Observable.Throw<BasicPitchDetectionResult>(
-                new Exception($"Vocals audio for '{Path.GetFileName(songMeta.Mp3)}' does not exist at path '{songMeta.VocalsAudio}'"));
+                new Exception($"Vocals audio for '{Path.GetFileName(songMeta.Audio)}' does not exist at path '{songMeta.VocalsAudio}'"));
         }
         if (!ApplicationUtils.IsSupportedBasicPitchDetectionAudioFormat(Path.GetExtension(vocalsAudioUri)))
         {
@@ -71,7 +71,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         // Create job to show in UI
         if (pitchDetectionJob == null)
         {
-            pitchDetectionJob = new Job($"Pitch detection of '{Path.GetFileName(songMeta.Mp3)}' (using vocals audio)");
+            pitchDetectionJob = new Job($"Pitch detection of '{Path.GetFileName(songMeta.Audio)}' (using vocals audio)");
             jobManager.AddJob(pitchDetectionJob);
         }
         pitchDetectionJob.SetStatus(EJobStatus.Running);
@@ -137,7 +137,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
                     Debug.Log($"Running basic pitch on vocals audio: {songMeta.VocalsAudio}");
                     UpdateBasicPitchRunnerConfig(fallbackCommand);
 
-                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Mp3);
+                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
 
                     BasicPitchParameters basicPitchParameters = new();
                     basicPitchParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.VocalsAudio);
@@ -197,9 +197,9 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         }
 
         // Prepare directory to move created audio files.
-        string destinationFolder = DirectoryUtils.IsSubDirectory(songMeta.Directory, generatedSongFolderAbsolutePath)
-            ? songMeta.Directory
-            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, songMeta.Directory);
+        string destinationFolder = DirectoryUtils.IsSubDirectory(SongMetaUtils.GetDirectoryPath(songMeta), generatedSongFolderAbsolutePath)
+            ? SongMetaUtils.GetDirectoryPath(songMeta)
+            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, SongMetaUtils.GetDirectoryPath(songMeta));
         if (!destinationFolder.IsNullOrEmpty()
             && !Directory.Exists(destinationFolder))
         {

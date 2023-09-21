@@ -71,7 +71,7 @@ public class EditorSentenceControl : INeedInjection, IInjectionFinishedListener
 
         if (Sentence.Voice != null)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(Sentence.Voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(Sentence.Voice.Id);
             SetColor(color);
         }
 

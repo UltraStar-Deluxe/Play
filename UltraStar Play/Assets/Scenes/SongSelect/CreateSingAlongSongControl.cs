@@ -4,7 +4,6 @@ using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -56,7 +55,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             return;
         }
 
-        Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Mp3)}'");
+        Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Audio)}'");
         Job audioSeparationJob = new("Vocals isolation", processSongJob);
         Job speechRecognitionJob = new("Speech recognition", processSongJob);
         Job pitchDetectionJob = new("Pitch detection", processSongJob);
@@ -107,7 +106,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
                 // Load vocals audio
                 AudioClip vocalsAudioClip = AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
-                int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * BpmUtils.GetBeatsPerSecond(songMeta));
+                int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * SongMetaBpmUtils.BeatsPerSecond(songMeta));
 
                 float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
@@ -142,7 +141,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 SongMetaUtils.RemoveAllNotes(songMeta);
                 List<List<Note>> noteBatches = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, createdNotes);
                 noteBatches.ForEach(noteBatch =>
-                    MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceName, false));
+                    MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, EVoiceId.P1, false));
 
                 // (4) Add Space between notes
                 SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);

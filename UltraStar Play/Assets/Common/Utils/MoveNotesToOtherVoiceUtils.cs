@@ -7,10 +7,10 @@ public static class MoveNotesToOtherVoiceUtils
     public static MoveNotesToVoiceResult MoveNotesToVoice(
         SongMeta songMeta,
         List<Note> selectedNotes,
-        string voiceName,
+        EVoiceId voiceId,
         bool preventMergingIntoSingleWord)
     {
-        Voice targetVoice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceName);
+        Voice targetVoice = SongMetaUtils.GetOrCreateVoice(songMeta, voiceId);
         List<Sentence> changedSentences = new();
         List<Sentence> removedSentences = new();
         List<Sentence> createdSentences = new();
@@ -28,7 +28,7 @@ public static class MoveNotesToOtherVoiceUtils
             {
                 SongMetaUtils.AddTrailingSpaceToLastNoteOfSentence(note);
             }
-            
+
             Sentence oldSentence = note.Sentence;
 
             // Find or create a sentence in the target voice for the note
@@ -75,7 +75,7 @@ public static class MoveNotesToOtherVoiceUtils
 
                 targetSentence = createdSentence;
             }
-            
+
             // Prevent notes from merging into a single word
             if (preventMergingIntoSingleWord)
             {
@@ -175,7 +175,7 @@ public static class MoveNotesToOtherVoiceUtils
                     && (lastNote.Text.IsNullOrEmpty()
                         || char.IsWhiteSpace(lastNote.Text.LastOrDefault()));
         }
-        
+
         /////////////////// Split Batches
         void SplitOnCondition(List<Note> inputBatch, Func<List<Note>, Note, Note, bool> shouldSplitFunction)
         {
@@ -225,7 +225,7 @@ public static class MoveNotesToOtherVoiceUtils
                     int minBeat = currentBatch.FirstOrDefault().StartBeat;
                     int maxBeat = currentBatch.LastOrDefault().EndBeat;
                     int lengthInBeats = maxBeat - minBeat;
-                    double lengthInMillis = lengthInBeats * BpmUtils.MillisecondsPerBeat(songMeta);
+                    double lengthInMillis = lengthInBeats * SongMetaBpmUtils.MillisPerBeat(songMeta);
                     if (lengthInMillis > 10000
                         && CanSplitNote(lastNote, note))
                     {

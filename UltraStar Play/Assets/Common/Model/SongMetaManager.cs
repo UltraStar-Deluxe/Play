@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Serilog.Events;
 using UniRx;
@@ -36,6 +35,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
 
     private static readonly Dictionary<SongMeta, string> songMetaToScoreRelevantHash = new();
+    private static readonly Dictionary<SongMeta, string> songMetaToUniqueHash = new();
 
     // Static to be persisted across scenes.
     private static List<string> lastEnabledSongFolders;
@@ -285,7 +285,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // Exclude audio files that are stored next to an UltraStar txt file
         HashSet<string> existingSongMetaFolders = existingSongMetas
-            .Select(songMeta => new DirectoryInfo(songMeta.Directory).FullName)
+            .Select(songMeta => new DirectoryInfo(SongMetaUtils.GetDirectoryPath(songMeta)).FullName)
             .ToHashSet();
 
         List<string> audioFilesWithoutSongMeta = audioFiles
@@ -322,7 +322,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             }
         }
 
-        TryAddAudioFilePath(songMeta.Mp3);
+        TryAddAudioFilePath(songMeta.Audio);
         TryAddAudioFilePath(songMeta.VocalsAudio);
         TryAddAudioFilePath(songMeta.InstrumentalAudio);
 
@@ -344,19 +344,25 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // TODO: use https://github.com/WestHillApps/UniBpmAnalyzer to analyze bpm
         // TODO: use https://github.com/Zeugma440/atldotnet to read meta tags.
-        float bpm = 300;
+        float txtFileBpm = 300;
+
+        Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
+        UltraStarSongMeta songMeta = new UltraStarSongMeta(
+            artist,
+            title,
+            txtFileBpm,
+            audioFile,
+            voiceIdToDisplayName);
 
         string absoluteSongMetaFilePath = GetAbsoluteGeneratedSongMetaFilePathForAudioFile(generatedSongFolderAbsolutePath, audioFile);
-        string songMetaFileName = Path.GetFileName(absoluteSongMetaFilePath);
-        string songMetaDirectory = Path.GetDirectoryName(absoluteSongMetaFilePath);
-        Dictionary<string, string> voiceNames = new();
-        SongMeta songMeta = new(songMetaDirectory, songMetaFileName, "", artist, bpm, audioFile, title, voiceNames, Encoding.UTF8);
+        songMeta.SetFileInfo(absoluteSongMetaFilePath);
 
         // Load lyrics and notes from MIDI file
         string fileExtension = Path.GetExtension(new Uri(audioFile).LocalPath);
         if (ApplicationUtils.IsSupportedMidiFormat(fileExtension))
         {
-            songMeta.onPostProcessLoadedVoices = () => MidiToSongMetaUtils.FillSongMetaWithMidiLyricsAndNotes(songMeta);
+            songMeta.LoadedVoicesEventStream
+                .Subscribe(_ => MidiToSongMetaUtils.FillSongMetaWithMidiLyricsAndNotes(songMeta));
         }
 
         Debug.Log("Generated SongMeta: " + songMeta);
@@ -473,7 +479,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         songIssues = new List<SongIssue>();
         try
         {
-            SongMeta newSongMeta = SongMetaBuilder.ParseFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
+            SongMeta newSongMeta = UltraStarSongParser.ParseFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
             songIssues.AddRange(parseFileIssues);
 
             List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
@@ -490,7 +496,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
                 return true;
             }
         }
-        catch (SongMetaBuilderException e)
+        catch (UltraStarSongParserException e)
         {
             Debug.LogError("SongMetaBuilderException: " + path + "\n" + e.Message);
         }
@@ -507,6 +513,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public void SaveSong(SongMeta songMeta, bool isAutoSave)
     {
         songMetaToScoreRelevantHash.Remove(songMeta);
+        songMetaToUniqueHash.Remove(songMeta);
 
         SongMetaUtils.CreateDirectory(songMeta);
         string songFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
@@ -514,7 +521,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         {
             // Write the song data structure to the file.
             Debug.Log($"Saving song {songFilePath}");
-            UltraStarSongFileWriter.WriteFile(songFilePath, songMeta);
+            UltraStarFormatWriter.WriteFile(songFilePath, songMeta);
         }
         catch (Exception e)
         {
@@ -534,7 +541,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         string absoluteFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
         try
         {
-            SongMeta other = SongMetaBuilder.ParseFile(absoluteFilePath, out List<SongIssue> _, songMeta.Encoding, false);
+            SongMeta other = UltraStarSongParser.ParseFile(absoluteFilePath, out List<SongIssue> _, songMeta.FileEncoding, false);
             songMeta.CopyValues(other);
         }
         catch (Exception e)
@@ -550,7 +557,8 @@ public class SongMetaManager : AbstractSingletonBehaviour
         {
             return null;
         }
-        SongMeta matchingSongMeta = allSongMetas.FirstOrDefault(songMeta => songMeta.SongHash == songId);
+        SongMeta matchingSongMeta = allSongMetas.FirstOrDefault(songMeta =>
+            GetAndCacheUniqueHash(songMeta) == songId);
         return matchingSongMeta;
     }
 
@@ -601,7 +609,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             // The ffmpeg integration in Unity can at the moment only play one file.
             // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
             bool isVideoEmptyOrSameAsAudio = songMeta.Video.IsNullOrEmpty()
-                                             || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
+                                             || string.Equals(songMeta.Video, songMeta.Audio, StringComparison.InvariantCultureIgnoreCase);
             if (!isVideoEmptyOrSameAsAudio
                 && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
                 && !WebViewUtils.CanHandleWebViewUrl(songMeta.Video))
@@ -670,10 +678,10 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static void CheckVideoCodecsAreSupportedByUnity(List<SongIssue> songIssues, SongMeta songMeta)
     {
-        if (!songMeta.Mp3.IsNullOrEmpty())
+        if (!songMeta.Audio.IsNullOrEmpty())
         {
-            CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Mp3,
-                codec => $"Unsupported video codec '{codec}' in '{songMeta.Mp3}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+            CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Audio,
+                codec => $"Unsupported video codec '{codec}' in '{songMeta.Audio}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Error);
         }
@@ -828,9 +836,26 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return scoreRelevantHash;
         }
 
-        scoreRelevantHash = SongMetaUtils.GetScoreRelevantSongHash(songMeta);
+        scoreRelevantHash = SongMetaUtils.ComputeScoreRelevantSongHash(songMeta);
         songMetaToScoreRelevantHash[songMeta] = scoreRelevantHash;
         return scoreRelevantHash;
+    }
+
+    public static string GetAndCacheUniqueHash(SongMeta songMeta)
+    {
+        if (songMeta == null)
+        {
+            return "";
+        }
+
+        if (songMetaToUniqueHash.TryGetValue(songMeta, out string hash))
+        {
+            return hash;
+        }
+
+        hash = SongMetaUtils.ComputeUniqueSongHash(songMeta);
+        songMetaToUniqueHash[songMeta] = hash;
+        return hash;
     }
 
     protected override void OnDestroySingleton()

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using FullSerializer;
-using UnityEngine;
 
 /**
  * Data structure for song scores.

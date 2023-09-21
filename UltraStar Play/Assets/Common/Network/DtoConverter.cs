@@ -9,7 +9,7 @@ public static class DtoConverter
         {
             Artist = songMeta.Artist,
             Title = songMeta.Title,
-            Hash = songMeta.SongHash,
+            Hash = SongMetaManager.GetAndCacheUniqueHash(songMeta),
         };
         return dto;
     }
@@ -62,17 +62,17 @@ public static class DtoConverter
             playerProfileNameToMicProfileDto[entry.Key.Name] = ToDto(entry.Value);
         });
 
-        Dictionary<string, string> playerProfileNameToVoiceNameMap = new();
-        singScenePlayerData.PlayerProfileToVoiceNameMap.ForEach(entry =>
+        Dictionary<string, EExtendedVoiceId> playerProfileNameToVoiceIdMap = new();
+        singScenePlayerData.PlayerProfileToVoiceIdMap.ForEach(entry =>
         {
-            playerProfileNameToVoiceNameMap[entry.Key.Name] = entry.Value;
+            playerProfileNameToVoiceIdMap[entry.Key.Name] = entry.Value;
         });
 
         SingScenePlayerDataDto dto = new()
         {
             PlayerProfileNames = playerProfileNames,
             PlayerProfileToMicProfileMap = playerProfileNameToMicProfileDto,
-            PlayerProfileToVoiceNameMap = playerProfileNameToVoiceNameMap,
+            PlayerProfileToVoiceIdMap = playerProfileNameToVoiceIdMap,
         };
         return dto;
     }
@@ -100,13 +100,13 @@ public static class DtoConverter
                 singScenePlayerData.PlayerProfileToMicProfileMap[playerProfile] = micProfile;
             }
         });
-        singScenePlayerData.PlayerProfileToVoiceNameMap = new();
-        dto.PlayerProfileToVoiceNameMap.ForEach(entry =>
+        singScenePlayerData.PlayerProfileToVoiceIdMap = new();
+        dto.PlayerProfileToVoiceIdMap.ForEach(entry =>
         {
             PlayerProfile playerProfile = SettingsUtils.GetPlayerProfile(settings, entry.Key);
             if (playerProfile != null)
             {
-                singScenePlayerData.PlayerProfileToVoiceNameMap[playerProfile] = entry.Value;
+                singScenePlayerData.PlayerProfileToVoiceIdMap[playerProfile] = entry.Value;
             }
         });
         return singScenePlayerData;

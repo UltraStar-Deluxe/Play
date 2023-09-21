@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public class Sentence : ISerializationCallbackReceiver
+public class Sentence
 {
     public readonly static IComparer<Sentence> comparerByStartBeat = new SentenceComparerByStartBeat();
 
@@ -29,7 +29,7 @@ public class Sentence : ISerializationCallbackReceiver
 
     public int LengthInBeats => MaxBeat - MinBeat;
     public int ExtendedLengthInBeats => ExtendedMaxBeat - MinBeat;
-    
+
     public Sentence()
     {
     }
@@ -186,11 +186,6 @@ public class Sentence : ISerializationCallbackReceiver
                 ExtendedMaxBeat = MaxBeat;
             }
         }
-    }
-
-    public void OnBeforeSerialize()
-    {
-        // Do nothing. Implementation of ISerializationCallbackReceiver
     }
 
     public void OnAfterDeserialize()

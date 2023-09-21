@@ -3,7 +3,7 @@ using System.Text;
 using UnityEngine;
 using UtfUnknown;
 
-public static class TxtReader
+public static class PlainTextReader
 {
     public static StreamReader GetFileStreamReader(string path, Encoding encoding, bool useUniversalCharsetDetector)
     {

@@ -1,4 +1,5 @@
 // Disable warning about fields that are never assigned, their values are injected.
+
 using UnityEngine;
 
 #pragma warning disable CS0649

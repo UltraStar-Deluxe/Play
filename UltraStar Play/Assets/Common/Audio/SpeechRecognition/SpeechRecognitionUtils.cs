@@ -219,13 +219,13 @@ public static class SpeechRecognitionUtils
             Debug.LogWarning("Received startIndex < 0. Setting startIndex to 0.");
             startIndex = 0;
         }
-        
+
         int lengthInSamples = endIndex - startIndex;
         if (lengthInSamples <= 0)
         {
             return Observable.Throw<SpeechRecognitionResult>(new IllegalStateException("No samples for speech recognition"));
         }
-        
+
         // Do speech recognition in an observable. The observable's code may be executed on a background thread.
         return Observable.Create<SpeechRecognitionResult>(o =>
         {
@@ -236,7 +236,7 @@ public static class SpeechRecognitionUtils
                     speechRecognitionProcessCount++;
 
                     Stopwatch stopwatch = Stopwatch.StartNew();
-                    
+
                     SpeechRecognitionResult speechRecognitionResult = speechRecognizer.GetSpeechRecognitionResult(
                         monoSamples,
                         startIndex,
@@ -248,7 +248,7 @@ public static class SpeechRecognitionUtils
                     double startSecond = (double)startIndex / sampleRate;
                     double endSecond = (double)endIndex / sampleRate;
                     Debug.Log($"Analyzed text from second {startSecond:0.00} to second {endSecond:0.00} (duration of {endSecond-startSecond:0.00} seconds). Took {(stopwatch.ElapsedMilliseconds / 1000.0):0.00} seconds. Result: {speechRecognitionResult?.Text}");
-                    
+
                     o.OnNext(speechRecognitionResult);
                 }
                 catch (Exception ex)
@@ -266,7 +266,7 @@ public static class SpeechRecognitionUtils
             }
         });
     }
-    
+
     private static List<Note> CreateNotesFromSpeechRecognitionResult(
         List<SpeechRecognitionWordResult> words,
         SongMeta songMeta,
@@ -275,7 +275,7 @@ public static class SpeechRecognitionUtils
         Hyphenator hyphenator,
         int spaceInMillisBetweenNotes)
     {
-        double beatsPerSeconds = BpmUtils.GetBeatsPerSecond(songMeta);
+        double beatsPerSeconds = SongMetaBpmUtils.BeatsPerSecond(songMeta);
         List<Note> createdNotes = words.Select(resultEntry =>
         {
             int noteStartInBeats = offsetInBeats + (int)(resultEntry.Start.TotalSeconds * beatsPerSeconds);
@@ -289,10 +289,10 @@ public static class SpeechRecognitionUtils
             Note createdNote = new(ENoteType.Normal, noteStartInBeats, noteLengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
             return createdNote;
         }).ToList();
-        
+
         // Shorten new notes left and right to give a little space
         SpaceBetweenNotesUtils.ShortenNotesByMillis(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);
-        
+
         // Split syllables if hyphenation is enabled
         if (hyphenator != null)
         {
@@ -306,13 +306,13 @@ public static class SpeechRecognitionUtils
                 createdNotes.AddRange(newNotes);
             });
         }
-        
+
         // Shorten new notes left and right to give a little space
         if (spaceInMillisBetweenNotes > 0)
         {
             SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, spaceInMillisBetweenNotes, songMeta);
         }
-        
+
         return createdNotes;
     }
 
@@ -351,8 +351,8 @@ public static class SpeechRecognitionUtils
             double bestMatchingWordOverlapInMillis = 0;
             foreach (SpeechRecognitionWordResult word in unusedWords)
             {
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.StartBeat - wordOffsetInBeats);
-                double noteEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.EndBeat - wordOffsetInBeats);
+                double noteStartInMillis = SongMetaBpmUtils.BeatsToMillisWithoutGap(songMeta, note.StartBeat - wordOffsetInBeats);
+                double noteEndInMillis = SongMetaBpmUtils.BeatsToMillisWithoutGap(songMeta, note.EndBeat - wordOffsetInBeats);
 
                 double overlapInMillis = NumberUtils.GetIntersectionLength(
                     noteStartInMillis, noteEndInMillis,

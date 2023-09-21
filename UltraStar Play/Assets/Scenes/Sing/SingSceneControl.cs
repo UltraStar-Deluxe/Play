@@ -239,7 +239,18 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             {
                 playerProfilesWithoutMic.Add(playerProfile);
             }
-            PlayerControl playerControl = CreatePlayerControl(playerProfile, micProfile, i);
+
+            PlayerControl playerControl;
+            try
+            {
+                playerControl = CreatePlayerControl(playerProfile, micProfile, i);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to create player control for player '{playerProfile.Name}': {ex.Message}");
+                continue;
+            }
 
             if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<PlayerScoreControlData> scoreDatas))
             {
@@ -299,8 +310,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         songTimeProgressBar.value = 0;
         songAudioPlayer.PositionInSongEventStream.Subscribe(_ =>
         {
-            double startTagInMillis = SongMeta.Start * 1000;
-            double endTagInMillis = SongMeta.End;
+            double startTagInMillis = SongMeta.StartInMillis;
+            double endTagInMillis = SongMeta.EndInMillis;
             double positionInSongInMillisConsideringStartTag = songAudioPlayer.PositionInSongInMillis - startTagInMillis;
             double durationOfSongInMillisConsideringStartAndEndTag = songAudioPlayer.DurationOfSongInMillis - startTagInMillis - endTagInMillis;
             double progressInPercent = 100 * (positionInSongInMillisConsideringStartTag / durationOfSongInMillisConsideringStartAndEndTag);
@@ -373,8 +384,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private void TriggerAchievementsAtSongStart()
     {
         // Two players with different lyrics
-        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Count == 2
-            && sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Values.Distinct().Count() > 1)
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Count == 2
+            && sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Values.Distinct().Count() > 1)
         {
             achievementEventStream.OnNext(AchievementId.startDuetWithDifferentLyrics);
         }
@@ -515,7 +526,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             // There are two different sets of lyrics that need to be displayed
             List<Voice> voices = voiceToPlayerControlsMap.Keys
-                .OrderBy(voice => Voice.NormalizeVoiceName(voice?.Name))
+                .OrderBy(voice => voice.Id)
                 .ToList();
             Voice firstVoice = voices.FirstOrDefault();
             Voice secondVoice = voices.LastOrDefault();
@@ -718,7 +729,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         // For debugging, go fast to next lyrics. In production, give the player some time to prepare.
         double offsetInMillis = Application.isEditor ? 500 : 2000;
-        double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - offsetInMillis;
+        double targetPositionInMillis = SongMetaBpmUtils.BeatsToMillis(SongMeta, nextStartBeat) - offsetInMillis;
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
         {
             SkipToPositionInSong(targetPositionInMillis);
@@ -735,7 +746,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public void SkipToPositionInSong(double positionInSongInMillis)
     {
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
-        int positionInSongInBeats = (int)BpmUtils.MillisecondInSongToBeat(SongMeta, positionInSongInMillis);
+        int positionInSongInBeats = (int)SongMetaBpmUtils.MillisToBeats(SongMeta, positionInSongInMillis);
         foreach (PlayerControl playerController in PlayerControls)
         {
             playerController.SkipToBeat(positionInSongInBeats);
@@ -1088,38 +1099,28 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         column.Add(visualElement);
     }
 
-    private string GetVoiceName(PlayerProfile playerProfile)
+    private EExtendedVoiceId GetExtendedVoiceId(PlayerProfile playerProfile)
     {
-        List<string> voiceNames = new(SongMeta.VoiceNames.Keys);
-        int voiceNameCount = voiceNames.Count;
-        if (voiceNameCount <= 1)
+        Dictionary<EVoiceId, string> voiceIdToDisplayName = SongMetaUtils.GetVoiceIdToDisplayName(SongMeta);
+        List<EVoiceId> voiceIds = voiceIdToDisplayName.Keys.ToList();
+        if (voiceIds.Count <= 1)
         {
-            return Voice.soloVoiceName;
+            return EExtendedVoiceId.P1;
         }
 
-        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.TryGetValue(playerProfile, out string voiceNameOrPerformerName))
+        if (sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.TryGetValue(playerProfile, out EExtendedVoiceId voiceId))
         {
-            if (voiceNameOrPerformerName == Voice.mergedVoiceName)
-            {
-                return Voice.mergedVoiceName;
-            }
-
-            // The given value could be "P1" / "P2" (i.e. a voiceName) or the performer's name (e.g. "Elvis").
-            string matchingVoiceName = SongMeta.VoiceNames
-                .Where(entry => entry.Key == voiceNameOrPerformerName
-                    || entry.Value == voiceNameOrPerformerName)
-                .Select(entry => entry.Key)
-                .FirstOrDefault();
-            return matchingVoiceName;
+            return voiceId;
         }
 
         if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count == 1)
         {
-            return Voice.soloVoiceName;
+            return EExtendedVoiceId.P1;
         }
 
-        int voiceIndex = sceneData.SingScenePlayerData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceNames.Count;
-        return voiceNames[voiceIndex];
+        int voiceIndex = sceneData.SingScenePlayerData.SelectedPlayerProfiles.IndexOf(playerProfile) % voiceIds.Count;
+        List<EExtendedVoiceId> extendedVoiceIds = EnumUtils.GetValuesAsList<EExtendedVoiceId>();
+        return extendedVoiceIds[voiceIndex];
     }
 
     public void Pause()
@@ -1200,10 +1201,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return sceneData.PositionInSongInMillis;
         }
 
-        if (SongMeta.Start > 0)
+        if (SongMeta.StartInMillis > 0)
         {
-            // #START tag in txt file is in seconds (but #END is in milliseconds).
-            return SongMeta.Start * 1000.0;
+            return SongMeta.StartInMillis;
         }
 
         return 0;
@@ -1240,24 +1240,31 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     private Voice GetVoice(PlayerProfile playerProfile)
     {
-        List<Voice> voices = SongMeta.GetVoices().ToList();
-
-        string voiceName = GetVoiceName(playerProfile);
-        if (voiceName == Voice.mergedVoiceName)
+        EExtendedVoiceId voiceId = GetExtendedVoiceId(playerProfile);
+        Voice voice = GetVoiceByExtendedVoiceId(voiceId);
+        if (voice == null)
         {
-            return SongMetaUtils.CreateMergedVoice(voices);
+            string voiceIdCsv = SongMeta.Voices.Select(it => it.Id).ToCsv();
+            Debug.LogError($"The song data does not contain a voice with id {voiceId}."
+                           + $" Available voice ids: {voiceIdCsv}");
+        }
+        return voice;
+    }
+
+    private Voice GetVoiceByExtendedVoiceId(EExtendedVoiceId extendedVoiceId)
+    {
+        if (extendedVoiceId is EExtendedVoiceId.Merged)
+        {
+            return SongMetaUtils.CreateMergedVoice(SongMeta.Voices.ToList());
         }
 
-        Voice matchingVoice = voices.FirstOrDefault(it => Voice.VoiceNameEquals(it.Name, voiceName));
-        if (matchingVoice != null)
+        if (extendedVoiceId.TryGetVoiceId(out EVoiceId voiceId))
         {
-            return matchingVoice;
+            return SongMetaUtils.GetVoiceById(SongMeta, voiceId);
         }
 
-        string voiceNameCsv = voices.Select(it => it.Name).ToCsv();
-        Debug.LogError($"The song data does not contain a voice with name {voiceName}."
-                       + $" Available voice names: {voiceNameCsv}");
-        return voices.FirstOrDefault();
+        Debug.LogWarning($"Failed to find voice for extended voice id: {extendedVoiceId}. Using first voice instead.");
+        return SongMeta.Voices.FirstOrDefault();
     }
 
     private void UpdateInputLegend()

@@ -26,7 +26,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     [Inject(Key = nameof(playerProfileIndex))]
     private int playerProfileIndex;
-    
+
     [Inject(Optional = true)]
     public MicProfile MicProfile { get; private set; }
 
@@ -35,25 +35,25 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     [Inject(Key = nameof(playerUi))]
     private VisualTreeAsset playerUi;
-    
+
     [Inject(Key = nameof(playerInfoUi))]
     private VisualTreeAsset playerInfoUi;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerInfoUiListBottomLeft)]
     private VisualElement playerInfoUiListBottomLeft;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerInfoUiListBottomRight)]
     private VisualElement playerInfoUiListBottomRight;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerInfoUiListTopLeft)]
     private VisualElement playerInfoUiListTopLeft;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerInfoUiListTopRight)]
     private VisualElement playerInfoUiListTopRight;
 
     [Inject]
     private SingSceneData sceneData;
-    
+
     private readonly Subject<EnterSentenceEvent> enterSentenceEventStream = new();
     public IObservable<EnterSentenceEvent> EnterSentenceEventStream => enterSentenceEventStream;
 
@@ -61,7 +61,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     public List<Sentence> SortedSentences { get; private set; } = new();
 
     public int MaxBeatInVoice => SortedSentences.LastOrDefault()?.ExtendedMaxBeat ?? 0;
-    
+
     [Inject]
     private Injector injector;
 
@@ -143,14 +143,14 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     private void AddPlayerInfoUiToTopOrBottom(VisualElement playerInfoUiVisualElement)
     {
-        bool hasTopPlayerInfoUiRow = (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 1 
-                                      && sceneData.SingScenePlayerData.PlayerProfileToVoiceNameMap.Values
+        bool hasTopPlayerInfoUiRow = (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 1
+                                      && sceneData.SingScenePlayerData.PlayerProfileToVoiceIdMap.Values
                                           .Distinct()
-                                          .Count() > 1) 
+                                          .Count() > 1)
                                      || sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 8;
-        
-        List<Voice> voices = songMeta.GetVoices()
-            .OrderBy(voice => Voice.NormalizeVoiceName(voice?.Name))
+
+        List<Voice> voices = songMeta.Voices
+            .OrderBy(voice => voice.Id)
             .ToList();
         int voiceIndex = voices.IndexOf(Voice);
         if (hasTopPlayerInfoUiRow
@@ -264,7 +264,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         {
             return null;
         }
-        
+
         Sentence result = SortedSentences
             .FirstOrDefault(sentence => currentBeat < sentence.LinebreakBeat);
         return result;
@@ -294,7 +294,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         PlayerMicPitchTracker.SkipToBeat(beat);
         Debug.Log($"Skipped forward to beat {beat} for player {PlayerProfile.Name}");
     }
-    
+
     public class EnterSentenceEvent
     {
         public Sentence Sentence { get; private set; }

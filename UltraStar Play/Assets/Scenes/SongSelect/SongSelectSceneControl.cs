@@ -346,7 +346,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
         {
-            UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
+            UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Audio)}'");
         });
 
         // Song queue
@@ -692,17 +692,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return lyricsLabel;
         }
 
-        if (songMeta.GetVoices().Count < 2)
+        if (songMeta.VoiceCount < 2)
         {
-            string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
+            string lyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(lyrics));
         }
         else
         {
-            string firstVoiceLyrics = $"<i><b>{songMeta.VoiceNames.FirstOrDefault().Value}</b></i>\n\n"
-                                      + SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
-            string secondVoiceLyrics = $"<i><b>{songMeta.VoiceNames.LastOrDefault().Value}</b></i>\n\n"
-                                       + SongMetaUtils.GetLyrics(songMeta, Voice.secondVoiceName);
+            string firstVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(EVoiceId.P1)}</b></i>\n\n"
+                                      + SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
+            string secondVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(EVoiceId.P2)}</b></i>\n\n"
+                                       + SongMetaUtils.GetLyrics(songMeta, EVoiceId.P2);
 
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
@@ -886,7 +886,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
         singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
         singScenePlayerData.PlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
-        singScenePlayerData.PlayerProfileToVoiceNameMap = playerListControl.GetSelectedPlayerProfileToVoiceNameMap();
+        singScenePlayerData.PlayerProfileToVoiceIdMap = playerListControl.GetSelectedPlayerProfileToExtendedVoiceIdMap();
         return singScenePlayerData;
     }
 
@@ -908,7 +908,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta)
     {
-        if (songMeta.FailedToLoadVoices)
+        if (songMeta is UltraStarSongMeta ultraStarSongMeta
+            && ultraStarSongMeta.HasFailedToLoadVoices)
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
@@ -929,7 +930,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        if (songMeta.FailedToLoadVoices)
+        if (songMeta is UltraStarSongMeta ultraStarSongMeta
+            && ultraStarSongMeta.HasFailedToLoadVoices)
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
@@ -1010,7 +1012,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
-                string message = $"Audio file '{songMeta.Mp3}' could not be loaded.\n" +
+                string message = $"Audio file '{songMeta.Audio}' could not be loaded.\n" +
                                  $"Please use one of {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}\n" +
                                  $"or a supported website URI.";
                 Debug.LogError(message);
@@ -1223,7 +1225,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
             .Where(songMeta => nonPersistentSettings.SongSelectDirectoryInfo == null
                                // Typically each song has its own folder. Thus, show a song if its PARENT folder matches the selected folder.
-                               || songMeta?.DirectoryInfo?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
+                               || SongMetaUtils.GetDirectoryInfo(songMeta)?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
             .ToList();
         return filteredSongs;

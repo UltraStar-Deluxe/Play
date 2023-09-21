@@ -1,6 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using UniRx;
-using System;
 
 public static class ThreadUtils
 {

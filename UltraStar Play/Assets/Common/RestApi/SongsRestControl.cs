@@ -53,7 +53,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 {
                     SongId = songId,
                     IsFavorite = isFavorite,
-                    VoiceNameToLyricsMap = CreateVoiceNameToLyricsMap(songMeta),
+                    VoiceNameToLyricsMap = CreateVoiceDisplayNameToLyricsMap(songMeta),
                 };
 
                 Debug.Log($"Returning song details for song {songId}");
@@ -134,15 +134,15 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
             });
 	}
 
-    private Dictionary<string,string> CreateVoiceNameToLyricsMap(SongMeta songMeta)
+    private Dictionary<string, string> CreateVoiceDisplayNameToLyricsMap(SongMeta songMeta)
     {
-        Dictionary<string, string> voiceNameToLyricsMap = new();
-        foreach (Voice voice in songMeta.GetVoices())
+        Dictionary<string, string> voiceIdToLyricsMap = new();
+        foreach (Voice voice in songMeta.Voices)
         {
-            string voiceDisplayName = songMeta.VoiceNames[voice.Name];
-            voiceNameToLyricsMap.Add(voiceDisplayName, SongMetaUtils.GetLyrics(voice, true));
+            string voiceDisplayName = songMeta.GetVoiceDisplayName(voice.Id);
+            voiceIdToLyricsMap.Add(voiceDisplayName, SongMetaUtils.GetLyrics(voice, true));
         }
-        return voiceNameToLyricsMap;
+        return voiceIdToLyricsMap;
     }
 
     private void SendLoadedSongs(EndpointRequestData requestData)
@@ -157,7 +157,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 {
                     Artist = songMeta.Artist,
                     Title = songMeta.Title,
-                    Hash = songMeta.SongHash,
+                    Hash = SongMetaManager.GetAndCacheUniqueHash(songMeta),
                 })
                 .ToList()
         }.ToJson());

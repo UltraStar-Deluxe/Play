@@ -108,11 +108,11 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         panelHelper = new PanelHelper(uiDocument);
-        MillisecondsPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
+        MillisecondsPerBeat = SongMetaBpmUtils.MillisPerBeat(songMeta);
 
         if (songAudioPlayer.PositionInSongInMillis == 0)
         {
-            songAudioPlayer.PositionInSongInMillis = songMeta.Gap - DefaultViewportWidthInMillis * 0.25f;
+            songAudioPlayer.PositionInSongInMillis = songMeta.GapInMillis - DefaultViewportWidthInMillis * 0.25f;
         }
 
         songAudioPlayer.LoadedEventStream.Subscribe(_ => InitializeViewport());
@@ -188,7 +188,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public void FitViewportVerticalToNotes()
     {
         List<Note> notesInLayers = songEditorLayerManager.GetAllEnumLayerNotes();
-        List<Note> notesInVoices = songMeta.GetVoices().SelectMany(voice => voice.Sentences)
+        List<Note> notesInVoices = songMeta.Voices.SelectMany(voice => voice.Sentences)
             .SelectMany(sentence => sentence.Notes).ToList();
         List<Note> notes = new();
         notes.AddRange(notesInLayers);
@@ -207,8 +207,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     {
         maxBeat = NumberUtils.Limit(maxBeat, 0, maxBeat);
         minBeat = NumberUtils.Limit(minBeat, 0, maxBeat);
-        double minPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, minBeat);
-        double maxPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, maxBeat);
+        double minPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, minBeat);
+        double maxPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, maxBeat);
         int newViewportX = (int)Math.Floor(minPositionInMillis);
         int newViewportWidth = (int)Math.Ceiling(maxPositionInMillis - minPositionInMillis);
         SetViewportHorizontal(newViewportX, newViewportWidth);
@@ -250,7 +250,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             SetViewportX((int)newViewportX);
         }
     }
-    
+
     public bool IsNoteVisible(Note note)
     {
         // Check y axis, which is the midi note
@@ -262,8 +262,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         }
 
         // Check x axis, which is the position in the song
-        double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
-        double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat);
+        double startPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
+        double endPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.EndBeat);
         bool isMillisecondsOk = (startPosInMillis >= MinMillisecondsInViewport)
                              && (endPosInMillis <= MaxMillisecondsInViewport);
         return isMillisecondsOk;
@@ -289,7 +289,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
     public double GetHorizontalPositionForBeat(int beat)
     {
-        double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+        double positionInSongInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
         return GetHorizontalPositionForMillis(positionInSongInMillis);
     }
 
@@ -326,7 +326,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
     public double GetHorizontalMousePositionInBeats()
     {
         int millis = GetHorizontalMousePositionInMillis();
-        double beat = BpmUtils.MillisecondInSongToBeat(songMeta, millis);
+        double beat = SongMetaBpmUtils.MillisToBeats(songMeta, millis);
         return beat;
     }
 
@@ -347,13 +347,13 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         double zoomFactor = (direction > 0) ? (1 - viewportChangeInPercent) : (1 + viewportChangeInPercent);
         int newViewportWidth = (int)(ViewportWidth * zoomFactor);
         newViewportWidth = NumberUtils.Limit(newViewportWidth, ViewportMinWidth, ViewportMaxWidth);
-        
-        // Already reached min or max zoom. 
+
+        // Already reached min or max zoom.
         if (newViewportWidth == ViewportWidth)
         {
             return;
         }
-        
+
         int viewportChange = ViewportWidth - newViewportWidth;
         int viewportChangeLeftSide = (int)(viewportChange * xPercent);
         int newViewportX = ViewportX + viewportChangeLeftSide;
@@ -461,8 +461,8 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         ViewportX = newViewportX;
         MinMillisecondsInViewport = ViewportX;
         MaxMillisecondsInViewport = ViewportX + ViewportWidth;
-        MinBeatInViewport = (int)Math.Floor(BpmUtils.MillisecondInSongToBeat(songMeta, MinMillisecondsInViewport));
-        MaxBeatInViewport = (int)Math.Ceiling(BpmUtils.MillisecondInSongToBeat(songMeta, MaxMillisecondsInViewport));
+        MinBeatInViewport = (int)Math.Floor(SongMetaBpmUtils.MillisToBeats(songMeta, MinMillisecondsInViewport));
+        MaxBeatInViewport = (int)Math.Ceiling(SongMetaBpmUtils.MillisToBeats(songMeta, MaxMillisecondsInViewport));
     }
 
     private void SetViewportYWithoutChangeEvent(int newViewportY)
@@ -510,7 +510,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
 
         ViewportWidth = newViewportWidth;
         MaxMillisecondsInViewport = ViewportX + ViewportWidth;
-        MaxBeatInViewport = (int)Math.Ceiling(BpmUtils.MillisecondInSongToBeat(songMeta, MaxMillisecondsInViewport));
+        MaxBeatInViewport = (int)Math.Ceiling(SongMetaBpmUtils.MillisToBeats(songMeta, MaxMillisecondsInViewport));
     }
 
     private void FireViewportChangedEvent()
@@ -607,7 +607,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         Note firstNote = allNotes.FindMinElement(note => note.StartBeat);
         if (firstNote != null)
         {
-            return (int)BpmUtils.BeatToMillisecondsInSong(songMeta, firstNote.StartBeat);
+            return (int)SongMetaBpmUtils.BeatsToMillis(songMeta, firstNote.StartBeat);
         }
 
         return 0;

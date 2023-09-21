@@ -1,36 +1,28 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using UnityEngine;
 
 [Serializable]
-public class Voice : ISerializationCallbackReceiver
+public class Voice
 {
-    public static readonly string soloVoiceName = "";
-    public static readonly string firstVoiceName = "P1";
-    public static readonly string secondVoiceName = "P2";
-    public static readonly string mergedVoiceName = "MERGED";
-    public static readonly IReadOnlyList<string> voiceNames = new List<string> { firstVoiceName, secondVoiceName, };
+    public static readonly IComparer<Voice> comparerById = new VoiceComparerById();
 
-    public static readonly IComparer<Voice> comparerByName = new VoiceComparerByName();
-
-    public string Name { get; private set; } = soloVoiceName;
+    public EVoiceId Id { get; private set; } = EVoiceId.P1;
 
     private readonly HashSet<Sentence> sentences = new();
     public IReadOnlyCollection<Sentence> Sentences { get { return sentences; } }
 
-    public Voice()
+    public Voice() : this(EVoiceId.P1)
     {
     }
 
-    public Voice(string name)
+    public Voice(EVoiceId id)
     {
-        SetName(name);
+        SetId(id);
     }
 
-    public Voice(IEnumerable<Sentence> sentences, string name)
+    public Voice(EVoiceId id, IEnumerable<Sentence> sentences) : this(id)
     {
-        SetName(name);
         SetSentences(sentences);
     }
 
@@ -83,14 +75,9 @@ public class Voice : ISerializationCallbackReceiver
         sentence.SetVoice(null);
     }
 
-    public void SetName(string name)
+    public void SetId(EVoiceId newId)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
-    }
-
-    public void OnBeforeSerialize()
-    {
-        // Do nothing. Implementation of ISerializationCallbackReceiver
+        Id = newId;
     }
 
     public void OnAfterDeserialize()
@@ -103,7 +90,7 @@ public class Voice : ISerializationCallbackReceiver
 
     public Voice CloneDeep()
     {
-        Voice clone = new(Name);
+        Voice clone = new(Id);
         foreach (Sentence sentence in Sentences)
         {
             Sentence sentenceCopy = sentence.CloneDeep();
@@ -112,7 +99,7 @@ public class Voice : ISerializationCallbackReceiver
         return clone;
     }
 
-    public class VoiceComparerByName : IComparer<Voice>
+    public class VoiceComparerById : IComparer<Voice>
     {
         public int Compare(Voice x, Voice y)
         {
@@ -128,38 +115,7 @@ public class Voice : ISerializationCallbackReceiver
             {
                 return 1;
             }
-            return string.Compare(x.Name, y.Name, true, CultureInfo.InvariantCulture);
-        }
-    }
-
-    public static bool VoiceNameEquals(string a, string b)
-    {
-        return a == b
-               || (a.IsNullOrEmpty() && b.IsNullOrEmpty())
-               || (a == firstVoiceName && b == soloVoiceName)
-               || (a == soloVoiceName && b == firstVoiceName);
-    }
-
-    public static string NormalizeVoiceName(string voiceName)
-    {
-        return voiceName.IsNullOrEmpty() || voiceName == soloVoiceName
-            ? firstVoiceName
-            : voiceName;
-    }
-
-    public static string GetNextVoiceName(string currentVoiceName)
-    {
-        if (currentVoiceName == Voice.firstVoiceName)
-        {
-            return Voice.secondVoiceName;
-        }
-        else if (currentVoiceName == Voice.secondVoiceName)
-        {
-            return Voice.mergedVoiceName;
-        }
-        else
-        {
-            return Voice.firstVoiceName;
+            return x.Id.CompareTo(y.Id);
         }
     }
 }

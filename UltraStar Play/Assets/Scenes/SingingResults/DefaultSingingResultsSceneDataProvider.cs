@@ -12,10 +12,10 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
     public string songTitle;
 
     public Vector2 scoreRange = new Vector2(2000, 8000);
-    
+
     public bool isLastPartyModeRound;
     public bool isKnockOutTournament;
-    
+
     public SceneData GetDefaultSceneData()
     {
         SingingResultsSceneData data = new();
@@ -30,7 +30,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
             Debug.LogError($"Did not find song meta with title: {songTitle}, using first found song instead.");
             songMeta = SongMetaManager.Instance.GetFirstSongMeta();
         }
-        
+
         data.SongMetas = new List<SongMeta> { songMeta };
         data.SongDurationInMillis = 120 * 1000;
 
@@ -39,7 +39,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         {
             PlayerProfile playerProfile = settingsPlayerProfiles[i];
             data.AddPlayerScores(playerProfile, CreatePlayerScoreData());
-            
+
             if (settings.MicProfiles.Count > i)
             {
                 data.PlayerProfileToMicProfileMap[playerProfile] = settings.MicProfiles[i];
@@ -79,7 +79,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence1, CreateSentenceScore(sentence1, 3000));
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence2, CreateSentenceScore(sentence2, 5000));
         playerScoreData.SentenceToSentenceScoreMap.Add(sentence3, CreateSentenceScore(sentence3, 6500));
-        
+
         return playerScoreData;
     }
 
@@ -109,7 +109,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
         PartyModeSettings partyModeSettings = new();
         partyModeSettings.RoundCount = 2;
         partyModeSettings.TeamSettings.IsKnockOutTournament = isKnockOutTournament;
-        
+
         void AddTeams()
         {
             for (int i = 1; i <= partyModeTeams; i++)
@@ -133,7 +133,7 @@ public class DefaultSingingResultsSceneDataProvider : MonoBehaviour, IDefaultSce
                 {
                     teamSettings.name = $"Team 0{i}";
                 }
-                
+
                 teamSettings.guestPlayerProfiles = new List<PlayerProfile> { guestPlayerProfile };
                 partyModeSettings.TeamSettings.Teams.Add(teamSettings);
             }

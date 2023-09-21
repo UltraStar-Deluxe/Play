@@ -9,7 +9,6 @@ using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using AddressFamily = System.Net.Sockets.AddressFamily;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

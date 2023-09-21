@@ -162,7 +162,7 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
             // Video resource of the song does not need to be cached.
 
             // Parse whole file by reading the voices.
-            songMeta.GetVoices();
+            Voice voice = songMeta.Voices.FirstOrDefault();
         }
         catch (Exception ex)
         {

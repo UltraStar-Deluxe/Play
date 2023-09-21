@@ -9,7 +9,7 @@
                 <ui:Label text="Player01" display-tooltip-when-elided="true" name="nameLabel" class="ellipsis" style="flex-grow: 1; display: none; max-width: 100%;" />
                 <ui:Label tabindex="-1" text="Team Red" display-tooltip-when-elided="true" name="teamLabel" focusable="false" picking-mode="Ignore" class="textShadow ellipsis smallerFont" style="-unity-text-align: upper-center; position: absolute; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;); bottom: 46px; max-width: 100%;" />
                 <ui:Button display-tooltip-when-elided="true" name="changeVoiceButton" class="transparentButton smallerFont secondaryFontColor textShadow" style="height: auto; position: absolute; bottom: 0; width: 100%; -unity-font-definition: url(&apos;project://database/Packages/playsharedui/Runtime/Fonts/Inter/static/Inter-ExtraBold%20SDF.asset?fileID=11400000&amp;guid=6e1aacfc177dfc742b8569db16a945f4&amp;type=2#Inter-ExtraBold SDF&apos;); overflow: visible; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0;">
-                    <ui:Label text="First Vocals" name="voiceNameLabel" min-font-size="8" max-font-size="14" class="textShadow ellipsis" />
+                    <ui:Label text="First Vocals" name="voiceIdLabel" min-font-size="8" max-font-size="14" class="textShadow ellipsis" />
                 </ui:Button>
             </ui:VisualElement>
             <ui:Button display-tooltip-when-elided="true" name="micButton" class="squareButton transparentButton">

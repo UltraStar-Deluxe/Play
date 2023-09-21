@@ -21,7 +21,7 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
 
     [Inject]
     private SongEditorIssueAnalyzerControl issueAnalyzerControl;
-    
+
     [Inject(UxmlName = R.UxmlNames.overviewAreaIssues)]
     private VisualElement overviewAreaIssues;
 
@@ -68,8 +68,8 @@ public class OverviewAreaIssueVisualizer : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        int startMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
-        int endMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, issue.EndBeat);
+        int startMillis = (int)SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
+        int endMillis = (int)SongMetaBpmUtils.BeatsToMillis(songMeta, issue.EndBeat);
 
         // Use a minimum width of 0.5% such that the issue is not overlooked
         int lengthInMillis = endMillis - startMillis;

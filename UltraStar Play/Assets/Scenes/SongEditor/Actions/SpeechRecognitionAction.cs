@@ -7,7 +7,6 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -46,7 +45,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
         {
             return;
         }
-        
+
         AudioClip audioClip = GetAudioClip(settings.SongEditorSettings.SpeechRecognitionSamplesSource);
         if (audioClip == null)
         {
@@ -55,7 +54,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
 
         int minBeat = SongMetaUtils.MinBeat(selectedNotes);
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
-        double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
+        double lengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta) * lengthInBeats;
         Job speechRecognitionJob = new("Speech recognition");
         jobManager.AddJob(speechRecognitionJob);
         speechRecognitionJob.EstimatedTotalDurationInMillis =
@@ -68,7 +67,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
             speechRecognitionJob.EstimatedCurrentProgressInPercent = progressInPercent;
 
         SpeechRecognitionParameters speechRecognitionParameters = CreateSpeechRecognizerParameters();
-        
+
         SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsObservable(speechRecognitionParameters, speechRecognitionJob)
             .SelectMany(speechRecognizer =>
             {
@@ -242,13 +241,13 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 editorNoteDisplayer.RemoveNoteControl(oldNote);
                 songEditorLayerManager.RemoveNoteFromAllEnumLayers(oldNote);
             });
-        
+
         float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, audioClip, startBeat, lengthInBeats, true);
 
         Hyphenator hyphenator = settings.SongEditorSettings.SplitSyllablesAfterSpeechRecognition
             ? SettingsUtils.CreateHyphenator(settings)
             : null;
-        
+
         return SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionAsObservable(
                 monoAudioSamples,
                 0,
@@ -284,7 +283,7 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
                 return createdNotes;
             });
     }
-    
+
     public SpeechRecognitionParameters CreateSpeechRecognizerParameters()
     {
         return new SpeechRecognitionParameters(

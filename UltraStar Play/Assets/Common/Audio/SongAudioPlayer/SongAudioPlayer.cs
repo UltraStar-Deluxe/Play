@@ -6,7 +6,6 @@ using LibVLCSharp;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour, INeedInjection
@@ -225,7 +224,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             {
                 rawResult = videoPlayer.time * 1000.0;
             }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource
+                     && audioSource.clip != null)
             {
                 int positionInSamples = audioSource.timeSamples;
                 rawResult = ((double)positionInSamples / (double)audioSource.clip.frequency) * 1000.0;
@@ -245,7 +245,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public double DurationOfSongInMillis { get; private set; }
     public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
-    public double DurationOfSongInBeats => BpmUtils.MillisecondInSongToBeat(loadedSongMeta, DurationOfSongInMillis);
+    public double DurationOfSongInBeats => SongMetaBpmUtils.MillisToBeats(loadedSongMeta, DurationOfSongInMillis);
 
     /**
      * Position in the song from 0 (start of song) to 1 (end of song).
@@ -1127,7 +1127,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
 
         double millisInSong = PositionInSongInMillis;
-        double result = BpmUtils.MillisecondInSongToBeat(loadedSongMeta, millisInSong);
+        double result = SongMetaBpmUtils.MillisToBeats(loadedSongMeta, millisInSong);
         if (result < 0
             && !allowNegativeResult)
         {

@@ -58,7 +58,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     private Button showBackgroundButton;
 
     private bool isCanceled;
-    private float videoGapAtDragStart;
+    private double videoGapInMillisAtDragStart;
 
     private GeneralDragControl dragControl;
     private ContextMenuControl videoImageContextMenuControl;
@@ -112,7 +112,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Cover Image",
-            songMeta.Directory,
+            SongMetaUtils.GetDirectoryPath(songMeta),
             FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
             () => songMeta.Cover,
             newValue =>
@@ -126,7 +126,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Background Image",
-            songMeta.Directory,
+            SongMetaUtils.GetDirectoryPath(songMeta),
             FileSystemDialogUtils.CreateExtensionFilters("Image Files", ApplicationUtils.supportedImageFiles),
             () => songMeta.Background,
             newValue =>
@@ -140,7 +140,7 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Video",
-            songMeta.Directory,
+            SongMetaUtils.GetDirectoryPath(songMeta),
             FileSystemDialogUtils.CreateExtensionFilters("Video Files", ApplicationUtils.supportedVideoFiles),
             () => songMeta.Video,
             newValue =>
@@ -231,14 +231,14 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
             return;
         }
 
-        videoGapAtDragStart = songMeta.VideoGap;
+        videoGapInMillisAtDragStart = songMeta.VideoGapInMillis;
     }
 
     public void OnDrag(GeneralDragEvent dragEvent)
     {
         setVideoGapAction.Execute(GetNewVideoGap(dragEvent));
         videoAreaLabel.ShowByDisplay();
-        videoAreaLabel.text = $"VideoGap: {songMeta.VideoGap}";
+        videoAreaLabel.text = $"VideoGap (ms): {songMeta.VideoGapInMillis}";
     }
 
     public void OnEndDrag(GeneralDragEvent dragEvent)
@@ -249,11 +249,12 @@ public class VideoAreaControl : INeedInjection, IInjectionFinishedListener, IDra
 
     private float GetNewVideoGap(GeneralDragEvent dragEvent)
     {
-        float videoGapDistance = dragEvent.ScreenCoordinateInPercent.Distance.x * 2f;
+        // Screen width corresponds to a video gap of 2 seconds.
+        float videoGapInMillisDistance = dragEvent.ScreenCoordinateInPercent.Distance.x * 2000f;
 
         // Round to 2 decimal places
-        float newVideoGap = (float)Math.Round(videoGapAtDragStart + videoGapDistance, 2);
-        return newVideoGap;
+        float newVideoGapInMillis = (int)(videoGapInMillisAtDragStart + videoGapInMillisDistance);
+        return newVideoGapInMillis;
     }
 
     public void Dispose()

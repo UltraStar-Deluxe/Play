@@ -150,7 +150,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         pitchLabel.text = MidiUtils.GetAbsoluteName(Note.MidiNote);
         if (Note.Sentence != null && Note.Sentence.Voice != null)
         {
-            Color color = songEditorLayerManager.GetVoiceLayerColor(Note.Sentence.Voice.Name);
+            Color color = songEditorLayerManager.GetVoiceLayerColor(Note.Sentence.Voice.Id);
             SetColor(color);
         }
     }
@@ -297,7 +297,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         else if (!InputUtils.IsKeyboardControlPressed())
         {
             // Move the playback position to the start of the note
-            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
+            double positionInSongInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, Note.StartBeat);
             songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         }
     }

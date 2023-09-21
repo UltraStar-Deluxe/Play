@@ -112,7 +112,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         recordedNoteEntryContainer.Clear();
         effectsContainer.Clear();
 
-        beatsPerSecond = BpmUtils.GetBeatsPerSecond(songMeta);
+        beatsPerSecond = SongMetaBpmUtils.BeatsPerSecond(songMeta);
         playerNoteRecorder.RecordedNoteStartedEventStream.Subscribe(recordedNoteStartedEvent =>
         {
             DisplayRecordedNote(recordedNoteStartedEvent.RecordedNote);

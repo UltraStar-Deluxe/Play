@@ -12,7 +12,7 @@ public class LrcFormatImporter : INeedInjection
         {
             return "";
         }
-        
+
         IParseResult<Line> parseResult = Lyrics.Parse(lrcText);
         if (!parseResult.Exceptions.IsNullOrEmpty())
         {
@@ -33,10 +33,10 @@ public class LrcFormatImporter : INeedInjection
             parseResult.Exceptions.ForEach(ex => Debug.LogException(ex));
             throw parseResult.Exceptions.FirstOrDefault();
         }
-        
+
         Debug.Log("Parsed LRC format successfully. Creating notes.");
         double millisPerCharacter = 100;
-        double beatsPerCharacter = millisPerCharacter / BpmUtils.MillisecondsPerBeat(songMeta);
+        double beatsPerCharacter = millisPerCharacter / SongMetaBpmUtils.MillisPerBeat(songMeta);
         Debug.Log("beatsPerCharacter: " + beatsPerCharacter);
         for (int i = 0; i < parseResult.Lyrics.Lines.Count; i++)
         {
@@ -44,8 +44,8 @@ public class LrcFormatImporter : INeedInjection
             Line nextLine = i + 1 < parseResult.Lyrics.Lines.Count
                 ? parseResult.Lyrics.Lines[i + 1]
                 : null;
-            
-            
+
+
             string text = line.Content;
             int midiNote = settings.SongEditorSettings.DefaultPitchForCreatedNotes;
             int currentLineMillis = line.Timestamp.Minute * 60 * 1000
@@ -60,22 +60,22 @@ public class LrcFormatImporter : INeedInjection
                                      + nextLine.Timestamp.Millisecond;
             }
 
-            int currentLineBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, currentLineMillis);
+            int currentLineBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, currentLineMillis);
             int lengthInBeats = 1 + (int)(text.Length * beatsPerCharacter);
 
             // Limit length of note
             if (nextLine != null)
             {
-                int nextLineBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, nextLineMillis);
+                int nextLineBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, nextLineMillis);
                 int maxLengthInBeats = nextLineBeat - currentLineBeat;
                 if (lengthInBeats > maxLengthInBeats)
                 {
                     lengthInBeats = maxLengthInBeats;
                 }
             }
-            
+
             Note note = new Note(ENoteType.Normal, currentLineBeat, lengthInBeats, MidiUtils.GetUltraStarTxtPitch(midiNote), text);
-            
+
             // Split note on space and semicolon characters
             EditLyricsUtils.TryApplyEditModeText(songMeta, note, note.Text, out List<Note> notesAfterSplit);
 
