@@ -250,7 +250,7 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
             SetViewportX((int)newViewportX);
         }
     }
-    
+
     public bool IsNoteVisible(Note note)
     {
         // Check y axis, which is the midi note
@@ -347,13 +347,13 @@ public class NoteAreaControl : INeedInjection, IInjectionFinishedListener
         double zoomFactor = (direction > 0) ? (1 - viewportChangeInPercent) : (1 + viewportChangeInPercent);
         int newViewportWidth = (int)(ViewportWidth * zoomFactor);
         newViewportWidth = NumberUtils.Limit(newViewportWidth, ViewportMinWidth, ViewportMaxWidth);
-        
-        // Already reached min or max zoom. 
+
+        // Already reached min or max zoom.
         if (newViewportWidth == ViewportWidth)
         {
             return;
         }
-        
+
         int viewportChange = ViewportWidth - newViewportWidth;
         int viewportChangeLeftSide = (int)(viewportChange * xPercent);
         int newViewportX = ViewportX + viewportChangeLeftSide;

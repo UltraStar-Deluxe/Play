@@ -20,7 +20,7 @@ public class SetMusicGapAction : INeedInjection
 
     [Inject]
     private PanelHelper panelHelper;
-    
+
     public void Execute(double positionInSongInMillis)
     {
         songMeta.Gap = (float)positionInSongInMillis;
