@@ -16,7 +16,7 @@ public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
 
     public void Execute(float newBpm)
     {
-        if (newBpm == songMeta.Bpm)
+        if (newBpm == songMeta.BeatsPerMinute)
         {
             return;
         }
@@ -27,7 +27,7 @@ public class ApplyBpmDontAdjustNoteLengthAction : INeedInjection
             return;
         }
 
-        songMeta.Bpm = newBpm;
+        songMeta.BeatsPerMinute = newBpm;
     }
 
     public void ExecuteAndNotify(float newBpm)

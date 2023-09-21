@@ -9,6 +9,24 @@ public class UltraStarSongMeta : SongMeta
 
     private bool ShouldLoadVoices => !hasLoadedVoices && !HasFailedToLoadVoices;
 
+    /**
+     * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
+     * Example: a BPM value of 60 in a txt file would define a beat every 0.25 seconds (60*4=240 beats-per-minute).
+     */
+    public float TxtFileBpm { get; private set; }
+    public override float BeatsPerMinute {
+        get
+        {
+            // UltraStar BPM is not "beats per minute" but "bars per minute" in four-four-time.
+            // To get the common "beats per minute", one has to multiply with 4.
+            return TxtFileBpm * 4;
+        }
+        set
+        {
+            TxtFileBpm = value / 4;
+        }
+    }
+
     public override int VoiceCount => !voiceIdToDisplayName.IsNullOrEmpty()
         ? voiceIdToDisplayName.Count
         : Voices.Count;
@@ -49,15 +67,20 @@ public class UltraStarSongMeta : SongMeta
     private readonly Subject<bool> loadedVoicesEventStream = new();
     public IObservable<bool> LoadedVoicesEventStream => loadedVoicesEventStream;
 
+    public UltraStarSongMeta(SongMeta other)
+    {
+        CopyValues(other);
+    }
+
     public UltraStarSongMeta(
         string artist,
         string title,
-        float bpm,
+        float txtFileBpm,
         string audioFile,
         Dictionary<EVoiceId, string> voiceIdToDisplayName)
     {
         Artist = artist ?? throw new ArgumentNullException(nameof(artist));
-        Bpm = bpm;
+        TxtFileBpm = txtFileBpm;
         Mp3 = audioFile ?? throw new ArgumentNullException(nameof(audioFile));
         Title = title ?? throw new ArgumentNullException(nameof(title));
 
@@ -107,4 +130,10 @@ public class UltraStarSongMeta : SongMeta
         // All done without errors.
         HasFailedToLoadVoices = false;
     }
+
+    // public override void CopyValues(SongMeta other)
+    // {
+    //     base.CopyValues(other);
+    //     TxtFileBpm = other.BeatsPerMinute / 4;
+    // }
 }

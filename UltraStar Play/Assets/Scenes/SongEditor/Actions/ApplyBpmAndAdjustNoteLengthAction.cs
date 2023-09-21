@@ -16,7 +16,7 @@ public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
 
     public void Execute(float newBpm)
     {
-        if (newBpm == songMeta.Bpm)
+        if (newBpm == songMeta.BeatsPerMinute)
         {
             return;
         }
@@ -28,8 +28,8 @@ public class ApplyBpmAndAdjustNoteLengthAction : INeedInjection
         }
 
         // Calculate start and end beat of all notes and sentences using the new bpm
-        songMeta.Voices.ForEach(voice => AdjustNoteLength(voice, newBpm, songMeta.Bpm));
-        songMeta.Bpm = newBpm;
+        songMeta.Voices.ForEach(voice => AdjustNoteLength(voice, newBpm, songMeta.BeatsPerMinute));
+        songMeta.BeatsPerMinute = newBpm;
     }
 
     private void AdjustNoteLength(Voice voice, float newBpm, float oldBpm)

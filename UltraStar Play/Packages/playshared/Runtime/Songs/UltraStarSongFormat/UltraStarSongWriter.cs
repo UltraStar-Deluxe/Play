@@ -8,11 +8,29 @@ public static class UltraStarFormatWriter
 {
     public static void WriteFile(string absolutePath, SongMeta songMeta)
     {
+        if (songMeta is not UltraStarSongMeta ultraStarSongMeta)
+        {
+            ultraStarSongMeta = new(songMeta);
+        }
+        WriteFile(absolutePath, ultraStarSongMeta);
+    }
+
+    private static void WriteFile(string absolutePath, UltraStarSongMeta songMeta)
+    {
         string ultraStarFormat = ToUltraStarSongFormat(songMeta);
         File.WriteAllText(absolutePath, ultraStarFormat, Encoding.UTF8);
     }
 
     public static string ToUltraStarSongFormat(SongMeta songMeta)
+    {
+        if (songMeta is not UltraStarSongMeta ultraStarSongMeta)
+        {
+            ultraStarSongMeta = new(songMeta);
+        }
+        return ToUltraStarSongFormat(ultraStarSongMeta);
+    }
+
+    private static string ToUltraStarSongFormat(UltraStarSongMeta songMeta)
     {
         StringBuilder sb = new();
         AppendHeader(sb, songMeta);
@@ -83,7 +101,7 @@ public static class UltraStarFormatWriter
         }
     }
 
-    private static void AppendHeader(StringBuilder sb, SongMeta songMeta)
+    private static void AppendHeader(StringBuilder sb, UltraStarSongMeta songMeta)
     {
         AppendHeaderField(sb, "encoding", "UTF8");
 
@@ -92,8 +110,11 @@ public static class UltraStarFormatWriter
         AppendHeaderField(sb, "mp3", songMeta.Mp3);
         AppendHeaderField(sb, "VocalsAudio", songMeta.VocalsAudio);
         AppendHeaderField(sb, "InstrumentalAudio", songMeta.InstrumentalAudio);
-        AppendHeaderField(sb, "MBID_RECORD", songMeta.MusicBrainzRecord);
-        AppendHeaderField(sb, "bpm", songMeta.Bpm.ToString(CultureInfo.InvariantCulture));
+        AppendHeaderField(sb, "MusicBrainzRecord", songMeta.MusicBrainzRecord);
+        AppendHeaderField(sb, "MusicBrainzRelease", songMeta.MusicBrainzRelease);
+        AppendHeaderField(sb, "MusicBrainzReleaseGroup", songMeta.MusicBrainzReleaseGroup);
+        AppendHeaderField(sb, "MusicBrainzArtist", songMeta.MusicBrainzArtist);
+        AppendHeaderField(sb, "bpm", songMeta.TxtFileBpm.ToString(CultureInfo.InvariantCulture));
         if (songMeta.Gap != 0)
         {
             AppendHeaderField(sb, "gap", songMeta.Gap.ToString(CultureInfo.InvariantCulture));

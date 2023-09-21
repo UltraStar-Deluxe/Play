@@ -344,13 +344,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // TODO: use https://github.com/WestHillApps/UniBpmAnalyzer to analyze bpm
         // TODO: use https://github.com/Zeugma440/atldotnet to read meta tags.
-        float bpm = 300;
+        float txtFileBpm = 300;
 
         Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
         UltraStarSongMeta songMeta = new UltraStarSongMeta(
             artist,
             title,
-            bpm,
+            txtFileBpm,
             audioFile,
             voiceIdToDisplayName);
 

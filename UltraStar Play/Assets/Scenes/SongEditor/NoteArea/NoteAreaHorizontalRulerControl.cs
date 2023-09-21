@@ -102,9 +102,9 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         if (lastViewportEvent == null
             || lastViewportEvent.X != viewportEvent.X
             || lastViewportEvent.Width != viewportEvent.Width
-            || songMeta.Bpm != lastSongMetaBpm)
+            || songMeta.BeatsPerMinute != lastSongMetaBpm)
         {
-            lastSongMetaBpm = songMeta.Bpm;
+            lastSongMetaBpm = songMeta.BeatsPerMinute;
 
             if (settings.SongEditorSettings.GridSizeInPx > 0)
             {

@@ -35,9 +35,9 @@ public class ParseSongFileHeaderTest
     [Test]
     public void SpaceAroundNumberTest()
     {
-        SongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-SpaceAroundNumber.txt", out List<SongIssue> songIssues, null, true);
+        UltraStarSongMeta songMeta = UltraStarSongParser.ParseFile(folderPath + "TestSong-SpaceAroundNumber.txt", out List<SongIssue> songIssues, null, true);
         Assert.NotNull(songMeta);
-        Assert.AreEqual(200, songMeta.Bpm);
+        Assert.AreEqual(200, songMeta.TxtFileBpm);
         Assert.AreEqual(0.12f, songMeta.Gap, 0.001f);
         Assert.AreEqual(2022, songMeta.Year);
     }

@@ -393,7 +393,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
         PositionInSongDto positionInSongDto = new PositionInSongDto
         {
-            SongBpm = songMeta.Bpm,
+            SongBpm = songMeta.BeatsPerMinute,
             SongGap = songMeta.Gap,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
         };

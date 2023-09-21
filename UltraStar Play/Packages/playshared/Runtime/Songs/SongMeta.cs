@@ -18,12 +18,28 @@ public class SongMeta
     public virtual Encoding FileEncoding { get; private set; }
 
     /**
-     * MusicBrainz identifier for the recording.
-     * For example, 99 Red Balloons, the original by Nena, has a release MBID of 189002e7-3285-4e2e-92a3-7f6c30d407a2.
-     * See https://musicbrainz.org/doc/Recording
+     * MusicBrainz identifier for the Recording.
      * See https://musicbrainz.org/doc/MusicBrainz_Identifier
      */
     public virtual string MusicBrainzRecord { get; set; } = "";
+
+    /**
+     * MusicBrainz identifier for the Release.
+     * See https://musicbrainz.org/doc/MusicBrainz_Identifier
+     */
+    public virtual string MusicBrainzRelease { get; set; } = "";
+
+    /**
+     * MusicBrainz identifier for the Release Group.
+     * See https://musicbrainz.org/doc/MusicBrainz_Identifier
+     */
+    public virtual string MusicBrainzReleaseGroup { get; set; } = "";
+
+    /**
+     * MusicBrainz identifier for the artist.
+     * See https://musicbrainz.org/doc/MusicBrainz_Identifier
+     */
+    public virtual string MusicBrainzArtist { get; set; } = "";
 
     /**
      * Artist of the song.
@@ -36,20 +52,14 @@ public class SongMeta
     public virtual string Title { get; set; } = "";
 
     /**
-     * The "bars-per-minute" in four-four-time (i.e. (beats-per-minute / 4)) of the song.
-     * Example: a BPM value of 60 in a txt file would define a beat every 0.25 seconds (60*4=240 beats-per-minute).
+     * Beats per minute of the audio.
      */
-    public virtual float Bpm { get; set; }
+    public virtual float BeatsPerMinute { get; set; }
 
     /**
-     * Path to the local audio file.
+     * Path or URI to the audio file.
      */
     public virtual string Mp3 { get; set; } = "";
-
-    /**
-     * URI to load the song in the embedded WebView.
-     */
-    public virtual string Website { get; set; } = "";
 
     /**
      * Path to the audio file that contains only the voice of the singers.
@@ -62,6 +72,11 @@ public class SongMeta
      * This audio file is created from the source audio file using AI.
      */
     public virtual string InstrumentalAudio { get; set; } = "";
+
+    /**
+     * URI to load the song in the embedded WebView.
+     */
+    public virtual string Website { get; set; } = "";
 
     /**
      * Path to an image file that should be displayed as background when singing.
@@ -212,7 +227,7 @@ public class SongMeta
 
         Artist = other.Artist;
         Title = other.Title;
-        Bpm = other.Bpm;
+        BeatsPerMinute = other.BeatsPerMinute;
         Mp3 = other.Mp3;
         VocalsAudio = other.VocalsAudio;
         InstrumentalAudio = other.InstrumentalAudio;

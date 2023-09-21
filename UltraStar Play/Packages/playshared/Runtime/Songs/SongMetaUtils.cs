@@ -817,7 +817,7 @@ public static class SongMetaUtils
         sb.Append("{");
 
         sb.Append("BPM:");
-        sb.Append(songMeta.Bpm.ToStringInvariantCulture("0.00"));
+        sb.Append(songMeta.BeatsPerMinute.ToStringInvariantCulture("0.00"));
 
         int voiceIndex = 1;
         foreach (Voice voice in songMeta.Voices)

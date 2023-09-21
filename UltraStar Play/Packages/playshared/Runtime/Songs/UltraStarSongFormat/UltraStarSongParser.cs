@@ -185,10 +185,10 @@ public static class UltraStarSongParser
                 artist = "";
             }
 
-            float bpm;
+            float txtFileBpm;
             try
             {
-                 bpm = ConvertToFloat(requiredFields["bpm"]);
+                 txtFileBpm = ConvertToFloat(requiredFields["bpm"]);
             }
             catch (Exception ex)
             {
@@ -201,7 +201,7 @@ public static class UltraStarSongParser
             UltraStarSongMeta songMeta = new(
                 artist,
                 title,
-                bpm,
+                txtFileBpm,
                 audioFile,
                 voiceIdToDisplayName);
             foreach (KeyValuePair<string, string> item in otherFields)

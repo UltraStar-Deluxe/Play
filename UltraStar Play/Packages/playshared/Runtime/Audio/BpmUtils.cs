@@ -16,9 +16,7 @@
 
     public static double GetBeatsPerMinute(SongMeta songMeta)
     {
-        // Ultrastar BPM is not "beats per minute" but "bars per minute" in four-four-time.
-        // To get the common "beats per minute", one has to multiply with 4.
-        return songMeta.Bpm * 4.0;
+        return songMeta.BeatsPerMinute;
     }
 
     public static double GetBeatsPerSecond(SongMeta songMeta)

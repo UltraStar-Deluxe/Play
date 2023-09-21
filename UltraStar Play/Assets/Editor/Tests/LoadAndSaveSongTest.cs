@@ -11,16 +11,16 @@ public class LoadAndSaveSongTest
     public void LoadAndSaveSongDoesNotChangeFields()
     {
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
-        SongMeta originalSongMeta = LoadSong(originalFilePath);
+        UltraStarSongMeta originalSongMeta = LoadSong(originalFilePath);
 
         string savedFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Saved.txt";
         UltraStarFormatWriter.WriteFile(savedFilePath, originalSongMeta);
 
-        SongMeta savedSongMeta = LoadSong(savedFilePath);
+        UltraStarSongMeta savedSongMeta = LoadSong(savedFilePath);
 
         Assert.AreEqual(originalSongMeta.Artist, savedSongMeta.Artist);
         Assert.AreEqual(originalSongMeta.Background, savedSongMeta.Background);
-        Assert.AreEqual(originalSongMeta.Bpm, savedSongMeta.Bpm);
+        Assert.AreEqual(originalSongMeta.BeatsPerMinute, savedSongMeta.BeatsPerMinute);
         Assert.AreEqual(originalSongMeta.Cover, savedSongMeta.Cover);
         Assert.AreEqual(originalSongMeta.Edition, savedSongMeta.Edition);
         Assert.AreEqual(originalSongMeta.End, savedSongMeta.End);
@@ -30,6 +30,9 @@ public class LoadAndSaveSongTest
         Assert.AreEqual(originalSongMeta.Language, savedSongMeta.Language);
         Assert.AreEqual(originalSongMeta.Mp3, savedSongMeta.Mp3);
         Assert.AreEqual(originalSongMeta.MusicBrainzRecord, savedSongMeta.MusicBrainzRecord);
+        Assert.AreEqual(originalSongMeta.MusicBrainzRelease, savedSongMeta.MusicBrainzRelease);
+        Assert.AreEqual(originalSongMeta.MusicBrainzReleaseGroup, savedSongMeta.MusicBrainzReleaseGroup);
+        Assert.AreEqual(originalSongMeta.MusicBrainzArtist, savedSongMeta.MusicBrainzArtist);
         Assert.AreEqual(originalSongMeta.PreviewEnd, savedSongMeta.PreviewEnd);
         Assert.AreEqual(originalSongMeta.MedleyEndBeat, savedSongMeta.MedleyEndBeat);
         Assert.AreEqual(originalSongMeta.MedleyStartBeat, savedSongMeta.MedleyStartBeat);
@@ -52,7 +55,7 @@ public class LoadAndSaveSongTest
         Assert.IsTrue(originalSongMeta.AdditionalHeaderEntries.SequenceEqual(savedSongMeta.AdditionalHeaderEntries), "UnknownHeaderEntries not equal");
     }
 
-    private SongMeta LoadSong(string path)
+    private UltraStarSongMeta LoadSong(string path)
     {
         return UltraStarSongParser.ParseFile(path, out List<SongIssue> songIssues, null, true);
     }

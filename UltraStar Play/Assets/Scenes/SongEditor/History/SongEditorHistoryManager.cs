@@ -149,7 +149,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private void SaveSongMetaTags(SongEditorMemento memento)
     {
-        memento.Bpm = songMeta.Bpm;
+        memento.Bpm = songMeta.BeatsPerMinute;
         memento.MusicGap = songMeta.Gap;
     }
 
@@ -171,7 +171,7 @@ public class SongEditorHistoryManager : MonoBehaviour, INeedInjection, ISceneInj
 
     private void LoadSongMetaTags(SongEditorMemento memento)
     {
-        songMeta.Bpm = memento.Bpm;
+        songMeta.BeatsPerMinute = memento.Bpm;
         songMeta.Gap = memento.MusicGap;
     }
 

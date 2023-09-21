@@ -64,12 +64,14 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
 
         detectBpmControl = new DetectBpmControl(detectBpmButton, detectBpmLabel);
         bpmTextField.AddToClassList("disabled");
-        bpmTextField.value = songMeta.Bpm.ToString("0.00", CultureInfo.InvariantCulture);
+        bpmTextField.value = songMeta.BeatsPerMinute.ToString("0.00", CultureInfo.InvariantCulture);
 
+        string enterBpmMessage = "Enter new BPM value.\n" +
+                         "For better accuracy, the BPM of the audio should at least be doubled.";
         setBpmChangeNoteDurationButton.RegisterCallbackButtonTriggered(_ =>
-            songEditorSceneControl.CreateNumberInputDialog("Set BPM and change note duration", "Enter new BPM value", newBpm => applyBpmDontAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
+            songEditorSceneControl.CreateNumberInputDialog("Set BPM and change note duration", enterBpmMessage, newBpm => applyBpmDontAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
         setBpmKeepNoteDurationButton.RegisterCallbackButtonTriggered(_ =>
-            songEditorSceneControl.CreateNumberInputDialog("Set BPM but keep note duration", "Enter new BPM value", newBpm => applyBpmAndAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
+            songEditorSceneControl.CreateNumberInputDialog("Set BPM but keep note duration", enterBpmMessage, newBpm => applyBpmAndAdjustNoteLengthAction.ExecuteAndNotify(newBpm)));
     }
 
     private void CreateSongPropertiesInputControls()
@@ -213,7 +215,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             }
         });
 
-        bpmTextField.value = songMeta.Bpm.ToString("0.00", CultureInfo.InvariantCulture);
+        bpmTextField.value = songMeta.BeatsPerMinute.ToString("0.00", CultureInfo.InvariantCulture);
     }
 
     private class SongPropertyInputControl
