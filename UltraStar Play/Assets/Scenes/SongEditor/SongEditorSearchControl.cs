@@ -152,7 +152,7 @@ public class SongEditorSearchControl : INeedInjection, IInjectionFinishedListene
 
         if (note != null)
         {
-            songAudioPlayer.PositionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+            songAudioPlayer.PositionInSongInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
             int indexOfNote = matchingNotes.IndexOf(note);
             if (indexOfNote >= 0)
             {

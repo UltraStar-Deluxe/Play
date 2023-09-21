@@ -225,7 +225,7 @@ public static class MoveNotesToOtherVoiceUtils
                     int minBeat = currentBatch.FirstOrDefault().StartBeat;
                     int maxBeat = currentBatch.LastOrDefault().EndBeat;
                     int lengthInBeats = maxBeat - minBeat;
-                    double lengthInMillis = lengthInBeats * BpmUtils.MillisecondsPerBeat(songMeta);
+                    double lengthInMillis = lengthInBeats * SongMetaBpmUtils.MillisPerBeat(songMeta);
                     if (lengthInMillis > 10000
                         && CanSplitNote(lastNote, note))
                     {

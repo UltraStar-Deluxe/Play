@@ -219,7 +219,7 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
         int lengthInSamples = toIndex - fromIndex;
         analyzeStartIndex = recordingIndex;
 
-        double gapShiftInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, songMeta.GapInMillis);
+        double gapShiftInBeats = SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, songMeta.GapInMillis);
 
         Debug.Log($"Analyzing speech of newly recorded samples from second {(double)fromIndex / sampleRate} to second {(double)toIndex / sampleRate} (length: {(lengthInSamples) / sampleRate} seconds)");
         speechRecognitionAction.CreateNotesFromSpeechRecognition(

@@ -54,7 +54,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         }
 
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
-        double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
+        double lengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta) * lengthInBeats;
         bool isVeryLong = lengthInMillis > 10000;
         return isVeryLong;
     }

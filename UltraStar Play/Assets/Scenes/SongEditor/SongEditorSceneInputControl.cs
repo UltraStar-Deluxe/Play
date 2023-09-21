@@ -444,7 +444,7 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
             }
             else if (InputUtils.IsKeyboardControlPressed())
             {
-                int stepInMillis = (int)(BpmUtils.MillisecondsPerBeat(songMeta) * timeFactor);
+                int stepInMillis = (int)(SongMetaBpmUtils.MillisPerBeat(songMeta) * timeFactor);
                 if (Keyboard.current.leftArrowKey.isPressed)
                 {
                     songAudioPlayer.PositionInSongInMillis -= stepInMillis;
@@ -627,8 +627,8 @@ public class SongEditorSceneInputControl : MonoBehaviour, INeedInjection
 
         int minBeat = notes.Select(it => it.StartBeat).Min();
         int maxBeat = notes.Select(it => it.EndBeat).Max();
-        double maxMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, maxBeat);
-        double minMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, minBeat);
+        double maxMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, maxBeat);
+        double minMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, minBeat);
         songEditorSceneControl.StopPlaybackAfterPositionInSongInMillis = maxMillis;
         songAudioPlayer.PositionInSongInMillis = minMillis;
         songAudioPlayer.PlayAudio();

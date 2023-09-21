@@ -214,7 +214,7 @@ public static class MidiToSongMetaUtils
             }
 
             int targetLengthInMillis = 100;
-            int targetLengthInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetLengthInMillis);
+            int targetLengthInBeats = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, targetLengthInMillis);
             int newLengthInBeats = Math.Min(targetLengthInBeats, availableSpaceInBeats);
             if (newLengthInBeats > 0)
             {
@@ -243,7 +243,7 @@ public static class MidiToSongMetaUtils
             }
 
             midiEventToAbsoluteDeltaTimeInMillis.TryGetValue(midiEvent, out int absoluteDeltaTimeInMillis);
-            int beat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, absoluteDeltaTimeInMillis));
+            int beat = (int)Math.Round(SongMetaBpmUtils.MillisToBeats(songMeta, absoluteDeltaTimeInMillis));
             Note note = new Note(ENoteType.Normal, beat, 1, ultraStarTxtPitch, midiEventLyrics);
             loadedNotes.Add(note);
         }
@@ -302,7 +302,7 @@ public static class MidiToSongMetaUtils
         }
 
         Note newNote = new();
-        int startBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, absoluteDeltaTimeInMillis));
+        int startBeat = (int)Math.Round(SongMetaBpmUtils.MillisToBeats(songMeta, absoluteDeltaTimeInMillis));
         newNote.SetStartAndEndBeat(startBeat, startBeat);
         newNote.SetMidiNote(midiPitch);
 
@@ -328,7 +328,7 @@ public static class MidiToSongMetaUtils
             return;
         }
 
-        int endBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, absoluteDeltaTimeInMillis));
+        int endBeat = (int)Math.Round(SongMetaBpmUtils.MillisToBeats(songMeta, absoluteDeltaTimeInMillis));
         if (midiPitchToNoteUnderConstruction.TryGetValue(midiPitch, out Note existingNote))
         {
             if (endBeat > existingNote.StartBeat)
@@ -380,7 +380,7 @@ public static class MidiToSongMetaUtils
                 }
 
                 midiEventToDeltaTimeInMillis.TryGetValue(midiEvent, out int deltaTimeInMillis);
-                int beat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
+                int beat = (int)Math.Round(SongMetaBpmUtils.MillisToBeats(songMeta, deltaTimeInMillis));
                 List<Note> correspondingNotes = notesWithoutGroup
                     .Where(note => note.StartBeat <= beat)
                     .ToList();

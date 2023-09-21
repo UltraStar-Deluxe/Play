@@ -92,8 +92,8 @@ public class TimeBarControl : INeedInjection
                 continue;
             }
 
-            double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
-            double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
+            double startPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, sentence.MinBeat);
+            double endPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, sentence.MaxBeat);
 
             if (playerCount <= 3)
             {

@@ -36,7 +36,7 @@ public class LrcFormatImporter : INeedInjection
 
         Debug.Log("Parsed LRC format successfully. Creating notes.");
         double millisPerCharacter = 100;
-        double beatsPerCharacter = millisPerCharacter / BpmUtils.MillisecondsPerBeat(songMeta);
+        double beatsPerCharacter = millisPerCharacter / SongMetaBpmUtils.MillisPerBeat(songMeta);
         Debug.Log("beatsPerCharacter: " + beatsPerCharacter);
         for (int i = 0; i < parseResult.Lyrics.Lines.Count; i++)
         {
@@ -60,13 +60,13 @@ public class LrcFormatImporter : INeedInjection
                                      + nextLine.Timestamp.Millisecond;
             }
 
-            int currentLineBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, currentLineMillis);
+            int currentLineBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, currentLineMillis);
             int lengthInBeats = 1 + (int)(text.Length * beatsPerCharacter);
 
             // Limit length of note
             if (nextLine != null)
             {
-                int nextLineBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, nextLineMillis);
+                int nextLineBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, nextLineMillis);
                 int maxLengthInBeats = nextLineBeat - currentLineBeat;
                 if (lengthInBeats > maxLengthInBeats)
                 {

@@ -5,10 +5,10 @@ using UnityEngine;
 public static class SpaceBetweenNotesUtils
 {
     public const int DefaultSpaceBetweenNotesInMillis = 150;
-    
+
     public static void AddSpaceInMillisBetweenNotes(IReadOnlyCollection<Note> notes, int millis, SongMeta songMeta)
     {
-        double beats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, millis);
+        double beats = SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, millis);
         if (beats < 1)
         {
             return;
@@ -16,7 +16,7 @@ public static class SpaceBetweenNotesUtils
 
         AddSpaceInBeatsBetweenNotes(notes, (int)beats);
     }
-    
+
     public static void AddSpaceInBeatsBetweenNotes(IReadOnlyCollection<Note> notes, int spaceInBeats)
     {
         if (spaceInBeats <= 0)
@@ -56,16 +56,16 @@ public static class SpaceBetweenNotesUtils
         {
             return;
         }
-        
-        double lengthInBeats = BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, millis);
+
+        double lengthInBeats = SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, millis);
         if (lengthInBeats < 1)
         {
             return;
         }
-        
+
         ShortenNotesByBeats(notes, (int)lengthInBeats);
     }
-    
+
     public static void ShortenNotesByBeats(IReadOnlyCollection<Note> notes, int lengthInBeats)
     {
         // Remove half from start and end of note

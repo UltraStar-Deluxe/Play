@@ -275,7 +275,7 @@ public static class SpeechRecognitionUtils
         Hyphenator hyphenator,
         int spaceInMillisBetweenNotes)
     {
-        double beatsPerSeconds = BpmUtils.GetBeatsPerSecond(songMeta);
+        double beatsPerSeconds = SongMetaBpmUtils.BeatsPerSecond(songMeta);
         List<Note> createdNotes = words.Select(resultEntry =>
         {
             int noteStartInBeats = offsetInBeats + (int)(resultEntry.Start.TotalSeconds * beatsPerSeconds);
@@ -351,8 +351,8 @@ public static class SpeechRecognitionUtils
             double bestMatchingWordOverlapInMillis = 0;
             foreach (SpeechRecognitionWordResult word in unusedWords)
             {
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.StartBeat - wordOffsetInBeats);
-                double noteEndInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, note.EndBeat - wordOffsetInBeats);
+                double noteStartInMillis = SongMetaBpmUtils.BeatsToMillisWithoutGap(songMeta, note.StartBeat - wordOffsetInBeats);
+                double noteEndInMillis = SongMetaBpmUtils.BeatsToMillisWithoutGap(songMeta, note.EndBeat - wordOffsetInBeats);
 
                 double overlapInMillis = NumberUtils.GetIntersectionLength(
                     noteStartInMillis, noteEndInMillis,

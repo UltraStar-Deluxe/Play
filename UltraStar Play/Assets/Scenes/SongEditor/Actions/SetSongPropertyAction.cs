@@ -19,16 +19,16 @@ public class SetSongPropertyAction : INeedInjection
 
     [Inject]
     private PanelHelper panelHelper;
-    
+
     public void SetMedleyStart(double positionInSongInMillis)
     {
-        int beat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
+        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillis);
         songMeta.MedleyStartInMillis = beat;
     }
-    
+
     public void SetMedleyEnd(double positionInSongInMillis)
     {
-        int beat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
+        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillis);
         songMeta.MedleyEndInMillis = beat;
     }
 
@@ -37,7 +37,7 @@ public class SetSongPropertyAction : INeedInjection
         SetMedleyStart(positionInSongInMillis);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.MedleyStart));
     }
-    
+
     public void SetMedleyEndAndNotify(double positionInSongInMillis)
     {
         SetMedleyEnd(positionInSongInMillis);

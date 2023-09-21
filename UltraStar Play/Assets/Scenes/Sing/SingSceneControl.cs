@@ -729,7 +729,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         // For debugging, go fast to next lyrics. In production, give the player some time to prepare.
         double offsetInMillis = Application.isEditor ? 500 : 2000;
-        double targetPositionInMillis = BpmUtils.BeatToMillisecondsInSong(SongMeta, nextStartBeat) - offsetInMillis;
+        double targetPositionInMillis = SongMetaBpmUtils.BeatsToMillis(SongMeta, nextStartBeat) - offsetInMillis;
         if (targetPositionInMillis > 0 && targetPositionInMillis > PositionInSongInMillis)
         {
             SkipToPositionInSong(targetPositionInMillis);
@@ -746,7 +746,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     public void SkipToPositionInSong(double positionInSongInMillis)
     {
         songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
-        int positionInSongInBeats = (int)BpmUtils.MillisecondInSongToBeat(SongMeta, positionInSongInMillis);
+        int positionInSongInBeats = (int)SongMetaBpmUtils.MillisToBeats(SongMeta, positionInSongInMillis);
         foreach (PlayerControl playerController in PlayerControls)
         {
             playerController.SkipToBeat(positionInSongInBeats);

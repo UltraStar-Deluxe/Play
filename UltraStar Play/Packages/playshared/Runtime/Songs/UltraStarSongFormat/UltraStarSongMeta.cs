@@ -88,11 +88,11 @@ public class UltraStarSongMeta : SongMeta
     {
         get
         {
-            return BpmUtils.MillisecondInSongToBeat(this, MedleyStartInMillis);
+            return SongMetaBpmUtils.MillisToBeats(this, MedleyStartInMillis);
         }
         set
         {
-            MedleyStartInMillis = BpmUtils.BeatToMillisecondsInSong(this, value);
+            MedleyStartInMillis = SongMetaBpmUtils.BeatsToMillis(this, value);
         }
     }
 
@@ -100,11 +100,11 @@ public class UltraStarSongMeta : SongMeta
     {
         get
         {
-            return (int)BpmUtils.MillisecondInSongToBeat(this, MedleyEndInMillis);
+            return (int)SongMetaBpmUtils.MillisToBeats(this, MedleyEndInMillis);
         }
         set
         {
-            MedleyEndInMillis = (int)BpmUtils.BeatToMillisecondsInSong(this, value);
+            MedleyEndInMillis = (int)SongMetaBpmUtils.BeatsToMillis(this, value);
         }
     }
 

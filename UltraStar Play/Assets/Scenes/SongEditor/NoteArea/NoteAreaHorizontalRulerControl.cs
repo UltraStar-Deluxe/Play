@@ -87,7 +87,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
                 return;
             }
             int beat = (int)label.userData;
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
             label.text = GetLabelText(beat, beatPosInMillis);
         });
     }
@@ -147,7 +147,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
 
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
@@ -182,12 +182,12 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             drawStepRough = 4;
         }
 
-        double millisPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
+        double millisPerBeat = SongMetaBpmUtils.MillisPerBeat(songMeta);
         double labelWidthInMillis = millisPerBeat * drawStepRough;
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
 
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)

@@ -245,7 +245,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public double DurationOfSongInMillis { get; private set; }
     public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
-    public double DurationOfSongInBeats => BpmUtils.MillisecondInSongToBeat(loadedSongMeta, DurationOfSongInMillis);
+    public double DurationOfSongInBeats => SongMetaBpmUtils.MillisToBeats(loadedSongMeta, DurationOfSongInMillis);
 
     /**
      * Position in the song from 0 (start of song) to 1 (end of song).
@@ -1127,7 +1127,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
 
         double millisInSong = PositionInSongInMillis;
-        double result = BpmUtils.MillisecondInSongToBeat(loadedSongMeta, millisInSong);
+        double result = SongMetaBpmUtils.MillisToBeats(loadedSongMeta, millisInSong);
         if (result < 0
             && !allowNegativeResult)
         {

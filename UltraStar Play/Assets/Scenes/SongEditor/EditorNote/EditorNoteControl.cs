@@ -297,7 +297,7 @@ public class EditorNoteControl : INeedInjection, IInjectionFinishedListener
         else if (!InputUtils.IsKeyboardControlPressed())
         {
             // Move the playback position to the start of the note
-            double positionInSongInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, Note.StartBeat);
+            double positionInSongInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, Note.StartBeat);
             songAudioPlayer.PositionInSongInMillis = positionInSongInMillis;
         }
     }

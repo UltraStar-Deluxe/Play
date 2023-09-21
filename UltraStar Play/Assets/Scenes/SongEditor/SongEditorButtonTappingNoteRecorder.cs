@@ -95,7 +95,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     private void OnJumpedBackInSong(Pair<double> previousAndNewPositionInMillis)
     {
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, previousAndNewPositionInMillis.Current);
+        int currentBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, previousAndNewPositionInMillis.Current);
         lastPitchDetectedBeat = currentBeat;
         upcomingSortedRecordedNotes = GetUpcomingSortedRecordedNotes();
     }
@@ -266,7 +266,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     private int GetBeat(double positionInSongInMillis)
     {
-        int beat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
+        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillis);
         return beat;
     }
 }

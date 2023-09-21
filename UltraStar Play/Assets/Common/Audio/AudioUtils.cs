@@ -125,8 +125,8 @@ public static class AudioUtils
             return null;
         }
 
-        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, startBeat);
-        double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
+        double startBeatInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, startBeat);
+        double singleBeatLengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta);
         double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
 
         float[] monoAudioSamples = GetAudioSamples(startBeatInMillis, lengthInMillis, audioClip, convertToMono);

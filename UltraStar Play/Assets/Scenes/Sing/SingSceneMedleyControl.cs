@@ -127,7 +127,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
         SongMeta songMeta = singSceneControl.SongMeta;
         int medleyStartBeat = SongMetaUtils.GetMedleyStartBeat(songMeta);
-        return BpmUtils.BeatToMillisecondsInSong(songMeta, medleyStartBeat);
+        return SongMetaBpmUtils.BeatsToMillis(songMeta, medleyStartBeat);
     }
 
     private double CalculateMedleyEndInMillis()
@@ -138,7 +138,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
         SongMeta songMeta = singSceneControl.SongMeta;
         int medleyEndBeat = SongMetaUtils.GetMedleyEndBeat(songMeta, settings.DefaultMedleyTargetDurationInSeconds);
-        return BpmUtils.BeatToMillisecondsInSong(songMeta, medleyEndBeat);
+        return SongMetaBpmUtils.BeatsToMillis(songMeta, medleyEndBeat);
     }
 
     private double CalculateMedleyDurationWithCountdownInMillis()

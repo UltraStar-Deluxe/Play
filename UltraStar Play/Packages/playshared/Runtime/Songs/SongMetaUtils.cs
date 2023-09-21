@@ -525,7 +525,7 @@ public static class SongMetaUtils
             Math.Abs(noteA.EndBeat - noteB.StartBeat),
             Math.Abs(noteB.EndBeat - noteA.StartBeat));
 
-        return noteDistanceInBeats * BpmUtils.MillisecondsPerBeat(songMeta);
+        return noteDistanceInBeats * SongMetaBpmUtils.MillisPerBeat(songMeta);
     }
 
     public static string GetMedleyName(List<SongMeta> songMetas)
@@ -549,7 +549,7 @@ public static class SongMetaUtils
     {
         if (songMeta.MedleyStartInMillis > 0)
         {
-            return (int)BpmUtils.MillisecondInSongToBeat(songMeta, songMeta.MedleyStartInMillis);
+            return (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.MedleyStartInMillis);
         }
         else
         {
@@ -561,7 +561,7 @@ public static class SongMetaUtils
     {
         if (songMeta.MedleyEndInMillis > 0)
         {
-            return (int)BpmUtils.MillisecondInSongToBeat(songMeta, songMeta.MedleyEndInMillis);
+            return (int)SongMetaBpmUtils.MillisToBeats(songMeta, songMeta.MedleyEndInMillis);
         }
         else
         {
@@ -593,7 +593,7 @@ public static class SongMetaUtils
     {
         // End the medley approx. 30 seconds afterward the start.
         int medleyStartBeta = GetMedleyStartBeat(songMeta);
-        int targetDurationInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetDurationInSeconds * 1000);
+        int targetDurationInBeats = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, targetDurationInSeconds * 1000);
         int targetEndBeat = medleyStartBeta + targetDurationInBeats;
 
         List<Sentence> sentencesAfterMedleyStart = GetVoiceById(songMeta, EVoiceId.P1)
@@ -891,7 +891,7 @@ public static class SongMetaUtils
         }
 
         int distanceInBeats = Math.Abs(a.StartBeat - b.EndBeat);
-        distanceInMillis = BpmUtils.BeatToMillisecondsInSongWithoutGap(songMeta, distanceInBeats);
+        distanceInMillis = SongMetaBpmUtils.BeatsToMillisWithoutGap(songMeta, distanceInBeats);
         return true;
     }
 
