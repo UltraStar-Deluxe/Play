@@ -185,6 +185,12 @@ public class SongMeta
     public virtual int VoiceCount => voiceIdToVoice.Count;
 
     /**
+     * Identifies the remote source of a song,
+     * for example the online server where it was found.
+     */
+    public virtual string RemoteSource { get; set; }
+
+    /**
      * Any value that does not have a dedicated field in
      * this data structure can be stored in this map.
      */
