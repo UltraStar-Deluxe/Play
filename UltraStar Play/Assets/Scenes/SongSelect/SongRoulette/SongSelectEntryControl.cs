@@ -79,6 +79,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         set
         {
             songSelectEntry = value;
+            VisualElement.SetVisibleByVisibility(songSelectEntry != null);
             UpdateLabels();
             UpdateIcons();
             UpdateCover();
@@ -328,49 +329,29 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateSongCover(SongSelectSongEntry songEntry)
     {
-        SongMeta coverSongMeta = songEntry.SongMeta;
-        SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta)
-            .Subscribe(uri =>
-            {
-                if (coverSongMeta != songEntry.SongMeta)
-                {
-                    // The associated song has changed in the meantime.
-                    return;
-                }
-                UpdateSongCoverFromUri(songEntry, uri);
-            });
-    }
-
-    private void UpdateSongCoverFromUri(SongSelectSongEntry songEntry, string uri)
-    {
-        if (uri.IsNullOrEmpty())
-        {
-            SetDefaultSongCoverImageWithColor();
-            return;
-        }
-
-        SongMeta coverSongMeta = songEntry.SongMeta;
-        ImageManager.LoadSpriteFromUri(uri)
+        SongMeta songMeta = songEntry.SongMeta;
+        SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                if (coverSongMeta != songEntry.SongMeta)
+
+                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
+                    || songSelectSongEntry.SongMeta != songMeta)
                 {
-                    // The associated song has changed in the meantime.
+                    // The entry changed in the meantime
                     return;
                 }
-
-                SetDefaultSongCoverImageWithColor();
+                SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
             })
-            .Subscribe(loadedSprite =>
+            .Subscribe(uri =>
             {
-                if (coverSongMeta != songEntry.SongMeta)
+                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
+                    || songSelectSongEntry.SongMeta != songMeta)
                 {
-                    // The associated song has changed in the meantime.
+                    // The entry changed in the meantime
                     return;
                 }
-
-                SetCoverImageWithoutColor(loadedSprite);
+                SongMetaImageUtils.SetCoverOrBackgroundImageFromUri(songMeta, uri, songImageOuter, songImageInner);
             });
     }
 
@@ -395,15 +376,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             songImageOuter.style.unityBackgroundImageTintColor = new StyleColor(StyleKeyword.Undefined);
             songImageInner.style.unityBackgroundImageTintColor = new StyleColor(StyleKeyword.Undefined);
         }
-    }
-
-    private void SetCoverImageWithoutColor(Sprite sprite)
-    {
-        songImageOuter.style.backgroundImage = new StyleBackground(sprite);
-        songImageOuter.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
-
-        songImageInner.style.backgroundImage = new StyleBackground(sprite);
-        songImageInner.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
     }
 
     private void UpdateIcons()

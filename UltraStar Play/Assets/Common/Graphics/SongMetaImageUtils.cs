@@ -26,10 +26,11 @@ public static class SongMetaImageUtils
         List<ISongBackgroundImageProvider> songBackgroundImageProviders = ModManager.GetModObjects<ISongBackgroundImageProvider>();
         if (songBackgroundImageProviders.IsNullOrEmpty())
         {
-            return Observable.Empty<string>();
+            return Observable.Return("");
         }
         return songBackgroundImageProviders
-            .Select(it => it.GetBackgroundImageUri(songMeta).FirstOrDefault())
+            .Select(songBackgroundImageProvider => songBackgroundImageProvider.GetBackgroundImageUri(songMeta))
+            .Merge()
             .FirstOrDefault()
             .ObserveOnMainThread();
     }
@@ -53,10 +54,11 @@ public static class SongMetaImageUtils
         List<ISongCoverImageProvider> songCoverImageProviders = ModManager.GetModObjects<ISongCoverImageProvider>();
         if (songCoverImageProviders.IsNullOrEmpty())
         {
-            return Observable.Empty<string>();
+            return Observable.Return("");
         }
         return songCoverImageProviders
-            .Select(it => it.GetCoverImageUri(songMeta).FirstOrDefault())
+            .Select(songCoverImageProvider => songCoverImageProvider.GetCoverImageUri(songMeta))
+            .Merge()
             .FirstOrDefault()
             .ObserveOnMainThread();
     }
@@ -64,15 +66,19 @@ public static class SongMetaImageUtils
     public static void SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
     {
         GetCoverOrBackgroundImageUri(songMeta)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                SetDefaultSongImageAndColor(songMeta, visualElements);
+            })
             .Subscribe(uri => SetCoverOrBackgroundImageFromUri(songMeta, uri, visualElements));
     }
 
-    private static void SetCoverOrBackgroundImageFromUri(SongMeta songMeta, string uri, params VisualElement[] visualElements)
+    public static void SetCoverOrBackgroundImageFromUri(SongMeta songMeta, string uri, params VisualElement[] visualElements)
     {
         if (uri.IsNullOrEmpty())
         {
-            SetDefaultSongImage(visualElements);
-            SetDefaultSongImageColor(songMeta, visualElements);
+            SetDefaultSongImageAndColor(songMeta, visualElements);
             return;
         }
 
@@ -80,8 +86,7 @@ public static class SongMetaImageUtils
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                SetDefaultSongImage(visualElements);
-                SetDefaultSongImageColor(songMeta, visualElements);
+                SetDefaultSongImageAndColor(songMeta, visualElements);
             })
             .Subscribe(loadedSprite =>
             {
@@ -91,6 +96,12 @@ public static class SongMetaImageUtils
                     visualElement.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
                 }
             });
+    }
+
+    public static void SetDefaultSongImageAndColor(SongMeta songMeta, params VisualElement[] visualElements)
+    {
+        SetDefaultSongImage(visualElements);
+        SetDefaultSongImageColor(songMeta, visualElements);
     }
 
     public static void SetDefaultSongImage(params VisualElement[] visualElements)
