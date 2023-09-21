@@ -838,3 +838,8 @@
     margin-top: 5px;
     margin-bottom: 5px;
 }
+
+#volumeSlider .unity-base-slider__dragger
+{
+    min-width: 12px;
+}
