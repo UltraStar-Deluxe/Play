@@ -94,7 +94,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject]
     private SongSelectSceneData sceneData;
 
-    private List<SongMeta> songMetas;
+    private List<SongMeta> songMetas = new();
     private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
     private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
     private float lastSongMetaCountUpdateTimeInSeconds;
