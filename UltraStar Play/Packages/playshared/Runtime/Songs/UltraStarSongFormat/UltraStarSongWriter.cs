@@ -118,8 +118,8 @@ public static class UltraStarFormatWriter
         AppendHeaderField(sb, "title", songMeta.Title);
         AppendHeaderField(sb, "artist", songMeta.Artist);
         AppendHeaderField(sb, "mp3", songMeta.Audio);
-        AppendHeaderField(sb, "VocalsAudio", songMeta.VocalsAudio);
-        AppendHeaderField(sb, "InstrumentalAudio", songMeta.InstrumentalAudio);
+        AppendHeaderField(sb, "Vocals", songMeta.VocalsAudio);
+        AppendHeaderField(sb, "Instrumental", songMeta.InstrumentalAudio);
         AppendHeaderField(sb, "MusicBrainzRecord", songMeta.MusicBrainzRecord);
         AppendHeaderField(sb, "MusicBrainzRelease", songMeta.MusicBrainzRelease);
         AppendHeaderField(sb, "MusicBrainzReleaseGroup", songMeta.MusicBrainzReleaseGroup);

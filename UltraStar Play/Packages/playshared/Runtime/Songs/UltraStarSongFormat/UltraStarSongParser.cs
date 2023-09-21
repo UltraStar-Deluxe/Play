@@ -257,12 +257,14 @@ public static class UltraStarSongParser
                 songMeta.TxtFileEndInMillis = ConvertToFloat(value);
                 break;
             case "gap":
+            case "audiogap":
                 songMeta.GapInMillis = ConvertToFloat(value);
                 break;
             case "genre":
                 songMeta.Genre = value;
                 break;
             case "instrumentalaudio":
+            case "instrumental":
                 songMeta.InstrumentalAudio = value;
                 break;
             case "language":
@@ -305,6 +307,7 @@ public static class UltraStarSongParser
                 songMeta.TxtFileVideoGapInSeconds = ConvertToFloat(value);
                 break;
             case "vocalsaudio":
+            case "vocals":
                 songMeta.VocalsAudio = value;
                 break;
             case "website":
