@@ -30,7 +30,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(RenderTextureManager.Instance);
         bb.BindExistingInstance(DontDestroyOnLoadManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
-        bb.BindExistingInstance(StatsManager.Instance);
+        bb.BindExistingInstance(StatisticsManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
         bb.BindExistingInstance(VfxManager.Instance);
@@ -73,7 +73,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings);
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings.PartyModeSettings);
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.NonPersistentSettings);
-        bb.BindExistingInstanceLazy(() => StatsManager.Instance.Statistics);
+        bb.BindExistingInstanceLazy(() => StatisticsManager.Instance.Statistics);
 
         return bb.GetBindings();
     }

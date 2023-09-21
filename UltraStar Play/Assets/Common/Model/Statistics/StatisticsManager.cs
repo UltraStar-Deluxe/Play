@@ -4,9 +4,8 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-//Holds all in-memory stats data
 [Serializable]
-public class StatsManager : AbstractSingletonBehaviour, INeedInjection
+public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -28,13 +27,13 @@ public class StatsManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    public static StatsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatsManager>();
+    public static StatisticsManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StatisticsManager>();
 
     private float lastSaveTimeInMillis;
 
     [Inject]
     private SceneNavigator sceneNavigator;
-    
+
     protected override object GetInstance()
     {
         return Instance;
@@ -49,10 +48,10 @@ public class StatsManager : AbstractSingletonBehaviour, INeedInjection
     public void Save()
     {
         Debug.Log("Writing database");
-        
+
         // Update the total play time before saving
         UpdateTotalPlayTime();
-        
+
         // Do not pretty print json. The database is relatively big compared to the settings.
         // To view the JSON file, use an external viewer/formatter, for example a web browser or JSON Viewer plugin of Notepad++.
         string json = JsonConverter.ToJson(Statistics, false);
