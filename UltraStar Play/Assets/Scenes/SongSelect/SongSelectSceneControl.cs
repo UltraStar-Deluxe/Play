@@ -94,7 +94,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject]
     private SongSelectSceneData sceneData;
 
-    private List<SongMeta> songMetas;
+    private List<SongMeta> songMetas = new();
     private List<SongMeta> lastSongMetasOfSongRouletteControl = new();
     private DirectoryInfo lastDirectoryInfoOfSongRouletteControl;
     private float lastSongMetaCountUpdateTimeInSeconds;
@@ -196,9 +196,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     [Inject(UxmlName = R.UxmlNames.previousDifficultyButton)]
     private Button previousDifficultyButton;
-
-    [Inject(UxmlName = R_PlayShared.UxmlNames.passTheMicToggle)]
-    private Toggle passTheMicToggle;
 
     private readonly SongSearchControl songSearchControl = new();
 
@@ -318,7 +315,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(it =>
             {
-                if (songOrderDropdownField.value is ESongOrder.Highscore)
+                if (songOrderDropdownField.value is ESongOrder.LocalHighScore)
                 {
                     UpdateFilteredSongs();
                 }
@@ -349,7 +346,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         createSingAlongSongControl.CreatedSingAlongVersionEventStream.Subscribe(processedSongMeta =>
         {
-            UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Mp3)}'");
+            UiManager.CreateNotification($"Created sing-along version of '{Path.GetFileName(processedSongMeta.Audio)}'");
         });
 
         // Song queue
@@ -427,11 +424,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         ModifiersOverlaySlideInControl = new(modifierDialogOverlay, ESide2D.Right, false);
         toggleModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.ToggleVisible());
         closeModifiersOverlayButton.RegisterCallbackButtonTriggered(_ => ModifiersOverlaySlideInControl.SlideOut());
-        modifierDialogControl.GetAvailableModifiersFunction = GetAvailableModifiers;
 
         // Modifier active icon
         modifiersActiveIcon.HideByDisplay();
-        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierOrFinishConditionActive)
+        nonPersistentSettings.ObserveEveryValueChanged(it => it.GameRoundSettings.AnyModifierActive)
             .Subscribe(_ => UpdateModifiersActiveIcon());
 
         // Delay initialization of modifier dialog control
@@ -453,37 +449,6 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Inject(modifierDialogControl);
         modifierDialogControl.OpenDialog(nonPersistentSettings.GameRoundSettings);
         modifierDialogOverlay.Query(R_PlayShared.UxmlNames.closeModifierDialogButton).ForEach(it => it.HideByDisplay());
-
-        // Disable 'pass the mic' toggle if needed. It requires a team with at least 2 players
-        if (!HasPartyModeSceneData
-            || PartyModeSettings.TeamSettings.Teams.AllMatch(team =>
-                team.playerProfiles.Count + team.guestPlayerProfiles.Count <= 1))
-        {
-            passTheMicToggle.value = false;
-            passTheMicToggle.SetEnabled(false);
-            passTheMicToggle.RegisterValueChangedCallback(evt =>
-            {
-                if (evt.newValue)
-                {
-                    UiManager.CreateNotification("'Pass the mic' requires a team with more than one player");
-                    StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () => passTheMicToggle.value = false));
-                }
-            });
-        }
-        else
-        {
-            passTheMicToggle.SetEnabled(true);
-        }
-    }
-
-    private List<EGameRoundModifier> GetAvailableModifiers()
-    {
-        List<EGameRoundModifier> availableModifiers = EnumUtils.GetValuesAsList<EGameRoundModifier>();
-        if (!HasPartyModeSceneData)
-        {
-            availableModifiers.Remove(EGameRoundModifier.PassTheMic);
-        }
-        return availableModifiers;
     }
 
     private void UpdateSongQueue()
@@ -506,8 +471,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void UpdateModifiersActiveIcon()
     {
-        modifiersActiveIcon.SetVisibleByDisplay(nonPersistentSettings.GameRoundSettings.AnyModifierOrFinishConditionActive);
-        modifiersInactiveIcon.SetVisibleByDisplay(!nonPersistentSettings.GameRoundSettings.AnyModifierOrFinishConditionActive);
+        modifiersActiveIcon.SetVisibleByDisplay(nonPersistentSettings.GameRoundSettings.AnyModifierActive);
+        modifiersInactiveIcon.SetVisibleByDisplay(!nonPersistentSettings.GameRoundSettings.AnyModifierActive);
     }
 
     private void UpdateMicCheckButton()
@@ -675,7 +640,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         SongQueueEntryDto songQueueEntryDto = new();
         songQueueEntryDto.SongDto = DtoConverter.ToDto(songMeta);
         songQueueEntryDto.SingScenePlayerDataDto = DtoConverter.ToDto(CreateSingScenePlayerData());
-        songQueueEntryDto.GameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
+        songQueueEntryDto.GameRoundSettingsDto = new GameRoundSettingsDto()
+        {
+            ModifierDtos = DtoConverter.ToDto(nonPersistentSettings.GameRoundSettings.modifiers),
+        };
         return songQueueEntryDto;
     }
 
@@ -724,17 +692,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return lyricsLabel;
         }
 
-        if (songMeta.GetVoices().Count < 2)
+        if (songMeta.VoiceCount < 2)
         {
-            string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
+            string lyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(lyrics));
         }
         else
         {
-            string firstVoiceLyrics = $"<i><b>{songMeta.VoiceNames.FirstOrDefault().Value}</b></i>\n\n"
-                                      + SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
-            string secondVoiceLyrics = $"<i><b>{songMeta.VoiceNames.LastOrDefault().Value}</b></i>\n\n"
-                                       + SongMetaUtils.GetLyrics(songMeta, Voice.secondVoiceName);
+            string firstVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(EVoiceId.P1)}</b></i>\n\n"
+                                      + SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
+            string secondVoiceLyrics = $"<i><b>{songMeta.GetVoiceDisplayName(EVoiceId.P2)}</b></i>\n\n"
+                                       + SongMetaUtils.GetLyrics(songMeta, EVoiceId.P2);
 
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(firstVoiceLyrics));
             lyricsDialogControl.AddVisualElement(CreateLyricsLabel(secondVoiceLyrics));
@@ -898,7 +866,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         singSceneData.gameRoundSettings = new(nonPersistentSettings.GameRoundSettings);
 
         if (singSceneData.gameRoundSettings != null
-            && singSceneData.gameRoundSettings.modifiers.Contains(EGameRoundModifier.ShortSong))
+            && singSceneData.gameRoundSettings.modifiers.AnyMatch(modifier => modifier is ShortSongGameRoundModifier))
         {
             // Set as medley song to play shortened version
             singSceneData.MedleySongIndex = 0;
@@ -918,7 +886,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
         singScenePlayerData.SelectedPlayerProfiles = selectedPlayerProfiles;
         singScenePlayerData.PlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
-        singScenePlayerData.PlayerProfileToVoiceNameMap = playerListControl.GetSelectedPlayerProfileToVoiceNameMap();
+        singScenePlayerData.PlayerProfileToVoiceIdMap = playerListControl.GetSelectedPlayerProfileToExtendedVoiceIdMap();
         return singScenePlayerData;
     }
 
@@ -940,7 +908,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void StartSingSceneWithGivenSongAndSettings(SongMeta songMeta)
     {
-        if (songMeta.FailedToLoadVoices)
+        if (songMeta is UltraStarSongMeta ultraStarSongMeta
+            && ultraStarSongMeta.HasFailedToLoadVoices)
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
@@ -961,7 +930,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
-        if (songMeta.FailedToLoadVoices)
+        if (songMeta is UltraStarSongMeta ultraStarSongMeta
+            && ultraStarSongMeta.HasFailedToLoadVoices)
         {
             UiManager.CreateNotification("Failed to load song. Check log for details.");
             return;
@@ -1042,7 +1012,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
-                string message = $"Audio file '{songMeta.Mp3}' could not be loaded.\n" +
+                string message = $"Audio file '{songMeta.Audio}' could not be loaded.\n" +
                                  $"Please use one of {ApplicationUtils.supportedAudioFiles.ToCsv(",", "", "")}\n" +
                                  $"or a supported website URI.";
                 Debug.LogError(message);
@@ -1215,6 +1185,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.OnSearchTextChanged");
 
+        // Search songs in song repositories
+        SongSearchParameters searchParameters = new(
+            songSearchControl.GetSearchText());
+        SongRepositoryUtils.SearchSongs(searchParameters)
+            .ThrottleFirst(TimeSpan.FromMilliseconds(500))
+            .Subscribe(songMeta =>
+            {
+                if (!songMetas.Contains(songMeta))
+                {
+                    songMetas.Add(songMeta);
+                }
+                UpdateFilteredSongs();
+            });
+
         SongSelectEntry lastSelectedEntry = songRouletteControl.SelectedEntry;
         string rawSearchText = songSearchControl.GetRawSearchText();
 
@@ -1245,7 +1229,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    public List<SongMeta> GetFilteredSongMetas()
+    private List<SongMeta> GetFilteredSongMetas()
     {
         // Ignore prefix for special search syntax
         IPlaylist playlist = SongSelectionPlaylistChooserControl.Selection.Value;
@@ -1255,7 +1239,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .Where(songMeta => songSelectFilterControl.SongMetaPassesActiveFilters(songMeta))
             .Where(songMeta => nonPersistentSettings.SongSelectDirectoryInfo == null
                                // Typically each song has its own folder. Thus, show a song if its PARENT folder matches the selected folder.
-                               || songMeta?.DirectoryInfo?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
+                               || SongMetaUtils.GetDirectoryInfo(songMeta)?.Parent?.FullName == nonPersistentSettings.SongSelectDirectoryInfo.FullName)
             .OrderBy(songMeta => GetSongMetaOrderByProperty(songMeta), songMetaPropertyComparer)
             .ToList();
         return filteredSongs;
@@ -1277,9 +1261,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 return SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
             case ESongOrder.Year:
                 return songMeta.Year;
-            case ESongOrder.Highscore:
+            case ESongOrder.LocalHighScore:
                 // Return negative value to sort descending
-                return -statistics.GetLocalHighscore(songMeta, settings.Difficulty);
+                return -StatisticsUtils.GetLocalHighScore(statistics, songMeta, settings.Difficulty);
             default:
                 Debug.LogWarning("Unknown order for songs: " + songOrderDropdownField.value);
                 return songMeta.Artist;
@@ -1340,7 +1324,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
     }
 
-    public void UpdateFilteredSongs()
+    private void UpdateFilteredSongs()
     {
         if (!SongMetaManager.IsSongScanFinished)
         {

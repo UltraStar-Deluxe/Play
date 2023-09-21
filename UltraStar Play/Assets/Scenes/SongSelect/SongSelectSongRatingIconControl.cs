@@ -1,38 +1,50 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine.UIElements;
 
 public class SongSelectSongRatingIconControl : INeedInjection
 {
     [Inject(UxmlName = R.UxmlNames.songRatingStarIcon)]
     private List<VisualElement> songRatingStarIcons;
-    
+
     [Inject]
     private Statistics statistics;
-    
+
     public void HideSongRatingIcons()
     {
         songRatingStarIcons.ForEach(it => it.HideByDisplay());
     }
-    
-    public void UpdateSongRatingIcons(SongMeta selectedSong, EDifficulty difficulty)
+
+    public void UpdateSongRatingIcons(SongMeta songMeta, EDifficulty difficulty)
     {
-        SongStatistics songStatistics = statistics.GetLocalStatistics(selectedSong);
-        if (songStatistics == null)
+        StatisticsUtils.GetLocalHighScoreEntries(statistics, songMeta)
+            .Subscribe(highScoreEntries =>
+            {
+                UpdateSongRatingIcons(highScoreEntries, difficulty);
+            });
+    }
+
+    private void UpdateSongRatingIcons(
+        List<HighScoreEntry> highScoreEntries,
+        EDifficulty difficulty)
+    {
+        if (highScoreEntries.IsNullOrEmpty())
         {
             HideSongRatingIcons();
-            return;
         }
-        
-        List<HighScoreEntry> topScores = songStatistics.HighScoreRecord.GetTopScores(1, difficulty);
+        List<HighScoreEntry> topScores = StatisticsUtils.GetTopScores(
+            highScoreEntries,
+            1,
+            difficulty);
         List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
         if (topScoreNumbers.IsNullOrEmpty())
         {
             HideSongRatingIcons();
             return;
         }
-        
+
         int topScore = topScoreNumbers.FirstOrDefault();
         int starCount = GetStarCount(topScore);
         for (int i = 0; i < songRatingStarIcons.Count; i++)

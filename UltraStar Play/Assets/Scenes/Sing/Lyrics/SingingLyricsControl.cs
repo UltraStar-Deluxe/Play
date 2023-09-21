@@ -90,11 +90,12 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
             }
 
             string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(themeManager.GetCurrentTheme(), path);
-            ImageManager.LoadSpriteFromUri(absolutePath, loadedSprite =>
-            {
-                positionBeforeLyricsIndicator.style.backgroundImage = new StyleBackground(loadedSprite);
-                positionBeforeLyricsIndicator.Icon = "";
-            });
+            ImageManager.LoadSpriteFromUri(absolutePath)
+                .Subscribe(loadedSprite =>
+                {
+                    positionBeforeLyricsIndicator.style.backgroundImage = new StyleBackground(loadedSprite);
+                    positionBeforeLyricsIndicator.Icon = "";
+                });
         });
     }
 
@@ -137,9 +138,9 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
         }
 
         double previousSentenceEndInMillis = previousSentence != null
-            ? BpmUtils.BeatToMillisecondsInSong(songMeta, previousSentence.ExtendedMaxBeat)
+            ? SongMetaBpmUtils.BeatsToMillis(songMeta, previousSentence.ExtendedMaxBeat)
             : 0;
-        double firstNoteStartBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, CurrentSentence.MinBeat);
+        double firstNoteStartBeatInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, CurrentSentence.MinBeat);
 
         if (Math.Abs(firstNoteStartBeatInMillis - previousSentenceEndInMillis) < 500)
         {
@@ -170,8 +171,8 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
     private void UpdateNoteHighlighting(double positionInSongInMillis)
     {
         Note currentNote = SortedNotes.FirstOrDefault(note =>
-            BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat) <= positionInSongInMillis
-            && positionInSongInMillis < BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat));
+            SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat) <= positionInSongInMillis
+            && positionInSongInMillis < SongMetaBpmUtils.BeatsToMillis(songMeta, note.EndBeat));
         HighlightNoteLyrics(positionInSongInMillis, currentNote);
     }
 
@@ -220,8 +221,8 @@ public class SingingLyricsControl : INeedInjection, IInjectionFinishedListener
 
                 GetCurrentNoteLyricsColor().IfNotDefault(color => label.style.color = new StyleColor(color));
 
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
-                double noteEndInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, note.EndBeat);
+                double noteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
+                double noteEndInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, note.EndBeat);
                 double noteDurationInMillis = noteEndInMillis - noteStartInMillis;
                 double noteDoneInMillis = positionInSongInMillis - noteStartInMillis;
                 if (noteDurationInMillis > 0

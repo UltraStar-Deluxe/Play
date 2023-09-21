@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
 using UniInject;
 
 // Disable warning about fields that are never assigned, their values are injected.

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using Serilog.Events;
 using UnityEditor.Build;
-using Debug = UnityEngine.Debug;
+using UnityEngine;
 
 public static class GitUtils
 {

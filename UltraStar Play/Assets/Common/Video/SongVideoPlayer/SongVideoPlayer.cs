@@ -241,7 +241,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private bool UseVlcMediaPlayerOfSongAudioPlayer => VideoSupportProvider == EVideoSupportProvider.Vlc
         && loadedSongMeta != null
-        && loadedSongMeta.Mp3 == loadedSongMeta.Video
+        && loadedSongMeta.Audio == loadedSongMeta.Video
         && songAudioPlayer.VlcMediaPlayer != null;
 
     private RenderTexture originalWebViewCameraRenderTexture;
@@ -427,7 +427,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         ResetWebViewRenderTexture();
         ResetFfmpegRenderTexture();
 
-        if (songMeta.Video == songMeta.Mp3
+        if (songMeta.Video == songMeta.Audio
             && songAudioPlayer.VlcMediaPlayer != null)
         {
             // Destroy old instance if any
@@ -583,7 +583,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                         else if (settings.FfmpegToPlayMediaFilesUsage
                                      is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
                                      or EThirdPartyLibraryUsage.Always
-                                 && string.Equals(songMeta.Mp3, songMeta.Video, StringComparison.InvariantCultureIgnoreCase))
+                                 && string.Equals(songMeta.Audio, songMeta.Video, StringComparison.InvariantCultureIgnoreCase))
                         {
                             Debug.Log($"Trying to load video with ffmpeg because Unity's VideoPlayer failed: '{uri}'");
                             LoadWithFfmpeg(songMeta, uri)
@@ -593,7 +593,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                                  is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
                                  or EThirdPartyLibraryUsage.Always)
                         {
-                            Debug.LogError($"Failed to load video with Unity's VideoPlayer and cannot use ffmpeg because the video and audio resource are not equal. Video URI: '{uri}', Video: '{songMeta.Video}', Audio URI: '{songMeta.Mp3}'");
+                            Debug.LogError($"Failed to load video with Unity's VideoPlayer and cannot use ffmpeg because the video and audio resource are not equal. Video URI: '{uri}', Video: '{songMeta.Video}', Audio URI: '{songMeta.Audio}'");
                         }
                         return;
                     }
@@ -706,7 +706,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                  && !IsPlaying)
 
         {
-            if (!IsWaitingForVideoGap(songAudioPlayer.PositionInSongInMillis, loadedSongMeta.VideoGap * 1000))
+            if (!IsWaitingForVideoGap(songAudioPlayer.PositionInSongInMillis, loadedSongMeta.VideoGapInMillis))
             {
                 PlayVideo();
                 SyncVideoPositionWithAudio(true);
@@ -724,7 +724,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
         double positionInAudioInMillis = songAudioPlayer.PositionInSongInMillis;
         double durationOfAudioInMillis = songAudioPlayer.DurationOfSongInMillis;
-        if (IsWaitingForVideoGap(positionInAudioInMillis, loadedSongMeta.VideoGap * 1000))
+        if (IsWaitingForVideoGap(positionInAudioInMillis, loadedSongMeta.VideoGapInMillis))
         {
             return;
         }
@@ -735,7 +735,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         // Both, the smooth sync and immediate sync need some time.
         nextSyncTimeInSeconds = Time.time + 1;
 
-        double targetPositionInVideoInMillis = (loadedSongMeta.VideoGap * 1000) + positionInAudioInMillis;
+        double targetPositionInVideoInMillis = (loadedSongMeta.VideoGapInMillis) + positionInAudioInMillis;
         if (IsLooping)
         {
             targetPositionInVideoInMillis %= DurationInMillis;
@@ -787,26 +787,27 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             videoImageVisualElement.style.opacity = 0;
         }
 
-        string imageUri = SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta);
-        LoadBackgroundImage(imageUri);
+        SongMetaImageUtils.GetBackgroundOrCoverImageUri(songMeta)
+            .Subscribe(uri => SetBackgroundImageFromUri(uri));
     }
 
-    private void LoadBackgroundImage(string imageUri)
+    private void SetBackgroundImageFromUri(string uri)
     {
-        if (imageUri.IsNullOrEmpty())
+        if (uri.IsNullOrEmpty())
         {
             return;
         }
 
-        ImageManager.LoadSpriteFromUri(imageUri, loadedSprite =>
-        {
-            if (backgroundImageVisualElement != null)
+        ImageManager.LoadSpriteFromUri(uri)
+            .Subscribe(loadedSprite =>
             {
-                backgroundImageVisualElement.ShowByDisplay();
-                backgroundImageVisualElement.style.backgroundImage = new StyleBackground(loadedSprite);
-            }
-            HasLoadedBackgroundImage = true;
-        });
+                if (backgroundImageVisualElement != null)
+                {
+                    backgroundImageVisualElement.ShowByDisplay();
+                    backgroundImageVisualElement.style.backgroundImage = new StyleBackground(loadedSprite);
+                }
+                HasLoadedBackgroundImage = true;
+            });
     }
 
     public void ReloadVideo()
@@ -832,10 +833,10 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
             {
                 Debug.Log($"Successfully loaded video of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
 
-                if (loadedSongMeta.VideoGap > 0)
+                if (loadedSongMeta.VideoGapInMillis > 0)
                 {
                     // Positive VideoGap, thus skip the start of the video
-                    PositionInVideoInSeconds = loadedSongMeta.VideoGap;
+                    PositionInVideoInMillis = loadedSongMeta.VideoGapInMillis;
                 }
 
                 ShowVideoImageVisualElement();

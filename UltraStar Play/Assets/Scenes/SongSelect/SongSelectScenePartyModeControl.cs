@@ -54,62 +54,6 @@ public class SongSelectScenePartyModeControl : INeedInjection, IInjectionFinishe
 
     public void OnInjectionFinished()
     {
-        UpdatePartyModeSettingsDescription();
-    }
-
-    private void UpdatePartyModeSettingsDescription()
-    {
-        if (!songSelectSceneControl.HasPartyModeSceneData)
-        {
-            return;
-        }
-
-        GameRoundSettings currentRoundSettings = nonPersistentSettings.GameRoundSettings;
-        GameRoundFinishConditionSettings finishConditionSettings = currentRoundSettings.finishConditionSettings;
-
-        string GetFinishConditionDescription()
-        {
-            if (finishConditionSettings == null)
-            {
-                return "";
-            }
-
-            if (finishConditionSettings.condition == EGameRoundFinishCondition.ReachPoints)
-            {
-                return $"Reach {finishConditionSettings.points} points";
-            }
-            else if (finishConditionSettings.condition == EGameRoundFinishCondition.ReachAdvanceOfPoints)
-            {
-                return $"Reach advance of {finishConditionSettings.points} points";
-            }
-
-            return "";
-        }
-
-        string GetUnconditionalModifierDescription()
-        {
-            if (currentRoundSettings.UnconditionalModifiers.IsNullOrEmpty())
-            {
-                return "";
-            }
-            string modifierCsv = currentRoundSettings.UnconditionalModifiers.ToList()
-                .OrderBy(it => it.ToString())
-                .JoinWith(", ");
-            return modifierCsv;
-        }
-
-        string GetConditionalModifierDescription()
-        {
-            if (currentRoundSettings.ConditionalModifiers.IsNullOrEmpty())
-            {
-                return "";
-            }
-            string modifierCsv = currentRoundSettings.ConditionalModifiers.ToList()
-                .OrderBy(it => it.ToString())
-                .JoinWith(", ");
-            string modifierConditionDescription = GameRoundSettingsUtils.GetModifierConditionDescription(currentRoundSettings);
-            return $"{modifierCsv} {modifierConditionDescription}";
-        }
     }
 
     public void SelectRandomSong()

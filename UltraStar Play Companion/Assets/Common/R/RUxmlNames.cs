@@ -69,7 +69,7 @@ public static partial class R
         public const string micViewContainer = "micViewContainer";
         public const string minimumLogLevelPicker = "minimumLogLevelPicker";
         public const string modifierChipsCombo = "modifierChipsCombo";
-        public const string modifierContainer = "modifierContainer";
+        public const string modifierChipsComboContainer = "modifierChipsComboContainer";
         public const string modifierDialogOverlay = "modifierDialogOverlay";
         public const string modifierDialogOverlayInner = "modifierDialogOverlayInner";
         public const string modifiersDialogOverlayTitle = "modifiersDialogOverlayTitle";

@@ -11,7 +11,7 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
 {
     private readonly Subject<SongListEvent> songListEventStream = new Subject<SongListEvent>();
     public IObservable<SongListEvent> SongListEventStream => songListEventStream;
-    
+
     public bool SuccessfullyLoadedAllSongs { get; private set; }
 
     public LoadedSongsDto LoadedSongsDto { get; private set; }
@@ -19,9 +19,6 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
 
-    [Inject]
-    private UnityWebRequestManager webRequestManager;
-    
     public void RequestSongList()
     {
         if (!mainGameHttpClient.IsConnected)
@@ -52,7 +49,7 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
             {
                 SuccessfullyLoadedAllSongs = true;
             }
-            
+
             songListEventStream.OnNext(new SongListEvent
             {
                 LoadedSongsDto = LoadedSongsDto,
@@ -70,7 +67,7 @@ public class SongListRequestor : MonoBehaviour, INeedInjection
     {
         FireErrorMessageEvent(TranslationManager.GetTranslation(R.Messages.companionApp_songList_error_general));
     }
-    
+
     private void FireErrorMessageEvent(string errorMessage)
     {
         Debug.LogError(errorMessage);

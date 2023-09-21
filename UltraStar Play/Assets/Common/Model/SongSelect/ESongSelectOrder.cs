@@ -6,5 +6,5 @@
     Language,
     Folder,
     Year,
-    Highscore,
+    LocalHighScore,
 }

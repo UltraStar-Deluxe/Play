@@ -79,6 +79,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         set
         {
             songSelectEntry = value;
+            VisualElement.SetVisibleByVisibility(songSelectEntry != null);
             UpdateLabels();
             UpdateIcons();
             UpdateCover();
@@ -249,7 +250,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             () => songSelectSceneControl.StartSongEditorScene());
         if (PlatformUtils.IsStandalone)
         {
-            if (DirectoryUtils.Exists(songEntry.SongMeta.Directory))
+            if (DirectoryUtils.Exists(SongMetaUtils.GetDirectoryPath(songEntry.SongMeta)))
             {
                 contextMenuPopup.AddButton("Open Folder", "open_in_new",
                     () => SongMetaUtils.OpenDirectory(songEntry.SongMeta));
@@ -328,34 +329,29 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateSongCover(SongSelectSongEntry songEntry)
     {
-        SongMeta coverSongMeta = songEntry.SongMeta;
-        string uri = SongMetaImageUtils.GetCoverOrBackgroundImageUri(coverSongMeta);
-        if (uri.IsNullOrEmpty())
-        {
-            SetDefaultSongCoverImageWithColor();
-            return;
-        }
-
-        ImageManager.LoadSpriteFromUri(uri,
-            loadedSprite =>
+        SongMeta songMeta = songEntry.SongMeta;
+        SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
+            .CatchIgnore((Exception ex) =>
             {
-                if (coverSongMeta != songEntry.SongMeta)
+                Debug.LogException(ex);
+
+                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
+                    || songSelectSongEntry.SongMeta != songMeta)
                 {
-                    // The associated song has changed in the meantime.
+                    // The entry changed in the meantime
                     return;
                 }
-
-                SetCoverImageWithoutColor(loadedSprite);
-            },
-            () =>
+                SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
+            })
+            .Subscribe(uri =>
             {
-                if (coverSongMeta != songEntry.SongMeta)
+                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
+                    || songSelectSongEntry.SongMeta != songMeta)
                 {
-                    // The associated song has changed in the meantime.
+                    // The entry changed in the meantime
                     return;
                 }
-
-                SetDefaultSongCoverImageWithColor();
+                SongMetaImageUtils.SetCoverOrBackgroundImageFromUri(songMeta, uri, songImageOuter, songImageInner);
             });
     }
 
@@ -382,15 +378,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
-    private void SetCoverImageWithoutColor(Sprite sprite)
-    {
-        songImageOuter.style.backgroundImage = new StyleBackground(sprite);
-        songImageOuter.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
-
-        songImageInner.style.backgroundImage = new StyleBackground(sprite);
-        songImageInner.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
-    }
-
     private void UpdateIcons()
     {
         if (SongSelectEntry is SongSelectSongEntry songEntry)
@@ -409,7 +396,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void UpdateSongIcons(SongSelectSongEntry songEntry)
     {
         favoriteIcon.SetVisibleByDisplay(playlistManager.FavoritesPlaylist.HasSongEntry(songEntry.SongMeta));
-        duetIcon.SetVisibleByDisplay(songEntry.SongMeta.VoiceNames.Count > 1);
+        duetIcon.SetVisibleByDisplay(songEntry.SongMeta.VoiceCount > 1);
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
         notSavedYetIcon.SetVisibleByDisplay(SongMetaUtils.IsGeneratedAndNotYetSaved(songEntry.SongMeta, generatedSongFolderAbsolutePath));
         songRatingIconControl.UpdateSongRatingIcons(songEntry.SongMeta, settings.Difficulty);

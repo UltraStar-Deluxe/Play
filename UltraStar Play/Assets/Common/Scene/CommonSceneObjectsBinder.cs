@@ -21,6 +21,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(CursorManager.Instance);
         bb.BindExistingInstance(UiManager.Instance);
         bb.BindExistingInstance(MidiManager.Instance);
+        bb.BindExistingInstance(ImageManager.Instance);
         bb.BindExistingInstance(AudioManager.Instance);
         bb.BindExistingInstance(TranslationManager.Instance);
         bb.BindExistingInstance(UltraStarPlayTranslationManager.Instance);
@@ -29,12 +30,11 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(RenderTextureManager.Instance);
         bb.BindExistingInstance(DontDestroyOnLoadManager.Instance);
         bb.BindExistingInstance(PlaylistManager.Instance);
-        bb.BindExistingInstance(StatsManager.Instance);
+        bb.BindExistingInstance(StatisticsManager.Instance);
         bb.BindExistingInstance(InputManager.Instance);
         bb.BindExistingInstance(BackgroundMusicManager.Instance);
         bb.BindExistingInstance(VfxManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
-        bb.BindExistingInstance(UnityWebRequestManager.Instance);
         bb.BindExistingInstance(BackgroundLightManager.Instance);
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
         bb.BindExistingInstance(SteamManager.Instance);
@@ -42,6 +42,8 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(AchievementEventStream.Instance);
         bb.BindExistingInstance(WebViewManager.Instance);
         bb.BindExistingInstance(SongMediaFileConversionManager.Instance);
+        bb.BindExistingInstance(ModManager.Instance);
+        bb.BindExistingInstance(RuntimeUiInspectionManager.Instance);
         bb.BindExistingInstance(VlcManager.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
 
@@ -71,7 +73,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings);
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.Settings.PartyModeSettings);
         bb.BindExistingInstanceLazy(() => SettingsManager.Instance.NonPersistentSettings);
-        bb.BindExistingInstanceLazy(() => StatsManager.Instance.Statistics);
+        bb.BindExistingInstanceLazy(() => StatisticsManager.Instance.Statistics);
 
         return bb.GetBindings();
     }

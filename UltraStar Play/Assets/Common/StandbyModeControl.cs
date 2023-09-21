@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEngine.UIElements;
 using UniInject;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 using UnityEngine.Video;
 
 // Disable warning about fields that are never assigned, their values are injected.

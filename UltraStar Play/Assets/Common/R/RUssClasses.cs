@@ -56,6 +56,7 @@ public static partial class R
         public const string leftSideBar = "leftSideBar";
         public const string listItem = "listItem";
         public const string lyricsContainer = "lyricsContainer";
+        public const string m_1 = "m-1";
         public const string m_2 = "m-2";
         public const string mainSceneButton = "mainSceneButton";
         public const string marginBottomSmaller = "marginBottomSmaller";
@@ -72,6 +73,7 @@ public static partial class R
         public const string mr_3 = "mr-3";
         public const string mr_4 = "mr-4";
         public const string mr_auto = "mr-auto";
+        public const string mt_1 = "mt-1";
         public const string mt_2 = "mt-2";
         public const string mt_3 = "mt-3";
         public const string mt_4 = "mt-4";
@@ -168,6 +170,7 @@ public static partial class R
         public const string warningFontColor = "warningFontColor";
         public const string wide = "wide";
         public const string wideControl = "wideControl";
+        public const string wordWrap = "wordWrap";
         public const string xxlFont = "xxlFont";
     }
 }

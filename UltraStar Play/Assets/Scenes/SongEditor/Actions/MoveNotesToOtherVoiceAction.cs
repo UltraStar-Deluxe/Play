@@ -12,12 +12,12 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
 
     // The notes can be moved if there exists a note
     // that is not yet inside a voice with one of the given voice names.
-    public bool CanMoveNotesToVoice(List<Note> selectedNotes, params string[] voiceNames)
+    public bool CanMoveNotesToVoice(List<Note> selectedNotes, params EVoiceId[] voiceIds)
     {
-        return selectedNotes.AnyMatch(note => !HasVoice(note, voiceNames));
+        return selectedNotes.AnyMatch(note => !HasVoice(note, voiceIds));
     }
 
-    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, string voiceName, bool smartSplit = true)
+    public MovedNotesToVoiceEvent MoveNotesToVoice(SongMeta songMeta, List<Note> selectedNotes, EVoiceId voiceId, bool smartSplit = true)
     {
         if (smartSplit
             && ShouldSplit(songMeta, selectedNotes))
@@ -26,7 +26,7 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
             List<MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult> moveNotesToVoiceResults = noteGroups
                 .Select(noteGroup =>
                 {
-                    MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteGroup, voiceName, true);
+                    MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteGroup, voiceId, true);
                     return moveNotesToVoiceResult;
                 })
                 .ToList();
@@ -36,8 +36,8 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
                 moveNotesToVoiceResults.SelectMany(it => it.ChangedSentences).ToList(),
                 moveNotesToVoiceResults.SelectMany(it => it.RemovedSentences).ToList());
         }
-        
-        MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, selectedNotes, voiceName, true);
+
+        MoveNotesToOtherVoiceUtils.MoveNotesToVoiceResult moveNotesToVoiceResult = MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, selectedNotes, voiceId, true);
         return new MovedNotesToVoiceEvent(
             moveNotesToVoiceResult.Notes,
             moveNotesToVoiceResult.ChangedSentences,
@@ -54,27 +54,27 @@ public class MoveNotesToOtherVoiceAction : INeedInjection
         }
 
         int lengthInBeats = SongMetaUtils.LengthInBeats(selectedNotes);
-        double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
+        double lengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta) * lengthInBeats;
         bool isVeryLong = lengthInMillis > 10000;
         return isVeryLong;
     }
 
-    public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, string voiceName)
+    public void MoveNotesToVoiceAndNotify(SongMeta songMeta, List<Note> selectedNotes, EVoiceId voiceId)
     {
-        MovedNotesToVoiceEvent movedNotesToVoiceEvent = MoveNotesToVoice(songMeta, selectedNotes, voiceName);
+        MovedNotesToVoiceEvent movedNotesToVoiceEvent = MoveNotesToVoice(songMeta, selectedNotes, voiceId);
         songMetaChangeEventStream.OnNext(movedNotesToVoiceEvent);
     }
 
-    private static bool HasVoice(Note note, string[] voiceNames)
+    private static bool HasVoice(Note note, EVoiceId[] voiceIds)
     {
-        if (voiceNames.IsNullOrEmpty()
+        if (voiceIds.IsNullOrEmpty()
             || note == null)
         {
             return false;
         }
         return note.Sentence != null
                && note.Sentence.Voice != null
-               && voiceNames.AnyMatch(voiceName => Voice.VoiceNameEquals(note.Sentence.Voice.Name, voiceName));
+               && voiceIds.AnyMatch(voiceId => note.Sentence.Voice.Id == voiceId);
     }
 
     private class SentenceWithRange

@@ -1,8 +1,26 @@
 ﻿using System;
 using System.Globalization;
+using System.Reflection;
 
 public static class PropertyUtils
 {
+    public static void CopyProperties<T>(T source, T target)
+    {
+        BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        FieldInfo[] fields = source.GetType().GetFields(bindingFlags);
+        PropertyInfo[] properties = source.GetType().GetProperties(bindingFlags);
+
+        foreach (FieldInfo field in fields)
+        {
+            field.SetValue(target, field.GetValue(source));
+        }
+
+        foreach (PropertyInfo property in properties)
+        {
+            property.SetValue(target, property.GetValue(source));
+        }
+    }
+
     public static Func<string> CreateStringGetterFromUintGetter(Func<uint> valueGetter, bool zeroToEmpty)
     {
         return () =>
@@ -42,7 +60,21 @@ public static class PropertyUtils
             {
                 return "";
             }
-            return value.ToString(null, CultureInfo.InvariantCulture);
+            return value.ToString(toStringFormat, CultureInfo.InvariantCulture);
+        };
+    }
+
+    public static Func<string> CreateStringGetterFromDoubleGetter(Func<double> valueGetter, bool zeroToEmpty, string toStringFormat)
+    {
+        return () =>
+        {
+            double value = valueGetter();
+            if (zeroToEmpty
+                && value == 0)
+            {
+                return "";
+            }
+            return value.ToString(toStringFormat, CultureInfo.InvariantCulture);
         };
     }
 
@@ -54,6 +86,22 @@ public static class PropertyUtils
                 && float.TryParse(newValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float newValueFloat))
             {
                 valueSetter(newValueFloat);
+            }
+            else
+            {
+                valueSetter(0);
+            }
+        };
+    }
+
+    public static Action<string> CreateStringSetterFromDoubleSetter(Action<double> valueSetter)
+    {
+        return (newValue) =>
+        {
+            if (!newValue.IsNullOrEmpty()
+                && double.TryParse(newValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double newValueDouble))
+            {
+                valueSetter(newValueDouble);
             }
             else
             {

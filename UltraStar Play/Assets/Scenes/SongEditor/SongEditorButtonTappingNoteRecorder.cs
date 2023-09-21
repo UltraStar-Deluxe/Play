@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
 using UniRx;
@@ -32,7 +31,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.buttonRecordingLyricsTextField)]
     private TextField buttonRecordingLyricsTextField;
-    
+
     private List<Note> upcomingSortedRecordedNotes = new();
 
     private int lastPitchDetectedFrame;
@@ -96,7 +95,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     private void OnJumpedBackInSong(Pair<double> previousAndNewPositionInMillis)
     {
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, previousAndNewPositionInMillis.Current);
+        int currentBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, previousAndNewPositionInMillis.Current);
         lastPitchDetectedBeat = currentBeat;
         upcomingSortedRecordedNotes = GetUpcomingSortedRecordedNotes();
     }
@@ -175,7 +174,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
         {
             return "";
         }
-        
+
         string remainingButtonTappingLyrics = buttonTappingLyrics.Substring(cursorIndex);
         int indexOfFirstSpaceOrNewline = StringUtils.MinIndexOf(remainingButtonTappingLyrics, 0, ' ', '\n');
         if (indexOfFirstSpaceOrNewline < 0)
@@ -267,7 +266,7 @@ public class SongEditorButtonTappingNoteRecorder : MonoBehaviour, INeedInjection
 
     private int GetBeat(double positionInSongInMillis)
     {
-        int beat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillis);
+        int beat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillis);
         return beat;
     }
 }

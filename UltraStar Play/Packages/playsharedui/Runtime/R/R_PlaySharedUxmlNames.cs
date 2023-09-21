@@ -19,9 +19,6 @@ public static partial class R_PlayShared
         public const string chipsComboLabel = "chipsComboLabel";
         public const string closeIcon = "closeIcon";
         public const string closeModifierDialogButton = "closeModifierDialogButton";
-        public const string conditionalModifierContainer = "conditionalModifierContainer";
-        public const string conditionContainer = "conditionContainer";
-        public const string conditionTitleLabel = "conditionTitleLabel";
         public const string container = "container";
         public const string contextMenu = "contextMenu";
         public const string contextMenuButton = "contextMenuButton";
@@ -44,13 +41,7 @@ public static partial class R_PlayShared
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string dialogTitleMaterialIcon = "dialogTitleMaterialIcon";
         public const string dummyButton = "dummyButton";
-        public const string finishConditionContainer = "finishConditionContainer";
-        public const string finishConditionPicker = "finishConditionPicker";
-        public const string finishConditionPointsSlider = "finishConditionPointsSlider";
-        public const string finishConditionPointsTextField = "finishConditionPointsTextField";
         public const string gameRoundPlayerEntryUiRoot = "gameRoundPlayerEntryUiRoot";
-        public const string hideLyricsToggle = "hideLyricsToggle";
-        public const string hideNotesToggle = "hideNotesToggle";
         public const string invalidValueIcon = "invalidValueIcon";
         public const string invalidValueLabel = "invalidValueLabel";
         public const string isMedleyIcon = "isMedleyIcon";
@@ -65,11 +56,8 @@ public static partial class R_PlayShared
         public const string micIcon = "micIcon";
         public const string micProgressBar = "micProgressBar";
         public const string micWithNameUiRoot = "micWithNameUiRoot";
-        public const string modifierConditionPicker = "modifierConditionPicker";
-        public const string modifierConditionScoreRangeSlider = "modifierConditionScoreRangeSlider";
-        public const string modifierConditionScoreRangeTextField = "modifierConditionScoreRangeTextField";
-        public const string modifierConditionTimeRangeSlider = "modifierConditionTimeRangeSlider";
-        public const string modifierConditionTimeRangeTextField = "modifierConditionTimeRangeTextField";
+        public const string modifierContainer = "modifierContainer";
+        public const string modifierToggle = "modifierToggle";
         public const string nameLabel = "nameLabel";
         public const string nextItemButton = "nextItemButton";
         public const string nextItemIcon = "nextItemIcon";
@@ -77,20 +65,15 @@ public static partial class R_PlayShared
         public const string notificationOverlay = "notificationOverlay";
         public const string okButton = "okButton";
         public const string overlay = "overlay";
-        public const string passTheMicToggle = "passTheMicToggle";
-        public const string playerAdvancePointsSlider = "playerAdvancePointsSlider";
-        public const string playerAdvancePointsTextField = "playerAdvancePointsTextField";
         public const string playerEntryList = "playerEntryList";
         public const string previousItemButton = "previousItemButton";
         public const string previousItemIcon = "previousItemIcon";
         public const string randomizeIcon = "randomizeIcon";
         public const string randomizeModifiersButton = "randomizeModifiersButton";
-        public const string reduceAudioToggle = "reduceAudioToggle";
         public const string resetModifiersButton = "resetModifiersButton";
         public const string roundModifierDialogUiRoot = "roundModifierDialogUiRoot";
         public const string row = "row";
         public const string rsetIcon = "rsetIcon";
-        public const string shortSongToggle = "shortSongToggle";
         public const string songArtist = "songArtist";
         public const string songInfo = "songInfo";
         public const string songQueueEntriesScrollView = "songQueueEntriesScrollView";
@@ -106,7 +89,6 @@ public static partial class R_PlayShared
         public const string toggleAccordionItemContentButton = "toggleAccordionItemContentButton";
         public const string toggleAccordionItemContentIcon = "toggleAccordionItemContentIcon";
         public const string toggleMedleyButton = "toggleMedleyButton";
-        public const string unconditionalModifierContainer = "unconditionalModifierContainer";
         public const string validationWarningContainer = "validationWarningContainer";
         public const string valueTextField = "valueTextField";
     }

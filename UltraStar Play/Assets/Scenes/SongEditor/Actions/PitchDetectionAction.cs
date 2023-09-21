@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -37,7 +36,7 @@ public class PitchDetectionAction : AbstractAudioClipAction
 
     public void CreateNotesUsingBasicPitch(bool notify)
     {
-        string fileName = Path.GetFileName(songMeta.Mp3);
+        string fileName = Path.GetFileName(songMeta.Audio);
         Job pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of '{fileName}'");
         IObservable<BasicPitchDetectionResult> pitchDetectionObservable = pitchDetectionManager.ProcessSongMetaAsObservable(songMeta, pitchDetectionJob);
 

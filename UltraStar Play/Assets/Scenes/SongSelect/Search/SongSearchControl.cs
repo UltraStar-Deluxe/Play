@@ -282,6 +282,16 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private bool SongMetaMatchesSearchedProperties(SongMeta songMeta, string searchText)
     {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        if (searchText.IsNullOrEmpty())
+        {
+             return true;
+        }
+
         if (searchProperties.Contains(ESearchProperty.Artist)
             && !songMeta.Artist.IsNullOrEmpty()
             && songMeta.Artist.ToLowerInvariant().Contains(searchText))
@@ -327,9 +337,19 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
     private bool SongMetaMatchesLyrics(SongMeta songMeta, string searchText)
     {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        if (searchText.IsNullOrEmpty())
+        {
+            return true;
+        }
+
         // TODO: Implement search on separate thread and concurrent update of search result.
         string searchTextLower = searchText.ToLowerInvariant();
-        return songMeta.GetVoices()
+        return songMeta.Voices
             .Select(voice => SongMetaUtils.GetLyrics(voice)
                 // The character '~' is often used in UltraStar files to indicate a change of pitch during the same syllable.
                 // Thus, it should be ignored when searching in lyrics.

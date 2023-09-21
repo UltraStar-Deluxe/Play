@@ -12,6 +12,14 @@
 
 // ## Example JSON
 {
+    // List of Unity Style Sheets (USS).
+    // See https://docs.unity3d.com/Manual/UIE-about-uss.html
+    // File references in these style sheets are not supported (e.g. referencing an image or font is not supported).
+    // Style sheets should be preferred because they are more stable and flexible than below styling options.
+    "styleSheets": [
+        "stylesheets/my-styles.uss"
+    ]
+
     // See below for the content of control style.
     // Not all controls need to be specified.
     // The defaultControl style will be used as fallback if needed.
@@ -23,7 +31,7 @@
     "toggle": {...},
     "staticPanel": {...},
     "dynamicPanel": {...},
-        
+
     // Font (and icon) colors
     "primaryFontColor": "#F0F0F0",
     "secondaryFontColor": "#C0C0C0",
@@ -60,11 +68,11 @@
         "videoPath": "videos/cool-loop.mp4",
         // Playback speed of the video where 1 is normal playback speed.
         "videoPlaybackSpeed": 0.5,
-    
+
         // Path to the video file that should be used as additive light.
         "lightVideoPath": "videos/cool-loop.mp4",
         "lightVideoPlaybackSpeed": 0.5,
-        
+
         // A single-pixel high image that defines the color gradient to use.
         "gradientRampFile": "gradients/green lime.png",
         // The type of gradient to use, accepted values are:
@@ -84,13 +92,13 @@
         "gradientAnimSpeed": 1.0,
         // Amplitude of the sine animation.
         "gradientAnimAmplitude": 0.2,
-        
+
         // The image to use for the background particles (preferably PNG with
         // alpha). Leave empty to hide particles.
         "particleFile": "",
         // The opacity of the background particles.
         "particleOpacity": 0.3
-        
+
         // The pattern file, i.e. a repeated image that will be displayed in the
         // background. PNG with alpha will work, to leave parts of the gradient
         // visible. Leave empty to hide pattern.
@@ -142,10 +150,10 @@
 
     // Custom background music.
     "backgroundMusic": "music/my-background-music.mp3",
-    
+
     // Color for the video preview in song select (can also be used to make it transparent).
     "videoPreviewColor": "#00FF0022",
-    
+
     // Defines the colors for the rating after each phrase.
     "phraseRatingColors": {
       "perfect": "#00FF00",
@@ -161,7 +169,7 @@
         "#00FF00",
         "#0000FF",
     ],
-    
+
     // Defines colors for the song editor
     "songEditorLayerColors": {
       "P1": "#ccbbaa",
@@ -187,7 +195,7 @@
     "hoverFocusFontColor": "...",
     "hoverActiveFontColor": "...",
     "disabledFontColor": "...",
-    
+
     "backgroundColor": "..."
     "hoverBackgroundColor": "..."
     "focusBackgroundColor": "..."
@@ -195,7 +203,7 @@
     "hoverFocusBackgroundColor": "..."
     "hoverActiveBackgroundColor": "..."
     "disabledBackgroundColor": "..."
-    
+
     "backgroundGradient": "45deg, #101828, #475467"
     "hoverBackgroundGradient": "..."
     "focusBackgroundGradient": "..."
@@ -203,7 +211,7 @@
     "hoverFocusBackgroundGradient": "..."
     "hoverActiveBackgroundGradient": "..."
     "disabledBackgroundGradient": "..."
-    
+
     "borderColor": "..."
     "hoverBorderColor": "..."
     "focusBorderColor": "..."
@@ -219,7 +227,7 @@
     "hoverFocusBackgroundImage": "..."
     "hoverActiveBackgroundImage": "..."
     "disabledBackgroundImage": "..."
-    
+
     "textShadow": : {
         "color": "#a0a0a0",
         "offset": {

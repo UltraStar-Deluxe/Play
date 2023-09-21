@@ -117,6 +117,9 @@ StreamingAssets/DemoSongs.meta
 StreamingAssets/ffmpeg/
 StreamingAssets/ffmpeg.meta
 
+StreamingAssets/RuntimeLoadedScripts/DemoMod
+StreamingAssets/RuntimeLoadedScripts/DemoMod.meta
+
 ######################################
 ## Play Mode Tests
 InitTestScene*

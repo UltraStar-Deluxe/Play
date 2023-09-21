@@ -34,28 +34,28 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     [InjectedInInspector]
     public AudioClip teamResultsApplauseAudioClip;
-    
+
     [InjectedInInspector]
     public AudioClip singingResultsApplauseAudioClip;
-    
+
     [InjectedInInspector]
     public AudioClip scoreBarAudioClip;
-    
+
     [Inject(UxmlName = R.UxmlNames.artistLabel)]
     private Label artistLabel;
 
     [Inject(UxmlName = R.UxmlNames.titleLabel)]
     private Label titleLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.coverImage)]
     private VisualElement coverImage;
-    
+
     [Inject(UxmlName = R.UxmlNames.onePlayerLayout)]
     private VisualElement onePlayerLayout;
 
     [Inject(UxmlName = R.UxmlNames.twoPlayerLayout)]
     private VisualElement twoPlayerLayout;
-    
+
     [Inject(UxmlName = R.UxmlNames.threePlayerLayout)]
     private VisualElement threePlayerLayout;
 
@@ -64,34 +64,34 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     [Inject(UxmlName = R.UxmlNames.continueButton)]
     private Button continueButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.quitButton)]
     private Button quitButton;
 
     [Inject(UxmlName = R.UxmlNames.restartButton)]
     private Button restartButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.background)]
     private VisualElement background;
-    
+
     [Inject(UxmlName = R.UxmlNames.showCurrentResultsButton)]
     private ToggleButton showCurrentResultsButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.showTeamResultsButton)]
     private ToggleButton showTeamResultsButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.showHighscoreButton)]
     private ToggleButton showHighscoreButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.playerResultsRoot)]
     private VisualElement playerResultsRoot;
-    
+
     [Inject(UxmlName = R.UxmlNames.teamResultsUi)]
     private VisualElement teamResultsUi;
-    
+
     [Inject(UxmlName = R.UxmlNames.highscoresRoot)]
     private VisualElement highscoresRoot;
-    
+
     [Inject]
     private Statistics statistics;
 
@@ -112,18 +112,18 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
 	[Inject]
     private SingingResultsSceneData sceneData;
-    
+
 	[Inject]
     private AchievementEventStream achievementEventStream;
-    
+
     private readonly List<SingingResultsPlayerControl> singingResultsPlayerUiControls = new();
     private readonly NextGameRoundUiControl nextGameRoundUiControl = new();
     private readonly TeamResultsUiControl teamResultsUiControl = new();
 
     private bool OnlyShowHighscores => sceneData.lastSceneData is SongSelectSceneData;
-    
+
     private readonly SingingResultsHighscoreControl highscoreControl = new();
-    
+
     public static SingingResultsSceneControl Instance
     {
         get
@@ -140,7 +140,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private readonly TabGroupControl tabGroupControl = new();
 
     private bool initializedTeamResultsParticleEffects;
-    
+
     public void OnInjectionFinished()
     {
         if (!OnlyShowHighscores)
@@ -155,19 +155,19 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     }
 
     private void Start()
-    {      
+    {
         tabGroupControl.AddTabGroupButton(showCurrentResultsButton, playerResultsRoot);
         tabGroupControl.AddTabGroupButton(showHighscoreButton, highscoresRoot);
         tabGroupControl.AddTabGroupButton(showTeamResultsButton, teamResultsUi);
-        
+
         continueButton.RegisterCallbackButtonTriggered(_ => Continue());
         continueButton.Focus();
-        
+
         showHighscoreButton.RegisterCallbackButtonTriggered(_ => highscoreControl.Init());
 
         InitSongDetails();
         InitSongPreview();
-        
+
         if (OnlyShowHighscores)
         {
             highscoreControl.Init();
@@ -187,7 +187,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void TriggerAchievementsOnSingingResultsStart()
     {
         if (sceneData.PlayerProfiles
-            .AnyMatch(playerProfile => playerProfile != null 
+            .AnyMatch(playerProfile => playerProfile != null
                                        && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
                                        && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000))
         {
@@ -221,14 +221,14 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
                 OnShowTeamResults();
             }
         });
-        
+
         if (!HasPartyModeSceneData)
         {
             showTeamResultsButton.HideByDisplay();
         }
-        
+
         restartButton.RegisterCallbackButtonTriggered(_ => RestartSingScene());
-        
+
         if (songQueueManager.IsSongQueueEmpty)
         {
             quitButton.HideByDisplay();
@@ -239,7 +239,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             quitButton.ShowByDisplay();
             quitButton.RegisterCallbackButtonTriggered(_ => GoToSongSelectScene());
         }
-        
+
         ActivateLayout();
         FillLayout();
 
@@ -263,7 +263,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         }
 
         AudioManager.PlaySoundEffect(teamResultsApplauseAudioClip, 0.8f);
-        
+
         // Create particle effect
         if (!initializedTeamResultsParticleEffects)
         {
@@ -279,7 +279,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
                 target = teamResultsUi,
                 hideAndShowWithTarget = true,
             });
-            
+
             VfxManager.CreateParticleEffect(new ParticleEffectConfig()
             {
                 particleEffect = EParticleEffect.Confetti_2,
@@ -291,7 +291,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
                 hideAndShowWithTarget = true,
             });
         }
-        
+
         // Trigger achievement
         achievementEventStream.OnNext(AchievementId.showFinalTeamResults);
     }
@@ -313,7 +313,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         singSceneData.PositionInSongInMillis = 0;
         sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
     }
-    
+
     private void KnockOutPartyTeams()
     {
         if (!HasPartyModeSceneData
@@ -356,7 +356,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         titleLabel.text = songMeta.Title;
         SongMetaImageUtils.SetCoverOrBackgroundImage(songMeta, coverImage);
     }
-    
+
     private void FillLayout()
     {
         VisualElement selectedLayout = GetSelectedLayout();
@@ -371,6 +371,8 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
         singingResultsPlayerUiControls.Clear();
         int i = 0;
+        bool showModScore = sceneData.PlayerProfiles
+            .AnyMatch(playerProfile => sceneData.GetPlayerScores(playerProfile)?.ModTotalScore != 0);
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
             sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
@@ -391,6 +393,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
                 SingingResultsPlayerControl singingResultsPlayerControl = new();
                 childInjector.AddBindingForInstance(Injector.RootVisualElementInjectionKey, playerUi, RebindingBehavior.Ignore);
                 childInjector.Inject(singingResultsPlayerControl);
+                singingResultsPlayerControl.SetModScoreVisible(showModScore);
                 singingResultsPlayerUiControls.Add(singingResultsPlayerControl);
             }
             i++;
@@ -400,7 +403,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void PrepareNPlayerLayout()
     {
         int playerCount = sceneData.PlayerProfiles.Count;
-        
+
         // Add elements to "square similar" grid
         int columns = (int)Math.Sqrt(sceneData.PlayerProfiles.Count);
         int rows = (int)Math.Ceiling((float)playerCount / columns);
@@ -425,12 +428,12 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             {
                 VisualElement playerUi = nPlayerUi.CloneTree().Children().FirstOrDefault();
                 playerUi.style.height = new StyleLength(Length.Percent(100f / rows));
-                
+
                 for (int i = 1; i <= playerCount; i++)
                 {
                     playerUi.AddToClassList($"singingResultUi-{i}");
                 }
-                
+
                 if (rows > 3)
                 {
                     playerUi.AddToClassList("singingResultUiSmallest");
@@ -493,13 +496,13 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             sceneNavigator.LoadScene(EScene.PartyModeScene);
             return;
         }
-        
+
         if (HasPartyModeSceneData)
         {
             // Increase party round index
             PartyModeSceneData.currentRoundIndex++;
         }
-        
+
         if (!songQueueManager.IsSongQueueEmpty)
         {
             // Start next game round
@@ -572,7 +575,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     {
         continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
-        
+
         if (HasPartyModeSceneData)
         {
             //sceneTitle.text += $" - {PartyModeSceneData.currentRoundIndex + 1} / {PartyModeSettings.roundCount}";
@@ -583,7 +586,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     {
         singingResultsPlayerUiControls.ForEach(it => it.Dispose());
     }
-    
+
     private void GivePartyModeTeamPoints()
     {
         if (!HasPartyModeSceneData)

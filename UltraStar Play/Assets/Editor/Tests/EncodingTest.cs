@@ -23,7 +23,7 @@ public class EncodingTest
         Assert.AreEqual(EncodingUtils.GetEncoding("cp1252"), Encoding.GetEncoding("windows-1252"));
         Assert.AreEqual(EncodingUtils.GetEncoding("windows1252"), Encoding.GetEncoding("WINDOWS-1252"));
     }
-    
+
     [Test]
     public void TestUtf8Bom()
     {
@@ -110,14 +110,14 @@ public class EncodingTest
     public void TestInvalidExplicit()
     {
         LogAssert.Expect(LogType.Exception, new Regex(@"ArgumentException: 'InvalidEncoding'.+"));
-        LogAssert.Expect(LogType.Error, new Regex(@"Failed to use explicitly specified encoding 'InvalidEncoding'.+"));
-      
+        LogAssert.Expect(LogType.Error, new Regex(@"Failed to find encoding for explicitly specified encoding name 'InvalidEncoding'.+"));
+
         TestFile("TestSong-invalid-explicit-encoding.txt",
             true,
             "SongArtist",
             "SongTitle");
     }
-    
+
     private void TestFile(
         string fileName,
         bool useUniversalCharsetDetector = true,
@@ -126,13 +126,13 @@ public class EncodingTest
         List<string> wordsInLyrics = null)
     {
         string filePath = folderPath + fileName;
-        SongMeta songMeta = SongMetaBuilder.ParseFile(filePath, out List<SongIssue> _, null, useUniversalCharsetDetector);
+        SongMeta songMeta = UltraStarSongParser.ParseFile(filePath, out List<SongIssue> _, null, useUniversalCharsetDetector);
         Assert.AreEqual(songArtist, songMeta.Artist);
         Assert.AreEqual(songTitle, songMeta.Title);
 
         if (!wordsInLyrics.IsNullOrEmpty())
         {
-            string lyrics = SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName);
+            string lyrics = SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1);
             wordsInLyrics.ForEach(word => Assert.IsTrue(lyrics.Contains(word), $"Lyrics did not contain the word '{word}'. Lyrics:\n{lyrics}"));
         }
     }

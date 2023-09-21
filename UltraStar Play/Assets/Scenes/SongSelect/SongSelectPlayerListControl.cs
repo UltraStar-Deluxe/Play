@@ -334,20 +334,11 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         return result;
     }
 
-    public Dictionary<PlayerProfile,string> GetSelectedPlayerProfileToVoiceNameMap()
+    public Dictionary<PlayerProfile, EExtendedVoiceId> GetSelectedPlayerProfileToExtendedVoiceIdMap()
     {
-        Dictionary<PlayerProfile,string> selectedPlayerProfileToVoiceNameMap = new();
-        playerEntryControls.ForEach(entry =>
-        {
-            if (entry.IsSelected.Value)
-            {
-                string voiceName = !entry.VoiceName.IsNullOrEmpty()
-                    ? entry.VoiceName
-                    : Voice.soloVoiceName;
-                selectedPlayerProfileToVoiceNameMap.Add(entry.PlayerProfile, voiceName);
-            }
-        });
-        return selectedPlayerProfileToVoiceNameMap;
+        return playerEntryControls
+            .Where(entry => entry.IsSelected.Value)
+            .ToDictionary(entry => entry.PlayerProfile, entry => entry.VoiceId);
     }
 
     public void ToggleSelectedPlayers()
@@ -465,7 +456,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         playerEntryControls.ForEach(entry =>
         {
             entry.ShowVoiceSelection(songMeta, voiceIndex);
-            voiceIndex = (voiceIndex + 1) % songMeta.VoiceNames.Count;
+            voiceIndex = (voiceIndex + 1) % songMeta.VoiceCount;
         });
     }
 
@@ -473,7 +464,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         SongMeta selectedSong = songSelectSceneControl.SelectedSong;
         bool hasMultipleVoices = selectedSong != null
-            && selectedSong.VoiceNames.Count > 1;
+            && selectedSong.Voices.Count > 1;
         if (hasMultipleVoices)
         {
             ShowVoiceSelection(selectedSong);

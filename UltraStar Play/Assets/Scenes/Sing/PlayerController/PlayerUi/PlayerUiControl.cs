@@ -68,6 +68,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private Injector injector;
+    public Injector Injector => injector;
 
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;

@@ -41,7 +41,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongEditorSceneInputControl songEditorSceneInputControl;
 
-    
+
     public bool HasCopiedNotes => copyPasteData != null && !copyPasteData.copiedNotes.IsNullOrEmpty();
 
     private SongEditorCopyPasteData copyPasteData;
@@ -57,7 +57,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         InputManager.GetInputAction(R.InputActions.songEditor_cut).PerformedAsObservable()
             .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
             .Subscribe(_ => CutSelectedNotes());
-        
+
         // Paste action
         InputManager.GetInputAction(R.InputActions.songEditor_paste).PerformedAsObservable()
             .Where(_ => !songEditorSceneInputControl.AnyInputFieldHasFocus())
@@ -82,7 +82,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
         int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
         int minBeat = copyPasteData.copiedNotes.Select(it => it.StartBeat).Min();
         int distanceInBeats = currentBeat - minBeat;
-        
+
         // Paste to enum layer
         foreach (Note copiedNote in copyPasteData.copiedNotes)
         {
@@ -93,14 +93,14 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
                 pastedNote.SetStartAndEndBeat(
                     pastedNote.StartBeat + distanceInBeats,
                     pastedNote.EndBeat + distanceInBeats);
-                
+
                 layerManager.AddNoteToEnumLayer(layerEnum, pastedNote);
                 pastedNotes.Add(pastedNote);
             }
         }
 
         // Paste to original voice
-        songMeta.GetVoices().ForEach(voice =>
+        songMeta.Voices.ForEach(voice =>
         {
             List<Note> copiedNotesFromVoice = copyPasteData.copiedNotes
                 .Where(copiedNote => !copyPasteData.copiedNoteToLayerMap.ContainsKey(copiedNote)
@@ -117,8 +117,8 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
                     pastedNote.EndBeat + distanceInBeats);
                 return pastedNote;
             }).ToList();
-            
-            moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, pastedNotesFromVoice, voice.Name);
+
+            moveNotesToOtherVoiceAction.MoveNotesToVoice(songMeta, pastedNotesFromVoice, voice.Id);
             pastedNotes.AddRange(pastedNotesFromVoice);
         });
 
@@ -131,8 +131,8 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
             }
             else
             {
-                string voiceName = pastedNote.Sentence?.Voice?.Name;
-                pastedNote.IsEditable = layerManager.IsVoiceLayerEditable(voiceName);
+                EVoiceId voiceId = pastedNote.Sentence?.Voice?.Id ?? EVoiceId.P1;
+                pastedNote.IsEditable = layerManager.IsVoiceLayerEditable(voiceId);
             }
         });
 
@@ -158,7 +158,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
     {
         CopyNotes(selectionControl.GetSelectedNotes());
     }
-    
+
     private void CopyNotes(List<Note> notes)
     {
         copyPasteData = new SongEditorCopyPasteData();
@@ -169,7 +169,7 @@ public class SongEditorCopyPasteManager : MonoBehaviour, INeedInjection
 
             Note copiedNote = note.Clone();
             copiedNote.SetSentence(null);
-            
+
             copyPasteData.copiedNotes.Add(copiedNote);
 
             if (note.Sentence != null

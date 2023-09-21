@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.UIElements;
 #if UNITY_ANDROID
     using UnityEngine.Android;
@@ -123,8 +122,16 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .WithRootVisualElement(visualElement)
             .CreateAndInject<DownloadSongArchiveUiControl>();
 
-        StartCoroutine(WebRequestUtils.LoadTextFromUri(songArchiveInfoJsonUrl,
-            json => downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(json)));
+        // Send web request
+        UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl));
+        webRequest.SendWebRequest();
+        StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
+            downloadHandler =>
+            {
+                downloadSongArchiveUiControl.SongArchiveEntries =
+                    JsonConverter.FromJson<List<SongArchiveEntry>>(downloadHandler.text);
+            },
+            ex => Debug.LogException(ex)));
 
         downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
         {
@@ -454,10 +461,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         visualElement.Q<Label>(R.UxmlNames.title).text = songMetaArtistAndTitle;
         Button openFolderButtonOfSongMeta = visualElement.Q<Button>(R.UxmlNames.openFolderButton);
         if (PlatformUtils.IsStandalone
-            && !songIssue.SongMeta.Directory.IsNullOrEmpty()
-            && Directory.Exists(songIssue.SongMeta.Directory))
+            && DirectoryUtils.Exists(SongMetaUtils.GetDirectoryPath(songIssue.SongMeta)))
         {
-            openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
+            openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(SongMetaUtils.GetDirectoryPath(songIssue.SongMeta)));
         }
         else
         {

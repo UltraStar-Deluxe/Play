@@ -15,7 +15,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
 
     [Inject]
     private SongEditorLayerManager layerManager;
-    
+
     [Inject]
     private SongMeta songMeta;
 
@@ -27,7 +27,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
 
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
-    
+
     [Inject]
     private SongEditorSceneControl songEditorSceneControl;
 
@@ -62,7 +62,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
             StopMidiPlayAlong();
         }
     }
-    
+
     private void RestartMidiPlayAlong()
     {
         if (!isPlaying)
@@ -72,7 +72,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         StopMidiPlayAlong();
         StartMidiPlayAlong();
     }
-    
+
     private bool InsideAnyVisibleNote()
     {
         int currentBeat = (int)songAudioPlayer.GetCurrentBeat(true);
@@ -103,20 +103,20 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
         double currentPositionInBeats = songAudioPlayer.GetCurrentBeat(true);
         List<Note> allVisibleNotes = songEditorSceneControl.GetAllVisibleNotes();
         List<Note> followingNotes = allVisibleNotes
-            .Where(note => note.StartBeat > currentPositionInBeats 
+            .Where(note => note.StartBeat > currentPositionInBeats
                            && layerManager.IsMidiSoundPlayAlongEnabled(layerManager.GetLayerOfNote(note)))
             .ToList();
         if (followingNotes.IsNullOrEmpty())
         {
             return;
         }
-        
+
         followingNotes.Sort(Note.comparerByStartBeat);
         Note firstNote = followingNotes.FirstOrDefault();
-        double firstNoteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, firstNote.StartBeat);
+        double firstNoteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, firstNote.StartBeat);
         double distanceToFirstNoteStartInMillis = firstNoteStartInMillis - songAudioPlayer.PositionInSongInMillis;
         distanceToFirstNoteStartInMillis += settings.SongEditorSettings.MidiPlaybackOffsetInMillis;
-        
+
         if (distanceToFirstNoteStartInMillis < 0)
         {
             distanceToFirstNoteStartInMillis = 0;
@@ -133,7 +133,7 @@ public class SongEditorMidiSoundPlayAlong : MonoBehaviour, INeedInjection
             timeFactor);
         MidiFileUtils.SetFirstDeltaTimeTo(midiFile, 0, (int)(distanceToFirstNoteStartInMillis * timeFactor));
         midiManager.PlayMidiFile(midiFile);
-        
+
         isPlaying = true;
         startTimeInSeconds = Time.time;
     }

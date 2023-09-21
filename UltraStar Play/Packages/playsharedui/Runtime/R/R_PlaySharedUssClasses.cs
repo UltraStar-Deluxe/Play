@@ -64,6 +64,9 @@ public static partial class R_PlayShared
         public const string fontIcon = "fontIcon";
         public const string fpsLabel = "fpsLabel";
         public const string fullMinHeightUnityContentContainer = "fullMinHeightUnityContentContainer";
+        public const string gameRoundModifierConfiguration = "gameRoundModifierConfiguration";
+        public const string gameRoundModifierConfigurationRoot = "gameRoundModifierConfigurationRoot";
+        public const string gameRoundModifierToggle = "gameRoundModifierToggle";
         public const string goldenNote = "goldenNote";
         public const string horizontal = "horizontal";
         public const string horizontalScrollBarTop = "horizontalScrollBarTop";
@@ -188,8 +191,11 @@ public static partial class R_PlayShared
         public const string unity_collection_view = "unity-collection-view";
         public const string unity_collection_view__item = "unity-collection-view__item";
         public const string unity_collection_view__item__selected = "unity-collection-view__item--selected";
+        public const string unity_double_field = "unity-double-field";
         public const string unity_enum_field = "unity-enum-field";
         public const string unity_enum_field__arrow = "unity-enum-field__arrow";
+        public const string unity_float_field = "unity-float-field";
+        public const string unity_integer_field = "unity-integer-field";
         public const string unity_label = "unity-label";
         public const string unity_list_view__empty_label = "unity-list-view__empty-label";
         public const string unity_progress_bar = "unity-progress-bar";

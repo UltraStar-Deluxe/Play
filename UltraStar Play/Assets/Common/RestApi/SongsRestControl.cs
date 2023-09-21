@@ -17,22 +17,22 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
 
     [Inject]
     private SongMetaManager songMetaManager;
-    
+
     [Inject]
     private PlaylistManager playlistManager;
-    
+
     protected override object GetInstance()
     {
         return Instance;
     }
-    
+
     protected override void StartSingleton()
     {
         httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Songs)
             .SetDescription("Get loaded songs")
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(SendLoadedSongs);
-        
+
         httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.Song)
             .SetDescription($"Get song details.")
             .SetRemoveOnDestroy(gameObject)
@@ -48,18 +48,18 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 }
 
                 bool isFavorite = playlistManager.HasSongEntry(playlistManager.FavoritesPlaylist, songMeta);
-                
+
                 SongDetailsDto songDetailsDto = new()
                 {
                     SongId = songId,
                     IsFavorite = isFavorite,
-                    VoiceNameToLyricsMap = CreateVoiceNameToLyricsMap(songMeta),
+                    VoiceNameToLyricsMap = CreateVoiceDisplayNameToLyricsMap(songMeta),
                 };
 
                 Debug.Log($"Returning song details for song {songId}");
                 requestData.Context.Response.WriteJson(songDetailsDto);
             });
-        
+
         httpServer.CreateEndpoint(HttpMethod.Get, HttpApiEndpointPaths.SongImage)
             .SetDescription($"Get song cover image. Returns the background image if no cover image was found.")
             .SetRemoveOnDestroy(gameObject)
@@ -95,27 +95,26 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 bool sendResponseComplete = false;
                 MainThreadDispatcher.Send(state =>
                 {
-                    ImageManager.LoadSpriteFromUri(imageUri, loadedSprite =>
+                    ImageManager.LoadSpriteFromUri(imageUri)
+                        .CatchIgnore((Exception ex) =>
                         {
-                            byte[] jpgBytes = loadedSprite.texture.EncodeToJPG();
-                            string jpgBytesBase64 = Convert.ToBase64String(jpgBytes);
-                            ImageDto imageDto = new()
-                            {
-                                JpgBytesBase64 = jpgBytesBase64,
-                            };
-                            
-                            Debug.Log($"Returning song image for song {songId}");
-                            requestData.Context.Response.WriteJson(imageDto);
-                            sendResponseComplete = true;
-                        },
-                        () =>
-                        {
+                            Debug.LogException(ex);
                             requestData.Context.Response.WriteJson(new ErrorMessageDto("Failed to load song image"));
                             sendResponseComplete = true;
                             Debug.LogError($"Failed to load song image from uri {imageUri}");
+                        })
+                        .Subscribe(loadedSprite =>
+                        {
+                            byte[] jpgBytes = loadedSprite.texture.EncodeToJPG();
+                            string jpgBytesBase64 = Convert.ToBase64String(jpgBytes);
+                            ImageDto imageDto = new() { JpgBytesBase64 = jpgBytesBase64, };
+
+                            Debug.Log($"Returning song image for song {songId}");
+                            requestData.Context.Response.WriteJson(imageDto);
+                            sendResponseComplete = true;
                         });
                 }, null);
-                
+
                 // Wait until the coroutine is finished.
                 // Otherwise the response is sent before the image is loaded.
                 Debug.Log($"Waiting for load image to complete");
@@ -135,17 +134,17 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
             });
 	}
 
-    private Dictionary<string,string> CreateVoiceNameToLyricsMap(SongMeta songMeta)
+    private Dictionary<string, string> CreateVoiceDisplayNameToLyricsMap(SongMeta songMeta)
     {
-        Dictionary<string, string> voiceNameToLyricsMap = new();
-        foreach (Voice voice in songMeta.GetVoices())
+        Dictionary<string, string> voiceIdToLyricsMap = new();
+        foreach (Voice voice in songMeta.Voices)
         {
-            string voiceDisplayName = songMeta.VoiceNames[voice.Name];
-            voiceNameToLyricsMap.Add(voiceDisplayName, SongMetaUtils.GetLyrics(voice, true));
+            string voiceDisplayName = songMeta.GetVoiceDisplayName(voice.Id);
+            voiceIdToLyricsMap.Add(voiceDisplayName, SongMetaUtils.GetLyrics(voice, true));
         }
-        return voiceNameToLyricsMap;
+        return voiceIdToLyricsMap;
     }
-    
+
     private void SendLoadedSongs(EndpointRequestData requestData)
     {
         SongMetaManager songMetaManager = SongMetaManager.Instance;
@@ -158,7 +157,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 {
                     Artist = songMeta.Artist,
                     Title = songMeta.Title,
-                    Hash = songMeta.SongHash,
+                    Hash = SongMetaManager.GetAndCacheUniqueHash(songMeta),
                 })
                 .ToList()
         }.ToJson());

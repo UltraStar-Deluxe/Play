@@ -10,6 +10,7 @@ public static partial class R
         public static readonly string action_longPress = "action_longPress";
         public static readonly string action_navigateRight = "action_navigateRight";
         public static readonly string action_openContextMenu = "action_openContextMenu";
+        public static readonly string action_openModsRootFolder = "action_openModsRootFolder";
         public static readonly string action_openSongEditor = "action_openSongEditor";
         public static readonly string action_openSongFolder = "action_openSongFolder";
         public static readonly string action_openSongMenu = "action_openSongMenu";
@@ -141,6 +142,17 @@ public static partial class R
         public static readonly string options_internet_button = "options_internet_button";
         public static readonly string options_internet_title = "options_internet_title";
         public static readonly string options_ipAddress = "options_ipAddress";
+        public static readonly string options_mod_button = "options_mod_button";
+        public static readonly string options_mod_helpDialog_developMods = "options_mod_helpDialog_developMods";
+        public static readonly string options_mod_helpDialog_developMods_title = "options_mod_helpDialog_developMods_title";
+        public static readonly string options_mod_helpDialog_install = "options_mod_helpDialog_install";
+        public static readonly string options_mod_helpDialog_install_title = "options_mod_helpDialog_install_title";
+        public static readonly string options_mod_helpDialog_intro = "options_mod_helpDialog_intro";
+        public static readonly string options_mod_helpDialog_intro_title = "options_mod_helpDialog_intro_title";
+        public static readonly string options_mod_helpDialog_modLoading = "options_mod_helpDialog_modLoading";
+        public static readonly string options_mod_helpDialog_modLoading_title = "options_mod_helpDialog_modLoading_title";
+        public static readonly string options_mod_helpDialog_title = "options_mod_helpDialog_title";
+        public static readonly string options_mod_title = "options_mod_title";
         public static readonly string options_noiseSuppression = "options_noiseSuppression";
         public static readonly string options_note = "options_note";
         public static readonly string options_noteDisplayMode = "options_noteDisplayMode";
@@ -327,6 +339,7 @@ public static partial class R
         public static readonly string uri_howToAddAndCreateSongs = "uri_howToAddAndCreateSongs";
         public static readonly string uri_howToCompanionApp = "uri_howToCompanionApp";
         public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
+        public static readonly string uri_howToMods = "uri_howToMods";
         public static readonly string uri_howToSongEditor = "uri_howToSongEditor";
         public static readonly string uri_logFiles = "uri_logFiles";
         public static readonly string uri_songEditorVideoTutorials = "uri_songEditorVideoTutorials";

@@ -15,19 +15,19 @@ public static class MidiToSongMetaUtils
         {
             return;
         }
-        
+
         List<TrackAndChannel> tracksAndChannels = MidiFileUtils.GetTracksAndChannels(midiFile);
         if (tracksAndChannels.IsNullOrEmpty())
         {
             return;
         }
-        
+
         List<MidiEvent> lyricsEvents = MidiFileUtils.GetLyricsEvents(midiFile);
         if (lyricsEvents.IsNullOrEmpty())
         {
             return;
         }
-        
+
         MidiFileUtils.CalculateMidiEventTimesInMillis(
             midiFile,
             out Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
@@ -39,19 +39,19 @@ public static class MidiToSongMetaUtils
             return;
         }
         MidiTrack track = midiFile.Tracks[lyricsTrackAndChannel.trackIndex];
-        
+
         List<Note> loadedNotes = LoadLyricsFromMidiFile(songMeta, midiFile, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
         MoveNotesToPitchAndPositionOfTrack(songMeta, track, lyricsTrackAndChannel.channelIndex, loadedNotes, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
 
         AssignNotesToVoice(
             songMeta,
             loadedNotes,
-            Voice.firstVoiceName,
+            EVoiceId.P1,
             track,
             midiEventToDeltaTimeInMillis,
             midiEventToAbsoluteDeltaTimeInMillis);
     }
-    
+
     public static List<Note> LoadNotesFromMidiFile(
         SongMeta songMeta,
         MidiFile midiFile,
@@ -66,7 +66,7 @@ public static class MidiToSongMetaUtils
         {
             throw new UltraStarPlayException($"No track with index {trackIndex}");
         }
-        
+
         using DisposableStopwatch d = new("LoadNotesFromMidiFile took <ms>");
 
         MidiTrack track = midiFile.Tracks[trackIndex];
@@ -91,12 +91,12 @@ public static class MidiToSongMetaUtils
         {
             return new List<Note>();
         }
-        
+
         if (loadedNotes.IsNullOrEmpty())
         {
             throw new UltraStarPlayException($"No notes found in channel {channelIndex} of track {trackIndex}");
         }
-        
+
         Debug.Log($"Loaded {loadedNotes.Count} notes from midi file");
         return loadedNotes;
     }
@@ -117,7 +117,7 @@ public static class MidiToSongMetaUtils
 
         List<Note> unusedNotesOfTrack = new List<Note>(notesOfTrack);
         List<Note> unusedLoadedNotes = new List<Note>(loadedNotes);
-        
+
         Note lastMatchingNoteOfTrack = null;
         foreach (Note note in loadedNotes)
         {
@@ -135,10 +135,10 @@ public static class MidiToSongMetaUtils
             // Remove all previous notes of track because these can never qualify for the remaining notes.
             unusedNotesOfTrack.RemoveAll(n => n.EndBeat < matchingNoteOfTrack.EndBeat);
             unusedLoadedNotes.Remove(note);
-            
+
             note.SetMidiNote(matchingNoteOfTrack.MidiNote);
             note.SetStartAndEndBeat(matchingNoteOfTrack.StartBeat, matchingNoteOfTrack.EndBeat);
-            
+
             lastMatchingNoteOfTrack = matchingNoteOfTrack;
         }
     }
@@ -153,10 +153,10 @@ public static class MidiToSongMetaUtils
     private static List<Note> LoadLyricsFromMidiFile(SongMeta songMeta, MidiFile midiFile, Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis, Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis)
     {
         using DisposableStopwatch d = new("LoadLyricsFromMidiFile took <ms>");
-        
+
         int defaultMidiNote = SettingsManager.Instance.Settings.SongEditorSettings.DefaultPitchForCreatedNotes;
         int defaultUltraStarTxtPitch = MidiUtils.GetUltraStarTxtPitch(defaultMidiNote);
-        
+
         List<MidiEvent> lyricsEvents = MidiFileUtils.GetLyricsEvents(midiFile);
         if (lyricsEvents.IsNullOrEmpty())
         {
@@ -167,7 +167,7 @@ public static class MidiToSongMetaUtils
         List<Note> loadedNotes = LoadNotesFromLyricsEvents(songMeta, lyricsEvents, defaultUltraStarTxtPitch, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
         ExpandNotesToUseAvailableSpace(songMeta, loadedNotes);
         NormalizeTextOnNotes(loadedNotes);
-        
+
         return loadedNotes;
     }
 
@@ -181,7 +181,7 @@ public static class MidiToSongMetaUtils
             {
                 note.SetText(note.Text.Replace("\n", ""));
             }
-            
+
             // Move space to end of word
             if (lastNote != null
                 && note.Text.StartsWith(" ")
@@ -190,7 +190,7 @@ public static class MidiToSongMetaUtils
                 lastNote.SetText(lastNote.Text + " ");
                 note.SetText(note.Text.Substring(1));
             }
-            
+
             lastNote = note;
         }
     }
@@ -204,7 +204,7 @@ public static class MidiToSongMetaUtils
             {
                 continue;
             }
-    
+
             Note note = notes[i];
             Note nextNote = notes[nextNoteIndex];
             int availableSpaceInBeats = nextNote.StartBeat - note.EndBeat - 1;
@@ -214,7 +214,7 @@ public static class MidiToSongMetaUtils
             }
 
             int targetLengthInMillis = 100;
-            int targetLengthInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, targetLengthInMillis);
+            int targetLengthInBeats = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, targetLengthInMillis);
             int newLengthInBeats = Math.Min(targetLengthInBeats, availableSpaceInBeats);
             if (newLengthInBeats > 0)
             {
@@ -222,7 +222,7 @@ public static class MidiToSongMetaUtils
             }
         }
     }
-    
+
     private static List<Note> LoadNotesFromLyricsEvents(
         SongMeta songMeta,
         List<MidiEvent> lyricsEvents,
@@ -241,9 +241,9 @@ public static class MidiToSongMetaUtils
             {
                 continue;
             }
-    
+
             midiEventToAbsoluteDeltaTimeInMillis.TryGetValue(midiEvent, out int absoluteDeltaTimeInMillis);
-            int beat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, absoluteDeltaTimeInMillis));
+            int beat = (int)Math.Round(SongMetaBpmUtils.MillisToBeats(songMeta, absoluteDeltaTimeInMillis));
             Note note = new Note(ENoteType.Normal, beat, 1, ultraStarTxtPitch, midiEventLyrics);
             loadedNotes.Add(note);
         }
@@ -267,18 +267,18 @@ public static class MidiToSongMetaUtils
         {
             throw new UltraStarPlayException($"No midi event in channel {channelIndex}");
         }
-        
+
         Dictionary<int, Note> midiPitchToNoteUnderConstruction = new();
-        
+
         midiEventsOfChannel.ForEach(midiEvent =>
         {
-            if (midiEvent.TryGetMidiEventTypeEnumFast(out MidiEventTypeEnum midiEventTypeEnum) 
+            if (midiEvent.TryGetMidiEventTypeEnumFast(out MidiEventTypeEnum midiEventTypeEnum)
                 && midiEventTypeEnum == MidiEventTypeEnum.NoteOn)
             {
                 HandleStartOfNote(songMeta, midiEvent, midiPitchToNoteUnderConstruction, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
             }
-    
-            if (midiEvent.TryGetMidiEventTypeEnumFast(out midiEventTypeEnum) 
+
+            if (midiEvent.TryGetMidiEventTypeEnumFast(out midiEventTypeEnum)
                 && midiEventTypeEnum == MidiEventTypeEnum.NoteOff)
             {
                 HandleEndOfNote(songMeta, midiEvent, midiPitchToNoteUnderConstruction, loadedNotes, midiEventToDeltaTimeInMillis, midiEventToAbsoluteDeltaTimeInMillis);
@@ -300,20 +300,20 @@ public static class MidiToSongMetaUtils
         {
             return;
         }
-        
+
         Note newNote = new();
-        int startBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, absoluteDeltaTimeInMillis));
+        int startBeat = (int)Math.Round(SongMetaBpmUtils.MillisToBeats(songMeta, absoluteDeltaTimeInMillis));
         newNote.SetStartAndEndBeat(startBeat, startBeat);
         newNote.SetMidiNote(midiPitch);
-        
+
         if (midiPitchToNoteUnderConstruction.ContainsKey(midiPitch))
         {
             Debug.LogWarning($"A Note with pitch {midiPitch} started but did not end before the next. The note will be ignored.");
         }
-        
+
         midiPitchToNoteUnderConstruction[midiPitch] = newNote;
     }
-    
+
     private static void HandleEndOfNote(
         SongMeta songMeta,
         MidiEvent midiEvent,
@@ -327,8 +327,8 @@ public static class MidiToSongMetaUtils
         {
             return;
         }
-        
-        int endBeat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, absoluteDeltaTimeInMillis));
+
+        int endBeat = (int)Math.Round(SongMetaBpmUtils.MillisToBeats(songMeta, absoluteDeltaTimeInMillis));
         if (midiPitchToNoteUnderConstruction.TryGetValue(midiPitch, out Note existingNote))
         {
             if (endBeat > existingNote.StartBeat)
@@ -347,11 +347,11 @@ public static class MidiToSongMetaUtils
             Debug.LogWarning($"No Note for pitch {MidiUtils.GetAbsoluteName(midiPitch)} is being constructed. Ignoring this Note_Off event at {absoluteDeltaTimeInMillis} ms.");
         }
     }
-    
+
     public static void AssignNotesToVoice(
         SongMeta songMeta,
         List<Note> loadedNotes,
-        string voiceName,
+        EVoiceId voiceId,
         MidiTrack track,
         Dictionary<MidiEvent, int> midiEventToDeltaTimeInMillis,
         Dictionary<MidiEvent, int> midiEventToAbsoluteDeltaTimeInMillis)
@@ -380,7 +380,7 @@ public static class MidiToSongMetaUtils
                 }
 
                 midiEventToDeltaTimeInMillis.TryGetValue(midiEvent, out int deltaTimeInMillis);
-                int beat = (int)Math.Round(BpmUtils.MillisecondInSongToBeat(songMeta, deltaTimeInMillis));
+                int beat = (int)Math.Round(SongMetaBpmUtils.MillisToBeats(songMeta, deltaTimeInMillis));
                 List<Note> correspondingNotes = notesWithoutGroup
                     .Where(note => note.StartBeat <= beat)
                     .ToList();
@@ -398,13 +398,13 @@ public static class MidiToSongMetaUtils
             // Thus, split into groups here.
             noteGroups = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, loadedNotes);
         }
-        
+
         noteGroups.ForEach(notesGroup =>
         {
-            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, notesGroup, voiceName, false);
+            MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, notesGroup, voiceId, false);
         });
     }
-    
+
     public static TrackAndChannel FindTrackAndChannelWithBestMatchingNotesForLyricsEvents(
         MidiFile midiFile,
         List<MidiEvent> lyricsEvents,
@@ -415,16 +415,16 @@ public static class MidiToSongMetaUtils
         {
             return null;
         }
-        
+
         using DisposableStopwatch d = new("FindBestMatchingTrackAndChannel took <ms>");
-        
+
         MidiTrack bestTrack = MidiFileUtils.FindTrackWithLongestLyrics(midiFile);
         if (bestTrack == null)
         {
             return trackAndChannels.FirstOrDefault();
         }
         int bestTrackIndex = midiFile.Tracks.IndexOf(bestTrack);
-        
+
         int bestChannelIndex = FindChannelIndexWithBestMatchingNotesForLyricsEvents(bestTrack, lyricsEvents, midiEventToAbsoluteDeltaTimeInMillis);
         if (bestChannelIndex < 0)
         {
@@ -432,7 +432,7 @@ public static class MidiToSongMetaUtils
         }
         return new TrackAndChannel(bestTrackIndex, bestChannelIndex);
     }
-    
+
     private static int FindChannelIndexWithBestMatchingNotesForLyricsEvents(
         MidiTrack track,
         List<MidiEvent> lyricsEvents,
@@ -447,7 +447,7 @@ public static class MidiToSongMetaUtils
         {
             return channelIndexes[0];
         }
-        
+
         // For each channel, calculate difference to lyrics events.
         // Then return the channel with smallest difference.
         Dictionary<int, double> channelIndexToDistance = new();
@@ -458,7 +458,7 @@ public static class MidiToSongMetaUtils
                                     && midiEvent.TryGetMidiEventTypeEnumFast(out MidiEventTypeEnum midiEventTypeEnum)
                                         && midiEventTypeEnum == MidiEventTypeEnum.NoteOn)
                 .ToList();
-        
+
             Dictionary<MidiEvent, MidiEvent> lyricsEventToNoteEvent = new();
 
             double distanceOfChannel = 0;
@@ -468,7 +468,7 @@ public static class MidiToSongMetaUtils
                 {
                     break;
                 }
-                
+
                 MidiEvent closestNoteOfLyricsEvent = noteEventsOfChannel.FindMinElement(noteEvent =>
                     GetMidiEventAbsoluteTimeDistance(lyricsEvent, noteEvent, midiEventToAbsoluteDeltaTimeInMillis));
                 if (closestNoteOfLyricsEvent == null)
@@ -477,27 +477,27 @@ public static class MidiToSongMetaUtils
                     distanceOfChannel += GetAbsoluteDeltaTimeInMillis(lyricsEvent, midiEventToAbsoluteDeltaTimeInMillis);
                 }
 
-                // Following matches must be behind this. Thus, remove all notes up to the current match. 
-                while (!noteEventsOfChannel.IsNullOrEmpty() 
+                // Following matches must be behind this. Thus, remove all notes up to the current match.
+                while (!noteEventsOfChannel.IsNullOrEmpty()
                        && noteEventsOfChannel[0] != closestNoteOfLyricsEvent)
                 {
                     noteEventsOfChannel.RemoveAt(0);
                 }
-                
+
                 double distanceOfNote = GetMidiEventAbsoluteTimeDistance(lyricsEvent, closestNoteOfLyricsEvent, midiEventToAbsoluteDeltaTimeInMillis);
                 distanceOfChannel += distanceOfNote;
             }
-        
+
             // Add unmatched notes to distance
             distanceOfChannel += noteEventsOfChannel.Sum(noteEvent => GetAbsoluteDeltaTimeInMillis(noteEvent, midiEventToAbsoluteDeltaTimeInMillis));
-            
+
             channelIndexToDistance[channelIndex] = distanceOfChannel;
         }
-        
+
         int channelIndexWithSmallestDistance = channelIndexToDistance.FindMinElement(entry => entry.Value).Key;
         return channelIndexWithSmallestDistance;
     }
-    
+
     private static double GetMidiEventAbsoluteTimeDistance(
         MidiEvent a,
         MidiEvent b,
@@ -518,7 +518,7 @@ public static class MidiToSongMetaUtils
         {
             return GetAbsoluteDeltaTimeInMillis(a, midiEventToAbsoluteDeltaTimeInMillis);
         }
-            
+
         return Mathf.Abs(GetAbsoluteDeltaTimeInMillis(a, midiEventToAbsoluteDeltaTimeInMillis) - GetAbsoluteDeltaTimeInMillis(b, midiEventToAbsoluteDeltaTimeInMillis));
     }
 

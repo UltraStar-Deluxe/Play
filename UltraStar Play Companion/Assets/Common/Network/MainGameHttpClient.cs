@@ -22,9 +22,6 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
     private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
     [Inject]
-    private UnityWebRequestManager webRequestManager;
-
-    [Inject]
     private Settings settings;
 
     private readonly Subject<bool> connectionEventStream = new();
@@ -133,9 +130,9 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
             onError?.Invoke(ex);
         }
 
-        webRequestManager.AddUnityWebRequest(unityWebRequest,
+        StartCoroutine(CoroutineUtils.WebRequestCoroutine(unityWebRequest,
             WrappedOnSuccess,
-            ex => WrappedOnError(ex));
+            ex => WrappedOnError(ex)));
     }
 
     private void AddHeaders(UnityWebRequest unityWebRequest)

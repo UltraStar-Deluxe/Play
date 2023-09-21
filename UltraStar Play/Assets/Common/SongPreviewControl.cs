@@ -146,13 +146,13 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual int GetPreviewStartInMillis(SongMeta songMeta)
     {
-        if (songMeta.PreviewStart > 0)
+        if (songMeta.PreviewStartInMillis > 0)
         {
-            return (int)(songMeta.PreviewStart * 1000);
+            return (int)songMeta.PreviewStartInMillis;
         }
 
         // Fallback: find some lyrics approx. 1/3 into the song.
-        Voice voice = songMeta.GetVoices().FirstOrDefault();
+        Voice voice = songMeta.Voices.FirstOrDefault();
         if (voice == null)
         {
             return 0;
@@ -166,7 +166,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         int noteIndex = (int)((notes.Count - 1) * 0.33f);
         Note note = notes[noteIndex];
-        int noteStartBeatInMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+        int noteStartBeatInMillis = (int)SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
         return noteStartBeatInMillis;
     }
 

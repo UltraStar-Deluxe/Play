@@ -131,7 +131,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
         }
 
         if (nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value
-            && songMeta.GetVoices().Count < 2)
+            && songMeta.VoiceCount < 2)
         {
             return false;
         }
@@ -300,7 +300,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
             case ESearchProperty.Edition:
                 return songMeta.Edition;
             case ESearchProperty.Lyrics:
-                return SongMetaUtils.GetLyrics(songMeta, Voice.firstVoiceName, true);
+                return SongMetaUtils.GetLyrics(songMeta, EVoiceId.P1, true);
             default:
                 return null;
         }

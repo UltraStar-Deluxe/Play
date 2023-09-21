@@ -103,7 +103,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(_ =>
             {
-                UpdateSongStatistics(songSelectSceneControl.SelectedSong);
+                UpdateHighScores(songSelectSceneControl.SelectedSong);
                 UpdateSongRatingIcons(songSelectSceneControl.SelectedSong);
             });
 
@@ -131,6 +131,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
             SongMetas = new List<SongMeta> { SelectedSong },
             partyModeSceneData = sceneData.partyModeSceneData,
             lastSceneData = sceneData,
+            GameRoundSettings = new(),
         };
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
@@ -147,7 +148,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         songIndexLabel.text = "";
         SongMetaImageUtils.SetDefaultSongImage(selectedSongImageOuter, selectedSongImageInner);
         songRatingIconControl.HideSongRatingIcons();
-        UpdateSongStatistics(null);
+        UpdateHighScores(new List<HighScoreEntry>());
     }
 
     private bool IsFavorite(SongMeta songMeta)
@@ -178,7 +179,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         // Instead, the label is updated when the AudioClip has been loaded.
         durationLabel.text = "";
 
-        UpdateSongStatistics(selectedSong);
+        UpdateHighScores(selectedSong);
 
         UpdateSongRatingIcons(selectedSong);
 
@@ -193,22 +194,29 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         durationLabel.text = $"{min}:{seconds.ToString().PadLeft(2, '0')}";
     }
 
-    private void UpdateSongStatistics(SongMeta songMeta)
+    private void UpdateHighScores(SongMeta songMeta)
     {
-        SongStatistics songStatistics = statistics.GetLocalStatistics(songMeta);
-        if (songStatistics != null)
-        {
-            List<HighScoreEntry> topScores = songStatistics.HighScoreRecord.GetTopScores(1, settings.Difficulty);
-            List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
+        StatisticsUtils.GetLocalHighScoreEntries(statistics, songMeta)
+            .Subscribe(highScoreEntries => UpdateHighScores(highScoreEntries));
+    }
 
-            UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);
-            highscoresContainer.SetVisibleByVisibility(!topScoreNumbers.IsNullOrEmpty());
-        }
-        else
+    private void UpdateHighScores(List<HighScoreEntry> highScoreEntries)
+    {
+        if (highScoreEntries.IsNullOrEmpty())
         {
             UpdateTopScoreLabels(new List<int>(), localHighScoreContainer);
             highscoresContainer.HideByVisibility();
+            return;
         }
+
+        List<HighScoreEntry> topScores = StatisticsUtils.GetTopScores(
+            highScoreEntries,
+            1,
+            settings.Difficulty);
+        List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
+
+        UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);
+        highscoresContainer.SetVisibleByVisibility(!topScoreNumbers.IsNullOrEmpty());
     }
 
     private void UpdateTopScoreLabels(List<int> topScores, VisualElement labelContainer)

@@ -4,7 +4,6 @@ using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using Whisper;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -18,9 +17,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
     private JobManager jobManager;
 
     [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
     private SongMetaManager songMetaManager;
 
     [Inject]
@@ -28,7 +24,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private PitchDetectionManager pitchDetectionManager;
 
@@ -59,7 +55,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             return;
         }
 
-        Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Mp3)}'");
+        Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Audio)}'");
         Job audioSeparationJob = new("Vocals isolation", processSongJob);
         Job speechRecognitionJob = new("Speech recognition", processSongJob);
         Job pitchDetectionJob = new("Pitch detection", processSongJob);
@@ -84,7 +80,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
             settings.SongEditorSettings.SpeechRecognitionModelPath,
             "auto",
             settings.SongEditorSettings.SpeechRecognitionPrompt);
-        
+
         // Load speech recognition model in parallel while doing audio separation.
         IObservable<SpeechRecognizer> loadSpeechRecognizerObservable = SpeechRecognitionUtils.GetOrCreateSpeechRecognizerAsObservable(speechRecognitionParameters, null);
 
@@ -109,9 +105,9 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 // (2) Run speech recognition on vocals audio
 
                 // Load vocals audio
-                AudioClip vocalsAudioClip = audioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
-                int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * BpmUtils.GetBeatsPerSecond(songMeta));
-                    
+                AudioClip vocalsAudioClip = AudioManager.LoadAudioClipFromUriImmediately(SongMetaUtils.GetVocalsAudioUri(songMeta), false);
+                int lengthInBeats = (int)Math.Floor(vocalsAudioClip.length * SongMetaBpmUtils.BeatsPerSecond(songMeta));
+
                 float[] monoAudioSamples = AudioUtils.GetSamplesOfBeatRangeFromAudioClip(songMeta, vocalsAudioClip, 0, lengthInBeats, true);
 
                 return SpeechRecognitionUtils.CreateNotesFromSpeechRecognitionAsObservable(
@@ -145,7 +141,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 SongMetaUtils.RemoveAllNotes(songMeta);
                 List<List<Note>> noteBatches = MoveNotesToOtherVoiceUtils.SplitIntoSentences(songMeta, createdNotes);
                 noteBatches.ForEach(noteBatch =>
-                    MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, Voice.firstVoiceName, false));
+                    MoveNotesToOtherVoiceUtils.MoveNotesToVoice(songMeta, noteBatch, EVoiceId.P1, false));
 
                 // (4) Add Space between notes
                 SpaceBetweenNotesUtils.AddSpaceInMillisBetweenNotes(createdNotes, SpaceBetweenNotesUtils.DefaultSpaceBetweenNotesInMillis, songMeta);

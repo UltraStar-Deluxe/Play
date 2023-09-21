@@ -234,7 +234,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         ConnectResponseDto connectResponseDto = JsonConverter.FromJson<ConnectResponseDto>(message);
         if (!connectResponseDto.ErrorMessage.IsNullOrEmpty())
         {
-            throw new ConnectRequestException("Server returned error message: " + connectResponseDto.ErrorMessage);
+            throw new ConnectRequestException("Received error message: " + connectResponseDto.ErrorMessage);
         }
         if (connectResponseDto.ClientName.IsNullOrEmpty())
         {
@@ -249,7 +249,11 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             throw new ConnectRequestException($"Malformed ConnectResponse: wrong ClientId. Is {connectResponseDto.ClientId}, expected {settings.ClientId}");
         }
 
-        connectEventStream.OnNext(new ConnectEvent(connectResponseDto.HttpServerPort, ServerPeer.EndPoint, connectResponseDto.Permissions));
+        connectEventStream.OnNext(new ConnectEvent(
+            connectResponseDto.HttpServerPort,
+            ServerPeer.EndPoint,
+            connectResponseDto.Permissions,
+            connectResponseDto.AvailableGameRoundModifierDtos));
         connectRequestCount = 0;
     }
 
@@ -260,7 +264,25 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
-        Debug.Log($"Disconnected: reason: {disconnectInfo.Reason}, additional info: {disconnectInfo.AdditionalData}, socket error code: {disconnectInfo.SocketErrorCode}");
+        string disconnectInfoAdditionalData;
+        try
+        {
+            disconnectInfoAdditionalData = disconnectInfo.AdditionalData.GetString();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError("Failed to read additional info from disconnect message");
+            disconnectInfoAdditionalData = "";
+        }
+        Debug.Log($"Disconnected: reason: {disconnectInfo.Reason}, additional info: {disconnectInfoAdditionalData}, socket error code: {disconnectInfo.SocketErrorCode}");
+
+        if (disconnectInfoAdditionalData.Trim().StartsWith("{")
+            && disconnectInfoAdditionalData.Trim().EndsWith("}")
+            && disconnectInfoAdditionalData.Contains("ErrorMessage", StringComparison.InvariantCultureIgnoreCase))
+        {
+            HandleMessageFromServer(disconnectInfoAdditionalData);
+        }
     }
 
     public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)

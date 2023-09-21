@@ -4,7 +4,7 @@
 #INSTRUMENTALAUDIO:SomeInstrumentalAudio.ogg
 #VOCALSAUDIO:SomeVocalsAudio.ogg
 #BPM:200
-#GAP:1.5
+#GAP:1500
 #GENRE:SomeGenre
 #BACKGROUND:SomeBackground
 #VIDEO:SomeVideo
