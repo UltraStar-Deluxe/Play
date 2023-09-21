@@ -69,7 +69,7 @@ public static class SongMetaUtils
 
     public static string GetLocalAudioUri(SongMeta songMeta)
     {
-        return GetUri(songMeta, songMeta.Mp3);
+        return GetUri(songMeta, songMeta.Audio);
     }
 
     public static string GetWebsiteUri(SongMeta songMeta)
@@ -79,7 +79,7 @@ public static class SongMetaUtils
 
     public static string GetAudioUri(SongMeta songMeta)
     {
-        string absoluteLocalAudioFilePath = GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+        string absoluteLocalAudioFilePath = GetAbsoluteFilePath(songMeta, songMeta.Audio);
         if (FileUtils.Exists(absoluteLocalAudioFilePath)
             || songMeta.Website.IsNullOrEmpty())
         {
@@ -870,7 +870,7 @@ public static class SongMetaUtils
             return false;
         }
 
-        if (ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(songMeta.Mp3))
+        if (ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(songMeta.Audio))
             && GetAllNotes(songMeta).Count > 0)
         {
             // Song has sing along data in the MIDI file.

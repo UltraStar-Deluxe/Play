@@ -59,7 +59,7 @@ public class SongMeta
     /**
      * Path or URI to the audio file.
      */
-    public virtual string Mp3 { get; set; } = "";
+    public virtual string Audio { get; set; } = "";
 
     /**
      * Path to the audio file that contains only the voice of the singers.
@@ -228,7 +228,7 @@ public class SongMeta
         Artist = other.Artist;
         Title = other.Title;
         BeatsPerMinute = other.BeatsPerMinute;
-        Mp3 = other.Mp3;
+        Audio = other.Audio;
         VocalsAudio = other.VocalsAudio;
         InstrumentalAudio = other.InstrumentalAudio;
 

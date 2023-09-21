@@ -241,7 +241,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     private bool UseVlcMediaPlayerOfSongAudioPlayer => VideoSupportProvider == EVideoSupportProvider.Vlc
         && loadedSongMeta != null
-        && loadedSongMeta.Mp3 == loadedSongMeta.Video
+        && loadedSongMeta.Audio == loadedSongMeta.Video
         && songAudioPlayer.VlcMediaPlayer != null;
 
     private RenderTexture originalWebViewCameraRenderTexture;
@@ -427,7 +427,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
         ResetWebViewRenderTexture();
         ResetFfmpegRenderTexture();
 
-        if (songMeta.Video == songMeta.Mp3
+        if (songMeta.Video == songMeta.Audio
             && songAudioPlayer.VlcMediaPlayer != null)
         {
             // Destroy old instance if any
@@ -583,7 +583,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                         else if (settings.FfmpegToPlayMediaFilesUsage
                                      is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
                                      or EThirdPartyLibraryUsage.Always
-                                 && string.Equals(songMeta.Mp3, songMeta.Video, StringComparison.InvariantCultureIgnoreCase))
+                                 && string.Equals(songMeta.Audio, songMeta.Video, StringComparison.InvariantCultureIgnoreCase))
                         {
                             Debug.Log($"Trying to load video with ffmpeg because Unity's VideoPlayer failed: '{uri}'");
                             LoadWithFfmpeg(songMeta, uri)
@@ -593,7 +593,7 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
                                  is EThirdPartyLibraryUsage.WhenUnsupportedByUnity
                                  or EThirdPartyLibraryUsage.Always)
                         {
-                            Debug.LogError($"Failed to load video with Unity's VideoPlayer and cannot use ffmpeg because the video and audio resource are not equal. Video URI: '{uri}', Video: '{songMeta.Video}', Audio URI: '{songMeta.Mp3}'");
+                            Debug.LogError($"Failed to load video with Unity's VideoPlayer and cannot use ffmpeg because the video and audio resource are not equal. Video URI: '{uri}', Video: '{songMeta.Video}', Audio URI: '{songMeta.Audio}'");
                         }
                         return;
                     }

@@ -19,7 +19,7 @@ public static class PitchDetectionUtils
             return Observable.Throw<List<Note>>(new Exception("Vocals audio not found. Split the audio first."));
         }
         
-        string fileName = Path.GetFileName(songMeta.Mp3);
+        string fileName = Path.GetFileName(songMeta.Audio);
         if (pitchDetectionJob == null)
         {
             pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of '{fileName}'");

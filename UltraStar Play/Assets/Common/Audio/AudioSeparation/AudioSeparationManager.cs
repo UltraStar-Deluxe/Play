@@ -65,7 +65,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // Create job to show in UI
         if (audioSeparationJob == null)
         {
-            audioSeparationJob = new Job($"Vocals isolation of '{Path.GetFileName(songMeta.Mp3)}'");
+            audioSeparationJob = new Job($"Vocals isolation of '{Path.GetFileName(songMeta.Audio)}'");
             jobManager.AddJob(audioSeparationJob);
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
@@ -131,10 +131,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
                     UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
 
-                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Mp3);
+                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
 
                     SpleeterParameters spleeterParameters = new();
-                    spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
                     spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
                     spleeterParameters.Overwrite = true;
 
@@ -145,7 +145,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
                     UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
 
-                    string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
                     string vocalsAudioFilePath = songMeta.VocalsAudio;
                     string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
                     o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));

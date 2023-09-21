@@ -328,14 +328,14 @@ public class SongMediaFileConversionManager : AbstractSingletonBehaviour, INeedI
     public void ConvertAudioToSupportedFormat(SongMeta songMeta)
     {
         // The MP3 tag can also be used with a video file.
-        string fileExtension = PathUtils.GetExtensionWithoutDot(songMeta.Mp3);
+        string fileExtension = PathUtils.GetExtensionWithoutDot(songMeta.Audio);
         bool isAudio = ApplicationUtils.audioFileExtensions.Contains(fileExtension);
 
         ConvertSongMetaMediaFileToSupportedFormat(
             songMeta,
             "audio",
-            () => songMeta.Mp3,
-            newValue => songMeta.Mp3 = newValue,
+            () => songMeta.Audio,
+            newValue => songMeta.Audio = newValue,
             $"Convert audio of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to supported format",
             isAudio);
     }

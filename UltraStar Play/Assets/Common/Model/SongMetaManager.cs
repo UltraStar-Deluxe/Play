@@ -322,7 +322,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             }
         }
 
-        TryAddAudioFilePath(songMeta.Mp3);
+        TryAddAudioFilePath(songMeta.Audio);
         TryAddAudioFilePath(songMeta.VocalsAudio);
         TryAddAudioFilePath(songMeta.InstrumentalAudio);
 
@@ -609,7 +609,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             // The ffmpeg integration in Unity can at the moment only play one file.
             // Thus, check video file is either same as audio file or ffmpeg is not used to play it.
             bool isVideoEmptyOrSameAsAudio = songMeta.Video.IsNullOrEmpty()
-                                             || string.Equals(songMeta.Video, songMeta.Mp3, StringComparison.InvariantCultureIgnoreCase);
+                                             || string.Equals(songMeta.Video, songMeta.Audio, StringComparison.InvariantCultureIgnoreCase);
             if (!isVideoEmptyOrSameAsAudio
                 && !ApplicationUtils.IsUnitySupportedVideoFormat(Path.GetExtension(songMeta.Video))
                 && !WebViewUtils.CanHandleWebViewUrl(songMeta.Video))
@@ -678,10 +678,10 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private static void CheckVideoCodecsAreSupportedByUnity(List<SongIssue> songIssues, SongMeta songMeta)
     {
-        if (!songMeta.Mp3.IsNullOrEmpty())
+        if (!songMeta.Audio.IsNullOrEmpty())
         {
-            CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Mp3,
-                codec => $"Unsupported video codec '{codec}' in '{songMeta.Mp3}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
+            CheckVideoCodecIsSupported(songIssues, songMeta, songMeta.Audio,
+                codec => $"Unsupported video codec '{codec}' in '{songMeta.Audio}'. Convert to one of {unitySupportedVideoFileExtensionsAsCsv}",
                 () => new FormatNotSupportedSongIssueData(songMeta, FormatNotSupportedSongIssueData.EMediaType.Video),
                 ESongIssueSeverity.Error);
         }

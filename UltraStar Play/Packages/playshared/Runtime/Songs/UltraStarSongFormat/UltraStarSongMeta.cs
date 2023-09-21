@@ -81,7 +81,7 @@ public class UltraStarSongMeta : SongMeta
     {
         Artist = artist ?? throw new ArgumentNullException(nameof(artist));
         TxtFileBpm = txtFileBpm;
-        Mp3 = audioFile ?? throw new ArgumentNullException(nameof(audioFile));
+        Audio = audioFile ?? throw new ArgumentNullException(nameof(audioFile));
         Title = title ?? throw new ArgumentNullException(nameof(title));
 
         if (voiceIdToDisplayName == null)

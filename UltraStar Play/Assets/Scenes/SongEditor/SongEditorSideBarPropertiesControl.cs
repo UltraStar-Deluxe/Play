@@ -86,7 +86,7 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             null);
         CreateSongPropertiesInputControl(ESongProperty.Mp3,
             "Audio",
-            () => songMeta.Mp3,
+            () => songMeta.Audio,
             null);
         CreateSongPropertiesInputControl(ESongProperty.Video,
             "Video",

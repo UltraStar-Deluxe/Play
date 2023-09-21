@@ -284,7 +284,7 @@ public static class UltraStarSongParser
                 songMeta.MedleyEndBeat = ConvertToInt32(value);
                 break;
             case "audio":
-                songMeta.Mp3 = value;
+                songMeta.Audio = value;
                 break;
             case "vocalsaudio":
                 songMeta.VocalsAudio = value;

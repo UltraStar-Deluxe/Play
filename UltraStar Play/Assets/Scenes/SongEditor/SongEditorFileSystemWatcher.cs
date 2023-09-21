@@ -89,7 +89,7 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
 
     private void ReloadAudioFiles(HashSet<string> changedFiles)
     {
-        if (songMeta.Mp3.IsNullOrEmpty())
+        if (songMeta.Audio.IsNullOrEmpty())
         {
             return;
         }

@@ -81,7 +81,7 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
                         Assert.Fail($"SongAudioPlayer loaded song with wrong duration {durationOfSongInMillis} ms (should be near {targetDurationInMillis} ms).");
                     }
 
-                    Debug.Log($"Successfully loaded song media {songMeta.Mp3} after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
+                    Debug.Log($"Successfully loaded song media {songMeta.Audio} after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
                 });
     }
 
