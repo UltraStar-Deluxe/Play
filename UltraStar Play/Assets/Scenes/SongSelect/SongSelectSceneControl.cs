@@ -1192,7 +1192,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .ThrottleFirst(TimeSpan.FromMilliseconds(500))
             .Subscribe(songMeta =>
             {
-                if (!songMetas.Contains(songMeta))
+                if (!songMetaManager.GetSongMetas().Contains(songMeta))
                 {
                     songMetas.Add(songMeta);
                     songMetaManager.AddSongMeta(songMeta);
