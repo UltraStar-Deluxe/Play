@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Serilog.Events;
@@ -173,5 +174,43 @@ public static class DirectoryUtils
                 Log.WithLevel(logEventLevel, () => $"Ignoring '{sourceSubDirectoryPath}'");
             }
         }
+    }
+
+    public static bool TryAddFilesRecursivelyUntilCount(
+        string folder,
+        FileScanner fileScanner,
+        int targetFileCount,
+        List<string> resultFiles,
+        Func<List<string>,
+        List<string>> subFolderSelector = null)
+    {
+        if (resultFiles.Count >= targetFileCount)
+        {
+            return true;
+        }
+
+        if (folder.IsNullOrEmpty())
+        {
+            return false;
+        }
+
+        List<string> txtFilesInFolder = fileScanner.GetFiles(folder, false);
+        if (CollectionUtils.TryAddUntilCount(resultFiles, txtFilesInFolder, targetFileCount))
+        {
+            return true;
+        }
+
+        List<string> subFolders = GetDirectories(folder, false, "*.txt");
+        List<string> subFolderSelection = subFolderSelector != null
+            ? subFolderSelector(subFolders)
+            : subFolders;
+        foreach (string subFolder in subFolderSelection)
+        {
+            if (TryAddFilesRecursivelyUntilCount(subFolder, fileScanner, targetFileCount, resultFiles, subFolderSelector))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
