@@ -12,7 +12,7 @@ public class OnlineSongRepositoryPrototype : ISongRepository
     [Inject]
     private OnlineSongRepositoryPrototypeModSettings modSettings;
 
-    private readonly Dictionary<string, SongMeta> uriToSongMetaCache = new Dictionary<string, SongMeta>();
+    private readonly Dictionary<string, SongRepositorySearchResultEntry> uriToSearchResultCache = new Dictionary<string, SongRepositorySearchResultEntry>();
 
     private List<RemoteSongReference> remoteSongReferences = new List<RemoteSongReference>()
     {
@@ -24,22 +24,23 @@ public class OnlineSongRepositoryPrototype : ISongRepository
         }
     };
 
-    public IObservable<SongMeta> SearchSongs(SongSearchParameters searchParameters)
+    public IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters)
     {
         if (searchParameters == null
             || searchParameters.SearchText.IsNullOrEmpty())
         {
-            return Observable.Empty<SongMeta>();
+            return Observable.Empty<SongRepositorySearchResultEntry>();
         }
 
-        return ObservableUtils.RunOnNewTaskAsObservableElements(() => SearchSongListAsync(searchParameters.SearchText), Disposable.Empty);
+        return ObservableUtils.RunOnNewTaskAsObservableElements(() => SearchSongListAsync(searchParameters), Disposable.Empty);
     }
 
-    public async Task<List<SongMeta>> SearchSongListAsync(string searchText)
+    public async Task<List<SongRepositorySearchResultEntry>> SearchSongListAsync(SongRepositorySearchParameters searchParameters)
     {
+        string searchText = searchParameters.SearchText;
         if (searchText.IsNullOrEmpty())
         {
-            return new List<SongMeta>();
+            return new List<SongRepositorySearchResultEntry>();
         }
 
         List<RemoteSongReference> matchingRemoteSongReferences = remoteSongReferences
@@ -48,21 +49,21 @@ public class OnlineSongRepositoryPrototype : ISongRepository
             .ToList();
         if (matchingRemoteSongReferences.IsNullOrEmpty())
         {
-            return new List<SongMeta>();
+            return new List<SongRepositorySearchResultEntry>();
         }
         Debug.Log($"{nameof(OnlineSongRepositoryPrototype)} - Found {matchingRemoteSongReferences.Count} songs matching search '{searchText}'");
         
-        List<SongMeta> songMetas = new List<SongMeta>();
+        List<SongRepositorySearchResultEntry> resultEntries = new List<SongRepositorySearchResultEntry>();
         foreach (RemoteSongReference remoteSongReference in matchingRemoteSongReferences)
         {
-            SongMeta songMeta = await LoadUltraStarSongFromUriAsync(remoteSongReference.Uri);
-            if (songMeta != null)
+            SongRepositorySearchResultEntry resultEntry = await LoadUltraStarSongFromUriAsync(remoteSongReference.Uri);
+            if (resultEntry != null)
             {
-                songMetas.Add(songMeta);
+                resultEntries.Add(resultEntry);
             }
         }
 
-        return songMetas;
+        return resultEntries;
     }
 
     private bool StringContainsIgnoreCaseInvariantCulture(string a, string b)
@@ -70,11 +71,11 @@ public class OnlineSongRepositoryPrototype : ISongRepository
         return a.ToLowerInvariant().Contains(b.ToLowerInvariant());
     }
 
-    private async Task<SongMeta> LoadUltraStarSongFromUriAsync(string uri)
+    private async Task<SongRepositorySearchResultEntry> LoadUltraStarSongFromUriAsync(string uri)
     {
-        if (uriToSongMetaCache.TryGetValue(uri, out SongMeta cachedSongMeta))
+        if (uriToSearchResultCache.TryGetValue(uri, out SongRepositorySearchResultEntry cachedSearchResultEntry))
         {
-            return cachedSongMeta;
+            return cachedSearchResultEntry;
         }
 
         try
@@ -84,8 +85,9 @@ public class OnlineSongRepositoryPrototype : ISongRepository
                 .GetStringAsync();
             UltraStarSongMeta songMeta = UltraStarSongParser.ParseString(ultraStarTxtContent, out List<SongIssue> songIssues);
             songMeta.RemoteSource = nameof(OnlineSongRepositoryPrototype);
-            uriToSongMetaCache[uri] = songMeta;
-            return songMeta;
+            SongRepositorySearchResultEntry resultEntry = new SongRepositorySearchResultEntry(songMeta, songIssues);
+            uriToSearchResultCache[uri] = resultEntry;
+            return resultEntry;
         }
         catch (Exception ex)
         {

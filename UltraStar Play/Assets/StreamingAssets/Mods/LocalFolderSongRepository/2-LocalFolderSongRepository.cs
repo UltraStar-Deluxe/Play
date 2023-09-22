@@ -12,7 +12,7 @@ public class LocalFolderSongRepository : ISongRepository
 
     private string SongFolder => modSettings.songFolder;
 
-    private readonly Dictionary<string, SongMeta> txtFileToSongMetaCache = new Dictionary<string, SongMeta>();
+    private readonly Dictionary<string, SongRepositorySearchResultEntry> txtFileToSearchResultCache = new Dictionary<string, SongRepositorySearchResultEntry>();
 
     private FileScanner txtFileScanner;
     private FileScanner TxtFileScanner
@@ -27,48 +27,50 @@ public class LocalFolderSongRepository : ISongRepository
         }
     }
 
-    public IObservable<SongMeta> SearchSongs(SongSearchParameters searchParameters)
+    public IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters)
     {
         if (searchParameters == null
             || searchParameters.SearchText.IsNullOrEmpty())
         {
-            return Observable.Empty<SongMeta>();
+            return Observable.Empty<SongRepositorySearchResultEntry>();
         }
 
-        return ObservableUtils.RunOnNewTaskAsObservableElements(() => SearchSongList(searchParameters.SearchText), Disposable.Empty);
+        return ObservableUtils.RunOnNewTaskAsObservableElements(() => SearchSongList(searchParameters), Disposable.Empty);
     }
 
-    public List<SongMeta> SearchSongList(string searchText)
+    public List<SongRepositorySearchResultEntry> SearchSongList(SongRepositorySearchParameters searchParameters)
     {
+        string searchText = searchParameters.SearchText;
         if (searchText.IsNullOrEmpty()
             || !DirectoryUtils.Exists(SongFolder))
         {
-            return new List<SongMeta>();
+            return new List<SongRepositorySearchResultEntry>();
         }
 
         List<string> txtFiles = DirectoryUtils.GetFiles(SongFolder, true, $"*{searchText}*.txt");
 
-        List<SongMeta> songMetas = txtFiles
+        List<SongRepositorySearchResultEntry> resultEntries = txtFiles
             .Select(txtFile => LoadUltraStarSongFromFile(txtFile))
-            .Where(songMeta => songMeta != null)
+            .Where(it => it != null)
             .ToList();        
-        Debug.Log($"{nameof(LocalFolderSongRepository)} - Found {songMetas.Count} songs matching search '{searchText}'");
-        return songMetas;
+        Debug.Log($"{nameof(LocalFolderSongRepository)} - Found {resultEntries.Count} songs matching search '{searchText}'");
+        return resultEntries;
     }
 
-    private SongMeta LoadUltraStarSongFromFile(string txtFile)
+    private SongRepositorySearchResultEntry LoadUltraStarSongFromFile(string txtFile)
     {
-        if (txtFileToSongMetaCache.TryGetValue(txtFile, out SongMeta cachedSongMeta))
+        if (txtFileToSearchResultCache.TryGetValue(txtFile, out SongRepositorySearchResultEntry cachedResultEntry))
         {
-            return cachedSongMeta;
+            return cachedResultEntry;
         }
 
         try
         {
             SongMeta songMeta = UltraStarSongParser.ParseFile(txtFile, out List<SongIssue> songIssues);
+            SongRepositorySearchResultEntry resultEntry = new SongRepositorySearchResultEntry(songMeta, songIssues);
             songMeta.RemoteSource = nameof(LocalFolderSongRepository);
-            txtFileToSongMetaCache[txtFile] = songMeta;
-            return songMeta;
+            txtFileToSearchResultCache[txtFile] = resultEntry;
+            return resultEntry;
         }
         catch (Exception ex)
         {

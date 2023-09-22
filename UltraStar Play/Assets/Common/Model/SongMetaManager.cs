@@ -137,14 +137,23 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     public void AddSongIssue(SongIssue songIssue)
     {
+        if (songIssue == null)
+        {
+            return;
+        }
         allSongIssues.Add(songIssue);
+    }
+
+    public void AddSongIssues(List<SongIssue> songIssues)
+    {
+        songIssues.ForEach(AddSongIssue);
     }
 
     public void AddSongMeta(SongMeta songMeta)
     {
         if (songMeta == null)
         {
-            throw new ArgumentNullException(nameof(songMeta));
+            return;
         }
 
         allSongMetas.Add(songMeta);
@@ -887,5 +896,15 @@ public class SongMetaManager : AbstractSingletonBehaviour
             Debug.Log($"Cancelling song-scan-thread.");
             songScanCancellationTokenSource.Cancel();
         }
+    }
+
+    public bool ContainsSongMeta(SongMeta songMeta)
+    {
+        if (songMeta == null)
+        {
+            return false;
+        }
+
+        return allSongMetas.Contains(songMeta);
     }
 }

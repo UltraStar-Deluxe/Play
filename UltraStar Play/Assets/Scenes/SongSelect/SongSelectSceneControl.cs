@@ -1186,16 +1186,20 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.OnSearchTextChanged");
 
         // Search songs in song repositories
-        SongSearchParameters searchParameters = new(
+        SongRepositorySearchParameters searchParameters = new(
             songSearchControl.GetSearchText());
         SongRepositoryUtils.SearchSongs(searchParameters)
             .ThrottleFirst(TimeSpan.FromMilliseconds(500))
-            .Subscribe(songMeta =>
+            .Subscribe(songSearchResultEntry =>
             {
-                if (!songMetaManager.GetSongMetas().Contains(songMeta))
+                SongMeta songMeta = songSearchResultEntry.SongMeta;
+                List<SongIssue> songIssues = songSearchResultEntry.SongIssues;
+                if (songMeta != null
+                    && !songMetaManager.ContainsSongMeta(songMeta))
                 {
                     songMetas.Add(songMeta);
                     songMetaManager.AddSongMeta(songMeta);
+                    songMetaManager.AddSongIssues(songIssues);
                 }
                 UpdateFilteredSongs();
             });
