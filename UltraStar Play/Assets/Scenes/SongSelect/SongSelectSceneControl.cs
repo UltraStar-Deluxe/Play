@@ -199,6 +199,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private readonly SongSearchControl songSearchControl = new();
 
+    public ReactiveProperty<bool> IsSongRepositorySearchRunning { get; private set; } = new(false);
+
     public SongMeta SelectedSong
     {
         get
@@ -1188,9 +1190,16 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Search songs in song repositories
         SongRepositorySearchParameters searchParameters = new(
             songSearchControl.GetSearchText());
+        IsSongRepositorySearchRunning.Value = true;
         SongRepositoryUtils.SearchSongs(searchParameters)
             .ThrottleFirst(TimeSpan.FromMilliseconds(500))
-            .Subscribe(songSearchResultEntry =>
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+            })
+            .DoOnCompleted(() => IsSongRepositorySearchRunning.Value = false)
+            .Subscribe(
+            songSearchResultEntry =>
             {
                 SongMeta songMeta = songSearchResultEntry.SongMeta;
                 List<SongIssue> songIssues = songSearchResultEntry.SongIssues;

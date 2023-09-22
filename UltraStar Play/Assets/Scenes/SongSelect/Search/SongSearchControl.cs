@@ -80,6 +80,9 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
     private SongRouletteControl songRouletteControl;
 
     [Inject]
+    private SongSelectSceneControl songSelectSceneControl;
+
+    [Inject]
     private SongSelectFilterControl songSelectFilterControl;
 
     [Inject]
@@ -160,18 +163,24 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         new AnchoredPopupControl(searchPropertyDropdownContainer, searchPropertyButton, Corner2D.BottomRight);
         new UseAvailableScreenHeightControl(searchPropertyDropdownContainer);
 
-        songRouletteControl.EntryListChangedEventStream.Subscribe(songList =>
+        songRouletteControl.EntryListChangedEventStream
+            .Subscribe(_ => UpdateSearchTextFieldStyle());
+        songSelectSceneControl.IsSongRepositorySearchRunning
+            .Subscribe(_ => UpdateSearchTextFieldStyle());
+    }
+
+    private void UpdateSearchTextFieldStyle()
+    {
+        if (songRouletteControl.Entries.IsNullOrEmpty()
+            && !GetRawSearchText().IsNullOrEmpty()
+            && !songSelectSceneControl.IsSongRepositorySearchRunning.Value)
         {
-            if (songList.IsNullOrEmpty()
-                && !GetRawSearchText().IsNullOrEmpty())
-            {
-                searchTextField.AddToClassList("noSearchResults");
-            }
-            else
-            {
-                searchTextField.RemoveFromClassList("noSearchResults");
-            }
-        });
+            searchTextField.AddToClassList("noSearchResults");
+        }
+        else
+        {
+            searchTextField.RemoveFromClassList("noSearchResults");
+        }
     }
 
     private void ResetActiveFilters()
