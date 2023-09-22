@@ -35,7 +35,7 @@ public class UltraStarSongVoicesParser
         return ParseStreamReader(streamReader, isRelativeSongFormat);
     }
 
-    public static List<Voice> ParseStreamReader(StreamReader reader, bool isRelativeSongFormat)
+    private static List<Voice> ParseStreamReader(StreamReader reader, bool isRelativeSongFormat)
     {
         UltraStarSongVoicesParser parser = new(reader, isRelativeSongFormat);
         IReadOnlyList<Voice> voices = parser.Parse();

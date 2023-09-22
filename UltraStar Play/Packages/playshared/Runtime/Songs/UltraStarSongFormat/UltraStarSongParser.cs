@@ -8,7 +8,12 @@ using UnityEngine;
 
 public static class UltraStarSongParser
 {
-    public static UltraStarSongMeta ParseFile(string filePath, out List<SongIssue> songIssues, Encoding encoding, bool useUniversalCharsetDetector)
+    public static UltraStarSongMeta ParseFile(
+        string filePath,
+        out List<SongIssue> songIssues,
+        Encoding encoding = null,
+        bool useUniversalCharsetDetector = true,
+        bool logIssues = true)
     {
         try
         {
@@ -18,24 +23,54 @@ public static class UltraStarSongParser
             songMeta.SetFileInfo(filePath, reader.CurrentEncoding);
 
             // Log issues
-            songIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in file '{filePath}'"));
+            if (logIssues)
+            {
+                songIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in file '{filePath}'"));
+            }
 
+            // Lazy load voices
+            songMeta.OnLoadVoices = () =>
+            {
+                List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
+                    songMeta.FileInfo.FullName,
+                    songMeta.FileEncoding,
+                    songMeta.IsTxtFileRelative,
+                    false);
+                voices.ForEach(voice => songMeta.AddVoice(voice));
+            };
             return songMeta;
         }
         catch (ExplicitEncodingMismatchException ex)
         {
-            return ParseFile(filePath, out songIssues, ex.ExplicitlyDefinedEncoding, useUniversalCharsetDetector);
+            return ParseFile(filePath, out songIssues, ex.ExplicitlyDefinedEncoding, useUniversalCharsetDetector, logIssues);
         }
     }
 
-    public static UltraStarSongMeta ParseString(string text, out List<SongIssue> songIssues)
+    public static UltraStarSongMeta ParseString(string text, out List<SongIssue> songIssues, bool logIssues = true)
     {
         MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
         StreamReader streamReader = new StreamReader(memoryStream, Encoding.UTF8);
-        return ParseStreamReader(streamReader, out songIssues);
+        UltraStarSongMeta songMeta = ParseStreamReader(streamReader, out songIssues);
+
+        if (logIssues)
+        {
+            // Log issues
+            songIssues.ForEach(songIssue => Debug.LogWarning($"{songIssue.Message} in song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"));
+        }
+
+        // Lazy load voices
+        songMeta.OnLoadVoices = () =>
+        {
+            List<Voice> voices = UltraStarSongVoicesParser.ParseString(
+                text,
+                songMeta.IsTxtFileRelative);
+            voices.ForEach(voice => songMeta.AddVoice(voice));
+        };
+
+        return songMeta;
     }
 
-    public static UltraStarSongMeta ParseStreamReader(StreamReader reader, out List<SongIssue> songIssues)
+    private static UltraStarSongMeta ParseStreamReader(StreamReader reader, out List<SongIssue> songIssues)
     {
         songIssues = new();
 

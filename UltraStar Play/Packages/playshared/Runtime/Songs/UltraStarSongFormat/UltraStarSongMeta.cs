@@ -103,6 +103,18 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
         }
     }
 
+    public bool IsTxtFileRelative
+    {
+        get
+        {
+            if (bool.TryParse(GetAdditionalHeaderEntry("relative"), out bool relative))
+            {
+                return relative;
+            }
+            return false;
+        }
+    }
+
     public override int VoiceCount => !voiceIdToDisplayName.IsNullOrEmpty()
         ? voiceIdToDisplayName.Count
         : Voices.Count;
@@ -110,7 +122,6 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
     public UltraStarSongMeta(SongMeta other)
     {
         CopyValues(other);
-        OnLoadVoices = DoLoadVoices;
     }
 
     public UltraStarSongMeta(
@@ -130,27 +141,5 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
             throw new ArgumentNullException(nameof(voiceIdToDisplayName));
         }
         this.voiceIdToDisplayName.AddRange(voiceIdToDisplayName);
-
-        OnLoadVoices = DoLoadVoices;
-    }
-
-    private void DoLoadVoices()
-    {
-        if (FileInfo == null
-            || !FileInfo.Exists)
-        {
-            Debug.LogError($"Failed to lazy load voices of {GetType().Name} '{SongMetaUtils.GetArtistDashTitle(this)}' because no file reference is set." +
-                           $"Try adding the voices manually or set another {nameof(OnLoadVoices)} callback.");
-            return;
-        }
-
-        bool.TryParse(GetAdditionalHeaderEntry("relative"), out bool isRelativeSongFormat);
-
-        List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
-            FileInfo.FullName,
-            FileEncoding,
-            isRelativeSongFormat,
-            false);
-        voices.ForEach(voice => AddVoice(voice));
     }
 }

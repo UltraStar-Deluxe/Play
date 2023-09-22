@@ -80,13 +80,9 @@ public class OnlineSongRepositoryPrototype : ISongRepository
         try
         {
             string ultraStarTxtContent = await uri
+                .WithHeader("User-Agent", "Some User Agent")
                 .GetStringAsync();
             UltraStarSongMeta songMeta = UltraStarSongParser.ParseString(ultraStarTxtContent, out List<SongIssue> songIssues);
-            songMeta.OnLoadVoices = () =>
-            {
-                List<Voice> voices = UltraStarSongVoicesParser.ParseString(ultraStarTxtContent, false);
-                voices.ForEach(voice => songMeta.AddVoice(voice));
-            };
             songMeta.RemoteSource = nameof(OnlineSongRepositoryPrototype);
             uriToSongMetaCache[uri] = songMeta;
             return songMeta;
