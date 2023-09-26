@@ -5,6 +5,14 @@ using UnityEngine;
 [Serializable]
 public class LazyLoadedVoicesSongMeta : SongMeta
 {
+    private enum ELoadVoicesPhase
+    {
+        Pending,
+        Started,
+        FinishedSuccessfully,
+        Failed,
+    }
+
     public virtual Action OnLoadVoices { get; set; }
 
     public bool HasFailedToLoadVoices => loadVoicesPhase is ELoadVoicesPhase.Failed;
@@ -65,7 +73,14 @@ public class LazyLoadedVoicesSongMeta : SongMeta
         try
         {
             loadVoicesPhase = ELoadVoicesPhase.Started;
-            OnLoadVoices();
+            if (OnLoadVoices == null)
+            {
+                LoadDefaultVoices();
+            }
+            else
+            {
+                OnLoadVoices();
+            }
         }
         catch (Exception ex)
         {
@@ -78,11 +93,9 @@ public class LazyLoadedVoicesSongMeta : SongMeta
         loadVoicesPhase = ELoadVoicesPhase.FinishedSuccessfully;
     }
 
-    private enum ELoadVoicesPhase
+    private void LoadDefaultVoices()
     {
-        Pending,
-        Started,
-        FinishedSuccessfully,
-        Failed,
+        // Create empty voice by default
+        AddVoice(new Voice(EVoiceId.P1));
     }
 }
