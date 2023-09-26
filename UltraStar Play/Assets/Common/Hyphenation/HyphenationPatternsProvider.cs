@@ -24,7 +24,7 @@ public class HyphenationPatternsProvider : IHyphenatePatternsLoader
     public string LoadExceptions() => hyphenationExceptionsText;
 
     public string LoadPatterns() => hyphenationPatternsText;
-    
+
     public static IHyphenatePatternsLoader CreateHyphenationPatternsLoader(string language)
     {
         string twoLetterCountryCode = GetTwoLetterCountryCode(language);
@@ -32,14 +32,18 @@ public class HyphenationPatternsProvider : IHyphenatePatternsLoader
         {
             return null;
         }
-        
+
+        // Hyphenation patterns from https://github.com/hyphenation/tex-hyphen/tree/master/hyph-utf8/tex/generic/hyph-utf8/patterns/txt
         TextAsset fileNamesTextAsset = Resources.Load<TextAsset>("HyphenationPatterns/HyphenationPatternFileNames");
         string fileNamesText = fileNamesTextAsset.text.Replace("\r\n", "\n");
-        string[] fileNames = fileNamesText.Split('\n');
-        
+        List<string> fileNames = fileNamesText
+            .Split('\n')
+            .Select(fileName => fileName.Trim())
+            .ToList();
+
         string patternFileName = fileNames.FirstOrDefault(fileName =>
             fileName.EndsWith(".pat.txt")
-            && (fileName.Contains($"-{twoLetterCountryCode}-") 
+            && (fileName.Contains($"-{twoLetterCountryCode}-")
                 || fileName.Contains($"-{twoLetterCountryCode}.")));
         if (patternFileName.IsNullOrEmpty())
         {
@@ -47,10 +51,10 @@ public class HyphenationPatternsProvider : IHyphenatePatternsLoader
             return null;
         }
         Debug.Log($"Loading hyphenation patterns for language: {language}, two letter country code: {twoLetterCountryCode} from file {patternFileName}");
-        
+
         string exceptionsFileName = fileNames.FirstOrDefault(fileName =>
             fileName.EndsWith(".hyp.txt")
-            && (fileName.Contains($"-{twoLetterCountryCode}-") 
+            && (fileName.Contains($"-{twoLetterCountryCode}-")
                 || fileName.Contains($"-{twoLetterCountryCode}.")));
 
         string patternsText = Resources.Load<TextAsset>(GetHyphenationPatternFilePathInResources(patternFileName))?.text;
@@ -67,12 +71,13 @@ public class HyphenationPatternsProvider : IHyphenatePatternsLoader
         string fileNameWithoutTxt = fileName.Replace(".txt", "");
         return $"HyphenationPatterns/txt/{fileNameWithoutTxt}";
     }
-    
+
     private static string GetTwoLetterCountryCode(string language)
     {
+        // handshake_country_language_locale_codes.json from https://gist.github.com/justincoh/80f97efdd21b516e3274973a003a1b08
         TextAsset countryCodeEntriesJsonTextAsset = Resources.Load<TextAsset>("handshake_country_language_locale_codes.json");
         List<Dictionary<string, string>> countryCodeEntries = JsonConverter.FromJson<List<Dictionary<string, string>>>(countryCodeEntriesJsonTextAsset.text);
-        Dictionary<string,string> matchingEntry = countryCodeEntries.FirstOrDefault(countryCodeEntry => 
+        Dictionary<string,string> matchingEntry = countryCodeEntries.FirstOrDefault(countryCodeEntry =>
             string.Equals(countryCodeEntry["Language"], language, StringComparison.InvariantCultureIgnoreCase)
             || string.Equals(countryCodeEntry["ISO639-2 Lang"], language, StringComparison.InvariantCultureIgnoreCase));
         if (matchingEntry == null)
