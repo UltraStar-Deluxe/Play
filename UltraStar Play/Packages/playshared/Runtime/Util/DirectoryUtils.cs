@@ -65,6 +65,19 @@ public static class DirectoryUtils
 
     public static bool IsSubDirectory(string potentialSubDirectory, string potentialAncestorDirectory)
     {
+        string potentialSubDirectoryNormalized = potentialSubDirectory.Replace("\\", "/");
+        string potentialAncestorDirectoryNormalized = potentialSubDirectory.Replace("\\", "/");
+        if (potentialSubDirectoryNormalized.StartsWith(potentialAncestorDirectoryNormalized.Normalize()))
+        {
+            return true;
+        }
+
+        if (!Exists(potentialSubDirectory)
+            || !Exists(potentialAncestorDirectory))
+        {
+            return false;
+        }
+
         string potentialAncestorDirectoryFullName = new DirectoryInfo(potentialAncestorDirectory).FullName;
         string potentialSubDirectoryFullName = new DirectoryInfo(potentialSubDirectory).FullName;
         return potentialSubDirectoryFullName.StartsWith(potentialAncestorDirectoryFullName);

@@ -195,11 +195,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             return;
         }
 
-        if (!DirectoryUtils.Exists(SongMetaUtils.GetDirectoryPath(songMeta)))
-        {
-            return;
-        }
-
         // Save the SongMeta if it changed
         bool songMetaChanged = false;
 
