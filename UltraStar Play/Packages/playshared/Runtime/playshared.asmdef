@@ -20,7 +20,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "YamlDotNet.dll"
+        "YamlDotNet.dll",
+        "ICSharpCode.SharpZipLib.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

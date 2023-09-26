@@ -38,7 +38,8 @@
         "HtmlAgilityPack.dll",
         "LibVLCSharp.dll",
         "Mono.CSharp.dll",
-        "Mono.Data.Sqlite.dll"
+        "Mono.Data.Sqlite.dll",
+        "ICSharpCode.SharpZipLib.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
