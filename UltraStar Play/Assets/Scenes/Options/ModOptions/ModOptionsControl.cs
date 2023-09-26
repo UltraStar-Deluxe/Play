@@ -31,8 +31,9 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
 
     private readonly List<ModListEntryControl> modListEntryControls = new();
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         UpdateModList();
     }
 

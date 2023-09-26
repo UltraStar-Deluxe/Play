@@ -31,9 +31,6 @@ public class SongEditorMicSampleRecorder : MonoBehaviour, INeedInjection
     private NonPersistentSettings nonPersistentSettings;
 
     [Inject]
-    private GameObject gameObject;
-
-    [Inject]
     private UiManager uiManager;
 
     [Inject(UxmlName = R.UxmlNames.overviewAreaRecordedAudioWaveform)]

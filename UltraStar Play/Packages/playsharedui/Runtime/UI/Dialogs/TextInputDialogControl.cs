@@ -89,7 +89,7 @@ public class TextInputDialogControl : AbstractDialogControl, IInjectionFinishedL
         }
     }
 
-    public virtual void OnInjectionFinished()
+    public override void OnInjectionFinished()
     {
         okButton.RegisterCallbackButtonTriggered(_ => TrySubmitValue(textField.value));
         cancelButton.RegisterCallbackButtonTriggered(_ => CloseDialog());

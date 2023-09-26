@@ -30,7 +30,7 @@ public static class NumberUtils
         }
         return value;
     }
-    
+
     public static float Limit(float value, float min, float max)
     {
         if (value < min)
@@ -161,7 +161,7 @@ public static class NumberUtils
         }
         return result;
     }
-    
+
     public static List<float> CreateFloatList(float startValueInclusive, float endValueInclusive, float stepValue = 1)
     {
         if (stepValue <= 0)
@@ -184,7 +184,7 @@ public static class NumberUtils
         {
             return target;
         }
-        
+
         if (current > target)
         {
             return current - step;
@@ -197,7 +197,7 @@ public static class NumberUtils
 
     public static int ShortestCircleDirection(int startPosition, int targetPosition, int fullCircleDistance = 360)
     {
-        https://stackoverflow.com/questions/7428718/algorithm-or-formula-for-the-shortest-direction-of-travel-between-two-degrees-on
+        // https://stackoverflow.com/questions/7428718/algorithm-or-formula-for-the-shortest-direction-of-travel-between-two-degrees-on
         if ((targetPosition - startPosition + fullCircleDistance) % fullCircleDistance < (fullCircleDistance / 2))
         {
             // clockwise

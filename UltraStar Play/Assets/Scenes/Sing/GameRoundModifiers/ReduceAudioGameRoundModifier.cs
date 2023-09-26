@@ -24,9 +24,6 @@ public class ReduceAudioGameRoundModifier : GameRoundModifier
     public class ReduceAudioControl : ClassicConditionGameRoundModifierControl
     {
         [Inject]
-        private SingSceneControl singSceneControl;
-
-        [Inject]
         private Settings settings;
 
         private readonly HashSet<PlayerControl> playerControlsWithActiveModifier = new();

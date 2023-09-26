@@ -25,9 +25,6 @@ public class HideNotesGameRoundModifier : GameRoundModifier
 
     public class HideLyricsControl : ClassicConditionGameRoundModifierControl
     {
-        [Inject]
-        private SingSceneControl singSceneControl;
-
         public override void ActivateModifier(IReadOnlyCollection<PlayerControl> playerControls)
         {
             foreach (PlayerControl playerControl in playerControls)
