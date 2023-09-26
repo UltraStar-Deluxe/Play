@@ -42,14 +42,20 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
     public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
 
-    public void ProcessSongMeta(SongMeta songMeta, Job audioSeparationJob = null)
+    public void ProcessSongMeta(
+        SongMeta songMeta,
+        bool saveSong,
+        Job audioSeparationJob = null)
     {
-        ProcessSongMetaAsObservable(songMeta, audioSeparationJob)
+        ProcessSongMetaAsObservable(songMeta, saveSong, audioSeparationJob)
             // Subscribe to trigger the observable
             .Subscribe(evt => Debug.Log($"Successfully separated audio: {evt}"));
     }
 
-    public IObservable<AudioSeparationResult> ProcessSongMetaAsObservable(SongMeta songMeta, Job audioSeparationJob = null)
+    public IObservable<AudioSeparationResult> ProcessSongMetaAsObservable(
+        SongMeta songMeta,
+        bool saveSong,
+        Job audioSeparationJob = null)
     {
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
@@ -87,7 +93,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                 songMeta,
                 generatedSongFolderAbsolutePath,
                 cancellationTokenSource.Token,
-                fallbackAudioSeparationCommand)
+                fallbackAudioSeparationCommand,
+                saveSong)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -112,7 +119,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta,
         string generatedSongFolderAbsolutePath,
         CancellationToken cancellationToken,
-        string fallbackAudioSeparationCommand)
+        string fallbackAudioSeparationCommand,
+        bool saveSong)
     {
         if (audioSeparationProcessCount > 0)
         {
@@ -143,7 +151,7 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     splitTask.Wait();
                     SpleeterResult spleeterResult = splitTask.Result;
 
-                    UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
+                    UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult, saveSong);
 
                     string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
                     string vocalsAudioFilePath = songMeta.VocalsAudio;
@@ -179,7 +187,11 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         });
     }
 
-    private void UpdateSongMetaWithSpleeterResult(SongMeta songMeta, string generatedSongFolderAbsolutePath, SpleeterResult spleeterResult)
+    private void UpdateSongMetaWithSpleeterResult(
+        SongMeta songMeta,
+        string generatedSongFolderAbsolutePath,
+        SpleeterResult spleeterResult,
+        bool saveSong)
     {
         if (spleeterResult.ExitCode != 0
             || !spleeterResult.Errors.IsNullOrEmpty())
@@ -269,7 +281,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // }
 
         // Save song meta
-        if (songMetaChanged)
+        if (songMetaChanged
+            && saveSong)
         {
             songMetaManager.SaveSong(songMeta, true);
         }

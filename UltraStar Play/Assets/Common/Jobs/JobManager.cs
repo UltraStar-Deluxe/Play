@@ -22,6 +22,9 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
 
     public static JobManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<JobManager>();
 
+    public bool AllJobsFinished => jobToJobControl.Keys
+        .AllMatch(job => job.Status.Value is EJobStatus.Finished);
+
     [InjectedInInspector]
     public VisualTreeAsset jobListUi;
 
@@ -36,7 +39,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private SceneNavigator sceneNavigator;
-    
+
     private VisualElement jobListElement;
     private Button toggleJobListButton;
 
@@ -85,7 +88,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         Instance.AddJob(job);
         return job;
     }
-    
+
     public void AddJob(Job job)
     {
         if (jobToJobControl.ContainsKey(job))
@@ -178,7 +181,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
                 // Object was destroyed in the meantime
                 return;
             }
-            
+
             if (job.Result.Value is EJobResult.Pending)
             {
                 jobListElement.Add(jobListEntryElement);
@@ -276,7 +279,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
             jobListElement.BringToFront();
         }
     }
-    
+
     private void OnSceneChanged()
     {
         if (jobListElement != null)

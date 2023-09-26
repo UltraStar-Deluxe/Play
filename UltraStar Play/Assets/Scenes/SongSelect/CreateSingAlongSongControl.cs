@@ -43,16 +43,23 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
 
     public void CreateSingAlongSong(SongMeta songMeta, bool saveSongFile)
     {
+        CreateSingAlongSongAsObservable(songMeta, saveSongFile)
+            // Subscribe to trigger observable
+            .Subscribe(_ => Debug.Log($"Created sing-along data for '{SongMetaUtils.GetArtistDashTitle(songMeta)}'"));
+    }
+
+    public IObservable<SongMeta> CreateSingAlongSongAsObservable(SongMeta songMeta, bool saveSongFile)
+    {
         if (songMeta == null)
         {
-            return;
+            return Observable.Empty<SongMeta>();
         }
 
         if (lastProcessSongJob != null
             && lastProcessSongJob.Result.Value == EJobResult.Pending)
         {
             UiManager.CreateNotification("Already processing a song.\nWait until the running tasks have finished.");
-            return;
+            return Observable.Empty<SongMeta>();
         }
 
         Job processSongJob = new($"Create sing-along version of '{Path.GetFileName(songMeta.Audio)}'");
@@ -63,7 +70,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         lastProcessSongJob = processSongJob;
 
         // (1) Run audio separation (vocals and instrumental audio)
-        IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMetaAsObservable(songMeta, audioSeparationJob);
+        IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMetaAsObservable(songMeta, saveSongFile, audioSeparationJob);
 
         SpeechRecognitionParameters speechRecognitionParameters = new(
             settings.SongEditorSettings.SpeechRecognitionModelPath,
@@ -77,7 +84,8 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         List<Note> createdNotes = new List<Note>();
 
         // Continue when audio separation and loading speech recognition model have finished
-        Observable.WhenAll<object>(
+        IObservable<SongMeta> resultObservable = Observable
+            .WhenAll<object>(
                 loadSpeechRecognizerObservable,
                 audioSeparationObservable)
             .CatchIgnore((Exception ex) =>
@@ -150,7 +158,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 Debug.LogError(localErrorMessage);
                 UiManager.CreateNotification(localErrorMessage);
             })
-            .Subscribe(loadedPitchDetectionNotes =>
+            .Select(loadedPitchDetectionNotes =>
             {
                 if (loadedPitchDetectionNotes.IsNullOrEmpty())
                 {
@@ -158,7 +166,7 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                     string localErrorMessage = "Failed to load pitch detection result.";
                     Debug.LogError(localErrorMessage);
                     UiManager.CreateNotification(localErrorMessage);
-                    return;
+                    return null;
                 }
 
                 try
@@ -194,8 +202,12 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                     Debug.LogError(localErrorMessage);
                     UiManager.CreateNotification(localErrorMessage);
                 }
+
+                return songMeta;
             });
 
         jobManager.AddJob(processSongJob);
+
+        return resultObservable;
     }
 }
