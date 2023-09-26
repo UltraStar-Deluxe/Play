@@ -60,6 +60,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaToggle)]
     private Toggle searchAudioFilesWithoutSongMetaToggle;
 
+    [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
+    private Toggle searchMidiFilesWithLyricsToggle;
+
     [Inject]
     private Injector injector;
 
@@ -97,6 +100,10 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         FieldBindingUtils.Bind(searchAudioFilesWithoutSongMetaToggle,
             () => settings.SearchAudioFilesWithoutSongMeta,
             newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
+
+        FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
+            () => settings.SearchMidiFilesWithLyrics,
+            newValue => settings.SearchMidiFilesWithLyrics = newValue);
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()

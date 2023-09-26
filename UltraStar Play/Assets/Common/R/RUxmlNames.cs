@@ -643,6 +643,7 @@ public static partial class R
         public const string searchBarContainer = "searchBarContainer";
         public const string searchContainer = "searchContainer";
         public const string searchErrorIcon = "searchErrorIcon";
+        public const string searchMidiFilesWithLyricsToggle = "searchMidiFilesWithLyricsToggle";
         public const string searchMissingImageFilesToggle = "searchMissingImageFilesToggle";
         public const string searchNextButton = "searchNextButton";
         public const string searchNextIcon = "searchNextIcon";

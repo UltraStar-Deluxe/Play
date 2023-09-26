@@ -70,6 +70,7 @@ public class Settings : ISettings
     public List<string> SongDirs { get; set; } = new();
     public List<string> DisabledSongFolders { get; set; } = new();
     public bool SearchAudioFilesWithoutSongMeta { get; set; }
+    public bool SearchMidiFilesWithLyrics { get; set; }
     public bool SearchMissingCoverAndBackgroundImageInFolderOfSong { get; set; }
     public string GeneratedFolderPath { get; set; } = "";
     public bool SaveVocalsAndInstrumentalAudioInFolderOfSong { get; set; }

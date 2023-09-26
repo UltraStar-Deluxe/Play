@@ -256,10 +256,25 @@ public class SongMetaManager : AbstractSingletonBehaviour
                     LoadAndAddSongMetasFromTxtFiles(txtFiles, cancellationToken);
                 }
 
-                // Only search for audio files in configured song folders, not in the generated song folder
+                // Only search for audio and midi files in configured song folders, not in the generated song folder
+                if (settings.SearchMidiFilesWithLyrics)
+                {
+                    List<string> midiFiles = FileScannerUtils.ScanForFiles(EnabledSongFolders, GetMidiFileExtensionPatterns());
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        // Generate song meta for audio files that do not have a corresponding SongMeta.
+                        GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, midiFiles, allSongMetas.ToList());
+                    }
+                }
+
                 if (settings.SearchAudioFilesWithoutSongMeta)
                 {
-                    List<string> audioFiles = FileScannerUtils.ScanForFiles(EnabledSongFolders, GetAudioFileExtensionPatterns());
+                    List<string> audioFiles = FileScannerUtils.ScanForFiles(EnabledSongFolders, GetNonMidiAudioFileExtensionPatterns());
                     if (cancellationToken.IsCancellationRequested)
                     {
                         return;
@@ -398,17 +413,19 @@ public class SongMetaManager : AbstractSingletonBehaviour
         return ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, audioFile) + "/song-info.txt";
     }
 
-    private List<string> GetAudioFileExtensionPatterns()
+    private List<string> GetNonMidiAudioFileExtensionPatterns()
     {
-        if (settings.SearchAudioFilesWithoutSongMeta)
-        {
-            return ApplicationUtils.supportedAudioFiles
-                .Select(fileExtension => $"*.{fileExtension}")
-                .ToList();
-        }
+        return ApplicationUtils.supportedAudioFiles
+            .Except(ApplicationUtils.supportedMidiFiles)
+            .Select(fileExtension => $"*.{fileExtension}")
+            .ToList();
+    }
 
-        // Only search MIDI files with lyrics
-        return new List<string> { "*.mid", "*.kar" };
+    private List<string> GetMidiFileExtensionPatterns()
+    {
+        return ApplicationUtils.supportedMidiFiles
+            .Select(fileExtension => $"*.{fileExtension}")
+            .ToList();
     }
 
     private void InitFolderIfNotDoneYet(string path)
