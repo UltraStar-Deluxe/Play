@@ -73,6 +73,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.playerProfileSettingsProblemHintIcon)]
     private VisualElement playerProfileSettingsProblemHintIcon;
 
+    [Inject(UxmlName = R.UxmlNames.modSettingsProblemHintIcon)]
+    private VisualElement modSettingsProblemHintIcon;
+
     [Inject(UxmlName = R.UxmlNames.loadedSceneContent)]
     private VisualElement loadedSceneContent;
 
@@ -96,6 +99,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private ModManager modManager;
 
     [Inject]
     private SongMetaManager songMetaManager;
@@ -248,24 +254,26 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     {
         SettingsProblemHintControl songSettingsProblemHintControl = new(
             songSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager),
-            injector);
+            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager));
 
         SettingsProblemHintControl recordingSettingsProblemHintControl = new(
             recordingSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetRecordingSettingsProblems(settings),
-            injector);
+            SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
 
         SettingsProblemHintControl playerProfileSettingsProblemHintControl = new(
             playerProfileSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetPlayerSettingsProblems(settings),
-            injector);
+            SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
+
+        SettingsProblemHintControl modSettingsProblemHintControl = new(
+            modSettingsProblemHintIcon,
+            SettingsProblemHintControl.GetModSettingsProblems(modManager));
 
         StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
         {
             songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager));
             recordingSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
             playerProfileSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
+            modSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetModSettingsProblems(modManager));
         }));
     }
 

@@ -410,6 +410,7 @@ public static partial class R
         public const string modOptionsButton = "modOptionsButton";
         public const string modSettingsButton = "modSettingsButton";
         public const string modSettingsIcon = "modSettingsIcon";
+        public const string modSettingsProblemHintIcon = "modSettingsProblemHintIcon";
         public const string modTrustWarningContainer = "modTrustWarningContainer";
         public const string modTrustWarningLabel = "modTrustWarningLabel";
         public const string modVersionLabel = "modVersionLabel";

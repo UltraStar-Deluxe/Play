@@ -15,8 +15,8 @@ public class SettingsProblemHintControl
     private readonly TooltipControl tooltipControl;
 
     private bool hasIssues;
-    
-    public SettingsProblemHintControl(VisualElement visualElement, List<string> settingsProblems, Injector injector)
+
+    public SettingsProblemHintControl(VisualElement visualElement, List<string> settingsProblems)
     {
         this.tooltipControl = new(visualElement);
         this.visualElement = visualElement;
@@ -25,12 +25,27 @@ public class SettingsProblemHintControl
         SetProblems(settingsProblems);
     }
 
-    public static List<string> GetAllSettingsProblems(Settings settings, SongMetaManager songMetaManager)
+    public static List<string> GetAllSettingsProblems(
+        Settings settings,
+        SongMetaManager songMetaManager,
+        ModManager modManager)
     {
         return GetSongLibrarySettingsProblems(settings, songMetaManager)
             .Concat(GetRecordingSettingsProblems(settings))
             .Concat(GetPlayerSettingsProblems(settings))
+            .Concat(GetModSettingsProblems(modManager))
             .ToList();
+    }
+
+    public static List<string> GetModSettingsProblems(ModManager modManager)
+    {
+        List<string> result = new();
+        if (!modManager.EnabledFailedToLoadModFolders.IsNullOrEmpty())
+        {
+            result.Add("Some mods failed to load.");
+        }
+
+        return result;
     }
 
     public static List<string> GetSongLibrarySettingsProblems(Settings settings, SongMetaManager songMetaManager)
@@ -185,7 +200,7 @@ public class SettingsProblemHintControl
                 })
                 .setEaseLinear();
         }
-        
+
         tooltipControl.TooltipText = settingsProblems.JoinWith("\n\n");
     }
 }

@@ -98,6 +98,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
 
+    [Inject]
+    private ModManager modManager;
+
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
@@ -150,8 +153,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
         settingsProblemHintControl = new SettingsProblemHintControl(
             settingsProblemHintIcon,
-            SettingsProblemHintControl.GetAllSettingsProblems(settings, songMetaManager),
-            injector);
+            SettingsProblemHintControl.GetAllSettingsProblems(settings, songMetaManager, modManager));
 
         micSampleRecorderManager.ConnectedMicDevicesChangesStream
             .Subscribe(_ => UpdateSettingsProblemHint())
@@ -160,7 +162,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private void UpdateSettingsProblemHint()
     {
-        settingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetAllSettingsProblems(settings, songMetaManager));
+        settingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetAllSettingsProblems(settings, songMetaManager, modManager));
     }
 
     private void OpenSongSelectScene()

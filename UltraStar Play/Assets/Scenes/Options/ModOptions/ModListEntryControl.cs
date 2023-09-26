@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ProTrans;
 using UniInject;
 using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
@@ -14,6 +16,9 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private UiManager uiManager;
+
+    [Inject]
+    private GameObject gameObject;
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     public VisualElement VisualElement { get; private set; }
@@ -35,6 +40,9 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.openModFolderButton)]
     private Button openModFolderButton;
+
+    [Inject(UxmlName = R.UxmlNames.warningContainer)]
+    private VisualElement warningContainer;
 
     [Inject(Key = "modFolder")]
     public string ModFolder { get; private set; }
@@ -75,13 +83,26 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
                 settings.EnabledMods.Add(ModName);
             }
             UpdateInactiveOverlay();
+            UpdateWarning();
         });
 
         modInfoButton.RegisterCallbackButtonTriggered(_ => ShowModInfoDialog());
         modSettingsButton.RegisterCallbackButtonTriggered(_ => ShowModSettingsDialog());
         openModFolderButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(ModFolder));
 
+        modManager.ObserveEveryValueChanged(it => it.FailedToLoadModFolders.Count)
+            .Subscribe(_ => UpdateWarning())
+            .AddTo(gameObject);
+
         UpdateInactiveOverlay();
+        UpdateWarning();
+    }
+
+    private void UpdateWarning()
+    {
+        warningContainer.SetVisibleByDisplay(
+            IsModEnabled
+            && modManager.FailedToLoadModFolders.Contains(ModFolder));
     }
 
     private void ShowModSettingsDialog()

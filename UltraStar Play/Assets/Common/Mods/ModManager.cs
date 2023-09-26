@@ -54,6 +54,9 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private readonly HashSet<string> failedToLoadModFolders = new();
     public IReadOnlyCollection<string> FailedToLoadModFolders => failedToLoadModFolders;
+    public IReadOnlyCollection<string> EnabledFailedToLoadModFolders => FailedToLoadModFolders
+        .Where(modFolder => IsModEnabled(modFolder))
+        .ToList();
 
     private static readonly IReadOnlyList<string> defaultExposedAssemblyNames = new List<string>()
     {
