@@ -65,17 +65,6 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         // (1) Run audio separation (vocals and instrumental audio)
         IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMetaAsObservable(songMeta, audioSeparationJob);
 
-        // audioSeparationObservable
-        //     .CatchIgnore((Exception ex) =>
-        //     {
-        //         audioSeparationJob.SetResult(EJobResult.Error);
-        //     })
-        //     .Subscribe(evt =>
-        //     {
-        //         Debug.Log($"Successfully separated audio: {evt}");
-        //         audioSeparationJob.SetResult(EJobResult.Ok);
-        //     });
-
         SpeechRecognitionParameters speechRecognitionParameters = new(
             settings.SongEditorSettings.SpeechRecognitionModelPath,
             "auto",
