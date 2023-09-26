@@ -57,7 +57,7 @@ public class PitchDetectionManager : MonoBehaviour, INeedInjection
         if (!FileUtils.Exists(vocalsAudioUri))
         {
             return Observable.Throw<BasicPitchDetectionResult>(
-                new Exception($"Vocals audio for '{Path.GetFileName(songMeta.Audio)}' does not exist at path '{songMeta.VocalsAudio}'"));
+                new Exception($"Vocals audio for '{Path.GetFileName(songMeta.Audio)}' does not exist at path '{vocalsAudioUri}'"));
         }
         if (!ApplicationUtils.IsSupportedBasicPitchDetectionAudioFormat(Path.GetExtension(vocalsAudioUri)))
         {

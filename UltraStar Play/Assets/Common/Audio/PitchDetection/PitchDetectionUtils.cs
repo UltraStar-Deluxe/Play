@@ -14,7 +14,7 @@ public static class PitchDetectionUtils
         SongMeta songMeta,
         Job pitchDetectionJob = null)
     {
-        if (!FileUtils.Exists(songMeta.VocalsAudio))
+        if (!SongMetaUtils.VocalsAudioResourceExists(songMeta))
         {
             return Observable.Throw<List<Note>>(new Exception("Vocals audio not found. Split the audio first."));
         }
