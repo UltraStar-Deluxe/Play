@@ -4,7 +4,7 @@
             <ui:VisualElement name="modTrustWarningContainer" class="mb-3">
                 <ui:VisualElement name="row" style="align-items: center;">
                     <MaterialIcon tabindex="-1" name="warningIcon" icon="warning" class="rounded mr-1" />
-                    <ui:Label tabindex="-1" text="Mods can be a security risk or steal sensitive information. Only enable trusted mods." parse-escape-sequences="true" display-tooltip-when-elided="true" name="modTrustWarningLabel" class="wordWrap" />
+                    <ui:Label tabindex="-1" text="Mods can be a security risk or steal sensitive information. Use at your own risk." parse-escape-sequences="true" display-tooltip-when-elided="true" name="modTrustWarningLabel" class="wordWrap" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="modList" />
