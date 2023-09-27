@@ -50,17 +50,17 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     [Inject(Key = nameof(modInfoDialogUi))]
     private VisualTreeAsset modInfoDialogUi;
 
-    private string modName;
-    private string ModName
+    private string modDisplayName;
+    private string ModDisplayName
     {
         get
         {
-            if (modName.IsNullOrEmpty())
+            if (modDisplayName.IsNullOrEmpty())
             {
-                modName = ModManager.GetModName(ModFolder);
+                modDisplayName = ModManager.GetModDisplayName(ModFolder);
             }
 
-            return modName;
+            return modDisplayName;
         }
     }
 
@@ -72,16 +72,12 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
     public void OnInjectionFinished()
     {
         modListEntryInactiveOverlay.ShowByDisplay();
-        modNameLabel.text = ModName;
+        modNameLabel.text = ModDisplayName;
 
         enabledToggle.value = IsModEnabled;
         enabledToggle.RegisterValueChangedCallback(evt =>
         {
-            settings.EnabledMods.Remove(ModName);
-            if (evt.newValue)
-            {
-                settings.EnabledMods.Add(ModName);
-            }
+            modManager.SetModEnabled(ModFolder, evt.newValue);
             UpdateInactiveOverlay();
             UpdateWarning();
         });
@@ -125,7 +121,16 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        modSettingsDialogControl = uiManager.CreateDialogControl($"{modName} Settings");
+        List<IModSettingControl> allModSettingControls = allModSettings
+            .SelectMany(modSettings => modSettings.GetModSettingControls())
+            .ToList();
+        if (allModSettingControls.IsNullOrEmpty())
+        {
+            UiManager.CreateNotification("This mod has no settings.");
+            return;
+        }
+
+        modSettingsDialogControl = uiManager.CreateDialogControl($"{ModDisplayName} Settings");
         modSettingsDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok),
             _ => modSettingsDialogControl.CloseDialog());
         modSettingsDialogControl.DialogClosedEventStream.Subscribe(_ => modSettingsDialogControl = null);
@@ -151,7 +156,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        modInfoDialogControl = uiManager.CreateDialogControl($"{modName}");
+        modInfoDialogControl = uiManager.CreateDialogControl($"{ModDisplayName}");
         modInfoDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
             _ => modInfoDialogControl.CloseDialog());
         modInfoDialogControl.DialogClosedEventStream.Subscribe(_ => modInfoDialogControl = null);

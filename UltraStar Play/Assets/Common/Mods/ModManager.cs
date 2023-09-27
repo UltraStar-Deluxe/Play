@@ -358,7 +358,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnDisableMod(string modName)
     {
-        string modFolder = GetModFolderByModName(modName);
+        string modFolder = GetModFolderByModFolderName(modName);
         List<IOnDisableMod> disableModHandlers = DoGetModObjects<IOnDisableMod>(modFolder, false);
         disableModHandlers.ForEach(disableModHandler =>
         {
@@ -407,16 +407,16 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             if (!onlyEnabledMods
                 || IsModEnabled(modFolder))
             {
-                string modName = GetModName(modFolder);
+                string modFolderName = GetModFolderName(modFolder);
 
                 try
                 {
-                    LoadModIntoAppDomain(modFolder, modName);
+                    LoadModIntoAppDomain(modFolder, modFolderName);
                 }
                 catch (Exception ex)
                 {
                     Debug.LogException(ex);
-                    Debug.LogError($"Failed to load mod '{modName}' into app domain: {ex.Message}");
+                    Debug.LogError($"Failed to load mod '{modFolderName}' into app domain: {ex.Message}");
                     failedToLoadModFolders.Add(modFolder);
                 }
             }
@@ -425,7 +425,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool IsModEnabled(string modFolder)
     {
-        return settings.EnabledMods.Contains(GetModName(modFolder));
+        return settings.EnabledMods.Contains(GetModFolderName(modFolder));
     }
 
     private bool IsModEnabled(Type type)
@@ -518,10 +518,10 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             .ToList();
     }
 
-    private void LoadModIntoAppDomain(string modFolder, string modName)
+    private void LoadModIntoAppDomain(string modFolder, string modFolderName)
     {
-        Debug.Log($"Loading mod '{modName}' into app domain");
-        using DisposableStopwatch d = new($"Loading mod '{modName}' into app domain took <ms> ms");
+        Debug.Log($"Loading mod '{modFolderName}' into app domain");
+        using DisposableStopwatch d = new($"Loading mod '{modFolderName}' into app domain took <ms> ms");
 
         List<string> exposedAssemblyNames = defaultExposedAssemblyNames.ToList();
         ModInfo modInfo = GetModInfo(modFolder);
@@ -561,7 +561,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         string[] csFilePaths = Directory.GetFiles(modFolder, "*.cs");
         foreach (string filePath in csFilePaths)
         {
-            LoadScriptFileIntoAppDomain(modName, filePath, compilerWrapper);
+            LoadScriptFileIntoAppDomain(modFolderName, filePath, compilerWrapper);
         }
 
         // Find types that are loaded from this mod folder
@@ -575,15 +575,15 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         string fullReport = compilerWrapper.FullReport;
         if (compilerWrapper.FullReportErrorCount > 0)
         {
-            Debug.LogError($"Failed to load scripts of mod '{modName}'. Full compilation output:\n{fullReport}");
+            Debug.LogError($"Failed to load scripts of mod '{modFolderName}'. Full compilation output:\n{fullReport}");
         }
         else
         {
-            Debug.Log($"Successfully loaded scripts of mod '{modName}'. Full compilation output:\n{fullReport}");
+            Debug.Log($"Successfully loaded scripts of mod '{modFolderName}'. Full compilation output:\n{fullReport}");
         }
     }
 
-    private void LoadScriptFileIntoAppDomain(string modName, string filePath, CompilerWrapper compilerWrapper)
+    private void LoadScriptFileIntoAppDomain(string modFolderName, string filePath, CompilerWrapper compilerWrapper)
     {
         string fileName = Path.GetFileName(filePath);
 
@@ -596,13 +596,13 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
         catch (Exception ex)
         {
-            throw new LoadModException($"Failed to load file '{fileName}' of mod '{modName}'. " +
+            throw new LoadModException($"Failed to load file '{fileName}' of mod '{modFolderName}'. " +
                                        $"Compilation output of the file:\n{compilerWrapper.PartialReport}", ex);
         }
 
         if (compilerWrapper.PartialReportErrorCount > 0)
         {
-            throw new LoadModException($"Errors in file '{fileName}' of mod '{modName}'. " +
+            throw new LoadModException($"Errors in file '{fileName}' of mod '{modFolderName}'. " +
                                        $"Compilation output of the file:\n{compilerWrapper.PartialReport}");
         }
     }
@@ -665,7 +665,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 catch (LoadModSettingsException ex)
                 {
                     Debug.LogException(ex);
-                    UiManager.CreateNotification($"Failed to load settings of mod '{GetModName(ex.ModFolder)}'");
+                    UiManager.CreateNotification($"Failed to load settings of mod '{GetModFolderName(ex.ModFolder)}'");
                 }
             }
         }
@@ -846,15 +846,23 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return PathUtils.GetFileName(modFolder);
     }
 
-    public string GetModFolderByModName(string modName)
+    public string GetModFolderByModFolderName(string modFolderName)
     {
         return typeToModFolder
             .Values
             .Distinct()
-            .FirstOrDefault(modFolder => GetModName(modFolder) == modName);
+            .FirstOrDefault(modFolder => GetModFolderName(modFolder) == modFolderName);
     }
 
-    public static string GetModName(string modFolder)
+    public string GetModFolderByModDisplayName(string modDisplayName)
+    {
+        return typeToModFolder
+            .Values
+            .Distinct()
+            .FirstOrDefault(modFolder => GetModDisplayName(modFolder) == modDisplayName);
+    }
+
+    public static string GetModDisplayName(string modFolder)
     {
         ModInfo modInfo = GetModInfo(modFolder);
         if (modInfo != null
@@ -862,7 +870,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         {
             return modInfo.name;
         }
-        return Path.GetFileName(modFolder);
+        return GetModFolderName(modFolder);
     }
 
     public static ModInfo GetModInfo(string modFolder)
@@ -902,5 +910,20 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             .Select(entry => entry.Key)
             .OfType<IModSettings>()
             .ForEach(modSettings => SaveModSettings(modSettings));
+    }
+
+    public void SetModEnabled(string modFolder, bool enabled)
+    {
+        string modFolderName = GetModFolderName(modFolder);
+        if (enabled
+            && !settings.EnabledMods.Contains(modFolderName))
+        {
+            settings.EnabledMods.Add(modFolderName);
+        }
+        else if (!enabled)
+        {
+            settings.EnabledMods
+                .RemoveAll(enabledModFolderName => enabledModFolderName == modFolderName);
+        }
     }
 }
