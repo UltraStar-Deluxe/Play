@@ -649,7 +649,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         foreach (IMod modObject in currentModObjects)
         {
             string modFolder = GetModFolder(modObject);
-            ModObjectContext modObjectContext = new(modFolder, false);
+            string modSettingsFolder = GetModSettingsFolder(modFolder);
+            ModObjectContext modObjectContext = new(modFolder, modSettingsFolder, false);
             modObjectToContext[modObject] = modObjectContext;
         }
 
@@ -738,7 +739,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         string modSettingsPath = GetModSettingsPath(modFolder);
-        string modSettingsFolder = PathUtils.GetDirectoryName(modSettingsPath);
+        string modSettingsFolder = GetModSettingsFolder(modSettingsPath);
         try
         {
             Debug.Log($"Writing mod settings of type {modSettings.GetType()} to file '{modSettingsPath}'");
@@ -836,9 +837,14 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return ApplicationUtils.GetPersistentDataPath(ModsRootFolderName);
     }
 
+    public static string GetModSettingsFolder(string modFolder)
+    {
+        return $"{Application.persistentDataPath}/ModSettings/{GetModFolderName(modFolder)}";
+    }
+
     public static string GetModSettingsPath(string modFolder)
     {
-        return $"{Application.persistentDataPath}/ModSettings/{GetModFolderName(modFolder)}/modsettings.json";
+        return $"{GetModSettingsFolder(modFolder)}/modsettings.json";
     }
 
     public static string GetModFolderName(string modFolder)
