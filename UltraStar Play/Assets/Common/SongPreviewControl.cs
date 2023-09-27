@@ -228,29 +228,22 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        try
-        {
-            songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
-                .CatchIgnore((Exception ex) =>
-                {
-                    string errorMessage = $"Audio could not be loaded: {SongMetaUtils.GetArtistDashTitle(songMeta)}";
-                    Debug.LogError(errorMessage);
-                    UiManager.CreateNotification(errorMessage);
-                })
-                .Subscribe(_ =>
-                {
-                    Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
-                    songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
-                    songAudioPlayer.VolumeFactor = 0;
-                    songAudioPlayer.PlayAudio();
-                });
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            string errorMessage = $"Audio could not be loaded (artist: {songMeta.Artist}, title: {songMeta.Title})";
-            UiManager.CreateNotification(errorMessage);
-        }
+        songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                string errorMessage = $"Audio could not be loaded: '{SongMetaUtils.GetArtistDashTitle(songMeta)}'";
+                Debug.LogError(errorMessage);
+                UiManager.CreateNotification(errorMessage);
+                songAudioPlayer.PauseAudio();
+            })
+            .Subscribe(_ =>
+            {
+                Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
+                songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
+                songAudioPlayer.VolumeFactor = 0;
+                songAudioPlayer.PlayAudio();
+            });
     }
 
     protected virtual float GetFinalPreviewVolume()
