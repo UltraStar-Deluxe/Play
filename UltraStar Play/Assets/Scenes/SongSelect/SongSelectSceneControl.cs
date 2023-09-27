@@ -1188,31 +1188,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSceneControl.OnSearchTextChanged");
 
-        // Search songs in song repositories
-        SongRepositorySearchParameters searchParameters = new(
-            songSearchControl.GetSearchText());
-        IsSongRepositorySearchRunning.Value = true;
-        SongRepositoryUtils.SearchSongs(searchParameters)
-            .ThrottleFirst(TimeSpan.FromMilliseconds(500))
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-            })
-            .DoOnCompleted(() => IsSongRepositorySearchRunning.Value = false)
-            .Subscribe(
-            songSearchResultEntry =>
-            {
-                SongMeta songMeta = songSearchResultEntry.SongMeta;
-                List<SongIssue> songIssues = songSearchResultEntry.SongIssues;
-                if (songMeta != null
-                    && !songMetaManager.ContainsSongMeta(songMeta))
-                {
-                    songMetas.Add(songMeta);
-                    songMetaManager.AddSongMeta(songMeta);
-                    songMetaManager.AddSongIssues(songIssues);
-                }
-                UpdateFilteredSongs();
-            });
+        StartSongRepositorySearch();
 
         SongSelectEntry lastSelectedEntry = songRouletteControl.SelectedEntry;
         string rawSearchText = songSearchControl.GetRawSearchText();
@@ -1241,6 +1217,45 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             {
                 songRouletteControl.SelectEntry(selectedEntryBeforeSearch);
             }
+        }
+    }
+
+    private void StartSongRepositorySearch()
+    {
+        IsSongRepositorySearchRunning.Value = true;
+        SongRepositorySearchParameters searchParameters = new(songSearchControl.GetSearchText());
+        SongRepositoryUtils.SearchSongs(searchParameters)
+            .Buffer(TimeSpan.FromMilliseconds(500))
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+            })
+            .DoOnCompleted(() => IsSongRepositorySearchRunning.Value = false)
+            .Subscribe(songSearchResultEntries =>
+            {
+                songSearchResultEntries.ForEach(entry => AddSearchResultEntryToSongMetaManager(entry));
+                UpdateFilteredSongs();
+            });
+    }
+
+    private void AddSearchResultEntryToSongMetaManager(SongRepositorySearchResultEntry searchResultEntry)
+    {
+        try
+        {
+            SongMeta songMeta = searchResultEntry.SongMeta;
+            List<SongIssue> songIssues = searchResultEntry.SongIssues;
+            if (songMeta != null
+                && !songMetaManager.ContainsSongMeta(songMeta))
+            {
+                songMetas.Add(songMeta);
+                songMetaManager.AddSongMeta(songMeta);
+                songMetaManager.AddSongIssues(songIssues);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.Log($"Failed to add search result entry '{SongMetaUtils.GetArtistDashTitle(searchResultEntry.SongMeta)}'");
         }
     }
 
