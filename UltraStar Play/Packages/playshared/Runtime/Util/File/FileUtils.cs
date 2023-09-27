@@ -5,6 +5,21 @@ using UnityEngine;
 
 public static class FileUtils
 {
+    public static string ReadAllText(string targetPath)
+    {
+        if (!Exists(targetPath))
+        {
+            return "";
+        }
+
+        return File.ReadAllText(targetPath);
+    }
+
+    public static void WriteAllText(string targetPath, string text)
+    {
+        File.WriteAllText(targetPath, text);
+    }
+
     public static void WriteAllTextIfChanged(string targetPath, string text)
     {
         string NormalizeText(string t)

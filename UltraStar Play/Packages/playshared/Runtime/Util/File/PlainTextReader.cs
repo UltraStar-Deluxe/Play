@@ -23,7 +23,7 @@ public static class PlainTextReader
         return reader;
     }
 
-    private static Encoding GuessUnicodeFileEncoding(string path)
+    public static Encoding GuessUnicodeFileEncoding(string path)
     {
         byte[] buffer = new byte[5];
         FileStream file = new(path, FileMode.Open, FileAccess.Read);
@@ -48,7 +48,7 @@ public static class PlainTextReader
         return Encoding.UTF8;
     }
 
-    private static Encoding GuessUnknownFileEncodingUsingUniversalCharsetDetector(string filePath)
+    public static Encoding GuessUnknownFileEncodingUsingUniversalCharsetDetector(string filePath)
     {
         DetectionResult detectionResult = CharsetDetector.DetectFromFile(filePath);
         if (detectionResult == null
