@@ -1,16 +1,16 @@
 ﻿public class ModObjectContext
 {
     public string ModFolder { get; private set; }
-    public string ModSettingsFolder { get; private set; }
+    public string ModPersistentDataFolder { get; private set; }
     public bool IsObsolete { get; private set; }
 
     public ModObjectContext(
         string modFolder,
-        string modSettingsFolder,
+        string modPersistentDataFolder,
         bool isObsolete)
     {
         ModFolder = modFolder;
-        ModSettingsFolder = modSettingsFolder;
+        ModPersistentDataFolder = modPersistentDataFolder;
         IsObsolete = isObsolete;
     }
 

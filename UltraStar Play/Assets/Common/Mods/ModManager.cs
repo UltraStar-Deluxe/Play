@@ -17,6 +17,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public const string ModInfoFileName = "modinfo.yml";
     private const string ModsRootFolderName = "Mods";
+    private const string ModPersistentDataFolderName = "ModPersistentData";
     private const string TemplateModFolderName = "TemplateMod";
     private const string TemplateModNamePlaceholder = "MODNAME";
     private const string TemplateModDllFolderPlaceholder = "DEFAULT_DLL_FOLDER";
@@ -649,8 +650,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         foreach (IMod modObject in currentModObjects)
         {
             string modFolder = GetModFolder(modObject);
-            string modSettingsFolder = GetModSettingsFolder(modFolder);
-            ModObjectContext modObjectContext = new(modFolder, modSettingsFolder, false);
+            string modPersistentDataFolder = GetModPersistentDataFolder(modFolder);
+            ModObjectContext modObjectContext = new(modFolder, modPersistentDataFolder, false);
             modObjectToContext[modObject] = modObjectContext;
         }
 
@@ -739,11 +740,11 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         string modSettingsPath = GetModSettingsPath(modFolder);
-        string modSettingsFolder = GetModSettingsFolder(modSettingsPath);
+        string modPersistentDataFolder = GetModPersistentDataFolder(modSettingsPath);
         try
         {
             Debug.Log($"Writing mod settings of type {modSettings.GetType()} to file '{modSettingsPath}'");
-            DirectoryUtils.CreateDirectory(modSettingsFolder);
+            DirectoryUtils.CreateDirectory(modPersistentDataFolder);
             string json = JsonConverter.ToJson(modSettings, true);
             File.WriteAllText(modSettingsPath, json);
         }
@@ -837,14 +838,14 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return ApplicationUtils.GetPersistentDataPath(ModsRootFolderName);
     }
 
-    public static string GetModSettingsFolder(string modFolder)
+    public static string GetModPersistentDataFolder(string modFolder)
     {
-        return $"{Application.persistentDataPath}/ModSettings/{GetModFolderName(modFolder)}";
+        return $"{Application.persistentDataPath}/{ModPersistentDataFolderName}/{GetModFolderName(modFolder)}";
     }
 
     public static string GetModSettingsPath(string modFolder)
     {
-        return $"{GetModSettingsFolder(modFolder)}/modsettings.json";
+        return $"{GetModPersistentDataFolder(modFolder)}/modsettings.json";
     }
 
     public static string GetModFolderName(string modFolder)
