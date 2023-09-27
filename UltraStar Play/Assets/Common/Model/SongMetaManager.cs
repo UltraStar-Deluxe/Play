@@ -314,7 +314,15 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
         // Exclude audio files that are stored next to an UltraStar txt file
         HashSet<string> existingSongMetaFolders = existingSongMetas
-            .Select(songMeta => new DirectoryInfo(SongMetaUtils.GetDirectoryPath(songMeta)).FullName)
+            .Select(songMeta =>
+            {
+                string directoryPath = SongMetaUtils.GetDirectoryPath(songMeta);
+                if (directoryPath.IsNullOrEmpty())
+                {
+                    return "";
+                }
+                return new DirectoryInfo(directoryPath).FullName;
+            })
             .ToHashSet();
 
         List<string> audioFilesWithoutSongMeta = audioFiles
