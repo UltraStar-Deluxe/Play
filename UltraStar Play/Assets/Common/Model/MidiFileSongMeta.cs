@@ -2,6 +2,11 @@
 
 public class MidiFileSongMeta : UltraStarSongMeta
 {
+    public MidiFileSongMeta()
+    {
+        OnLoadVoices = DoLoadVoices;
+    }
+
     public MidiFileSongMeta(SongMeta other)
         : base(other)
     {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
 {
@@ -118,6 +117,10 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
     public override int VoiceCount => !voiceIdToDisplayName.IsNullOrEmpty()
         ? voiceIdToDisplayName.Count
         : Voices.Count;
+
+    public UltraStarSongMeta()
+    {
+    }
 
     public UltraStarSongMeta(SongMeta other)
     {
