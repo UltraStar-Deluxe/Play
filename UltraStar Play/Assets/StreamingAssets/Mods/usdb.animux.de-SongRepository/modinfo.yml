@@ -1,0 +1,18 @@
+name: Search Songs on usdb.animux.de
+version: 1.0.0
+description : |
+  Search songs on usdb.animux.de to play them with YouTube.
+  Requires an account on usdb.animux.de.
+
+  How it works:
+  Searches on usdb.animux.de for songs with matching artist or title
+  when using the search text field in song select.
+  The content of a song (i.e. its txt file) is loaded only when it is played.
+  Thereby, no audio or video files are downloaded.
+  Instead, the embedded browser is used to play songs via YouTube.
+  Thus, the download size is relatively small.
+  However, only txt files with a link to YouTube will work.
+requiredAssemblies:
+  - Flurl
+  - Flurl.Http
+  - ICSharpCode.SharpZipLib

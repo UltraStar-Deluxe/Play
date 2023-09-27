@@ -16,6 +16,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Mono.CSharp;
@@ -59,7 +61,7 @@ public class CompilerWrapper
         evaluator.ImportTypes(true, BuiltInTypes);
         evaluator.ImportTypes(true, AsynchronousFunctionSupportTypes);
         evaluator.ImportTypes(true, AdditionalTypes);
-        // evaluator.ImportTypes(false, QuestionableTypes);
+        evaluator.ImportTypes(true, QuestionableTypes);
     }
 
     public void ImportTypes(Type[] types)
@@ -230,52 +232,42 @@ public class CompilerWrapper
         //// mscorlib System
 
         //typeof(System.AsyncCallback),
-        //typeof(System.BitConverter),
-        //typeof(System.Buffer),
-        //typeof(System.DateTime),
-        //typeof(System.DateTimeKind),
-        //typeof(System.DateTimeOffset),
-        //typeof(System.DayOfWeek),
+        typeof(BitConverter),
+        typeof(Buffer),
+        typeof(DateTime),
+        typeof(DateTimeKind),
+        typeof(DateTimeOffset),
+        typeof(DayOfWeek),
         //typeof(System.EventArgs),
         //typeof(System.EventHandler),
         //typeof(System.EventHandler<>),
-        //typeof(System.TimeSpan),
-        //typeof(System.TimeZone),
-        //typeof(System.TimeZoneInfo),
-        //typeof(System.TimeZoneNotFoundException),
+        typeof(TimeSpan),
+        typeof(TimeZone),
+        typeof(TimeZoneInfo),
+        typeof(TimeZoneNotFoundException),
 
         //// mscorlib System.IO
 
-        //typeof(System.IO.BinaryReader),
-        //typeof(System.IO.BinaryWriter),
-        //typeof(System.IO.BufferedStream),
-        //typeof(System.IO.EndOfStreamException),
-        //typeof(System.IO.FileAccess),
-        //typeof(System.IO.FileMode),
-        //typeof(System.IO.FileNotFoundException),
-        //typeof(System.IO.IOException),
-        //typeof(System.IO.MemoryStream),
-        //typeof(System.IO.Path),
-        //typeof(System.IO.PathTooLongException),
-        //typeof(System.IO.SeekOrigin),
-        //typeof(System.IO.Stream),
-        //typeof(System.IO.StringReader),
-        //typeof(System.IO.StringWriter),
-        //typeof(System.IO.TextReader),
-        //typeof(System.IO.TextWriter),
-
-        //// mscorlib System.Text
-
-        //typeof(System.Text.ASCIIEncoding),
-        //typeof(System.Text.Decoder),
-        //typeof(System.Text.Encoder),
-        //typeof(System.Text.Encoding),
-        //typeof(System.Text.EncodingInfo),
-        //typeof(System.Text.StringBuilder),
-        //typeof(System.Text.UnicodeEncoding),
-        //typeof(System.Text.UTF32Encoding),
-        //typeof(System.Text.UTF7Encoding),
-        //typeof(System.Text.UTF8Encoding),
+        typeof(BinaryReader),
+        typeof(BinaryWriter),
+        typeof(BufferedStream),
+        typeof(EndOfStreamException),
+        typeof(Directory),
+        typeof(File),
+        typeof(FileAccess),
+        typeof(FileMode),
+        typeof(FileNotFoundException),
+        typeof(FileStream),
+        typeof(IOException),
+        typeof(MemoryStream),
+        typeof(Path),
+        typeof(PathTooLongException),
+        typeof(SeekOrigin),
+        typeof(Stream),
+        typeof(StringReader),
+        typeof(StringWriter),
+        typeof(TextReader),
+        typeof(TextWriter),
 
         //// mscorlib System.Globalization
 
@@ -297,18 +289,36 @@ public class CompilerWrapper
         //typeof(System.IO.Compression.DeflateStream),
         //typeof(System.IO.Compression.GZipStream),
 
+        //// mscorlib System.Text
+
+        typeof(ASCIIEncoding),
+        typeof(Decoder),
+        typeof(Encoder),
+        typeof(Encoding),
+        typeof(EncodingInfo),
+        typeof(StringBuilder),
+        typeof(UnicodeEncoding),
+        typeof(UTF32Encoding),
+        typeof(UTF7Encoding),
+        typeof(UTF8Encoding),
+
         //// System System.Text.RegularExpressions
 
-        //typeof(System.Text.RegularExpressions.Capture),
-        //typeof(System.Text.RegularExpressions.CaptureCollection),
-        //typeof(System.Text.RegularExpressions.Group),
-        //typeof(System.Text.RegularExpressions.GroupCollection),
-        //typeof(System.Text.RegularExpressions.Match),
-        //typeof(System.Text.RegularExpressions.MatchCollection),
-        //typeof(System.Text.RegularExpressions.MatchEvaluator),
-        //typeof(System.Text.RegularExpressions.Regex),
-        //typeof(System.Text.RegularExpressions.RegexCompilationInfo),
-        //typeof(System.Text.RegularExpressions.RegexOptions),
+        typeof(Capture),
+        typeof(CaptureCollection),
+        typeof(Group),
+        typeof(GroupCollection),
+        typeof(Match),
+        typeof(MatchCollection),
+        typeof(MatchEvaluator),
+        typeof(Regex),
+        typeof(RegexCompilationInfo),
+        typeof(RegexOptions),
+
+        //// System.Threading
+
+        typeof(CancellationTokenSource),
+        typeof(CancellationToken),
     };
 
     #endregion

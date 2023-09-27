@@ -1,9 +1,0 @@
-name: Online Song Repository Prototype
-version: 1.0.0
-description : |
-  Dynamically loads songs from an online source when searching (just as a proof of concept).
-authors: 
-  - email@melodymania.org
-requiredAssemblies:
-  - Flurl
-  - Flurl.Http
