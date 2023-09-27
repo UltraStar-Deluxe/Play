@@ -26,13 +26,13 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
                                                              @"<td onclick=""show_detail\(\d+\)"">(.*)</td>";
     private static readonly Regex songListRowRegex = new Regex(songListRowRegexPattern, RegexOptions.Multiline);
     private static readonly Regex youTubeVideoIdRegex = new Regex(@"v=(\w+)(\r|\n|\,)", RegexOptions.Multiline);
-
-    private static readonly object downloadZipArchiveLock = new object();
+    private static readonly Regex youTubeHtmlAnchorElementRegex = new Regex(@"<a .+ title=""(.+)"" /watch\?v=(\w+)(\r|\n|\,)", RegexOptions.Multiline);
 
     private static Dictionary<int, SongMeta> usdbSongIdToSongMeta = new Dictionary<int, SongMeta>();
+    private static Dictionary<string, List<SongRepositorySearchResultEntry>> searchTermToSearchResult = new Dictionary<string, List<SongRepositorySearchResultEntry>>();
 
-    // private const int MaxSongId = 300_000;
-    private const int MaxSongId = 100;
+    private const int MaxSongId = 30_000;
+    // private const int MaxSongId = 1000;
 
     private const int MaxSongsPerPage = 100;
     private const int MaxSongsPerSearchResult = 15;
@@ -50,17 +50,75 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
     private SongMetaManager songMetaManager;
 
     private UsdbSongIndex songIndex = new UsdbSongIndex();
-    private string PersistedSongIndexFilePath => $"{modObjectContext.ModSettingsFolder}/song-index.json";
+    private string PersistedSongIndexFilePath => $"{modObjectContext.ModPersistentDataFolder}/song-index.json";
 
     private FlurlCookie sessionCookie;
 
+    private int fetchingSongDetailsSemaphore;
+
     public void OnLoadMod()
     {
-        // Uncomment to load song index from usdb.animux.de when the mod is loaded.
-        // SynchronizeSongIndex();
+        if (modSettings.loadFullSongIndex)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await LoadFullSongIndexAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to load song index of usdb.animux.de: {ex.Message}");
+                }
+            });
+        }
     }
 
-    private void SynchronizeSongIndex()
+    private async Task LoadFullSongIndexAsync()
+    {
+        await SynchronizeSongIndexAsync();
+        await AddSongMetasForSongIndexAsync();
+    }
+
+    private async Task AddSongMetasForSongIndexAsync()
+    {
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        Job job = new Job("Creating songs from usdb.animux.de");
+        job.OnCancel = () => cancellationTokenSource.Cancel();
+        job.EstimatedTotalDurationInMillis = songIndex.Count * 10;
+        job.SetStatus(EJobStatus.Running);
+
+        jobManager.AddJob(job);
+
+        List<UsdbSong> usdbSongs = songIndex.usdbSongIdToUsdbSong
+            .Values
+            .ToList();
+        for (int i = 0; i < usdbSongs.Count; i++)
+        {
+            UsdbSong usdbSong = usdbSongs[i];
+            if (cancellationTokenSource.IsCancellationRequested)
+            {
+                break;
+            }
+
+            try
+            {
+                job.EstimatedCurrentProgressInPercent = 100* ((double)i / usdbSongs.Count);
+                SongMeta songMeta = CreateSongMetaFromUsdbSong(usdbSong);
+                songMetaManager.AddSongMeta(songMeta);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to add SongMeta for usdb.animux.de song '{usdbSong.artist} - {usdbSong.title}' (usdb id {usdbSong.songId})");
+            }
+        }
+
+        job.SetResult(EJobResult.Ok);
+    }
+
+    private async Task SynchronizeSongIndexAsync()
     {
         if (modSettings.username.IsNullOrEmpty()
             || modSettings.password.IsNullOrEmpty())
@@ -69,35 +127,29 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
             return;
         }
 
-        Job job = new Job("Updating songs from usdb.animux.de");
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        Job job = new Job("Updating song index from usdb.animux.de");
+        job.OnCancel = () => cancellationTokenSource.Cancel();
+        job.EstimatedTotalDurationInMillis = MaxSongId * 10;
+        job.SetStatus(EJobStatus.Running);
         jobManager.AddJob(job);
 
-        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        job.OnCancel = () => cancellationTokenSource.Cancel();
+        try
+        {
+            await UpdateSongIndexAsync(job, cancellationTokenSource.Token);
+            Debug.Log($"Successfully updated song index from usdb.animux.de");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            string errorMessage = $"Failed to update song index from usdb.animux.de: {ex.Message}";
+            Debug.LogError(errorMessage);
+            job.SetResult(EJobResult.Error);
 
-        ObservableUtils.RunOnNewTaskAsObservable(
-            async () => await UpdateSongIndexAsync(job, cancellationTokenSource.Token),
-            new JobDisposable(job))
-            .CatchIgnore((Exception ex) =>
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to update song index from usdb.animux.de: {ex.Message}");
-                job.SetResult(EJobResult.Error);
-            })
-            .Subscribe(_ =>
-            {
-                Debug.Log($"Successfully updated song index from usdb.animux.de");
-                job.SetResult(EJobResult.Ok);
+            throw new Exception(errorMessage);
+        }
 
-                List<SongMeta> songMetas = songIndex.usdbSongIdToUsdbSong
-                    .Values
-                    .Select(songMeta => CreateSongMetaFromUsdbSong(songMeta))
-                    .ToList();
-                foreach (SongMeta songMeta in songMetas)
-                {
-                    songMetaManager.AddSongMeta(songMeta);
-                }
-            });
+        job.SetResult(EJobResult.Ok);
     }
 
     private SongMeta CreateSongMetaFromUsdbSong(UsdbSong usdbSong)
@@ -109,26 +161,34 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
 
         Debug.Log($"Creating SongMeta from usdb.animux.de song with id {usdbSong.songId}");
 
-        int dummyTxtFileBpm = 200;
-        Dictionary<EVoiceId, string> voiceIdToDisplayName = new Dictionary<EVoiceId, string>();
-        UltraStarSongMeta songMeta = new UltraStarSongMeta(
+        UsdbUltraStarSongMeta songMeta = new UsdbUltraStarSongMeta(
             usdbSong.artist,
-            usdbSong.title,
-            dummyTxtFileBpm,
-            "dummy-audio.ogg",
-            voiceIdToDisplayName);
-        songMeta.RemoteSource = "usdb.animux.de";
+            usdbSong.title);
 
-        songMeta.OnLoadVoices = () => Task.Run(async () =>
+        songMeta.OnLoadDetails = () => Task.Run(async () =>
         {
+            // Sadly, querying multiple song details at once is not possible
+            // because the "ziparchiv" data needs to be set via a cookie, which is stored on server side.
+            // Thus, make an attempt at avoiding overlaps in this critical section. But no guarantees.
+            while (fetchingSongDetailsSemaphore > 0)
+            {
+                Debug.Log($"Waiting for other song details to be fetched before fetching details of '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
+                ThreadUtils.Sleep(1000);
+            }
+
             try
             {
+                fetchingSongDetailsSemaphore++;
                 await LoadSongMetaDetailsAsync(songMeta, usdbSong);
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to load details of song '{usdbSong.artist} - {usdbSong.title}' (usdb id {usdbSong.songId}) from usdb.animux.de: {ex.Message}");
+            }
+            finally
+            {
+                fetchingSongDetailsSemaphore--;
             }
         });
 
@@ -162,11 +222,24 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
         if (songMeta.Website.IsNullOrEmpty())
         {
             // Try to find link to YouTube video
+            string youTubeVideoId;
             Match match = youTubeVideoIdRegex.Match(usdbSongDetails.txtContent);
             if (match.Success)
             {
-                string youTubeVideoId = match.Groups[1].Value;
+                youTubeVideoId = match.Groups[1].Value;
+            }
+            else
+            {
+                youTubeVideoId = await SearchYouTubeVideoIdAsync(songMeta);
+            }
+
+            if (!youTubeVideoId.IsNullOrEmpty())
+            {
                 songMeta.Website = $"https://www.youtube.com/watch?v={youTubeVideoId}";
+            }
+            else
+            {
+                Debug.Log($"Failed to find YouTube video for song '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
             }
         }
 
@@ -174,16 +247,22 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
         parsedSongMeta.Voices.ForEach(voice => songMeta.AddVoice(voice));
     }
 
+    private async Task<string> SearchYouTubeVideoIdAsync(SongMeta songMeta)
+    {
+        // TODO: Could be implemented via YouTube search API
+        return "";
+    }
+
     private async Task<UsdbSongDetails> GetSongDetailsAsync(UsdbSong usdbSong)
     {
-        string extractPath = GetSongDetailsDataFolder(usdbSong);
-        
-        // Try to use previously extracted txt file.
-        if (DirectoryUtils.Exists(extractPath))
+        string detailsFolder = GetSongDetailsFolder(usdbSong);
+
+        // Try to use previously downloaded txt file.
+        if (DirectoryUtils.Exists(detailsFolder))
         {
             List<string> folders = new List<string>()
             {
-                extractPath
+                detailsFolder
             };
 
             List<string> txtFileExtensionPatterns = new List<string>()
@@ -195,14 +274,14 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
                 .FirstOrDefault();
             if (FileUtils.Exists(txtFile))
             {
-                SearchCoverAndBackgroundImageInFolder(extractPath, out string coverImage, out string backgroundImage);
+                SearchCoverAndBackgroundImageInFolder(detailsFolder, out string coverImage, out string backgroundImage);
                 string txtContent = ReadPlainTextFileWithUnknownEncoding(txtFile);
                 return new UsdbSongDetails()
                 {
                     txtFile = txtFile,
                     txtContent = txtContent,
-                    coverImage = coverImage,  
-                    backgroundImage = backgroundImage,  
+                    coverImage = coverImage,
+                    backgroundImage = backgroundImage,
                 };
             }
         }
@@ -231,7 +310,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
             .WithCookie("ziparchiv", $"{usdbSong.songId}|")
             .GetAsync();
         Debug.Log($"Received status code {setZipArchiveSongIdsResponse.StatusCode} when setting ZIP archive song ids to {usdbSong.songId}");
-        
+
         IFlurlResponse setZipArchiveSongIdsSaveResponse = await $"https://usdb.animux.de/"
             .SetQueryParam("link", "ziparchiv")
             .SetQueryParam("save", "1")
@@ -267,7 +346,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
 
     private UsdbSongDetails GetSongDetailsFromZipArchiveByteArray(UsdbSong usdbSong, byte[] zipArchiveBytes)
     {
-        string extractPath = GetSongDetailsDataFolder(usdbSong);
+        string extractPath = GetSongDetailsFolder(usdbSong);
         Debug.Log($"Extracting ZIP archive with details of song '{usdbSong.artist} - {usdbSong.title}' (usdb id {usdbSong.songId}) to folder '{extractPath}'");
         DirectoryUtils.CreateDirectory(extractPath);
 
@@ -336,9 +415,9 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
         return fileContent;
     }
 
-    private string GetSongDetailsDataFolder(UsdbSong usdbSong)
+    private string GetSongDetailsFolder(UsdbSong usdbSong)
     {
-        return $"{modObjectContext.ModSettingsFolder}/extracted-songs/{usdbSong.songId} - {usdbSong.artist} - {usdbSong.title}";
+        return $"{modObjectContext.ModPersistentDataFolder}/songs/{usdbSong.songId} - {usdbSong.artist} - {usdbSong.title}";
     }
 
     private async Task<UsdbSongIndex> UpdateSongIndexAsync(Job job, CancellationToken cancellationToken)
@@ -369,7 +448,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
 
         songIndex.AddSongs(availableSongs);
         songIndex.synchronizationDateTime = DateTime.Now;
-        
+
         SaveSongIndexToCacheFile();
 
         return songIndex;
@@ -417,7 +496,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
                 .WithCookie(sessionCookie.Name, sessionCookie.Value)
                 .PostUrlEncodedAsync(payload)
                 .ReceiveString();
-            
+
             List<UsdbSong> newSongs = CreateUsdbSongsFromHtml(html);
 
             availableSongs.AddRange(newSongs);
@@ -452,7 +531,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
             .WithCookie(sessionCookie.Name, sessionCookie.Value)
             .PostUrlEncodedAsync(payload)
             .ReceiveString();
-        
+
         List<UsdbSong> songs = CreateUsdbSongsFromHtml(html);
 
         Debug.Log($"Found {songs.Count} songs on usdb.animux.de matching artist '{artist}' AND title '{title}'");
@@ -540,7 +619,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
         IFlurlResponse response = await "https://usdb.animux.de"
             .WithHeader("User-Agent", "Some User Agent")
             .PostUrlEncodedAsync(formData);
-        
+
         FlurlCookie sessionCookie = response.Cookies
             .FirstOrDefault(cookie => cookie.Name == PhpSessionIdCookieName);
 
@@ -548,7 +627,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
         {
             throw new Exception($"Failed to log in to usdb.animux.de with given username and password. Response status: {response.StatusCode}, response message: {response.ResponseMessage}");
         }
-        else 
+        else
         {
             Debug.Log($"Successfully logged in to usdb.animux.de.");
         }
@@ -603,8 +682,20 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
 
     public IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters)
     {
+        if (modSettings.loadFullSongIndex)
+        {
+            // Not searching dynamically on the website
+            // because the full song index is loaded when the mod is loaded.
+            return Observable.Empty<SongRepositorySearchResultEntry>();
+        }
+
         return ObservableUtils.RunOnNewTaskAsObservableElements(async () =>
         {
+            if (searchTermToSearchResult.TryGetValue(searchParameters.SearchText, out List<SongRepositorySearchResultEntry> cachedSearchResult))
+            {
+                return cachedSearchResult;
+            }
+
             if (sessionCookie == null)
             {
                 sessionCookie = await GetNewSessionCookieAsync();
@@ -617,11 +708,11 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
             List<UsdbSong> usdbSearchResult = usdbSearchResultMatchingArtist
                 .Union(usdbSearchResultMatchingTitle)
                 .ToList();
-            
+
             // Update song index with search result
             int oldSongIndexSize = songIndex.Count;
             songIndex.AddSongs(usdbSearchResult);
-            if (oldSongIndexSize != songIndex.Count)
+            if (oldSongIndexSize < songIndex.Count)
             {
                 SaveSongIndexToCacheFile();
             }
@@ -633,6 +724,9 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
             List<SongRepositorySearchResultEntry> searchResultEntries = songMetas
                 .Select(songMeta => new SongRepositorySearchResultEntry(songMeta, new List<SongIssue>()))
                 .ToList();
+
+            // Cache search result
+            searchTermToSearchResult[searchParameters.SearchText] = searchResultEntries;
 
             Debug.Log($"Returning {searchResultEntries.Count} search result entries for search text '{searchParameters.SearchText}'");
 
@@ -704,5 +798,104 @@ public class PersistedUsdbSongIndex
         songIndex.AddSongs(persistedUsdbSongIndex.songs);
         songIndex.synchronizationDateTime = persistedUsdbSongIndex.synchronizationDateTime;
         return songIndex;
+    }
+}
+
+public class UsdbUltraStarSongMeta : UltraStarSongMeta
+{
+    private enum ELoadDetailsPhase
+    {
+        Pending,
+        Started,
+        FinishedSuccessfully,
+        Failed,
+    }
+
+    private Action onLoadDetails;
+    public virtual Action OnLoadDetails
+    {
+        get
+        {
+            return onLoadDetails;
+        }
+        set
+        {
+            onLoadDetails = value;
+            OnLoadVoices = value;
+        }
+    }
+
+    public bool HasFailedToLoadDetails => loadDetailsPhase == ELoadDetailsPhase.Failed;
+    private bool ShouldLoadDetails => loadDetailsPhase == ELoadDetailsPhase.Pending;
+    private ELoadDetailsPhase loadDetailsPhase;
+
+    public UsdbUltraStarSongMeta(string artist, string title)
+        : base(artist, title, 200, "dummy-audio.ogg", new Dictionary<EVoiceId, string>())
+    {
+        RemoteSource = "usdb.animux.de";
+    }
+
+    public override string Cover
+    {
+        get
+        {
+            if (ShouldLoadDetails)
+            {
+                LoadDetails();
+            }
+            return base.Cover;
+        }
+
+        set
+        {
+            base.Cover = value;
+        }
+    }
+
+    public override string Background
+    {
+        get
+        {
+            if (ShouldLoadDetails)
+            {
+                LoadDetails();
+            }
+            return base.Background;
+        }
+
+        set
+        {
+            base.Background = value;
+        }
+    }
+
+    protected virtual void LoadDetails()
+    {
+        if (loadDetailsPhase != ELoadDetailsPhase.Pending)
+        {
+            return;
+        }
+
+        try
+        {
+            loadDetailsPhase = ELoadDetailsPhase.Started;
+            if (OnLoadDetails == null)
+            {
+                throw new Exception($"Failed to load details of song '{SongMetaUtils.GetArtistDashTitle(this)}' because no lazy load action is set.");
+            }
+            else
+            {
+                OnLoadDetails();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to lazy load voices of '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
+            loadDetailsPhase = ELoadDetailsPhase.Failed;
+            return;
+        }
+
+        loadDetailsPhase = ELoadDetailsPhase.FinishedSuccessfully;
     }
 }
