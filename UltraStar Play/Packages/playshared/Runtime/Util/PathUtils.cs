@@ -16,6 +16,16 @@ public static class PathUtils
         return Path.GetFileName(path);
     }
 
+    public static string GetDirectoryName(string path)
+    {
+        if (path.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        return Path.GetDirectoryName(path);
+    }
+
     public static string CombinePaths(string firstPart, string secondPart)
     {
         bool EndsWithSeparator(string path)

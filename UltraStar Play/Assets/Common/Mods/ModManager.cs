@@ -738,9 +738,11 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         string modSettingsPath = GetModSettingsPath(modFolder);
+        string modSettingsFolder = PathUtils.GetDirectoryName(modSettingsPath);
         try
         {
             Debug.Log($"Writing mod settings of type {modSettings.GetType()} to file '{modSettingsPath}'");
+            DirectoryUtils.CreateDirectory(modSettingsFolder);
             string json = JsonConverter.ToJson(modSettings, true);
             File.WriteAllText(modSettingsPath, json);
         }
@@ -836,7 +838,12 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public static string GetModSettingsPath(string modFolder)
     {
-        return $"{modFolder}/modsettings.json";
+        return $"{Application.persistentDataPath}/ModSettings/{GetModFolderName(modFolder)}/modsettings.json";
+    }
+
+    public static string GetModFolderName(string modFolder)
+    {
+        return PathUtils.GetFileName(modFolder);
     }
 
     public string GetModFolderByModName(string modName)
