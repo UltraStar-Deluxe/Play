@@ -114,10 +114,18 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages();
     }
 
-    public static Label CreateNotification(
-        string text)
+    public static void CreateNotification(string text)
     {
-        return Instance.DoCreateNotification(text);
+        ThreadUtils.RunOnMainThread(() =>
+        {
+            UiManager uiManager = Instance;
+            if (uiManager == null)
+            {
+                return;
+            }
+
+            uiManager.DoCreateNotification(text);
+        });
     }
 
     public MessageDialogControl CreateDialogControl(string dialogTitle)

@@ -102,7 +102,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
             jobsWithoutParent.Add(job);
         }
 
-        UpdateJobsUi();
+        ThreadUtils.RunOnMainThread(() => UpdateJobsUi());
     }
 
     private void FadeOutThenRemoveJob(Job job)
