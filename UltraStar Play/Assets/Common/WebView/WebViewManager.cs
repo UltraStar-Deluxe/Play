@@ -134,6 +134,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     private CanvasWebViewPrefab webViewPrefabInstance;
 
+    private bool hasShownControlsNotification;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -488,6 +490,14 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         loadedUrl = url;
         RunWhenWebViewInitialized(() =>
         {
+            if (!hasShownControlsNotification)
+            {
+                hasShownControlsNotification = true;
+                UiManager.CreateNotification("Loading website.\n" +
+                                             "Press F8 or Ctrl+B anytime\n" +
+                                             "to switch to embedded browser.");
+            }
+
             if (isContentLoaded && javaScriptCanLoadUrl)
             {
                 Debug.Log("Loading new URL via JavaScript");
