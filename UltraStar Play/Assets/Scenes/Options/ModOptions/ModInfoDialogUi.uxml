@@ -6,7 +6,7 @@
             <ui:Label tabindex="-1" text="Website: example.com" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modWebsiteLabel" />
             <ui:Label tabindex="-1" text="Authors: a, b, c" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modAuthorsLabel" />
         </ui:VisualElement>
-        <AccordionItem name="modDependenciesAccordionItem" label="Requires">
+        <AccordionItem name="modDependenciesAccordionItem" label="Requires" style="display: none;">
             <ui:VisualElement name="modDependenciesContainer" class="child-mb-2" style="flex-grow: 1;">
                 <ui:Label tabindex="-1" text="UnityEngine.AudioModule" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modDependencyLabel" />
                 <ui:Label tabindex="-1" text="UnityEngine.AudioModule" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modDependencyLabel" />

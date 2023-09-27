@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -182,21 +183,32 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         SetTextOrHideLabel(versionLabel, "Version: " , modInfo.version);
         SetTextOrHideLabel(websiteLabel, "Website: " , modInfo.website);
         SetTextOrHideLabel(websiteLabel, "License: " , modInfo.license);
-        SetTextOrHideLabel(authorsLabel, "Authors: " , modInfo.authors.ToCsv(", ", "", ""));
+        SetTextOrHideLabel(authorsLabel, "Authors: " , modInfo.authors);
 
+        // TODO: Mod permissions like FileSystem, Networking, etc.
         modDependenciesContainer.Clear();
-        if (modInfo.requiredAssemblies.IsNullOrEmpty())
+        // if (modInfo.requiredAssemblies.IsNullOrEmpty())
+        // {
+        //     modDependenciesContainer.Add(new Label($"Requires default app domain libraries."));
+        // }
+        // else
+        // {
+        //     modDependenciesContainer.Add(new Label($"Requires default app domain libraries and the following"));
+        //     foreach (string require in modInfo.requiredAssemblies)
+        //     {
+        //         modDependenciesContainer.Add(new Label($"• {require}"));
+        //     }
+        // }
+    }
+
+    private void SetTextOrHideLabel(Label label, string prefix, List<string> texts)
+    {
+        if (texts.IsNullOrEmpty())
         {
-            modDependenciesContainer.Add(new Label($"Requires default app domain libraries."));
+            SetTextOrHideLabel(label, prefix, "");
+            return;
         }
-        else
-        {
-            modDependenciesContainer.Add(new Label($"Requires default app domain libraries and the following"));
-            foreach (string require in modInfo.requiredAssemblies)
-            {
-                modDependenciesContainer.Add(new Label($"• {require}"));
-            }
-        }
+        SetTextOrHideLabel(label, prefix, texts.ToCsv(", ", "", ""));
     }
 
     private void SetTextOrHideLabel(Label label, string prefix, string text)
