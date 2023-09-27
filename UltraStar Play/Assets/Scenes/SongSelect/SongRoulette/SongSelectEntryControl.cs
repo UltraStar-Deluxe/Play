@@ -108,6 +108,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private Vector2 pointerDownMousePosition;
     private bool wasSelectedOnPointerDown;
 
+    private string lastSongMetaCover;
+    private string lastSongMetaBackground;
+
     public void OnInjectionFinished()
     {
         Init();
@@ -337,6 +340,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void UpdateSongCover(SongSelectSongEntry songEntry)
     {
         SongMeta songMeta = songEntry.SongMeta;
+        lastSongMetaCover = songMeta.Cover;
+        lastSongMetaBackground = songMeta.Background;
+
         SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
             .CatchIgnore((Exception ex) =>
             {
@@ -446,6 +452,17 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 openSongMenuButton.worldBound.xMin,
                 openSongMenuButton.worldBound.yMin));
             contextMenuPopupControl?.VisualElement.Q<Button>().Focus();
+        }
+    }
+
+    public void Update()
+    {
+        if (SongSelectEntry is SongSelectSongEntry songEntry
+            && (songEntry.SongMeta?.Cover != lastSongMetaCover
+                || songEntry.SongMeta?.Background != lastSongMetaBackground))
+        {
+            Debug.Log($"Updating cover image because cover or background changed in song '{SongMetaUtils.GetArtistDashTitle(songEntry.SongMeta)}'");
+            UpdateCover();
         }
     }
 }

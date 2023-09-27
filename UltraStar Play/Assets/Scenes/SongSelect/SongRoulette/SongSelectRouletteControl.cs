@@ -259,6 +259,8 @@ public class SongRouletteControl : MonoBehaviour, INeedInjection
             isPointerDownOnListView = false;
             UpdateScrollSelectedListViewItemToCenter();
         }
+
+        entryControls.ForEach(entryControl => entryControl.Update());
     }
 
     private void LateUpdate()
