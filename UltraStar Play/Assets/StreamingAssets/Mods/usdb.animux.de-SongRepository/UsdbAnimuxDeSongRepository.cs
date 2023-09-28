@@ -156,17 +156,10 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
 
     private async Task AddSongMetasForSongIndexAsync()
     {
-        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        Job job = new Job("Creating songs from usdb.animux.de");
-        job.OnCancel = () => cancellationTokenSource.Cancel();
-        job.EstimatedTotalDurationInMillis = songIndex.Count * 10;
-        job.SetStatus(EJobStatus.Running);
-
-        jobManager.AddJob(job);
-
         List<UsdbSong> usdbSongs = songIndex.usdbSongIdToUsdbSong
             .Values
             .ToList();
+        
         for (int i = 0; i < usdbSongs.Count; i++)
         {
             if (DebugOnlyMaxSongsToLoadFromSongIndex > 0
@@ -176,14 +169,9 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
             }
 
             UsdbSong usdbSong = usdbSongs[i];
-            if (cancellationTokenSource.IsCancellationRequested)
-            {
-                break;
-            }
 
             try
             {
-                job.EstimatedCurrentProgressInPercent = 100* ((double)i / usdbSongs.Count);
                 SongMeta songMeta = CreateSongMetaFromUsdbSong(usdbSong);
                 songMetaManager.AddSongMeta(songMeta);
             }
@@ -193,8 +181,6 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
                 Debug.LogError($"Failed to add SongMeta for usdb.animux.de song '{usdbSong.artist} - {usdbSong.title}' (usdb id {usdbSong.songId})");
             }
         }
-
-        job.SetResult(EJobResult.Ok);
     }
 
     private SongMeta CreateSongMetaFromUsdbSong(UsdbSong usdbSong)
@@ -203,8 +189,6 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
         {
             return cachedSongMeta;
         }
-
-        Debug.Log($"Creating SongMeta from usdb.animux.de song with id {usdbSong.songId}");
 
         UsdbUltraStarSongMeta songMeta = new UsdbUltraStarSongMeta(
             usdbSong.artist,
@@ -530,7 +514,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
 
                     Debug.Log($"Extracting ZIP entry {entry.Name}");
 
-                    string extractedFileName = Path.GetFileName(entry.Name);
+                    string extractedFileName = PathUtils.ReplaceInvalidFileNameChars(Path.GetFileName(entry.Name));
                     string extractedFilePath = $"{extractPath}/{extractedFileName}";
 
                     // Create directory structure if it doesn't exist
@@ -581,7 +565,8 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
 
     private string GetSongDetailsFolder(UsdbSong usdbSong)
     {
-        return $"{modObjectContext.ModPersistentDataFolder}/songs/{usdbSong.songId} - {usdbSong.artist} - {usdbSong.title}";
+        string folderName = PathUtils.ReplaceInvalidFileNameChars($"{usdbSong.songId} - {usdbSong.artist} - {usdbSong.title}");
+        return $"{modObjectContext.ModPersistentDataFolder}/songs/{folderName}";
     }
 
     private string GetNormalizedMatchGroupValue(Match match, int groupIndex)
