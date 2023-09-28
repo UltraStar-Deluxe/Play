@@ -1,4 +1,4 @@
-name: Folder Song Repository
+name: Local Folder Song Repository Demo
 version: 1.0.0
 description : |
   Dynamically loads songs from a local folder when searching.

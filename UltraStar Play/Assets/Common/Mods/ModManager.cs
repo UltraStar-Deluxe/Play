@@ -17,7 +17,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public const string ModInfoFileName = "modinfo.yml";
     private const string ModsRootFolderName = "Mods";
-    private const string ModPersistentDataFolderName = "ModPersistentData";
+    private const string ModsPersistentDataFolderName = "ModsPersistentData";
     private const string TemplateModFolderName = "TemplateMod";
     private const string TemplateModNamePlaceholder = "MODNAME";
     private const string TemplateModDllFolderPlaceholder = "DEFAULT_DLL_FOLDER";
@@ -850,7 +850,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public static string GetModPersistentDataFolder(string modFolder)
     {
-        return $"{Application.persistentDataPath}/{ModPersistentDataFolderName}/{GetModFolderName(modFolder)}";
+        return $"{Application.persistentDataPath}/{ModsPersistentDataFolderName}/{GetModFolderName(modFolder)}";
     }
 
     public static string GetModSettingsPath(string modFolder)
