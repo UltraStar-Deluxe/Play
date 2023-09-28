@@ -8,12 +8,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
+using FullSerializer;
 using ICSharpCode.SharpZipLib.Zip;
 using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
+public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
 {
     private static readonly string PhpSessionIdCookieName = "PHPSESSID";
 
@@ -37,6 +38,8 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
     private const int MaxSongsPerPage = 100;
     private const int MaxSongsPerSearchResult = 15;
 
+    private const int DebugOnlyMaxSongsToLoadFromSongIndex = -100;
+
     [Inject]
     private UsdbAnimuxDeSongRepositoryModSettings modSettings;
 
@@ -56,40 +59,76 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
 
     private int fetchingSongDetailsSemaphore;
 
+    private string lastUsername;
+    private string lastPassword;
+
+    private bool hasLoadedFullSongsIndex;
+
     public void OnLoadMod()
     {
-        if (modSettings.loadFullSongIndex)
+        LoadFullSongIndexIfEnabled();
+    }
+
+    public void OnSceneEntered(SceneEnteredContext sceneEnteredContext)
+    {
+        LoadFullSongIndexIfEnabled();
+    }
+
+    private void LoadFullSongIndexIfEnabled()
+    {
+        if (!modSettings.loadFullSongIndex)
         {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await LoadFullSongIndexAsync();
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to load song index from usdb.animux.de: {ex.Message}");
-                }
-            });
+            return;
         }
+
+        if (modSettings.username.IsNullOrEmpty()
+            && modSettings.password.IsNullOrEmpty())
+        {
+            Debug.Log("Not loading song index from usdb.animux.de because credentials are empty.");
+            return;
+        }
+
+        if (hasLoadedFullSongsIndex)
+        {
+            Debug.Log("Not loading song index from usdb.animux.de because it has been loaded already.");
+            return;
+        }
+
+        if (lastUsername == modSettings.username
+            && lastPassword == modSettings.password)
+        {
+            // Credentials did not change, ignore.
+            Debug.Log("Not loading song index from usdb.animux.de because credentials did not change since last time.");
+            return;
+        }
+        lastUsername = modSettings.username;
+        lastPassword = modSettings.password;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                await LoadFullSongIndexAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to load song index from usdb.animux.de: {ex.Message}");
+            }
+        });
     }
 
     private async Task LoadFullSongIndexAsync()
     {
         await SynchronizeSongIndexAsync();
+
+        hasLoadedFullSongsIndex = true;
+
         await AddSongMetasForSongIndexAsync();
     }
 
     private async Task SynchronizeSongIndexAsync()
     {
-        if (modSettings.username.IsNullOrEmpty()
-            || modSettings.password.IsNullOrEmpty())
-        {
-            Debug.LogWarning("Not updating song index from usdb.animux.de because username or password is missing.");
-            return;
-        }
-
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         Job job = new Job("Updating song index from usdb.animux.de");
         job.OnCancel = () => cancellationTokenSource.Cancel();
@@ -130,6 +169,12 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
             .ToList();
         for (int i = 0; i < usdbSongs.Count; i++)
         {
+            if (DebugOnlyMaxSongsToLoadFromSongIndex > 0
+                && i > DebugOnlyMaxSongsToLoadFromSongIndex)
+            {
+                break;
+            }
+
             UsdbSong usdbSong = usdbSongs[i];
             if (cancellationTokenSource.IsCancellationRequested)
             {
@@ -689,6 +734,13 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
             return Observable.Empty<SongRepositorySearchResultEntry>();
         }
 
+        if (modSettings.username.IsNullOrEmpty()
+            || modSettings.password.IsNullOrEmpty())
+        {
+            Debug.Log("Not searching for songs on usdb.animux.de because no credentials are provided");
+            return Observable.Empty<SongRepositorySearchResultEntry>();
+        }
+
         return ObservableUtils.RunOnNewTaskAsObservableElements(async () =>
         {
             if (searchTermToSearchResult.TryGetValue(searchParameters.SearchText, out List<SongRepositorySearchResultEntry> cachedSearchResult))
@@ -727,12 +779,47 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
     }
 }
 
-public class UsdbAnimuxDeSongRepositoryModSettings : IModSettings
+public class UsdbAnimuxDeSongRepositoryModSettings : IModSettings, IOnBeforeSaveModSettings, IOnAfterLoadModSettings
 {
-    public string username = "";
-    public string password = "";
     public bool loadFullSongIndex;
     public int maxSongIndexCacheAgeInDays = 7;
+
+    // Do not write the credentials to disk by default,
+    // i.e., ignore them in serialization to JSON via fsIgnore annotation.
+    [fsIgnore]
+    public string username = "";
+    [fsIgnore]
+    public string password = "";
+
+    // Fields to save credentials
+    public bool saveUserNameAndPassword;
+    public string savedUsername = "";
+    public string savedPassword = "";
+
+    public void OnBeforeSaveModSettings()
+    {
+        Debug.Log("BeforeSaveModSettings");
+        if (saveUserNameAndPassword)
+        {
+            savedUsername = username;
+            savedPassword = password;
+        }
+        else
+        {
+            savedUsername = "";
+            savedPassword = "";
+        }
+    }
+
+    public void OnAfterLoadModSettings()
+    {
+        Debug.Log("AfterLoadingModSettings");
+        if (saveUserNameAndPassword)
+        {
+            username = savedUsername;
+            password = savedPassword;
+        }
+    }
 
     public List<IModSettingControl> GetModSettingControls()
     {
@@ -740,6 +827,7 @@ public class UsdbAnimuxDeSongRepositoryModSettings : IModSettings
         {
             new StringModSettingControl(() => username, newValue => username = newValue) { Label="User Name" },
             new StringModSettingControl(() => password, newValue => password = newValue) { Label="Password", IsPassword = true },
+            new BoolModSettingControl(() => saveUserNameAndPassword, newValue => saveUserNameAndPassword = newValue) { Label="Save credentials (insecure, uses plain text)" },
             new BoolModSettingControl(() => loadFullSongIndex, newValue => loadFullSongIndex = newValue) { Label="Load full song index into cache" },
             new IntModSettingControl(() => maxSongIndexCacheAgeInDays, newValue => maxSongIndexCacheAgeInDays = newValue) { Label="Max age of song index cache (days)" },
         };

@@ -13,6 +13,8 @@ description : |
   Instead, the embedded browser is used to play songs via YouTube.
   Thus, the download size is relatively small.
   However, only txt files with a link to YouTube will work.
+  ATTENTION: user name and password for the website are stored in plain text.
+  Use at your own risk.
 requiredAssemblies:
   - Flurl
   - Flurl.Http

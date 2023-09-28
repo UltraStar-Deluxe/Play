@@ -719,6 +719,11 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.Log($"Reading mod settings of type {modSettings.GetType()} from file '{modSettingsPath}'");
                 string json = File.ReadAllText(modSettingsPath);
                 JsonConverter.FillFromJsonCopy(json, modSettings, false);
+
+                if (modSettings is IOnAfterLoadModSettings afterLoadModSettings)
+                {
+                    afterLoadModSettings.OnAfterLoadModSettings();
+                }
             }
         }
         catch (Exception ex)
@@ -743,6 +748,11 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         string modPersistentDataFolder = GetModPersistentDataFolder(modSettingsPath);
         try
         {
+            if (modSettings is IOnBeforeSaveModSettings beforeSaveModSettings)
+            {
+                beforeSaveModSettings.OnBeforeSaveModSettings();
+            }
+
             Debug.Log($"Writing mod settings of type {modSettings.GetType()} to file '{modSettingsPath}'");
             DirectoryUtils.CreateDirectory(modPersistentDataFolder);
             string json = JsonConverter.ToJson(modSettings, true);
