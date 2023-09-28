@@ -393,7 +393,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
         PositionInSongDto positionInSongDto = new PositionInSongDto
         {
-            SongBpm = songMeta.BeatsPerMinute,
+            // TODO: Should exchange BeatsPerMinute instead of UltraStar txt file BPM
+            SongBpm = songMeta.BeatsPerMinute / 4,
             SongGap = songMeta.GapInMillis,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
         };
