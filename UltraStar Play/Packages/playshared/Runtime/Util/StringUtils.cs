@@ -1,9 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 public static class StringUtils
 {
     private static readonly Regex whitespaceRegex = new(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    public static string ReplaceInvalidChars(string text, char replacement, HashSet<char> invalidCharacters)
+    {
+        StringBuilder sb = new();
+        foreach (char c in text)
+        {
+            if (invalidCharacters.Contains(c))
+            {
+                sb.Append(replacement);
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        return sb.ToString();
+    }
 
     public static int CountOccurrencesInString(string source, string toFind, bool ignoreCase = false)
     {

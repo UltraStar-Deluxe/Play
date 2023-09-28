@@ -1,7 +1,18 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 
 public class StringUtilsTest
 {
+    [Test]
+    public void ReplaceInvalidCharactersTest()
+    {
+        Assert.AreEqual("dummy-file__-name", StringUtils.ReplaceInvalidChars(
+            "dummy-file*|-name", '_', new HashSet<char>() { '*', '|' }));
+
+        Assert.AreEqual("XA bX cC dD eE fF", StringUtils.ReplaceInvalidChars(
+            "aA bB cC dD eE fF", 'X', new HashSet<char>() { 'a', 'B' }));
+    }
+
     [Test]
     public void CountOccurrencesInStringTest()
     {
