@@ -37,6 +37,11 @@ public static class BuildUtils
         "Assets/StreamingAssets/SpeechRecognitionModels",
     };
 
+    private static readonly List<string> abortSteamUploadWhenFilesPresent = new()
+    {
+        "Melody Mania_Data/StreamingAssets/Mods/usdb.animux.de-SongRepository",
+    };
+
     private static string IgnoredAssetsOfMobileBuildFolder => "IgnoredAssetsOfMobileBuild";
 
     public static void PerformCustomBuild(CustomBuildOptions options)
@@ -168,6 +173,24 @@ public static class BuildUtils
             throw new Exception($"Cannot upload to Steam with build target {options.buildTarget}");
         }
 
+        // Get path to latest build
+        string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
+
+        List<string> abortSteamUploadPresentFiles = abortSteamUploadWhenFilesPresent
+            .Where(path =>
+            {
+                string pathInBuildOutput = $"{outputFolderPath}/{path}";
+                return DirectoryUtils.Exists(path)
+                       || FileUtils.Exists(path)
+                       || DirectoryUtils.Exists(pathInBuildOutput)
+                       || FileUtils.Exists(pathInBuildOutput);
+            })
+            .ToList();
+        if (!abortSteamUploadPresentFiles.IsNullOrEmpty())
+        {
+            throw new Exception($"Aborting upload to Steam because of the following files or folders in the build output:\n    {abortSteamUploadPresentFiles.JoinWith("\n    ")}");
+        }
+
         bool shouldUpload = EditorUtility.DisplayDialog(
             "Upload to Steam",
             "Upload latest build result to Steam?",
@@ -179,9 +202,6 @@ public static class BuildUtils
             return;
         }
         Debug.Log("Uploading build to Steam...");
-
-        // Get path to latest build
-        string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
 
         // Get app version
         string bundleVersion = GetPlayerSettingsFileBundleVersion();
