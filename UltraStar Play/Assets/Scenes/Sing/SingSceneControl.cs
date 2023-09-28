@@ -121,6 +121,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     [Inject(UxmlClass = R.UssClasses.playerInfoUiList)]
     private List<VisualElement> playerInfoUiLists;
 
+    [Inject(UxmlName = R.UxmlNames.passTheMicProgressBar)]
+    private VisualElement passTheMicProgressBar;
+
     [Inject]
     private UIDocument uiDocument;
 
@@ -205,6 +208,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void OnInjectionFinished()
     {
+        // PassTheMicControl may not be executed.
+        // Thus, we hide the progress bar here as a workaround.
+        passTheMicProgressBar?.HideByDisplay();
+
         injector
             .WithRootVisualElement(detailedTimeBar)
             .Inject(timeBarControl);
