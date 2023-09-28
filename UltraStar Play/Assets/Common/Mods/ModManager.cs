@@ -745,7 +745,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
 
         string modSettingsPath = GetModSettingsPath(modFolder);
-        string modPersistentDataFolder = GetModPersistentDataFolder(modSettingsPath);
+        string modPersistentDataFolder = GetModPersistentDataFolder(modFolder);
         try
         {
             if (modSettings is IOnBeforeSaveModSettings beforeSaveModSettings)
