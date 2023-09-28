@@ -7,6 +7,7 @@ description : |
   How it works:
   Searches on usdb.animux.de for songs with matching artist or title
   when using the search text field in song select.
+  Alternatively, download the full song index from usdb.animux.de upfront.
   The content of a song (i.e. its txt file) is loaded only when it is played.
   Thereby, no audio or video files are downloaded.
   Instead, the embedded browser is used to play songs via YouTube.

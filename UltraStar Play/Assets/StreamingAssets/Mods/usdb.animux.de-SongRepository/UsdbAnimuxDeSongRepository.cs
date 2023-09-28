@@ -38,7 +38,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
     private const int MaxSongsPerSearchResult = 15;
 
     [Inject]
-    private UsdbAnimuxDeSongSynchronizerModSettings modSettings;
+    private UsdbAnimuxDeSongRepositoryModSettings modSettings;
 
     [Inject]
     private ModObjectContext modObjectContext;
@@ -69,7 +69,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
                 catch (Exception ex)
                 {
                     Debug.LogException(ex);
-                    Debug.LogError($"Failed to load song index of usdb.animux.de: {ex.Message}");
+                    Debug.LogError($"Failed to load song index from usdb.animux.de: {ex.Message}");
                 }
             });
         }
@@ -79,6 +79,40 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
     {
         await SynchronizeSongIndexAsync();
         await AddSongMetasForSongIndexAsync();
+    }
+
+    private async Task SynchronizeSongIndexAsync()
+    {
+        if (modSettings.username.IsNullOrEmpty()
+            || modSettings.password.IsNullOrEmpty())
+        {
+            Debug.LogWarning("Not updating song index from usdb.animux.de because username or password is missing.");
+            return;
+        }
+
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        Job job = new Job("Updating song index from usdb.animux.de");
+        job.OnCancel = () => cancellationTokenSource.Cancel();
+        job.EstimatedTotalDurationInMillis = MaxSongId * 10;
+        job.SetStatus(EJobStatus.Running);
+        jobManager.AddJob(job);
+
+        try
+        {
+            await UpdateSongIndexAsync(job, cancellationTokenSource.Token);
+            Debug.Log($"Successfully updated song index from usdb.animux.de");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            string errorMessage = $"Failed to update song index from usdb.animux.de: {ex.Message}";
+            Debug.LogError(errorMessage);
+            job.SetResult(EJobResult.Error);
+
+            throw new Exception(errorMessage);
+        }
+
+        job.SetResult(EJobResult.Ok);
     }
 
     private async Task AddSongMetasForSongIndexAsync()
@@ -113,40 +147,6 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to add SongMeta for usdb.animux.de song '{usdbSong.artist} - {usdbSong.title}' (usdb id {usdbSong.songId})");
             }
-        }
-
-        job.SetResult(EJobResult.Ok);
-    }
-
-    private async Task SynchronizeSongIndexAsync()
-    {
-        if (modSettings.username.IsNullOrEmpty()
-            || modSettings.password.IsNullOrEmpty())
-        {
-            Debug.LogWarning("Not updating song index from usdb.animux.de because username or password is missing.");
-            return;
-        }
-
-        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        Job job = new Job("Updating song index from usdb.animux.de");
-        job.OnCancel = () => cancellationTokenSource.Cancel();
-        job.EstimatedTotalDurationInMillis = MaxSongId * 10;
-        job.SetStatus(EJobStatus.Running);
-        jobManager.AddJob(job);
-
-        try
-        {
-            await UpdateSongIndexAsync(job, cancellationTokenSource.Token);
-            Debug.Log($"Successfully updated song index from usdb.animux.de");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            string errorMessage = $"Failed to update song index from usdb.animux.de: {ex.Message}";
-            Debug.LogError(errorMessage);
-            job.SetResult(EJobResult.Error);
-
-            throw new Exception(errorMessage);
         }
 
         job.SetResult(EJobResult.Ok);
@@ -195,6 +195,125 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
         usdbSongIdToSongMeta[usdbSong.songId] = songMeta;
 
         return songMeta;
+    }
+
+    private async Task<UsdbSongIndex> UpdateSongIndexAsync(Job job, CancellationToken cancellationToken)
+    {
+        if (modSettings.maxSongIndexCacheAgeInDays > 0
+            && FileUtils.Exists(PersistedSongIndexFilePath))
+        {
+            Debug.Log($"Loading song index from cache file '{PersistedSongIndexFilePath}'");
+            LoadSongIndexFromCacheFile();
+
+            if (songIndex.synchronizationDateTime.AddDays(modSettings.maxSongIndexCacheAgeInDays) < DateTime.Now)
+            {
+                Debug.Log($"Updating song index from usdb.animux.de because cached song index is older than {modSettings.maxSongIndexCacheAgeInDays} days.");
+            }
+            else
+            {
+                Debug.Log($"Using song index from cache because the cache is younger than {modSettings.maxSongIndexCacheAgeInDays} days.");
+                return songIndex;
+            }
+        }
+
+        if (sessionCookie == null)
+        {
+            sessionCookie = await GetNewSessionCookieAsync();
+        }
+        List<UsdbSong> availableSongs = await GetAvailableSongs(job, cancellationToken, sessionCookie);
+        Debug.Log($"Found {availableSongs.Count} songs on usdb.animux.de");
+
+        songIndex.AddSongs(availableSongs);
+        songIndex.synchronizationDateTime = DateTime.Now;
+
+        SaveSongIndexToCacheFile();
+
+        return songIndex;
+    }
+
+    private void LoadSongIndexFromCacheFile()
+    {
+        string loadedJson = File.ReadAllText(PersistedSongIndexFilePath, Encoding.UTF8);
+        PersistedUsdbSongIndex loadedPersistedSongIndex = JsonConverter.FromJson<PersistedUsdbSongIndex>(loadedJson);
+        UsdbSongIndex loadedSongIndex = PersistedUsdbSongIndex.FromPersistedSongIndex(loadedPersistedSongIndex);
+        songIndex = loadedSongIndex;
+        Debug.Log($"Successfully loaded song index from cache with {songIndex.Count} songs from '{PersistedSongIndexFilePath}'.");
+    }
+
+    private void SaveSongIndexToCacheFile()
+    {
+        PersistedUsdbSongIndex persistedUsdbSongIndex = PersistedUsdbSongIndex.FromSongIndex(songIndex);
+        string json = JsonConverter.ToJson(persistedUsdbSongIndex);
+        Debug.Log($"Saving song index to cache '{PersistedSongIndexFilePath}'");
+        File.WriteAllText(PersistedSongIndexFilePath, json, Encoding.UTF8);
+        Debug.Log($"Successfully saved song index with {songIndex.Count} songs to cache '{PersistedSongIndexFilePath}'.");
+    }
+
+    private async Task<List<UsdbSong>> GetAvailableSongs(Job job, CancellationToken cancellationToken, FlurlCookie sessionCookie)
+    {
+        // Code ported to C# from https://github.com/bohning/usdb_syncer/blob/main/src/usdb_syncer/usdb_scraper.py
+        List<UsdbSong> availableSongs = new List<UsdbSong>();
+        Dictionary<string, string> payload = new Dictionary<string, string>()
+        {
+            { "order", "id"},
+            { "ud", "desc"},
+            { "limit", MaxSongsPerPage.ToString() },
+        };
+
+        for (int start = 0; start < MaxSongId; start += MaxSongsPerPage)
+        {
+            job.EstimatedCurrentProgressInPercent = 100 * ((double)start / MaxSongId);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            Debug.Log($"Fetching song index from {start} to {start + MaxSongsPerPage} from usdb.animux.de");
+
+            payload["start"] = start.ToString();
+            string html = await "https://usdb.animux.de/index.php"
+                .SetQueryParam("link", "list")
+                .WithCookie(sessionCookie.Name, sessionCookie.Value)
+                .PostUrlEncodedAsync(payload)
+                .ReceiveString();
+
+            List<UsdbSong> newSongs = CreateUsdbSongsFromHtml(html);
+
+            availableSongs.AddRange(newSongs);
+
+            if (newSongs.Count < MaxSongsPerPage)
+            {
+                // No more songs left on the website
+                break;
+            }
+        }
+
+        return availableSongs;
+    }
+
+    private async Task<List<UsdbSong>> SearchSongsAsync(
+        FlurlCookie sessionCookie,
+        string artist,
+        string title)
+    {
+        Debug.Log($"Searching songs on usdb.animux.de matching artist '{artist}' AND title '{title}'");
+
+        Dictionary<string, string> payload = new Dictionary<string, string>()
+        {
+            { "interpret", artist},
+            { "title", title},
+            { "order", "id"},
+            { "ud", "desc"},
+            { "limit", MaxSongsPerSearchResult.ToString() },
+        };
+        string html = await "https://usdb.animux.de/index.php"
+            .SetQueryParam("link", "list")
+            .WithCookie(sessionCookie.Name, sessionCookie.Value)
+            .PostUrlEncodedAsync(payload)
+            .ReceiveString();
+
+        List<UsdbSong> songs = CreateUsdbSongsFromHtml(html);
+
+        Debug.Log($"Found {songs.Count} songs on usdb.animux.de matching artist '{artist}' AND title '{title}'");
+
+        return songs;
     }
 
     private async Task LoadSongMetaDetailsAsync(UltraStarSongMeta songMeta, UsdbSong usdbSong)
@@ -348,7 +467,6 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
     {
         string extractPath = GetSongDetailsFolder(usdbSong);
         Debug.Log($"Extracting ZIP archive with details of song '{usdbSong.artist} - {usdbSong.title}' (usdb id {usdbSong.songId}) to folder '{extractPath}'");
-        DirectoryUtils.CreateDirectory(extractPath);
 
         List<string> extractedFiles = new List<string>();
 
@@ -367,7 +485,8 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
 
                     Debug.Log($"Extracting ZIP entry {entry.Name}");
 
-                    string extractedFilePath = Path.Combine(extractPath, Path.GetFileName(entry.Name));
+                    string extractedFileName = Path.GetFileName(entry.Name);
+                    string extractedFilePath = $"{extractPath}/{extractedFileName}";
 
                     // Create directory structure if it doesn't exist
                     DirectoryUtils.CreateDirectory(Path.GetDirectoryName(extractedFilePath));
@@ -418,125 +537,6 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
     private string GetSongDetailsFolder(UsdbSong usdbSong)
     {
         return $"{modObjectContext.ModPersistentDataFolder}/songs/{usdbSong.songId} - {usdbSong.artist} - {usdbSong.title}";
-    }
-
-    private async Task<UsdbSongIndex> UpdateSongIndexAsync(Job job, CancellationToken cancellationToken)
-    {
-        if (modSettings.maxSongIndexCacheAgeInDays > 0
-            && FileUtils.Exists(PersistedSongIndexFilePath))
-        {
-            Debug.Log($"Loading song index from cache file '{PersistedSongIndexFilePath}'");
-            LoadSongIndexFromCacheFile();
-
-            if (songIndex.synchronizationDateTime.AddDays(modSettings.maxSongIndexCacheAgeInDays) < DateTime.Now)
-            {
-                Debug.Log($"Updating song index from usdb.animux.de because cached song index is older than {modSettings.maxSongIndexCacheAgeInDays} days.");
-            }
-            else
-            {
-                Debug.Log($"Using song index from cache because the cache is younger than {modSettings.maxSongIndexCacheAgeInDays} days.");
-                return songIndex;
-            }
-        }
-
-        if (sessionCookie == null)
-        {
-            sessionCookie = await GetNewSessionCookieAsync();
-        }
-        List<UsdbSong> availableSongs = await GetAvailableSongs(job, cancellationToken, sessionCookie);
-        Debug.Log($"Found {availableSongs.Count} songs on usdb.animux.de");
-
-        songIndex.AddSongs(availableSongs);
-        songIndex.synchronizationDateTime = DateTime.Now;
-
-        SaveSongIndexToCacheFile();
-
-        return songIndex;
-    }
-
-    private void LoadSongIndexFromCacheFile()
-    {
-        string loadedJson = File.ReadAllText(PersistedSongIndexFilePath, Encoding.UTF8);
-        PersistedUsdbSongIndex loadedPersistedSongIndex = JsonConverter.FromJson<PersistedUsdbSongIndex>(loadedJson);
-        UsdbSongIndex loadedSongIndex = PersistedUsdbSongIndex.FromPersistedSongIndex(loadedPersistedSongIndex);
-        songIndex = loadedSongIndex;
-        Debug.Log($"Successfully loaded song index from cache with {songIndex.Count} songs from '{PersistedSongIndexFilePath}'.");
-    }
-
-    private void SaveSongIndexToCacheFile()
-    {
-        PersistedUsdbSongIndex persistedUsdbSongIndex = PersistedUsdbSongIndex.FromSongIndex(songIndex);
-        string json = JsonConverter.ToJson(persistedUsdbSongIndex);
-        Debug.Log($"Saving song index to cache '{PersistedSongIndexFilePath}'");
-        File.WriteAllText(PersistedSongIndexFilePath, json, Encoding.UTF8);
-        Debug.Log($"Successfully saved song index with {songIndex.Count} songs to cache '{PersistedSongIndexFilePath}'.");
-    }
-
-    private async Task<List<UsdbSong>> GetAvailableSongs(Job job, CancellationToken cancellationToken, FlurlCookie sessionCookie)
-    {
-        // Code ported to C# from https://github.com/bohning/usdb_syncer/blob/main/src/usdb_syncer/usdb_scraper.py
-        List<UsdbSong> availableSongs = new List<UsdbSong>();
-        Dictionary<string, string> payload = new Dictionary<string, string>()
-        {
-            { "order", "id"},
-            { "ud", "desc"},
-            { "limit", MaxSongsPerPage.ToString() },
-        };
-
-        for (int start = 0; start < MaxSongId; start += MaxSongsPerPage)
-        {
-            job.EstimatedCurrentProgressInPercent = 100 * ((double)start / MaxSongId);
-            cancellationToken.ThrowIfCancellationRequested();
-
-            Debug.Log($"Fetching song index from {start} to {start + MaxSongsPerPage} from usdb.animux.de");
-
-            payload["start"] = start.ToString();
-            string html = await "https://usdb.animux.de/index.php"
-                .SetQueryParam("link", "list")
-                .WithCookie(sessionCookie.Name, sessionCookie.Value)
-                .PostUrlEncodedAsync(payload)
-                .ReceiveString();
-
-            List<UsdbSong> newSongs = CreateUsdbSongsFromHtml(html);
-
-            availableSongs.AddRange(newSongs);
-
-            if (newSongs.Count < MaxSongsPerPage)
-            {
-                // No more songs left on the website
-                break;
-            }
-        }
-
-        return availableSongs;
-    }
-
-    private async Task<List<UsdbSong>> SearchSongsAsync(
-        FlurlCookie sessionCookie,
-        string artist,
-        string title)
-    {
-        Debug.Log($"Searching songs on usdb.animux.de matching artist '{artist}' AND title '{title}'");
-
-        Dictionary<string, string> payload = new Dictionary<string, string>()
-        {
-            { "interpret", artist},
-            { "title", title},
-            { "order", "id"},
-            { "ud", "desc"},
-            { "limit", MaxSongsPerSearchResult.ToString() },
-        };
-        string html = await "https://usdb.animux.de/index.php"
-            .SetQueryParam("link", "list")
-            .WithCookie(sessionCookie.Name, sessionCookie.Value)
-            .PostUrlEncodedAsync(payload)
-            .ReceiveString();
-
-        List<UsdbSong> songs = CreateUsdbSongsFromHtml(html);
-
-        Debug.Log($"Found {songs.Count} songs on usdb.animux.de matching artist '{artist}' AND title '{title}'");
-
-        return songs;
     }
 
     private string GetNormalizedMatchGroupValue(Match match, int groupIndex)
@@ -651,8 +651,8 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
 
         List<string> imageFileExtensionPatterns = new List<string>()
         {
-                "*.png",
-                "*.jpg",
+            "*.png",
+            "*.jpg",
         };
 
         List<string> imageFiles = FileScannerUtils.ScanForFiles(folders, imageFileExtensionPatterns);
@@ -709,14 +709,6 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
                 .Union(usdbSearchResultMatchingTitle)
                 .ToList();
 
-            // Update song index with search result
-            int oldSongIndexSize = songIndex.Count;
-            songIndex.AddSongs(usdbSearchResult);
-            if (oldSongIndexSize < songIndex.Count)
-            {
-                SaveSongIndexToCacheFile();
-            }
-
             List<SongMeta> songMetas = usdbSearchResult
                 .Select(usdbSong => CreateSongMetaFromUsdbSong(usdbSong))
                 .ToList();
@@ -732,6 +724,25 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository
 
             return searchResultEntries;
         }, Disposable.Empty);
+    }
+}
+
+public class UsdbAnimuxDeSongRepositoryModSettings : IModSettings
+{
+    public string username = "";
+    public string password = "";
+    public bool loadFullSongIndex;
+    public int maxSongIndexCacheAgeInDays = 7;
+
+    public List<IModSettingControl> GetModSettingControls()
+    {
+        return new List<IModSettingControl>()
+        {
+            new StringModSettingControl(() => username, newValue => username = newValue) { Label="User Name" },
+            new StringModSettingControl(() => password, newValue => password = newValue) { Label="Password", IsPassword = true },
+            new BoolModSettingControl(() => loadFullSongIndex, newValue => loadFullSongIndex = newValue) { Label="Load full song index into cache" },
+            new IntModSettingControl(() => maxSongIndexCacheAgeInDays, newValue => maxSongIndexCacheAgeInDays = newValue) { Label="Max age of song index cache (days)" },
+        };
     }
 }
 
