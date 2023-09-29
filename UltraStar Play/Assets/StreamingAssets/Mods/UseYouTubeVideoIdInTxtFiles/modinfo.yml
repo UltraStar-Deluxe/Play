@@ -1,0 +1,7 @@
+name: Use YouTube video id from txt file
+version: 1.0.0
+description : |
+  Search for a YouTube video id (e.g. 'v=...') in UltraStar txt files
+  to play the song on YouTube.
+authors: 
+  - email@melodymania.org

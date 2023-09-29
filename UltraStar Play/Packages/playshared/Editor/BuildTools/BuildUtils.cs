@@ -41,6 +41,7 @@ public static class BuildUtils
     {
         "Melody Mania_Data/StreamingAssets/Mods/usdb.animux.de-SongRepository",
         "Melody Mania_Data/StreamingAssets/Mods/CoverAndBackgroundImageFromMusicBrainz",
+        "Melody Mania_Data/StreamingAssets/Mods/UseYouTubeVideoIdInTxtFiles",
     };
 
     private static string IgnoredAssetsOfMobileBuildFolder => "IgnoredAssetsOfMobileBuild";
