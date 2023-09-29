@@ -125,6 +125,51 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
         hasLoadedFullSongsIndex = true;
 
         await AddSongMetasForSongIndexAsync();
+
+        if (modSettings.loadFullSongIndexDetails)
+        {
+            await LoadAllSongIndexSongDetailsAsync();
+        }
+    }
+
+    private async Task LoadAllSongIndexSongDetailsAsync()
+    {
+        Debug.Log($"Loading song details of {songIndex.Count} songs in song index.");
+
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        Job job = new Job("Downloading song details from usdb.animux.de");
+        job.OnCancel = () => cancellationTokenSource.Cancel();
+        job.EstimatedTotalDurationInMillis = songIndex.Count * 10;
+        job.SetStatus(EJobStatus.Running);
+        jobManager.AddJob(job);
+
+        List<int> usdbSongIds = songIndex.usdbSongIdToUsdbSong
+            .Keys
+            .OrderBy(id => id)
+            .ToList();
+        for (int i = 0; i < songIndex.Count; i++)
+        {
+            job.EstimatedCurrentProgressInPercent = 100 * ((double)i / songIndex.Count);
+            if (cancellationTokenSource.IsCancellationRequested)
+            {
+                Debug.Log($"Cancel requested when loading song details {i} of {songIndex.Count}");
+                break;
+            }
+
+            int usdbSongId = usdbSongIds[i];
+            UsdbSong usdbSong = songIndex.usdbSongIdToUsdbSong[usdbSongId];
+            try
+            {
+                await GetSongDetailsAsync(usdbSong);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to load song details of '{usdbSong.artist} - {usdbSong.title}' (usdb id {usdbSong.songId}): {ex.Message}");
+            }
+        }
+
+        job.SetResult(EJobResult.Ok);
     }
 
     private async Task SynchronizeSongIndexAsync()
@@ -199,8 +244,15 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
             // Sadly, querying multiple song details at once is not possible
             // because the "ziparchiv" data needs to be set via a cookie, which is stored on server side.
             // Thus, make an attempt at avoiding overlaps in this critical section. But no guarantees.
+            long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+            long maxWaitTimeInMillis = 30000;
             while (fetchingSongDetailsSemaphore > 0)
             {
+                if (TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
+                {
+                    throw new Exception($"Failed to get song details of '{SongMetaUtils.GetArtistDashTitle(songMeta)}' after waiting {maxWaitTimeInMillis} ms");
+                }
+
                 Debug.Log($"Waiting for other song details to be fetched before fetching details of '{SongMetaUtils.GetArtistDashTitle(songMeta)}'");
                 ThreadUtils.Sleep(1000);
             }
@@ -767,6 +819,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
 public class UsdbAnimuxDeSongRepositoryModSettings : IModSettings, IOnBeforeSaveModSettings, IOnAfterLoadModSettings
 {
     public bool loadFullSongIndex;
+    public bool loadFullSongIndexDetails;
     public int maxSongIndexCacheAgeInDays = 7;
 
     // Do not write the credentials to disk by default,
@@ -814,6 +867,7 @@ public class UsdbAnimuxDeSongRepositoryModSettings : IModSettings, IOnBeforeSave
             new StringModSettingControl(() => password, newValue => password = newValue) { Label="Password", IsPassword = true },
             new BoolModSettingControl(() => saveUserNameAndPassword, newValue => saveUserNameAndPassword = newValue) { Label="Save credentials (insecure, uses plain text)" },
             new BoolModSettingControl(() => loadFullSongIndex, newValue => loadFullSongIndex = newValue) { Label="Load full song index into cache" },
+            new BoolModSettingControl(() => loadFullSongIndexDetails, newValue => loadFullSongIndexDetails = newValue) { Label="Load details of all songs in song index" },
             new IntModSettingControl(() => maxSongIndexCacheAgeInDays, newValue => maxSongIndexCacheAgeInDays = newValue) { Label="Max age of song index cache (days)" },
         };
     }
