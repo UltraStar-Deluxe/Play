@@ -196,7 +196,7 @@ public class Job
                 Debug.LogError("Failed to cancel job after setting result to error");
             }
         }
-        
+
         Result.Value = newResult;
         endTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         if (Status.Value != EJobStatus.Finished)
@@ -222,6 +222,15 @@ public class Job
         }
 
         IsCanceled.Value = true;
-        onCancel();
+        try
+        {
+            Debug.Log($"Cancelling job '{Name}'");
+            onCancel?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to cancel job '{Name}': {ex.Message}");
+        }
     }
 }

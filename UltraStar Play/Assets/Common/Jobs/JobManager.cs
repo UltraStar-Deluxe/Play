@@ -308,6 +308,28 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10f, () => testObservable2.OnNext(true)));
     }
 
+    protected override void OnDestroySingleton()
+    {
+        Debug.Log("JobManager is destroyed, cancelling remaining jobs");
+        jobsWithoutParent.ForEach(job => CancelJob(job, true));
+    }
+
+    private void CancelJob(Job job, bool recursive)
+    {
+        // Cancel child jobs first
+        if (recursive
+            && !job.ChildJobs.IsNullOrEmpty())
+        {
+            job.ChildJobs.ForEach(childJob => CancelJob(childJob, recursive));
+        }
+
+        if (job.IsCancelable.Value
+            && !job.IsCanceled.Value)
+        {
+            job.Cancel();
+        }
+    }
+
     public static Job CreateJobFromObservable<T>(string jobName, Job parentJob, IObservable<T> observable)
     {
         Job job = new(jobName, parentJob);
