@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class LocalFolderSongRepository : ISongRepository
+public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
 {
     [Inject]
     private LocalFolderSongRepositoryModSettings modSettings;
@@ -27,15 +29,45 @@ public class LocalFolderSongRepository : ISongRepository
         }
     }
 
+    private bool songScanStarted;
+    private List<string> txtFilesInSongFolder = new List<string>();
+
+    public void OnLoadMod()
+    {
+        SearchTxtFilesIfNotDoneYet();
+    }
+
     public IObservable<SongRepositorySearchResultEntry> SearchSongs(SongRepositorySearchParameters searchParameters)
     {
-        if (searchParameters == null
+        if (!DirectoryUtils.Exists(SongFolder)
+            || searchParameters == null
             || searchParameters.SearchText.IsNullOrEmpty())
         {
             return Observable.Empty<SongRepositorySearchResultEntry>();
         }
 
+        SearchTxtFilesIfNotDoneYet();
+
         return ObservableUtils.RunOnNewTaskAsObservableElements(() => SearchSongList(searchParameters), Disposable.Empty);
+    }
+
+    private void SearchTxtFilesIfNotDoneYet()
+    {
+        if (songScanStarted
+            || !DirectoryUtils.Exists(SongFolder))
+        {
+            return;
+        }
+
+        songScanStarted = true;
+        Task.Run(() => DoSearchTxtFiles());
+    }
+    
+    private void DoSearchTxtFiles()
+    {
+        Debug.Log($"Searching for txt files in '{SongFolder}'");
+        txtFilesInSongFolder = DirectoryUtils.GetFiles(SongFolder, true, $"*.txt");
+        Debug.Log($"Found {txtFilesInSongFolder.Count} txt files in '{SongFolder}'");
     }
 
     public List<SongRepositorySearchResultEntry> SearchSongList(SongRepositorySearchParameters searchParameters)
@@ -47,12 +79,16 @@ public class LocalFolderSongRepository : ISongRepository
             return new List<SongRepositorySearchResultEntry>();
         }
 
-        List<string> txtFiles = DirectoryUtils.GetFiles(SongFolder, true, $"*{searchText}*.txt");
-
-        List<SongRepositorySearchResultEntry> resultEntries = txtFiles
+        string searchTextLower = searchText.ToLower();
+        List<SongRepositorySearchResultEntry> resultEntries = txtFilesInSongFolder
+            .Where(txtFile =>
+            {
+                string fileNameLower = Path.GetFileName(txtFile).ToLowerInvariant();
+                return fileNameLower.Contains(searchTextLower);
+            })
             .Select(txtFile => LoadUltraStarSongFromFile(txtFile))
             .Where(it => it != null)
-            .ToList();        
+            .ToList();
         Debug.Log($"{nameof(LocalFolderSongRepository)} - Found {resultEntries.Count} songs matching search '{searchText}'");
         return resultEntries;
     }
