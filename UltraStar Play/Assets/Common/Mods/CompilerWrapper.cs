@@ -186,7 +186,7 @@ public class CompilerWrapper
 
         typeof(Comparer<>), typeof(Dictionary<,>), typeof(EqualityComparer<>),
         typeof(ICollection<>), typeof(IComparer<>), typeof(IDictionary<,>), typeof(IReadOnlyDictionary<,>),
-        typeof(IEnumerable<>), typeof(IEnumerator<>), typeof(IEqualityComparer<>), typeof(IList<>),
+        typeof(IEnumerable<>), typeof(IEnumerator<>), typeof(IEqualityComparer<>), typeof(IList<>), typeof(IReadOnlyCollection<>),
         typeof(IReadOnlyList<>), typeof(KeyNotFoundException), typeof(KeyValuePair<,>), typeof(List<>),
 
         // mscorlib System.Collections.ObjectModel
