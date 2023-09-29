@@ -26,14 +26,16 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
                                                              @"<td onclick=""show_detail\(\d+\)"">(.*)</td>\n" +
                                                              @"<td onclick=""show_detail\(\d+\)"">(.*)</td>";
     private static readonly Regex songListRowRegex = new Regex(songListRowRegexPattern, RegexOptions.Multiline);
-    private static readonly Regex youTubeVideoIdRegex = new Regex(@"v=(\w+)(\r|\n|\,)", RegexOptions.Multiline);
-    private static readonly Regex youTubeHtmlAnchorElementRegex = new Regex(@"<a .+ title=""(.+)"" /watch\?v=(\w+)(\r|\n|\,)", RegexOptions.Multiline);
+
+    // In the txt files on usdb.animux.de, there is
+    // - "v=..." if YouTube has a video with audio and video
+    // - "a=..." if YouTube has a video with audio only
+    private static readonly Regex youTubeVideoIdRegex = new Regex(@"(v|a)=([\w\-_]+)(\r|\n|\,)", RegexOptions.Multiline);
 
     private static Dictionary<int, SongMeta> usdbSongIdToSongMeta = new Dictionary<int, SongMeta>();
     private static Dictionary<string, List<SongRepositorySearchResultEntry>> searchTermToSearchResult = new Dictionary<string, List<SongRepositorySearchResultEntry>>();
 
     private const int MaxSongId = 30_000;
-    // private const int MaxSongId = 1000;
 
     private const int MaxSongsPerPage = 100;
     private const int MaxSongsPerSearchResult = 15;
@@ -426,7 +428,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
             Match match = youTubeVideoIdRegex.Match(usdbSongDetails.txtContent);
             if (match.Success)
             {
-                youTubeVideoId = match.Groups[1].Value;
+                youTubeVideoId = match.Groups[2].Value;
             }
             else
             {
@@ -644,7 +646,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
         MatchCollection matchCollection = songListRowRegex.Matches(html);
         if (matchCollection.Count <= 0)
         {
-            throw new Exception("Song row regex did not match anything in HTML response from usdb.animux.de");
+            return new List<UsdbSong>();
         }
 
         Debug.Log($"Found {matchCollection.Count} song rows in HTML response from usdb.animux.de");
