@@ -30,6 +30,9 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private ServerSideConnectRequestManager serverSideConnectRequestManager;
+
     private enum ECalibrationPhase
     {
         None,
@@ -69,9 +72,10 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
             });
     }
 
-    public async void StartCalibration()
+    public async Task StartCalibration()
     {
-        if (calibrationPhase is not ECalibrationPhase.None)
+        if (calibrationPhase is not ECalibrationPhase.None
+            || MicProfile == null)
         {
             return;
         }
@@ -91,12 +95,29 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     private async Task CalibrateAsync()
     {
         CalibrationResult calibrationResult;
+        IDisposable beatPitchEventsStreamSubscription = null;
+        BeatPitchEventsDto lastReceivedBeatPitchEventsDto = null;
         try
         {
+            if (MicProfile.IsInputFromConnectedClient)
+            {
+                if (!serverSideConnectRequestManager.TryGetConnectedClientHandler(MicProfile.ConnectedClientId, out IConnectedClientHandler connectedClientHandler))
+                {
+                    throw new Exception("Mic calibration aborted, no connected client found for mic input.");
+                }
+
+                beatPitchEventsStreamSubscription = connectedClientHandler.ReceivedMessageStream
+                    .Where(message => message is BeatPitchEventsDto)
+                    .Select(message => message as BeatPitchEventsDto)
+                    .Subscribe(dto => lastReceivedBeatPitchEventsDto = dto);
+            }
+
             VolumeCalibrationResult volumeCalibrationResult = await VolumeCalibrationAsync();
             float volumeThreshold = volumeCalibrationResult.MaxRecordedVolume / 2;
 
-            MicDelayCalibrationResult micDelayCalibrationResult = await MicDelayCalibrationAsync(volumeThreshold);
+            MicDelayCalibrationResult micDelayCalibrationResult = await MicDelayCalibrationAsync(
+                volumeThreshold,
+                () => lastReceivedBeatPitchEventsDto);
             calibrationResult = new CalibrationResult(micDelayCalibrationResult.DelaysInMillis);
         }
         catch (Exception ex)
@@ -106,6 +127,10 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
             calibrationResultEventStream.OnNext(new CalibrationResult());
             return;
         }
+        finally
+        {
+            beatPitchEventsStreamSubscription?.Dispose();
+        }
 
         calibrationResultEventStream.OnNext(calibrationResult);
     }
@@ -113,6 +138,13 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
     private async Task<VolumeCalibrationResult> VolumeCalibrationAsync()
     {
         Debug.Log($"Starting volume calibration of '{MicProfile.GetDisplayNameWithChannel()}' on thread {Thread.CurrentThread.ManagedThreadId}");
+
+        if (MicProfile.IsInputFromConnectedClient)
+        {
+            Debug.Log("Returning volume threshold 0 for mic input from connected client");
+            return new VolumeCalibrationResult(0);
+        }
+
         calibrationPhase = ECalibrationPhase.Volume;
         float maxRecordedVolume = 0;
         PlayNextSineTone(GetIterationFrequency(0));
@@ -150,7 +182,9 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         return newSampleCount;
     }
 
-    private async Task<MicDelayCalibrationResult> MicDelayCalibrationAsync(float thresholdVolume)
+    private async Task<MicDelayCalibrationResult> MicDelayCalibrationAsync(
+        float thresholdVolume,
+        Func<BeatPitchEventsDto> lastReceivedBeatPitchEventsDtoGetter)
     {
         Debug.Log($"Starting mic delay calibration of '{MicProfile.GetDisplayNameWithChannel()}' on thread {Thread.CurrentThread.ManagedThreadId}");
         calibrationPhase = ECalibrationPhase.MicDelay;
@@ -158,9 +192,16 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
         int iteration = 1;
         int pauseTimeInMillis = 500;
 
-        MuteSineTone();
-        await Task.Delay(TimeSpan.FromMilliseconds(pauseTimeInMillis));
-        PlayNextSineTone(GetIterationFrequency(iteration));
+        if (!MicProfile.IsInputFromConnectedClient)
+        {
+            // Short mute after sine tone that was used to get the volume threshold.
+            MuteSineTone();
+            await Task.Delay(TimeSpan.FromMilliseconds(pauseTimeInMillis));
+        }
+
+        int sineToneFrequency = GetIterationFrequency(iteration);
+        int sineToneMidiNote = MidiUtils.GetMidiNoteForFrequency(sineToneFrequency);
+        PlayNextSineTone(sineToneFrequency);
 
         long maxIterationTimeInMillis = 1000;
         long iterationStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
@@ -180,20 +221,37 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
 
             // Check if newly recorded samples are above threshold volume
             bool isAboveThresholdVolume = false;
+            bool isCorrectPitchFromConnectedClient = false;
             int newSampleCount = CalculateNewSampleCount(micPitchTracker.FinalSampleRate.Value, previousSampleCheckTimeInMillis, currentTimeInMillis);
             previousSampleCheckTimeInMillis = currentTimeInMillis;
             // Debug.Log($"Mic delay calibration iteration {iteration}, new sample count: {newSampleCount}");
-            for (int sampleIndex = MicSamples.Length - newSampleCount; sampleIndex < MicSamples.Length; sampleIndex++)
+            if (MicProfile.IsInputFromConnectedClient)
             {
-                float sample = MicSamples[sampleIndex];
-                if (sample > Mathf.Abs(thresholdVolume))
+                // Wait for correct pitch to be reported from connected client
+                BeatPitchEventsDto receivedBeatPitchEventsDto = lastReceivedBeatPitchEventsDtoGetter?.Invoke();
+                if (receivedBeatPitchEventsDto != null)
                 {
-                    isAboveThresholdVolume = true;
-                    break;
+                    isCorrectPitchFromConnectedClient = receivedBeatPitchEventsDto
+                        .BeatPitchEvents
+                        .AnyMatch(dto => dto.MidiNote == sineToneMidiNote);
+                }
+            }
+            else
+            {
+                // Wait for mic volume threshold to be reached
+                for (int sampleIndex = MicSamples.Length - newSampleCount; sampleIndex < MicSamples.Length; sampleIndex++)
+                {
+                    float sample = MicSamples[sampleIndex];
+                    if (sample >= Mathf.Abs(thresholdVolume))
+                    {
+                        isAboveThresholdVolume = true;
+                        break;
+                    }
                 }
             }
 
-            if (isAboveThresholdVolume)
+            if ((!MicProfile.IsInputFromConnectedClient && isAboveThresholdVolume)
+                || (MicProfile.IsInputFromConnectedClient && isCorrectPitchFromConnectedClient))
             {
                 long delayInMillis = currentTimeInMillis - iterationStartTimeInMillis;
                 delaysInMillis.Add(delayInMillis);
@@ -205,7 +263,9 @@ public class CalibrateMicDelayControl : MonoBehaviour, INeedInjection
                     // Start next iteration
                     MuteSineTone();
                     await Task.Delay(TimeSpan.FromMilliseconds(pauseTimeInMillis));
-                    PlayNextSineTone(GetIterationFrequency(iteration));
+                    sineToneFrequency = GetIterationFrequency(iteration);
+                    sineToneMidiNote = MidiUtils.GetMidiNoteForFrequency(sineToneFrequency);
+                    PlayNextSineTone(sineToneFrequency);
                     iterationStartTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
                     previousSampleCheckTimeInMillis = iterationStartTimeInMillis;
                 }
