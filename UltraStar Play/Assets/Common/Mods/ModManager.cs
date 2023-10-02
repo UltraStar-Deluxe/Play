@@ -294,7 +294,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             }));
 
         // Replace placeholders in created files
-        List<string> textFileExtensions = new() { "txt", "json", "xml", "csproj", "cs", };
+        List<string> textFileExtensions = new() { "txt", "json", "yml", "xml", "csproj", "cs", };
         foreach (FileInfo fileInfo in targetModFolderInfo.GetFiles())
         {
             try
