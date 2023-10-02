@@ -32,6 +32,9 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
     // - "a=..." if YouTube has a video with audio only
     private static readonly Regex youTubeVideoIdRegex = new Regex(@"(v|a)=([\w\-_]+)(\r|\n|\,)", RegexOptions.Multiline);
 
+    // Text files in the archive from usdb.animux.de are saved with Windows1252 encoding.
+    private static readonly Encoding windows1252Encoding = Encoding.GetEncoding("Windows-1252");
+
     private static Dictionary<int, SongMeta> usdbSongIdToSongMeta = new Dictionary<int, SongMeta>();
     private static Dictionary<string, List<SongRepositorySearchResultEntry>> searchTermToSearchResult = new Dictionary<string, List<SongRepositorySearchResultEntry>>();
 
@@ -477,7 +480,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
             if (FileUtils.Exists(txtFile))
             {
                 SearchCoverAndBackgroundImageInFolder(detailsFolder, out string coverImage, out string backgroundImage);
-                string txtContent = ReadPlainTextFileWithUnknownEncoding(txtFile);
+                string txtContent = File.ReadAllText(txtFile, windows1252Encoding);
                 return new UsdbSongDetails()
                 {
                     txtFile = txtFile,
@@ -596,7 +599,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
 
         if (FileUtils.Exists(extractedTxtFilePath))
         {
-            string txtContent = ReadPlainTextFileWithUnknownEncoding(extractedTxtFilePath);
+            string txtContent = File.ReadAllText(extractedTxtFilePath, windows1252Encoding);
             SearchCoverAndBackgroundImageInFolder(extractPath, out string coverImage, out string backgroundImage);
             return new UsdbSongDetails()
             {
@@ -608,13 +611,6 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
         }
 
         return new UsdbSongDetails();
-    }
-
-    private string ReadPlainTextFileWithUnknownEncoding(string filePath)
-    {
-        Encoding encoding = PlainTextReader.GuessUnknownFileEncodingUsingUniversalCharsetDetector(filePath);
-        string fileContent = File.ReadAllText(filePath, encoding);
-        return fileContent;
     }
 
     private string GetSongDetailsFolder(UsdbSong usdbSong)

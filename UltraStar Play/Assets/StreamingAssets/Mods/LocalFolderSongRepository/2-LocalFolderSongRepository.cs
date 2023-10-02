@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using UniInject;
 using UniRx;
@@ -102,7 +103,8 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
 
         try
         {
-            SongMeta songMeta = UltraStarSongParser.ParseFile(txtFile, out List<SongIssue> songIssues);
+            Encoding encoding = GetEncodingFromModSettings();
+            SongMeta songMeta = UltraStarSongParser.ParseFile(txtFile, out List<SongIssue> songIssues, encoding);
             SongRepositorySearchResultEntry resultEntry = new SongRepositorySearchResultEntry(songMeta, songIssues);
             songMeta.RemoteSource = nameof(LocalFolderSongRepository);
             txtFileToSearchResultCache[txtFile] = resultEntry;
@@ -112,6 +114,22 @@ public class LocalFolderSongRepository : ISongRepository, IOnLoadMod
         {
             Debug.LogException(ex);
             Debug.LogError($"{nameof(LocalFolderSongRepository)} - Failed to load UltraStar song file '{txtFile}': {ex.Message}");
+            return null;
+        }
+    }
+
+    private Encoding GetEncodingFromModSettings()
+    {
+        try
+        {
+            return !modSettings.encodingName.IsNullOrEmpty()
+                ? Encoding.GetEncoding(modSettings.encodingName)
+                : null;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to get encoding from mod settings: {ex.Message}, guessing encoding instead.");
             return null;
         }
     }
