@@ -1,9 +1,0 @@
-name: Search Song Images Online
-version: 1.0.0
-description: Search for missing cover and background images via musicbrainz.org and coverartarchive.org.
-authors:
-  - someone@example.com
-requiredAssemblies:
-  - UnityEngine.UnityWebRequestModule
-  - Flurl
-  - Flurl.Http
