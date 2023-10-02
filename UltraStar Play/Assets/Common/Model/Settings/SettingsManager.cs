@@ -75,10 +75,18 @@ public class SettingsManager : AbstractSingletonBehaviour
 
     public void Save()
     {
-        SimplifySettings();
+        try
+        {
+            SimplifySettings();
 
-        string json = JsonConverter.ToJson(Settings, true);
-        File.WriteAllText(GetSettingsPath(), json);
+            string json = JsonConverter.ToJson(Settings, true);
+            File.WriteAllText(GetSettingsPath(), json);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to save settings: {ex.Message}");
+        }
     }
 
     private void SimplifySettings()
