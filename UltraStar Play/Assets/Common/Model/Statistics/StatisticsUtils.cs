@@ -14,13 +14,11 @@ public static class StatisticsUtils
         SortedSet<HighScoreEntry> highScoreEntries = localSongStatistics?.HighScoreRecord?.HighScoreEntries;
         if (highScoreEntries.IsNullOrEmpty())
         {
-            return Observable.Empty<List<HighScoreEntry>>();
+            return Observable.Return(new List<HighScoreEntry>());
         }
-        else
-        {
-            List<HighScoreEntry> highScoreEntriesAsList = highScoreEntries.ToList();
-            return Observable.Return<List<HighScoreEntry>>(highScoreEntriesAsList);
-        }
+
+        List<HighScoreEntry> highScoreEntriesAsList = highScoreEntries.ToList();
+        return Observable.Return(highScoreEntriesAsList);
     }
 
     public static IObservable<List<HighScoreEntry>> GetLocalAndRemoteHighScoreEntriesAllAtOnce(
@@ -29,7 +27,7 @@ public static class StatisticsUtils
     {
         if (songMeta == null)
         {
-            return Observable.Empty<List<HighScoreEntry>>();
+            return Observable.Return(new List<HighScoreEntry>());
         }
 
         IObservable<HighScoreEntry> highScoreRecordObservable = GetLocalAndRemoteHighScoreRecords(statistics, songMeta)
