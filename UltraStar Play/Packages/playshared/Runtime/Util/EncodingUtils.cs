@@ -10,7 +10,7 @@ public static class EncodingUtils
         {
             return encoding;
         }
-        
+
         string normalizedName = NormalizeEncodingName(name);
         return Encoding.GetEncoding(normalizedName);
     }
@@ -22,7 +22,8 @@ public static class EncodingUtils
             { "utf8", "utf-8" },
             { "utf16", "utf-16" },
             { "utf32", "utf-32" },
-            { "ansi", "ascii" },
+            { "ansi", "windows-1252" },
+            { "1252", "windows-1252" },
             { "cp1252", "windows-1252" },
             { "cp-1252", "windows-1252" },
             { "windows1252", "windows-1252" },
@@ -38,7 +39,7 @@ public static class EncodingUtils
 
         return name;
     }
-    
+
     private static bool TryGetEncoding(string name, out Encoding encoding)
     {
         Dictionary<string, Encoding> nameToEncoding = new()

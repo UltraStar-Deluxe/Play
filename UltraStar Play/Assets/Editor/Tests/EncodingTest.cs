@@ -19,7 +19,7 @@ public class EncodingTest
         Assert.AreEqual(EncodingUtils.GetEncoding("utf16"), Encoding.Unicode);
         Assert.AreEqual(EncodingUtils.GetEncoding("utf-16"), Encoding.Unicode);
         Assert.AreEqual(EncodingUtils.GetEncoding("ascii"), Encoding.ASCII);
-        Assert.AreEqual(EncodingUtils.GetEncoding("ansi"), Encoding.ASCII);
+        Assert.AreEqual(EncodingUtils.GetEncoding("ansi"), Encoding.GetEncoding("windows-1252"));
         Assert.AreEqual(EncodingUtils.GetEncoding("cp1252"), Encoding.GetEncoding("windows-1252"));
         Assert.AreEqual(EncodingUtils.GetEncoding("windows1252"), Encoding.GetEncoding("WINDOWS-1252"));
     }
