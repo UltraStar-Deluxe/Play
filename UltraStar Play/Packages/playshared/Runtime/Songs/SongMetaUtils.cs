@@ -463,14 +463,19 @@ public static class SongMetaUtils
 
     public static string GetArtistDashTitle(SongMeta songMeta)
     {
+        return GetArtistAndTitle(songMeta, " - ");
+    }
+
+    public static string GetArtistAndTitle(SongMeta songMeta, string joinWith)
+    {
         if (songMeta == null)
         {
             return "";
         }
-        return GetArtistDashTitle(songMeta.Artist, songMeta.Title);
+        return GetArtistAndTitle(songMeta.Artist, songMeta.Title, joinWith);
     }
 
-    public static string GetArtistDashTitle(string artist, string title)
+    public static string GetArtistAndTitle(string artist, string title, string joinWith)
     {
         if (artist.IsNullOrEmpty()
             && title.IsNullOrEmpty())
@@ -488,7 +493,7 @@ public static class SongMetaUtils
             return artist;
         }
 
-        return $"{artist} - {title}";
+        return $"{artist}{joinWith}{title}";
     }
 
     public static int MinBeat(List<Note> notes)
@@ -847,7 +852,7 @@ public static class SongMetaUtils
         sb.Append("}");
 
         string scoreRelevantSongHash = Hashing.Md5(Encoding.UTF8.GetBytes(sb.ToString()));
-        Log.Verbose(() => $"{songMeta} has ScoreRelevantSongHash {scoreRelevantSongHash}, from string: {sb}");
+        Log.Verbose(() => $"{songMeta} has score relevant hash '{scoreRelevantSongHash}', computed from string: {sb}");
         return scoreRelevantSongHash;
     }
 

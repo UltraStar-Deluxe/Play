@@ -606,8 +606,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
         {
             return null;
         }
-        SongMeta matchingSongMeta = allSongMetas.FirstOrDefault(songMeta =>
-            GetAndCacheUniqueHash(songMeta) == songId);
+
+        SongMeta matchingSongMeta = allSongMetas
+            .FirstOrDefault(songMeta => SongMetaMatchesSongId(songMeta, songId));
         return matchingSongMeta;
     }
 
@@ -897,14 +898,32 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return "";
         }
 
-        if (songMetaToUniqueHash.TryGetValue(songMeta, out string hash))
+        if (songMetaToUniqueHash.TryGetValue(songMeta, out string cachedHash))
         {
-            return hash;
+            return cachedHash;
         }
 
-        hash = SongMetaUtils.ComputeUniqueSongHash(songMeta);
-        songMetaToUniqueHash[songMeta] = hash;
-        return hash;
+        // Prefix with artist and title for an efficient check whether a song may equal the hash.
+        string artistAndTitle = SongMetaUtils.GetArtistAndTitle(songMeta, ":");
+        string computedHash = SongMetaUtils.ComputeUniqueSongHash(songMeta);
+        string hashPrefixedWithArtistAndTitle = $"{artistAndTitle}:{computedHash}";
+
+        songMetaToUniqueHash[songMeta] = hashPrefixedWithArtistAndTitle;
+        return hashPrefixedWithArtistAndTitle;
+    }
+
+    private bool SongMetaMatchesSongId(SongMeta songMeta, string songId)
+    {
+        // Efficient check whether this song may equal the full hash.
+        string artistAndTitle = SongMetaUtils.GetArtistAndTitle(songMeta, ":");
+        if (!songId.StartsWith(artistAndTitle))
+        {
+            // The artist and title did not match.
+            // Thus, the rest of the hash cannot match, so we don't need to compute the full hash.
+            return false;
+        }
+
+        return GetAndCacheUniqueHash(songMeta) == songId;
     }
 
     protected override void OnDestroySingleton()
