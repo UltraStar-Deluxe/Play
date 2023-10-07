@@ -826,7 +826,10 @@ public static class SongMetaUtils
         sb.Append(songMeta.BeatsPerMinute.ToStringInvariantCulture("0.00"));
 
         int voiceIndex = 1;
-        foreach (Voice voice in songMeta.Voices)
+        List<Voice> sortedVoices = songMeta.Voices
+            .OrderBy(voice => voice.Id)
+            .ToList();
+        foreach (Voice voice in sortedVoices)
         {
             sb.Append("|");
             sb.Append("P");
