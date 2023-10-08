@@ -87,6 +87,8 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new SongSelectSongRatingIconControl();
 
+    private IDisposable setSongDetailsCoverOrBackgroundImageDisposable;
+
     public void OnInjectionFinished()
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSelectedSongDetailsControl.OnInjectionFinished");
@@ -171,8 +173,10 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
         selectedSongArtist.text = selectedSong.Artist;
         selectedSongTitle.text = selectedSong.Title;
-        SongMetaImageUtils.SetCoverOrBackgroundImage(selectedSong, selectedSongImageInner, selectedSongImageOuter);
         songIndexLabel.text = $"{selection.Index + 1} / {selection.Count}";
+
+        setSongDetailsCoverOrBackgroundImageDisposable?.Dispose();
+        setSongDetailsCoverOrBackgroundImageDisposable = SongMetaImageUtils.SetCoverOrBackgroundImage(selectedSong, selectedSongImageInner, selectedSongImageOuter);
 
         // The song duration requires loading the audio file.
         // Loading every song only to show its duration is slow (e.g. when scrolling through songs).

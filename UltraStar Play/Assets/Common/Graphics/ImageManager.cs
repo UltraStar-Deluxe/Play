@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -95,6 +96,8 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 
         return Observable.Create<Sprite>(o =>
         {
+            CancellationTokenSource cancellationTokenSource = new();
+
             // Send web request
             UnityWebRequest webRequest = ImageUtils.CreateTextureRequest(new Uri(uri));
             webRequest.SendWebRequest();
@@ -110,10 +113,13 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
                         Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
                         AddSpriteToCache(sprite, uri);
 
-                        o.OnNext(sprite);
+                        if (!cancellationTokenSource.IsCancellationRequested)
+                        {
+                            o.OnNext(sprite);
+                        }
                         o.OnCompleted();
                     }
-                    else
+                    else if (!cancellationTokenSource.IsCancellationRequested)
                     {
                         o.OnError(new LoadImageException($"Failed to load Texture2D from URI: '{uri}'."));
                     }
@@ -125,7 +131,7 @@ public class ImageManager : AbstractSingletonBehaviour, INeedInjection
                     o.OnError(ex);
                 },
                 busyWaiting));
-            return Disposable.Empty;
+            return Disposable.Create(() => cancellationTokenSource.Cancel());
         });
     }
 

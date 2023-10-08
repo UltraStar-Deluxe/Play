@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -344,6 +345,22 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         lastSongMetaBackground = songMeta.Background;
 
         SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
+            .SelectMany(uri =>
+            {
+                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
+                    || songSelectSongEntry.SongMeta != songMeta)
+                {
+                    // The entry changed in the meantime
+                    return Observable.Return<Sprite>(null);
+                }
+
+                if (uri.IsNullOrEmpty())
+                {
+                    return Observable.Return<Sprite>(null);
+                }
+
+                return ImageManager.LoadSpriteFromUri(uri);
+            })
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -356,7 +373,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 }
                 SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
             })
-            .Subscribe(uri =>
+            .Subscribe(sprite =>
             {
                 if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
                     || songSelectSongEntry.SongMeta != songMeta)
@@ -364,7 +381,14 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                     // The entry changed in the meantime
                     return;
                 }
-                SongMetaImageUtils.SetCoverOrBackgroundImageFromUri(songMeta, uri, songImageOuter, songImageInner);
+
+                if (sprite == null)
+                {
+                    SongMetaImageUtils.SetDefaultSongImageAndColor(songMeta, songImageOuter, songImageInner);
+                    return;
+                }
+
+                SongMetaImageUtils.SetCoverOrBackgroundImage(sprite, songImageOuter, songImageInner);
             });
     }
 

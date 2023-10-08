@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Random = System.Random;
 
 public static class SongMetaImageUtils
 {
@@ -63,26 +65,44 @@ public static class SongMetaImageUtils
             .ObserveOnMainThread();
     }
 
-    public static void SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
+    public static IDisposable SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
     {
-        GetCoverOrBackgroundImageUri(songMeta)
+        IDisposable getUriDisposable = null;
+        IDisposable setImageFromUriDisposable = null;
+
+        getUriDisposable = GetCoverOrBackgroundImageUri(songMeta)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
                 SetDefaultSongImageAndColor(songMeta, visualElements);
             })
-            .Subscribe(uri => SetCoverOrBackgroundImageFromUri(songMeta, uri, visualElements));
+            .Subscribe(uri => setImageFromUriDisposable = SetCoverOrBackgroundImageFromUri(songMeta, uri, visualElements));
+
+        return Disposable.Create(() =>
+        {
+            getUriDisposable?.Dispose();
+            setImageFromUriDisposable?.Dispose();
+        });
     }
 
-    public static void SetCoverOrBackgroundImageFromUri(SongMeta songMeta, string uri, params VisualElement[] visualElements)
+    public static void SetCoverOrBackgroundImage(Sprite sprite, params VisualElement[] visualElements)
+    {
+        foreach (VisualElement visualElement in visualElements)
+        {
+            visualElement.style.backgroundImage = new StyleBackground(sprite);
+            visualElement.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+        }
+    }
+
+    public static IDisposable SetCoverOrBackgroundImageFromUri(SongMeta songMeta, string uri, params VisualElement[] visualElements)
     {
         if (uri.IsNullOrEmpty())
         {
             SetDefaultSongImageAndColor(songMeta, visualElements);
-            return;
+            return Disposable.Empty;
         }
 
-        ImageManager.LoadSpriteFromUri(uri)
+        return ImageManager.LoadSpriteFromUri(uri)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -90,11 +110,7 @@ public static class SongMetaImageUtils
             })
             .Subscribe(loadedSprite =>
             {
-                foreach (VisualElement visualElement in visualElements)
-                {
-                    visualElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                    visualElement.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
-                }
+                SetCoverOrBackgroundImage(loadedSprite, visualElements);
             });
     }
 
