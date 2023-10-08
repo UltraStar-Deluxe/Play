@@ -528,22 +528,26 @@ public class SongMetaManager : AbstractSingletonBehaviour
         songIssues = new List<SongIssue>();
         try
         {
-            SongMeta newSongMeta = UltraStarSongParser.ParseFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
-            songIssues.AddRange(parseFileIssues);
+            SongMeta newSongMeta = new LazyLoadedFromFileSongMeta(path);
+            songMeta = newSongMeta;
+            return true;
 
-            List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
-                newSongMeta,
-                settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never,
-                settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never,
-                settings.CheckCodecIsSupported);
-            songIssues.AddRange(mediaFormatIssues);
+            // SongMeta newSongMeta = UltraStarSongParser.ParseFile(path, out List<SongIssue> parseFileIssues, null, settings.UseUniversalCharsetDetector);
+            // songIssues.AddRange(parseFileIssues);
 
-            if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
-            {
-                // No issues or only warnings, thus ok.
-                songMeta = newSongMeta;
-                return true;
-            }
+            // List<SongIssue> mediaFormatIssues = GetSupportedMediaFormatIssues(
+            //     newSongMeta,
+            //     settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never,
+            //     settings.VlcToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never,
+            //     settings.CheckCodecIsSupported);
+            // songIssues.AddRange(mediaFormatIssues);
+            //
+            // if (songIssues.AllMatch(songIssue => songIssue.Severity == ESongIssueSeverity.Warning))
+            // {
+            //     // No issues or only warnings, thus ok.
+            //     songMeta = newSongMeta;
+            //     return true;
+            // }
         }
         catch (UltraStarSongParserException e)
         {
