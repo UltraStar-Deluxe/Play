@@ -547,7 +547,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
         catch (UltraStarSongParserException e)
         {
-            Debug.LogError("SongMetaBuilderException: " + path + "\n" + e.Message);
+            Debug.LogError($"{nameof(UltraStarSongParserException)}: " + path + "\n" + e.Message);
         }
         catch (Exception ex)
         {
