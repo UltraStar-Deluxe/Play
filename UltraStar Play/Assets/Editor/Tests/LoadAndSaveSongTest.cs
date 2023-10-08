@@ -29,10 +29,6 @@ public class LoadAndSaveSongTest
         Assert.AreEqual(originalSongMeta.InstrumentalAudio, savedSongMeta.InstrumentalAudio);
         Assert.AreEqual(originalSongMeta.Language, savedSongMeta.Language);
         Assert.AreEqual(originalSongMeta.Audio, savedSongMeta.Audio);
-        Assert.AreEqual(originalSongMeta.MusicBrainzRecord, savedSongMeta.MusicBrainzRecord);
-        Assert.AreEqual(originalSongMeta.MusicBrainzRelease, savedSongMeta.MusicBrainzRelease);
-        Assert.AreEqual(originalSongMeta.MusicBrainzReleaseGroup, savedSongMeta.MusicBrainzReleaseGroup);
-        Assert.AreEqual(originalSongMeta.MusicBrainzArtist, savedSongMeta.MusicBrainzArtist);
         Assert.AreEqual(originalSongMeta.PreviewEndInMillis, savedSongMeta.PreviewEndInMillis);
         Assert.AreEqual(originalSongMeta.MedleyEndInMillis, savedSongMeta.MedleyEndInMillis);
         Assert.AreEqual(originalSongMeta.MedleyStartInMillis, savedSongMeta.MedleyStartInMillis);

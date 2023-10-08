@@ -31,6 +31,7 @@ public static class UltraStarSongParser
             // Lazy load voices
             songMeta.OnLoadVoices = () =>
             {
+                using IDisposable d = new DisposableStopwatch($"Lazy loading voices of '{filePath}' took <ms> ms");
                 List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
                     songMeta.FileInfo.FullName,
                     songMeta.FileEncoding,
@@ -98,7 +99,7 @@ public static class UltraStarSongParser
             {
                 if (lineNumber == 1)
                 {
-                    throw new UltraStarSongParserException("Does not look like a song file; ignoring");
+                    throw new UltraStarSongParserException("Does not look like a song file, ignoring");
                 }
 
                 // Finished headers
@@ -317,18 +318,6 @@ public static class UltraStarSongParser
                 break;
             case "medleystartbeat":
                 songMeta.TxtFileMedleyStartBeat = ConvertToInt32(value);
-                break;
-            case "musicbrainzartist":
-                songMeta.MusicBrainzArtist = value;
-                break;
-            case "musicbrainzrecord":
-                songMeta.MusicBrainzRecord = value;
-                break;
-            case "musicbrainzrelease":
-                songMeta.MusicBrainzRelease = value;
-                break;
-            case "musicbrainzreleasegroup":
-                songMeta.MusicBrainzReleaseGroup = value;
                 break;
             case "previewend":
                 songMeta.TxtFilePreviewEndInSeconds = ConvertToFloat(value);
