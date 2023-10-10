@@ -25,10 +25,7 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
     {
         get
         {
-            if (!hasSetFileInfo)
-            {
-                LoadSongIfNotDoneYet();
-            }
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetFileInfo);
             return base.FileInfo;
         }
     }
@@ -45,10 +42,7 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
     {
         get
         {
-            if (!hasSetFileEncoding)
-            {
-                LoadSongIfNotDoneYet();
-            }
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetFileEncoding);
             return base.FileEncoding;
         }
     }
@@ -57,10 +51,7 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
     public override string Artist {
         get
         {
-            if (!hasSetArtist)
-            {
-                LoadSongIfNotDoneYet();
-            }
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetArtist);
             return base.Artist;
         }
         set
@@ -75,10 +66,7 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
     {
         get
         {
-            if (!hasSetTitle)
-            {
-                LoadSongIfNotDoneYet();
-            }
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetTitle);
             return base.Title;
         }
         set
@@ -88,223 +76,349 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         }
     }
 
+    private bool hasSetYear;
     public override uint Year
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetYear);
             return base.Year;
+        }
+        set
+        {
+            hasSetYear = true;
+            base.Year = value;
         }
     }
 
+    private bool hasSetAudio;
     public override string Audio
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetAudio);
             return base.Audio;
+        }
+        set
+        {
+            hasSetAudio = true;
+            base.Audio = value;
         }
     }
 
+    private bool hasSetVocalsAudio;
     public override string VocalsAudio
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetVocalsAudio);
             return base.VocalsAudio;
+        }
+
+        set
+        {
+            hasSetVocalsAudio = true;
+            base.VocalsAudio = value;
         }
     }
 
+    private bool hasSetInstrumentalAudio;
     public override string InstrumentalAudio
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetInstrumentalAudio);
             return base.InstrumentalAudio;
+        }
+        set
+        {
+            hasSetInstrumentalAudio = true;
+            base.InstrumentalAudio = value;
         }
     }
 
+    private bool hasSetWebsite;
     public override string Website
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetWebsite);
             return base.Website;
+        }
+        set
+        {
+            hasSetWebsite = true;
+            base.Website = value;
         }
     }
 
+    private bool hasSetBackground;
     public override string Background
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetBackground);
             return base.Background;
+        }
+        set
+        {
+            hasSetBackground = true;
+            base.Background = value;
         }
     }
 
+    private bool hasSetCover;
     public override string Cover
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetCover);
             return base.Cover;
+        }
+        set
+        {
+            hasSetCover = true;
+            base.Cover = value;
         }
     }
 
+    private bool hasSetEdition;
     public override string Edition
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetEdition);
             return base.Edition;
+        }
+        set
+        {
+            hasSetEdition = true;
+            base.Edition = value;
         }
     }
 
+    private bool hasSetGenre;
     public override string Genre
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetGenre);
             return base.Genre;
+        }
+        set
+        {
+            hasSetGenre = true;
+            base.Genre = value;
         }
     }
 
+    private bool hasSetLanguage;
     public override string Language
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetLanguage);
             return base.Language;
+        }
+        set
+        {
+            hasSetLanguage = true;
+            base.Language = value;
         }
     }
 
+    private bool hasSetVideo;
     public override string Video
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetVideo);
             return base.Video;
+        }
+        set
+        {
+            hasSetVideo = true;
+            base.Video = value;
         }
     }
 
+    private bool hasSetBeatsPerMinute;
     public override double BeatsPerMinute
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetBeatsPerMinute);
             return base.BeatsPerMinute;
+        }
+        set
+        {
+            hasSetBeatsPerMinute = true;
+            base.BeatsPerMinute = value;
         }
     }
 
+    private bool hasSetGapInMillis;
     public override double GapInMillis
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetGapInMillis);
             return base.GapInMillis;
+        }
+        set
+        {
+            hasSetGapInMillis = true;
+            base.GapInMillis = value;
         }
     }
 
+    private bool hasSetVideoGapInMillis;
     public override double VideoGapInMillis
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetVideoGapInMillis);
             return base.VideoGapInMillis;
+        }
+        set
+        {
+            hasSetVideoGapInMillis = true;
+            base.VideoGapInMillis = value;
         }
     }
 
+    private bool hasSetPreviewStartInMillis;
     public override double PreviewStartInMillis
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetPreviewStartInMillis);
             return base.PreviewStartInMillis;
+        }
+        set
+        {
+            hasSetPreviewStartInMillis = true;
+            base.PreviewStartInMillis = value;
         }
     }
 
+    private bool hasSetPreviewEndInMillis;
     public override double PreviewEndInMillis
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetPreviewEndInMillis);
             return base.PreviewEndInMillis;
+        }
+        set
+        {
+            hasSetPreviewEndInMillis = true;
+            base.PreviewEndInMillis = value;
         }
     }
 
+    private bool hasSetStartInMillis;
     public override double StartInMillis
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetStartInMillis);
             return base.StartInMillis;
+        }
+        set
+        {
+            hasSetStartInMillis = true;
+            base.StartInMillis = value;
         }
     }
 
+    private bool hasSetEndInMillis;
     public override double EndInMillis
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetEndInMillis);
             return base.EndInMillis;
+        }
+        set
+        {
+            hasSetEndInMillis = true;
+            base.EndInMillis = value;
         }
     }
 
+    private bool hasSetMedleyStartInMillis;
     public override double MedleyStartInMillis
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetMedleyStartInMillis);
             return base.MedleyStartInMillis;
+        }
+        set
+        {
+            base.MedleyStartInMillis = value;
         }
     }
 
+    private bool hasSetMedleyEndInMillis;
     public override double MedleyEndInMillis
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetMedleyEndInMillis);
             return base.MedleyEndInMillis;
         }
-    }
-
-    public override IReadOnlyCollection<Voice> Voices
-    {
-        get
+        set
         {
-            LoadSongIfNotDoneYet();
-            return base.Voices;
+            hasSetMedleyEndInMillis = true;
+            base.MedleyEndInMillis = value;
         }
     }
 
-    public override int VoiceCount
-    {
-        get
-        {
-            LoadSongIfNotDoneYet();
-            return base.VoiceCount;
-        }
-    }
-
+    private bool hasSetRemoteSource;
     public override string RemoteSource
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetRemoteSource);
             return base.RemoteSource;
+        }
+        set
+        {
+            hasSetRemoteSource = true;
+            base.RemoteSource = value;
         }
     }
 
+    private bool hasSetAdditionalHeaderEntries;
     public override IReadOnlyDictionary<string, string> AdditionalHeaderEntries
     {
         get
         {
-            LoadSongIfNotDoneYet();
+            LoadSongIfNotDoneYetAndIsNotSetYet(hasSetAdditionalHeaderEntries);
             return base.AdditionalHeaderEntries;
         }
     }
 
-    protected virtual void LoadSongIfNotDoneYet()
+    public override void SetAdditionalHeaderEntry(string key, string value)
+    {
+        hasSetAdditionalHeaderEntries = true;
+        base.SetAdditionalHeaderEntry(key, value);
+    }
+
+    protected virtual void LoadSongIfNotDoneYetAndIsNotSetYet(bool isSet)
+    {
+        if (isSet)
+        {
+            // Has been set already
+            return;
+        }
+
+        DoLoadSongIfNotDoneYet();
+    }
+
+    protected virtual void DoLoadSongIfNotDoneYet()
     {
         if (loadSongPhase is not ELoadSongPhase.Pending)
         {
