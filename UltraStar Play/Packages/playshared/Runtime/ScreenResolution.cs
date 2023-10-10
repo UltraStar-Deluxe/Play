@@ -10,9 +10,9 @@ public struct ScreenResolution : IEqualityComparer<ScreenResolution>
     public int Height { get; set; }
     public int RefreshRate { get; set; }
 
-    public ScreenResolution(int widht, int height, int refreshRate)
+    public ScreenResolution(int width, int height, int refreshRate)
     {
-        this.Width = widht;
+        this.Width = width;
         this.Height = height;
         this.RefreshRate = refreshRate;
     }
