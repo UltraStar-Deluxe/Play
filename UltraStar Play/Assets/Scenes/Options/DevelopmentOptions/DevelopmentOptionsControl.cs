@@ -41,9 +41,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
     private ItemPicker songDataFetchTypeChooser;
 
-    [Inject(UxmlName = R.UxmlNames.searchMissingImageFilesToggle)]
-    private Toggle searchMissingImageFilesToggle;
-
     [Inject(UxmlName = R.UxmlNames.saveVocalsAndInstrumentalAudioInFolderOfSongToggle)]
     private Toggle saveVocalsAndInstrumentalAudioInFolderOfSongToggle;
 
@@ -166,10 +163,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(showFpsToggle,
             () => settings.ShowFps,
             newValue => settings.ShowFps = newValue);
-
-        FieldBindingUtils.Bind(searchMissingImageFilesToggle,
-            () => settings.SearchMissingCoverAndBackgroundImageInFolderOfSong,
-            newValue => settings.SearchMissingCoverAndBackgroundImageInFolderOfSong = newValue);
 
         FieldBindingUtils.Bind(saveVocalsAndInstrumentalAudioInFolderOfSongToggle,
             () => settings.SaveVocalsAndInstrumentalAudioInFolderOfSong,
