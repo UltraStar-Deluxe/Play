@@ -415,10 +415,10 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
             return;
         }
 
-        DoLoadSongIfNotDoneYet();
+        LoadSongIfNotDoneYet();
     }
 
-    protected virtual void DoLoadSongIfNotDoneYet()
+    public virtual void LoadSongIfNotDoneYet()
     {
         if (loadSongPhase is not ELoadSongPhase.Pending)
         {

@@ -528,7 +528,12 @@ public class SongMetaManager : AbstractSingletonBehaviour
         songIssues = new List<SongIssue>();
         try
         {
-            SongMeta newSongMeta = new LazyLoadedFromFileSongMeta(path);
+            LazyLoadedFromFileSongMeta newSongMeta = new LazyLoadedFromFileSongMeta(path);
+            if (settings.SongDataFetchType is EFetchType.Eager)
+            {
+                Log.Debug(() => $"Eager loading of '{SongMetaUtils.GetArtistDashTitle(newSongMeta)}'");
+                newSongMeta.LoadSongIfNotDoneYet();
+            }
             songMeta = newSongMeta;
             return true;
 

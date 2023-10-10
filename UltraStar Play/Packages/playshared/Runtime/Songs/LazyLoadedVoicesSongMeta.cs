@@ -55,7 +55,7 @@ public class LazyLoadedVoicesSongMeta : SongMeta
         }
     }
 
-    protected virtual void LoadVoicesIfNotDoneYet()
+    public virtual void LoadVoicesIfNotDoneYet()
     {
         if (loadVoicesPhase is not ELoadVoicesPhase.Pending)
         {

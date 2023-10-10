@@ -743,6 +743,7 @@ public static partial class R
         public const string songBackgroundScaleModePicker = "songBackgroundScaleModePicker";
         public const string songCoverImage = "songCoverImage";
         public const string songCoverLabel = "songCoverLabel";
+        public const string songDataFetchTypeChooser = "songDataFetchTypeChooser";
         public const string songEditorRoot = "songEditorRoot";
         public const string SongEditorSideBarMainColumnUi = "SongEditorSideBarMainColumnUi";
         public const string SongEditorSideBarSecondaryColumnUi = "SongEditorSideBarSecondaryColumnUi";

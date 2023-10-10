@@ -74,6 +74,7 @@ public class Settings : ISettings
     public bool SearchMissingCoverAndBackgroundImageInFolderOfSong { get; set; }
     public string GeneratedFolderPath { get; set; } = "";
     public bool SaveVocalsAndInstrumentalAudioInFolderOfSong { get; set; }
+    public EFetchType SongDataFetchType { get; set; } = EFetchType.Eager;
 
     // Theme settings
     public string ThemeName { get; set; } = ThemeManager.DefaultThemeName;
