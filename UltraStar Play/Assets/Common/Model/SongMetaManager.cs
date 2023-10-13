@@ -13,6 +13,7 @@ using Debug = UnityEngine.Debug;
 // Handles loading and caching of SongMeta and related data structures (e.g. the voices are cached).
 public class SongMetaManager : AbstractSingletonBehaviour
 {
+    private const int LazyLoadingSongRecommendationThresholdCount = 500;
     private static readonly object scanLock = new();
 
     private static string unitySupportedVideoFileExtensionsAsCsv = ApplicationUtils.unitySupportedVideoFiles.ToCsv(",", "", "");
@@ -252,6 +253,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
                     return;
                 }
                 targetSongCount += txtFiles.Count;
+
+                // Show notification to the user when switching to lazy loading of songs is recommended.
+                if (targetSongCount > LazyLoadingSongRecommendationThresholdCount
+                    && settings.SongDataFetchType is EFetchType.Eager)
+                {
+                    UiManager.CreateNotification($"Configure on-demand loading\nof songs for faster setup.");
+                }
 
                 if (!cancellationToken.IsCancellationRequested)
                 {
@@ -533,7 +541,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
             LazyLoadedFromFileSongMeta newSongMeta = new LazyLoadedFromFileSongMeta(path);
             if (settings.SongDataFetchType is EFetchType.Eager)
             {
-                Log.Debug(() => $"Eager loading of '{SongMetaUtils.GetArtistDashTitle(newSongMeta)}'");
                 newSongMeta.LoadSongIfNotDoneYet();
             }
             songMeta = newSongMeta;

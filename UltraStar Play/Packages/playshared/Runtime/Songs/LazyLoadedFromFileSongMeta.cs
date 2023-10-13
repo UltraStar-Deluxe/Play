@@ -22,14 +22,14 @@ public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta
 
         OnLoadSong = () =>
         {
-            using IDisposable d = new DisposableStopwatch($"Lazy loading of '{fileInfo.Name}' took <ms> ms");
+            using IDisposable d = new DisposableStopwatch($"Loading '{fileInfo.Name}' took <ms> ms");
             UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding);
             CopyValues(loadedSongMeta);
         };
 
         OnLoadVoices = () =>
         {
-            using IDisposable d = new DisposableStopwatch($"Lazy loading voices of '{fileInfo.Name}' took <ms> ms");
+            using IDisposable d = new DisposableStopwatch($"Loading voices of '{fileInfo.Name}' took <ms> ms");
             List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
                 FileInfo.FullName,
                 FileEncoding,
