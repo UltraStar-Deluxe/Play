@@ -34,9 +34,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
 
-    private static readonly Dictionary<SongMeta, string> songMetaToScoreRelevantHash = new();
-    private static readonly Dictionary<SongMeta, string> songMetaToGloballyUniqueHash = new();
-    private static readonly Dictionary<SongMeta, string> songMetaToLocallyUniqueHash = new();
+    private static readonly BiDictionary<SongMeta, string> songMetaToScoreRelevantHash = new();
+    private static readonly BiDictionary<SongMeta, string> songMetaToGloballyUniqueHash = new();
+    private static readonly BiDictionary<SongMeta, string> songMetaToLocallyUniqueHash = new();
     private static readonly Dictionary<string, string> stringToMd5Hash = new();
 
     // Static to be persisted across scenes.
@@ -572,8 +572,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     public void SaveSong(SongMeta songMeta, bool isAutoSave)
     {
-        songMetaToScoreRelevantHash.Remove(songMeta);
-        songMetaToGloballyUniqueHash.Remove(songMeta);
+        songMetaToScoreRelevantHash.RemoveByFirst(songMeta);
+        songMetaToGloballyUniqueHash.RemoveByFirst(songMeta);
+        songMetaToLocallyUniqueHash.RemoveByFirst(songMeta);
 
         SongMetaUtils.CreateDirectory(songMeta);
         string songFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
@@ -618,6 +619,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return null;
         }
 
+        if (songMetaToGloballyUniqueHash.TryGetBySecond(songId, out SongMeta knownMatchingSongMeta))
+        {
+            return knownMatchingSongMeta;
+        }
+
         SongMeta matchingSongMeta = allSongMetas
             .FirstOrDefault(songMeta => SongMetaMatchesGloballyUniqueSongId(songMeta, songId));
         return matchingSongMeta;
@@ -628,6 +634,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
         if (songId.IsNullOrEmpty())
         {
             return null;
+        }
+
+        if (songMetaToLocallyUniqueHash.TryGetBySecond(songId, out SongMeta knownMatchingSongMeta))
+        {
+            return knownMatchingSongMeta;
         }
 
         SongMeta matchingSongMeta = allSongMetas
@@ -892,13 +903,13 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return "";
         }
 
-        if (songMetaToScoreRelevantHash.TryGetValue(songMeta, out string scoreRelevantHash))
+        if (songMetaToScoreRelevantHash.TryGetByFirst(songMeta, out string scoreRelevantHash))
         {
             return scoreRelevantHash;
         }
 
         scoreRelevantHash = SongMetaUtils.ComputeScoreRelevantSongHash(songMeta);
-        songMetaToScoreRelevantHash[songMeta] = scoreRelevantHash;
+        songMetaToScoreRelevantHash.Set(songMeta, scoreRelevantHash);
         return scoreRelevantHash;
     }
 
@@ -913,7 +924,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return "";
         }
 
-        if (songMetaToGloballyUniqueHash.TryGetValue(songMeta, out string cachedHash))
+        if (songMetaToGloballyUniqueHash.TryGetByFirst(songMeta, out string cachedHash))
         {
             return cachedHash;
         }
@@ -923,7 +934,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         string computedHash = SongMetaUtils.ComputeUniqueSongHash(songMeta);
         string hashPrefixedWithArtistAndTitle = $"{artistAndTitleHash}:{computedHash}";
 
-        songMetaToGloballyUniqueHash[songMeta] = hashPrefixedWithArtistAndTitle;
+        songMetaToGloballyUniqueHash.Set(songMeta, hashPrefixedWithArtistAndTitle);
         return hashPrefixedWithArtistAndTitle;
     }
 
@@ -938,7 +949,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             return "";
         }
 
-        if (songMetaToLocallyUniqueHash.TryGetValue(songMeta, out string cachedHash))
+        if (songMetaToLocallyUniqueHash.TryGetByFirst(songMeta, out string cachedHash))
         {
             return cachedHash;
         }
@@ -952,7 +963,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             : SongMetaUtils.ComputeUniqueSongHash(songMeta);
         string hashPrefixedWithArtistAndTitle = $"{artistAndTitleHash}:{computedHash}";
 
-        songMetaToLocallyUniqueHash[songMeta] = hashPrefixedWithArtistAndTitle;
+        songMetaToLocallyUniqueHash.Set(songMeta, hashPrefixedWithArtistAndTitle);
         return hashPrefixedWithArtistAndTitle;
     }
 
@@ -971,6 +982,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private bool SongMetaMatchesGloballyUniqueSongId(SongMeta songMeta, string songId)
     {
+        if (songMetaToGloballyUniqueHash.TryGetBySecond(songId, out SongMeta _))
+        {
+            return true;
+        }
+
         // Efficient check whether this song may equal the full hash.
         string artistAndTitleHash = GetArtistAndTitleHash(songMeta);
         if (!songId.StartsWith(artistAndTitleHash))
@@ -985,6 +1001,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private bool SongMetaMatchesLocallyUniqueSongId(SongMeta songMeta, string songId)
     {
+        if (songMetaToLocallyUniqueHash.TryGetBySecond(songId, out SongMeta _))
+        {
+            return true;
+        }
+
         // Efficient check whether this song may equal the full hash.
         string artistAndTitleHash = GetArtistAndTitleHash(songMeta);
         if (!songId.StartsWith(artistAndTitleHash))
