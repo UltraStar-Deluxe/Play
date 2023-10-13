@@ -35,7 +35,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public static SongMetaManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongMetaManager>();
 
     private static readonly Dictionary<SongMeta, string> songMetaToScoreRelevantHash = new();
-    private static readonly Dictionary<SongMeta, string> songMetaToUniqueHash = new();
+    private static readonly Dictionary<SongMeta, string> songMetaToGloballyUniqueHash = new();
+    private static readonly Dictionary<SongMeta, string> songMetaToLocallyUniqueHash = new();
+    private static readonly Dictionary<string, string> stringToMd5Hash = new();
 
     // Static to be persisted across scenes.
     private static List<string> lastEnabledSongFolders;
@@ -571,7 +573,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public void SaveSong(SongMeta songMeta, bool isAutoSave)
     {
         songMetaToScoreRelevantHash.Remove(songMeta);
-        songMetaToUniqueHash.Remove(songMeta);
+        songMetaToGloballyUniqueHash.Remove(songMeta);
 
         SongMetaUtils.CreateDirectory(songMeta);
         string songFilePath = SongMetaUtils.GetAbsoluteSongMetaFilePath(songMeta);
@@ -609,7 +611,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
     }
 
-    public SongMeta GetSongMetaById(string songId)
+    public SongMeta GetSongMetaByGloballyUniqueId(string songId)
     {
         if (songId.IsNullOrEmpty())
         {
@@ -617,20 +619,20 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         SongMeta matchingSongMeta = allSongMetas
-            .FirstOrDefault(songMeta => SongMetaMatchesSongId(songMeta, songId));
+            .FirstOrDefault(songMeta => SongMetaMatchesGloballyUniqueSongId(songMeta, songId));
         return matchingSongMeta;
     }
 
-    public List<SongMeta> GetSongMetasByIds(List<string> songIds)
+    public SongMeta GetSongMetaByLocallyUniqueId(string songId)
     {
-        if (songIds.IsNullOrEmpty())
+        if (songId.IsNullOrEmpty())
         {
-            return new();
+            return null;
         }
 
-        return songIds
-            .Select(id => GetSongMetaById(id))
-            .ToList();
+        SongMeta matchingSongMeta = allSongMetas
+            .FirstOrDefault(songMeta => SongMetaMatchesLocallyUniqueSongId(songMeta, songId));
+        return matchingSongMeta;
     }
 
     public SongMeta GetSongMetaByTitle(string title)
@@ -900,39 +902,99 @@ public class SongMetaManager : AbstractSingletonBehaviour
         return scoreRelevantHash;
     }
 
-    public static string GetAndCacheUniqueHash(SongMeta songMeta)
+    /**
+     * Returns a hash that identifies this song globally, e.g.,
+     * for online multiplayer.
+     */
+    public static string GetAndCacheGloballyUniqueHash(SongMeta songMeta)
     {
         if (songMeta == null)
         {
             return "";
         }
 
-        if (songMetaToUniqueHash.TryGetValue(songMeta, out string cachedHash))
+        if (songMetaToGloballyUniqueHash.TryGetValue(songMeta, out string cachedHash))
         {
             return cachedHash;
         }
 
         // Prefix with artist and title for an efficient check whether a song may equal the hash.
-        string artistAndTitle = SongMetaUtils.GetArtistAndTitle(songMeta, ":");
+        string artistAndTitleHash = GetArtistAndTitleHash(songMeta);
         string computedHash = SongMetaUtils.ComputeUniqueSongHash(songMeta);
-        string hashPrefixedWithArtistAndTitle = $"{artistAndTitle}:{computedHash}";
+        string hashPrefixedWithArtistAndTitle = $"{artistAndTitleHash}:{computedHash}";
 
-        songMetaToUniqueHash[songMeta] = hashPrefixedWithArtistAndTitle;
+        songMetaToGloballyUniqueHash[songMeta] = hashPrefixedWithArtistAndTitle;
         return hashPrefixedWithArtistAndTitle;
     }
 
-    private bool SongMetaMatchesSongId(SongMeta songMeta, string songId)
+    /**
+     * Returns a hash that identifies this song on this local machine, e.g.,
+     * for use with the Companion App.
+     */
+    public static string GetAndCacheLocallyUniqueHash(SongMeta songMeta)
+    {
+        if (songMeta == null)
+        {
+            return "";
+        }
+
+        if (songMetaToLocallyUniqueHash.TryGetValue(songMeta, out string cachedHash))
+        {
+            return cachedHash;
+        }
+
+        // Prefix with artist and title for an efficient check whether a song may equal the hash.
+        string artistAndTitleHash = GetArtistAndTitleHash(songMeta);
+        string computedHash = songMeta.FileInfo != null
+            // Using the file path is faster because is does not require to read the file content.
+            // However, the file path can only be used to identify the song locally on this machine.
+            ? HashingUtils.Md5Hash(songMeta.FileInfo.FullName)
+            : SongMetaUtils.ComputeUniqueSongHash(songMeta);
+        string hashPrefixedWithArtistAndTitle = $"{artistAndTitleHash}:{computedHash}";
+
+        songMetaToLocallyUniqueHash[songMeta] = hashPrefixedWithArtistAndTitle;
+        return hashPrefixedWithArtistAndTitle;
+    }
+
+    private static string GetArtistAndTitleHash(SongMeta songMeta)
+    {
+        string artistAndTitle = SongMetaUtils.GetArtistAndTitle(songMeta, ":");
+        if (stringToMd5Hash.TryGetValue(artistAndTitle, out string cachedHash))
+        {
+            return cachedHash;
+        }
+
+        string computedHash = HashingUtils.Md5Hash(artistAndTitle);
+        stringToMd5Hash[artistAndTitle] = computedHash;
+        return computedHash;
+    }
+
+    private bool SongMetaMatchesGloballyUniqueSongId(SongMeta songMeta, string songId)
     {
         // Efficient check whether this song may equal the full hash.
-        string artistAndTitle = SongMetaUtils.GetArtistAndTitle(songMeta, ":");
-        if (!songId.StartsWith(artistAndTitle))
+        string artistAndTitleHash = GetArtistAndTitleHash(songMeta);
+        if (!songId.StartsWith(artistAndTitleHash))
         {
             // The artist and title did not match.
             // Thus, the rest of the hash cannot match, so we don't need to compute the full hash.
             return false;
         }
 
-        return GetAndCacheUniqueHash(songMeta) == songId;
+        return GetAndCacheGloballyUniqueHash(songMeta) == songId;
+    }
+
+    private bool SongMetaMatchesLocallyUniqueSongId(SongMeta songMeta, string songId)
+    {
+        // Efficient check whether this song may equal the full hash.
+        string artistAndTitleHash = GetArtistAndTitleHash(songMeta);
+        if (!songId.StartsWith(artistAndTitleHash))
+        {
+            // The artist and title did not match.
+            // Thus, the rest of the hash cannot match, so we don't need to compute the full hash.
+            return false;
+        }
+
+        return GetAndCacheLocallyUniqueHash(songMeta) == songId;
     }
 
     protected override void OnDestroySingleton()
