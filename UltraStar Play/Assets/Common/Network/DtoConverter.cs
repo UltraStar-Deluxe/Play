@@ -9,7 +9,7 @@ public static class DtoConverter
         {
             Artist = songMeta.Artist,
             Title = songMeta.Title,
-            Hash = SongMetaManager.GetAndCacheLocallyUniqueHash(songMeta),
+            Hash = SongIdManager.GetAndCacheLocallyUniqueId(songMeta),
         };
         return dto;
     }

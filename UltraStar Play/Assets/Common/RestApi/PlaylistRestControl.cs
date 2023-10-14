@@ -36,7 +36,7 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
                     {
                         Artist = songMeta.Artist,
                         Title = songMeta.Title,
-                        Hash = SongMetaManager.GetAndCacheLocallyUniqueHash(songMeta),
+                        Hash = SongIdManager.GetAndCacheLocallyUniqueId(songMeta),
                     })
                     .ToList();
                 requestData.Context.Response.WriteJson(songListDto);

@@ -157,7 +157,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 {
                     Artist = songMeta.Artist,
                     Title = songMeta.Title,
-                    Hash = SongMetaManager.GetAndCacheLocallyUniqueHash(songMeta),
+                    Hash = SongIdManager.GetAndCacheLocallyUniqueId(songMeta),
                 })
                 .ToList()
         }.ToJson());

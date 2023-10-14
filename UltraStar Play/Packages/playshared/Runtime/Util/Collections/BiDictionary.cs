@@ -72,4 +72,10 @@ public class BiDictionary<TFirst, TSecond>
         firstToSecond.Remove(first);
         secondToFirst.Remove(second);
     }
+
+    public void Clear()
+    {
+        firstToSecond.Clear();
+        secondToFirst.Clear();
+    }
 }
