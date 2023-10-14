@@ -29,9 +29,16 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private FfplayCommand ffplayCommand;
     private FfmpegPlayerVideoTexture ffmpegPlayerVideoTexture;
 
+    [InjectedInAwake]
     private Settings settings;
+
+    [InjectedInAwake]
     private WebViewManager webViewManager;
+
+    [InjectedInAwake]
     private SceneNavigator sceneNavigator;
+
+    [InjectedInAwake]
     private VlcManager vlcManager;
 
     private readonly Lazy<MidiManager> midiManagerLazy = new(() => MidiManager.Instance);
