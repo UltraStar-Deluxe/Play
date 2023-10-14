@@ -99,7 +99,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         settings = SettingsManager.Instance.Settings;
     }
 
-    public static void AddSongMeta(SongMeta songMeta, IReadOnlyCollection<SongIssue> songIssues)
+    public static void AddSongMeta(SongMeta songMeta)
     {
         if (songMeta == null)
         {
@@ -107,8 +107,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         allSongMetas.Add(songMeta);
-
-        SongIssueManager.AddSongIssues(songIssues);
     }
 
     public SongMeta GetFirstSongMeta()
@@ -152,7 +150,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     private void ScanFilesAsynchronously(string generatedSongFolderAbsolutePath, CancellationToken cancellationToken)
     {
-        Debug.Log("ScanFilesAsynchronously");
+        Debug.Log("Starting song scan");
 
         // Update supported file formats when ffmpeg is (not) used.
         ApplicationUtils.UseFfmpegToPlayMediaFiles = settings.FfmpegToPlayMediaFilesUsage is not EThirdPartyLibraryUsage.Never;

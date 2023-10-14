@@ -1248,7 +1248,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 && !songMetaManager.ContainsSongMeta(songMeta))
             {
                 songMetas.Add(songMeta);
-                SongMetaManager.AddSongMeta(songMeta, songIssues);
+                CommonEventStream.Publish(new FoundSongIssuesEvent(songIssues));
             }
         }
         catch (Exception ex)

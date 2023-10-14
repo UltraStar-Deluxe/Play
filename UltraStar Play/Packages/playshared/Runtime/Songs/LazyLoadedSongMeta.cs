@@ -429,12 +429,14 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         {
             loadSongPhase = ELoadSongPhase.Started;
             OnLoadSong?.Invoke();
+
+            CommonEventStream.Publish(new SongMetaLoadedEvent(this));
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to lazy load song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             loadSongPhase = ELoadSongPhase.Failed;
+            Debug.LogException(ex);
+            Debug.LogError($"Failed load song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             return;
         }
 

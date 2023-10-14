@@ -80,15 +80,18 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     private MessageDialogControl deleteSongFolderDialog;
 
+    private string settingsAtStart;
+
     protected override void Start()
     {
         base.Start();
+
+        settingsAtStart = JsonConverter.ToJson(settings);
 
         if (SongMetaManager.IsSongScanFinished)
         {
             UpdateSongIssues();
         }
-        songMetaManager.ScanFilesIfNotDoneYet();
         songMetaManager.SongScanFinishedEventStream
             .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()))
             .AddTo(gameObject);
@@ -266,6 +269,40 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .CreateAndInject<MessageDialogControl>();
         issuesDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
 
+        if (SongIssueManager.IsSongIssueScanFinished)
+        {
+            FillIssuesDialog(issuesDialogControl);
+        }
+        else
+        {
+            // Start song issue scan if needed
+            if (!SongIssueManager.IsSongIssueScanStarted)
+            {
+                songIssueManager.ReloadSongIssues();
+            }
+
+            // Show message that song issue scan is in progress
+            FillIssuesDialogWithSongIssueScanInProgressMessage(issuesDialogControl);
+
+            // Update dialog when song issue scan finished
+            songIssueManager.SongIssueScanFinishedEventStream
+                .SubscribeOneShot(evt =>
+                {
+                    issuesDialogControl.CloseDialog();
+                    CreateIssuesDialogControl();
+                });
+        }
+
+        return issuesDialogControl;
+    }
+
+    private void FillIssuesDialogWithSongIssueScanInProgressMessage(MessageDialogControl issuesDialogControl)
+    {
+        issuesDialogControl.AddVisualElement(new Label("Searching issues in loaded songs. Please wait..."));
+    }
+
+    private void FillIssuesDialog(MessageDialogControl issuesDialogControl)
+    {
         AccordionGroup accordionGroup = new();
         issuesDialogControl.AddVisualElement(accordionGroup);
 
@@ -301,19 +338,15 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         }
 
         // Refresh button
-        issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), _ =>
+        issuesDialogControl.AddButton("Refresh Issues in Loaded Songs", _ =>
         {
-            OnRefreshSongIssuesButtonClicked();
+            songMetaManager.ReloadSongMetas();
+            songIssueManager.ReloadSongIssues();
+
+            // Update dialog
             issuesDialogControl.CloseDialog();
+            CreateIssuesDialogControl();
         });
-
-        return issuesDialogControl;
-    }
-
-    private void OnRefreshSongIssuesButtonClicked()
-    {
-        songMetaManager.ReloadSongMetas();
-        songIssueManager.ReloadSongIssues();
     }
 
     private Button CreateQuickFixAllButton(string title, List<QuickFixAction> quickFixActions)
@@ -655,7 +688,11 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .Distinct()
             .ToList();
 
-        songMetaManager.ReloadSongMetas();
+        if (settingsAtStart != JsonConverter.ToJson(settings))
+        {
+            Debug.Log("Reloading songs because settings changed");
+            songMetaManager.ReloadSongMetas();
+        }
     }
 
     private class QuickFixAction

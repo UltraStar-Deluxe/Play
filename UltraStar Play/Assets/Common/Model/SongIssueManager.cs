@@ -25,14 +25,19 @@ public class SongIssueManager : AbstractSingletonBehaviour
     private static readonly string unitySupportedVideoFileExtensionsAsCsv = ApplicationUtils.unitySupportedVideoFiles.ToCsv(",", "", "");
     private static readonly string unitySupportedAudioFileExtensionsAsCsv = ApplicationUtils.unitySupportedAudioFiles.ToCsv(",", "", "");
 
+    private static IDisposable songIssueScanDisposable;
+    public static bool IsSongIssueScanStarted => songIssueScanDisposable != null;
+    public static bool IsSongIssueScanFinished { get; private set; }
+
+    private readonly Subject<SongIssueScanFinishedEvent> songIssueScanFinishedEventStream = new();
+    public IObservable<SongIssueScanFinishedEvent> SongIssueScanFinishedEventStream => songIssueScanFinishedEventStream
+        .ObserveOnMainThread();
+
     [InjectedInAwake]
     private Settings settings;
 
     [InjectedInAwake]
     private SongMetaManager songMetaManager;
-
-    private readonly Subject<SongIssueScanFinishedEvent> songIssueScanFinishedEventStream = new();
-    public IObservable<SongIssueScanFinishedEvent> SongIssueScanFinishedEventStream => songIssueScanFinishedEventStream;
 
     private static CancellationTokenSource songIssueScanCancellationTokenSource;
 
@@ -45,44 +50,51 @@ public class SongIssueManager : AbstractSingletonBehaviour
     {
         settings = SettingsManager.Instance.Settings;
         songMetaManager = SongMetaManager.Instance;
+
+        CommonEventStream.Subscribe<FoundSongIssuesEvent>(
+            evt => evt.SongIssues
+                    .ForEach(songIssue =>
+                    {
+                        if (songIssue == null)
+                        {
+                            return;
+                        }
+                        allSongIssues.Add(songIssue);
+                    }))
+            .AddTo(gameObject);
+
+        songIssueScanFinishedEventStream
+            .Subscribe(evt =>
+            {
+                IsSongIssueScanFinished = true;
+            })
+            .AddTo(gameObject);
     }
 
     private static void ResetSongIssues()
     {
+        // Stop old song scan
+        songIssueScanDisposable?.Dispose();
+        songIssueScanDisposable = null;
+        IsSongIssueScanFinished = false;
+
         allSongIssues = new ConcurrentBag<SongIssue>();
     }
 
     public void ReloadSongIssues()
     {
         ResetSongIssues();
+
+        songMetaManager.ScanFilesIfNotDoneYet();
         if (SongMetaManager.IsSongScanFinished)
         {
             ScanSongIssues();
         }
         else
         {
-            IDisposable songScanFinishedEventStreamDisposable = null;
-            songScanFinishedEventStreamDisposable = songMetaManager.SongScanFinishedEventStream
-                .Subscribe(evt =>
-                {
-                    ScanSongIssues();
-                    songScanFinishedEventStreamDisposable?.Dispose();
-                });
+            songMetaManager.SongScanFinishedEventStream
+                .SubscribeOneShot(evt => ScanSongIssues());
         }
-    }
-
-    public static void AddSongIssue(SongIssue songIssue)
-    {
-        if (songIssue == null)
-        {
-            return;
-        }
-        allSongIssues.Add(songIssue);
-    }
-
-    public static void AddSongIssues(IReadOnlyCollection<SongIssue> songIssues)
-    {
-        songIssues.ForEach(AddSongIssue);
     }
 
     public static IReadOnlyList<SongIssue> GetSongIssues()
@@ -106,6 +118,11 @@ public class SongIssueManager : AbstractSingletonBehaviour
 
     private void ScanSongIssues()
     {
+        if (IsSongIssueScanStarted)
+        {
+            throw new IllegalStateException("Already started song Issue scan");
+        }
+
         IReadOnlyCollection<SongMeta> songMetas = songMetaManager.GetSongMetas();
         CancellationDisposable cancellationDisposable = new();
 
@@ -113,9 +130,9 @@ public class SongIssueManager : AbstractSingletonBehaviour
         job.OnCancel = () => cancellationDisposable.Dispose();
         job.SetStatus(EJobStatus.Running);
 
-        ObservableUtils.RunOnNewTaskAsObservableElements(
-            async () => await ScanSongIssuesAsync(songMetas, job, cancellationDisposable.Token),
-            cancellationDisposable)
+        songIssueScanDisposable = ObservableUtils.RunOnNewTaskAsObservableElements(
+                async () => await ScanSongIssuesAsync(songMetas, job, cancellationDisposable.Token),
+                cancellationDisposable)
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
@@ -123,6 +140,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             })
             .DoOnCompleted(() =>
             {
+                songIssueScanFinishedEventStream.OnNext(new SongIssueScanFinishedEvent());
                 if (job.Status.Value is EJobStatus.Running)
                 {
                     job.SetResult(EJobResult.Ok);
@@ -130,7 +148,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             })
             .Subscribe(songIssue =>
             {
-                AddSongIssue(songIssue);
+                CommonEventStream.Publish(new FoundSongIssuesEvent(songIssue));
             });
     }
 
@@ -170,7 +188,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to search issues from file '{songMeta.FileInfo}' of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {ex.Message}");
+                Debug.LogError($"Failed to search issues in file '{songMeta.FileInfo}' of song '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {ex.Message}");
             }
 
             // Search issues in used audio, video, image files

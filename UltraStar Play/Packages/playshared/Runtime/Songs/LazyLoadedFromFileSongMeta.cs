@@ -25,6 +25,11 @@ public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta
             using IDisposable d = new DisposableStopwatch($"Loading '{fileInfo.Name}' took <ms> ms");
             UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding);
             CopyValues(loadedSongMeta);
+
+            if (!songIssues.IsNullOrEmpty())
+            {
+                CommonEventStream.Publish(new FoundSongIssuesEvent(songIssues));
+            }
         };
 
         OnLoadVoices = () =>
