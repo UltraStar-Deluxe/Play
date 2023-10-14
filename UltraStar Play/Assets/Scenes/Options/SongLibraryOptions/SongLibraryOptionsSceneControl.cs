@@ -70,6 +70,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     private SongMetaManager songMetaManager;
 
     [Inject]
+    private SongIssueManager songIssueManager;
+
+    [Inject]
     private OptionsOverviewSceneControl optionsOverviewSceneControl;
 
     private readonly List<SongFolderListEntryControl> songFolderListEntryControls = new();
@@ -200,11 +203,11 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         // Update icon style
         issuesIcon.RemoveFromClassList(R.UssClasses.warningFontColor);
         issuesIcon.RemoveFromClassList(R.UssClasses.errorFontColor);
-        if (songMetaManager.GetSongErrors().Count > 0)
+        if (SongIssueManager.GetSongErrors().Count > 0)
         {
             issuesIcon.AddToClassList(R.UssClasses.errorFontColor);
         }
-        else if (songMetaManager.GetSongWarnings().Count > 0)
+        else if (SongIssueManager.GetSongWarnings().Count > 0)
         {
             issuesIcon.AddToClassList(R.UssClasses.warningFontColor);
         }
@@ -268,17 +271,17 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
         accordionGroup.Add(errorsAccordionItem);
-        FillWithSongIssues(errorsAccordionItem, songMetaManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
+        FillWithSongIssues(errorsAccordionItem, SongIssueManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
 
         AccordionItem warningsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings));
         accordionGroup.Add(warningsAccordionItem);
-        FillWithSongIssues(warningsAccordionItem, songMetaManager.GetSongWarnings(), out List<QuickFixAction> warningQuickFixActions);
+        FillWithSongIssues(warningsAccordionItem, SongIssueManager.GetSongWarnings(), out List<QuickFixAction> warningQuickFixActions);
 
-        if (!songMetaManager.GetSongErrors().IsNullOrEmpty())
+        if (!SongIssueManager.GetSongErrors().IsNullOrEmpty())
         {
             errorsAccordionItem.ShowAccordionContent();
         }
-        else if (!songMetaManager.GetSongWarnings().IsNullOrEmpty())
+        else if (!SongIssueManager.GetSongWarnings().IsNullOrEmpty())
         {
             warningsAccordionItem.ShowAccordionContent();
         }
@@ -300,11 +303,17 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         // Refresh button
         issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), _ =>
         {
-            songMetaManager.ReloadSongMetas();
+            OnRefreshSongIssuesButtonClicked();
             issuesDialogControl.CloseDialog();
         });
 
         return issuesDialogControl;
+    }
+
+    private void OnRefreshSongIssuesButtonClicked()
+    {
+        songMetaManager.ReloadSongMetas();
+        songIssueManager.ReloadSongIssues();
     }
 
     private Button CreateQuickFixAllButton(string title, List<QuickFixAction> quickFixActions)
