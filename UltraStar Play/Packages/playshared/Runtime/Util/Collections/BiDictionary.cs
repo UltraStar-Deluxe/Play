@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class BiDictionary<TFirst, TSecond>
 {
@@ -32,11 +31,6 @@ public class BiDictionary<TFirst, TSecond>
 
     public void Set(TFirst first, TSecond second)
     {
-        if (firstToSecond.ContainsKey(first)
-            || secondToFirst.ContainsKey(second))
-        {
-            throw new ArgumentException($"Duplicate first or second (first: {first}, second: {second})");
-        }
         firstToSecond[first] = second;
         secondToFirst[second] = first;
     }
