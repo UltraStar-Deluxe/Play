@@ -977,9 +977,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         // Check that there is associated sing-along data. If not, ask to open song editor.
-        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
-        if (SongMetaUtils.HasNoSingAlongData(songMeta, generatedSongFolderAbsolutePath)
-            && SongMetaUtils.GetAllNotes(songMeta).IsNullOrEmpty())
+        if (!SongMetaUtils.HasSingAlongData(songMeta))
         {
             noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
             noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
@@ -995,7 +993,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 noSingAlongDataDialogControl.CloseDialog();
                 StartSongEditorScene(songMeta);
             });
-            // noSingAlongDataDialogControl.AddButton("Start song", _ => StartSingScene(songMeta));
+            // noSingAlongDataDialogControl.AddButton("Start anyway", _ => StartSingScene(songMeta));
             noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
             defaultButton.Focus();
             return;
