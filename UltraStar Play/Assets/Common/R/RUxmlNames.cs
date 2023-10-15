@@ -36,6 +36,7 @@ public static partial class R
         public const string artistTextField = "artistTextField";
         public const string assignToPlayerDropdownField = "assignToPlayerDropdownField";
         public const string assignToPlayerToggle = "assignToPlayerToggle";
+        public const string audioFileTextField = "audioFileTextField";
         public const string audioSeparationButton = "audioSeparationButton";
         public const string audioSeparationCommandTextField = "audioSeparationCommandTextField";
         public const string audioWaveForm = "audioWaveForm";
@@ -662,6 +663,8 @@ public static partial class R
         public const string secondTeamUi = "secondTeamUi";
         public const string selectAllNotesIcon = "selectAllNotesIcon";
         public const string selectAllNotesOfLayerButton = "selectAllNotesOfLayerButton";
+        public const string selectAudioFileButton = "selectAudioFileButton";
+        public const string selectAudioFileIcon = "selectAudioFileIcon";
         public const string selectedRecordingDeviceOptionsContainer = "selectedRecordingDeviceOptionsContainer";
         public const string selectedSongArtist = "selectedSongArtist";
         public const string selectedSongDetails = "selectedSongDetails";
