@@ -98,7 +98,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         settings = SettingsManager.Instance.Settings;
     }
 
-    public static void AddSongMeta(SongMeta songMeta)
+    public void AddSongMeta(SongMeta songMeta)
     {
         if (songMeta == null)
         {
