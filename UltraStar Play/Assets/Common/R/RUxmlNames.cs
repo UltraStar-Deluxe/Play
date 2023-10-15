@@ -639,7 +639,6 @@ public static partial class R
         public const string scoreValue = "scoreValue";
         public const string scrollView = "scrollView";
         public const string ScrollView = "ScrollView";
-        public const string searchAudioFilesWithoutSongMetaToggle = "searchAudioFilesWithoutSongMetaToggle";
         public const string searchBarContainer = "searchBarContainer";
         public const string searchContainer = "searchContainer";
         public const string searchErrorIcon = "searchErrorIcon";
@@ -710,7 +709,6 @@ public static partial class R
         public const string showLogButton = "showLogButton";
         public const string showNotePitchLabelToggle = "showNotePitchLabelToggle";
         public const string showOnlyDuetsToggle = "showOnlyDuetsToggle";
-        public const string showOnlyFilesWithoutSingAlongDataToggle = "showOnlyFilesWithoutSingAlongDataToggle";
         public const string showRightSideBarToggle = "showRightSideBarToggle";
         public const string showScrollBarInSongSelectToggle = "showScrollBarInSongSelectToggle";
         public const string showSearchExpressionInfoButton = "showSearchExpressionInfoButton";

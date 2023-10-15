@@ -57,9 +57,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject(UxmlName = R.UxmlNames.issuesIcon)]
     private VisualElement issuesIcon;
 
-    [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaToggle)]
-    private Toggle searchAudioFilesWithoutSongMetaToggle;
-
     [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
     private Toggle searchMidiFilesWithLyricsToggle;
 
@@ -102,10 +99,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
         addSongFolderButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
         downloadSongArchiveButton.RegisterCallbackButtonTriggered(_ => CreateDownloadSongArchiveUiControl());
-
-        FieldBindingUtils.Bind(searchAudioFilesWithoutSongMetaToggle,
-            () => settings.SearchAudioFilesWithoutSongMeta,
-            newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
 
         FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
             () => settings.SearchMidiFilesWithLyrics,
@@ -240,8 +233,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
-            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songsWithoutSingAlongDataInfo_title),
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songsWithoutSingAlongDataInfo) },
         };
         if (PlatformUtils.IsAndroid)
         {

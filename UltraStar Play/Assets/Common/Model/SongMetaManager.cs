@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Serilog.Events;
 using UniRx;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -214,21 +213,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
                     }
                 }
 
-                if (settings.SearchAudioFilesWithoutSongMeta)
-                {
-                    List<string> audioFiles = FileScannerUtils.ScanForFiles(EnabledSongFolders, GetNonMidiAudioFileExtensionPatterns());
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        // Generate song meta for audio files that do not have a corresponding SongMeta.
-                        GenerateSongMetasForAudioFiles(generatedSongFolderAbsolutePath, audioFiles, allSongMetas.ToList());
-                    }
-                }
-
                 isSongScanFinished = true;
             }
 
@@ -361,14 +345,6 @@ public class SongMetaManager : AbstractSingletonBehaviour
     public static string GetAbsoluteGeneratedSongMetaFilePathForAudioFile(string generatedSongFolderAbsolutePath, string audioFile)
     {
         return ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, audioFile) + "/song-info.txt";
-    }
-
-    private List<string> GetNonMidiAudioFileExtensionPatterns()
-    {
-        return ApplicationUtils.supportedAudioFiles
-            .Except(ApplicationUtils.supportedMidiFiles)
-            .Select(fileExtension => $"*.{fileExtension}")
-            .ToList();
     }
 
     private List<string> GetMidiFileExtensionPatterns()
