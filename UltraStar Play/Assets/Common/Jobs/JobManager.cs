@@ -22,8 +22,13 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
 
     public static JobManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<JobManager>();
 
-    public bool AllJobsFinished => jobToJobControl.Keys
+    public bool AllJobsFinished => AllJobs
         .AllMatch(job => job.Status.Value is EJobStatus.Finished);
+
+    private List<Job> AllJobs => jobsWithoutParent
+        .Union(jobToJobControl.Keys)
+        .Distinct()
+        .ToList();
 
     [InjectedInInspector]
     public VisualTreeAsset jobListUi;
@@ -47,6 +52,8 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
     private readonly HashSet<Job> fadingJobs = new();
 
     private bool isJobListMinimized;
+
+    private bool jobsUiNeedsRefresh;
 
     protected override object GetInstance()
     {
@@ -80,6 +87,11 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         });
 
         UpdateJobListPosition();
+
+        if (jobsUiNeedsRefresh)
+        {
+            UpdateJobsUi();
+        }
     }
 
     public static Job CreateAndAddJob(string title, Job parentJob = null)
@@ -102,7 +114,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
             jobsWithoutParent.Add(job);
         }
 
-        ThreadUtils.RunOnMainThread(() => UpdateJobsUi());
+        jobsUiNeedsRefresh = true;
     }
 
     private void FadeOutThenRemoveJob(Job job)

@@ -179,26 +179,6 @@ public static class SongMetaUtils
         return songMeta?.FileInfo?.Directory?.FullName ?? "";
     }
 
-    public static bool IsGeneratedAndNotYetSaved(SongMeta songMeta, string generatedSongFolderAbsolutePath)
-    {
-        if (songMeta == null
-            || !songMeta.RemoteSource.IsNullOrEmpty())
-        {
-            return false;
-        }
-
-        DirectoryInfo directoryInfo = GetDirectoryInfo(songMeta);
-        if (directoryInfo == null
-            || !directoryInfo.Exists)
-        {
-            return true;
-        }
-
-        string songMetaAbsolutePath = directoryInfo.FullName;
-        return songMetaAbsolutePath.Contains(generatedSongFolderAbsolutePath)
-               && !File.Exists(GetAbsoluteSongMetaFilePath(songMeta));
-    }
-
     public static void CreateDirectory(SongMeta songMeta)
     {
         DirectoryInfo directoryInfo = GetDirectoryInfo(songMeta);
@@ -871,22 +851,9 @@ public static class SongMetaUtils
         return songHash;
     }
 
-    public static bool HasNoSingAlongData(SongMeta songMeta, string generatedSongFolderAbsolutePath)
+    public static bool HasSingAlongData(SongMeta songMeta)
     {
-        if (!IsGeneratedAndNotYetSaved(songMeta, generatedSongFolderAbsolutePath))
-        {
-            // Song has saved UltraStar txt file.
-            return false;
-        }
-
-        if (ApplicationUtils.IsSupportedMidiFormat(Path.GetExtension(songMeta.Audio))
-            && GetAllNotes(songMeta).Count > 0)
-        {
-            // Song has sing along data in the MIDI file.
-            return false;
-        }
-
-        return true;
+        return !GetAllNotes(songMeta).IsNullOrEmpty();
     }
 
     public static bool TryGetDistanceInMillis(SongMeta songMeta, Note a, Note b, out double distanceInMillis)

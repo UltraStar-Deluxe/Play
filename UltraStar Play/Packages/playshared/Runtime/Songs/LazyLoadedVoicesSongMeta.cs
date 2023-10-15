@@ -16,15 +16,13 @@ public class LazyLoadedVoicesSongMeta : SongMeta
     public virtual Action OnLoadVoices { get; set; }
 
     public bool HasFailedToLoadVoices => loadVoicesPhase is ELoadVoicesPhase.Failed;
-    private bool ShouldLoadVoices => loadVoicesPhase is ELoadVoicesPhase.Pending;
     private ELoadVoicesPhase loadVoicesPhase;
 
     public override string GetVoiceDisplayName(EVoiceId voiceId)
     {
-        if (voiceIdToDisplayName.IsNullOrEmpty()
-            && ShouldLoadVoices)
+        if (voiceIdToDisplayName.IsNullOrEmpty())
         {
-            LoadVoices();
+            LoadVoicesIfNotDoneYet();
         }
         return base.GetVoiceDisplayName(voiceId);
     }
@@ -33,10 +31,7 @@ public class LazyLoadedVoicesSongMeta : SongMeta
     {
         get
         {
-            if (ShouldLoadVoices)
-            {
-                LoadVoices();
-            }
+            LoadVoicesIfNotDoneYet();
 
             return base.Voices;
         }
@@ -44,10 +39,7 @@ public class LazyLoadedVoicesSongMeta : SongMeta
 
     public override bool TryGetVoice(EVoiceId voiceId, out Voice voice)
     {
-        if (ShouldLoadVoices)
-        {
-            LoadVoices();
-        }
+        LoadVoicesIfNotDoneYet();
 
         return base.TryGetVoice(voiceId, out voice);
     }
@@ -63,7 +55,7 @@ public class LazyLoadedVoicesSongMeta : SongMeta
         }
     }
 
-    protected virtual void LoadVoices()
+    public virtual void LoadVoicesIfNotDoneYet()
     {
         if (loadVoicesPhase is not ELoadVoicesPhase.Pending)
         {
@@ -81,12 +73,14 @@ public class LazyLoadedVoicesSongMeta : SongMeta
             {
                 OnLoadVoices();
             }
+
+            CommonEventStream.Publish(new SongMetaLoadedVoicesEvent(this));
         }
         catch (Exception ex)
         {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to lazy load voices of '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             loadVoicesPhase = ELoadVoicesPhase.Failed;
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to load voices of '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             return;
         }
 

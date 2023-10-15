@@ -11,7 +11,6 @@ public class NonPersistentSettings
     public ReactiveProperty<bool> MicTestActive { get; private set; } = new();
     public Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveSearchPropertyFilters { get; private set; } = new();
     public ReactiveProperty<bool> IsShowOnlyDuetsFilterActive { get; private set; } = new();
-    public ReactiveProperty<bool> IsShowOnlyFilesWithoutSingAlongDataFilterActive { get; private set; } = new();
     public Dictionary<string, MicProfileReference> PlayerProfileNameToLastUsedMicProfile { get; private set; } = new();
     public DirectoryInfo SongSelectDirectoryInfo { get; set; }
 

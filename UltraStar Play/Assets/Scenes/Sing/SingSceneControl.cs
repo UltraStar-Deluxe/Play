@@ -1251,9 +1251,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         Voice voice = GetVoiceByExtendedVoiceId(voiceId);
         if (voice == null)
         {
+            Voice fallbackVoice = SongMeta.Voices.FirstOrDefault();
             string voiceIdCsv = SongMeta.Voices.Select(it => it.Id).ToCsv();
             Debug.LogError($"The song data does not contain a voice with id {voiceId}."
-                           + $" Available voice ids: {voiceIdCsv}");
+                           + $" Available voice ids: {voiceIdCsv}. Using voice {fallbackVoice?.Id} instead.");
+            return fallbackVoice;
         }
         return voice;
     }

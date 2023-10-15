@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using UniInject;
+using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -35,7 +36,7 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
                     {
                         Artist = songMeta.Artist,
                         Title = songMeta.Title,
-                        Hash = SongMetaManager.GetAndCacheUniqueHash(songMeta),
+                        Hash = SongIdManager.GetAndCacheLocallyUniqueId(songMeta),
                     })
                     .ToList();
                 requestData.Context.Response.WriteJson(songListDto);
@@ -47,7 +48,12 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
             .SetCallbackAndAdd(requestData =>
             {
                 string songId = requestData.PathParameters["songId"];
-                SongMeta songMeta = songMetaManager.GetSongMetaById(songId);
+                SongMeta songMeta = songMetaManager.GetSongMetaByLocallyUniqueId(songId);
+                if (songMeta == null)
+                {
+                    Debug.Log($"Cannot add song to favorites. No song found with locally unique id {songId}.");
+                    requestData.Context.Response.WriteJson(new ErrorMessageDto("Song not found"));
+                }
                 playlistManager.AddSongToPlaylist(playlistManager.FavoritesPlaylist, songMeta);
             });
 
@@ -57,7 +63,12 @@ public class PlaylistRestControl : AbstractRestControl, INeedInjection
             .SetCallbackAndAdd(requestData =>
             {
                 string songId = requestData.PathParameters["songId"];
-                SongMeta songMeta = songMetaManager.GetSongMetaById(songId);
+                SongMeta songMeta = songMetaManager.GetSongMetaByLocallyUniqueId(songId);
+                if (songMeta == null)
+                {
+                    Debug.Log($"Cannot remove song from favorites. No song found with locally unique id {songId}.");
+                    requestData.Context.Response.WriteJson(new ErrorMessageDto("Song not found"));
+                }
                 playlistManager.RemoveSongFromPlaylist(playlistManager.FavoritesPlaylist, songMeta);
             });
 	}

@@ -18,6 +18,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SceneRecipeManager.Instance);
         bb.BindExistingInstance(SettingsManager.Instance);
         bb.BindExistingInstance(SongMetaManager.Instance);
+        bb.BindExistingInstance(SongIssueManager.Instance);
         bb.BindExistingInstance(CursorManager.Instance);
         bb.BindExistingInstance(UiManager.Instance);
         bb.BindExistingInstance(MidiManager.Instance);

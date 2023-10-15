@@ -143,30 +143,6 @@ public class SongMeta
     public virtual double MedleyEndInMillis { get; set; }
 
     /**
-     * MusicBrainz identifier for the Recording.
-     * See https://musicbrainz.org/doc/MusicBrainz_Identifier
-     */
-    public virtual string MusicBrainzRecord { get; set; } = "";
-
-    /**
-     * MusicBrainz identifier for the Release.
-     * See https://musicbrainz.org/doc/MusicBrainz_Identifier
-     */
-    public virtual string MusicBrainzRelease { get; set; } = "";
-
-    /**
-     * MusicBrainz identifier for the Release Group.
-     * See https://musicbrainz.org/doc/MusicBrainz_Identifier
-     */
-    public virtual string MusicBrainzReleaseGroup { get; set; } = "";
-
-    /**
-     * MusicBrainz identifier for the artist.
-     * See https://musicbrainz.org/doc/MusicBrainz_Identifier
-     */
-    public virtual string MusicBrainzArtist { get; set; } = "";
-
-    /**
      * Mapping from voice IDs ("P1", "P2", "P3", ...)
      * to performer names ("Elvis Presley", "Shakira")
      */
@@ -195,7 +171,7 @@ public class SongMeta
      * this data structure can be stored in this map.
      */
     private readonly Dictionary<string, string> additionalHeaderEntries = new();
-    public IReadOnlyDictionary<string, string> AdditionalHeaderEntries
+    public virtual IReadOnlyDictionary<string, string> AdditionalHeaderEntries
     {
         get
         {
@@ -215,10 +191,15 @@ public class SongMeta
             : null;
     }
 
+    public virtual void SetFileInfo(FileInfo filePath, Encoding encoding = null)
+    {
+        FileInfo = filePath;
+        FileEncoding = encoding;
+    }
+
     public virtual void SetFileInfo(string filePath, Encoding encoding = null)
     {
-        FileInfo = new FileInfo(filePath);
-        FileEncoding = encoding;
+        SetFileInfo(new FileInfo(filePath), encoding);
     }
 
     public virtual string GetVoiceDisplayName(EVoiceId voiceId)

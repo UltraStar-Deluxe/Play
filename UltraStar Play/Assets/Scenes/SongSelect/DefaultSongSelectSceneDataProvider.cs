@@ -15,7 +15,6 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
 
     public SceneData GetDefaultSceneData()
     {
-        SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         SongMetaManager.Instance.WaitUntilSongScanFinished();
 
         SongSelectSceneData songSelectSceneData = new();

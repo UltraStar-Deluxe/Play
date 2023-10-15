@@ -9,14 +9,14 @@ public static class DtoConverter
         {
             Artist = songMeta.Artist,
             Title = songMeta.Title,
-            Hash = SongMetaManager.GetAndCacheUniqueHash(songMeta),
+            Hash = SongIdManager.GetAndCacheLocallyUniqueId(songMeta),
         };
         return dto;
     }
 
     public static SongMeta FromDto(SongDto dto, SongMetaManager songMetaManager)
     {
-        return songMetaManager.GetSongMetaById(dto.Hash);
+        return songMetaManager.GetSongMetaByLocallyUniqueId(dto.Hash);
     }
 
     public static MicProfileDto ToDto(MicProfile micProfile)

@@ -83,7 +83,7 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
         RemoveSongQueueEntries(nextEntries);
 
         List<SongMeta> songMetas = nextEntries
-            .Select(entry => songMetaManager.GetSongMetaById(entry.SongDto.Hash))
+            .Select(entry => songMetaManager.GetSongMetaByLocallyUniqueId(entry.SongDto.Hash))
             .ToList();
 
         SongQueueEntryDto firstEntry = nextEntries.FirstOrDefault();

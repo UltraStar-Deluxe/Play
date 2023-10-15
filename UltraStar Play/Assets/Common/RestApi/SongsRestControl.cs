@@ -40,10 +40,10 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
             {
                 string songId = requestData.PathParameters["songId"];
 
-                SongMeta songMeta = songMetaManager.GetSongMetaById(songId);
+                SongMeta songMeta = songMetaManager.GetSongMetaByLocallyUniqueId(songId);
                 if (songMeta == null)
                 {
-                    Debug.Log($"Cannot return song details. No song found with id {songId}.");
+                    Debug.Log($"Cannot return song details. No song found with locally unique id {songId}.");
                     requestData.Context.Response.WriteJson(new ErrorMessageDto("Song not found"));
                 }
 
@@ -68,10 +68,10 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
             {
                 string songId = requestData.PathParameters["songId"];
 
-                SongMeta songMeta = songMetaManager.GetSongMetaById(songId);
+                SongMeta songMeta = songMetaManager.GetSongMetaByLocallyUniqueId(songId);
                 if (songMeta == null)
                 {
-                    Debug.Log($"Cannot return song image. No song found with id {songId}.");
+                    Debug.Log($"Cannot return song image. No song found with locally unique id {songId}.");
                     requestData.Context.Response.WriteJson(new ErrorMessageDto("Song not found"));
                 }
 
@@ -157,7 +157,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 {
                     Artist = songMeta.Artist,
                     Title = songMeta.Title,
-                    Hash = SongMetaManager.GetAndCacheUniqueHash(songMeta),
+                    Hash = SongIdManager.GetAndCacheLocallyUniqueId(songMeta),
                 })
                 .ToList()
         }.ToJson());

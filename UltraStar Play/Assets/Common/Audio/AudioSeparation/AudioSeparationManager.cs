@@ -37,8 +37,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaManager songMetaManager;
 
-    private readonly List<Job> audioSeparationJobs = new();
-
     private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
     public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
 
@@ -82,7 +80,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
 
         CancellationTokenSource cancellationTokenSource = new();
         audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
-        audioSeparationJobs.Add(audioSeparationJob);
 
         // Set path to spleeter executable if needed
         string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
@@ -298,10 +295,5 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             .SetSpleeterCommand(audioSeparationCommand)
             .SetIsWindows(PlatformUtils.IsWindows)
             .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
-    }
-
-    private void OnApplicationQuit()
-    {
-        audioSeparationJobs.ForEach(job => job.Cancel());
     }
 }

@@ -26,9 +26,6 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     [Inject(UxmlName = R.UxmlNames.showOnlyDuetsToggle)]
     private Toggle showOnlyDuetsToggle;
 
-    [Inject(UxmlName = R.UxmlNames.showOnlyFilesWithoutSingAlongDataToggle)]
-    private Toggle showOnlyFilesWithoutSingAlongDataToggle;
-
     [Inject(UxmlName = R.UxmlNames.filtersAccordionItem)]
     private AccordionItem filtersAccordionItem;
 
@@ -36,8 +33,7 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
     private Dictionary<ESearchProperty, HashSet<SearchPropertyFilter>> ActiveFilters => nonPersistentSettings.ActiveSearchPropertyFilters;
     public bool IsAnyFilterActive => !nonPersistentSettings.ActiveSearchPropertyFilters.IsNullOrEmpty()
-        || nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value
-        || nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value;
+        || nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value;
 
     private readonly Subject<bool> filtersChangedEventStream = new();
     public IObservable<bool> FiltersChangedEventStream => filtersChangedEventStream;
@@ -46,24 +42,6 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
     public void OnInjectionFinished()
     {
-        if (settings.SearchAudioFilesWithoutSongMeta)
-        {
-            showOnlyFilesWithoutSingAlongDataToggle.ShowByDisplay();
-        }
-        else
-        {
-            showOnlyFilesWithoutSingAlongDataToggle.HideByDisplay();
-            nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value = false;
-        }
-
-        FieldBindingUtils.Bind(gameObject, showOnlyFilesWithoutSingAlongDataToggle,
-            () => nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value,
-            newValue =>
-            {
-                nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value = newValue;
-                filtersChangedEventStream.OnNext(true);
-            });
-
         FieldBindingUtils.Bind(gameObject, showOnlyDuetsToggle,
             () => nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value,
             newValue =>
@@ -132,13 +110,6 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
 
         if (nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value
             && songMeta.VoiceCount < 2)
-        {
-            return false;
-        }
-
-        string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
-        if (nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value
-            && !SongMetaUtils.HasNoSingAlongData(songMeta, generatedSongFolderAbsolutePath))
         {
             return false;
         }
@@ -309,7 +280,6 @@ public class SongSelectFilterControl : INeedInjection, IInjectionFinishedListene
     public void Reset()
     {
         nonPersistentSettings.IsShowOnlyDuetsFilterActive.Value = false;
-        nonPersistentSettings.IsShowOnlyFilesWithoutSingAlongDataFilterActive.Value = false;
         ActiveFilters.ToList()
             .SelectMany(entry => entry.Value.ToList())
             .ForEach(activeFilter => DisableFilter(activeFilter));

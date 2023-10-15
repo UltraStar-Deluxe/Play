@@ -104,9 +104,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private ModManager modManager;
 
     [Inject]
-    private SongMetaManager songMetaManager;
-
-    [Inject]
     private Injector injector;
 
     [Inject]
@@ -254,7 +251,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     {
         SettingsProblemHintControl songSettingsProblemHintControl = new(
             songSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager));
+            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings));
 
         SettingsProblemHintControl recordingSettingsProblemHintControl = new(
             recordingSettingsProblemHintIcon,
@@ -270,7 +267,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
         {
-            songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager));
+            songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings));
             recordingSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
             playerProfileSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
             modSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetModSettingsProblems(modManager));

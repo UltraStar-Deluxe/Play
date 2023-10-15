@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -74,6 +75,25 @@ public class UseYouTubeVideoIdTxtFilesControl : MonoBehaviour
 
     private void UpdateSongWithYouTubeVideoIdFromTxtFiles(SongMeta songMeta)
     {
+        if (songMeta is LazyLoadedSongMeta lazyLoadedSongMeta)
+        {
+            // Search for the YouTube video id when the song is loaded
+            Action oldOnLoadSong = lazyLoadedSongMeta.OnLoadSong;
+            lazyLoadedSongMeta.OnLoadSong = () => 
+            {
+                oldOnLoadSong?.Invoke();
+                DoUpdateSongWithYouTubeVideoIdFromTxtFiles(songMeta);
+            };
+        }
+        else
+        {
+            // Search for the YouTube video id now
+            DoUpdateSongWithYouTubeVideoIdFromTxtFiles(songMeta);
+        }
+    }
+
+    private void DoUpdateSongWithYouTubeVideoIdFromTxtFiles(SongMeta songMeta)
+    {
         if (songMeta == null
             || !songMeta.Website.IsNullOrEmpty()
             || songMeta.FileInfo == null
@@ -84,11 +104,12 @@ public class UseYouTubeVideoIdTxtFilesControl : MonoBehaviour
 
         string txtContent = FileUtils.ReadAllText(songMeta.FileInfo.FullName);
         Match match = youTubeVideoIdRegex.Match(txtContent);
+        Debug.Log($"Searching for YouTube video id for '{SongMetaUtils.GetArtistDashTitle(songMeta)}' in file '{songMeta.FileInfo}'");
         if (match.Success)
         {
             string videoId = match.Groups[2].Value;
             songMeta.Website = $"https://youtube.com/watch?v={videoId}";
-            Debug.Log($"Found YouTube video id for '{SongMetaUtils.GetArtistDashTitle(songMeta)}' in file '{songMeta.FileInfo}'");
+            Debug.Log($"Found YouTube video id for '{SongMetaUtils.GetArtistDashTitle(songMeta)}' in file '{songMeta.FileInfo}': {videoId}");
         }
     }
 }

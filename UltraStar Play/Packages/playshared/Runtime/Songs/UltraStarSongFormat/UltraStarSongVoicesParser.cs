@@ -21,7 +21,6 @@ public class UltraStarSongVoicesParser
 
     public static List<Voice> ParseFile(string filePath, Encoding fileEncoding, bool isRelativeSongFormat, bool useUniversalCharsetDetector)
     {
-        using IDisposable d = new DisposableStopwatch($"Parsing voices of '{filePath}' took <millis> ms");
         StreamReader reader = PlainTextReader.GetFileStreamReader(filePath, fileEncoding, useUniversalCharsetDetector);
         UltraStarSongVoicesParser parser = new(reader, isRelativeSongFormat, filePath);
         IReadOnlyList<Voice> voices = parser.Parse();
