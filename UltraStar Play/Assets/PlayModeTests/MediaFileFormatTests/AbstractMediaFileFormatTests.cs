@@ -12,13 +12,19 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
 {
     protected static readonly string audioFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/AudioFileFormatTests";
     protected static readonly string videoFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/VideoFileFormatTests";
-    protected static readonly double targetDurationInMillis = 4000;
-    protected static readonly double maxDistanteToTargetDurationInMillis = 500;
+    protected static readonly string webViewFileFormatTestFolderPath = Application.dataPath + "/PlayModeTests/MediaFileFormatTests/WebViewTests";
+
+    protected static readonly double localFileTargetDurationInMillis = 4000;
+    protected static readonly double webViewTargetDurationInMillis = 242561;
+    private static readonly double maxDistanteToTargetDurationInMillis = 500;
+
+    protected static readonly long localFileMaxWaitTimeInMillis = 5000;
+    protected static readonly long webViewMaxWaitTimeInMillis = 30000;
 
     protected override string TestSceneName => "MediaFileFormatTestScene";
 
     private SongAudioPlayer songAudioPlayer;
-    private SongAudioPlayer SongAudioPlayer
+    protected SongAudioPlayer SongAudioPlayer
     {
         get
         {
@@ -37,52 +43,71 @@ public abstract class AbstractMediaFileFormatTests : AbstractPlayModeTest
 
     protected IEnumerator AudioFileTest(string filePrefix)
     {
-        return FileTest(filePrefix, audioFileFormatTestFolderPath);
+        yield return FileTest(filePrefix, audioFileFormatTestFolderPath, localFileTargetDurationInMillis, localFileMaxWaitTimeInMillis);
     }
 
     protected IEnumerator VideoFileTest(string filePrefix)
     {
-        return FileTest(filePrefix, videoFileFormatTestFolderPath);
+        yield return FileTest(filePrefix, videoFileFormatTestFolderPath, localFileTargetDurationInMillis, localFileMaxWaitTimeInMillis);
     }
 
-    private IEnumerator FileTest(string filePrefix, string folderPath)
+    protected IEnumerator WebViewFileTest(string filePrefix, double targetDurationInMillis)
+    {
+        yield return FileTest(filePrefix, webViewFileFormatTestFolderPath, targetDurationInMillis, webViewMaxWaitTimeInMillis);
+    }
+
+    private IEnumerator FileTest(string filePrefix, string folderPath, double targetDurationInMillis, long maxWaitTimeInMillis)
     {
         LogAssert.ignoreFailingMessages = true;
 
-        long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-
         string songFilePath = GetSongMetaFilePath(filePrefix, folderPath);
-        SongAudioPlayerCanLoadFileTest(songFilePath);
-
-        yield return new WaitUntil(() => SongAudioPlayer.DurationOfSongInMillis > 0
-                                         || TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, 1000));
+        yield return SongAudioPlayerCanLoadFileTest(songFilePath, targetDurationInMillis, maxWaitTimeInMillis);
     }
 
-    private void SongAudioPlayerCanLoadFileTest(string songFilePath)
+    private IEnumerator SongAudioPlayerCanLoadFileTest(string songFilePath, double targetDurationInMillis, long maxWaitTimeInMillis)
     {
         long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        bool hasFailed = false;
+
         SongMeta songMeta = LoadSongMeta(songFilePath);
         SongAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+            .Select(evt =>
+            {
+                double durationOfSongInMillis = SongAudioPlayer.DurationOfSongInMillis;
+                if (durationOfSongInMillis <= 0)
+                {
+                    Assert.Fail("SongAudioPlayer failed to load song (duration is 0).");
+                }
+
+                if (Math.Abs(durationOfSongInMillis - targetDurationInMillis) > maxDistanteToTargetDurationInMillis)
+                {
+                    Assert.Fail($"SongAudioPlayer loaded song with wrong duration {durationOfSongInMillis} ms (should be near {targetDurationInMillis} ms).");
+                }
+
+                return evt;
+            })
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                Assert.Fail($"SongAudioPlayer failed to load song {songFilePath}: {ex.Message}");
+                hasFailed = true;
             })
             .Subscribe(evt =>
-                {
-                    double durationOfSongInMillis = SongAudioPlayer.DurationOfSongInMillis;
-                    if (durationOfSongInMillis <= 0)
-                    {
-                        Assert.Fail("SongAudioPlayer failed to load song (duration is 0).");
-                    }
+            {
+                Debug.Log($"Successfully loaded song media (audio: '{songMeta.Audio}', website: '{songMeta.Website}') after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
+            });
 
-                    if (Math.Abs(durationOfSongInMillis - targetDurationInMillis) > maxDistanteToTargetDurationInMillis)
-                    {
-                        Assert.Fail($"SongAudioPlayer loaded song with wrong duration {durationOfSongInMillis} ms (should be near {targetDurationInMillis} ms).");
-                    }
+        yield return new WaitUntil(() => SongAudioPlayer.DurationOfSongInMillis > 0
+                                         || hasFailed
+                                         || TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis));
 
-                    Debug.Log($"Successfully loaded song media {songMeta.Audio} after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms. Song duration: {songAudioPlayer.DurationOfSongInMillis} ms");
-                });
+        if (hasFailed)
+        {
+            Assert.Fail("Test failed. Check log for details.");
+        }
+        else if (TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis))
+        {
+            Assert.Fail($"Failed to load song media (audio: '{songMeta.Audio}', website: '{songMeta.Website}') after {TimeUtils.GetUnixTimeMilliseconds() - startTimeInMillis} ms.");
+        }
     }
 
     protected string GetSongMetaFilePath(string filePrefix, string folderPath)
