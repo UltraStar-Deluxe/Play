@@ -886,7 +886,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         // The WebView is loaded asynchronously. When the duration is available then the audio is loaded.
         long startTime = TimeUtils.GetUnixTimeMilliseconds();
-        long timeoutInMillis = 5000;
+        long timeoutInMillis = 10000;
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
