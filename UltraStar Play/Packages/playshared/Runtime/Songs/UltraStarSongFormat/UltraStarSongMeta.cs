@@ -134,10 +134,10 @@ public class UltraStarSongMeta : LazyLoadedVoicesSongMeta
         string audioFile,
         Dictionary<EVoiceId, string> voiceIdToDisplayName)
     {
-        Artist = artist ?? throw new ArgumentNullException(nameof(artist));
+        Artist = artist;
         TxtFileBpm = txtFileBpm;
-        Audio = audioFile ?? throw new ArgumentNullException(nameof(audioFile));
-        Title = title ?? throw new ArgumentNullException(nameof(title));
+        Audio = audioFile;
+        Title = title;
 
         if (voiceIdToDisplayName == null)
         {

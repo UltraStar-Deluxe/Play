@@ -75,14 +75,8 @@ public static class UltraStarSongParser
     {
         songIssues = new();
 
-        Dictionary<string, string> requiredFields = new()
-        {
-            { "bpm", null },
-            { "mp3", null },
-            { "title", null }
-        };
         Dictionary<EVoiceId, string> voiceIdToDisplayName = new();
-        Dictionary<string, string> otherFields = new();
+        Dictionary<string, string> headerFields = new();
 
         uint lineNumber = 0;
         while (!reader.EndOfStream)
@@ -155,24 +149,12 @@ public static class UltraStarSongParser
                     throw new ExplicitEncodingMismatchException(explicitlyDefinedEncoding, reader.CurrentEncoding);
                 }
             }
-            else if (requiredFields.ContainsKey(tagNameLowerCase))
-            {
-                requiredFields[tagNameLowerCase] = tagValue;
-            }
-            else if (tagNameLowerCase.Equals("previewstart"))
-            {
-                otherFields[tagNameLowerCase] = tagValue;
-            }
-            else if (tagNameLowerCase.StartsWith("previewend"))
-            {
-                otherFields[tagNameLowerCase] = tagValue;
-            }
             else if (tagNameLowerCase.StartsWith("p", StringComparison.Ordinal)
                      && tagNameLowerCase.Length == 2
                      && char.IsDigit(tagNameLowerCase, 1)
                      && Enum.TryParse(tagNameLowerCase.ToUpperInvariant(), out EVoiceId pTagVoiceId))
             {
-                otherFields.Add(tagNameLowerCase, tagValue);
+                headerFields.Add(tagNameLowerCase, tagValue);
                 if (!voiceIdToDisplayName.ContainsKey(pTagVoiceId))
                 {
                     voiceIdToDisplayName[pTagVoiceId] = tagValue;
@@ -188,7 +170,7 @@ public static class UltraStarSongParser
                     // Get P1 resp. P2 from DUETSINGERP1 resp. DUETSINGERP2
                      && Enum.TryParse(tagNameLowerCase.Substring(10).ToUpperInvariant(), out EVoiceId duetSingerPTagVoiceId))
             {
-                otherFields.Add(tagNameLowerCase, tagValue);
+                headerFields.Add(tagNameLowerCase, tagValue);
                 if (!voiceIdToDisplayName.ContainsKey(duetSingerPTagVoiceId))
                 {
                     voiceIdToDisplayName.Add(duetSingerPTagVoiceId, tagValue);
@@ -200,54 +182,71 @@ public static class UltraStarSongParser
             }
             else
             {
-                if (otherFields.ContainsKey(tagNameLowerCase))
+                if (headerFields.ContainsKey(tagNameLowerCase))
                 {
                     songIssues.Add(SongIssue.CreateWarning(null, $"Cannot set '{tagName}' multiple times"));
                 }
                 else
                 {
-                    otherFields[tagNameLowerCase] = tagValue;
+                    headerFields[tagNameLowerCase] = tagValue;
                 }
             }
         }
 
         // Check that required tags are set.
-        foreach (var requiredFieldName in requiredFields)
+        if (!headerFields.ContainsKey("mp3"))
         {
-            if (requiredFieldName.Value == null)
+            if (!headerFields.ContainsKey("website"))
             {
-                throw new UltraStarSongParserException("Required tag '" + requiredFieldName.Key + "' was not set");
+                songIssues.Add(SongIssue.CreateError(null, $"Missing required tag #MP3 or #WEBSITE"));
             }
+        }
+
+        if (!headerFields.ContainsKey("bpm"))
+        {
+            songIssues.Add(SongIssue.CreateError(null, $"Missing required tag #BPM"));
+        }
+
+        if (!headerFields.ContainsKey("title"))
+        {
+            songIssues.Add(SongIssue.CreateError(null, $"Missing required tag #TITLE"));
         }
 
         try
         {
-            otherFields.TryGetValue("artist", out string artist);
+            headerFields.TryGetValue("artist", out string artist);
             if (artist == null)
             {
                 artist = "";
             }
 
             float txtFileBpm;
-            try
+            if (headerFields.TryGetValue("bpm", out string txtFileBpmString))
             {
-                 txtFileBpm = ConvertToFloat(requiredFields["bpm"]);
+                try
+                {
+                    txtFileBpm = ConvertToFloat(txtFileBpmString);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    throw new UltraStarSongParserException($"Failed to parse BPM value {txtFileBpmString}");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Debug.LogException(ex);
-                throw new UltraStarSongParserException($"Failed to parse BPM value {requiredFields["bpm"]}");
+                txtFileBpm = 0;
             }
 
-            string audioFile = requiredFields["mp3"];
-            string title = requiredFields["title"];
+            headerFields.TryGetValue("mp3", out string audioFile);
+            headerFields.TryGetValue("title", out string title);
             UltraStarSongMeta songMeta = new(
                 artist,
                 title,
                 txtFileBpm,
                 audioFile,
                 voiceIdToDisplayName);
-            foreach (KeyValuePair<string, string> item in otherFields)
+            foreach (KeyValuePair<string, string> item in headerFields)
             {
                 try
                 {
