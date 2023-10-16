@@ -240,27 +240,37 @@ public class SongMeta
 
     public virtual void CopyValues(SongMeta other)
     {
-        FileEncoding = other.FileEncoding;
-
         Artist = other.Artist;
-        Title = other.Title;
-        BeatsPerMinute = other.BeatsPerMinute;
         Audio = other.Audio;
-        VocalsAudio = other.VocalsAudio;
-        InstrumentalAudio = other.InstrumentalAudio;
-
         Background = other.Background;
+        BeatsPerMinute = other.BeatsPerMinute;
         Cover = other.Cover;
         Edition = other.Edition;
         EndInMillis = other.EndInMillis;
+        FileEncoding = other.FileEncoding;
+        FileInfo = other.FileInfo;
         GapInMillis = other.GapInMillis;
         Genre = other.Genre;
+        InstrumentalAudio = other.InstrumentalAudio;
         Language = other.Language;
-        StartInMillis = other.StartInMillis;
-        PreviewStartInMillis = other.PreviewStartInMillis;
+        MedleyEndInMillis = other.MedleyEndInMillis;
+        MedleyStartInMillis = other.MedleyStartInMillis;
         PreviewEndInMillis = other.PreviewEndInMillis;
+        PreviewStartInMillis = other.PreviewStartInMillis;
+        StartInMillis = other.StartInMillis;
+        Title = other.Title;
         Video = other.Video;
         VideoGapInMillis = other.VideoGapInMillis;
+        VocalsAudio = other.VocalsAudio;
+        Website = other.Website;
         Year = other.Year;
+        if (VoiceCount > 0)
+        {
+            Voices.ForEach(voice =>
+            {
+                Voice voiceClone = voice.CloneDeep();
+                other.AddVoice(voiceClone);
+            });
+        }
     }
 }
