@@ -9,7 +9,8 @@
         "playshared",
         "playsharedui",
         "Common",
-        "Scenes"
+        "Scenes",
+        "SongEditorScene"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

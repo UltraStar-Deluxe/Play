@@ -384,4 +384,9 @@ public static class ApplicationUtils
             .Union(includeVlcFormats ? vlcSupportedVideoFiles : new List<string>())
             .ToHashSet();
     }
+
+    public static string GetTemporaryCachePath(string pathInsideTemporaryCachePath)
+    {
+        return $"{Application.temporaryCachePath}/{pathInsideTemporaryCachePath}";
+    }
 }
