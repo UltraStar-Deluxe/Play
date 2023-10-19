@@ -11,7 +11,9 @@ public class SongDataStructureTests
         string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
         UltraStarSongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath, out List<SongIssue> _);
         UltraStarSongMeta copiedSongMeta = new(originalSongMeta);
-        Assert.AreEqual(JsonConverter.ToJson(originalSongMeta), JsonConverter.ToJson(copiedSongMeta));
+        string originalJson = JsonConverter.ToJson(originalSongMeta);
+        string copyJson = JsonConverter.ToJson(copiedSongMeta);
+        Assert.AreEqual(originalJson, copyJson);
     }
 
     [Test]

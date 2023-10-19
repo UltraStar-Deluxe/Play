@@ -49,6 +49,13 @@ public class LoadAndSaveSongTest
         Assert.AreEqual("43.2", originalSongMeta.GetAdditionalHeaderEntry("NUMBERWITHDOT"));
         Assert.AreEqual("SomeOtherValue", originalSongMeta.GetAdditionalHeaderEntry("UNSUPPORTEDFIELD"));
         Assert.IsTrue(originalSongMeta.AdditionalHeaderEntries.SequenceEqual(savedSongMeta.AdditionalHeaderEntries), "UnknownHeaderEntries not equal");
+
+        Assert.AreEqual(2, originalSongMeta.VoiceCount);
+        Assert.AreEqual(originalSongMeta.VoiceCount, savedSongMeta.VoiceCount);
+        Assert.IsNotEmpty(SongMetaUtils.GetLyrics(originalSongMeta, EVoiceId.P1));
+        Assert.IsNotEmpty(SongMetaUtils.GetLyrics(originalSongMeta, EVoiceId.P2));
+        Assert.AreEqual(SongMetaUtils.GetLyrics(originalSongMeta, EVoiceId.P1), SongMetaUtils.GetLyrics(savedSongMeta, EVoiceId.P1));
+        Assert.AreEqual(SongMetaUtils.GetLyrics(originalSongMeta, EVoiceId.P2), SongMetaUtils.GetLyrics(savedSongMeta, EVoiceId.P2));
     }
 
     private UltraStarSongMeta LoadSong(string path)

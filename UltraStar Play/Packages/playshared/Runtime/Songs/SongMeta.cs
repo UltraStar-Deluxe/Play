@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 [Serializable]
@@ -266,10 +267,10 @@ public class SongMeta
         Year = other.Year;
         if (VoiceCount > 0)
         {
-            Voices.ForEach(voice =>
+            other.Voices.ForEach(voice =>
             {
                 Voice voiceClone = voice.CloneDeep();
-                other.AddVoice(voiceClone);
+                AddVoice(voiceClone);
             });
         }
     }
