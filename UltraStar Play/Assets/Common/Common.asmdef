@@ -6,6 +6,8 @@
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.Netcode.Runtime",
+        "Unity.Netcode.Components",
+        "Unity.Collections",
         "Facepunch Transport for Netcode for GameObjects",
         "Serilog",
         "Plugins",

@@ -12,8 +12,8 @@ using UnityEngine;
 public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static SteamManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamManager>();
-    
-    private const int MelodyManiaSteamAppId = 2394070;
+
+    public const int MelodyManiaSteamAppId = 2394070;
 
     public bool IsConnectedToSteam { get; private set; }
     public SteamId PlayerSteamId { get; private set; }
@@ -21,7 +21,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private AchievementEventStream achievementEventStream;
-    
+
     private readonly Dictionary<string, Achievement> achievementIdToAchievement = new();
     private Subject<bool> connectedToSteamEventStream = new();
     public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
@@ -83,7 +83,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.LogWarning("Already connected to Steam");
                 return;
             }
-            
+
             Debug.Log("Initializing SteamClient");
 
             if (Application.isEditor)
@@ -114,13 +114,13 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             activeUnrankedLobbies = new List<Lobby>();
             activeRankedLobbies = new List<Lobby>();
             IsConnectedToSteam = true;
-            
+
             bool requestCurrentStatsSuccess = SteamUserStats.RequestCurrentStats();
             if (!requestCurrentStatsSuccess)
             {
                 Debug.LogError("Connected to Steam but failed to request current stats");
             }
-            
+
             achievementIdToAchievement.Clear();
             SteamUserStats.Achievements.ForEach(achievement => achievementIdToAchievement[achievement.Identifier] = achievement);
 
@@ -167,7 +167,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             Debug.LogWarning($"Attempt to trigger {achievementId}, but not connected to SteamClient");
             return;
         }
-        
+
         if (!TryGetAchievement(achievementId, out Achievement achievement))
         {
             Debug.LogError($"No achievement found for id: {achievementId.Id}");
@@ -179,7 +179,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             Debug.Log($"Skipping already unlocked achievement {achievementId.Id}");
             return;
         }
-        
+
         try
         {
             Debug.Log("Unlocking achievement: " + achievementId.Id);
