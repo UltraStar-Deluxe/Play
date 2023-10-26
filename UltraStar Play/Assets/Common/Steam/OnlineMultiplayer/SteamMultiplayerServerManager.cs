@@ -8,11 +8,9 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using static Network.Framework.SteamMultiplayerNetworkExtensions;
 
-namespace Network.Framework
+namespace SteamOnlineMultiplayer
 {
-    [AddComponentMenu("Network/Framework/Server Manager"), DisallowMultipleComponent]
     public class SteamMultiplayerServerManager : MonoBehaviour
     {
         private const int MaxConnectionPayload = 1024;
@@ -23,8 +21,7 @@ namespace Network.Framework
         public static event UnityAction OnServerStarted;
         public static event UnityAction OnServerShutdown;
 
-        [Header("Config")]
-        [SerializeField] byte m_MaxPlayers = 4;
+        [Header("Config")] [SerializeField] byte m_MaxPlayers = 4;
 
         public bool GameInProgress
         {
@@ -36,11 +33,13 @@ namespace Network.Framework
             }
         }
 
-        public IReadOnlyDictionary<FixedString64Bytes, MemberData> MemberLookup => members;
+        public IReadOnlyDictionary<FixedString64Bytes, SteamMultiplayerNetworkExtensions.MemberData> MemberLookup => members;
         public IReadOnlyDictionary<ulong, FixedString64Bytes> ClientLookup => clientIdToGuid;
         public IReadOnlyDictionary<SteamId, FixedString64Bytes> SteamLookup => steamIdToGuid;
 
-        private Dictionary<FixedString64Bytes, MemberData> members = new(capacity: MaxConnectionPayload);
+        private Dictionary<FixedString64Bytes, SteamMultiplayerNetworkExtensions.MemberData> members =
+            new(capacity: MaxConnectionPayload);
+
         private Dictionary<ulong, FixedString64Bytes> clientIdToGuid = new(capacity: MaxConnectionPayload);
         private Dictionary<SteamId, FixedString64Bytes> steamIdToGuid = new(capacity: MaxConnectionPayload);
         private Dictionary<ulong, int> clientSceneMap = new(capacity: MaxConnectionPayload);
@@ -69,7 +68,7 @@ namespace Network.Framework
             NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
             NetworkManager.Singleton.OnServerStarted += HandleServerStarted;
 
-            members = new Dictionary<FixedString64Bytes, MemberData>();
+            members = new Dictionary<FixedString64Bytes, SteamMultiplayerNetworkExtensions.MemberData>();
             clientIdToGuid = new Dictionary<ulong, FixedString64Bytes>();
             steamIdToGuid = new Dictionary<SteamId, FixedString64Bytes>();
             clientSceneMap = new Dictionary<ulong, int>();
@@ -86,16 +85,11 @@ namespace Network.Framework
             NetworkManager.Singleton.OnServerStarted -= HandleServerStarted;
         }
 
-        /// <summary>
-        /// Get member data via <seealso cref="ulong"/>
-        /// </summary>
-        /// <param name="steamId"></param>
-        /// <returns></returns>
-        public MemberData? GetMemberData(ulong clientId)
+        public SteamMultiplayerNetworkExtensions.MemberData? GetMemberData(ulong clientId)
         {
             if (clientIdToGuid.TryGetValue(clientId, out var clientGuid))
             {
-                if (members.TryGetValue(clientGuid, out MemberData playerData))
+                if (members.TryGetValue(clientGuid, out SteamMultiplayerNetworkExtensions.MemberData playerData))
                     return playerData;
                 else
                     Debug.LogWarning($"No member data found for client id: {clientId}");
@@ -106,16 +100,11 @@ namespace Network.Framework
             return null;
         }
 
-        /// <summary>
-        /// Get member data via <seealso cref="SteamId"/>
-        /// </summary>
-        /// <param name="steamId"></param>
-        /// <returns></returns>
-        public MemberData? GetMemberData(SteamId steamId)
+        public SteamMultiplayerNetworkExtensions.MemberData? GetMemberData(SteamId steamId)
         {
             if (steamIdToGuid.TryGetValue(steamId, out var clientGuid))
             {
-                if (members.TryGetValue(clientGuid, out MemberData playerData))
+                if (members.TryGetValue(clientGuid, out SteamMultiplayerNetworkExtensions.MemberData playerData))
                     return playerData;
                 else
                     Debug.LogWarning($"No member data found for client id: {steamId}");
@@ -126,10 +115,6 @@ namespace Network.Framework
             return null;
         }
 
-        /// <summary>
-        /// Kick specific client from the server
-        /// </summary>
-        /// <param name="clientId"></param>
         public void KickClient(ulong clientId)
         {
             if (!NetworkManager.Singleton.IsServer)
@@ -146,9 +131,6 @@ namespace Network.Framework
             NetworkManager.Singleton.DisconnectClient(clientId);
         }
 
-        /// <summary>
-        /// Server will start the game
-        /// </summary>
         public bool StartGame()
         {
             if (!NetworkManager.Singleton.IsServer)
@@ -159,9 +141,6 @@ namespace Network.Framework
             return true;
         }
 
-        /// <summary>
-        /// Server will end the game
-        /// </summary>
         public bool EndGame()
         {
             if (!NetworkManager.Singleton.IsServer)
@@ -181,10 +160,11 @@ namespace Network.Framework
             gameInProgress = false;
         }
 
-        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest, NetworkManager.ConnectionApprovalResponse callback)
+        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest,
+            NetworkManager.ConnectionApprovalResponse callback)
         {
-            var connectionData = connectionApprovalRequest.Payload;
-            var clientId = connectionApprovalRequest.ClientNetworkId;
+            byte[] connectionData = connectionApprovalRequest.Payload;
+            ulong clientId = connectionApprovalRequest.ClientNetworkId;
             if (connectionData.Length > MaxConnectionPayload)
             {
                 callback.CreatePlayerObject = false;
@@ -205,21 +185,22 @@ namespace Network.Framework
                 return;
             }
 
-            var payload = Encoding.UTF8.GetString(connectionData);
-            var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
+            string payload = Encoding.UTF8.GetString(connectionData);
+            SteamMultiplayerNetworkExtensions.ConnectionPayload connectionPayload = JsonConverter.FromJson<SteamMultiplayerNetworkExtensions.ConnectionPayload>(payload);
 
-            var status = ConnectStatus.Success;
+            SteamMultiplayerNetworkExtensions.ConnectStatus status = SteamMultiplayerNetworkExtensions.ConnectStatus.Success;
 
             if (gameInProgress)
-                status = ConnectStatus.GameInProgress;
+                status = SteamMultiplayerNetworkExtensions.ConnectStatus.GameInProgress;
             else if (members.Count >= m_MaxPlayers)
-                status = ConnectStatus.ServerFull;
+                status = SteamMultiplayerNetworkExtensions.ConnectStatus.ServerFull;
 
-            if (status == ConnectStatus.Success)
+            if (status == SteamMultiplayerNetworkExtensions.ConnectStatus.Success)
             {
                 clientSceneMap[clientId] = connectionPayload.clientScene;
                 clientIdToGuid[clientId] = connectionPayload.clientGUID;
-                members[connectionPayload.clientGUID] = new MemberData(SteamClient.SteamId, connectionPayload.displayName, clientId);
+                members[connectionPayload.clientGUID] =
+                    new SteamMultiplayerNetworkExtensions.MemberData(SteamClient.SteamId, connectionPayload.displayName, clientId);
             }
 
             callback.CreatePlayerObject = false;
@@ -230,11 +211,11 @@ namespace Network.Framework
 
             portal.ServerToClientConnectResult(clientId, status);
 
-            if (status != ConnectStatus.Success)
+            if (status != SteamMultiplayerNetworkExtensions.ConnectStatus.Success)
                 StartCoroutine(WaitToDisconnectClient(clientId, status));
         }
 
-        private IEnumerator WaitToDisconnectClient(ulong clientId, ConnectStatus reason, float seconds = 0f)
+        private IEnumerator WaitToDisconnectClient(ulong clientId, SteamMultiplayerNetworkExtensions.ConnectStatus reason, float seconds = 0f)
         {
             portal.ServerToClientSetDisconnectReason(clientId, reason);
             yield return new WaitForSeconds(seconds);
@@ -306,7 +287,7 @@ namespace Network.Framework
                     ? SteamClient.Name
                     : "Missing Name");
 
-            members.TryAdd(clientGuid, new MemberData
+            members.TryAdd(clientGuid, new SteamMultiplayerNetworkExtensions.MemberData
             (
                 SteamManager.Instance.IsConnectedToSteam
                     ? SteamClient.SteamId

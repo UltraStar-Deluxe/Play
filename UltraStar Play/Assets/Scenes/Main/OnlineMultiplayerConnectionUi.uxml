@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="onlineMultiplayerConnectionRoot">
+        <AccordionGroup>
+            <AccordionItem label="Host Game Settings" name="hostGameAccordionItem">
+                <ui:VisualElement name="hostGameControlsContainer" class="child-mb-2">
+                    <ui:DropdownField label="Dropdown" index="-1" choices="System.Collections.Generic.List`1[ESteamLobbyVisibility]" name="hostGameVisibilityChooser" />
+                    <ui:TextField picking-mode="Ignore" label="Password" name="hostLobbyPasswordField" value="Enter password to create a private game" />
+                    <ui:Button text="Host" parse-escape-sequences="true" display-tooltip-when-elided="true" name="hostGameButton" />
+                </ui:VisualElement>
+            </AccordionItem>
+            <AccordionItem label="Join Game Settings" name="joinGameAccordionItem">
+                <ui:VisualElement name="joinGameControlsContainer" class="child-mb-2">
+                    <ui:TextField picking-mode="Ignore" label="Password" name="joinLobbyPasswordField" value="Enter password to join a private game" />
+                    <ui:Button text="Join" parse-escape-sequences="true" display-tooltip-when-elided="true" name="joinGameButton" />
+                </ui:VisualElement>
+                <ui:VisualElement name="lobbyList" style="flex-grow: 1;" />
+            </AccordionItem>
+        </AccordionGroup>
+    </ui:VisualElement>
+</ui:UXML>

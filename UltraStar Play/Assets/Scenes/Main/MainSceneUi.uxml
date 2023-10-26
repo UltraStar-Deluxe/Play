@@ -1,4 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="OnlineMultiplayerConnectionUi" src="project://database/Assets/Scenes/Main/OnlineMultiplayerConnectionUi.uxml?fileID=9197481963319205126&amp;guid=f4dc81a200bb8f8479b8aa01cc7e18d7&amp;type=3#OnlineMultiplayerConnectionUi" />
     <ui:VisualElement name="background" style="flex-grow: 1; align-items: center; justify-content: center;">
         <ui:VisualElement name="logo" style="flex-grow: 1; position: absolute; width: 100%; left: 0; align-items: flex-start; top: 0; height: 60%;" />
         <ui:VisualElement name="row" style="position: absolute; top: 66.6%;">
@@ -31,5 +32,6 @@
                 <MaterialIcon name="quitIcon" icon="logout" />
             </ui:Button>
         </ui:VisualElement>
+        <ui:Instance template="OnlineMultiplayerConnectionUi" name="OnlineMultiplayerConnectionUi" class="overlay overlayBackground" style="width: auto; height: auto; top: 0;" />
     </ui:VisualElement>
 </ui:UXML>

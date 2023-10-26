@@ -235,6 +235,11 @@ public static partial class R
         public const string horizontalGrid = "horizontalGrid";
         public const string horizontalGridLabelContainer = "horizontalGridLabelContainer";
         public const string horizontalGridLineContainer = "horizontalGridLineContainer";
+        public const string hostGameAccordionItem = "hostGameAccordionItem";
+        public const string hostGameButton = "hostGameButton";
+        public const string hostGameControlsContainer = "hostGameControlsContainer";
+        public const string hostGameVisibilityChooser = "hostGameVisibilityChooser";
+        public const string hostLobbyPasswordField = "hostLobbyPasswordField";
         public const string httpEndpointExampleLabel = "httpEndpointExampleLabel";
         public const string httpServerHostTextField = "httpServerHostTextField";
         public const string httpServerPortTextField = "httpServerPortTextField";
@@ -296,6 +301,10 @@ public static partial class R
         public const string jobProgressBar = "jobProgressBar";
         public const string jobRunningIcon = "jobRunningIcon";
         public const string jobStatusIconContainer = "jobStatusIconContainer";
+        public const string joinGameAccordionItem = "joinGameAccordionItem";
+        public const string joinGameButton = "joinGameButton";
+        public const string joinGameControlsContainer = "joinGameControlsContainer";
+        public const string joinLobbyPasswordField = "joinLobbyPasswordField";
         public const string knockOutLabel = "knockOutLabel";
         public const string knockOutLabelOverlay = "knockOutLabelOverlay";
         public const string knockOutTournamentItemToggle = "knockOutTournamentItemToggle";
@@ -338,6 +347,7 @@ public static partial class R
         public const string loadedSceneContent = "loadedSceneContent";
         public const string loadedSceneTitle = "loadedSceneTitle";
         public const string loadingLabel = "loadingLabel";
+        public const string lobbyList = "lobbyList";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logFfmpegOutputToggle = "logFfmpegOutputToggle";
         public const string logo = "logo";
@@ -484,6 +494,8 @@ public static partial class R
         public const string nPlayerLayout = "nPlayerLayout";
         public const string okButton = "okButton";
         public const string onePlayerLayout = "onePlayerLayout";
+        public const string onlineMultiplayerConnectionRoot = "onlineMultiplayerConnectionRoot";
+        public const string OnlineMultiplayerConnectionUi = "OnlineMultiplayerConnectionUi";
         public const string openControlsMenuButton = "openControlsMenuButton";
         public const string openFileIcon = "openFileIcon";
         public const string openFolderButton = "openFolderButton";

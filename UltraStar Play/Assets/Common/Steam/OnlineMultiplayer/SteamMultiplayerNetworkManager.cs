@@ -1,4 +1,5 @@
-﻿using Steamworks;
+﻿using System;
+using Steamworks;
 using Steamworks.Data;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,25 +8,24 @@ using UnityEngine.SceneManagement;
 using Unity.Collections;
 using Unity.Netcode;
 
-using static Network.Framework.SteamMultiplayerNetworkExtensions;
-using static Network.Framework.SteamExtensions;
 
-namespace Network.Framework
+namespace SteamOnlineMultiplayer
 {
-    [AddComponentMenu("Network/Framework/Network Manager"), DisallowMultipleComponent]
     public class SteamMultiplayerNetworkManager : MonoBehaviour
     {
         public static SteamMultiplayerNetworkManager Instance { get; private set; } = null;
 
         /// NETWORK CALLBACKS ///
         public static event UnityAction OnClientReadied;
+
         public static event UnityAction OnClientDisconnectRequested;
         public static event UnityAction<ulong, int> OnClientSceneChanged;
-        public static event UnityAction<ConnectStatus> OnConnectionCompleted;
-        public static event UnityAction<ConnectStatus> OnDisconnectReceived;
+        public static event UnityAction<SteamMultiplayerNetworkExtensions.ConnectStatus> OnConnectionCompleted;
+        public static event UnityAction<SteamMultiplayerNetworkExtensions.ConnectStatus> OnDisconnectReceived;
 
         /// STEAM CALLBACKS ///
         public static event UnityAction OnLobbyCreatedEvent;
+
         public static event UnityAction OnLobbyDataChangedEvent;
         public static event UnityAction<string> OnLobbyChatMessageDeliveredEvent;
         public static event UnityAction<Friend, string> OnLobbyChatMessageReceivedEvent;
@@ -39,10 +39,6 @@ namespace Network.Framework
 
         public Lobby? CurrentLobby { get; private set; } = null;
 
-        /// <summary>
-        /// Override <seealso cref="CurrentLobby"/> to <paramref name="lobby"/>
-        /// </summary>
-        /// <param name="lobby"></param>
         public void SetLobby(Lobby lobby) => CurrentLobby = lobby;
 
         private void Awake()
@@ -116,13 +112,14 @@ namespace Network.Framework
 
         private void OnApplicationQuit() => CurrentLobby?.Leave();
 
-        /// <summary>
-        /// Start hosting [With Steam Lobby]
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        public async Task<bool> StartSteamHost(LobbyConfig config)
+        public async Task<bool> StartSteamHost(SteamOnlineMultiplayerExtensions.LobbyConfig config)
         {
+            if (NetworkManager.Singleton == null
+                || NetworkManager.Singleton.IsServer)
+            {
+                return await Task.FromResult(false);
+            }
+
             if (!SteamManager.Instance.IsConnectedToSteam)
                 return await Task.FromResult(false);
 
@@ -137,12 +134,7 @@ namespace Network.Framework
             return await Task.FromResult(true);
         }
 
-        /// <summary>
-        /// Start dedicated server [With Steam Lobby]
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        public async Task<bool> StartSteamServer(LobbyConfig config)
+        public async Task<bool> StartSteamServer(SteamOnlineMultiplayerExtensions.LobbyConfig config)
         {
             if (!SteamManager.Instance.IsConnectedToSteam)
                 return await Task.FromResult(false);
@@ -158,7 +150,7 @@ namespace Network.Framework
             return await Task.FromResult(true);
         }
 
-        private async Task CreateLobbyAsync(LobbyConfig config)
+        private async Task CreateLobbyAsync(SteamOnlineMultiplayerExtensions.LobbyConfig config)
         {
             CurrentLobby = await SteamMatchmaking.CreateLobbyAsync(config.maxMembers);
 
@@ -169,20 +161,6 @@ namespace Network.Framework
             CurrentLobby?.SetData("isRunning", $"{false}");
         }
 
-        /// <summary>
-        /// Send message to current lobby
-        /// </summary>
-        /// <param name="msg"></param>
-        public void SendChatMessage(string msg)
-        {
-            OnLobbyChatMessageDeliveredEvent?.Invoke(msg);
-            CurrentLobby?.SendChatString(msg);
-        }
-
-        /// <summary>
-        /// Start hosting
-        /// </summary>
-        /// <returns></returns>
         public bool StartNetworkHost()
         {
             if (NetworkManager.Singleton.StartHost())
@@ -194,10 +172,6 @@ namespace Network.Framework
             return false;
         }
 
-        /// <summary>
-        /// Start dedicated server
-        /// </summary>
-        /// <returns></returns>
         public bool StartNetworkServer()
         {
             if (NetworkManager.Singleton.StartServer())
@@ -209,9 +183,6 @@ namespace Network.Framework
             return false;
         }
 
-        /// <summary>
-        /// Reques disconnected
-        /// </summary>
         public void RequestDisconnect()
         {
             if (NetworkManager.Singleton.IsServer)
@@ -229,7 +200,8 @@ namespace Network.Framework
                     if (client.ClientId.Equals(NetworkManager.Singleton.LocalClient.ClientId))
                         continue;
 
-                    ServerToClientSetDisconnectReason(client.ClientId, ConnectStatus.KickDisconnect);
+                    ServerToClientSetDisconnectReason(client.ClientId,
+                        SteamMultiplayerNetworkExtensions.ConnectStatus.KickDisconnect);
                     //NW_ServerManager.Instance.KickClient(client.ClientId);
                 }
             }
@@ -253,13 +225,14 @@ namespace Network.Framework
             if (sceneEvent.SceneEventType != SceneEventType.LoadComplete)
                 return;
 
-            OnClientSceneChanged?.Invoke(sceneEvent.ClientId, SceneManager.GetSceneByName(sceneEvent.SceneName).buildIndex);
+            OnClientSceneChanged?.Invoke(sceneEvent.ClientId,
+                SceneManager.GetSceneByName(sceneEvent.SceneName).buildIndex);
         }
 
         private void OnConnectedCallback()
         {
             if (NetworkManager.Singleton.IsHost)
-                OnConnectionCompleted?.Invoke(ConnectStatus.Success);
+                OnConnectionCompleted?.Invoke(SteamMultiplayerNetworkExtensions.ConnectStatus.Success);
 
             OnClientReadied?.Invoke();
             print("Client Ready...");
@@ -269,9 +242,11 @@ namespace Network.Framework
 
         #region Steam Callbacks
 
-        private void OnGameRichPresenceJoinRequested(Friend friend, string key) => Debug.Log($"{friend.Name} joined with key={key}");
+        private void OnGameRichPresenceJoinRequested(Friend friend, string key) =>
+            Debug.Log($"{friend.Name} joined with key={key}");
 
-        private void OnChatMessage(Lobby lobby, Friend friend, string msg) => OnLobbyChatMessageReceivedEvent?.Invoke(friend, msg);
+        private void OnChatMessage(Lobby lobby, Friend friend, string msg) =>
+            OnLobbyChatMessageReceivedEvent?.Invoke(friend, msg);
 
         private void OnLobbyMemberDataChanged(Lobby lobby, Friend friend) => OnMemberDataChangedEvent?.Invoke(friend);
 
@@ -281,9 +256,11 @@ namespace Network.Framework
 
         private void OnLobbyMemberLeave(Lobby lobby, Friend friend) => OnMemberLeftEvent?.Invoke(friend);
 
-        private void OnLobbyMemberKicked(Lobby lobby, Friend friend, Friend user) => OnMemberKickedEvent?.Invoke(friend, user);
+        private void OnLobbyMemberKicked(Lobby lobby, Friend friend, Friend user) =>
+            OnMemberKickedEvent?.Invoke(friend, user);
 
-        private void OnLobbyMemberBanned(Lobby lobby, Friend friend, Friend user) => OnMemberBannedEvent?.Invoke(friend, user);
+        private void OnLobbyMemberBanned(Lobby lobby, Friend friend, Friend user) =>
+            OnMemberBannedEvent?.Invoke(friend, user);
 
         private void OnLobbyMemberDisconnected(Lobby lobby, Friend friend) => OnMemberLeftEvent?.Invoke(friend);
 
@@ -307,46 +284,53 @@ namespace Network.Framework
 
         private void RegisterClientMessageHandlers()
         {
-            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(nameof(ServerToClientConnectResult), (senderClientId, messagePayload) =>
-            {
-                messagePayload.ReadValueSafe(out ConnectStatus status);
-                Debug.Log($"{senderClientId} -> {status}", this);
-                OnConnectionCompleted?.Invoke(status);
-            });
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(
+                nameof(ServerToClientConnectResult), (senderClientId, messagePayload) =>
+                {
+                    messagePayload.ReadValueSafe(out SteamMultiplayerNetworkExtensions.ConnectStatus status);
+                    Debug.Log($"{senderClientId} -> {status}", this);
+                    OnConnectionCompleted?.Invoke(status);
+                });
 
-            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(nameof(ServerToClientSetDisconnectReason), (senderClientId, messagePayload) =>
-            {
-                messagePayload.ReadValueSafe(out ConnectStatus status);
-                Debug.Log($"{senderClientId} -> {status}", this);
-                OnDisconnectReceived?.Invoke(status);
-            });
+            NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(
+                nameof(ServerToClientSetDisconnectReason), (senderClientId, messagePayload) =>
+                {
+                    messagePayload.ReadValueSafe(out SteamMultiplayerNetworkExtensions.ConnectStatus status);
+                    Debug.Log($"{senderClientId} -> {status}", this);
+                    OnDisconnectReceived?.Invoke(status);
+                });
         }
 
         private void UnregisterClientMessageHandlers()
         {
-            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(nameof(ServerToClientConnectResult));
+            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(
+                nameof(ServerToClientConnectResult));
 
-            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(nameof(ServerToClientSetDisconnectReason));
+            NetworkManager.Singleton.CustomMessagingManager.UnregisterNamedMessageHandler(
+                nameof(ServerToClientSetDisconnectReason));
         }
 
         #endregion
 
         #region Message Senders
 
-        public void ServerToClientConnectResult(ulong netId, ConnectStatus status)
+        public void ServerToClientConnectResult(ulong netId, SteamMultiplayerNetworkExtensions.ConnectStatus status)
         {
-            var writer = new FastBufferWriter(sizeof(ConnectStatus), Allocator.Temp);
+            var writer = new FastBufferWriter(sizeof(SteamMultiplayerNetworkExtensions.ConnectStatus), Allocator.Temp);
             writer.WriteValueSafe(status);
 
-            NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(nameof(ServerToClientConnectResult), netId, writer);
+            NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(nameof(ServerToClientConnectResult), netId,
+                writer);
         }
 
-        public void ServerToClientSetDisconnectReason(ulong netId, ConnectStatus status)
+        public void ServerToClientSetDisconnectReason(ulong netId,
+            SteamMultiplayerNetworkExtensions.ConnectStatus status)
         {
-            var writer = new FastBufferWriter(sizeof(ConnectStatus), Allocator.Temp);
+            var writer = new FastBufferWriter(sizeof(SteamMultiplayerNetworkExtensions.ConnectStatus), Allocator.Temp);
             writer.WriteValueSafe(status);
 
-            NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(nameof(ServerToClientSetDisconnectReason), netId, writer);
+            NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(nameof(ServerToClientSetDisconnectReason),
+                netId, writer);
         }
 
         #endregion

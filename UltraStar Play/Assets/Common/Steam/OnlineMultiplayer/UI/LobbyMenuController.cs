@@ -6,7 +6,6 @@
 //
 // namespace Multiplayer.Runtime.UI
 // {
-//     [AddComponentMenu("Network/UI/UI Lobby Menu"), DisallowMultipleComponent]
 //     public class LobbyMenuController : MonoBehaviour
 //     {
 //         [Header("References")]

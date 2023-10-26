@@ -11,7 +11,6 @@
 //
 // namespace Multiplayer.Runtime.UI
 // {
-//     [AddComponentMenu("Network/UI/UI Main Menu"), DisallowMultipleComponent]
 //     public class MainMenuController : MonoBehaviour
 //     {
 //         [Header("Private Game References")]

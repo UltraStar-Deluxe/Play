@@ -1,3 +1,4 @@
+using System;
 using Steamworks;
 using Steamworks.Data;
 using UnityEngine;
@@ -6,20 +7,16 @@ using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using Netcode.Transports.Facepunch;
 
-using static Network.Framework.SteamMultiplayerNetworkExtensions;
-using System.Threading.Tasks;
-
-namespace Network.Framework
+namespace SteamOnlineMultiplayer
 {
-    [AddComponentMenu("Network/Framework/Client Manager"), DisallowMultipleComponent]
     [RequireComponent(typeof(SteamMultiplayerNetworkManager))]
     public class SteamMultiplayerClientManager : MonoBehaviour
     {
         public static SteamMultiplayerClientManager Instance { get; private set; } = null;
 
-        public DisconnectReason DisconnectReason { get; private set; } = new DisconnectReason();
+        public SteamMultiplayerNetworkExtensions.DisconnectReason DisconnectReason { get; private set; } = new();
 
-        public static event UnityAction<ConnectStatus> OnConnectionFinished;
+        public static event UnityAction<SteamMultiplayerNetworkExtensions.ConnectStatus> OnConnectionFinished;
         public static event UnityAction OnNetworkTimedOut;
 
         private SteamMultiplayerNetworkManager portal = null;
@@ -67,34 +64,38 @@ namespace Network.Framework
             NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
         }
 
-        /// <summary>
-        /// Start client [With Steam Transport]
-        /// </summary>
-        /// <param name="lobby"></param>
-        /// <returns></returns>
-        public bool StartSteamClient(SteamId targetId)
+        public void JoinLobby(string lobbyCode)
         {
-            transport.targetSteamId = targetId;
-            return StartNetworkClient();
+            string hexCode = lobbyCode
+                .Replace("-", string.Empty)
+                .Trim();
+            SteamId lobbyId = Convert.ToUInt64(hexCode, fromBase: 16);
+            TryJoinLobbyById(lobbyId);
         }
 
-        /// <summary>
-        /// Start client
-        /// </summary>
-        /// <returns></returns>
-        public bool StartNetworkClient()
+        private void TryJoinLobbyById(SteamId lobbyId)
         {
-            var payload = JsonUtility.ToJson(new ConnectionPayload()
+            transport.targetSteamId = lobbyId;
+            StartNetworkClient();
+        }
+
+        private void StartNetworkClient()
+        {
+            string payload = JsonConverter.ToJson(new SteamMultiplayerNetworkExtensions.ConnectionPayload()
             {
                 clientGUID = System.Guid.NewGuid().ToString(),
                 clientScene = SceneManager.GetActiveScene().buildIndex,
                 displayName = PlayerPrefs.GetString("PlayerName", "Missing Name")
             });
 
-            var payloadBytes = System.Text.Encoding.UTF8.GetBytes(payload);
+            byte[] payloadBytes = System.Text.Encoding.UTF8.GetBytes(payload);
 
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
-            return NetworkManager.Singleton.StartClient();
+            bool success = NetworkManager.Singleton.StartClient();
+            if (!success)
+            {
+                throw new Exception("Failed to start Netcode for GameObject NetworkManager client");
+            }
         }
 
         #region Steam Callbacks
@@ -102,7 +103,7 @@ namespace Network.Framework
         private async void OnGameLobbyJoinRequested(Lobby lobby, SteamId friendId)
         {
             portal.SetLobby(lobby);
-            var result = await lobby.Join();
+            RoomEnter result = await lobby.Join();
 
             if (result != RoomEnter.Success)
             {
@@ -110,7 +111,7 @@ namespace Network.Framework
                 return;
             }
 
-            StartSteamClient(friendId);
+            TryJoinLobbyById(friendId);
         }
 
         #endregion
@@ -130,7 +131,7 @@ namespace Network.Framework
         {
             Debug.Log($"You have disconnected from the server", this);
 
-            DisconnectReason.SetDisconnectReason(ConnectStatus.UserRequestedDisconnect);
+            DisconnectReason.SetDisconnectReason(SteamMultiplayerNetworkExtensions.ConnectStatus.UserRequestedDisconnect);
             NetworkManager.Singleton.Shutdown();
 
             OnClientDisconnect(NetworkManager.Singleton.LocalClientId);
@@ -138,27 +139,29 @@ namespace Network.Framework
             SceneNavigator.Instance.LoadScene(EScene.MainScene);
         }
 
-        private void OnClientConnectionFinished(ConnectStatus status)
+        private void OnClientConnectionFinished(SteamMultiplayerNetworkExtensions.ConnectStatus status)
         {
-            if (status != ConnectStatus.Success)
+            if (status != SteamMultiplayerNetworkExtensions.ConnectStatus.Success)
                 DisconnectReason.SetDisconnectReason(status);
 
             OnConnectionFinished?.Invoke(status);
         }
 
-        private void OnDisconnectReasonReceived(ConnectStatus status)
+        private void OnDisconnectReasonReceived(SteamMultiplayerNetworkExtensions.ConnectStatus status)
         {
             Debug.Log($"You have been disconnected by {status}", this);
             DisconnectReason.SetDisconnectReason(status);
         }
 
-        private void OnReasonChanged(ConnectStatus status)
+        private void OnReasonChanged(SteamMultiplayerNetworkExtensions.ConnectStatus status)
         {
             Debug.Log($"{nameof(OnReasonChanged)} -> {status}", this);
 
             switch (status)
             {
-                case ConnectStatus.KickDisconnect: OnClientKicked(); break;
+                case SteamMultiplayerNetworkExtensions.ConnectStatus.KickDisconnect:
+                    OnClientKicked();
+                    break;
             }
 
             void OnClientKicked()
@@ -179,7 +182,7 @@ namespace Network.Framework
                 if (SceneNavigator.Instance.CurrentScene != EScene.MainScene)
                 {
                     if (!DisconnectReason.HasTransitionReason)
-                        DisconnectReason.SetDisconnectReason(ConnectStatus.GenericDisconnect);
+                        DisconnectReason.SetDisconnectReason(SteamMultiplayerNetworkExtensions.ConnectStatus.GenericDisconnect);
 
                     // Debug.Log("ClientDisconnect, opening main scene.");
                     // SceneNavigator.Instance.LoadScene(EScene.MainScene);

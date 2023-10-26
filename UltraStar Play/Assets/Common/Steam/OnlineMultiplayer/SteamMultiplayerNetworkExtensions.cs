@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Network.Framework
+namespace SteamOnlineMultiplayer
 {
     public static class SteamMultiplayerNetworkExtensions
     {
@@ -75,46 +75,11 @@ namespace Network.Framework
             public bool HasTransitionReason => Reason != ConnectStatus.Undefined;
         }
 
-        /// <summary>
-        /// Checks if we are the owner (<b>NOTE:</b> If NetworkManager.Singleton is null, then owner is true. Helpful for Singleplayer)
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /**
+         * Checks if we are the owner
+         * NOTE: If NetworkManager.Singleton is null, then owner is true (helpful for single player)
+         */
         public static bool IsOwner(this NetworkBehaviour obj) => NetworkManager.Singleton == null || obj.IsOwner;
-
-        // /// <summary>
-        // /// Check if scene exist in Network.SceneManager rather regular SceneManager, then loads it
-        // /// </summary>
-        // /// <param name="reference"></param>
-        // /// <param name="loadMode"></param>
-        // /// <returns></returns>
-        // public static bool TryLoadNetworkScene(this SceneReference reference, LoadSceneMode loadMode = LoadSceneMode.Single)
-        // {
-        //     if (Application.CanStreamedLevelBeLoaded(reference.SceneName))
-        //     {
-        //         NetworkManager.Singleton.SceneManager.LoadScene(reference.SceneName, loadMode);
-        //         return true;
-        //     }
-        //
-        //     return false;
-        // }
-        //
-        // /// <summary>
-        // /// Check if scene exist in SceneManager, then loads it
-        // /// </summary>
-        // /// <param name="reference"></param>
-        // /// <param name="loadMode"></param>
-        // /// <returns></returns>
-        // public static bool TryLoadRegularScene(this SceneReference reference, LoadSceneMode loadMode = LoadSceneMode.Single)
-        // {
-        //     if (Application.CanStreamedLevelBeLoaded(reference.SceneName))
-        //     {
-        //         SceneManager.LoadScene(reference.SceneName, loadMode);
-        //         return true;
-        //     }
-        //
-        //     return false;
-        // }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()

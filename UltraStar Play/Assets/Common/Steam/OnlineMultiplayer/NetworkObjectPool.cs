@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Network.Framework
+namespace SteamOnlineMultiplayer
 {
     /// <summary>
     /// Object Pool for networked objects, used for controlling how objects are spawned by Netcode. Netcode by default will allocate new memory when spawning new
@@ -18,8 +18,7 @@ namespace Network.Framework
 
         public static NetworkObjectPool Singleton { get { return _instance; } }
 
-        [SerializeField]
-        List<PoolConfigObject> PooledPrefabsList;
+        [SerializeField] List<PoolConfigObject> PooledPrefabsList;
 
         HashSet<GameObject> prefabs = new();
 
@@ -47,7 +46,8 @@ namespace Network.Framework
 
                 if (prefab != null)
                 {
-                    Assert.IsNotNull(prefab.GetComponent<NetworkObject>(), $"{nameof(NetworkObjectPool)}: Pooled prefab \"{prefab.name}\" at index {i} has no {nameof(NetworkObject)} component.");
+                    Assert.IsNotNull(prefab.GetComponent<NetworkObject>(),
+                        $"{nameof(NetworkObjectPool)}: Pooled prefab \"{prefab.name}\" at index {i} has no {nameof(NetworkObject)} component.");
                 }
             }
         }
@@ -57,7 +57,8 @@ namespace Network.Framework
         /// </summary>
         /// <param name="prefab"></param>
         /// <returns></returns>
-        public NetworkObject GetNetworkObject(GameObject prefab) => GetNetworkObjectInternal(prefab, Vector3.zero, Quaternion.identity);
+        public NetworkObject GetNetworkObject(GameObject prefab) =>
+            GetNetworkObjectInternal(prefab, Vector3.zero, Quaternion.identity);
 
         /// <summary>
         /// Gets an instance of the given prefab from the pool. The prefab must be registered to the pool.
@@ -66,7 +67,8 @@ namespace Network.Framework
         /// <param name="position">The position to spawn the object at.</param>
         /// <param name="rotation">The rotation to spawn the object with.</param>
         /// <returns></returns>
-        public NetworkObject GetNetworkObject(GameObject prefab, Vector3 position, Quaternion rotation) => GetNetworkObjectInternal(prefab, position, rotation);
+        public NetworkObject GetNetworkObject(GameObject prefab, Vector3 position, Quaternion rotation) =>
+            GetNetworkObjectInternal(prefab, position, rotation);
 
         /// <summary>
         /// Return an object to the pool (reset objects before returning).
@@ -188,8 +190,10 @@ namespace Network.Framework
             m_Pool = pool;
         }
 
-        NetworkObject INetworkPrefabInstanceHandler.Instantiate(ulong ownerClientId, Vector3 position, Quaternion rotation) => m_Pool.GetNetworkObject(m_Prefab, position, rotation);
+        NetworkObject INetworkPrefabInstanceHandler.Instantiate(ulong ownerClientId, Vector3 position,
+            Quaternion rotation) => m_Pool.GetNetworkObject(m_Prefab, position, rotation);
 
-        void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject) => m_Pool.ReturnNetworkObject(networkObject, m_Prefab);
+        void INetworkPrefabInstanceHandler.Destroy(NetworkObject networkObject) =>
+            m_Pool.ReturnNetworkObject(networkObject, m_Prefab);
     }
 }
