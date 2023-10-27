@@ -31,24 +31,24 @@ namespace SteamOnlineMultiplayer
         {
             public string name;
             public bool joinable;
-            public ESteamLobbyVisibility visibility;
+            public ELobbyVisibility visibility;
             public byte maxMembers;
         }
 
-        public static void SetVisibility(this Lobby lobby, ESteamLobbyVisibility visibility)
+        public static void SetVisibility(this Lobby lobby, ELobbyVisibility visibility)
         {
             switch (visibility)
             {
-                case ESteamLobbyVisibility.Public:
+                case ELobbyVisibility.Public:
                     lobby.SetPublic();
                     break;
-                case ESteamLobbyVisibility.Private:
+                case ELobbyVisibility.Private:
                     lobby.SetPrivate();
                     break;
-                case ESteamLobbyVisibility.FriendsOnly:
+                case ELobbyVisibility.FriendsOnly:
                     lobby.SetFriendsOnly();
                     break;
-                case ESteamLobbyVisibility.Invisible:
+                case ELobbyVisibility.Invisible:
                     lobby.SetInvisible();
                     break;
             }
@@ -94,7 +94,7 @@ namespace SteamOnlineMultiplayer
 
         public static async Task<Texture2D> GetAvatarTextureAsync(this SteamId steamId)
         {
-            var image = await SteamFriends.GetLargeAvatarAsync(steamId);
+            Image? image = await SteamFriends.GetLargeAvatarAsync(steamId);
             return await GetSteamImageAsTextureAsync(image ?? default);
         }
 
@@ -102,7 +102,7 @@ namespace SteamOnlineMultiplayer
         {
             return await Task.Run(() =>
             {
-                var texture = new Texture2D((int)image.Width, (int)image.Width, TextureFormat.RGBA32, mipChain: false,
+                Texture2D texture = new Texture2D((int)image.Width, (int)image.Width, TextureFormat.RGBA32, mipChain: false,
                     linear: true);
 
                 texture.LoadRawTextureData(image.Data);
@@ -181,7 +181,7 @@ Debug.unityLogger.logEnabled = Debug.isDebugBuild || false;
 
             Application.quitting += Shutdown;
 
-            var source = new CancellationTokenSource();
+            CancellationTokenSource source = new CancellationTokenSource();
             workshopItemToken = source.Token;
         }
 

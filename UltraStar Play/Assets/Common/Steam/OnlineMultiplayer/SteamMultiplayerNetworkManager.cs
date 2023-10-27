@@ -20,8 +20,8 @@ namespace SteamOnlineMultiplayer
 
         public static event UnityAction OnClientDisconnectRequested;
         public static event UnityAction<ulong, int> OnClientSceneChanged;
-        public static event UnityAction<SteamMultiplayerNetworkExtensions.ConnectStatus> OnConnectionCompleted;
-        public static event UnityAction<SteamMultiplayerNetworkExtensions.ConnectStatus> OnDisconnectReceived;
+        public static event UnityAction<ConnectStatus> OnConnectionCompleted;
+        public static event UnityAction<ConnectStatus> OnDisconnectReceived;
 
         /// STEAM CALLBACKS ///
         public static event UnityAction OnLobbyCreatedEvent;
@@ -193,16 +193,14 @@ namespace SteamOnlineMultiplayer
 
             void KickAllClients()
             {
-                for (int i = 0; i < NetworkManager.Singleton.ConnectedClientsList.Count; i++)
+                foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
                 {
-                    var client = NetworkManager.Singleton.ConnectedClientsList[i];
-
                     if (client.ClientId.Equals(NetworkManager.Singleton.LocalClient.ClientId))
+                    {
                         continue;
+                    }
 
-                    ServerToClientSetDisconnectReason(client.ClientId,
-                        SteamMultiplayerNetworkExtensions.ConnectStatus.KickDisconnect);
-                    //NW_ServerManager.Instance.KickClient(client.ClientId);
+                    ServerToClientSetDisconnectReason(client.ClientId, ConnectStatus.KickDisconnect);
                 }
             }
         }
@@ -232,7 +230,7 @@ namespace SteamOnlineMultiplayer
         private void OnConnectedCallback()
         {
             if (NetworkManager.Singleton.IsHost)
-                OnConnectionCompleted?.Invoke(SteamMultiplayerNetworkExtensions.ConnectStatus.Success);
+                OnConnectionCompleted?.Invoke(ConnectStatus.Success);
 
             OnClientReadied?.Invoke();
             print("Client Ready...");
@@ -287,7 +285,7 @@ namespace SteamOnlineMultiplayer
             NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(
                 nameof(ServerToClientConnectResult), (senderClientId, messagePayload) =>
                 {
-                    messagePayload.ReadValueSafe(out SteamMultiplayerNetworkExtensions.ConnectStatus status);
+                    messagePayload.ReadValueSafe(out ConnectStatus status);
                     Debug.Log($"{senderClientId} -> {status}", this);
                     OnConnectionCompleted?.Invoke(status);
                 });
@@ -295,7 +293,7 @@ namespace SteamOnlineMultiplayer
             NetworkManager.Singleton.CustomMessagingManager.RegisterNamedMessageHandler(
                 nameof(ServerToClientSetDisconnectReason), (senderClientId, messagePayload) =>
                 {
-                    messagePayload.ReadValueSafe(out SteamMultiplayerNetworkExtensions.ConnectStatus status);
+                    messagePayload.ReadValueSafe(out ConnectStatus status);
                     Debug.Log($"{senderClientId} -> {status}", this);
                     OnDisconnectReceived?.Invoke(status);
                 });
@@ -314,19 +312,18 @@ namespace SteamOnlineMultiplayer
 
         #region Message Senders
 
-        public void ServerToClientConnectResult(ulong netId, SteamMultiplayerNetworkExtensions.ConnectStatus status)
+        public void ServerToClientConnectResult(ulong netId, ConnectStatus status)
         {
-            var writer = new FastBufferWriter(sizeof(SteamMultiplayerNetworkExtensions.ConnectStatus), Allocator.Temp);
+            FastBufferWriter writer = new FastBufferWriter(sizeof(ConnectStatus), Allocator.Temp);
             writer.WriteValueSafe(status);
 
             NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(nameof(ServerToClientConnectResult), netId,
                 writer);
         }
 
-        public void ServerToClientSetDisconnectReason(ulong netId,
-            SteamMultiplayerNetworkExtensions.ConnectStatus status)
+        public void ServerToClientSetDisconnectReason(ulong netId, ConnectStatus status)
         {
-            var writer = new FastBufferWriter(sizeof(SteamMultiplayerNetworkExtensions.ConnectStatus), Allocator.Temp);
+            FastBufferWriter writer = new FastBufferWriter(sizeof(ConnectStatus), Allocator.Temp);
             writer.WriteValueSafe(status);
 
             NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(nameof(ServerToClientSetDisconnectReason),

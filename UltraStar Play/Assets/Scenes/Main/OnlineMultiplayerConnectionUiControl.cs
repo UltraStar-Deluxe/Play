@@ -47,7 +47,7 @@ public class OnlineMultiplayerConnectionUiControl : MonoBehaviour, INeedInjectio
         string lobbyName = $"Lobby {Guid.NewGuid()}";
         bool joinable = true;
         byte maxMembers = 32;
-        ESteamLobbyVisibility visibility = ESteamLobbyVisibility.Public;
+        ELobbyVisibility visibility = ELobbyVisibility.Public;
 
         ObservableUtils.RunOnNewTaskAsObservable(async () =>
             {

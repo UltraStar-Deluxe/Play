@@ -14,9 +14,9 @@ namespace SteamOnlineMultiplayer
     {
         public static SteamMultiplayerClientManager Instance { get; private set; } = null;
 
-        public SteamMultiplayerNetworkExtensions.DisconnectReason DisconnectReason { get; private set; } = new();
+        public DisconnectReason DisconnectReason { get; private set; } = new();
 
-        public static event UnityAction<SteamMultiplayerNetworkExtensions.ConnectStatus> OnConnectionFinished;
+        public static event UnityAction<ConnectStatus> OnConnectionFinished;
         public static event UnityAction OnNetworkTimedOut;
 
         private SteamMultiplayerNetworkManager portal = null;
@@ -81,7 +81,7 @@ namespace SteamOnlineMultiplayer
 
         private void StartNetworkClient()
         {
-            string payload = JsonConverter.ToJson(new SteamMultiplayerNetworkExtensions.ConnectionPayload()
+            string payload = JsonConverter.ToJson(new ConnectionPayloadDto()
             {
                 clientGUID = System.Guid.NewGuid().ToString(),
                 clientScene = SceneManager.GetActiveScene().buildIndex,
@@ -131,7 +131,7 @@ namespace SteamOnlineMultiplayer
         {
             Debug.Log($"You have disconnected from the server", this);
 
-            DisconnectReason.SetDisconnectReason(SteamMultiplayerNetworkExtensions.ConnectStatus.UserRequestedDisconnect);
+            DisconnectReason.SetDisconnectReason(ConnectStatus.UserRequestedDisconnect);
             NetworkManager.Singleton.Shutdown();
 
             OnClientDisconnect(NetworkManager.Singleton.LocalClientId);
@@ -139,27 +139,27 @@ namespace SteamOnlineMultiplayer
             SceneNavigator.Instance.LoadScene(EScene.MainScene);
         }
 
-        private void OnClientConnectionFinished(SteamMultiplayerNetworkExtensions.ConnectStatus status)
+        private void OnClientConnectionFinished(ConnectStatus status)
         {
-            if (status != SteamMultiplayerNetworkExtensions.ConnectStatus.Success)
+            if (status != ConnectStatus.Success)
                 DisconnectReason.SetDisconnectReason(status);
 
             OnConnectionFinished?.Invoke(status);
         }
 
-        private void OnDisconnectReasonReceived(SteamMultiplayerNetworkExtensions.ConnectStatus status)
+        private void OnDisconnectReasonReceived(ConnectStatus status)
         {
             Debug.Log($"You have been disconnected by {status}", this);
             DisconnectReason.SetDisconnectReason(status);
         }
 
-        private void OnReasonChanged(SteamMultiplayerNetworkExtensions.ConnectStatus status)
+        private void OnReasonChanged(ConnectStatus status)
         {
             Debug.Log($"{nameof(OnReasonChanged)} -> {status}", this);
 
             switch (status)
             {
-                case SteamMultiplayerNetworkExtensions.ConnectStatus.KickDisconnect:
+                case ConnectStatus.KickDisconnect:
                     OnClientKicked();
                     break;
             }
@@ -182,7 +182,7 @@ namespace SteamOnlineMultiplayer
                 if (SceneNavigator.Instance.CurrentScene != EScene.MainScene)
                 {
                     if (!DisconnectReason.HasTransitionReason)
-                        DisconnectReason.SetDisconnectReason(SteamMultiplayerNetworkExtensions.ConnectStatus.GenericDisconnect);
+                        DisconnectReason.SetDisconnectReason(ConnectStatus.GenericDisconnect);
 
                     // Debug.Log("ClientDisconnect, opening main scene.");
                     // SceneNavigator.Instance.LoadScene(EScene.MainScene);

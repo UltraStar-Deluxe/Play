@@ -83,6 +83,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.logo)]
     private VisualElement logo;
 
+    [Inject(UxmlName = R.UxmlNames.onlineMultiplayerConnectionRoot)]
+    private VisualElement onlineMultiplayerConnectionRoot;
+
     [Inject]
     private Settings settings;
 
@@ -105,6 +108,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     private NewSongDialogControl newSongDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
     private readonly BuildInfoUiControl buildInfoUiControl = new();
+    private readonly OnlineMultiplayerConnectionUiControl onlineMultiplayerConnectionUiControl = new();
 
     private bool IsNewSongDialogOpen => newSongDialogControl != null;
     private bool IsQuitGameDialogOpen => quitGameDialogControl != null;
@@ -115,6 +119,10 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         injector
             .WithBindingForInstance(versionPropertiesTextAsset)
             .Inject(buildInfoUiControl);
+
+        injector
+            .WithRootVisualElement(onlineMultiplayerConnectionRoot)
+            .Inject(onlineMultiplayerConnectionUiControl);
     }
 
     private void Start()

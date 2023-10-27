@@ -9,9 +9,9 @@ using UnityEngine;
 
 namespace SteamOnlineMultiplayer
 {
-    public class GameNetworkManager : MonoBehaviour
+    public class SteamMultiplayerGameNetworkManager : MonoBehaviour
     {
-	    public static GameNetworkManager Instance { get; private set; } = null;
+	    public static SteamMultiplayerGameNetworkManager Instance { get; private set; } = null;
 
 	    private FacepunchTransport transport;
 	    public Lobby? CurrentLobby { get; private set; } = null;
@@ -109,7 +109,7 @@ namespace SteamOnlineMultiplayer
 		    {
 			    Lobbies.Clear();
 
-			    var lobbies = await SteamMatchmaking.LobbyList
+                Lobby[] lobbies = await SteamMatchmaking.LobbyList
 				    .FilterDistanceClose()
 				    .WithMaxResults(maxResults)
 				    .RequestAsync();

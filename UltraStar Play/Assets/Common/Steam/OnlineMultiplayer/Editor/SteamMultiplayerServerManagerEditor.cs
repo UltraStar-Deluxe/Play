@@ -16,7 +16,7 @@ public class SteamMultiplayerServerManagerEditor : UnityEditor.Editor
             return;
         }
 
-        var data = (SteamMultiplayerServerManager)target;
+        SteamMultiplayerServerManager data = (SteamMultiplayerServerManager)target;
 
         EditorGUI.BeginDisabledGroup(disabled: true);
 
@@ -24,7 +24,7 @@ public class SteamMultiplayerServerManagerEditor : UnityEditor.Editor
 
         EditorGUI.indentLevel++;
 
-        foreach (KeyValuePair<FixedString64Bytes, SteamMultiplayerNetworkExtensions.MemberData> member in data.MemberLookup)
+        foreach (KeyValuePair<FixedString64Bytes, MemberData> member in data.MemberLookup)
         {
             DrawMember(member);
         }
@@ -37,11 +37,11 @@ public class SteamMultiplayerServerManagerEditor : UnityEditor.Editor
         base.OnInspectorGUI();
     }
 
-    private void DrawMember(KeyValuePair<FixedString64Bytes, SteamMultiplayerNetworkExtensions.MemberData> member)
+    private void DrawMember(KeyValuePair<FixedString64Bytes, MemberData> member)
     {
-        var labelStyle = new GUIStyle(EditorStyles.label);
+        GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
         labelStyle.wordWrap = true;
-        var data = member.Value;
+        MemberData data = member.Value;
 
         EditorGUILayout.LabelField($"Key/Id: {member.Key} | {data.ClientId}", labelStyle);
         EditorGUILayout.LabelField($"Display Name: {data.DisplayName}", labelStyle);
