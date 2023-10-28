@@ -13,11 +13,9 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static SteamManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamManager>();
 
-    public const int MelodyManiaSteamAppId = 2394070;
-
     public bool IsConnectedToSteam { get; private set; }
     public SteamId PlayerSteamId { get; private set; }
-    public string PlayerName { get; private set; } = "";
+    public string PlayerName { get; private set; } = "Missing Name";
 
     [Inject]
     private AchievementEventStream achievementEventStream;
@@ -91,7 +89,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
                 // Steam is not expected to run in the editor. Only log a warning.
                 try
                 {
-                    SteamClient.Init(MelodyManiaSteamAppId);
+                    SteamClient.Init(SteamConstants.MelodyManiaSteamAppId);
                 }
                 catch (Exception ex)
                 {
@@ -101,7 +99,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             }
             else
             {
-                SteamClient.Init(MelodyManiaSteamAppId);
+                SteamClient.Init(SteamConstants.MelodyManiaSteamAppId);
                 if (!SteamClient.IsValid)
                 {
                     throw new SteamException("Steam client not valid");

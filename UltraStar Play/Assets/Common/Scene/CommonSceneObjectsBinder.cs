@@ -2,7 +2,9 @@
 using PrimeInputActions;
 using ProTrans;
 using SimpleHttpServerForUnity;
+using SteamOnlineMultiplayer;
 using UniInject;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -38,7 +40,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(BackgroundLightManager.Instance);
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
-        bb.BindExistingInstance(SteamManager.Instance);
         bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(AchievementEventStream.Instance);
         bb.BindExistingInstance(WebViewManager.Instance);
@@ -47,6 +48,18 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(RuntimeUiInspectionManager.Instance);
         bb.BindExistingInstance(VlcManager.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
+
+        // Steam
+        bb.BindExistingInstance(SteamManager.Instance);
+        // Online Multiplayer
+        bb.BindExistingInstance(SteamMultiplayerManager.Instance);
+        bb.BindExistingInstance(SteamLobbyManager.Instance);
+
+        if (NetworkManager.Singleton == null)
+        {
+            FindObjectOfType<NetworkManager>().SetSingleton();
+        }
+        bb.BindExistingInstance(NetworkManager.Singleton);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);

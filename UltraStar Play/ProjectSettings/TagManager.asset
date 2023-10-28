@@ -26,6 +26,7 @@ TagManager:
   - StyleSheetControl
   - ContextMenuPopupManager
   - FxTemporaire
+  - NetworkManager
   layers:
   - Default
   - TransparentFX
