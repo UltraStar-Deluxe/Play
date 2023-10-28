@@ -1,7 +1,7 @@
 ﻿
 namespace SteamOnlineMultiplayer
 {
-    public enum ELobbyVisibility
+    public enum ESteamLobbyVisibility
     {
         Public,
         Private,

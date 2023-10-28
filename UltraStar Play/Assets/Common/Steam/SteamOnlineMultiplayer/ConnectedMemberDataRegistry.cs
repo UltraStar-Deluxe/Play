@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CommonOnlineMultiplayer;
 using Steamworks;
 
 namespace SteamOnlineMultiplayer
 {
+    [Serializable]
     public class ConnectedMemberDataRegistry
     {
         private readonly List<MemberData> datas = new();

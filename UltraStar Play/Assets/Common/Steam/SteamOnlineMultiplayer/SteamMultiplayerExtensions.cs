@@ -11,20 +11,20 @@ namespace SteamOnlineMultiplayer
 {
     public static class SteamOnlineMultiplayerExtensions
     {
-        public static void SetVisibility(this Lobby lobby, ELobbyVisibility visibility)
+        public static void SetVisibility(this Lobby lobby, ESteamLobbyVisibility visibility)
         {
             switch (visibility)
             {
-                case ELobbyVisibility.Public:
+                case ESteamLobbyVisibility.Public:
                     lobby.SetPublic();
                     break;
-                case ELobbyVisibility.Private:
+                case ESteamLobbyVisibility.Private:
                     lobby.SetPrivate();
                     break;
-                case ELobbyVisibility.FriendsOnly:
+                case ESteamLobbyVisibility.FriendsOnly:
                     lobby.SetFriendsOnly();
                     break;
-                case ELobbyVisibility.Invisible:
+                case ESteamLobbyVisibility.Invisible:
                     lobby.SetInvisible();
                     break;
             }
@@ -98,29 +98,5 @@ namespace SteamOnlineMultiplayer
         public static byte[] ReadFileFromCloudAsync(string filename) => SteamRemoteStorage.FileRead(filename);
 
         private static CancellationToken workshopItemToken;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Init()
-        {
-#if UNITY_EDITOR
-            Debug.unityLogger.logEnabled = true;
-#else
-Debug.unityLogger.logEnabled = Debug.isDebugBuild || false;
-#endif
-            if (NetworkManager.Singleton == null || !SteamManager.Instance.IsConnectedToSteam)
-                return;
-
-            SteamFriends.ClearRichPresence();
-
-            Application.quitting += Shutdown;
-
-            CancellationTokenSource source = new CancellationTokenSource();
-            workshopItemToken = source.Token;
-        }
-
-        private static void Shutdown()
-        {
-            Application.quitting -= Shutdown;
-        }
     }
 }

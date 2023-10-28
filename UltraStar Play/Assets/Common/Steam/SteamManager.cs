@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Netcode.Transports.Facepunch;
 using Steamworks;
 using Steamworks.Data;
 using UniInject;
@@ -19,6 +20,9 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private AchievementEventStream achievementEventStream;
+
+    [Inject]
+    private FacepunchTransport facepunchTransport;
 
     private readonly Dictionary<string, Achievement> achievementIdToAchievement = new();
     private Subject<bool> connectedToSteamEventStream = new();
@@ -82,30 +86,13 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
                 return;
             }
 
-            Debug.Log("Initializing SteamClient");
-
-            if (Application.isEditor)
+            // SteamClient is initialized in FacepunchTransport.Awake()
+            if (!SteamClient.IsLoggedOn)
             {
-                // Steam is not expected to run in the editor. Only log a warning.
-                try
-                {
-                    SteamClient.Init(SteamConstants.MelodyManiaSteamAppId);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning(ex.Message);
-                    return;
-                }
-            }
-            else
-            {
-                SteamClient.Init(SteamConstants.MelodyManiaSteamAppId);
-                if (!SteamClient.IsValid)
-                {
-                    throw new SteamException("Steam client not valid");
-                }
+                throw new SteamException("SteamClient.IsLoggedOn is false");
             }
 
+            IsConnectedToSteam = true;
             PlayerName = SteamClient.Name;
             PlayerSteamId = SteamClient.SteamId;
             playerSteamIdString = PlayerSteamId.ToString();

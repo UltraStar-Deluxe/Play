@@ -4,7 +4,8 @@
     {
         public string name;
         public bool joinable;
-        public ELobbyVisibility visibility;
+        public ESteamLobbyVisibility visibility;
         public byte maxMembers;
+        public string password;
     }
 }

@@ -58,60 +58,44 @@ namespace SteamOnlineMultiplayer
 
         private void OnApplicationQuit() => CurrentLobby?.Leave();
 
-        public async Task CreateLobbyAsync(LobbyConfig config)
+        public async Task<Lobby> CreateLobbyAsync(LobbyConfig config)
         {
-            if (steamManager!.IsConnectedToSteam)
+            if (!steamManager.IsConnectedToSteam)
             {
-                throw new OnlineMultiplayerException("Failed to start Steam host, not connected to Steam.");
+                throw new OnlineMultiplayerException("Failed to create Steam lobby, not connected to Steam.");
             }
 
-            if (CurrentLobby != null)
-            {
-                RequestDisconnect();
-            }
-            CurrentLobby = await DoCreateLobbyAsync(config);
-        }
-
-        private async Task<Lobby> DoCreateLobbyAsync(LobbyConfig config)
-        {
+            Debug.Log("Creating new lobby");
             Lobby lobby = await SteamMatchmaking.CreateLobbyAsync(config.maxMembers)
-                          ?? throw new Exception("Failed to create new lobby.");
-
+                          ?? throw new OnlineMultiplayerException("Failed to create new lobby.");
             lobby.SetVisibility(config.visibility);
             lobby.SetJoinable(config.joinable);
             lobby.SetData("name", config.name);
-            lobby.SetData("appId", SteamConstants.MelodyManiaSteamAppId.ToString());
-            lobby.SetData("isRunning", $"{false}");
+            lobby.SetData("password", config.password);
             return lobby;
         }
 
-        public void RequestDisconnect()
+        public async Task<Lobby[]> GetLobbiesAsync(string password)
         {
-            if (CurrentLobby == null)
+            if (!SteamManager.Instance.IsConnectedToSteam)
             {
-                throw new OnlineMultiplayerException("Cannot disconnect, not yet connected to a lobby");
+                Debug.LogWarning("Failed to find lobbies. Steam is not running");
+                return Array.Empty<Lobby>();
             }
 
-            if (NetworkManager.Singleton.IsServer)
-                KickAllClients();
+            LobbyQuery lobbyQuery = SteamMatchmaking.LobbyList
+                .WithMaxResults(100);
+            if (!password.IsNullOrEmpty())
+            {
+                lobbyQuery.WithKeyValue("password", password);
+            }
+            return await lobbyQuery.RequestAsync() ?? Array.Empty<Lobby>();
+        }
 
+        public void LeaveCurrentLobby()
+        {
             CurrentLobby?.Leave();
             CurrentLobby = null;
-
-            networkManager.DisconnectClient(NetworkManager.Singleton.LocalClientId, "CLIENT REQUESTED DISCONNECT");
-
-            void KickAllClients()
-            {
-                foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
-                {
-                    if (client.ClientId.Equals(NetworkManager.Singleton.LocalClient.ClientId))
-                    {
-                        continue;
-                    }
-
-                    networkManager.DisconnectClient(client.ClientId, "SERVER REQUESTED DISCONNECT");
-                }
-            }
         }
 
         private void FireLobbyEvent(LobbyEvent lobbyEvent)

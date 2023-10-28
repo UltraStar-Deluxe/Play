@@ -302,7 +302,6 @@ public static partial class R
         public const string jobRunningIcon = "jobRunningIcon";
         public const string jobStatusIconContainer = "jobStatusIconContainer";
         public const string joinGameAccordionItem = "joinGameAccordionItem";
-        public const string joinGameButton = "joinGameButton";
         public const string joinGameControlsContainer = "joinGameControlsContainer";
         public const string joinLobbyPasswordField = "joinLobbyPasswordField";
         public const string knockOutLabel = "knockOutLabel";
@@ -655,6 +654,8 @@ public static partial class R
         public const string searchBarContainer = "searchBarContainer";
         public const string searchContainer = "searchContainer";
         public const string searchErrorIcon = "searchErrorIcon";
+        public const string searchLobbiesButton = "searchLobbiesButton";
+        public const string searchLobbiesIcon = "searchLobbiesIcon";
         public const string searchMidiFilesWithLyricsToggle = "searchMidiFilesWithLyricsToggle";
         public const string searchNextButton = "searchNextButton";
         public const string searchNextIcon = "searchNextIcon";

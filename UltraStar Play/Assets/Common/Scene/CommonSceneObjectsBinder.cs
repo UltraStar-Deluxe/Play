@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Netcode.Transports.Facepunch;
 using PrimeInputActions;
 using ProTrans;
 using SimpleHttpServerForUnity;
@@ -54,6 +55,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         // Online Multiplayer
         bb.BindExistingInstance(SteamMultiplayerManager.Instance);
         bb.BindExistingInstance(SteamLobbyManager.Instance);
+        bb.BindExistingInstance(DontDestroyOnLoadManager.Instance.FindComponentOrThrow<FacepunchTransport>());
 
         if (NetworkManager.Singleton == null)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommonOnlineMultiplayer;
@@ -20,7 +21,7 @@ namespace SteamOnlineMultiplayer
 
         private const int MaxConnectionDataLength = 2048;
 
-        private readonly ConnectedMemberDataRegistry connectedMemberDataRegistry = new();
+        private ConnectedMemberDataRegistry connectedMemberDataRegistry = new();
 
         [Inject]
         private NetworkManager networkManager;
@@ -33,6 +34,9 @@ namespace SteamOnlineMultiplayer
 
         [Inject]
         private SteamLobbyManager lobbyManager;
+
+        [Inject]
+        private FacepunchTransport injectedFacepunchTransport;
 
         protected override object GetInstance()
         {
@@ -69,7 +73,7 @@ namespace SteamOnlineMultiplayer
             networkManager.OnClientStopped -= OnClientStopped;
         }
 
-        public async Task CreateLobbyAndStartHostAsync(LobbyConfig lobbyConfig)
+        public async Task CreateLobbyAsync(LobbyConfig lobbyConfig)
         {
             if (!steamManager.IsConnectedToSteam)
             {
@@ -77,7 +81,32 @@ namespace SteamOnlineMultiplayer
             }
 
             await lobbyManager.CreateLobbyAsync(lobbyConfig);
-            StartNetcodeNetworkManagerHost();
+        }
+
+        public void RequestDisconnect()
+        {
+            if (lobbyManager.CurrentLobby == null)
+            {
+                throw new OnlineMultiplayerException("Cannot disconnect, not yet connected to a lobby");
+            }
+
+            if (NetworkManager.Singleton.IsServer)
+                KickAllClients();
+
+            networkManager.DisconnectClient(NetworkManager.Singleton.LocalClientId, "CLIENT REQUESTED DISCONNECT");
+
+            void KickAllClients()
+            {
+                foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+                {
+                    if (client.ClientId.Equals(NetworkManager.Singleton.LocalClient.ClientId))
+                    {
+                        continue;
+                    }
+
+                    networkManager.DisconnectClient(client.ClientId, "SERVER REQUESTED DISCONNECT");
+                }
+            }
         }
 
         /**
@@ -93,39 +122,33 @@ namespace SteamOnlineMultiplayer
             string hexCode = lobbyCode
                 .Replace("-", string.Empty)
                 .Trim();
-            SteamId hostSteamId = Convert.ToUInt64(hexCode, fromBase: 16);
-            JoinLobbyByHostSteamId(hostSteamId);
+            SteamId lobbyId = Convert.ToUInt64(hexCode, fromBase: 16);
+            // TODO: Find lobby with matching ID, join if such a lobby has been found.
         }
 
-        private void JoinLobbyByHostSteamId(SteamId steamId)
+        public void JoinLobby(Lobby lobby)
         {
-            Debug.Log($"Joining lobby that is hosted by {steamId}");
-            UpdateFacepunchTransport(steamId);
+            Debug.Log($"Joining lobby {lobby.Id} that is hosted by {lobby.Owner.Id}");
+            UpdateFacepunchTransport(lobby.Owner.Id);
             StartNetcodeNetworkManagerClient();
         }
 
         private void UpdateFacepunchTransport(SteamId targetSteamId)
         {
-            FacepunchTransport facepunchTransport = networkManager.NetworkConfig.NetworkTransport as FacepunchTransport;
-            if (facepunchTransport == null)
+            if (networkManager.NetworkConfig.NetworkTransport is not FacepunchTransport)
             {
-                facepunchTransport = networkManager.GetComponent<FacepunchTransport>();
-                if (facepunchTransport == null)
-                {
-                    facepunchTransport = networkManager.gameObject.AddComponent<FacepunchTransport>();
-                }
-
-                networkManager.NetworkConfig.NetworkTransport = facepunchTransport;
+                networkManager.NetworkConfig.NetworkTransport = injectedFacepunchTransport;
             }
 
-            if (facepunchTransport.targetSteamId != targetSteamId)
+            FacepunchTransport configuredFacepunchTransport = networkManager.NetworkConfig.NetworkTransport as FacepunchTransport;
+            if (configuredFacepunchTransport.targetSteamId != targetSteamId)
             {
                 Debug.Log($"Set FacepunchTransport.targetSteamId to {targetSteamId}");
-                facepunchTransport.targetSteamId = targetSteamId;
+                configuredFacepunchTransport.targetSteamId = targetSteamId;
             }
         }
 
-        private void StartNetcodeNetworkManagerHost()
+        public void StartNetcodeNetworkManagerHost()
         {
             bool success = networkManager.StartHost();
             if (!success)
@@ -215,12 +238,22 @@ namespace SteamOnlineMultiplayer
             }
         }
 
+        public List<Friend> GetFriends()
+        {
+            if (!steamManager.IsConnectedToSteam)
+                return new List<Friend>();
+
+            return SteamFriends
+                .GetFriends()
+                .ToList();
+        }
+
         #region SteamCallbacks
 
         private void OnGameLobbyJoinRequested(Lobby lobby, SteamId steamId)
         {
             Debug.Log($"Received request to join lobby hosted by {steamId}");
-            JoinLobbyByHostSteamId(steamId);
+            JoinLobby(lobby);
         }
 
         #endregion

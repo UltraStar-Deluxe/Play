@@ -1,8 +1,10 @@
-﻿using CommonOnlineMultiplayer;
+﻿using System;
+using CommonOnlineMultiplayer;
 using Steamworks;
 
 namespace SteamOnlineMultiplayer
 {
+    [Serializable]
     public struct MemberData
     {
         public UnityNetcodeClientId UnityNetcodeClientId { get; private set; }
