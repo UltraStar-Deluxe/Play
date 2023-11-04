@@ -46,9 +46,11 @@ namespace SteamOnlineMultiplayer
 
         protected override void StartSingleton()
         {
-            networkManager.OnClientConnectedCallback += OnClientConnected;
-            networkManager.OnClientDisconnectCallback += OnClientDisconnected;
-            networkManager.ConnectionApprovalCallback += OnClientConnectionApproval;
+            networkManager.OnClientConnectedCallback += OnNetcodeClientConnected;
+            networkManager.OnClientDisconnectCallback += OnNetcodeClientDisconnected;
+            networkManager.ConnectionApprovalCallback += OnNetcodeClientConnectionApproval;
+            networkManager.OnClientStopped += OnNetcodeClientStopped;
+            networkManager.OnServerStopped += OnNetcodeServerStopped;
 
             sceneNavigator.SceneChangedEventStream
                 .Subscribe(evt => OnClientSceneChanged(networkManager.LocalClientId, (int)evt.NewScene))
@@ -57,72 +59,50 @@ namespace SteamOnlineMultiplayer
 
         protected override void OnDestroySingleton()
         {
-            networkManager.OnClientConnectedCallback -= OnClientConnected;
-            networkManager.OnClientDisconnectCallback -= OnClientDisconnected;
-            networkManager.ConnectionApprovalCallback -= OnClientConnectionApproval;
+            networkManager.OnClientConnectedCallback -= OnNetcodeClientConnected;
+            networkManager.OnClientDisconnectCallback -= OnNetcodeClientDisconnected;
+            networkManager.ConnectionApprovalCallback -= OnNetcodeClientConnectionApproval;
+            networkManager.OnClientStopped -= OnNetcodeClientStopped;
+            networkManager.OnServerStopped -= OnNetcodeServerStopped;
         }
 
-        public async Task CreateLobbyAsync(LobbyConfig lobbyConfig)
+        private void OnNetcodeClientStopped(bool wasHostMode)
         {
-            if (!steamManager.IsConnectedToSteam)
+            Debug.Log("OnUnityNetcodeClientStopped");
+            UiManager.CreateNotification("Disconnected from online game");
+            if (lobbyManager.CurrentLobby != null)
             {
-                throw new OnlineMultiplayerException("Failed to host game, not connected to Steam");
-            }
-
-            await lobbyManager.CreateLobbyAsync(lobbyConfig);
-        }
-
-        public void RequestDisconnect()
-        {
-            if (lobbyManager.CurrentLobby == null)
-            {
-                throw new OnlineMultiplayerException("Cannot disconnect, not yet connected to a lobby");
-            }
-
-            if (NetworkManager.Singleton.IsServer)
-                KickAllClients();
-
-            networkManager.DisconnectClient(NetworkManager.Singleton.LocalClientId, "CLIENT REQUESTED DISCONNECT");
-
-            void KickAllClients()
-            {
-                foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
-                {
-                    if (client.ClientId.Equals(NetworkManager.Singleton.LocalClient.ClientId))
-                    {
-                        continue;
-                    }
-
-                    networkManager.DisconnectClient(client.ClientId, "SERVER REQUESTED DISCONNECT");
-                }
+                lobbyManager.LeaveCurrentLobby();
             }
         }
 
-        /**
-         * Can be used to join a lobby via a sharable code.
-         */
-        public void JoinLobbyByCode(string lobbyCode)
+        private void OnNetcodeServerStopped(bool wasHostMode)
         {
-            if (!steamManager.IsConnectedToSteam)
+            Debug.Log("OnUnityNetcodeServerStopped");
+            if (lobbyManager.CurrentLobby != null)
             {
-                throw new OnlineMultiplayerException("Failed to join lobby, not connected to Steam");
+                lobbyManager.LeaveCurrentLobby();
             }
-
-            string hexCode = lobbyCode
-                .Replace("-", string.Empty)
-                .Trim();
-            SteamId lobbyId = Convert.ToUInt64(hexCode, fromBase: 16);
-            // TODO: Find lobby with matching ID, join if such a lobby has been found.
         }
 
-        public void JoinLobby(Lobby lobby)
-        {
-            Debug.Log($"Joining lobby {lobby.Id} that is hosted by {lobby.Owner.Id}");
-            UpdateFacepunchTransport(lobby.Owner.Id);
-            StartNetcodeNetworkManagerClient();
-        }
+        // /**
+        //  * Can be used to join a lobby via a sharable code.
+        //  */
+        // public void JoinLobbyByCode(string lobbyCode)
+        // {
+        //     if (!steamManager.IsConnectedToSteam)
+        //     {
+        //         throw new OnlineMultiplayerException("Failed to join lobby, not connected to Steam");
+        //     }
+        //
+        //     string hexCode = lobbyCode
+        //         .Replace("-", string.Empty)
+        //         .Trim();
+        //     SteamId lobbyId = Convert.ToUInt64(hexCode, fromBase: 16);
+        //     // TODO: Find lobby with matching ID, join if such a lobby has been found.
+        // }
 
-        private void UpdateFacepunchTransport(SteamId targetSteamId)
+        private void ConfigureFacepunchTransport(SteamId targetSteamId)
         {
             if (networkManager.NetworkConfig.NetworkTransport is not FacepunchTransport)
             {
@@ -130,7 +110,7 @@ namespace SteamOnlineMultiplayer
             }
 
             FacepunchTransport configuredFacepunchTransport = networkManager.NetworkConfig.NetworkTransport as FacepunchTransport;
-            if (configuredFacepunchTransport.targetSteamId != targetSteamId)
+            if (configuredFacepunchTransport != null)
             {
                 Debug.Log($"Set FacepunchTransport.targetSteamId to {targetSteamId}");
                 configuredFacepunchTransport.targetSteamId = targetSteamId;
@@ -139,6 +119,8 @@ namespace SteamOnlineMultiplayer
 
         public void StartNetcodeNetworkManagerHost()
         {
+            ConfigureFacepunchTransport(0);
+
             bool success = networkManager.StartHost();
             if (!success)
             {
@@ -148,8 +130,10 @@ namespace SteamOnlineMultiplayer
             Debug.Log("Successfully started Unity Netcode host");
         }
 
-        private void StartNetcodeNetworkManagerClient()
+        public void StartNetcodeNetworkManagerClient(SteamId targetSteamId)
         {
+            ConfigureFacepunchTransport(targetSteamId);
+
             NetworkPlayerConnectionRequestDataDto requestDataDto = new(
                 steamManager.PlayerSteamId.Value,
                 Guid.NewGuid().ToString(),
@@ -241,32 +225,32 @@ namespace SteamOnlineMultiplayer
 
         private void OnGameLobbyJoinRequested(Lobby lobby, SteamId steamId)
         {
-            Debug.Log($"Received request to join lobby hosted by {steamId}");
-            JoinLobby(lobby);
+            Debug.Log($"Received request to join lobby '{lobby.GetName()}' with id {lobby.Id} owned by {steamId}");
         }
 
         #endregion
 
         #region NetcodeNetworkManagerCallbacks
 
-        private void OnClientConnected(ulong netcodeClientId)
+        private void OnNetcodeClientConnected(ulong netcodeClientId)
         {
-            Debug.Log("Network client callbacks registered");
+            Debug.Log($"OnClientConnected(UnityNetcodeClientId: {netcodeClientId})");
         }
 
-        private void OnClientDisconnected(ulong netcodeClientId)
+        private void OnNetcodeClientDisconnected(ulong netcodeClientId)
         {
+            Debug.Log($"OnClientDisconnected(UnityNetcodeClientId: {netcodeClientId})");
             if (connectedMemberDataRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out MemberData memberData))
             {
                 connectedMemberDataRegistry.Remove(memberData);
             }
         }
 
-        private void OnClientConnectionApproval(
+        private void OnNetcodeClientConnectionApproval(
             NetworkManager.ConnectionApprovalRequest connectionApprovalRequest,
             NetworkManager.ConnectionApprovalResponse response)
         {
-            Debug.Log("Checking approval of connection request");
+            Debug.Log($"Checking approval of connection request (UnityNetcodeClientId: {connectionApprovalRequest.ClientNetworkId})");
 
             void DenyRequest()
             {

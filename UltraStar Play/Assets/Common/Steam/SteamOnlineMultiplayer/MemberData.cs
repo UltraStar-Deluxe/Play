@@ -7,11 +7,11 @@ namespace SteamOnlineMultiplayer
     [Serializable]
     public struct MemberData
     {
-        public UnityNetcodeClientId UnityNetcodeClientId { get; private set; }
-        public SteamId SteamId { get; private set; }
-        public string ConnectionGuid { get; private set; }
         public string DisplayName { get; private set; }
+        public SteamId SteamId { get; private set; }
+        public UnityNetcodeClientId UnityNetcodeClientId { get; private set; }
         public string CurrentSceneName { get; set; }
+        public string ConnectionGuid { get; private set; }
 
         public MemberData(
             UnityNetcodeClientId unityNetcodeClientId,
@@ -25,6 +25,11 @@ namespace SteamOnlineMultiplayer
             ConnectionGuid = connectionGuid;
             DisplayName = displayName;
             CurrentSceneName = currentSceneName;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(MemberData)}(DisplayName: {DisplayName}, SteamId: {SteamId}, UnityNetcodeClientId: {UnityNetcodeClientId})";
         }
     }
 }

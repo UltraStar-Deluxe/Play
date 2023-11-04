@@ -19,7 +19,23 @@ namespace SteamOnlineMultiplayer
         [Inject]
         private NetworkManager networkManager;
 
-        public Lobby? CurrentLobby { get; private set; }
+        public Lobby? currentLobby;
+        public Lobby? CurrentLobby
+        {
+            get => currentLobby;
+            private set
+            {
+                currentLobby = value;
+                if (value == null)
+                {
+                    Debug.Log($"Set CurrentLobby to null");
+                }
+                else
+                {
+                    Debug.Log($"Set CurrentLobby to lobby '{value?.GetName()}' with id {value?.Id}");
+                }
+            }
+        }
 
         private readonly Subject<LobbyEvent> lobbyEventStream = new();
         public IObservable<LobbyEvent> LobbyEventStream => lobbyEventStream;
@@ -54,24 +70,58 @@ namespace SteamOnlineMultiplayer
             SteamMatchmaking.OnChatMessage -= OnChatMessage;
             SteamMatchmaking.OnLobbyDataChanged -= OnLobbyDataChanged;
             SteamMatchmaking.OnLobbyEntered -= OnLobbyEntered;
-        }
 
-        private void OnApplicationQuit() => CurrentLobby?.Leave();
+            if (CurrentLobby != null)
+            {
+                LeaveCurrentLobby();
+            }
+        }
 
         public async Task<Lobby> CreateLobbyAsync(LobbyConfig config)
         {
             if (!steamManager.IsConnectedToSteam)
             {
-                throw new OnlineMultiplayerException("Failed to create Steam lobby, not connected to Steam.");
+                throw new OnlineMultiplayerException("Failed to create lobby, not connected to Steam.");
             }
 
-            Debug.Log("Creating new lobby");
+            if (CurrentLobby != null)
+            {
+                LeaveCurrentLobby();
+            }
+
+            Debug.Log($"Creating new lobby with config: {JsonConverter.ToJson(config)}");
+
             Lobby lobby = await SteamMatchmaking.CreateLobbyAsync(config.maxMembers)
                           ?? throw new OnlineMultiplayerException("Failed to create new lobby.");
             lobby.SetVisibility(config.visibility);
             lobby.SetJoinable(config.joinable);
-            lobby.SetData("name", config.name);
-            lobby.SetData("password", config.password);
+            lobby.SetName(config.name);
+            lobby.SetPassword(config.password);
+
+            CurrentLobby = lobby;
+
+            Debug.Log($"Successfully created new lobby with id {lobby.Id} and owner {lobby.Owner} from config: {JsonConverter.ToJson(config)}");
+
+            return lobby;
+        }
+
+        public async Task<Lobby> JoinLobbyAsync(Lobby lobby)
+        {
+            if (!steamManager.IsConnectedToSteam)
+            {
+                throw new OnlineMultiplayerException("Failed to join lobby, not connected to Steam");
+            }
+
+            Debug.Log($"Joining lobby '{lobby.GetName()}' with id {lobby.Id}");
+            RoomEnter roomEnter = await lobby.Join();
+            if (roomEnter is not RoomEnter.Success)
+            {
+                throw new OnlineMultiplayerException($"Failed to join lobby '{lobby.GetName()}' with {lobby.Id}: {roomEnter}");
+            }
+
+            CurrentLobby = lobby;
+
+            Debug.Log($"Successfully joined lobby '{lobby.GetName()}' with id {lobby.Id} and owner {lobby.Owner}");
             return lobby;
         }
 
@@ -79,7 +129,7 @@ namespace SteamOnlineMultiplayer
         {
             if (!SteamManager.Instance.IsConnectedToSteam)
             {
-                Debug.LogWarning("Failed to find lobbies. Steam is not running");
+                Debug.LogError("Failed to find lobbies. Steam is not running");
                 return Array.Empty<Lobby>();
             }
 
@@ -87,19 +137,39 @@ namespace SteamOnlineMultiplayer
                 .WithMaxResults(100);
             if (!password.IsNullOrEmpty())
             {
-                lobbyQuery.WithKeyValue("password", password);
+                lobbyQuery.WithPassword(password);
             }
-            return await lobbyQuery.RequestAsync() ?? Array.Empty<Lobby>();
+            return await lobbyQuery.RequestAsync()
+                   ?? Array.Empty<Lobby>();
         }
 
         public void LeaveCurrentLobby()
         {
-            CurrentLobby?.Leave();
-            CurrentLobby = null;
+            if (CurrentLobby == null)
+            {
+                Debug.Log("Cannot leave Steam lobby because CurrentLobby is null");
+                return;
+            }
+
+            try
+            {
+                Debug.Log($"Leaving Steam lobby '{CurrentLobby?.GetName()}' with id {CurrentLobby?.Id}");
+                CurrentLobby?.Leave();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to leave lobby: {ex.Message}");
+            }
+            finally
+            {
+                CurrentLobby = null;
+            }
         }
 
         private void FireLobbyEvent(LobbyEvent lobbyEvent)
         {
+            Debug.Log($"FireLobbyEvent: {lobbyEvent}");
             lobbyEventStream.OnNext(lobbyEvent);
         }
 

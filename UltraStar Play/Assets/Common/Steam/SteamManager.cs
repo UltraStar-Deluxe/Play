@@ -25,47 +25,21 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     private FacepunchTransport facepunchTransport;
 
     private readonly Dictionary<string, Achievement> achievementIdToAchievement = new();
-    private Subject<bool> connectedToSteamEventStream = new();
+    private readonly Subject<bool> connectedToSteamEventStream = new();
     public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
 
-    private Subject<bool> disconnectedFromSteamEventStream = new();
+    private readonly Subject<bool> disconnectedFromSteamEventStream = new();
     public IObservable<bool> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
 
     private string playerSteamIdString;
     private List<Lobby> activeUnrankedLobbies;
     private List<Lobby> activeRankedLobbies;
 
-    private HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
+    private readonly HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
 
     protected override object GetInstance()
     {
         return Instance;
-    }
-
-    protected override void OnEnableSingleton()
-    {
-        // SteamMatchmaking.OnLobbyGameCreated += OnLobbyGameCreatedCallback;
-        // SteamMatchmaking.OnLobbyCreated += OnLobbyCreatedCallback;
-        // SteamMatchmaking.OnLobbyEntered += OnLobbyEnteredCallback;
-        // SteamMatchmaking.OnLobbyMemberJoined += OnLobbyMemberJoinedCallback;
-        // SteamMatchmaking.OnChatMessage += OnChatMessageCallback;
-        // SteamMatchmaking.OnLobbyMemberDisconnected += OnLobbyMemberDisconnectedCallback;
-        // SteamMatchmaking.OnLobbyMemberLeave += OnLobbyMemberLeaveCallback;
-        // SteamFriends.OnGameLobbyJoinRequested += OnGameLobbyJoinRequestedCallback;
-        // SteamApps.OnDlcInstalled += OnDlcInstalledCallback;
-    }
-
-    protected override void OnDisableSingleton()
-    {
-        // SteamMatchmaking.OnLobbyGameCreated -= OnLobbyGameCreatedCallback;
-        // SteamMatchmaking.OnLobbyCreated -= OnLobbyCreatedCallback;
-        // SteamMatchmaking.OnLobbyEntered -= OnLobbyEnteredCallback;
-        // SteamMatchmaking.OnLobbyMemberJoined -= OnLobbyMemberJoinedCallback;
-        // SteamMatchmaking.OnChatMessage -= OnChatMessageCallback;
-        // SteamMatchmaking.OnLobbyMemberDisconnected -= OnLobbyMemberDisconnectedCallback;
-        // SteamMatchmaking.OnLobbyMemberLeave -= OnLobbyMemberLeaveCallback;
-        // SteamFriends.OnGameLobbyJoinRequested -= OnGameLobbyJoinRequestedCallback;
-        // SteamApps.OnDlcInstalled -= OnDlcInstalledCallback;
     }
 
     protected override void StartSingleton()

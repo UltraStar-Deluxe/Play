@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3481021831759652217}
   - component: {fileID: 4115186513179324303}
-  - component: {fileID: 9120240342640873454}
   - component: {fileID: 6404088887241050407}
+  - component: {fileID: 251149015487477948}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: NetworkManager
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NetworkConfig:
     ProtocolVersion: 0
-    NetworkTransport: {fileID: 9120240342640873454}
+    NetworkTransport: {fileID: 251149015487477948}
     PlayerPrefab: {fileID: 8513232370543791744, guid: c7ec15aee2124c84788811cdbda92bf9,
       type: 3}
     Prefabs:
@@ -62,7 +62,7 @@ MonoBehaviour:
     EnsureNetworkVariableLengthSafety: 0
     EnableSceneManagement: 1
     ForceSamePrefabs: 1
-    RecycleNetworkIds: 1
+    RecycleNetworkIds: 0
     NetworkIdRecycleDelay: 3600
     RpcHashSize: 0
     LoadSceneTimeOut: 120
@@ -70,8 +70,20 @@ MonoBehaviour:
     EnableNetworkLogs: 1
     OldPrefabList: []
   RunInBackground: 1
-  LogLevel: 1
---- !u!114 &9120240342640873454
+  LogLevel: 0
+--- !u!114 &6404088887241050407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8695616358685915127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ce1c4dce6f044c08153ac832b87dadb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &251149015487477948
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -98,15 +110,3 @@ MonoBehaviour:
     PacketDelayMS: 0
     PacketJitterMS: 0
     PacketDropRate: 0
---- !u!114 &6404088887241050407
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8695616358685915127}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ce1c4dce6f044c08153ac832b87dadb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Steamworks;
 using Steamworks.Data;
 using UniInject;
 using UniRx;
@@ -57,7 +58,7 @@ namespace SteamOnlineMultiplayer
         {
             hostGameButton.RegisterCallbackButtonTriggered(_ => HostGame());
 
-            hostGameVisibilityChooserControl = new(
+            hostGameVisibilityChooserControl = new DropdownFieldControl<ELobbyVisibility>(
                 hostGameVisibilityChooser,
                 new List<ELobbyVisibility>()
                 {
@@ -89,15 +90,34 @@ namespace SteamOnlineMultiplayer
 
         private void JoinGame(Lobby lobby)
         {
-            try
-            {
-                steamMultiplayerManager.JoinLobby(lobby);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                UiManager.CreateNotification($"Failed to join lobby: {ex.Message}");
-            }
+            ObservableUtils.RunOnNewTaskAsObservable(async () =>
+                    {
+                        return await steamLobbyManager.JoinLobbyAsync(lobby);
+                    },
+                    Disposable.Empty)
+                .ObserveOnMainThread()
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to join lobby: {ex.Message}");
+                    UiManager.CreateNotification("Failed to join lobby");
+                })
+                .Select(joinedLobby =>
+                {
+                    ulong joinedLobbyOwnerId = joinedLobby.Owner.Id;
+                    if (joinedLobbyOwnerId <= 0)
+                    {
+                        throw new OnlineMultiplayerException($"Successfully joined lobby '{joinedLobby.GetName()}' with id {joinedLobby.Id} but owner id is 0.");
+                    }
+
+                    Debug.Log($"Successfully joined lobby '{joinedLobby.GetName()}' with id {joinedLobby.Id} and owner {joinedLobby.Owner}. Starting Unity Netcode client with FacepunchTransport.");
+                    steamMultiplayerManager.StartNetcodeNetworkManagerClient(joinedLobbyOwnerId);
+                    return true;
+                })
+                .Subscribe(_ =>
+                {
+                    UiManager.CreateNotification("Successfully joined online game");
+                });
         }
 
         private void HostGame()
@@ -112,6 +132,15 @@ namespace SteamOnlineMultiplayer
                 ? HostLobbyPassword
                 : "";
 
+            LobbyConfig lobbyConfig = new LobbyConfig()
+            {
+                name = $"{steamManager.PlayerName}'s lobby",
+                joinable = true,
+                maxMembers = SteamConstants.MaxLobbyMembers,
+                visibility = steamLobbyVisibility,
+                password = lobbyPassword,
+            };
+
             ObservableUtils.RunOnNewTaskAsObservable(async () =>
                     {
                         if (lobbyVisibility is ELobbyVisibility.Hidden
@@ -120,35 +149,31 @@ namespace SteamOnlineMultiplayer
                             throw new OnlineMultiplayerException("Hosting a hidden lobby requires a password");
                         }
 
-                        await steamMultiplayerManager.CreateLobbyAsync(
-                            new LobbyConfig()
-                            {
-                                name = $"Lobby {Guid.NewGuid()}",
-                                joinable = true,
-                                maxMembers = SteamConstants.MaxLobbyMembers,
-                                visibility = steamLobbyVisibility,
-                                password = lobbyPassword,
-                            });
-
-                        return true;
+                        return await steamLobbyManager.CreateLobbyAsync(lobbyConfig);
                     },
                     Disposable.Empty)
                 .ObserveOnMainThread()
-                .Select(_ =>
+                .CatchIgnore((Exception ex) =>
                 {
-                    Debug.Log("Successfully created new Steam lobby.");
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to create lobby: {ex.Message}");
+                    UiManager.CreateNotification("Failed to create lobby");
+                })
+                .Select(lobby=>
+                {
+                    Debug.Log($"Successfully created lobby: {lobby.Id}. Starting Unity Netcode host with FacepunchTransport.");
                     steamMultiplayerManager.StartNetcodeNetworkManagerHost();
                     return true;
                 })
                 .CatchIgnore((Exception ex) =>
                 {
                     Debug.LogException(ex);
-                    UiManager.CreateNotification(ex.Message);
+                    Debug.LogError($"Failed to start Unity Netcode host: {ex.Message}");
+                    UiManager.CreateNotification("Failed to start Unity Netcode host");
                 })
                 .Subscribe(_ =>
                 {
-                    Debug.Log("Successfully started host");
-                    UiManager.CreateNotification("Hosting new online game");
+                    UiManager.CreateNotification("Successfully hosting online game");
                 });
         }
 
@@ -195,7 +220,7 @@ namespace SteamOnlineMultiplayer
                 foreach (Lobby lobby in lobbies)
                 {
                     Button joinLobbyButton = new Button();
-                    joinLobbyButton.text = $"Join lobby {lobby.Id}";
+                    joinLobbyButton.text = $"Join \"{lobby.GetName()}\" {lobby.Id}, members: {lobby.MemberCount}";
                     joinLobbyButton.RegisterCallbackButtonTriggered(_ => JoinGame(lobby));
                     lobbyList.Add(joinLobbyButton);
                 }

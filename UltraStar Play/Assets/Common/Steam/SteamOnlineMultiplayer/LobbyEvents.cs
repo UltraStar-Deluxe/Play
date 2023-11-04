@@ -11,6 +11,11 @@ namespace SteamOnlineMultiplayer
         {
             Lobby = lobby;
         }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}(Lobby: {Lobby.Id})";
+        }
     }
 
     public class LobbyCreatedEvent : LobbyEvent
@@ -41,6 +46,11 @@ namespace SteamOnlineMultiplayer
         public HasFriendLobbyEvent(Lobby lobby, Friend friend) : base(lobby)
         {
             Friend = friend;
+        }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}(Lobby: {Lobby.Id}, Friend: {Friend})";
         }
     }
 
@@ -75,6 +85,11 @@ namespace SteamOnlineMultiplayer
             ExecutingMember = executingMember;
             KickedMember = kickedMember;
         }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}(Lobby: {Lobby.Id}, ExecutingMember: {ExecutingMember}, KickedMember: {KickedMember})";
+        }
     }
 
     public class MemberBannedLobbyEvent : LobbyEvent
@@ -87,6 +102,11 @@ namespace SteamOnlineMultiplayer
             ExecutingMember = executingMember;
             BannedMember = bannedMember;
         }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}(Lobby: {Lobby.Id}, ExecutingMember: {ExecutingMember}, BannedMember: {BannedMember})";
+        }
     }
 
     public class LobbyChatMessageReceivedEvent : HasFriendLobbyEvent
@@ -96,6 +116,11 @@ namespace SteamOnlineMultiplayer
         public LobbyChatMessageReceivedEvent(Lobby lobby, Friend friend, string message) : base(lobby, friend)
         {
             Message = message;
+        }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name}(Lobby: {Lobby.Id}, Message: {Message})";
         }
     }
 }
