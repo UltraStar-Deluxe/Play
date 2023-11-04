@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SteamOnlineMultiplayer;
-using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,33 +8,31 @@ public class SteamMultiplayerServerManagerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        if (NetworkManager.Singleton == null)
-        {
-            base.OnInspectorGUI();
-            return;
-        }
-
         SteamMultiplayerManager steamMultiplayerManager = (SteamMultiplayerManager)target;
-        IReadOnlyList<MemberData> members = steamMultiplayerManager.GetMembers();
+        DrawConnectedLobbyMembers(steamMultiplayerManager.GetMembers());
 
+        base.OnInspectorGUI();
+    }
+
+    private void DrawConnectedLobbyMembers(IReadOnlyList<MemberData> members)
+    {
         EditorGUI.BeginDisabledGroup(disabled: true);
 
-        EditorGUILayout.LabelField($"Current Members [{members.Count}]");
+        EditorGUILayout.LabelField($"Connected lobby member count: {members.Count}");
 
         EditorGUI.indentLevel++;
         foreach (MemberData member in members)
         {
-            DrawMember(member);
+            DrawConnectedLobbyMember(member);
         }
         EditorGUI.indentLevel--;
 
         EditorGUI.EndDisabledGroup();
         EditorGUILayout.Space();
 
-        base.OnInspectorGUI();
     }
 
-    private void DrawMember(MemberData data)
+    private void DrawConnectedLobbyMember(MemberData data)
     {
         GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
         labelStyle.wordWrap = true;

@@ -1,13 +1,9 @@
 {
-    "name": "Common.OnlineMultiplayer.Editor",
+    "name": "Steam.OnlineMultiplayer.Editor",
     "rootNamespace": "",
     "references": [
         "Unity.Netcode.Runtime",
         "Unity.Netcode.Components",
-        "Unity.InputSystem",
-        "Unity.Mathematics",
-        "Unity.Collections",
-        "Facepunch Transport for Netcode for GameObjects",
         "playshared",
         "Common"
     ],

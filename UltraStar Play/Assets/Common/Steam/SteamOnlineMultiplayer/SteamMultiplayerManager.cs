@@ -12,6 +12,7 @@ using UniRx;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 namespace SteamOnlineMultiplayer
 {
@@ -49,12 +50,6 @@ namespace SteamOnlineMultiplayer
             networkManager.OnClientDisconnectCallback += OnClientDisconnected;
             networkManager.ConnectionApprovalCallback += OnClientConnectionApproval;
 
-            networkManager.OnServerStarted += OnServerStarted;
-            networkManager.OnServerStopped += OnServerStopped;
-
-            networkManager.OnClientStarted += OnClientStarted;
-            networkManager.OnClientStopped += OnClientStopped;
-
             sceneNavigator.SceneChangedEventStream
                 .Subscribe(evt => OnClientSceneChanged(networkManager.LocalClientId, (int)evt.NewScene))
                 .AddTo(gameObject);
@@ -65,12 +60,6 @@ namespace SteamOnlineMultiplayer
             networkManager.OnClientConnectedCallback -= OnClientConnected;
             networkManager.OnClientDisconnectCallback -= OnClientDisconnected;
             networkManager.ConnectionApprovalCallback -= OnClientConnectionApproval;
-
-            networkManager.OnServerStarted -= OnServerStarted;
-            networkManager.OnServerStopped -= OnServerStopped;
-
-            networkManager.OnClientStarted -= OnClientStarted;
-            networkManager.OnClientStopped -= OnClientStopped;
         }
 
         public async Task CreateLobbyAsync(LobbyConfig lobbyConfig)
@@ -161,15 +150,13 @@ namespace SteamOnlineMultiplayer
 
         private void StartNetcodeNetworkManagerClient()
         {
-            RemotePlayerConnectionDataDto connectionData = new(
-                networkManager.LocalClientId,
+            NetworkPlayerConnectionRequestDataDto requestDataDto = new(
                 steamManager.PlayerSteamId.Value,
                 Guid.NewGuid().ToString(),
-                SteamManager.Instance.PlayerName,
+                steamManager.PlayerName,
                 SceneManager.GetActiveScene().name);
-            byte[] payloadBytes = Encoding.UTF8.GetBytes(connectionData.ToJson());
-
-            networkManager.NetworkConfig.ConnectionData = payloadBytes;
+            string payload = requestDataDto.ToJson();
+            networkManager.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(payload);
             bool success = networkManager.StartClient();
             if (!success)
             {
@@ -224,6 +211,8 @@ namespace SteamOnlineMultiplayer
 
         private void OnClientSceneChanged(UnityNetcodeClientId netcodeClientId, int sceneIndex)
         {
+            Debug.Log($"OnClientSceneChanged(UnityNetcodeClientId: {netcodeClientId}, sceneIndex: {sceneIndex})");
+
             if (connectedMemberDataRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out MemberData memberData))
             {
                 try
@@ -273,63 +262,45 @@ namespace SteamOnlineMultiplayer
             }
         }
 
-        private void OnServerStarted()
+        private void OnClientConnectionApproval(
+            NetworkManager.ConnectionApprovalRequest connectionApprovalRequest,
+            NetworkManager.ConnectionApprovalResponse response)
         {
-            if (!networkManager.IsHost)
-                return;
+            Debug.Log("Checking approval of connection request");
 
-            MemberData ownMemberData = new MemberData
-            (
-                networkManager.LocalClientId,
-                SteamManager.Instance.PlayerSteamId,
-                Guid.NewGuid().ToString(),
-                SteamManager.Instance.PlayerName,
-                SceneManager.GetActiveScene().name
-            );
-
-            connectedMemberDataRegistry.Add(ownMemberData);
-
-        }
-
-        private void OnServerStopped(bool isHostInsteadOfServer)
-        {
-
-        }
-
-        private void OnClientStarted()
-        {
-
-        }
-
-        private void OnClientStopped(bool obj)
-        {
-        }
-
-        private void OnClientConnectionApproval(NetworkManager.ConnectionApprovalRequest connectionApprovalRequest,
-            NetworkManager.ConnectionApprovalResponse callback)
-        {
             void DenyRequest()
             {
-                callback.CreatePlayerObject = false;
-                callback.PlayerPrefabHash = uint.MinValue;
-                callback.Approved = false;
-                callback.Position = null;
-                callback.Rotation = null;
+                Debug.Log("DenyRequest");
+                response.Approved = false;
+                response.CreatePlayerObject = false;
             }
 
             void ApproveRequest()
             {
-                callback.CreatePlayerObject = false;
-                callback.PlayerPrefabHash = 0;
-                callback.Approved = true;
-                callback.Position = null;
-                callback.Rotation = null;
+                Debug.Log("ApproveRequest");
+                // Your approval logic determines the following values
+                response.Approved = true;
+                response.CreatePlayerObject = true;
+
+                // The prefab hash value of the NetworkPrefab, if null the default NetworkManager player prefab is used
+                response.PlayerPrefabHash = null;
+
+                // Position to spawn the player object (if null it uses default of Vector3.zero)
+                response.Position = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), Random.Range(-5, 5));
+
+                // Rotation to spawn the player object (if null it uses the default of Quaternion.identity)
+                response.Rotation = Quaternion.Euler(Random.Range(0,359), Random.Range(0,359), Random.Range(0,359));
+
+                // If additional approval steps are needed, set this to true until the additional steps are complete
+                // once it transitions from true to false the connection approval response will be processed.
+                response.Pending = false;
             }
 
             byte[] connectionData = connectionApprovalRequest.Payload;
             UnityNetcodeClientId netcodeClientId = connectionApprovalRequest.ClientNetworkId;
             if (connectionData.Length > MaxConnectionDataLength)
             {
+                Debug.Log($"DenyRequest because connection payload is longer than {MaxConnectionDataLength} bytes");
                 DenyRequest();
                 return;
             }
@@ -337,29 +308,72 @@ namespace SteamOnlineMultiplayer
             if (netcodeClientId == networkManager.LocalClientId)
             {
                 // This a request from ourself
+                Debug.Log("ApproveRequest from ourself");
                 ApproveRequest();
                 return;
             }
 
-            string payload = Encoding.UTF8.GetString(connectionData);
-            RemotePlayerConnectionDataDto connectionDataDto = JsonConverter.FromJson<RemotePlayerConnectionDataDto>(payload);
-
-            if (connectionDataDto.UnityNetcodeClientId != netcodeClientId)
+            string payload = Encoding.UTF8.GetString(connectionData, 0, Math.Min(connectionData.Length, MaxConnectionDataLength));
+            Debug.Log($"Connection payload: {payload}");
+            NetworkPlayerConnectionRequestDataDto requestDataDto;
+            try
             {
-                // clientId of Unity API object does not match clientId of JSON payload
+                requestDataDto = JsonConverter.FromJson<NetworkPlayerConnectionRequestDataDto>(payload, false);
+                if (!IsConnectionRequestDataValid(requestDataDto, out string errorMessage))
+                {
+                    Debug.Log($"DenyRequest because connection data is invalid: {errorMessage}");
+                    DenyRequest();
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"DenyRequest because payload could not be deserialized: {ex.Message}");
                 DenyRequest();
                 return;
             }
 
             MemberData memberData = new MemberData(
-                connectionDataDto.UnityNetcodeClientId,
-                connectionDataDto.SteamId,
-                connectionDataDto.ConnectionGuid,
-                connectionDataDto.DisplayName,
-                connectionDataDto.CurrentSceneName);
+                netcodeClientId,
+                requestDataDto.SteamId,
+                requestDataDto.ConnectionGuid,
+                requestDataDto.DisplayName,
+                requestDataDto.CurrentSceneName);
             connectedMemberDataRegistry.Add(memberData);
 
+            Debug.Log($"ApproveRequest because payload is OK. Added member data: {JsonConverter.ToJson(memberData)}");
             ApproveRequest();
+        }
+
+        private bool IsConnectionRequestDataValid(NetworkPlayerConnectionRequestDataDto requestDataDto, out string errorMessage)
+        {
+            if (requestDataDto.SteamId <= 0)
+            {
+                errorMessage = "SteamId is missing";
+                return false;
+            }
+
+            if (requestDataDto.DisplayName.IsNullOrEmpty())
+            {
+                errorMessage = "DisplayName is missing";
+                return false;
+            }
+
+            if (requestDataDto.ConnectionGuid.IsNullOrEmpty())
+            {
+                errorMessage = "ConnectionGuid is missing";
+                return false;
+            }
+
+            if (requestDataDto.CurrentSceneName.IsNullOrEmpty())
+            {
+                errorMessage = "CurrentSceneName is missing";
+                return false;
+            }
+
+            errorMessage = "";
+            return true;
         }
 
         #endregion

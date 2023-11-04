@@ -420,7 +420,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5257901910265333630}
+  m_Father: {fileID: 5483831765678408185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3822308763357709982
 MonoBehaviour:
@@ -861,6 +861,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6629089734903470095}
+  - {fileID: 5257901910265333630}
+  - {fileID: 5453439099230278257}
+  - {fileID: 1072376310074565602}
+  - {fileID: 3154429417377895152}
   - {fileID: 280779799394265030}
   - {fileID: 5543064232540367519}
   - {fileID: 5679655992247309606}
@@ -884,7 +889,6 @@ Transform:
   - {fileID: 2247980495390972918}
   - {fileID: 6981507401744584904}
   - {fileID: 6858925117782900906}
-  - {fileID: 5257901910265333630}
   - {fileID: 3016431984148765601}
   - {fileID: 7132115325482742499}
   - {fileID: 5594954776714672956}
@@ -6865,7 +6869,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5257901910265333630}
+  m_Father: {fileID: 5483831765678408185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2514473756895476179
 MonoBehaviour:
@@ -7445,7 +7449,7 @@ GameObject:
   - component: {fileID: 3154429417377895152}
   - component: {fileID: 2111751457325209}
   m_Layer: 0
-  m_Name: FacepunchTransport
+  m_Name: SteamFacepunchTransport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7459,12 +7463,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4422566477879890427}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5257901910265333630}
+  m_Father: {fileID: 5483831765678408185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2111751457325209
 MonoBehaviour:
@@ -8071,10 +8075,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 5453439099230278257}
-  - {fileID: 1072376310074565602}
-  - {fileID: 3154429417377895152}
+  m_Children: []
   m_Father: {fileID: 5483831765678408185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8839172341623466722
@@ -8934,6 +8935,50 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dadc79d29fc117541a2c020d474c7780, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &7607099458606064786
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6629089734903470095}
+  - component: {fileID: 3318301725331816876}
+  m_Layer: 0
+  m_Name: CommonOnlineMultiplayerDevelopmentConnectionControl
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6629089734903470095
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7607099458606064786}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5483831765678408185}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3318301725331816876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7607099458606064786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf21613e897d491b8c5fdf76a7c15f16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7911092659538429188
