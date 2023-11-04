@@ -94,16 +94,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void Update()
-    {
-        if (this != Instance)
-        {
-            return;
-        }
-
-        SteamClient.RunCallbacks();
-    }
-
     protected override void OnDestroySingleton()
     {
         Debug.Log("Shutting down SteamClient...");
