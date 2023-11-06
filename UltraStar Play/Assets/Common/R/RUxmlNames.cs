@@ -122,7 +122,6 @@ public static partial class R
         public const string coverImage = "coverImage";
         public const string createBackgroundToggle = "createBackgroundToggle";
         public const string createCoverToggle = "createCoverToggle";
-        public const string createOnlineGameButton = "createOnlineGameButton";
         public const string createPlaylistButton = "createPlaylistButton";
         public const string createPlaylistIcon = "createPlaylistIcon";
         public const string createSongButton = "createSongButton";
@@ -163,7 +162,7 @@ public static partial class R
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string difficultyChooser = "difficultyChooser";
         public const string difficultyPicker = "difficultyPicker";
-        public const string disconnectButton = "disconnectButton";
+        public const string disconnectOnlineGameButton = "disconnectOnlineGameButton";
         public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
@@ -241,11 +240,14 @@ public static partial class R
         public const string horizontalGrid = "horizontalGrid";
         public const string horizontalGridLabelContainer = "horizontalGridLabelContainer";
         public const string horizontalGridLineContainer = "horizontalGridLineContainer";
-        public const string hostGameDirectlyButton = "hostGameDirectlyButton";
+        public const string hostedGameList = "hostedGameList";
+        public const string hostedGameListScrollView = "hostedGameListScrollView";
         public const string hostGameNameField = "hostGameNameField";
         public const string hostHiddenGamePasswordField = "hostHiddenGamePasswordField";
         public const string hostHiddenGameToggle = "hostHiddenGameToggle";
+        public const string hostOnlineGameButton = "hostOnlineGameButton";
         public const string hostOnlineGameControlsContainer = "hostOnlineGameControlsContainer";
+        public const string hostOnlineGameDirectlyButton = "hostOnlineGameDirectlyButton";
         public const string hostOnlineGameTabButton = "hostOnlineGameTabButton";
         public const string httpEndpointExampleLabel = "httpEndpointExampleLabel";
         public const string httpServerHostTextField = "httpServerHostTextField";
@@ -308,10 +310,10 @@ public static partial class R
         public const string jobProgressBar = "jobProgressBar";
         public const string jobRunningIcon = "jobRunningIcon";
         public const string jobStatusIconContainer = "jobStatusIconContainer";
-        public const string joinGameDirectlyButton = "joinGameDirectlyButton";
         public const string joinHiddenGamePasswordField = "joinHiddenGamePasswordField";
-        public const string joinLobbyDummyButton = "joinLobbyDummyButton";
+        public const string joinHostedGameButton = "joinHostedGameButton";
         public const string joinOnlineGameControlsContainer = "joinOnlineGameControlsContainer";
+        public const string joinOnlineGameDirectlyButton = "joinOnlineGameDirectlyButton";
         public const string joinOnlineGameTabButton = "joinOnlineGameTabButton";
         public const string knockOutLabel = "knockOutLabel";
         public const string knockOutLabelOverlay = "knockOutLabelOverlay";
@@ -355,8 +357,6 @@ public static partial class R
         public const string loadedSceneContent = "loadedSceneContent";
         public const string loadedSceneTitle = "loadedSceneTitle";
         public const string loadingLabel = "loadingLabel";
-        public const string lobbyList = "lobbyList";
-        public const string lobbyListScrollView = "lobbyListScrollView";
         public const string lobbyListTitle = "lobbyListTitle";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logFfmpegOutputToggle = "logFfmpegOutputToggle";
@@ -665,7 +665,7 @@ public static partial class R
         public const string searchBarContainer = "searchBarContainer";
         public const string searchContainer = "searchContainer";
         public const string searchErrorIcon = "searchErrorIcon";
-        public const string searchLobbiesButton = "searchLobbiesButton";
+        public const string searchHostedGamesButton = "searchHostedGamesButton";
         public const string searchLobbiesIcon = "searchLobbiesIcon";
         public const string searchMidiFilesWithLyricsToggle = "searchMidiFilesWithLyricsToggle";
         public const string searchNextButton = "searchNextButton";

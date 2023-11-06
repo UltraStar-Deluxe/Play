@@ -173,4 +173,8 @@ public class Settings : ISettings
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();
+
+    // Online multiplayer
+    public string UnityTransportIpAddress { get; set; } = "127.0.0.1";
+    public ushort UnityTransportPort { get; set; } = 7777;
 }

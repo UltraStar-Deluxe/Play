@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CommonOnlineMultiplayer;
 using Steamworks;
 using Steamworks.Data;
 using UniInject;
@@ -82,6 +83,17 @@ namespace SteamOnlineMultiplayer
             if (!steamManager.IsConnectedToSteam)
             {
                 throw new OnlineMultiplayerException("Failed to create lobby, not connected to Steam.");
+            }
+
+            if (config.name.IsNullOrEmpty())
+            {
+                throw new OnlineMultiplayerException("Missing name for lobby.");
+            }
+
+            if (config.visibility is not ESteamLobbyVisibility.Public
+                && config.password.IsNullOrEmpty())
+            {
+                throw new OnlineMultiplayerException("Missing password for hidden lobby.");
             }
 
             if (CurrentLobby != null)

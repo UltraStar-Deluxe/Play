@@ -1,0 +1,133 @@
+using System;
+using CommonOnlineMultiplayer;
+using UniInject;
+using UniRx;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+// Disable warning about fields that are never assigned, their values are injected.
+#pragma warning disable CS0649
+
+namespace SteamOnlineMultiplayer
+{
+    public class HostOnlineGameUiControl : INeedInjection, IInjectionFinishedListener, IDisposable
+    {
+        [Inject(UxmlName = R.UxmlNames.hostOnlineGameButton)]
+        private Button hostOnlineGameButton;
+
+        [Inject(UxmlName = R.UxmlNames.hostHiddenGameToggle)]
+        private Toggle hostHiddenGameToggle;
+
+        [Inject(UxmlName = R.UxmlNames.hostGameNameField)]
+        private TextField hostGameNameField;
+
+        [Inject(UxmlName = R.UxmlNames.hostHiddenGamePasswordField)]
+        private TextField hostHiddenGamePasswordField;
+
+        [Inject(UxmlName = R.UxmlNames.hostOnlineGameDirectlyButton)]
+        private Button hostOnlineGameDirectlyButton;
+
+        [Inject]
+        private SteamMultiplayerManager steamMultiplayerManager;
+
+        [Inject]
+        private SteamLobbyManager steamLobbyManager;
+
+        [Inject]
+        private SteamManager steamManager;
+
+        [Inject]
+        private NetworkManager networkManager;
+
+        [Inject]
+        private Settings settings;
+
+        private string HostGameName => hostGameNameField.value.Trim();
+        private bool HostHiddenGame => hostHiddenGameToggle.value;
+        private string HostGamePassword => hostHiddenGamePasswordField.value.Trim();
+
+        public void OnInjectionFinished()
+        {
+            hostHiddenGameToggle.RegisterValueChangedCallback(evt => UpdateControls());
+            hostGameNameField.RegisterValueChangedCallback(evt => UpdateControls());
+            hostHiddenGamePasswordField.RegisterValueChangedCallback(evt => UpdateControls());
+            hostOnlineGameButton.RegisterCallbackButtonTriggered(evt => HostGameOnSteam());
+            hostOnlineGameDirectlyButton.RegisterCallbackButtonTriggered(evt => HostGameDirectly());
+            UpdateControls();
+        }
+
+        private void UpdateControls()
+        {
+            hostHiddenGamePasswordField.SetEnabled(hostHiddenGameToggle.value);
+            hostOnlineGameButton.SetEnabled(!HostGameName.IsNullOrEmpty()
+                && (!HostHiddenGame || !HostGamePassword.IsNullOrEmpty()));
+        }
+
+        private void HostGameOnSteam()
+        {
+            bool isHidden = hostHiddenGameToggle.value;
+            ESteamLobbyVisibility lobbyVisibility = isHidden
+                ? ESteamLobbyVisibility.Private
+                : ESteamLobbyVisibility.Public;
+
+            string lobbyPassword = isHidden
+                ? HostGamePassword
+                : "";
+
+            LobbyConfig lobbyConfig = new LobbyConfig()
+            {
+                name = $"{steamManager.PlayerName}'s game",
+                joinable = true,
+                maxMembers = SteamConstants.MaxLobbyMembers,
+                visibility = lobbyVisibility,
+                password = lobbyPassword,
+            };
+
+            ObservableUtils.RunOnNewTaskAsObservable(async () =>
+                    {
+                        if (isHidden
+                            && lobbyPassword.IsNullOrEmpty())
+                        {
+                            throw new OnlineMultiplayerException("Hosting a hidden lobby requires a password");
+                        }
+
+                        return await steamLobbyManager.CreateLobbyAsync(lobbyConfig);
+                    },
+                    Disposable.Empty)
+                .ObserveOnMainThread()
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to create lobby: {ex.Message}");
+                    UiManager.CreateNotification("Failed to create lobby");
+                })
+                .Select(lobby=>
+                {
+                    Debug.Log($"Successfully created lobby: {lobby.Id}. Starting Unity Netcode host with FacepunchTransport.");
+                    steamMultiplayerManager.StartNetcodeNetworkManagerHost();
+                    return true;
+                })
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to start Unity Netcode host: {ex.Message}");
+                    UiManager.CreateNotification("Failed to start Unity Netcode host");
+                })
+                .Subscribe(_ =>
+                {
+                    UiManager.CreateNotification("Successfully hosting online game");
+                });
+        }
+
+        private void HostGameDirectly()
+        {
+            CommonOnlineMultiplayerUtils.ConfigureUnityTransport(networkManager, settings);
+            networkManager.StartHost();
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}

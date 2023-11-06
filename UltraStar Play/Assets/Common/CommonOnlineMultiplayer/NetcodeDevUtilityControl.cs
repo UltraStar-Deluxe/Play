@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using CommonOnlineMultiplayer;
@@ -27,43 +26,14 @@ public class NetcodeDevUtilityControl : MonoBehaviour, INeedInjection
         if (!networkManager.IsClient
             && !networkManager.IsServer)
         {
-            ShowStartButtons();
         }
         else
         {
             ShowStatusLabels();
-
             ShowMoveButton();
-            ShowDisconnectButton();
         }
 
         GUILayout.EndArea();
-    }
-
-    private void ShowStartButtons()
-    {
-        if (GUILayout.Button("Client"))
-        {
-            NetworkPlayerConnectionRequestDataDto requestDataDto = new(
-                123456789,
-                Guid.NewGuid().ToString(),
-                "Dummy Client",
-                SceneManager.GetActiveScene().name);
-            string payload = requestDataDto.ToJson();
-            networkManager.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(payload);
-            networkManager.StartClient();
-        }
-
-        if (GUILayout.Button("Server"))
-        {
-            networkManager.StartServer();
-        }
-
-        // Host is both, client and server
-        if (GUILayout.Button("Host"))
-        {
-            networkManager.StartHost();
-        }
     }
 
     private void ShowStatusLabels()
@@ -103,14 +73,6 @@ public class NetcodeDevUtilityControl : MonoBehaviour, INeedInjection
             return "client";
         }
         return "none";
-    }
-
-    private void ShowDisconnectButton()
-    {
-        if (GUILayout.Button("Shutdown"))
-        {
-            networkManager.Shutdown();
-        }
     }
 
     private void ShowMoveButton()

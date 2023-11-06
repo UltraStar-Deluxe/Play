@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SteamOnlineMultiplayer
+namespace CommonOnlineMultiplayer
 {
     public class OnlineMultiplayerException : Exception
     {
