@@ -10,6 +10,7 @@ public static partial class R_PlayShared
         public const string asset = "asset";
         public const string backgroundTransition = "backgroundTransition";
         public const string bootstrapIcon = "bootstrapIcon";
+        public const string borderBottom = "borderBottom";
         public const string bottomLineSeparator = "bottomLineSeparator";
         public const string centerVerticalByMargin = "centerVerticalByMargin";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";

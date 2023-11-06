@@ -6,6 +6,7 @@ using SteamOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
 
@@ -26,6 +27,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     [InjectedInInspector]
     public VisualTreeAsset newSongDialogUi;
+
+    [FormerlySerializedAs("onlineMultiplayerConnectionUi")] [InjectedInInspector]
+    public VisualTreeAsset onlineMultiplayerConnectionDialogUi;
 
     [InjectedInInspector]
     public CreateSongFromTemplateControl createSongFromTemplateControl;
@@ -84,8 +88,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
     [Inject(UxmlName = R.UxmlNames.logo)]
     private VisualElement logo;
 
-    [Inject(UxmlName = R.UxmlNames.onlineMultiplayerConnectionRoot)]
-    private VisualElement onlineMultiplayerConnectionRoot;
+    [Inject(UxmlName = R.UxmlNames.onlineGameButton)]
+    private Button onlineGameButton;
 
     [Inject]
     private Settings settings;
@@ -107,23 +111,15 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private MessageDialogControl quitGameDialogControl;
     private NewSongDialogControl newSongDialogControl;
+    private OnlineMultiplayerConnectionDialogControl onlineMultiplayerConnectionDialogControl;
     private SettingsProblemHintControl settingsProblemHintControl;
     private readonly BuildInfoUiControl buildInfoUiControl = new();
-    private readonly OnlineMultiplayerConnectionUiControl onlineMultiplayerConnectionUiControl = new();
-
-    private bool IsNewSongDialogOpen => newSongDialogControl != null;
-    private bool IsQuitGameDialogOpen => quitGameDialogControl != null;
-    private bool IsAnyDialogOpen => IsNewSongDialogOpen || IsQuitGameDialogOpen || newVersionChecker.IsNewVersionAvailableDialogOpen;
 
     public void OnInjectionFinished()
     {
         injector
             .WithBindingForInstance(versionPropertiesTextAsset)
             .Inject(buildInfoUiControl);
-
-        injector
-            .WithRootVisualElement(onlineMultiplayerConnectionRoot)
-            .Inject(onlineMultiplayerConnectionUiControl);
     }
 
     private void Start()
@@ -137,6 +133,7 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         startButton.RegisterCallbackButtonTriggered(_ => OpenSongSelectScene());
         startButton.Focus();
         partyButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.PartyModeScene));
+        onlineGameButton.RegisterCallbackButtonTriggered(_ => OpenOnlineMultiplayerConnectionDialog());
         settingsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.OptionsScene));
         aboutButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.AboutScene));
         creditsButton.RegisterCallbackButtonTriggered(_ => sceneNavigator.LoadScene(EScene.CreditsScene));
@@ -167,6 +164,23 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
         micSampleRecorderManager.ConnectedMicDevicesChangesStream
             .Subscribe(_ => UpdateSettingsProblemHint())
             .AddTo(gameObject);
+    }
+
+    private void OpenOnlineMultiplayerConnectionDialog()
+    {
+        if (onlineMultiplayerConnectionDialogControl != null)
+        {
+            return;
+        }
+
+        VisualElement dialogVisualElement = onlineMultiplayerConnectionDialogUi.CloneTreeAndGetFirstChild();
+        uiDocument.rootVisualElement.Add(dialogVisualElement);
+
+        onlineMultiplayerConnectionDialogControl = injector
+            .WithRootVisualElement(dialogVisualElement)
+            .CreateAndInject<OnlineMultiplayerConnectionDialogControl>();
+        onlineMultiplayerConnectionDialogControl.DialogClosedEventStream
+            .Subscribe(_ => onlineMultiplayerConnectionDialogControl = null);
     }
 
     private void UpdateSettingsProblemHint()

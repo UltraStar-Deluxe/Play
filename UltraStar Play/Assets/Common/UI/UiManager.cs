@@ -13,6 +13,9 @@ using IBinding = UniInject.IBinding;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 {
+    private const float NotificationFadeOutDelayInSeconds = 4;
+    private const float NotificationFadeOutDurationInSeconds = 1;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
@@ -104,7 +107,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         notificationOverlay.Add(notification);
 
         // Fade out then remove
-        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, 2, 1));
+        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, NotificationFadeOutDelayInSeconds, NotificationFadeOutDurationInSeconds));
 
         return notificationLabel;
     }
