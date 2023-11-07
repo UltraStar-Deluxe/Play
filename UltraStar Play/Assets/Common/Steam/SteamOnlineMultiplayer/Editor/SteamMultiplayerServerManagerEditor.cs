@@ -39,8 +39,7 @@ public class SteamMultiplayerServerManagerEditor : Editor
 
         string text = $"Display Name: {data.DisplayName}, " +
                       $"SteamId: {data.SteamId}, " +
-                      $"UnityNetcodeClientId: {data.UnityNetcodeClientId}, " +
-                      $"Connection Guid: {data.ConnectionGuid} ";
+                      $"UnityNetcodeClientId: {data.UnityNetcodeClientId}, ";
         EditorGUILayout.LabelField(text, labelStyle);
 
         EditorGUILayout.Space();

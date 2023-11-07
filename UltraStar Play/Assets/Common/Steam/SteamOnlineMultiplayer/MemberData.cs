@@ -10,21 +10,15 @@ namespace SteamOnlineMultiplayer
         public string DisplayName { get; private set; }
         public SteamId SteamId { get; private set; }
         public UnityNetcodeClientId UnityNetcodeClientId { get; private set; }
-        public string CurrentSceneName { get; set; }
-        public string ConnectionGuid { get; private set; }
 
         public MemberData(
             UnityNetcodeClientId unityNetcodeClientId,
             SteamId steamId,
-            string connectionGuid,
-            string displayName,
-            string currentSceneName)
+            string displayName)
         {
             UnityNetcodeClientId = unityNetcodeClientId;
             SteamId = steamId;
-            ConnectionGuid = connectionGuid;
             DisplayName = displayName;
-            CurrentSceneName = currentSceneName;
         }
 
         public override string ToString()

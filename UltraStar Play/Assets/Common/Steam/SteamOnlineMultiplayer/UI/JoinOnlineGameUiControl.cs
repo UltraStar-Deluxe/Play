@@ -142,9 +142,7 @@ namespace SteamOnlineMultiplayer
 
             NetworkPlayerConnectionRequestDataDto requestDataDto = new(
                 123456789,
-                Guid.NewGuid().ToString(),
-                "Dummy Client",
-                SceneManager.GetActiveScene().name);
+                "Dummy Client");
             string payload = requestDataDto.ToJson();
             networkManager.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(payload);
             networkManager.StartClient();

@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using CommonOnlineMultiplayer;
 using Steamworks.Data;
 using UniInject;
 using UniRx;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -22,6 +25,9 @@ namespace SteamOnlineMultiplayer
         [Inject(UxmlName = R.UxmlNames.disconnectOnlineGameButton)]
         private Button disconnectOnlineGameButton;
 
+        [Inject(Key = nameof(connectedClientEntryUi))]
+        private VisualTreeAsset connectedClientEntryUi;
+
         [Inject]
         private NetworkManager networkManager;
 
@@ -31,19 +37,25 @@ namespace SteamOnlineMultiplayer
         [Inject]
         private SteamLobbyManager steamLobbyManager;
 
+        [Inject]
+        private Injector injector;
+
         private readonly List<IDisposable> disposables = new();
+
+        private readonly List<NetworkClientEntryControl> entryControls = new();
 
         public void OnInjectionFinished()
         {
-            disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => networkManager.Shutdown());
-
-            // TODO: Get lobby name from server and display it.
             connectedClientsListTitle.text = "Connected Players";
-
-            // TODO: Get connected clients from host and display them.
             connectedClientsListScrollView.Clear();
 
-            steamLobbyManager
+            disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => networkManager.Shutdown());
+
+            disposables.Add(steamMultiplayerManager
+                .NetworkClientConnectionChangedEventSteam
+                .Subscribe(_ => OnConnectedClientsChanged()));
+
+            disposables.Add(steamLobbyManager
                 .LobbyEventStream
                 .Subscribe(evt =>
                 {
@@ -54,7 +66,14 @@ namespace SteamOnlineMultiplayer
                     {
                         OnSteamLobbyChanged();
                     }
-                });
+                }));
+
+            UpdateConnectedClientList();
+        }
+
+        private void OnConnectedClientsChanged()
+        {
+            UpdateConnectedClientList();
         }
 
         private void OnSteamLobbyChanged()
@@ -64,15 +83,70 @@ namespace SteamOnlineMultiplayer
             if (lobby.HasValue)
             {
                 connectedClientsListTitle.text = $"Members of \"{lobby?.GetName()}\"";
-
-                connectedClientsListScrollView.Clear();
-                lobby?.Members.ForEach(friend => connectedClientsListScrollView.Add(new Label(friend.Name)));
+                UpdateConnectedClientList();
             }
             else
             {
                 connectedClientsListTitle.text = "Not connected";
-                connectedClientsListScrollView.Clear();
+                UpdateConnectedClientList();
             }
+        }
+
+        private void UpdateConnectedClientList()
+        {
+            connectedClientsListScrollView.Clear();
+            entryControls.Clear();
+
+            if (networkManager.IsServer)
+            {
+                FillConnectedClientList(steamMultiplayerManager.GetMembers().ToList());
+            }
+            else if (networkManager.IsClient)
+            {
+                NetworkObject localPlayerObject = networkManager.SpawnManager.GetLocalPlayerObject();
+                if (localPlayerObject == null)
+                {
+                    Debug.LogError("Missing LocalPlayerObject");
+                    return;
+                }
+
+                NetworkPlayerControl networkPlayerControl = localPlayerObject.GetComponent<NetworkPlayerControl>();
+                if (networkPlayerControl == null)
+                {
+                    Debug.LogError("Missing NetworkPlayerControl");
+                    return;
+                }
+
+                networkPlayerControl.SendRequestToServerAsObservable(new ConnectedMemberDatasRequestDto().ToJson())
+                    .Subscribe(response =>
+                    {
+                        ConnectedMemberDatasResponseDto responseDto = JsonConverter.FromJson<ConnectedMemberDatasResponseDto>(response);
+                        FillConnectedClientList(responseDto.MemberDatas);
+                    });
+            }
+        }
+
+        private void FillConnectedClientList(List<MemberData> memberDatas)
+        {
+            foreach (MemberData memberData in memberDatas)
+            {
+                CreateConnectedClientEntryControl(memberData);
+            }
+
+            ThemeManager.ApplyThemeSpecificStylesToVisualElements(connectedClientsListScrollView);
+        }
+
+        private void CreateConnectedClientEntryControl(MemberData memberData)
+        {
+            VisualElement visualElement = connectedClientEntryUi.CloneTreeAndGetFirstChild();
+            connectedClientsListScrollView.Add(visualElement);
+
+            NetworkClientEntryControl entryControl = injector
+                .WithBindingForInstance(memberData)
+                .WithRootVisualElement(visualElement)
+                .CreateAndInject<NetworkClientEntryControl>();
+
+            entryControls.Add(entryControl);
         }
 
         public void Dispose()

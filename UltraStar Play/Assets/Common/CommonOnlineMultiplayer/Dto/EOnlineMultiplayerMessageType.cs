@@ -2,6 +2,7 @@
 {
     public enum EOnlineMultiplayerMessageType
     {
-
+        MemberDatasRequest,
+        MemberDatasResponse,
     }
 }

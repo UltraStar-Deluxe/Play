@@ -48,6 +48,8 @@ MonoBehaviour:
     type: 3}
   newSongDialogUi: {fileID: 9197481963319205126, guid: d26d2933254a3114aae87f65770c961c,
     type: 3}
+  connectedClientEntryUi: {fileID: 9197481963319205126, guid: 02348618f8cffba42864c8979a4bd8ba,
+    type: 3}
   onlineMultiplayerConnectionDialogUi: {fileID: 9197481963319205126, guid: 9c3e722be3fae1e41b7f3ea338b29834,
     type: 3}
   createSongFromTemplateControl: {fileID: 3044738762891279275}

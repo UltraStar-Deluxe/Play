@@ -11,7 +11,7 @@ namespace CommonOnlineMultiplayer
         private NetworkManager networkManager;
 
         [Inject]
-        private NetcodeMessagingManager netcodeMessagingManager;
+        private NetcodeCustomMessagingManager netcodeCustomMessagingManager;
 
         protected override object GetInstance()
         {

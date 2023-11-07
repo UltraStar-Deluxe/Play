@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public class NetcodeMessagingManager : AbstractSingletonBehaviour, INeedInjection
+    public class NetcodeCustomMessagingManager : AbstractSingletonBehaviour, INeedInjection
     {
-        public static NetcodeMessagingManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<NetcodeMessagingManager>();
+        public static NetcodeCustomMessagingManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<NetcodeCustomMessagingManager>();
 
         private const string CustomJsonMessageName = "CustomJsonMessage";
 

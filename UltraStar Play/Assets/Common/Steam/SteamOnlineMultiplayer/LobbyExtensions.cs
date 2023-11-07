@@ -33,5 +33,24 @@ namespace SteamOnlineMultiplayer
         {
             lobbyQuery.WithKeyValue("password", value);
         }
+
+        public static void SetVisibility(this Lobby lobby, ESteamLobbyVisibility visibility)
+        {
+            switch (visibility)
+            {
+                case ESteamLobbyVisibility.Public:
+                    lobby.SetPublic();
+                    break;
+                case ESteamLobbyVisibility.Private:
+                    lobby.SetPrivate();
+                    break;
+                case ESteamLobbyVisibility.FriendsOnly:
+                    lobby.SetFriendsOnly();
+                    break;
+                case ESteamLobbyVisibility.Invisible:
+                    lobby.SetInvisible();
+                    break;
+            }
+        }
     }
 }
