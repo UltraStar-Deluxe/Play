@@ -50,13 +50,14 @@ namespace SteamOnlineMultiplayer
 
         private void RegisterNetcodeRequestHandlers()
         {
-            NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new NetcodeRequestHandler<CurrentLobbyMembersRequestDto>(
-                ENetcodeMessageType.CurrentLobbyMembersRequest,
-                1,
-                (requestDto, senderNetcodeClientId) => new CurrentSteamLobbyMembersResponseDto()
-                {
-                    SteamLobbyMembers = GetSteamLobbyMembers().ToList(),
-                }));
+            // TODO: Only register when backend is set to Steam
+            // NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new NetcodeRequestHandler<CurrentLobbyMembersRequestDto>(
+            //     ENetcodeMessageType.CurrentLobbyMembersRequest,
+            //     1,
+            //     (requestDto, senderNetcodeClientId) => new CurrentSteamLobbyMembersResponseDto()
+            //     {
+            //         SteamLobbyMembers = GetSteamLobbyMembers().ToList(),
+            //     }));
         }
 
         public IReadOnlyList<LobbyMember> GetLobbyMembers()

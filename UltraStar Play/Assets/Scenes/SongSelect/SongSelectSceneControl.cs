@@ -532,7 +532,12 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Set difficulty for all players
         settings.ObserveEveryValueChanged(it => it.Difficulty)
-            .Subscribe(newValue => settings.PlayerProfiles.ForEach(it => it.Difficulty = newValue));
+            .Subscribe(newValue =>
+            {
+                settings.PlayerProfiles
+                    .Union(nonPersistentSettings.LobbyMemberPlayerProfiles)
+                    .ForEach(it => it.Difficulty = newValue);
+            });
 
         nextDifficultyButton.RegisterCallbackButtonTriggered(_ => SetNextDifficulty());
         previousDifficultyButton.RegisterCallbackButtonTriggered(_ => SetPreviousDifficulty());
@@ -1577,7 +1582,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     {
         if (!HasPartyModeSceneData)
         {
-            return settings.PlayerProfiles
+            return SettingsUtils.GetPlayerProfiles(settings, nonPersistentSettings)
                 .Where(playerProfile => playerProfile.IsEnabled)
                 .ToList();
         }

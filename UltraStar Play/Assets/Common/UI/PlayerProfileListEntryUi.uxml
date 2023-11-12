@@ -11,6 +11,9 @@
                             <MaterialIcon tabindex="-1" icon="delete" name="removeWebCamImageIcon" />
                         </ui:Button>
                     </ui:VisualElement>
+                    <ui:VisualElement name="onlinePlayerProfileIconContainer" class="overlay" style="align-items: flex-end; justify-content: flex-start;">
+                        <MaterialIcon name="onlinePlayerProfileIcon" picking-mode="Ignore" icon="cloud" />
+                    </ui:VisualElement>
                 </ItemPicker>
                 <ui:TextField picking-mode="Ignore" text="New Player" name="nameTextField" style="margin-left: 8px; margin-right: 8px; margin-bottom: 4px;" />
             </ui:VisualElement>

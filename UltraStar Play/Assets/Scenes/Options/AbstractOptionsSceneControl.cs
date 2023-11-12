@@ -21,6 +21,9 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
     [Inject]
     protected Settings settings;
 
+    [Inject]
+    protected NonPersistentSettings nonPersistentSettings;
+
     [Inject(UxmlName = R.UxmlNames.helpIcon, Optional = true)]
     protected VisualElement helpIcon;
 

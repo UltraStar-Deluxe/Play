@@ -25,6 +25,6 @@ public class PlayerProfile
 
     public override string ToString()
     {
-        return $"PlayerProfile(Name: {Name})";
+        return $"{nameof(PlayerProfile)}(Name: {Name})";
     }
 }

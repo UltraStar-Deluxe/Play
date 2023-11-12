@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UniInject;
 using UniRx;
 using Unity.Netcode;
@@ -12,6 +13,9 @@ namespace CommonOnlineMultiplayer
 
         [Inject]
         private NetworkManager networkManager;
+
+        [Inject]
+        private NonPersistentSettings nonPersistentSettings;
 
         [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
         public OnlineMultiplayerBackendManager BackendManager { get; private set; }
@@ -40,6 +44,33 @@ namespace CommonOnlineMultiplayer
             networkManager.ConnectionApprovalCallback += OnNetcodeClientConnectionApproval;
             networkManager.OnClientStopped += OnNetcodeLocalClientStopped;
             networkManager.OnServerStopped += OnNetcodeLocalServerStopped;
+
+            LobbyMemberConnectionChangedEventSteam
+                .Subscribe(evt => UpdateLobbyMemberPlayerProfiles(evt));
+        }
+
+        private void UpdateLobbyMemberPlayerProfiles(LobbyMemberConnectionChangedEvent evt)
+        {
+            if (evt is LobbyMemberConnectedEvent)
+            {
+                LobbyMember lobbyMember = LobbyMemberManager.GetLobbyMember(evt.UnityNetcodeClientId);
+                if (lobbyMember == null)
+                {
+                    Debug.LogWarning($"Failed to find lobby member for Netcode client id {evt.UnityNetcodeClientId}");
+                    return;
+                }
+                LobbyMemberPlayerProfile lobbyMemberPlayerProfile = new(lobbyMember.DisplayName, evt.UnityNetcodeClientId);
+                nonPersistentSettings.LobbyMemberPlayerProfiles.Add(lobbyMemberPlayerProfile);
+            }
+            else if (evt is LobbyMemberDisconnectedEvent)
+            {
+                LobbyMemberPlayerProfile lobbyMemberPlayerProfile = nonPersistentSettings.LobbyMemberPlayerProfiles
+                    .FirstOrDefault(it => it.UnityNetcodeClientId == evt.UnityNetcodeClientId);
+                if (lobbyMemberPlayerProfile != null)
+                {
+                    nonPersistentSettings.LobbyMemberPlayerProfiles.Remove(lobbyMemberPlayerProfile);
+                }
+            }
         }
 
         protected override void OnDestroySingleton()

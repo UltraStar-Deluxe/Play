@@ -515,6 +515,8 @@ public static partial class R
         public const string onePlayerLayout = "onePlayerLayout";
         public const string onlineGameButton = "onlineGameButton";
         public const string onlineMultiplayerDialogUiRoot = "onlineMultiplayerDialogUiRoot";
+        public const string onlinePlayerProfileIcon = "onlinePlayerProfileIcon";
+        public const string onlinePlayerProfileIconContainer = "onlinePlayerProfileIconContainer";
         public const string openControlsMenuButton = "openControlsMenuButton";
         public const string openFileIcon = "openFileIcon";
         public const string openFolderButton = "openFolderButton";

@@ -77,7 +77,7 @@ public static class DtoConverter
         return dto;
     }
 
-    public static SingScenePlayerData FromDto(SingScenePlayerDataDto dto, Settings settings)
+    public static SingScenePlayerData FromDto(SingScenePlayerDataDto dto, Settings settings, NonPersistentSettings nonPersistentSettings)
     {
         if (dto == null)
         {
@@ -86,13 +86,13 @@ public static class DtoConverter
 
         SingScenePlayerData singScenePlayerData = new();
         singScenePlayerData.SelectedPlayerProfiles = dto.PlayerProfileNames
-            .Select(playerProfileName => SettingsUtils.GetPlayerProfile(settings, playerProfileName))
+            .Select(playerProfileName => SettingsUtils.GetPlayerProfile(settings, nonPersistentSettings, playerProfileName))
             .Where(it => it != null)
             .ToList();
         singScenePlayerData.PlayerProfileToMicProfileMap = new();
         dto.PlayerProfileToMicProfileMap.ForEach(entry =>
         {
-            PlayerProfile playerProfile = SettingsUtils.GetPlayerProfile(settings, entry.Key);
+            PlayerProfile playerProfile = SettingsUtils.GetPlayerProfile(settings, nonPersistentSettings, entry.Key);
             MicProfile micProfile = SettingsUtils.GetMicProfile(settings, entry.Value.Name, entry.Value.ChannelIndex);
             if (playerProfile != null
                 && micProfile != null)
@@ -103,7 +103,7 @@ public static class DtoConverter
         singScenePlayerData.PlayerProfileToVoiceIdMap = new();
         dto.PlayerProfileToVoiceNameMap.ForEach(entry =>
         {
-            PlayerProfile playerProfile = SettingsUtils.GetPlayerProfile(settings, entry.Key);
+            PlayerProfile playerProfile = SettingsUtils.GetPlayerProfile(settings, nonPersistentSettings, entry.Key);
             if (playerProfile != null)
             {
                 singScenePlayerData.PlayerProfileToVoiceIdMap[playerProfile] = entry.Value;
