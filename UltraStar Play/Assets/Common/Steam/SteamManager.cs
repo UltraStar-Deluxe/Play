@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using Netcode.Transports.Facepunch;
 using Steamworks;
-using Steamworks.Data;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -19,19 +16,13 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     public string PlayerName { get; private set; } = "Player";
 
     [Inject]
-    private AchievementEventStream achievementEventStream;
+    private SteamAchievementManager steamAchievementManager;
 
-    [Inject]
-    private FacepunchTransport facepunchTransport;
-
-    private readonly Dictionary<string, Achievement> achievementIdToAchievement = new();
     private readonly Subject<bool> connectedToSteamEventStream = new();
     public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
 
     private readonly Subject<bool> disconnectedFromSteamEventStream = new();
     public IObservable<bool> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
-
-    private readonly HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
 
     protected override object GetInstance()
     {
@@ -40,9 +31,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
-        achievementEventStream
-            .Subscribe(achievementId => TriggerAchievement(achievementId))
-            .AddTo(gameObject);
         InitSteamClient();
     }
 
@@ -73,8 +61,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.LogError("Connected to Steam but failed to request current stats");
             }
 
-            achievementIdToAchievement.Clear();
-            SteamUserStats.Achievements.ForEach(achievement => achievementIdToAchievement[achievement.Identifier] = achievement);
+            steamAchievementManager.SetAvailableAchievements(SteamUserStats.Achievements);
 
             connectedToSteamEventStream.OnNext(true);
             Debug.Log("Steam successfully initialized, PlayerName: " + PlayerName);
@@ -92,52 +79,5 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         SteamClient.Shutdown();
         Debug.Log("SteamClient shut down successfully");
         disconnectedFromSteamEventStream.OnNext(true);
-    }
-
-    private void TriggerAchievement(AchievementId achievementId)
-    {
-        if (triggeredAchievementsSinceAppStart.Contains(achievementId))
-        {
-            return;
-        }
-        triggeredAchievementsSinceAppStart.Add(achievementId);
-
-        if (!IsConnectedToSteam)
-        {
-            // Maybe next time
-            Debug.LogWarning($"Attempt to trigger {achievementId}, but not connected to SteamClient");
-            return;
-        }
-
-        if (!TryGetAchievement(achievementId, out Achievement achievement))
-        {
-            Debug.LogError($"No achievement found for id: {achievementId.Id}");
-            return;
-        }
-
-        if (achievement.State)
-        {
-            Debug.Log($"Skipping already unlocked achievement {achievementId.Id}");
-            return;
-        }
-
-        try
-        {
-            Debug.Log("Unlocking achievement: " + achievementId.Id);
-            bool success = achievement.Trigger();
-            if (!success)
-            {
-                Debug.LogWarning($"Failed to unlock achievement: {achievementId.Id}");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
-    }
-
-    private bool TryGetAchievement(AchievementId achievementId, out Achievement achievement)
-    {
-        return achievementIdToAchievement.TryGetValue(achievementId.Id, out achievement);
     }
 }
