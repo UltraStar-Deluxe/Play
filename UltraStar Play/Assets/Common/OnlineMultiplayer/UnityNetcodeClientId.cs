@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.Netcode;
 
 namespace CommonOnlineMultiplayer
 {
@@ -9,9 +10,9 @@ namespace CommonOnlineMultiplayer
      * NOTE: A Netcode client is named LobbyMember in most of the code.
      */
     [Serializable]
-    public readonly struct UnityNetcodeClientId
+    public struct UnityNetcodeClientId : INetworkSerializable
     {
-        private readonly ulong value;
+        private ulong value;
         public ulong Value => value;
 
         public UnityNetcodeClientId(ulong value)
@@ -26,5 +27,10 @@ namespace CommonOnlineMultiplayer
         public override string ToString() => this.value.ToString();
 
         public bool IsValid => this.value > 0UL;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref value);
+        }
     }
 }

@@ -1,52 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace CommonOnlineMultiplayer
 {
-    public class NetcodeRequestHandler : INetcodeRequestHandler
+    public class NetcodeRequestHandler<REQUESTDTO> : INetcodeRequestHandler
+        where REQUESTDTO : NetcodeRequestDto, new()
     {
-        private readonly List<ENetcodeMessageType> handledMessageTypes;
-        public IReadOnlyList<ENetcodeMessageType> HandledMessageTypes => handledMessageTypes;
+        private readonly ENetcodeMessageType handledMessageType;
+        public ENetcodeMessageType HandledMessageType => handledMessageType;
 
         private readonly int priority;
         public int Priority => priority;
 
-        private readonly Func<NetcodeRequestDto, string> getResponse;
-        public string GetResponse(NetcodeRequestDto requestDto)
+        private readonly Func<REQUESTDTO, UnityNetcodeClientId, JsonSerializable> getResponse;
+
+        public string GetResponse(NetcodeRequest request)
         {
-            return getResponse(requestDto);
+            REQUESTDTO requestDto = JsonConverter.FromJson<REQUESTDTO>(request.RequestMessage);
+            JsonSerializable responseDto = getResponse(requestDto, request.SenderNetcodeClientId);
+            if (responseDto == null)
+            {
+                return "{}";
+            }
+
+            return responseDto.ToJson();
         }
 
         public NetcodeRequestHandler(
-            List<ENetcodeMessageType> handledMessageTypes,
+            ENetcodeMessageType handledMessageType,
             int priority,
-            Func<NetcodeRequestDto, string> getResponse)
+            Func<REQUESTDTO, UnityNetcodeClientId, JsonSerializable> getResponse)
         {
-            this.handledMessageTypes = handledMessageTypes;
+            this.handledMessageType = handledMessageType;
             this.priority = priority;
             this.getResponse = getResponse;
-        }
-
-        public NetcodeRequestHandler(
-            ENetcodeMessageType handledMessageType,
-            int priority,
-            Func<NetcodeRequestDto, string> getResponse)
-            : this(
-                new List<ENetcodeMessageType>() { handledMessageType },
-                priority,
-                getResponse)
-        {
-        }
-
-        public NetcodeRequestHandler(
-            ENetcodeMessageType handledMessageType,
-            int priority,
-            Func<NetcodeRequestDto, JsonSerializable> getResponse)
-            : this(
-                handledMessageType,
-                priority,
-                requestDto => getResponse(requestDto).ToJson())
-        {
         }
     }
 }

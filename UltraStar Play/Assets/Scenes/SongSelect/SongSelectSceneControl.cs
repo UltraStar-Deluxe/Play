@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using CommonOnlineMultiplayer;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -125,6 +126,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     [Inject]
     private SongQueueManager songQueueManager;
 
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
+
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
     private VisualElement noSongsFoundContainer;
 
@@ -235,7 +239,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     public VisualElementSlideInControl SongQueueSlideInControl { get; private set; }
     public VisualElementSlideInControl ModifiersOverlaySlideInControl { get; private set; }
 
-    static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
+    private static readonly ProfilerMarker onInjectionFinishedProfilerMarker = new ProfilerMarker("SongSelectSceneControl.OnInjectionFinished");
+
+    private NetcodeRequestHandler<SuggestSongRequestDto> suggestSongRequestHandler;
 
     public void OnInjectionFinished()
     {
@@ -359,6 +365,42 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Hide slide-in controls with click outside
         InitHideSlideInControlsViaClick();
+
+        InitOnlineMultiplayerRequestHandlers();
+    }
+
+    private void OnDestroy()
+    {
+        onlineMultiplayerManager.NetcodeRequestHandlerRegistry.RemoveRequestHandler(suggestSongRequestHandler);
+    }
+
+    private void InitOnlineMultiplayerRequestHandlers()
+    {
+        if (!onlineMultiplayerManager.IsServer)
+        {
+            return;
+        }
+
+        suggestSongRequestHandler = new NetcodeRequestHandler<SuggestSongRequestDto>(
+            ENetcodeMessageType.SuggestSongRequest,
+            0,
+            (requestDto, senderNetcodeClientId) =>
+            {
+                LobbyMember lobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(senderNetcodeClientId);
+                SongMeta songMeta = songMetaManager.GetSongMetaByGloballyUniqueId(requestDto.GloballyUniqueSongId);
+                if (songMeta != null)
+                {
+                    uiManager.CreateConfirmationDialogControl(
+                        "Song Suggestion",
+                        $"Go to song\n'{SongMetaUtils.GetArtistDashTitle(songMeta)}'\nsuggested by {lobbyMember.DisplayName}?",
+                        "Yes",
+                        _ => songRouletteControl.SelectEntryBySongMeta(songMeta),
+                        "No");
+                }
+
+                return null;
+            });
+        onlineMultiplayerManager.NetcodeRequestHandlerRegistry.AddRequestHandler(suggestSongRequestHandler);
     }
 
     private void InitSongQueue()
@@ -1093,6 +1135,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void AttemptStartSong(SongMeta songMeta, bool ignoreRandomlySelectedSong = false, bool ignoreMissingMicProfiles = false)
     {
+        if (onlineMultiplayerManager.IsConnectedToOnlineGame
+            && !onlineMultiplayerManager.IsServer)
+        {
+            onlineMultiplayerManager.SendMessageToServer(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta)));
+            UiManager.CreateNotification($"Suggested '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to host.");
+            return;
+        }
+
         List<PlayerProfile> selectedPlayerProfiles = playerListControl.GetSelectedPlayerProfiles();
         Dictionary<PlayerProfile, MicProfile> selectedPlayerProfileToMicProfileMap = playerListControl.GetSelectedPlayerProfileToMicProfileMap();
 

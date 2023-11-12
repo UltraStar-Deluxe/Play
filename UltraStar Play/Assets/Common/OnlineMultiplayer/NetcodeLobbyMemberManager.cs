@@ -104,6 +104,17 @@ namespace CommonOnlineMultiplayer
             ApproveRequest(lobbyMember, $"payload is OK");
         }
 
+        public LobbyMember GetLobbyMember(UnityNetcodeClientId netcodeClientId)
+        {
+            if (lobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out LobbyMember lobbyMember))
+            {
+                return lobbyMember;
+            }
+
+            Debug.LogWarning($"No lobby member found for Netcode client id: {netcodeClientId}");
+            return null;
+        }
+
         private bool IsConnectionRequestDataValid(LobbyConnectionRequestDto requestDto, out string errorMessage)
         {
             if (requestDto.DisplayName.IsNullOrEmpty())

@@ -50,10 +50,10 @@ namespace SteamOnlineMultiplayer
 
         private void RegisterNetcodeRequestHandlers()
         {
-            NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new NetcodeRequestHandler(
+            NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new NetcodeRequestHandler<CurrentLobbyMembersRequestDto>(
                 ENetcodeMessageType.CurrentLobbyMembersRequest,
                 1,
-                requestDto => new CurrentSteamLobbyMembersResponseDto()
+                (requestDto, senderNetcodeClientId) => new CurrentSteamLobbyMembersResponseDto()
                 {
                     SteamLobbyMembers = GetSteamLobbyMembers().ToList(),
                 }));
@@ -82,18 +82,23 @@ namespace SteamOnlineMultiplayer
             steamLobbyMemberRegistry.Clear();
         }
 
-        public SteamLobbyMember? GetMemberDataByUnityNetcodeClientId(UnityNetcodeClientId netcodeClientId)
+        public LobbyMember GetLobbyMember(UnityNetcodeClientId netcodeClientId)
+        {
+            return GetSteamLobbyMember(netcodeClientId);
+        }
+
+        public SteamLobbyMember GetSteamLobbyMember(UnityNetcodeClientId netcodeClientId)
         {
             if (steamLobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out SteamLobbyMember memberData))
             {
-                    return memberData;
+                return memberData;
             }
 
-            Debug.LogWarning($"No member data found for net client id: {netcodeClientId}");
+            Debug.LogWarning($"No lobby member found for Netcode client id: {netcodeClientId}");
             return null;
         }
 
-        public SteamLobbyMember? GetMemberDataBySteamId(SteamId steamId)
+        public SteamLobbyMember GetSteamLobbyMember(SteamId steamId)
         {
             if (steamLobbyMemberRegistry.TryGetDataBySteamId(steamId, out SteamLobbyMember memberData))
             {

@@ -104,26 +104,9 @@ namespace SteamOnlineMultiplayer
             }
             else if (networkManager.IsClient)
             {
-                NetworkObject localPlayerObject = networkManager.SpawnManager.GetLocalPlayerObject();
-                if (localPlayerObject == null)
-                {
-                    Debug.LogError("Missing LocalPlayerObject");
-                    return;
-                }
-
-                LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = localPlayerObject.GetComponent<LobbyMemberNetworkBehaviour>();
-                if (lobbyMemberNetworkBehaviour == null)
-                {
-                    Debug.LogError("Missing NetworkPlayerControl");
-                    return;
-                }
-
-                lobbyMemberNetworkBehaviour.MessagingNetworkBehaviour.SendRequestToServerAsObservable(new CurrentLobbyMembersRequestDto().ToJson())
-                    .Subscribe(response =>
-                    {
-                        CurrentSteamLobbyMembersResponseDto responseDto = JsonConverter.FromJson<CurrentSteamLobbyMembersResponseDto>(response);
-                        FillConnectedClientList(responseDto.SteamLobbyMembers);
-                    });
+                onlineMultiplayerManager
+                    .SendMessageToServerAsObservable<CurrentSteamLobbyMembersResponseDto>(new CurrentLobbyMembersRequestDto())
+                    .Subscribe(responseDto => FillConnectedClientList(responseDto.SteamLobbyMembers));
             }
         }
 

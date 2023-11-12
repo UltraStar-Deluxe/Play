@@ -4,5 +4,6 @@
     {
         CurrentLobbyMembersRequest,
         CurrentLobbyMembersResponse,
+        SuggestSongRequest,
     }
 }

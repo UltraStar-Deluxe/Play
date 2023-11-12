@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using CommonOnlineMultiplayer;
-using SteamOnlineMultiplayer;
 using UniRx;
 using Unity.Netcode;
 using UnityEngine;
@@ -23,21 +21,21 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
             ResponseSubject = responseSubject,
         };
         requestIdToRunningRequestData[requestId] = runningRequestData;
-        SendRequestMessageToServerRpc(requestMessage, requestId);
+        SendRequestMessageToServerRpc(requestMessage, requestId, OwnerClientId);
 
         return responseSubject;
     }
 
     // ServerRpc => Executed on server
     [ServerRpc]
-    private void SendRequestMessageToServerRpc(string requestMessage, string requestId)
+    private void SendRequestMessageToServerRpc(string requestMessage, string requestId, UnityNetcodeClientId senderNetcodeClientId)
     {
         Debug.Log($"Received request from client: {requestMessage}");
 
         string responseText = "";
         try
         {
-            responseText = GetResponseText(requestMessage);
+            responseText = GetResponseText(new NetcodeRequest(requestMessage, senderNetcodeClientId));
         }
         catch (Exception ex)
         {
@@ -48,11 +46,11 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
         SendResponseMessageToClientRpc(responseText, requestId);
     }
 
-    private string GetResponseText(string requestMessage)
+    private string GetResponseText(NetcodeRequest netcodeRequest)
     {
-        NetcodeRequestDto requestDto = JsonConverter.FromJson<NetcodeRequestDto>(requestMessage);
+        NetcodeRequestDto requestDto = JsonConverter.FromJson<NetcodeRequestDto>(netcodeRequest.RequestMessage);
         INetcodeRequestHandler netcodeRequestHandler = NetcodeRequestHandlerRegistry.Instance.GetRequestHandler(requestDto.MessageType);
-        return netcodeRequestHandler.GetResponse(requestDto);
+        return netcodeRequestHandler.GetResponse(netcodeRequest);
     }
 
     // ClientRpc => Executed on client

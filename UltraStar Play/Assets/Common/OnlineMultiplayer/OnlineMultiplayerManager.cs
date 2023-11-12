@@ -16,12 +16,17 @@ namespace CommonOnlineMultiplayer
         [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
         public OnlineMultiplayerBackendManager BackendManager { get; private set; }
 
+        [Inject]
+        public NetcodeRequestHandlerRegistry NetcodeRequestHandlerRegistry { get; private set; }
+
         private readonly Subject<LobbyMemberConnectionChangedEvent> lobbyMemberConnectionChangedEventSteam = new();
         public IObservable<LobbyMemberConnectionChangedEvent> LobbyMemberConnectionChangedEventSteam => lobbyMemberConnectionChangedEventSteam
             .ObserveOnMainThread();
 
-        private ILobbyManager LobbyManager => BackendManager.CurrentBackend.LobbyManager;
-        private ILobbyMemberManager LobbyMemberManager => BackendManager.CurrentBackend.LobbyMemberManager;
+        public ILobbyManager LobbyManager => BackendManager.CurrentBackend.LobbyManager;
+        public ILobbyMemberManager LobbyMemberManager => BackendManager.CurrentBackend.LobbyMemberManager;
+        public bool IsConnectedToOnlineGame => networkManager.IsClient;
+        public bool IsServer => networkManager.IsServer;
 
         protected override object GetInstance()
         {
@@ -95,6 +100,45 @@ namespace CommonOnlineMultiplayer
             NetworkManager.ConnectionApprovalResponse response)
         {
             LobbyMemberManager.OnNetcodeClientConnectionApproval(connectionApprovalRequest, response);
+        }
+
+        public void SendMessageToServer(JsonSerializable jsonSerializable)
+        {
+            SendMessageToServerAsObservable<object>(jsonSerializable)
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Exception when sending message to server: {ex.Message}. Sent message: {jsonSerializable.ToJson()}");
+                })
+                // Subscribe to trigger observable
+                .Subscribe(responseDto =>
+                {
+                    // Do nothing.
+                });
+        }
+
+        public IObservable<T> SendMessageToServerAsObservable<T>(JsonSerializable jsonSerializable) where T : new()
+        {
+            if (jsonSerializable == null)
+            {
+                return Observable.Empty<T>();
+            }
+
+            NetworkObject localPlayerObject = networkManager.SpawnManager.GetLocalPlayerObject();
+            if (localPlayerObject == null)
+            {
+                throw new OnlineMultiplayerException("Missing LocalPlayerObject");
+            }
+
+            LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = localPlayerObject.GetComponent<LobbyMemberNetworkBehaviour>();
+            if (lobbyMemberNetworkBehaviour == null)
+            {
+                throw new OnlineMultiplayerException($"Missing {nameof(LobbyMemberMessagingNetworkBehaviour)}");
+            }
+
+            return lobbyMemberNetworkBehaviour.MessagingNetworkBehaviour
+                .SendRequestToServerAsObservable(jsonSerializable.ToJson())
+                .Select(responseMessage => JsonConverter.FromJson<T>(responseMessage));
         }
     }
 }

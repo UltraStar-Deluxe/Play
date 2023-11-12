@@ -13,6 +13,7 @@ namespace CommonOnlineMultiplayer
         void OnNetcodeClientConnectionApproval(
             NetworkManager.ConnectionApprovalRequest connectionApprovalRequest,
             NetworkManager.ConnectionApprovalResponse response);
+        LobbyMember GetLobbyMember(UnityNetcodeClientId netcodeClientId);
         void RemoveLobbyMemberFromRegistry(UnityNetcodeClientId netcodeClientId);
         void ClearLobbyMemberRegistry();
         IReadOnlyList<LobbyMember> GetLobbyMembers();

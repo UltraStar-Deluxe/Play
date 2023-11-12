@@ -31,24 +31,41 @@ namespace CommonOnlineMultiplayer
 
         public void AddRequestHandler(INetcodeRequestHandler netcodeRequestHandler)
         {
-            foreach (ENetcodeMessageType messageType in netcodeRequestHandler.HandledMessageTypes)
+            if (netcodeRequestHandler == null)
             {
-                if (messageTypeToRequestHandlers.TryGetValue(messageType, out List<INetcodeRequestHandler> existingRequestHandlers))
+                return;
+            }
+
+            ENetcodeMessageType messageType = netcodeRequestHandler.HandledMessageType;
+            if (messageTypeToRequestHandlers.TryGetValue(messageType, out List<INetcodeRequestHandler> existingRequestHandlers))
+            {
+                if (existingRequestHandlers.AnyMatch(existingRequestHandler => existingRequestHandler.Priority == netcodeRequestHandler.Priority))
                 {
-                    if (existingRequestHandlers.AnyMatch(existingRequestHandler => existingRequestHandler.Priority == netcodeRequestHandler.Priority))
-                    {
-                        throw new OnlineMultiplayerException($"Failed to add request handler of type {netcodeRequestHandler.GetType().Name}." +
-                                                             $"Cannot register multiple Netcode request handlers with priority {netcodeRequestHandler.Priority} and message type {messageType}.");
-                    }
-                    existingRequestHandlers.Add(netcodeRequestHandler);
+                    throw new OnlineMultiplayerException($"Failed to add request handler of type {netcodeRequestHandler.GetType().Name}." +
+                                                         $"Cannot register multiple Netcode request handlers with priority {netcodeRequestHandler.Priority} and message type {messageType}.");
                 }
-                else
+                existingRequestHandlers.Add(netcodeRequestHandler);
+            }
+            else
+            {
+                messageTypeToRequestHandlers[messageType] = new List<INetcodeRequestHandler>()
                 {
-                    messageTypeToRequestHandlers[messageType] = new List<INetcodeRequestHandler>()
-                    {
-                        netcodeRequestHandler
-                    };
-                }
+                    netcodeRequestHandler
+                };
+            }
+        }
+
+        public void RemoveRequestHandler(INetcodeRequestHandler netcodeRequestHandler)
+        {
+            if (netcodeRequestHandler == null)
+            {
+                return;
+            }
+
+            ENetcodeMessageType messageType = netcodeRequestHandler.HandledMessageType;
+            if (messageTypeToRequestHandlers.TryGetValue(messageType, out List<INetcodeRequestHandler> existingRequestHandlers))
+            {
+                existingRequestHandlers.Remove(netcodeRequestHandler);
             }
         }
     }

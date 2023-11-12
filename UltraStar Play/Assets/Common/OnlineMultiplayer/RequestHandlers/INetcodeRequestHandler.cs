@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace CommonOnlineMultiplayer
+﻿namespace CommonOnlineMultiplayer
 {
     public interface INetcodeRequestHandler
     {
-        public IReadOnlyList<ENetcodeMessageType> HandledMessageTypes { get; }
-        public string GetResponse(NetcodeRequestDto requestDto);
+        public ENetcodeMessageType HandledMessageType { get; }
+        public string GetResponse(NetcodeRequest request);
         public int Priority { get; }
     }
 }
