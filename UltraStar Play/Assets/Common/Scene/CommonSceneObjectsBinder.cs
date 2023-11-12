@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CommonOnlineMultiplayer;
 using Netcode.Transports.Facepunch;
 using PrimeInputActions;
 using ProTrans;
@@ -52,9 +53,20 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
         // Steam
         bb.BindExistingInstance(SteamManager.Instance);
+
         // Online Multiplayer
-        bb.BindExistingInstance(SteamMultiplayerManager.Instance);
+        bb.BindExistingInstance(OnlineMultiplayerManager.Instance);
+        bb.BindExistingInstance(OnlineMultiplayerBackendManager.Instance);
+
+        // Netcode online multiplayer (direct connection without Steam lobby)
+        bb.BindExistingInstance(NetcodeLobbyManager.Instance);
+        bb.BindExistingInstance(NetcodeLobbyMemberManager.Instance);
+        bb.BindExistingInstance(NetcodeOnlineMultiplayerBackendConfigurator.Instance);
+
+        // Steam online multiplayer
         bb.BindExistingInstance(SteamLobbyManager.Instance);
+        bb.BindExistingInstance(SteamLobbyMemberManager.Instance);
+        bb.BindExistingInstance(SteamOnlineMultiplayerBackendConfigurator.Instance);
         bb.BindExistingInstance(DontDestroyOnLoadManager.Instance.FindComponentOrThrow<FacepunchTransport>());
 
         if (NetworkManager.Singleton == null)

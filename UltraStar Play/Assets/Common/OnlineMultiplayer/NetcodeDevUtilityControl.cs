@@ -14,7 +14,7 @@ public class NetcodeDevUtilityControl : MonoBehaviour, INeedInjection
     private SteamManager steamManager;
 
     [Inject]
-    private SteamMultiplayerManager steamMultiplayerManager;
+    private SteamLobbyMemberManager steamLobbyMemberManager;
 
     [Inject]
     private NetworkManager networkManager;
@@ -53,7 +53,7 @@ public class NetcodeDevUtilityControl : MonoBehaviour, INeedInjection
                 .JoinWith(", ", "", ""));
         }
 
-        GUILayout.Label("Connected Steam Lobby Members: " + steamMultiplayerManager.GetMembers()
+        GUILayout.Label("Connected Steam Lobby Members: " + steamLobbyMemberManager.GetSteamLobbyMembers()
             .Select(memberData => memberData.ToString())
             .JoinWith(", ", "", ""));
     }

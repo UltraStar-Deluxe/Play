@@ -3,6 +3,7 @@ using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using Unity.Netcode;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,7 +12,7 @@ using UnityEngine.UIElements;
 
 namespace SteamOnlineMultiplayer
 {
-    public class HostOnlineGameUiControl : INeedInjection, IInjectionFinishedListener, IDisposable
+    public class HostSteamLobbyUiControl : INeedInjection, IInjectionFinishedListener, IHostLobbyUiControl
     {
         [Inject(UxmlName = R.UxmlNames.hostOnlineGameButton)]
         private Button hostOnlineGameButton;
@@ -29,7 +30,7 @@ namespace SteamOnlineMultiplayer
         private Button hostOnlineGameDirectlyButton;
 
         [Inject]
-        private SteamMultiplayerManager steamMultiplayerManager;
+        private SteamLobbyMemberManager steamLobbyMemberManager;
 
         [Inject]
         private SteamLobbyManager steamLobbyManager;
@@ -49,7 +50,7 @@ namespace SteamOnlineMultiplayer
 
         public void OnInjectionFinished()
         {
-            hostGameNameField.value = $"{steamManager.PlayerName}'s game";
+            hostGameNameField.value = $"{steamManager.PlayerName} game";
             hostGameNameField.RegisterValueChangedCallback(evt => UpdateControls());
 
             hostHiddenGameToggle.RegisterValueChangedCallback(evt => UpdateControls());
@@ -107,7 +108,7 @@ namespace SteamOnlineMultiplayer
                 .Select(lobby=>
                 {
                     Debug.Log($"Successfully created lobby: {lobby.Id}. Starting Unity Netcode host with FacepunchTransport.");
-                    steamMultiplayerManager.StartNetcodeNetworkManagerHost();
+                    steamLobbyMemberManager.StartNetcodeNetworkManagerHost();
                     return true;
                 })
                 .CatchIgnore((Exception ex) =>
@@ -130,6 +131,11 @@ namespace SteamOnlineMultiplayer
 
         public void Dispose()
         {
+        }
+
+        public VisualElement CreateVisualElement()
+        {
+            return Resources.Load<VisualTreeAsset>("HostSteamLobbyUi").CloneTreeAndGetFirstChild();
         }
     }
 }

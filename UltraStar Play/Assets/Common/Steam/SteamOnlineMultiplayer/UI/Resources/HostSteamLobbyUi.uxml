@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="hostSteamLobbyUiRoot" class="child-mb-2">
+        <ui:TextField picking-mode="Ignore" label="Name" name="hostGameNameField" />
+        <ui:Toggle label="Hidden" name="hostHiddenGameToggle" />
+        <ui:TextField picking-mode="Ignore" label="Password for&#10;hidden game" name="hostHiddenGamePasswordField" />
+        <ui:Button text="Host Online Game" parse-escape-sequences="true" display-tooltip-when-elided="false" name="hostOnlineGameButton" />
+        <ui:Button text="Host Directly (without Steam)" parse-escape-sequences="true" display-tooltip-when-elided="false" name="hostOnlineGameDirectlyButton" />
+    </ui:VisualElement>
+</ui:UXML>

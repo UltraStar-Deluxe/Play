@@ -1,6 +1,6 @@
 ﻿namespace CommonOnlineMultiplayer
 {
-    public class LobbyMemberConnectedEvent : AbstractLobbyMemberConnectionChangedEvent
+    public class LobbyMemberConnectedEvent : LobbyMemberConnectionChangedEvent
     {
         public LobbyMemberConnectedEvent(UnityNetcodeClientId unityNetcodeClientId)
             : base(unityNetcodeClientId)

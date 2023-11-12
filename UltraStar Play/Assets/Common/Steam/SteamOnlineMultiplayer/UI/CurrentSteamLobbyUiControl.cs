@@ -14,7 +14,7 @@ using UnityEngine.UIElements;
 
 namespace SteamOnlineMultiplayer
 {
-    public class CurrentLobbyUiControl : INeedInjection, IInjectionFinishedListener, IDisposable
+    public class CurrentSteamLobbyUiControl : INeedInjection, IInjectionFinishedListener, ICurrentLobbyUiControl
     {
         [Inject(UxmlName = R.UxmlNames.connectedClientsListTitle)]
         private Label connectedClientsListTitle;
@@ -32,7 +32,10 @@ namespace SteamOnlineMultiplayer
         private NetworkManager networkManager;
 
         [Inject]
-        private SteamMultiplayerManager steamMultiplayerManager;
+        private OnlineMultiplayerManager onlineMultiplayerManager;
+
+        [Inject]
+        private SteamLobbyMemberManager steamLobbyMemberManager;
 
         [Inject]
         private SteamLobbyManager steamLobbyManager;
@@ -42,7 +45,7 @@ namespace SteamOnlineMultiplayer
 
         private readonly List<IDisposable> disposables = new();
 
-        private readonly List<LobbyMemberUiControl> entryControls = new();
+        private readonly List<SteamLobbyMemberUiControl> entryControls = new();
 
         public void OnInjectionFinished()
         {
@@ -51,9 +54,9 @@ namespace SteamOnlineMultiplayer
 
             disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => networkManager.Shutdown());
 
-            disposables.Add(steamMultiplayerManager
-                .NetworkClientConnectionChangedEventSteam
-                .Subscribe(_ => OnConnectedClientsChanged()));
+            disposables.Add(onlineMultiplayerManager
+                .LobbyMemberConnectionChangedEventSteam
+                .Subscribe(_ => OnLobbyMembersChanged()));
 
             disposables.Add(steamLobbyManager
                 .LobbyEventStream
@@ -68,38 +71,36 @@ namespace SteamOnlineMultiplayer
                     }
                 }));
 
-            UpdateConnectedClientList();
+            UpdateLobbyMemberList();
         }
 
-        private void OnConnectedClientsChanged()
+        private void OnLobbyMembersChanged()
         {
-            UpdateConnectedClientList();
+            UpdateLobbyMemberList();
         }
 
         private void OnSteamLobbyChanged()
         {
-            Lobby? lobby = steamLobbyManager.CurrentLobby;
-
-            if (lobby.HasValue)
+            if (steamLobbyManager.CurrentSteamLobby != null)
             {
-                connectedClientsListTitle.text = $"Members of \"{lobby?.GetName()}\"";
-                UpdateConnectedClientList();
+                connectedClientsListTitle.text = $"Members of \"{steamLobbyManager.CurrentSteamLobby.Name}\"";
+                UpdateLobbyMemberList();
             }
             else
             {
                 connectedClientsListTitle.text = "Not connected";
-                UpdateConnectedClientList();
+                UpdateLobbyMemberList();
             }
         }
 
-        private void UpdateConnectedClientList()
+        private void UpdateLobbyMemberList()
         {
             connectedClientsListScrollView.Clear();
             entryControls.Clear();
 
             if (networkManager.IsServer)
             {
-                FillConnectedClientList(steamMultiplayerManager.GetMembers().ToList());
+                FillConnectedClientList(steamLobbyMemberManager.GetSteamLobbyMembers().ToList());
             }
             else if (networkManager.IsClient)
             {
@@ -141,10 +142,13 @@ namespace SteamOnlineMultiplayer
             VisualElement visualElement = connectedClientEntryUi.CloneTreeAndGetFirstChild();
             connectedClientsListScrollView.Add(visualElement);
 
-            LobbyMemberUiControl entryControl = injector
-                .WithBindingForInstance(steamLobbyMember)
+            SteamLobbyMemberUiControl entryControl = injector
                 .WithRootVisualElement(visualElement)
-                .CreateAndInject<LobbyMemberUiControl>();
+                .WithBinding(new Binding(typeof(ILobbyManager), new ExistingInstanceProvider<ILobbyManager>(steamLobbyManager)))
+                .WithBinding(new Binding(typeof(ILobbyMemberManager), new ExistingInstanceProvider<ILobbyMemberManager>(steamLobbyMemberManager)))
+                .WithBinding(new Binding(typeof(LobbyMember), new ExistingInstanceProvider<LobbyMember>(steamLobbyMember)))
+                .WithBindingForInstance(steamLobbyMember)
+                .CreateAndInject<SteamLobbyMemberUiControl>();
 
             entryControls.Add(entryControl);
         }
@@ -152,6 +156,11 @@ namespace SteamOnlineMultiplayer
         public void Dispose()
         {
             disposables.ForEach(it => it.Dispose());
+        }
+
+        public VisualElement CreateVisualElement()
+        {
+            return Resources.Load<VisualTreeAsset>("CurrentSteamLobbyUi").CloneTreeAndGetFirstChild();
         }
     }
 }

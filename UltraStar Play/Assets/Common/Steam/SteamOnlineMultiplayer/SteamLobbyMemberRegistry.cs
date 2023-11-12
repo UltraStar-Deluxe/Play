@@ -8,43 +8,43 @@ namespace SteamOnlineMultiplayer
     [Serializable]
     public class SteamLobbyMemberRegistry
     {
-        private readonly List<SteamLobbyMember> datas = new();
-        private readonly Dictionary<ulong, SteamLobbyMember> unityNetcodeClientIdToData = new();
-        private readonly Dictionary<SteamId, SteamLobbyMember> steamIdToData = new();
-        public int Count => datas.Count;
+        private readonly List<SteamLobbyMember> lobbyMembers = new();
+        private readonly Dictionary<ulong, SteamLobbyMember> unityNetcodeClientIdToLobbyMember = new();
+        private readonly Dictionary<SteamId, SteamLobbyMember> steamIdToLobbyMember = new();
+        public int Count => lobbyMembers.Count;
 
         public void Clear()
         {
-            datas.Clear();
-            unityNetcodeClientIdToData.Clear();
-            steamIdToData.Clear();
+            lobbyMembers.Clear();
+            unityNetcodeClientIdToLobbyMember.Clear();
+            steamIdToLobbyMember.Clear();
         }
 
-        public IReadOnlyList<SteamLobbyMember> GetAllData()
+        public IReadOnlyList<SteamLobbyMember> GetAllLobbyMembers()
         {
-            return datas;
+            return lobbyMembers;
         }
 
-        public void Add(SteamLobbyMember data)
+        public void Add(SteamLobbyMember lobbyMember)
         {
-            datas.Add(data);
-            unityNetcodeClientIdToData[data.UnityNetcodeClientId] = data;
-            steamIdToData[data.SteamId] = data;
+            lobbyMembers.Add(lobbyMember);
+            unityNetcodeClientIdToLobbyMember[lobbyMember.UnityNetcodeClientId] = lobbyMember;
+            steamIdToLobbyMember[lobbyMember.SteamId] = lobbyMember;
         }
 
         public void Remove(SteamLobbyMember data)
         {
-            datas.Remove(data);
+            lobbyMembers.Remove(data);
         }
 
-        public bool TryGetDataBySteamId(SteamId steamId, out SteamLobbyMember data)
+        public bool TryGetDataBySteamId(SteamId steamId, out SteamLobbyMember lobbyMember)
         {
-            return steamIdToData.TryGetValue(steamId, out data);
+            return steamIdToLobbyMember.TryGetValue(steamId, out lobbyMember);
         }
 
-        public bool TryGetDataByUnityNetcodeClientId(UnityNetcodeClientId netcodeClientId, out SteamLobbyMember data)
+        public bool TryGetDataByUnityNetcodeClientId(UnityNetcodeClientId netcodeClientId, out SteamLobbyMember lobbyMember)
         {
-            return unityNetcodeClientIdToData.TryGetValue(netcodeClientId, out data);
+            return unityNetcodeClientIdToLobbyMember.TryGetValue(netcodeClientId, out lobbyMember);
         }
     }
 }

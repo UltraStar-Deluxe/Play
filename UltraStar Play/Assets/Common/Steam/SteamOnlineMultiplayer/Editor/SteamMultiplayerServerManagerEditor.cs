@@ -3,27 +3,27 @@ using SteamOnlineMultiplayer;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SteamMultiplayerManager))]
+[CustomEditor(typeof(SteamLobbyMemberManager))]
 public class SteamMultiplayerServerManagerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        SteamMultiplayerManager steamMultiplayerManager = (SteamMultiplayerManager)target;
-        DrawConnectedLobbyMembers(steamMultiplayerManager.GetMembers());
+        SteamLobbyMemberManager steamLobbyMemberManager = (SteamLobbyMemberManager)target;
+        DrawConnectedSteamLobbyMembers(steamLobbyMemberManager.GetSteamLobbyMembers());
 
         base.OnInspectorGUI();
     }
 
-    private void DrawConnectedLobbyMembers(IReadOnlyList<SteamLobbyMember> members)
+    private void DrawConnectedSteamLobbyMembers(IReadOnlyList<SteamLobbyMember> members)
     {
         EditorGUI.BeginDisabledGroup(disabled: true);
 
-        EditorGUILayout.LabelField($"Connected lobby member count: {members.Count}");
+        EditorGUILayout.LabelField($"Connected Steam lobby member count: {members.Count}");
 
         EditorGUI.indentLevel++;
         foreach (SteamLobbyMember member in members)
         {
-            DrawConnectedLobbyMember(member);
+            DrawConnectedSteamLobbyMember(member);
         }
         EditorGUI.indentLevel--;
 
@@ -32,14 +32,14 @@ public class SteamMultiplayerServerManagerEditor : Editor
 
     }
 
-    private void DrawConnectedLobbyMember(SteamLobbyMember data)
+    private void DrawConnectedSteamLobbyMember(SteamLobbyMember data)
     {
         GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
         labelStyle.wordWrap = true;
 
         string text = $"Display Name: {data.DisplayName}, " +
-                      $"SteamId: {data.SteamId}, " +
-                      $"UnityNetcodeClientId: {data.UnityNetcodeClientId}, ";
+                      $"UnityNetcodeClientId: {data.UnityNetcodeClientId}, " +
+                      $"SteamId: {data.SteamId}, ";
         EditorGUILayout.LabelField(text, labelStyle);
 
         EditorGUILayout.Space();

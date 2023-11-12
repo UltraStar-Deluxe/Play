@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 
 namespace SteamOnlineMultiplayer
 {
-    public class JoinOnlineGameUiControl : INeedInjection, IInjectionFinishedListener, IDisposable
+    public class JoinSteamLobbyUiControl : INeedInjection, IInjectionFinishedListener, IJoinLobbyUiControl
     {
         [Inject(UxmlName = R.UxmlNames.joinHiddenGamePasswordField)]
         private TextField joinHiddenGamePasswordField;
@@ -31,7 +31,7 @@ namespace SteamOnlineMultiplayer
         private Button joinOnlineGameDirectlyButton;
 
         [Inject]
-        private SteamMultiplayerManager steamMultiplayerManager;
+        private SteamLobbyMemberManager steamLobbyMemberManager;
 
         [Inject]
         private SteamLobbyManager steamLobbyManager;
@@ -77,7 +77,7 @@ namespace SteamOnlineMultiplayer
                     }
 
                     Debug.Log($"Successfully joined lobby '{joinedLobby.GetName()}' with id {joinedLobby.Id} and owner {joinedLobby.Owner}. Starting Unity Netcode client with FacepunchTransport.");
-                    steamMultiplayerManager.StartNetcodeNetworkManagerClient(joinedLobbyOwnerId);
+                    steamLobbyMemberManager.StartNetcodeNetworkManagerClient(joinedLobbyOwnerId);
                     return true;
                 })
                 .Subscribe(_ =>
@@ -155,6 +155,11 @@ namespace SteamOnlineMultiplayer
 
         public void Dispose()
         {
+        }
+
+        public VisualElement CreateVisualElement()
+        {
+            return Resources.Load<VisualTreeAsset>("JoinSteamLobbyUi").CloneTreeAndGetFirstChild();
         }
     }
 }

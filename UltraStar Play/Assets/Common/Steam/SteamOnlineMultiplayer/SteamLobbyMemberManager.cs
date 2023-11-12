@@ -4,20 +4,17 @@ using System.Linq;
 using System.Text;
 using CommonOnlineMultiplayer;
 using Netcode.Transports.Facepunch;
-using SteamOnlineMultiplayer.RequestHandlers;
 using Steamworks;
-using Steamworks.Data;
 using UniInject;
-using UniRx;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace SteamOnlineMultiplayer
 {
-    public class SteamMultiplayerManager : AbstractSingletonBehaviour, INeedInjection
+    public class SteamLobbyMemberManager : AbstractSingletonBehaviour, INeedInjection, ILobbyMemberManager
     {
-        public static SteamMultiplayerManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamMultiplayerManager>();
+        public static SteamLobbyMemberManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamLobbyMemberManager>();
 
         private const int MaxConnectionDataLength = 2048;
 
@@ -38,13 +35,8 @@ namespace SteamOnlineMultiplayer
         [Inject]
         private FacepunchTransport injectedFacepunchTransport;
 
-        private readonly Subject<SteamLobbyMemberChangedEvent> connectedMemberDataChangedEventSteam = new();
-        public IObservable<SteamLobbyMemberChangedEvent> ConnectedMemberDataChangedEventSteam => connectedMemberDataChangedEventSteam
-            .ObserveOnMainThread();
-
-        private readonly Subject<AbstractLobbyMemberConnectionChangedEvent> networkClientConnectionChangedEventSteam = new();
-        public IObservable<AbstractLobbyMemberConnectionChangedEvent> NetworkClientConnectionChangedEventSteam => networkClientConnectionChangedEventSteam
-            .ObserveOnMainThread();
+        [Inject]
+        private OnlineMultiplayerManager onlineMultiplayerManager;
 
         protected override object GetInstance()
         {
@@ -53,62 +45,63 @@ namespace SteamOnlineMultiplayer
 
         protected override void StartSingleton()
         {
-            networkManager.OnClientConnectedCallback += OnNetcodeClientConnected;
-            networkManager.OnClientDisconnectCallback += OnNetcodeClientDisconnected;
-            networkManager.ConnectionApprovalCallback += OnNetcodeClientConnectionApproval;
-            networkManager.OnClientStopped += OnNetcodeClientStopped;
-            networkManager.OnServerStopped += OnNetcodeServerStopped;
-
             RegisterNetcodeRequestHandlers();
         }
 
         private void RegisterNetcodeRequestHandlers()
         {
-            NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new CurrentSteamLobbyMembersRequestHandler());
+            NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new NetcodeRequestHandler(
+                ENetcodeMessageType.CurrentLobbyMembersRequest,
+                1,
+                requestDto => new CurrentSteamLobbyMembersResponseDto()
+                {
+                    SteamLobbyMembers = GetSteamLobbyMembers().ToList(),
+                }));
         }
 
-        protected override void OnDestroySingleton()
+        public IReadOnlyList<LobbyMember> GetLobbyMembers()
         {
-            networkManager.OnClientConnectedCallback -= OnNetcodeClientConnected;
-            networkManager.OnClientDisconnectCallback -= OnNetcodeClientDisconnected;
-            networkManager.ConnectionApprovalCallback -= OnNetcodeClientConnectionApproval;
-            networkManager.OnClientStopped -= OnNetcodeClientStopped;
-            networkManager.OnServerStopped -= OnNetcodeServerStopped;
+            return GetSteamLobbyMembers();
         }
 
-        private void OnNetcodeClientStopped(bool wasHostMode)
+        public IReadOnlyList<SteamLobbyMember> GetSteamLobbyMembers()
         {
-            Debug.Log($"OnUnityNetcodeClientStopped(wasHostMode: {wasHostMode})");
-            UiManager.CreateNotification("Disconnected from online game");
+            return steamLobbyMemberRegistry.GetAllLobbyMembers();
+        }
 
-            if (lobbyManager.CurrentLobby != null)
+        public void RemoveLobbyMemberFromRegistry(UnityNetcodeClientId netcodeClientId)
+        {
+            if (steamLobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out SteamLobbyMember steamLobbyMember))
             {
-                lobbyManager.LeaveCurrentLobby();
-            }
-
-            if (wasHostMode)
-            {
-                IReadOnlyList<SteamLobbyMember> memberDatas = steamLobbyMemberRegistry.GetAllData();
-                steamLobbyMemberRegistry.Clear();
-                memberDatas.ForEach(memberData => connectedMemberDataChangedEventSteam.OnNext(new SteamLobbyMemberRemovedEvent(memberData)));
+                steamLobbyMemberRegistry.Remove(steamLobbyMember);
             }
         }
 
-        private void OnNetcodeServerStopped(bool wasHostMode)
+        public void ClearLobbyMemberRegistry()
         {
-            Debug.Log($"OnUnityNetcodeServerStopped(wasHostMode: {wasHostMode})");
+            steamLobbyMemberRegistry.Clear();
+        }
 
-            if (lobbyManager.CurrentLobby != null)
+        public SteamLobbyMember? GetMemberDataByUnityNetcodeClientId(UnityNetcodeClientId netcodeClientId)
+        {
+            if (steamLobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out SteamLobbyMember memberData))
             {
-                lobbyManager.LeaveCurrentLobby();
+                    return memberData;
             }
 
-            if (wasHostMode)
+            Debug.LogWarning($"No member data found for net client id: {netcodeClientId}");
+            return null;
+        }
+
+        public SteamLobbyMember? GetMemberDataBySteamId(SteamId steamId)
+        {
+            if (steamLobbyMemberRegistry.TryGetDataBySteamId(steamId, out SteamLobbyMember memberData))
             {
-                IReadOnlyList<SteamLobbyMember> memberDatas = steamLobbyMemberRegistry.GetAllData();
-                steamLobbyMemberRegistry.Clear();
-                memberDatas.ForEach(memberData => connectedMemberDataChangedEventSteam.OnNext(new SteamLobbyMemberRemovedEvent(memberData)));
+                return memberData;
             }
+
+            Debug.LogWarning($"No member data found for Steam id: {steamId}");
+            return null;
         }
 
         private void ConfigureFacepunchTransport(SteamId targetSteamId)
@@ -157,72 +150,7 @@ namespace SteamOnlineMultiplayer
             Debug.Log("Successfully started Unity Netcode client");
         }
 
-        public SteamLobbyMember? GetMemberDataByUnityNetcodeClientId(UnityNetcodeClientId netcodeClientId)
-        {
-            if (steamLobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out SteamLobbyMember memberData))
-            {
-                    return memberData;
-            }
-
-            Debug.LogWarning($"No member data found for net client id: {netcodeClientId}");
-            return null;
-        }
-
-        public IReadOnlyList<SteamLobbyMember> GetMembers()
-        {
-            return steamLobbyMemberRegistry.GetAllData();
-        }
-
-        public SteamLobbyMember? GetMemberDataBySteamId(SteamId steamId)
-        {
-            if (steamLobbyMemberRegistry.TryGetDataBySteamId(steamId, out SteamLobbyMember memberData))
-            {
-                return memberData;
-            }
-
-            Debug.LogWarning($"No member data found for Steam id: {steamId}");
-            return null;
-        }
-
-        public List<Friend> GetFriends()
-        {
-            if (!steamManager.IsConnectedToSteam)
-                return new List<Friend>();
-
-            return SteamFriends
-                .GetFriends()
-                .ToList();
-        }
-
-        #region SteamCallbacks
-
-        private void OnGameLobbyJoinRequested(Lobby lobby, SteamId steamId)
-        {
-            Debug.Log($"Received request to join lobby '{lobby.GetName()}' with id {lobby.Id} owned by {steamId}");
-        }
-
-        #endregion
-
-        #region NetcodeNetworkManagerCallbacks
-
-        private void OnNetcodeClientConnected(ulong netcodeClientId)
-        {
-            Debug.Log($"OnClientConnected(UnityNetcodeClientId: {netcodeClientId})");
-            networkClientConnectionChangedEventSteam.OnNext(new LobbyMemberConnectedEvent(netcodeClientId));
-        }
-
-        private void OnNetcodeClientDisconnected(ulong netcodeClientId)
-        {
-            Debug.Log($"OnClientDisconnected(UnityNetcodeClientId: {netcodeClientId})");
-            if (steamLobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out SteamLobbyMember memberData))
-            {
-                steamLobbyMemberRegistry.Remove(memberData);
-                connectedMemberDataChangedEventSteam.OnNext(new SteamLobbyMemberRemovedEvent(memberData));
-            }
-            networkClientConnectionChangedEventSteam.OnNext(new LobbyMemberDisconnectedEvent(netcodeClientId));
-        }
-
-        private void OnNetcodeClientConnectionApproval(
+        public void OnNetcodeClientConnectionApproval(
             NetworkManager.ConnectionApprovalRequest connectionApprovalRequest,
             NetworkManager.ConnectionApprovalResponse response)
         {
@@ -254,7 +182,6 @@ namespace SteamOnlineMultiplayer
 
                 steamLobbyMemberRegistry.Add(memberData);
                 Debug.Log($"Added member data: {JsonConverter.ToJson(memberData)}");
-                connectedMemberDataChangedEventSteam.OnNext(new SteamLobbyMemberAddedEvent(memberData));
             }
 
             byte[] connectionData = connectionApprovalRequest.Payload;
@@ -322,7 +249,5 @@ namespace SteamOnlineMultiplayer
             errorMessage = "";
             return true;
         }
-
-        #endregion
     }
 }

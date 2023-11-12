@@ -1,7 +1,11 @@
 ﻿namespace CommonOnlineMultiplayer
 {
+    /**
+     * Payload of the request for joining an online game.
+     */
     public class LobbyConnectionRequestDto : JsonSerializable
     {
+        public string OnlineMultiplayerBackend {get; private set; }
         public string DisplayName {get; private set; }
 
         public LobbyConnectionRequestDto()

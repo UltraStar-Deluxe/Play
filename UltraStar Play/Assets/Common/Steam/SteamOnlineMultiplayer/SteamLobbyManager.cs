@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SteamOnlineMultiplayer
 {
-    public class SteamLobbyManager : AbstractSingletonBehaviour, INeedInjection
+    public class SteamLobbyManager : AbstractSingletonBehaviour, INeedInjection, ILobbyManager
     {
         public static SteamLobbyManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamLobbyManager>();
 
@@ -20,20 +20,22 @@ namespace SteamOnlineMultiplayer
         [Inject]
         private NetworkManager networkManager;
 
-        public Lobby? currentLobby;
-        public Lobby? CurrentLobby
+        public ILobby CurrentLobby => CurrentSteamLobby;
+
+        public SteamLobby currentSteamLobby;
+        public SteamLobby CurrentSteamLobby
         {
-            get => currentLobby;
+            get => currentSteamLobby;
             private set
             {
-                currentLobby = value;
+                currentSteamLobby = value;
                 if (value == null)
                 {
                     Debug.Log($"Set CurrentLobby to null");
                 }
                 else
                 {
-                    Debug.Log($"Set CurrentLobby to lobby '{value?.GetName()}' with id {value?.Id}");
+                    Debug.Log($"Set CurrentLobby to lobby '{value?.Name}' with id {value?.Id}");
                 }
             }
         }
@@ -72,7 +74,7 @@ namespace SteamOnlineMultiplayer
             SteamMatchmaking.OnLobbyDataChanged -= OnLobbyDataChanged;
             SteamMatchmaking.OnLobbyEntered -= OnLobbyEntered;
 
-            if (CurrentLobby != null)
+            if (CurrentSteamLobby != null)
             {
                 LeaveCurrentLobby();
             }
@@ -96,7 +98,7 @@ namespace SteamOnlineMultiplayer
                 throw new OnlineMultiplayerException("Missing password for hidden lobby.");
             }
 
-            if (CurrentLobby != null)
+            if (CurrentSteamLobby != null)
             {
                 LeaveCurrentLobby();
             }
@@ -110,7 +112,7 @@ namespace SteamOnlineMultiplayer
             lobby.SetName(config.name);
             lobby.SetPassword(config.password);
 
-            CurrentLobby = lobby;
+            CurrentSteamLobby = new SteamLobby(lobby);
 
             Debug.Log($"Successfully created new lobby with id {lobby.Id} and owner {lobby.Owner} from config: {JsonConverter.ToJson(config)}");
 
@@ -131,7 +133,7 @@ namespace SteamOnlineMultiplayer
                 throw new OnlineMultiplayerException($"Failed to join lobby '{lobby.GetName()}' with {lobby.Id}: {roomEnter}");
             }
 
-            CurrentLobby = lobby;
+            CurrentSteamLobby = new SteamLobby(lobby);
 
             Debug.Log($"Successfully joined lobby '{lobby.GetName()}' with id {lobby.Id} and owner {lobby.Owner}");
             return lobby;
@@ -157,7 +159,7 @@ namespace SteamOnlineMultiplayer
 
         public void LeaveCurrentLobby()
         {
-            if (CurrentLobby == null)
+            if (CurrentSteamLobby == null)
             {
                 Debug.Log("Cannot leave Steam lobby because CurrentLobby is null");
                 return;
@@ -165,8 +167,8 @@ namespace SteamOnlineMultiplayer
 
             try
             {
-                Debug.Log($"Leaving Steam lobby '{CurrentLobby?.GetName()}' with id {CurrentLobby?.Id}");
-                CurrentLobby?.Leave();
+                Debug.Log($"Leaving Steam lobby '{CurrentSteamLobby?.Name}' with id {CurrentSteamLobby?.Id}");
+                CurrentSteamLobby?.Leave();
             }
             catch (Exception ex)
             {
@@ -175,7 +177,7 @@ namespace SteamOnlineMultiplayer
             }
             finally
             {
-                CurrentLobby = null;
+                CurrentSteamLobby = null;
             }
         }
 

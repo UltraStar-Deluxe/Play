@@ -133,7 +133,9 @@ public static partial class R
         public const string creditsSummaryLabel = "creditsSummaryLabel";
         public const string currentConnectionControlsContainer = "currentConnectionControlsContainer";
         public const string currentDifficultyLabel = "currentDifficultyLabel";
+        public const string currentNetcodeLobbyUiRoot = "currentNetcodeLobbyUiRoot";
         public const string currentSentenceContainer = "currentSentenceContainer";
+        public const string currentSteamLobbyUiRoot = "currentSteamLobbyUiRoot";
         public const string customEventSystemOptInOnAndroidToggle = "customEventSystemOptInOnAndroidToggle";
         public const string dateLabel = "dateLabel";
         public const string defaultCloseDialogButton = "defaultCloseDialogButton";
@@ -174,6 +176,9 @@ public static partial class R
         public const string duetLegend = "duetLegend";
         public const string duetLegendIcon = "duetLegendIcon";
         public const string duetLegendLabel = "duetLegendLabel";
+        public const string dummyCurrentLobbyControls = "dummyCurrentLobbyControls";
+        public const string dummyHostLobbyControls = "dummyHostLobbyControls";
+        public const string dummyJoinLobbyControls = "dummyJoinLobbyControls";
         public const string dummyPermissionToggle = "dummyPermissionToggle";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
@@ -246,10 +251,12 @@ public static partial class R
         public const string hostGameNameField = "hostGameNameField";
         public const string hostHiddenGamePasswordField = "hostHiddenGamePasswordField";
         public const string hostHiddenGameToggle = "hostHiddenGameToggle";
+        public const string hostNetcodeLobbyUiRoot = "hostNetcodeLobbyUiRoot";
         public const string hostOnlineGameButton = "hostOnlineGameButton";
         public const string hostOnlineGameControlsContainer = "hostOnlineGameControlsContainer";
         public const string hostOnlineGameDirectlyButton = "hostOnlineGameDirectlyButton";
         public const string hostOnlineGameTabButton = "hostOnlineGameTabButton";
+        public const string hostSteamLobbyUiRoot = "hostSteamLobbyUiRoot";
         public const string httpEndpointExampleLabel = "httpEndpointExampleLabel";
         public const string httpServerHostTextField = "httpServerHostTextField";
         public const string httpServerPortTextField = "httpServerPortTextField";
@@ -313,9 +320,11 @@ public static partial class R
         public const string jobStatusIconContainer = "jobStatusIconContainer";
         public const string joinHiddenGamePasswordField = "joinHiddenGamePasswordField";
         public const string joinHostedGameButton = "joinHostedGameButton";
+        public const string joinNetcodeLobbyUiRoot = "joinNetcodeLobbyUiRoot";
         public const string joinOnlineGameControlsContainer = "joinOnlineGameControlsContainer";
         public const string joinOnlineGameDirectlyButton = "joinOnlineGameDirectlyButton";
         public const string joinOnlineGameTabButton = "joinOnlineGameTabButton";
+        public const string joinSteamLobbyUiRoot = "joinSteamLobbyUiRoot";
         public const string knockOutLabel = "knockOutLabel";
         public const string knockOutLabelOverlay = "knockOutLabelOverlay";
         public const string knockOutTournamentItemToggle = "knockOutTournamentItemToggle";
@@ -913,6 +922,7 @@ public static partial class R
         public const string toggleMicCheckButton = "toggleMicCheckButton";
         public const string toggleMicCheckButtonLabel = "toggleMicCheckButtonLabel";
         public const string toggleModifiersOverlayButton = "toggleModifiersOverlayButton";
+        public const string toggleOnlineMultiplayerBackendButton = "toggleOnlineMultiplayerBackendButton";
         public const string togglePlaybackButton = "togglePlaybackButton";
         public const string togglePlayerSelectedButton = "togglePlayerSelectedButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
@@ -941,6 +951,8 @@ public static partial class R
         public const string undoButton = "undoButton";
         public const string unexpectedErrorContainer = "unexpectedErrorContainer";
         public const string unexpectedErrorLabel = "unexpectedErrorLabel";
+        public const string unityTransportIpAddressField = "unityTransportIpAddressField";
+        public const string unityTransportPortField = "unityTransportPortField";
         public const string unityVersionLabel = "unityVersionLabel";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";

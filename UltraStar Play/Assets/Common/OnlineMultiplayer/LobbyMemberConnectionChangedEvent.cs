@@ -1,10 +1,10 @@
 ﻿namespace CommonOnlineMultiplayer
 {
-    public abstract class AbstractLobbyMemberConnectionChangedEvent
+    public abstract class LobbyMemberConnectionChangedEvent
     {
         public UnityNetcodeClientId UnityNetcodeClientId { get; private set; }
 
-        protected AbstractLobbyMemberConnectionChangedEvent(UnityNetcodeClientId unityNetcodeClientId)
+        protected LobbyMemberConnectionChangedEvent(UnityNetcodeClientId unityNetcodeClientId)
         {
             UnityNetcodeClientId = unityNetcodeClientId;
         }

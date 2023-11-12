@@ -6,35 +6,35 @@ namespace CommonOnlineMultiplayer
     [Serializable]
     public class LobbyMemberRegistry
     {
-        private readonly List<LobbyMember> datas = new();
-        private readonly Dictionary<ulong, LobbyMember> unityNetcodeClientIdToData = new();
-        public int Count => datas.Count;
+        private readonly List<LobbyMember> lobbyMembers = new();
+        private readonly Dictionary<ulong, LobbyMember> unityNetcodeClientIdToLobbyMembers = new();
+        public int Count => lobbyMembers.Count;
 
         public void Clear()
         {
-            datas.Clear();
-            unityNetcodeClientIdToData.Clear();
+            lobbyMembers.Clear();
+            unityNetcodeClientIdToLobbyMembers.Clear();
         }
 
-        public IReadOnlyList<LobbyMember> GetAllData()
+        public IReadOnlyList<LobbyMember> GetAllLobbyMembers()
         {
-            return datas;
+            return lobbyMembers;
         }
 
         public void Add(LobbyMember lobbyMember)
         {
-            datas.Add(lobbyMember);
-            unityNetcodeClientIdToData[lobbyMember.UnityNetcodeClientId] = lobbyMember;
+            lobbyMembers.Add(lobbyMember);
+            unityNetcodeClientIdToLobbyMembers[lobbyMember.UnityNetcodeClientId] = lobbyMember;
         }
 
         public void Remove(LobbyMember lobbyMember)
         {
-            datas.Remove(lobbyMember);
+            lobbyMembers.Remove(lobbyMember);
         }
 
         public bool TryGetDataByUnityNetcodeClientId(UnityNetcodeClientId netcodeClientId, out LobbyMember lobbyMember)
         {
-            return unityNetcodeClientIdToData.TryGetValue(netcodeClientId, out lobbyMember);
+            return unityNetcodeClientIdToLobbyMembers.TryGetValue(netcodeClientId, out lobbyMember);
         }
     }
 }
