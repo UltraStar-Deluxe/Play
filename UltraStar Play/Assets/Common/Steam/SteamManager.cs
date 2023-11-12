@@ -16,7 +16,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     public bool IsConnectedToSteam { get; private set; }
     public SteamId PlayerSteamId { get; private set; }
-    public string PlayerName { get; private set; } = "Missing Name";
+    public string PlayerName { get; private set; } = "Player";
 
     [Inject]
     private AchievementEventStream achievementEventStream;
@@ -30,10 +30,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     private readonly Subject<bool> disconnectedFromSteamEventStream = new();
     public IObservable<bool> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
-
-    private string playerSteamIdString;
-    private List<Lobby> activeUnrankedLobbies;
-    private List<Lobby> activeRankedLobbies;
 
     private readonly HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
 
@@ -69,9 +65,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             IsConnectedToSteam = true;
             PlayerName = SteamClient.Name;
             PlayerSteamId = SteamClient.SteamId;
-            playerSteamIdString = PlayerSteamId.ToString();
-            activeUnrankedLobbies = new List<Lobby>();
-            activeRankedLobbies = new List<Lobby>();
             IsConnectedToSteam = true;
 
             bool requestCurrentStatsSuccess = SteamUserStats.RequestCurrentStats();
@@ -89,7 +82,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         catch (Exception e)
         {
             IsConnectedToSteam = false;
-            playerSteamIdString = "NoSteamId";
             Debug.LogException(e);
         }
     }

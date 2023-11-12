@@ -35,14 +35,14 @@ namespace SteamOnlineMultiplayer
         private readonly TabGroupControl tabGroupControl = new();
         private readonly HostOnlineGameUiControl hostOnlineGameUiControl = new();
         private readonly JoinOnlineGameUiControl joinOnlineGameUiControl = new();
-        private readonly CurrentOnlineGameUiControl currentOnlineGameUiControl = new();
+        private readonly CurrentLobbyUiControl currentLobbyUiControl = new();
 
         public override void OnInjectionFinished()
         {
             base.OnInjectionFinished();
             injector.Inject(hostOnlineGameUiControl);
             injector.Inject(joinOnlineGameUiControl);
-            injector.Inject(currentOnlineGameUiControl);
+            injector.Inject(currentLobbyUiControl);
 
             tabGroupControl.AddTabGroupButton(hostOnlineGameTabButton, hostOnlineGameControlsContainer);
             tabGroupControl.AddTabGroupButton(joinOnlineGameTabButton, joinOnlineGameControlsContainer);
@@ -58,7 +58,7 @@ namespace SteamOnlineMultiplayer
                 .Subscribe(_ => UpdateVisibleContainer()));
             disposables.Add(hostOnlineGameUiControl);
             disposables.Add(joinOnlineGameUiControl);
-            disposables.Add(currentOnlineGameUiControl);
+            disposables.Add(currentLobbyUiControl);
         }
 
         private void UpdateVisibleContainer()

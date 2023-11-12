@@ -14,14 +14,14 @@ public class SteamMultiplayerServerManagerEditor : Editor
         base.OnInspectorGUI();
     }
 
-    private void DrawConnectedLobbyMembers(IReadOnlyList<MemberData> members)
+    private void DrawConnectedLobbyMembers(IReadOnlyList<SteamLobbyMember> members)
     {
         EditorGUI.BeginDisabledGroup(disabled: true);
 
         EditorGUILayout.LabelField($"Connected lobby member count: {members.Count}");
 
         EditorGUI.indentLevel++;
-        foreach (MemberData member in members)
+        foreach (SteamLobbyMember member in members)
         {
             DrawConnectedLobbyMember(member);
         }
@@ -32,7 +32,7 @@ public class SteamMultiplayerServerManagerEditor : Editor
 
     }
 
-    private void DrawConnectedLobbyMember(MemberData data)
+    private void DrawConnectedLobbyMember(SteamLobbyMember data)
     {
         GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
         labelStyle.wordWrap = true;

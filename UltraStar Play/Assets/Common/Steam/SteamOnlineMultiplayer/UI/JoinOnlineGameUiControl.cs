@@ -6,7 +6,6 @@ using UniInject;
 using UniRx;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -21,6 +20,9 @@ namespace SteamOnlineMultiplayer
 
         [Inject(UxmlName = R.UxmlNames.hostedGameList)]
         private VisualElement hostedGameList;
+
+        [Inject(UxmlName = R.UxmlNames.hostedGameListTitle)]
+        private VisualElement hostedGameListTitle;
 
         [Inject(UxmlName = R.UxmlNames.searchHostedGamesButton)]
         private Button searchHostedGamesButton;
@@ -108,26 +110,29 @@ namespace SteamOnlineMultiplayer
 
         private void FillHostedGameList(Lobby[] lobbies)
         {
-            if (lobbies.IsNullOrEmpty())
+            bool hasHostedGames = !lobbies.IsNullOrEmpty();
+            hostedGameListTitle.SetVisibleByDisplay(hasHostedGames);
+            if (hasHostedGames)
             {
-                hostedGameList.Add(new Label("No online games found."));
-                if (JoinGamePassword.IsNullOrEmpty())
-                {
-                    hostedGameList.Add(new Label("Try to enter a password to search hidden games."));
-                }
-                else
-                {
-                    hostedGameList.Add(new Label("Try a different password to search hidden games."));
-                }
-            }
-            else
-            {
+                hostedGameListTitle.ShowByDisplay();
                 foreach (Lobby lobby in lobbies)
                 {
                     Button joinLobbyButton = new Button();
                     joinLobbyButton.text = $"Join \"{lobby.GetName()}\", members: {lobby.MemberCount}";
                     joinLobbyButton.RegisterCallbackButtonTriggered(_ => JoinGameOnSteam(lobby));
                     hostedGameList.Add(joinLobbyButton);
+                }
+            }
+            else
+            {
+                hostedGameList.Add(new Label());
+                if (JoinGamePassword.IsNullOrEmpty())
+                {
+                    hostedGameList.Add(new Label("No online games found.\nTry to enter a password to search hidden games."));
+                }
+                else
+                {
+                    hostedGameList.Add(new Label("No online games found.\nTry a different password to search hidden games."));
                 }
             }
 
@@ -140,10 +145,10 @@ namespace SteamOnlineMultiplayer
         {
             CommonOnlineMultiplayerUtils.ConfigureUnityTransport(networkManager, settings);
 
-            NetworkPlayerConnectionRequestDataDto requestDataDto = new(
-                123456789,
-                "Dummy Client");
-            string payload = requestDataDto.ToJson();
+            SteamLobbyConnectionRequestDto requestDto = new(
+                "Dummy Client",
+                123456789);
+            string payload = requestDto.ToJson();
             networkManager.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(payload);
             networkManager.StartClient();
         }

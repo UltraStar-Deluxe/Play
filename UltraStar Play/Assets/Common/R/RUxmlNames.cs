@@ -242,6 +242,7 @@ public static partial class R
         public const string horizontalGridLineContainer = "horizontalGridLineContainer";
         public const string hostedGameList = "hostedGameList";
         public const string hostedGameListScrollView = "hostedGameListScrollView";
+        public const string hostedGameListTitle = "hostedGameListTitle";
         public const string hostGameNameField = "hostGameNameField";
         public const string hostHiddenGamePasswordField = "hostHiddenGamePasswordField";
         public const string hostHiddenGameToggle = "hostHiddenGameToggle";
@@ -357,7 +358,6 @@ public static partial class R
         public const string loadedSceneContent = "loadedSceneContent";
         public const string loadedSceneTitle = "loadedSceneTitle";
         public const string loadingLabel = "loadingLabel";
-        public const string lobbyListTitle = "lobbyListTitle";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logFfmpegOutputToggle = "logFfmpegOutputToggle";
         public const string logo = "logo";

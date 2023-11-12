@@ -49,8 +49,10 @@ namespace SteamOnlineMultiplayer
 
         public void OnInjectionFinished()
         {
-            hostHiddenGameToggle.RegisterValueChangedCallback(evt => UpdateControls());
+            hostGameNameField.value = $"{steamManager.PlayerName}'s game";
             hostGameNameField.RegisterValueChangedCallback(evt => UpdateControls());
+
+            hostHiddenGameToggle.RegisterValueChangedCallback(evt => UpdateControls());
             hostHiddenGamePasswordField.RegisterValueChangedCallback(evt => UpdateControls());
             hostOnlineGameButton.RegisterCallbackButtonTriggered(evt => HostGameOnSteam());
             hostOnlineGameDirectlyButton.RegisterCallbackButtonTriggered(evt => HostGameDirectly());
@@ -75,7 +77,7 @@ namespace SteamOnlineMultiplayer
                 ? HostGamePassword
                 : "";
 
-            LobbyConfig lobbyConfig = new LobbyConfig()
+            SteamLobbyConfig steamLobbyConfig = new SteamLobbyConfig()
             {
                 name = $"{steamManager.PlayerName}'s game",
                 joinable = true,
@@ -92,7 +94,7 @@ namespace SteamOnlineMultiplayer
                             throw new OnlineMultiplayerException("Hosting a hidden lobby requires a password");
                         }
 
-                        return await steamLobbyManager.CreateLobbyAsync(lobbyConfig);
+                        return await steamLobbyManager.CreateLobbyAsync(steamLobbyConfig);
                     },
                     Disposable.Empty)
                 .ObserveOnMainThread()

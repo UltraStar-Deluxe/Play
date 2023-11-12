@@ -38,8 +38,8 @@ namespace SteamOnlineMultiplayer
             }
         }
 
-        private readonly Subject<LobbyEvent> lobbyEventStream = new();
-        public IObservable<LobbyEvent> LobbyEventStream => lobbyEventStream;
+        private readonly Subject<SteamLobbyEvent> lobbyEventStream = new();
+        public IObservable<SteamLobbyEvent> LobbyEventStream => lobbyEventStream;
 
         protected override object GetInstance()
         {
@@ -78,7 +78,7 @@ namespace SteamOnlineMultiplayer
             }
         }
 
-        public async Task<Lobby> CreateLobbyAsync(LobbyConfig config)
+        public async Task<Lobby> CreateLobbyAsync(SteamLobbyConfig config)
         {
             if (!steamManager.IsConnectedToSteam)
             {
@@ -179,43 +179,43 @@ namespace SteamOnlineMultiplayer
             }
         }
 
-        private void FireLobbyEvent(LobbyEvent lobbyEvent)
+        private void FireLobbyEvent(SteamLobbyEvent steamLobbyEvent)
         {
-            Debug.Log($"FireLobbyEvent: {lobbyEvent}");
-            lobbyEventStream.OnNext(lobbyEvent);
+            Debug.Log($"FireLobbyEvent: {steamLobbyEvent}");
+            lobbyEventStream.OnNext(steamLobbyEvent);
         }
 
         #region SteamCallbacks
 
         private void OnChatMessage(Lobby lobby, Friend friend, string message) =>
-            FireLobbyEvent(new LobbyChatMessageReceivedEvent(lobby, friend, message));
+            FireLobbyEvent(new SteamLobbyChatMessageReceivedEvent(lobby, friend, message));
 
         private void OnLobbyMemberDataChanged(Lobby lobby, Friend friend) =>
-            FireLobbyEvent(new LobbyDataChangedEvent(lobby));
+            FireLobbyEvent(new SteamLobbyDataChangedEvent(lobby));
 
         private void OnLobbyDataChanged(Lobby lobby) =>
-            FireLobbyEvent(new LobbyDataChangedEvent(lobby));
+            FireLobbyEvent(new SteamLobbyDataChangedEvent(lobby));
 
         private void OnLobbyMemberJoined(Lobby lobby, Friend friend) =>
-            FireLobbyEvent(new MemberJoinedLobbyEvent(lobby, friend));
+            FireLobbyEvent(new MemberJoinedSteamLobbyEvent(lobby, friend));
 
         private void OnLobbyMemberLeave(Lobby lobby, Friend friend) =>
-            FireLobbyEvent(new MemberLeftLobbyEvent(lobby, friend));
+            FireLobbyEvent(new MemberLeftSteamLobbyEvent(lobby, friend));
 
         private void OnLobbyMemberKicked(Lobby lobby, Friend friend, Friend user) =>
-            FireLobbyEvent(new MemberKickedLobbyEvent(lobby, friend, user));
+            FireLobbyEvent(new MemberKickedSteamLobbyEvent(lobby, friend, user));
 
         private void OnLobbyMemberBanned(Lobby lobby, Friend friend, Friend user) =>
-            FireLobbyEvent(new MemberBannedLobbyEvent(lobby, friend, user));
+            FireLobbyEvent(new MemberBannedSteamLobbyEvent(lobby, friend, user));
 
         private void OnLobbyMemberDisconnected(Lobby lobby, Friend friend) =>
-            FireLobbyEvent(new MemberLeftLobbyEvent(lobby, friend));
+            FireLobbyEvent(new MemberLeftSteamLobbyEvent(lobby, friend));
 
         private void OnLobbyInvite(Friend friend, Lobby lobby) =>
-            FireLobbyEvent(new MemberInviteReceivedLobbyEvent(lobby, friend));
+            FireLobbyEvent(new MemberInviteReceivedSteamLobbyEvent(lobby, friend));
 
         private void OnLobbyEntered(Lobby lobby) =>
-            FireLobbyEvent(new LobbyEnteredEvent(lobby));
+            FireLobbyEvent(new SteamLobbyEnteredEvent(lobby));
 
         private void OnLobbyCreated(Result result, Lobby lobby)
         {
@@ -225,8 +225,8 @@ namespace SteamOnlineMultiplayer
                 return;
             }
 
-            FireLobbyEvent(new LobbyCreatedEvent(lobby));
-            FireLobbyEvent(new MemberJoinedLobbyEvent(lobby, lobby.Owner));
+            FireLobbyEvent(new SteamLobbyCreatedEvent(lobby));
+            FireLobbyEvent(new MemberJoinedSteamLobbyEvent(lobby, lobby.Owner));
         }
 
         #endregion

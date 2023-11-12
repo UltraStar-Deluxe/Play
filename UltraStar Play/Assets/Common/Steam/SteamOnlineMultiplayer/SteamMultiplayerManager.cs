@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CommonOnlineMultiplayer;
 using Netcode.Transports.Facepunch;
+using SteamOnlineMultiplayer.RequestHandlers;
 using Steamworks;
 using Steamworks.Data;
 using UniInject;
@@ -20,7 +21,7 @@ namespace SteamOnlineMultiplayer
 
         private const int MaxConnectionDataLength = 2048;
 
-        private readonly ConnectedMemberDataRegistry connectedMemberDataRegistry = new();
+        private readonly SteamLobbyMemberRegistry steamLobbyMemberRegistry = new();
 
         [Inject]
         private NetworkManager networkManager;
@@ -37,12 +38,12 @@ namespace SteamOnlineMultiplayer
         [Inject]
         private FacepunchTransport injectedFacepunchTransport;
 
-        private readonly Subject<ConnectedMemberDataChangedEvent> connectedMemberDataChangedEventSteam = new();
-        public IObservable<ConnectedMemberDataChangedEvent> ConnectedMemberDataChangedEventSteam => connectedMemberDataChangedEventSteam
+        private readonly Subject<SteamLobbyMemberChangedEvent> connectedMemberDataChangedEventSteam = new();
+        public IObservable<SteamLobbyMemberChangedEvent> ConnectedMemberDataChangedEventSteam => connectedMemberDataChangedEventSteam
             .ObserveOnMainThread();
 
-        private readonly Subject<NetworkClientConnectionChangedEvent> networkClientConnectionChangedEventSteam = new();
-        public IObservable<NetworkClientConnectionChangedEvent> NetworkClientConnectionChangedEventSteam => networkClientConnectionChangedEventSteam
+        private readonly Subject<AbstractLobbyMemberConnectionChangedEvent> networkClientConnectionChangedEventSteam = new();
+        public IObservable<AbstractLobbyMemberConnectionChangedEvent> NetworkClientConnectionChangedEventSteam => networkClientConnectionChangedEventSteam
             .ObserveOnMainThread();
 
         protected override object GetInstance()
@@ -57,6 +58,13 @@ namespace SteamOnlineMultiplayer
             networkManager.ConnectionApprovalCallback += OnNetcodeClientConnectionApproval;
             networkManager.OnClientStopped += OnNetcodeClientStopped;
             networkManager.OnServerStopped += OnNetcodeServerStopped;
+
+            RegisterNetcodeRequestHandlers();
+        }
+
+        private void RegisterNetcodeRequestHandlers()
+        {
+            NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new CurrentSteamLobbyMembersRequestHandler());
         }
 
         protected override void OnDestroySingleton()
@@ -80,9 +88,9 @@ namespace SteamOnlineMultiplayer
 
             if (wasHostMode)
             {
-                IReadOnlyList<MemberData> memberDatas = connectedMemberDataRegistry.GetAllData();
-                connectedMemberDataRegistry.Clear();
-                memberDatas.ForEach(memberData => connectedMemberDataChangedEventSteam.OnNext(new ConnectedMemberDataRemovedEvent(memberData)));
+                IReadOnlyList<SteamLobbyMember> memberDatas = steamLobbyMemberRegistry.GetAllData();
+                steamLobbyMemberRegistry.Clear();
+                memberDatas.ForEach(memberData => connectedMemberDataChangedEventSteam.OnNext(new SteamLobbyMemberRemovedEvent(memberData)));
             }
         }
 
@@ -97,9 +105,9 @@ namespace SteamOnlineMultiplayer
 
             if (wasHostMode)
             {
-                IReadOnlyList<MemberData> memberDatas = connectedMemberDataRegistry.GetAllData();
-                connectedMemberDataRegistry.Clear();
-                memberDatas.ForEach(memberData => connectedMemberDataChangedEventSteam.OnNext(new ConnectedMemberDataRemovedEvent(memberData)));
+                IReadOnlyList<SteamLobbyMember> memberDatas = steamLobbyMemberRegistry.GetAllData();
+                steamLobbyMemberRegistry.Clear();
+                memberDatas.ForEach(memberData => connectedMemberDataChangedEventSteam.OnNext(new SteamLobbyMemberRemovedEvent(memberData)));
             }
         }
 
@@ -135,10 +143,10 @@ namespace SteamOnlineMultiplayer
         {
             ConfigureFacepunchTransport(targetSteamId);
 
-            NetworkPlayerConnectionRequestDataDto requestDataDto = new(
-                steamManager.PlayerSteamId.Value,
-                steamManager.PlayerName);
-            string payload = requestDataDto.ToJson();
+            SteamLobbyConnectionRequestDto requestDto = new(
+                steamManager.PlayerName,
+                steamManager.PlayerSteamId.Value);
+            string payload = requestDto.ToJson();
             networkManager.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(payload);
             bool success = networkManager.StartClient();
             if (!success)
@@ -149,9 +157,9 @@ namespace SteamOnlineMultiplayer
             Debug.Log("Successfully started Unity Netcode client");
         }
 
-        public MemberData? GetMemberDataByUnityNetcodeClientId(UnityNetcodeClientId netcodeClientId)
+        public SteamLobbyMember? GetMemberDataByUnityNetcodeClientId(UnityNetcodeClientId netcodeClientId)
         {
-            if (connectedMemberDataRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out MemberData memberData))
+            if (steamLobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out SteamLobbyMember memberData))
             {
                     return memberData;
             }
@@ -160,14 +168,14 @@ namespace SteamOnlineMultiplayer
             return null;
         }
 
-        public IReadOnlyList<MemberData> GetMembers()
+        public IReadOnlyList<SteamLobbyMember> GetMembers()
         {
-            return connectedMemberDataRegistry.GetAllData();
+            return steamLobbyMemberRegistry.GetAllData();
         }
 
-        public MemberData? GetMemberDataBySteamId(SteamId steamId)
+        public SteamLobbyMember? GetMemberDataBySteamId(SteamId steamId)
         {
-            if (connectedMemberDataRegistry.TryGetDataBySteamId(steamId, out MemberData memberData))
+            if (steamLobbyMemberRegistry.TryGetDataBySteamId(steamId, out SteamLobbyMember memberData))
             {
                 return memberData;
             }
@@ -200,18 +208,18 @@ namespace SteamOnlineMultiplayer
         private void OnNetcodeClientConnected(ulong netcodeClientId)
         {
             Debug.Log($"OnClientConnected(UnityNetcodeClientId: {netcodeClientId})");
-            networkClientConnectionChangedEventSteam.OnNext(new NetworkClientConnectionAddedEvent(netcodeClientId));
+            networkClientConnectionChangedEventSteam.OnNext(new LobbyMemberConnectedEvent(netcodeClientId));
         }
 
         private void OnNetcodeClientDisconnected(ulong netcodeClientId)
         {
             Debug.Log($"OnClientDisconnected(UnityNetcodeClientId: {netcodeClientId})");
-            if (connectedMemberDataRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out MemberData memberData))
+            if (steamLobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out SteamLobbyMember memberData))
             {
-                connectedMemberDataRegistry.Remove(memberData);
-                connectedMemberDataChangedEventSteam.OnNext(new ConnectedMemberDataRemovedEvent(memberData));
+                steamLobbyMemberRegistry.Remove(memberData);
+                connectedMemberDataChangedEventSteam.OnNext(new SteamLobbyMemberRemovedEvent(memberData));
             }
-            networkClientConnectionChangedEventSteam.OnNext(new NetworkClientConnectionRemovedEvent(netcodeClientId));
+            networkClientConnectionChangedEventSteam.OnNext(new LobbyMemberDisconnectedEvent(netcodeClientId));
         }
 
         private void OnNetcodeClientConnectionApproval(
@@ -227,7 +235,7 @@ namespace SteamOnlineMultiplayer
                 response.CreatePlayerObject = false;
             }
 
-            void ApproveRequest(MemberData memberData, string reason)
+            void ApproveRequest(SteamLobbyMember memberData, string reason)
             {
                 Debug.Log($"ApproveRequest: {reason}");
 
@@ -244,9 +252,9 @@ namespace SteamOnlineMultiplayer
                 // once it transitions from true to false the connection approval response will be processed.
                 response.Pending = false;
 
-                connectedMemberDataRegistry.Add(memberData);
+                steamLobbyMemberRegistry.Add(memberData);
                 Debug.Log($"Added member data: {JsonConverter.ToJson(memberData)}");
-                connectedMemberDataChangedEventSteam.OnNext(new ConnectedMemberDataAddedEvent(memberData));
+                connectedMemberDataChangedEventSteam.OnNext(new SteamLobbyMemberAddedEvent(memberData));
             }
 
             byte[] connectionData = connectionApprovalRequest.Payload;
@@ -261,21 +269,21 @@ namespace SteamOnlineMultiplayer
             if (netcodeClientId == networkManager.LocalClientId)
             {
                 // This a request from ourself
-                MemberData ownMemberData = new MemberData(
+                SteamLobbyMember ownSteamLobbyMember = new SteamLobbyMember(
                     netcodeClientId,
-                    steamManager.PlayerSteamId,
-                    steamManager.PlayerName);
-                ApproveRequest(ownMemberData, "approval request from ourself");
+                    steamManager.PlayerName,
+                    steamManager.PlayerSteamId);
+                ApproveRequest(ownSteamLobbyMember, "approval request from ourself");
                 return;
             }
 
             string payload = Encoding.UTF8.GetString(connectionData, 0, Math.Min(connectionData.Length, MaxConnectionDataLength));
             Debug.Log($"Connection payload: {payload}");
-            NetworkPlayerConnectionRequestDataDto requestDataDto;
+            SteamLobbyConnectionRequestDto requestDto;
             try
             {
-                requestDataDto = JsonConverter.FromJson<NetworkPlayerConnectionRequestDataDto>(payload, false);
-                if (!IsConnectionRequestDataValid(requestDataDto, out string errorMessage))
+                requestDto = JsonConverter.FromJson<SteamLobbyConnectionRequestDto>(payload, false);
+                if (!IsConnectionRequestDataValid(requestDto, out string errorMessage))
                 {
                     Debug.Log($"DenyRequest because connection data is invalid: {errorMessage}");
                     DenyRequest();
@@ -290,22 +298,22 @@ namespace SteamOnlineMultiplayer
                 return;
             }
 
-            MemberData memberData = new MemberData(
+            SteamLobbyMember steamLobbyMember = new SteamLobbyMember(
                 netcodeClientId,
-                requestDataDto.SteamId,
-                requestDataDto.DisplayName);
-            ApproveRequest(memberData, $"payload is OK");
+                requestDto.DisplayName,
+                requestDto.SteamId);
+            ApproveRequest(steamLobbyMember, $"payload is OK");
         }
 
-        private bool IsConnectionRequestDataValid(NetworkPlayerConnectionRequestDataDto requestDataDto, out string errorMessage)
+        private bool IsConnectionRequestDataValid(SteamLobbyConnectionRequestDto requestDto, out string errorMessage)
         {
-            if (requestDataDto.SteamId <= 0)
+            if (requestDto.SteamId <= 0)
             {
                 errorMessage = "SteamId is missing";
                 return false;
             }
 
-            if (requestDataDto.DisplayName.IsNullOrEmpty())
+            if (requestDto.DisplayName.IsNullOrEmpty())
             {
                 errorMessage = "DisplayName is missing";
                 return false;
