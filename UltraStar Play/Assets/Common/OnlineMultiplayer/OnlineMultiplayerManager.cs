@@ -135,7 +135,7 @@ namespace CommonOnlineMultiplayer
 
         public void SendMessageToServer(JsonSerializable jsonSerializable)
         {
-            SendMessageToServerAsObservable<object>(jsonSerializable)
+            SendRequestToServerAsObservable<object>(jsonSerializable)
                 .CatchIgnore((Exception ex) =>
                 {
                     Debug.LogException(ex);
@@ -148,11 +148,11 @@ namespace CommonOnlineMultiplayer
                 });
         }
 
-        public IObservable<T> SendMessageToServerAsObservable<T>(JsonSerializable jsonSerializable) where T : new()
+        public IObservable<RESPONSEDTO> SendRequestToServerAsObservable<RESPONSEDTO>(JsonSerializable jsonSerializable) where RESPONSEDTO : new()
         {
             if (jsonSerializable == null)
             {
-                return Observable.Empty<T>();
+                return Observable.Empty<RESPONSEDTO>();
             }
 
             NetworkObject localPlayerObject = networkManager.SpawnManager.GetLocalPlayerObject();
@@ -169,7 +169,7 @@ namespace CommonOnlineMultiplayer
 
             return lobbyMemberNetworkBehaviour.MessagingNetworkBehaviour
                 .SendRequestToServerAsObservable(jsonSerializable.ToJson())
-                .Select(responseMessage => JsonConverter.FromJson<T>(responseMessage));
+                .Select(responseMessage => JsonConverter.FromJson<RESPONSEDTO>(responseMessage));
         }
     }
 }

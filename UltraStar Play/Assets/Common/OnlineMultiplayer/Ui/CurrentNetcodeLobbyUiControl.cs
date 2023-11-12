@@ -54,20 +54,11 @@ namespace CommonOnlineMultiplayer
 
             disposables.Add(onlineMultiplayerManager
                 .LobbyMemberConnectionChangedEventSteam
-                .Subscribe(_ => OnLobbyMembersChanged()));
-
-            disposables.Add(onlineMultiplayerManager
-                .LobbyMemberConnectionChangedEventSteam
                 .Subscribe(evt =>
                 {
                     OnLobbyMemberConnectionChanged();
                 }));
 
-            UpdateLobbyMemberList();
-        }
-
-        private void OnLobbyMembersChanged()
-        {
             UpdateLobbyMemberList();
         }
 
@@ -87,33 +78,15 @@ namespace CommonOnlineMultiplayer
 
         private void UpdateLobbyMemberList()
         {
-            connectedClientsListScrollView.Clear();
-            entryControls.Clear();
-
             if (networkManager.IsServer)
             {
                 FillConnectedClientList(lobbyMemberManager.GetLobbyMembers().ToList());
             }
             else if (networkManager.IsClient)
             {
-                NetworkObject localPlayerObject = networkManager.SpawnManager.GetLocalPlayerObject();
-                if (localPlayerObject == null)
-                {
-                    Debug.LogError("Missing LocalPlayerObject");
-                    return;
-                }
-
-                LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = localPlayerObject.GetComponent<LobbyMemberNetworkBehaviour>();
-                if (lobbyMemberNetworkBehaviour == null)
-                {
-                    Debug.LogError("Missing NetworkPlayerControl");
-                    return;
-                }
-
-                lobbyMemberNetworkBehaviour.MessagingNetworkBehaviour.SendRequestToServerAsObservable(new CurrentLobbyMembersRequestDto().ToJson())
-                    .Subscribe(response =>
+                onlineMultiplayerManager.SendRequestToServerAsObservable<CurrentLobbyMembersResponseDto>(new CurrentLobbyMembersRequestDto())
+                    .Subscribe(responseDto =>
                     {
-                        CurrentLobbyMembersResponseDto responseDto = JsonConverter.FromJson<CurrentLobbyMembersResponseDto>(response);
                         FillConnectedClientList(responseDto.LobbyMembers);
                     });
             }
@@ -121,6 +94,9 @@ namespace CommonOnlineMultiplayer
 
         private void FillConnectedClientList(List<LobbyMember> lobbyMembers)
         {
+            connectedClientsListScrollView.Clear();
+            entryControls.Clear();
+
             foreach (LobbyMember lobbyMember in lobbyMembers)
             {
                 CreateConnectedClientEntryControl(lobbyMember);

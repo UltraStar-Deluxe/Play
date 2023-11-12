@@ -21,6 +21,8 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
             ResponseSubject = responseSubject,
         };
         requestIdToRunningRequestData[requestId] = runningRequestData;
+
+        Debug.Log($"Sending request to server: {requestMessage}, requestId: {requestId}, senderNetcodeClientId: {OwnerClientId}");
         SendRequestMessageToServerRpc(requestMessage, requestId, OwnerClientId);
 
         return responseSubject;
@@ -30,7 +32,7 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
     [ServerRpc]
     private void SendRequestMessageToServerRpc(string requestMessage, string requestId, UnityNetcodeClientId senderNetcodeClientId)
     {
-        Debug.Log($"Received request from client: {requestMessage}");
+        Debug.Log($"Received request from client: {requestMessage}, requestId: {requestId}, senderNetcodeClientId: {senderNetcodeClientId}");
 
         string responseText = "";
         try
@@ -40,10 +42,10 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError($"Failed to process request from client, error message: {ex.Message}, request message: {requestMessage}");
+            Debug.LogError($"Failed to process request from client, error message: {ex.Message}, request message: {requestMessage}, requestId: {requestId}, senderNetcodeClientId: {senderNetcodeClientId}");
         }
 
-        SendResponseMessageToClientRpc(responseText, requestId);
+        SendResponseMessageToClientRpc(responseText, requestId, senderNetcodeClientId);
     }
 
     private string GetResponseText(NetcodeRequest netcodeRequest)
@@ -55,9 +57,14 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
 
     // ClientRpc => Executed on client
     [ClientRpc]
-    private void SendResponseMessageToClientRpc(string responseMessage, string requestId)
+    private void SendResponseMessageToClientRpc(string responseMessage, string requestId, UnityNetcodeClientId targetNetcodeClientId)
     {
-        Debug.Log($"Received response from server: {responseMessage}");
+        if (targetNetcodeClientId != OwnerClientId)
+        {
+            return;
+        }
+
+        Debug.Log($"Received response from server: {responseMessage}, requestId: {requestId}, targetNetcodeClientId: {targetNetcodeClientId}");
         if (requestIdToRunningRequestData.TryGetValue(requestId, out RunningRequestData runningRequestData))
         {
             runningRequestData.ResponseMessage = responseMessage;
@@ -82,7 +89,7 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
         }
         else
         {
-            Debug.LogError($"Failed to find running request object for response from server with request id {requestId}. Response: {responseMessage}");
+            Debug.LogError($"Failed to find running request object for response from server with requestId {requestId}. Response: {responseMessage}");
         }
     }
 

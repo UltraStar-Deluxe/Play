@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UniInject;
 using Unity.Netcode;
@@ -22,6 +23,22 @@ namespace CommonOnlineMultiplayer
         protected override object GetInstance()
         {
             return Instance;
+        }
+
+        protected override void StartSingleton()
+        {
+            RegisterNetcodeRequestHandlers();
+        }
+
+        private void RegisterNetcodeRequestHandlers()
+        {
+            NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new NetcodeRequestHandler<CurrentLobbyMembersRequestDto>(
+                ENetcodeMessageType.CurrentLobbyMembersRequest,
+                0,
+                (requestDto, senderNetcodeClientId) => new CurrentLobbyMembersResponseDto()
+                {
+                    LobbyMembers = GetLobbyMembers().ToList(),
+                }));
         }
 
         public void OnNetcodeClientConnectionApproval(

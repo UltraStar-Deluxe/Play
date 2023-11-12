@@ -50,7 +50,7 @@ namespace SteamOnlineMultiplayer
 
         private void RegisterNetcodeRequestHandlers()
         {
-            // TODO: Only register when backend is set to Steam
+            // TODO: Only register when backend is set to Steam?
             // NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new NetcodeRequestHandler<CurrentLobbyMembersRequestDto>(
             //     ENetcodeMessageType.CurrentLobbyMembersRequest,
             //     1,
