@@ -18,7 +18,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "Moq.dll"
+        "Moq.dll",
+        "Facepunch.Steamworks.Win64.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

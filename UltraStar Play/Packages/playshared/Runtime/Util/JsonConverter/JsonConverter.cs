@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FullSerializer;
 
@@ -9,6 +10,11 @@ public static class JsonConverter
     // Indentation for pretty printing JSON.
     private const string IndentString = "    ";
 
+    // Cannot clear this list in RuntimeInitializeLoadType.SubsystemRegistration because it would clear already added converters.
+    // Instead, use a dictionary such that every converter is only once in the collection, even when in the Unity editor.
+    private static readonly Dictionary<string, Func<fsBaseConverter>> customConverterProviders = new();
+    public static IReadOnlyCollection<string> CustomConverterTypeNames => customConverterProviders.Keys;
+
     private static fsSerializer CreateSerializer()
     {
         fsSerializer newSerializer = new();
@@ -16,6 +22,7 @@ public static class JsonConverter
         newSerializer.AddConverter(new Color32Converter());
         newSerializer.AddConverter(new GradientConfigConverter());
         newSerializer.AddConverter(new ReactivePropertyConverter());
+        customConverterProviders.Values.ForEach(customConverterProvider => newSerializer.AddConverter(customConverterProvider.Invoke()));
         return newSerializer;
     }
 
@@ -86,5 +93,11 @@ public static class JsonConverter
                         : lineBreak;
 
         return String.Concat(result);
+    }
+
+    public static void AddCustomConverter<T>(Func<T> customConverterProvider) where T : fsBaseConverter
+    {
+        string converterTypeName = typeof(T).FullName;
+        customConverterProviders[converterTypeName] = customConverterProvider;
     }
 }
