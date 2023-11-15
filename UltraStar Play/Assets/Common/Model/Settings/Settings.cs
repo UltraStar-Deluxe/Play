@@ -109,6 +109,7 @@ public class Settings : ISettings
         ESearchProperty.Artist,
         ESearchProperty.Title,
     };
+    public Dictionary<string, MicProfileReference> PlayerProfileNameToLastUsedMicProfile { get; private set; } = new();
 
     // Technical settings
     public bool ShowFps { get; set; }
