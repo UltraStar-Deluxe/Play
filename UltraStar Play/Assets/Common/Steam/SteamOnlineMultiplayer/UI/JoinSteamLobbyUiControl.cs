@@ -27,9 +27,6 @@ namespace SteamOnlineMultiplayer
         [Inject(UxmlName = R.UxmlNames.searchHostedGamesButton)]
         private Button searchHostedGamesButton;
 
-        [Inject(UxmlName = R.UxmlNames.joinOnlineGameDirectlyButton)]
-        private Button joinOnlineGameDirectlyButton;
-
         [Inject]
         private SteamLobbyMemberManager steamLobbyMemberManager;
 
@@ -49,7 +46,6 @@ namespace SteamOnlineMultiplayer
 
         public void OnInjectionFinished()
         {
-            joinOnlineGameDirectlyButton.RegisterCallbackButtonTriggered(_ => JoinGameDirectly());
             searchHostedGamesButton.RegisterCallbackButtonTriggered(_ => UpdateHostedGameList());
             UpdateHostedGameList();
         }
@@ -139,18 +135,6 @@ namespace SteamOnlineMultiplayer
             hostedGameList.GetFirstAncestorOfType<AccordionItem>()?.UpdateTargetHeight();
 
             ThemeManager.ApplyThemeSpecificStylesToVisualElements(hostedGameList);
-        }
-
-        private void JoinGameDirectly()
-        {
-            CommonOnlineMultiplayerUtils.ConfigureUnityTransport(networkManager, settings);
-
-            SteamLobbyConnectionRequestDto requestDto = new(
-                "Dummy Client",
-                123456789);
-            string payload = requestDto.ToJson();
-            networkManager.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(payload);
-            networkManager.StartClient();
         }
 
         public void Dispose()

@@ -25,9 +25,6 @@ namespace SteamOnlineMultiplayer
         [Inject(UxmlName = R.UxmlNames.hostHiddenGamePasswordField)]
         private TextField hostHiddenGamePasswordField;
 
-        [Inject(UxmlName = R.UxmlNames.hostOnlineGameDirectlyButton)]
-        private Button hostOnlineGameDirectlyButton;
-
         [Inject]
         private SteamLobbyMemberManager steamLobbyMemberManager;
 
@@ -55,7 +52,6 @@ namespace SteamOnlineMultiplayer
             hostHiddenGameToggle.RegisterValueChangedCallback(evt => UpdateControls());
             hostHiddenGamePasswordField.RegisterValueChangedCallback(evt => UpdateControls());
             hostOnlineGameButton.RegisterCallbackButtonTriggered(evt => HostGameOnSteam());
-            hostOnlineGameDirectlyButton.RegisterCallbackButtonTriggered(evt => HostGameDirectly());
             UpdateControls();
         }
 
@@ -120,12 +116,6 @@ namespace SteamOnlineMultiplayer
                 {
                     UiManager.CreateNotification("Successfully hosting online game");
                 });
-        }
-
-        private void HostGameDirectly()
-        {
-            CommonOnlineMultiplayerUtils.ConfigureUnityTransport(networkManager, settings);
-            networkManager.StartHost();
         }
 
         public void Dispose()

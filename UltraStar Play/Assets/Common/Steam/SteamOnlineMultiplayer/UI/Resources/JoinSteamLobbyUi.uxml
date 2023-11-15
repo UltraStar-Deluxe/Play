@@ -14,6 +14,5 @@
                 <MaterialIcon tabindex="-1" name="searchLobbiesIcon" icon="search" />
             </ui:Button>
         </ui:VisualElement>
-        <ui:Button text="Join Directly (without Steam)" parse-escape-sequences="true" display-tooltip-when-elided="false" name="joinOnlineGameDirectlyButton" />
     </ui:VisualElement>
 </ui:UXML>
