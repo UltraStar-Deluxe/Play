@@ -123,12 +123,20 @@ namespace CommonOnlineMultiplayer
 
         public LobbyMember GetLobbyMember(UnityNetcodeClientId netcodeClientId)
         {
-            if (lobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out LobbyMember lobbyMember))
+            if (networkManager.IsServer)
             {
-                return lobbyMember;
+                if (lobbyMemberRegistry.TryGetDataByUnityNetcodeClientId(netcodeClientId, out LobbyMember lobbyMember))
+                {
+                    return lobbyMember;
+                }
+                Debug.LogWarning($"No lobby member found for Netcode client id: {netcodeClientId}");
+                return null;
+            }
+            else if (networkManager.IsClient)
+            {
+                return GetLobbyMembers().FirstOrDefault(it => it.UnityNetcodeClientId == netcodeClientId);
             }
 
-            Debug.LogWarning($"No lobby member found for Netcode client id: {netcodeClientId}");
             return null;
         }
 
@@ -159,7 +167,25 @@ namespace CommonOnlineMultiplayer
 
         public IReadOnlyList<LobbyMember> GetLobbyMembers()
         {
-            return lobbyMemberRegistry.GetAllLobbyMembers();
+            if (networkManager.IsServer)
+            {
+                return lobbyMemberRegistry.GetAllLobbyMembers();
+            }
+            else if (networkManager.IsClient)
+            {
+                List<LobbyMember> result = new();
+                networkManager.SpawnManager.SpawnedObjectsList.ForEach(networkObject =>
+                {
+                    LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = networkObject.GetComponent<LobbyMemberNetworkBehaviour>();
+                    if (lobbyMemberNetworkBehaviour != null)
+                    {
+                        result.Add(lobbyMemberNetworkBehaviour.LobbyMember);
+                    }
+                });
+                return result;
+            }
+
+            return new List<LobbyMember>();
         }
     }
 }

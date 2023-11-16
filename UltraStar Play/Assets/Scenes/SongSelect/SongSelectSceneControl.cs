@@ -968,6 +968,17 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         if (singSceneData != null)
         {
             sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
+
+            if (onlineMultiplayerManager.IsConnectedToOnlineGame
+                && onlineMultiplayerManager.IsServer)
+            {
+                // Connected lobby members must also start this song now. Thus, send required data to them.
+                SingSceneDataDto singSceneDataDto = NetcodeMessageDtoConverterUtils.ToDto(singSceneData);
+                onlineMultiplayerManager.SendMessageToAllClients(new StartSingSceneRequestDto()
+                {
+                    SingSceneDataDto = singSceneDataDto,
+                });
+            }
         }
     }
 

@@ -1,3 +1,4 @@
+using CommonOnlineMultiplayer;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,30 +10,61 @@ public class LobbyMemberNetworkBehaviour : NetworkBehaviour
 {
     public LobbyMemberMessagingNetworkBehaviour MessagingNetworkBehaviour { get; private set; }
 
+    private NetworkVariable<LobbyMemberNetworkSerializable> lobbyMemberNetworkVariable = new();
+
+    public LobbyMember LobbyMember => new LobbyMember(
+        lobbyMemberNetworkVariable.Value.unityNetcodeClientId,
+        lobbyMemberNetworkVariable.Value.displayName);
+
     // Not used, only to see if Unity Netcode is working as expected
     private readonly NetworkVariable<Vector3> positionNetworkVariable = new NetworkVariable<Vector3>();
+
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     private void Awake()
     {
         MessagingNetworkBehaviour = GetComponentInChildren<LobbyMemberMessagingNetworkBehaviour>();
+        onlineMultiplayerManager = OnlineMultiplayerManager.Instance;
     }
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         Debug.Log($"{nameof(LobbyMemberNetworkBehaviour)}.OnNetworkSpawn");
 
         // DontDestroyOnLoad object to persist the object across (custom implementation of) scene changes.
         DontDestroyOnLoad(this);
 
-        if (IsOwner)
+        if (IsServer)
         {
-            // This is executed only on the client that owns this object.
+            // Distribute LobbyMember data, which is known on server, to all clients by setting the corresponding NetworkVariable.
+            LobbyMember lobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(OwnerClientId);
+            lobbyMemberNetworkVariable.Value = new LobbyMemberNetworkSerializable(lobbyMember);
         }
+
+        onlineMultiplayerManager.OnLobbyMemberNetworkObjectSpawned(OwnerClientId);
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        onlineMultiplayerManager.OnLobbyMemberNetworkObjectDestroyed(OwnerClientId);
     }
 
     private void Update()
     {
         transform.position = positionNetworkVariable.Value;
+
+        UpdateGameObjectName();
+    }
+
+    private void UpdateGameObjectName()
+    {
+        LobbyMemberNetworkSerializable lobbyMemberNetworkSerializable = lobbyMemberNetworkVariable.Value;
+        if (lobbyMemberNetworkSerializable != null)
+        {
+            name = $"{nameof(LobbyMemberNetworkBehaviour)}-{lobbyMemberNetworkSerializable.unityNetcodeClientId}-{lobbyMemberNetworkSerializable.displayName}";
+        }
     }
 
     public void Move()
