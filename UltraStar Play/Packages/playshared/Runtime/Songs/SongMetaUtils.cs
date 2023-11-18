@@ -205,7 +205,16 @@ public static class SongMetaUtils
         {
             return null;
         }
-        return voice.Sentences.FirstOrDefault(sentence => IsBeatInSentence(sentence, beat, inclusiveMinBeat, inclusiveMaxBeat));
+        return GetSentenceAtBeat(voice.Sentences, beat, inclusiveMinBeat, inclusiveMaxBeat);
+    }
+
+    public static Sentence GetSentenceAtBeat(IReadOnlyCollection<Sentence> sentences, int beat, bool inclusiveMinBeat = true, bool inclusiveMaxBeat = true)
+    {
+        if (sentences.IsNullOrEmpty())
+        {
+            return null;
+        }
+        return sentences.FirstOrDefault(sentence => IsBeatInSentence(sentence, beat, inclusiveMinBeat, inclusiveMaxBeat));
     }
 
     public static Note GetNoteAtBeat(IEnumerable<Note> notes, int beat, bool inclusiveStartBeat = true, bool inclusiveEndBeat = true)

@@ -65,11 +65,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     [Inject]
     private Injector injector;
 
-    // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
-    private Injector childrenInjector;
-
-    public PlayerUiControl PlayerUiControl { get; private set; }
-
     [Inject]
     private SongMeta songMeta;
 
@@ -79,14 +74,29 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     [Inject]
     private AchievementEventStream achievementEventStream;
 
+    public PlayerUiControl PlayerUiControl { get; private set; } = new();
+
+    // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
+    private Injector childrenInjector;
+
+    // private readonly PlayerScoreNetworkControl playerScoreNetworkControl = new();
+
     private int displaySentenceIndex;
 
     private int perfectSentenceCount;
 
+    private List<Note> sortedNotesInVoice;
+    private List<Sentence> sortedSentencesInVoice;
+
     public void OnInjectionFinished()
     {
-        this.PlayerUiControl = new PlayerUiControl();
-        this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
+        childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
+
+        sortedNotesInVoice = SongMetaUtils.GetAllNotes(Voice);
+        sortedNotesInVoice.Sort(Note.comparerByStartBeat);
+
+        sortedSentencesInVoice = Voice.Sentences.ToList();
+        sortedSentencesInVoice.Sort(Sentence.comparerByStartBeat);
 
         SortedSentences = Voice.Sentences.ToList();
         SortedSentences.Sort(Sentence.comparerByStartBeat);
@@ -117,6 +127,8 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
                 childrenInjector.Inject(childThatNeedsInjection);
             }
         }
+
+        // playerUiControlInjector.Inject(playerScoreNetworkControl);
 
         PlayerMicPitchTracker.MicProfile = MicProfile;
 
@@ -237,6 +249,16 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
         // Update the UI
         enterSentenceEventStream.OnNext(new EnterSentenceEvent(displaySentence, displaySentenceIndex));
+    }
+
+    public IReadOnlyList<Note> GetSortedNotesInVoice()
+    {
+        return sortedNotesInVoice;
+    }
+
+    public IReadOnlyList<Sentence> GetSortedSentencesInVoice()
+    {
+        return sortedSentencesInVoice;
     }
 
     public Sentence GetSentence(int index)

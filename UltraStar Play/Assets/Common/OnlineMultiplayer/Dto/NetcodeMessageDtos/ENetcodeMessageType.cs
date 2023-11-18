@@ -2,10 +2,13 @@
 {
     public enum ENetcodeMessageType
     {
+        Other,
+
         CurrentLobbyMembersRequest,
         CurrentLobbyMembersResponse,
-        SetCurrentLobbyMembersRequest,
+
         SuggestSongRequest,
         StartSongRequest,
+        BeatAnalyzedEventRequest,
     }
 }

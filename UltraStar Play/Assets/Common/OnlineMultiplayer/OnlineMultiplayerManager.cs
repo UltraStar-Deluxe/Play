@@ -34,7 +34,8 @@ namespace CommonOnlineMultiplayer
         /**
          * Each connected Netcode peer has a client, but only one of them is the host and server.
          */
-        public bool IsConnectedToOnlineGame => networkManager.IsClient;
+        public bool IsOnlineGame => networkManager.IsClient;
+        public bool IsLocalGame => !IsOnlineGame;
 
         /**
          * The host is the Netcode server that adds a client for itself automatically.
@@ -55,6 +56,8 @@ namespace CommonOnlineMultiplayer
                     .FirstOrDefault(it => it.UnityNetcodeClientId == ownLobbyMember.UnityNetcodeClientId);
             }
         }
+        public NetworkObject OwnLobbyMemberNetworkObject => networkManager.SpawnManager.GetLocalPlayerObject();
+        public UnityNetcodeClientId OwnUnityNetcodeClientId => OwnLobbyMember.UnityNetcodeClientId;
 
         protected override object GetInstance()
         {
@@ -199,10 +202,13 @@ namespace CommonOnlineMultiplayer
                 .Select(responseMessage => JsonConverter.FromJson<RESPONSEDTO>(responseMessage));
         }
 
-        public IObservable<RESPONSEDTO> SendMessageToAllClientsAsObservable<RESPONSEDTO>(JsonSerializable jsonSerializable)
+        public IObservable<RESPONSEDTO> SendMessageToClientsAsObservable<RESPONSEDTO>(
+            JsonSerializable jsonSerializable,
+            List<UnityNetcodeClientId> unityNetcodeClientIds)
             where RESPONSEDTO : new()
         {
-            if (jsonSerializable == null)
+            if (jsonSerializable == null
+                || unityNetcodeClientIds.IsNullOrEmpty())
             {
                 return Observable.Empty<RESPONSEDTO>();
             }
@@ -220,13 +226,22 @@ namespace CommonOnlineMultiplayer
             }
 
             return lobbyMemberNetworkBehaviour.MessagingNetworkBehaviour
-                .SendRequestMessageToAllClientsAsObservable(jsonSerializable.ToJson())
+                .SendRequestMessageToAllClientsAsObservable(jsonSerializable.ToJson(), unityNetcodeClientIds)
                 .Select(responseMessage => JsonConverter.FromJson<RESPONSEDTO>(responseMessage));
         }
 
         public void SendMessageToAllClients(JsonSerializable jsonSerializable)
         {
-            SendMessageToAllClientsAsObservable<object>(jsonSerializable)
+            List<UnityNetcodeClientId> unityNetcodeClientIds = LobbyMemberManager
+                .GetLobbyMembers()
+                .Select(it => it.UnityNetcodeClientId)
+                .ToList();
+            SendMessageToClients(jsonSerializable, unityNetcodeClientIds);
+        }
+
+        public void SendMessageToClients(JsonSerializable jsonSerializable, List<UnityNetcodeClientId> netcodeClientIds)
+        {
+            SendMessageToClientsAsObservable<object>(jsonSerializable, netcodeClientIds)
                 .CatchIgnore((Exception ex) =>
                 {
                     Debug.LogException(ex);
@@ -237,6 +252,45 @@ namespace CommonOnlineMultiplayer
                 {
                     // Do nothing.
                 });
+        }
+
+        public T GetNetworkBehaviour<T>(UnityNetcodeClientId netcodeClientId)
+            where T : NetworkBehaviour
+        {
+            GameObject lobbyMemberGameObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId).gameObject;
+            return lobbyMemberGameObject.GetComponentInChildren<T>();
+        }
+
+        public T GetNetworkBehaviourOfOwnLobbyMember<T>()
+            where T : NetworkBehaviour
+        {
+            return GetNetworkBehaviour<T>(OwnLobbyMemberNetworkObject.OwnerClientId);
+        }
+
+        public T AddNetworkBehaviourToOwnLobbyMemberIfMissing<T>()
+            where T : NetworkBehaviour
+        {
+            GameObject ownLobbyMemberGameObject = OwnLobbyMemberNetworkObject.gameObject;
+            T existingComponent = ownLobbyMemberGameObject.GetComponentInChildren<T>();
+            if (existingComponent)
+            {
+                return existingComponent;
+            }
+
+            GameObject newGameObject = new();
+            newGameObject.name = typeof(T).Name;
+            newGameObject.transform.parent = ownLobbyMemberGameObject.transform;
+            return newGameObject.AddComponent<T>();
+        }
+
+        public void SendMessageToOtherClients(JsonSerializable jsonSerializable)
+        {
+            List<UnityNetcodeClientId> unityNetcodeClientIds = LobbyMemberManager
+                .GetLobbyMembers()
+                .Select(it => it.UnityNetcodeClientId)
+                .Where(it => it != OwnUnityNetcodeClientId)
+                .ToList();
+            SendMessageToClients(jsonSerializable, unityNetcodeClientIds);
         }
     }
 }

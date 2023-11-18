@@ -5,11 +5,12 @@
         public string GloballyUniqueSongId { get; set; }
 
         public SuggestSongRequestDto()
+            : base(ENetcodeMessageType.SuggestSongRequest)
         {
         }
 
         public SuggestSongRequestDto(string globallyUniqueSongId)
-            : base(ENetcodeMessageType.SuggestSongRequest)
+            : this()
         {
             GloballyUniqueSongId = globallyUniqueSongId;
         }

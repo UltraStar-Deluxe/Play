@@ -88,7 +88,7 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
     public void LoadScene(EScene scene, bool skipAnimation=false)
     {
-        if (onlineMultiplayerManager.IsConnectedToOnlineGame
+        if (onlineMultiplayerManager.IsOnlineGame
             && (scene is EScene.PartyModeScene or EScene.SongEditorScene))
         {
             Debug.Log($"Cannot open {scene} when connected to online game");

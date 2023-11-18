@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -37,6 +38,9 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     [Inject]
     private Settings mainGameSettings;
 
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
+
     // The rounding distance of the PlayerProfile
     private float roundingDistance;
 
@@ -57,7 +61,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     public int usedJokerCount;
 
     private readonly Subject<BeatAnalyzedEvent> beatAnalyzedEventStream = new();
-    public IObservable<BeatAnalyzedEvent> BeatAnalyzedEventStream => beatAnalyzedEventStream;
+    public IObservable<BeatAnalyzedEvent> BeatAnalyzedEventStream => beatAnalyzedEventStream
+        .ObserveOnMainThread();
 
     private readonly Subject<NoteAnalyzedEvent> noteAnalyzedEventStream = new();
     public IObservable<NoteAnalyzedEvent> NoteAnalyzedEventStream => noteAnalyzedEventStream;
@@ -71,6 +76,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private readonly Queue<BeatPitchEventAndTime> beatPitchEventsFromConnectedClientQueue = new();
 
+    private NetcodeRequestHandler<BeatAnalyzedEventNetcodeRequestDto> beatAnalyzedEventDtoRequestHandler;
+
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
@@ -80,6 +87,48 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
         roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
         beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
+
+        InitOnlineMultiplayerRequestHandlers();
+    }
+
+    private void InitOnlineMultiplayerRequestHandlers()
+    {
+        beatAnalyzedEventDtoRequestHandler = new(
+            ENetcodeMessageType.BeatAnalyzedEventRequest,
+            0,
+            (requestDto, senderNetcodeClientId) =>
+            {
+                if (playerProfile is not LobbyMemberPlayerProfile
+                    || playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+                {
+                    Debug.Log($"Ignoring {requestDto.GetType().Name} because player '{playerProfile.Name}' is handled locally");
+                    // The request is not relevant for this player.
+                    return EmptyNetcodeResponseDto.Instance;
+                }
+
+                Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(playerControl.GetSortedNotesInVoice(), requestDto.Beat);
+                Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.GetSortedSentencesInVoice(), requestDto.Beat);
+
+                BeatAnalyzedEvent beatAnalyzedEvent = new(
+                    requestDto.PitchEvent,
+                    requestDto.Beat,
+                    noteAtBeat,
+                    sentenceAtBeat,
+                    requestDto.RecordedMidiNote,
+                    requestDto.RoundedRecordedMidiNote);
+
+                Debug.Log($"Fire BeatAnalyzedEvent because of {requestDto.GetType().Name}");
+                beatAnalyzedEventStream.OnNext(beatAnalyzedEvent);
+
+                return EmptyNetcodeResponseDto.Instance;
+            });
+        onlineMultiplayerManager.NetcodeRequestHandlerRegistry.AddRequestHandler(beatAnalyzedEventDtoRequestHandler);
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        onlineMultiplayerManager.NetcodeRequestHandlerRegistry.RemoveRequestHandler(beatAnalyzedEventDtoRequestHandler);
     }
 
     public void InitPitchDetection()
@@ -120,7 +169,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         MicSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
-        audioSamplesAnalyzer = AbstractMicPitchTracker.CreateAudioSamplesAnalyzer(mainGameSettings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
+        audioSamplesAnalyzer = CreateAudioSamplesAnalyzer(mainGameSettings.PitchDetectionAlgorithm, MicSampleRecorder.FinalSampleRate.Value);
     }
 
     private void InitPitchDetectionFromConnectedClient()
@@ -440,7 +489,24 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
         int roundedMidiNoteAfterJoker = ApplyJokerRule(pitchEvent, roundedRecordedMidiNote, noteAtBeat);
 
-        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(pitchEvent, beat, noteAtBeat, sentenceAtBeat, recordedMidiNote, roundedMidiNoteAfterJoker));
+        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(
+            pitchEvent,
+            beat,
+            noteAtBeat,
+            sentenceAtBeat,
+            recordedMidiNote,
+            roundedMidiNoteAfterJoker));
+
+        if (onlineMultiplayerManager.IsOnlineGame
+            && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+        {
+            BeatAnalyzedEventNetcodeRequestDto beatAnalyzedEventNetcodeRequestDto = new BeatAnalyzedEventNetcodeRequestDto(
+                pitchEvent,
+                beat,
+                recordedMidiNote,
+                roundedRecordedMidiNote);
+            onlineMultiplayerManager.SendMessageToOtherClients(beatAnalyzedEventNetcodeRequestDto);
+        }
     }
 
     private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)

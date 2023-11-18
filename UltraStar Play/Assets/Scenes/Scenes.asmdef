@@ -2,6 +2,7 @@
     "name": "Scenes",
     "rootNamespace": "",
     "references": [
+        "Unity.Netcode.Runtime",
         "Serilog",
         "Plugins",
         "UniRx",

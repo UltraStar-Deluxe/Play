@@ -969,7 +969,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         {
             sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
 
-            if (onlineMultiplayerManager.IsConnectedToOnlineGame
+            if (onlineMultiplayerManager.IsOnlineGame
                 && onlineMultiplayerManager.IsServer)
             {
                 // Connected lobby members must also start this song now. Thus, send required data to them.
@@ -1151,7 +1151,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void AttemptStartSong(SongMeta songMeta, bool ignoreRandomlySelectedSong = false, bool ignoreMissingMicProfiles = false)
     {
-        if (onlineMultiplayerManager.IsConnectedToOnlineGame
+        if (onlineMultiplayerManager.IsOnlineGame
             && !onlineMultiplayerManager.IsServer)
         {
             onlineMultiplayerManager.SendMessageToServer(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta)));

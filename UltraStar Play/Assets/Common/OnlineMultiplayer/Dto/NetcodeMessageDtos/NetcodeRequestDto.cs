@@ -3,6 +3,7 @@
     public class NetcodeRequestDto : NetcodeMessageDto
     {
         public NetcodeRequestDto()
+            : base(ENetcodeMessageType.Other)
         {
         }
 

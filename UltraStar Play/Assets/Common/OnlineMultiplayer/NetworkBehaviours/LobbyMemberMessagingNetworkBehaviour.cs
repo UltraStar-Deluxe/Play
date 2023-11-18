@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommonOnlineMultiplayer;
 using UniRx;
 using Unity.Netcode;
@@ -28,8 +29,16 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
         return responseSubject;
     }
 
-    public IObservable<string> SendRequestMessageToAllClientsAsObservable(string requestMessage)
+    public IObservable<string> SendRequestMessageToAllClientsAsObservable(
+        string requestMessage,
+        List<UnityNetcodeClientId> unityNetcodeClientIds)
     {
+        if (requestMessage.IsNullOrEmpty()
+            || unityNetcodeClientIds.IsNullOrEmpty())
+        {
+            return Observable.Empty<string>();
+        }
+
         Subject<string> responseSubject = new Subject<string>();
 
         string requestId = Guid.NewGuid().ToString();
@@ -41,12 +50,15 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
         };
         requestIdToRunningRequestData[requestId] = runningRequestData;
 
-        Debug.Log($"Sending request to all clients: {requestMessage}, requestId: {requestId}, senderNetcodeClientId: {OwnerClientId}");
+        Debug.Log($"Sending request to {unityNetcodeClientIds.Count} clients: {requestMessage}, requestId: {requestId}, senderNetcodeClientId: {OwnerClientId}");
+        List<ulong> unityNetcodeClientIdsAsLongList = unityNetcodeClientIds
+            .Select(it => it.Value)
+            .ToList();
         ClientRpcParams clientRpcParams = new()
         {
             Send = new ClientRpcSendParams()
             {
-                TargetClientIds = NetworkManager.ConnectedClientsIds
+                TargetClientIds = unityNetcodeClientIdsAsLongList,
             }
         };
         SendRequestMessageToClientRpc(requestMessage, requestId, OwnerClientId, clientRpcParams);

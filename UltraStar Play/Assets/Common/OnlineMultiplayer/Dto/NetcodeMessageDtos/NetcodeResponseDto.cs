@@ -2,11 +2,11 @@
 {
     public class NetcodeResponseDto : NetcodeMessageDto
     {
-        public NetcodeResponseDto()
+        protected NetcodeResponseDto() : base(ENetcodeMessageType.Other)
         {
         }
 
-        public NetcodeResponseDto(ENetcodeMessageType messageType) : base(messageType)
+        protected NetcodeResponseDto(ENetcodeMessageType messageType) : base(messageType)
         {
         }
     }
