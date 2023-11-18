@@ -1194,8 +1194,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
         // Ask to connect a Companion App when there are players without mics.
         List<PlayerProfile> playerProfilesWithoutMics = selectedPlayerProfiles
-            .Where(selectedPlayerProfile => !selectedPlayerProfileToMicProfileMap.TryGetValue(selectedPlayerProfile, out MicProfile micProfile)
-                                            || micProfile == null)
+            .Where(selectedPlayerProfile => selectedPlayerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                || lobbyMemberPlayerProfile.UnityNetcodeClientId == onlineMultiplayerManager.OwnUnityNetcodeClientId)
+            .Where(selectedPlayerProfile =>
+                !selectedPlayerProfileToMicProfileMap.TryGetValue(selectedPlayerProfile, out MicProfile micProfile)
+                || micProfile == null)
             .ToList();
         if (!ignoreMissingMicProfiles
             && !playerProfilesWithoutMics.IsNullOrEmpty())

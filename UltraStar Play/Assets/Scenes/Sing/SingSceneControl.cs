@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -134,6 +135,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private AudioSeparationManager audioSeparationManager;
 
     [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
+
+    [Inject]
     private AchievementEventStream achievementEventStream;
 
     public List<PlayerControl> PlayerControls { get; private set; } = new();
@@ -242,7 +246,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             PlayerProfile playerProfile = sceneData.SingScenePlayerData.SelectedPlayerProfiles[i];
             sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            if (micProfile == null)
+            if (micProfile == null
+                && (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                    || lobbyMemberPlayerProfile.UnityNetcodeClientId == onlineMultiplayerManager.OwnUnityNetcodeClientId))
             {
                 playerProfilesWithoutMic.Add(playerProfile);
             }
