@@ -186,12 +186,14 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         playerNameLabel.text = playerProfile.Name;
         injector.WithRootVisualElement(playerImage)
             .Inject(playerProfileImageControl);
-        if (micProfile != null)
+        if (micProfile != null
+            || playerProfile is LobbyMemberPlayerProfile)
         {
+            Color color = micProfile?.Color ?? Color.white;
             playerScoreProgressBar.ShowByDisplay();
             playerScoreProgressBar.ShowByVisibility();
-            playerScoreProgressBar.ProgressColor = micProfile.Color;
-            playerImageBorder.SetBorderColor(micProfile.Color);
+            playerScoreProgressBar.ProgressColor = color;
+            playerImageBorder.SetBorderColor(color);
         }
         else
         {
