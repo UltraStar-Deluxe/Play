@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 
 namespace CommonOnlineMultiplayer
@@ -19,6 +20,17 @@ namespace CommonOnlineMultiplayer
             }
 
             unityTransport.SetConnectionData(settings.UnityTransportIpAddress, settings.UnityTransportPort);
+        }
+
+        public static ClientRpcParams CreateSendToClientRpcParams(IReadOnlyList<ulong> targetNetcodeClientIds)
+        {
+            return new ClientRpcParams()
+            {
+                Send = new ClientRpcSendParams()
+                {
+                    TargetClientIds = targetNetcodeClientIds,
+                }
+            };
         }
     }
 }

@@ -41,6 +41,9 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     [Inject]
     private OnlineMultiplayerManager onlineMultiplayerManager;
 
+    [Inject]
+    private Injector injector;
+
     // The rounding distance of the PlayerProfile
     private float roundingDistance;
 
@@ -76,7 +79,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private readonly Queue<BeatPitchEventAndTime> beatPitchEventsFromConnectedClientQueue = new();
 
-    private NetcodeRequestHandler<BeatAnalyzedEventNetcodeRequestDto> beatAnalyzedEventDtoRequestHandler;
+    private readonly List<IDisposable> disposables = new();
 
     public override void OnInjectionFinished()
     {
@@ -88,47 +91,38 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
         beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
 
-        InitOnlineMultiplayerRequestHandlers();
+        InitOnlineMultiplayer();
     }
 
-    private void InitOnlineMultiplayerRequestHandlers()
+    private void InitOnlineMultiplayer()
     {
-        beatAnalyzedEventDtoRequestHandler = new(
-            ENetcodeMessageType.BeatAnalyzedEventRequest,
-            0,
-            (requestDto, senderNetcodeClientId) =>
-            {
-                if (playerProfile is not LobbyMemberPlayerProfile
-                    || playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
-                {
-                    Debug.Log($"Ignoring {requestDto.GetType().Name} because player '{playerProfile.Name}' is handled locally");
-                    // The request is not relevant for this player.
-                    return EmptyNetcodeResponseDto.Instance;
-                }
+        disposables.Add(onlineMultiplayerManager.RegisterNamedMessageHandler<BeatAnalyzedEventNetcodeRequestDto>(
+            nameof(BeatAnalyzedEventNetcodeRequestDto),
+            OnBeatAnalyzedEventNetcodeRequestDto));
+    }
 
-                Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(playerControl.GetSortedNotesInVoice(), requestDto.Beat);
-                Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.GetSortedSentencesInVoice(), requestDto.Beat);
+    private void OnBeatAnalyzedEventNetcodeRequestDto(ulong senderClientId, BeatAnalyzedEventNetcodeRequestDto dto)
+    {
+        if (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+            || senderClientId == lobbyMemberPlayerProfile.UnityNetcodeClientId)
+        {
+            Debug.Log($"Ignoring BeatAnalyzedEventNetcodeRequestDto from Netcode client {senderClientId} because this PlayerMicPitchTracker handles a different player, namely {playerProfile.Name}");
+        }
 
-                BeatAnalyzedEvent beatAnalyzedEvent = new(
-                    requestDto.PitchEvent,
-                    requestDto.Beat,
-                    noteAtBeat,
-                    sentenceAtBeat,
-                    requestDto.RecordedMidiNote,
-                    requestDto.RoundedRecordedMidiNote);
+        Debug.Log($"OnBeatAnalyzedEventNetcodeRequestDto from {senderClientId}: {dto.ToJson()}");
 
-                Debug.Log($"Fire BeatAnalyzedEvent because of {requestDto.GetType().Name}");
-                beatAnalyzedEventStream.OnNext(beatAnalyzedEvent);
-
-                return EmptyNetcodeResponseDto.Instance;
-            });
-        onlineMultiplayerManager.NetcodeRequestHandlerRegistry.AddRequestHandler(beatAnalyzedEventDtoRequestHandler);
+        FireBeatAnalyzedEventFromRemote(
+            dto.PitchEvent?.MidiNote ?? -1,
+            dto.PitchEvent?.Frequency ?? -1,
+            dto.Beat,
+            dto.RecordedMidiNote,
+            dto.RoundedRecordedMidiNote);
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        onlineMultiplayerManager.NetcodeRequestHandlerRegistry.RemoveRequestHandler(beatAnalyzedEventDtoRequestHandler);
+        disposables.ForEach(it => it.Dispose());
     }
 
     public void InitPitchDetection()
@@ -489,13 +483,14 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
         int roundedMidiNoteAfterJoker = ApplyJokerRule(pitchEvent, roundedRecordedMidiNote, noteAtBeat);
 
-        beatAnalyzedEventStream.OnNext(new BeatAnalyzedEvent(
+        BeatAnalyzedEvent beatAnalyzedEvent = new BeatAnalyzedEvent(
             pitchEvent,
             beat,
             noteAtBeat,
             sentenceAtBeat,
             recordedMidiNote,
-            roundedMidiNoteAfterJoker));
+            roundedMidiNoteAfterJoker);
+        beatAnalyzedEventStream.OnNext(beatAnalyzedEvent);
 
         if (onlineMultiplayerManager.IsOnlineGame
             && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
@@ -505,8 +500,40 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
                 beat,
                 recordedMidiNote,
                 roundedRecordedMidiNote);
-            onlineMultiplayerManager.SendMessageToOtherClients(beatAnalyzedEventNetcodeRequestDto);
+
+            Debug.Log("SendNamedMessageToOtherClients");
+            onlineMultiplayerManager.SendNamedMessageToOtherClients(
+                nameof(BeatAnalyzedEventNetcodeRequestDto),
+                beatAnalyzedEventNetcodeRequestDto);
         }
+    }
+
+    public void FireBeatAnalyzedEventFromRemote(int midiNote, float frequency, int beat, int recordedMidiNote, int roundedRecordedMidiNote)
+    {
+        if (playerProfile is not LobbyMemberPlayerProfile
+            || playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+        {
+            Debug.Log($"Ignoring BeatAnalyzedEvent from remote because player '{playerProfile.Name}' is handled locally");
+            return;
+        }
+
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(playerControl.GetSortedNotesInVoice(), beat);
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.GetSortedSentencesInVoice(), beat);
+
+        PitchEvent pitchEvent = midiNote > 0 && frequency > 0
+            ? new PitchEvent(midiNote, frequency)
+            : null;
+
+        BeatAnalyzedEvent beatAnalyzedEvent = new(
+            pitchEvent,
+            beat,
+            noteAtBeat,
+            sentenceAtBeat,
+            recordedMidiNote,
+            roundedRecordedMidiNote);
+
+        Debug.Log($"Fire BeatAnalyzedEvent from ClientRpc (beat: {beat}, midiNote: {midiNote}, noteAtBeat: {noteAtBeat.Text})");
+        beatAnalyzedEventStream.OnNext(beatAnalyzedEvent);
     }
 
     private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)

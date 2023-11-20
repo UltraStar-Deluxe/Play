@@ -79,8 +79,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
     private Injector childrenInjector;
 
-    // private readonly PlayerScoreNetworkControl playerScoreNetworkControl = new();
-
     private int displaySentenceIndex;
 
     private int perfectSentenceCount;
@@ -127,8 +125,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
                 childrenInjector.Inject(childThatNeedsInjection);
             }
         }
-
-        // playerUiControlInjector.Inject(playerScoreNetworkControl);
 
         PlayerMicPitchTracker.MicProfile = MicProfile;
 
