@@ -101,19 +101,26 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             OnBeatAnalyzedEventNetcodeRequestDto));
     }
 
-    private void OnBeatAnalyzedEventNetcodeRequestDto(ulong senderClientId, BeatAnalyzedEventNetcodeRequestDto dto)
+    private void OnBeatAnalyzedEventNetcodeRequestDto(ulong senderNetcodeClientId, BeatAnalyzedEventNetcodeRequestDto dto)
     {
-        if (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
-            || senderClientId == lobbyMemberPlayerProfile.UnityNetcodeClientId)
+        if (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
         {
-            Debug.Log($"Ignoring BeatAnalyzedEventNetcodeRequestDto from Netcode client {senderClientId} because this PlayerMicPitchTracker handles a different player, namely {playerProfile.Name}");
+            Debug.Log($"Ignoring BeatAnalyzedEventNetcodeRequestDto from Netcode client {senderNetcodeClientId} because this PlayerMicPitchTracker handles a local player");
+            return;
         }
 
-        Debug.Log($"OnBeatAnalyzedEventNetcodeRequestDto from {senderClientId}: {dto.ToJson()}");
+        if (senderNetcodeClientId != lobbyMemberPlayerProfile.UnityNetcodeClientId)
+        {
+            Debug.Log($"Ignoring BeatAnalyzedEventNetcodeRequestDto from Netcode client {senderNetcodeClientId} because this PlayerMicPitchTracker handles client {lobbyMemberPlayerProfile.UnityNetcodeClientId} with name '{playerProfile.Name}'");
+            return;
+        }
+
+        Debug.Log($"OnBeatAnalyzedEventNetcodeRequestDto from {senderNetcodeClientId}: {dto.ToJson()}");
 
         FireBeatAnalyzedEventFromRemote(
-            dto.PitchEvent?.MidiNote ?? -1,
-            dto.PitchEvent?.Frequency ?? -1,
+            senderNetcodeClientId,
+            dto.PitchEvent?.MidiNote ?? 0,
+            dto.PitchEvent?.Frequency ?? 0,
             dto.Beat,
             dto.RecordedMidiNote,
             dto.RoundedRecordedMidiNote);
@@ -495,20 +502,24 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         if (onlineMultiplayerManager.IsOnlineGame
             && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
         {
-            BeatAnalyzedEventNetcodeRequestDto beatAnalyzedEventNetcodeRequestDto = new BeatAnalyzedEventNetcodeRequestDto(
-                pitchEvent,
-                beat,
-                recordedMidiNote,
-                roundedRecordedMidiNote);
+            // TODO: How to send message from non-host clients to clients?
+            if (onlineMultiplayerManager.IsServer)
+            {
+                BeatAnalyzedEventNetcodeRequestDto beatAnalyzedEventNetcodeRequestDto = new BeatAnalyzedEventNetcodeRequestDto(
+                    pitchEvent,
+                    beat,
+                    recordedMidiNote,
+                    roundedRecordedMidiNote);
 
-            Debug.Log("SendNamedMessageToOtherClients");
-            onlineMultiplayerManager.SendNamedMessageToOtherClients(
-                nameof(BeatAnalyzedEventNetcodeRequestDto),
-                beatAnalyzedEventNetcodeRequestDto);
+                Debug.Log("SendNamedMessageToOtherClients");
+                onlineMultiplayerManager.SendNamedMessageToOtherClients(
+                    nameof(BeatAnalyzedEventNetcodeRequestDto),
+                    beatAnalyzedEventNetcodeRequestDto);
+            }
         }
     }
 
-    public void FireBeatAnalyzedEventFromRemote(int midiNote, float frequency, int beat, int recordedMidiNote, int roundedRecordedMidiNote)
+    private void FireBeatAnalyzedEventFromRemote(ulong senderNetcodeClientId, int midiNote, float frequency, int beat, int recordedMidiNote, int roundedRecordedMidiNote)
     {
         if (playerProfile is not LobbyMemberPlayerProfile
             || playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
@@ -517,12 +528,17 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             return;
         }
 
-        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(playerControl.GetSortedNotesInVoice(), beat);
-        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.GetSortedSentencesInVoice(), beat);
+        Debug.Log($"Fire BeatAnalyzedEvent from Netcode client {senderNetcodeClientId} (beat: {beat}, midiNote: {midiNote})");
 
-        PitchEvent pitchEvent = midiNote > 0 && frequency > 0
+        Note noteAtBeat = SongMetaUtils.GetNoteAtBeat(playerControl.GetSortedNotesInVoice(), beat);
+        Debug.Log($"noteAtBeat: {noteAtBeat}");
+        Sentence sentenceAtBeat = SongMetaUtils.GetSentenceAtBeat(playerControl.GetSortedSentencesInVoice(), beat);
+        Debug.Log($"sentenceAtBeat: {sentenceAtBeat}");
+
+        PitchEvent pitchEvent = midiNote > 0
             ? new PitchEvent(midiNote, frequency)
             : null;
+        Debug.Log($"pitchEvent: {pitchEvent}");
 
         BeatAnalyzedEvent beatAnalyzedEvent = new(
             pitchEvent,
@@ -531,8 +547,9 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             sentenceAtBeat,
             recordedMidiNote,
             roundedRecordedMidiNote);
+        Debug.Log($"beatAnalyzedEvent: {beatAnalyzedEvent}");
 
-        Debug.Log($"Fire BeatAnalyzedEvent from ClientRpc (beat: {beat}, midiNote: {midiNote}, noteAtBeat: {noteAtBeat.Text})");
+        Debug.Log($"Calling OnNext");
         beatAnalyzedEventStream.OnNext(beatAnalyzedEvent);
     }
 
