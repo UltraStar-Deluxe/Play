@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -28,6 +29,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     [Inject]
     private ThemeManager themeManager;
@@ -200,7 +204,11 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        SongSelectPlayerEntryControl listEntryControlWithMatchingMicProfile = playerEntryControls.FirstOrDefault(it =>
+        List<SongSelectPlayerEntryControl> relevantPlayerEntryControls = playerEntryControls
+            .Where(it => it.CanSelectMic)
+            .ToList();
+
+        SongSelectPlayerEntryControl listEntryControlWithMatchingMicProfile = relevantPlayerEntryControls.FirstOrDefault(it =>
             Equals(it.MicProfile, micProfile));
         if (listEntryControlWithMatchingMicProfile != null)
         {
@@ -208,7 +216,7 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        List<SongSelectPlayerEntryControl> listEntryControlsWithMissingMicProfile = playerEntryControls
+        List<SongSelectPlayerEntryControl> listEntryControlsWithMissingMicProfile = relevantPlayerEntryControls
             .Where(it => it.PlayerProfile.IsSelected && it.MicProfile == null)
             .ToList();
         if (listEntryControlsWithMissingMicProfile.IsNullOrEmpty())
@@ -275,7 +283,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     private MicProfile GetUnusedMicProfileForPlayer(PlayerProfile playerProfile)
     {
         List<MicProfile> unusedMicProfiles = FindUnusedMicProfiles();
-        if (unusedMicProfiles.IsNullOrEmpty())
+        if (unusedMicProfiles.IsNullOrEmpty()
+            || (playerProfile is LobbyMemberPlayerProfile
+                && playerProfile != onlineMultiplayerManager.OwnLobbyMemberPlayerProfile))
         {
             return null;
         }
@@ -443,7 +453,8 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
     {
         foreach (SongSelectPlayerEntryControl playerEntryControl in playerEntryControls)
         {
-            if (playerEntryControl.MicProfile != null)
+            if (playerEntryControl.MicProfile != null
+                && playerEntryControl.CanSelectMic)
             {
                 string playerProfileName = playerEntryControl.PlayerProfile.Name;
                 MicProfileReference micProfileReference = new(playerEntryControl.MicProfile);

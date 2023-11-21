@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -51,6 +52,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     [Inject]
     private Injector injector;
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     [Inject]
     private Settings settings;
@@ -140,6 +144,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private int lastUpdateAllMicPitchTrackersFrameCount;
 
+    public bool CanSelectMic => PlayerProfile is not LobbyMemberPlayerProfile
+                                || PlayerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile;
+
     public void OnInjectionFinished()
     {
         InitVoiceSelection();
@@ -169,7 +176,8 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
                 playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
                 noMicIcon.HideByVisibility();
             }
-            micButton.SetVisibleByDisplay(newValue);
+            micButton.SetVisibleByDisplay(newValue
+                                          && CanSelectMic);
 
             if (PlayerProfile != null)
             {
