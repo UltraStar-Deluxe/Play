@@ -31,7 +31,7 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
 
     public IObservable<string> SendRequestMessageToAllClientsAsObservable(
         string requestMessage,
-        List<UnityNetcodeClientId> unityNetcodeClientIds)
+        IReadOnlyList<ulong> unityNetcodeClientIds)
     {
         if (requestMessage.IsNullOrEmpty()
             || unityNetcodeClientIds.IsNullOrEmpty())
@@ -51,14 +51,11 @@ public class LobbyMemberMessagingNetworkBehaviour : NetworkBehaviour
         requestIdToRunningRequestData[requestId] = runningRequestData;
 
         Debug.Log($"Sending request to {unityNetcodeClientIds.Count} clients: {requestMessage}, requestId: {requestId}, senderNetcodeClientId: {OwnerClientId}");
-        List<ulong> unityNetcodeClientIdsAsLongList = unityNetcodeClientIds
-            .Select(it => it.Value)
-            .ToList();
         ClientRpcParams clientRpcParams = new()
         {
             Send = new ClientRpcSendParams()
             {
-                TargetClientIds = unityNetcodeClientIdsAsLongList,
+                TargetClientIds = unityNetcodeClientIds,
             }
         };
         SendRequestMessageToClientRpc(requestMessage, requestId, OwnerClientId, clientRpcParams);

@@ -974,7 +974,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             {
                 // Connected lobby members must also start this song now. Thus, send required data to them.
                 SingSceneDataDto singSceneDataDto = NetcodeMessageDtoConverterUtils.ToDto(singSceneData);
-                onlineMultiplayerManager.SendMessageToAllClients(new StartSingSceneRequestDto()
+                onlineMultiplayerManager.ObservableMessagingControl.SendMessageToAllClients(new StartSingSceneRequestDto()
                 {
                     SingSceneDataDto = singSceneDataDto,
                 });
@@ -1154,7 +1154,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         if (onlineMultiplayerManager.IsOnlineGame
             && !onlineMultiplayerManager.IsServer)
         {
-            onlineMultiplayerManager.SendMessageToServer(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta)));
+            onlineMultiplayerManager.ObservableMessagingControl.SendMessageToServer(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta)));
             UiManager.CreateNotification($"Suggested '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to host.");
             return;
         }

@@ -15,13 +15,13 @@ public class BeatAnalyzedEventNetcodeRequestDto : NetcodeRequestDto
     public BeatAnalyzedEventNetcodeRequestDto(
         PitchEvent pitchEvent,
         int beat,
-        int roundedRecordedMidiNote,
-        int recordedMidiNote)
+        int recordedMidiNote,
+        int roundedRecordedMidiNote)
         : this()
     {
         PitchEvent = pitchEvent;
         Beat = beat;
-        RoundedRecordedMidiNote = roundedRecordedMidiNote;
         RecordedMidiNote = recordedMidiNote;
+        RoundedRecordedMidiNote = roundedRecordedMidiNote;
     }
 }

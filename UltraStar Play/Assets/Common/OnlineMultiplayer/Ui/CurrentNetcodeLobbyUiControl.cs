@@ -84,7 +84,7 @@ namespace CommonOnlineMultiplayer
             }
             else if (networkManager.IsClient)
             {
-                onlineMultiplayerManager.SendRequestToServerAsObservable<CurrentLobbyMembersResponseDto>(new CurrentLobbyMembersRequestDto())
+                onlineMultiplayerManager.ObservableMessagingControl.SendRequestToServerAsObservable<CurrentLobbyMembersResponseDto>(new CurrentLobbyMembersRequestDto())
                     .Subscribe(responseDto =>
                     {
                         FillConnectedClientList(responseDto.LobbyMembers);

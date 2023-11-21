@@ -52,7 +52,7 @@ namespace CommonOnlineMultiplayer
                 {
                     return null;
                 }
-                return  nonPersistentSettings.LobbyMemberPlayerProfiles
+                return nonPersistentSettings.LobbyMemberPlayerProfiles
                     .FirstOrDefault(it => it.UnityNetcodeClientId == ownLobbyMember.UnityNetcodeClientId);
             }
         }
@@ -79,8 +79,8 @@ namespace CommonOnlineMultiplayer
             }
         }
 
-        private readonly Dictionary<string, List<NamedMessageHandler>> messageNameToHandlers = new();
-        private readonly Dictionary<string, HandleNamedMessageHelper> messageNameToHandleNamedMessageHelper = new();
+        public MessagingControl MessagingControl { get; private set; }
+        public ObservableMessagingControl ObservableMessagingControl { get; private set; }
 
         protected override object GetInstance()
         {
@@ -89,14 +89,28 @@ namespace CommonOnlineMultiplayer
 
         protected override void StartSingleton()
         {
+            MessagingControl = new MessagingControl(
+                () => OtherLobbyMemberUnityNetcodeClientIds);
+
+            ObservableMessagingControl = new ObservableMessagingControl(
+                () => OtherLobbyMemberUnityNetcodeClientIds,
+                () => OwnUnityNetcodeClientId);
+
             networkManager.OnClientConnectedCallback += OnNetcodeClientConnectedOnServerOrLocal;
             networkManager.OnClientDisconnectCallback += OnNetcodeClientDisconnectedOnServerOrLocal;
             networkManager.ConnectionApprovalCallback += OnNetcodeClientConnectionApproval;
             networkManager.OnClientStopped += OnNetcodeLocalClientStopped;
+            networkManager.OnServerStarted += OnNetcodeLocalServerStarted;
             networkManager.OnServerStopped += OnNetcodeLocalServerStopped;
 
             LobbyMemberConnectionChangedEventSteam
                 .Subscribe(evt => UpdateLobbyMemberPlayerProfiles());
+        }
+
+        private void OnNetcodeLocalServerStarted()
+        {
+            Debug.Log($"OnNetcodeLocalServerStarted");
+            MessagingControl.RegisterForwardNamedMessageHandlersIfNeeded();
         }
 
         private void UpdateLobbyMemberPlayerProfiles()
@@ -185,264 +199,38 @@ namespace CommonOnlineMultiplayer
             LobbyMemberManager.OnNetcodeClientConnectionApproval(connectionApprovalRequest, response);
         }
 
-        public void SendNamedMessageToAllClients(
-            string messageName,
-            JsonSerializable jsonSerializable,
-            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
-        {
-            networkManager.CustomMessagingManager.SendNamedMessageToAll(
-                messageName,
-                FastBufferWriterUtils.WriteValuePacked(name),
-                networkDelivery);
-        }
-
-        public void SendNamedMessageToOtherClients(
-            string messageName,
-            JsonSerializable jsonSerializable,
-            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
-        {
-            SendNamedMessageToClients(
-                messageName,
-                jsonSerializable,
-                OtherLobbyMemberUnityNetcodeClientIds,
-                networkDelivery);
-        }
-
-        public void SendNamedMessageToClients(
-            string messageName,
-            JsonSerializable jsonSerializable,
-            IReadOnlyList<ulong> targetNetcodeClientIds,
-            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
-        {
-            if (targetNetcodeClientIds.IsNullOrEmpty())
-            {
-                return;
-            }
-
-            string message = jsonSerializable.ToJson();
-
-            Debug.Log($"Sending message to Netcode clients {targetNetcodeClientIds.ToCsv()}: {message}");
-
-            networkManager.CustomMessagingManager.SendNamedMessage(
-                messageName,
-                targetNetcodeClientIds,
-                FastBufferWriterUtils.WriteValuePacked(message),
-                networkDelivery);
-        }
-
-        public void SendNamedMessageToClient(
-            string messageName,
-            JsonSerializable jsonSerializable,
-            ulong targetNetcodeClientId,
-            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
-        {
-            string message = jsonSerializable.ToJson();
-            networkManager.CustomMessagingManager.SendNamedMessage(
-                messageName,
-                targetNetcodeClientId,
-                FastBufferWriterUtils.WriteValuePacked(message),
-                networkDelivery);
-        }
-
-        public IDisposable RegisterNamedMessageHandler<T>(
-            string messageName,
-            Action<ulong, T> handleMessage)
-            where T : new()
-        {
-            if (!messageNameToHandlers.TryGetValue(messageName, out List<NamedMessageHandler> messageHandlers))
-            {
-                messageHandlers = new();
-                messageNameToHandlers[messageName] = messageHandlers;
-            }
-
-            if (!messageNameToHandleNamedMessageHelper.ContainsKey(messageName))
-            {
-                HandleNamedMessageHelper handleNamedMessageHelper = new HandleNamedMessageHelper(messageHandlers);
-                messageNameToHandleNamedMessageHelper[messageName] = handleNamedMessageHelper;
-                networkManager.CustomMessagingManager.RegisterNamedMessageHandler(messageName, handleNamedMessageHelper.HandleNamedMessage);
-            }
-
-            NamedMessageHandler namedMessageHandler = new NamedMessageHandler(
-                (ulong senderNetcodeClientId, string message) =>
-                {
-                    T dto = JsonConverter.FromJson<T>(message);
-                    handleMessage(senderNetcodeClientId, dto);
-                });
-
-            messageHandlers.Add(namedMessageHandler);
-
-            Debug.Log($"RegisterNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
-
-            return Disposable.Create(() =>
-            {
-                Debug.Log($"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
-                messageHandlers.Remove(namedMessageHandler);
-            });
-        }
-
-        public void SendMessageToServer(JsonSerializable jsonSerializable)
-        {
-            SendRequestToServerAsObservable<object>(jsonSerializable)
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Exception when sending message to server: {ex.Message}. Sent message: {jsonSerializable.ToJson()}");
-                })
-                // Subscribe to trigger observable
-                .Subscribe(responseDto =>
-                {
-                    // Do nothing.
-                });
-        }
-
-        public IObservable<RESPONSEDTO> SendRequestToServerAsObservable<RESPONSEDTO>(JsonSerializable jsonSerializable)
-            where RESPONSEDTO : new()
-        {
-            if (jsonSerializable == null)
-            {
-                return Observable.Empty<RESPONSEDTO>();
-            }
-
-            NetworkObject localPlayerObject = networkManager.SpawnManager.GetLocalPlayerObject();
-            if (localPlayerObject == null)
-            {
-                throw new OnlineMultiplayerException("Missing LocalPlayerObject");
-            }
-
-            LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = localPlayerObject.GetComponent<LobbyMemberNetworkBehaviour>();
-            if (lobbyMemberNetworkBehaviour == null)
-            {
-                throw new OnlineMultiplayerException($"Missing {nameof(LobbyMemberMessagingNetworkBehaviour)}");
-            }
-
-            return lobbyMemberNetworkBehaviour.MessagingNetworkBehaviour
-                .SendRequestToServerAsObservable(jsonSerializable.ToJson())
-                .Select(responseMessage => JsonConverter.FromJson<RESPONSEDTO>(responseMessage));
-        }
-
-        public IObservable<RESPONSEDTO> SendMessageToClientsAsObservable<RESPONSEDTO>(
-            JsonSerializable jsonSerializable,
-            List<UnityNetcodeClientId> unityNetcodeClientIds)
-            where RESPONSEDTO : new()
-        {
-            if (jsonSerializable == null
-                || unityNetcodeClientIds.IsNullOrEmpty())
-            {
-                return Observable.Empty<RESPONSEDTO>();
-            }
-
-            NetworkObject localPlayerObject = networkManager.SpawnManager.GetLocalPlayerObject();
-            if (localPlayerObject == null)
-            {
-                throw new OnlineMultiplayerException("Missing LocalPlayerObject");
-            }
-
-            LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = localPlayerObject.GetComponent<LobbyMemberNetworkBehaviour>();
-            if (lobbyMemberNetworkBehaviour == null)
-            {
-                throw new OnlineMultiplayerException($"Missing {nameof(LobbyMemberMessagingNetworkBehaviour)}");
-            }
-
-            return lobbyMemberNetworkBehaviour.MessagingNetworkBehaviour
-                .SendRequestMessageToAllClientsAsObservable(jsonSerializable.ToJson(), unityNetcodeClientIds)
-                .Select(responseMessage => JsonConverter.FromJson<RESPONSEDTO>(responseMessage));
-        }
-
-        public void SendMessageToAllClients(JsonSerializable jsonSerializable)
-        {
-            List<UnityNetcodeClientId> unityNetcodeClientIds = LobbyMemberManager
-                .GetLobbyMembers()
-                .Select(it => it.UnityNetcodeClientId)
-                .ToList();
-            SendMessageToClients(jsonSerializable, unityNetcodeClientIds);
-        }
-
-        public void SendMessageToClients(JsonSerializable jsonSerializable, List<UnityNetcodeClientId> netcodeClientIds)
-        {
-            SendMessageToClientsAsObservable<object>(jsonSerializable, netcodeClientIds)
-                .CatchIgnore((Exception ex) =>
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to send message to clients: {ex.Message}. Message to be sent: {jsonSerializable.ToJson()}");
-                })
-                // Subscribe to trigger observable
-                .Subscribe(responseDto =>
-                {
-                    // Do nothing.
-                });
-        }
-
-        public T GetNetworkBehaviour<T>(UnityNetcodeClientId netcodeClientId)
-            where T : NetworkBehaviour
-        {
-            GameObject lobbyMemberGameObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId).gameObject;
-            return lobbyMemberGameObject.GetComponentInChildren<T>();
-        }
-
-        public T GetNetworkBehaviourOfOwnLobbyMember<T>()
-            where T : NetworkBehaviour
-        {
-            return GetNetworkBehaviour<T>(OwnLobbyMemberNetworkObject.OwnerClientId);
-        }
-
-        public T AddNetworkBehaviourIfMissing<T>(UnityNetcodeClientId netcodeClientId)
-            where T : NetworkBehaviour
-        {
-            NetworkObject networkObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId);
-            if (networkObject == null)
-            {
-                throw new OnlineMultiplayerException($"Cannot add component of type {typeof(T)} because no lobby member found with Netcode id {netcodeClientId}");
-            }
-
-            T existingComponent = networkObject.GetComponentInChildren<T>();
-            if (existingComponent)
-            {
-                return existingComponent;
-            }
-
-            GameObject newGameObject = new();
-            newGameObject.name = typeof(T).Name;
-            newGameObject.transform.parent = networkObject.transform;
-            return newGameObject.AddComponent<T>();
-        }
-
-        public void SendMessageToOtherClients(JsonSerializable jsonSerializable)
-        {
-            List<UnityNetcodeClientId> unityNetcodeClientIds = LobbyMemberManager
-                .GetLobbyMembers()
-                .Select(it => it.UnityNetcodeClientId)
-                .Where(it => it != OwnUnityNetcodeClientId)
-                .ToList();
-            SendMessageToClients(jsonSerializable, unityNetcodeClientIds);
-        }
-    }
-
-    public struct HandleNamedMessageHelper
-    {
-        private readonly List<NamedMessageHandler> messageHandlers;
-
-        public HandleNamedMessageHelper(List<NamedMessageHandler> messageHandlers)
-        {
-            this.messageHandlers = messageHandlers;
-        }
-
-        public void HandleNamedMessage(ulong senderNetcodeClientId, FastBufferReader messagePayload)
-        {
-            FastBufferReaderUtils.ReadValuePacked(messagePayload, out string message);
-            foreach (NamedMessageHandler messageHandler in messageHandlers)
-            {
-                messageHandler.action?.Invoke(senderNetcodeClientId, message);
-            }
-        }
-    }
-
-    public struct NamedMessageHandler
-    {
-        public readonly Action<ulong, string> action;
-
-        public NamedMessageHandler(Action<ulong, string> action)
-        {
-            this.action = action;
-        }
+        // public T GetNetworkBehaviour<T>(UnityNetcodeClientId netcodeClientId)
+        //     where T : NetworkBehaviour
+        // {
+        //     GameObject lobbyMemberGameObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId).gameObject;
+        //     return lobbyMemberGameObject.GetComponentInChildren<T>();
+        // }
+        //
+        // public T GetNetworkBehaviourOfOwnLobbyMember<T>()
+        //     where T : NetworkBehaviour
+        // {
+        //     return GetNetworkBehaviour<T>(OwnLobbyMemberNetworkObject.OwnerClientId);
+        // }
+        //
+        // public T AddNetworkBehaviourIfMissing<T>(UnityNetcodeClientId netcodeClientId)
+        //     where T : NetworkBehaviour
+        // {
+        //     NetworkObject networkObject = networkManager.SpawnManager.GetPlayerNetworkObject(netcodeClientId);
+        //     if (networkObject == null)
+        //     {
+        //         throw new OnlineMultiplayerException($"Cannot add component of type {typeof(T)} because no lobby member found with Netcode id {netcodeClientId}");
+        //     }
+        //
+        //     T existingComponent = networkObject.GetComponentInChildren<T>();
+        //     if (existingComponent)
+        //     {
+        //         return existingComponent;
+        //     }
+        //
+        //     GameObject newGameObject = new();
+        //     newGameObject.name = typeof(T).Name;
+        //     newGameObject.transform.parent = networkObject.transform;
+        //     return newGameObject.AddComponent<T>();
+        // }
     }
 }

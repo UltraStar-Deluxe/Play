@@ -101,7 +101,7 @@ namespace SteamOnlineMultiplayer
             }
             else if (networkManager.IsClient)
             {
-                onlineMultiplayerManager
+                onlineMultiplayerManager.ObservableMessagingControl
                     .SendRequestToServerAsObservable<CurrentSteamLobbyMembersResponseDto>(new CurrentLobbyMembersRequestDto())
                     .Subscribe(responseDto => FillConnectedClientList(responseDto.SteamLobbyMembers));
             }
