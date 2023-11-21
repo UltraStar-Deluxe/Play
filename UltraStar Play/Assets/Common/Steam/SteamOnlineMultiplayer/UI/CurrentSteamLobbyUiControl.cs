@@ -95,16 +95,7 @@ namespace SteamOnlineMultiplayer
 
         private void UpdateLobbyMemberList()
         {
-            if (networkManager.IsServer)
-            {
-                FillConnectedClientList(steamLobbyMemberManager.GetSteamLobbyMembers().ToList());
-            }
-            else if (networkManager.IsClient)
-            {
-                onlineMultiplayerManager.ObservableMessagingControl
-                    .SendRequestToServerAsObservable<CurrentSteamLobbyMembersResponseDto>(new CurrentLobbyMembersRequestDto())
-                    .Subscribe(responseDto => FillConnectedClientList(responseDto.SteamLobbyMembers));
-            }
+            FillConnectedClientList(steamLobbyMemberManager.GetSteamLobbyMembers().ToList());
         }
 
         private void FillConnectedClientList(List<SteamLobbyMember> memberDatas)

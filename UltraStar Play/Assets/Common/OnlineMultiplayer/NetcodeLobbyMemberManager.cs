@@ -25,22 +25,6 @@ namespace CommonOnlineMultiplayer
             return Instance;
         }
 
-        protected override void StartSingleton()
-        {
-            RegisterNetcodeRequestHandlers();
-        }
-
-        private void RegisterNetcodeRequestHandlers()
-        {
-            NetcodeRequestHandlerRegistry.Instance.AddRequestHandler(new NetcodeRequestHandler<CurrentLobbyMembersRequestDto>(
-                ENetcodeMessageType.CurrentLobbyMembersRequest,
-                0,
-                (requestDto, senderNetcodeClientId) => new CurrentLobbyMembersResponseDto()
-                {
-                    LobbyMembers = GetLobbyMembers().ToList(),
-                }));
-        }
-
         public void OnNetcodeClientConnectionApproval(
             NetworkManager.ConnectionApprovalRequest connectionApprovalRequest,
             NetworkManager.ConnectionApprovalResponse response)

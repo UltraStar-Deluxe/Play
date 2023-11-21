@@ -78,18 +78,7 @@ namespace CommonOnlineMultiplayer
 
         private void UpdateLobbyMemberList()
         {
-            if (networkManager.IsServer)
-            {
-                FillConnectedClientList(lobbyMemberManager.GetLobbyMembers().ToList());
-            }
-            else if (networkManager.IsClient)
-            {
-                onlineMultiplayerManager.ObservableMessagingControl.SendRequestToServerAsObservable<CurrentLobbyMembersResponseDto>(new CurrentLobbyMembersRequestDto())
-                    .Subscribe(responseDto =>
-                    {
-                        FillConnectedClientList(responseDto.LobbyMembers);
-                    });
-            }
+            FillConnectedClientList(lobbyMemberManager.GetLobbyMembers().ToList());
         }
 
         private void FillConnectedClientList(List<LobbyMember> lobbyMembers)
