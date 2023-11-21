@@ -82,6 +82,21 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private readonly List<IDisposable> disposables = new();
 
+    protected override MicSampleRecorder MicSampleRecorder
+    {
+        get
+        {
+            if (playerProfile is LobbyMemberPlayerProfile
+                && playerProfile != onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+            {
+                // Cannot record mic samples for other lobby members
+                return null;
+            }
+
+            return base.MicSampleRecorder;
+        }
+    }
+
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();

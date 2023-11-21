@@ -348,7 +348,9 @@ public class SongSelectPlayerListControl : MonoBehaviour, INeedInjection
         Dictionary<PlayerProfile, MicProfile> result = new();
         playerEntryControls.ForEach(entry =>
         {
-            if (entry.IsSelected.Value && entry.MicProfile != null)
+            if (entry.IsSelected.Value
+                && entry.CanSelectMic
+                && entry.MicProfile != null)
             {
                 result.Add(entry.PlayerProfile, entry.MicProfile);
             }
