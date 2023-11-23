@@ -45,7 +45,7 @@ public class GapQuickFixerMonoBehaviour : MonoBehaviour, INeedInjection
         double newGapInMillis = songAudioPlayer.PositionInSongInMillis;
         double newGapInSeconds = newGapInMillis / 1000;
         songMeta.GapInMillis = newGapInMillis;
-        UiManager.CreateNotification($"Set GAP to {newGapInSeconds:2} s");
+        UiManager.CreateNotification($"Set GAP to {newGapInSeconds:0.00} s");
 
         // Save song
         songMetaManager.SaveSong(songMeta, false);
