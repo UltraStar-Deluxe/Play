@@ -7,8 +7,13 @@
         CurrentLobbyMembersRequest,
         CurrentLobbyMembersResponse,
 
+        PlayerHasSongLocallyRequest,
+        PlayerHasSongLocallyResponse,
+
         SuggestSongRequest,
+
         StartSongRequest,
+
         BeatAnalyzedEventRequest,
     }
 }

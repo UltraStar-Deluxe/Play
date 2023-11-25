@@ -964,6 +964,36 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             return;
         }
 
+        if (onlineMultiplayerManager.IsOnlineGame
+            && onlineMultiplayerManager.IsServer)
+        {
+            AllPlayersHaveSongLocallyAsObservable(songMeta)
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to get whether all players have song locally: {ex.Message}");
+                    UiManager.CreateNotification("Failed to start song. Check log for details.");
+                })
+                .Subscribe(result =>
+                {
+                    if (result.Value)
+                    {
+                        DoStartSingSceneWithGivenSongAndSettings(songMeta);
+                    }
+                    else
+                    {
+                        UiManager.CreateNotification($"Not all players have this exact song locally:\n{result.PlayersThatDoNotHaveSongLocally.ToCsv(",", "", "")}.");
+                    }
+                });
+        }
+        else
+        {
+            DoStartSingSceneWithGivenSongAndSettings(songMeta);
+        }
+    }
+
+    private void DoStartSingSceneWithGivenSongAndSettings(SongMeta songMeta)
+    {
         SingSceneData singSceneData = CreateSingSceneDataWithGivenSongAndSettings(songMeta);
         if (singSceneData != null)
         {
@@ -1653,5 +1683,57 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         });
 
         dialogControl.AddInformationMessage($"AI model parameters can be changed in the song editor");
+    }
+
+    public IObservable<AllPlayersHaveSongLocallyResult> AllPlayersHaveSongLocallyAsObservable(SongMeta songMeta)
+    {
+        return Observable.Create<AllPlayersHaveSongLocallyResult>(o =>
+        {
+            AllPlayersHaveSongLocallyResult result = new();
+
+            HasSongRequest request = new HasSongRequest()
+            {
+                GloballyUniqueSongId = SongIdManager.GetAndCacheGloballyUniqueId(songMeta),
+            };
+            onlineMultiplayerManager.ObservableMessagingControl.SendMessageToClientsAsObservable<HasSongResponse>(
+                    request,
+                    onlineMultiplayerManager.AllLobbyMemberUnityNetcodeClientIds)
+                .CatchIgnore((Exception ex) =>
+                {
+                    o.OnError(ex);
+                })
+                .DoOnCompleted(() =>
+                {
+                    o.OnNext(result);
+                    o.OnCompleted();
+                })
+                .Subscribe(response =>
+                {
+                    if (!response.HasSong)
+                    {
+                        LobbyMemberPlayerProfile lobbyMemberPlayerProfile = nonPersistentSettings.LobbyMemberPlayerProfiles
+                            .FirstOrDefault(it => it.UnityNetcodeClientId == response.UnityNetcodeClientId);
+                        result.AddPlayerThatDoesNotHaveSongLocally(lobbyMemberPlayerProfile.Name);
+                    }
+                });
+
+            return Disposable.Empty;
+        });
+    }
+
+    public class AllPlayersHaveSongLocallyResult
+    {
+        public bool Value { get; private set; }
+        public List<string> PlayersThatDoNotHaveSongLocally { get; private set; } = new();
+
+        public AllPlayersHaveSongLocallyResult()
+        {
+            Value = true;
+        }
+
+        public void AddPlayerThatDoesNotHaveSongLocally(string playerName)
+        {
+            PlayersThatDoNotHaveSongLocally.Add(playerName);
+        }
     }
 }
