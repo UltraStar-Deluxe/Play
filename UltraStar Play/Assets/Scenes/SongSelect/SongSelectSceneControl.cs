@@ -980,7 +980,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                     }
                     else
                     {
-                        UiManager.CreateNotification($"Not all players have this exact song locally:\n{result.PlayersThatDoNotHaveSongLocally.ToCsv(",", "", "")}.");
+                        UiManager.CreateNotification($"The following players do not have this song locally:\n{result.PlayersThatDoNotHaveSongLocally.ToCsv(",", "", "")}.");
                     }
                 });
         }
