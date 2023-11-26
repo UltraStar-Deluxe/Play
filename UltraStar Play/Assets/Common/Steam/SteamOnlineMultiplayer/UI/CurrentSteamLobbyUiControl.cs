@@ -52,7 +52,7 @@ namespace SteamOnlineMultiplayer
             connectedClientsListTitle.text = "Connected Players";
             connectedClientsListScrollView.Clear();
 
-            disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => networkManager.Shutdown());
+            disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => steamLobbyManager.LeaveCurrentLobby());
 
             disposables.Add(onlineMultiplayerManager
                 .LobbyMemberConnectionChangedEventSteam

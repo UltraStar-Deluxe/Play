@@ -179,6 +179,22 @@ namespace SteamOnlineMultiplayer
             {
                 CurrentSteamLobby = null;
             }
+
+            try
+            {
+                if (networkManager.IsConnectedClient)
+                {
+                    networkManager.ShutdownIfConnectedClient("Leaving Steam lobby");
+                }
+                else
+                {
+                    Debug.Log("Leaving Steam lobby, but not connected as Netcode client. Thus, not shutting down NetworkManager.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         private void FireLobbyEvent(SteamLobbyEvent steamLobbyEvent)

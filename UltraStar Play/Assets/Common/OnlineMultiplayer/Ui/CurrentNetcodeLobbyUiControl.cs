@@ -50,7 +50,7 @@ namespace CommonOnlineMultiplayer
             connectedClientsListTitle.text = "Connected Players";
             connectedClientsListScrollView.Clear();
 
-            disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => networkManager.Shutdown());
+            disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => lobbyManager.LeaveCurrentLobby());
 
             disposables.Add(onlineMultiplayerManager
                 .LobbyMemberConnectionChangedEventSteam

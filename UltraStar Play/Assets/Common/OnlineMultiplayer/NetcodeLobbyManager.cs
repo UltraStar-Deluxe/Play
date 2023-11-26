@@ -1,5 +1,7 @@
-﻿using UniInject;
+﻿using System;
+using UniInject;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
@@ -9,6 +11,8 @@ namespace CommonOnlineMultiplayer
 
         [Inject]
         private NetworkManager networkManager;
+
+        private bool isLeavingLobby;
 
         protected override object GetInstance()
         {
@@ -30,7 +34,12 @@ namespace CommonOnlineMultiplayer
 
         public void LeaveCurrentLobby()
         {
-            networkManager.Shutdown();
+            networkManager.ShutdownIfConnectedClient("Leaving Netcode lobby");
+        }
+
+        private void LateUpdate()
+        {
+            isLeavingLobby = false;
         }
 
         public class NetcodeLobby : ILobby

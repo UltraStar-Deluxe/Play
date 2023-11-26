@@ -1,5 +1,6 @@
 ﻿using UniInject;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CommonOnlineMultiplayer
@@ -62,14 +63,15 @@ namespace CommonOnlineMultiplayer
         {
             if (networkManager.IsServer)
             {
-                if (lobbyMember.UnityNetcodeClientId == networkManager.LocalClientId)
+                if (lobbyMember.UnityNetcodeClientId == NetworkManager.ServerClientId)
                 {
                     // Disconnect own client by shutting down the server
-                    networkManager.Shutdown();
+                    networkManager.ShutdownIfConnectedClient("Disconnecting own player from online game, which is the host");
                 }
                 else
                 {
                     // Disconnect other client
+                    Debug.Log($"Disconnecting other player with Netcode id {lobbyMember.UnityNetcodeClientId} from online game");
                     networkManager.DisconnectClient(lobbyMember.UnityNetcodeClientId, "Kicked by host");
                 }
             }
