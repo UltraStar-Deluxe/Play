@@ -5,19 +5,26 @@ namespace CommonOnlineMultiplayer
 {
     public static class FastBufferReaderUtils
     {
-        public static void ReadValuePacked(FastBufferReader fastBufferReader, out string text)
-        {
-            ByteUnpacker.ReadValuePacked(fastBufferReader, out text);
-        }
-
-        public static Action<ulong, FastBufferReader> CreateMessageHandlerCallback<T>(Action<ulong, T> handleMessage)
+        public static T ReadJsonValuePacked<T>(FastBufferReader fastBufferReader)
             where T : new()
         {
-            return (ulong senderNetcodeClientId, FastBufferReader fastBufferReader) =>
+            string json = ReadValuePacked(fastBufferReader);
+            return JsonConverter.FromJson<T>(json);
+        }
+
+        public static string ReadValuePacked(FastBufferReader fastBufferReader)
+        {
+            ByteUnpacker.ReadValuePacked(fastBufferReader, out string text);
+            return text;
+        }
+
+        public static Action<NamedMessage> CreateMessageHandlerCallback<T>(Action<ulong, T> handleMessage)
+            where T : new()
+        {
+            return (NamedMessage response) =>
             {
-                ReadValuePacked(fastBufferReader, out string json);
-                T dto = JsonConverter.FromJson<T>(json);
-                handleMessage.Invoke(senderNetcodeClientId, dto);
+                T dto = ReadJsonValuePacked<T>(response.MessagePayload);
+                handleMessage.Invoke(response.SenderNetcodeClientId, dto);
             };
         }
     }

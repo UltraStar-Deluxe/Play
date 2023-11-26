@@ -1,15 +1,15 @@
 ﻿namespace CommonOnlineMultiplayer
 {
-    public class HasSongRequest : NetcodeRequestDto
+    public class HasSongRequestDto : NetcodeRequestDto
     {
-        public string GloballyUniqueSongId { get; set; }
+        public string GloballyUniqueSongId { get; private set; }
 
-        public HasSongRequest()
+        public HasSongRequestDto()
             : base(ENetcodeMessageType.PlayerHasSongLocallyRequest)
         {
         }
 
-        public HasSongRequest(string globallyUniqueSongId)
+        public HasSongRequestDto(string globallyUniqueSongId)
             : this()
         {
             GloballyUniqueSongId = globallyUniqueSongId;

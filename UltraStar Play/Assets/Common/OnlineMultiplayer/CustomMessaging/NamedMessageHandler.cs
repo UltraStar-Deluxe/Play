@@ -5,9 +5,9 @@ namespace CommonOnlineMultiplayer
 {
     public struct NamedMessageHandler
     {
-        public readonly Action<ulong, FastBufferReader> handleMessage;
+        public readonly Action<NamedMessage> handleMessage;
 
-        public NamedMessageHandler(Action<ulong, FastBufferReader> handleMessage)
+        public NamedMessageHandler(Action<NamedMessage> handleMessage)
         {
             this.handleMessage = handleMessage;
         }

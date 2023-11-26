@@ -8,8 +8,6 @@ using UnityEngine;
  */
 public class LobbyMemberNetworkBehaviour : NetworkBehaviour
 {
-    public LobbyMemberMessagingNetworkBehaviour MessagingNetworkBehaviour { get; private set; }
-
     private NetworkVariable<LobbyMemberNetworkSerializable> lobbyMemberNetworkVariable = new();
 
     public LobbyMember LobbyMember => new LobbyMember(
@@ -23,7 +21,6 @@ public class LobbyMemberNetworkBehaviour : NetworkBehaviour
 
     private void Awake()
     {
-        MessagingNetworkBehaviour = GetComponentInChildren<LobbyMemberMessagingNetworkBehaviour>();
         onlineMultiplayerManager = OnlineMultiplayerManager.Instance;
     }
 

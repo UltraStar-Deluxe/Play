@@ -31,7 +31,7 @@ namespace CommonOnlineMultiplayer
 
             if (messageHandlers.Count == 1)
             {
-                messageHandlers[0].handleMessage?.Invoke(senderNetcodeClientId, messagePayload);
+                messageHandlers[0].handleMessage?.Invoke(new NamedMessage(senderNetcodeClientId, messagePayload));
             }
             else
             {
@@ -47,7 +47,7 @@ namespace CommonOnlineMultiplayer
                 foreach (NamedMessageHandler messageHandler in messageHandlers)
                 {
                     using FastBufferReader readerCopy = new(messageBytes, Allocator.Temp);
-                    messageHandler.handleMessage?.Invoke(senderNetcodeClientId, readerCopy);
+                    messageHandler.handleMessage?.Invoke(new NamedMessage(senderNetcodeClientId, readerCopy));
                 }
             }
         }

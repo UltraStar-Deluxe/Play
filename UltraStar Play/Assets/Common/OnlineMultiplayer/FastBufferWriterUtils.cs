@@ -5,6 +5,11 @@ namespace CommonOnlineMultiplayer
 {
     public static class FastBufferWriterUtils
     {
+        public static FastBufferWriter WriteJsonValuePacked(JsonSerializable jsonSerializable)
+        {
+            return WriteValuePacked(jsonSerializable.ToJson());
+        }
+
         public static FastBufferWriter WriteValuePacked(string text)
         {
             FastBufferWriter w = new(1024, Allocator.Temp);

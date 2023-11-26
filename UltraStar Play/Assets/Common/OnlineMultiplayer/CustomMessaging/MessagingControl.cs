@@ -15,17 +15,21 @@ namespace CommonOnlineMultiplayer
         private readonly Dictionary<string, List<NamedMessageHandler>> messageNameToHandlers = new();
         private readonly Dictionary<string, HandleNamedMessageHelper> messageNameToHandleNamedMessageHelper = new();
 
-        private NetworkManager NetworkManager => NetworkManager.Singleton;
-        private readonly Func<IReadOnlyList<ulong>> otherLobbyMemberUnityNetcodeClientIdsGetter;
-
         private bool hasRegisteredForwardNamedMessageHandlers;
 
-        public MessagingControl(Func<IReadOnlyList<ulong>> otherLobbyMemberUnityNetcodeClientIdsGetter)
+        private NetworkManager NetworkManager => NetworkManager.Singleton;
+        private readonly Func<ulong> ownLobbyMemberUnityNetcodeClientIdGetter;
+        private readonly Func<IReadOnlyList<ulong>> otherLobbyMemberUnityNetcodeClientIdsGetter;
+
+        public MessagingControl(
+            Func<ulong> ownLobbyMemberUnityNetcodeClientIdGetter,
+            Func<IReadOnlyList<ulong>> otherLobbyMemberUnityNetcodeClientIdsGetter)
         {
+            this.ownLobbyMemberUnityNetcodeClientIdGetter = ownLobbyMemberUnityNetcodeClientIdGetter;
             this.otherLobbyMemberUnityNetcodeClientIdsGetter = otherLobbyMemberUnityNetcodeClientIdsGetter;
         }
 
-        public void RegisterForwardNamedMessageHandlersIfNeeded()
+        public void RegisterNamedMessageHandlersToForwardMessagesIfNeeded()
         {
             if (hasRegisteredForwardNamedMessageHandlers
                 || !NetworkManager.IsServer)
@@ -43,10 +47,11 @@ namespace CommonOnlineMultiplayer
                 ForwardNamedMessageToClient);
         }
 
-        private void ForwardNamedMessageToClient(ulong senderNetcodeClientId, FastBufferReader fastBufferReader)
+        private void ForwardNamedMessageToClient(NamedMessage request)
         {
-            Debug.Log($"Forwarding named message from client {senderNetcodeClientId} to single client");
+            Debug.Log($"Forwarding named message from client {request.SenderNetcodeClientId} to single client");
 
+            FastBufferReader fastBufferReader = request.MessagePayload;
             fastBufferReader.ReadValueSafe(out string messageName);
             fastBufferReader.ReadValueSafe(out ulong targetNetcodeClientId);
             fastBufferReader.ReadValueSafe(out NetworkDelivery networkDelivery);
@@ -63,10 +68,11 @@ namespace CommonOnlineMultiplayer
                 networkDelivery);
         }
 
-        private void ForwardNamedMessageToClients(ulong senderNetcodeClientId, FastBufferReader fastBufferReader)
+        private void ForwardNamedMessageToClients(NamedMessage request)
         {
-            Debug.Log($"Forwarding named message from client {senderNetcodeClientId} to multiple clients");
+            Debug.Log($"Forwarding named message from client {request.SenderNetcodeClientId} to multiple clients");
 
+            FastBufferReader fastBufferReader = request.MessagePayload;
             fastBufferReader.ReadValueSafe(out string messageName);
             fastBufferReader.ReadValueSafe(out ulong[] targetNetcodeClientIds);
             fastBufferReader.ReadValueSafe(out NetworkDelivery networkDelivery);
@@ -88,9 +94,13 @@ namespace CommonOnlineMultiplayer
             FastBufferWriter fastBufferWriter,
             NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
         {
-            NetworkManager.CustomMessagingManager.SendNamedMessageToAll(
+            List<ulong> targetNetcodeClientIds = new List<ulong>() { ownLobbyMemberUnityNetcodeClientIdGetter.Invoke() };
+            targetNetcodeClientIds.AddRange(otherLobbyMemberUnityNetcodeClientIdsGetter.Invoke());
+
+            SendNamedMessageToClients(
                 messageName,
                 fastBufferWriter,
+                targetNetcodeClientIds,
                 networkDelivery);
         }
 
@@ -204,7 +214,7 @@ namespace CommonOnlineMultiplayer
 
         public IDisposable RegisterNamedMessageHandler(
             string messageName,
-            Action<ulong, FastBufferReader> handleMessage)
+            Action<NamedMessage> handleMessage)
         {
             if (!messageNameToHandlers.TryGetValue(messageName, out List<NamedMessageHandler> messageHandlers))
             {
@@ -225,11 +235,23 @@ namespace CommonOnlineMultiplayer
 
             Debug.Log($"RegisterNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
 
+            bool isDisposed = false;
             return Disposable.Create(() =>
             {
-                Debug.Log($"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
+                if (isDisposed)
+                {
+                    return;
+                }
+                isDisposed = true;
+
                 messageHandlers.Remove(namedMessageHandler);
+                Debug.Log($"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
             });
+        }
+
+        public string GetResponseMessageName(string messageName)
+        {
+            return $"Re:{messageName}";
         }
     }
 }

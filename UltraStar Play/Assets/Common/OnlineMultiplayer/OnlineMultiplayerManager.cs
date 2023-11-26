@@ -21,11 +21,16 @@ namespace CommonOnlineMultiplayer
         [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
         public OnlineMultiplayerBackendManager BackendManager { get; private set; }
 
-        [Inject]
-        public NetcodeRequestHandlerRegistry NetcodeRequestHandlerRegistry { get; private set; }
-
         private readonly Subject<LobbyMemberConnectionChangedEvent> lobbyMemberConnectionChangedEventSteam = new();
         public IObservable<LobbyMemberConnectionChangedEvent> LobbyMemberConnectionChangedEventSteam => lobbyMemberConnectionChangedEventSteam
+            .ObserveOnMainThread();
+
+        private readonly Subject<OwnNetcodeClientStartedEvent> ownNetcodeClientStartedEventStream = new();
+        public IObservable<OwnNetcodeClientStartedEvent> OwnNetcodeClientStartedEventStream => ownNetcodeClientStartedEventStream
+            .ObserveOnMainThread();
+
+        private readonly Subject<OwnNetcodeClientStoppedEvent> ownNetcodeClientStoppedEventStream = new();
+        public IObservable<OwnNetcodeClientStoppedEvent> OwnNetcodeClientStoppedEventStream => ownNetcodeClientStoppedEventStream
             .ObserveOnMainThread();
 
         public ILobbyManager LobbyManager => BackendManager.CurrentBackend.LobbyManager;
@@ -57,14 +62,14 @@ namespace CommonOnlineMultiplayer
             }
         }
         public NetworkObject OwnLobbyMemberNetworkObject => networkManager.SpawnManager.GetLocalPlayerObject();
-        public UnityNetcodeClientId OwnUnityNetcodeClientId => OwnLobbyMember.UnityNetcodeClientId;
+        public UnityNetcodeClientId OwnLobbyMemberUnityNetcodeClientId => OwnLobbyMember.UnityNetcodeClientId;
 
         public IReadOnlyList<ulong> OtherLobbyMemberUnityNetcodeClientIds
         {
             get
             {
                 return AllLobbyMemberUnityNetcodeClientIds
-                    .Except(new List<ulong>() { OwnUnityNetcodeClientId })
+                    .Except(new List<ulong>() { OwnLobbyMemberUnityNetcodeClientId })
                     .ToList();
             }
         }
@@ -87,19 +92,27 @@ namespace CommonOnlineMultiplayer
             return Instance;
         }
 
-        protected override void StartSingleton()
+        protected override void AwakeSingleton()
         {
             MessagingControl = new MessagingControl(
+                () => OwnLobbyMemberUnityNetcodeClientId,
                 () => OtherLobbyMemberUnityNetcodeClientIds);
 
             ObservableMessagingControl = new ObservableMessagingControl(
-                () => OtherLobbyMemberUnityNetcodeClientIds,
-                () => OwnUnityNetcodeClientId);
+                MessagingControl,
+                () => OwnLobbyMemberUnityNetcodeClientId,
+                () => OtherLobbyMemberUnityNetcodeClientIds);
+        }
 
+        protected override void StartSingleton()
+        {
             networkManager.OnClientConnectedCallback += OnNetcodeClientConnectedOnServerOrLocal;
             networkManager.OnClientDisconnectCallback += OnNetcodeClientDisconnectedOnServerOrLocal;
             networkManager.ConnectionApprovalCallback += OnNetcodeClientConnectionApproval;
+
+            networkManager.OnClientStarted += OnNetcodeLocalClientStarted;
             networkManager.OnClientStopped += OnNetcodeLocalClientStopped;
+
             networkManager.OnServerStarted += OnNetcodeLocalServerStarted;
             networkManager.OnServerStopped += OnNetcodeLocalServerStopped;
 
@@ -107,10 +120,28 @@ namespace CommonOnlineMultiplayer
                 .Subscribe(evt => UpdateLobbyMemberPlayerProfiles());
         }
 
+        protected override void OnDestroySingleton()
+        {
+            networkManager.OnClientConnectedCallback -= OnNetcodeClientConnectedOnServerOrLocal;
+            networkManager.OnClientDisconnectCallback -= OnNetcodeClientDisconnectedOnServerOrLocal;
+            networkManager.ConnectionApprovalCallback -= OnNetcodeClientConnectionApproval;
+
+            networkManager.OnClientStarted -= OnNetcodeLocalClientStarted;
+            networkManager.OnClientStopped -= OnNetcodeLocalClientStopped;
+
+            networkManager.OnServerStarted -= OnNetcodeLocalServerStarted;
+            networkManager.OnServerStopped -= OnNetcodeLocalServerStopped;
+        }
+
+        private void Update()
+        {
+            ObservableMessagingControl.UpdateMessageTimeout();
+        }
+
         private void OnNetcodeLocalServerStarted()
         {
             Debug.Log($"OnNetcodeLocalServerStarted");
-            MessagingControl.RegisterForwardNamedMessageHandlersIfNeeded();
+            MessagingControl.RegisterNamedMessageHandlersToForwardMessagesIfNeeded();
         }
 
         private void UpdateLobbyMemberPlayerProfiles()
@@ -121,13 +152,10 @@ namespace CommonOnlineMultiplayer
                 .ToList();
         }
 
-        protected override void OnDestroySingleton()
+        private void OnNetcodeLocalClientStarted()
         {
-            networkManager.OnClientConnectedCallback -= OnNetcodeClientConnectedOnServerOrLocal;
-            networkManager.OnClientDisconnectCallback -= OnNetcodeClientDisconnectedOnServerOrLocal;
-            networkManager.ConnectionApprovalCallback -= OnNetcodeClientConnectionApproval;
-            networkManager.OnClientStopped -= OnNetcodeLocalClientStopped;
-            networkManager.OnServerStopped -= OnNetcodeLocalServerStopped;
+            Debug.Log($"OnNetcodeLocalClientStarted");
+            ownNetcodeClientStartedEventStream.OnNext(new OwnNetcodeClientStartedEvent());
         }
 
         private void OnNetcodeLocalClientStopped(bool wasHostMode)
@@ -144,6 +172,8 @@ namespace CommonOnlineMultiplayer
             {
                 LobbyMemberManager.ClearLobbyMemberRegistry();
             }
+
+            ownNetcodeClientStoppedEventStream.OnNext(new OwnNetcodeClientStoppedEvent());
         }
 
         private void OnNetcodeLocalServerStopped(bool wasHostMode)

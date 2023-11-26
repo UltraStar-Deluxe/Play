@@ -65,27 +65,25 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
 
     private void UpdatePlayerImageColors()
     {
-        image.style.backgroundColor = new StyleColor(GetPlayerImageBackgroundColor());
-        image.style.unityBackgroundImageTintColor = new StyleColor(GetPlayerImageTintColor());
+        UpdatePlayerImageBackgroundColor();
+        UpdatePlayerImageTintColor();
     }
 
-    private Color32 GetPlayerImageTintColor()
+    private void UpdatePlayerImageTintColor()
     {
         if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
         {
-            return ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name);
+             image.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name));
         }
-
-        return Colors.white;
     }
 
-    private Color32 GetPlayerImageBackgroundColor()
+    private void UpdatePlayerImageBackgroundColor()
     {
         if (micProfile != null)
         {
-            return micProfile.Color;
+            image.style.backgroundColor = new StyleColor(micProfile.Color);
         }
 
-        return Color.clear;
+        image.style.backgroundColor =  new StyleColor(Color.clear);
     }
 }

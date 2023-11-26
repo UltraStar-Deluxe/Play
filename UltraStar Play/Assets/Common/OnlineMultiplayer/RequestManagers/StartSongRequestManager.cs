@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UniInject;
+using UniRx;
 using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
-    public class StartSongRequestHandlerManager : AbstractSingletonBehaviour, INeedInjection
+    public class StartSongRequestManager : AbstractSingletonBehaviour, INeedInjection
     {
-        public static StartSongRequestHandlerManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StartSongRequestHandlerManager>();
+        public static StartSongRequestManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<StartSongRequestManager>();
 
         [Inject]
         private SceneNavigator sceneNavigator;
@@ -37,27 +38,29 @@ namespace CommonOnlineMultiplayer
 
         protected override void StartSingleton()
         {
-            InitOnlineMultiplayerRequestHandlers();
+            onlineMultiplayerManager.OwnNetcodeClientStartedEventStream
+                .Subscribe(_ => InitOnlineMultiplayerRequestHandlers());
         }
 
         private void InitOnlineMultiplayerRequestHandlers()
         {
-            NetcodeRequestHandler<StartSingSceneRequestDto> suggestSongRequestHandler = new NetcodeRequestHandler<StartSingSceneRequestDto>(
-                ENetcodeMessageType.StartSongRequest,
-                0,
-                (requestDto, senderNetcodeClientId) =>
+            onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+                nameof(StartSingSceneRequestDto),
+                response =>
                 {
                     if (onlineMultiplayerManager.IsServer)
                     {
                         // This request is only sent by the host, which is this lobby member, so nothing to do here.
-                        return EmptyNetcodeResponseDto.Instance;
+                        return;
                     }
 
                     if (onlineMultiplayerManager.OwnLobbyMemberPlayerProfile == null)
                     {
                         Debug.LogError("Failed to start sing scene from request because this lobby member has no corresponding player profile.");
-                        return EmptyNetcodeResponseDto.Instance;
+                        return;
                     }
+
+                    StartSingSceneRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<StartSingSceneRequestDto>(response.MessagePayload);
 
                     MicProfile micProfile = GetOwnLobbyMemberMicProfile();
                     SingSceneData singSceneData = NetcodeMessageDtoConverterUtils.FromDto(requestDto.SingSceneDataDto, songMetaManager);
@@ -72,9 +75,7 @@ namespace CommonOnlineMultiplayer
                         },
                     };
                     sceneNavigator.LoadScene(EScene.SingScene, singSceneData);
-                    return EmptyNetcodeResponseDto.Instance;
                 });
-            onlineMultiplayerManager.NetcodeRequestHandlerRegistry.AddRequestHandler(suggestSongRequestHandler);
         }
 
         private MicProfile GetOwnLobbyMemberMicProfile()

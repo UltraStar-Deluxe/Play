@@ -56,7 +56,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(SteamAchievementManager.Instance);
 
         // Online Multiplayer
-        bb.BindExistingInstance(NetcodeRequestHandlerRegistry.Instance);
         bb.BindExistingInstance(OnlineMultiplayerManager.Instance);
         bb.BindExistingInstance(OnlineMultiplayerBackendManager.Instance);
 

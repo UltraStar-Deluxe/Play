@@ -248,7 +248,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
             if (micProfile == null
                 && (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
-                    || lobbyMemberPlayerProfile.UnityNetcodeClientId == onlineMultiplayerManager.OwnUnityNetcodeClientId))
+                    || lobbyMemberPlayerProfile.UnityNetcodeClientId == onlineMultiplayerManager.OwnLobbyMemberUnityNetcodeClientId))
             {
                 playerProfilesWithoutMic.Add(playerProfile);
             }
