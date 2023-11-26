@@ -56,22 +56,36 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
             return;
         }
 
-        UpdatePlayerImageBackgroundColor();
+        UpdatePlayerImageColors();
 
         string finalImagePath = uiManager.GetFinalPlayerProfileImagePath(playerProfile);
         uiManager.LoadPlayerProfileImage(finalImagePath)
             .Subscribe(loadedSprite => image.style.backgroundImage = new StyleBackground(loadedSprite));
     }
 
-    private void UpdatePlayerImageBackgroundColor()
+    private void UpdatePlayerImageColors()
+    {
+        image.style.backgroundColor = new StyleColor(GetPlayerImageBackgroundColor());
+        image.style.unityBackgroundImageTintColor = new StyleColor(GetPlayerImageTintColor());
+    }
+
+    private Color32 GetPlayerImageTintColor()
+    {
+        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
+        {
+            return ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name);
+        }
+
+        return Colors.white;
+    }
+
+    private Color32 GetPlayerImageBackgroundColor()
     {
         if (micProfile != null)
         {
-            image.style.backgroundColor = new StyleColor(micProfile.Color);
+            return micProfile.Color;
         }
-        else
-        {
-            image.style.backgroundColor = new StyleColor(Color.clear);
-        }
+
+        return Color.clear;
     }
 }
