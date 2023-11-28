@@ -11,6 +11,7 @@
                     <MaterialIcon name="songEntryRemoteSourceIcon" icon="cloud" class="smallFont fontColor secondaryFontColor" />
                 </ui:VisualElement>
                 <ui:VisualElement name="songEntryDarkOverlay" picking-mode="Ignore" class="overlay" style="flex-grow: 1; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px;" />
+                <MaterialIcon tabindex="-1" icon="cloud_off" name="notAvailableInOnlineGameIcon" class="overlay rounded" style="-unity-text-align: middle-center; font-size: 100px;" />
             </ui:VisualElement>
             <ui:VisualElement name="songInfoContainer" picking-mode="Ignore" class="px-1" style="min-height: 50px; overflow: hidden;">
                 <ui:Label text="Some very long song title" display-tooltip-when-elided="true" name="songTitle" picking-mode="Ignore" class="ellipsis" style="white-space: normal; -unity-font-style: bold; max-height: 45px;" />

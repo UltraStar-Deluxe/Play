@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -49,6 +50,12 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.openSongMenuButton)]
     private Button openSongMenuButton;
+
+    [Inject(UxmlName = R.UxmlNames.notAvailableInOnlineGameIcon)]
+    private VisualElement notAvailableInOnlineGameIcon;
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     [Inject]
     private CreateSingAlongSongControl createSingAlongSongControl;
@@ -324,6 +331,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateCover()
     {
+        notAvailableInOnlineGameIcon.HideByDisplay();
+
         if (SongSelectEntry is SongSelectSongEntry songEntry)
         {
             UpdateSongCover(songEntry);
@@ -389,6 +398,34 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                 }
 
                 SongMetaImageUtils.SetCoverOrBackgroundImage(sprite, songImageOuter, songImageInner);
+            });
+
+        notAvailableInOnlineGameIcon.HideByDisplay();
+        if (onlineMultiplayerManager.IsOnlineGame)
+        {
+            CheckAllPlayersHaveSongLocally(songMeta);
+        }
+    }
+
+    private void CheckAllPlayersHaveSongLocally(SongMeta songMeta)
+    {
+        onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
+            nameof(HasSongRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new HasSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to check whether all lobby members have song '{SongMetaUtils.GetArtistDashTitle(songMeta)}' locally: {ex.Message}");
+            })
+            .Subscribe(response =>
+            {
+                HasSongResponseDto responseDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongResponseDto>(response.MessagePayload);
+                if (!responseDto.HasSong)
+                {
+                    Debug.Log($"Netcode client {response.SenderNetcodeClientId} does not have the song '{SongMetaUtils.GetArtistDashTitle(songMeta)}', showing corresponding icon.");
+                    notAvailableInOnlineGameIcon.ShowByDisplay();
+                }
             });
     }
 

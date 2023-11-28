@@ -490,6 +490,7 @@ public static partial class R
         public const string noSongsFoundContainer = "noSongsFoundContainer";
         public const string noSongsFoundIcon = "noSongsFoundIcon";
         public const string noSongsFoundLabel = "noSongsFoundLabel";
+        public const string notAvailableInOnlineGameIcon = "notAvailableInOnlineGameIcon";
         public const string notConnectedContainer = "notConnectedContainer";
         public const string notConnectedLabel = "notConnectedLabel";
         public const string note = "note";
