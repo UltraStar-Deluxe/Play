@@ -166,16 +166,20 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
         IsSelected.Subscribe(newValue =>
         {
-            if (newValue)
+            if (PlayerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
             {
-                playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
-                noMicIcon.ShowByVisibility();
+                if (newValue)
+                {
+                    playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+                    noMicIcon.ShowByVisibility();
+                }
+                else
+                {
+                    playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
+                    noMicIcon.HideByVisibility();
+                }
             }
-            else
-            {
-                playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
-                noMicIcon.HideByVisibility();
-            }
+
             micButton.SetVisibleByDisplay(newValue
                                           && CanSelectMic);
 
