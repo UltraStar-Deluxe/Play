@@ -95,7 +95,17 @@ namespace CommonOnlineMultiplayer
                 IDisposable namedMessageHandlerDisposable = null;
                 runningRequestData.OnTimeout = () =>
                 {
-                    namedMessageHandlerDisposable?.Dispose();
+                    try
+                    {
+                        namedMessageHandlerDisposable?.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
+
+                    // Notify subscribers
+                    o.OnError(new TimeoutException($"Received no response for message {messageName} with requestId {requestId} within {MessageTimeoutInMillis} ms"));
                 };
 
                 // Register handler for response message
