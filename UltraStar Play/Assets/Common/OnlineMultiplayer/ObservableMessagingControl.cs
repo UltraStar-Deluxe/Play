@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UniRx;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -97,7 +98,8 @@ namespace CommonOnlineMultiplayer
                     namedMessageHandlerDisposable?.Dispose();
                 };
 
-                string responseMessageName = messagingControl.GetResponseMessageName(messageName);
+                // Register handler for response message
+                string responseMessageName = GetResponseMessageName(messageName, requestId);
                 namedMessageHandlerDisposable = messagingControl.RegisterNamedMessageHandler(
                     responseMessageName,
                     response =>
@@ -135,14 +137,28 @@ namespace CommonOnlineMultiplayer
                         }
                     });
 
+                // Add responseMessageName to message payload,
+                // such that the response can be sent directly to this recipient code
+                int size = FastBufferWriter.GetWriteSize(responseMessageName)
+                           + fastBufferWriter.Length;
+                FastBufferWriter returnAddressableFastBufferWriter = new(size, Allocator.Temp);
+                returnAddressableFastBufferWriter.WriteValueSafe(responseMessageName);
+                returnAddressableFastBufferWriter.TryBeginWrite(fastBufferWriter.Length);
+                returnAddressableFastBufferWriter.CopyFrom(fastBufferWriter);
+
                 messagingControl.SendNamedMessageToClients(
                     messageName,
-                    fastBufferWriter,
+                    returnAddressableFastBufferWriter,
                     targetNetcodeClientIds,
                     ToNetcodeNetworkDelivery(reliableNetworkDelivery));
 
                 return Disposable.Empty;
             });
+        }
+
+        private string GetResponseMessageName(string messageName, string requestId)
+        {
+            return $"Re:{messageName}:{requestId}";
         }
 
         public void UpdateMessageTimeout()
@@ -212,6 +228,31 @@ namespace CommonOnlineMultiplayer
                 receivedResponses.Add(request);
                 netcodeClientIdsWithoutResponse.Remove(request.SenderNetcodeClientId);
             }
+        }
+
+        public void RegisterAnswerableMessageHandler(string messageName, Action<AnswerableMessage> action)
+        {
+            messagingControl.RegisterNamedMessageHandler(
+                messageName,
+                request =>
+                {
+                    // Read responseMessageName,
+                    // such that the response can be send directly to the corresponding recipient code
+                    FastBufferReader fastBufferReader = request.MessagePayload;
+                    fastBufferReader.ReadValueSafe(out string responseMessageName);
+
+                    int originalMessageLength = fastBufferReader.Length - fastBufferReader.Position;
+                    byte[] originalMessageBytes = new byte[originalMessageLength];
+                    fastBufferReader.ReadBytesSafe(ref originalMessageBytes, originalMessageBytes.Length, 0);
+                    using FastBufferReader originalMessageReader = new FastBufferReader(originalMessageBytes, Allocator.Temp);
+
+                    AnswerableMessage answerableMessage = new(
+                        request.SenderNetcodeClientId,
+                        responseMessageName,
+                        originalMessageReader);
+
+                    action?.Invoke(answerableMessage);
+                });
         }
     }
 }

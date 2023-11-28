@@ -1,5 +1,6 @@
 ﻿using UniInject;
 using UniRx;
+using Unity.Netcode;
 
 namespace CommonOnlineMultiplayer
 {
@@ -26,18 +27,18 @@ namespace CommonOnlineMultiplayer
 
         private void InitOnlineMultiplayerRequestHandlers()
         {
-            onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            onlineMultiplayerManager.ObservableMessagingControl.RegisterAnswerableMessageHandler(
                 nameof(HasSongRequestDto),
-                request =>
+                answerableMessage =>
                 {
-                    HasSongRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongRequestDto>(request.MessagePayload);
+                    HasSongRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongRequestDto>(answerableMessage.MessagePayload);
 
                     bool hasSong = songMetaManager.GetSongMetaByGloballyUniqueId(requestDto.GloballyUniqueSongId) != null;
                     HasSongResponseDto responseDto = new HasSongResponseDto(requestDto.GloballyUniqueSongId, hasSong);
                     onlineMultiplayerManager.MessagingControl.SendNamedMessageToClient(
-                        onlineMultiplayerManager.MessagingControl.GetResponseMessageName(nameof(HasSongRequestDto)),
+                        answerableMessage.ResponseMessageName,
                         FastBufferWriterUtils.WriteJsonValuePacked(responseDto),
-                        request.SenderNetcodeClientId);
+                        answerableMessage.SenderNetcodeClientId);
                 });
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UniRx;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -51,20 +52,16 @@ namespace CommonOnlineMultiplayer
         {
             Debug.Log($"Forwarding named message from client {request.SenderNetcodeClientId} to single client");
 
-            FastBufferReader fastBufferReader = request.MessagePayload;
-            fastBufferReader.ReadValueSafe(out string messageName);
-            fastBufferReader.ReadValueSafe(out ulong targetNetcodeClientId);
-            fastBufferReader.ReadValueSafe(out NetworkDelivery networkDelivery);
-            int originalMessageLength = fastBufferReader.Length - fastBufferReader.Position;
-            byte[] originalMessageBytes = new byte[originalMessageLength];
-            fastBufferReader.ReadBytes(ref originalMessageBytes, originalMessageBytes.Length, 0);
+            using FastBufferWriter originalMessageWriter = ReadForwardedFastBufferReader(
+                request.MessagePayload,
+                out string messageName,
+                out ulong[] targetNetcodeClientIds,
+                out NetworkDelivery networkDelivery);
 
-            using FastBufferWriter originalMessageWriter = new();
-            originalMessageWriter.WriteBytes(originalMessageBytes);
             SendNamedMessageToClient(
                 messageName,
                 originalMessageWriter,
-                targetNetcodeClientId,
+                targetNetcodeClientIds.First(),
                 networkDelivery);
         }
 
@@ -72,16 +69,12 @@ namespace CommonOnlineMultiplayer
         {
             Debug.Log($"Forwarding named message from client {request.SenderNetcodeClientId} to multiple clients");
 
-            FastBufferReader fastBufferReader = request.MessagePayload;
-            fastBufferReader.ReadValueSafe(out string messageName);
-            fastBufferReader.ReadValueSafe(out ulong[] targetNetcodeClientIds);
-            fastBufferReader.ReadValueSafe(out NetworkDelivery networkDelivery);
-            int originalMessageLength = fastBufferReader.Length - fastBufferReader.Position;
-            byte[] originalMessageBytes = new byte[originalMessageLength];
-            fastBufferReader.ReadBytes(ref originalMessageBytes, originalMessageBytes.Length, 0);
+            using FastBufferWriter originalMessageWriter = ReadForwardedFastBufferReader(
+                request.MessagePayload,
+                out string messageName,
+                out ulong[] targetNetcodeClientIds,
+                out NetworkDelivery networkDelivery);
 
-            using FastBufferWriter originalMessageWriter = new();
-            originalMessageWriter.WriteBytes(originalMessageBytes);
             SendNamedMessageToClients(
                 messageName,
                 originalMessageWriter,
@@ -151,11 +144,11 @@ namespace CommonOnlineMultiplayer
             {
                 // Only the server can send to clients directly. Other clients can only send to the server.
                 // We are not the server, thus we need to sent the message to the server, which then forwards it to the clients.
-                using FastBufferWriter forwardedFastBufferWriter = new();
-                forwardedFastBufferWriter.WriteValueSafe(messageName);
-                forwardedFastBufferWriter.WriteValueSafe(targetNetcodeClientIds.ToArray());
-                forwardedFastBufferWriter.WriteValueSafe(networkDelivery);
-                forwardedFastBufferWriter.CopyFrom(fastBufferWriter);
+                using FastBufferWriter forwardedFastBufferWriter = CreateForwardedFastBufferWriter(
+                    messageName,
+                    targetNetcodeClientIds.ToArray(),
+                    networkDelivery,
+                    fastBufferWriter);
                 SendNamedMessageToServer(
                     ForwardToClientsMessageName,
                     forwardedFastBufferWriter,
@@ -187,10 +180,11 @@ namespace CommonOnlineMultiplayer
                 // Only the server can send to clients directly. Other clients can only send to the server.
                 // We are not the server and do not send to the server,
                 // thus we need to sent the message to the server, which then forwards it to the clients.
-                using FastBufferWriter forwardedFastBufferWriter = new();
-                forwardedFastBufferWriter.WriteValueSafe(messageName);
-                forwardedFastBufferWriter.WriteValueSafe(targetNetcodeClientId);
-                forwardedFastBufferWriter.CopyFrom(fastBufferWriter);
+                using FastBufferWriter forwardedFastBufferWriter = CreateForwardedFastBufferWriter(
+                    messageName,
+                    new ulong[] { targetNetcodeClientId },
+                    networkDelivery,
+                    fastBufferWriter);
                 SendNamedMessageToServer(
                     "FORWARD_TO_CLIENT",
                     forwardedFastBufferWriter,
@@ -198,6 +192,46 @@ namespace CommonOnlineMultiplayer
             }
 
             fastBufferWriter.Dispose();
+        }
+
+        private FastBufferWriter CreateForwardedFastBufferWriter(
+            string messageName,
+            ulong[] targetNetcodeClientIds,
+            NetworkDelivery networkDelivery,
+            FastBufferWriter originalFastBufferWriter)
+        {
+            int size = FastBufferWriter.GetWriteSize(messageName)
+                       + FastBufferWriter.GetWriteSize(targetNetcodeClientIds)
+                       + FastBufferWriter.GetWriteSize<NetworkDelivery>()
+                       + originalFastBufferWriter.Length;
+            FastBufferWriter forwardedFastBufferWriter = new(size, Allocator.Temp);
+            forwardedFastBufferWriter.WriteValueSafe(messageName);
+            forwardedFastBufferWriter.WriteValueSafe(targetNetcodeClientIds);
+            forwardedFastBufferWriter.WriteValueSafe(networkDelivery);
+            forwardedFastBufferWriter.TryBeginWrite(originalFastBufferWriter.Length);
+            forwardedFastBufferWriter.CopyFrom(originalFastBufferWriter);
+
+            return forwardedFastBufferWriter;
+        }
+
+        private FastBufferWriter ReadForwardedFastBufferReader(
+            FastBufferReader forwardedFastBufferReader,
+            out string messageName,
+            out ulong[] targetNetcodeClientIds,
+            out NetworkDelivery networkDelivery)
+        {
+            forwardedFastBufferReader.ReadValueSafe(out messageName);
+            forwardedFastBufferReader.ReadValueSafe(out targetNetcodeClientIds);
+            forwardedFastBufferReader.ReadValueSafe(out networkDelivery);
+
+            int originalMessageLength = forwardedFastBufferReader.Length - forwardedFastBufferReader.Position;
+            byte[] originalMessageBytes = new byte[originalMessageLength];
+            forwardedFastBufferReader.ReadBytes(ref originalMessageBytes, originalMessageBytes.Length, 0);
+
+            FastBufferWriter originalFastBufferWriter = new();
+            originalFastBufferWriter.WriteBytes(originalMessageBytes);
+
+            return originalFastBufferWriter;
         }
 
         private void SendNamedMessageToServer(
@@ -245,13 +279,12 @@ namespace CommonOnlineMultiplayer
                 isDisposed = true;
 
                 messageHandlers.Remove(namedMessageHandler);
+                if (messageHandlers.IsNullOrEmpty())
+                {
+                    messageNameToHandlers.Remove(messageName);
+                }
                 Debug.Log($"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
             });
-        }
-
-        public string GetResponseMessageName(string messageName)
-        {
-            return $"Re:{messageName}";
         }
     }
 }
