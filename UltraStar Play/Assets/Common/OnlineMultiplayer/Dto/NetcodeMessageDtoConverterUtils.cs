@@ -10,7 +10,8 @@ namespace CommonOnlineMultiplayer
             {
                 GloballyUniqueSongMetaIds = singSceneData.SongMetas
                     .Select(songMeta => SongIdManager.GetAndCacheGloballyUniqueId(songMeta))
-                    .ToList()
+                    .ToList(),
+                StartPaused = singSceneData.StartPaused,
             };
         }
 
@@ -20,7 +21,8 @@ namespace CommonOnlineMultiplayer
             {
                 SongMetas = dto.GloballyUniqueSongMetaIds
                     .Select(globallyUniqueSongId => songMetaManager.GetSongMetaByGloballyUniqueId(globallyUniqueSongId))
-                    .ToList()
+                    .ToList(),
+                StartPaused = dto.StartPaused,
             };
             return singSceneData;
         }

@@ -2,19 +2,19 @@
 
 namespace CommonOnlineMultiplayer
 {
-    public struct AnswerableMessage
+    public struct ObservedMessage
     {
         public ulong SenderNetcodeClientId { get; private set; }
-        public string ResponseMessageName { get; private set; }
+        public string ObservedMessageName { get; private set; }
         public FastBufferReader MessagePayload { get; private set; }
 
-        public AnswerableMessage(
+        public ObservedMessage(
             ulong senderNetcodeClientId,
-            string responseMessageName,
+            string observedMessageName,
             FastBufferReader messagePayload)
         {
             SenderNetcodeClientId = senderNetcodeClientId;
-            ResponseMessageName = responseMessageName;
+            ObservedMessageName = observedMessageName;
             MessagePayload = messagePayload;
         }
     }

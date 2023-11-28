@@ -48,7 +48,7 @@ namespace CommonOnlineMultiplayer
                 nameof(StartSingSceneRequestDto),
                 response =>
                 {
-                    if (onlineMultiplayerManager.IsServer)
+                    if (onlineMultiplayerManager.IsHost)
                     {
                         // This request is only sent by the host, which is this lobby member, so nothing to do here.
                         return;

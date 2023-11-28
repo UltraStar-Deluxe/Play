@@ -40,12 +40,11 @@ namespace CommonOnlineMultiplayer
          * Each connected Netcode peer has a client, but only one of them is the host and server.
          */
         public bool IsOnlineGame => networkManager.IsClient;
-        public bool IsLocalGame => !IsOnlineGame;
 
         /**
          * The host is the Netcode server that adds a client for itself automatically.
          */
-        public bool IsServer => networkManager.IsServer;
+        public bool IsHost => networkManager.IsHost;
 
         public LobbyMember OwnLobbyMember => LobbyMemberManager.GetLobbyMember(networkManager.LocalClientId);
         public PlayerProfile OwnLobbyMemberPlayerProfile
@@ -64,17 +63,17 @@ namespace CommonOnlineMultiplayer
         public NetworkObject OwnLobbyMemberNetworkObject => networkManager.SpawnManager.GetLocalPlayerObject();
         public UnityNetcodeClientId OwnLobbyMemberUnityNetcodeClientId => OwnLobbyMember.UnityNetcodeClientId;
 
-        public IReadOnlyList<ulong> OtherLobbyMemberUnityNetcodeClientIds
+        public IReadOnlyList<ulong> OtherLobbyMembersUnityNetcodeClientIds
         {
             get
             {
-                return AllLobbyMemberUnityNetcodeClientIds
+                return AllLobbyMembersUnityNetcodeClientIds
                     .Except(new List<ulong>() { OwnLobbyMemberUnityNetcodeClientId })
                     .ToList();
             }
         }
 
-        public IReadOnlyList<ulong> AllLobbyMemberUnityNetcodeClientIds
+        public IReadOnlyList<ulong> AllLobbyMembersUnityNetcodeClientIds
         {
             get
             {
@@ -94,14 +93,8 @@ namespace CommonOnlineMultiplayer
 
         protected override void AwakeSingleton()
         {
-            MessagingControl = new MessagingControl(
-                () => OwnLobbyMemberUnityNetcodeClientId,
-                () => OtherLobbyMemberUnityNetcodeClientIds);
-
-            ObservableMessagingControl = new ObservableMessagingControl(
-                MessagingControl,
-                () => OwnLobbyMemberUnityNetcodeClientId,
-                () => OtherLobbyMemberUnityNetcodeClientIds);
+            MessagingControl = new MessagingControl();
+            ObservableMessagingControl = new ObservableMessagingControl(MessagingControl);
         }
 
         protected override void StartSingleton()

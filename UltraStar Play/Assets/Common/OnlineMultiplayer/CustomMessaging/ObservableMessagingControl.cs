@@ -9,71 +9,40 @@ namespace CommonOnlineMultiplayer
 {
     public class ObservableMessagingControl
     {
-        private const long MessageTimeoutInMillis = 5000;
+        private const long DefaultMessageTimeoutInMillis = 5000;
 
         private readonly MessagingControl messagingControl;
-        private readonly Func<ulong> ownLobbyMemberUnityNetcodeClientIdGetter;
-        private readonly Func<IReadOnlyList<ulong>> otherLobbyMemberUnityNetcodeClientIdsGetter;
 
         private readonly List<RunningRequestData> runningRequestDatas = new();
         private readonly object runningRequestDatasLock = new();
 
         public ObservableMessagingControl(
-            MessagingControl messagingControl,
-            Func<ulong> ownLobbyMemberUnityNetcodeClientIdGetter,
-            Func<IReadOnlyList<ulong>> otherLobbyMemberUnityNetcodeClientIdsGetter)
+            MessagingControl messagingControl)
         {
             this.messagingControl = messagingControl;
-            this.ownLobbyMemberUnityNetcodeClientIdGetter = ownLobbyMemberUnityNetcodeClientIdGetter;
-            this.otherLobbyMemberUnityNetcodeClientIdsGetter = otherLobbyMemberUnityNetcodeClientIdsGetter;
-        }
-
-        public IObservable<NamedMessage> SendNamedMessageToAllClientsAsObservable(
-            string messageName,
-            FastBufferWriter fastBufferWriter,
-            EReliableNetworkDelivery reliableNetworkDelivery = EReliableNetworkDelivery.ReliableSequenced)
-        {
-            List<ulong> targetNetcodeClientIds = new List<ulong>() { ownLobbyMemberUnityNetcodeClientIdGetter.Invoke() };
-            targetNetcodeClientIds.AddRange(otherLobbyMemberUnityNetcodeClientIdsGetter.Invoke());
-
-            return SendNamedMessageToClientsAsObservable(
-                messageName,
-                fastBufferWriter,
-                targetNetcodeClientIds,
-                reliableNetworkDelivery);
-        }
-
-        public IObservable<NamedMessage> SendNamedMessageToOtherClientsAsObservable(
-            string messageName,
-            FastBufferWriter fastBufferWriter,
-            EReliableNetworkDelivery reliableNetworkDelivery = EReliableNetworkDelivery.ReliableSequenced)
-        {
-            IReadOnlyList<ulong> targetNetcodeClientIds = otherLobbyMemberUnityNetcodeClientIdsGetter.Invoke();
-            return SendNamedMessageToClientsAsObservable(
-                messageName,
-                fastBufferWriter,
-                targetNetcodeClientIds,
-                reliableNetworkDelivery);
         }
 
         public IObservable<NamedMessage> SendNamedMessageToClientAsObservable(
             string messageName,
             FastBufferWriter fastBufferWriter,
             ulong targetNetcodeClientId,
-            EReliableNetworkDelivery reliableNetworkDelivery = EReliableNetworkDelivery.ReliableSequenced)
+            EReliableNetworkDelivery reliableNetworkDelivery = EReliableNetworkDelivery.ReliableSequenced,
+            long timeoutInMillis = DefaultMessageTimeoutInMillis)
         {
             return SendNamedMessageToClientsAsObservable(
                 messageName,
                 fastBufferWriter,
-                new List<ulong>() { targetNetcodeClientId },
-                reliableNetworkDelivery);
+                new ulong[] { targetNetcodeClientId },
+                reliableNetworkDelivery,
+                timeoutInMillis);
         }
 
         public IObservable<NamedMessage> SendNamedMessageToClientsAsObservable(
             string messageName,
             FastBufferWriter fastBufferWriter,
             IReadOnlyList<ulong> targetNetcodeClientIds,
-            EReliableNetworkDelivery reliableNetworkDelivery = EReliableNetworkDelivery.ReliableSequenced)
+            EReliableNetworkDelivery reliableNetworkDelivery = EReliableNetworkDelivery.ReliableSequenced,
+            long timeoutInMillis = DefaultMessageTimeoutInMillis)
         {
             string requestId = Guid.NewGuid().ToString();
 
@@ -81,7 +50,8 @@ namespace CommonOnlineMultiplayer
                 requestId,
                 messageName,
                 targetNetcodeClientIds,
-                reliableNetworkDelivery);
+                reliableNetworkDelivery,
+                timeoutInMillis);
 
             lock (runningRequestDatasLock)
             {
@@ -105,7 +75,7 @@ namespace CommonOnlineMultiplayer
                     }
 
                     // Notify subscribers
-                    o.OnError(new TimeoutException($"Received no response for message {messageName} with requestId {requestId} within {MessageTimeoutInMillis} ms"));
+                    o.OnError(new TimeoutException($"Received no response for message {messageName} with requestId {requestId} within {timeoutInMillis} ms"));
                 };
 
                 // Register handler for response message
@@ -178,7 +148,7 @@ namespace CommonOnlineMultiplayer
                 for (int i = runningRequestDatas.Count - 1; i >= 0; i--)
                 {
                     RunningRequestData runningRequestData = runningRequestDatas[i];
-                    if (TimeUtils.IsDurationAboveThresholdInMillis(runningRequestData.MessageSendTimeInMillis, MessageTimeoutInMillis))
+                    if (TimeUtils.IsDurationAboveThresholdInMillis(runningRequestData.MessageSendTimeInMillis, runningRequestData.TimeoutInMillis))
                     {
                         Debug.Log($"Timeout of observable message response with messageName: {runningRequestData.MessageName}, requestId: {runningRequestData.RequestId}");
                         runningRequestData.OnTimeout?.Invoke();
@@ -213,13 +183,15 @@ namespace CommonOnlineMultiplayer
             private readonly List<ulong> netcodeClientIdsWithoutResponse;
             public bool HasReceivedResponseFromEveryClient => netcodeClientIdsWithoutResponse.IsNullOrEmpty();
 
+            public long TimeoutInMillis { get; private set; }
             public Action OnTimeout { get; set; }
 
             public RunningRequestData(
                 string requestId,
                 string messageName,
                 IReadOnlyList<ulong> targetNetcodeClientIds,
-                EReliableNetworkDelivery reliableNetworkDelivery)
+                EReliableNetworkDelivery reliableNetworkDelivery,
+                long timeoutInMillis)
             {
                 RequestId = requestId;
                 MessageName = messageName;
@@ -230,6 +202,7 @@ namespace CommonOnlineMultiplayer
                 netcodeClientIdsWithoutResponse = new List<ulong>(targetNetcodeClientIds);
 
                 MessageSendTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+                TimeoutInMillis = timeoutInMillis;
                 OnTimeout = null;
             }
 
@@ -240,9 +213,21 @@ namespace CommonOnlineMultiplayer
             }
         }
 
-        public void RegisterAnswerableMessageHandler(string messageName, Action<AnswerableMessage> action)
+        public void SendResponseMessage(
+            ObservedMessage observedMessage,
+            FastBufferWriter messagePayload,
+            EReliableNetworkDelivery reliableNetworkDelivery = EReliableNetworkDelivery.ReliableSequenced)
         {
-            messagingControl.RegisterNamedMessageHandler(
+            messagingControl.SendNamedMessageToClient(
+                observedMessage.ObservedMessageName,
+                messagePayload,
+                observedMessage.SenderNetcodeClientId,
+                ToNetcodeNetworkDelivery(reliableNetworkDelivery));
+        }
+
+        public IDisposable RegisterObservedMessageHandler(string messageName, Action<ObservedMessage> action)
+        {
+            return messagingControl.RegisterNamedMessageHandler(
                 messageName,
                 request =>
                 {
@@ -256,12 +241,12 @@ namespace CommonOnlineMultiplayer
                     fastBufferReader.ReadBytesSafe(ref originalMessageBytes, originalMessageBytes.Length, 0);
                     using FastBufferReader originalMessageReader = new FastBufferReader(originalMessageBytes, Allocator.Temp);
 
-                    AnswerableMessage answerableMessage = new(
+                    ObservedMessage observedMessage = new(
                         request.SenderNetcodeClientId,
                         responseMessageName,
                         originalMessageReader);
 
-                    action?.Invoke(answerableMessage);
+                    action?.Invoke(observedMessage);
                 });
         }
     }

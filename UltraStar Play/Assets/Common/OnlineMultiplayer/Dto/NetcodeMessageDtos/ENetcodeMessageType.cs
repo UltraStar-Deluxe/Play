@@ -10,6 +10,12 @@
         PlayerHasSongLocallyRequest,
         PlayerHasSongLocallyResponse,
 
+        SingSceneReadyRequest,
+        SingSceneReadyResponse,
+
+        PauseGameRequest,
+        UnpauseGameRequest,
+
         SuggestSongRequest,
 
         StartSongRequest,

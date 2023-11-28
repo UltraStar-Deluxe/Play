@@ -27,18 +27,17 @@ namespace CommonOnlineMultiplayer
 
         private void InitOnlineMultiplayerRequestHandlers()
         {
-            onlineMultiplayerManager.ObservableMessagingControl.RegisterAnswerableMessageHandler(
+            onlineMultiplayerManager.ObservableMessagingControl.RegisterObservedMessageHandler(
                 nameof(HasSongRequestDto),
-                answerableMessage =>
+                observedMessage =>
                 {
-                    HasSongRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongRequestDto>(answerableMessage.MessagePayload);
+                    HasSongRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongRequestDto>(observedMessage.MessagePayload);
 
                     bool hasSong = songMetaManager.GetSongMetaByGloballyUniqueId(requestDto.GloballyUniqueSongId) != null;
                     HasSongResponseDto responseDto = new HasSongResponseDto(requestDto.GloballyUniqueSongId, hasSong);
-                    onlineMultiplayerManager.MessagingControl.SendNamedMessageToClient(
-                        answerableMessage.ResponseMessageName,
-                        FastBufferWriterUtils.WriteJsonValuePacked(responseDto),
-                        answerableMessage.SenderNetcodeClientId);
+                    onlineMultiplayerManager.ObservableMessagingControl.SendResponseMessage(
+                        observedMessage,
+                        FastBufferWriterUtils.WriteJsonValuePacked(responseDto));
                 });
         }
     }

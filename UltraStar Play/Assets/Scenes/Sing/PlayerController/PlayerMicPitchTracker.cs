@@ -524,9 +524,10 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
                 recordedMidiNote,
                 roundedMidiNoteAfterJoker);
 
-            onlineMultiplayerManager.MessagingControl.SendNamedMessageToOtherClients(
+            onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
                 nameof(BeatAnalyzedEventNetcodeRequestDto),
                 FastBufferWriterUtils.WriteValuePacked(beatAnalyzedEventNetcodeRequestDto.ToJson()),
+                onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds,
                 NetworkDelivery.Unreliable);
         }
     }

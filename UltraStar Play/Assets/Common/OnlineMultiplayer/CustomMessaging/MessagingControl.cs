@@ -19,16 +19,6 @@ namespace CommonOnlineMultiplayer
         private bool hasRegisteredForwardNamedMessageHandlers;
 
         private NetworkManager NetworkManager => NetworkManager.Singleton;
-        private readonly Func<ulong> ownLobbyMemberUnityNetcodeClientIdGetter;
-        private readonly Func<IReadOnlyList<ulong>> otherLobbyMemberUnityNetcodeClientIdsGetter;
-
-        public MessagingControl(
-            Func<ulong> ownLobbyMemberUnityNetcodeClientIdGetter,
-            Func<IReadOnlyList<ulong>> otherLobbyMemberUnityNetcodeClientIdsGetter)
-        {
-            this.ownLobbyMemberUnityNetcodeClientIdGetter = ownLobbyMemberUnityNetcodeClientIdGetter;
-            this.otherLobbyMemberUnityNetcodeClientIdsGetter = otherLobbyMemberUnityNetcodeClientIdsGetter;
-        }
 
         public void RegisterNamedMessageHandlersToForwardMessagesIfNeeded()
         {
@@ -79,33 +69,6 @@ namespace CommonOnlineMultiplayer
                 messageName,
                 originalMessageWriter,
                 targetNetcodeClientIds,
-                networkDelivery);
-        }
-
-        public void SendNamedMessageToAllClients(
-            string messageName,
-            FastBufferWriter fastBufferWriter,
-            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
-        {
-            List<ulong> targetNetcodeClientIds = new List<ulong>() { ownLobbyMemberUnityNetcodeClientIdGetter.Invoke() };
-            targetNetcodeClientIds.AddRange(otherLobbyMemberUnityNetcodeClientIdsGetter.Invoke());
-
-            SendNamedMessageToClients(
-                messageName,
-                fastBufferWriter,
-                targetNetcodeClientIds,
-                networkDelivery);
-        }
-
-        public void SendNamedMessageToOtherClients(
-            string messageName,
-            FastBufferWriter fastBufferWriter,
-            NetworkDelivery networkDelivery = NetworkDelivery.ReliableSequenced)
-        {
-            SendNamedMessageToClients(
-                messageName,
-                fastBufferWriter,
-                otherLobbyMemberUnityNetcodeClientIdsGetter.Invoke(),
                 networkDelivery);
         }
 

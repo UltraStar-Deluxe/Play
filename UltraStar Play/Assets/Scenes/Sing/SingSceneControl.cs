@@ -210,6 +210,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public ReactiveProperty<int> ModifiedVolumePercent { get; private set; } = new(100);
 
+    private readonly List<IDisposable> disposables = new();
+
     public void OnInjectionFinished()
     {
         // PassTheMicControl may not be executed.
@@ -359,7 +361,111 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             injector.Inject(passTheMicControl);
         }
 
+        InitOnlineMultiplayer();
+
         TriggerAchievementsAtSongStart();
+    }
+
+    private void InitOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        SendUnpauseMessageForOnlineMultiplayer(0);
+
+        InitOnlineMultiplayerMessageHandlers();
+    }
+
+    private void SendUnpauseMessageForOnlineMultiplayer(int failedAttempts)
+    {
+        if (!onlineMultiplayerManager.IsHost)
+        {
+            return;
+        }
+
+        int maxFailedAttempts = 6;
+        long timeoutInMillis = 500;
+
+        // Send message to all lobby members to start playback when all clients are ready
+        onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
+                nameof(SingSceneReadyRequestDto),
+                FastBufferWriterUtils.WriteJsonValuePacked(new SingSceneReadyRequestDto()),
+                onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds,
+                EReliableNetworkDelivery.ReliableSequenced,
+                timeoutInMillis)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to check readiness of lobby members at {failedAttempts + 1} attempt: {ex.Message}");
+
+                if (failedAttempts >= maxFailedAttempts)
+                {
+                    // Failed for good, go back to song select
+                    Debug.LogError($"Failed to check readiness of lobby members too many times. Going back to song select.");
+                    sceneNavigator.LoadScene(EScene.SongSelectScene, new SongSelectSceneData()
+                    {
+                        SongMeta = SongMeta,
+                        partyModeSceneData = PartyModeSceneData,
+                    });
+                }
+                else
+                {
+                    // Try again after short delay (if this error was not triggered by a timeout already)
+                    float delayInSeconds = ex is TimeoutException
+                        ? 0
+                        : timeoutInMillis / 1000f;
+                    StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds,
+                        () => SendUnpauseMessageForOnlineMultiplayer(failedAttempts + 1)));
+                }
+            })
+            .DoOnCompleted(() =>
+            {
+                Debug.Log($"All Netcode clients are ready to start. Sending start message");
+                onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+                    nameof(UnpauseGameRequestDto),
+                    FastBufferWriterUtils.WriteJsonValuePacked(new UnpauseGameRequestDto()),
+                    onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
+            })
+            .Subscribe(response =>
+            {
+                SingSceneReadyResponseDto responseDto = FastBufferReaderUtils.ReadJsonValuePacked<SingSceneReadyResponseDto>(response.MessagePayload);
+                Debug.Log($"Netcode client {response.SenderNetcodeClientId} is ready to start");
+            });
+    }
+
+    private void InitOnlineMultiplayerMessageHandlers()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        // Send response that SingScene is ready
+        disposables.Add(onlineMultiplayerManager.ObservableMessagingControl.RegisterObservedMessageHandler(
+            nameof(SingSceneReadyRequestDto),
+            observedMessage =>
+            {
+                onlineMultiplayerManager.ObservableMessagingControl.SendResponseMessage(
+                    observedMessage,
+                    FastBufferWriterUtils.WriteJsonValuePacked(new SingSceneReadyResponseDto()));
+            }));
+
+        // Handle messages to pause and resume the game
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(UnpauseGameRequestDto),
+            message =>
+            {
+                Unpause();
+            }));
+
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(PauseGameRequestDto),
+            message =>
+            {
+                Pause();
+            }));
     }
 
     private void CreateGameRoundModifiers()
@@ -444,6 +550,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         webcamControl?.Stop();
         singSceneGovernanceControl?.Dispose();
         audioFadeInControl?.Dispose();
+        disposables.ForEach(it => it.Dispose());
     }
 
     private void InitDummySingers()
@@ -1201,7 +1308,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             {
                 timeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
                 governanceOverlayTimeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
-                songAudioPlayer.PlayAudio();
+
+                if (sceneData.StartPaused)
+                {
+                    songAudioPlayer.PauseAudio();
+                }
+                else
+                {
+                    songAudioPlayer.PlayAudio();
+                }
             });
 
         SkipToPositionInSong(startPositionInSongInMillis);

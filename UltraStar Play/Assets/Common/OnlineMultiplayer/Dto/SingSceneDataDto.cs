@@ -14,6 +14,7 @@ namespace CommonOnlineMultiplayer
 
         public double PositionInSongInMillis { get; set; }
         public bool IsRestart { get; set; }
+        public bool StartPaused { get; set; }
         public Dictionary<LobbyMember, List<PlayerScoreControlData>> LobbyMemberToScoreDataMap { get; set; } = new();
     }
 }
