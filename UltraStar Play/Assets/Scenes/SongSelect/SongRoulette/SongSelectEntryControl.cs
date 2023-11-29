@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CommonOnlineMultiplayer;
 using ProTrans;
@@ -118,6 +119,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private string lastSongMetaCover;
     private string lastSongMetaBackground;
+
+    private readonly List<IDisposable> disposables = new();
 
     public void OnInjectionFinished()
     {
@@ -409,7 +412,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private void CheckAllPlayersHaveSongLocally(SongMeta songMeta)
     {
-        onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
+        disposables.Add(onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
             nameof(HasSongRequestDto),
             FastBufferWriterUtils.WriteJsonValuePacked(new HasSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
             onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds)
@@ -426,7 +429,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                     Debug.Log($"Netcode client {response.SenderNetcodeClientId} does not have the song '{SongMetaUtils.GetArtistDashTitle(songMeta)}', showing corresponding icon.");
                     notAvailableInOnlineGameIcon.ShowByDisplay();
                 }
-            });
+            }));
     }
 
     private void SetDefaultFolderImage()
@@ -502,6 +505,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     {
         SongSelectEntry = null;
         UnregisterCallbacks();
+        disposables.ForEach(it => it.Dispose());
+        disposables.Clear();
     }
 
     public void OpenContextMenu()
