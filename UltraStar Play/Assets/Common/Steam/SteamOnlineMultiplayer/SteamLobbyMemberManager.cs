@@ -43,16 +43,6 @@ namespace SteamOnlineMultiplayer
             return Instance;
         }
 
-        protected override void StartSingleton()
-        {
-            RegisterNetcodeRequestHandlers();
-        }
-
-        private void RegisterNetcodeRequestHandlers()
-        {
-            // TODO: Only register when backend is set to Steam?
-        }
-
         public IReadOnlyList<LobbyMember> GetLobbyMembers()
         {
             return GetSteamLobbyMembers();

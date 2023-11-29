@@ -156,7 +156,17 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         injector.Inject(micProgressBarRecordingControl);
         micProgressBarRecordingControl.MicProfile = MicProfile;
 
-        togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ => IsSelected.Value = !IsSelected.Value);
+        togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            if (PlayerProfile is LobbyMemberPlayerProfile)
+            {
+                // Online multiplayer players cannot be disabled
+                IsSelected.Value = true;
+                return;
+            }
+
+            IsSelected.Value = !IsSelected.Value;
+        });
         micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
 
         focusableNavigator.AddCustomNavigationTarget(micButton, Vector2.left, togglePlayerSelectedButton, true);
@@ -166,19 +176,7 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
         IsSelected.Subscribe(newValue =>
         {
-            if (PlayerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
-            {
-                if (newValue)
-                {
-                    playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
-                    noMicIcon.ShowByVisibility();
-                }
-                else
-                {
-                    playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
-                    noMicIcon.HideByVisibility();
-                }
-            }
+            UpdateBackgroundImageTintColor();
 
             micButton.SetVisibleByDisplay(newValue
                                           && CanSelectMic);
@@ -190,6 +188,27 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         });
 
         nonPersistentSettings.MicTestActive.Subscribe(_ => UpdateAllMicPitchTrackers());
+    }
+
+    private void UpdateBackgroundImageTintColor()
+    {
+        if (PlayerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
+        {
+            // Online multiplayer players cannot be disabled.
+            playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+            return;
+        }
+
+        if (IsSelected.Value)
+        {
+            playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+            noMicIcon.ShowByVisibility();
+        }
+        else
+        {
+            playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
+            noMicIcon.HideByVisibility();
+        }
     }
 
     private void InitVoiceSelection()

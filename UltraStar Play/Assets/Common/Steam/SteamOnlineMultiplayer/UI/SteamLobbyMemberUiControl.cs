@@ -26,11 +26,7 @@ namespace SteamOnlineMultiplayer
             Image itemElement = playerProfileImagePicker.ItemImage;
 
             itemElement.SetBorderRadius(Length.Percent(50));
-            ObservableUtils.RunOnNewTaskAsObservable<Texture2D>(async () =>
-                {
-                    return await SteamOnlineMultiplayerUtils.GetAvatarTextureAsync(steamLobbyMember.SteamId);
-                })
-                .ObserveOnMainThread()
+            SteamOnlineMultiplayerUtils.GetAvatarTextureAsObservable(steamLobbyMember.SteamId)
                 .CatchIgnore((Exception ex) =>
                 {
                     Debug.LogException(ex);

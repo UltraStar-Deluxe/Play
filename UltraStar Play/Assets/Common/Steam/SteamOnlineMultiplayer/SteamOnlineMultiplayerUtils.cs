@@ -1,32 +1,59 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using CommonOnlineMultiplayer;
 using Steamworks;
 using Steamworks.Data;
+using UniRx;
 using UnityEngine;
+using Util;
 
 namespace SteamOnlineMultiplayer
 {
     public static class SteamOnlineMultiplayerUtils
     {
-        public static async Task<Texture2D> GetAvatarTextureAsync(SteamId steamId)
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void StaticInit()
         {
-            Image? image = await SteamFriends.GetLargeAvatarAsync(steamId);
-            return await GetSteamImageAsTextureAsync(image ?? default);
+            steamIdToAvatarTextureCache.ForEach(entry => GameObject.Destroy(entry.Value));
+            steamIdToAvatarTextureCache.Clear();
         }
 
-        public static async Task<Texture2D> GetSteamImageAsTextureAsync(Image image)
+        private static readonly Dictionary<SteamId, Texture2D> steamIdToAvatarTextureCache = new();
+
+        public static IObservable<Texture2D> GetAvatarTextureAsObservable(SteamId steamId)
         {
-            return await Task.Run(() =>
+            if (steamIdToAvatarTextureCache.TryGetValue(steamId, out Texture2D cachedTexture))
             {
-                Texture2D texture = new Texture2D((int)image.Width, (int)image.Width, TextureFormat.RGBA32, mipChain: false,
-                    linear: true);
+                return Observable.Return(cachedTexture);
+            }
 
-                texture.LoadRawTextureData(image.Data);
-                texture.Apply();
+            return ObservableUtils.RunOnNewTaskAsObservable(async () =>
+                {
+                    return await SteamFriends.GetLargeAvatarAsync(steamId);
+                })
+                .ObserveOnMainThread()
+                .Select(steamImage =>
+                {
+                    if (!steamImage.HasValue)
+                    {
+                        throw new OnlineMultiplayerException($"No avatar image found for player with Steam id {steamId}");
+                    }
 
-                return texture;
-            });
+                    Texture2D texture = CreateTextureFromSteamImage(steamImage.Value);
+                    steamIdToAvatarTextureCache[steamId] = texture;
+                    return texture;
+                });
+        }
+
+        private static Texture2D CreateTextureFromSteamImage(Image image)
+        {
+            Texture2D texture = new Texture2D((int)image.Width, (int)image.Height, TextureFormat.RGBA32, mipChain: false, linear: true);
+            texture.LoadRawTextureData(image.Data);
+            TextureUtils.FlipTextureVertically(texture);
+            texture.Apply();
+            return texture;
         }
 
         /**
