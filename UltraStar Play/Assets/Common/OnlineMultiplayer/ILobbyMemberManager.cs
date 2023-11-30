@@ -16,6 +16,7 @@ namespace CommonOnlineMultiplayer
         LobbyMember GetLobbyMember(UnityNetcodeClientId netcodeClientId);
         void RemoveLobbyMemberFromRegistry(UnityNetcodeClientId netcodeClientId);
         void ClearLobbyMemberRegistry();
+        void UpdateLobbyMemberRegistry();
         IReadOnlyList<LobbyMember> GetLobbyMembers();
     }
 }

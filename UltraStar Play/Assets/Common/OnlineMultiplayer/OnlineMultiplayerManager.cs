@@ -207,12 +207,18 @@ namespace CommonOnlineMultiplayer
 
         public void OnLobbyMemberNetworkObjectSpawned(ulong netcodeClientId)
         {
+            LobbyMemberManager.UpdateLobbyMemberRegistry();
             lobbyMemberConnectionChangedEventSteam.OnNext(new LobbyMemberConnectedEvent(netcodeClientId));
         }
 
         public void OnLobbyMemberNetworkObjectDestroyed(ulong netcodeClientId)
         {
-            lobbyMemberConnectionChangedEventSteam.OnNext(new LobbyMemberDisconnectedEvent(netcodeClientId));
+            // The object has not been destroyed yet. Wait one frame to finish destruction.
+            StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(1, () =>
+            {
+                LobbyMemberManager.UpdateLobbyMemberRegistry();
+                lobbyMemberConnectionChangedEventSteam.OnNext(new LobbyMemberDisconnectedEvent(netcodeClientId));
+            }));
         }
 
         private void OnNetcodeClientConnectionApproval(

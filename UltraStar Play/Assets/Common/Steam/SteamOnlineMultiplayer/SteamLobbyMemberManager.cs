@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using CommonOnlineMultiplayer;
 using Netcode.Transports.Facepunch;
@@ -50,38 +49,57 @@ namespace SteamOnlineMultiplayer
 
         public IReadOnlyList<SteamLobbyMember> GetSteamLobbyMembers()
         {
+            return steamLobbyMemberRegistry.GetAllLobbyMembers();
+        }
+
+        public void UpdateLobbyMemberRegistry()
+        {
             if (networkManager.IsServer)
             {
-                return steamLobbyMemberRegistry.GetAllLobbyMembers();
+                // Registry of server is updated in approval request
+                return;
             }
-            else if (networkManager.IsClient)
+
+            ClearLobbyMemberRegistry();
+            GetLobbyMembersFromSpawnedNetworkObjects()
+                .ForEach(steamLobbyMember => steamLobbyMemberRegistry.Add(steamLobbyMember));
+        }
+
+        private List<SteamLobbyMember> GetLobbyMembersFromSpawnedNetworkObjects()
+        {
+            List<SteamLobbyMember> result = new();
+            if (networkManager == null
+                || networkManager.SpawnManager == null
+                || networkManager.SpawnManager.SpawnedObjectsList.IsNullOrEmpty())
             {
-                List<SteamLobbyMember> result = new();
-                networkManager.SpawnManager.SpawnedObjectsList.ForEach(networkObject =>
-                {
-                    LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = networkObject.GetComponent<LobbyMemberNetworkBehaviour>();
-                    if (lobbyMemberNetworkBehaviour == null
-                        || lobbyMemberNetworkBehaviour.LobbyMemberJson.IsNullOrEmpty())
-                    {
-                        return;
-                    }
-
-                    if (lobbyMemberNetworkBehaviour.LobbyMember is SteamLobbyMember steamLobbyMember)
-                    {
-                        result.Add(steamLobbyMember);
-                        return;
-                    }
-
-                    SteamLobbyMember deserializedSteamLobbyMember = JsonConverter.FromJson<SteamLobbyMember>(lobbyMemberNetworkBehaviour.LobbyMemberJson);
-                    if (deserializedSteamLobbyMember != null)
-                    {
-                        result.Add(deserializedSteamLobbyMember);
-                    }
-                });
                 return result;
             }
 
-            return new List<SteamLobbyMember>();
+            networkManager.SpawnManager.SpawnedObjectsList.ForEach(networkObject =>
+            {
+                LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = networkObject.GetComponent<LobbyMemberNetworkBehaviour>();
+                if (lobbyMemberNetworkBehaviour == null
+                    || lobbyMemberNetworkBehaviour.LobbyMemberJson.IsNullOrEmpty())
+                {
+                    return;
+                }
+
+                if (lobbyMemberNetworkBehaviour.LobbyMember is SteamLobbyMember steamLobbyMember)
+                {
+                    result.Add(steamLobbyMember);
+                    return;
+                }
+
+                SteamLobbyMember deserializedSteamLobbyMember = JsonConverter.FromJson<SteamLobbyMember>(lobbyMemberNetworkBehaviour.LobbyMemberJson);
+                if (deserializedSteamLobbyMember == null)
+                {
+                    Debug.LogWarning($"Failed to deserialize SteamLobbyMember for Netcode client {networkObject.OwnerClientId}: {lobbyMemberNetworkBehaviour.LobbyMemberJson}");
+                    return;
+                }
+
+                result.Add(deserializedSteamLobbyMember);
+            });
+            return result;
         }
 
         public void RemoveLobbyMemberFromRegistry(UnityNetcodeClientId netcodeClientId)

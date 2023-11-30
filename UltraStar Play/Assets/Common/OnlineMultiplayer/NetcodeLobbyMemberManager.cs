@@ -149,27 +149,44 @@ namespace CommonOnlineMultiplayer
             lobbyMemberRegistry.Clear();
         }
 
-        public IReadOnlyList<LobbyMember> GetLobbyMembers()
+        public void UpdateLobbyMemberRegistry()
         {
             if (networkManager.IsServer)
             {
-                return lobbyMemberRegistry.GetAllLobbyMembers();
+                // Registry of server is updated in approval request
+                return;
             }
-            else if (networkManager.IsClient)
+
+            ClearLobbyMemberRegistry();
+            GetLobbyMembersFromSpawnedNetworkObjects()
+                .ForEach(steamLobbyMember => lobbyMemberRegistry.Add(steamLobbyMember));
+        }
+
+        private List<LobbyMember> GetLobbyMembersFromSpawnedNetworkObjects()
+        {
+            List<LobbyMember> result = new();
+            if (networkManager == null
+                || networkManager.SpawnManager == null
+                || networkManager.SpawnManager.SpawnedObjectsList.IsNullOrEmpty())
             {
-                List<LobbyMember> result = new();
-                networkManager.SpawnManager.SpawnedObjectsList.ForEach(networkObject =>
-                {
-                    LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = networkObject.GetComponent<LobbyMemberNetworkBehaviour>();
-                    if (lobbyMemberNetworkBehaviour != null)
-                    {
-                        result.Add(lobbyMemberNetworkBehaviour.LobbyMember);
-                    }
-                });
                 return result;
             }
 
-            return new List<LobbyMember>();
+            networkManager.SpawnManager.SpawnedObjectsList.ForEach(networkObject =>
+            {
+                LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = networkObject.GetComponent<LobbyMemberNetworkBehaviour>();
+                if (lobbyMemberNetworkBehaviour == null
+                    && lobbyMemberNetworkBehaviour.LobbyMember != null)
+                {
+                    result.Add(lobbyMemberNetworkBehaviour.LobbyMember);
+                }
+            });
+            return result;
+        }
+
+        public IReadOnlyList<LobbyMember> GetLobbyMembers()
+        {
+            return lobbyMemberRegistry.GetAllLobbyMembers();
         }
     }
 }
