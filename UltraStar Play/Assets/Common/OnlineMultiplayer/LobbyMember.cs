@@ -15,6 +15,10 @@ namespace CommonOnlineMultiplayer
         public string DisplayName { get; private set; }
         public UnityNetcodeClientId UnityNetcodeClientId { get; private set; }
 
+        public LobbyMember()
+        {
+        }
+
         public LobbyMember(
             UnityNetcodeClientId unityNetcodeClientId,
             string displayName)

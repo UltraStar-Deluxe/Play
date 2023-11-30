@@ -50,7 +50,38 @@ namespace SteamOnlineMultiplayer
 
         public IReadOnlyList<SteamLobbyMember> GetSteamLobbyMembers()
         {
-            return steamLobbyMemberRegistry.GetAllLobbyMembers();
+            if (networkManager.IsServer)
+            {
+                return steamLobbyMemberRegistry.GetAllLobbyMembers();
+            }
+            else if (networkManager.IsClient)
+            {
+                List<SteamLobbyMember> result = new();
+                networkManager.SpawnManager.SpawnedObjectsList.ForEach(networkObject =>
+                {
+                    LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = networkObject.GetComponent<LobbyMemberNetworkBehaviour>();
+                    if (lobbyMemberNetworkBehaviour == null
+                        || lobbyMemberNetworkBehaviour.LobbyMemberJson.IsNullOrEmpty())
+                    {
+                        return;
+                    }
+
+                    if (lobbyMemberNetworkBehaviour.LobbyMember is SteamLobbyMember steamLobbyMember)
+                    {
+                        result.Add(steamLobbyMember);
+                        return;
+                    }
+
+                    SteamLobbyMember deserializedSteamLobbyMember = JsonConverter.FromJson<SteamLobbyMember>(lobbyMemberNetworkBehaviour.LobbyMemberJson);
+                    if (deserializedSteamLobbyMember != null)
+                    {
+                        result.Add(deserializedSteamLobbyMember);
+                    }
+                });
+                return result;
+            }
+
+            return new List<SteamLobbyMember>();
         }
 
         public void RemoveLobbyMemberFromRegistry(UnityNetcodeClientId netcodeClientId)

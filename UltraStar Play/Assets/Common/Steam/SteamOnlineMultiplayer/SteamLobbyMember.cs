@@ -9,6 +9,10 @@ namespace SteamOnlineMultiplayer
     {
         public SteamId SteamId { get; private set; }
 
+        public SteamLobbyMember()
+        {
+        }
+
         public SteamLobbyMember(
             UnityNetcodeClientId unityNetcodeClientId,
             string displayName,

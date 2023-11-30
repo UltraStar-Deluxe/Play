@@ -8,11 +8,10 @@ using UnityEngine;
  */
 public class LobbyMemberNetworkBehaviour : NetworkBehaviour
 {
-    private NetworkVariable<LobbyMemberNetworkSerializable> lobbyMemberNetworkVariable = new();
+    private readonly JsonSerializable4096BytesNetworkVariable<LobbyMember> lobbyMemberNetworkVariable = new();
 
-    public LobbyMember LobbyMember => new LobbyMember(
-        lobbyMemberNetworkVariable.Value.unityNetcodeClientId,
-        lobbyMemberNetworkVariable.Value.displayName);
+    public string LobbyMemberJson => lobbyMemberNetworkVariable.Value.Value;
+    public LobbyMember LobbyMember => lobbyMemberNetworkVariable.DeserializedValue;
 
     // Not used, only to see if Unity Netcode is working as expected
     private readonly NetworkVariable<Vector3> positionNetworkVariable = new NetworkVariable<Vector3>();
@@ -36,7 +35,7 @@ public class LobbyMemberNetworkBehaviour : NetworkBehaviour
         {
             // Distribute LobbyMember data, which is known on server, to all clients by setting the corresponding NetworkVariable.
             LobbyMember lobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(OwnerClientId);
-            lobbyMemberNetworkVariable.Value = new LobbyMemberNetworkSerializable(lobbyMember);
+            lobbyMemberNetworkVariable.DeserializedValue = lobbyMember;
         }
 
         onlineMultiplayerManager.OnLobbyMemberNetworkObjectSpawned(OwnerClientId);
@@ -57,10 +56,9 @@ public class LobbyMemberNetworkBehaviour : NetworkBehaviour
 
     private void UpdateGameObjectName()
     {
-        LobbyMemberNetworkSerializable lobbyMemberNetworkSerializable = lobbyMemberNetworkVariable.Value;
-        if (lobbyMemberNetworkSerializable != null)
+        if (!lobbyMemberNetworkVariable.Value.Value.IsNullOrEmpty())
         {
-            name = $"{nameof(LobbyMemberNetworkBehaviour)}-{lobbyMemberNetworkSerializable.unityNetcodeClientId}-{lobbyMemberNetworkSerializable.displayName}";
+            name = $"{nameof(LobbyMemberNetworkBehaviour)}-{LobbyMember.UnityNetcodeClientId}-{LobbyMember.DisplayName}";
         }
     }
 
