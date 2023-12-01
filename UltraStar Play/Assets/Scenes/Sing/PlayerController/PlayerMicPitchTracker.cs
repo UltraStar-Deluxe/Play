@@ -115,9 +115,12 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private void InitOnlineMultiplayer()
     {
-        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-            nameof(BeatAnalyzedEvent),
-            message => OnBeatAnalyzedEventMessage(message)));
+        if (onlineMultiplayerManager.IsOnlineGame)
+        {
+            disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+                nameof(BeatAnalyzedEvent),
+                message => OnBeatAnalyzedEventMessage(message)));
+        }
     }
 
     private void OnBeatAnalyzedEventMessage(NamedMessage message)
