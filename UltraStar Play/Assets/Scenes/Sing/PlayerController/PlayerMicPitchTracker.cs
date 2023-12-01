@@ -70,10 +70,12 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         .ObserveOnMainThread();
 
     private readonly Subject<NoteAnalyzedEvent> noteAnalyzedEventStream = new();
-    public IObservable<NoteAnalyzedEvent> NoteAnalyzedEventStream => noteAnalyzedEventStream;
+    public IObservable<NoteAnalyzedEvent> NoteAnalyzedEventStream => noteAnalyzedEventStream
+        .ObserveOnMainThread();
 
     private readonly Subject<SentenceAnalyzedEvent> sentenceAnalyzedEventStream = new();
-    public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream => sentenceAnalyzedEventStream;
+    public IObservable<SentenceAnalyzedEvent> SentenceAnalyzedEventStream => sentenceAnalyzedEventStream
+        .ObserveOnMainThread();
 
     private int lastAnalyzedBeatFromConnectedClient;
 
@@ -106,7 +108,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         SetRecordingSentence(recordingSentenceIndex);
 
         roundingDistance = playerProfile.Difficulty.GetRoundingDistanceInMidiNotes();
-        beatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
+        BeatAnalyzedEventStream.Subscribe(evt => OnBeatAnalyzed(evt));
 
         InitOnlineMultiplayer();
     }
