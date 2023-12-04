@@ -21,7 +21,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "YamlDotNet.dll",
-        "ICSharpCode.SharpZipLib.dll"
+        "ICSharpCode.SharpZipLib.dll",
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
