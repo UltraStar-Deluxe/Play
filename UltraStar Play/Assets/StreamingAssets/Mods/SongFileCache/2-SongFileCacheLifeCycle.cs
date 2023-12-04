@@ -25,17 +25,19 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
 
         if (FileUtils.Exists(CacheFilePath))
         {
+            // Load songs from cache
             loadedSongsCache = LoadCache(CacheFilePath);
             LoadSongsFromCacheObject(loadedSongsCache);
         }
 
         if (modSettings.songFolder.IsNullOrEmpty())
         {
+            // Missing settings, thus abort.
             Debug.Log($"{nameof(SongFileCacheLifeCycle)} - Not caching *.txt files because no song folder specified in mod settings");
             return;
         }
 
-        // Search txt files concurrently
+        // Search txt files and update cache concurrently.
         Task.Run(() =>
         {
             List<string> txtFiles = SearchTxtFiles(modSettings.songFolder);
@@ -132,35 +134,35 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
 }
 
 public class SongCache
+{
+    public List<CachedSong> CachedSongs { get; set; } = new List<CachedSong>();
+
+    public SongCache()
     {
-        public List<CachedSong> CachedSongs { get; set; } = new List<CachedSong>();
-
-        public SongCache()
-        {
-            // Empty constructor for JSON deserialization
-        }
-
-        public SongCache(IReadOnlyCollection<string> txtFiles)
-        {
-            txtFiles.ForEach(txtFile =>
-            {
-                CachedSong songCache = new CachedSong(txtFile);
-                CachedSongs.Add(songCache);
-            });
-        }
+        // Empty constructor for JSON deserialization
     }
 
-    public class CachedSong
+    public SongCache(IReadOnlyCollection<string> txtFiles)
     {
-        public string FilePath { get; set; }
-
-        public CachedSong()
+        txtFiles.ForEach(txtFile =>
         {
-            // Empty constructor for JSON deserialization
-        }
-
-        public CachedSong(string filePath)
-        {
-            FilePath = filePath;
-        }
+            CachedSong songCache = new CachedSong(txtFile);
+            CachedSongs.Add(songCache);
+        });
     }
+}
+
+public class CachedSong
+{
+    public string FilePath { get; set; }
+
+    public CachedSong()
+    {
+        // Empty constructor for JSON deserialization
+    }
+
+    public CachedSong(string filePath)
+    {
+        FilePath = filePath;
+    }
+}
