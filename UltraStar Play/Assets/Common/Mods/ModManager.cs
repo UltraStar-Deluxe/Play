@@ -475,6 +475,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return modParentFolders
             .SelectMany(modParentFolder => Directory.GetDirectories(modParentFolder))
             .Where(modFolder => !ignoredFolderNames.Contains(Path.GetFileName(modFolder)))
+            .Where(modFolder => GetModInfo(modFolder) != null)
             .ToList();
     }
 
