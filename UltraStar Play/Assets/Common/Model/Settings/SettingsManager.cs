@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using UniRx;
@@ -119,10 +120,16 @@ public class SettingsManager : AbstractSingletonBehaviour
             }
             catch (Exception ex)
             {
-                string settingsCopyPath = GetSettingsPath().Replace(".json", "_crash.json");
-                File.WriteAllText(settingsCopyPath, fileContent);
                 Debug.LogException(ex);
+
+                // Create copy of original settings file with timestamp
+                string originalSettingsPath = GetSettingsPath();
+                string dateTimeStamp = DateTime.Now.ToString("yyyy-MM-dd'T'HH-mm-ss", CultureInfo.InvariantCulture);
+                string settingsCopyPath = originalSettingsPath.Replace(".json", $"_crashed_{dateTimeStamp}.json");
+                File.WriteAllText(settingsCopyPath, fileContent);
                 Debug.LogError($"Failed to load settings from JSON. Using new default settings instead. You can find the original settings in {settingsCopyPath}. Original settings JSON: {fileContent}");
+
+                // Fall back to default settings
                 settings = CreateDefaultSettings();
             }
             OverwriteSettingsWithCommandLineArguments();
