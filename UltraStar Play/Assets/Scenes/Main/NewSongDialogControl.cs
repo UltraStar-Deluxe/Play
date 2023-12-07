@@ -78,12 +78,19 @@ public class NewSongDialogControl : AbstractModalDialogControl, IInjectionFinish
             return;
         }
 
-        string fileName = Path.GetFileNameWithoutExtension(newValue);
-        Match artistDashTitleMatch = Regex.Match(fileName, @"^(?<artist>[^\-]+) - (?<title>[^\-]+)$");
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(newValue);
+        // Expected file name: "trackNumber - artist - title", where trackNumber, artist, and separators are optional.
+        Match artistDashTitleMatch = Regex.Match(fileNameWithoutExtension, @"^((?<trackNumber>\d+)(\s?[-|,~]\s?))?((?<artist>[^\-]+)(\s?[-|,~]\s?))?(?<title>[^\-]+)$");
         if (artistDashTitleMatch.Success)
         {
-            string artist = artistDashTitleMatch.Groups["artist"].Value;
-            string title = artistDashTitleMatch.Groups["title"].Value;
+            string title = artistDashTitleMatch.Groups["title"].Value.Trim();
+            string artist = artistDashTitleMatch.Groups["artist"].Value.Trim();
+            if (int.TryParse(artist, out int artistAsInt))
+            {
+                // Ignore artist part when it can be parsed to an int because in this case, it is probably a track number.
+                artist = "";
+                title = fileNameWithoutExtension;
+            }
             artistTextField.value = artist;
             titleTextField.value = title;
         }
