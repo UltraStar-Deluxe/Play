@@ -4,5 +4,5 @@ public class SongDetailsDto : JsonSerializable
 {
     public string SongId { get; set; }
     public bool IsFavorite { get; set; }
-    public Dictionary<EExtendedVoiceId, string> VoiceIdToLyricsMap { get; set; }
+    public Dictionary<string, string> VoiceDisplayNameToLyricsMap { get; set; }
 }

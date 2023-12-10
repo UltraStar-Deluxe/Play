@@ -53,7 +53,7 @@ public class SongDetailsRestControl : AbstractRestControl, INeedInjection
                 {
                     SongId = songId,
                     IsFavorite = isFavorite,
-                    VoiceNameToLyricsMap = CreateVoiceDisplayNameToLyricsMap(songMeta),
+                    VoiceDisplayNameToLyricsMap = CreateVoiceDisplayNameToLyricsMap(songMeta),
                 };
 
                 Debug.Log($"Returning song details for song {songId}");

@@ -88,7 +88,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     private bool isFavorite;
 
     private Texture2D texture2D;
-    private Dictionary<EExtendedVoiceId, string> voiceIdToLyricsMap = new();
+    private Dictionary<string, string> voiceDisplayNameToLyricsMap = new();
 
     private readonly List<PlayerSelectPlayerEntryControl> playerEntryControls = new();
 
@@ -381,20 +381,11 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                     .ForEach(it => it.MicProfile = null);
             };
 
-            if (voiceIdToLyricsMap != null)
+            List<EExtendedVoiceId> voiceIds = GetVoiceIdsFromVoiceDisplayNameToLyricsMap();
+            playerEntryControl.SetAvailableVoiceIds(voiceIds);
+            if (!voiceIds.IsNullOrEmpty())
             {
-                List<EExtendedVoiceId> voiceIds = voiceIdToLyricsMap.Keys
-                    .ToList();
-                if (voiceIds.Count > 1
-                    && !voiceIds.Contains(EExtendedVoiceId.Merged))
-                {
-                    voiceIds.Add(EExtendedVoiceId.Merged);
-                }
-                playerEntryControl.SetAvailableVoiceIds(voiceIds);
-                if (!voiceIds.IsNullOrEmpty())
-                {
-                    playerEntryControl.VoiceChooserControl.SelectItem(voiceIds[playerProfileIndex % voiceIds.Count]);
-                }
+                playerEntryControl.VoiceChooserControl.SelectItem(voiceIds[playerProfileIndex % voiceIds.Count]);
             }
 
             playerEntryControl.IsSelected.Value = IsPlayerSelectedInSettings(playerProfile);
@@ -425,6 +416,21 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         UpdateEnqueueButton();
         enqueueSettingsAccordionItem.UpdateTargetHeight();
+    }
+
+    private List<EExtendedVoiceId> GetVoiceIdsFromVoiceDisplayNameToLyricsMap()
+    {
+        if (voiceDisplayNameToLyricsMap.IsNullOrEmpty())
+        {
+            return new();
+        }
+
+        if (voiceDisplayNameToLyricsMap.Count == 1)
+        {
+            return new List<EExtendedVoiceId>() { EExtendedVoiceId.P1, };
+        }
+
+        return new List<EExtendedVoiceId>() { EExtendedVoiceId.P1, EExtendedVoiceId.P2, EExtendedVoiceId.Merged };
     }
 
     private bool IsPlayerSelectedInSettings(string playerProfile)
@@ -495,7 +501,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
 
                 isFavorite = songDetailsDto.IsFavorite;
-                UpdateLyrics(songDetailsDto.VoiceIdToLyricsMap);
+                UpdateLyrics(songDetailsDto.VoiceDisplayNameToLyricsMap);
                 UpdateFavoriteButton();
             });
     }
@@ -506,13 +512,13 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
     }
 
-    private void UpdateLyrics(Dictionary<EExtendedVoiceId, string> newVoiceIdToLyricsMap)
+    private void UpdateLyrics(Dictionary<string, string> newVoiceDisplayNameToLyricsMap)
     {
-        voiceIdToLyricsMap = newVoiceIdToLyricsMap;
+        voiceDisplayNameToLyricsMap = newVoiceDisplayNameToLyricsMap;
 
-        if (newVoiceIdToLyricsMap.Count <= 1)
+        if (newVoiceDisplayNameToLyricsMap.Count <= 1)
         {
-            SetLyrics(newVoiceIdToLyricsMap.Values.FirstOrDefault());
+            SetLyrics(newVoiceDisplayNameToLyricsMap.Values.FirstOrDefault());
             return;
         }
 
@@ -534,14 +540,19 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         try
         {
             string lyrics = "";
-            if (newVoiceIdToLyricsMap.Count == 1)
+            if (newVoiceDisplayNameToLyricsMap.Count == 1)
             {
-                lyrics = newVoiceIdToLyricsMap.FirstOrDefault().Value;
+                lyrics = newVoiceDisplayNameToLyricsMap.FirstOrDefault().Value;
             }
-            else if (newVoiceIdToLyricsMap.Count > 1)
+            else if (newVoiceDisplayNameToLyricsMap.Count > 1)
             {
-                lyrics = newVoiceIdToLyricsMap
-                    .Select(entry => $"<i><b>{GetVoiceDisplayName(entry.Key)}</i></b>\n\n{entry.Value}")
+                lyrics = newVoiceDisplayNameToLyricsMap
+                    .Select(entry =>
+                    {
+                        string voiceDisplayName = entry.Key;
+                        string voiceLyrics = entry.Value;
+                        return $"<i><b>{voiceDisplayName}</i></b>\n\n{voiceLyrics}";
+                    })
                     .JoinWith("\n\n");
             }
 
