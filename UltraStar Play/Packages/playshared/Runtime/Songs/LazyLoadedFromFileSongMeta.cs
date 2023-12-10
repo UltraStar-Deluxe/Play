@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using UnityEngine;
 
-public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta
+public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta, IHasSongIssues
 {
+    public List<SongIssue> SongIssues { get; private set; } = new();
+
     public LazyLoadedFromFileSongMeta(string filePath, Encoding encoding = null)
         : this(new FileInfo(filePath), encoding)
     {
@@ -27,18 +28,7 @@ public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta
             UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding);
             CopyValues(loadedSongMeta);
 
-            if (!songIssues.IsNullOrEmpty())
-            {
-                try
-                {
-                    foundIssuesEventStream.OnNext(new FoundSongMetaIssuesEvent(songIssues));
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                    Debug.LogError($"Failed to notify about song issues: {ex.Message}");
-                }
-            }
+            SongIssues = songIssues;
         };
 
         DoLoadVoices = () =>

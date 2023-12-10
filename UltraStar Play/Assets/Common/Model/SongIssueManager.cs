@@ -51,6 +51,17 @@ public class SongIssueManager : AbstractSingletonBehaviour
         settings = SettingsManager.Instance.Settings;
         songMetaManager = SongMetaManager.Instance;
 
+        songMetaManager.AddedSongMetaEventStream
+            .Subscribe(songMeta =>
+            {
+                if (songMeta is IHasSongIssues hasSongIssues
+                    && !hasSongIssues.SongIssues.IsNullOrEmpty())
+                {
+                    AddSongIssues(hasSongIssues.SongIssues);
+                }
+            })
+            .AddTo(gameObject);
+
         songIssueScanFinishedEventStream
             .Subscribe(evt =>
             {

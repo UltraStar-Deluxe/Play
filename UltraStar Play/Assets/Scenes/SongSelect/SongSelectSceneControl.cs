@@ -1246,9 +1246,11 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             SongMeta songMeta = searchResultEntry.SongMeta;
             List<SongIssue> songIssues = searchResultEntry.SongIssues;
             if (songMeta != null
+                && !songMetas.Contains(songMeta)
                 && !songMetaManager.ContainsSongMeta(songMeta))
             {
                 songMetas.Add(songMeta);
+                songMetaManager.AddSongMeta(songMeta);
                 songIssueManager.AddSongIssues(songIssues);
             }
         }

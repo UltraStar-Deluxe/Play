@@ -55,6 +55,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
     private readonly Subject<SongScanFinishedEvent> songScanFinishedEventStream = new();
     public IObservable<SongScanFinishedEvent> SongScanFinishedEventStream => songScanFinishedEventStream;
 
+    private readonly Subject<SongMeta> addedSongMetaEventStream = new();
+    public IObservable<SongMeta> AddedSongMetaEventStream => addedSongMetaEventStream;
+
     [InjectedInAwake]
     private Settings settings;
 
@@ -98,6 +101,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
         settings = SettingsManager.Instance.Settings;
     }
 
+    public void AddSongMetas(IEnumerable<SongMeta> songMetas)
+    {
+        allSongMetas.AddRange(songMetas);
+    }
+
     public void AddSongMeta(SongMeta songMeta)
     {
         if (songMeta == null)
@@ -106,6 +114,15 @@ public class SongMetaManager : AbstractSingletonBehaviour
         }
 
         allSongMetas.Add(songMeta);
+        try
+        {
+            addedSongMetaEventStream.OnNext(songMeta);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to notify about added song: '{SongMetaUtils.GetArtistDashTitle(songMeta)}': {ex.Message}");
+        }
     }
 
     public SongMeta GetFirstSongMeta()
@@ -269,7 +286,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
             .Where(generatedSongMeta => generatedSongMeta != null)
             .ToList();
 
-        generatedSongMetas.ForEach(songMeta => allSongMetas.Add(songMeta));
+        generatedSongMetas.ForEach(songMeta => AddSongMeta(songMeta));
     }
 
     private List<string> GetAbsoluteAudioFilePaths(SongMeta songMeta)
@@ -369,7 +386,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         {
             if (TryLoadSongMetaFromFile(path, out SongMeta newSongMeta, out List<SongIssue> newSongIssues))
             {
-                allSongMetas.Add(newSongMeta);
+                AddSongMeta(newSongMeta);
             }
 
             if (cancellationToken.IsCancellationRequested)
@@ -422,7 +439,7 @@ public class SongMetaManager : AbstractSingletonBehaviour
         List<string> txtFiles = txtScanner.GetFiles(songFolder, true);
 
         LoadSongMetasFromTxtFiles(txtFiles, out List<SongMeta> newSongMetas, out List<SongIssue> newSongIssues);
-        allSongMetas.AddRange(newSongMetas);
+        AddSongMetas(newSongMetas);
 
         songMetas.AddRange(newSongMetas);
         newSongIssues.AddRange(newSongIssues);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using UniRx;
 using UnityEngine;
 
 [Serializable]
@@ -17,9 +16,6 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
     }
 
     public virtual Action DoLoadSong { get; set; }
-
-    protected readonly Subject<FoundSongMetaIssuesEvent> foundIssuesEventStream = new();
-    public virtual IObservable<FoundSongMetaIssuesEvent> FoundIssuesEventStream => foundIssuesEventStream;
 
     public bool HasFailedToLoadSong => loadSongPhase is ELoadSongPhase.Failed;
     private ELoadSongPhase loadSongPhase;
