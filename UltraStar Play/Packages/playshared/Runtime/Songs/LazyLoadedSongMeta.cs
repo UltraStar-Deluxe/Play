@@ -18,9 +18,6 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
 
     public virtual Action DoLoadSong { get; set; }
 
-    protected readonly Subject<SongMetaLoadedEvent> loadedEventStream = new();
-    public virtual IObservable<SongMetaLoadedEvent> LoadedEventStream => loadedEventStream;
-
     protected readonly Subject<FoundSongMetaIssuesEvent> foundIssuesEventStream = new();
     public virtual IObservable<FoundSongMetaIssuesEvent> FoundIssuesEventStream => foundIssuesEventStream;
 
@@ -442,17 +439,6 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
             loadSongPhase = ELoadSongPhase.Failed;
             Debug.LogException(ex);
             Debug.LogError($"Failed load song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
-            return;
-        }
-
-        try
-        {
-            loadedEventStream.OnNext(new SongMetaLoadedEvent(this));
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed notify about loaded song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             return;
         }
 
