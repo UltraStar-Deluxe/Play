@@ -117,6 +117,7 @@ public static partial class R
         public const string simulateRightMouseButton = "simulateRightMouseButton";
         public const string simulateSpaceButton = "simulateSpaceButton";
         public const string simulateSpaceButtonContainer = "simulateSpaceButtonContainer";
+        public const string simulateSpaceButtonSpacer = "simulateSpaceButtonSpacer";
         public const string simulateUpButton = "simulateUpButton";
         public const string simulateVolumeButtonContainer = "simulateVolumeButtonContainer";
         public const string simulateVolumeDownButton = "simulateVolumeDownButton";

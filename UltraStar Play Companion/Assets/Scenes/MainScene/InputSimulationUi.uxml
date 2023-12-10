@@ -32,10 +32,10 @@
                     <ui:Button display-tooltip-when-elided="true" name="simulateEscapeButton" text="Esc" style="position: absolute; left: 10px; width: 40%; height: 100%;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); height: 20px;" />
-                <ui:VisualElement name="simulateSpaceButtonContainer" style="flex-grow: 4; background-color: rgba(0, 0, 0, 0); width: 100%; align-items: center; display: none;">
+                <ui:VisualElement name="simulateSpaceButtonContainer" style="flex-grow: 4; background-color: rgba(0, 0, 0, 0); width: 100%; align-items: center; display: flex;">
                     <ui:Button display-tooltip-when-elided="true" name="simulateSpaceButton" text="Space" style="position: absolute; width: 60%; height: 100%;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="spacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); height: 20px; display: none;" />
+                <ui:VisualElement name="simulateSpaceButtonSpacer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); height: 20px;" />
                 <ui:VisualElement name="simulateVolumeButtonContainer" style="flex-grow: 2; background-color: rgba(0, 0, 0, 0); width: 100%; align-items: center;">
                     <ui:Button display-tooltip-when-elided="true" name="simulateVolumeDownButton" style="position: absolute; left: 10px; width: 40%; height: 100%;">
                         <MaterialIcon tabindex="-1" name="icon" icon="volume_down" />
@@ -46,7 +46,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="mouseSimulationContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%;">
+        <ui:VisualElement name="mouseSimulationContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 100%; display: none;">
             <ui:VisualElement name="row" style="background-color: rgba(0, 0, 0, 0); flex-grow: 10; display: flex;">
                 <ui:VisualElement name="mousePadArea" class="outline roundCorners" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; width: 100%;">
                     <ui:VisualElement name="scrollWheelArea" class="roundCorners" style="height: 100%; width: 40px; position: absolute; right: 0;">
