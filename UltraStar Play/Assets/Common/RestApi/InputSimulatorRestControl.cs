@@ -12,7 +12,7 @@ using UnityEngine.InputSystem.LowLevel;
 public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 {
     public static InputSimulatorRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<InputSimulatorRestControl>();
-    
+
     private Keyboard virtualKeyboard;
     private Mouse virtualMouse;
     private Mouse systemMouse;
@@ -27,7 +27,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         // Grab the system mouse before the virtual mouse is used.
         // Mouse.current can later change to the virtual mouse.
         systemMouse = Mouse.current;
-        
+
         virtualKeyboard = InputSystem.AddDevice<Keyboard>("Virtual Keyboard");
         virtualMouse = InputSystem.AddDevice<Mouse>("Virtual Mouse");
 
@@ -65,25 +65,25 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             "Simulate space key press",
             virtualKeyboard,
             () => virtualKeyboard.spaceKey);
-        
+
         RegisterPseudoNavigationEndpoint("volumeUpKey",
             "Increase volume",
             () => IncreaseVolume());
-        
+
         RegisterPseudoNavigationEndpoint("volumeDownKey",
             "Decrease volume",
             () => DecreaseVolume());
-        
+
         RegisterNavigationEndpoint("leftMouseButton",
             "Simulate left mouse button press",
             virtualMouse,
             () => virtualMouse.leftButton);
-        
+
         RegisterNavigationEndpoint("rightMouseButton",
             "Simulate left mouse button press",
             virtualMouse,
             () => virtualMouse.rightButton);
-        
+
         RegisterNavigationEndpoint("middleMouseButton",
             "Simulate left mouse button press",
             virtualMouse,
@@ -102,7 +102,7 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
     {
         SettingsUtils.DecreaseVolume(settings);
     }
-    
+
     /**
      * Method that uses an endpoint similar to other input simulation,
      * but for a key that Unity does not really support.
@@ -121,14 +121,15 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
                     return;
                 }
 
-                Debug.Log($"Received input simulation request {path}");
+                Log.Debug(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
                 callback?.Invoke();
             });
     }
 
     private void RegisterMouseDeltaEndpoint()
     {
-        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.InputMouseDelta)
+        string path = HttpApiEndpointPaths.InputMouseDelta;
+        httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription("Move the current mouse if any by the given X and Y delta values")
             .SetRemoveOnDestroy(gameObject)
             .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
@@ -139,18 +140,20 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
                     return;
                 }
 
-                bool hasDeltaX = float.TryParse(requestData.PathParameters["deltaX"], out float deltaX);
-                bool hasDeltaY = float.TryParse(requestData.PathParameters["deltaY"], out float deltaY);
+                Log.Debug(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
+                bool hasDeltaX = NumberUtils.TryParseDoubleAnyCulture(requestData.PathParameters["deltaX"], out double deltaX);
+                bool hasDeltaY = NumberUtils.TryParseDoubleAnyCulture(requestData.PathParameters["deltaY"], out double deltaY);
                 if (hasDeltaX && hasDeltaY)
                 {
-                    SimulateCurrentMouseDelta(new Vector2(deltaX, deltaY));
+                    SimulateCurrentMouseDelta(new Vector2((float)deltaX, (float)deltaY));
                 }
             });
     }
 
     private void RegisterScrollWheelEndpoint()
     {
-        httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.InputScrollWheel)
+        string path = HttpApiEndpointPaths.InputScrollWheel;
+        httpServer.CreateEndpoint(HttpMethod.Post, path)
             .SetDescription("Simulate scroll wheel events")
             .SetRemoveOnDestroy(gameObject)
             .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
@@ -161,11 +164,13 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
                     return;
                 }
 
-                bool hasDeltaX = float.TryParse(requestData.PathParameters["deltaX"], out float deltaX);
-                bool hasDeltaY = float.TryParse(requestData.PathParameters["deltaY"], out float deltaY);
+                Log.Debug(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
+                bool hasDeltaX = NumberUtils.TryParseDoubleAnyCulture(requestData.PathParameters["deltaX"], out double deltaX);
+                bool hasDeltaY = NumberUtils.TryParseDoubleAnyCulture(requestData.PathParameters["deltaY"], out double deltaY);
+                Debug.Log($"deltaX: {deltaX} | deltaY: {deltaY}");
                 if (hasDeltaX && hasDeltaY)
                 {
-                    SimulateVirtualMouseScrollDelta(new Vector2(deltaX, deltaY));
+                    SimulateVirtualMouseScrollDelta(new Vector2((float)deltaX, (float)deltaY));
                 }
             });
     }
@@ -215,14 +220,14 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             .SetCallbackAndAdd(_ =>
             {
                 InputControl inputControl = inputControlGetter();
-                Debug.Log($"Received input simulation request {path}");
+                Log.Debug(() => $"Received input simulation request {path}");
                 SimulateButtonClick(inputDevice, inputControl);
             });
     }
 
     private void SimulateButtonClick(InputDevice inputDevice, InputControl inputControl)
     {
-        Debug.Log($"Triggering button click on input control {inputControl} by setting its value to 1 and afterwards to 0");
+        Log.Debug(() => $"Triggering button click on input control {inputControl} by setting its value to 1 and afterwards to 0");
         MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
             using (StateEvent.From(inputDevice, out InputEventPtr eventPtr))
