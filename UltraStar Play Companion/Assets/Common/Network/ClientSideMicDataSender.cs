@@ -64,7 +64,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         if (isRecording && HasPositionInSong)
         {
             // Analyze the following beats, not past beats.
-            lastAnalyzedBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, GetEstimatedPositionInSongInMillis());
+            lastAnalyzedBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, GetEstimatedPositionInSongInMillis());
             Log.Debug(() => $"HandleRecordingStatusChanged - lastAnalyzedBeat: {lastAnalyzedBeat}");
         }
     }
@@ -93,7 +93,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         // Check if can analyze new beat
         double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
         double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - MicProfile.DelayInMillis;
-        int currentBeatConsideringMicDelay = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, positionInSongConsideringMicDelay);
+        int currentBeatConsideringMicDelay = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongConsideringMicDelay);
         if (currentBeatConsideringMicDelay <= lastAnalyzedBeat
             // Do not start analyzing beats too much before the first lyrics (typically at beat 0 when GAP is set correctly)
             || currentBeatConsideringMicDelay < -20)
@@ -230,7 +230,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         };
 
         // If beats have been analyzed prematurely, then redo analysis.
-        int currentBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, GetEstimatedPositionInSongInMillis());
+        int currentBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, GetEstimatedPositionInSongInMillis());
         if (lastAnalyzedBeat > currentBeat)
         {
             lastAnalyzedBeat = currentBeat;
