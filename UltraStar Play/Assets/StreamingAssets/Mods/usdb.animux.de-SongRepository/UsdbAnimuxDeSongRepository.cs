@@ -244,7 +244,7 @@ public class UsdbAnimuxDeSongRepository : IOnLoadMod, ISongRepository, ISceneMod
             usdbSong.artist,
             usdbSong.title);
 
-        songMeta.OnLoadDetails = () => Task.Run(async () =>
+        songMeta.DoLoadDetails = () => Task.Run(async () =>
         {
             // Sadly, querying multiple song details at once is not possible
             // because the "ziparchiv" data needs to be set via a cookie, which is stored on server side.
@@ -947,17 +947,17 @@ public class UsdbUltraStarSongMeta : UltraStarSongMeta
         Failed,
     }
 
-    private Action onLoadDetails;
-    public virtual Action OnLoadDetails
+    private Action doLoadDetails;
+    public virtual Action DoLoadDetails
     {
         get
         {
-            return onLoadDetails;
+            return doLoadDetails;
         }
         set
         {
-            onLoadDetails = value;
-            OnLoadVoices = value;
+            doLoadDetails = value;
+            DoLoadVoices = value;
         }
     }
 
@@ -1015,13 +1015,13 @@ public class UsdbUltraStarSongMeta : UltraStarSongMeta
         try
         {
             loadDetailsPhase = ELoadDetailsPhase.Started;
-            if (OnLoadDetails == null)
+            if (DoLoadDetails == null)
             {
                 throw new Exception($"Failed to load details of song '{SongMetaUtils.GetArtistDashTitle(this)}' because no lazy load action is set.");
             }
             else
             {
-                OnLoadDetails();
+                DoLoadDetails();
             }
         }
         catch (Exception ex)

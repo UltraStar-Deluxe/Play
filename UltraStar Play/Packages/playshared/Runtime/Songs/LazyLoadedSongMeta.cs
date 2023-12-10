@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UniRx;
 using UnityEngine;
 
 [Serializable]
@@ -15,7 +16,13 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         Failed,
     }
 
-    public virtual Action OnLoadSong { get; set; }
+    public virtual Action DoLoadSong { get; set; }
+
+    protected readonly Subject<SongMetaLoadedEvent> loadedEventStream = new();
+    public virtual IObservable<SongMetaLoadedEvent> LoadedEventStream => loadedEventStream;
+
+    protected readonly Subject<FoundSongMetaIssuesEvent> foundIssuesEventStream = new();
+    public virtual IObservable<FoundSongMetaIssuesEvent> FoundIssuesEventStream => foundIssuesEventStream;
 
     public bool HasFailedToLoadSong => loadSongPhase is ELoadSongPhase.Failed;
     private ELoadSongPhase loadSongPhase;
@@ -428,15 +435,24 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         try
         {
             loadSongPhase = ELoadSongPhase.Started;
-            OnLoadSong?.Invoke();
-
-            CommonEventStream.Publish(new SongMetaLoadedEvent(this));
+            DoLoadSong?.Invoke();
         }
         catch (Exception ex)
         {
             loadSongPhase = ELoadSongPhase.Failed;
             Debug.LogException(ex);
             Debug.LogError($"Failed load song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
+            return;
+        }
+
+        try
+        {
+            loadedEventStream.OnNext(new SongMetaLoadedEvent(this));
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed notify about loaded song '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             return;
         }
 

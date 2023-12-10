@@ -4,13 +4,13 @@ public class MidiFileSongMeta : UltraStarSongMeta
 {
     public MidiFileSongMeta()
     {
-        OnLoadVoices = DoLoadVoices;
+        DoLoadVoices = DefaultDoLoadVoices;
     }
 
     public MidiFileSongMeta(SongMeta other)
         : base(other)
     {
-        OnLoadVoices = DoLoadVoices;
+        DoLoadVoices = DefaultDoLoadVoices;
     }
 
     public MidiFileSongMeta(
@@ -21,10 +21,10 @@ public class MidiFileSongMeta : UltraStarSongMeta
         Dictionary<EVoiceId, string> voiceIdToDisplayName)
             : base(artist, title, txtFileBpm, audioFile, voiceIdToDisplayName)
     {
-        OnLoadVoices = DoLoadVoices;
+        DoLoadVoices = DefaultDoLoadVoices;
     }
 
-    private void DoLoadVoices()
+    private void DefaultDoLoadVoices()
     {
         MidiToSongMetaUtils.FillSongMetaWithMidiLyricsAndNotes(this);
     }

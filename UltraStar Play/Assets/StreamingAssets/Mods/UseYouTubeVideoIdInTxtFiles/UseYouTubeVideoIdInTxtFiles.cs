@@ -78,10 +78,10 @@ public class UseYouTubeVideoIdTxtFilesControl : MonoBehaviour
         if (songMeta is LazyLoadedSongMeta lazyLoadedSongMeta)
         {
             // Search for the YouTube video id when the song is loaded
-            Action oldOnLoadSong = lazyLoadedSongMeta.OnLoadSong;
-            lazyLoadedSongMeta.OnLoadSong = () => 
+            Action oldDoLoadSong = lazyLoadedSongMeta.DoLoadSong;
+            lazyLoadedSongMeta.DoLoadSong = () => 
             {
-                oldOnLoadSong?.Invoke();
+                oldDoLoadSong?.Invoke();
                 DoUpdateSongWithYouTubeVideoIdFromTxtFiles(songMeta);
             };
         }

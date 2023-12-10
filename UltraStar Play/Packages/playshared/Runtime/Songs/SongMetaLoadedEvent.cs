@@ -1,4 +1,4 @@
-﻿public class SongMetaLoadedEvent : ICommonEvent
+﻿public class SongMetaLoadedEvent
 {
     public SongMeta SongMeta { get; private set; }
 

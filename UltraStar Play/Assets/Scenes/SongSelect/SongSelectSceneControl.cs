@@ -123,6 +123,9 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
     private SongMetaManager songMetaManager;
 
     [Inject]
+    private SongIssueManager songIssueManager;
+
+    [Inject]
     private SongQueueManager songQueueManager;
 
     [Inject(UxmlName = R.UxmlNames.noSongsFoundContainer)]
@@ -1246,7 +1249,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 && !songMetaManager.ContainsSongMeta(songMeta))
             {
                 songMetas.Add(songMeta);
-                CommonEventStream.Publish(new FoundSongIssuesEvent(songIssues));
+                songIssueManager.AddSongIssues(songIssues);
             }
         }
         catch (Exception ex)

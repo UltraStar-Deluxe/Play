@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UnityEngine;
 
 public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta
 {
@@ -20,7 +21,7 @@ public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta
 
         SetFileInfo(fileInfo, encoding);
 
-        OnLoadSong = () =>
+        DoLoadSong = () =>
         {
             using IDisposable d = new DisposableStopwatch($"Loading '{fileInfo.Name}' took <ms> ms");
             UltraStarSongMeta loadedSongMeta = UltraStarSongParser.ParseFile(fileInfo.FullName, out List<SongIssue> songIssues, FileEncoding);
@@ -28,11 +29,19 @@ public class LazyLoadedFromFileSongMeta : LazyLoadedSongMeta
 
             if (!songIssues.IsNullOrEmpty())
             {
-                CommonEventStream.Publish(new FoundSongIssuesEvent(songIssues));
+                try
+                {
+                    foundIssuesEventStream.OnNext(new FoundSongMetaIssuesEvent(songIssues));
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to notify about song issues: {ex.Message}");
+                }
             }
         };
 
-        OnLoadVoices = () =>
+        DoLoadVoices = () =>
         {
             using IDisposable d = new DisposableStopwatch($"Loading voices of '{fileInfo.Name}' took <ms> ms");
             List<Voice> voices = UltraStarSongVoicesParser.ParseFile(
