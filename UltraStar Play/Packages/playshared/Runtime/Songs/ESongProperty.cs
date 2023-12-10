@@ -13,6 +13,8 @@
     Year,
     Gap,
     VideoGap,
+    Start,
+    End,
     PreviewStart,
     PreviewEnd,
     MedleyStart,
