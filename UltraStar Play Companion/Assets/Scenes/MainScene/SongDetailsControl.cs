@@ -88,7 +88,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     private bool isFavorite;
 
     private Texture2D texture2D;
-    private Dictionary<string, string> voiceNameToLyricsMap = new();
+    private Dictionary<EExtendedVoiceId, string> voiceIdToLyricsMap = new();
 
     private readonly List<PlayerSelectPlayerEntryControl> playerEntryControls = new();
 
@@ -200,12 +200,12 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             }
         });
 
-        dto.SingScenePlayerDataDto.PlayerProfileToVoiceNameMap = new Dictionary<string, string>();
+        dto.SingScenePlayerDataDto.PlayerProfileToVoiceIdMap = new Dictionary<string, EExtendedVoiceId>();
         selectedPlayerControls.ForEach(control =>
         {
             if (control.MicProfile != null)
             {
-                dto.SingScenePlayerDataDto.PlayerProfileToVoiceNameMap[control.PlayerProfileName] = control.VoiceChooserControl.SelectedItem;
+                dto.SingScenePlayerDataDto.PlayerProfileToVoiceIdMap[control.PlayerProfileName] = control.VoiceChooserControl.SelectedItem;
             }
         });
 
@@ -381,20 +381,19 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                     .ForEach(it => it.MicProfile = null);
             };
 
-            if (voiceNameToLyricsMap != null)
+            if (voiceIdToLyricsMap != null)
             {
-                List<string> voiceNames = voiceNameToLyricsMap.Keys
-                    .Select(voiceName => Voice.NormalizeVoiceName(voiceName))
+                List<EExtendedVoiceId> voiceIds = voiceIdToLyricsMap.Keys
                     .ToList();
-                if (voiceNames.Count > 1
-                    && !voiceNames.Contains(Voice.mergedVoiceName))
+                if (voiceIds.Count > 1
+                    && !voiceIds.Contains(EExtendedVoiceId.Merged))
                 {
-                    voiceNames.Add(Voice.mergedVoiceName);
+                    voiceIds.Add(EExtendedVoiceId.Merged);
                 }
-                playerEntryControl.SetAvailableVoiceNames(voiceNames);
-                if (!voiceNames.IsNullOrEmpty())
+                playerEntryControl.SetAvailableVoiceIds(voiceIds);
+                if (!voiceIds.IsNullOrEmpty())
                 {
-                    playerEntryControl.VoiceChooserControl.SelectItem(voiceNames[playerProfileIndex % voiceNames.Count]);
+                    playerEntryControl.VoiceChooserControl.SelectItem(voiceIds[playerProfileIndex % voiceIds.Count]);
                 }
             }
 
@@ -496,7 +495,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
 
                 isFavorite = songDetailsDto.IsFavorite;
-                UpdateLyrics(songDetailsDto.VoiceNameToLyricsMap);
+                UpdateLyrics(songDetailsDto.VoiceIdToLyricsMap);
                 UpdateFavoriteButton();
             });
     }
@@ -507,41 +506,41 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
     }
 
-    private void UpdateLyrics(Dictionary<string,string> newVoiceNameToLyricsMap)
+    private void UpdateLyrics(Dictionary<EExtendedVoiceId, string> newVoiceIdToLyricsMap)
     {
-        voiceNameToLyricsMap = newVoiceNameToLyricsMap;
+        voiceIdToLyricsMap = newVoiceIdToLyricsMap;
 
-        if (newVoiceNameToLyricsMap.Count <= 1)
+        if (newVoiceIdToLyricsMap.Count <= 1)
         {
-            SetLyrics(newVoiceNameToLyricsMap.Values.FirstOrDefault());
+            SetLyrics(newVoiceIdToLyricsMap.Values.FirstOrDefault());
             return;
         }
 
-        string GetVoiceDisplayName(string voiceName)
+        string GetVoiceDisplayName(EExtendedVoiceId voiceId)
         {
-            if (voiceName.IsNullOrEmpty()
-                || voiceName == "P1")
+            switch (voiceId)
             {
-                return "Vocals 1";
+                case EExtendedVoiceId.P1:
+                    return "Vocals 1";
+                case EExtendedVoiceId.P2:
+                    return "Vocals 2";
+                case EExtendedVoiceId.Merged:
+                    return "Both";
+                default:
+                    return voiceId.ToString();
             }
-            else if (voiceName == "P2")
-            {
-                return "Vocals 2";
-            }
-
-            return voiceName;
         }
 
         try
         {
             string lyrics = "";
-            if (newVoiceNameToLyricsMap.Count == 1)
+            if (newVoiceIdToLyricsMap.Count == 1)
             {
-                lyrics = newVoiceNameToLyricsMap.FirstOrDefault().Value;
+                lyrics = newVoiceIdToLyricsMap.FirstOrDefault().Value;
             }
-            else if (newVoiceNameToLyricsMap.Count > 1)
+            else if (newVoiceIdToLyricsMap.Count > 1)
             {
-                lyrics = newVoiceNameToLyricsMap
+                lyrics = newVoiceIdToLyricsMap
                     .Select(entry => $"<i><b>{GetVoiceDisplayName(entry.Key)}</i></b>\n\n{entry.Value}")
                     .JoinWith("\n\n");
             }

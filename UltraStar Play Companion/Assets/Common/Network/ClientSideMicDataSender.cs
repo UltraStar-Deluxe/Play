@@ -64,7 +64,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         if (isRecording && HasPositionInSong)
         {
             // Analyze the following beats, not past beats.
-            lastAnalyzedBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+            lastAnalyzedBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, GetEstimatedPositionInSongInMillis());
             Log.Debug(() => $"HandleRecordingStatusChanged - lastAnalyzedBeat: {lastAnalyzedBeat}");
         }
     }
@@ -93,7 +93,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         // Check if can analyze new beat
         double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
         double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - MicProfile.DelayInMillis;
-        int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
+        int currentBeatConsideringMicDelay = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, positionInSongConsideringMicDelay);
         if (currentBeatConsideringMicDelay <= lastAnalyzedBeat
             // Do not start analyzing beats too much before the first lyrics (typically at beat 0 when GAP is set correctly)
             || currentBeatConsideringMicDelay < -20)
@@ -225,12 +225,12 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         receivedPositionInSongTimes.PushBack(positionInSongData);
         songMeta = new SongMeta
         {
-            Bpm = positionInSongDto.SongBpm,
-            Gap = positionInSongDto.SongGap,
+            BeatsPerMinute = positionInSongDto.BeatsPerMinute,
+            GapInMillis = positionInSongDto.SongGap,
         };
 
         // If beats have been analyzed prematurely, then redo analysis.
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+        int currentBeat = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, GetEstimatedPositionInSongInMillis());
         if (lastAnalyzedBeat > currentBeat)
         {
             lastAnalyzedBeat = currentBeat;
