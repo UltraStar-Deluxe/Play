@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Net.Http;
+using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -17,6 +17,9 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
     private Keyboard virtualKeyboard;
     private Mouse virtualMouse;
     private Mouse systemMouse;
+
+    private bool isDragging;
+    private bool wasDragging;
 
     private enum ESimulateButtonDirection
     {
@@ -85,32 +88,79 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         RegisterNavigationEndpoint("leftMouseButton",
             "Simulate left mouse button click, i.e. down followed by up",
             virtualMouse,
-            () => virtualMouse.leftButton);
+            () => virtualMouse.leftButton,
+            () => !isDragging);
 
         RegisterNavigationEndpoint("rightMouseButton",
             "Simulate right mouse button click, i.e. down followed by up",
             virtualMouse,
-            () => virtualMouse.rightButton);
+            () => virtualMouse.rightButton,
+            () => !isDragging);
 
         RegisterNavigationEndpoint("middleMouseButton",
             "Simulate middle mouse button click, i.e. down followed by up",
             virtualMouse,
-            () => virtualMouse.middleButton);
+            () => virtualMouse.middleButton,
+            () => !isDragging);
 
-        RegisterNavigationEndpoint("leftMouseButtonDown",
-            "Simulate left mouse button down event",
-            virtualMouse,
-            () => virtualMouse.leftButton,
-            ESimulateButtonDirection.Down);
-
-        RegisterNavigationEndpoint("leftMouseButtonUp",
-            "Simulate left mouse button up event",
-            virtualMouse,
-            () => virtualMouse.leftButton,
-            ESimulateButtonDirection.Up);
+        // TODO: Simulating drag does not seem to work. Unity always seems to do a mouse click instead of holding the button.
+        // RegisterNavigationEndpointCallback("dragStart",
+        //     "Simulate drag start",
+        //     _ =>
+        //     {
+        //         if (isDragging)
+        //         {
+        //             return;
+        //         }
+        //
+        //         Log.Debug(() => "Received input simulation request 'dragStart'");
+        //         isDragging = true;
+        //     });
+        //
+        // RegisterNavigationEndpointCallback("dragEnd",
+        //     "Simulate drag end",
+        //     _ =>
+        //     {
+        //         if (!isDragging)
+        //         {
+        //             return;
+        //         }
+        //
+        //         Log.Debug(() => "Received input simulation request 'dragEnd'");
+        //         isDragging = false;
+        //     });
 
         RegisterMouseDeltaEndpoint();
         RegisterScrollWheelEndpoint();
+    }
+
+    private void Update()
+    {
+        UpdateMouseDragSimulation();
+    }
+
+    private void UpdateMouseDragSimulation()
+    {
+        if (isDragging)
+        {
+            // Keep writing a 1 to the InputControl
+            using (StateEvent.From(virtualMouse, out InputEventPtr eventPtr))
+            {
+                virtualMouse.leftButton.WriteValueIntoEvent(1f, eventPtr);
+                InputSystem.QueueEvent(eventPtr);
+            }
+        }
+        else if (wasDragging)
+        {
+            // Write a 0 to the InputControl once
+            using (StateEvent.From(virtualMouse, out InputEventPtr eventPtr))
+            {
+                virtualMouse.leftButton.WriteValueIntoEvent(0f, eventPtr);
+                InputSystem.QueueEvent(eventPtr);
+            }
+        }
+
+        wasDragging = isDragging;
     }
 
     private void IncreaseVolume()
@@ -155,12 +205,12 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
             .SetCallbackAndAdd(requestData =>
             {
-                Log.Debug(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
+                Log.Verbose(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
                 bool hasDeltaX = NumberUtils.TryParseDoubleAnyCulture(requestData.PathParameters["deltaX"], out double deltaX);
                 bool hasDeltaY = NumberUtils.TryParseDoubleAnyCulture(requestData.PathParameters["deltaY"], out double deltaY);
                 if (hasDeltaX && hasDeltaY)
                 {
-                    SimulateSystemMouseDelta(new Vector2((float)deltaX, (float)deltaY));
+                    SimulateMouseDelta(new Vector2((float)deltaX, (float)deltaY));
                 }
             });
     }
@@ -180,24 +230,29 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
                 Debug.Log($"deltaX: {deltaX} | deltaY: {deltaY}");
                 if (hasDeltaX && hasDeltaY)
                 {
-                    SimulateVirtualMouseScrollDelta(new Vector2((float)deltaX, (float)deltaY));
+                    SimulateMouseScrollDelta(new Vector2((float)deltaX, (float)deltaY));
                 }
             });
     }
 
-    private void SimulateVirtualMouseScrollDelta(Vector2 scrollDelta)
+    private void SimulateMouseScrollDelta(Vector2 scrollDelta)
     {
         MainThreadDispatcher.StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
-            using (StateEvent.From(virtualMouse, out InputEventPtr eventPtr))
-            {
-                virtualMouse.scroll.WriteValueIntoEvent(scrollDelta, eventPtr);
-                InputSystem.QueueEvent(eventPtr);
-            }
+            DoSimulateMouseScrollDelta(scrollDelta, systemMouse);
         }));
     }
 
-    private void SimulateSystemMouseDelta(Vector2 delta)
+    private void DoSimulateMouseScrollDelta(Vector2 scrollDelta, Mouse mouse)
+    {
+        using (StateEvent.From(mouse, out InputEventPtr eventPtr))
+        {
+            mouse.scroll.WriteValueIntoEvent(scrollDelta, eventPtr);
+            InputSystem.QueueEvent(eventPtr);
+        }
+    }
+
+    private void SimulateMouseDelta(Vector2 delta)
     {
         if (delta == Vector2.zero)
         {
@@ -223,11 +278,28 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
         }
     }
 
+    private void RegisterNavigationEndpointCallback(
+        string inputControlName,
+        string description,
+        Action<EndpointRequestData> callback)
+    {
+        string path = $"api/rest/input/{inputControlName}";
+        httpServer.CreateEndpoint(HttpMethod.Post, path)
+            .SetDescription(description)
+            .SetRemoveOnDestroy(gameObject)
+            .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
+            .SetCallbackAndAdd(request =>
+            {
+                callback(request);
+            });
+    }
+
     private void RegisterNavigationEndpoint(
         string inputControlName,
         string description,
         InputDevice inputDevice,
         Func<InputControl> inputControlGetter,
+        Func<bool> condition = null,
         ESimulateButtonDirection simulateButtonDirection = ESimulateButtonDirection.DownFollowedByUp)
     {
         string path = $"api/rest/input/{inputControlName}";
@@ -237,6 +309,12 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             .SetRequiredPermission(HttpApiPermission.WriteInputSimulation)
             .SetCallbackAndAdd(_ =>
             {
+                if (condition != null
+                    && !condition())
+                {
+                    return;
+                }
+
                 InputControl inputControl = inputControlGetter();
                 Log.Debug(() => $"Received input simulation request {path}");
                 SimulateButtonClick(inputDevice, inputControl, simulateButtonDirection);
