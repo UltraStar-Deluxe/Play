@@ -103,32 +103,31 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
             () => virtualMouse.middleButton,
             () => !isDragging);
 
-        // TODO: Simulating drag does not seem to work. Unity always seems to do a mouse click instead of holding the button.
-        // RegisterNavigationEndpointCallback("dragStart",
-        //     "Simulate drag start",
-        //     _ =>
-        //     {
-        //         if (isDragging)
-        //         {
-        //             return;
-        //         }
-        //
-        //         Log.Debug(() => "Received input simulation request 'dragStart'");
-        //         isDragging = true;
-        //     });
-        //
-        // RegisterNavigationEndpointCallback("dragEnd",
-        //     "Simulate drag end",
-        //     _ =>
-        //     {
-        //         if (!isDragging)
-        //         {
-        //             return;
-        //         }
-        //
-        //         Log.Debug(() => "Received input simulation request 'dragEnd'");
-        //         isDragging = false;
-        //     });
+        RegisterNavigationEndpointCallback("dragStart",
+            "Simulate drag start",
+            _ =>
+            {
+                if (isDragging)
+                {
+                    return;
+                }
+
+                Log.Debug(() => "Received input simulation request 'dragStart'");
+                isDragging = true;
+            });
+
+        RegisterNavigationEndpointCallback("dragEnd",
+            "Simulate drag end",
+            _ =>
+            {
+                if (!isDragging)
+                {
+                    return;
+                }
+
+                Log.Debug(() => "Received input simulation request 'dragEnd'");
+                isDragging = false;
+            });
 
         RegisterMouseDeltaEndpoint();
         RegisterScrollWheelEndpoint();
@@ -141,26 +140,31 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
 
     private void UpdateMouseDragSimulation()
     {
-        if (isDragging)
-        {
-            // Keep writing a 1 to the InputControl
-            using (StateEvent.From(virtualMouse, out InputEventPtr eventPtr))
-            {
-                virtualMouse.leftButton.WriteValueIntoEvent(1f, eventPtr);
-                InputSystem.QueueEvent(eventPtr);
-            }
-        }
-        else if (wasDragging)
-        {
-            // Write a 0 to the InputControl once
-            using (StateEvent.From(virtualMouse, out InputEventPtr eventPtr))
-            {
-                virtualMouse.leftButton.WriteValueIntoEvent(0f, eventPtr);
-                InputSystem.QueueEvent(eventPtr);
-            }
-        }
+        // TODO: Simulating drag does not seem to work.
+        // Unity always seems to do a mouse click instead of holding the button.
+        // See https://forum.unity.com/threads/how-to-simulate-drag-event-with-new-inputsystem.1525885/
+        return;
 
-        wasDragging = isDragging;
+        // if (isDragging)
+        // {
+        //     // Keep writing a 1 to the InputControl
+        //     using (StateEvent.From(virtualMouse, out InputEventPtr eventPtr))
+        //     {
+        //         virtualMouse.leftButton.WriteValueIntoEvent(1f, eventPtr);
+        //         InputSystem.QueueEvent(eventPtr);
+        //     }
+        // }
+        // else if (wasDragging)
+        // {
+        //     // Write a 0 to the InputControl once
+        //     using (StateEvent.From(virtualMouse, out InputEventPtr eventPtr))
+        //     {
+        //         virtualMouse.leftButton.WriteValueIntoEvent(0f, eventPtr);
+        //         InputSystem.QueueEvent(eventPtr);
+        //     }
+        // }
+        //
+        // wasDragging = isDragging;
     }
 
     private void IncreaseVolume()
@@ -227,7 +231,6 @@ public class InputSimulatorRestControl : AbstractRestControl, INeedInjection
                 Log.Debug(() => $"Received input simulation request '{path}' via URL '{requestData.Context.Request.Url}'");
                 bool hasDeltaX = NumberUtils.TryParseDoubleAnyCulture(requestData.PathParameters["deltaX"], out double deltaX);
                 bool hasDeltaY = NumberUtils.TryParseDoubleAnyCulture(requestData.PathParameters["deltaY"], out double deltaY);
-                Debug.Log($"deltaX: {deltaX} | deltaY: {deltaY}");
                 if (hasDeltaX && hasDeltaY)
                 {
                     SimulateMouseScrollDelta(new Vector2((float)deltaX, (float)deltaY));
