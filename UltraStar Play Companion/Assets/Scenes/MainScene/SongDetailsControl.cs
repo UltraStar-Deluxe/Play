@@ -88,7 +88,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     private bool isFavorite;
 
     private Texture2D texture2D;
-    private Dictionary<string, string> voiceNameToLyricsMap = new();
+    private Dictionary<string, string> voiceDisplayNameToLyricsMap = new();
 
     private readonly List<PlayerSelectPlayerEntryControl> playerEntryControls = new();
 
@@ -200,12 +200,12 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             }
         });
 
-        dto.SingScenePlayerDataDto.PlayerProfileToVoiceNameMap = new Dictionary<string, string>();
+        dto.SingScenePlayerDataDto.PlayerProfileToVoiceIdMap = new Dictionary<string, EExtendedVoiceId>();
         selectedPlayerControls.ForEach(control =>
         {
             if (control.MicProfile != null)
             {
-                dto.SingScenePlayerDataDto.PlayerProfileToVoiceNameMap[control.PlayerProfileName] = control.VoiceChooserControl.SelectedItem;
+                dto.SingScenePlayerDataDto.PlayerProfileToVoiceIdMap[control.PlayerProfileName] = control.VoiceChooserControl.SelectedItem;
             }
         });
 
@@ -381,21 +381,11 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                     .ForEach(it => it.MicProfile = null);
             };
 
-            if (voiceNameToLyricsMap != null)
+            List<EExtendedVoiceId> voiceIds = GetVoiceIdsFromVoiceDisplayNameToLyricsMap();
+            playerEntryControl.SetAvailableVoiceIds(voiceIds);
+            if (!voiceIds.IsNullOrEmpty())
             {
-                List<string> voiceNames = voiceNameToLyricsMap.Keys
-                    .Select(voiceName => Voice.NormalizeVoiceName(voiceName))
-                    .ToList();
-                if (voiceNames.Count > 1
-                    && !voiceNames.Contains(Voice.mergedVoiceName))
-                {
-                    voiceNames.Add(Voice.mergedVoiceName);
-                }
-                playerEntryControl.SetAvailableVoiceNames(voiceNames);
-                if (!voiceNames.IsNullOrEmpty())
-                {
-                    playerEntryControl.VoiceChooserControl.SelectItem(voiceNames[playerProfileIndex % voiceNames.Count]);
-                }
+                playerEntryControl.VoiceChooserControl.SelectItem(voiceIds[playerProfileIndex % voiceIds.Count]);
             }
 
             playerEntryControl.IsSelected.Value = IsPlayerSelectedInSettings(playerProfile);
@@ -426,6 +416,21 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         UpdateEnqueueButton();
         enqueueSettingsAccordionItem.UpdateTargetHeight();
+    }
+
+    private List<EExtendedVoiceId> GetVoiceIdsFromVoiceDisplayNameToLyricsMap()
+    {
+        if (voiceDisplayNameToLyricsMap.IsNullOrEmpty())
+        {
+            return new();
+        }
+
+        if (voiceDisplayNameToLyricsMap.Count == 1)
+        {
+            return new List<EExtendedVoiceId>() { EExtendedVoiceId.P1, };
+        }
+
+        return new List<EExtendedVoiceId>() { EExtendedVoiceId.P1, EExtendedVoiceId.P2, EExtendedVoiceId.Merged };
     }
 
     private bool IsPlayerSelectedInSettings(string playerProfile)
@@ -496,7 +501,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
 
                 isFavorite = songDetailsDto.IsFavorite;
-                UpdateLyrics(songDetailsDto.VoiceNameToLyricsMap);
+                UpdateLyrics(songDetailsDto.VoiceDisplayNameToLyricsMap);
                 UpdateFavoriteButton();
             });
     }
@@ -507,42 +512,47 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
     }
 
-    private void UpdateLyrics(Dictionary<string,string> newVoiceNameToLyricsMap)
+    private void UpdateLyrics(Dictionary<string, string> newVoiceDisplayNameToLyricsMap)
     {
-        voiceNameToLyricsMap = newVoiceNameToLyricsMap;
+        voiceDisplayNameToLyricsMap = newVoiceDisplayNameToLyricsMap;
 
-        if (newVoiceNameToLyricsMap.Count <= 1)
+        if (newVoiceDisplayNameToLyricsMap.Count <= 1)
         {
-            SetLyrics(newVoiceNameToLyricsMap.Values.FirstOrDefault());
+            SetLyrics(newVoiceDisplayNameToLyricsMap.Values.FirstOrDefault());
             return;
         }
 
-        string GetVoiceDisplayName(string voiceName)
+        string GetVoiceDisplayName(EExtendedVoiceId voiceId)
         {
-            if (voiceName.IsNullOrEmpty()
-                || voiceName == "P1")
+            switch (voiceId)
             {
-                return "Vocals 1";
+                case EExtendedVoiceId.P1:
+                    return "Vocals 1";
+                case EExtendedVoiceId.P2:
+                    return "Vocals 2";
+                case EExtendedVoiceId.Merged:
+                    return "Both";
+                default:
+                    return voiceId.ToString();
             }
-            else if (voiceName == "P2")
-            {
-                return "Vocals 2";
-            }
-
-            return voiceName;
         }
 
         try
         {
             string lyrics = "";
-            if (newVoiceNameToLyricsMap.Count == 1)
+            if (newVoiceDisplayNameToLyricsMap.Count == 1)
             {
-                lyrics = newVoiceNameToLyricsMap.FirstOrDefault().Value;
+                lyrics = newVoiceDisplayNameToLyricsMap.FirstOrDefault().Value;
             }
-            else if (newVoiceNameToLyricsMap.Count > 1)
+            else if (newVoiceDisplayNameToLyricsMap.Count > 1)
             {
-                lyrics = newVoiceNameToLyricsMap
-                    .Select(entry => $"<i><b>{GetVoiceDisplayName(entry.Key)}</i></b>\n\n{entry.Value}")
+                lyrics = newVoiceDisplayNameToLyricsMap
+                    .Select(entry =>
+                    {
+                        string voiceDisplayName = entry.Key;
+                        string voiceLyrics = entry.Value;
+                        return $"<i><b>{voiceDisplayName}</i></b>\n\n{voiceLyrics}";
+                    })
                     .JoinWith("\n\n");
             }
 

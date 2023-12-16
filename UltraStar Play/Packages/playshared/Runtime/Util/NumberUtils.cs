@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
 public static class NumberUtils
 {
+    public static bool TryParseDoubleAnyCulture(string text, out double d)
+    {
+        string textNormalizedDecimalSeparator = text.Replace(",", ".");
+        return double.TryParse(textNormalizedDecimalSeparator, NumberStyles.Any, CultureInfo.InvariantCulture, out d);
+    }
+
     public static int Limit(int value, int min, int max)
     {
         if (value < min)
