@@ -108,6 +108,14 @@ public class SongEditorSideBarPropertiesControl : INeedInjection, IInjectionFini
             "Video Gap (ms)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.VideoGapInMillis, true, "0"),
             PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.VideoGapInMillis = newValue));
+        CreateSongPropertiesInputControl(ESongProperty.Start,
+            "Skip Intro (ms, #START)",
+            PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.StartInMillis, true, "0"),
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.StartInMillis = (int)newValue));
+        CreateSongPropertiesInputControl(ESongProperty.End,
+            "Skip Outro (ms, #END)",
+            PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.EndInMillis, true, "0"),
+            PropertyUtils.CreateStringSetterFromDoubleSetter(newValue => songMeta.EndInMillis = (int)newValue));
         CreateSongPropertiesInputControl(ESongProperty.PreviewStart,
             "Preview Start (ms)",
             PropertyUtils.CreateStringGetterFromDoubleGetter(() => songMeta.PreviewStartInMillis, true, "0"),

@@ -51,16 +51,15 @@ public class SongIssueManager : AbstractSingletonBehaviour
         settings = SettingsManager.Instance.Settings;
         songMetaManager = SongMetaManager.Instance;
 
-        CommonEventStream.Subscribe<FoundSongIssuesEvent>(
-            evt => evt.SongIssues
-                    .ForEach(songIssue =>
-                    {
-                        if (songIssue == null)
-                        {
-                            return;
-                        }
-                        allSongIssues.Add(songIssue);
-                    }))
+        songMetaManager.AddedSongMetaEventStream
+            .Subscribe(songMeta =>
+            {
+                if (songMeta is IHasSongIssues hasSongIssues
+                    && !hasSongIssues.SongIssues.IsNullOrEmpty())
+                {
+                    AddSongIssues(hasSongIssues.SongIssues);
+                }
+            })
             .AddTo(gameObject);
 
         songIssueScanFinishedEventStream
@@ -79,6 +78,20 @@ public class SongIssueManager : AbstractSingletonBehaviour
         IsSongIssueScanFinished = false;
 
         allSongIssues = new ConcurrentBag<SongIssue>();
+    }
+
+    public void AddSongIssues(IEnumerable<SongIssue> songIssues)
+    {
+        songIssues.ForEach(songIssue => AddSongIssue(songIssue));
+    }
+
+    public void AddSongIssue(SongIssue songIssue)
+    {
+        if (songIssue == null)
+        {
+            return;
+        }
+        allSongIssues.Add(songIssue);
     }
 
     public void ReloadSongIssues()
@@ -120,7 +133,7 @@ public class SongIssueManager : AbstractSingletonBehaviour
     {
         if (IsSongIssueScanStarted)
         {
-            throw new IllegalStateException("Already started song Issue scan");
+            throw new IllegalStateException("Already started song issue scan");
         }
 
         IReadOnlyCollection<SongMeta> songMetas = songMetaManager.GetSongMetas();
@@ -130,8 +143,12 @@ public class SongIssueManager : AbstractSingletonBehaviour
         job.OnCancel = () => cancellationDisposable.Dispose();
         job.SetStatus(EJobStatus.Running);
 
-        songIssueScanDisposable = ObservableUtils.RunOnNewTaskAsObservableElements(
-                async () => await ScanSongIssuesAsync(songMetas, job, cancellationDisposable.Token),
+        songIssueScanDisposable = ObservableUtils.RunOnNewTaskAsObservableElements(async () =>
+                {
+                    List<SongIssue> songIssues = await ScanSongIssuesAsync(songMetas, job, cancellationDisposable.Token);
+                    AddSongIssues(songIssues);
+                    return songIssues;
+                },
                 cancellationDisposable)
             .CatchIgnore((Exception ex) =>
             {
@@ -146,9 +163,9 @@ public class SongIssueManager : AbstractSingletonBehaviour
                     job.SetResult(EJobResult.Ok);
                 }
             })
-            .Subscribe(songIssue =>
+            .Subscribe(_ =>
             {
-                CommonEventStream.Publish(new FoundSongIssuesEvent(songIssue));
+                Debug.Log("Song issue scan finished.");
             });
     }
 

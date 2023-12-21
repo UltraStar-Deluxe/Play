@@ -13,7 +13,7 @@ public class LazyLoadedVoicesSongMeta : SongMeta
         Failed,
     }
 
-    public virtual Action OnLoadVoices { get; set; }
+    public virtual Action DoLoadVoices { get; set; }
 
     public bool HasFailedToLoadVoices => loadVoicesPhase is ELoadVoicesPhase.Failed;
     private ELoadVoicesPhase loadVoicesPhase;
@@ -65,16 +65,14 @@ public class LazyLoadedVoicesSongMeta : SongMeta
         try
         {
             loadVoicesPhase = ELoadVoicesPhase.Started;
-            if (OnLoadVoices == null)
+            if (DoLoadVoices == null)
             {
                 LoadDefaultVoices();
             }
             else
             {
-                OnLoadVoices();
+                DoLoadVoices();
             }
-
-            CommonEventStream.Publish(new SongMetaLoadedVoicesEvent(this));
         }
         catch (Exception ex)
         {

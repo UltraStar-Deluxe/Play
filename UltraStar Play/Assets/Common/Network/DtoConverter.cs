@@ -72,7 +72,7 @@ public static class DtoConverter
         {
             PlayerProfileNames = playerProfileNames,
             PlayerProfileToMicProfileMap = playerProfileNameToMicProfileDto,
-            PlayerProfileToVoiceNameMap = playerProfileNameToVoiceIdMap,
+            PlayerProfileToVoiceIdMap = playerProfileNameToVoiceIdMap,
         };
         return dto;
     }
@@ -101,7 +101,7 @@ public static class DtoConverter
             }
         });
         singScenePlayerData.PlayerProfileToVoiceIdMap = new();
-        dto.PlayerProfileToVoiceNameMap.ForEach(entry =>
+        dto.PlayerProfileToVoiceIdMap.ForEach(entry =>
         {
             PlayerProfile playerProfile = SettingsUtils.GetPlayerProfile(settings, nonPersistentSettings, entry.Key);
             if (playerProfile != null)

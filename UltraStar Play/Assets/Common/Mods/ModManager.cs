@@ -221,7 +221,12 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             });
 
         DebugLogConsole.AddCommand("mod.create", "Create a new mod with the given name from template",
-            (string modName) => CreateModFolderFromTemplate(modName),
+            (string modName) =>
+            {
+                string newModFolder = CreateModFolderFromTemplate(modName);
+                Debug.Log($"Created new mod folder '{newModFolder}'");
+                ApplicationUtils.OpenDirectory(newModFolder);
+            },
             "name");
 
         DebugLogConsole.AddCommand("mod.interfaces", "Copy and log all mod interfaces.",
@@ -475,6 +480,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return modParentFolders
             .SelectMany(modParentFolder => Directory.GetDirectories(modParentFolder))
             .Where(modFolder => !ignoredFolderNames.Contains(Path.GetFileName(modFolder)))
+            .Where(modFolder => GetModInfo(modFolder) != null)
             .ToList();
     }
 

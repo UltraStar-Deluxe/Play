@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using LiteNetLib;
@@ -449,14 +448,17 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
     {
         if (connectEvent.IsSuccess)
         {
+            connectionInfoLabel.text = $"Connected to {connectEvent.ServerIpEndPoint.Address}:{connectEvent.ServerIpEndPoint.Port}";
             connectionStatusText.text = TranslationManager.GetTranslation(R.Messages.companionApp_connectedTo, "remote" , connectEvent.ServerIpEndPoint.Address);
+
             onlyVisibleWhenConnected.ForEach(it => it.ShowByDisplay());
             onlyVisibleWhenNotConnected.ForEach(it => it.HideByDisplay());
+
+            SetErrorResponseTextAndVisibility("");
+            SetThroubleshootingTextAndVisibility("");
+
             audioWaveForm.SetVisibleByVisibility(settings.ShowAudioWaveForm);
-            connectionThroubleshootingText.HideByDisplay();
-            serverErrorResponseText.HideByDisplay();
             toggleRecordingButton.Focus();
-            connectionInfoLabel.text = $"Connected to {connectEvent.ServerIpEndPoint.Address}:{connectEvent.ServerIpEndPoint.Port}";
         }
         else
         {
@@ -467,18 +469,26 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
             onlyVisibleWhenConnected.ForEach(it => it.HideByDisplay());
             onlyVisibleWhenNotConnected.ForEach(it => it.ShowByDisplay());
-            if (connectEvent.ConnectRequestCount > ConnectRequestCountShowTroubleshootingHintThreshold)
-            {
-                connectionThroubleshootingText.ShowByDisplay();
-                connectionThroubleshootingText.text = TranslationManager.GetTranslation(R.Messages.companionApp_troubleShootingHints);
-            }
 
-            if (!connectEvent.ErrorMessage.IsNullOrEmpty())
-            {
-                serverErrorResponseText.ShowByDisplay();
-                serverErrorResponseText.text = connectEvent.ErrorMessage;
-            }
+            SetErrorResponseTextAndVisibility(connectEvent.ErrorMessage);
+            SetThroubleshootingTextAndVisibility(
+                connectEvent.ErrorMessage.IsNullOrEmpty()
+                && connectEvent.ConnectRequestCount > ConnectRequestCountShowTroubleshootingHintThreshold
+                    ? TranslationManager.GetTranslation(R.Messages.companionApp_troubleShootingHints)
+                    : "");
         }
+    }
+
+    private void SetThroubleshootingTextAndVisibility(string text)
+    {
+        connectionThroubleshootingText.text = text;
+        connectionThroubleshootingText.SetVisibleByDisplay(!text.IsNullOrEmpty());
+    }
+
+    private void SetErrorResponseTextAndVisibility(string text)
+    {
+        serverErrorResponseText.text = text;
+        serverErrorResponseText.SetVisibleByDisplay(!text.IsNullOrEmpty());
     }
 
     private void ToggleRecording()

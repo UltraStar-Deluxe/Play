@@ -15,7 +15,7 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         Failed,
     }
 
-    public virtual Action OnLoadSong { get; set; }
+    public virtual Action DoLoadSong { get; set; }
 
     public bool HasFailedToLoadSong => loadSongPhase is ELoadSongPhase.Failed;
     private ELoadSongPhase loadSongPhase;
@@ -428,9 +428,7 @@ public class LazyLoadedSongMeta : LazyLoadedVoicesSongMeta
         try
         {
             loadSongPhase = ELoadSongPhase.Started;
-            OnLoadSong?.Invoke();
-
-            CommonEventStream.Publish(new SongMetaLoadedEvent(this));
+            DoLoadSong?.Invoke();
         }
         catch (Exception ex)
         {
