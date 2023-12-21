@@ -3,7 +3,6 @@ using System.IO;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Assert = NUnit.Framework.Assert;
 
 public class FileFormatConversionTests : AbstractMediaFileFormatTests
 {
@@ -109,7 +108,7 @@ public class FileFormatConversionTests : AbstractMediaFileFormatTests
 
         string songFilePath = GetSongMetaFilePath(songFilePrefix, testFolderPath);
         SongMeta songMeta = LoadSongMeta(songFilePath);
-        string originalSourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+        string originalSourceFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
 
         // Copy file to temp folder so that we don't modify the original file
         string tempSourceFilePath = $"{tempFolder}/{Path.GetFileName(originalSourceFilePath)}";

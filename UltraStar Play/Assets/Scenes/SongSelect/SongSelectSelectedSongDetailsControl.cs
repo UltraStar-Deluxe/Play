@@ -10,52 +10,55 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 {
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
-    
+
+    [Inject]
+    private SongRouletteControl songRouletteControl;
+
     [Inject]
     private PlaylistManager playlistManager;
-    
+
     [Inject]
     private SongAudioPlayer songAudioPlayer;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private SongSearchControl songSearchControl;
-    
+
     [Inject]
     private UiManager uiManager;
-    
+
     [Inject]
     private Statistics statistics;
-    
+
     [Inject]
     private SongSelectPlayerListControl playerListControl;
-    
+
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private SongSelectSceneData sceneData;
-    
+
     [Inject]
     private SceneNavigator sceneNavigator;
-        
+
     [Inject]
     private FocusableNavigator focusableNavigator;
-    
+
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private VisualElement songListView;
-    
+
     [Inject(UxmlName = R.UxmlNames.localHighScoreContainer)]
     private VisualElement localHighScoreContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.highscoresContainer)]
     private VisualElement highscoresContainer;
 
     [Inject(UxmlName = R.UxmlNames.highscoreTitleButton)]
     private Button highscoreTitleButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.selectedSongArtist)]
     private Label selectedSongArtist;
 
@@ -64,33 +67,35 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
 
     [Inject(UxmlName = R.UxmlNames.selectedSongImageOuter)]
     private VisualElement selectedSongImageOuter;
-    
+
     [Inject(UxmlName = R.UxmlNames.selectedSongImageInner)]
     private VisualElement selectedSongImageInner;
-    
+
     [Inject(UxmlName = R.UxmlNames.songIndexLabel)]
     private Label songIndexLabel;
 
     [Inject(UxmlName = R.UxmlNames.songIndexContainer)]
-    private VisualElement songIndexContainer;
+    private VisualElement entryIndexContainer;
 
     [Inject(UxmlName = R.UxmlNames.durationLabel)]
     private Label durationLabel;
-    
+
     [Inject]
     private SongMetaManager songMetaManager;
-    
+
     private SongMeta SelectedSong => songSelectSceneControl.SelectedSong;
-    
+
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new SongSelectSongRatingIconControl();
-    
+
+    private IDisposable setSongDetailsCoverOrBackgroundImageDisposable;
+
     public void OnInjectionFinished()
     {
         using IDisposable d = ProfileMarkerUtils.Auto("SongSelectSelectedSongDetailsControl.OnInjectionFinished");
-        
+
         injector.Inject(songRatingIconControl);
-        
-        songIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{songSelectSceneControl.SelectedSongIndex + 1}"));
+
+        entryIndexContainer.RegisterCallback<PointerDownEvent>(evt => songSearchControl.SetSearchText($"#{songRouletteControl.SelectedEntryIndex + 1}"));
 
         highscoreTitleButton.RegisterCallbackButtonTriggered(_ => OpenHighScoreScene());
         focusableNavigator.AddCustomNavigationTarget(highscoreTitleButton, Vector2.up, songListView);
@@ -100,10 +105,10 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         settings.ObserveEveryValueChanged(it => it.Difficulty)
             .Subscribe(_ =>
             {
-                UpdateSongStatistics(songSelectSceneControl.SelectedSong);
+                UpdateHighScores(songSelectSceneControl.SelectedSong);
                 UpdateSongRatingIcons(songSelectSceneControl.SelectedSong);
             });
-        
+
         // Smaller song index label if numbers get huge
         int songCount = songMetaManager.GetSongMetas().Count;
         if (songCount > 10000)
@@ -118,7 +123,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         {
             songIndexLabel.AddToClassList("smallFont");
         }
-        songIndexContainer.SetVisibleByDisplay(settings.ShowSongIndexInSongSelect);
+        entryIndexContainer.SetVisibleByDisplay(settings.ShowSongIndexInSongSelect);
     }
 
     private void OpenHighScoreScene()
@@ -128,6 +133,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
             SongMetas = new List<SongMeta> { SelectedSong },
             partyModeSceneData = sceneData.partyModeSceneData,
             lastSceneData = sceneData,
+            GameRoundSettings = new(),
         };
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
@@ -144,7 +150,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         songIndexLabel.text = "";
         SongMetaImageUtils.SetDefaultSongImage(selectedSongImageOuter, selectedSongImageInner);
         songRatingIconControl.HideSongRatingIcons();
-        UpdateSongStatistics(null);
+        UpdateHighScores(new List<HighScoreEntry>());
     }
 
     private bool IsFavorite(SongMeta songMeta)
@@ -152,28 +158,32 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         return songMeta != null
                && playlistManager.FavoritesPlaylist.HasSongEntry(songMeta);
     }
-    
-    public void OnSongSelectionChanged(SongSelection selection)
+
+    public void OnSongSelectionChanged(SongSelectEntrySelection selection)
     {
-        SongMeta selectedSong = selection.SongMeta;
-        if (selectedSong == null)
+        SongSelectEntry selectedEntry = selection.Entry;
+        if (selectedEntry is not SongSelectSongEntry songEntry)
         {
             SetEmptySongDetails();
             songIndexLabel.text = "-";
             return;
         }
 
+        SongMeta selectedSong = songEntry.SongMeta;
+
         selectedSongArtist.text = selectedSong.Artist;
         selectedSongTitle.text = selectedSong.Title;
-        SongMetaImageUtils.SetCoverOrBackgroundImage(selection.SongMeta, selectedSongImageInner, selectedSongImageOuter);
-        songIndexLabel.text = $"{selection.SongIndex + 1} / {selection.SongsCount}";
+        songIndexLabel.text = $"{selection.Index + 1} / {selection.Count}";
+
+        setSongDetailsCoverOrBackgroundImageDisposable?.Dispose();
+        setSongDetailsCoverOrBackgroundImageDisposable = SongMetaImageUtils.SetCoverOrBackgroundImage(selectedSong, selectedSongImageInner, selectedSongImageOuter);
 
         // The song duration requires loading the audio file.
         // Loading every song only to show its duration is slow (e.g. when scrolling through songs).
         // Instead, the label is updated when the AudioClip has been loaded.
         durationLabel.text = "";
 
-        UpdateSongStatistics(selectedSong);
+        UpdateHighScores(selectedSong);
 
         UpdateSongRatingIcons(selectedSong);
 
@@ -188,22 +198,29 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
         durationLabel.text = $"{min}:{seconds.ToString().PadLeft(2, '0')}";
     }
 
-    private void UpdateSongStatistics(SongMeta songMeta)
+    private void UpdateHighScores(SongMeta songMeta)
     {
-        SongStatistics songStatistics = statistics.GetLocalStatistics(songMeta);
-        if (songStatistics != null)
-        {
-            List<HighScoreEntry> topScores = songStatistics.HighScoreRecord.GetTopScores(1, settings.Difficulty);
-            List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
+        StatisticsUtils.GetLocalHighScoreEntries(statistics, songMeta)
+            .Subscribe(highScoreEntries => UpdateHighScores(highScoreEntries));
+    }
 
-            UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);
-            highscoresContainer.SetVisibleByVisibility(!topScoreNumbers.IsNullOrEmpty());
-        }
-        else
+    private void UpdateHighScores(List<HighScoreEntry> highScoreEntries)
+    {
+        if (highScoreEntries.IsNullOrEmpty())
         {
             UpdateTopScoreLabels(new List<int>(), localHighScoreContainer);
             highscoresContainer.HideByVisibility();
+            return;
         }
+
+        List<HighScoreEntry> topScores = StatisticsUtils.GetTopScores(
+            highScoreEntries,
+            1,
+            settings.Difficulty);
+        List<int> topScoreNumbers = topScores.Select(it => it.Score).ToList();
+
+        UpdateTopScoreLabels(topScoreNumbers, localHighScoreContainer);
+        highscoresContainer.SetVisibleByVisibility(!topScoreNumbers.IsNullOrEmpty());
     }
 
     private void UpdateTopScoreLabels(List<int> topScores, VisualElement labelContainer)
@@ -216,7 +233,7 @@ public class SongSelectSelectedSongDetailsControl : INeedInjection, IInjectionFi
             string scoreText = topScores.Count >= i + 1
                 ? topScores[i].ToString()
                 : "-";
-            
+
             labels[i].text = scoreText;
         }
     }

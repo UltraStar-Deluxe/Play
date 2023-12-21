@@ -17,7 +17,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     {
         anyContextMenuOpenedEventStream = new();
     }
-    
+
     public Action<ContextMenuPopupControl> FillContextMenuAction { get; set; }
     public Func<bool> ShouldOpenContextMenuFunction { get; set; }
 
@@ -40,18 +40,18 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     private Vector2 pointerDownPosition;
 
     private readonly List<IDisposable> disposables = new();
-    
+
     private static Subject<ContextMenuPopupControl> anyContextMenuOpenedEventStream = new();
     public static Subject<ContextMenuPopupControl> AnyContextMenuOpenedEventStream => anyContextMenuOpenedEventStream;
-    
+
     private readonly Subject<ContextMenuPopupControl> contextMenuOpenedEventStream = new();
     public IObservable<ContextMenuPopupControl> ContextMenuOpenedEventStream => contextMenuOpenedEventStream;
-    
+
     private readonly Subject<ContextMenuPopupControl> contextMenuClosedEventStream = new();
     public IObservable<ContextMenuPopupControl> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
     private VisualElement focusedVisualElementOnOpen;
-    
+
     public virtual void OnInjectionFinished()
     {
         panelHelper = new PanelHelper(uiDocument);
@@ -107,7 +107,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
         {
             return;
         }
-        
+
         Vector2 pointerPosition = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         if (!targetVisualElement.worldBound.Contains(pointerPosition))
         {
@@ -125,8 +125,8 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
         }
 
         focusedVisualElementOnOpen = targetVisualElement.focusController?.focusedElement as VisualElement;
-        
-        ContextMenuPopupControl contextMenuPopupControl = new(gameObject, position);
+
+        ContextMenuPopupControl contextMenuPopupControl = new(gameObject, targetVisualElement, position);
         injector.Inject(contextMenuPopupControl);
         FillContextMenuAction(contextMenuPopupControl);
 
@@ -139,7 +139,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
     private void OnContextMenuClose(ContextMenuPopupControl contextMenuPopupControl)
     {
         contextMenuClosedEventStream.OnNext(contextMenuPopupControl);
-        
+
         // Focus last element
         if (focusedVisualElementOnOpen != null)
         {

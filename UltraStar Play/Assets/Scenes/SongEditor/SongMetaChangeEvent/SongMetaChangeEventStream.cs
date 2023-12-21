@@ -1,14 +1,9 @@
 using System;
 using UniRx;
 
-public class SongMetaChangeEventStream : IDisposable, IObservable<SongMetaChangeEvent>
+public class SongMetaChangeEventStream : IObservable<SongMetaChangeEvent>
 {
     private readonly Subject<SongMetaChangeEvent> subject = new();
-
-    public void Dispose()
-    {
-        subject.Dispose();
-    }
 
     public void OnNext(SongMetaChangeEvent value)
     {

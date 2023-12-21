@@ -64,8 +64,8 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         if (isRecording && HasPositionInSong)
         {
             // Analyze the following beats, not past beats.
-            lastAnalyzedBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
-            Debug.Log($"HandleRecordingStatusChanged - lastAnalyzedBeat: {lastAnalyzedBeat}");
+            lastAnalyzedBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, GetEstimatedPositionInSongInMillis());
+            Log.Debug(() => $"HandleRecordingStatusChanged - lastAnalyzedBeat: {lastAnalyzedBeat}");
         }
     }
 
@@ -93,7 +93,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         // Check if can analyze new beat
         double estimatedPositionInSongInMillis = GetEstimatedPositionInSongInMillis();
         double positionInSongConsideringMicDelay = estimatedPositionInSongInMillis - MicProfile.DelayInMillis;
-        int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongConsideringMicDelay);
+        int currentBeatConsideringMicDelay = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongConsideringMicDelay);
         if (currentBeatConsideringMicDelay <= lastAnalyzedBeat
             // Do not start analyzing beats too much before the first lyrics (typically at beat 0 when GAP is set correctly)
             || currentBeatConsideringMicDelay < -20)
@@ -150,7 +150,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         {
             return;
         }
-        
+
         PitchEvent pitchEvent = AudioSamplesAnalyzer.ProcessAudioSamples(
             recordingEvent.MicSamples,
             recordingEvent.NewSamplesStartIndex,
@@ -169,7 +169,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
 
     private void SendMessageToServer(JsonSerializable jsonSerializable)
     {
-        // Debug.Log($"SendMessageToServer - method: {companionAppSettings.MicDataDeliveryMethod}, message: " + jsonSerializable.ToJson());
+        Log.Verbose(() => $"SendMessageToServer - method: {companionAppSettings.MicDataDeliveryMethod}, message: " + jsonSerializable.ToJson());
         clientSideConnectRequestManager.SendMessageToServer(jsonSerializable, companionAppSettings.MicDataDeliveryMethod);
     }
 
@@ -191,7 +191,7 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         {
             return null;
         }
-        
+
         PitchEvent pitchEvent = AbstractMicPitchTracker.AnalyzeBeat(
             songMeta,
             beat,
@@ -225,12 +225,12 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         receivedPositionInSongTimes.PushBack(positionInSongData);
         songMeta = new SongMeta
         {
-            Bpm = positionInSongDto.SongBpm,
-            Gap = positionInSongDto.SongGap,
+            BeatsPerMinute = positionInSongDto.BeatsPerMinute,
+            GapInMillis = positionInSongDto.SongGap,
         };
 
         // If beats have been analyzed prematurely, then redo analysis.
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, GetEstimatedPositionInSongInMillis());
+        int currentBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, GetEstimatedPositionInSongInMillis());
         if (lastAnalyzedBeat > currentBeat)
         {
             lastAnalyzedBeat = currentBeat;
@@ -253,12 +253,12 @@ public class ClientSideMicDataSender : AbstractMicPitchTracker, INeedInjection
         }
         bestPositionInSongData = receivedPositionInSongTimes.FindMinElement(time => GetTimeError(time));
 
-        Debug.Log($"Received position in song: {positionInSongDto.ToJson()}, new best position in song {bestPositionInSongData.ToJson()}");
+        Log.Debug(() => $"Received position in song: {positionInSongDto.ToJson()}, new best position in song {bestPositionInSongData.ToJson()}");
     }
 
     private void ResetPositionInSong()
     {
-        Debug.Log("Resetting position in song");
+        Log.Debug(() => "Resetting position in song");
         songMeta = null;
         bestPositionInSongData = null;
         receivedPositionInSongTimes.Clear();

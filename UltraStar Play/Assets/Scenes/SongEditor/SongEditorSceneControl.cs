@@ -98,8 +98,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
 
     private double positionInSongInMillisWhenPlaybackStarted;
 
-    private readonly Dictionary<string, Color> voiceNameToColorMap = new();
-
     private bool audioWaveFormInitialized;
 
     public double StopPlaybackAfterPositionInSongInMillis { get; set; }
@@ -174,6 +172,24 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         InitAutoSave();
 
         InitSteamAchievement();
+
+        if (sceneData.CreateSingAlongDataViaAiTools)
+        {
+            CreateSingAlongDataViaAiTools();
+        }
+    }
+
+    private void CreateSingAlongDataViaAiTools()
+    {
+        CreateSingAlongSongControl createSingAlongSongControl = injector
+            .CreateAndInject<CreateSingAlongSongControl>();
+        createSingAlongSongControl.CreateSingAlongSongAsObservable(SongMeta, true)
+            .Subscribe(evt =>
+            {
+                Debug.Log($"Created sing-along data for song '{SongMetaUtils.GetArtistDashTitle(SongMeta)}'");
+                editorNoteDisplayer.ClearNoteControls();
+                songMetaChangeEventStream.OnNext(new NotesChangedEvent());
+            });
     }
 
     private void InitSongEditorStyleSheet()
@@ -297,7 +313,7 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
     public List<Note> GetAllVisibleNotes()
     {
         List<Note> result = new();
-        List<Note> notesInVoices = SongMeta.GetVoices()
+        List<Note> notesInVoices = SongMeta.Voices
             // Second voice is drawn on top of first voice. Thus, start with second voice.
             .Reverse()
             .SelectMany(voice => voice.Sentences)
@@ -308,22 +324,6 @@ public class SongEditorSceneControl : MonoBehaviour, IBinder, INeedInjection, II
         result.AddRange(notesInLayers);
         result.AddRange(notesInVoices);
         return result;
-    }
-
-    private void CreateVoiceToColorMap()
-    {
-        List<Color> colors = new()
-        {
-            Colors.CreateColor("#"),
-            Colors.CreateColor("#"),
-        };
-        int index = 0;
-        foreach (Color color in colors)
-        {
-            string voiceName = "P" + (index + 1);
-            voiceNameToColorMap[voiceName] = colors[index];
-            index++;
-        }
     }
 
     private void DoAutoSaveIfEnabled()

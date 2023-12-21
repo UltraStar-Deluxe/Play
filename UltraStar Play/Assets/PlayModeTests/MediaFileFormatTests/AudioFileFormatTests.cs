@@ -10,7 +10,7 @@ public class AudioFileFormatTests : AbstractMediaFileFormatTests
     [UnityTest]
     public IEnumerator Mp3Test()
     {
-        return AudioFileTest("mp3-");
+        yield return AudioFileTest("mp3-");
     }
 
     // [UnityTest]
@@ -24,13 +24,13 @@ public class AudioFileFormatTests : AbstractMediaFileFormatTests
     [UnityTest]
     public IEnumerator OggTest()
     {
-        return AudioFileTest("ogg-");
+        yield return AudioFileTest("ogg-");
     }
 
     [UnityTest]
     public IEnumerator WavTest()
     {
-        return AudioFileTest("wav-");
+        yield return AudioFileTest("wav-");
     }
 
     /////////////////////////////////////////////////////////
@@ -39,30 +39,30 @@ public class AudioFileFormatTests : AbstractMediaFileFormatTests
     [UnityTest]
     public IEnumerator AacTest()
     {
-        return AudioFileTest("aac-");
+        yield return AudioFileTest("aac-");
     }
 
     [UnityTest]
     public IEnumerator AiffTest()
     {
-        return AudioFileTest("aiff-");
+        yield return AudioFileTest("aiff-");
     }
 
     [UnityTest]
     public IEnumerator FlacTest()
     {
-        return AudioFileTest("flac-");
+        yield return AudioFileTest("flac-");
     }
 
     [UnityTest]
     public IEnumerator M4aTest()
     {
-        return AudioFileTest("m4a-");
+        yield return AudioFileTest("m4a-");
     }
 
     [UnityTest]
     public IEnumerator WmaTest()
     {
-        return AudioFileTest("wma-");
+        yield return AudioFileTest("wma-");
     }
 }

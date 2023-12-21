@@ -26,9 +26,6 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     public static AudioSeparationManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<AudioSeparationManager>();
 
     [Inject]
-    private AudioManager audioManager;
-
-    [Inject]
     private UiManager uiManager;
 
     [Inject]
@@ -40,19 +37,23 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     [Inject]
     private SongMetaManager songMetaManager;
 
-    private readonly List<Job> audioSeparationJobs = new();
-
     private readonly Subject<AudioSeparationFinishedEvent> audioSeparationFinishedEventStream = new();
     public Subject<AudioSeparationFinishedEvent> AudioSeparationFinishedEventStream => audioSeparationFinishedEventStream;
 
-    public void ProcessSongMeta(SongMeta songMeta, Job audioSeparationJob = null)
+    public void ProcessSongMeta(
+        SongMeta songMeta,
+        bool saveSong,
+        Job audioSeparationJob = null)
     {
-        ProcessSongMetaAsObservable(songMeta, audioSeparationJob)
+        ProcessSongMetaAsObservable(songMeta, saveSong, audioSeparationJob)
             // Subscribe to trigger the observable
             .Subscribe(evt => Debug.Log($"Successfully separated audio: {evt}"));
     }
 
-    public IObservable<AudioSeparationResult> ProcessSongMetaAsObservable(SongMeta songMeta, Job audioSeparationJob = null)
+    public IObservable<AudioSeparationResult> ProcessSongMetaAsObservable(
+        SongMeta songMeta,
+        bool saveSong,
+        Job audioSeparationJob = null)
     {
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         string fileExtension = Path.GetExtension(new Uri(audioUri).LocalPath);
@@ -62,24 +63,23 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                                          $"Requires one of {ApplicationUtils.supportedVocalsSeparationAudioFiles.ToCsv(",", "", "")}");
             return Observable.Empty<AudioSeparationResult>();
         }
-        
+
         string generatedSongFolderAbsolutePath = SettingsUtils.GetGeneratedSongFolderAbsolutePath(settings);
 
         // Create job to show in UI
         if (audioSeparationJob == null)
         {
-            audioSeparationJob = new Job($"Vocals isolation of '{Path.GetFileName(songMeta.Mp3)}'");
+            audioSeparationJob = new Job($"Vocals isolation of '{Path.GetFileName(songMeta.Audio)}'");
             jobManager.AddJob(audioSeparationJob);
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
 
-        AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(audioUri, false);
+        AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(audioUri, false);
         int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
         audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
 
         CancellationTokenSource cancellationTokenSource = new();
         audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();
-        audioSeparationJobs.Add(audioSeparationJob);
 
         // Set path to spleeter executable if needed
         string fallbackAudioSeparationCommand = PlatformUtils.IsWindows
@@ -90,7 +90,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                 songMeta,
                 generatedSongFolderAbsolutePath,
                 cancellationTokenSource.Token,
-                fallbackAudioSeparationCommand)
+                fallbackAudioSeparationCommand,
+                saveSong)
             // Execute on Background thread
             .SubscribeOn(Scheduler.ThreadPool)
             // Notify on Main thread
@@ -115,7 +116,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
     private IObservable<AudioSeparationResult> DoProcessSongMetaAsObservable(SongMeta songMeta,
         string generatedSongFolderAbsolutePath,
         CancellationToken cancellationToken,
-        string fallbackAudioSeparationCommand)
+        string fallbackAudioSeparationCommand,
+        bool saveSong)
     {
         if (audioSeparationProcessCount > 0)
         {
@@ -134,10 +136,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     Debug.Log($"Separating voice and instrumental audio from song: {songMeta}");
                     UpdateSpleeterSharpConfig(fallbackAudioSeparationCommand);
 
-                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Mp3);
-                    
+                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(songMeta.Audio);
+
                     SpleeterParameters spleeterParameters = new();
-                    spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    spleeterParameters.InputFile = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
                     spleeterParameters.OutputFolder = $"{generatedSongFolderAbsolutePath}/{fileNameWithoutExtension}.ogg";
                     spleeterParameters.Overwrite = true;
 
@@ -146,9 +148,9 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
                     splitTask.Wait();
                     SpleeterResult spleeterResult = splitTask.Result;
 
-                    UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult);
+                    UpdateSongMetaWithSpleeterResult(songMeta, generatedSongFolderAbsolutePath, spleeterResult, saveSong);
 
-                    string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3);
+                    string originalAudioFilePath = SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio);
                     string vocalsAudioFilePath = songMeta.VocalsAudio;
                     string instrumentalAudioFilePath = songMeta.InstrumentalAudio;
                     o.OnNext(new AudioSeparationResult(originalAudioFilePath, vocalsAudioFilePath, instrumentalAudioFilePath));
@@ -182,7 +184,11 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         });
     }
 
-    private void UpdateSongMetaWithSpleeterResult(SongMeta songMeta, string generatedSongFolderAbsolutePath, SpleeterResult spleeterResult)
+    private void UpdateSongMetaWithSpleeterResult(
+        SongMeta songMeta,
+        string generatedSongFolderAbsolutePath,
+        SpleeterResult spleeterResult,
+        bool saveSong)
     {
         if (spleeterResult.ExitCode != 0
             || !spleeterResult.Errors.IsNullOrEmpty())
@@ -202,9 +208,13 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         bool songMetaChanged = false;
 
         // Prepare directory to move created audio files.
-        string destinationFolder = DirectoryUtils.IsSubDirectory(songMeta.Directory, generatedSongFolderAbsolutePath)
-            ? songMeta.Directory
-            : ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, songMeta.Directory);
+        string destinationFolder = SongMetaUtils.GetDirectoryPath(songMeta);
+        if (!settings.SaveVocalsAndInstrumentalAudioInFolderOfSong
+            && !DirectoryUtils.IsSubDirectory(SongMetaUtils.GetDirectoryPath(songMeta), generatedSongFolderAbsolutePath))
+        {
+            destinationFolder = ApplicationUtils.GetGeneratedOutputFolderForSourceFilePath(generatedSongFolderAbsolutePath, SongMetaUtils.GetDirectoryPath(songMeta));
+        }
+
         if (!destinationFolder.IsNullOrEmpty()
             && !Directory.Exists(destinationFolder))
         {
@@ -224,6 +234,10 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             FileUtils.MoveFileOverwriteIfExists(vocalsAudioPath, destinationVocalsAudioPath);
 
             songMeta.VocalsAudio = destinationVocalsAudioPath;
+            if (destinationFolder == SongMetaUtils.GetDirectoryPath(songMeta))
+            {
+                songMeta.VocalsAudio = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), songMeta.VocalsAudio);
+            }
             songMetaChanged = true;
         }
         else
@@ -244,6 +258,11 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             FileUtils.MoveFileOverwriteIfExists(instrumentalAudioPath, destinationInstrumentalAudioPath);
 
             songMeta.InstrumentalAudio = destinationInstrumentalAudioPath;
+            if (destinationFolder == SongMetaUtils.GetDirectoryPath(songMeta))
+            {
+                songMeta.InstrumentalAudio = PathUtils.MakeRelativePath(SongMetaUtils.GetDirectoryPath(songMeta), songMeta.InstrumentalAudio);
+            }
+
             songMetaChanged = true;
         }
         else
@@ -259,7 +278,8 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         // }
 
         // Save song meta
-        if (songMetaChanged)
+        if (songMetaChanged
+            && saveSong)
         {
             songMetaManager.SaveSong(songMeta, true);
         }
@@ -275,10 +295,5 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
             .SetSpleeterCommand(audioSeparationCommand)
             .SetIsWindows(PlatformUtils.IsWindows)
             .SetLogAction(message => Debug.Log($"SpleeterSharp: {message}"));
-    }
-
-    private void OnApplicationQuit()
-    {
-        audioSeparationJobs.ForEach(job => job.Cancel());
     }
 }

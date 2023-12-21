@@ -21,7 +21,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
     private readonly Subject<ConnectEvent> connectEventStream = new Subject<ConnectEvent>();
     public IObservable<ConnectEvent> ConnectEventStream => connectEventStream;
-    
+
     private bool isListeningForConnectResponse;
 
     private bool hasBeenDestroyed;
@@ -29,9 +29,9 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     private int connectRequestCount;
 
     private NetPeer ServerPeer => liteNetLibClient.FirstPeer;
-    
+
     public bool IsConnected => ServerPeer != null;
-    
+
     private readonly Subject<JsonSerializable> receivedMessageStream = new();
     public IObservable<JsonSerializable> ReceivedMessageStream => receivedMessageStream;
 
@@ -61,7 +61,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             liteNetLibClient.Stop();
         }
     }
-    
+
     private void ConnectToServer()
     {
         if (IsConnected)
@@ -96,18 +96,18 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
     private void SendDiscoveryBroadcast()
     {
         Debug.Log($"Sending discovery broadcast to port {settings.ConnectionServerPort}. Connect request count: {connectRequestCount}");
-            
+
         NetDataWriter netDataWriter = new NetDataWriter();
         netDataWriter.Put(1);
         liteNetLibClient.SendBroadcast(netDataWriter, settings.ConnectionServerPort);
     }
-    
+
     private void OnReceivedDiscoveryResponse(IPEndPoint remoteEndPoint)
     {
         Debug.Log($"Received discovery response from {remoteEndPoint}");
         SendConnectMessage(remoteEndPoint);
     }
-    
+
     private void SendConnectMessage(IPEndPoint remoteEndPoint)
     {
         Debug.Log($"Sending connect request to {remoteEndPoint}");
@@ -121,7 +121,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         netDataWriter.Put(connectRequestDto.ToJson());
         liteNetLibClient.Connect(remoteEndPoint, netDataWriter);
     }
-    
+
     public void DisconnectFromServer()
     {
         if (ServerPeer == null)
@@ -166,10 +166,10 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         {
             return;
         }
-        
+
         ServerPeer.Send(jsonSerializable, deliveryMethod);
     }
-    
+
     private void HandleMessageFromServer(string message)
     {
         message = message.Trim();
@@ -179,11 +179,11 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             Debug.LogWarning($"Received invalid message from server: {message}");
             return;
         }
-        
-        // Debug.Log($"Received message from server: {message}");
+
+        Log.Verbose(() => $"Received message from server: {message}");
         HandleJsonMessageFromServer(message);
     }
-    
+
     private void HandleJsonMessageFromServer(string json)
     {
         if (!CompanionAppMessageUtils.TryGetMessageType(json, out CompanionAppMessageType messageType))
@@ -204,7 +204,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                     Debug.LogException(e);
                     Debug.LogError("Failed to handle connect response. Disconnecting from server.");
                     DisconnectFromServer();
-                    
+
                     connectEventStream.OnNext(new ConnectEvent(connectRequestCount, e.Message));
                 }
                 return;
@@ -228,13 +228,13 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                 return;
         }
     }
-    
+
     private void HandleConnectResponse(string message)
     {
         ConnectResponseDto connectResponseDto = JsonConverter.FromJson<ConnectResponseDto>(message);
         if (!connectResponseDto.ErrorMessage.IsNullOrEmpty())
         {
-            throw new ConnectRequestException("Server returned error message: " + connectResponseDto.ErrorMessage);
+            throw new ConnectRequestException("Received error message: " + connectResponseDto.ErrorMessage);
         }
         if (connectResponseDto.ClientName.IsNullOrEmpty())
         {
@@ -249,7 +249,11 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
             throw new ConnectRequestException($"Malformed ConnectResponse: wrong ClientId. Is {connectResponseDto.ClientId}, expected {settings.ClientId}");
         }
 
-        connectEventStream.OnNext(new ConnectEvent(connectResponseDto.HttpServerPort, ServerPeer.EndPoint, connectResponseDto.Permissions));
+        connectEventStream.OnNext(new ConnectEvent(
+            connectResponseDto.HttpServerPort,
+            ServerPeer.EndPoint,
+            connectResponseDto.Permissions,
+            connectResponseDto.AvailableGameRoundModifierDtos));
         connectRequestCount = 0;
     }
 
@@ -260,7 +264,25 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
-        Debug.Log($"Disconnected: reason: {disconnectInfo.Reason}, additional info: {disconnectInfo.AdditionalData}, socket error code: {disconnectInfo.SocketErrorCode}");
+        string disconnectInfoAdditionalData;
+        try
+        {
+            disconnectInfoAdditionalData = disconnectInfo.AdditionalData.GetString();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError("Failed to read additional info from disconnect message");
+            disconnectInfoAdditionalData = "";
+        }
+        Debug.Log($"Disconnected: reason: {disconnectInfo.Reason}, additional info: {disconnectInfoAdditionalData}, socket error code: {disconnectInfo.SocketErrorCode}");
+
+        if (disconnectInfoAdditionalData.Trim().StartsWith("{")
+            && disconnectInfoAdditionalData.Trim().EndsWith("}")
+            && disconnectInfoAdditionalData.Contains("ErrorMessage", StringComparison.InvariantCultureIgnoreCase))
+        {
+            HandleMessageFromServer(disconnectInfoAdditionalData);
+        }
     }
 
     public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
@@ -275,7 +297,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         {
             return;
         }
-        
+
         HandleMessageFromServer(message);
     }
 
@@ -291,7 +313,6 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
     public void OnNetworkLatencyUpdate(NetPeer peer, int latency)
     {
-        // Debug.Log($"OnNetworkLatencyUpdate: {peer}, latency: {latency}");
     }
 
     public void OnConnectionRequest(ConnectionRequest request)

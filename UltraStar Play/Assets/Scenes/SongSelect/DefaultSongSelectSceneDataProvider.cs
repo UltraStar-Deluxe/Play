@@ -11,13 +11,10 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
     public bool isFreeForAll;
     public bool isKnockOutTournament;
     public PartyModeSongSelectionSettings songSelectionSettings;
-    public GameRoundFinishConditionSettings finishConditionSettings;
-    public List<EGameRoundModifier> modifiers;
-    public GameRoundModifierConditionSettings modifierConditionSettings;
+    public List<string> modifierIds;
 
     public SceneData GetDefaultSceneData()
     {
-        SongMetaManager.Instance.ScanFilesIfNotDoneYet();
         SongMetaManager.Instance.WaitUntilSongScanFinished();
 
         SongSelectSceneData songSelectSceneData = new();
@@ -27,7 +24,7 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
         }
         return songSelectSceneData;
     }
-    
+
     private PartyModeSceneData CreatePartyModeSceneData()
     {
         PartyModeSceneData partyModeSceneData = new();
@@ -72,9 +69,7 @@ public class DefaultSongSelectSceneDataProvider : MonoBehaviour, IDefaultSceneDa
         void FillRounds()
         {
             GameRoundSettings roundSettings = new();
-            roundSettings.modifiers = modifiers.ToHashSet();
-            roundSettings.finishConditionSettings = finishConditionSettings;
-            roundSettings.modifierConditionSettings = modifierConditionSettings;
+            roundSettings.modifiers = GameRoundModifierUtils.GetGameRoundModifiersById(modifierIds);
             nonPersistentSettings.GameRoundSettings = roundSettings;
 
             partyModeSettings.RoundCount = 2;

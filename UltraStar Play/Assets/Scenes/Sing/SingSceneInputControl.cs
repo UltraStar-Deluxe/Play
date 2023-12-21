@@ -2,7 +2,6 @@
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649

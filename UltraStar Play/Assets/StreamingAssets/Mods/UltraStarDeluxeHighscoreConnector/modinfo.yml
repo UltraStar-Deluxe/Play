@@ -1,0 +1,8 @@
+name: UltraStar Deluxe Score Database
+version: 1.0.0
+description: |
+  Read existing high scores from your local USDX database.
+authors: 
+  - email@melodymania.org
+requiredAssemblies:
+  - System.Data

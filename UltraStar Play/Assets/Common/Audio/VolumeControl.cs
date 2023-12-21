@@ -13,12 +13,12 @@ public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
         volumeBeforeMute = -1;
     }
     private static int volumeBeforeMute = -1;
-    
+
     public static VolumeControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<VolumeControl>();
 
     [Inject]
     private Settings settings;
-    
+
     public bool IsMuted => volumeBeforeMute >= 0;
 
     protected override object GetInstance()
@@ -50,6 +50,15 @@ public class VolumeControl : AbstractSingletonBehaviour, INeedInjection
         {
             volumeBeforeMute = settings.VolumePercent;
             settings.VolumePercent = 0;
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (IsMuted)
+        {
+            Debug.Log("Unmuting in OnApplicationQuit");
+            ToggleMuteAudio();
         }
     }
 }

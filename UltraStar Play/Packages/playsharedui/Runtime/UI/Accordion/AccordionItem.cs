@@ -47,29 +47,29 @@ public class AccordionItem : VisualElement
         get { return TitleElement.text; }
         set { TitleElement.text = value; }
     }
-    
+
     public override VisualElement contentContainer => ContentElement;
 
     private readonly Subject<bool> beforeContentVisibleChangedEventStream = new();
     public IObservable<bool> BeforeContentVisibleChangedEventStream => beforeContentVisibleChangedEventStream;
-    
+
     private readonly Subject<bool> afterContentVisibleChangedEventStream = new();
     public IObservable<bool> AfterContentVisibleChangedEventStream => afterContentVisibleChangedEventStream;
 
     private Label TitleElement { get; set; }
     private Button ToggleContentButton { get; set; }
     private VisualElement ContentElement { get; set; }
-    
+
     private float targetContentHeight = -1;
     private bool shouldUpdateTargetHeight;
-    
+
     private object control;
 
     public AccordionItem()
         : this("Title")
     {
     }
-    
+
     public AccordionItem(string title)
     {
         // Load UXML and add as child element
@@ -81,11 +81,12 @@ public class AccordionItem : VisualElement
             return;
         }
         visualTreeAsset.CloneTree(this);
+        this.AddToClassList("accordionItem");
 
         TitleElement = this.Q<Label>(R_PlayShared.UxmlNames.accordionItemTitle);
         ToggleContentButton = this.Q<Button>(R_PlayShared.UxmlNames.toggleAccordionItemContentButton);
         ContentElement = this.Q<VisualElement>(R_PlayShared.UxmlNames.accordionItemContent);
-        
+
         ToggleContentButton.RegisterCallbackButtonTriggered(_ => ToggleContentVisible());
 
         ContentElement.RegisterCallback<GeometryChangedEvent>(evt =>
@@ -105,12 +106,12 @@ public class AccordionItem : VisualElement
             {
                 ContentElement.style.height = targetContentHeight;
             }
-            
+
             afterContentVisibleChangedEventStream.OnNext(ContentVisible);
         });
 
         Title = title;
-        
+
         UpdateTargetHeight();
     }
 
@@ -122,7 +123,7 @@ public class AccordionItem : VisualElement
         }
         control = AccordionItemControl;
     }
-    
+
     private void ToggleContentVisible()
     {
         if (ContentVisible)
@@ -141,9 +142,9 @@ public class AccordionItem : VisualElement
         {
             return;
         }
-        
+
         beforeContentVisibleChangedEventStream.OnNext(true);
-        
+
         this.AddToClassList("expanded");
         if (targetContentHeight >= 0)
         {
@@ -164,13 +165,13 @@ public class AccordionItem : VisualElement
         }
 
         beforeContentVisibleChangedEventStream.OnNext(false);
-        
+
         this.RemoveFromClassList("expanded");
         if (targetContentHeight >= 0)
         {
             ContentElement.style.height = 0;
         }
-        
+
         if (parent is AccordionGroup accordionGroup)
         {
             accordionGroup.OnAccordionItemContentVisibleChanged(this);

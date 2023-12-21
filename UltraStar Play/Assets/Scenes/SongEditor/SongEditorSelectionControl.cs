@@ -32,7 +32,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
     [Inject]
     private UIDocument uiDocument;
-    
+
     private readonly HashSet<Note> selectedNotes = new();
 
     private readonly Subject<NoteSelectionChangeEvent> noteSelectionChangeEventStream = new();
@@ -49,7 +49,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         return selectedNotes != null
                && selectedNotes.Count > 0;
     }
-    
+
     public bool IsSelected(Note note)
     {
         return selectedNotes.Contains(note);
@@ -158,7 +158,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
         {
             return;
         }
-        
+
         selectedNotes.Add(note);
         EditorNoteControl noteControl = editorNoteDisplayer.GetNoteControl(note);
         if (noteControl != null)
@@ -266,7 +266,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
             if (updatePositionInSong)
             {
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, nextNote.StartBeat);
+                double noteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, nextNote.StartBeat);
                 songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
             }
 
@@ -326,7 +326,7 @@ public class SongEditorSelectionControl : MonoBehaviour, INeedInjection
 
             if (updatePositionInSong)
             {
-                double noteStartInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, previousNote.StartBeat);
+                double noteStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, previousNote.StartBeat);
                 songAudioPlayer.PositionInSongInMillis = noteStartInMillis;
             }
 

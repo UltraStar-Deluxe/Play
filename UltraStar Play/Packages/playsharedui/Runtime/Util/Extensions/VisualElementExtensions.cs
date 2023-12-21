@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,7 +14,7 @@ public static class VisualElementExtensions
             baseField.value = newValue;
         }
     }
-    
+
     public static void RegisterCallbackButtonTriggered(this Button button, EventCallback<EventBase> callback, TrickleDown trickleDown = TrickleDown.NoTrickleDown)
     {
         button.RegisterCallback<ClickEvent>(callback, trickleDown);
@@ -158,7 +159,7 @@ public static class VisualElementExtensions
 
         visualElement.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
     }
-    
+
     public static void SetBackgroundImageAlpha(this VisualElement visualElement, float newAlpha)
     {
         Color lastColor = visualElement.resolvedStyle.unityBackgroundImageTintColor;
@@ -214,7 +215,7 @@ public static class VisualElementExtensions
         visualElement.style.borderTopColor = color;
         visualElement.style.borderBottomColor = color;
     }
-    
+
     public static void SetBorderWidth(this VisualElement visualElement, StyleFloat value)
     {
         visualElement.style.borderLeftWidth = value;
@@ -222,7 +223,7 @@ public static class VisualElementExtensions
         visualElement.style.borderTopWidth = value;
         visualElement.style.borderBottomWidth = value;
     }
-    
+
     public static void SetBorderRadius(this VisualElement visualElement, StyleLength value)
     {
         visualElement.style.borderTopLeftRadius = value;
@@ -236,18 +237,18 @@ public static class VisualElementExtensions
         listView.SetSelection(index);
         listView.ScrollToItem(index);
     }
-    
+
     public static void SetSelectionAndScrollTo(this ListViewH listView, int index)
     {
         listView.SetSelection(index);
         // listView.ScrollToItem(index);
     }
-    
+
     public static VisualElement GetSelectedVisualElement(this ListView listView)
     {
         return listView.Q<VisualElement>(className: "unity-collection-view__item--selected");
     }
-    
+
     public static VisualElement GetSelectedVisualElement(this ListViewH listView)
     {
         return listView.Q<VisualElement>(className: "unity-collection-view__item--selected");
@@ -255,17 +256,17 @@ public static class VisualElementExtensions
 
     public static VisualElement GetRootVisualElement(this VisualElement visualElement)
     {
-        return visualElement.GetParent(parent => parent.parent == null 
+        return visualElement.GetParent(parent => parent.parent == null
                                                  || parent.ClassListContains("unity-ui-document__root"));
     }
-    
+
     public static VisualElement GetParent(this VisualElement visualElement, Func<VisualElement, bool> condition=null)
     {
         if (visualElement == null)
         {
             return null;
         }
-        
+
         VisualElement parent = visualElement.parent;
         while (parent != null)
         {
@@ -279,7 +280,7 @@ public static class VisualElementExtensions
 
         return null;
     }
-    
+
     public static List<VisualElement> GetParents(VisualElement visualElement)
     {
         List<VisualElement> parents = new();
@@ -292,7 +293,7 @@ public static class VisualElementExtensions
 
         return parents;
     }
-    
+
     public static void RemoveTemplateContainers(this VisualElement visualElement)
     {
         visualElement
@@ -332,7 +333,7 @@ public static class VisualElementExtensions
         {
             return;
         }
-        
+
         textElement.parseEscapeSequences = false;
     }
 
@@ -340,11 +341,54 @@ public static class VisualElementExtensions
     {
         // See https://forum.unity.com/threads/disable-integerfield-changing-value-on-drag.1448113/#post-9079210
         visualElement.labelElement.style.cursor = StyleKeyword.Initial;
- 
+
         visualElement.labelElement.RegisterCallback<MouseMoveEvent>(
             e => e.StopImmediatePropagation(), TrickleDown.TrickleDown);
- 
+
         visualElement.labelElement.RegisterCallback<PointerMoveEvent>(
             e => e.StopImmediatePropagation(), TrickleDown.TrickleDown);
+    }
+
+    public static string ToUxml(this VisualElement root, int indentCount = 0)
+    {
+        string GetIndentation()
+        {
+            if (indentCount < 0)
+            {
+                return "";
+            }
+
+            StringBuilder sb = new();
+            for (int i = 0; i < indentCount; i++)
+            {
+                sb.Append("    ");
+            }
+            return sb.ToString();
+        }
+
+        string indent = GetIndentation();
+
+        StringBuilder sb = new();
+        sb.Append(indent);
+        sb.Append($"<{root.GetType().Name} name=\"{root.name}\" class=\"{root.GetClasses().ToCsv(" ", "", "")}\"");
+        if (root.childCount > 0)
+        {
+            sb.Append(">\n");
+            sb.Append(indent);
+            sb.Append(root.Children()
+                .Select(child => child.ToUxml(indentCount >= 0 ? indentCount + 1 : indentCount))
+                .JoinWith($"\n{indent}"));
+            if (indentCount == 0)
+            {
+
+                sb.Append("\n");
+            }
+            sb.Append($"</{root.GetType().Name}>");
+        }
+        else
+        {
+            sb.Append("/>");
+        }
+        return sb.ToString();
     }
 }

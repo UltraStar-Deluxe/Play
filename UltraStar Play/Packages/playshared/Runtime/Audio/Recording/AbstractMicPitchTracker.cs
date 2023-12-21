@@ -56,7 +56,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             {
                 return Array.Empty<float>();
             }
-            
+
             return MicSampleRecorder.MicSamples;
         }
     }
@@ -78,7 +78,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
 
             return MicSampleRecorder.PlayRecordedAudio;
         }
-        
+
         set
         {
             if (MicSampleRecorder == null)
@@ -89,7 +89,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             MicSampleRecorder.PlayRecordedAudio = value;
         }
     }
-    
+
     protected MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
 
     protected readonly Subject<PitchEvent> pitchEventStream = new();
@@ -98,7 +98,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
     public IAudioSamplesAnalyzer AudioSamplesAnalyzer { get; protected set; }
 
     protected readonly List<IDisposable> micSampleRecorderDisposables = new();
-    
+
     public virtual void OnInjectionFinished()
     {
         settings.ObserveEveryValueChanged(it => it.PitchDetectionAlgorithm)
@@ -131,17 +131,17 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         {
             return;
         }
-        
+
         MicSampleRecorder.StartRecording();
     }
-    
+
     public virtual void StopRecording()
     {
         if (MicSampleRecorder == null)
         {
             return;
         }
-        
+
         MicSampleRecorder.StopRecording();
     }
 
@@ -162,8 +162,8 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
             return null;
         }
 
-        float beatStartInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
-        float beatEndInMillis = (float)BpmUtils.BeatToMillisecondsInSong(songMeta, beat + 1);
+        float beatStartInMillis = (float)SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
+        float beatEndInMillis = (float)SongMetaBpmUtils.BeatsToMillis(songMeta, beat + 1);
         float beatLengthInMillis = beatEndInMillis - beatStartInMillis;
         int beatLengthInSamples = (int)(beatLengthInMillis * micSampleRate / 1000f);
 

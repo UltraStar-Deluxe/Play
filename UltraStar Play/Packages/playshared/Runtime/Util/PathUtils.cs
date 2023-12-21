@@ -1,12 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using Util;
 
 public static class PathUtils
 {
+    private static readonly HashSet<char> invalidFileNameChars = Path.GetInvalidFileNameChars()
+        .Union(new List<char>() { '*', '?', '"', '<', '>', '|', '/', '\\', ':' })
+        .ToHashSet();
+    private static readonly HashSet<char> invalidPathChars = Path.GetInvalidPathChars()
+        .Union(new List<char>() { '*', '?', '"', '<', '>', '|' })
+        .ToHashSet();
+
+    public static string ReplaceInvalidPathChars(string path, char replacement = '_')
+    {
+        return StringUtils.ReplaceInvalidChars(path, replacement, invalidPathChars);
+    }
+
+    public static string ReplaceInvalidFileNameChars(string fileName, char replacement = '_')
+    {
+        return StringUtils.ReplaceInvalidChars(fileName, replacement, invalidFileNameChars);
+    }
+
+    public static string GetFileName(string path)
+    {
+        if (path.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        return Path.GetFileName(path);
+    }
+
+    public static string GetDirectoryName(string path)
+    {
+        if (path.IsNullOrEmpty())
+        {
+            return "";
+        }
+
+        return Path.GetDirectoryName(path);
+    }
+
     public static string CombinePaths(string firstPart, string secondPart)
     {
         bool EndsWithSeparator(string path)
@@ -49,7 +88,7 @@ public static class PathUtils
 
         if (path.Length == 2
             && IsValidDriveChar(path[0])
-            && path[1] == System.IO.Path.VolumeSeparatorChar)
+            && path[1] == Path.VolumeSeparatorChar)
         {
             // 'C:' or similar
             return true;
@@ -57,7 +96,7 @@ public static class PathUtils
 
         if (path.Length >= 3
             && IsValidDriveChar(path[0])
-            && path[1] == System.IO.Path.VolumeSeparatorChar
+            && path[1] == Path.VolumeSeparatorChar
             && IsDirectorySeparator(path[2]))
         {
             // 'C:\' or similar
@@ -136,6 +175,15 @@ public static class PathUtils
     public static string MakeRelativePath(string relativeTo, string path)
     {
         return Path.GetRelativePath(relativeTo, path);
+    }
+
+    public static string GetExtensionWithDot(string path)
+    {
+        if (path.IsNullOrEmpty())
+        {
+            return "";
+        }
+        return Path.GetExtension(path);
     }
 
     public static string GetExtensionWithoutDot(string path)

@@ -1,21 +1,31 @@
 ﻿using System;
+using FullSerializer;
 
 public class MicProfileReference : IEquatable<MicProfileReference>
 {
+    [fsProperty]
     private readonly string name;
     public string Name => name;
-    
+
+    [fsProperty]
     private readonly int channelIndex;
     public int ChannelIndex => channelIndex;
 
-    public MicProfileReference(string name, int channelIndex)
+    [fsProperty]
+    private readonly string connectedClientId;
+    public string ConnectedClientId => connectedClientId;
+
+    public bool IsInputFromConnectedClient => !ConnectedClientId.IsNullOrEmpty();
+
+    public MicProfileReference(string name, int channelIndex, string connectedClientId)
     {
         this.name = name;
         this.channelIndex = channelIndex;
+        this.connectedClientId = connectedClientId;
     }
-    
+
     public MicProfileReference(MicProfile micProfile)
-        : this(micProfile.Name, micProfile.ChannelIndex)
+        : this(micProfile.Name, micProfile.ChannelIndex, micProfile.ConnectedClientId)
     {
     }
 
@@ -31,7 +41,24 @@ public class MicProfileReference : IEquatable<MicProfileReference>
             return true;
         }
 
-        return name == other.name && channelIndex == other.channelIndex;
+        return (IsInputFromConnectedClient
+                && other.IsInputFromConnectedClient
+                && ConnectedClientId == other.ConnectedClientId)
+               || (!IsInputFromConnectedClient
+                   && !other.IsInputFromConnectedClient
+                   && Name == other.Name
+                   && ChannelIndex == other.ChannelIndex);
+    }
+
+    public bool Equals(MicProfile other)
+    {
+        return (IsInputFromConnectedClient
+                && other.IsInputFromConnectedClient
+                && ConnectedClientId == other.ConnectedClientId)
+               || (!IsInputFromConnectedClient
+                   && !other.IsInputFromConnectedClient
+                   && Name == other.Name
+                   && ChannelIndex == other.ChannelIndex);
     }
 
     public override bool Equals(object obj)
@@ -46,12 +73,17 @@ public class MicProfileReference : IEquatable<MicProfileReference>
             return true;
         }
 
-        if (obj.GetType() != this.GetType())
+        if (obj is MicProfileReference otherMicProfileReference)
         {
-            return false;
+            return Equals(otherMicProfileReference);
         }
 
-        return Equals((MicProfileReference)obj);
+        if (obj is MicProfile otherMicProfile)
+        {
+            return Equals(otherMicProfile);
+        }
+
+        return false;
     }
 
     public override int GetHashCode()

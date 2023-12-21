@@ -66,6 +66,11 @@
                     <MaterialIcon icon="phonelink_setup" name="image" />
                     <ui:Label text="Apps" name="label" />
                 </ToggleButton>
+                <ToggleButton name="modOptionsButton" class="optionsOverviewButton">
+                    <MaterialIcon icon="code" name="image" />
+                    <ui:Label text="Mods" name="label" />
+                    <MaterialIcon name="modSettingsProblemHintIcon" icon="warning" class="rounded warning settingsProblemHintIcon warningFontColor" />
+                </ToggleButton>
                 <ToggleButton name="developerOptionsButton" class="optionsOverviewButton">
                     <MaterialIcon icon="bug_report" name="image" />
                     <ui:Label text="Developer" name="label" />

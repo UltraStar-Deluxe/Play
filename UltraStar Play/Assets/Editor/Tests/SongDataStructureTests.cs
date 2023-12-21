@@ -1,8 +1,21 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using UnityEngine;
 
 public class SongDataStructureTests
 {
+    [Test]
+    public void CopyValuesTest()
+    {
+        string folderPath = $"{Application.dataPath}/Editor/Tests/TestSongs";
+        string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
+        UltraStarSongMeta originalSongMeta = UltraStarSongParser.ParseFile(originalFilePath, out List<SongIssue> _);
+        UltraStarSongMeta copiedSongMeta = new(originalSongMeta);
+        string originalJson = JsonConverter.ToJson(originalSongMeta);
+        string copyJson = JsonConverter.ToJson(copiedSongMeta);
+        Assert.AreEqual(originalJson, copyJson);
+    }
+
     [Test]
     public void SentenceMinAndMaxBeatIsSetWhenCreated()
     {

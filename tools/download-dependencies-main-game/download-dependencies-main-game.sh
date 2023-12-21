@@ -4,7 +4,6 @@ sh download-unirx.sh
 sh download-fullserializer.sh
 sh download-csharpsynthforunity.sh
 sh download-text-mesh-pro-resources.sh
-sh download-sharpziplib.sh
 sh download-serilog.sh
 sh download-jokenizer.sh
 sh download-dynamicqueryable.sh

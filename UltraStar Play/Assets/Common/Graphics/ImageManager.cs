@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using PrimeInputActions;
+using System.Threading;
+using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
 
 // Handles loading and caching of images.
-public static class ImageManager
+public class ImageManager : AbstractSingletonBehaviour, INeedInjection
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
@@ -17,12 +18,19 @@ public static class ImageManager
         ClearCache();
     }
 
+    public static ImageManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ImageManager>();
+
     private static readonly HashSet<ISpriteHolder> spriteHolders = new();
 
     // When the cache has reached the critical size, then unused sprites are searched in the scene
     // and removed from memory.
     private static readonly int criticalCacheSize = 50;
     private static readonly Dictionary<string, CachedSprite> spriteCache = new();
+
+    protected override object GetInstance()
+    {
+        return Instance;
+    }
 
     public static void AddSpriteHolder(ISpriteHolder spriteHolder)
     {
@@ -32,17 +40,6 @@ public static class ImageManager
     public static void RemoveSpriteHolder(ISpriteHolder spriteHolder)
     {
         spriteHolders.Remove(spriteHolder);
-    }
-
-    public static void LoadSpriteFromFile(string path, Action<Sprite> onSuccess, Action onFailure = null)
-    {
-        if (!File.Exists(path))
-        {
-            Debug.LogError("Image file does not exist: " + path);
-            return;
-        }
-
-        LoadSpriteFromUri(path, onSuccess, onFailure);
     }
 
     public static void ReloadImage(string uri, UIDocument uiDocument)
@@ -63,38 +60,79 @@ public static class ImageManager
         // Remove from cache before reloading.
         RemoveCachedSprite(cachedSprite);
 
-        LoadSpriteFromUri(uri, sprite => visualElementsUsingTheSprite
-            .ForEach(it => it.style.backgroundImage = new StyleBackground(sprite)));
+        LoadSpriteFromUri(uri)
+            .Subscribe(sprite =>
+            {
+                visualElementsUsingTheSprite.ForEach(it => it.style.backgroundImage = new StyleBackground(sprite));
+            });
     }
 
-    public static void LoadSpriteFromUri(string uri, Action<Sprite> onSuccess, Action onFailure = null)
+    public static Sprite LoadSpriteFromUriImmediately(string uri)
     {
+        Sprite result = null;
+        // Load with busy waiting
+        LoadSpriteFromUri(uri, true)
+            .Subscribe(sprite => result = sprite);
+        return result;
+    }
+
+    public static IObservable<Sprite> LoadSpriteFromUri(string uri)
+    {
+        return LoadSpriteFromUri(uri, false);
+    }
+
+    private static IObservable<Sprite> LoadSpriteFromUri(string uri, bool busyWaiting)
+    {
+        if (uri.IsNullOrEmpty())
+        {
+            return ObservableUtils.LogErrorThenThrow<Sprite>(new NullReferenceException("Cannot load Sprite, URI is null or empty"));
+        }
+
         if (spriteCache.TryGetValue(uri, out CachedSprite cachedSprite)
             && cachedSprite?.Sprite != null)
         {
-            onSuccess?.Invoke(cachedSprite.Sprite);
-            return;
+            return Observable.Return<Sprite>(cachedSprite.Sprite);
         }
 
-        void DoCacheSpriteThenOnSuccess(Texture2D loadedTexture)
+        return Observable.Create<Sprite>(o =>
         {
-            if (loadedTexture == null)
-            {
-                Debug.LogError($"Loaded texture is null for URI {uri}");
-                onFailure?.Invoke();
-                return;
-            }
-            Sprite sprite = Sprite.Create(loadedTexture, new Rect(0, 0, loadedTexture.width, loadedTexture.height), new Vector2(0.5f, 0.5f), 100f, 0u,  SpriteMeshType.FullRect);
-            AddSpriteToCache(sprite, uri);
-            onSuccess?.Invoke(sprite);
-        }
+            CancellationTokenSource cancellationTokenSource = new();
 
-        void OnFailureOfUnityWebRequest(UnityWebRequest request)
-        {
-            onFailure?.Invoke();
-        }
-        
-        UiManager.Instance.StartCoroutine(WebRequestUtils.LoadTexture2DFromUri(uri, DoCacheSpriteThenOnSuccess, OnFailureOfUnityWebRequest));
+            // Send web request
+            UnityWebRequest webRequest = ImageUtils.CreateTextureRequest(new Uri(uri));
+            webRequest.SendWebRequest();
+
+            // Check web request result in coroutine
+            Instance.StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
+                downloadHandler =>
+                {
+                    if (webRequest.downloadHandler is DownloadHandlerTexture downloadHandlerTexture
+                        && downloadHandlerTexture.texture != null)
+                    {
+                        Texture2D loadedTexture = downloadHandlerTexture.texture;
+                        Sprite sprite = ImageUtils.CreateUncachedSprite(loadedTexture);
+                        AddSpriteToCache(sprite, uri);
+
+                        if (!cancellationTokenSource.IsCancellationRequested)
+                        {
+                            o.OnNext(sprite);
+                        }
+                        o.OnCompleted();
+                    }
+                    else if (!cancellationTokenSource.IsCancellationRequested)
+                    {
+                        o.OnError(new LoadImageException($"Failed to load Texture2D from URI: '{uri}'."));
+                    }
+                },
+                ex =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to load Texture2D from URI: '{uri}': {ex.Message}");
+                    o.OnError(ex);
+                },
+                busyWaiting));
+            return Disposable.Create(() => cancellationTokenSource.Cancel());
+        });
     }
 
     private static void AddSpriteToCache(Sprite sprite, string source)
@@ -147,7 +185,7 @@ public static class ImageManager
         List<CachedSprite> unusedSprites = spriteCache.Values
             .Where(cachedSprite => !usedSprites.Contains(cachedSprite.Sprite))
             .ToList();
-        
+
         Debug.Log($"Removing {unusedSprites.Count} unused sprites from cache.");
         unusedSprites.ForEach(RemoveCachedSprite);
     }

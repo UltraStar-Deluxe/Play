@@ -1,69 +1,123 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
+using Random = System.Random;
 
 public static class SongMetaImageUtils
 {
-    public static string GetBackgroundOrCoverImageUri(SongMeta songMeta)
+    public static IObservable<string> GetBackgroundOrCoverImageUri(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetBackgroundUri(songMeta);
-        if (!uri.IsNullOrEmpty())
+        if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return uri;
-
+            return Observable.Return(uri);
         }
 
         // Try the cover image as fallback
         uri = SongMetaUtils.GetCoverUri(songMeta);
-        if (!uri.IsNullOrEmpty())
+        if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return uri;
+            return Observable.Return(uri);
         }
 
-        return null;
+        // Try to find an image via mods
+        List<ISongBackgroundImageProvider> songBackgroundImageProviders = ModManager.GetModObjects<ISongBackgroundImageProvider>();
+        if (songBackgroundImageProviders.IsNullOrEmpty())
+        {
+            return Observable.Return("");
+        }
+        return songBackgroundImageProviders
+            .Select(songBackgroundImageProvider => songBackgroundImageProvider.GetBackgroundImageUri(songMeta))
+            .Merge()
+            .FirstOrDefault()
+            .ObserveOnMainThread();
     }
-    
-    public static string GetCoverOrBackgroundImageUri(SongMeta songMeta)
+
+    public static IObservable<string> GetCoverOrBackgroundImageUri(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetCoverUri(songMeta);
-        if (!uri.IsNullOrEmpty())
+        if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return uri;
+            return Observable.Return(uri);
         }
 
         // Try the background image as fallback
         uri = SongMetaUtils.GetBackgroundUri(songMeta);
-        if (!uri.IsNullOrEmpty())
+        if (SongMetaUtils.ResourceExists(songMeta, uri))
         {
-            return uri;
+            return Observable.Return(uri);
         }
 
-        return null;
+        // Try to find an image via mods
+        List<ISongCoverImageProvider> songCoverImageProviders = ModManager.GetModObjects<ISongCoverImageProvider>();
+        if (songCoverImageProviders.IsNullOrEmpty())
+        {
+            return Observable.Return("");
+        }
+        return songCoverImageProviders
+            .Select(songCoverImageProvider => songCoverImageProvider.GetCoverImageUri(songMeta))
+            .Merge()
+            .FirstOrDefault()
+            .ObserveOnMainThread();
     }
-    
-    public static void SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
+
+    public static IDisposable SetCoverOrBackgroundImage(SongMeta songMeta, params VisualElement[] visualElements)
     {
-        string uri = GetCoverOrBackgroundImageUri(songMeta);
+        IDisposable getUriDisposable = null;
+        IDisposable setImageFromUriDisposable = null;
+
+        getUriDisposable = GetCoverOrBackgroundImageUri(songMeta)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                SetDefaultSongImageAndColor(songMeta, visualElements);
+            })
+            .Subscribe(uri => setImageFromUriDisposable = SetCoverOrBackgroundImageFromUri(songMeta, uri, visualElements));
+
+        return Disposable.Create(() =>
+        {
+            getUriDisposable?.Dispose();
+            setImageFromUriDisposable?.Dispose();
+        });
+    }
+
+    public static void SetCoverOrBackgroundImage(Sprite sprite, params VisualElement[] visualElements)
+    {
+        foreach (VisualElement visualElement in visualElements)
+        {
+            visualElement.style.backgroundImage = new StyleBackground(sprite);
+            visualElement.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+        }
+    }
+
+    public static IDisposable SetCoverOrBackgroundImageFromUri(SongMeta songMeta, string uri, params VisualElement[] visualElements)
+    {
         if (uri.IsNullOrEmpty())
         {
-            SetDefaultSongImage(visualElements);
-            SetDefaultSongImageColor(songMeta, visualElements);
-            return;
+            SetDefaultSongImageAndColor(songMeta, visualElements);
+            return Disposable.Empty;
         }
-        
-        ImageManager.LoadSpriteFromUri(uri,
-            loadedSprite =>
+
+        return ImageManager.LoadSpriteFromUri(uri)
+            .CatchIgnore((Exception ex) =>
             {
-                foreach (VisualElement visualElement in visualElements)
-                {
-                    visualElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                    visualElement.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
-                }
-            },
-            () =>
+                Debug.LogException(ex);
+                SetDefaultSongImageAndColor(songMeta, visualElements);
+            })
+            .Subscribe(loadedSprite =>
             {
-                SetDefaultSongImage(visualElements);
-                SetDefaultSongImageColor(songMeta, visualElements);
+                SetCoverOrBackgroundImage(loadedSprite, visualElements);
             });
+    }
+
+    public static void SetDefaultSongImageAndColor(SongMeta songMeta, params VisualElement[] visualElements)
+    {
+        SetDefaultSongImage(visualElements);
+        SetDefaultSongImageColor(songMeta, visualElements);
     }
 
     public static void SetDefaultSongImage(params VisualElement[] visualElements)
@@ -72,14 +126,14 @@ public static class SongMetaImageUtils
         {
             return;
         }
-        
+
         Sprite defaultCoverImage = UiManager.Instance.defaultSongImage;
         foreach (VisualElement visualElement in visualElements)
         {
             visualElement.style.backgroundImage = new StyleBackground(defaultCoverImage);
         }
     }
-    
+
     public static void SetDefaultSongImageColor(SongMeta songMeta, params VisualElement[] visualElements)
     {
         if (songMeta == null
@@ -87,7 +141,7 @@ public static class SongMetaImageUtils
         {
             return;
         }
-        
+
         Color32 color = SongMetaUtils.CreateColorForSongMeta(songMeta);
         foreach (VisualElement visualElement in visualElements)
         {

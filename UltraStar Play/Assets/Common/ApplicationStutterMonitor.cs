@@ -1,8 +1,6 @@
-﻿using System.Threading;
-using UniInject;
+﻿using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class ApplicationStutterMonitor : AbstractSingletonBehaviour, INeedInjection
 {

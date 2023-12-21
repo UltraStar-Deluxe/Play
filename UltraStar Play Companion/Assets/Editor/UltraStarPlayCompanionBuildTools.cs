@@ -2,14 +2,7 @@ using UnityEditor;
 
 public static class UltraStarPlayCompanionBuildTools
 {
-    private static readonly string appName = "UltraStar Play Companion";
-
-    [MenuItem("Tools/Build/Build for release (signed apk, signed app bundle)")]
-    public static void BuildAllForRelease()
-    {
-        BuildSignedAndroidApk();
-        BuildSignedAndroidAppBundle();
-    }
+    private static readonly string appName = "Melody Mania Companion";
 
     [MenuItem("Tools/Build/Android - Build apk")]
     public static void BuildAndroidApk()
@@ -48,7 +41,7 @@ public static class UltraStarPlayCompanionBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Build signed app bundle")]
+    [MenuItem("Tools/Build/Android - Build signed app bundle (aab)")]
     public static void BuildSignedAndroidAppBundle()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);
@@ -57,7 +50,7 @@ public static class UltraStarPlayCompanionBuildTools
         BuildUtils.PerformCustomBuild(customBuildOptions);
     }
 
-    [MenuItem("Tools/Build/Android - Build and run signed app bundle")]
+    [MenuItem("Tools/Build/Android - Build and run signed app bundle (aab)")]
     public static void BuildAndRunSignedAndroidAppBundle()
     {
         CustomBuildOptions customBuildOptions = CreateCustomBuildOptions(BuildTarget.Android);

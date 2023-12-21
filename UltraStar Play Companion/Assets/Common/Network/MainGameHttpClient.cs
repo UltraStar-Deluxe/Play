@@ -22,11 +22,8 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
     private ClientSideConnectRequestManager clientSideConnectRequestManager;
 
     [Inject]
-    private UnityWebRequestManager webRequestManager;
- 
-    [Inject]
     private Settings settings;
-    
+
     private readonly Subject<bool> connectionEventStream = new();
     public IObservable<bool> ConnectionEventStream => connectionEventStream;
 
@@ -58,7 +55,8 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
                 }
             });
 
-        Permissions.Subscribe(newPermissions => Debug.Log($"Permissions changed: {newPermissions.ToCsv()}"));
+        Permissions.Subscribe(newPermissions =>
+            Debug.Log($"Permissions changed: {newPermissions.ToCsv()}"));
     }
 
     public string GetUri(string path)
@@ -78,7 +76,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
-        Debug.Log($"Sending GET request to {uri}");
+        Log.Debug(() => $"Sending GET request to {uri}");
         UnityWebRequest unityWebRequest = UnityWebRequest.Get(uri);
         SendRequest(unityWebRequest, onSuccess, onError);
     }
@@ -93,7 +91,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
-        Debug.Log($"Sending POST request to '{uri}'");
+        Log.Debug(() => $"Sending POST request to '{uri}'");
         UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, body, contentType);
         SendRequest(unityWebRequest, onSuccess, onError);
     }
@@ -106,11 +104,11 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
         ThrowIfNotConnected();
 
         string uri = GetUri(path);
-        Debug.Log($"Sending DELETE request to {uri}");
+        Log.Debug(() => $"Sending DELETE request to {uri}");
         UnityWebRequest unityWebRequest = UnityWebRequest.Delete(uri);
         SendRequest(unityWebRequest, onSuccess, onError);
     }
-    
+
     private void SendRequest(
         UnityWebRequest unityWebRequest,
         Action<string> onSuccess,
@@ -132,9 +130,9 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
             onError?.Invoke(ex);
         }
 
-        webRequestManager.AddUnityWebRequest(unityWebRequest,
+        StartCoroutine(CoroutineUtils.WebRequestCoroutine(unityWebRequest,
             WrappedOnSuccess,
-            ex => WrappedOnError(ex));
+            ex => WrappedOnError(ex)));
     }
 
     private void AddHeaders(UnityWebRequest unityWebRequest)
@@ -153,7 +151,7 @@ public class MainGameHttpClient : AbstractSingletonBehaviour, INeedInjection
     private void LogRequestSuccess(UnityWebRequest unityWebRequest)
     {
         string responseBody = unityWebRequest.downloadHandler?.text;
-        Debug.Log($"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
+        Log.Debug(() => $"{unityWebRequest.method} '{unityWebRequest.uri}' has completed. Status: {unityWebRequest.result}, response code: {unityWebRequest.responseCode}, response body: {responseBody}");
     }
 
     private void ThrowIfNotConnected()

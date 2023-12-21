@@ -22,10 +22,10 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         get
         {
-            int calculatedTotalScore = NormalNotesTotalScore + GoldenNotesTotalScore + PerfectSentenceBonusTotalScore;
-            if (calculatedTotalScore > maxScore)
+            int calculatedTotalScoreNoMods = NormalNotesTotalScore + GoldenNotesTotalScore + PerfectSentenceBonusTotalScore;
+            if (calculatedTotalScoreNoMods > maxScore)
             {
-                Debug.LogWarning($"Total score is {calculatedTotalScore}, returning max score of {maxScore} instead. "
+                Debug.LogWarning($"Total score is {calculatedTotalScoreNoMods}, returning max score of {maxScore} instead. "
                                  + $"(NormalNotesTotalScore: {NormalNotesTotalScore}, GoldenNotesTotalScore: {GoldenNotesTotalScore}, PerfectSentenceBonusTotalScore: {PerfectSentenceBonusTotalScore}, "
                                  + $"maxScoreForNormalNotes: {maxScoreForNormalNotes}, maxScoreForGoldenNotes: {maxScoreForGoldenNotes}, sum: {maxScoreForNormalNotes + maxScoreForGoldenNotes}, "
                                  + $"NormalBeatData.PerfectAndGoodBeats: {ScoreData.NormalBeatData.PerfectAndGoodBeats}, GoldenBeatData.PerfectAndGoodBeats: {ScoreData.GoldenBeatData.PerfectAndGoodBeats}, "
@@ -33,11 +33,12 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
                 return maxScore;
             }
 
-            return calculatedTotalScore;
+            int calculatedTotalScoreWithMods = calculatedTotalScoreNoMods + ModTotalScore;
+            return calculatedTotalScoreWithMods;
         }
     }
 
-    public int NormalNotesTotalScore
+    private int NormalNotesTotalScore
     {
         get
         {
@@ -50,7 +51,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    public int GoldenNotesTotalScore
+    private int GoldenNotesTotalScore
     {
         get
         {
@@ -63,7 +64,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    public int PerfectSentenceBonusTotalScore
+    private int PerfectSentenceBonusTotalScore
     {
         get
         {
@@ -85,6 +86,8 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             return (int)score;
         }
     }
+
+    public int ModTotalScore { get; set; }
 
     public int NextBeatToScore { get; private set; }
 
@@ -218,7 +221,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             Debug.LogWarning("Attempt to score a beat that is neither a normal nor golden note: " + beatAnalyzedEvent.Beat);
             return;
         }
-        
+
         if (IsPerfectHit(beatAnalyzedEvent))
         {
             ScoreData.GetBeatData(analyzedNote).IfNotNull(it => it.PerfectBeats++);
@@ -305,6 +308,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         ScoreData.NormalNotesTotalScore = NormalNotesTotalScore;
         ScoreData.GoldenNotesTotalScore = GoldenNotesTotalScore;
         ScoreData.PerfectSentenceBonusTotalScore = PerfectSentenceBonusTotalScore;
+        ScoreData.ModTotalScore = ModTotalScore;
 
         sentenceScoreEventStream.OnNext(new SentenceScoreEvent(sentenceScore, sentenceRating));
     }
@@ -352,7 +356,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
         // Remember the sentence count to calculate the points for a perfect sentence.
         ScoreData.TotalSentenceCount = sentences.Count;
-        
+
         // Setup checks for the beats to be analyzed
         PrepareBeatToBeAnalyzedChecks();
     }
@@ -375,7 +379,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             {
                 lastBeatToScoreExclusive = n.EndBeat;
             }
-            
+
             // Remember the beats of the normal and golden notes to be analyzed
             HashSet<int> hashSet = null;
             if (n.IsNormal)
@@ -386,7 +390,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             {
                 hashSet = goldenNoteBeats;
             }
-            
+
             if (hashSet != null)
             {
                 for (int beatIndex = n.StartBeat; beatIndex < n.StartBeat + n.Length; beatIndex++)
@@ -433,7 +437,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             firstBeatToScoreInclusive = beat;
         }
     }
-    
+
     public class SentenceScoreEvent
     {
         public SentenceScore SentenceScore { get; private set; }

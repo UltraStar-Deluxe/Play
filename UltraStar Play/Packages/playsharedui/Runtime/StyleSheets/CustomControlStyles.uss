@@ -406,6 +406,7 @@ AccordionGroup > AccordionItem.lastChild {
 #accordionItemRoot {
     width: 100%;
     border-width: 0;
+    margin-bottom: 0;
 }
 
 #accordionItemContent {
@@ -505,16 +506,22 @@ AccordionItem.expanded #toggleAccordionItemContentIcon {
 /* SLIDE TOGGLE */
 /**************************************************/
 .slide-toggle {
-    width: var(--control-height-double);
-    height: var(--control-height);
     margin: 0;
     padding: 0;
 }
 
+.slide-toggle > Label {
+    flex-grow: 1;
+}
+
 .slide-toggle__input {
+    width: var(--control-height-double);
+    height: var(--control-height);
+    max-width: var(--control-height-double);
+    max-height: var(--control-height);
+    min-width: var(--control-height-double);
+    min-height: var(--control-height);
     background-color: var(--control-color);
-    width: 100%;
-    height: 100%;
     border-radius: 16px;
     overflow: visible;
     border-width: 1px;

@@ -508,6 +508,11 @@
     background-color: #F04438;
 }
 
+#modBonusScore > #scoreIcon {
+    background-color: #ed68f2;
+}
+
+
 #totalScore > #scoreIcon {
     visibility: hidden;
 }
@@ -832,4 +837,9 @@
     height: var(--control-height);
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+#volumeSlider .unity-base-slider__dragger
+{
+    min-width: 12px;
 }

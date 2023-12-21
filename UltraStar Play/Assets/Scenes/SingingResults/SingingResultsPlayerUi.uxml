@@ -53,6 +53,15 @@
                             <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
                         </ui:VisualElement>
                     </ui:VisualElement>
+                    <ui:VisualElement name="modBonusScore" picking-mode="Ignore" class="scoreRow" style="flex-direction: row; justify-content: space-between;">
+                        <ui:VisualElement name="scoreIcon" picking-mode="Ignore" class="iconImage" style="align-items: center; justify-content: center;">
+                            <FeatherIcon tabindex="-1" icon="music" name="musicNoteIcon" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="labels" picking-mode="Ignore" style="flex-direction: row; justify-content: space-between; flex-grow: 1; flex-wrap: wrap;">
+                            <ui:Label text="Mod Bonus" display-tooltip-when-elided="true" name="scoreName" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
+                            <ui:Label text="9999" display-tooltip-when-elided="true" name="scoreValue" picking-mode="Ignore" class="textShadowThemed noBackgroundInHierarchy" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
                     <ui:VisualElement name="newHighscoreContainer" style="align-items: center;">
                         <MaterialIcon tabindex="-1" icon="star_outline" name="newHighscoreIcon" class="mr-2 ignoreTheme" style="font-size: 22px;" />
                         <ui:Label tabindex="-1" text="New High Score" display-tooltip-when-elided="true" name="newHighscoreLabel" class="ignoreTheme" />

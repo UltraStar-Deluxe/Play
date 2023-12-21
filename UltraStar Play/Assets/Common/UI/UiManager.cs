@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -33,7 +34,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
     [InjectedInInspector]
     public VisualTreeAsset micWithNameUi;
-    
+
     [InjectedInInspector]
     public Sprite fallbackPlayerProfileImage;
 
@@ -45,13 +46,16 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
     [InjectedInInspector]
     public VisualTreeAsset songQueueEntryUi;
-    
+
     [InjectedInInspector]
     public VisualTreeAsset songQueuePlayerEntryUi;
-    
+
     [InjectedInInspector]
     public Sprite defaultSongImage;
-    
+
+    [InjectedInInspector]
+    public Sprite defaultFolderImage;
+
     [Inject]
     private Injector injector;
 
@@ -110,10 +114,18 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages();
     }
 
-    public static Label CreateNotification(
-        string text)
+    public static void CreateNotification(string text)
     {
-        return Instance.DoCreateNotification(text);
+        ThreadUtils.RunOnMainThread(() =>
+        {
+            UiManager uiManager = Instance;
+            if (uiManager == null)
+            {
+                return;
+            }
+
+            uiManager.DoCreateNotification(text);
+        });
     }
 
     public MessageDialogControl CreateDialogControl(string dialogTitle)
@@ -129,7 +141,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         return dialogControl;
     }
-    
+
     public MessageDialogControl CreateConfirmationDialogControl(
         string dialogTitle,
         string dialogMessage,
@@ -156,7 +168,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         });
         return messageDialogControl;
     }
-    
+
     public MessageDialogControl CreateHelpDialogControl(
         string dialogTitle,
         Dictionary<string, string> titleToContentMap)
@@ -164,7 +176,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         VisualElement dialogVisualElement = messageDialogUi.CloneTree().Children().FirstOrDefault();
         uiDocument.rootVisualElement.Add(dialogVisualElement);
         dialogVisualElement.AddToClassList("wordWrap");
-        
+
         MessageDialogControl dialogControl = injector
             .WithRootVisualElement(dialogVisualElement)
             .CreateAndInject<MessageDialogControl>();
@@ -172,7 +184,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
         AccordionGroup accordionGroup = new();
         dialogControl.AddVisualElement(accordionGroup);
-            
+
         void AddChapter(string title, string content)
         {
             AccordionItem accordionItem = new(title);
@@ -198,13 +210,12 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             return playerProfile.ImagePath;
         }
     }
-    
-    public void LoadPlayerProfileImage(string imagePath, Action<Sprite> onSuccess)
+
+    public IObservable<Sprite> LoadPlayerProfileImage(string imagePath)
     {
         if (imagePath.IsNullOrEmpty())
         {
-            onSuccess(fallbackPlayerProfileImage);
-            return;
+            return Observable.Return<Sprite>(fallbackPlayerProfileImage);
         }
 
         string relativePathNormalized = PathUtils.NormalizePath(imagePath);
@@ -213,14 +224,14 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
             string absolutePathNormalized = PathUtils.NormalizePath(absolutePath);
             return absolutePathNormalized.EndsWith(relativePathNormalized);
         });
+
         if (matchingFullPath.IsNullOrEmpty())
         {
             Debug.LogWarning($"Cannot load player profile image with path '{imagePath}' (normalized: '{relativePathNormalized}'), no corresponding image file found.");
-            onSuccess(fallbackPlayerProfileImage);
-            return;
+            return Observable.Return(fallbackPlayerProfileImage);
         }
 
-        ImageManager.LoadSpriteFromUri(matchingFullPath, onSuccess);
+        return ImageManager.LoadSpriteFromUri(matchingFullPath);
     }
 
     public List<string> GetAbsolutePlayerProfileImagePaths()
@@ -242,7 +253,7 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         }
 
     }
-    
+
     public List<IBinding> GetBindings()
     {
         BindingBuilder bb = new();

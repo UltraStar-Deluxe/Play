@@ -33,14 +33,11 @@ public class OverviewAreaControl : IInjectionFinishedListener
     private Injector injector;
 
     [Inject]
-    private AudioManager audioManager;
+    private Settings settings;
 
     [Inject]
-    private Settings settings;
-    
-    [Inject]
     private GameObject gameObject;
-    
+
     private OverviewAreaPositionInSongIndicatorControl positionInSongIndicatorControl;
     private OverviewAreaViewportIndicatorControl viewportIndicatorControl;
     private OverviewAreaNoteVisualizer noteVisualizer;
@@ -71,21 +68,21 @@ public class OverviewAreaControl : IInjectionFinishedListener
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.PlaybackSamplesSource)
             .Subscribe(_ => UpdateAudioWaveForm())
             .AddTo(gameObject);
-        
+
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AudioWaveformSamplesSource)
             .Subscribe(_ => UpdateAudioWaveForm())
             .AddTo(gameObject);
-        
+
         songAudioPlayer.LoadedEventStream.Subscribe(_ =>
         {
             UpdateAudioWaveForm();
         });
-        
+
         overviewArea.RegisterCallbackOneShot<GeometryChangedEvent>(evt =>
         {
             UpdateAudioWaveForm();
         });
-        
+
         contextMenuControl = injector
             .WithRootVisualElement(overviewArea)
             .CreateAndInject<ContextMenuControl>();
@@ -108,7 +105,7 @@ public class OverviewAreaControl : IInjectionFinishedListener
     {
         if (!songAudioPlayer.IsFullyLoaded
             // Must be an audio format. Getting all the samples does not work with video files.
-            || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Mp3))
+            || !ApplicationUtils.IsSupportedAudioFormat(Path.GetExtension(songMeta.Audio))
             || !VisualElementUtils.HasGeometry(overviewArea))
         {
             return;
@@ -128,10 +125,10 @@ public class OverviewAreaControl : IInjectionFinishedListener
             audioWaveFormVisualization.WaveformColor = overviewAreaLabel.resolvedStyle.color;
         }
 
-        AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, audioManager, settings);
+        AudioClip audioClip = SongEditorAudioWaveformUtils.GetAudioClipToDrawAudioWaveform(songMeta, settings);
         SongEditorAudioWaveformUtils.DrawAudioWaveform(audioWaveFormVisualization, audioClip);
     }
-    
+
     private void RegisterPointerEvents()
     {
         bool isPointerDown = false;

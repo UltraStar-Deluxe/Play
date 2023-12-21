@@ -6,6 +6,6 @@ public class SongEditorMemento
     public List<SongEditorEnumLayer> Layers { get; private set; } = new();
 
     // Memento of SongMeta tags
-    public float Bpm { get; set; }
-    public float MusicGap { get; set; }
+    public double BeatsPerMinute { get; set; }
+    public double GapInMillis { get; set; }
 }

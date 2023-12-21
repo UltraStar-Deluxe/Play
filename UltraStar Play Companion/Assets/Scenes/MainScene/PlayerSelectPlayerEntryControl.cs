@@ -11,31 +11,31 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
 {
     [Inject]
     public string PlayerProfileName { get; private set; }
-    
+
     [Inject]
     private Injector injector;
 
     [Inject(Key = nameof(micProfiles))]
     private List<MicProfile> micProfiles;
-        
+
     [Inject(Key = nameof(messageDialogUi))]
     private VisualTreeAsset messageDialogUi;
-    
+
     [Inject(UxmlName = R.UxmlNames.dialogContainer)]
     private VisualElement dialogContainer;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.micButton)]
     private Button micButton;
-        
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.micIcon)]
     private VisualElement micIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.noMicIcon)]
     private VisualElement noMicIcon;
-    
+
     [Inject(UxmlName = R_PlayShared.UxmlNames.nameLabel)]
     private Label nameLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.teamLabel)]
     private Label teamLabel;
 
@@ -44,7 +44,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
 
     [Inject(UxmlName = R.UxmlNames.selectedToggle)]
     private Toggle selectedToggle;
-    
+
     [Inject(UxmlName = R.UxmlNames.horizontalSeparatorLine)]
     private VisualElement horizontalSeparatorLine;
 
@@ -63,11 +63,11 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
     }
 
     public ReactiveProperty<bool> IsSelected { get; private set; } = new();
-    
-    public LabeledItemPickerControl<string> VoiceChooserControl { get; private set; }
+
+    public LabeledItemPickerControl<EExtendedVoiceId> VoiceChooserControl { get; private set; }
 
     private MicSelectionDialogControl micSelectionDialogControl;
-    
+
     public Action<MicProfile> OnMicProfileSelected { get; set; }
 
     public void OnInjectionFinished()
@@ -83,25 +83,17 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
             selectedToggle.value = newValue;
             UpdateMicIcon();
         });
-        
-        VoiceChooserControl = new(voiceChooser, new List<string>()
-        {
-            Voice.firstVoiceName,
-            Voice.secondVoiceName,
-        });
+
+        VoiceChooserControl = new EnumItemPickerControl<EExtendedVoiceId>(voiceChooser);
         VoiceChooserControl.GetLabelTextFunction = item =>
         {
-            if (item == null)
-            {
-                return "";
-            }
-            else if (item == Voice.mergedVoiceName)
+            if (item is EExtendedVoiceId.Merged)
             {
                 return "Both";
             }
             else
             {
-                return item;
+                return item.ToString();
             }
         };
 
@@ -130,7 +122,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         VisualElement dialog = messageDialogUi.CloneTreeAndGetFirstChild();
         dialogContainer.Add(dialog);
         dialogContainer.ShowByDisplay();
-        
+
         micSelectionDialogControl = injector
             .WithRootVisualElement(dialog)
             .CreateAndInject<MicSelectionDialogControl>();
@@ -151,7 +143,7 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         micSelectionDialogControl = null;
         dialogContainer.HideByDisplay();
     }
-    
+
     private void UpdateMicIcon()
     {
         if (micProfile != null)
@@ -168,15 +160,15 @@ public class PlayerSelectPlayerEntryControl : INeedInjection, IInjectionFinished
         }
     }
 
-    public void SetAvailableVoiceNames(List<string> voiceNames)
+    public void SetAvailableVoiceIds(List<EExtendedVoiceId> voiceIds)
     {
-        VoiceChooserControl.Items = voiceNames;
+        VoiceChooserControl.Items = voiceIds;
         if (VoiceChooserControl.Items.Count <= 1)
         {
             VoiceChooserControl.ItemPicker.HideByDisplay();
         }
     }
-    
+
     public void SetSeparatorVisibleByDisplay(bool newValue)
     {
         horizontalSeparatorLine.SetVisibleByDisplay(newValue);

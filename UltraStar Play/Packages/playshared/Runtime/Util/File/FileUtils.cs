@@ -5,6 +5,21 @@ using UnityEngine;
 
 public static class FileUtils
 {
+    public static string ReadAllText(string targetPath)
+    {
+        if (!Exists(targetPath))
+        {
+            return "";
+        }
+
+        return File.ReadAllText(targetPath);
+    }
+
+    public static void WriteAllText(string targetPath, string text)
+    {
+        File.WriteAllText(targetPath, text);
+    }
+
     public static void WriteAllTextIfChanged(string targetPath, string text)
     {
         string NormalizeText(string t)
@@ -12,7 +27,7 @@ public static class FileUtils
             // Normalize line endings.
             return t.Replace("\r", "");
         }
-    
+
         // Only write file if the code changed. Otherwise it can lead to an endless loop of recompiling.
         string oldText = File.Exists(targetPath)
             ? File.ReadAllText(targetPath, Encoding.UTF8)
@@ -28,7 +43,7 @@ public static class FileUtils
             Debug.Log("File still up-to-date " + targetPath);
         }
     }
-    
+
     public static void MoveFileOverwriteIfExists(string sourceFile, string destinationFile)
     {
         if (File.Exists(destinationFile))
@@ -67,5 +82,41 @@ public static class FileUtils
         }
 
         File.Copy(sourcePath, targetPath, overwrite);
+    }
+
+    public static void SleepUntilFileExists(string newPlaylistPath, int maxWaitTimeInMillis)
+    {
+        if (File.Exists(newPlaylistPath))
+        {
+            return;
+        }
+
+        long startTime = TimeUtils.GetUnixTimeMilliseconds();
+        while (!File.Exists(newPlaylistPath)
+               && !TimeUtils.IsDurationAboveThresholdInMillis(startTime, maxWaitTimeInMillis))
+        {
+            Thread.Sleep(10);
+        }
+    }
+
+    public static void Delete(string dbPath, long maxWaitTineInMillis = 100)
+    {
+        if (!File.Exists(dbPath))
+        {
+            return;
+        }
+
+        File.Delete(dbPath);
+        long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        while (File.Exists(dbPath)
+               && !TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTineInMillis))
+        {
+            Thread.Sleep(1);
+        }
+
+        if (File.Exists(dbPath))
+        {
+            throw new IOException($"Failed to delete file {dbPath} within {maxWaitTineInMillis}");
+        }
     }
 }

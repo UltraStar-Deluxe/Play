@@ -19,7 +19,7 @@ public class AddNoteAction : INeedInjection
             Note newNote = new(ENoteType.Normal, beat - 2, 4, 0, "~");
             newNote.SetMidiNote(midiNote);
             Sentence newSentence = new(new List<Note> { newNote }, newNote.EndBeat);
-            IReadOnlyCollection<Voice> voices = songMeta.GetVoices();
+            IReadOnlyCollection<Voice> voices = songMeta.Voices;
             newSentence.SetVoice(voices.FirstOrDefault());
         }
         else

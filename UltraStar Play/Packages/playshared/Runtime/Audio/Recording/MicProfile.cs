@@ -47,6 +47,58 @@ public class MicProfile
         ConnectedClientId = other.ConnectedClientId;
     }
 
+    protected bool Equals(MicProfile other)
+    {
+        return (IsInputFromConnectedClient
+                && other.IsInputFromConnectedClient
+                && ConnectedClientId == other.ConnectedClientId)
+               || (!IsInputFromConnectedClient
+                   && !other.IsInputFromConnectedClient
+                   && Name == other.Name
+                   && ChannelIndex == other.ChannelIndex);
+    }
+
+    protected bool Equals(MicProfileReference other)
+    {
+        return (IsInputFromConnectedClient
+                && other.IsInputFromConnectedClient
+                && ConnectedClientId == other.ConnectedClientId)
+               || (!IsInputFromConnectedClient
+                   && !other.IsInputFromConnectedClient
+                   && Name == other.Name
+                   && ChannelIndex == other.ChannelIndex);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj is MicProfileReference otherMicProfileReference)
+        {
+            return Equals(otherMicProfileReference);
+        }
+
+        if (obj is MicProfile otherMicProfile)
+        {
+            return Equals(otherMicProfile);
+        }
+
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Name, ChannelIndex, ConnectedClientId);
+    }
+
     public override string ToString()
     {
         return this.GetDisplayNameWithChannel();

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OneJS.CustomStyleSheets;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -89,6 +90,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     private string lastThemeDynamicBackgroundJson;
+
+    private readonly Dictionary<string, StyleSheet> filePathToStyleSheet = new();
+
+    private readonly List<FileSystemWatcher> styleSheetFileSystemWatchers = new();
 
     protected override object GetInstance()
     {
@@ -251,6 +256,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         Debug.Log($"Loading theme '{themeMeta.FileNameWithoutExtension}'");
         loadedSprites.Clear();
+
+        ApplyThemeStyleSheets(themeMeta);
+
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInFrames(0, () =>
         {
             alreadyProcessedVisualElements.Clear();
@@ -258,6 +266,91 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             ApplyThemeSpecificStylesToVisualElements(uiDocument.rootVisualElement);
             anyThemeLoaded = true;
         }));
+    }
+
+    private void ApplyThemeStyleSheets(ThemeMeta themeMeta)
+    {
+        // Remove old theme style sheets
+        foreach (StyleSheet styleSheet in filePathToStyleSheet.Values)
+        {
+            uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
+        }
+
+        if (themeMeta == null
+            || themeMeta.ThemeJson == null
+            || themeMeta.ThemeJson.styleSheets.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        foreach (string styleSheetFile in themeMeta.ThemeJson.styleSheets)
+        {
+            string absoluteStyleSheetFile = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, styleSheetFile);
+            if (!File.Exists(absoluteStyleSheetFile))
+            {
+                Debug.LogWarning($"Style Sheet file does not exist: {absoluteStyleSheetFile}");
+                continue;
+            }
+
+            if (!filePathToStyleSheet.TryGetValue(absoluteStyleSheetFile, out StyleSheet styleSheet))
+            {
+                styleSheet = LoadAndCacheStyleSheet(absoluteStyleSheetFile);
+            }
+
+            if (!uiDocument.rootVisualElement.styleSheets.Contains(styleSheet))
+            {
+                uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
+            }
+        }
+    }
+
+    private StyleSheet LoadAndCacheStyleSheet(string styleSheetFile)
+    {
+        string styleSheetContent = File.ReadAllText(styleSheetFile);
+        StyleSheet styleSheet = StyleSheetUtils.CreateStyleSheet(styleSheetContent);
+        filePathToStyleSheet[styleSheetFile] = styleSheet;
+
+        AddStyleSheetFileSystemWatcher(styleSheetFile, styleSheet);
+
+        return styleSheet;
+    }
+
+    private void AddStyleSheetFileSystemWatcher(string styleSheetFile, StyleSheet styleSheet)
+    {
+        void OnThemeStyleSheetFileChanged(object sender, FileSystemEventArgs e)
+        {
+            ThreadUtils.RunOnMainThread(() => UpdateThemeStyleSheet(styleSheetFile, styleSheet));
+        }
+
+        Debug.Log($"Creating file system watcher for theme style sheet: {styleSheetFile}");
+        FileSystemWatcher fileSystemWatcher = FileSystemWatcherUtils.CreateFileSystemWatcher(
+            Path.GetDirectoryName(styleSheetFile),
+            Path.GetFileName(styleSheetFile),
+            OnThemeStyleSheetFileChanged);
+        styleSheetFileSystemWatchers.Add(fileSystemWatcher);
+    }
+
+    private void UpdateThemeStyleSheet(string styleSheetFile, StyleSheet styleSheet)
+    {
+        Debug.Log($"Reloading changed style sheet file: {styleSheetFile}");
+        try
+        {
+            bool wasAdded = uiDocument.rootVisualElement.styleSheets.Contains(styleSheet);
+            uiDocument.rootVisualElement.styleSheets.Remove(styleSheet);
+
+            string styleSheetContent = File.ReadAllText(styleSheetFile);
+            new CustomStyleSheetImporterImpl().BuildStyleSheet(styleSheet, styleSheetContent);
+
+            if (wasAdded)
+            {
+                uiDocument.rootVisualElement.styleSheets.Add(styleSheet);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to update style sheet with content from file '{styleSheetFile}'");
+        }
     }
 
     private void ApplyThemeBackground(ThemeMeta themeMeta)
@@ -311,11 +404,12 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         string absoluteImageFilePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, staticBackgroundJson.imagePath);
         if (ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
         {
-            ImageManager.LoadSpriteFromUri(absoluteImageFilePath, loadedSprite =>
-            {
-                backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
-                ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.imageScaleMode);
-            });
+            ImageManager.LoadSpriteFromUri(absoluteImageFilePath)
+                .Subscribe(loadedSprite =>
+                {
+                    backgroundElement.style.backgroundImage = new StyleBackground(loadedSprite);
+                    ApplyThemeStyleUtils.TryApplyScaleMode(backgroundElement, staticBackgroundJson.imageScaleMode);
+                });
         }
         else
         {
@@ -367,11 +461,19 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         string backgroundJsonAsString = JsonConverter.ToJson(backgroundJson);
-        if (backgroundJsonAsString == lastThemeDynamicBackgroundJson)
+        if (backgroundJsonAsString != lastThemeDynamicBackgroundJson)
         {
-            return;
+            ApplyThemeParticleBackground(themeMeta, backgroundJson);
         }
 
+        ApplyThemeBaseBackground(themeMeta, backgroundJson);
+        ApplyThemeLightBackground(themeMeta, backgroundJson);
+
+        lastThemeDynamicBackgroundJson = backgroundJsonAsString;
+    }
+
+    private void ApplyThemeParticleBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
+    {
         // Material
         if (!backgroundJson.gradientRampFile.IsNullOrEmpty())
         {
@@ -381,12 +483,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 TextureWrapMode textureWrapMode = backgroundJson.gradientScrollingSpeed > 0
                     ? TextureWrapMode.Repeat
                     : TextureWrapMode.Clamp;
-                ImageManager.LoadSpriteFromFile(gradientPath, gradientSprite =>
-                {
-                    loadedSprites.Add(gradientSprite);
-                    gradientSprite.texture.wrapMode = textureWrapMode;
-                    backgroundMaterial.SetTexture("_ColorRampTex", gradientSprite.texture);
-                });
+                ImageManager.LoadSpriteFromUri(gradientPath)
+                    .Subscribe(gradientSprite =>
+                    {
+                        loadedSprites.Add(gradientSprite);
+                        gradientSprite.texture.wrapMode = textureWrapMode;
+                        backgroundMaterial.SetTexture("_ColorRampTex", gradientSprite.texture);
+                    });
             }
             else
             {
@@ -410,12 +513,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             string patternPath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.patternFile);
             if (File.Exists(patternPath))
             {
-                ImageManager.LoadSpriteFromFile(patternPath, patternSprite =>
-                {
-                    loadedSprites.Add(patternSprite);
-                    patternSprite.texture.wrapMode = TextureWrapMode.Repeat;
-                    backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
-                });
+                ImageManager.LoadSpriteFromUri(patternPath)
+                    .Subscribe(patternSprite =>
+                    {
+                        loadedSprites.Add(patternSprite);
+                        patternSprite.texture.wrapMode = TextureWrapMode.Repeat;
+                        backgroundMaterial.SetTexture("_PatternTex", patternSprite.texture);
+                    });
 
                 patternColor = backgroundJson.patternColor;
             }
@@ -455,12 +559,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             string particlePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, backgroundJson.particleFile);
             if (File.Exists(particlePath))
             {
-                ImageManager.LoadSpriteFromFile(particlePath, particleSprite =>
-                {
-                    loadedSprites.Add(particleSprite);
-                    particleSprite.texture.wrapMode = TextureWrapMode.Clamp;
-                    particleMaterial.mainTexture = particleSprite.texture;
-                });
+                ImageManager.LoadSpriteFromUri(particlePath)
+                    .Subscribe(particleSprite =>
+                    {
+                        loadedSprites.Add(particleSprite);
+                        particleSprite.texture.wrapMode = TextureWrapMode.Clamp;
+                        particleMaterial.mainTexture = particleSprite.texture;
+                    });
             }
             else
             {
@@ -479,11 +584,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         backgroundParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         backgroundParticleSystem.Play();
-
-        ApplyThemeBaseBackground(themeMeta, backgroundJson);
-        ApplyThemeLightBackground(themeMeta, backgroundJson);
-
-        lastThemeDynamicBackgroundJson = backgroundJsonAsString;
     }
 
     private void ApplyThemeBaseBackground(ThemeMeta themeMeta, DynamicBackgroundJson backgroundJson)
@@ -499,7 +599,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
         else
         {
-            StopVideoPlayer(backgroundLightVideoPlayer);
+            StopVideoPlayer(backgroundVideoPlayer);
             backgroundShaderControl.SetBaseTextureEnabled(false);
 
             // Try to use static image as base background
@@ -507,12 +607,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             if (!absoluteImageFilePath.IsNullOrEmpty()
                 && ApplicationUtils.IsSupportedImageFormat(Path.GetExtension(absoluteImageFilePath)))
             {
-                ImageManager.LoadSpriteFromFile(absoluteImageFilePath, loadedSprite =>
-                {
-                    dynamicBackgroundStaticImageSprite = loadedSprite;
-                    backgroundShaderControl.SetBaseTexture(loadedSprite.texture);
-                    backgroundShaderControl.SetBaseTextureEnabled(true);
-                });
+                ImageManager.LoadSpriteFromUri(absoluteImageFilePath)
+                    .Subscribe(loadedSprite =>
+                    {
+                        dynamicBackgroundStaticImageSprite = loadedSprite;
+                        backgroundShaderControl.SetBaseTexture(loadedSprite.texture);
+                        backgroundShaderControl.SetBaseTextureEnabled(true);
+                    });
             }
             else
             {
@@ -564,6 +665,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             particleMaterial.CopyPropertiesFromMaterial(particleMaterialCopy);
             Destroy(particleMaterialCopy);
+        }
+
+        foreach (FileSystemWatcher styleSheetFileSystemWatcher in styleSheetFileSystemWatchers)
+        {
+            styleSheetFileSystemWatcher.Dispose();
         }
     }
 
@@ -659,7 +765,10 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     private void DoApplyThemeSpecificStylesToVisualElements(VisualElement root)
     {
-        if (!applyThemeSpecificStyles)
+        if (!applyThemeSpecificStyles
+            // Settings can be null when running a specific scene in the Unity editor
+            // and injection did not finish yet.
+            || settings == null)
         {
             return;
         }
@@ -686,6 +795,13 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return;
         }
         ThemeJson themeJson = themeMeta.ThemeJson;
+
+        // if (!themeJson.styleSheets.IsNullOrEmpty())
+        // {
+        //     // Do not set inline styles when Style Sheets are used.
+        //     Log.Debug(() => "Not applying theme styles as inline styles because style sheets are used.");
+        //     return;
+        // }
 
         ControlStyleConfig defaultControlStyleConfig = themeMeta.ThemeJson.defaultControl;
 
@@ -1138,3 +1254,4 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             .OrIfDefault(defaultGoldenColor);
     }
 }
+

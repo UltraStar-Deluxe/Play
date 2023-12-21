@@ -737,6 +737,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "navigateToParentFolder",
+                    "type": "Value",
+                    "id": "e8cfff54-15d6-475f-9a3b-ca516b2d2897",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -1529,6 +1538,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "singSceneShowGovernanceOverlay",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "174b9165-1cc7-49f9-bcb6-040335d62e7c",
+                    "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateToParentFolder",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cb08a2d0-0694-4407-98ea-192d2a5654b7",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "navigateToParentFolder",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -5,7 +5,6 @@ using PortAudioForUnity;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem.EnhancedTouch;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -21,15 +20,15 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private MicSampleRecorderManager micSampleRecorderManager;
-    
+
     private int lastScreenWidth;
     private int lastScreenHeight;
     private readonly Subject<ScreenSizeChangedEvent> screenSizeChangedEventStream = new();
     public IObservable<ScreenSizeChangedEvent> ScreenSizeChangedEventStream => screenSizeChangedEventStream;
-    
+
     private int lastTargetFrameRate;
 
     protected override object GetInstance()
@@ -48,7 +47,7 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         settings.ObserveEveryValueChanged(it => it.TargetFps)
             .Subscribe(newValue => targetFrameRate = newValue)
             .AddTo(gameObject);
-        
+
         ApplicationUtils.SetUsePortAudio(settings.PreferPortAudio);
 
         micSampleRecorderManager.ConnectedMicDevicesChangesStream
@@ -89,13 +88,13 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         if (lastTargetFrameRate != targetFrameRate)
         {
             lastTargetFrameRate = targetFrameRate;
             ApplyTargetFrameRateAndVSync();
         }
-        
+
         if (lastScreenHeight != Screen.height
             || lastScreenWidth != Screen.width)
         {
@@ -155,17 +154,6 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
     public static string PersistentTempPath()
     {
         string path = Path.Combine(Application.persistentDataPath, "Temp");
-        //Create Directory if it does not exist
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-        return path;
-    }
-
-    public static string PersistentSongsPath()
-    {
-        string path = Path.Combine(Application.persistentDataPath, "Songs");
         //Create Directory if it does not exist
         if (!Directory.Exists(path))
         {

@@ -22,13 +22,13 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject(UxmlName = R.UxmlNames.doPitchDetectionInSelectionButton)]
     private Button doPitchDetectionInSelectionButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.pitchDetectionUsingBasicPitchButton)]
     private Button pitchDetectionUsingBasicPitchButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.doSpeechRecognitionButton)]
     private Button doSpeechRecognitionButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.undoButton)]
     private Button undoButton;
 
@@ -79,7 +79,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject(UxmlName = R.UxmlNames.pauseIcon)]
     private VisualElement pauseIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.sideBarSecondaryColumnUi)]
     private VisualElement sideBarSecondaryColumnUi;
 
@@ -88,7 +88,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private NonPersistentSettings nonPersistentSettings;
 
@@ -118,16 +118,16 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     [Inject]
     private PitchDetectionAction pitchDetectionAction;
-    
+
     [Inject]
     private SpeechRecognitionAction speechRecognitionAction;
-    
+
     [Inject]
     private SpeechRecognitionManager speechRecognitionManager;
-    
+
     [Inject]
     private UiManager uiManager;
-    
+
     private readonly TabGroupControl sideBarTabGroupControl = new();
     private readonly SongEditorSideBarPropertiesControl propertiesControl = new();
     private readonly SongEditorSideBarLayersControl sideBarLayersControl = new();
@@ -147,7 +147,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         injector.Inject(sideBarSettingsControl);
 
         sideBarSecondaryColumnUi.ShowByDisplay();
-        
+
         if (PlatformUtils.IsStandalone)
         {
             openSongFolderButton.RegisterCallbackButtonTriggered(_ => SongMetaUtils.OpenDirectory(songMeta));
@@ -164,10 +164,10 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
             UpdateRecordingButton();
         });
         UpdateRecordingButton();
-        
+
         pitchDetectionUsingBasicPitchButton.RegisterCallbackButtonTriggered(_ => AnalyzePitchUsingBasicPitch());
         doSpeechRecognitionButton.RegisterCallbackButtonTriggered(_ => DoSpeechRecognition());
-        
+
         undoButton.RegisterCallbackButtonTriggered(_ => historyManager.Undo());
         redoButton.RegisterCallbackButtonTriggered(_ => historyManager.Redo());
         exitSceneButton.RegisterCallbackButtonTriggered(_ => songEditorSceneControl.ReturnToLastScene());
@@ -177,7 +177,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         settings.ObserveEveryValueChanged(it => it.SongEditorSettings.AutoSave)
             .Subscribe(autoSave => saveButton.SetVisibleByDisplay(!autoSave))
             .AddTo(gameObject);
-        
+
         inputManager.InputDeviceChangeEventStream.Subscribe(_ => UpdateInputLegend());
 
         issuesSideBarContainer.RegisterCallback<GeometryChangedEvent>(evt =>
@@ -203,7 +203,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         UpdatePlayPauseIcon();
 
         toggleHelpButton.RegisterCallbackButtonTriggered(_ => ShowSongEditorHelpDialog());
-        
+
         songAudioPlayer.PlaybackStartedEventStream
             .Subscribe(_ => UpdatePlayPauseIcon());
         songAudioPlayer.PlaybackStoppedEventStream
@@ -229,7 +229,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         {
             return;
         }
-        
+
         Dictionary<string, string> titleToContentMap = new()
         {
             { TranslationManager.GetTranslation(R.Messages.songEditor_helpDialog_audioSeparation_title),
@@ -253,16 +253,16 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         // Add controls info
         inputLegendContainer = new();
         UpdateInputLegend();
-        
+
         AccordionItem controlsAccordionItem = new AccordionItem("Controls");
         controlsAccordionItem.Add(inputLegendContainer);
         helpDialogControl.DialogRootVisualElement.Q<AccordionGroup>().Add(controlsAccordionItem);
-        
+
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToSongEditor)));
         helpDialogControl.AddButton("Video Tutorials",
             _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_songEditorVideoTutorials)));
-        
+
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(helpDialogControl.DialogRootVisualElement);
     }
 
@@ -273,7 +273,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         {
             return;
         }
-        
+
         SpeechRecognitionParameters speechRecognitionParameters = speechRecognitionAction.CreateSpeechRecognizerParameters();
         speechRecognitionAction.CreateNotesFromSpeechRecognition(
             NoteAreaSelectionDragListener.lastSelectionRect.Value.MinBeat,
@@ -337,12 +337,12 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         VisualElement visualElement = issueSideBarEntryUi.CloneTree().Children().First();
         issuesSideBarContainer.Add(visualElement);
 
-        double issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
+        double issueStartPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
         int issueStartPositionInSeconds = (int)(issueStartPositionInMillis / 1000);
         visualElement.Q<Button>(R.UxmlNames.goToIssueButton).RegisterCallbackButtonTriggered(_ => GoToIssue(issue));
         visualElement.Q<Label>(R.UxmlNames.issueMessageLabel).text = issue.Message;
         visualElement.Q<Label>(R.UxmlNames.issuePositionLabel).text = $"({issueStartPositionInSeconds}s)";
-        
+
         VisualElement issueImage = visualElement.Q<VisualElement>(R.UxmlNames.issueImage);
         if (issue.Severity == ESongIssueSeverity.Error)
         {
@@ -356,7 +356,7 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
 
     private void GoToIssue(SongIssue issue)
     {
-        double issueStartPositionInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, issue.StartBeat);
+        double issueStartPositionInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, issue.StartBeat);
         songAudioPlayer.PositionInSongInMillis = issueStartPositionInMillis;
     }
 
@@ -381,9 +381,9 @@ public class SongEditorSideBarControl : INeedInjection, IInjectionFinishedListen
         {
             return;
         }
-        
+
         List<InputActionInfo> inputActionInfos = new();
-        
+
         inputActionInfos.Add(InputLegendControl.GetInputActionInfo(R.InputActions.usplay_back, TranslationManager.GetTranslation(R.Messages.back)));
 
         if (inputManager.InputDeviceEnum == EInputDevice.KeyboardAndMouse)

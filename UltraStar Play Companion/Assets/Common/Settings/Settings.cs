@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LiteNetLib;
+using Serilog.Events;
 using UnityEngine;
 
 [Serializable]
@@ -10,7 +11,7 @@ public class Settings : ISettings
      * UUID that is generated on first start and identifies this device.
      */
     public string ClientId { get; private set; }
-    
+
     public string ClientName { get; set; } = "MyCompanionApp";
 
     public SystemLanguage Language { get; set; } = SystemLanguage.English;
@@ -20,7 +21,8 @@ public class Settings : ISettings
     public bool ShowAudioWaveForm { get; set; } = true;
     public float MousePadSensitivity { get; set; } = 0.2f;
     public bool IsDevModeEnabled { get; set; }
-    
+    public LogEventLevel MinimumLogLevel { get; set; } = LogEventLevel.Information;
+
     public bool PlayRecordedAudio { get; set; }
     public int MicrophonePlaybackVolumePercent { get; set; } = 100;
     public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
@@ -34,8 +36,8 @@ public class Settings : ISettings
     public string ConnectionServerAddress { get; set; } = "";
     public DeliveryMethod MicDataDeliveryMethod { get; set; } = DeliveryMethod.ReliableOrdered;
 
-    public GameRoundSettings GameRoundSettings { get; set; } = new();
-    
+    public GameRoundSettingsDto GameRoundSettingsDto { get; set; } = new();
+
     public void CreateAndSetClientId()
     {
         ClientId = Guid.NewGuid().ToString();

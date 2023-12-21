@@ -222,3 +222,11 @@ Update Mode: updateDependencies
 The following packages were updated:
   com.unity.inputsystem from version 1.6.1 to 1.6.3
   com.unity.timeline from version 1.7.4 to 1.7.5
+
+=== Wed Sep 13 16:59:25 2023
+
+Packages were changed.
+Update Mode: updateDependencies
+
+The following packages were updated:
+  com.unity.inputsystem from version 1.6.3 to 1.7.0

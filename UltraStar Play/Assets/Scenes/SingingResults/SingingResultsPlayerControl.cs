@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using ProTrans;
 using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -35,6 +36,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     [Inject(UxmlName = R.UxmlNames.phraseBonusScore)]
     private VisualElement phraseBonusScoreContainer;
+
+    [Inject(UxmlName = R.UxmlNames.modBonusScore)]
+    private VisualElement modBonusScoreContainer;
 
     [Inject(UxmlName = R.UxmlNames.totalScoreLabel)]
     private Label totalScoreLabel;
@@ -77,7 +81,8 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private float NormalNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.NormalNotesTotalScore / PlayerScoreControl.maxScore);
     private float GoldenNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.GoldenNoteLengthTotal / PlayerScoreControl.maxScore);
     private float PerfectSentenceBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.PerfectSentenceBonusTotalScore / PlayerScoreControl.maxScore);
-    private float TotalScoreAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float) playerScoreData.TotalScore / PlayerScoreControl.maxScore);
+    private float ModBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)Math.Abs(playerScoreData.ModTotalScore) / PlayerScoreControl.maxScore);
+    private float TotalScoreAnimTimeInSeconds => NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds + ModBonusAnimTimeInSeconds;
 
     private readonly List<int> animationIds = new();
 
@@ -102,34 +107,35 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         }
 
         // Song rating
-        LoadSongRatingSprite(songRating.EnumValue, songRatingSprite =>
-        {
-            if (songRatingSprite == null)
+        LoadSongRatingSprite(songRating.EnumValue)
+            .Subscribe(songRatingSprite =>
             {
-                return;
-            }
+                if (songRatingSprite == null)
+                {
+                    return;
+                }
 
-            ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
-            // Bouncy size animation
-            ratingLabel.style.scale = new StyleScale(new Scale(Vector2.zero));
-            ratingImage.style.scale = new StyleScale(new Scale(Vector2.zero));
-            LeanTween.value(singingResultsSceneControl.gameObject, Vector2.one, Vector2.one * 0.5f, bounceAnimTimeInSeconds)
-                .setEasePunch()
-                .setOnStart(() =>
-                {
-                    if (TotalScoreAnimTimeInSeconds > 0)
+                ratingImage.style.backgroundImage = new StyleBackground(songRatingSprite);
+                // Bouncy size animation
+                ratingLabel.style.scale = new StyleScale(new Scale(Vector2.zero));
+                ratingImage.style.scale = new StyleScale(new Scale(Vector2.zero));
+                LeanTween.value(singingResultsSceneControl.gameObject, Vector2.one, Vector2.one * 0.5f, bounceAnimTimeInSeconds)
+                    .setEasePunch()
+                    .setOnStart(() =>
                     {
-                        PlaySingingResultsRatingPopupSound();
-                    }
-                })
-                .setOnUpdate(s =>
-                {
-                    Vector2 scale = new Vector2(s, s);
-                    ratingLabel.style.scale = new StyleScale(new Scale(scale));
-                    ratingImage.style.scale = new StyleScale(new Scale(scale));
-                })
-                .setDelay(TotalScoreAnimTimeInSeconds);
-        });
+                        if (TotalScoreAnimTimeInSeconds > 0)
+                        {
+                            PlaySingingResultsRatingPopupSound();
+                        }
+                    })
+                    .setOnUpdate(s =>
+                    {
+                        Vector2 scale = new Vector2(s, s);
+                        ratingLabel.style.scale = new StyleScale(new Scale(scale));
+                        ratingImage.style.scale = new StyleScale(new Scale(scale));
+                    })
+                    .setDelay(TotalScoreAnimTimeInSeconds);
+            });
         ratingLabel.text = songRating.Text;
 
         // Score texts (animated)
@@ -142,6 +148,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.PerfectSentenceBonusTotalScore, PerfectSentenceBonusAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(phraseBonusScoreContainer, interpolatedValue))
             .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds);
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.ModTotalScore, ModBonusAnimTimeInSeconds)
+            .setOnUpdate(interpolatedValue => SetScoreRowLabelText(modBonusScoreContainer, interpolatedValue))
+            .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds);
         LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.TotalScore, TotalScoreAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
 
@@ -178,6 +187,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         SetScoreRowLabelText(normalNoteScoreContainer, 0);
         SetScoreRowLabelText(goldenNoteScoreContainer, 0);
         SetScoreRowLabelText(phraseBonusScoreContainer, 0);
+        SetScoreRowLabelText(modBonusScoreContainer, 0);
     }
 
     private void AnimateStarRatingIcons()
@@ -204,12 +214,15 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private bool IsNewHighscore()
     {
-        if (playerScoreData.TotalScore <= 0)
+        if (playerScoreData.TotalScore <= 0
+            || sceneData.GameRoundSettings == null
+            || sceneData.GameRoundSettings.AnyModifierActive)
         {
             return false;
         }
 
-        SongStatistics songStatistics = statistics.GetLocalStatistics(sceneData.SongMetas.LastOrDefault());
+        SongMeta songMeta = sceneData.SongMetas.LastOrDefault();
+        SongStatistics songStatistics = StatisticsUtils.GetLocalSongStatistics(statistics, songMeta);
         if (songStatistics == null
             || songStatistics.HighScoreRecord == null
             || songStatistics.HighScoreRecord.HighScoreEntries.IsNullOrEmpty())
@@ -217,8 +230,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             return false;
         }
 
-        HighScoreEntry highScoreEntry = songStatistics.HighScoreRecord
-            .GetTopScores(1, PlayerProfile.Difficulty)
+        HighScoreEntry highScoreEntry = StatisticsUtils.GetTopScores(
+                songStatistics.HighScoreRecord.HighScoreEntries,
+                1,
+                PlayerProfile.Difficulty)
             .FirstOrDefault();
         if (highScoreEntry == null)
         {
@@ -228,15 +243,14 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         return highScoreEntry.Score == playerScoreData.TotalScore;
     }
 
-    private void LoadSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private IObservable<Sprite> LoadSongRatingSprite(ESongRating songRatingEnumValue)
     {
         if (!settings.EnableDynamicThemes
             || themeManager.GetCurrentTheme()?.ThemeJson?.songRatingIcons == null)
         {
-            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
-            return;
+            return LoadDefaultSongRatingSprite(songRatingEnumValue);
         }
-        LoadSongRatingSpriteFromTheme(songRatingEnumValue, onSuccess);
+        return LoadSongRatingSpriteFromTheme(songRatingEnumValue);
     }
 
     private string GetTeamName()
@@ -256,7 +270,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
         return teamSettings != null;
     }
 
-    private void LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private IObservable<Sprite> LoadSongRatingSpriteFromTheme(ESongRating songRatingEnumValue)
     {
         try
         {
@@ -264,26 +278,25 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             string valueForSongRating = themeMeta.ThemeJson.songRatingIcons.GetValueForSongRating(songRatingEnumValue);
             if (valueForSongRating.IsNullOrEmpty())
             {
-                LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
-                return;
+                return LoadDefaultSongRatingSprite(songRatingEnumValue);
             }
 
             string imagePath = ThemeMetaUtils.GetAbsoluteFilePath(themeMeta, valueForSongRating);
-            ImageManager.LoadSpriteFromUri(imagePath, onSuccess);
+            return ImageManager.LoadSpriteFromUri(imagePath);
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
             Debug.LogError($"Load song rating sprite from theme failed: {ex.Message}");
-            LoadDefaultSongRatingSprite(songRatingEnumValue, onSuccess);
+            return LoadDefaultSongRatingSprite(songRatingEnumValue);
         }
     }
 
-    private void LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue, Action<Sprite> onSuccess)
+    private IObservable<Sprite> LoadDefaultSongRatingSprite(ESongRating songRatingEnumValue)
     {
         SongRatingImageReference songRatingImageReference = singingResultsSceneControl.songRatingImageReferences
             .FirstOrDefault(it => it.songRating == songRatingEnumValue);
-        onSuccess(songRatingImageReference?.sprite);
+        return Observable.Return<Sprite>(songRatingImageReference?.sprite);
     }
 
     public void UpdateTranslation()
@@ -319,5 +332,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
                     hideAndShowWithTarget = true,
                 });
             }));
+    }
+
+    public void SetModScoreVisible(bool isVisible)
+    {
+        modBonusScoreContainer.SetVisibleByDisplay(isVisible);
     }
 }

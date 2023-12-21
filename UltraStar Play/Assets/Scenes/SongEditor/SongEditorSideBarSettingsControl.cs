@@ -430,7 +430,7 @@ public class SongEditorSideBarSettingsControl : INeedInjection, IInjectionFinish
                 UiManager.CreateNotification("Vocals and instrumental audio already exists");
                 return;
             }
-            audioSeparationManager.ProcessSongMeta(songMeta);
+            audioSeparationManager.ProcessSongMeta(songMeta, true);
             audioSeparationButton.SetEnabled(false);
         });
         if (SongMetaUtils.VocalsAudioResourceExists(songMeta)

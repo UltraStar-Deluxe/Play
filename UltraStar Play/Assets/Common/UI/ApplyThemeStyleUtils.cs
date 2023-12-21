@@ -30,7 +30,7 @@ public static class ApplyThemeStyleUtils
         }
         return false;
     }
-    
+
     public static void ApplyControlStyles(VisualElement visualElement, VisualElement styleTarget, ControlStyleConfig controlStyleConfig)
     {
         if (visualElement == null)
@@ -53,13 +53,13 @@ public static class ApplyThemeStyleUtils
             };
             visualElementToData[visualElement] = data;
         }
-        
+
         if (!data.hasRegisteredCallbacks)
         {
             data.hasRegisteredCallbacks = true;
             RegisterCallbacks(visualElement);
         }
-        
+
         data.controlStyleConfig = controlStyleConfig;
         UpdateStyles(data);
     }
@@ -76,7 +76,7 @@ public static class ApplyThemeStyleUtils
         {
             return;
         }
-        
+
         // Hover events
         visualElement.RegisterCallback<PointerEnterEvent>(evt =>
         {
@@ -129,7 +129,7 @@ public static class ApplyThemeStyleUtils
             listView.selectionChanged += selectedObjects => OnListViewSelectionChanged(listView, selectedObjects);
         }
     }
-    
+
     public static void UpdateStylesOnListViewSelectionChanged(ListViewH listView)
     {
         if (listView != null
@@ -164,14 +164,14 @@ public static class ApplyThemeStyleUtils
             SetListViewItemActive(listView, newSelectedVisualElement, true);
         }
     }
-    
+
     public static void SetListViewItemActive(ListView listView, VisualElement listItemAncestor, bool isActive)
     {
         if (listItemAncestor == null)
         {
             return;
         }
-        
+
         VisualElement listItem = listItemAncestor.ClassListContains("listItem")
             ? listItemAncestor
             : listItemAncestor.Q(null, "listItem");
@@ -198,7 +198,7 @@ public static class ApplyThemeStyleUtils
         {
             return;
         }
-        
+
         VisualElement listItem = listItemAncestor.ClassListContains("listItem")
             ? listItemAncestor
             : listItemAncestor.Q(null, "listItem");
@@ -219,7 +219,7 @@ public static class ApplyThemeStyleUtils
             listViewToSelectedVisualElement[listView] = null;
         }
     }
-    
+
     private static void ApplyGradient(VisualElementData data, GradientConfig newGradientConfig)
     {
         VisualElement visualElement = data.styleTarget;
@@ -273,7 +273,7 @@ public static class ApplyThemeStyleUtils
         {
             return;
         }
-        
+
         if (!backgroundImagePath.IsNullOrEmpty())
         {
             string absoluteBackgroundImagePath = PathUtils.IsAbsolutePath(backgroundImagePath)
@@ -281,8 +281,8 @@ public static class ApplyThemeStyleUtils
                 : ThemeMetaUtils.GetAbsoluteFilePath(ThemeManager.Instance.GetCurrentTheme(), backgroundImagePath);
             if (File.Exists(absoluteBackgroundImagePath))
             {
-                ImageManager.LoadSpriteFromFile(absoluteBackgroundImagePath,
-                    loadedSprite => visualElement.style.backgroundImage = new StyleBackground(loadedSprite));
+                ImageManager.LoadSpriteFromUri(absoluteBackgroundImagePath)
+                    .Subscribe(loadedSprite => visualElement.style.backgroundImage = new StyleBackground(loadedSprite));
                 visualElement.style.backgroundColor = new StyleColor(StyleKeyword.None);
             }
             else
@@ -316,7 +316,7 @@ public static class ApplyThemeStyleUtils
                         {
                             return;
                         }
-                        
+
                         label.style.color = new StyleColor(fontColor);
                     });
             }
@@ -350,7 +350,7 @@ public static class ApplyThemeStyleUtils
                         // Do not remove text shadow
                         return;
                     }
-                    
+
                     ApplyTextShadow(label, textShadowConfig);
 
                     if (hasFontColor
@@ -362,7 +362,7 @@ public static class ApplyThemeStyleUtils
                     }
                 });
         }
-        
+
         visualElement.SetBorderColor(borderColor);
     }
 
@@ -370,7 +370,7 @@ public static class ApplyThemeStyleUtils
     {
         return visualElement.ClassListContains("ignoreTheme");
     }
-    
+
     private static ControlStyleConfig GetControlStyleConfig(VisualElementData data)
     {
         if (data.visualElement is SlideToggle slideToggle
@@ -386,7 +386,7 @@ public static class ApplyThemeStyleUtils
 
         return data.controlStyleConfig;
     }
-    
+
     private static void ApplyActiveStyle(VisualElementData data)
     {
         ControlStyleConfig c = GetControlStyleConfig(data);
@@ -410,7 +410,7 @@ public static class ApplyThemeStyleUtils
             ObjectUtils.FirstNonDefault(c.focusBackgroundImage, c.activeBackgroundImage, c.hoverBackgroundImage, c.backgroundImage),
             ObjectUtils.FirstNonDefault(c.focusTextShadow, c.activeTextShadow, c.hoverTextShadow, c.textShadow));
     }
-    
+
     private static void ApplyHoverFocusStyle(VisualElementData data)
     {
         ControlStyleConfig c = GetControlStyleConfig(data);
@@ -458,7 +458,7 @@ public static class ApplyThemeStyleUtils
             controlStyleConfig.backgroundImage,
             controlStyleConfig.textShadow);
     }
-    
+
     private static void ApplyDisabledStyle(VisualElementData data)
     {
         ControlStyleConfig c = GetControlStyleConfig(data);
@@ -477,7 +477,7 @@ public static class ApplyThemeStyleUtils
         {
             return;
         }
-        
+
         bool shouldApplyHoverStyle = data.isPointerOver;
         bool shouldApplyFocusStyle = data.hasFocus;
         bool shouldApplyActiveStyle = data.isActive;
@@ -521,7 +521,7 @@ public static class ApplyThemeStyleUtils
         public bool isPointerOver;
         public bool hasFocus;
         public bool isActive;
-        
+
         public float initTimeInSeconds;
         public ControlStyleConfig controlStyleConfig;
         public GradientConfig currentGradientConfig;
@@ -567,7 +567,7 @@ public static class ApplyThemeStyleUtils
                 .ForEach(label => label.style.color = new StyleColor(color));
         });
     }
-    
+
     public static void ApplyErrorFontColor(Color32 fontColor, VisualElement root)
     {
         fontColor.IfNotDefault(color =>
@@ -588,7 +588,7 @@ public static class ApplyThemeStyleUtils
                 {
                     return;
                 }
-            
+
                 if (visualElement is Label label)
                 {
                     ApplyTextShadow(label, textShadowConfig);
@@ -612,7 +612,7 @@ public static class ApplyThemeStyleUtils
             visualElement.style.textShadow = new StyleTextShadow();
             return;
         }
-        
+
         TextShadow textShadow = new()
         {
             color = textShadowConfig.color,

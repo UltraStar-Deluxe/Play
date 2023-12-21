@@ -103,9 +103,9 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
 
             // Detect end of the song by #END tag of txt file.
             // This can be used to skip the ending of the audio file.
-            if (songMeta.End > 0
+            if (songMeta.EndInMillis > 0
                 // #END tag is in milliseconds (but #START is in seconds)
-                && positionInSongInMillis > songMeta.End)
+                && positionInSongInMillis > songMeta.EndInMillis)
             {
                 IsSongFinished = true;
             }

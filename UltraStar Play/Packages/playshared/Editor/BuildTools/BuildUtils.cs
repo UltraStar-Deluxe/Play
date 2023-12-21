@@ -37,6 +37,13 @@ public static class BuildUtils
         "Assets/StreamingAssets/SpeechRecognitionModels",
     };
 
+    private static readonly List<string> undesiredPathsForSteamUpload = new()
+    {
+        "Melody Mania_Data/StreamingAssets/Mods/usdb.animux.de-SongRepository",
+        "Melody Mania_Data/StreamingAssets/Mods/CoverAndBackgroundImageFromMusicBrainz",
+        "Melody Mania_Data/StreamingAssets/Mods/UseYouTubeVideoIdInTxtFiles",
+    };
+
     private static string IgnoredAssetsOfMobileBuildFolder => "IgnoredAssetsOfMobileBuild";
 
     public static void PerformCustomBuild(CustomBuildOptions options)
@@ -168,10 +175,25 @@ public static class BuildUtils
             throw new Exception($"Cannot upload to Steam with build target {options.buildTarget}");
         }
 
+        // Get path to latest build
         string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
 
+        DeleteFilesAndFoldersThatShouldNotBeUploadedToSteam(outputFolderPath);
+
+        bool shouldUpload = EditorUtility.DisplayDialog(
+            "Upload to Steam",
+            "Upload latest build result to Steam?",
+            "Yes",
+            "No");
+        if (!shouldUpload)
+        {
+            Debug.Log("Canceled upload to Steam");
+            return;
+        }
+        Debug.Log("Uploading build to Steam...");
+
         // Get app version
-        string bundleVersion = BuildUtils.GetPlayerSettingsFileBundleVersion();
+        string bundleVersion = GetPlayerSettingsFileBundleVersion();
         string timeStamp = DateTime.Now.ToString("yyMMddHHmm", CultureInfo.InvariantCulture);
         string commitShortHash = GitUtils.GetCurrentCommitShortHash();
 
@@ -218,6 +240,52 @@ public static class BuildUtils
             throw new Exception("Upload to Steam failed.\n" + steamcmdErrorOutput);
         }
         Debug.Log("Uploaded build to Steam successfully.");
+    }
+
+    private static void DeleteFilesAndFoldersThatShouldNotBeUploadedToSteam(string outputFolderPath)
+    {
+        List<string> undesiredPaths = undesiredPathsForSteamUpload
+            .Where(path =>
+            {
+                string pathInBuildOutput = $"{outputFolderPath}/{path}";
+                return DirectoryUtils.Exists(path)
+                       || FileUtils.Exists(path)
+                       || DirectoryUtils.Exists(pathInBuildOutput)
+                       || FileUtils.Exists(pathInBuildOutput);
+            })
+            .ToList();
+        if (!undesiredPaths.IsNullOrEmpty())
+        {
+            bool shouldDelete = EditorUtility.DisplayDialog(
+                "Undesired files and folders for Steam upload",
+                $"Delete the following undesired files and folders:\n    " +
+                $"{undesiredPaths.JoinWith("\n    ")}?",
+                "Yes",
+                "No");
+            if (!shouldDelete)
+            {
+                throw new Exception("Aborted upload to Steam because undesired files or folder are present.");
+            }
+
+            foreach (string undesiredPath in undesiredPaths)
+            {
+                string fullPath = $"{outputFolderPath}/{undesiredPath}";
+                if (DirectoryUtils.Exists(fullPath))
+                {
+                    Debug.Log($"Deleting folder '{fullPath}'");
+                    DirectoryUtils.Delete(fullPath, true);
+                }
+
+                if (FileUtils.Exists(fullPath))
+                {
+                    Debug.Log($"Deleting file '{fullPath}'");
+                    FileUtils.Delete(undesiredPath);
+                }
+            }
+
+            // Re-check to ensure that no more undesired files and folders are present
+            DeleteFilesAndFoldersThatShouldNotBeUploadedToSteam(outputFolderPath);
+        }
     }
 
     private static void CopyFilesBeforeBuild()

@@ -6,7 +6,6 @@ public static class SongEditorAudioWaveformUtils
 {
     public static AudioClip GetAudioClipToDrawAudioWaveform(
         SongMeta songMeta,
-        AudioManager audioManager,
         Settings settings)
     {
         using IDisposable d = new DisposableStopwatch($"Get audio clip to draw audio wave form");
@@ -31,7 +30,7 @@ public static class SongEditorAudioWaveformUtils
             // Cannot draw audio wave form of MIDI file.
             return null;
         }
-        
+
         if (!ApplicationUtils.IsUnitySupportedAudioFormat(fileExtension))
         {
             // Cannot load this format using Unity API.
@@ -39,7 +38,7 @@ public static class SongEditorAudioWaveformUtils
         }
 
         // For drawing the waveform, the AudioClip must not be streamed. All data must have been fully loaded.
-        AudioClip audioClip = audioManager.LoadAudioClipFromUriImmediately(audioUri, false);
+        AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(audioUri, false);
         return audioClip;
     }
 
@@ -80,11 +79,11 @@ public static class SongEditorAudioWaveformUtils
         {
             return;
         }
-        
+
         using IDisposable d = new DisposableStopwatch($"Draw audio wave form");
         audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(audioClip, minSampleSingleChannel, maxSampleSingleChannel);
     }
-    
+
     public static void DrawAudioWaveform(
         AudioWaveFormVisualization audioWaveFormVisualization,
         float[] samples,
@@ -96,11 +95,11 @@ public static class SongEditorAudioWaveformUtils
         {
             return;
         }
-        
+
         using IDisposable d = new DisposableStopwatch($"Draw audio wave form");
         audioWaveFormVisualization.DrawWaveFormMinAndMaxValues(samples, minSample, maxSample);
     }
-    
+
     private static string GetAudioUri(SongMeta songMeta, ESongEditorSamplesSource samplesSource)
     {
         switch (samplesSource)

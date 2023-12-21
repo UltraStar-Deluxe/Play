@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -24,40 +22,6 @@ public static class AudioUtils
         // See here for details: https://answers.unity.com/questions/25139/how-i-can-change-the-speed-of-a-song-or-sound.html
         // See here for how the pitch value of the Pitch Shifter effect is made available for scripting: https://learn.unity.com/tutorial/audio-mixing#5c7f8528edbc2a002053b506
         audioSource.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - pitch));
-    }
-
-    // This method should only be called from tests.
-    // Use the cached version of the AudioManager for the normal game logic.
-    public static AudioClip LoadUncachedAudioClipImmediately(string uri, bool streamAudio)
-    {
-        if (!ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(uri)))
-        {
-            Debug.LogWarning($"Cannot load AudioClip because the format is not supported by Unity. URI: '{uri}', supported formats: {ApplicationUtils.unitySupportedAudioFiles.ToCsv(", ", "", "")}");
-            return null;
-        }
-
-        Uri uriHandle = new Uri(uri);
-        using UnityWebRequest webRequest = CreateAudioClipRequest(uriHandle, streamAudio);
-        webRequest.SendWebRequest();
-
-        while (!webRequest.isDone)
-        {
-            Debug.LogWarning("Waiting for AudioClip to load via Thread.Sleep");
-            Thread.Sleep(10);
-        }
-
-        if (webRequest.result
-            is UnityWebRequest.Result.ConnectionError
-            or UnityWebRequest.Result.ProtocolError)
-        {
-            Debug.LogError("Error Loading Audio: " + uri);
-            Debug.LogError(webRequest.error);
-        }
-
-        AudioClip audioClip = (webRequest.downloadHandler as DownloadHandlerAudioClip)?.audioClip;
-        string fileName = Path.GetFileName(uriHandle.LocalPath);
-        audioClip.name = $"Audio file '{fileName}'";
-        return audioClip;
     }
 
     public static UnityWebRequest CreateAudioClipRequest(Uri uriHandle, bool streamAudio)
@@ -161,8 +125,8 @@ public static class AudioUtils
             return null;
         }
 
-        double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, startBeat);
-        double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
+        double startBeatInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, startBeat);
+        double singleBeatLengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta);
         double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
 
         float[] monoAudioSamples = GetAudioSamples(startBeatInMillis, lengthInMillis, audioClip, convertToMono);

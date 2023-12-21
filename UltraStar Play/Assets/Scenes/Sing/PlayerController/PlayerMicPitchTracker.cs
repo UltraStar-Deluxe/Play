@@ -33,7 +33,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     [Inject]
     private SingSceneMedleyControl medleyControl;
-    
+
     [Inject]
     private Settings mainGameSettings;
 
@@ -41,7 +41,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private float roundingDistance;
 
     private int recordingSentenceIndex;
-    
+
     private int beatToAnalyze;
     public int BeatToAnalyze { get; private set; }
 
@@ -74,7 +74,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
-        
+
         // Find first sentence to analyze
         SetRecordingSentence(recordingSentenceIndex);
 
@@ -89,7 +89,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             return;
         }
-        
+
         if (micProfile.IsInputFromConnectedClient)
         {
             InitPitchDetectionFromConnectedClient();
@@ -103,7 +103,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             InitPitchDetectionFromLocalMicrophone();
         }
     }
-    
+
     private void OnClientConnectionChanged()
     {
         InitPitchDetectionFromConnectedClient();
@@ -116,7 +116,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             return;
         }
-        
+
         MicSampleRecorder.StartRecording();
 
         // The AudioSampleAnalyzer uses the MicSampleRecorder's sampleRateHz. Thus, it must be initialized after the MicSampleRecorder.
@@ -181,7 +181,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     protected override void Update()
     {
         base.Update();
-        
+
         if (micProfile == null
             || MicSampleRecorder == null)
         {
@@ -207,7 +207,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         }
 
         // Analyze the next beat with fully recorded mic samples
-        double nextBeatToAnalyzeEndPositionInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, BeatToAnalyze + 1);
+        double nextBeatToAnalyzeEndPositionInMs = SongMetaBpmUtils.BeatsToMillis(songMeta, BeatToAnalyze + 1);
         if (nextBeatToAnalyzeEndPositionInMs >= songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis)
         {
             return;
@@ -233,21 +233,21 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             // Disconnected
             return;
         }
-        
+
         // Read messages from client since last time the reader thread was active.
         // connectedClientHandler.ReadMessagesFromClient();
-        
+
         if (lastUnixTimeMillisecondsWhenSentPositionInSongToClient + SendPositionInSongIntervalInMillis < TimeUtils.GetUnixTimeMilliseconds())
         {
             // Synchronize position in song with connected client.
             SendPositionInSongToClient();
         }
-        
+
         // Handle received messages after buffer time.
         if (!beatPitchEventsFromConnectedClientQueue.IsNullOrEmpty())
         {
             long connectedClientMessageBufferTime = (long)Mathf.Max(mainGameSettings.ConnectedClientMessageBufferTimeInMillis, connectedClientHandler.JitterInMillis * 1.5f);
-            int beatBufferTime = Mathf.Max(1, (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, connectedClientMessageBufferTime * 1.5f));
+            int beatBufferTime = Mathf.Max(1, (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, connectedClientMessageBufferTime * 1.5f));
             DequeuePitchEventsFromConnectedClient(connectedClientMessageBufferTime, beatBufferTime);
         }
     }
@@ -255,7 +255,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private void DequeuePitchEventsFromConnectedClient(long messageBufferTimeInMillis, int eventBufferTimeInBeats)
     {
         int positionInSongInMillisConsideringMicDelay = (int)(songAudioPlayer.PositionInSongInMillis - micProfile.DelayInMillis);
-        int currentBeatConsideringMicDelay = (int)BpmUtils.MillisecondInSongToBeat(songMeta, positionInSongInMillisConsideringMicDelay);
+        int currentBeatConsideringMicDelay = (int)SongMetaBpmUtils.MillisToBeats(songMeta, positionInSongInMillisConsideringMicDelay);
         long unixTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
         int maxIterations = 100;
         for (int i = 0; i < maxIterations && !beatPitchEventsFromConnectedClientQueue.IsNullOrEmpty(); i++)
@@ -269,15 +269,15 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             // {
             //     Log.Verbose(() => $"Handling old message with age {messageAgeInMillis} ms" + JsonConverter.ToJson(beatPitchEvent));
             // }
-            
+
             int eventAgeInBeats = Math.Abs(currentBeatConsideringMicDelay - beatPitchEventAndTime.beatPitchEvent.Beat);
             bool handleBecauseOfEventBufferTime = eventAgeInBeats > eventBufferTimeInBeats;
-            // if (!handleBecauseOfMessageBufferTime 
+            // if (!handleBecauseOfMessageBufferTime
             //     && handleBecauseOfEventBufferTime)
             // {
             //     Log.Verbose(() => $"Handling old event with age {eventAgeInBeats} beats: " + JsonConverter.ToJson(beatPitchEvent));
             // }
-            
+
             if (handleBecauseOfMessageBufferTime
                 || handleBecauseOfEventBufferTime)
             {
@@ -290,7 +290,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
                 break;
             }
         }
-        
+
         // Log.Verbose(() => "DequeuePitchEventsFromConnectedClient: Remaining events: " + beatPitchEventsFromConnectedClientQueue.Count);
     }
 
@@ -339,7 +339,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             return;
         }
 
-        int currentBeat = (int)BpmUtils.MillisecondInSongToBeat(songMeta, songAudioPlayer.PositionInSongInMillis);
+        int currentBeat = (int)SongMetaBpmUtils.MillisToBeats(songMeta, songAudioPlayer.PositionInSongInMillis);
         if (pitchEvent.Beat > currentBeat)
         {
             Log.Verbose(() => $"Received future beat from connected client (received: {pitchEvent.Beat}, current: {currentBeat}).");
@@ -357,7 +357,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             return;
         }
-        
+
         PlayerNoteRecorder playerNoteRecorder = GetComponent<PlayerNoteRecorder>();
         if (playerNoteRecorder != null
             && !playerNoteRecorder.isActiveAndEnabled)
@@ -393,8 +393,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
         PositionInSongDto positionInSongDto = new PositionInSongDto
         {
-            SongBpm = songMeta.Bpm,
-            SongGap = songMeta.Gap,
+            BeatsPerMinute = songMeta.BeatsPerMinute,
+            SongGap = songMeta.GapInMillis,
             PositionInSongInMillis = songAudioPlayer.PositionInSongInMillisExact,
         };
         Log.Verbose(() => $"Send position in song to client {micProfile.ConnectedClientId}: {positionInSongDto.ToJson()}");
@@ -429,7 +429,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             // Ignore this event, the beat was already analyzed.
             return;
         }
-        
+
         int recordedMidiNote = pitchEvent != null
             ? pitchEvent.MidiNote
             : -1;
@@ -515,8 +515,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             return 0;
         }
-        
-        double beatInMs = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+
+        double beatInMs = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
         double beatPassedBeforeMs = songAudioPlayer.PositionInSongInMillis - beatInMs;
         int beatPassedBeforeSamplesInMicBuffer = Convert.ToInt32(((beatPassedBeforeMs - micProfile.DelayInMillis) / 1000) * MicSampleRecorder.FinalSampleRate.Value);
         // The newest sample has the highest index in the MicSampleBuffer
@@ -531,14 +531,14 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             && mainGameSettings.ShowPitchIndicator)
         {
             // Start with very first beat, possibly before the lyrics start to update the pitch indicator.
-            BeatToAnalyze = (int)BpmUtils.MillisecondInSongToBeat(songMeta, 0);
+            BeatToAnalyze = (int)SongMetaBpmUtils.MillisToBeats(songMeta, 0);
         }
-        
+
         RecordingSentence = playerControl.GetSentence(sentenceIndex);
         if (RecordingSentence == null)
         {
             // After last sentence or no sentences at all.
-            // Wait until the mic has finished recording the last note. 
+            // Wait until the mic has finished recording the last note.
             StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f,
                 () =>
                 {
@@ -598,7 +598,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
     private int GetRoundedMidiNote(int recordedMidiNote, float recordedFrequency, int targetMidiNote, float roundingDistance)
     {
         float exactMidiNote = recordedMidiNote;
-        
+
         // Check if rounding a fraction of a midi note is possible and needed.
         if (recordedFrequency > 0)
         {
@@ -610,7 +610,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
                 exactMidiNote = MidiUtils.CalculateMidiNote(recordedFrequency);
             }
         }
-        
+
         float distance = MidiUtils.GetRelativePitchDistance(exactMidiNote, targetMidiNote);
         return distance <= roundingDistance
             ? targetMidiNote
@@ -624,7 +624,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             // Cannot jump back in song
             return;
         }
-        
+
         // Find sentence to analyze next.
         RecordingSentence = playerControl.SortedSentences
             .FirstOrDefault(sentence => currentBeat <= sentence.MaxBeat);
@@ -670,7 +670,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             return null;
         }
-        
+
         if (startSampleBufferIndex > endSampleBufferIndex)
         {
             ObjectUtils.Swap(ref startSampleBufferIndex, ref endSampleBufferIndex);
@@ -711,7 +711,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             return;
         }
-        
+
         if (micProfile.IsInputFromConnectedClient)
         {
             SendStartRecordingMessageToConnectedClient();
@@ -728,7 +728,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         {
             return;
         }
-        
+
         if (micProfile.IsInputFromConnectedClient)
         {
             SendStopRecordingMessageToConnectedClient();
@@ -738,7 +738,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             base.StopRecording();
         }
     }
-    
+
     private class BeatPitchEventAndTime
     {
         public BeatPitchEvent beatPitchEvent;

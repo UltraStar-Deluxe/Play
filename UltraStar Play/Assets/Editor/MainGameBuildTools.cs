@@ -1,5 +1,3 @@
-using System;
-using System.Globalization;
 using UnityEditor;
 
 public static class MainGameBuildTools

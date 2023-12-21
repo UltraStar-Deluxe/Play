@@ -33,11 +33,13 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="topContent" picking-mode="Ignore" class="px-4 pt-2" style="flex-shrink: 0; flex-direction: row; position: absolute; align-items: center; width: 100%; top: 0;">
-            <ui:Button name="quitSceneButton" class="circleButton transparentButton mr-2">
-                <MaterialIcon icon="arrow_back" name="backIcon" picking-mode="Ignore" />
-            </ui:Button>
-            <ui:Label text="Song Select" name="sceneTitle" class="titleText noBackgroundInHierarchy" style="-unity-font-style: bold; flex-shrink: 1; white-space: normal; max-width: 145px; flex-grow: 1;" />
-            <ui:VisualElement name="topCenterContent" style="background-color: rgba(0, 0, 0, 0); width: 33.33%; position: absolute; left: 33.3%;">
+            <ui:VisualElement name="topLeftContent" style="flex-direction: row; align-items: center; width: 33.3%;">
+                <ui:Button name="quitSceneButton" class="circleButton transparentButton mr-2">
+                    <MaterialIcon icon="arrow_back" name="backIcon" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Label text="Song Select" name="sceneTitle" class="titleText noBackgroundInHierarchy" style="-unity-font-style: bold; flex-shrink: 1; white-space: normal; max-width: 145px; flex-grow: 1;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="topCenterContent" style="background-color: rgba(0, 0, 0, 0); width: 33.33%;">
                 <ui:VisualElement name="searchBarContainer" style="flex-direction: row; flex-shrink: 1;">
                     <ui:TextField picking-mode="Ignore" name="searchTextField" hide-placeholder-on-focus="true" style="align-items: center; flex-shrink: 1; width: 100px; flex-grow: 1;">
                         <ui:Label tabindex="-1" text="What do you want to sing today?" display-tooltip-when-elided="true" name="searchTextFieldHint" picking-mode="Ignore" class="textFieldHint secondaryFontColor" />
@@ -71,6 +73,9 @@
                     <MaterialIcon tabindex="-1" name="noCoopIcon" icon="groups" style="font-size: 20px; display: none;" />
                     <ui:Label tabindex="-1" text="Co-op" display-tooltip-when-elided="true" name="toggleCoopModeButtonLabel" class="tinyFont" />
                 </ToggleButton>
+                <ui:Button name="navigateFolderUpButton" class="squareButton transparentButton">
+                    <MaterialIcon name="selectRandomSongIcon" icon="folder" />
+                </ui:Button>
                 <ui:Button display-tooltip-when-elided="true" name="selectRandomSongButton" class="squareButton transparentButton">
                     <MaterialIcon tabindex="-1" name="selectRandomSongIcon" icon="casino" />
                 </ui:Button>

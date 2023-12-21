@@ -19,7 +19,8 @@
         "UnityStandaloneFileBrowser",
         "Vuplex.WebView",
         "LiteNetLib",
-        "com.whisper.unity"
+        "com.whisper.unity",
+        "OneJS"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -29,7 +30,8 @@
         "Facepunch.Steamworks.Win64.dll",
         "Flurl.dll",
         "Flurl.Http.dll",
-        "HtmlAgilityPack.dll"
+        "HtmlAgilityPack.dll",
+        "ICSharpCode.SharpZipLib.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

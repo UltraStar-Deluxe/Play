@@ -15,8 +15,8 @@ public class SettingsProblemHintControl
     private readonly TooltipControl tooltipControl;
 
     private bool hasIssues;
-    
-    public SettingsProblemHintControl(VisualElement visualElement, List<string> settingsProblems, Injector injector)
+
+    public SettingsProblemHintControl(VisualElement visualElement, List<string> settingsProblems)
     {
         this.tooltipControl = new(visualElement);
         this.visualElement = visualElement;
@@ -25,15 +25,29 @@ public class SettingsProblemHintControl
         SetProblems(settingsProblems);
     }
 
-    public static List<string> GetAllSettingsProblems(Settings settings, SongMetaManager songMetaManager)
+    public static List<string> GetAllSettingsProblems(
+        Settings settings,
+        ModManager modManager)
     {
-        return GetSongLibrarySettingsProblems(settings, songMetaManager)
+        return GetSongLibrarySettingsProblems(settings)
             .Concat(GetRecordingSettingsProblems(settings))
             .Concat(GetPlayerSettingsProblems(settings))
+            .Concat(GetModSettingsProblems(modManager))
             .ToList();
     }
 
-    public static List<string> GetSongLibrarySettingsProblems(Settings settings, SongMetaManager songMetaManager)
+    public static List<string> GetModSettingsProblems(ModManager modManager)
+    {
+        List<string> result = new();
+        if (!modManager.EnabledFailedToLoadModFolders.IsNullOrEmpty())
+        {
+            result.Add("Some mods failed to load.");
+        }
+
+        return result;
+    }
+
+    public static List<string> GetSongLibrarySettingsProblems(Settings settings)
     {
         List<string> result = new();
         if (settings.SongDirs.IsNullOrEmpty())
@@ -45,7 +59,7 @@ public class SettingsProblemHintControl
             result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_songFolderDoesNotExist));
         }
 
-        if (songMetaManager.GetSongIssues().Count > 0)
+        if (SongIssueManager.HasSongIssues)
         {
             result.Add(TranslationManager.GetTranslation(R.Messages.settingsProblem_thereAreSongIssues));
         }
@@ -185,7 +199,7 @@ public class SettingsProblemHintControl
                 })
                 .setEaseLinear();
         }
-        
+
         tooltipControl.TooltipText = settingsProblems.JoinWith("\n\n");
     }
 }

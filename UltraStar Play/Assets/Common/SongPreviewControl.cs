@@ -146,13 +146,13 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
     protected virtual int GetPreviewStartInMillis(SongMeta songMeta)
     {
-        if (songMeta.PreviewStart > 0)
+        if (songMeta.PreviewStartInMillis > 0)
         {
-            return (int)(songMeta.PreviewStart * 1000);
+            return (int)songMeta.PreviewStartInMillis;
         }
 
         // Fallback: find some lyrics approx. 1/3 into the song.
-        Voice voice = songMeta.GetVoices().FirstOrDefault();
+        Voice voice = songMeta.Voices.FirstOrDefault();
         if (voice == null)
         {
             return 0;
@@ -166,7 +166,7 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
 
         int noteIndex = (int)((notes.Count - 1) * 0.33f);
         Note note = notes[noteIndex];
-        int noteStartBeatInMillis = (int)BpmUtils.BeatToMillisecondsInSong(songMeta, note.StartBeat);
+        int noteStartBeatInMillis = (int)SongMetaBpmUtils.BeatsToMillis(songMeta, note.StartBeat);
         return noteStartBeatInMillis;
     }
 
@@ -228,29 +228,22 @@ public class SongPreviewControl : MonoBehaviour, INeedInjection
             return;
         }
 
-        try
-        {
-            songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
-                .CatchIgnore((Exception ex) =>
-                {
-                    string errorMessage = $"Audio could not be loaded: {SongMetaUtils.GetArtistDashTitle(songMeta)}";
-                    Debug.LogError(errorMessage);
-                    UiManager.CreateNotification(errorMessage);
-                })
-                .Subscribe(_ =>
-                {
-                    Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
-                    songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
-                    songAudioPlayer.VolumeFactor = 0;
-                    songAudioPlayer.PlayAudio();
-                });
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            string errorMessage = $"Audio could not be loaded (artist: {songMeta.Artist}, title: {songMeta.Title})";
-            UiManager.CreateNotification(errorMessage);
-        }
+        songAudioPlayer.LoadAndPlaySongAudioAsObservable(songMeta)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                string errorMessage = $"Audio could not be loaded: '{SongMetaUtils.GetArtistDashTitle(songMeta)}'";
+                Debug.LogError(errorMessage);
+                UiManager.CreateNotification(errorMessage);
+                songAudioPlayer.PauseAudio();
+            })
+            .Subscribe(_ =>
+            {
+                Debug.Log($"Skipping to song preview of {songMeta.Title} at {previewStartInMillis} ms");
+                songAudioPlayer.PositionInSongInMillis = previewStartInMillis;
+                songAudioPlayer.VolumeFactor = 0;
+                songAudioPlayer.PlayAudio();
+            });
     }
 
     protected virtual float GetFinalPreviewVolume()

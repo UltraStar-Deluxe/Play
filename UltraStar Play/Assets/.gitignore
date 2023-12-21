@@ -94,6 +94,9 @@ FfmpegUnity.meta
 VLCUnity/
 VLCUnity.meta
 
+OneJS/
+OneJS.meta
+
 ######################################
 ## StreamingAssets
 StreamingAssets/Input/UltraStarPlayInputActions.inputactions
@@ -113,6 +116,9 @@ StreamingAssets/DemoSongs.meta
 
 StreamingAssets/ffmpeg/
 StreamingAssets/ffmpeg.meta
+
+StreamingAssets/RuntimeLoadedScripts/DemoMod
+StreamingAssets/RuntimeLoadedScripts/DemoMod.meta
 
 ######################################
 ## Play Mode Tests

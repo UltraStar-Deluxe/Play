@@ -68,6 +68,19 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
     }
 
+    public double CurrentTimeInSongInPercentConsideringMedley
+    {
+        get
+        {
+            if (!IsMedley)
+            {
+                return songAudioPlayer.PositionInSongInPercent;
+            }
+            return (songAudioPlayer.PositionInSongInMillis - MedleyStartWithCountdownInMillis)
+                            / MedleyDurationWithCountdownInMillis;
+        }
+    }
+
     public void StartCurrentMedleySong()
     {
         if (!IsMedley)
@@ -85,7 +98,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
             });
             return;
         }
-        
+
         DoStartCurrentMedleySong();
     }
 
@@ -96,7 +109,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         countdownControl.StartCountdown(CountDownTimeInSeconds);
         audioFadeInControl.StartAudioFadeIn(CountDownTimeInSeconds);
     }
-    
+
     private double CalculateMedleyStartWithCountdownInMillis()
     {
         if (!IsMedley)
@@ -114,7 +127,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
         SongMeta songMeta = singSceneControl.SongMeta;
         int medleyStartBeat = SongMetaUtils.GetMedleyStartBeat(songMeta);
-        return BpmUtils.BeatToMillisecondsInSong(songMeta, medleyStartBeat);
+        return SongMetaBpmUtils.BeatsToMillis(songMeta, medleyStartBeat);
     }
 
     private double CalculateMedleyEndInMillis()
@@ -125,7 +138,7 @@ public class SingSceneMedleyControl : INeedInjection, IInjectionFinishedListener
         }
         SongMeta songMeta = singSceneControl.SongMeta;
         int medleyEndBeat = SongMetaUtils.GetMedleyEndBeat(songMeta, settings.DefaultMedleyTargetDurationInSeconds);
-        return BpmUtils.BeatToMillisecondsInSong(songMeta, medleyEndBeat);
+        return SongMetaBpmUtils.BeatsToMillis(songMeta, medleyEndBeat);
     }
 
     private double CalculateMedleyDurationWithCountdownInMillis()

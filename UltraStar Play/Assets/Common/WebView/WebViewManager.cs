@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using PrimeInputActions;
 using ProTrans;
 using UniInject;
@@ -136,6 +133,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     public bool IsWebViewCanvasControlEnabled => webViewCanvas.renderMode is RenderMode.ScreenSpaceOverlay;
 
     private CanvasWebViewPrefab webViewPrefabInstance;
+
+    private bool hasShownControlsNotification;
 
     protected override object GetInstance()
     {
@@ -491,6 +490,14 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         loadedUrl = url;
         RunWhenWebViewInitialized(() =>
         {
+            if (!hasShownControlsNotification)
+            {
+                hasShownControlsNotification = true;
+                UiManager.CreateNotification("Loading website.\n" +
+                                             "Press F8 or Ctrl+B anytime\n" +
+                                             "to switch to embedded browser.");
+            }
+
             if (isContentLoaded && javaScriptCanLoadUrl)
             {
                 Debug.Log("Loading new URL via JavaScript");

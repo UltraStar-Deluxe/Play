@@ -15,7 +15,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     {
         OpenContextMenuPopups = new List<ContextMenuPopupControl>();
     }
-    
+
     private bool wasNoButtonOrTouchPressed;
 
     public static List<ContextMenuPopupControl> OpenContextMenuPopups { get; private set; } = new();
@@ -29,7 +29,10 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     [Inject]
     private Injector injector;
-    
+
+    private readonly VisualElement targetElement;
+    public VisualElement TargetElement => targetElement;
+
     private PanelHelper panelHelper;
 
     private VisualElement visualElement;
@@ -43,13 +46,14 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
 
     private Vector2 lastSize;
     private Vector2 lastPosition;
-    
+
     private readonly Subject<bool> contextMenuClosedEventStream = new();
     public IObservable<bool> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
-    public ContextMenuPopupControl(GameObject gameObject, Vector2 position)
+    public ContextMenuPopupControl(GameObject gameObject, VisualElement targetElement, Vector2 position)
     {
         this.gameObject = gameObject;
+        this.targetElement = targetElement;
         this.position = position;
     }
 
@@ -109,7 +113,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     {
         wasNoButtonOrTouchPressed = wasNoButtonOrTouchPressed || !InputUtils.AnyKeyboardOrMouseOrTouchPressed();
     }
-    
+
     public void AddSeparator()
     {
         VisualElement contextMenuItemVisualElement = contextMenuPopupManager.contextMenuSeparatorUi.CloneTree().Children().First();
@@ -135,7 +139,7 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
         visualElement.Add(contextMenuItemVisualElement);
         return contextMenuItemVisualElement;
     }
-    
+
     public void CloseContextMenu()
     {
         closeContextMenuDisposable.Dispose();

@@ -14,12 +14,12 @@ public static class PitchDetectionUtils
         SongMeta songMeta,
         Job pitchDetectionJob = null)
     {
-        if (!FileUtils.Exists(songMeta.VocalsAudio))
+        if (!SongMetaUtils.VocalsAudioResourceExists(songMeta))
         {
             return Observable.Throw<List<Note>>(new Exception("Vocals audio not found. Split the audio first."));
         }
-        
-        string fileName = Path.GetFileName(songMeta.Mp3);
+
+        string fileName = Path.GetFileName(songMeta.Audio);
         if (pitchDetectionJob == null)
         {
             pitchDetectionJob = JobManager.CreateAndAddJob($"Pitch detection of '{fileName}'");
@@ -62,7 +62,7 @@ public static class PitchDetectionUtils
                 }
             });
     }
-    
+
     public static void MoveNotesToDetectedPitchUsingPitchDetectionLayer(SongMeta songMeta, List<Note> notes, List<Note> pitchDetectionLayerNotes)
     {
         int minBeat = SongMetaUtils.MinBeat(notes);
@@ -84,10 +84,10 @@ public static class PitchDetectionUtils
                 beatToDetectedPitches.AddInsideList(beat, pitchDetectionLayerNote.MidiNote);
             }
         }
-        
-        int localAverageWindowSizeInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, 3000);
+
+        int localAverageWindowSizeInBeats = (int)SongMetaBpmUtils.MillisToBeatsWithoutGap(songMeta, 3000);
         localAverageWindowSizeInBeats = NumberUtils.Limit(localAverageWindowSizeInBeats, 1, int.MaxValue);
-        
+
         foreach (Note note in notes)
         {
             // Move note to pitch that is closest to local average on pitch detection layer
@@ -128,7 +128,7 @@ public static class PitchDetectionUtils
     private static bool TryFindLocalAveragePitch(List<Note> notes, int beat, int localAverageWindowSizeInBeats, out int localAveragePitch)
     {
         List<Note> notesInWindow = notes
-            .Where(note => note.StartBeat - localAverageWindowSizeInBeats <= beat 
+            .Where(note => note.StartBeat - localAverageWindowSizeInBeats <= beat
                            && beat < note.EndBeat + localAverageWindowSizeInBeats)
             .ToList();
         if (notesInWindow.IsNullOrEmpty())
@@ -136,16 +136,16 @@ public static class PitchDetectionUtils
             localAveragePitch = 0;
             return false;
         }
-        
+
         localAveragePitch = (int)notesInWindow
             .Select(note => note.MidiNote)
             .Average();
         return true;
     }
-    
+
     // public static long GetEstimatedPitchDetectionDurationInMillis(SongMeta songMeta, int lengthInBeats)
     // {
-    //     double lengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta) * lengthInBeats;
+    //     double lengthInMillis = BpmUtils.MillisPerBeat(songMeta) * lengthInBeats;
     //     return (int)Math.Ceiling(lengthInMillis / 20);
     // }
     //
@@ -231,13 +231,13 @@ public static class PitchDetectionUtils
     //             {
     //                 pitchDetectionProcessCount++;
     //                 PitchDetectionResult pitchDetectionResult = new();
-    //                 
+    //
     //                 int endBeatExclusive = startBeat + lengthInBeats;
-    //                 
+    //
     //                 int singlePitchDetectionLengthInMillis = 100;
     //                 int singlePitchDetectionLengthInBeats = (int)BpmUtils.MillisecondInSongToBeatWithoutGap(songMeta, singlePitchDetectionLengthInMillis);
     //                 singlePitchDetectionLengthInBeats = NumberUtils.Limit(singlePitchDetectionLengthInBeats, 1, int.MaxValue);
-    //                 
+    //
     //                 for (int beat = startBeat; beat < endBeatExclusive; beat += singlePitchDetectionLengthInBeats)
     //                 {
     //                     int offsetInBeats = beat - startBeat;
@@ -308,8 +308,8 @@ public static class PitchDetectionUtils
     //         return null;
     //     }
     //
-    //     double startBeatInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, startBeat);
-    //     double singleBeatLengthInMillis = BpmUtils.MillisecondsPerBeat(songMeta);
+    //     double startBeatInMillis = BpmUtils.BeatsToMillis(songMeta, startBeat);
+    //     double singleBeatLengthInMillis = BpmUtils.MillisPerBeat(songMeta);
     //     double lengthInMillis = singleBeatLengthInMillis * lengthInBeats;
     //
     //     float[] monoAudioSamples = AudioUtils.GetAudioSamples(startBeatInMillis, lengthInMillis, audioClip, true);

@@ -13,40 +13,55 @@
                     <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
                 </ui:Button>
             </ui:VisualElement>
-            <ui:Toggle name="showFpsToggle" label="Show FPS" class="noBackgroundInHierarchy" />
-            <ItemPicker name="portAudioHostApiPicker" label="PortAudio Host API¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-            <ItemPicker name="portAudioOutputDevicePicker" label="PortAudio Output Device" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-            <ui:Button text="Show PortAudio Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
-            <ItemPicker name="systemAudioBackendDelayPicker" label="System Audio Backend Delay" wrap-around="true" min-value="0" max-value="500" step-value="10" />
-            <ItemPicker name="useVlcToPlayMediaFilesPicker" label="Use VLC to Play Audio&#10;and Video Files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy" />
-            <ItemPicker name="useFfmpegToPlayMediaFilesPicker" label="Use ffmpeg to Play Audio&#10;and Video Files (unstable)¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="logFfmpegOutputToggle" label="Log ffmpeg Output" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="checkCodecIsSupportedToggle" label="Check Codecs are Supported.&#10;(slower song search)" class="noBackgroundInHierarchy" />
-            <ItemPicker name="maxConcurrentSongMediaConversionsPicker" label="Max Concurrent Conversions" wrap-around="true" min-value="0" max-value="100" step-value="1" class="noBackgroundInHierarchy" />
-            <ui:TextField picking-mode="Ignore" label="ffmpeg Conversion Commands&#10;(JSON)" name="ffmpegConversionCommandsJsonPicker" is-delayed="true" multiline="true" class="noBackgroundInHierarchy multiline" style="align-items: center; flex-grow: 1; margin-bottom: 4px; min-height: 100px;" />
+            <ItemPicker name="minimumLogLevelPicker" label="Minimum Log Level¹" wrap-around="true" class="noBackgroundInHierarchy" />
             <ui:TextField picking-mode="Ignore" label="Absolute Path to Folder&#10;with Generated Files¹" name="generatedFolderPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
                 <ui:Label tabindex="-1" text="Default path" display-tooltip-when-elided="true" name="generatedFolderPathHintLabel" class="textFieldHint secondaryFontColor" style="left: auto; right: 10px;" />
             </ui:TextField>
-            <ItemPicker name="minimumLogLevelPicker" label="Minimum Log Level¹" wrap-around="true" class="noBackgroundInHierarchy" />
-            <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
-            <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
-            <ui:Toggle name="wipeLyricsEffectToggle" label="Wipe Lyrics Effect" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="analyzeBeatsWithoutTargetNoteToggle" label="Analyze Beats Without Target Note" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="animatedBackgroundItemToggle" label="Enable Animated Background¹" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="enableDynamicThemesToggle" label="Enable Themes¹" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="enableWebViewToggle" label="Enable embedded browser¹" wrapAround="true" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="useUniversalCharsetDetectorToggle" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
-            <ui:Toggle name="customEventSystemOptInOnAndroidToggle" label="Use custom event system&#10;for input actions.&#10;This enables keyboard&#10;and gamepad control&#10;but can cause issues on Android¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
-            <ui:TextField text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
-            <ui:TextField text="python -m spleeter" name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
-            <ui:IntegerField label="Connection Port¹&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />
-            <ui:Label text="Connection endpoint: ????" name="connectionEndpointLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
-            <ui:TextField label="HTTP Server Host¹&#10;(leave empty for automatic value)" name="httpServerHostTextField" class="noBackgroundInHierarchy mb-3" />
-            <ui:IntegerField label="HTTP Server Port¹&#10;(default: 6789)" name="httpServerPortTextField" class="noBackgroundInHierarchy mb-3" />
-            <ui:Label text="HTTP Endpoint Example: ????" name="httpEndpointExampleLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+            <ui:Toggle name="saveVocalsAndInstrumentalAudioInFolderOfSongToggle" label="Save vocals and instrumental audio&#10;in folder of song" class="noBackgroundInHierarchy" />
+            <AccordionItem name="inputAndPitchDetectionGroup" label="Input and Pitch Detection" class="child-mb-3">
+                <ItemPicker name="portAudioHostApiPicker" label="PortAudio Host API¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                <ItemPicker name="portAudioOutputDevicePicker" label="PortAudio Output Device" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                <ui:Button text="Show PortAudio Devices" display-tooltip-when-elided="true" name="portAudioDeviceInfoButton" style="align-self: flex-end;" />
+                <ItemPicker name="systemAudioBackendDelayPicker" label="System Audio Backend Delay" wrap-around="true" min-value="0" max-value="500" step-value="10" class="noBackgroundInHierarchy" />
+                <ItemPicker name="pitchDetectionAlgorithmPicker" label="Pitch Detection Algorithm" wrap-around="true" min-value="0" max-value="100" step-value="10" class="multiline noBackgroundInHierarchy" />
+                <ui:Toggle name="customEventSystemOptInOnAndroidToggle" label="Use custom event system&#10;for input actions.&#10;This enables better keyboard&#10;and gamepad control&#10;but can cause issues on Android¹" wrapAround="true" minValue="0" maxValue="100" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+            </AccordionItem>
+            <AccordionItem name="mediaFileFormatGroup" label="Media File Format Support" class="child-mb-3">
+                <ui:Toggle name="useUniversalCharsetDetectorToggle" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+                <ItemPicker name="songDataFetchTypeChooser" label="Song data loading.&#10;Upfront = smoother during song select&#10;On-demand = faster song folder scan" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                <ItemPicker name="useVlcToPlayMediaFilesPicker" label="Use VLC to Play Audio&#10;and Video Files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy" />
+                <ItemPicker name="useFfmpegToPlayMediaFilesPicker" label="Use ffmpeg to Play Audio&#10;and Video Files (unstable)¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="logFfmpegOutputToggle" label="Log ffmpeg Output" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="checkCodecIsSupportedToggle" label="Check Codecs are Supported&#10;(much slower song search)" class="noBackgroundInHierarchy" />
+                <ItemPicker name="maxConcurrentSongMediaConversionsPicker" label="Max Concurrent Conversions" wrap-around="true" min-value="0" max-value="100" step-value="1" class="noBackgroundInHierarchy" />
+                <ui:TextField picking-mode="Ignore" label="ffmpeg Conversion Commands&#10;(JSON)" name="ffmpegConversionCommandsJsonPicker" is-delayed="true" multiline="true" class="noBackgroundInHierarchy multiline" style="align-items: center; flex-grow: 1; margin-bottom: 4px; min-height: 100px;" />
+            </AccordionItem>
+            <AccordionItem name="webViewGroup" label="Embedded Browser" class="child-mb-3">
+                <ui:Toggle name="enableWebViewToggle" label="Enable embedded browser¹" wrapAround="true" class="noBackgroundInHierarchy" />
+            </AccordionItem>
+            <AccordionItem name="performanceAndEffectsGroup" label="Performance And Effects" class="child-mb-3">
+                <ui:Toggle name="showFpsToggle" label="Show FPS" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="animatedBackgroundItemToggle" label="Enable Animated Background¹" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="vfxEnabledToggle" label="Enable Visual Effects" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="enableDynamicThemesToggle" label="Enable Themes¹" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="wipeLyricsEffectToggle" label="Wipe Lyrics Effect" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="analyzeBeatsWithoutTargetNoteToggle" label="Analyze Beats Without Target Note" class="noBackgroundInHierarchy" />
+            </AccordionItem>
+            <AccordionItem name="clientConnectionGroup" label="Client Connections" class="child-mb-3">
+                <ui:IntegerField label="Connection Port¹&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />
+                <ui:Label text="Connection endpoint: ????" name="connectionEndpointLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
+                <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
+                <ui:TextField label="HTTP Server Host¹&#10;(leave empty for automatic value)" name="httpServerHostTextField" class="noBackgroundInHierarchy mb-3" />
+                <ui:IntegerField label="HTTP Server Port¹&#10;(default: 6789)" name="httpServerPortTextField" class="noBackgroundInHierarchy mb-3" />
+                <ui:Label text="HTTP Endpoint Example: ????" name="httpEndpointExampleLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+            </AccordionItem>
+            <AccordionItem name="externalToolsGroup" label="External Tools" class="child-mb-3">
+                <ui:TextField text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
+                <ui:TextField text="python -m spleeter" name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
+            </AccordionItem>
             <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
-            <ui:Label tabindex="-1" text="¹ requires restart" display-tooltip-when-elided="true" name="requiresRestartLabel" />
+            <ui:Label tabindex="-1" text="¹ requires restart" display-tooltip-when-elided="true" name="requiresRestartLabel" class="noBackgroundInHierarchy" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

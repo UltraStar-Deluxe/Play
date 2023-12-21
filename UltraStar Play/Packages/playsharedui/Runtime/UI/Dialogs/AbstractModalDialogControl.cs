@@ -1,5 +1,4 @@
-﻿using System;
-using PrimeInputActions;
+﻿using PrimeInputActions;
 using UniInject;
 using UniRx;
 using UnityEngine.UIElements;
@@ -11,7 +10,7 @@ public abstract class AbstractModalDialogControl : AbstractDialogControl, INeedI
 
     protected VisualElement lastFocusedVisualElement;
 
-    public virtual void OnInjectionFinished()
+    public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
         lastFocusedVisualElement = DialogRootVisualElement.focusController.focusedElement as VisualElement;
@@ -24,10 +23,10 @@ public abstract class AbstractModalDialogControl : AbstractDialogControl, INeedI
                 CloseDialog();
                 InputManager.GetInputAction("usplay/back").CancelNotifyForThisFrame();
             }));
-        
+
         // Close by clicking on background
         VisualElementUtils.RegisterDirectClickCallback(DialogRootVisualElement, () => CloseDialog());
-        
+
         // Close by clicking on default close button
         defaultCloseDialogButton?.RegisterCallbackButtonTriggered(_ => CloseDialog());
         defaultCloseDialogButton?.Focus();

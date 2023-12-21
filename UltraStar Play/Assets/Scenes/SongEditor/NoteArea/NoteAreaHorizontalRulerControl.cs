@@ -13,10 +13,10 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     [Inject]
     private SongMeta songMeta;
-    
+
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
-    
+
     [Inject]
     private NoteAreaControl noteAreaControl;
 
@@ -40,7 +40,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
     private ViewportEvent lastViewportEvent;
 
-    private float lastSongMetaBpm;
+    private double lastSongMetaBpm;
 
     private readonly VisualElementPool<Label> labelPool = new();
 
@@ -57,7 +57,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.GridSizeInPx)
             .Subscribe(_ => UpdateLines())
             .AddTo(gameObject);
-        
+
         settings.ObserveEveryValueChanged(_ => settings.SongEditorSettings.TimeLabelFormat)
             .Subscribe(_ => UpdateLabelTexts())
             .AddTo(gameObject);
@@ -79,7 +79,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         {
             return;
         }
-        
+
         labelPool.ForEach(label =>
         {
             if (label == null)
@@ -87,7 +87,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
                 return;
             }
             int beat = (int)label.userData;
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
             label.text = GetLabelText(beat, beatPosInMillis);
         });
     }
@@ -102,9 +102,9 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
         if (lastViewportEvent == null
             || lastViewportEvent.X != viewportEvent.X
             || lastViewportEvent.Width != viewportEvent.Width
-            || songMeta.Bpm != lastSongMetaBpm)
+            || songMeta.BeatsPerMinute != lastSongMetaBpm)
         {
-            lastSongMetaBpm = songMeta.Bpm;
+            lastSongMetaBpm = songMeta.BeatsPerMinute;
 
             if (settings.SongEditorSettings.GridSizeInPx > 0)
             {
@@ -147,7 +147,7 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
 
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)
@@ -182,12 +182,12 @@ public class NoteAreaHorizontalRulerControl : INeedInjection, IInjectionFinished
             drawStepRough = 4;
         }
 
-        double millisPerBeat = BpmUtils.MillisecondsPerBeat(songMeta);
+        double millisPerBeat = SongMetaBpmUtils.MillisPerBeat(songMeta);
         double labelWidthInMillis = millisPerBeat * drawStepRough;
 
         for (int beat = viewportStartBeat; beat < viewportEndBeat; beat++)
         {
-            double beatPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, beat);
+            double beatPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, beat);
 
             bool hasRoughLine = drawStepRough > 0 && (beat % drawStepRough == 0);
             if (hasRoughLine)

@@ -51,6 +51,9 @@ public static class ApplicationUtils
         }
     }
 
+    public static readonly string ultraStarPlaylistFileExtension = "upl";
+    public static readonly string m3uPlaylistFileExtension = "m3u";
+
     public static readonly IReadOnlyCollection<string> supportedSoundfontFiles = new HashSet<string>
     {
         "sf2",
@@ -380,5 +383,10 @@ public static class ApplicationUtils
             .Union(includeFfmpegFormats ? ffmpegSupportedVideoFiles : new List<string>())
             .Union(includeVlcFormats ? vlcSupportedVideoFiles : new List<string>())
             .ToHashSet();
+    }
+
+    public static string GetTemporaryCachePath(string pathInsideTemporaryCachePath)
+    {
+        return $"{Application.temporaryCachePath}/{pathInsideTemporaryCachePath}";
     }
 }

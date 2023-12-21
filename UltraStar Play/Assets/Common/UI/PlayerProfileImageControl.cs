@@ -1,4 +1,5 @@
 ﻿using UniInject;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -58,10 +59,8 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
         UpdatePlayerImageBackgroundColor();
 
         string finalImagePath = uiManager.GetFinalPlayerProfileImagePath(playerProfile);
-        uiManager.LoadPlayerProfileImage(finalImagePath, loadedSprite =>
-        {
-            image.style.backgroundImage = new StyleBackground(loadedSprite);
-        });
+        uiManager.LoadPlayerProfileImage(finalImagePath)
+            .Subscribe(loadedSprite => image.style.backgroundImage = new StyleBackground(loadedSprite));
     }
 
     private void UpdatePlayerImageBackgroundColor()

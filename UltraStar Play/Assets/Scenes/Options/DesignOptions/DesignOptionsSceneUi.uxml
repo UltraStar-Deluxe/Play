@@ -3,14 +3,14 @@
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" style="width: 100%; height: 10%; flex-grow: 1; margin-bottom: 20px;">
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="themePicker" label="Theme" class="noBackgroundInHierarchy" />
             <ItemPicker wrap-around="true" min-value="0" max-value="100" step-value="10" name="backgroundLightItemPicker" label="Background Lights" class="noBackgroundInHierarchy" />
-            <ItemPicker name="imageAsCursorPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Use Image as Cursor" class="noBackgroundInHierarchy" />
-            <ItemPicker name="vfxEnabledPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Visual Effects" class="noBackgroundInHierarchy" />
             <ItemPicker name="sceneChangeAnimationPicker" wrap-around="true" min-value="0" max-value="100" step-value="10" label="Scene Transition" class="noBackgroundInHierarchy" />
             <ItemPicker name="sceneChangeDurationPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Scene Transition Duration" class="noBackgroundInHierarchy" />
             <ItemPicker name="previewFadeInDurationChooser" label="Preview Fade-in Duration" wrap-around="true" min-value="0" max-value="5" step-value="0.5" class="noBackgroundInHierarchy" />
-            <ItemPicker name="showScrollBarInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Scroll Bar in Song Select" class="noBackgroundInHierarchy" />
-            <ItemPicker name="showSongIndexInSongSelectPicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Show Index in Song Select" class="noBackgroundInHierarchy" />
             <ItemPicker name="songBackgroundScaleModePicker" wrap-around="true" min-value="0" max-value="1" step-value="0.05" label="Song Background Scale Mode" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="imageAsCursorToggle" label="Use Image as Cursor" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="showSongIndexInSongSelectToggle" label="Show Index in Song Select" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="showScrollBarInSongSelectToggle" label="Show Scroll Bar in Song Select" class="noBackgroundInHierarchy" />
+            <ui:Toggle name="navigateFoldersInSongSelectToggle" label="Navigate Folders in Song Select" class="noBackgroundInHierarchy" />
         </ui:ScrollView>
     </ui:VisualElement>
 </ui:UXML>

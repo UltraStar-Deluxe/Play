@@ -6,7 +6,6 @@ using LibVLCSharp;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Video;
 
 public class SongAudioPlayer : MonoBehaviour, INeedInjection
@@ -30,10 +29,16 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     private FfplayCommand ffplayCommand;
     private FfmpegPlayerVideoTexture ffmpegPlayerVideoTexture;
 
+    [InjectedInAwake]
     private Settings settings;
-    private AudioManager audioManager;
+
+    [InjectedInAwake]
     private WebViewManager webViewManager;
+
+    [InjectedInAwake]
     private SceneNavigator sceneNavigator;
+
+    [InjectedInAwake]
     private VlcManager vlcManager;
 
     private readonly Lazy<MidiManager> midiManagerLazy = new(() => MidiManager.Instance);
@@ -226,7 +231,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             {
                 rawResult = videoPlayer.time * 1000.0;
             }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource
+                     && audioSource.clip != null)
             {
                 int positionInSamples = audioSource.timeSamples;
                 rawResult = ((double)positionInSamples / (double)audioSource.clip.frequency) * 1000.0;
@@ -246,7 +252,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public double DurationOfSongInMillis { get; private set; }
     public double DurationOfSongInSeconds => DurationOfSongInMillis / 1000.0;
-    public double DurationOfSongInBeats => BpmUtils.MillisecondInSongToBeat(loadedSongMeta, DurationOfSongInMillis);
+    public double DurationOfSongInBeats => SongMetaBpmUtils.MillisToBeats(loadedSongMeta, DurationOfSongInMillis);
 
     /**
      * Position in the song from 0 (start of song) to 1 (end of song).
@@ -366,7 +372,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         // Early fetch of dependencies.
         // This is needed because the SongAudioPlayer is called early in the scene setup.
         // TODO: This is not making use of UniInject. Find a better way to do this (e.g. inject objects in order of their dependencies).
-        audioManager = AudioManager.Instance;
         webViewManager = WebViewManager.Instance;
         sceneNavigator = SceneNavigator.Instance;
         settings = SettingsManager.Instance.Settings;
@@ -545,8 +550,6 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
     public void UnloadAudio()
     {
-        AudioSupportProvider = EAudioSupportProvider.None;
-
         StopAllCoroutines();
         StopAudio();
         audioSource.clip = null;
@@ -558,6 +561,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         DurationOfSongInMillis = 0;
 
         videoPlayerErrorMessages.Clear();
+
+        AudioSupportProvider = EAudioSupportProvider.None;
     }
 
     private IObservable<SongAudioLoadedEvent> LoadWithMidiManager(SongMeta songMeta, string audioUri,
@@ -592,7 +597,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             AudioSupportProvider = EAudioSupportProvider.UnityAudioSource;
-            audioManager.LoadAudioClipFromUri(audioUri, streamAudio)
+            AudioManager.LoadAudioClipFromUri(audioUri, streamAudio)
                 .CatchIgnore((Exception error) => o.OnError(error))
                 .Subscribe(loadedAudioClip =>
                 {
@@ -881,7 +886,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         // The WebView is loaded asynchronously. When the duration is available then the audio is loaded.
         long startTime = TimeUtils.GetUnixTimeMilliseconds();
-        long timeoutInMillis = 5000;
+        long timeoutInMillis = 10000;
         return Observable.Create<SongAudioLoadedEvent>(o =>
         {
             StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
@@ -1129,7 +1134,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
 
         double millisInSong = PositionInSongInMillis;
-        double result = BpmUtils.MillisecondInSongToBeat(loadedSongMeta, millisInSong);
+        double result = SongMetaBpmUtils.MillisToBeats(loadedSongMeta, millisInSong);
         if (result < 0
             && !allowNegativeResult)
         {

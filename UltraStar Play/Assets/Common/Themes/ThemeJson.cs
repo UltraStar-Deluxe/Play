@@ -9,11 +9,13 @@ using UnityEngine;
 [Serializable]
 public class ThemeJson
 {
+    public List<string> styleSheets;
+
     public StaticBackgroundJson staticBackground;
     public Dictionary<string, StaticAndDynamicBackgroundJson> sceneSpecificBackgrounds;
     public DynamicBackgroundJson dynamicBackground;
     public SongRatingIconsJson songRatingIcons;
-    
+
     public ControlStyleConfig defaultControl;
     public ControlStyleConfig transparentButton;
     public ControlStyleConfig textOnlyButton;
@@ -23,18 +25,18 @@ public class ThemeJson
     public ControlStyleConfig slideToggleOn;
     public ControlStyleConfig dynamicPanel;
     public ControlStyleConfig staticPanel;
-    
+
     public Color32 primaryFontColor;
     public Color32 secondaryFontColor;
     public Color32 warningFontColor;
     public Color32 errorFontColor;
     public TextShadowConfig noBackgroundInHierarchyTextShadow;
-    
+
     public List<Color32> microphoneColors;
     public Dictionary<string, Color32> phraseRatingColors;
     public Dictionary<string, Color32> songEditorLayerColors;
     public Color32 videoPreviewColor;
-    
+
     public string backgroundMusic;
 
     public GradientConfig lyricsContainerGradient;

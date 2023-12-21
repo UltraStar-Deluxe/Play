@@ -18,13 +18,13 @@ public class SetVideoGapAction : INeedInjection
     [Inject]
     private SongMetaChangeEventStream songMetaChangeEventStream;
 
-    public void Execute(float newVideoGap)
+    public void Execute(double newVideoGap)
     {
-        songMeta.VideoGap = newVideoGap;
+        songMeta.VideoGapInMillis = newVideoGap;
         songVideoPlayer.SyncVideoPositionWithAudio(true);
     }
 
-    public void ExecuteAndNotify(float newVideoGap)
+    public void ExecuteAndNotify(double newVideoGap)
     {
         Execute(newVideoGap);
         songMetaChangeEventStream.OnNext(new SongPropertyChangedEvent(ESongProperty.VideoGap));

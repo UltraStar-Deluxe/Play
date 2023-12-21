@@ -34,7 +34,7 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
     [Inject]
     private OverviewAreaControl overviewAreaControl;
 
-    private string FolderPath => songMeta.Directory;
+    private string FolderPath => SongMetaUtils.GetDirectoryPath(songMeta);
 
     private readonly List<IDisposable> disposables = new();
 
@@ -89,7 +89,7 @@ public class SongEditorFileSystemWatcher : MonoBehaviour, INeedInjection
 
     private void ReloadAudioFiles(HashSet<string> changedFiles)
     {
-        if (songMeta.Mp3.IsNullOrEmpty())
+        if (songMeta.Audio.IsNullOrEmpty())
         {
             return;
         }

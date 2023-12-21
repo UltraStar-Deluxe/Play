@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="root">
+        <ui:VisualElement name="row" style="align-items: center;">
+            <ui:Label tabindex="-1" text="My Custom Mod Name" parse-escape-sequences="true" display-tooltip-when-elided="true" name="modNameLabel" class="mr-auto ml-1 mt-1 mb-1" />
+            <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="modSettingsButton" class="squareButton mr-2">
+                <MaterialIcon tabindex="-1" name="modSettingsIcon" icon="settings" />
+            </ui:Button>
+            <ui:VisualElement name="modListEntryInactiveOverlay" picking-mode="Ignore" class="inactiveOverlay overlay roundCorners" style="width: 100%;" />
+            <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="openModFolderButton" class="squareButton mr-2">
+                <MaterialIcon tabindex="-1" name="openModFolderIcon" icon="open_in_new" />
+            </ui:Button>
+            <ui:Button parse-escape-sequences="true" display-tooltip-when-elided="true" name="modInfoButton" class="squareButton">
+                <MaterialIcon tabindex="-1" name="modInfoIcon" icon="info_outline" />
+            </ui:Button>
+            <SlideToggle name="enabledToggle" class="m-1" style="margin-left: 8px; margin-right: 4px; margin-top: 4px; margin-bottom: 4px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="warningContainer" style="flex-direction: row; align-items: center; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: center;">
+            <MaterialIcon name="warningIcon" icon="warning" class="rounded warning noBackgroundInHierarchy" style="margin-right: 5px;" />
+            <ui:Label text="Failed to load mod. Check log for details." display-tooltip-when-elided="true" name="warningLabel" class="noBackgroundInHierarchy" style="white-space: normal; flex-shrink: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -8,6 +8,7 @@
                 <ItemPicker name="devModePicker" noPreviousButton="true" wrapAround="true" wrap-around="true" label="Developer Mode" class="controlWithLabelVertical" />
                 <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="onlyVisibleWhenDevModeEnabled" />
                 <ui:Button text="View Log" display-tooltip-when-elided="true" name="viewLogButton" class="onlyVisibleWhenDevModeEnabled" />
+                <ItemPicker name="minimumLogLevelPicker" noPreviousButton="true" wrapAround="true" wrap-around="true" label="Minimum Log Level" class="controlWithLabelVertical onlyVisibleWhenDevModeEnabled" />
                 <ItemPicker name="targetFpsPicker" noPreviousButton="true" wrapAround="true" wrap-around="true" label="FPS" class="controlWithLabelVertical onlyVisibleWhenDevModeEnabled" />
                 <ui:IntegerField label="Connection Port on Main Game&#10;(default 34567)" value="34567" name="connectionServerPortTextField" is-delayed="true" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />
                 <ui:TextField label="IP Address of Main Game&#10;(leave empty for automatic connection)" name="connectionServerAddressTextField" is-delayed="true" class="onlyVisibleWhenDevModeEnabled" style="flex-direction: column;" />

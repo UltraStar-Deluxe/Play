@@ -35,6 +35,13 @@
       "dependencies": {},
       "hash": "5b6e02e899a69af2aa5eb22d49927697bfbd8a38"
     },
+    "com.achimmihca.sqliteunity": {
+      "version": "https://github.com/achimmihca/SQLiteUnity.git?path=SQLiteUnity/Packages/com.achimmihca.sqliteunity#654876bc42a72eb46feb045d86e3b7ea01fb50fc",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "654876bc42a72eb46feb045d86e3b7ea01fb50fc"
+    },
     "com.achimmihca.uniinject": {
       "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#f8c6f93dabc03137957588f7d9e572fc623272b0",
       "depth": 0,
@@ -49,15 +56,24 @@
       "dependencies": {},
       "hash": "31253e868265494482a8bb32269942b0b2e3d17e"
     },
+    "com.community.netcode.transport.facepunch": {
+      "version": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.facepunch",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.netcode.gameobjects": "1.0.0-pre.4"
+      },
+      "hash": "b2265b5a650ccc1c4ea4526351839b1c6e3263e0"
+    },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.2",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "afc36b236c8b4ad2aef25dae3dd0c8d381e264f9"
+      "hash": "f2af6f436926f19052cf3df832083a3f111a9ea7"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -84,7 +100,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.7",
+      "version": "1.8.8",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -97,6 +113,16 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.collections": {
+      "version": "1.2.4",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.6.6",
+        "com.unity.test-framework": "1.1.31"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.ext.nunit": {
@@ -125,7 +151,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.6.3",
+      "version": "1.7.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -143,6 +169,23 @@
     "com.unity.mobile.android-logcat": {
       "version": "1.3.2",
       "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.netcode.gameobjects": {
+      "version": "1.5.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.nuget.mono-cecil": "1.10.1",
+        "com.unity.transport": "1.3.4"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.mono-cecil": {
+      "version": "1.11.4",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -231,6 +274,17 @@
       "dependencies": {
         "com.unity.sysroot": "2.0.7",
         "com.unity.sysroot.linux-x86_64": "2.0.6"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.transport": {
+      "version": "1.3.4",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.collections": "1.2.4",
+        "com.unity.burst": "1.6.6",
+        "com.unity.mathematics": "1.2.6"
       },
       "url": "https://packages.unity.com"
     },

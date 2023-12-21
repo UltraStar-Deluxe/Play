@@ -4,6 +4,7 @@
         <ui:Label text="Player 1" display-tooltip-when-elided="true" name="playerNameLabel" picking-mode="Ignore" class="titleText noBackgroundInHierarchy ellipsis" style="margin-right: 5px; flex-shrink: 1; flex-grow: 1;" />
         <MaterialIcon name="commonScoreIcon" icon="diversity_2" style="display: none;" />
         <ui:VisualElement name="rightSide" picking-mode="Ignore" style="flex-direction: row; justify-content: flex-end; height: 100%; align-items: center; flex-shrink: 0;">
+            <MaterialIcon tabindex="-1" name="highScoreSourceIcon" icon="cloud" class="mr-3" />
             <ui:Label text="99999" display-tooltip-when-elided="true" name="scoreLabel" picking-mode="Ignore" class="titleText noBackgroundInHierarchy" style="margin-right: 20px;" />
             <ui:Label text="01.01.2020" display-tooltip-when-elided="true" name="dateLabel" picking-mode="Ignore" class="titleText noBackgroundInHierarchy" />
         </ui:VisualElement>

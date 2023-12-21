@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.UIElements;
 #if UNITY_ANDROID
     using UnityEngine.Android;
@@ -58,14 +57,17 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject(UxmlName = R.UxmlNames.issuesIcon)]
     private VisualElement issuesIcon;
 
-    [Inject(UxmlName = R.UxmlNames.searchAudioFilesWithoutSongMetaToggle)]
-    private Toggle searchAudioFilesWithoutSongMetaToggle;
+    [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
+    private Toggle searchMidiFilesWithLyricsToggle;
 
     [Inject]
     private Injector injector;
 
     [Inject]
     private SongMetaManager songMetaManager;
+
+    [Inject]
+    private SongIssueManager songIssueManager;
 
     [Inject]
     private OptionsOverviewSceneControl optionsOverviewSceneControl;
@@ -75,15 +77,18 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
 
     private MessageDialogControl deleteSongFolderDialog;
 
+    private string settingsAtStart;
+
     protected override void Start()
     {
         base.Start();
+
+        settingsAtStart = JsonConverter.ToJson(settings);
 
         if (SongMetaManager.IsSongScanFinished)
         {
             UpdateSongIssues();
         }
-        songMetaManager.ScanFilesIfNotDoneYet();
         songMetaManager.SongScanFinishedEventStream
             .Subscribe(_ => Scheduler.MainThread.Schedule(() => UpdateSongIssues()))
             .AddTo(gameObject);
@@ -95,9 +100,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         addSongFolderButton.RegisterCallbackButtonTriggered(_ => AddNewSongFolder());
         downloadSongArchiveButton.RegisterCallbackButtonTriggered(_ => CreateDownloadSongArchiveUiControl());
 
-        FieldBindingUtils.Bind(searchAudioFilesWithoutSongMetaToggle,
-            () => settings.SearchAudioFilesWithoutSongMeta,
-            newValue => settings.SearchAudioFilesWithoutSongMeta = newValue);
+        FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
+            () => settings.SearchMidiFilesWithLyrics,
+            newValue => settings.SearchMidiFilesWithLyrics = newValue);
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -123,8 +128,16 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .WithRootVisualElement(visualElement)
             .CreateAndInject<DownloadSongArchiveUiControl>();
 
-        StartCoroutine(WebRequestUtils.LoadTextFromUri(songArchiveInfoJsonUrl,
-            json => downloadSongArchiveUiControl.SongArchiveEntries = JsonConverter.FromJson<List<SongArchiveEntry>>(json)));
+        // Send web request
+        UnityWebRequest webRequest = UnityWebRequest.Get(new Uri(songArchiveInfoJsonUrl));
+        webRequest.SendWebRequest();
+        StartCoroutine(CoroutineUtils.WebRequestCoroutine(webRequest,
+            downloadHandler =>
+            {
+                downloadSongArchiveUiControl.SongArchiveEntries =
+                    JsonConverter.FromJson<List<SongArchiveEntry>>(downloadHandler.text);
+            },
+            ex => Debug.LogException(ex)));
 
         downloadSongArchiveUiControl.IsDoneWithoutError.Subscribe(newValue =>
         {
@@ -186,11 +199,11 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         // Update icon style
         issuesIcon.RemoveFromClassList(R.UssClasses.warningFontColor);
         issuesIcon.RemoveFromClassList(R.UssClasses.errorFontColor);
-        if (songMetaManager.GetSongErrors().Count > 0)
+        if (SongIssueManager.GetSongErrors().Count > 0)
         {
             issuesIcon.AddToClassList(R.UssClasses.errorFontColor);
         }
-        else if (songMetaManager.GetSongWarnings().Count > 0)
+        else if (SongIssueManager.GetSongWarnings().Count > 0)
         {
             issuesIcon.AddToClassList(R.UssClasses.warningFontColor);
         }
@@ -220,8 +233,6 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_createSongInfo) },
             { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo_title),
                 TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_downloadSongInfo) },
-            { TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songsWithoutSingAlongDataInfo_title),
-                TranslationManager.GetTranslation(R.Messages.options_songLibrary_helpDialog_songsWithoutSingAlongDataInfo) },
         };
         if (PlatformUtils.IsAndroid)
         {
@@ -249,22 +260,56 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .CreateAndInject<MessageDialogControl>();
         issuesDialogControl.Title = TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_title);
 
+        if (SongIssueManager.IsSongIssueScanFinished)
+        {
+            FillIssuesDialog(issuesDialogControl);
+        }
+        else
+        {
+            // Start song issue scan if needed
+            if (!SongIssueManager.IsSongIssueScanStarted)
+            {
+                songIssueManager.ReloadSongIssues();
+            }
+
+            // Show message that song issue scan is in progress
+            FillIssuesDialogWithSongIssueScanInProgressMessage(issuesDialogControl);
+
+            // Update dialog when song issue scan finished
+            songIssueManager.SongIssueScanFinishedEventStream
+                .SubscribeOneShot(evt =>
+                {
+                    issuesDialogControl.CloseDialog();
+                    CreateIssuesDialogControl();
+                });
+        }
+
+        return issuesDialogControl;
+    }
+
+    private void FillIssuesDialogWithSongIssueScanInProgressMessage(MessageDialogControl issuesDialogControl)
+    {
+        issuesDialogControl.AddVisualElement(new Label("Searching issues in loaded songs. Please wait..."));
+    }
+
+    private void FillIssuesDialog(MessageDialogControl issuesDialogControl)
+    {
         AccordionGroup accordionGroup = new();
         issuesDialogControl.AddVisualElement(accordionGroup);
 
         AccordionItem errorsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_errors));
         accordionGroup.Add(errorsAccordionItem);
-        FillWithSongIssues(errorsAccordionItem, songMetaManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
+        FillWithSongIssues(errorsAccordionItem, SongIssueManager.GetSongErrors(), out List<QuickFixAction> errorQuickFixActions);
 
         AccordionItem warningsAccordionItem = new(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songIssueDialog_warnings));
         accordionGroup.Add(warningsAccordionItem);
-        FillWithSongIssues(warningsAccordionItem, songMetaManager.GetSongWarnings(), out List<QuickFixAction> warningQuickFixActions);
+        FillWithSongIssues(warningsAccordionItem, SongIssueManager.GetSongWarnings(), out List<QuickFixAction> warningQuickFixActions);
 
-        if (!songMetaManager.GetSongErrors().IsNullOrEmpty())
+        if (!SongIssueManager.GetSongErrors().IsNullOrEmpty())
         {
             errorsAccordionItem.ShowAccordionContent();
         }
-        else if (!songMetaManager.GetSongWarnings().IsNullOrEmpty())
+        else if (!SongIssueManager.GetSongWarnings().IsNullOrEmpty())
         {
             warningsAccordionItem.ShowAccordionContent();
         }
@@ -284,13 +329,15 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         }
 
         // Refresh button
-        issuesDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.refresh), _ =>
+        issuesDialogControl.AddButton("Refresh Issues in Loaded Songs", _ =>
         {
             songMetaManager.ReloadSongMetas();
-            issuesDialogControl.CloseDialog();
-        });
+            songIssueManager.ReloadSongIssues();
 
-        return issuesDialogControl;
+            // Update dialog
+            issuesDialogControl.CloseDialog();
+            CreateIssuesDialogControl();
+        });
     }
 
     private Button CreateQuickFixAllButton(string title, List<QuickFixAction> quickFixActions)
@@ -454,10 +501,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         visualElement.Q<Label>(R.UxmlNames.title).text = songMetaArtistAndTitle;
         Button openFolderButtonOfSongMeta = visualElement.Q<Button>(R.UxmlNames.openFolderButton);
         if (PlatformUtils.IsStandalone
-            && !songIssue.SongMeta.Directory.IsNullOrEmpty()
-            && Directory.Exists(songIssue.SongMeta.Directory))
+            && DirectoryUtils.Exists(SongMetaUtils.GetDirectoryPath(songIssue.SongMeta)))
         {
-            openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(songIssue.SongMeta.Directory));
+            openFolderButtonOfSongMeta.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(SongMetaUtils.GetDirectoryPath(songIssue.SongMeta)));
         }
         else
         {
@@ -633,7 +679,11 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
             .Distinct()
             .ToList();
 
-        songMetaManager.ReloadSongMetas();
+        if (settingsAtStart != JsonConverter.ToJson(settings))
+        {
+            Debug.Log("Reloading songs because settings changed");
+            songMetaManager.ReloadSongMetas();
+        }
     }
 
     private class QuickFixAction

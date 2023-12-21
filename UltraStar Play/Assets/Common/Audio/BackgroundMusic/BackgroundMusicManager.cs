@@ -44,18 +44,15 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private SceneRecipeManager sceneRecipeManager;
-    
+
     [Inject]
     private ThemeManager themeManager;
 
     [Inject]
-    private AudioManager audioManager;
-    
-    [Inject]
     private SceneNavigator sceneNavigator;
 
     private float lastPauseTimeInSeconds;
-    
+
     private AudioClip defaultBackgroundMusicAudioClip;
 
     protected override object GetInstance()
@@ -115,19 +112,20 @@ public class BackgroundMusicManager : AbstractSingletonBehaviour, INeedInjection
         if (!backgroundMusicPath.IsNullOrEmpty())
         {
             string absolutePath = ThemeMetaUtils.GetAbsoluteFilePath(currentTheme, backgroundMusicPath);
-            audioManager.LoadAudioClipFromUri(absolutePath).Subscribe(loadedAudioClip =>
-            {
-                if (loadedAudioClip != null
-                    && backgroundMusicAudioSource.clip != loadedAudioClip)
+            AudioManager.LoadAudioClipFromUri(absolutePath)
+                .Subscribe(loadedAudioClip =>
                 {
-                    backgroundMusicAudioSource.clip = loadedAudioClip;
-                }
-                else if (loadedAudioClip == null
-                         && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
-                {
-                    backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
-                }
-            });
+                    if (loadedAudioClip != null
+                        && backgroundMusicAudioSource.clip != loadedAudioClip)
+                    {
+                        backgroundMusicAudioSource.clip = loadedAudioClip;
+                    }
+                    else if (loadedAudioClip == null
+                             && backgroundMusicAudioSource.clip != defaultBackgroundMusicAudioClip)
+                    {
+                        backgroundMusicAudioSource.clip = defaultBackgroundMusicAudioClip;
+                    }
+                });
         }
     }
 }

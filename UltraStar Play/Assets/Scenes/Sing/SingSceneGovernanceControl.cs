@@ -383,7 +383,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
         else
         {
             contextMenuPopup.AddButton("Separate audio", "call_split",
-                () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta));
+                () => audioSeparationManager.ProcessSongMeta(singSceneControl.SongMeta, true));
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using PrimeInputActions;
 using UniInject;
 using UniRx;
@@ -12,34 +13,34 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 {
     [Inject]
     private SongSelectSceneControl songSelectSceneControl;
-    
+
     [Inject]
     private SongSearchControl songSearchControl;
-    
+
     [Inject]
     private SongRouletteControl songRouletteControl;
 
     [Inject]
     private SceneNavigator sceneNavigator;
-    
+
     [Inject]
     private FocusableNavigator focusableNavigator;
 
     [Inject(UxmlName = R.UxmlNames.songListView)]
     private VisualElement songListView;
-    
+
     [Inject(UxmlName = R.UxmlNames.inputLegend, Optional = true)]
     private VisualElement inputLegendContainer;
-    
+
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private PanelHelper panelHelper;
 
     [Inject]
     private WebViewManager webViewManager;
-    
+
     private readonly ReactiveProperty<string> fuzzySearchText = new("");
     public IObservable<string> FuzzySearchText => fuzzySearchText;
     private float fuzzySearchLastInputTimeInSeconds;
@@ -49,77 +50,102 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     {
         focusableNavigator.NoNavigationTargetFoundInListViewCallback = OnNoNavigationTargetFoundInListView;
         focusableNavigator.BeforeNavigationInListViewCallback = OnBeforeNavigationInListView;
-        
+
         songListView.ReleaseMouse();
-            
+
         // Toggle song is favorite
         InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).PerformedAsObservable()
             .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() == 0)
             .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavorite).InputAction.ReadValue<float>() >= 1)
             .Subscribe(_ => songSelectSceneControl.ToggleSelectedSongIsFavorite());
-        
+
         // Toggle favorite playlist is active
         InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).PerformedAsObservable()
             .Where(_ => InputManager.GetInputAction(R.InputActions.usplay_toggleFavoritePlaylistActive).InputAction.ReadValue<float>() >= 1)
             .Subscribe(_ => songSelectSceneControl.ToggleFavoritePlaylist());
-        
+
         // Close search or leave scene with Back
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_search).PerformedAsObservable()
             .Subscribe(_ => songSearchControl.FocusSearchTextField());
-        
+
         // Select random song
         InputManager.GetInputAction(R.InputActions.usplay_randomSong).PerformedAsObservable()
             .Subscribe(_ => songSelectSceneControl.SelectRandomSong());
-        
+
         // Open the song editor
         InputManager.GetInputAction(R.InputActions.usplay_openSongEditor).PerformedAsObservable()
             .Subscribe(_ => songSelectSceneControl.StartSongEditorScene());
-        
+
         // Toggle selected players
         InputManager.GetInputAction(R.InputActions.usplay_togglePlayers).PerformedAsObservable()
             .Subscribe(_ => songSelectSceneControl.ToggleSelectedPlayers());
-        
+
         // Toggle song menu
         InputManager.GetInputAction(R.InputActions.usplay_toggleSongMenu).PerformedAsObservable()
             .Where(_ => !songSearchControl.IsSearchTextFieldFocused() && fuzzySearchText.Value.IsNullOrEmpty())
-            .Subscribe(_ => songRouletteControl.OpenSelectedSongContextMenu());
-        
+            .Subscribe(_ => songRouletteControl.OpenSelectedEntryContextMenu());
+
         // Open the sing scene
         InputManager.GetInputAction(R.InputActions.usplay_start).PerformedAsObservable()
-            .Subscribe(_ => songSelectSceneControl.AttemptStartSelectedSong());
-        
+            .Subscribe(_ => songSelectSceneControl.AttemptStartSelectedEntry());
+
         // Select controls
         InputManager.GetInputAction(R.InputActions.ui_scrollWheel).PerformedAsObservable()
             .Subscribe(OnScrollWheel);
         InputManager.GetInputAction(R.InputActions.usplay_nextSong).PerformedAsObservable()
-            .Subscribe(_ => songRouletteControl.SelectNextSong());
+            .Subscribe(_ => songRouletteControl.SelectNextEntry());
         InputManager.GetInputAction(R.InputActions.usplay_previousSong).PerformedAsObservable()
-            .Subscribe(_ => songRouletteControl.SelectPreviousSong());
+            .Subscribe(_ => songRouletteControl.SelectPreviousEntry());
+
+        // Navigate to parent folder
+        InputManager.GetInputAction(R.InputActions.usplay_navigateToParentFolder).PerformedAsObservable()
+            .Where(_ => !songSearchControl.IsSearchTextFieldFocused() && fuzzySearchText.Value.IsNullOrEmpty())
+            .Subscribe(ctx => songSelectSceneControl.TryNavigateToParentFolder());
+
+        // Navigate to parent folder with right click on song list
+        songListView.RegisterCallback<PointerUpEvent>(evt =>
+        {
+            VisualElement targetElement = evt.target as VisualElement;
+            if (targetElement == null)
+            {
+                return;
+            }
+            List<VisualElement> ancestors = targetElement.GetAncestors();
+            if (ancestors.AnyMatch(ancestor => ancestor.name == R.UxmlNames.songEntryUiRoot))
+            {
+                return;
+            }
+
+            if (evt.button == 1)
+            {
+                songSelectSceneControl.TryNavigateToParentFolder();
+            }
+        });
     }
 
     private bool OnBeforeNavigationInListView(NavigationParameters navigationParameters)
     {
         if (navigationParameters.focusedVisualElement != songListView
-            || songRouletteControl.Selection.Value.SongMeta == null)
+            || songRouletteControl.Selection.Value.Entry == null)
         {
             return false;
         }
 
         if (navigationParameters.navigationDirection.x < 0
-            && songRouletteControl.Selection.Value.SongIndex == 0)
+            && songRouletteControl.Selection.Value.Index == 0)
         {
             // Wrap around: select last song
-            songRouletteControl.SelectVeryLastSong();
+            songRouletteControl.SelectVeryLastEntry();
             return true;
         }
-        
+
         if (navigationParameters.navigationDirection.x > 0
-            && songRouletteControl.Selection.Value.SongIndex == songRouletteControl.Songs.Count - 1)
+            && songRouletteControl.Selection.Value.Index == songRouletteControl.Entries.Count - 1)
         {
             // Wrap around: select last song
-            songRouletteControl.SelectVeryFirstSong();
+            songRouletteControl.SelectVeryFirstEntry();
             return true;
         }
 
@@ -130,18 +156,18 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     {
         if (evt.FocusedVisualElement == songListView
             && evt.NavigationDirection.x > 0
-            && songRouletteControl.Songs.Count > 2)
+            && songRouletteControl.Entries.Count > 2)
         {
             // Wrap selection, i.e. select first song
-            songRouletteControl.SelectSongByIndex(0);
+            songRouletteControl.SelectEntryByIndex(0);
             return true;
         }
         else if (evt.FocusedVisualElement == songListView
             && evt.NavigationDirection.x < 0
-            && songRouletteControl.Songs.Count > 2)
+            && songRouletteControl.Entries.Count > 2)
         {
             // Wrap selection, i.e. select first song
-            songRouletteControl.SelectSongByIndex(songRouletteControl.Songs.Count - 1);
+            songRouletteControl.SelectEntryByIndex(songRouletteControl.Entries.Count - 1);
             return true;
         }
         return false;
@@ -153,14 +179,14 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             return;
         }
-        
-        if (context.ReadValue<Vector2>().y < 0) 
+
+        if (context.ReadValue<Vector2>().y < 0)
         {
-            songRouletteControl.SelectNextSong();
+            songRouletteControl.SelectNextEntry();
         }
         if (context.ReadValue<Vector2>().y > 0)
         {
-            songRouletteControl.SelectPreviousSong();
+            songRouletteControl.SelectPreviousEntry();
         }
     }
 
@@ -222,6 +248,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
     {
         if (newChar == (int)KeyCode.Escape
             || newChar == (int)KeyCode.Return
+            || (newChar == (int)KeyCode.Backspace && fuzzySearchText.Value.IsNullOrEmpty())
             || webViewManager.IsWebViewCanvasControlEnabled
             || (newChar == (int)KeyCode.Space && fuzzySearchText.Value.IsNullOrEmpty()))
         {
@@ -232,7 +259,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         {
             // When there was no keyboard input for a while, then reset the search term.
             CheckResetFuzzySearchText();
-            
+
             fuzzySearchLastInputTimeInSeconds = Time.time;
             if (newChar == '\b' && fuzzySearchText.Value.Length > 0)
             {
@@ -262,7 +289,7 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
         return !InputUtils.AnyKeyboardModifierPressed()
                && !songSearchControl.IsSearchTextFieldFocused();
     }
-    
+
     private void OnDestroy()
     {
         focusableNavigator.NoNavigationTargetFoundInListViewCallback = null;

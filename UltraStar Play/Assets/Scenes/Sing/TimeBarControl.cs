@@ -21,8 +21,8 @@ public class TimeBarControl : INeedInjection
     [Inject]
     private SongMeta songMeta;
 
-    private double LateStartInSongInMillis => songMeta != null ? (songMeta.Start * 1000.0) : 0;
-    private double EarlyEndInSongInMillis => songMeta != null ? songMeta.End : 0;
+    private double LateStartInSongInMillis => songMeta?.StartInMillis ?? 0;
+    private double EarlyEndInSongInMillis => songMeta?.EndInMillis ?? 0;
 
     public void UpdateTimeValueLabel(double positionInSongInMillis, double durationOfSongInMillis)
     {
@@ -92,8 +92,8 @@ public class TimeBarControl : INeedInjection
                 continue;
             }
 
-            double startPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MinBeat);
-            double endPosInMillis = BpmUtils.BeatToMillisecondsInSong(songMeta, sentence.MaxBeat);
+            double startPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, sentence.MinBeat);
+            double endPosInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, sentence.MaxBeat);
 
             if (playerCount <= 3)
             {

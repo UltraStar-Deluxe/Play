@@ -16,18 +16,18 @@ using IBinding = UniInject.IBinding;
 public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
 {
     private const EScene DefaultOptionsScene = EScene.OptionsGameScene;
-    
+
     public List<SceneRecipe> optionSceneRecipes = new();
-    
+
     [Inject(UxmlName = R.UxmlNames.sceneTitle)]
     private Label sceneTitle;
-    
+
     [Inject(UxmlName = R.UxmlNames.titleContainer)]
     private VisualElement titleContainer;
 
     [Inject(UxmlName = R.UxmlNames.loadedSceneTitle)]
     private Label loadedSceneTitle;
-    
+
     [Inject(UxmlName = R.UxmlNames.gameOptionsButton)]
     private ToggleButton gameOptionsButton;
 
@@ -61,6 +61,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.webcamOptionsButton)]
     private ToggleButton webcamOptionsButton;
 
+    [Inject(UxmlName = R.UxmlNames.modOptionsButton)]
+    private ToggleButton modOptionsButton;
+
     [Inject(UxmlName = R.UxmlNames.songSettingsProblemHintIcon)]
     private VisualElement songSettingsProblemHintIcon;
 
@@ -70,21 +73,24 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.playerProfileSettingsProblemHintIcon)]
     private VisualElement playerProfileSettingsProblemHintIcon;
 
+    [Inject(UxmlName = R.UxmlNames.modSettingsProblemHintIcon)]
+    private VisualElement modSettingsProblemHintIcon;
+
     [Inject(UxmlName = R.UxmlNames.loadedSceneContent)]
     private VisualElement loadedSceneContent;
-    
+
     [Inject(UxmlName = R.UxmlNames.optionsSceneScrollView)]
     private VisualElement optionsSceneScrollView;
-    
+
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.helpButton)]
     private Button helpButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.issuesButton)]
     private Button issuesButton;
-    
+
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -95,17 +101,17 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     private Settings settings;
 
     [Inject]
-    private SongMetaManager songMetaManager;
+    private ModManager modManager;
 
     [Inject]
     private Injector injector;
 
     [Inject]
     private UIDocument uiDocument;
-    
+
     [Inject]
     private OptionsSceneData sceneData;
-    
+
     private SceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
     private readonly Dictionary<EScene, ToggleButton> sceneToButtonMap = new();
@@ -123,16 +129,16 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     {
         UpdateSceneToButtonMap();
         UpdateSceneToNameMap();
-        
+
         sceneToButtonMap.ForEach(entry =>
         {
-           entry.Value.RegisterCallbackButtonTriggered(_ => LoadScene(entry.Key)); 
+           entry.Value.RegisterCallbackButtonTriggered(_ => LoadScene(entry.Key));
         });
 
         InitSettingsProblemHints();
-        
+
         LoadOptionsScene(sceneData.scene);
-        
+
         // Options scene scroll view should be as wide as the title.
         titleContainer.RegisterCallback<GeometryChangedEvent>(evt =>
         {
@@ -145,7 +151,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
         helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
         issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
-        
+
         backButton.RegisterCallbackButtonTriggered(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
@@ -176,7 +182,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         // Set button style
         sceneToButtonMap[scene].SetActive(true);
         sceneToButtonMap[scene].Focus();
-        
+
         // Load UI
         VisualElement loadedSceneVisualElement = loadedSceneRecipe.visualTreeAsset.CloneTree().Children().FirstOrDefault();
         loadedSceneContent.Add(loadedSceneVisualElement);
@@ -205,7 +211,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             loadedSceneInjector
                 .WithRootVisualElement(loadedSceneVisualElement)
                 .InjectAllComponentsInChildren(loadedGameObject, true);
-            
+
             // Update translations
             loadedGameObject.GetComponentsInChildren<ITranslator>()
                 .ForEach(it => it.UpdateTranslation());
@@ -217,10 +223,10 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         // Hide buttons in top row
         helpButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasHelpDialog);
         issuesButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasIssuesDialog);
-        
+
         // Apply theme to loaded UI
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
-        
+
         // Scroll with mouse drag
         MouseEventScrollControl.RegisterMouseScrollEvents();
     }
@@ -233,10 +239,10 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
 
         sceneToButtonMap[loadedSceneRecipe.scene].SetActive(false);
-        
+
         loadedGameObjects.ForEach(Destroy);
         loadedGameObjects.Clear();
-        
+
         loadedSceneContent.Clear();
         loadedSceneRecipe = null;
     }
@@ -245,31 +251,33 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     {
         SettingsProblemHintControl songSettingsProblemHintControl = new(
             songSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager),
-            injector);
+            SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings));
 
         SettingsProblemHintControl recordingSettingsProblemHintControl = new(
             recordingSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetRecordingSettingsProblems(settings),
-            injector);
+            SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
 
         SettingsProblemHintControl playerProfileSettingsProblemHintControl = new(
             playerProfileSettingsProblemHintIcon,
-            SettingsProblemHintControl.GetPlayerSettingsProblems(settings),
-            injector);
+            SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
+
+        SettingsProblemHintControl modSettingsProblemHintControl = new(
+            modSettingsProblemHintIcon,
+            SettingsProblemHintControl.GetModSettingsProblems(modManager));
 
         StartCoroutine(CoroutineUtils.ExecuteRepeatedlyInSeconds(0.5f, () =>
         {
-            songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings, songMetaManager));
+            songSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetSongLibrarySettingsProblems(settings));
             recordingSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetRecordingSettingsProblems(settings));
             playerProfileSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetPlayerSettingsProblems(settings));
+            modSettingsProblemHintControl.SetProblems(SettingsProblemHintControl.GetModSettingsProblems(modManager));
         }));
     }
 
     public void UpdateTranslation()
     {
         sceneTitle.text = TranslationManager.GetTranslation(R.Messages.options);
-        
+
         UpdateSceneToNameMap();
         sceneToButtonMap.ForEach(entry =>
         {
@@ -298,7 +306,8 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToShortNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_button));
         sceneToShortNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_button));
         sceneToShortNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_button));
-        
+        sceneToShortNameMap.Add(EScene.ModOptionsScene, TranslationManager.GetTranslation(R.Messages.options_mod_button));
+
         sceneToLongNameMap.Clear();
         sceneToLongNameMap.Add(EScene.OptionsGameScene, TranslationManager.GetTranslation(R.Messages.options_game_title));
         sceneToLongNameMap.Add(EScene.SongLibraryOptionsScene, TranslationManager.GetTranslation(R.Messages.options_songLibrary_title));
@@ -311,8 +320,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToLongNameMap.Add(EScene.CompanionAppOptionsScene, TranslationManager.GetTranslation(R.Messages.options_companionApp_title));
         sceneToLongNameMap.Add(EScene.WebcamOptionsSecene, TranslationManager.GetTranslation(R.Messages.options_webcam_title));
         sceneToLongNameMap.Add(EScene.DevelopmentOptionsScene, TranslationManager.GetTranslation(R.Messages.options_development_title));
+        sceneToLongNameMap.Add(EScene.ModOptionsScene, TranslationManager.GetTranslation(R.Messages.options_mod_title));
     }
-    
+
     private void UpdateSceneToButtonMap()
     {
         sceneToButtonMap.Add(EScene.OptionsGameScene, gameOptionsButton);
@@ -326,6 +336,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         sceneToButtonMap.Add(EScene.CompanionAppOptionsScene, appOptionsButton);
         sceneToButtonMap.Add(EScene.DevelopmentOptionsScene, developerOptionsButton);
         sceneToButtonMap.Add(EScene.WebcamOptionsSecene, webcamOptionsButton);
+        sceneToButtonMap.Add(EScene.ModOptionsScene, modOptionsButton);
     }
 
     public List<IBinding> GetBindings()

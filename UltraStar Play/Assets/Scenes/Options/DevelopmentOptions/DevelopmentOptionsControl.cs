@@ -38,6 +38,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
     private ItemPicker pitchDetectionAlgorithmPicker;
 
+    [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
+    private ItemPicker songDataFetchTypeChooser;
+
+    [Inject(UxmlName = R.UxmlNames.saveVocalsAndInstrumentalAudioInFolderOfSongToggle)]
+    private Toggle saveVocalsAndInstrumentalAudioInFolderOfSongToggle;
+
     [Inject(UxmlName = R.UxmlNames.analyzeBeatsWithoutTargetNoteToggle)]
     private Toggle analyzeBeatsWithoutTargetNoteToggle;
 
@@ -140,13 +146,27 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.checkCodecIsSupportedToggle)]
     private Toggle checkCodecIsSupportedToggle;
 
+    [Inject(UxmlName = R.UxmlNames.vfxEnabledToggle)]
+    private Toggle vfxEnabledToggle;
+
+    [Inject(UxmlClass = "accordionItem")]
+    private List<AccordionItem> accordionItems;
+
     protected override void Start()
     {
         base.Start();
 
+        // Fold accordion items
+        accordionItems.ForEach(it => it.HideAccordionContent());
+
+        // Bind fields
         FieldBindingUtils.Bind(showFpsToggle,
             () => settings.ShowFps,
             newValue => settings.ShowFps = newValue);
+
+        FieldBindingUtils.Bind(saveVocalsAndInstrumentalAudioInFolderOfSongToggle,
+            () => settings.SaveVocalsAndInstrumentalAudioInFolderOfSong,
+            newValue => settings.SaveVocalsAndInstrumentalAudioInFolderOfSong = newValue);
 
         FieldBindingUtils.Bind(generatedFolderPathTextField,
             () => settings.GeneratedFolderPath,
@@ -186,6 +206,14 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmPicker)
             .Bind(() => settings.PitchDetectionAlgorithm,
                 newValue => settings.PitchDetectionAlgorithm = newValue);
+
+        new EnumItemPickerControl<EFetchType>(songDataFetchTypeChooser)
+        {
+            GetLabelTextFunction = item => item == EFetchType.Eager
+                ? "Upfront"
+                : "On-demand",
+        }.Bind(() => settings.SongDataFetchType,
+                newValue => settings.SongDataFetchType = newValue);
 
         FieldBindingUtils.Bind(analyzeBeatsWithoutTargetNoteToggle,
             () => settings.AnalyzeBeatsWithoutTargetNote,
@@ -373,6 +401,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(wipeLyricsEffectToggle,
             () => settings.WipeLyrics,
             newValue => settings.WipeLyrics = newValue);
+
+        // Vfx enabled
+        FieldBindingUtils.Bind(vfxEnabledToggle,
+            () => settings.EnableVfx,
+            newValue => settings.EnableVfx = newValue);
     }
 
     private List<string> GetAvailablePortAudioOutputDeviceNames()

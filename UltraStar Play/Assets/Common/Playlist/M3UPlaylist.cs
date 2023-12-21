@@ -18,13 +18,13 @@ public class M3UPlaylist : IPlaylist
     
     public bool HasSongEntry(SongMeta songMeta)
     {
-        if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Mp3)
-            || WebRequestUtils.IsNetworkPath(songMeta.Mp3))
+        if (WebRequestUtils.IsHttpOrHttpsUri(songMeta.Audio)
+            || WebRequestUtils.IsNetworkPath(songMeta.Audio))
         {
             return false;
         }
 
-        string normalizedSongMetaAbsoluteAudioFilePath = new FileInfo(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Mp3)).FullName;
+        string normalizedSongMetaAbsoluteAudioFilePath = new FileInfo(SongMetaUtils.GetAbsoluteFilePath(songMeta, songMeta.Audio)).FullName;
         
         return audioFilePaths.AnyMatch(audioFilePath =>
         {

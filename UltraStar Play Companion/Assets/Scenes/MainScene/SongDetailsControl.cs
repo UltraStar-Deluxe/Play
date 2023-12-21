@@ -13,61 +13,64 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 {
     [Inject(Key = nameof(playerSelectPlayerEntryUi))]
     private VisualTreeAsset playerSelectPlayerEntryUi;
-    
+
     [Inject]
     private Settings settings;
-    
+
     [Inject]
     private Injector injector;
-    
+
     [Inject]
     private MainGameHttpClient mainGameHttpClient;
 
     [Inject(UxmlName = R.UxmlNames.songListContainer)]
     private VisualElement songListContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.songDetailsContainer)]
     private VisualElement songDetailsContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.songArtistLabel)]
     private Label songArtistLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.songTitleLabel)]
     private Label songTitleLabel;
-    
+
     [Inject(UxmlName = R.UxmlNames.songImage)]
     private VisualElement songImage;
-    
+
     [Inject(UxmlName = R.UxmlNames.backButton)]
     private Button backButton;
-        
+
     [Inject(UxmlName = R.UxmlNames.favoriteButton)]
     private Button favoriteButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.enqueueButton)]
     private Button enqueueButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.enqueueMedleyButton)]
     private Button enqueueMedleyButton;
-    
+
     [Inject(UxmlName = R.UxmlNames.playersContainer)]
     private VisualElement playersContainer;
-    
+
     [Inject(UxmlName = R.UxmlNames.favoriteIcon)]
     private VisualElement favoriteIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.noFavoriteIcon)]
     private VisualElement noFavoriteIcon;
-    
+
     [Inject(UxmlName = R.UxmlNames.lyricsAccordionItem)]
     private AccordionItem lyricsAccordionItem;
-    
+
     [Inject(UxmlName = R.UxmlNames.enqueueSettingsAccordionItem)]
     private AccordionItem enqueueSettingsAccordionItem;
-    
+
     [Inject(UxmlName = R.UxmlNames.modifierDialogOverlay)]
     private VisualElement modifierDialogOverlay;
-    
+
+    [Inject(UxmlName = R.UxmlNames.songListView)]
+    private ListView songListView;
+
     private SongDto songDto;
     public SongDto SongDto
     {
@@ -83,26 +86,27 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     }
 
     private bool isFavorite;
-    
+
     private Texture2D texture2D;
-    private Dictionary<string, string> voiceNameToLyricsMap = new();
+    private Dictionary<string, string> voiceDisplayNameToLyricsMap = new();
 
     private readonly List<PlayerSelectPlayerEntryControl> playerEntryControls = new();
 
-    private readonly GameRoundSettingsUiControl gameRoundSettingsUiControl = new();
-    
+    private readonly GameRoundSettingsDtoUiControl gameRoundSettingsDtoUiControl = new();
+
     public void OnInjectionFinished()
     {
-        injector.Inject(gameRoundSettingsUiControl);
-        gameRoundSettingsUiControl.GameRoundSettings = settings.GameRoundSettings;
-        VisualElementUtils.RegisterDirectClickCallback(modifierDialogOverlay, () => gameRoundSettingsUiControl.CloseModifierDialog());
-        
-        gameRoundSettingsUiControl
+        injector.Inject(gameRoundSettingsDtoUiControl);
+
+        gameRoundSettingsDtoUiControl.GameRoundSettingsDto = settings.GameRoundSettingsDto;
+        VisualElementUtils.RegisterDirectClickCallback(modifierDialogOverlay, () => gameRoundSettingsDtoUiControl.CloseModifierDialog());
+
+        gameRoundSettingsDtoUiControl
             .DialogClosedEventStream
             .Subscribe(_ => enqueueSettingsAccordionItem.UpdateTargetHeight());
 
         mainGameHttpClient.Permissions.Subscribe(permissions => OnPermissionsChanged(permissions));
-        
+
         HideSongDetails();
         backButton.RegisterCallbackButtonTriggered(_ => HideSongDetails());
         favoriteButton.RegisterCallbackButtonTriggered(_ => ToggleFavorite());
@@ -119,7 +123,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         enqueueMedleyButton.SetVisibleByDisplay(enqueueButton.IsVisibleByDisplay());
         enqueueSettingsAccordionItem.SetVisibleByDisplay(permissions.Contains(HttpApiPermission.WriteSongQueue));
     }
-    
+
     private void EnqueueSong()
     {
         List<PlayerSelectPlayerEntryControl> selectedPlayerControls = GetSelectedPlayerControls();
@@ -129,16 +133,16 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             UiManager.CreateNotification("Select a player first");
             return;
         }
-        
+
         SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls, false);
         string json = JsonConverter.ToJson(dto);
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
-        
+
         HideSongDetails();
 
         UiManager.CreateNotification($"Enqueued Song '{dto.SongDto.Title}'");
     }
-    
+
     private void EnqueueSongAsMedley()
     {
         List<PlayerSelectPlayerEntryControl> selectedPlayerControls = GetSelectedPlayerControls();
@@ -148,23 +152,23 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             UiManager.CreateNotification("Select a player first");
             return;
         }
-        
+
         SongQueueEntryDto dto = CreateSongQueueEntryDto(selectedPlayerControls, true);
         string json = JsonConverter.ToJson(dto);
         mainGameHttpClient.PostRequest(HttpApiEndpointPaths.SongQueueEntry, json);
-        
+
         HideSongDetails();
-        
+
         UiManager.CreateNotification($"Enqueued Medley Song '{dto.SongDto.Title}'");
     }
-    
+
     public List<PlayerSelectPlayerEntryControl> GetSelectedPlayerControls()
     {
         return playerEntryControls
             .Where(control => control.IsSelected.Value)
             .ToList();
     }
-    
+
     private SongQueueEntryDto CreateSongQueueEntryDto(List<PlayerSelectPlayerEntryControl> selectedPlayerControls, bool isMedleyWithPreviousEntry)
     {
         SongQueueEntryDto dto = new();
@@ -174,7 +178,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             .Select(control => control.PlayerProfileName)
             .ToList();
         dto.IsMedleyWithPreviousEntry = isMedleyWithPreviousEntry;
-        
+
         dto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap = new Dictionary<string, MicProfileDto>();
         selectedPlayerControls.ForEach(control =>
         {
@@ -195,17 +199,17 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 dto.SingScenePlayerDataDto.PlayerProfileToMicProfileMap[control.PlayerProfileName] = micProfileDto;
             }
         });
-        
-        dto.SingScenePlayerDataDto.PlayerProfileToVoiceNameMap = new Dictionary<string, string>();
+
+        dto.SingScenePlayerDataDto.PlayerProfileToVoiceIdMap = new Dictionary<string, EExtendedVoiceId>();
         selectedPlayerControls.ForEach(control =>
         {
             if (control.MicProfile != null)
             {
-                dto.SingScenePlayerDataDto.PlayerProfileToVoiceNameMap[control.PlayerProfileName] = control.VoiceChooserControl.SelectedItem;
+                dto.SingScenePlayerDataDto.PlayerProfileToVoiceIdMap[control.PlayerProfileName] = control.VoiceChooserControl.SelectedItem;
             }
         });
 
-        dto.GameRoundSettings = settings.GameRoundSettings;
+        dto.GameRoundSettingsDto = settings.GameRoundSettingsDto;
         return dto;
     }
 
@@ -236,7 +240,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
         enqueueButton.SetEnabled(false);
         enqueueMedleyButton.SetEnabled(enqueueButton.enabledInHierarchy);
-        
+
         LoadSongDetails();
         LoadSongImage();
         UpdateEnqueueSettings();
@@ -258,13 +262,13 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         playersContainer.Clear();
         playersContainer.Add(new Label("Loading players..."));
         enqueueSettingsAccordionItem.UpdateTargetHeight();
-        
+
         playerEntryControls.Clear();
 
         mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailablePlayers,
             response =>
             {
-                ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response, false); 
+                ListDto<string> listDto = JsonConverter.FromJson<ListDto<string>>(response, false);
                 if (listDto == null
                     || listDto.Items == null)
                 {
@@ -275,18 +279,18 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
 
                 playerProfileNames = listDto.Items;
-                
+
                 receivedPlayers = true;
                 if (receivedPlayers && receivedMicrophones)
                 {
                     DoUpdatePlayersAndMics(playerProfileNames, micProfiles);
                 }
             });
-        
+
         mainGameHttpClient.GetRequest(HttpApiEndpointPaths.AvailableMicrophones,
             response =>
             {
-                ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response, false); 
+                ListDto<MicProfile> listDto = JsonConverter.FromJson<ListDto<MicProfile>>(response, false);
                 if (listDto == null
                     || listDto.Items == null)
                 {
@@ -300,7 +304,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
 
                 micProfiles = listDto.Items;
-                
+
                 receivedMicrophones = true;
                 if (receivedPlayers && receivedMicrophones)
                 {
@@ -318,7 +322,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             playersContainer.Add(new Label("No active players found.\nEdit players in the settings first."));
             return;
         }
-        
+
         playersContainer.Clear();
 
         List<MicProfile> GetUnusedMicProfiles()
@@ -327,15 +331,15 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 .Except(playerEntryControls.Select(playerEntryControl => playerEntryControl.MicProfile))
                 .ToList();
         }
-        
+
         void AssignUnusedMicProfile(PlayerSelectPlayerEntryControl playerEntryControl)
         {
             MicProfileReference lastUsedMicProfile = settings.PlayerProfileNameToLastUsedMicProfile
                 .FirstOrDefault(entry => entry.Key == playerEntryControl.PlayerProfileName)
                 .Value;
-            
+
             List<MicProfile> unusedMicProfiles = GetUnusedMicProfiles();
-            
+
             // Prefer the last used mic profile
             MicProfile unusedMicProfileThatWasUsedLastTime = unusedMicProfiles
                 .FirstOrDefault(unusedMicProfile => Equals(new MicProfileReference(unusedMicProfile), lastUsedMicProfile));
@@ -357,7 +361,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             // Use any unused mic profile, no further preferences.
             playerEntryControl.MicProfile = unusedMicProfiles.FirstOrDefault();
         }
-        
+
         int playerProfileIndex = 0;
         playerProfileNames.ForEach(playerProfile =>
         {
@@ -376,22 +380,12 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                     .Where(it => it.MicProfile == newMicProfile && it != playerEntryControl)
                     .ForEach(it => it.MicProfile = null);
             };
-            
-            if (voiceNameToLyricsMap != null)
+
+            List<EExtendedVoiceId> voiceIds = GetVoiceIdsFromVoiceDisplayNameToLyricsMap();
+            playerEntryControl.SetAvailableVoiceIds(voiceIds);
+            if (!voiceIds.IsNullOrEmpty())
             {
-                List<string> voiceNames = voiceNameToLyricsMap.Keys
-                    .Select(voiceName => Voice.NormalizeVoiceName(voiceName))
-                    .ToList();
-                if (voiceNames.Count > 1
-                    && !voiceNames.Contains(Voice.mergedVoiceName))
-                {
-                    voiceNames.Add(Voice.mergedVoiceName);
-                }
-                playerEntryControl.SetAvailableVoiceNames(voiceNames);
-                if (!voiceNames.IsNullOrEmpty())
-                {
-                    playerEntryControl.VoiceChooserControl.SelectItem(voiceNames[playerProfileIndex % voiceNames.Count]);
-                }
+                playerEntryControl.VoiceChooserControl.SelectItem(voiceIds[playerProfileIndex % voiceIds.Count]);
             }
 
             playerEntryControl.IsSelected.Value = IsPlayerSelectedInSettings(playerProfile);
@@ -413,15 +407,30 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
 
                 UpdateEnqueueButton();
             });
-            
+
             playerEntryControl.SetSeparatorVisibleByDisplay(playerProfileIndex < playerProfileNames.Count - 1);
-            
+
             playerEntryControls.Add(playerEntryControl);
             playerProfileIndex++;
         });
 
         UpdateEnqueueButton();
         enqueueSettingsAccordionItem.UpdateTargetHeight();
+    }
+
+    private List<EExtendedVoiceId> GetVoiceIdsFromVoiceDisplayNameToLyricsMap()
+    {
+        if (voiceDisplayNameToLyricsMap.IsNullOrEmpty())
+        {
+            return new();
+        }
+
+        if (voiceDisplayNameToLyricsMap.Count == 1)
+        {
+            return new List<EExtendedVoiceId>() { EExtendedVoiceId.P1, };
+        }
+
+        return new List<EExtendedVoiceId>() { EExtendedVoiceId.P1, EExtendedVoiceId.P2, EExtendedVoiceId.Merged };
     }
 
     private bool IsPlayerSelectedInSettings(string playerProfile)
@@ -463,10 +472,10 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
                 songImage.ShowByVisibility();
                 byte[] jpgBytes = Convert.FromBase64String(imageDto.JpgBytesBase64);
-                
+
                 // Remove old texture if any
                 GameObject.Destroy(texture2D);
-                
+
                 // Load new texture from bytes
                 texture2D = new Texture2D(2, 2);
                 // This will auto-resize the texture dimensions.
@@ -492,7 +501,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
                 }
 
                 isFavorite = songDetailsDto.IsFavorite;
-                UpdateLyrics(songDetailsDto.VoiceNameToLyricsMap);
+                UpdateLyrics(songDetailsDto.VoiceDisplayNameToLyricsMap);
                 UpdateFavoriteButton();
             });
     }
@@ -503,42 +512,47 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
         noFavoriteIcon.SetVisibleByDisplay(!isFavorite);
     }
 
-    private void UpdateLyrics(Dictionary<string,string> newVoiceNameToLyricsMap)
+    private void UpdateLyrics(Dictionary<string, string> newVoiceDisplayNameToLyricsMap)
     {
-        voiceNameToLyricsMap = newVoiceNameToLyricsMap;
-        
-        if (newVoiceNameToLyricsMap.Count <= 1)
+        voiceDisplayNameToLyricsMap = newVoiceDisplayNameToLyricsMap;
+
+        if (newVoiceDisplayNameToLyricsMap.Count <= 1)
         {
-            SetLyrics(newVoiceNameToLyricsMap.Values.FirstOrDefault());
+            SetLyrics(newVoiceDisplayNameToLyricsMap.Values.FirstOrDefault());
             return;
         }
 
-        string GetVoiceDisplayName(string voiceName)
+        string GetVoiceDisplayName(EExtendedVoiceId voiceId)
         {
-            if (voiceName.IsNullOrEmpty()
-                || voiceName == "P1")
+            switch (voiceId)
             {
-                return "Vocals 1";
+                case EExtendedVoiceId.P1:
+                    return "Vocals 1";
+                case EExtendedVoiceId.P2:
+                    return "Vocals 2";
+                case EExtendedVoiceId.Merged:
+                    return "Both";
+                default:
+                    return voiceId.ToString();
             }
-            else if (voiceName == "P2")
-            {
-                return "Vocals 2";
-            }
-
-            return voiceName;
         }
 
         try
         {
             string lyrics = "";
-            if (newVoiceNameToLyricsMap.Count == 1)
+            if (newVoiceDisplayNameToLyricsMap.Count == 1)
             {
-                lyrics = newVoiceNameToLyricsMap.FirstOrDefault().Value;
+                lyrics = newVoiceDisplayNameToLyricsMap.FirstOrDefault().Value;
             }
-            else if (newVoiceNameToLyricsMap.Count > 1)
+            else if (newVoiceDisplayNameToLyricsMap.Count > 1)
             {
-                lyrics = newVoiceNameToLyricsMap
-                    .Select(entry => $"<i><b>{GetVoiceDisplayName(entry.Key)}</i></b>\n\n{entry.Value}")
+                lyrics = newVoiceDisplayNameToLyricsMap
+                    .Select(entry =>
+                    {
+                        string voiceDisplayName = entry.Key;
+                        string voiceLyrics = entry.Value;
+                        return $"<i><b>{voiceDisplayName}</i></b>\n\n{voiceLyrics}";
+                    })
                     .JoinWith("\n\n");
             }
 
@@ -569,7 +583,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
     public void HideSongDetails()
     {
         SaveLastUsedMicProfiles();
-        
+
         songDetailsContainer.HideByDisplay();
         songListContainer.ShowByDisplay();
     }

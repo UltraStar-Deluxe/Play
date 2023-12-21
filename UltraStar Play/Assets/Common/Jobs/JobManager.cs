@@ -22,6 +22,14 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
 
     public static JobManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<JobManager>();
 
+    public bool AllJobsFinished => AllJobs
+        .AllMatch(job => job.Status.Value is EJobStatus.Finished);
+
+    private List<Job> AllJobs => jobsWithoutParent
+        .Union(jobToJobControl.Keys)
+        .Distinct()
+        .ToList();
+
     [InjectedInInspector]
     public VisualTreeAsset jobListUi;
 
@@ -36,7 +44,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private SceneNavigator sceneNavigator;
-    
+
     private VisualElement jobListElement;
     private Button toggleJobListButton;
 
@@ -44,6 +52,8 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
     private readonly HashSet<Job> fadingJobs = new();
 
     private bool isJobListMinimized;
+
+    private bool jobsUiNeedsRefresh;
 
     protected override object GetInstance()
     {
@@ -77,6 +87,11 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         });
 
         UpdateJobListPosition();
+
+        if (jobsUiNeedsRefresh)
+        {
+            UpdateJobsUi();
+        }
     }
 
     public static Job CreateAndAddJob(string title, Job parentJob = null)
@@ -85,7 +100,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
         Instance.AddJob(job);
         return job;
     }
-    
+
     public void AddJob(Job job)
     {
         if (jobToJobControl.ContainsKey(job))
@@ -99,7 +114,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
             jobsWithoutParent.Add(job);
         }
 
-        UpdateJobsUi();
+        jobsUiNeedsRefresh = true;
     }
 
     private void FadeOutThenRemoveJob(Job job)
@@ -178,7 +193,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
                 // Object was destroyed in the meantime
                 return;
             }
-            
+
             if (job.Result.Value is EJobResult.Pending)
             {
                 jobListElement.Add(jobListEntryElement);
@@ -276,7 +291,7 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
             jobListElement.BringToFront();
         }
     }
-    
+
     private void OnSceneChanged()
     {
         if (jobListElement != null)
@@ -303,6 +318,28 @@ public class JobManager : AbstractSingletonBehaviour, INeedInjection
 
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () => testObservable1.OnNext(true)));
         StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(10f, () => testObservable2.OnNext(true)));
+    }
+
+    protected override void OnDestroySingleton()
+    {
+        Debug.Log("JobManager is destroyed, cancelling remaining jobs");
+        jobsWithoutParent.ForEach(job => CancelJob(job, true));
+    }
+
+    private void CancelJob(Job job, bool recursive)
+    {
+        // Cancel child jobs first
+        if (recursive
+            && !job.ChildJobs.IsNullOrEmpty())
+        {
+            job.ChildJobs.ForEach(childJob => CancelJob(childJob, recursive));
+        }
+
+        if (job.IsCancelable.Value
+            && !job.IsCanceled.Value)
+        {
+            job.Cancel();
+        }
     }
 
     public static Job CreateJobFromObservable<T>(string jobName, Job parentJob, IObservable<T> observable)
