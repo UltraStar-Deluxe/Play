@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using ProTrans;
+using SteamOnlineMultiplayer;
 using UniInject;
+using UniRx;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -24,6 +28,9 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
     [Inject]
     private WebCamManager webCamManager;
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     protected override void Start()
     {
@@ -141,7 +148,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
         VisualElement onlinePlayerProfileIconContainer = visualElement.Q<VisualElement>(R.UxmlNames.onlinePlayerProfileIconContainer);
 
-        if (playerProfile is LobbyMemberPlayerProfile)
+        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
         {
             enabledToggle.HideByDisplay();
             deleteButton.HideByDisplay();
@@ -149,6 +156,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             playerProfileImagePickerControl.ItemPicker.PreviousItemButton.HideByDisplay();
             playerProfileImagePickerControl.ItemPicker.NextItemButton.HideByDisplay();
             onlinePlayerProfileIconContainer.ShowByDisplay();
+
+            UpdateOnlineMultiplayerPlayerImage(lobbyMemberPlayerProfile, playerProfileImagePickerControl);
         }
         else
         {
@@ -156,6 +165,34 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         }
 
         return visualElement;
+    }
+
+    private void UpdateOnlineMultiplayerPlayerImage(LobbyMemberPlayerProfile lobbyMemberPlayerProfile, PlayerProfileImagePickerControl playerProfileImagePickerControl)
+    {
+        if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Netcode)
+        {
+            playerProfileImagePickerControl.ItemPicker.ItemLabel.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name));
+        }
+        else if (settings.EOnlineMultiplayerBackend is EOnlineMultiplayerBackend.Steam)
+        {
+            SteamLobbyMember steamLobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(lobbyMemberPlayerProfile.UnityNetcodeClientId) as SteamLobbyMember;
+            if (steamLobbyMember == null)
+            {
+                return;
+            }
+
+            SteamOnlineMultiplayerUtils.GetAvatarTextureAsObservable(steamLobbyMember.SteamId)
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to get avatar image of Steam user '{steamLobbyMember.DisplayName}' with id {steamLobbyMember.SteamId}");
+                })
+                .Subscribe(texture =>
+                {
+                    playerProfileImagePickerControl.ItemPicker.ItemImage.image = texture;
+                    playerProfileImagePickerControl.ItemPicker.ItemLabel.HideByDisplay();
+                });
+        }
     }
 
     public override bool HasHelpDialog => true;
