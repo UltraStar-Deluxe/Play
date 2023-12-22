@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 /**
@@ -21,7 +22,7 @@ public class RadialProgressBar : VisualElement
             target.ShowLabel = ShowLabel.GetValueFromBag(bag, cc);
         }
     }
-    
+
     // These are USS class names for the control overall and the label.
     private static readonly string ussClassName = "radial-progress-bar";
     private static readonly string ussLabelClassName = "radial-progress-bar__label";
@@ -71,7 +72,7 @@ public class RadialProgressBar : VisualElement
             MarkDirtyRepaint();
         }
     }
-    
+
     public bool ShowLabel
     {
         get => labelElement.IsVisibleByDisplay();
@@ -103,7 +104,7 @@ public class RadialProgressBar : VisualElement
             MarkDirtyRepaint();
         }
     }
-    
+
     private bool overwriteTrackColor;
     private Color trackColor;
     public Color TrackColor
@@ -116,10 +117,10 @@ public class RadialProgressBar : VisualElement
             MarkDirtyRepaint();
         }
     }
-    
+
     public readonly float highValue = 100;
     public readonly float lowValue = 0;
-    
+
     // This default constructor is RadialProgressBar's only constructor.
     public RadialProgressBar()
     {
@@ -136,7 +137,7 @@ public class RadialProgressBar : VisualElement
 
         // Register a callback to generate the visual content of the control.
         generateVisualContent = OnGenerateVisualContent;
-        
+
         ProgressInPercent = 0.0f;
     }
 
@@ -167,34 +168,49 @@ public class RadialProgressBar : VisualElement
         {
             strokeWidth = newBorderSize;
         }
-        
+
         if (!overwriteLineCap
             && customStyle.TryGetValue(roundLineCapStyle, out bool newRoundLineCap))
         {
             lineCap = newRoundLineCap ? LineCap.Round : LineCap.Butt;
         }
-        
+
         MarkDirtyRepaint();
     }
 
     void OnGenerateVisualContent(MeshGenerationContext mgc)
     {
-        Painter2D painter = mgc.painter2D;
+        if (float.IsNaN(contentRect.width)
+            || float.IsNaN(contentRect.height)
+            || float.IsNaN(contentRect.x)
+            || float.IsNaN(contentRect.y)
+            || float.IsNaN(StrokeWidth)
+            || float.IsNaN(ProgressInPercent))
+        {
+            return;
+        }
+
         float radius = (contentRect.width / 2) - (StrokeWidth / 2);
+        if (radius <= 0)
+        {
+            return;
+        }
+
         float startAngle = -90;
         float endAngle = startAngle + (359.9999f * ProgressInPercent / 100);
         Vector2 center = contentRect.center;
-        
+
         // Draw Track
+        Painter2D painter = mgc.painter2D;
         painter.BeginPath();
         painter.strokeColor = TrackColor;
         painter.lineWidth = StrokeWidth;
         painter.lineCap = LineCap;
-        painter.Arc(contentRect.center, radius, 0, 360);
+        painter.Arc(center, radius, 0, 360);
         painter.Stroke();
-        
+
         // Draw Progress
-        if (ProgressInPercent > 0)
+        if (Math.Abs(startAngle - endAngle) > 1f)
         {
             painter.BeginPath();
             painter.strokeColor = ProgressColor;
