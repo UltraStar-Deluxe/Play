@@ -245,6 +245,7 @@ namespace CommonOnlineMultiplayer
                 if (messageHandlers.IsNullOrEmpty())
                 {
                     messageNameToHandlers.Remove(messageName);
+                    messageNameToHandleNamedMessageHelper.Remove(messageName);
                 }
                 Debug.Log($"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
             });
