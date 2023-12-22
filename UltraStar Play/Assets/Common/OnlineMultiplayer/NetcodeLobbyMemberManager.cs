@@ -176,10 +176,12 @@ namespace CommonOnlineMultiplayer
             {
                 LobbyMemberNetworkBehaviour lobbyMemberNetworkBehaviour = networkObject.GetComponent<LobbyMemberNetworkBehaviour>();
                 if (lobbyMemberNetworkBehaviour == null
-                    && lobbyMemberNetworkBehaviour.LobbyMember != null)
+                    || lobbyMemberNetworkBehaviour.LobbyMemberJson.IsNullOrEmpty())
                 {
-                    result.Add(lobbyMemberNetworkBehaviour.LobbyMember);
+                    return;
                 }
+
+                result.Add(lobbyMemberNetworkBehaviour.LobbyMember);
             });
             return result;
         }
