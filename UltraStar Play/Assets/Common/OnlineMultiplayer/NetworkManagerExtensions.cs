@@ -12,9 +12,14 @@ namespace CommonOnlineMultiplayer
                 Debug.Log($"{logPrefix}. Thus, shutting down NetworkManger");
                 networkManager.Shutdown();
             }
+            else if (networkManager.IsListening)
+            {
+                Debug.Log($"{logPrefix}. But only listening, not yet connected as Netcode client. Thus, shutting down NetworkManger.");
+                networkManager.Shutdown();
+            }
             else
             {
-                Debug.Log($"{logPrefix}. But not connected as Netcode client, so not shutting down NetworkManger");
+                Debug.Log($"{logPrefix}. But not connected and not listening for connections, so not shutting down NetworkManger");
             }
         }
     }
