@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -104,6 +107,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private readonly PlayerPitchIndicatorControl playerPitchIndicatorControl = new();
 
     private float setNextPlayerProfileAnimTimeInSeconds = 1.5f;
+    private int lastDisplayedScore;
 
     public void OnInjectionFinished()
     {
@@ -128,7 +132,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
         else if (settings.ScoreMode is EScoreMode.None)
         {
-            // TODO: setting `ProgressInPercent = 0` here causes a crash in RadialProgressBar.OnGenerateVisualContent. Thus, use HideByDisplay instead.
             playerScoreProgressBar.HideByDisplay();
         }
 
@@ -194,6 +197,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             playerScoreProgressBar.ShowByDisplay();
             playerScoreProgressBar.ShowByVisibility();
             playerScoreProgressBar.ProgressColor = PlayerColor;
+            playerScoreProgressBar.ProgressInPercent = 0;
             playerImageBorder.SetBorderColor(PlayerColor);
         }
         else
@@ -316,7 +320,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
     public void ShowTotalScore(int score, bool animate = true)
     {
-        if (settings.ScoreMode == EScoreMode.None)
+        if (settings.ScoreMode == EScoreMode.None
+            || score == lastDisplayedScore)
         {
             return;
         }
@@ -326,11 +331,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             LeanTween.cancel(singSceneControl.gameObject, totalScoreAnimationId);
         }
 
-        if (!int.TryParse(playerScoreLabel.text, out int lastDisplayedScore)
-            || lastDisplayedScore < 0)
-        {
-            lastDisplayedScore = 0;
-        }
         if (score < 0)
         {
             score = 0;
@@ -342,15 +342,19 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
                 .setOnUpdate((float interpolatedScoreValue) =>
                 {
                     playerScoreLabel.text = interpolatedScoreValue.ToString("0");
-                    playerScoreProgressBar.ProgressInPercent = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+                    float progressInPercent = (float)(100.0 * interpolatedScoreValue / PlayerScoreControl.maxScore);
+                    playerScoreProgressBar.ProgressInPercent = progressInPercent;
                 })
                 .id;
         }
         else
         {
             playerScoreLabel.text = score.ToString("0");
-            playerScoreProgressBar.ProgressInPercent = (float)(100.0 * score / PlayerScoreControl.maxScore);
+            float progressInPercent = (float)(100.0 * score / PlayerScoreControl.maxScore);
+            playerScoreProgressBar.ProgressInPercent = progressInPercent;
         }
+
+        lastDisplayedScore = score;
     }
 
     private void CreateMultiplePerfectSentenceEffect()
