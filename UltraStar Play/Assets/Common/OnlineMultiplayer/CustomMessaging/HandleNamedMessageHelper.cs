@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -27,13 +28,14 @@ namespace CommonOnlineMultiplayer
             }
 
             string messageNameLocal = this.messageName;
-            Log.Verbose(() => $"Received message {messageNameLocal} with length {messageLength} from Netcode client {senderNetcodeClientId}");
+            IReadOnlyList<NamedMessageHandler> messageHandlersLocalRef = messageHandlers;
+            Log.Verbose(() => $"Received message {messageNameLocal} with length {messageLength} from Netcode client {senderNetcodeClientId}. Registered message handlers: {messageHandlersLocalRef.Count}");
 
             if (messageHandlers.Count == 1)
             {
                 messageHandlers[0].handleMessage?.Invoke(new NamedMessage(senderNetcodeClientId, messagePayload));
             }
-            else
+            else if (messageHandlers.Count > 1)
             {
                 // The reader can only be read once.
                 // Thus, for multiple handlers, we need to make a copy of the data.
@@ -49,6 +51,10 @@ namespace CommonOnlineMultiplayer
                     using FastBufferReader readerCopy = new(messageBytes, Allocator.Temp);
                     messageHandler.handleMessage?.Invoke(new NamedMessage(senderNetcodeClientId, readerCopy));
                 }
+            }
+            else if (messageHandlers.Count <= 0)
+            {
+                Debug.LogWarning($"No handler found for message {messageNameLocal} from Netcode client {senderNetcodeClientId}");
             }
         }
     }
