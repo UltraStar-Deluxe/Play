@@ -118,9 +118,14 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
         if (onlineMultiplayerManager.IsOnlineGame)
         {
             disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-                nameof(BeatAnalyzedEvent),
+                GetBeatAnalyzedEventMessageName(),
                 message => OnBeatAnalyzedEventMessage(message)));
         }
+    }
+
+    private string GetBeatAnalyzedEventMessageName()
+    {
+        return $"{nameof(BeatAnalyzedEvent)}-{playerProfile.Name}";
     }
 
     private void OnBeatAnalyzedEventMessage(NamedMessage message)
@@ -532,7 +537,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
             && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
         {
             onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
-                nameof(BeatAnalyzedEvent),
+                GetBeatAnalyzedEventMessageName(),
                 CreateBeatAnalyzedEventFastBufferWriter(beatAnalyzedEvent),
                 onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds,
                 NetworkDelivery.Unreliable);
