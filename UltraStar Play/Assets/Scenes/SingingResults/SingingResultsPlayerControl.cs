@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -155,11 +156,9 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
 
         // Score bar (animated)
-        if (micProfile != null)
-        {
-            playerScoreProgressBar.ProgressColor = micProfile.Color;
-        }
-        else
+        Color32 scoreBarColor = CommonOnlineMultiplayerUtils.GetPlayerColor(PlayerProfile, micProfile);
+        playerScoreProgressBar.ProgressColor = scoreBarColor;
+        if (scoreBarColor == Color.clear)
         {
             // Do not show border because it looks bad without a fill color
             playerImage.SetBorderWidth(0);

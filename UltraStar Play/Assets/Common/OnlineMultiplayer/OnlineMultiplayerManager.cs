@@ -61,7 +61,7 @@ namespace CommonOnlineMultiplayer
             }
         }
         public NetworkObject OwnLobbyMemberNetworkObject => networkManager.SpawnManager.GetLocalPlayerObject();
-        public UnityNetcodeClientId OwnLobbyMemberUnityNetcodeClientId => OwnLobbyMember.UnityNetcodeClientId;
+        public UnityNetcodeClientId OwnLobbyMemberUnityNetcodeClientId => networkManager.LocalClientId;
 
         public IReadOnlyList<ulong> OtherLobbyMembersUnityNetcodeClientIds
         {

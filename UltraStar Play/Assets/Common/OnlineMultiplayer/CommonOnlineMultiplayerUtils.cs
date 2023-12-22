@@ -1,11 +1,27 @@
 ﻿using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using UnityEngine;
 
 namespace CommonOnlineMultiplayer
 {
     public static class CommonOnlineMultiplayerUtils
     {
+        public static Color32 GetPlayerColor(PlayerProfile playerProfile, MicProfile micProfile)
+        {
+            if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                && lobbyMemberPlayerProfile.UnityNetcodeClientId != NetworkManager.Singleton.LocalClientId)
+            {
+                return ColorGenerationUtils.FromString(playerProfile.Name);
+            }
+            else if (micProfile != null)
+            {
+                return micProfile.Color;
+            }
+
+            return Colors.clearBlack;
+        }
+
         public static void ConfigureUnityTransport(NetworkManager networkManager, Settings settings)
         {
             if (networkManager.NetworkConfig.NetworkTransport is not UnityTransport unityTransport)

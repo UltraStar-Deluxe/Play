@@ -85,6 +85,8 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     [Inject]
     private AchievementEventStream achievementEventStream;
 
+    private Color32 PlayerColor => CommonOnlineMultiplayerUtils.GetPlayerColor(playerProfile, micProfile);
+
     private AbstractSingSceneNoteDisplayer noteDisplayer;
     public AbstractSingSceneNoteDisplayer NoteDisplayer => noteDisplayer;
 
@@ -189,11 +191,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         if (micProfile != null
             || playerProfile is LobbyMemberPlayerProfile)
         {
-            Color color = micProfile?.Color ?? Color.white;
             playerScoreProgressBar.ShowByDisplay();
             playerScoreProgressBar.ShowByVisibility();
-            playerScoreProgressBar.ProgressColor = color;
-            playerImageBorder.SetBorderColor(color);
+            playerScoreProgressBar.ProgressColor = PlayerColor;
+            playerImageBorder.SetBorderColor(PlayerColor);
         }
         else
         {
@@ -237,10 +238,7 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         string newText = $"Next: {nextPlayerProfile.Name}";
         if (newText != nextPlayerNameLabel.text)
         {
-            if (micProfile != null)
-            {
-                nextPlayerNameLabel.style.color = new StyleColor(micProfile.Color);
-            }
+            nextPlayerNameLabel.style.color = new StyleColor(PlayerColor);
             nextPlayerNameLabel.text = newText;
             AnimationUtils.BounceVisualElementSize(singSceneControl.gameObject, nextPlayerNameLabel, setNextPlayerProfileAnimTimeInSeconds);
         }
@@ -424,10 +422,6 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         leadingPlayerIcon.ShowByVisibility();
-        if (micProfile != null)
-        {
-            leadingPlayerIcon.style.color = new StyleColor(micProfile.Color);
-        }
 
         // Bouncy size animation
         if (leadingPlayerIconAnimationId > 0)

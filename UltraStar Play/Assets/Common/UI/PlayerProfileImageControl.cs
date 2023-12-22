@@ -104,7 +104,7 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
         if (lobbyMember != null
             && lobbyMember is not SteamLobbyMember)
         {
-            image.style.unityBackgroundImageTintColor = new StyleColor(ColorGenerationUtils.FromString(playerProfile.Name));
+            image.style.unityBackgroundImageTintColor = new StyleColor(CommonOnlineMultiplayerUtils.GetPlayerColor(playerProfile, micProfile));
         }
     }
 
@@ -113,6 +113,7 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
         if (micProfile != null)
         {
             image.style.backgroundColor = new StyleColor(micProfile.Color);
+            return;
         }
 
         image.style.backgroundColor =  new StyleColor(Color.clear);
