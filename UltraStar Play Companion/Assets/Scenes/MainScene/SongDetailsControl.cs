@@ -371,7 +371,7 @@ public class SongDetailsControl : INeedInjection, IInjectionFinishedListener, ID
             PlayerSelectPlayerEntryControl playerEntryControl = injector
                 .WithRootVisualElement(playerEntry)
                 .WithBindingForInstance(playerProfile)
-                .WithBinding(new Binding(nameof(micProfiles), new ExistingInstanceProvider<List<MicProfile>>(micProfiles)))
+                .WithBinding(new UniInjectBinding(nameof(micProfiles), new ExistingInstanceProvider<List<MicProfile>>(micProfiles)))
                 .CreateAndInject<PlayerSelectPlayerEntryControl>();
             playerEntryControl.OnMicProfileSelected = newMicProfile =>
             {
