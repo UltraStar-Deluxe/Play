@@ -62,7 +62,7 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
         ModListEntryControl modListEntryControl = injector
             .CreateChildInjector()
             .WithRootVisualElement(modEntryVisualElement)
-            .WithBinding(new Binding("modFolder", new ExistingInstanceProvider<string>(modFolder)))
+            .WithBinding(new UniInjectBinding("modFolder", new ExistingInstanceProvider<string>(modFolder)))
             .CreateAndInject<ModListEntryControl>();
 
         return modListEntryControl;

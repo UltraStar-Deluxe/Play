@@ -593,8 +593,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         VisualElement visualElement = songFolderListEntryUi.CloneTree();
         SongFolderListEntryControl songFolderListEntryControl = injector
             .WithRootVisualElement(visualElement)
-            .WithBinding(new Binding("initialPath", new ExistingInstanceProvider<string>(path)))
-            .WithBinding(new Binding("indexInList", new ExistingInstanceProvider<int>(indexInList)))
+            .WithBinding(new UniInjectBinding("initialPath", new ExistingInstanceProvider<string>(path)))
+            .WithBinding(new UniInjectBinding("indexInList", new ExistingInstanceProvider<int>(indexInList)))
             .CreateAndInject<SongFolderListEntryControl>();
 
         songFolderListEntryControl.ValueChangedEventStream.Subscribe(newValue => OnSongFolderPathChanged(indexInList, newValue));
