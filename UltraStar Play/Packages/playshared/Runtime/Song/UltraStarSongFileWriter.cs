@@ -9,7 +9,8 @@ public static class UltraStarSongFileWriter
     public static void WriteFile(string absolutePath, SongMeta songMeta)
     {
         string txtFileContent = GetTxtFileContent(songMeta);
-        File.WriteAllText(absolutePath, txtFileContent, Encoding.UTF8);
+        // Do not use Encoding.UTF8 as it will produce a BOM.
+        File.WriteAllText(absolutePath, txtFileContent, new UTF8Encoding());
     }
 
     private static string GetTxtFileContent(SongMeta songMeta)
