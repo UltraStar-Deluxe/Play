@@ -13,9 +13,8 @@ git init
 git remote add origin https://github.com/jacobdufault/fullserializer.git
 git config core.sparsecheckout true
 echo "Assets/FullSerializer/Source/*" >> .git/info/sparse-checkout
-git pull --depth=100 origin master
 # commit from 30 Mar 2017: c01db302f337205696585daa72e7d7baea922e44
-git checkout c01db302f337205696585daa72e7d7baea922e44
+git pull --depth=1 origin c01db302f337205696585daa72e7d7baea922e44
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v Assets/FullSerializer/* ./
