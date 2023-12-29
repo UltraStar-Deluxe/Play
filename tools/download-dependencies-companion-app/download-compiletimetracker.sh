@@ -15,8 +15,7 @@ git config core.sparsecheckout true
 echo "CompileTimeTracker/*" >> .git/info/sparse-checkout
 echo "README.md" >> .git/info/sparse-checkout
 # commit from 1st October 2019: 276095b3b212d7c33106b53d71b93b5a72d1e1d3
-git pull --depth=100 origin master
-git checkout 276095b3b212d7c33106b53d71b93b5a72d1e1d3
+git pull --depth=1 origin 276095b3b212d7c33106b53d71b93b5a72d1e1d3
 
 echo "Moving downloaded files to correct position for this project..."
 mv -v CompileTimeTracker/* ./
