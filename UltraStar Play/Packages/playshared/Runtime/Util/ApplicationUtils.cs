@@ -115,14 +115,14 @@ public static class ApplicationUtils
         "m4a",
         "wma",
         "flac",
-    }.Intersect(supportedAudioFiles).ToHashSet();
+    }.ToHashSet();
 
     public static readonly IReadOnlyCollection<string> supportedBasicPitchDetectionAudioFiles = new HashSet<string>
     {
         "wav",
         "mp3",
         "ogg",
-    }.Intersect(supportedAudioFiles).ToHashSet();
+    }.ToHashSet();
 
     public static readonly IReadOnlyCollection<string> unitySupportedVideoFiles = new HashSet<string>
     {
