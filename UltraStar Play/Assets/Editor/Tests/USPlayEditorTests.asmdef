@@ -21,6 +21,8 @@
     "precompiledReferences": [
         "nunit.framework.dll",
         "Moq.dll",
+        "ArchUnitNET.dll",
+        "ArchUnitNET.NUnit.dll",
         "Facepunch.Steamworks.Win64.dll"
     ],
     "autoReferenced": false,
