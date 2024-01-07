@@ -101,8 +101,8 @@ namespace CommonOnlineMultiplayer
 
             LobbyMemberUiControl entryControl = injector
                 .WithBindingForInstance(lobbyMember)
-                .WithBinding(new Binding(typeof(ILobbyManager), new ExistingInstanceProvider<ILobbyManager>(lobbyManager)))
-                .WithBinding(new Binding(typeof(ILobbyMemberManager), new ExistingInstanceProvider<ILobbyMemberManager>(lobbyMemberManager)))
+                .WithBinding(new UniInjectBinding(typeof(ILobbyManager), new ExistingInstanceProvider<ILobbyManager>(lobbyManager)))
+                .WithBinding(new UniInjectBinding(typeof(ILobbyMemberManager), new ExistingInstanceProvider<ILobbyMemberManager>(lobbyMemberManager)))
                 .WithRootVisualElement(visualElement)
                 .CreateAndInject<LobbyMemberUiControl>();
 

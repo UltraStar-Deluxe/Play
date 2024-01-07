@@ -118,9 +118,9 @@ namespace SteamOnlineMultiplayer
 
             SteamLobbyMemberUiControl entryControl = injector
                 .WithRootVisualElement(visualElement)
-                .WithBinding(new Binding(typeof(ILobbyManager), new ExistingInstanceProvider<ILobbyManager>(steamLobbyManager)))
-                .WithBinding(new Binding(typeof(ILobbyMemberManager), new ExistingInstanceProvider<ILobbyMemberManager>(steamLobbyMemberManager)))
-                .WithBinding(new Binding(typeof(LobbyMember), new ExistingInstanceProvider<LobbyMember>(steamLobbyMember)))
+                .WithBinding(new UniInjectBinding(typeof(ILobbyManager), new ExistingInstanceProvider<ILobbyManager>(steamLobbyManager)))
+                .WithBinding(new UniInjectBinding(typeof(ILobbyMemberManager), new ExistingInstanceProvider<ILobbyMemberManager>(steamLobbyMemberManager)))
+                .WithBinding(new UniInjectBinding(typeof(LobbyMember), new ExistingInstanceProvider<LobbyMember>(steamLobbyMember)))
                 .WithBindingForInstance(steamLobbyMember)
                 .CreateAndInject<SteamLobbyMemberUiControl>();
 
