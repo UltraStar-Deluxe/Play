@@ -489,6 +489,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return true;
         }
 
+        bool isLoadingUrlOfSameHost;
+        try
+        {
+            isLoadingUrlOfSameHost = string.Equals(new Uri(loadedUrl).Host, new Uri(webView.Url).Host, StringComparison.InvariantCultureIgnoreCase);
+        }
+        catch
+        {
+            isLoadingUrlOfSameHost = false;
+        }
+
         if (!javaScriptCanLoadUrl)
         {
             isContentLoaded = false;
@@ -505,7 +515,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                                              "to switch to embedded browser.");
             }
 
-            if (isContentLoaded && javaScriptCanLoadUrl)
+            if (isContentLoaded && isLoadingUrlOfSameHost && javaScriptCanLoadUrl)
             {
                 Debug.Log("Loading new URL via JavaScript");
                 webView.ExecuteJavaScript($"setVolume(0)");
