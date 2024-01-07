@@ -20,7 +20,9 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "Moq.dll"
+        "Moq.dll",
+        "ArchUnitNET.dll",
+        "ArchUnitNET.NUnit.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
