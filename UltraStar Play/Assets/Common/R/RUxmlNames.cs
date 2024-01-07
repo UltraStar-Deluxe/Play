@@ -955,6 +955,7 @@ public static partial class R
         public const string webcamOptionsButton = "webcamOptionsButton";
         public const string webcamRenderContainer = "webcamRenderContainer";
         public const string webcamRenderContainerParent = "webcamRenderContainerParent";
+        public const string webViewCustomUserAgentTextField = "webViewCustomUserAgentTextField";
         public const string webViewGroup = "webViewGroup";
         public const string wideIcon = "wideIcon";
         public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
