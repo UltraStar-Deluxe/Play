@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 #pragma warning disable CS0649
 
-public class OverviewAreaControl : IInjectionFinishedListener
+public class OverviewAreaControl : INeedInjection, IInjectionFinishedListener
 {
     [Inject]
     private SongMeta songMeta;
