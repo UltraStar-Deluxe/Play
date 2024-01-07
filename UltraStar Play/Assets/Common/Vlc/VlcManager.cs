@@ -24,7 +24,7 @@ public class VlcManager : AbstractSingletonBehaviour, INeedInjection
     /**
      * The LibVLC class is mainly used for making MediaPlayer and Media objects. You should only have one LibVLC instance.
      */
-    public static LibVLC libVLC;
+    private static LibVLC libVLC;
 
     protected override object GetInstance()
     {
