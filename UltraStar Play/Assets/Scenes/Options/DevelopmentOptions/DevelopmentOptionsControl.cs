@@ -149,6 +149,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.vfxEnabledToggle)]
     private Toggle vfxEnabledToggle;
 
+    [Inject(UxmlName = R.UxmlNames.webViewCustomUserAgentTextField)]
+    private TextField webViewCustomUserAgentTextField;
+
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
 
@@ -237,6 +240,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(enableWebViewToggle,
             () => settings.EnableWebView,
             newValue => settings.EnableWebView = newValue);
+
+        FieldBindingUtils.Bind(webViewCustomUserAgentTextField,
+            () => settings.CustomUserAgent,
+            newValue => settings.CustomUserAgent = newValue);
 
         FieldBindingUtils.Bind(useUniversalCharsetDetectorToggle,
             () => settings.UseUniversalCharsetDetector,
