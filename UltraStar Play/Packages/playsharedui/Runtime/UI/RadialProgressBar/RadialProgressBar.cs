@@ -210,6 +210,7 @@ public class RadialProgressBar : VisualElement
         painter.Stroke();
 
         // Draw Progress
+        // A Unity crash can happen when the difference between startAngle and endAngle is too small.
         if (Math.Abs(startAngle - endAngle) > 1f)
         {
             painter.BeginPath();
