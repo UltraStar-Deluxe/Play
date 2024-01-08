@@ -1,6 +1,6 @@
 ﻿#TITLE:SomeTitle
 #ARTIST:SomeArtist
-#MP3:SomeAudio.ogg
+#MP3:ogg-TestAudio.ogg
 #INSTRUMENTALAUDIO:SomeInstrumentalAudio.ogg
 #VOCALSAUDIO:SomeVocalsAudio.ogg
 #BPM:200
