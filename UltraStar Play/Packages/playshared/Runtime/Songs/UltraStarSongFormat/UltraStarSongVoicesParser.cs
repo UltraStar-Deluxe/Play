@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -219,14 +220,29 @@ public class UltraStarSongVoicesParser
         string[] data = line.Split(splitChars, 5);
         if (data.Length < 5)
         {
-            throw new UltraStarSongParserException("Incomplete note");
+            throw new UltraStarSongParserException($"Incomplete note. Found '{line}' but expected '<NoteType> <StartBeat> <LengthInBeats> <Pitch> <Lyrics>'");
         }
-        ENoteType noteType = GetNoteType(data[0]);
-        int startBeat = ConvertToBeat(data[1]);
+
+        string noteTypeString = data[0];
+        string startBeatString = data[1];
+        string lengthString = data[2];
+        string txtPitchString = data[3];
+        string lyricsString = data[4];
+
+        if (noteTypeString.IsNullOrEmpty()
+            || startBeatString.IsNullOrEmpty()
+            || lengthString.IsNullOrEmpty()
+            || txtPitchString.IsNullOrEmpty())
+        {
+            throw new UltraStarSongParserException($"Incomplete note. Found '{line}' but expected '<NoteType> <StartBeat> <LengthInBeats> <Pitch> <Lyrics>'");
+        }
+
+        ENoteType noteType = GetNoteType(noteTypeString);
+        int startBeat = ConvertToBeat(startBeatString);
         lastBeat = startBeat;
-        int length = ConvertToInt32(data[2]);
-        int txtPitch = ConvertToInt32(data[3]);
-        string lyrics = data[4];
+        int length = ConvertToInt32(lengthString);
+        int txtPitch = ConvertToInt32(txtPitchString);
+        string lyrics = lyricsString;
         return new Note(
             noteType,
             startBeat,
