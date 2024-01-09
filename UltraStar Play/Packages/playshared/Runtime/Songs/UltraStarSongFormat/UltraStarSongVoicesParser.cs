@@ -220,7 +220,7 @@ public class UltraStarSongVoicesParser
         string[] data = line.Split(splitChars, 5);
         if (data.Length < 5)
         {
-            throw new UltraStarSongParserException($"Incomplete note. Found '{line}' but expected '<NoteType> <StartBeat> <LengthInBeats> <Pitch> <Lyrics>'");
+            throw new UltraStarSongParserException(GetIncompleteNoteErrorMessage(line));
         }
 
         string noteTypeString = data[0];
@@ -234,7 +234,7 @@ public class UltraStarSongVoicesParser
             || lengthString.IsNullOrEmpty()
             || txtPitchString.IsNullOrEmpty())
         {
-            throw new UltraStarSongParserException($"Incomplete note. Found '{line}' but expected '<NoteType> <StartBeat> <LengthInBeats> <Pitch> <Lyrics>'");
+            throw new UltraStarSongParserException(GetIncompleteNoteErrorMessage(line));
         }
 
         ENoteType noteType = GetNoteType(noteTypeString);
@@ -250,6 +250,11 @@ public class UltraStarSongVoicesParser
             txtPitch,
             lyrics
         );
+    }
+
+    private static string GetIncompleteNoteErrorMessage(string line)
+    {
+        return $"Incomplete note. Got '{line}' but expected '<NoteType> <StartBeat> <LengthInBeats> <Pitch> <Lyrics>'";
     }
 
     private int ConvertToBeat(string s)
