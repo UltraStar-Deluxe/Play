@@ -142,6 +142,24 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         return dialogControl;
     }
 
+    public MessageDialogControl CreateInfoDialogControl(
+        string dialogTitle,
+        string dialogMessage,
+        string closeButtonText = null)
+    {
+        MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
+        messageDialogControl.Message = dialogMessage;
+
+        closeButtonText = !closeButtonText.IsNullOrEmpty()
+            ? closeButtonText
+            : TranslationManager.GetTranslation(R.Messages.close);
+        messageDialogControl.AddButton(closeButtonText, evt =>
+        {
+            messageDialogControl.CloseDialog();
+        });
+        return messageDialogControl;
+    }
+
     public MessageDialogControl CreateConfirmationDialogControl(
         string dialogTitle,
         string dialogMessage,
