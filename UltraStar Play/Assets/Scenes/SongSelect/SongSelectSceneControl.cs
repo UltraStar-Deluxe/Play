@@ -1018,10 +1018,22 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)
     {
-        uiManager.CreateInfoDialogControl(
+        string errorMessage;
+        if (songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
+            && !lazyLoadedVoicesSongMeta.FailedToLoadVoicesExceptionMessage.IsNullOrEmpty())
+        {
+            errorMessage = lazyLoadedVoicesSongMeta.FailedToLoadVoicesExceptionMessage;
+        }
+        else
+        {
+            errorMessage = "";
+        }
+
+        uiManager.CreateErrorInfoDialogControl(
             "Failed to Load Song",
             "The UltraStar txt file could not be loaded.\n" +
-            "Please see the log for details and fix any issues with the file.");
+            $"Please see the log for details and fix any issues with the file.\n",
+            errorMessage);
     }
 
     private void ShowAskToCreateSingAlongDataDialog(SongMeta songMeta)
