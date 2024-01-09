@@ -142,6 +142,47 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         return dialogControl;
     }
 
+    public MessageDialogControl CreateErrorInfoDialogControl(
+        string dialogTitle,
+        string dialogMessage,
+        string errorMessage,
+        string closeButtonText = null)
+    {
+        MessageDialogControl messageDialogControl = CreateInfoDialogControl(dialogTitle,dialogMessage, closeButtonText);
+
+        // Add accordion item to show error message.
+        if (!errorMessage.IsNullOrEmpty())
+        {
+            AccordionItem accordionItem = new AccordionItem();
+            accordionItem.Title = "Details";
+            Label errorMessageLabel = new();
+            errorMessageLabel.text = errorMessage;
+            accordionItem.Add(errorMessageLabel);
+            accordionItem.HideAccordionContent();
+            messageDialogControl.AddVisualElement(accordionItem);
+        }
+
+        return messageDialogControl;
+    }
+
+    public MessageDialogControl CreateInfoDialogControl(
+        string dialogTitle,
+        string dialogMessage,
+        string closeButtonText = null)
+    {
+        MessageDialogControl messageDialogControl = CreateDialogControl(dialogTitle);
+        messageDialogControl.Message = dialogMessage;
+
+        closeButtonText = !closeButtonText.IsNullOrEmpty()
+            ? closeButtonText
+            : TranslationManager.GetTranslation(R.Messages.close);
+        messageDialogControl.AddButton(closeButtonText, evt =>
+        {
+            messageDialogControl.CloseDialog();
+        });
+        return messageDialogControl;
+    }
+
     public MessageDialogControl CreateConfirmationDialogControl(
         string dialogTitle,
         string dialogMessage,

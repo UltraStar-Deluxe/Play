@@ -266,10 +266,7 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
                 throw new ConnectRequestException($"Malformed connection request: protocol version does not match"
                                                   + $" (server (main game): {ProtocolVersions.ProtocolVersion}, client (companion app): {connectRequestDto.ProtocolVersion}).");
             }
-            if (connectRequestDto.ClientName.IsNullOrEmpty())
-            {
-                throw new ConnectRequestException($"Malformed connection request: missing ClientName.");
-            }
+
             if (connectRequestDto.ClientId.IsNullOrEmpty())
             {
                 throw new ConnectRequestException($"Malformed connection request: missing ClientId.");
@@ -277,6 +274,13 @@ public class ServerSideConnectRequestManager : AbstractSingletonBehaviour, INeed
 
             Debug.Log($"Accepted connection request from {remoteEndPoint}");
             NetPeer peer = request.Accept();
+
+            // Set default values
+            if (connectRequestDto.ClientName.IsNullOrEmpty())
+            {
+                // ClientName must not be empty
+                connectRequestDto.ClientName = "Companion App";
+            }
 
             // Register client
             peerToConnectRequestDto[peer] = connectRequestDto;
