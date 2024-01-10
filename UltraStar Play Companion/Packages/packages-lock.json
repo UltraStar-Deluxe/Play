@@ -21,13 +21,6 @@
       "dependencies": {},
       "hash": "9d50e260346432ca05b6508b09e21f530ba3bae0"
     },
-    "com.achimmihca.simplehttpserverforunity": {
-      "version": "https://github.com/achimmihca/SimpleHttpServerForUnity.git?path=SimpleHttpServerForUnity/Packages/com.achimmihca.simplehttpserverforunity#v1.0.0",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "dca59973cd6eccc68f353d1489b50196c926e665"
-    },
     "com.achimmihca.uniinject": {
       "version": "https://github.com/achimmihca/UniInject.git?path=UniInject/Packages/com.achimmihca.uniinject#2aca140060bf59f18a496ade55db4ee88965ab8a",
       "depth": 0,
