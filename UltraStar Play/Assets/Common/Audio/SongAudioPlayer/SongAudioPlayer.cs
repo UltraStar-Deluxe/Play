@@ -309,6 +309,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
     }
 
+    /**
+     * The playback speed.
+     * Attempts to change tempo without affecting pitch by making use of AudioMixer effects.
+     */
     public float PlaybackSpeed
     {
         get
@@ -327,39 +331,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
         set
         {
-            float oldPlaybackSpeed = PlaybackSpeed;
-
-            // Limit playback speed. Allowed (and useful) is a range of 0.5 to 1.5.
-            float newPlaybackSpeed = value;
-            if (newPlaybackSpeed < 0.5f)
-            {
-                newPlaybackSpeed = 0.5f;
-            }
-            else if (newPlaybackSpeed > 1.5f)
-            {
-                newPlaybackSpeed = 1.5f;
-            }
-
-            // Set playback speed
-            if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
-            {
-                videoPlayer.playbackSpeed = newPlaybackSpeed;
-            }
-            else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
-            {
-                if (Math.Abs(newPlaybackSpeed - audioSource.pitch) < 0.01f)
-                {
-                    return;
-                }
-
-                AudioUtils.SetPitchWithPitchShifter(audioSource, newPlaybackSpeed);
-            }
-
-            // Fire change event
-            if (Math.Abs(PlaybackSpeed - oldPlaybackSpeed) > 0.01f)
-            {
-                playbackSpeedChangedEventStream.OnNext(newPlaybackSpeed);
-            }
+            SetPlaybackSpeed(value, true);
         }
     }
 
@@ -1168,6 +1140,52 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource or EAudioSupportProvider.UnityVideoPlayer)
         {
             audioSource.volume = value;
+        }
+    }
+
+    public void SetPlaybackSpeed(float newValue, bool usePitchShifterToCounterTempoChange)
+    {
+        float oldPlaybackSpeed = PlaybackSpeed;
+
+        // Limit playback speed. Allowed (and useful) is a range of 0.5 to 1.5.
+        float newPlaybackSpeed = newValue;
+        if (newPlaybackSpeed < 0.5f)
+        {
+            newPlaybackSpeed = 0.5f;
+        }
+        else if (newPlaybackSpeed > 1.5f)
+        {
+            newPlaybackSpeed = 1.5f;
+        }
+
+        if (Math.Abs(newValue - oldPlaybackSpeed) < 0.01f)
+        {
+            // Nothing to change
+            return;
+        }
+
+        // Set playback speed
+        if (AudioSupportProvider is EAudioSupportProvider.UnityVideoPlayer)
+        {
+            videoPlayer.playbackSpeed = newPlaybackSpeed;
+        }
+        else if (AudioSupportProvider is EAudioSupportProvider.UnityAudioSource)
+        {
+            if (Math.Abs(newPlaybackSpeed - audioSource.pitch) < 0.01f)
+            {
+                return;
+            }
+
+            if (usePitchShifterToCounterTempoChange)
+            {
+                AudioUtils.SetPitchWithPitchShifter(audioSource, newPlaybackSpeed);
+            }
+        }
+
+        // Fire change event
+        if (Math.Abs(PlaybackSpeed - oldPlaybackSpeed) > 0.01f)
+        {
+            playbackSpeedChangedEventStream.OnNext(newPlaybackSpeed);
         }
     }
 }
