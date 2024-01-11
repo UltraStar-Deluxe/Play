@@ -10,7 +10,7 @@ using System.Collections.Generic;
 // ---
 // Mods must implement subtypes of special mod interfaces.
 // Available interfaces can be found by executing 'mod.interfaces' in the game's console.
-public class MODNAMELifeCycle : IOnLoadMod, IOnDisableMod
+public class MODNAMELifeCycle : IOnLoadMod, IOnDisableMod, IOnModInstanceBecomesObsolete
 {
     // Get common objects from the app environment via Inject attribute.
     [Inject]
@@ -29,5 +29,12 @@ public class MODNAMELifeCycle : IOnLoadMod, IOnDisableMod
     public void OnDisableMod()
     {
         Debug.Log($"{nameof(MODNAMELifeCycle)}.OnDisableMod");
+    }
+
+    // Called when this instance becomes obsolete.
+    // For example during mod reload, i.e., when a newer instance is created because of a .cs file changed.
+    public void OnModInstanceBecomesObsolete()
+    {
+        Debug.Log($"{nameof(MODNAMELifeCycle)}.OnModInstanceBecomesObsolete");
     }
 }
