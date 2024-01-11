@@ -409,6 +409,7 @@ public static partial class R
         public const string modListEntryInactiveOverlay = "modListEntryInactiveOverlay";
         public const string modNameLabel = "modNameLabel";
         public const string modOptionsButton = "modOptionsButton";
+        public const string modReloadOnChangeToggle = "modReloadOnChangeToggle";
         public const string modSettingsButton = "modSettingsButton";
         public const string modSettingsIcon = "modSettingsIcon";
         public const string modSettingsProblemHintIcon = "modSettingsProblemHintIcon";

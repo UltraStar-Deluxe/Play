@@ -49,7 +49,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private bool shouldReloadChangedMods;
     private readonly Dictionary<string, FileSystemWatcher> modFolderToFileSystemWatcher = new();
     private readonly List<string> changedCsFiles = new();
 
@@ -147,7 +146,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnCsFileChanged(string modFolder, string filePath)
     {
-        if (!shouldReloadChangedMods)
+        if (!settings.ReloadModsOnFileChange)
         {
             return;
         }
@@ -241,8 +240,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         DebugLogConsole.AddCommand("mod.reloadOnChange", "Toggle auto reload of mods when a .cs file in a mod folder changes.",
             () =>
             {
-                shouldReloadChangedMods = !shouldReloadChangedMods;
-                Debug.Log($"Reload changed mods: {shouldReloadChangedMods}");
+                settings.ReloadModsOnFileChange = !settings.ReloadModsOnFileChange;
+                Debug.Log($"Reload changed mods: {settings.ReloadModsOnFileChange}");
             });
 
         DebugLogConsole.AddCommand("mod.eval", "Evaluate C# code in the current context. " +

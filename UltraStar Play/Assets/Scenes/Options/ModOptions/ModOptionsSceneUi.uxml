@@ -7,6 +7,7 @@
                     <ui:Label tabindex="-1" text="Mods can be a security risk or steal sensitive information. Use at your own risk." parse-escape-sequences="true" display-tooltip-when-elided="true" name="modTrustWarningLabel" class="wordWrap" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:Toggle label="Reload Mods on File Change" name="modReloadOnChangeToggle" />
             <ui:VisualElement name="modList" />
         </ui:ScrollView>
     </ui:VisualElement>
