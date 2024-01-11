@@ -380,6 +380,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         DestroyFfmpegPlayer();
         DestroyVlcMediaPlayer();
+        AudioUtils.ResetPitchAndPitchShifter(audioSource);
     }
 
     private void Update()
@@ -1147,17 +1148,8 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
     {
         float oldPlaybackSpeed = PlaybackSpeed;
 
-        // Limit playback speed. Allowed (and useful) is a range of 0.5 to 1.5.
-        float newPlaybackSpeed = newValue;
-        if (newPlaybackSpeed < 0.5f)
-        {
-            newPlaybackSpeed = 0.5f;
-        }
-        else if (newPlaybackSpeed > 1.5f)
-        {
-            newPlaybackSpeed = 1.5f;
-        }
-
+        // Limit playback speed. Allowed is a range of 0.5 (half speed) to 2 (double speed).
+        float newPlaybackSpeed = NumberUtils.Limit(newValue, 0.5f, 2f);
         if (Math.Abs(newValue - oldPlaybackSpeed) < 0.01f)
         {
             // Nothing to change
@@ -1179,6 +1171,10 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
             if (usePitchShifterToCounterTempoChange)
             {
                 AudioUtils.SetPitchWithPitchShifter(audioSource, newPlaybackSpeed);
+            }
+            else
+            {
+                audioSource.pitch = newPlaybackSpeed;
             }
         }
 
