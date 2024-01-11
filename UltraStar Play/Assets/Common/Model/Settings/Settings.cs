@@ -174,4 +174,5 @@ public class Settings : ISettings
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();
+    public bool ReloadModsOnFileChange { get; set; }
 }
