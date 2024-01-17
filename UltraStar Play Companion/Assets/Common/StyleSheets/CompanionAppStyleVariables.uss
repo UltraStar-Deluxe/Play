@@ -11,13 +11,13 @@
     --control-danger: rgb(220, 53, 69);
     --control-danger-accent1: rgb(200, 35, 51);
 
-    --font-size-xxs: 10px;
-    --font-size-xs: 12px;
-    --font-size-s: 14px;
-    --font-size: 20px;
-    --font-size-l: 24px;
-    --font-size-xl: 28px;
-    --font-size-xxl: 32px;
+    --font-size-xxs: 12px;
+    --font-size-xs: 14px;
+    --font-size-s: 16px;
+    --font-size: 18px;
+    --font-size-l: 21px;
+    --font-size-xl: 26px;
+    --font-size-xxl: 30px;
     --font-icon-size: 32px;
     --control-height: 48px;
     --control-height-double: 96px;

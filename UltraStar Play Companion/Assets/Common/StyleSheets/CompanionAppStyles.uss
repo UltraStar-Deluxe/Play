@@ -3,6 +3,11 @@
     transition: left 0.5s;
 }
 
+.unity-toggle__label {
+    flex-shrink: 0;
+    margin-right: auto;
+}
+
 .overlayBackground {
     background-color: rgba(0, 0, 0, 0.8);
 }

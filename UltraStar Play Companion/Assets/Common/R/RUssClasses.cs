@@ -38,6 +38,7 @@ public static partial class R
         public const string stopRecordingButton = "stopRecordingButton";
         public const string titleText = "titleText";
         public const string transparentBackgroundColor = "transparentBackgroundColor";
+        public const string unity_toggle__label = "unity-toggle__label";
         public const string wordWrap = "wordWrap";
     }
 }
