@@ -108,10 +108,11 @@ public static class BuildUtils
 
         if (options.buildTarget == BuildTarget.Android)
         {
-            // Use the Unix time in minutes as version code.
-            // This ensures that the value is incremented for every new build.
-            // Using minutes (instead of milliseconds) makes the value small enough to fit into an int32.
-            PlayerSettings.Android.bundleVersionCode = (int)(TimeUtils.GetUnixTimeMilliseconds() / 1000 / 60);
+            PlayerSettings.Android.bundleVersionCode = GetBundleVersionFromCurrentTime();
+        }
+        else if (options.buildTarget == BuildTarget.iOS)
+        {
+            PlayerSettings.iOS.buildNumber = GetBundleVersionFromCurrentTime().ToString();
         }
 
         if (options.configureKeystoreForAndroidBuild)
@@ -162,6 +163,16 @@ public static class BuildUtils
         {
             UploadBuildOutputToSteam(options);
         }
+    }
+
+    /**
+     * Use the Unix time in minutes as bundle version.
+     * This ensures that the value is incremented for every new build.
+     */
+    private static int GetBundleVersionFromCurrentTime()
+    {
+        // Using minutes (instead of milliseconds) makes the value small enough to fit into an int32.
+        return (int)(TimeUtils.GetUnixTimeMilliseconds() / 1000 / 60);
     }
 
     public static void UploadBuildOutputToSteam(CustomBuildOptions options)
