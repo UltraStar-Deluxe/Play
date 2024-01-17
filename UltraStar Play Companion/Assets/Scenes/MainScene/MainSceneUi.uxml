@@ -13,7 +13,7 @@
                     <ui:Label text="Melody Mania&#10;Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Button display-tooltip-when-elided="true" name="showMenuButton" class="ml-3" style="align-items: center; justify-content: center; width: 48px; height: 48px; flex-grow: 0;">
+            <ui:Button display-tooltip-when-elided="true" name="showMenuButton" class="ml-3 squareButton" style="align-items: center; justify-content: center; flex-grow: 0;">
                 <MaterialIcon icon="settings" name="menuIcon" />
             </ui:Button>
         </ui:VisualElement>
