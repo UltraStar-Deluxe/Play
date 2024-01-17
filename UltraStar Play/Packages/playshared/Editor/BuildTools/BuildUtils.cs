@@ -72,19 +72,92 @@ public static class BuildUtils
 
     private static void DoPerformCustomBuild(CustomBuildOptions options)
     {
-        string executableName = GetExecutableName(options.appName, options.buildTarget,
-            options.buildAppBundleForGooglePlay, options.configureKeystoreForAndroidBuild);
-        string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
+        ConfigureBuildSettings(options);
+
+        RunUnityBuildPipeline(options);
+
+        if (ShouldCompressOutputFolderToZip(options))
+        {
+            CompressOutputFolderToZipFile(options);
+        }
+
+        if (options.uploadToSteam)
+        {
+            UploadBuildOutputToSteam(options);
+        }
+    }
+
+    private static void RunUnityBuildPipeline(CustomBuildOptions options)
+    {
+        // Define build output location
+        string outputFolderPath = GetBuildOutputFolderFromBuildOptions(options);
+        string executableName = GetExecutableName(options.appName, options.buildTarget, options.buildAppBundleForGooglePlay, options.configureKeystoreForAndroidBuild);
         string executableFileInOutputFolder = !executableName.IsNullOrEmpty() ? $"/{executableName}" : "";
         string fullOutputPath = $"{outputFolderPath}{executableFileInOutputFolder}";
         if (options.buildTarget == BuildTarget.StandaloneOSX)
         {
             fullOutputPath += ".app";
         }
+        Debug.Log($"Starting build of {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}");
 
+        // Run Unity build
         string[] enabledScenePaths = GetEnabledScenePaths();
-        Debug.Log(
-            $"Starting build of {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}");
+        BuildReport buildReport = BuildPipeline.BuildPlayer(enabledScenePaths, fullOutputPath, options.buildTarget, options.buildOptions);
+
+        // Log results
+        LogType logType = GetLogType(buildReport.summary.result);
+        TimeSpan buildDuration = buildReport.summary.buildEndedAt - buildReport.summary.buildStartedAt;
+        Debug.unityLogger.Log(logType, $"Built {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}. Duration: {buildDuration.TotalSeconds} seconds");
+    }
+
+    private static void ConfigureBuildSettings(CustomBuildOptions options)
+    {
+        if (options.buildTarget is BuildTarget.Android)
+        {
+            ConfigureAndroidBuildSettings(options);
+        }
+        else if (options.buildTarget is BuildTarget.iOS)
+        {
+            ConfigureIosBuildSettings(options);
+        }
+    }
+
+    private static bool ShouldCompressOutputFolderToZip(CustomBuildOptions options)
+    {
+        return options.compressOutputFolderToZipFile
+               && options.buildTarget
+                   is BuildTarget.StandaloneOSX
+                   or BuildTarget.StandaloneLinux64
+                   or BuildTarget.StandaloneWindows64
+                   or BuildTarget.StandaloneWindows;
+    }
+
+    private static void CompressOutputFolderToZipFile(CustomBuildOptions options)
+    {
+        string outputFolderPath = GetBuildOutputFolderFromBuildOptions(options);
+        if (options.buildTarget is BuildTarget.StandaloneOSX)
+        {
+            // A folder that ends with ".app" was created. This folder is the app for macOS.
+            // To include this ".app" folder in the ZIP file, we need to move it to a subfolder.
+            // Example: generated folder is "MyApp-macOS.app". This will be moved to "MyApp-macOS/MyApp-macOS.app".
+            string generatedFolderPath = $"{outputFolderPath}.app";
+            string generatedFolderName = Path.GetFileName(generatedFolderPath);
+            string subfolderPath = outputFolderPath + $"/{generatedFolderName}";
+            if (!Directory.Exists(outputFolderPath))
+            {
+                Directory.CreateDirectory(outputFolderPath);
+            }
+
+            Directory.Move(generatedFolderPath, subfolderPath);
+            Debug.Log($"Moved folder {generatedFolderPath} to {subfolderPath}");
+        }
+
+        CompressDirectoryToZipFile(outputFolderPath, outputFolderPath + ".zip");
+    }
+
+    private static void ConfigureAndroidBuildSettings(CustomBuildOptions options)
+    {
+        PlayerSettings.Android.bundleVersionCode = GetBundleVersionFromCurrentTime();
 
         // Build Android app bundle (aab file) or apk file
         EditorUserBuildSettings.buildAppBundle = options.buildAppBundleForGooglePlay;
@@ -106,15 +179,6 @@ public static class BuildUtils
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARMv7;
         }
 
-        if (options.buildTarget == BuildTarget.Android)
-        {
-            PlayerSettings.Android.bundleVersionCode = GetBundleVersionFromCurrentTime();
-        }
-        else if (options.buildTarget == BuildTarget.iOS)
-        {
-            PlayerSettings.iOS.buildNumber = GetBundleVersionFromCurrentTime().ToString();
-        }
-
         if (options.configureKeystoreForAndroidBuild)
         {
             ConfigureKeystoreForAndroidBuild();
@@ -123,46 +187,11 @@ public static class BuildUtils
         {
             PlayerSettings.Android.useCustomKeystore = false;
         }
+    }
 
-        BuildReport buildReport = BuildPipeline.BuildPlayer(enabledScenePaths, fullOutputPath, options.buildTarget,
-            options.buildOptions);
-
-        LogType logType = GetLogType(buildReport.summary.result);
-        TimeSpan buildDuration = buildReport.summary.buildEndedAt - buildReport.summary.buildStartedAt;
-        Debug.unityLogger.Log(logType,
-            $"Built {options.appName} for {options.buildTarget}. Build options: {options.buildOptions}. Target path: {Path.GetFullPath(fullOutputPath)}. Duration: {buildDuration.TotalSeconds} seconds");
-
-        if (options.compressOutputFolderToZipFile
-            && options.buildTarget
-                is BuildTarget.StandaloneOSX
-                or BuildTarget.StandaloneLinux64
-                or BuildTarget.StandaloneWindows64
-                or BuildTarget.StandaloneWindows)
-        {
-            if (options.buildTarget is BuildTarget.StandaloneOSX)
-            {
-                // A folder that ends with ".app" was created. This folder is the app for macOS.
-                // To include this ".app" folder in the ZIP file, we need to move it to a subfolder.
-                // Example: generated folder is "MyApp-macOS.app". This will be moved to "MyApp-macOS/MyApp-macOS.app".
-                string generatedFolderPath = $"{outputFolderPath}.app";
-                string generatedFolderName = Path.GetFileName(generatedFolderPath);
-                string subfolderPath = outputFolderPath + $"/{generatedFolderName}";
-                if (!Directory.Exists(outputFolderPath))
-                {
-                    Directory.CreateDirectory(outputFolderPath);
-                }
-
-                Directory.Move(generatedFolderPath, subfolderPath);
-                Debug.Log($"Moved folder {generatedFolderPath} to {subfolderPath}");
-            }
-
-            CompressDirectoryToZipFile(outputFolderPath, outputFolderPath + ".zip");
-        }
-
-        if (options.uploadToSteam)
-        {
-            UploadBuildOutputToSteam(options);
-        }
+    private static void ConfigureIosBuildSettings(CustomBuildOptions options)
+    {
+        PlayerSettings.iOS.buildNumber = GetBundleVersionFromCurrentTime().ToString();
     }
 
     /**
@@ -187,7 +216,7 @@ public static class BuildUtils
         }
 
         // Get path to latest build
-        string outputFolderPath = GetBuildOutputFolder(options.appName, options.buildTarget);
+        string outputFolderPath = GetBuildOutputFolderFromBuildOptions(options);
 
         DeleteFilesAndFoldersThatShouldNotBeUploadedToSteam(outputFolderPath);
 
@@ -402,6 +431,11 @@ public static class BuildUtils
         string bundleVersion = bundleVersionLine.Replace("bundleVersion:", "").Trim();
         Debug.Log($"bundleVersion from ProjectSettings/ProjectSettings.asset: {bundleVersion}");
         return bundleVersion;
+    }
+
+    private static string GetBuildOutputFolderFromBuildOptions(CustomBuildOptions options)
+    {
+        return GetBuildOutputFolder(options.appName, options.buildTarget);
     }
 
     private static string GetBuildOutputFolder(string appName, BuildTarget buildTarget)
