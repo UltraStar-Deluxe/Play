@@ -108,8 +108,17 @@ VisualElement
     background-color: rgba(0, 0, 0, 0);
 }
 
+.transparentBackgroundColor:hover:enabled {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 .transparentBackgroundColor:focus {
     background-color: rgba(0, 0, 0, 0);
+}
+
+.transparentBackgroundColor:focus:enabled {
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
 }
 
 .textFieldHint {
