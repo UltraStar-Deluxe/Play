@@ -163,7 +163,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.melodymania.MelodyManiaCompanion
     Standalone: com.melodymania.MelodyManiaCompanion
-    iPhone: com.Karaoke.UltraStarPlayCompanion
+    iPhone: com.melodymania.MelodyManiaCompanion
   buildNumber:
     Standalone: 0
     VisionOS: 0
