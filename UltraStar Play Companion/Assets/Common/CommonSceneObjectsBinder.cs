@@ -21,6 +21,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(UiManager.Instance);
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(GetUiDocument());
+        bb.BindExistingInstance(new PanelHelper(GetUiDocument()));
 
         bb.BindExistingInstance(SettingsManager.Instance.Settings);
         bb.Bind(typeof(ISettings)).ToExistingInstance(SettingsManager.Instance.Settings);
