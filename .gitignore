@@ -55,6 +55,7 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+.utmp/
 
 # OS generated
 .DS_Store*
