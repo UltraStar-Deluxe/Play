@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -78,12 +80,10 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
     [Inject(UxmlName = R.UxmlNames.mouseSimulationContainer)]
     private VisualElement mouseSimulationContainer;
 
-    private bool isPointerOverScrollWheelArea;
     private Vector3 lastScrollWheelAreaPos;
 
     private bool isAllFingersUp;
 
-    private bool isPointerOverMousePadArea;
     private bool isPointerDownOnMousePadArea;
 
     // TODO: Create DragDetectionControl that identifies drag start and end vs. single click vs. double click
@@ -98,6 +98,9 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
     private bool awaitingDragEnd;
 
     private readonly TabGroupControl tabGroupControl = new();
+
+    private readonly Subject<CustomPointerMoveEvent> pointerMoveOnMousePadAreaEventStream = new();
+    private readonly Subject<CustomPointerMoveEvent> pointerMoveOnScrollWheelAreaEventStream = new();
 
     public void OnInjectionFinished()
     {
@@ -118,23 +121,41 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         RegisterCallbackToSendSimulationInputRequest(simulateRightMouseButton, "rightMouseButton");
         RegisterCallbackToSendSimulationInputRequest(simulateMiddleMouseButton, "middleMouseButton");
 
-        mousePadArea.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnterMousePadArea(evt));
-        mousePadArea.RegisterCallback<PointerLeaveEvent>(evt => OnPointerLeaveMousePadArea(evt));
-        mousePadArea.RegisterCallback<PointerMoveEvent>(evt => OnPointerMoveOnMousePadArea(evt));
-        mousePadArea.RegisterCallback<PointerDownEvent>(evt => OnPointerDownOnMousePadArea(evt));
-        mousePadArea.GetRootVisualElement().RegisterCallback<PointerUpEvent>(evt => OnPointerUp(evt));
+        mousePadArea.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnterMousePadArea(evt), TrickleDown.TrickleDown);
+        mousePadArea.RegisterCallback<PointerLeaveEvent>(evt => OnPointerLeaveMousePadArea(evt), TrickleDown.TrickleDown);
+        mousePadArea.RegisterCallback<PointerMoveEvent>(evt => OnPointerMoveOnMousePadArea(evt), TrickleDown.TrickleDown);
+        mousePadArea.RegisterCallback<PointerDownEvent>(evt => OnPointerDownOnMousePadArea(evt), TrickleDown.TrickleDown);
+        mousePadArea.GetRootVisualElement().RegisterCallback<PointerUpEvent>(evt => OnPointerUpOnRootVisualElement(evt), TrickleDown.TrickleDown);
 
         scrollWheelArea.RegisterCallback<PointerEnterEvent>(evt => OnPointerEnterScrollWheelArea(evt));
         scrollWheelArea.RegisterCallback<PointerLeaveEvent>(evt => OnPointerLeaveScrollWheelArea(evt));
         scrollWheelArea.RegisterCallback<PointerMoveEvent>(evt => OnPointerMoveOnScrollWheelArea(evt));
         scrollWheelArea.RegisterCallback<PointerDownEvent>(evt => OnPointerDownOnScrollWheelArea(evt));
 
+        // The pointer move event is fired very often.
+        // To send a manageable amount of events, buffer them.
+        pointerMoveOnMousePadAreaEventStream
+            .Buffer(TimeSpan.FromMilliseconds(50))
+            .CatchIgnore((Exception ex) => Debug.LogException(ex))
+            .Subscribe(events =>
+            {
+                OnPointerMoveOnMousePadAreaBufferedEvents(events);
+            });
+
+        pointerMoveOnScrollWheelAreaEventStream
+            .Buffer(TimeSpan.FromMilliseconds(50))
+            .CatchIgnore((Exception ex) => Debug.LogException(ex))
+            .Subscribe(events =>
+            {
+                OnPointerMoveOnScrollWheelAreaBufferedEvents(events);
+            });
+
         applicationManager.FingerUpEventStream.Subscribe(_ =>
         {
             // The event seems to be fired before the count is decreased.
             // Thus, check for count smaller or equal than 1.
             if (Touch.activeTouches.Count <= 1
-                || Touch.activeFingers.Count<= 1)
+                || Touch.activeFingers.Count <= 1)
             {
                 isAllFingersUp = true;
             }
@@ -188,8 +209,9 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         SendSimulateInputRequest("dragEnd");
     }
 
-    private void OnPointerUp(PointerUpEvent evt)
+    private void OnPointerUpOnRootVisualElement(PointerUpEvent evt)
     {
+        Log.Debug(() => $"OnPointerUpOnRootVisualElement: {evt.deltaPosition}");
         isPointerDownOnMousePadArea = false;
 
         if (awaitingDragEnd)
@@ -200,6 +222,7 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerDownOnMousePadArea(PointerDownEvent evt)
     {
+        Log.Debug(() => "OnPointerDownOnMousePadArea");
         UpdateClickCountOnPointerDownOnMousePadArea();
 
         isAllFingersUp = false;
@@ -252,32 +275,56 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
 
     private void OnPointerEnterMousePadArea(PointerEnterEvent evt)
     {
-        isPointerOverMousePadArea = true;
+        Log.Debug(() => "OnPointerEnterMousePadArea");
         mousePadAreaStartPos = evt.localPosition;
         lastMousePadAreaPos = evt.localPosition;
     }
 
     private void OnPointerLeaveMousePadArea(PointerLeaveEvent evt)
     {
-        isPointerOverMousePadArea = false;
+        Log.Debug(() => "OnPointerLeaveMousePadArea");
     }
 
     private void OnPointerEnterScrollWheelArea(PointerEnterEvent evt)
     {
-        isPointerOverScrollWheelArea = true;
+        Log.Debug(() => "OnPointerEnterScrollWheelArea");
         lastScrollWheelAreaPos = evt.localPosition;
     }
 
     private void OnPointerLeaveScrollWheelArea(PointerLeaveEvent evt)
     {
-        isPointerOverScrollWheelArea = false;
+        Log.Debug(() => "OnPointerLeaveScrollWheelArea");
     }
 
     private void OnPointerMoveOnScrollWheelArea(PointerMoveEvent evt)
     {
-        if (!isPointerOverScrollWheelArea)
+        pointerMoveOnScrollWheelAreaEventStream.OnNext(new CustomPointerMoveEvent()
         {
-            lastScrollWheelAreaPos = evt.localPosition;
+            localPosition = evt.localPosition,
+            targetVisualElement = evt.target as VisualElement,
+        });
+    }
+
+    private void OnPointerDownOnScrollWheelArea(PointerDownEvent evt)
+    {
+        Log.Debug(() => "OnPointerDownOnScrollWheelArea");
+        lastScrollWheelAreaPos = evt.localPosition;
+    }
+
+    private void OnPointerMoveOnScrollWheelAreaBufferedEvents(IList<CustomPointerMoveEvent> events)
+    {
+        if (events.Count == 0)
+        {
+            return;
+        }
+
+        VisualElement targetVisualElement = events.Last().targetVisualElement;
+        Vector3 localPosition = events.Last().localPosition;
+        Log.Verbose(() => $"OnPointerMoveOnScrollWheelAreaBufferedEvents - events: {events.Count}, localPosition: {localPosition}");
+
+        if (targetVisualElement != scrollWheelArea)
+        {
+            lastScrollWheelAreaPos = localPosition;
             return;
         }
 
@@ -285,51 +332,78 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
         {
             // All fingers up => reset position
             isAllFingersUp = false;
-            lastScrollWheelAreaPos = evt.localPosition;
+            lastScrollWheelAreaPos = localPosition;
             return;
         }
 
-        Vector3 pointerDelta = evt.localPosition - lastScrollWheelAreaPos;
+        Vector3 pointerDelta = localPosition - lastScrollWheelAreaPos;
         if (Math.Abs(pointerDelta.y) > scrollWheelArea.contentRect.height / 10)
         {
             float deltaX = 0;
             float deltaY = Math.Sign(-pointerDelta.y);
             SendSimulateScrollWheelRequest(new Vector2(deltaX, deltaY));
-            lastScrollWheelAreaPos = evt.localPosition;
+            lastScrollWheelAreaPos = localPosition;
         }
     }
 
-    private void OnPointerDownOnScrollWheelArea(PointerDownEvent evt)
+    private Vector3 GetAverageLocalPosition(IList<CustomPointerMoveEvent> events)
     {
-        lastScrollWheelAreaPos = evt.localPosition;
+        float averageLocalPositionX = events
+            .Select(evt => evt.localPosition)
+            .Average(localPosition => localPosition.x);
+        float averageLocalPositionY = events
+            .Select(evt => evt.localPosition)
+            .Average(localPosition => localPosition.y);
+        return new Vector3(averageLocalPositionX, averageLocalPositionY);
     }
 
     private void OnPointerMoveOnMousePadArea(PointerMoveEvent evt)
     {
-        if (!isPointerOverMousePadArea
-            || isPointerOverScrollWheelArea
+        pointerMoveOnMousePadAreaEventStream.OnNext(new CustomPointerMoveEvent()
+        {
+            localPosition = evt.localPosition,
+            targetVisualElement = evt.target as VisualElement,
+        });
+    }
+
+    private void OnPointerMoveOnMousePadAreaBufferedEvents(IList<CustomPointerMoveEvent> events)
+    {
+        if (events.Count == 0)
+        {
+            return;
+        }
+
+        VisualElement targetVisualElement = events.Last().targetVisualElement;
+        Vector3 localPosition = events.Last().localPosition;
+        Log.Verbose(() => $"OnPointerMoveOnMousePadAreaBufferedEvents - events: {events.Count}, localPosition: {localPosition}");
+
+        if (targetVisualElement != mousePadArea
             || !isPointerDownOnMousePadArea)
         {
-            mousePadAreaStartPos = evt.localPosition;
-            lastMousePadAreaPos = evt.localPosition;
+            Log.Verbose(() => $"OnPointerMoveOnMousePadAreaBufferedEvents - aborting because pointer not down on mouse pad area");
+
+            mousePadAreaStartPos = localPosition;
+            lastMousePadAreaPos = localPosition;
             return;
         }
 
         if (isAllFingersUp)
         {
+            Log.Verbose(() => $"OnPointerMoveOnMousePadAreaBufferedEvents - aborting because all fingers up");
+
             // All fingers up => reset position
             isAllFingersUp = false;
-            mousePadAreaStartPos = evt.localPosition;
-            lastMousePadAreaPos = evt.localPosition;
+            mousePadAreaStartPos = localPosition;
+            lastMousePadAreaPos = localPosition;
             return;
         }
 
         float mousePadAreaMagnitude = mousePadArea.worldBound.size.magnitude;
         if (mousePadAreaMagnitude > 0)
         {
-            Vector3 totalPointerDelta = evt.localPosition - mousePadAreaStartPos;
+            Vector3 totalPointerDelta = localPosition - mousePadAreaStartPos;
             float magnitudeInPercent = totalPointerDelta.magnitude / mousePadAreaMagnitude;
-            Debug.Log($"magnitudeInPercent: {magnitudeInPercent}");
+            Log.Verbose(() => $"pointerDeltaMagnitudeInPercent: {magnitudeInPercent}");
             if (magnitudeInPercent > MousePadAreaTotalPointerDeltaThresholdInPercent)
             {
                 isMousePadAreaTotalPointerDeltaAboveThreshold = true;
@@ -342,12 +416,14 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
             && isMousePadAreaTotalPointerDeltaAboveThreshold
             && !awaitingDragEnd)
         {
+            Log.Verbose(() => $"OnPointerMoveOnMousePadAreaBufferedEvents - aborting because sending drag start event instead");
             SendSimulateDragStartRequest();
+            return;
         }
 
-        Vector3 pointerDelta = (evt.localPosition - lastMousePadAreaPos) * settings.MousePadSensitivity;
+        Vector3 pointerDelta = (localPosition - lastMousePadAreaPos) * settings.MousePadSensitivity;
         SendSimulateMouseDeltaRequest(new Vector2(pointerDelta.x, -pointerDelta.y));
-        lastMousePadAreaPos = evt.localPosition;
+        lastMousePadAreaPos = localPosition;
     }
 
     private void SendSimulateInputRequest(string inputControl)
@@ -389,5 +465,11 @@ public class InputSimulationControl : INeedInjection, IInjectionFinishedListener
     private void RegisterCallbackToSendSimulationInputRequest(Button uiButton, string keyboardButton)
     {
         uiButton.RegisterCallbackButtonTriggered(_ => SendSimulateInputRequest(keyboardButton));
+    }
+
+    private class CustomPointerMoveEvent
+    {
+        public Vector3 localPosition;
+        public VisualElement targetVisualElement;
     }
 }

@@ -19,7 +19,7 @@ public class Settings : ISettings
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; }
     public int TargetFps { get; set; } = 60;
     public bool ShowAudioWaveForm { get; set; } = true;
-    public float MousePadSensitivity { get; set; } = 0.2f;
+    public float MousePadSensitivity { get; set; } = 1f;
     public bool IsDevModeEnabled { get; set; }
     public LogEventLevel MinimumLogLevel { get; set; } = LogEventLevel.Information;
 
