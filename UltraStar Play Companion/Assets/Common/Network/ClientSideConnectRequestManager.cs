@@ -50,7 +50,7 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         liteNetLibClient.UnconnectedMessagesEnabled = true;
         // 16 ms are approx. 60 FPS
         liteNetLibClient.UpdateTime = 16;
-        liteNetLibClient.Start();
+        StartLiteNetLibClient();
     }
 
     protected override void OnDestroySingleton()
@@ -134,6 +134,29 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         connectEventStream.OnNext(new ConnectEvent(connectRequestCount));
     }
 
+    private void StartLiteNetLibClient()
+    {
+        if (liteNetLibClient.IsRunning)
+        {
+            return;
+        }
+
+        Debug.Log($"Starting {nameof(liteNetLibClient)}");
+        liteNetLibClient.Start();
+        Debug.Log($"Started {nameof(liteNetLibClient)} on port {liteNetLibClient.LocalPort}");
+    }
+
+    private void StopLiteNetLibClient()
+    {
+        if (!liteNetLibClient.IsRunning)
+        {
+            return;
+        }
+
+        Debug.Log($"Stopping {nameof(liteNetLibClient)}");
+        liteNetLibClient.Stop(true);
+    }
+
     private void Update()
     {
         liteNetLibClient.PollEvents();
@@ -148,14 +171,27 @@ public class ClientSideConnectRequestManager : AbstractSingletonBehaviour, INeed
         }
     }
 
-    private void OnApplicationPause(bool pauseStatus)
+    private void OnApplicationPause(bool isPaused)
     {
-        if (pauseStatus
-            && !Application.isEditor
-            && Application.platform != RuntimePlatform.WindowsPlayer)
+        if (Application.isEditor
+            || PlatformUtils.IsStandalone)
         {
-            // Application is paused now (e.g. the app was moved to the background on Android)
-            DisconnectFromServer();
+            Log.Verbose(() => $"OnApplicationPause: ignoring because not running on mobile device.");
+            return;
+        }
+
+        Log.Debug(() => $"OnApplicationPause: isPaused: {isPaused}");
+
+        if (isPaused)
+        {
+            // Application is paused now (e.g. the app was moved to the background on Android).
+            // Stop LiteNetLib because iOS may close the socket that was used for the connection.
+            StopLiteNetLibClient();
+        }
+        else
+        {
+            // Application was resumed. Need to start LiteNetLibClient again, possibly on different port.
+            StartLiteNetLibClient();
         }
     }
 
