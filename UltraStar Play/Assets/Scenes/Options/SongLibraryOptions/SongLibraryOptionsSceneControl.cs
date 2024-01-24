@@ -60,6 +60,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
     private Toggle searchMidiFilesWithLyricsToggle;
 
+    [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
+    private ItemPicker songDataFetchTypeChooser;
+
     [Inject]
     private Injector injector;
 
@@ -103,6 +106,14 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
             () => settings.SearchMidiFilesWithLyrics,
             newValue => settings.SearchMidiFilesWithLyrics = newValue);
+
+        new EnumItemPickerControl<EFetchType>(songDataFetchTypeChooser)
+        {
+            GetLabelTextFunction = item => item == EFetchType.Eager
+                ? "Upfront"
+                : "On-demand",
+        }.Bind(() => settings.SongDataFetchType,
+            newValue => settings.SongDataFetchType = newValue);
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()

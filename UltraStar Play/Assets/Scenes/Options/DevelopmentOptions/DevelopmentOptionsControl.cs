@@ -38,9 +38,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
     private ItemPicker pitchDetectionAlgorithmPicker;
 
-    [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
-    private ItemPicker songDataFetchTypeChooser;
-
     [Inject(UxmlName = R.UxmlNames.saveVocalsAndInstrumentalAudioInFolderOfSongToggle)]
     private Toggle saveVocalsAndInstrumentalAudioInFolderOfSongToggle;
 
@@ -209,14 +206,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new PitchDetectionAlgorithmPickerControl(pitchDetectionAlgorithmPicker)
             .Bind(() => settings.PitchDetectionAlgorithm,
                 newValue => settings.PitchDetectionAlgorithm = newValue);
-
-        new EnumItemPickerControl<EFetchType>(songDataFetchTypeChooser)
-        {
-            GetLabelTextFunction = item => item == EFetchType.Eager
-                ? "Upfront"
-                : "On-demand",
-        }.Bind(() => settings.SongDataFetchType,
-                newValue => settings.SongDataFetchType = newValue);
 
         FieldBindingUtils.Bind(analyzeBeatsWithoutTargetNoteToggle,
             () => settings.AnalyzeBeatsWithoutTargetNote,
