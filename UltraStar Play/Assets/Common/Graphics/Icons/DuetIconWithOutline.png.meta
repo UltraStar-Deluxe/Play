@@ -8,12 +8,6 @@ TextureImporter:
   - first:
       213: 5579906493742513239
     second: DuetIconWithOutline_1
-  - first:
-      213: 5219747591821468110
-    second: DuetIconWithOutline_2
-  - first:
-      213: 7709850262566560806
-    second: DuetIconWithOutline_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -140,8 +134,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 11
-        width: 37
-        height: 39
+        width: 40
+        height: 42
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -159,10 +153,10 @@ TextureImporter:
       name: DuetIconWithOutline_1
       rect:
         serializedVersion: 2
-        x: 24
-        y: 36
-        width: 16
-        height: 17
+        x: 23
+        y: 11
+        width: 41
+        height: 42
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -172,48 +166,6 @@ TextureImporter:
       bones: []
       spriteID: 75cfa67746fcf6d40800000000000000
       internalID: 5579906493742513239
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: DuetIconWithOutline_2
-      rect:
-        serializedVersion: 2
-        x: 24
-        y: 11
-        width: 38
-        height: 39
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ec128b387c4407840800000000000000
-      internalID: 5219747591821468110
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: DuetIconWithOutline_3
-      rect:
-        serializedVersion: 2
-        x: 49
-        y: 36
-        width: 15
-        height: 17
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6246bbb17f3eefa60800000000000000
-      internalID: 7709850262566560806
       vertices: []
       indices: 
       edges: []
@@ -231,8 +183,6 @@ TextureImporter:
     nameFileIdTable:
       DuetIconWithOutline_0: 8345525588690253302
       DuetIconWithOutline_1: 5579906493742513239
-      DuetIconWithOutline_2: 5219747591821468110
-      DuetIconWithOutline_3: 7709850262566560806
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
