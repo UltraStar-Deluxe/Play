@@ -116,7 +116,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
                 return;
             }
 
-            contextMenuControl.OpenContextMenu(Vector2.zero);
+            contextMenuControl.OpenContextMenu(Vector2.zero, this);
         });
 
         volumeSlider.RegisterValueChangedCallback(evt =>
@@ -344,7 +344,7 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
             fillAppearanceContextMenu = true;
             contextMenuPopup.CloseContextMenu();
             isContextMenuOpenedFromInputAction = wasContextMenuOpenedFromInputAction;
-            contextMenuControl.OpenContextMenu(Vector2.zero);
+            contextMenuControl.OpenContextMenu(Vector2.zero, this);
         });
 
         contextMenuPopup.AddButton("Attribution", "info_outline", () =>
@@ -421,6 +421,6 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
     public void OpenContextMenuFromInputAction()
     {
         isContextMenuOpenedFromInputAction = true;
-        contextMenuControl.OpenContextMenu(Vector2.zero);
+        contextMenuControl.OpenContextMenu(Vector2.zero, this);
     }
 }

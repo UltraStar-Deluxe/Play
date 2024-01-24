@@ -188,7 +188,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             && !isPopupMenuOpen
             && TimeUtils.IsDurationAboveThresholdInSeconds(popupMenuClosedTimeInSeconds, 0.1f))
         {
-            contextMenuControl.OpenContextMenu(evt.position);
+            contextMenuControl.OpenContextMenu(evt.position, this);
         }
     }
 
@@ -200,11 +200,12 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             return;
         }
 
-        contextMenuControl.OpenContextMenu(new Vector2(-1, -1));
+        contextMenuControl.OpenContextMenu(new Vector2(-1, -1), this);
     }
 
     private void FillContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
+        Debug.Log($"Context: {contextMenuPopup.Context}");
         if (SongSelectEntry is SongSelectSongEntry songEntry)
         {
             FillSongEntryContextMenu(contextMenuPopup, songEntry);
@@ -471,9 +472,9 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     {
         if (!isPopupMenuOpen)
         {
-            ContextMenuPopupControl contextMenuPopupControl = contextMenuControl?.OpenContextMenu(new Vector2(
-                openSongMenuButton.worldBound.xMin,
-                openSongMenuButton.worldBound.yMin));
+            ContextMenuPopupControl contextMenuPopupControl = contextMenuControl?.OpenContextMenu(
+                new Vector2(openSongMenuButton.worldBound.xMin, openSongMenuButton.worldBound.yMin),
+                this);
             contextMenuPopupControl?.VisualElement.Q<Button>().Focus();
         }
     }
