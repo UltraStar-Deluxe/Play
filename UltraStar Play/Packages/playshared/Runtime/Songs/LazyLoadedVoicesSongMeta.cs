@@ -30,6 +30,16 @@ public class LazyLoadedVoicesSongMeta : SongMeta
         return base.GetVoiceDisplayName(voiceId);
     }
 
+    public override int VoiceCount
+    {
+        get
+        {
+            LoadVoicesIfNotDoneYet();
+
+            return base.VoiceCount;
+        }
+    }
+
     public override IReadOnlyCollection<Voice> Voices
     {
         get
