@@ -555,8 +555,8 @@ PlayerSettings:
   enableCrashReportAPI: 0
   cameraUsageDescription: 
   locationUsageDescription: 
-  microphoneUsageDescription: Microphone access is required to find the pitch of
-    your singing. You can still use other features of the app without this permission
+  microphoneUsageDescription: This app uses the microphone to find the pitch of your
+    singing. You can still use other features of the app without this permission
     but you won't be able to score points in the connected game.
   bluetoothUsageDescription: 
   macOSTargetOSVersion: 10.13.0
