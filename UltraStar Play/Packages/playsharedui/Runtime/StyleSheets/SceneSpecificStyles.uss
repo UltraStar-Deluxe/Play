@@ -1,6 +1,12 @@
 /**************************************************/
 /* SONG SELECT SCENE */
 /**************************************************/
+.songSelectSongEntryIcon {
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(127, 127, 127, 0.5);
+    font-size: var(--font-size-l);
+}
+
 #jokerList {
     flex-direction: row;
     justify-content: center;
