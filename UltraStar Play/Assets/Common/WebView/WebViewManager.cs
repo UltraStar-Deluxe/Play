@@ -36,6 +36,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private Settings settings;
 
     private IWebView webView;
+    public IWebView WebView => webView; // Public getter to allow modding
 
     private bool IsWebViewInitialized => webView != null;
     private readonly Subject<bool> webViewInitializedEventStream = new();
@@ -127,6 +128,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     }
 
     private string loadedUrl;
+    public string LoadedUrl => loadedUrl; // Public getter to allow modding
 
     private bool javaScriptCanLoadUrl;
 
