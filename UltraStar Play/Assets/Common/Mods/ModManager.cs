@@ -850,7 +850,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             List<Type> foundTypes = new List<Type>();
             foreach (Assembly assembly in assemblies)
             {
-                foreach (string typeName in remainingTypeNames)
+                foreach (string typeName in remainingTypeNames.ToList())
                 {
                     try
                     {
@@ -870,6 +870,11 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                     {
                         // Ignore
                     }
+                }
+
+                if (remainingTypeNames.IsNullOrEmpty())
+                {
+                    break;
                 }
             }
 
