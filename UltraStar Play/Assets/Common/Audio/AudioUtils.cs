@@ -24,6 +24,11 @@ public static class AudioUtils
         audioSource.outputAudioMixerGroup.audioMixer.SetFloat("PitchShifter.Pitch", 1 + (1 - pitch));
     }
 
+    public static void ResetPitchAndPitchShifter(AudioSource audioSource)
+    {
+        SetPitchWithPitchShifter(audioSource, 1);
+    }
+
     public static UnityWebRequest CreateAudioClipRequest(Uri uriHandle, bool streamAudio)
     {
         UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(uriHandle, AudioType.UNKNOWN);

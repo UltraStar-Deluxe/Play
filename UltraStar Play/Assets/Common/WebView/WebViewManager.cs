@@ -36,6 +36,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     private Settings settings;
 
     private IWebView webView;
+    public IWebView WebView => webView; // Public getter to allow modding
 
     private bool IsWebViewInitialized => webView != null;
     private readonly Subject<bool> webViewInitializedEventStream = new();
@@ -127,6 +128,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
     }
 
     private string loadedUrl;
+    public string LoadedUrl => loadedUrl; // Public getter to allow modding
 
     private bool javaScriptCanLoadUrl;
 
@@ -143,17 +145,24 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void AwakeSingleton()
     {
-        // By default browsers block web pages from autoplaying video or audio.
-        // Explicitly allow playback of video or audio without user interaction.
-        // This must be called early, e.g. in Awake.
-        Web.SetAutoplayEnabled(true);
-
         // Disable camera until WebView texture requested
         webViewCamera.gameObject.SetActive(false);
     }
 
     protected override void StartSingleton()
     {
+        // By default browsers block web pages from autoplaying video or audio.
+        // Explicitly allow playback of video or audio without user interaction.
+        // This must be called early, e.g. in Awake.
+        Web.SetAutoplayEnabled(true);
+
+        // Google only allows sign-in from selected browser.
+        // Thus, set the User-Agent header to a browser that is allowed by Google.
+        if (!settings.CustomUserAgent.IsNullOrEmpty())
+        {
+            Web.SetUserAgent(settings.CustomUserAgent);
+        }
+
         sceneNavigator.BeforeSceneChangeEventStream.Subscribe(_ => OnBeforeSceneChanged());
         sceneNavigator.SceneChangedEventStream.Subscribe(_ => OnSceneChanged());
         settings.ObserveEveryValueChanged(it => it.VolumePercent)
@@ -482,6 +491,16 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
             return true;
         }
 
+        bool isLoadingUrlOfSameHost;
+        try
+        {
+            isLoadingUrlOfSameHost = string.Equals(new Uri(loadedUrl).Host, new Uri(webView.Url).Host, StringComparison.InvariantCultureIgnoreCase);
+        }
+        catch
+        {
+            isLoadingUrlOfSameHost = false;
+        }
+
         if (!javaScriptCanLoadUrl)
         {
             isContentLoaded = false;
@@ -498,7 +517,7 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
                                              "to switch to embedded browser.");
             }
 
-            if (isContentLoaded && javaScriptCanLoadUrl)
+            if (isContentLoaded && isLoadingUrlOfSameHost && javaScriptCanLoadUrl)
             {
                 Debug.Log("Loading new URL via JavaScript");
                 webView.ExecuteJavaScript($"setVolume(0)");

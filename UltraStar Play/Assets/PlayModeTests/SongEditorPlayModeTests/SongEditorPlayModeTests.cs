@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using UniInject;
@@ -15,13 +16,21 @@ public class SongEditorPlayModeTests : AbstractPlayModeTest
         LogAssert.ignoreFailingMessages = true;
 
         // Load SongMeta from temporary file
-        string testSongFileName = "EditSongMeta-TestSong.txt";
-        string originalSongMetaPath = $"{testFolderPath}/{testSongFileName}";
+        string testSongFolderName = "EditSongMeta-TestSong";
+        string testSongFolderPath = $"{testFolderPath}/{testSongFolderName}";
+        string testSongMetaFileName = "EditSongMeta-TestSong.txt";
+        string originalSongMetaPath = $"{testSongFolderPath}/{testSongMetaFileName}";
         SongMeta originalSongMeta = new LazyLoadedFromFileSongMeta(originalSongMetaPath);
 
-        string tmpSongMetaPath = ApplicationUtils.GetTemporaryCachePath($"SongEditorTest/{testSongFileName}");
-        FileUtils.Copy(originalSongMetaPath, tmpSongMetaPath, true);
-        SongMeta editedSongMeta = new LazyLoadedFromFileSongMeta(tmpSongMetaPath);
+        string tmpSongFolderPath = ApplicationUtils.GetTemporaryCachePath($"SongEditorTest/{testSongFolderName}");
+        DirectoryUtils.CopyAll(testSongFolderPath, tmpSongFolderPath);
+        string copiedSongMetaPath = $"{tmpSongFolderPath}/{testSongMetaFileName}";
+        SongMeta editedSongMeta = new LazyLoadedFromFileSongMeta(copiedSongMetaPath);
+
+        if (!FileUtils.Exists($"{tmpSongFolderPath}/ogg-TestAudio.ogg"))
+        {
+            throw new FileNotFoundException($"ogg-TestAudio.ogg not found in folder '{tmpSongFolderPath}'");
+        }
 
         // Open song editor
         Injector injector = null;
@@ -75,7 +84,7 @@ public class SongEditorPlayModeTests : AbstractPlayModeTest
         SongMetaManager.Instance.SaveSong(editedSongMeta, true);
 
         // Assert changes have been persisted and loaded as expected
-        SongMeta loadedEditedSongMeta = new LazyLoadedFromFileSongMeta(tmpSongMetaPath);
+        SongMeta loadedEditedSongMeta = new LazyLoadedFromFileSongMeta(copiedSongMetaPath);
         Assert.AreEqual(JsonConverter.ToJson(editedSongMeta), JsonConverter.ToJson(loadedEditedSongMeta));
 
         // Assert that there is a change compared to the original song

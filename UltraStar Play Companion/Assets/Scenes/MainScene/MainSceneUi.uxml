@@ -10,10 +10,13 @@
             <ui:VisualElement name="titleImageAndText" style="flex-direction: row; align-items: center; flex-grow: 1; justify-content: center;">
                 <ui:VisualElement name="titleAndDescription" class="mr-auto" style="flex-direction: row; align-items: center;">
                     <ui:VisualElement name="logo" class="mr-3 ml-3" style="background-image: url(&apos;project://database/Packages/playshared/Runtime/Graphics/Logos/LogoSmall-512.png?fileID=2800000&amp;guid=f3ab5af68813c5446a5f5403af87b6c7&amp;type=3#LogoSmall-512&apos;); width: 48px; height: 48px; flex-shrink: 0;" />
-                    <ui:Label text="Melody Mania&#10;Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
+                    <ui:VisualElement name="column" style="flex-grow: 1;">
+                        <ui:Label text="Melody Mania" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
+                        <ui:Label text="Companion" name="sceneTitle" class="titleText" style="-unity-font-style: bold; white-space: normal;" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Button display-tooltip-when-elided="true" name="showMenuButton" class="ml-3" style="align-items: center; justify-content: center; width: 48px; height: 48px; flex-grow: 0;">
+            <ui:Button display-tooltip-when-elided="true" name="showMenuButton" class="ml-3 squareButton" style="align-items: center; justify-content: center; flex-grow: 0;">
                 <MaterialIcon icon="settings" name="menuIcon" />
             </ui:Button>
         </ui:VisualElement>

@@ -746,6 +746,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "increaseVolume",
+                    "type": "Value",
+                    "id": "c6b329b8-e4ae-4fa6-a277-8ffa72060902",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "decreaseVolume",
+                    "type": "Value",
+                    "id": "d9da46c9-9b9e-45f0-8bb6-a7434175304d",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -1560,6 +1578,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "navigateToParentFolder",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c6728fbd-05c8-41a0-b384-da1f583b1db9",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "increaseVolume",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6c80daeb-e381-475d-8921-63ffed0af0e8",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "decreaseVolume",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

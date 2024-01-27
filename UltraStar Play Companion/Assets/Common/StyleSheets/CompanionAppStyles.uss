@@ -3,6 +3,11 @@
     transition: left 0.5s;
 }
 
+.unity-toggle__label {
+    flex-shrink: 0;
+    margin-right: auto;
+}
+
 .overlayBackground {
     background-color: rgba(0, 0, 0, 0.8);
 }
@@ -16,6 +21,10 @@
 }
 
 .stopRecordingButton:focus {
+    background-color: #F2452E;
+}
+
+.stopRecordingButton:focus:enabled {
     background-color: #F2452E;
 }
 

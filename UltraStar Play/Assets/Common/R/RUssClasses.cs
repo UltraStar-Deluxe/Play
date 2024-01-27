@@ -18132,6 +18132,7 @@ public static partial class R
         public const string smallFont = "smallFont";
         public const string songEditorRoot = "songEditorRoot";
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
+        public const string songSelectSongEntryIcon = "songSelectSongEntryIcon";
         public const string squareButton = "squareButton";
         public const string startPreviewIcon = "startPreviewIcon";
         public const string staticPanel = "staticPanel";

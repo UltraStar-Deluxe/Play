@@ -137,6 +137,7 @@ public class Settings : ISettings
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();
     public bool EnableWebView { get; set; } = true;
+    public string CustomUserAgent { get; set; } = "";
 
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
@@ -173,6 +174,7 @@ public class Settings : ISettings
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();
+    public bool ReloadModsOnFileChange { get; set; }
 
     // Online multiplayer
     public EOnlineMultiplayerBackend EOnlineMultiplayerBackend { get; set; } = EOnlineMultiplayerBackend.Steam;

@@ -48,7 +48,9 @@ public static partial class R
         public static readonly string usplay_anyKeyboardModifierPressedOrReleased = "usplay/anyKeyboardModifierPressedOrReleased";
         public static readonly string usplay_back = "usplay/back";
         public static readonly string usplay_closeContextMenu = "usplay/closeContextMenu";
+        public static readonly string usplay_decreaseVolume = "usplay/decreaseVolume";
         public static readonly string usplay_enter = "usplay/enter";
+        public static readonly string usplay_increaseVolume = "usplay/increaseVolume";
         public static readonly string usplay_navigateToParentFolder = "usplay/navigateToParentFolder";
         public static readonly string usplay_nextCharacterQuickJumpCharacter = "usplay/nextCharacterQuickJumpCharacter";
         public static readonly string usplay_nextSong = "usplay/nextSong";

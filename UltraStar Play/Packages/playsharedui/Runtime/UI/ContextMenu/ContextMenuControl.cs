@@ -113,10 +113,10 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
         {
             return;
         }
-        OpenContextMenu(pointerPosition + popupOffset);
+        OpenContextMenu(pointerPosition + popupOffset, null);
     }
 
-    public ContextMenuPopupControl OpenContextMenu(Vector2 position)
+    public ContextMenuPopupControl OpenContextMenu(Vector2 position, object context)
     {
         if (FillContextMenuAction == null
             || (ShouldOpenContextMenuFunction != null && !ShouldOpenContextMenuFunction()))
@@ -126,7 +126,7 @@ public class ContextMenuControl : INeedInjection, IInjectionFinishedListener, ID
 
         focusedVisualElementOnOpen = targetVisualElement.focusController?.focusedElement as VisualElement;
 
-        ContextMenuPopupControl contextMenuPopupControl = new(gameObject, targetVisualElement, position);
+        ContextMenuPopupControl contextMenuPopupControl = new(gameObject, targetVisualElement, position, context);
         injector.Inject(contextMenuPopupControl);
         FillContextMenuAction(contextMenuPopupControl);
 

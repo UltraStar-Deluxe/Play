@@ -4,6 +4,7 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "Serilog",
         "UniRx",
         "com.achimmihca.uniinject",
         "playshared",

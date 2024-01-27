@@ -13,6 +13,10 @@
     color: var(--font-color);
 }
 
+.unity-base-field:focus:enabled .unity-base-field__label {
+    color: var(--font-color);
+}
+
 /**************************************************/
 /* TEXT FIELD */
 /**************************************************/
@@ -155,6 +159,11 @@
 }
 
 .unity-button:hover {
+    background-color: var(--control-color-accent1);
+    border-color: rgba(0, 0, 0, 0);
+}
+
+.unity-button:hover:enabled {
     background-color: var(--control-color-accent1);
     border-color: rgba(0, 0, 0, 0);
 }
