@@ -19,6 +19,7 @@
         SuggestSongRequest,
 
         StartSongRequest,
+        EndSingSceneRequest,
 
         BeatAnalyzedEventRequest,
     }

@@ -378,6 +378,19 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         InitOnlineMultiplayerMessageHandlers();
     }
 
+    private void SendEndSingSceneMessageForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(EndSingSceneRequest),
+            FastBufferWriterUtils.WriteJsonValuePacked(new EndSingSceneRequest()),
+            onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
+    }
+
     private void SendPauseMessageForOnlineMultiplayer()
     {
         if (!onlineMultiplayerManager.IsOnlineGame)
@@ -959,6 +972,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             FinishSceneToSingingResults(isAfterEndOfSong);
         }
+
+        SendEndSingSceneMessageForOnlineMultiplayer();
     }
 
     private void TriggerAchievementsAfterEndOfSong()
