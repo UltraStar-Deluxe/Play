@@ -378,6 +378,19 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         InitOnlineMultiplayerMessageHandlers();
     }
 
+    private void SendPauseMessageForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(PauseGameRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new PauseGameRequestDto()),
+            onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
+    }
+
     private void SendUnpauseMessageForOnlineMultiplayer(int failedAttempts)
     {
         if (!onlineMultiplayerManager.IsHost)
@@ -1258,6 +1271,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             achievementEventStream.OnNext(AchievementId.pauseSingingAfterOneMinute);
         }
+
+        SendPauseMessageForOnlineMultiplayer();
     }
 
     public void Unpause()
@@ -1273,6 +1288,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             playerControl.PlayerMicPitchTracker.StartRecording();
             playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
         });
+
+        SendUnpauseMessageForOnlineMultiplayer(0);
     }
 
     public void TogglePlayPause()
