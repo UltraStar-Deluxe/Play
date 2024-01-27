@@ -72,7 +72,7 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
 
         if (NetworkManager.Singleton == null)
         {
-            FindObjectOfType<NetworkManager>().SetSingleton();
+            FindOrCreateNetworkManager().SetSingleton();
         }
         bb.BindExistingInstance(NetworkManager.Singleton);
 
@@ -105,5 +105,20 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => StatisticsManager.Instance.Statistics);
 
         return bb.GetBindings();
+    }
+
+    private NetworkManager FindOrCreateNetworkManager()
+    {
+        NetworkManager networkManager = FindObjectOfType<NetworkManager>();
+        if (networkManager != null)
+        {
+            return networkManager;
+        }
+
+        GameObject networkManagerGameObject = new GameObject();
+        networkManagerGameObject.name = "NetworkManager-RuntimeCreated";
+        networkManager = networkManagerGameObject.AddComponent<NetworkManager>();
+        return networkManager;
+
     }
 }
