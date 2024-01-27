@@ -52,6 +52,7 @@ namespace CommonOnlineMultiplayer
             playerProfileImagePicker.ItemLabel.HideByDisplay();
             playerProfileImagePicker.PreviousItemButton.HideByDisplay();
             playerProfileImagePicker.NextItemButton.HideByDisplay();
+            playerProfileImagePicker.ItemImage.AddToClassList("circle");
             onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMember.IsHost);
             UpdateImage();
         }
