@@ -540,7 +540,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
                 GetBeatAnalyzedEventMessageName(),
                 CreateBeatAnalyzedEventFastBufferWriter(beatAnalyzedEvent),
                 onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds,
-                NetworkDelivery.Unreliable);
+                mainGameSettings.BeatAnalyzedEventNetworkDelivery);
         }
     }
 

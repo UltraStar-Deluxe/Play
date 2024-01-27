@@ -8,6 +8,7 @@ using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -148,6 +149,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.webViewCustomUserAgentTextField)]
     private TextField webViewCustomUserAgentTextField;
+
+    [Inject(UxmlName = R.UxmlNames.beatAnalyzedEventNetworkDeliveryPicker)]
+    private ItemPicker beatAnalyzedEventNetworkDeliveryPicker;
 
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
@@ -402,6 +406,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(vfxEnabledToggle,
             () => settings.EnableVfx,
             newValue => settings.EnableVfx = newValue);
+
+        // Online multiplayer
+        new EnumItemPickerControl<NetworkDelivery>(beatAnalyzedEventNetworkDeliveryPicker)
+            .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
+                newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
+
     }
 
     private List<string> GetAvailablePortAudioOutputDeviceNames()

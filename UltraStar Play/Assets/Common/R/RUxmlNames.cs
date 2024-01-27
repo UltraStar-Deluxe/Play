@@ -48,6 +48,7 @@ public static partial class R
         public const string backIcon = "backIcon";
         public const string banner = "banner";
         public const string basicPitchCommandTextField = "basicPitchCommandTextField";
+        public const string beatAnalyzedEventNetworkDeliveryPicker = "beatAnalyzedEventNetworkDeliveryPicker";
         public const string bestMatchnigTrackAndChannelLabel = "bestMatchnigTrackAndChannelLabel";
         public const string bonusLabel = "bonusLabel";
         public const string bottomBarsOverlay = "bottomBarsOverlay";
@@ -517,6 +518,7 @@ public static partial class R
         public const string onePlayerLayout = "onePlayerLayout";
         public const string onlineGameButton = "onlineGameButton";
         public const string onlineMultiplayerDialogUiRoot = "onlineMultiplayerDialogUiRoot";
+        public const string onlineMultiplayerGroup = "onlineMultiplayerGroup";
         public const string onlinePlayerProfileIcon = "onlinePlayerProfileIcon";
         public const string onlinePlayerProfileIconContainer = "onlinePlayerProfileIconContainer";
         public const string openControlsMenuButton = "openControlsMenuButton";
