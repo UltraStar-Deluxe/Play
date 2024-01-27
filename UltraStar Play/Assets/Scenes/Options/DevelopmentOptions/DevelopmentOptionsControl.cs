@@ -149,6 +149,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.webViewCustomUserAgentTextField)]
     private TextField webViewCustomUserAgentTextField;
 
+    [Inject(UxmlName = R.UxmlNames.writeUltraStarTxtFileWithByteOrderMarkToggle)]
+    private Toggle writeUltraStarTxtFileWithByteOrderMarkToggle;
+
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
 
@@ -321,6 +324,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.HttpServerPort,
             newValue => settings.HttpServerPort = newValue);
         httpServerPortTextField.DisableChangeValueByDragging();
+
+        // File format
+        FieldBindingUtils.Bind(writeUltraStarTxtFileWithByteOrderMarkToggle,
+            () => settings.WriteUltraStarTxtFileWithByteOrderMark,
+            newValue => settings.WriteUltraStarTxtFileWithByteOrderMark = newValue);
 
         // Ffmpeg playback / conversion
         FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,

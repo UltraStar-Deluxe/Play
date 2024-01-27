@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NHyphenator;
 using NHyphenator.Loaders;
 using UnityEngine;
@@ -137,5 +138,10 @@ public static class SettingsUtils
         {
             return settings.GeneratedFolderPath;
         }
+    }
+
+    public static Encoding GetEncodingForWritingUltraStarTxtFile(Settings settings)
+    {
+        return EncodingUtils.GetUtf8Encoding(settings.WriteUltraStarTxtFileWithByteOrderMark);
     }
 }

@@ -28,6 +28,7 @@
             </AccordionItem>
             <AccordionItem name="mediaFileFormatGroup" label="Media File Format Support" class="child-mb-3">
                 <ui:Toggle name="useUniversalCharsetDetectorToggle" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="writeUltraStarTxtFileWithByteOrderMarkToggle" label="Write UltraStar txt with BOM" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
                 <ItemPicker name="useVlcToPlayMediaFilesPicker" label="Use VLC to Play Audio&#10;and Video Files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy" />
                 <ItemPicker name="useFfmpegToPlayMediaFilesPicker" label="Use ffmpeg to Play Audio&#10;and Video Files (unstable)¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
