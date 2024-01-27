@@ -1,10 +1,12 @@
 ﻿using System;
 using CommonOnlineMultiplayer;
+using Unity.Netcode;
 
 [Serializable]
 public class LobbyMemberPlayerProfile : PlayerProfile
 {
     public UnityNetcodeClientId UnityNetcodeClientId { get; set; }
+    public bool IsHost => UnityNetcodeClientId == NetworkManager.ServerClientId;
 
     public LobbyMemberPlayerProfile()
     {

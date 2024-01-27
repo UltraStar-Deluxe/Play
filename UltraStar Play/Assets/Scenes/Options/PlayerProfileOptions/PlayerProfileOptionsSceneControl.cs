@@ -147,6 +147,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         playerProfileList.Add(visualElement);
 
         VisualElement onlinePlayerProfileIconContainer = visualElement.Q<VisualElement>(R.UxmlNames.onlinePlayerProfileIconContainer);
+        VisualElement onlinePlayerProfileIcon = visualElement.Q<VisualElement>(R.UxmlNames.onlinePlayerProfileIcon);
 
         if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
         {
@@ -155,6 +156,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
             difficultyPicker.ItemPicker.HideByDisplay();
             playerProfileImagePickerControl.ItemPicker.PreviousItemButton.HideByDisplay();
             playerProfileImagePickerControl.ItemPicker.NextItemButton.HideByDisplay();
+            onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMemberPlayerProfile.IsHost);
             onlinePlayerProfileIconContainer.ShowByDisplay();
 
             UpdateOnlineMultiplayerPlayerImage(lobbyMemberPlayerProfile, playerProfileImagePickerControl);

@@ -13925,6 +13925,7 @@ public static partial class R
         public const string noteAreaGridLabel = "noteAreaGridLabel";
         public const string noTextShadow = "noTextShadow";
         public const string not_italic = "not-italic";
+        public const string onlineMultiplayerHost = "onlineMultiplayerHost";
         public const string opacity_0 = "opacity-0";
         public const string opacity_10 = "opacity-10";
         public const string opacity_100 = "opacity-100";

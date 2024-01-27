@@ -31,6 +31,9 @@ namespace CommonOnlineMultiplayer
         [Inject(UxmlName = R.UxmlNames.playerProfileImagePicker)]
         protected ItemPicker playerProfileImagePicker;
 
+        [Inject(UxmlName = R.UxmlNames.onlinePlayerProfileIcon)]
+        protected VisualElement onlinePlayerProfileIcon;
+
         public virtual void OnInjectionFinished()
         {
             string displayName = lobbyMember.DisplayName;
@@ -49,6 +52,7 @@ namespace CommonOnlineMultiplayer
             playerProfileImagePicker.ItemLabel.HideByDisplay();
             playerProfileImagePicker.PreviousItemButton.HideByDisplay();
             playerProfileImagePicker.NextItemButton.HideByDisplay();
+            onlinePlayerProfileIcon.SetInClassList("onlineMultiplayerHost", lobbyMember.IsHost);
             UpdateImage();
         }
 
