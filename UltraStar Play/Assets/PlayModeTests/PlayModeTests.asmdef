@@ -4,14 +4,18 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "Unity.InputSystem",
+        "Unity.InputSystem.TestFramework",
         "Serilog",
         "UniRx",
+        "Responsible",
         "com.achimmihca.uniinject",
         "playshared",
         "playsharedui",
         "Common",
         "Scenes",
-        "SongEditorScene"
+        "SongEditorScene",
+        "Unity.InputSystem.IntegrationTests"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
