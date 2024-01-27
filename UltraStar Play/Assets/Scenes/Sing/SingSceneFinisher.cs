@@ -53,7 +53,7 @@ public class SingSceneFinisher : MonoBehaviour, INeedInjection
                 && !hasFinishedScene)
             {
                 hasFinishedScene = true;
-                singSceneControl.FinishScene(!isEarlyFinish, true);
+                singSceneControl.FinishScene(!isEarlyFinish, true, true);
             }
 
             if (hasBeenNearEndOfSong

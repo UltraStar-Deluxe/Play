@@ -158,7 +158,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 if (sceneData.MedleySongIndex >= sceneData.SongMetas.Count)
                 {
                     Debug.LogWarning($"Cannot start medley song at index {sceneData.MedleySongIndex} because there are only {sceneData.SongMetas.Count} songs selected for the medley. Exiting SingScene.");
-                    FinishScene(false, false);
+                    FinishScene(false, false, true);
                     return null;
                 }
 
@@ -483,14 +483,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             nameof(UnpauseGameRequestDto),
             message =>
             {
-                Unpause();
+                Unpause(false);
             }));
 
         disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
             nameof(PauseGameRequestDto),
             message =>
             {
-                Pause();
+                Pause(false);
+            }));
+
+        // Handle message to end singing
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(EndSingSceneRequest),
+            message =>
+            {
+                FinishScene(false, false, false);
             }));
     }
 
@@ -942,7 +950,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         sceneNavigator.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
-    public void FinishScene(bool isAfterEndOfSong, bool continueWithNextMedleySong)
+    public void FinishScene(
+        bool isAfterEndOfSong,
+        bool continueWithNextMedleySong,
+        bool sendOnlineMultiplayerMessage)
     {
         if (hasFinishedScene)
         {
@@ -973,7 +984,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             FinishSceneToSingingResults(isAfterEndOfSong);
         }
 
-        SendEndSingSceneMessageForOnlineMultiplayer();
+        if (sendOnlineMultiplayerMessage)
+        {
+            SendEndSingSceneMessageForOnlineMultiplayer();
+        }
     }
 
     private void TriggerAchievementsAfterEndOfSong()
@@ -1271,7 +1285,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         return extendedVoiceIds[voiceIndex];
     }
 
-    public void Pause()
+    public void Pause(bool sendOnlineMultiplayerMessage)
     {
         if (IsPaused)
         {
@@ -1287,10 +1301,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             achievementEventStream.OnNext(AchievementId.pauseSingingAfterOneMinute);
         }
 
-        SendPauseMessageForOnlineMultiplayer();
+        if (sendOnlineMultiplayerMessage)
+        {
+            SendPauseMessageForOnlineMultiplayer();
+        }
     }
 
-    public void Unpause()
+    public void Unpause(bool sendOnlineMultiplayerMessage)
     {
         if (!IsPaused)
         {
@@ -1304,18 +1321,21 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
         });
 
-        SendUnpauseMessageForOnlineMultiplayer(0);
+        if (sendOnlineMultiplayerMessage)
+        {
+            SendUnpauseMessageForOnlineMultiplayer(0);
+        }
     }
 
     public void TogglePlayPause()
     {
         if (songAudioPlayer.IsPlaying)
         {
-            Pause();
+            Pause(true);
         }
         else
         {
-            Unpause();
+            Unpause(true);
         }
     }
 
