@@ -303,19 +303,19 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
 
         if (searchProperties.Contains(ESearchProperty.Artist)
             && !songMeta.Artist.IsNullOrEmpty()
-            && songMeta.Artist.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Artist, searchText))
         {
             return true;
         }
         if (searchProperties.Contains(ESearchProperty.Title)
             && !songMeta.Title.IsNullOrEmpty()
-            && songMeta.Title.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Title, searchText))
         {
             return true;
         }
         if (searchProperties.Contains(ESearchProperty.Genre)
             && !songMeta.Genre.IsNullOrEmpty()
-            && songMeta.Genre.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Genre, searchText))
         {
             return true;
         }
@@ -326,13 +326,13 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         }
         if (searchProperties.Contains(ESearchProperty.Edition)
             && !songMeta.Edition.IsNullOrEmpty()
-            && songMeta.Edition.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Edition, searchText))
         {
             return true;
         }
         if (searchProperties.Contains(ESearchProperty.Language)
             && !songMeta.Language.IsNullOrEmpty()
-            && songMeta.Language.ToLowerInvariant().Contains(searchText))
+            && StringUtils.ContainsIgnoreCaseAndDiacritics(songMeta.Language, searchText))
         {
             return true;
         }
@@ -357,13 +357,12 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         }
 
         // TODO: Implement search on separate thread and concurrent update of search result.
-        string searchTextLower = searchText.ToLowerInvariant();
         return songMeta.Voices
             .Select(voice => SongMetaUtils.GetLyrics(voice)
                 // The character '~' is often used in UltraStar files to indicate a change of pitch during the same syllable.
                 // Thus, it should be ignored when searching in lyrics.
                 .Replace("~", ""))
-            .Any(lyrics => lyrics.ToLowerInvariant().Contains(searchTextLower));
+            .Any(lyrics => StringUtils.ContainsIgnoreCaseAndDiacritics(lyrics, searchText));
     }
 
     public string GetRawSearchText()

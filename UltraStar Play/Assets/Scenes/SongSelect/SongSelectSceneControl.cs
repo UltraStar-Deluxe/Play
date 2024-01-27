@@ -784,8 +784,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void DoFuzzySearch(string text)
     {
-        string searchTextToLowerNoWhitespace = text.ToLowerInvariant().Replace(" ", "");
-        if (searchTextToLowerNoWhitespace.IsNullOrEmpty())
+        string searchTextNoWhitespace = text.Replace(" ", "");
+        if (searchTextNoWhitespace.IsNullOrEmpty())
         {
             return;
         }
@@ -827,8 +827,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Search title that starts with the text
         SongSelectEntry titleStartsWithMatch = songRouletteControl.Find(it =>
         {
-            string titleToLowerNoWhitespace = GetEntryTitle(it).ToLowerInvariant().Replace(" ", "");
-            return titleToLowerNoWhitespace.StartsWith(searchTextToLowerNoWhitespace);
+            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
+            return StringUtils.StartsWithIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
         });
         if (titleStartsWithMatch != null)
         {
@@ -839,8 +839,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Search artist that starts with the text
         SongSelectEntry artistStartsWithMatch = songRouletteControl.Find(it =>
         {
-            string artistToLowerNoWhitespace = GetEntryArtist(it).ToLowerInvariant().Replace(" ", "");
-            return artistToLowerNoWhitespace.StartsWith(searchTextToLowerNoWhitespace);
+            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
+            return StringUtils.StartsWithIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace);
         });
         if (artistStartsWithMatch != null)
         {
@@ -851,10 +851,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Search title or artist contains the text
         SongSelectEntry artistOrTitleContainsMatch = songRouletteControl.Find(it =>
         {
-            string artistToLowerNoWhitespace = GetEntryArtist(it).ToLowerInvariant().Replace(" ", "");
-            string titleToLowerNoWhitespace = GetEntryTitle(it).ToLowerInvariant().Replace(" ", "");
-            return artistToLowerNoWhitespace.Contains(searchTextToLowerNoWhitespace)
-                || titleToLowerNoWhitespace.Contains(searchTextToLowerNoWhitespace);
+            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
+            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
+            return StringUtils.ContainsIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace)
+                || StringUtils.ContainsIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
         });
         if (artistOrTitleContainsMatch != null)
         {
