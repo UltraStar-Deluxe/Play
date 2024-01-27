@@ -1,26 +1,25 @@
 ﻿using System.Collections;
-using NUnit.Framework;
-using Responsible;
 using Responsible.Unity;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-public abstract class AbstractPlayModeTest
+public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 {
     protected virtual string TestSceneName => "CommonTestScene";
-
-    protected TestInstructionExecutor Executor { get; set; }
-    protected InputTestFixture VirtualInput { get; set; }
 
     [UnitySetUp]
     public IEnumerator UnitySetUp()
     {
-        this.Executor = new UnityTestInstructionExecutor();
-        VirtualInput = new InputTestFixture();
-
         yield return LoadTestScene();
+
+        InputFixture = new InputTestFixture();
+        Keyboard = InputSystem.GetDevice<Keyboard>();
+
+        Executor = new UnityTestInstructionExecutor();
+
+        yield return new WaitForEndOfFrame();
     }
 
     private IEnumerator LoadTestScene()
