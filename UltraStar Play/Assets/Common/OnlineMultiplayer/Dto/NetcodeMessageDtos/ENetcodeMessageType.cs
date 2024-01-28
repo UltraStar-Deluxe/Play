@@ -20,6 +20,7 @@
 
         StartSongRequest,
         EndSingSceneRequest,
+        AbortSingSceneRequest,
 
         BeatAnalyzedEventRequest,
     }

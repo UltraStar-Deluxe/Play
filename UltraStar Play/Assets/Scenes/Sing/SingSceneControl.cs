@@ -373,7 +373,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
-        SendUnpauseMessageForOnlineMultiplayer(0);
+        if (onlineMultiplayerManager.IsHost)
+        {
+            SendInitialUnpauseMessageWhenAllReadyToStartForOnlineMultiplayer(0);
+        }
 
         InitOnlineMultiplayerMessageHandlers();
     }
@@ -388,7 +391,20 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
             nameof(EndSingSceneRequest),
             FastBufferWriterUtils.WriteJsonValuePacked(new EndSingSceneRequest()),
-            onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
+    }
+
+    private void SendAbortSingSceneMessageForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(AbortSingSceneRequest),
+            FastBufferWriterUtils.WriteJsonValuePacked(new AbortSingSceneRequest()),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
     }
 
     private void SendPauseMessageForOnlineMultiplayer()
@@ -401,13 +417,28 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
             nameof(PauseGameRequestDto),
             FastBufferWriterUtils.WriteJsonValuePacked(new PauseGameRequestDto()),
-            onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
     }
 
-    private void SendUnpauseMessageForOnlineMultiplayer(int failedAttempts)
+    private void SendUnpauseMessageToOthersForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(UnpauseGameRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new UnpauseGameRequestDto()),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
+    }
+
+    private void SendInitialUnpauseMessageWhenAllReadyToStartForOnlineMultiplayer(int failedAttempts)
     {
         if (!onlineMultiplayerManager.IsHost)
         {
+            // Only the host sends the unpause message to all (including itself)
+            // to start singing with all peers roughly at the same time.
             return;
         }
 
@@ -430,11 +461,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 {
                     // Failed for good, go back to song select
                     Debug.LogError($"Failed to check readiness of lobby members too many times. Going back to song select.");
-                    sceneNavigator.LoadScene(EScene.SongSelectScene, new SongSelectSceneData()
-                    {
-                        SongMeta = SongMeta,
-                        partyModeSceneData = PartyModeSceneData,
-                    });
+                    AbortSceneToSongSelect(true);
                 }
                 else
                 {
@@ -443,7 +470,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                         ? 0
                         : timeoutInMillis / 1000f;
                     StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds,
-                        () => SendUnpauseMessageForOnlineMultiplayer(failedAttempts + 1)));
+                        () => SendInitialUnpauseMessageWhenAllReadyToStartForOnlineMultiplayer(failedAttempts + 1)));
                 }
             })
             .DoOnCompleted(() =>
@@ -480,26 +507,48 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         // Handle messages to pause and resume the game
         disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-            nameof(UnpauseGameRequestDto),
-            message =>
-            {
-                Unpause(false);
-            }));
-
-        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
             nameof(PauseGameRequestDto),
             message =>
             {
                 Pause(false);
             }));
 
-        // Handle message to end singing
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(UnpauseGameRequestDto),
+            message =>
+            {
+                Unpause(false);
+            }));
+
+        // Handle messages to end singing
         disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
             nameof(EndSingSceneRequest),
             message =>
             {
                 FinishScene(false, false, false);
             }));
+
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(AbortSingSceneRequest),
+            message =>
+            {
+                Debug.Log("Abort singing because of online multiplayer request. See log of host player for details.");
+                AbortSceneToSongSelect(false);
+            }));
+    }
+
+    private void AbortSceneToSongSelect(bool sendOnlineMultiplayerMessage)
+    {
+        sceneNavigator.LoadScene(EScene.SongSelectScene, new SongSelectSceneData()
+        {
+            SongMeta = SongMeta,
+            partyModeSceneData = PartyModeSceneData,
+        });
+
+        if (sendOnlineMultiplayerMessage)
+        {
+            SendAbortSingSceneMessageForOnlineMultiplayer();
+        }
     }
 
     private void CreateGameRoundModifiers()
@@ -910,8 +959,34 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void Restart()
     {
+        if (onlineMultiplayerManager.IsOnlineGame
+            && !onlineMultiplayerManager.IsHost)
+        {
+            UiManager.CreateNotification("The host player must restart.");
+            return;
+        }
+
         sceneData.IsRestart = true;
         sceneNavigator.LoadScene(EScene.SingScene, sceneData);
+
+        SendRestartMessageForOnlineMultiplayer();
+    }
+
+    private void SendRestartMessageForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsHost)
+        {
+            return;
+        }
+
+        SingSceneDataDto singSceneDataDto = NetcodeMessageDtoConverterUtils.ToDto(sceneData);
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(StartSingSceneRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new StartSingSceneRequestDto()
+            {
+                SingSceneDataDto = singSceneDataDto,
+            }),
+            onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
     }
 
     public void OpenSongInEditor()
@@ -1323,7 +1398,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         if (sendOnlineMultiplayerMessage)
         {
-            SendUnpauseMessageForOnlineMultiplayer(0);
+            SendUnpauseMessageToOthersForOnlineMultiplayer();
         }
     }
 
