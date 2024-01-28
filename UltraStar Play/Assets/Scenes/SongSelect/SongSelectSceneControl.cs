@@ -1222,11 +1222,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         if (onlineMultiplayerManager.IsOnlineGame
             && !onlineMultiplayerManager.IsHost)
         {
-            onlineMultiplayerManager.MessagingControl.SendNamedMessageToClient(
-                nameof(SuggestSongRequestDto),
-                FastBufferWriterUtils.WriteJsonValuePacked(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
-                NetworkManager.ServerClientId);
-            UiManager.CreateNotification($"Suggested '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to host.");
+            ShowSuggestSongToHostDialog(songMeta);
             return;
         }
 
@@ -1281,6 +1277,27 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         }
 
         CheckAudioThenStartSingScene(songMeta);
+    }
+
+    private void ShowSuggestSongToHostDialog(SongMeta songMeta)
+    {
+        uiManager.CreateConfirmationDialogControl(
+            "Suggest Song",
+            $"Suggest song\n" +
+            $"'{SongMetaUtils.GetArtistDashTitle(songMeta)}'\n" +
+            $"to host?",
+            TranslationManager.GetTranslation(R.Messages.yes),
+            _ => SendSuggestSongMessageForOnlineMultiplayer(songMeta),
+            TranslationManager.GetTranslation(R.Messages.no));
+    }
+
+    private void SendSuggestSongMessageForOnlineMultiplayer(SongMeta songMeta)
+    {
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClient(
+            nameof(SuggestSongRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new SuggestSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
+            NetworkManager.ServerClientId);
+        UiManager.CreateNotification($"Suggested '{SongMetaUtils.GetArtistDashTitle(songMeta)}' to host.");
     }
 
     private void OpenAskToAssignMicsDialog(List<PlayerProfile> playerProfilesWithoutMics, Action onIgnoreAndStart)
