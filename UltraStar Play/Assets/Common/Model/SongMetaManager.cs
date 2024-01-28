@@ -485,6 +485,11 @@ public class SongMetaManager : AbstractSingletonBehaviour
 
     public void SaveSong(SongMeta songMeta, bool isAutoSave)
     {
+        if (songMeta == null)
+        {
+            return;
+        }
+
         SongIdManager.ClearSongIds(songMeta);
 
         SongMetaUtils.CreateDirectory(songMeta);
@@ -494,6 +499,9 @@ public class SongMetaManager : AbstractSingletonBehaviour
             // Write the song data structure to the file.
             Debug.Log($"Saving song {songFilePath}");
             UltraStarFormatWriter.WriteFile(songFilePath, songMeta, settings.WriteUltraStarTxtFileWithByteOrderMark);
+
+            // Update creation and modification time
+            songMeta.FileInfo?.Refresh();
         }
         catch (Exception e)
         {

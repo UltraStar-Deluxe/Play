@@ -1311,7 +1311,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private object GetSongMetaOrderByProperty(SongMeta songMeta)
     {
-        switch (songOrderDropdownField.value)
+        switch (settings.SongOrder)
         {
             case ESongOrder.Artist:
                 return songMeta.Artist;
@@ -1328,6 +1328,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             case ESongOrder.LocalHighScore:
                 // Return negative value to sort descending
                 return -StatisticsUtils.GetLocalHighScore(statistics, songMeta, settings.Difficulty);
+            case ESongOrder.CreationTime:
+                return songMeta.FileInfo == null
+                    ? 0
+                    : -songMeta.FileInfo.CreationTimeUtc.Ticks;
+            case ESongOrder.LastModificationTime:
+                return songMeta.FileInfo == null
+                    ? 0
+                    : -songMeta.FileInfo.LastWriteTimeUtc.Ticks;
             default:
                 Debug.LogWarning("Unknown order for songs: " + songOrderDropdownField.value);
                 return songMeta.Artist;
