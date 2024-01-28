@@ -13,8 +13,8 @@
         SingSceneReadyRequest,
         SingSceneReadyResponse,
 
-        PauseGameRequest,
-        UnpauseGameRequest,
+        PauseRequest,
+        UnpauseRequest,
 
         SuggestSongRequest,
 

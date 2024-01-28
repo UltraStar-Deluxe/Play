@@ -415,8 +415,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
-            nameof(PauseGameRequestDto),
-            FastBufferWriterUtils.WriteJsonValuePacked(new PauseGameRequestDto()),
+            nameof(PauseRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new PauseRequestDto()),
             onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
     }
 
@@ -428,8 +428,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         }
 
         onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
-            nameof(UnpauseGameRequestDto),
-            FastBufferWriterUtils.WriteJsonValuePacked(new UnpauseGameRequestDto()),
+            nameof(UnpauseRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new UnpauseRequestDto()),
             onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
     }
 
@@ -477,8 +477,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             {
                 Debug.Log($"All Netcode clients are ready to start. Sending start message");
                 onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
-                    nameof(UnpauseGameRequestDto),
-                    FastBufferWriterUtils.WriteJsonValuePacked(new UnpauseGameRequestDto()),
+                    nameof(UnpauseRequestDto),
+                    FastBufferWriterUtils.WriteJsonValuePacked(new UnpauseRequestDto()
+                    {
+                        ShowSenderName = false,
+                    }),
                     onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
             })
             .Subscribe(response =>
@@ -507,16 +510,29 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         // Handle messages to pause and resume the game
         disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-            nameof(PauseGameRequestDto),
+            nameof(PauseRequestDto),
             message =>
             {
+                PauseRequestDto pauseRequestDto = FastBufferReaderUtils.ReadJsonValuePacked<PauseRequestDto>(message.MessagePayload);
+                if (pauseRequestDto.ShowSenderName)
+                {
+                    UiManager.CreateNotification(
+                        $"Paused by {CommonOnlineMultiplayerUtils.GetPlayerDisplayName(onlineMultiplayerManager, message)}");
+                }
+
                 Pause(false);
             }));
 
         disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-            nameof(UnpauseGameRequestDto),
+            nameof(UnpauseRequestDto),
             message =>
             {
+                UnpauseRequestDto unpauseRequestDto = FastBufferReaderUtils.ReadJsonValuePacked<UnpauseRequestDto>(message.MessagePayload);
+                if (unpauseRequestDto.ShowSenderName)
+                {
+                    UiManager.CreateNotification($"Resumed by {CommonOnlineMultiplayerUtils.GetPlayerDisplayName(onlineMultiplayerManager, message)}");
+                }
+
                 Unpause(false);
             }));
 

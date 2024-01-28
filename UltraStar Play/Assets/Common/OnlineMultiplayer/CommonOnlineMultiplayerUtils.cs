@@ -48,5 +48,22 @@ namespace CommonOnlineMultiplayer
                 }
             };
         }
+
+        public static string GetPlayerDisplayName(OnlineMultiplayerManager onlineMultiplayerManager, NamedMessage message)
+        {
+            if (onlineMultiplayerManager == null
+                || onlineMultiplayerManager.LobbyMemberManager == null)
+            {
+                return "Unknown Player";
+            }
+
+            LobbyMember lobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(message.SenderNetcodeClientId);
+            if (lobbyMember == null)
+            {
+                return "Unknown Player";
+            }
+
+            return lobbyMember.DisplayName;
+        }
     }
 }
