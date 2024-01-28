@@ -922,7 +922,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         if (sceneData.IsMedley)
         {
-            // Skipping is not allowed in a medley.
+            UiManager.CreateNotification("Cannot skip during medley.");
+            return;
+        }
+
+        if (onlineMultiplayerManager.IsOnlineGame)
+        {
+            UiManager.CreateNotification("Cannot skip during online game.");
             return;
         }
 
