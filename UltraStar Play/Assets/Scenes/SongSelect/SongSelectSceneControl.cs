@@ -392,7 +392,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 SuggestSongRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<SuggestSongRequestDto>(request.MessagePayload);
                 LobbyMember lobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(request.SenderNetcodeClientId);
                 SongMeta songMeta = songMetaManager.GetSongMetaByGloballyUniqueId(requestDto.GloballyUniqueSongId);
-                if (songMeta != null)
+                if (songMeta != null
+                    && songMeta != SelectedSong)
                 {
                     uiManager.CreateConfirmationDialogControl(
                         "Song Suggestion",
