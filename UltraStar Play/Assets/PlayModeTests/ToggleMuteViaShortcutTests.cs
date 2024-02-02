@@ -3,7 +3,6 @@ using Responsible;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.TestTools;
-using static Responsible.Bdd.Keywords;
 using static Responsible.Responsibly;
 
 public class ToggleMuteViaShortcutTests : AbstractPlayModeTest
@@ -11,14 +10,12 @@ public class ToggleMuteViaShortcutTests : AbstractPlayModeTest
     protected override string TestSceneName => EScene.MainScene.ToString();
 
     [UnityTest]
-    public IEnumerator ToggleMuteViaShortcutTest() => this.Executor.YieldScenario(
-        Scenario("should toggle mute when pressing shortcut"),
-        Given("is not muted", LoadMainSceneAssertNotMuted()),
-        When("pressed F10", PressAndReleaseF10Key()),
-        Then("is muted", AssertMuted())
-    );
+    public IEnumerator ToggleMuteViaShortcutTest() => ExpectNotMutedAndNonZeroVolume()
+        .ContinueWith(_ => PressAndReleaseF10Key())
+        .ContinueWith(_ => ExpectMutedAndZeroVolume())
+        .ToYieldInstruction(Executor);
 
-    private ITestInstruction<object> LoadMainSceneAssertNotMuted() => WaitForCondition(
+    private ITestInstruction<object> ExpectNotMutedAndNonZeroVolume() => WaitForCondition(
             "is not muted",
             () => !VolumeControl.Instance.IsMuted)
         .AndThen(WaitForCondition(
@@ -30,7 +27,7 @@ public class ToggleMuteViaShortcutTests : AbstractPlayModeTest
         "press and release F10 key",
         () => InputFixture.PressAndRelease(Keyboard.current.f10Key));
 
-    private ITestInstruction<object> AssertMuted() => WaitForCondition(
+    private ITestInstruction<object> ExpectMutedAndZeroVolume() => WaitForCondition(
             "is muted",
             () => VolumeControl.Instance.IsMuted
         ).AndThen(WaitForCondition(
