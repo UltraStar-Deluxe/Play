@@ -5,42 +5,38 @@ using System.Linq;
 using Responsible;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
-using static Responsible.Bdd.Keywords;
 using static Responsible.Responsibly;
+using static ResponsibleVisualElementUtils;
+using static ResponsibleFindComponentUtils;
 
 public class SongSelectSearchTests : AbstractPlayModeTest
 {
     protected override string TestSceneName => EScene.SongSelectScene.ToString();
 
-    private TextField SearchTextField => UIDocumentUtils.FindUIDocumentOrThrow()
-        .rootVisualElement
-        .Q<TextField>(R.UxmlNames.searchTextField);
-
     [UnityTest]
-    public IEnumerator SongSearchIgnoresAccentsTest() => this.Executor.YieldScenario(
-        Scenario("should ignore accents when searching songs"),
-        When("searching song without accent character", SetSearchText("mana")),
-        Then("has found song with accent character", AssertSearchResultContainsSongWithAccentCharacter())
-    );
+    public IEnumerator SongSearchIgnoresAccentsTest() => SetSearchText("mana")
+        .ContinueWith(ExpectSongSelectEntryWithArtistName("Maná"))
+        .ToYieldInstruction(this.Executor);
 
-    private ITestInstruction<object> SetSearchText(string text) => Do(
-        $"write search text '{text}'",
-        () => SearchTextField.value = text)
-        .ContinueWith(WaitForSeconds(2));
+    private static ITestInstruction<object> SetSearchText(string text)
+        => GetElement<TextField>(R.UxmlNames.searchTextField)
+            .ContinueWith(textField => SetElementValue(textField, text));
 
-    private ITestInstruction<object> AssertSearchResultContainsSongWithAccentCharacter() => WaitForCondition(
-        nameof(AssertSearchResultContainsSongWithAccentCharacter),
-        () =>
-        {
-            SongSelectSceneControl songSelectSceneControl = UltraStarPlaySceneInjectionManager.Instance
-                .SceneInjector
-                .GetValueForInjectionKey<SongSelectSceneControl>();
-            List<SongSelectSongEntry> songSelectSongEntries = songSelectSceneControl
-                .songRouletteControl
-                .Entries
-                .OfType<SongSelectSongEntry>()
-                .ToList();
-            return songSelectSongEntries.Count == 1
-                && songSelectSongEntries.FirstOrDefault().SongMeta.Artist.Contains("maná", StringComparison.InvariantCultureIgnoreCase);
-        }).ExpectWithinSeconds(1);
+    private static ITestInstruction<object> ExpectSongSelectEntryWithArtistName(string text) =>
+        FindFirstObjectByType<SongSelectSceneControl>()
+            .ContinueWith(songSelectSceneControl => WaitForCondition(
+                    $"expect song select entry with artist name '{text}'",
+                    () =>
+                    {
+                        List<SongSelectSongEntry> songSelectSongEntries = songSelectSceneControl
+                            .songRouletteControl
+                            .Entries
+                            .OfType<SongSelectSongEntry>()
+                            .ToList();
+                        return songSelectSongEntries.Count == 1
+                               && songSelectSongEntries.FirstOrDefault()
+                                   .SongMeta
+                                   .Artist
+                                   .Contains(text, StringComparison.InvariantCultureIgnoreCase);
+                    }).ExpectWithinSeconds(1));
 }
