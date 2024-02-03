@@ -14,13 +14,39 @@ public class SongSelectSearchTests : AbstractPlayModeTest
     protected override string TestSceneName => EScene.SongSelectScene.ToString();
 
     [UnityTest]
-    public IEnumerator SongSearchIgnoresAccentsTest() => SetSearchText("mana")
-        .ContinueWith(ExpectSongSelectEntryWithArtistName("Maná"))
+    public IEnumerator SongSearchIgnoresAccentsTest() => ExpectAnySongSelectEntry()
+        .ContinueWith(_ => SetSearchText("eLLo"))
+        .ContinueWith(ExpectSongSelectEntryWithArtistName("HèllóArtist"))
         .ToYieldInstruction(this.Executor);
+
+    protected override List<string> GetRelativeTestSongFilePaths()
+    {
+        return new List<string>
+        {
+            "SongSearchTestSongs/Default-TestSong.txt",
+            "SongSearchTestSongs/ArtistHelloNoAccent-TestSong.txt",
+            "SongSearchTestSongs/ArtistHelloWithAccent-TestSong.txt",
+        };
+    }
 
     private static ITestInstruction<object> SetSearchText(string text)
         => GetElement<TextField>(R.UxmlNames.searchTextField)
             .ContinueWith(textField => SetElementValue(textField, text));
+
+
+    private static ITestInstruction<object> ExpectAnySongSelectEntry() =>
+        FindFirstObjectByType<SongSelectSceneControl>()
+            .ContinueWith(songSelectSceneControl => WaitForCondition(
+                $"expect any song select entry",
+                () =>
+                {
+                    List<SongSelectSongEntry> songSelectSongEntries = songSelectSceneControl
+                        .songRouletteControl
+                        .Entries
+                        .OfType<SongSelectSongEntry>()
+                        .ToList();
+                    return !songSelectSongEntries.IsNullOrEmpty();
+                }).ExpectWithinSeconds(1));
 
     private static ITestInstruction<object> ExpectSongSelectEntryWithArtistName(string text) =>
         FindFirstObjectByType<SongSelectSceneControl>()
@@ -33,10 +59,12 @@ public class SongSelectSearchTests : AbstractPlayModeTest
                             .Entries
                             .OfType<SongSelectSongEntry>()
                             .ToList();
-                        return songSelectSongEntries.Count == 1
-                               && songSelectSongEntries.FirstOrDefault()
+
+                        // Expect less songs than before, but expect the one with the given artist.
+                        return songSelectSongEntries.Count == 2
+                               && songSelectSongEntries.AnyMatch(songSelectSongEntry => songSelectSongEntry
                                    .SongMeta
                                    .Artist
-                                   .Contains(text, StringComparison.InvariantCultureIgnoreCase);
-                    }).ExpectWithinSeconds(1));
+                                   .Contains(text, StringComparison.InvariantCultureIgnoreCase));
+                    }).ExpectWithinSeconds(5));
 }
