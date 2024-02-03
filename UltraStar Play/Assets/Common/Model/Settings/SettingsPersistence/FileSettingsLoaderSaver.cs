@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using UnityEngine;
 
-public class DefaultSettingsLoaderSaver : ISettingsLoaderSaver
+public class FileSettingsLoaderSaver : ISettingsLoaderSaver
 {
     private string settingsPath;
     public string SettingsPath
@@ -32,12 +32,10 @@ public class DefaultSettingsLoaderSaver : ISettingsLoaderSaver
     {
         using DisposableStopwatch stopwatch = new DisposableStopwatch("Loading the settings took <millis> ms");
 
-        Settings settings;
         if (!File.Exists(SettingsPath))
         {
             Debug.LogWarning($"Settings file not found. Creating default settings at '{SettingsPath}'.");
-            settings = DefaultSettingsFactory.CreateDefaultSettings();
-            SaveSettings(settings);
+            SaveSettings(DefaultSettingsFactory.CreateDefaultSettings());
         }
 
         string fileContent = File.ReadAllText(SettingsPath);

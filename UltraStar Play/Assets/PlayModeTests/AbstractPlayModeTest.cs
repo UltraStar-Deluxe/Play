@@ -13,11 +13,14 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
     public IEnumerator UnitySetUp()
     {
         SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
+        StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
 
         yield return LoadTestScene();
 
         AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
         ConfigureTestSettings(SettingsManager.Instance.Settings as TestSettings);
+        AssertUtils.HasType<TestStatistics>(StatisticsManager.Instance.Statistics);
+        ConfigureTestStatistics(StatisticsManager.Instance.Statistics as TestStatistics);
 
         InputFixture = new InputTestFixture();
         Keyboard = InputSystem.GetDevice<Keyboard>();
@@ -25,6 +28,10 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         Executor = new UnityTestInstructionExecutor();
 
         yield return new WaitForEndOfFrame();
+    }
+
+    protected virtual void ConfigureTestStatistics(TestStatistics statistics)
+    {
     }
 
     protected virtual void ConfigureTestSettings(TestSettings settings)
@@ -38,7 +45,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
             yield break;
         }
 
-        Debug.Log($"Loading scene {TestSceneName}");
+        Debug.Log($"Loading test scene {TestSceneName}");
         SceneManager.LoadScene(TestSceneName, LoadSceneMode.Single);
         yield return new WaitForEndOfFrame();
     }

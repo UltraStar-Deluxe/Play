@@ -61,8 +61,8 @@ public class SettingsManager : AbstractSingletonBehaviour
         {
             return;
         }
-        Debug.Log($"No {nameof(ISettingsLoaderSaver)} set. Using new instance of {nameof(DefaultSettingsLoaderSaver)}.");
-        SettingsLoaderSaver = new DefaultSettingsLoaderSaver();
+        SettingsLoaderSaver = new FileSettingsLoaderSaver();
+        Debug.Log($"No {nameof(SettingsLoaderSaver)} set. Using new instance of {SettingsLoaderSaver.GetType()}.");
     }
 
     public void SaveSettings()
