@@ -7,6 +7,16 @@ using UnityEngine;
 
 public static class SettingsUtils
 {
+    public static void SimplifySettings(Settings settings)
+    {
+        // Remove permission list if empty
+        List<string> clientIdsWithoutPermission = settings.HttpApiPermissions
+            .Where(entry => entry.Value.IsNullOrEmpty())
+            .Select(entry => entry.Key)
+            .ToList();
+        clientIdsWithoutPermission.ForEach(clientId => settings.HttpApiPermissions.Remove(clientId));
+    }
+
     public static bool ShouldUsePortAudio(Settings settings)
     {
         return settings.PreferPortAudio

@@ -12,7 +12,12 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
     [UnitySetUp]
     public IEnumerator UnitySetUp()
     {
+        SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
+
         yield return LoadTestScene();
+
+        AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
+        ConfigureTestSettings(SettingsManager.Instance.Settings as TestSettings);
 
         InputFixture = new InputTestFixture();
         Keyboard = InputSystem.GetDevice<Keyboard>();
@@ -20,6 +25,10 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         Executor = new UnityTestInstructionExecutor();
 
         yield return new WaitForEndOfFrame();
+    }
+
+    protected virtual void ConfigureTestSettings(TestSettings settings)
+    {
     }
 
     private IEnumerator LoadTestScene()

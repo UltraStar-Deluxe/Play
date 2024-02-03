@@ -141,7 +141,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
             && !songDirs.Contains(persistentDataPathSongsFolder))
         {
             songDirs.Add(persistentDataPathSongsFolder);
-            settingsManager.Save();
+            settingsManager.SaveSettings();
         }
 
         if (PlatformUtils.IsStandalone)
