@@ -21,6 +21,8 @@ public class FileStatisticsLoaderSaver : IStatisticsLoaderSaver
 
     public Statistics LoadStatistics()
     {
+        Debug.Log($"Loading statistics from '{StatisticsPath}'");
+
         string databasePath = StatisticsPath;
         if (!File.Exists(databasePath))
         {

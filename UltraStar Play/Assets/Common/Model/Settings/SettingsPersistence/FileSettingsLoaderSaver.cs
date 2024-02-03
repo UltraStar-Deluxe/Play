@@ -30,6 +30,7 @@ public class FileSettingsLoaderSaver : ISettingsLoaderSaver
 
     public Settings LoadSettings()
     {
+        Debug.Log($"Loading settings from file '{SettingsPath}'");
         using DisposableStopwatch stopwatch = new DisposableStopwatch("Loading the settings took <millis> ms");
 
         if (!File.Exists(SettingsPath))
