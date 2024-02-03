@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Responsible.Unity;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +13,8 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
     [UnitySetUp]
     public IEnumerator UnitySetUp()
     {
+        LogAssert.ignoreFailingMessages = true;
+
         SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
         StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
 
@@ -47,6 +50,9 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 
         Debug.Log($"Loading test scene {TestSceneName}");
         SceneManager.LoadScene(TestSceneName, LoadSceneMode.Single);
-        yield return new WaitForEndOfFrame();
+        yield return new WaitUntilWithTimeout(
+            "wait until test scene loaded",
+            TimeSpan.FromSeconds(10),
+            () => SceneManager.GetActiveScene().name == TestSceneName);
     }
 }
