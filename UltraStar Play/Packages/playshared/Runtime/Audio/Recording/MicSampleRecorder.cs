@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using PortAudioForUnity;
 using UniRx;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 [RequireComponent(typeof(AudioSource))]
 public class MicSampleRecorder : MonoBehaviour
@@ -38,8 +40,10 @@ public class MicSampleRecorder : MonoBehaviour
         }
     }
 
+    public static IMicrophoneAdapter MicrophoneAdapterImpl { get; set; } = new PortAudioForUnityMicrophoneAdapter();
+
     public ReactiveProperty<bool> IsRecording { get; private set; } = new(false);
-    
+
     // The sample rate is available after a MicProfile has been set.
     public ReactiveProperty<int> FinalSampleRate { get; private set; } = new(0);
     // The MicSamples array has one float value per sample.
@@ -111,7 +115,7 @@ public class MicSampleRecorder : MonoBehaviour
             }
         });
     }
-    
+
     private void OnEnable()
     {
         if (MicProfile != null
@@ -121,7 +125,7 @@ public class MicSampleRecorder : MonoBehaviour
             StartRecording();
         }
     }
-    
+
     private void OnDisable()
     {
         if (MicProfile != null
@@ -155,11 +159,11 @@ public class MicSampleRecorder : MonoBehaviour
             Debug.LogWarning("Cannot record mic samples using connected client");
             return;
         }
-        
+
         IsRecording.Value = true;
 
         // Check for microphone existence.
-        string[] micDevices = MicrophoneAdapter.Devices;
+        string[] micDevices = MicrophoneAdapterImpl.Devices;
         if (!micDevices.Contains(micProfile.Name))
         {
             IsRecording.Value = false;
@@ -169,7 +173,7 @@ public class MicSampleRecorder : MonoBehaviour
 
         Debug.Log($"Starting recording with '{MicProfile.GetDisplayNameWithChannel()}' at {FinalSampleRate} Hz");
 
-        string outputDeviceName = playRecordedAudio && MicrophoneAdapter.UsePortAudio
+        string outputDeviceName = playRecordedAudio && MicrophoneAdapterImpl.UsePortAudio
             ? GetFinalPortAudioOutputDeviceName()
             : "";
 
@@ -178,14 +182,14 @@ public class MicSampleRecorder : MonoBehaviour
         DestroyAudioClips();
         using DisposableStopwatch d = new($"MicrophoneAdapter.Start took <ms> with {MicProfile.GetDisplayNameWithChannel()}");
         {
-            micAudioClip = MicrophoneAdapter.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName, OutputVolume);
+            micAudioClip = MicrophoneAdapterImpl.Start(MicProfile.Name, true, 1, FinalSampleRate.Value, outputDeviceName, OutputVolume);
         }
-        
-        if (!MicrophoneAdapter.UsePortAudio)
+
+        if (!MicrophoneAdapterImpl.UsePortAudio)
         {
-            System.Diagnostics.Stopwatch stopwatch = new();
+            Stopwatch stopwatch = new();
             stopwatch.Start();
-            while (MicrophoneAdapter.GetPosition(MicProfile.Name) <= 0)
+            while (MicrophoneAdapterImpl.GetPosition(MicProfile.Name) <= 0)
             {
                 // <Busy waiting>
                 // Emergency exit
@@ -234,9 +238,9 @@ public class MicSampleRecorder : MonoBehaviour
         DestroyAudioClips();
 
         if (!MicProfile.IsInputFromConnectedClient
-            && MicrophoneAdapter.Devices.Contains(MicProfile.Name))
+            && MicrophoneAdapterImpl.Devices.Contains(MicProfile.Name))
         {
-            MicrophoneAdapter.End(MicProfile.Name);
+            MicrophoneAdapterImpl.End(MicProfile.Name);
         }
         // Reset mic buffer
         for (int i = 0; i < MicSamples.Length; i++)
@@ -252,7 +256,7 @@ public class MicSampleRecorder : MonoBehaviour
             return;
         }
 
-        if (micAudioClip == null && !MicrophoneAdapter.UsePortAudio)
+        if (micAudioClip == null && !MicrophoneAdapterImpl.UsePortAudio)
         {
             Debug.LogError("AudioClip from Unity microphone recording is null");
             StopRecording();
@@ -260,13 +264,13 @@ public class MicSampleRecorder : MonoBehaviour
         }
 
         // Fill buffer with raw sample data from microphone
-        int currentSamplePosition = MicrophoneAdapter.GetPosition(MicProfile.Name);
+        int currentSamplePosition = MicrophoneAdapterImpl.GetPosition(MicProfile.Name);
         if (currentSamplePosition == lastSamplePosition)
         {
             // No new samples yet (or all samples changed, which is unlikely because the buffer has a length of 1 second and FPS should be > 1).
             return;
         }
-        MicrophoneAdapter.GetRecordedSamples(MicProfile.Name, MicProfile.ChannelIndex, micAudioClip, currentSamplePosition, MicSamples);
+        MicrophoneAdapterImpl.GetRecordedSamples(MicProfile.Name, MicProfile.ChannelIndex, micAudioClip, currentSamplePosition, MicSamples);
 
         int newSamplesCount = GetNewSampleCountInCircularBuffer(lastSamplePosition, currentSamplePosition, MicSamples.Length);
         NotifyListeners(newSamplesCount);
@@ -289,7 +293,7 @@ public class MicSampleRecorder : MonoBehaviour
 
     private void UpdateMicrophoneAudioPlayback()
     {
-        if (MicrophoneAdapter.UsePortAudio)
+        if (MicrophoneAdapterImpl.UsePortAudio)
         {
             return;
         }
@@ -303,7 +307,7 @@ public class MicSampleRecorder : MonoBehaviour
             audioSource.Stop();
         }
     }
-    
+
     private static int GetNewSampleCountInCircularBuffer(int lastSamplePosition, int currentSamplePosition, int bufferLength)
     {
         // Check if the recording re-started from index 0 after reaching the end of the buffer.
@@ -326,11 +330,11 @@ public class MicSampleRecorder : MonoBehaviour
         }
 
         // Use best available sample rate
-        if (!MicrophoneAdapter.Devices.Contains(deviceName))
+        if (!MicrophoneAdapterImpl.Devices.Contains(deviceName))
         {
             return DefaultSampleRate;
         }
-        MicrophoneAdapter.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate, out int channelCount);
+        MicrophoneAdapterImpl.GetDeviceCaps(deviceName, out int minSampleRate, out int maxSampleRate, out int channelCount);
         return GetMaxSampleRate(maxSampleRate);
     }
 

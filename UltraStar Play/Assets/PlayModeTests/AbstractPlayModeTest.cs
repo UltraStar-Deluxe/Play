@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using NUnit.Framework;
 using Responsible.Unity;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,13 +20,17 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 
         SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
         StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
+        MicSampleRecorder.MicrophoneAdapterImpl = new SimulatedMicrophoneAdapter();
 
         yield return LoadTestScene();
 
         AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
         ConfigureTestSettings(SettingsManager.Instance.Settings as TestSettings);
+
         AssertUtils.HasType<TestStatistics>(StatisticsManager.Instance.Statistics);
         ConfigureTestStatistics(StatisticsManager.Instance.Statistics as TestStatistics);
+
+        AssertMicSampleRecorderIsSimulated();
 
         ConfigureAndPrepareTestSongs(SettingsManager.Instance.Settings);
 
@@ -35,6 +40,17 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         Executor = new UnityTestInstructionExecutor();
 
         yield return new WaitForEndOfFrame();
+    }
+
+    private void AssertMicSampleRecorderIsSimulated()
+    {
+        string simulatedMicName = SimulatedMicrophoneAdapter.GetSimulatedMicName(0);
+        MicProfile simulatedMicProfile = new MicProfile(simulatedMicName);
+        MicSampleRecorder simulatedMicSampleRecorder = MicSampleRecorderManager.Instance.GetOrCreateMicSampleRecorder(simulatedMicProfile);
+        simulatedMicSampleRecorder.StartRecording();
+        Assert.IsTrue(simulatedMicSampleRecorder.IsRecording.Value, "Microphone simulation not set up correctly. Should be recording.");
+        simulatedMicSampleRecorder.StopRecording();
+        Assert.IsFalse(simulatedMicSampleRecorder.IsRecording.Value, "Microphone simulation not set up correctly. Should not be recording.");
     }
 
     protected virtual string GetAbsoluteTestSongFilePath(string songPathRelativeToTestSongFolderInAssets)
