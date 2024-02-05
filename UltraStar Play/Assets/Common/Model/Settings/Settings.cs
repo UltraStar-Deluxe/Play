@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Serilog.Events;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class Settings : ISettings
@@ -148,6 +149,9 @@ public class Settings : ISettings
      // PortAudio settings
      public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
      public string PortAudioOutputDeviceName { get; set; } = "";
+
+    // Media format support settings
+    public ESongVideoPlayback SongVideoPlayback { get; set; } = ESongVideoPlayback.AlwaysEnabled;
 
     // Vlc settings
     public bool LogVlcOutput { get; set; }

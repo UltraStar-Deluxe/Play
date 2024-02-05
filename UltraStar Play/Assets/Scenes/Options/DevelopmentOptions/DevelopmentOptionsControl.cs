@@ -128,6 +128,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonPicker)]
     private TextField ffmpegConversionCommandsJsonPicker;
 
+    [Inject(UxmlName = R.UxmlNames.songVideoPlaybackPicker)]
+    private ItemPicker songVideoPlaybackPicker;
+
     [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesPicker)]
     private ItemPicker useFfmpegToPlayMediaFilesPicker;
 
@@ -347,6 +350,13 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                         $"Failed to update ffmpeg conversion commands with the following JSON: '{newValueAsString}', error message: {ex.Message}");
                 }
             });
+
+        // SongVideoPlayback
+        new EnumItemPickerControl<ESongVideoPlayback>(songVideoPlaybackPicker)
+        {
+            GetLabelTextFunction = item => item.ToDisplayString()
+        }.Bind(() => settings.SongVideoPlayback,
+                newValue => settings.SongVideoPlayback = newValue);
 
         // VLC
         new EnumItemPickerControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesPicker)
