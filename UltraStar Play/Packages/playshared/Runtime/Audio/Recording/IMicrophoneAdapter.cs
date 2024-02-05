@@ -2,6 +2,8 @@
 
 public interface IMicrophoneAdapter
 {
+    public static IMicrophoneAdapter Instance { get; set; }
+
     public bool UsePortAudio { get; set; }
 
     public string[] Devices { get; }

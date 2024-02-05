@@ -3,6 +3,12 @@ using UnityEngine;
 
 public class PortAudioForUnityMicrophoneAdapter : IMicrophoneAdapter
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void StaticInit()
+    {
+        IMicrophoneAdapter.Instance = new PortAudioForUnityMicrophoneAdapter();
+    }
+
     public bool UsePortAudio
     {
         get => MicrophoneAdapter.UsePortAudio;

@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using Responsible.Unity;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -18,11 +20,19 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
     {
         LogAssert.ignoreFailingMessages = true;
 
-        SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
-        StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
-        MicSampleRecorder.MicrophoneAdapterImpl = new SimulatedMicrophoneAdapter();
+        yield return SetUpTestFixture();
 
         yield return LoadTestScene();
+        yield return new WaitForEndOfFrame();
+    }
+
+    private IEnumerator SetUpTestFixture()
+    {
+        SettingsManager.SettingsLoaderSaver = new TestSettingsLoaderSaver();
+        StatisticsManager.StatisticsLoaderSaver = new TestStatisticsLoaderSaver();
+        IMicrophoneAdapter.Instance = new SimulatedMicrophoneAdapter();
+
+        yield return LoadSceneByName("CommonTestScene");
 
         AssertUtils.HasType<TestSettings>(SettingsManager.Instance.Settings);
         ConfigureTestSettings(SettingsManager.Instance.Settings as TestSettings);
@@ -38,13 +48,13 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         Keyboard = InputSystem.GetDevice<Keyboard>();
 
         Executor = new UnityTestInstructionExecutor();
-
-        yield return new WaitForEndOfFrame();
     }
 
     private void AssertMicSampleRecorderIsSimulated()
     {
-        string simulatedMicName = SimulatedMicrophoneAdapter.GetSimulatedMicName(0);
+        AssertUtils.HasType<SimulatedMicrophoneAdapter>(IMicrophoneAdapter.Instance);
+
+        string simulatedMicName = IMicrophoneAdapter.Instance.Devices.FirstOrDefault();
         MicProfile simulatedMicProfile = new MicProfile(simulatedMicName);
         MicSampleRecorder simulatedMicSampleRecorder = MicSampleRecorderManager.Instance.GetOrCreateMicSampleRecorder(simulatedMicProfile);
         simulatedMicSampleRecorder.StartRecording();
@@ -53,7 +63,7 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
         Assert.IsFalse(simulatedMicSampleRecorder.IsRecording.Value, "Microphone simulation not set up correctly. Should not be recording.");
     }
 
-    protected virtual string GetAbsoluteTestSongFilePath(string songPathRelativeToTestSongFolderInAssets)
+    private static string GetAbsoluteTestSongFilePath(string songPathRelativeToTestSongFolderInAssets)
     {
         return $"{Application.dataPath}/Editor/Tests/TestSongs/{songPathRelativeToTestSongFolderInAssets}";
     }
@@ -140,16 +150,21 @@ public abstract class AbstractPlayModeTest : AbstractResponsibleTest
 
     private IEnumerator LoadTestScene()
     {
-        if (TestSceneName.IsNullOrEmpty())
+        yield return LoadSceneByName(TestSceneName);
+    }
+
+    private static IEnumerator LoadSceneByName(string sceneName)
+    {
+        if (sceneName.IsNullOrEmpty())
         {
             yield break;
         }
 
-        Debug.Log($"Loading test scene {TestSceneName}");
-        SceneManager.LoadScene(TestSceneName, LoadSceneMode.Single);
+        Debug.Log($"Loading test scene {sceneName}");
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         yield return new WaitUntilWithTimeout(
             "wait until test scene loaded",
             TimeSpan.FromSeconds(10),
-            () => SceneManager.GetActiveScene().name == TestSceneName);
+            () => SceneManager.GetActiveScene().name == sceneName);
     }
 }

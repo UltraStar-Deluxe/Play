@@ -25,26 +25,30 @@ public class SimulatedMicrophoneAdapter : IMicrophoneAdapter
         simulatedDevices = newSimulatedDevices;
     }
 
-    public static void SetSimulatedDeviceIsRecording(string deviceName, bool isRecording)
+    public static void SimulateRecording(string deviceName, bool isRecording)
     {
         if (isRecording)
         {
+            Debug.Log($"Simulate start recording with '{deviceName}'");
             deviceNameToIsRecording.Add(deviceName);
         }
         else
         {
+            Debug.Log($"Simulate stop recording with '{deviceName}'");
             deviceNameToIsRecording.Remove(deviceName);
         }
     }
 
-    public static void SetSimulatedDeviceIsSilent(string deviceName, bool isSilent)
+    public static void SimulateSilence(string deviceName, bool isSilent)
     {
         if (isSilent)
         {
+            Debug.Log($"Simulate silent input with '{deviceName}'");
             deviceNameToIsSilent.Add(deviceName);
         }
         else
         {
+            Debug.Log($"Simulate pitch input with '{deviceName}'");
             deviceNameToIsSilent.Remove(deviceName);
         }
     }
@@ -101,13 +105,13 @@ public class SimulatedMicrophoneAdapter : IMicrophoneAdapter
         string outputDeviceName = "",
         float directOutputAmplificationFactor = 1)
     {
-        SetSimulatedDeviceIsRecording(inputDeviceName, true);
+        SimulateRecording(inputDeviceName, true);
         return null;
     }
 
     public void End(string deviceName)
     {
-        SetSimulatedDeviceIsRecording(deviceName, false);
+        SimulateRecording(deviceName, false);
     }
 
     public int GetPosition(string deviceName)
