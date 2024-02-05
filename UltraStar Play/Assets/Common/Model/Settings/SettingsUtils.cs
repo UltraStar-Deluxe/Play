@@ -1,11 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NHyphenator;
 using NHyphenator.Loaders;
 using UnityEngine;
 
 public static class SettingsUtils
 {
+    public static void SimplifySettings(Settings settings)
+    {
+        // Remove permission list if empty
+        List<string> clientIdsWithoutPermission = settings.HttpApiPermissions
+            .Where(entry => entry.Value.IsNullOrEmpty())
+            .Select(entry => entry.Key)
+            .ToList();
+        clientIdsWithoutPermission.ForEach(clientId => settings.HttpApiPermissions.Remove(clientId));
+    }
+
     public static bool ShouldUsePortAudio(Settings settings)
     {
         return settings.PreferPortAudio
@@ -137,5 +148,10 @@ public static class SettingsUtils
         {
             return settings.GeneratedFolderPath;
         }
+    }
+
+    public static Encoding GetEncodingForWritingUltraStarTxtFile(Settings settings)
+    {
+        return EncodingUtils.GetUtf8Encoding(settings.WriteUltraStarTxtFileWithByteOrderMark);
     }
 }

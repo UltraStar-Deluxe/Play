@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -10,18 +9,19 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
-        statistics = null;
+        StatisticsLoaderSaver = null;
     }
 
-    // Statistics are static to persist across scenes
-    private static Statistics statistics;
+    public static IStatisticsLoaderSaver StatisticsLoaderSaver { get; set; }
+
+    private Statistics statistics;
     public Statistics Statistics
     {
         get
         {
             if (statistics == null)
             {
-                Reload();
+                LoadStatistics();
             }
             return statistics;
         }
@@ -45,20 +45,6 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
             .Subscribe(_ => SaveStatsIfDirty());
     }
 
-    public void Save()
-    {
-        Debug.Log("Writing database");
-
-        // Update the total play time before saving
-        UpdateTotalPlayTime();
-
-        // Do not pretty print json. The database is relatively big compared to the settings.
-        // To view the JSON file, use an external viewer/formatter, for example a web browser or JSON Viewer plugin of Notepad++.
-        string json = JsonConverter.ToJson(Statistics, false);
-        File.WriteAllText(DatabasePath(), json);
-        Statistics.IsDirty = false;
-    }
-
     private void UpdateTotalPlayTime()
     {
         float currentTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
@@ -67,26 +53,44 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
         lastSaveTimeInMillis = currentTimeInMillis;
     }
 
-    public void Reload()
+    private void InitStatisticsLoaderSaverIfNotDoneYet()
     {
-        string databasePath = DatabasePath();
-        Debug.Log("Reloading StatsManager");
-        if (!File.Exists(databasePath))
+        if (StatisticsLoaderSaver != null)
         {
-            Debug.LogWarning($"Database file not found. Creating new database at {databasePath}.");
-            statistics = new Statistics();
-            Save();
+            return;
+        }
+        StatisticsLoaderSaver = new FileStatisticsLoaderSaver();
+        Debug.Log($"No {nameof(StatisticsLoaderSaver)} set. Using new instance of {StatisticsLoaderSaver.GetType()}.");
+    }
+
+    public void SaveStatistics()
+    {
+        if (statistics == null)
+        {
+            Debug.LogWarning("Failed to save statistics. Statistics are null.");
             return;
         }
 
-        string fileContent = File.ReadAllText(databasePath);
-        lastSaveTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
-        statistics = JsonConverter.FromJson<Statistics>(fileContent);
+        InitStatisticsLoaderSaverIfNotDoneYet();
+
+        // Update the total play time before saving
+        UpdateTotalPlayTime();
+
+        StatisticsLoaderSaver.SaveStatistics(statistics);
+
+        Statistics.IsDirty = false;
     }
 
-    public string DatabasePath()
+    private void LoadStatistics()
     {
-        return Path.Combine(Application.persistentDataPath, "Database.json");
+        if (statistics != null)
+        {
+            throw new IllegalStateException("Statistics have been loaded already");
+        }
+        InitStatisticsLoaderSaverIfNotDoneYet();
+
+        statistics = StatisticsLoaderSaver.LoadStatistics();
+        lastSaveTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
     }
 
     protected override void OnDisableSingleton()
@@ -100,7 +104,7 @@ public class StatisticsManager : AbstractSingletonBehaviour, INeedInjection
             && statistics.IsDirty)
         {
             Debug.Log("Stats have changed, saving.");
-            Save();
+            SaveStatistics();
         }
     }
 }

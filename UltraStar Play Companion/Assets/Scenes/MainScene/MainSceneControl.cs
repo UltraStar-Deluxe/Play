@@ -393,9 +393,24 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, ITranslator, IInj
 
     private void OnClientNameTextFieldSubmit()
     {
-        settings.ClientName = clientNameTextField.value;
-        // Reconnect to let the main know about the new clientName.
-        clientSideConnectRequestManager.DisconnectFromServer();
+        if (clientNameTextField.value == settings.ClientName)
+        {
+            return;
+        }
+
+        if (clientNameTextField.value.IsNullOrEmpty()
+            && !settings.ClientName.IsNullOrEmpty())
+        {
+            // ClientName must not be empty, so restore last value.
+            clientNameTextField.value = settings.ClientName;
+        }
+        else
+        {
+            // Apply new ClientName
+            settings.ClientName = clientNameTextField.value;
+            // Reconnect to let the main know about the new clientName.
+            clientSideConnectRequestManager.DisconnectFromServer();
+        }
     }
 
     private void OnMicProfileChanged()

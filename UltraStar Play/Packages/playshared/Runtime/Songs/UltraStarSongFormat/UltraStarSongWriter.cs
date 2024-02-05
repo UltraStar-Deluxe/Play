@@ -6,34 +6,34 @@ using System.Text;
 
 public static class UltraStarFormatWriter
 {
-    public static void WriteFile(string absolutePath, SongMeta songMeta)
+    public static void WriteFile(string absolutePath, SongMeta songMeta, bool writeByteOrderMark = true)
     {
         if (songMeta is not UltraStarSongMeta ultraStarSongMeta)
         {
             ultraStarSongMeta = new(songMeta);
         }
-        WriteFile(absolutePath, ultraStarSongMeta);
+        WriteFileWithUltraStarSongMeta(absolutePath, ultraStarSongMeta, writeByteOrderMark);
     }
 
-    private static void WriteFile(string absolutePath, UltraStarSongMeta songMeta)
+    private static void WriteFileWithUltraStarSongMeta(string absolutePath, UltraStarSongMeta songMeta, bool writeByteOrderMark)
     {
-        string ultraStarFormat = ToUltraStarSongFormat(songMeta, Encoding.UTF8);
-        File.WriteAllText(absolutePath, ultraStarFormat, Encoding.UTF8);
+        string ultraStarFormat = ToUltraStarSongFormat(songMeta);
+        File.WriteAllText(absolutePath, ultraStarFormat, EncodingUtils.GetUtf8Encoding(writeByteOrderMark));
     }
 
-    public static string ToUltraStarSongFormat(SongMeta songMeta, Encoding encoding = null)
+    public static string ToUltraStarSongFormat(SongMeta songMeta)
     {
         if (songMeta is not UltraStarSongMeta ultraStarSongMeta)
         {
             ultraStarSongMeta = new(songMeta);
         }
-        return ToUltraStarSongFormat(ultraStarSongMeta, encoding);
+        return ToUltraStarSongFormat(ultraStarSongMeta);
     }
 
-    private static string ToUltraStarSongFormat(UltraStarSongMeta songMeta, Encoding encoding = null)
+    private static string ToUltraStarSongFormat(UltraStarSongMeta songMeta)
     {
         StringBuilder sb = new();
-        AppendHeader(sb, songMeta, encoding);
+        AppendHeader(sb, songMeta);
         List<Voice> nonEmptyVoices = songMeta.Voices.Where(voice => IsNotEmpty(voice)).ToList();
         nonEmptyVoices.Sort(Voice.comparerById);
         foreach (Voice voice in nonEmptyVoices)
@@ -101,20 +101,8 @@ public static class UltraStarFormatWriter
         }
     }
 
-    private static void AppendHeader(StringBuilder sb, UltraStarSongMeta songMeta, Encoding encoding = null)
+    private static void AppendHeader(StringBuilder sb, UltraStarSongMeta songMeta)
     {
-        if (encoding != null)
-        {
-            if (Equals(encoding, Encoding.UTF8))
-            {
-                AppendHeaderField(sb, "encoding", "UTF8");
-            }
-            else
-            {
-                throw new IllegalArgumentException("Unsupported encoding. Use UTF8 instead.");
-            }
-        }
-
         AppendHeaderField(sb, "title", songMeta.Title);
         AppendHeaderField(sb, "artist", songMeta.Artist);
         AppendHeaderField(sb, "mp3", songMeta.Audio);

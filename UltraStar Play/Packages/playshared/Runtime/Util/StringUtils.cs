@@ -1,11 +1,87 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
 public static class StringUtils
 {
     private static readonly Regex whitespaceRegex = new(@"^\s+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    public static bool StartsWithIgnoreCaseAndDiacritics(string a, string b)
+    {
+        if (a == null || b == null)
+        {
+            return false;
+        }
+
+        string aNoDiacritics = RemoveDiacritics(a);
+        string bNoDiacritics = RemoveDiacritics(b);
+        return aNoDiacritics.StartsWith(bNoDiacritics, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    public static bool EndsWithIgnoreCaseAndDiacritics(string a, string b)
+    {
+        if (a == null || b == null)
+        {
+            return false;
+        }
+
+        string aNoDiacritics = RemoveDiacritics(a);
+        string bNoDiacritics = RemoveDiacritics(b);
+        return aNoDiacritics.EndsWith(bNoDiacritics, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    public static bool ContainsIgnoreCaseAndDiacritics(string a, string b)
+    {
+        if (a == null || b == null)
+        {
+            return false;
+        }
+
+        string aNoDiacritics = RemoveDiacritics(a);
+        string bNoDiacritics = RemoveDiacritics(b);
+        return aNoDiacritics.Contains(bNoDiacritics, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    public static bool EqualsIgnoreCaseAndDiacritics(string a, string b)
+    {
+        if (a == null && b == null)
+        {
+            return true;
+        }
+        else if (a == null || b == null)
+        {
+            return false;
+        }
+
+        string aNoDiacritics = RemoveDiacritics(a);
+        string bNoDiacritics = RemoveDiacritics(b);
+        return string.Equals(aNoDiacritics, bNoDiacritics, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    public static string RemoveDiacritics(string text)
+    {
+        if (text == null)
+        {
+            return null;
+        }
+
+        // Solution from https://stackoverflow.com/a/368850/4412885
+        string formD = text.Normalize(NormalizationForm.FormD);
+        StringBuilder sb = new StringBuilder();
+
+        foreach (char ch in formD)
+        {
+            UnicodeCategory uc = CharUnicodeInfo.GetUnicodeCategory(ch);
+            if (uc != UnicodeCategory.NonSpacingMark)
+            {
+                sb.Append(ch);
+            }
+        }
+
+        return sb.ToString().Normalize(NormalizationForm.FormC);
+    }
 
     public static string ReplaceInvalidChars(string text, char replacement, HashSet<char> invalidCharacters)
     {

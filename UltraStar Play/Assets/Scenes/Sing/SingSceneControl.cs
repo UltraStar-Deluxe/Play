@@ -1064,7 +1064,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         playerControlInjector.AddBindingForInstance(voice);
         playerControlInjector.AddBindingForInstance(micProfile);
         playerControlInjector.AddBindingForInstance(playerControlInjector, RebindingBehavior.Ignore);
-        playerControlInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(playerIndex)));
+        playerControlInjector.AddBinding(new UniInjectBinding("playerProfileIndex", new ExistingInstanceProvider<int>(playerIndex)));
         playerControlInjector.Inject(playerControl);
 
         PlayerControls.Add(playerControl);

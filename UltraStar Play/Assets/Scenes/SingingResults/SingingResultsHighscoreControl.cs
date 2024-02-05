@@ -120,7 +120,7 @@ public class SingingResultsHighscoreControl : INeedInjection
         injector
             .WithRootVisualElement(highscoreEntry)
             .WithBindingForInstance(highScoreEntry)
-            .WithBinding(new Binding("entryIndex", new ExistingInstanceProvider<int>(index)))
+            .WithBinding(new UniInjectBinding("entryIndex", new ExistingInstanceProvider<int>(index)))
             .CreateAndInject<SingingResultsHighscoreEntryControl>();
     }
 }

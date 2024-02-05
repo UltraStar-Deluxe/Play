@@ -28,7 +28,7 @@
             </AccordionItem>
             <AccordionItem name="mediaFileFormatGroup" label="Media File Format Support" class="child-mb-3">
                 <ui:Toggle name="useUniversalCharsetDetectorToggle" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
-                <ItemPicker name="songDataFetchTypeChooser" label="Song data loading.&#10;Upfront = smoother during song select&#10;On-demand = faster song folder scan" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
+                <ui:Toggle name="writeUltraStarTxtFileWithByteOrderMarkToggle" label="Write UltraStar txt with BOM" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
                 <ItemPicker name="useVlcToPlayMediaFilesPicker" label="Use VLC to Play Audio&#10;and Video Files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy" />
                 <ItemPicker name="useFfmpegToPlayMediaFilesPicker" label="Use ffmpeg to Play Audio&#10;and Video Files (unstable)¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
@@ -39,6 +39,7 @@
             </AccordionItem>
             <AccordionItem name="webViewGroup" label="Embedded Browser" class="child-mb-3">
                 <ui:Toggle name="enableWebViewToggle" label="Enable embedded browser¹" wrapAround="true" class="noBackgroundInHierarchy" />
+                <ui:TextField label="Custom User-Agent¹" name="webViewCustomUserAgentTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center;" />
             </AccordionItem>
             <AccordionItem name="performanceAndEffectsGroup" label="Performance And Effects" class="child-mb-3">
                 <ui:Toggle name="showFpsToggle" label="Show FPS" class="noBackgroundInHierarchy" />
@@ -57,8 +58,8 @@
                 <ui:Label text="HTTP Endpoint Example: ????" name="httpEndpointExampleLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
             </AccordionItem>
             <AccordionItem name="externalToolsGroup" label="External Tools" class="child-mb-3">
-                <ui:TextField text="python -m spleeter" name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
-                <ui:TextField text="python -m spleeter" name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
+                <ui:TextField name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
+                <ui:TextField name="basicPitchCommandTextField" is-delayed="true" label="Basic Pitch Command&#10;(pitch detection)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
             </AccordionItem>
             <ui:VisualElement name="separator" class="horizontalSeparatorLine" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);" />
             <ui:Label tabindex="-1" text="¹ requires restart" display-tooltip-when-elided="true" name="requiresRestartLabel" class="noBackgroundInHierarchy" />

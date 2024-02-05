@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable
+public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable, INeedInjection
 {
     private static readonly int displayedSampleCount = 1024;
 
@@ -17,7 +17,7 @@ public class SongSelectMicEntryControl : IInjectionFinishedListener, IDisposable
         {
             return micProfile;
         }
-        
+
         set
         {
             micProfile = value;

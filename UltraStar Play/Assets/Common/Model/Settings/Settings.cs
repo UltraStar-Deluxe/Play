@@ -53,6 +53,7 @@ public class Settings : ISettings
     public int DefaultMedleyTargetDurationInSeconds { get; set; } = 30;
     public int ReducedAudioVolumePercent { get; set; } = 1;
     public float PassTheMicTimeInSeconds { get; set; } = 20;
+    public bool JokerRuleEnabled { get; set; } = true;
 
     // Player profile settings
     public List<PlayerProfile> PlayerProfiles { get; set; } = new();
@@ -114,7 +115,8 @@ public class Settings : ISettings
     // Technical settings
     public bool ShowFps { get; set; }
     public bool UseUniversalCharsetDetector { get; set; } = true;
-    public LogEventLevel MinimumLogLevel { get; set; }= LogEventLevel.Information;
+    public bool WriteUltraStarTxtFileWithByteOrderMark { get; set; }
+    public LogEventLevel MinimumLogLevel { get; set; } = LogEventLevel.Information;
 
     /**
      * Require explicit user action to use custom event system
@@ -137,6 +139,7 @@ public class Settings : ISettings
     // WebView settings
     public List<string> AcceptedWebViewHosts { get; set; } = new();
     public bool EnableWebView { get; set; } = true;
+    public string CustomUserAgent { get; set; } = "";
 
     // Other settings
     public PartyModeSettings PartyModeSettings { get; set; } = new();
@@ -173,4 +176,5 @@ public class Settings : ISettings
 
     // Mods
     public List<string> EnabledMods { get; private set; } = new();
+    public bool ReloadModsOnFileChange { get; set; }
 }

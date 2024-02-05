@@ -73,7 +73,7 @@ public static class ApplicationUtils
         "kar",
     };
 
-    public static readonly IReadOnlyCollection<string> audioFileExtensions = File.ReadAllLines(GetStreamingAssetsPath("audio-file-extensions.txt"), System.Text.Encoding.UTF8)
+    public static readonly IReadOnlyCollection<string> audioFileExtensions = ReadAudioFileExtensionsFromFile()
         .Select(line => line.Trim().TrimStart('.'))
         .Where(line => !line.IsNullOrEmpty())
         .ToHashSet();
@@ -81,7 +81,7 @@ public static class ApplicationUtils
     // Supported file formats of ffmpeg can be obtained via "ffmpeg -demuxers"
     // See also https://stackoverflow.com/questions/50069235/what-are-all-of-the-file-extensions-supported-by-ffmpeg
     // See also http://www.ffmpeg.org/general.html#toc-Supported-File-Formats_002c-Codecs-or-Features
-    public static readonly IReadOnlyCollection<string> ffmpegSupportedFileExtensions = File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), System.Text.Encoding.UTF8)
+    public static readonly IReadOnlyCollection<string> ffmpegSupportedFileExtensions = ReadFfmpegSupportedFileExtensionsFromFile()
         .Select(line => line.Trim().TrimStart('.'))
         .Where(line => !line.IsNullOrEmpty())
         .ToHashSet();
@@ -115,14 +115,14 @@ public static class ApplicationUtils
         "m4a",
         "wma",
         "flac",
-    }.Intersect(supportedAudioFiles).ToHashSet();
+    }.ToHashSet();
 
     public static readonly IReadOnlyCollection<string> supportedBasicPitchDetectionAudioFiles = new HashSet<string>
     {
         "wav",
         "mp3",
         "ogg",
-    }.Intersect(supportedAudioFiles).ToHashSet();
+    }.ToHashSet();
 
     public static readonly IReadOnlyCollection<string> unitySupportedVideoFiles = new HashSet<string>
     {
@@ -346,7 +346,7 @@ public static class ApplicationUtils
 
     public static void SetUsePortAudio(bool preferPortAudio)
     {
-        MicrophoneAdapter.UsePortAudio = preferPortAudio && CanUsePortAudio();
+        IMicrophoneAdapter.Instance.UsePortAudio = preferPortAudio && CanUsePortAudio();
     }
 
     public static bool CanUsePortAudio()
@@ -388,5 +388,37 @@ public static class ApplicationUtils
     public static string GetTemporaryCachePath(string pathInsideTemporaryCachePath)
     {
         return $"{Application.temporaryCachePath}/{pathInsideTemporaryCachePath}";
+    }
+
+    private static IReadOnlyCollection<string> ReadAudioFileExtensionsFromFile()
+    {
+        try
+        {
+            return File.ReadAllLines(GetStreamingAssetsPath("audio-file-extensions.txt"), System.Text.Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+
+            List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
+            Debug.LogError($"Failed to load audio file extensions from file. Using fallback list: {fallbackList.ToCsv()}");
+            return fallbackList;
+        }
+    }
+
+    private static IReadOnlyCollection<string> ReadFfmpegSupportedFileExtensionsFromFile()
+    {
+        try
+        {
+            return File.ReadAllLines(GetStreamingAssetsPath("ffmpeg-supported-common-file-extensions.txt"), System.Text.Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+
+            List<string> fallbackList = new List<string>() { "ogg", "mp3", "wav" };
+            Debug.LogError($"Failed to load ffmpeg supported audio file extensions from file. Using fallback list: {fallbackList.ToCsv()}");
+            return fallbackList;
+        }
     }
 }

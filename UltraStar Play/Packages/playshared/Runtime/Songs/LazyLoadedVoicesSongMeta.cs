@@ -18,6 +18,9 @@ public class LazyLoadedVoicesSongMeta : SongMeta
     public bool HasFailedToLoadVoices => loadVoicesPhase is ELoadVoicesPhase.Failed;
     private ELoadVoicesPhase loadVoicesPhase;
 
+    public string FailedToLoadVoicesExceptionMessage => failedToLoadVoicesExceptionMessage;
+    private string failedToLoadVoicesExceptionMessage;
+
     public override string GetVoiceDisplayName(EVoiceId voiceId)
     {
         if (voiceIdToDisplayName.IsNullOrEmpty())
@@ -25,6 +28,16 @@ public class LazyLoadedVoicesSongMeta : SongMeta
             LoadVoicesIfNotDoneYet();
         }
         return base.GetVoiceDisplayName(voiceId);
+    }
+
+    public override int VoiceCount
+    {
+        get
+        {
+            LoadVoicesIfNotDoneYet();
+
+            return base.VoiceCount;
+        }
     }
 
     public override IReadOnlyCollection<Voice> Voices
@@ -77,6 +90,7 @@ public class LazyLoadedVoicesSongMeta : SongMeta
         catch (Exception ex)
         {
             loadVoicesPhase = ELoadVoicesPhase.Failed;
+            failedToLoadVoicesExceptionMessage = ex.Message;
             Debug.LogException(ex);
             Debug.LogError($"Failed to load voices of '{SongMetaUtils.GetArtistDashTitle(this)}': {ex.Message}");
             return;

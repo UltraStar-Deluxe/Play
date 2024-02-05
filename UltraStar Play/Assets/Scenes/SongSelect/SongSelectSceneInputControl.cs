@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using PrimeInputActions;
 using UniInject;
 using UniRx;
@@ -228,20 +229,16 @@ public class SongSelectSceneInputControl : MonoBehaviour, INeedInjection
 
     private void OnEnable()
     {
-        Keyboard keyboard = InputSystem.GetDevice<Keyboard>();
-        if (keyboard != null)
-        {
-            keyboard.onTextInput += OnKeyboardTextInput;
-        }
+        InputSystem.devices
+            .OfType<Keyboard>()
+            .ForEach(keyboard => keyboard.onTextInput += OnKeyboardTextInput);
     }
 
     private void OnDisable()
     {
-        Keyboard keyboard = InputSystem.GetDevice<Keyboard>();
-        if (keyboard != null)
-        {
-            keyboard.onTextInput -= OnKeyboardTextInput;
-        }
+        InputSystem.devices
+            .OfType<Keyboard>()
+            .ForEach(keyboard => keyboard.onTextInput -= OnKeyboardTextInput);
     }
 
     private void OnKeyboardTextInput(char newChar)

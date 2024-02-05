@@ -50,11 +50,22 @@ public class ContextMenuPopupControl : INeedInjection, IInjectionFinishedListene
     private readonly Subject<bool> contextMenuClosedEventStream = new();
     public IObservable<bool> ContextMenuClosedEventStream => contextMenuClosedEventStream;
 
-    public ContextMenuPopupControl(GameObject gameObject, VisualElement targetElement, Vector2 position)
+    /**
+     * Optional object to associate data with the popup menu.
+     */
+    private readonly object context;
+    public object Context => context; // Public getter to allow modding
+
+    public ContextMenuPopupControl(
+        GameObject gameObject,
+        VisualElement targetElement,
+        Vector2 position,
+        object context)
     {
         this.gameObject = gameObject;
         this.targetElement = targetElement;
         this.position = position;
+        this.context = context;
     }
 
     public void OnInjectionFinished()

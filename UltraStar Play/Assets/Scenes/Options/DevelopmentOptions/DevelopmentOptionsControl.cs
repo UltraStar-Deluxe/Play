@@ -38,9 +38,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.pitchDetectionAlgorithmPicker)]
     private ItemPicker pitchDetectionAlgorithmPicker;
 
-    [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
-    private ItemPicker songDataFetchTypeChooser;
-
     [Inject(UxmlName = R.UxmlNames.saveVocalsAndInstrumentalAudioInFolderOfSongToggle)]
     private Toggle saveVocalsAndInstrumentalAudioInFolderOfSongToggle;
 
@@ -149,6 +146,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.vfxEnabledToggle)]
     private Toggle vfxEnabledToggle;
 
+    [Inject(UxmlName = R.UxmlNames.webViewCustomUserAgentTextField)]
+    private TextField webViewCustomUserAgentTextField;
+
+    [Inject(UxmlName = R.UxmlNames.writeUltraStarTxtFileWithByteOrderMarkToggle)]
+    private Toggle writeUltraStarTxtFileWithByteOrderMarkToggle;
+
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
 
@@ -207,14 +210,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             .Bind(() => settings.PitchDetectionAlgorithm,
                 newValue => settings.PitchDetectionAlgorithm = newValue);
 
-        new EnumItemPickerControl<EFetchType>(songDataFetchTypeChooser)
-        {
-            GetLabelTextFunction = item => item == EFetchType.Eager
-                ? "Upfront"
-                : "On-demand",
-        }.Bind(() => settings.SongDataFetchType,
-                newValue => settings.SongDataFetchType = newValue);
-
         FieldBindingUtils.Bind(analyzeBeatsWithoutTargetNoteToggle,
             () => settings.AnalyzeBeatsWithoutTargetNote,
             newValue => settings.AnalyzeBeatsWithoutTargetNote = newValue);
@@ -237,6 +232,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(enableWebViewToggle,
             () => settings.EnableWebView,
             newValue => settings.EnableWebView = newValue);
+
+        FieldBindingUtils.Bind(webViewCustomUserAgentTextField,
+            () => settings.CustomUserAgent,
+            newValue => settings.CustomUserAgent = newValue);
 
         FieldBindingUtils.Bind(useUniversalCharsetDetectorToggle,
             () => settings.UseUniversalCharsetDetector,
@@ -325,6 +324,11 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
             () => settings.HttpServerPort,
             newValue => settings.HttpServerPort = newValue);
         httpServerPortTextField.DisableChangeValueByDragging();
+
+        // File format
+        FieldBindingUtils.Bind(writeUltraStarTxtFileWithByteOrderMarkToggle,
+            () => settings.WriteUltraStarTxtFileWithByteOrderMark,
+            newValue => settings.WriteUltraStarTxtFileWithByteOrderMark = newValue);
 
         // Ffmpeg playback / conversion
         FieldBindingUtils.Bind(ffmpegConversionCommandsJsonPicker,

@@ -60,6 +60,9 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
     [Inject(UxmlName = R.UxmlNames.searchMidiFilesWithLyricsToggle)]
     private Toggle searchMidiFilesWithLyricsToggle;
 
+    [Inject(UxmlName = R.UxmlNames.songDataFetchTypeChooser)]
+    private ItemPicker songDataFetchTypeChooser;
+
     [Inject]
     private Injector injector;
 
@@ -103,6 +106,14 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         FieldBindingUtils.Bind(searchMidiFilesWithLyricsToggle,
             () => settings.SearchMidiFilesWithLyrics,
             newValue => settings.SearchMidiFilesWithLyrics = newValue);
+
+        new EnumItemPickerControl<EFetchType>(songDataFetchTypeChooser)
+        {
+            GetLabelTextFunction = item => item == EFetchType.Eager
+                ? "Upfront"
+                : "On-demand",
+        }.Bind(() => settings.SongDataFetchType,
+            newValue => settings.SongDataFetchType = newValue);
 
 #if UNITY_ANDROID
         if (AndroidUtils.GetAppSpecificStorageAbsolutePath(false).IsNullOrEmpty()
@@ -593,8 +604,8 @@ public class SongLibraryOptionsSceneControl : AbstractOptionsSceneControl, INeed
         VisualElement visualElement = songFolderListEntryUi.CloneTree();
         SongFolderListEntryControl songFolderListEntryControl = injector
             .WithRootVisualElement(visualElement)
-            .WithBinding(new Binding("initialPath", new ExistingInstanceProvider<string>(path)))
-            .WithBinding(new Binding("indexInList", new ExistingInstanceProvider<int>(indexInList)))
+            .WithBinding(new UniInjectBinding("initialPath", new ExistingInstanceProvider<string>(path)))
+            .WithBinding(new UniInjectBinding("indexInList", new ExistingInstanceProvider<int>(indexInList)))
             .CreateAndInject<SongFolderListEntryControl>();
 
         songFolderListEntryControl.ValueChangedEventStream.Subscribe(newValue => OnSongFolderPathChanged(indexInList, newValue));

@@ -296,7 +296,8 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private int ApplyJokerRule(PitchEvent pitchEvent, int roundedMidiNote, Note noteAtBeat)
     {
-        if (noteAtBeat == null)
+        if (noteAtBeat == null
+            || !mainGameSettings.JokerRuleEnabled)
         {
             return roundedMidiNote;
         }

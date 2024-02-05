@@ -157,6 +157,7 @@ public static partial class R_PlayShared
         public const string songIssueSongMetaTitle = "songIssueSongMetaTitle";
         public const string songLibraryNoSongsButton = "songLibraryNoSongsButton";
         public const string songSelectLyricsPreview = "songSelectLyricsPreview";
+        public const string songSelectSongEntryIcon = "songSelectSongEntryIcon";
         public const string squareButton = "squareButton";
         public const string staticPanel = "staticPanel";
         public const string svg = "svg";

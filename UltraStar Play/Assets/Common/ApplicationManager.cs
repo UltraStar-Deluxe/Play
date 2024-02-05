@@ -57,7 +57,7 @@ public class ApplicationManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnConnectedMicDevicesChanged()
     {
-        if (MicrophoneAdapter.UsePortAudio)
+        if (IMicrophoneAdapter.Instance.UsePortAudio)
         {
             Debug.LogWarning("Connected mic devices changed, but PortAudio is used for multi-channel support. A restart is required to use changed devices.");
             UiManager.CreateNotification("Connected microphones changed.\nAn app restart is required.");

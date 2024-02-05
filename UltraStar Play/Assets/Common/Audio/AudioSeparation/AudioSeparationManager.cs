@@ -74,9 +74,12 @@ public class AudioSeparationManager : MonoBehaviour, INeedInjection
         }
         audioSeparationJob.SetStatus(EJobStatus.Running);
 
-        AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(audioUri, false);
-        int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
-        audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
+        if (ApplicationUtils.IsUnitySupportedAudioFormat(Path.GetExtension(audioUri)))
+        {
+            AudioClip audioClip = AudioManager.LoadAudioClipFromUriImmediately(audioUri, false);
+            int lengthInMillis = (int)Math.Floor(audioClip.length * 1000);
+            audioSeparationJob.EstimatedTotalDurationInMillis = (int)Math.Ceiling(lengthInMillis / 2.0);
+        }
 
         CancellationTokenSource cancellationTokenSource = new();
         audioSeparationJob.OnCancel = () => cancellationTokenSource.Cancel();

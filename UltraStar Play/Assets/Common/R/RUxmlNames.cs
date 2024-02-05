@@ -409,6 +409,7 @@ public static partial class R
         public const string modListEntryInactiveOverlay = "modListEntryInactiveOverlay";
         public const string modNameLabel = "modNameLabel";
         public const string modOptionsButton = "modOptionsButton";
+        public const string modReloadOnChangeToggle = "modReloadOnChangeToggle";
         public const string modSettingsButton = "modSettingsButton";
         public const string modSettingsIcon = "modSettingsIcon";
         public const string modSettingsProblemHintIcon = "modSettingsProblemHintIcon";
@@ -955,9 +956,11 @@ public static partial class R
         public const string webcamOptionsButton = "webcamOptionsButton";
         public const string webcamRenderContainer = "webcamRenderContainer";
         public const string webcamRenderContainerParent = "webcamRenderContainerParent";
+        public const string webViewCustomUserAgentTextField = "webViewCustomUserAgentTextField";
         public const string webViewGroup = "webViewGroup";
         public const string wideIcon = "wideIcon";
         public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
+        public const string writeUltraStarTxtFileWithByteOrderMarkToggle = "writeUltraStarTxtFileWithByteOrderMarkToggle";
         public const string yearPropertyToggle = "yearPropertyToggle";
     }
 }

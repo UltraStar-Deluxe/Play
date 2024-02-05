@@ -385,7 +385,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
             childInjector.AddBindingForInstance(micProfile);
             childInjector.AddBindingForInstance(playerScoreData);
             childInjector.AddBindingForInstance(songRating);
-            childInjector.AddBinding(new Binding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
+            childInjector.AddBinding(new UniInjectBinding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
 
             if (i < playerUis.Count)
             {

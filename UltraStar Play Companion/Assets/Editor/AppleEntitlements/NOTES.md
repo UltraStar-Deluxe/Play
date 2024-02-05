@@ -1,0 +1,15 @@
+- The UDP broadcast of the Companion App requires the "multicast networking" entitlement from Apple.
+    - An entitlement is a right or privilege that grants an executable particular capabilities.
+- Requesting the multicast networking entitlement from Apple can be done via this form: https://developer.apple.com/contact/request/networking-multicast
+    - Response from Apple should be timely. For example, the request for the Melody Mania Companion App was answered within 24 hours.
+
+- When the entitlement request has been approved, then the capability needs to be added to the App ID Configuration.
+    - Therefor, the approved "multicast networking" capability should now be listed under of the App ID Configuration.
+- Because the App ID Configuration has been changed, a new provisioning profile must be created that includes the new entitlement.
+- Finally, the entitlement must be added to the `.entitlements` file of the XCode project.
+    - This can be done from XCode by adding a new Capability under `Signing & Capabilites`.
+- The `.entitlements` file in this folder is the required `.entitlements` file with the multicast networking capability.
+    - The file is added to the generated XCode project by Unity via a custom IPostprocessBuild step.
+- For further instructions see Apple documentation:
+    - https://forums.developer.apple.com/forums/thread/663271
+    - https://developer.apple.com/help/account/reference/provisioning-with-managed-capabilities

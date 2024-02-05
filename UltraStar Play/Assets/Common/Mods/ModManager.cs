@@ -49,7 +49,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private bool shouldReloadChangedMods;
     private readonly Dictionary<string, FileSystemWatcher> modFolderToFileSystemWatcher = new();
     private readonly List<string> changedCsFiles = new();
 
@@ -147,7 +146,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     private void OnCsFileChanged(string modFolder, string filePath)
     {
-        if (!shouldReloadChangedMods)
+        if (!settings.ReloadModsOnFileChange)
         {
             return;
         }
@@ -163,8 +162,27 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         {
             Debug.Log($"Reloading mods because of changed files: {changedCsFiles.ToCsv()}");
             changedCsFiles.Clear();
-            LoadAndInstantiateMods();
+            ReloadMods();
         }
+    }
+
+    private void ReloadMods()
+    {
+        // Notify mods about reload
+        foreach (IOnReloadMod modObject in GetModObjects<IOnReloadMod>())
+        {
+            try
+            {
+                modObject.OnReloadMod();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to call OnReloadMod on mod object '{modObject}' of type {modObject.GetType()}");
+            }
+        }
+
+        LoadAndInstantiateMods();
     }
 
     private void UpdateEnabledMods()
@@ -241,8 +259,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         DebugLogConsole.AddCommand("mod.reloadOnChange", "Toggle auto reload of mods when a .cs file in a mod folder changes.",
             () =>
             {
-                shouldReloadChangedMods = !shouldReloadChangedMods;
-                Debug.Log($"Reload changed mods: {shouldReloadChangedMods}");
+                settings.ReloadModsOnFileChange = !settings.ReloadModsOnFileChange;
+                Debug.Log($"Reload changed mods: {settings.ReloadModsOnFileChange}");
             });
 
         DebugLogConsole.AddCommand("mod.eval", "Evaluate C# code in the current context. " +
@@ -648,9 +666,31 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         List<IMod> currentModObjects = GetNewestImplementations(currentAndObsoleteModObjects);
 
         // Mark context of old instances as obsolete
-        modObjectToContext
-            .Where(entry => !currentModObjects.Contains(entry.Key))
-            .ForEach(entry => entry.Value.SetObsolete());
+        List<IMod> newlyObsoleteModObjects = modObjectToContext
+            .Where(entry => !currentModObjects.Contains(entry.Key) && !entry.Value.IsObsolete)
+            .Select(entry => entry.Key)
+            .ToList();
+        foreach (IMod obsoleteModObject in newlyObsoleteModObjects)
+        {
+            if (modObjectToContext.TryGetValue(obsoleteModObject, out ModObjectContext modObjectContext))
+            {
+                modObjectContext.SetObsolete();
+            }
+
+            // Notify object that it is now obsolete
+            if (obsoleteModObject is IOnModInstanceBecomesObsolete onModInstanceBecomesObsolete)
+            {
+                try
+                {
+                    onModInstanceBecomesObsolete.OnModInstanceBecomesObsolete();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError($"Failed to notify mod object that it is obsolete now: '{obsoleteModObject}' of type {obsoleteModObject.GetType()}");
+                }
+            }
+        }
 
         // Create context for new instances
         foreach (IMod modObject in currentModObjects)
@@ -810,7 +850,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             List<Type> foundTypes = new List<Type>();
             foreach (Assembly assembly in assemblies)
             {
-                foreach (string typeName in remainingTypeNames)
+                foreach (string typeName in remainingTypeNames.ToList())
                 {
                     try
                     {
@@ -830,6 +870,11 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                     {
                         // Ignore
                     }
+                }
+
+                if (remainingTypeNames.IsNullOrEmpty())
+                {
+                    break;
                 }
             }
 

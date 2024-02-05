@@ -7,4 +7,6 @@
     Folder,
     Year,
     LocalHighScore,
+    CreationTime,
+    LastModificationTime,
 }

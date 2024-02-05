@@ -17,16 +17,16 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private VolumeControl volumeControl;
-    
+
     [Inject]
     private SceneRecipeManager sceneRecipeManager;
-    
+
     [Inject]
     private SceneNavigator sceneNavigator;
-    
+
     [Inject]
     private UIDocument uiDocument;
-    
+
     protected override object GetInstance()
     {
         return Instance;
@@ -40,11 +40,9 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
 
     private void RegisterInputActions()
     {
-        // Toggle full-screen mode via F11
         InputManager.GetInputAction(R.InputActions.usplay_toggleFullscreen).PerformedAsObservable()
             .Subscribe(_ => ToggleFullscreen());
 
-        // Mute / unmute audio via F12
         InputManager.GetInputAction(R.InputActions.usplay_toggleMute).PerformedAsObservable()
             .Subscribe(_ => ToggleMuteAudio());
     }
@@ -55,7 +53,7 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         if (Application.isEditor
             && Keyboard.current.f4Key.wasReleasedThisFrame)
         {
@@ -77,14 +75,14 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         {
             return;
         }
-        
+
         if (InputUtils.IsKeyboardAltPressed()
             && Keyboard.current.rKey.wasReleasedThisFrame)
         {
             RefreshAssetDatabase();
             ReloadCurrentScene();
         }
-        
+
         if (InputUtils.IsKeyboardControlPressed()
             && Keyboard.current.rKey.wasReleasedThisFrame)
         {
@@ -93,14 +91,14 @@ public class GlobalInputControl : AbstractSingletonBehaviour, INeedInjection
         }
     }
 #endif
-    
+
     private void RefreshAssetDatabase()
     {
 #if UNITY_EDITOR
         AssetDatabase.Refresh();
 #endif
     }
-    
+
     private void ReloadCurrentScene()
     {
         EScene currentScene = sceneRecipeManager.GetCurrentScene();

@@ -26,6 +26,9 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
     [Inject]
     private ModManager modManager;
 
+    [Inject(UxmlName = R.UxmlNames.modReloadOnChangeToggle)]
+    private Toggle modReloadOnChangeToggle;
+
     [Inject(UxmlName = R.UxmlNames.modList)]
     private VisualElement modList;
 
@@ -40,6 +43,10 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
     private void UpdateModList()
     {
         modList.Clear();
+
+        FieldBindingUtils.Bind(modReloadOnChangeToggle,
+            () => settings.ReloadModsOnFileChange,
+            newValue => settings.ReloadModsOnFileChange = newValue);
 
         List<string> modFolders = modManager.GetModFolders();
         if (modFolders.IsNullOrEmpty())
@@ -62,7 +69,7 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
         ModListEntryControl modListEntryControl = injector
             .CreateChildInjector()
             .WithRootVisualElement(modEntryVisualElement)
-            .WithBinding(new Binding("modFolder", new ExistingInstanceProvider<string>(modFolder)))
+            .WithBinding(new UniInjectBinding("modFolder", new ExistingInstanceProvider<string>(modFolder)))
             .CreateAndInject<ModListEntryControl>();
 
         return modListEntryControl;

@@ -5,4 +5,5 @@
 @import url("/Packages/playsharedui/Runtime/StyleSheets/UtilityStyles.uss");
 @import url("/Packages/playsharedui/Runtime/StyleSheets/CommonStyles.uss");
 @import url("/Packages/playsharedui/Runtime/StyleSheets/SceneSpecificStyles.uss");
+@import url("/Assets/Common/StyleSheets/CompanionAppStyleVariables.uss");
 @import url("/Assets/Common/StyleSheets/CompanionAppStyles.uss");

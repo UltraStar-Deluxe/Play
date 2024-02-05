@@ -25,7 +25,7 @@ public class MicProgressBarControl : INeedInjection, IInjectionFinishedListener
         get => micProgressBar.ProgressInPercent;
         set
         {
-            micProgressBar.Value = value;
+            micProgressBar.ProgressInPercent = value;
             micProgressBar.SetVisibleByDisplay(value > 0);
 
             if (value >= micProgressBar.highValue)

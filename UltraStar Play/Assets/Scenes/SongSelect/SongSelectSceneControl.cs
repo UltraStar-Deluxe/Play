@@ -784,8 +784,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     public void DoFuzzySearch(string text)
     {
-        string searchTextToLowerNoWhitespace = text.ToLowerInvariant().Replace(" ", "");
-        if (searchTextToLowerNoWhitespace.IsNullOrEmpty())
+        string searchTextNoWhitespace = text.Replace(" ", "");
+        if (searchTextNoWhitespace.IsNullOrEmpty())
         {
             return;
         }
@@ -827,8 +827,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Search title that starts with the text
         SongSelectEntry titleStartsWithMatch = songRouletteControl.Find(it =>
         {
-            string titleToLowerNoWhitespace = GetEntryTitle(it).ToLowerInvariant().Replace(" ", "");
-            return titleToLowerNoWhitespace.StartsWith(searchTextToLowerNoWhitespace);
+            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
+            return StringUtils.StartsWithIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
         });
         if (titleStartsWithMatch != null)
         {
@@ -839,8 +839,8 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Search artist that starts with the text
         SongSelectEntry artistStartsWithMatch = songRouletteControl.Find(it =>
         {
-            string artistToLowerNoWhitespace = GetEntryArtist(it).ToLowerInvariant().Replace(" ", "");
-            return artistToLowerNoWhitespace.StartsWith(searchTextToLowerNoWhitespace);
+            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
+            return StringUtils.StartsWithIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace);
         });
         if (artistStartsWithMatch != null)
         {
@@ -851,10 +851,10 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Search title or artist contains the text
         SongSelectEntry artistOrTitleContainsMatch = songRouletteControl.Find(it =>
         {
-            string artistToLowerNoWhitespace = GetEntryArtist(it).ToLowerInvariant().Replace(" ", "");
-            string titleToLowerNoWhitespace = GetEntryTitle(it).ToLowerInvariant().Replace(" ", "");
-            return artistToLowerNoWhitespace.Contains(searchTextToLowerNoWhitespace)
-                || titleToLowerNoWhitespace.Contains(searchTextToLowerNoWhitespace);
+            string artistNoWhitespace = GetEntryArtist(it).Replace(" ", "");
+            string titleNoWhitespace = GetEntryTitle(it).Replace(" ", "");
+            return StringUtils.ContainsIgnoreCaseAndDiacritics(artistNoWhitespace, searchTextNoWhitespace)
+                || StringUtils.ContainsIgnoreCaseAndDiacritics(titleNoWhitespace, searchTextNoWhitespace);
         });
         if (artistOrTitleContainsMatch != null)
         {
@@ -982,23 +982,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         // Check that there is associated sing-along data. If not, ask to open song editor.
         if (!SongMetaUtils.HasSingAlongData(songMeta))
         {
-            noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
-            noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
-                                                   + "Do you want to open the song editor?";
-            noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
-            Button defaultButton = noSingAlongDataDialogControl.AddButton("Create sing-along data", _ =>
+            if (songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
+                && lazyLoadedVoicesSongMeta.HasFailedToLoadVoices)
             {
-                noSingAlongDataDialogControl.CloseDialog();
-                createSingAlongSongControl.CreateSingAlongSong(songMeta, true);
-            });
-            noSingAlongDataDialogControl.AddButton("Open song editor", _ =>
-            {
-                noSingAlongDataDialogControl.CloseDialog();
-                StartSongEditorScene(songMeta);
-            });
-            // noSingAlongDataDialogControl.AddButton("Start anyway", _ => StartSingScene(songMeta));
-            noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
-            defaultButton.Focus();
+                ShowFailedToLoadVoicesDialog(songMeta);
+                return;
+            }
+
+            ShowAskToCreateSingAlongDataDialog(songMeta);
             return;
         }
 
@@ -1023,6 +1014,47 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                 UiManager.CreateNotification(message);
             })
             .Subscribe(_ => StartSingScene(songMeta));
+    }
+
+    private void ShowFailedToLoadVoicesDialog(SongMeta songMeta)
+    {
+        string errorMessage;
+        if (songMeta is LazyLoadedVoicesSongMeta lazyLoadedVoicesSongMeta
+            && !lazyLoadedVoicesSongMeta.FailedToLoadVoicesExceptionMessage.IsNullOrEmpty())
+        {
+            errorMessage = lazyLoadedVoicesSongMeta.FailedToLoadVoicesExceptionMessage;
+        }
+        else
+        {
+            errorMessage = "";
+        }
+
+        uiManager.CreateErrorInfoDialogControl(
+            "Failed to Load Song",
+            "The UltraStar txt file could not be loaded.\n" +
+            $"Please see the log for details and fix any issues with the file.\n",
+            errorMessage);
+    }
+
+    private void ShowAskToCreateSingAlongDataDialog(SongMeta songMeta)
+    {
+        noSingAlongDataDialogControl = uiManager.CreateDialogControl("No Sing-Along Data");
+        noSingAlongDataDialogControl.Message = "This song does not yet have associated sing-along data.\n"
+                                               + "Do you want to open the song editor?";
+        noSingAlongDataDialogControl.MessageElement.AddToClassList("my-2");
+        Button defaultButton = noSingAlongDataDialogControl.AddButton("Create sing-along data", _ =>
+        {
+            noSingAlongDataDialogControl.CloseDialog();
+            createSingAlongSongControl.CreateSingAlongSong(songMeta, true);
+        });
+        noSingAlongDataDialogControl.AddButton("Open song editor", _ =>
+        {
+            noSingAlongDataDialogControl.CloseDialog();
+            StartSongEditorScene(songMeta);
+        });
+        // noSingAlongDataDialogControl.AddButton("Start anyway", _ => StartSingScene(songMeta));
+        noSingAlongDataDialogControl.AddButton("Cancel", _ => noSingAlongDataDialogControl.CloseDialog());
+        defaultButton.Focus();
     }
 
     public void AttemptStartSelectedEntry()
@@ -1279,7 +1311,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
 
     private object GetSongMetaOrderByProperty(SongMeta songMeta)
     {
-        switch (songOrderDropdownField.value)
+        switch (settings.SongOrder)
         {
             case ESongOrder.Artist:
                 return songMeta.Artist;
@@ -1296,6 +1328,14 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             case ESongOrder.LocalHighScore:
                 // Return negative value to sort descending
                 return -StatisticsUtils.GetLocalHighScore(statistics, songMeta, settings.Difficulty);
+            case ESongOrder.CreationTime:
+                return songMeta.FileInfo == null
+                    ? 0
+                    : -songMeta.FileInfo.CreationTimeUtc.Ticks;
+            case ESongOrder.LastModificationTime:
+                return songMeta.FileInfo == null
+                    ? 0
+                    : -songMeta.FileInfo.LastWriteTimeUtc.Ticks;
             default:
                 Debug.LogWarning("Unknown order for songs: " + songOrderDropdownField.value);
                 return songMeta.Artist;
