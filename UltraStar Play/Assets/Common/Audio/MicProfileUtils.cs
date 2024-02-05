@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PortAudioForUnity;
 using UnityEngine;
 
 public static class MicProfileUtils
@@ -16,7 +15,7 @@ public static class MicProfileUtils
         List<IConnectedClientHandler> connectedClientHandlers = serverSideConnectRequestManager.GetAllConnectedClientHandlers();
         List<MicProfile> micProfiles = CreateMicProfiles(persistedMicProfiles, microphoneColors, connectedClientHandlers, settings);
         micProfiles.Sort(MicProfile.compareByName);
-        
+
         List<MicProfile> newMicProfiles = micProfiles
             .Except(persistedMicProfiles)
             .ToList();
@@ -32,7 +31,7 @@ public static class MicProfileUtils
 
         return micProfiles;
     }
-    
+
     public static List<MicProfile> CreateMicProfiles(List<MicProfile> persistedMicProfiles, List<Color32> micProfileColors, List<IConnectedClientHandler> connectedClientHandlers, Settings settings)
     {
         // Create list of connected and loaded microphones without duplicates.
@@ -41,13 +40,13 @@ public static class MicProfileUtils
         List<string> connectedMicNames = GetConnectedMicrophoneNames();
         List<MicProfile> micProfiles = new(persistedMicProfiles);
         List<Color32> usedMicProfileColors = persistedMicProfiles.Select(it => it.Color).ToList();
-        
+
         // Create mic profiles for connected microphones that are not yet in the list
         foreach (string connectedMicName in connectedMicNames)
         {
             try
             {
-                MicrophoneAdapter.GetDeviceCaps(connectedMicName, out int minSampleRate, out int maxSampleRate, out int channelCount);
+                IMicrophoneAdapter.Instance.GetDeviceCaps(connectedMicName, out int minSampleRate, out int maxSampleRate, out int channelCount);
                 for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
                 {
                     bool alreadyInList = micProfiles.AnyMatch(it =>
@@ -57,10 +56,10 @@ public static class MicProfileUtils
                     if (!alreadyInList)
                     {
                         MicProfile micProfile = new(connectedMicName, channelIndex);
-                        
+
                         micProfile.Color = GetUnusedMicProfileColor(micProfileColors, usedMicProfileColors);
                         usedMicProfileColors.Add(micProfile.Color);
-                        
+
                         micProfiles.Add(micProfile);
                     }
                 }
@@ -92,7 +91,7 @@ public static class MicProfileUtils
     {
         // Some obscure devices contain weird characters that may cause issues.
         // Example: 'Input (@System32\drivers\bthhfenum.sys,#4;%1 Hands-Free HF Audio%0\r\n;(Galaxy S10e))'
-        return MicrophoneAdapter.Devices
+        return IMicrophoneAdapter.Instance.Devices
             .Where(deviceName => !deviceName.Contains("\r")
                                  && !deviceName.Contains("\n"))
             .ToList();

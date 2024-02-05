@@ -271,7 +271,7 @@ public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITransl
                     settings.PreferPortAudio = preferPortAudio;
                     ApplicationUtils.SetUsePortAudio(preferPortAudio);
 
-                    Debug.Log($"UsePortAudio: {MicrophoneAdapter.UsePortAudio}");
+                    Debug.Log($"UsePortAudio: {IMicrophoneAdapter.Instance.UsePortAudio}");
 
                     UpdateRecordingDevices();
                 });

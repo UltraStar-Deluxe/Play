@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -78,7 +79,7 @@ public static class VisualElementUtils
         {
             return null;
         }
-        
+
         VisualElement focusedVisualElement = focusController.focusedElement as VisualElement;
         return focusedVisualElement;
     }
@@ -87,7 +88,7 @@ public static class VisualElementUtils
     {
         return IsDropdownListFocused(focusController, out VisualElement _);
     }
-    
+
     public static bool IsDropdownListFocused(FocusController focusController, out VisualElement unityBaseDropdown)
     {
         VisualElement focusedVisualElement = GetFocusedVisualElement(focusController);
@@ -112,7 +113,7 @@ public static class VisualElementUtils
             }
         });
     }
-    
+
     public static void RegisterCallbackToHideByDisplayOnDirectClick(VisualElement visualElement)
     {
         RegisterDirectClickCallback(visualElement, visualElement.HideByDisplay);
@@ -129,7 +130,7 @@ public static class VisualElementUtils
         return !float.IsNaN(worldBound.width)
                && !float.IsNaN(worldBound.height);
     }
-    
+
     public static bool HasGeometryAndNonZeroSize(VisualElement visualElement)
     {
         if (visualElement == null)
@@ -143,7 +144,7 @@ public static class VisualElementUtils
                && worldBound.width > 0
                && worldBound.height > 0;
     }
-    
+
     public static VisualElement LoadVisualElementFromResources(string path)
     {
         VisualTreeAsset visualTreeAsset = Resources.Load<VisualTreeAsset>(path);
@@ -160,7 +161,7 @@ public static class VisualElementUtils
         {
             return worldRect;
         }
-        
+
         Rect parentWorldRect = visualElement.parent.worldBound;
         return new Rect(worldRect.x - parentWorldRect.x,
             worldRect.y - parentWorldRect.y,
@@ -174,7 +175,7 @@ public static class VisualElementUtils
         VisualElement matchingParentOfFocusedVisualElement = focusedVisualElement.GetParent(parent => parent == visualElement);
         return matchingParentOfFocusedVisualElement != null;
     }
-    
+
     public static bool IsNonStyleKeywordValueSet(StyleLength style)
     {
         return style != new StyleLength(StyleKeyword.Null)
@@ -182,7 +183,7 @@ public static class VisualElementUtils
                && style != new StyleLength(StyleKeyword.Initial)
                && style != new StyleLength(StyleKeyword.None);
     }
-    
+
     public static bool IsNonStyleKeywordValueSet(StyleBackground style)
     {
         return style != new StyleBackground(StyleKeyword.Null)
@@ -190,7 +191,7 @@ public static class VisualElementUtils
                && style != new StyleBackground(StyleKeyword.Initial)
                && style != new StyleBackground(StyleKeyword.None);
     }
-    
+
     public static bool IsNonStyleKeywordValueSet(StyleColor style)
     {
         return style != new StyleColor(StyleKeyword.Null)
@@ -198,16 +199,61 @@ public static class VisualElementUtils
                && style != new StyleColor(StyleKeyword.Initial)
                && style != new StyleColor(StyleKeyword.None);
     }
-    
+
     public static VisualElement GetElementUnderPointer(UIDocument uiDocument, PanelHelper panelHelper)
     {
         if (Pointer.current == null)
         {
             return null;
         }
-        
+
         Vector2 pointerPanelPos = InputUtils.GetPointerPositionInPanelCoordinates(panelHelper, true);
         VisualElement picked = uiDocument.rootVisualElement?.panel?.Pick(pointerPanelPos);
         return picked;
+    }
+
+    public static bool IsFocusableNow(VisualElement visualElement, UIDocument uiDocument)
+    {
+        if (visualElement == null)
+        {
+            return false;
+        }
+        Rect worldBound = visualElement.worldBound;
+        return visualElement.IsVisibleByDisplay()
+               && !float.IsNaN(worldBound.center.x)
+               && !float.IsNaN(worldBound.center.y)
+               && worldBound.height > 0
+               && worldBound.width > 0
+               && visualElement is not Focusable { focusable: false }
+               && visualElement.enabledInHierarchy
+               && visualElement.canGrabFocus
+               && !visualElement.ClassListContains("focusableNavigatorIgnore")
+               && IsAllAncestorsFocusableNow(visualElement, uiDocument);
+    }
+
+    private static bool IsAllAncestorsFocusableNow(VisualElement visualElement, UIDocument uiDocument)
+    {
+        List<VisualElement> ancestors = visualElement.GetAncestors();
+
+        bool isInHierarchy = ancestors.AnyMatch(ancestor => ancestor == uiDocument.rootVisualElement);
+        if (!isInHierarchy)
+        {
+            return false;
+        }
+
+        return ancestors.AllMatch(ancestor =>
+        {
+            Rect ancestorWorldBound = ancestor.worldBound;
+            return ancestor.IsVisibleByDisplay()
+                   && !float.IsNaN(ancestorWorldBound.center.x)
+                   && !float.IsNaN(ancestorWorldBound.center.y)
+                   && !float.IsNaN(ancestorWorldBound.width)
+                   && !float.IsNaN(ancestorWorldBound.height)
+                   && ancestorWorldBound.width > 0
+                   && ancestorWorldBound.height > 0
+                   && ancestor.enabledInHierarchy
+                   && !ancestor.ClassListContains("focusableNavigatorIgnore")
+                   && !ancestor.ClassListContains(VisualElementSlideInControl.SlideOutClassName);
+        }) ;
     }
 }

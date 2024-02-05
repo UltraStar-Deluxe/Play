@@ -733,48 +733,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             .ToList();
     }
 
-    protected bool IsFocusableNow(VisualElement visualElement)
+    private bool IsFocusableNow(VisualElement visualElement)
     {
-        if (visualElement == null)
-        {
-            return false;
-        }
-        Rect worldBound = visualElement.worldBound;
-        return visualElement.IsVisibleByDisplay()
-               && !float.IsNaN(worldBound.center.x)
-               && !float.IsNaN(worldBound.center.y)
-               && worldBound.height > 0
-               && worldBound.width > 0
-               && visualElement is not Focusable { focusable: false }
-               && visualElement.enabledInHierarchy
-               && visualElement.canGrabFocus
-               && !visualElement.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
-               && IsAllAncestorsFocusableNow(visualElement);
-    }
-
-    private bool IsAllAncestorsFocusableNow(VisualElement visualElement)
-    {
-        List<VisualElement> ancestors = visualElement.GetAncestors();
-
-        bool isInHierarchy = ancestors.AnyMatch(ancestor => ancestor == uiDocument.rootVisualElement);
-        if (!isInHierarchy)
-        {
-            return false;
-        }
-
-        return ancestors.AllMatch(ancestor =>
-        {
-            Rect ancestorWorldBound = ancestor.worldBound;
-            return ancestor.IsVisibleByDisplay()
-                   && !float.IsNaN(ancestorWorldBound.center.x)
-                   && !float.IsNaN(ancestorWorldBound.center.y)
-                   && !float.IsNaN(ancestorWorldBound.width)
-                   && !float.IsNaN(ancestorWorldBound.height)
-                   && ancestorWorldBound.width > 0
-                   && ancestorWorldBound.height > 0
-                   && ancestor.enabledInHierarchy
-                   && !ancestor.ClassListContains(R.UssClasses.focusableNavigatorIgnore)
-                   && !ancestor.ClassListContains(VisualElementSlideInControl.SlideOutClassName);
-        }) ;
+        return VisualElementUtils.IsFocusableNow(visualElement, uiDocument);
     }
 }

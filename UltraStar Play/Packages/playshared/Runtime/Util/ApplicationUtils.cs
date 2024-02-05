@@ -346,7 +346,7 @@ public static class ApplicationUtils
 
     public static void SetUsePortAudio(bool preferPortAudio)
     {
-        MicrophoneAdapter.UsePortAudio = preferPortAudio && CanUsePortAudio();
+        IMicrophoneAdapter.Instance.UsePortAudio = preferPortAudio && CanUsePortAudio();
     }
 
     public static bool CanUsePortAudio()
