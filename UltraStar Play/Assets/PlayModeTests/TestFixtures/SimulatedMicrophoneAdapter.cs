@@ -12,6 +12,7 @@ public class SimulatedMicrophoneAdapter : IMicrophoneAdapter
     };
 
     private static readonly HashSet<string> deviceNameToIsRecording = new HashSet<string>();
+    private static readonly HashSet<string> deviceNameToIsSilent = new HashSet<string>();
     private static readonly Dictionary<string, double> deviceNameToSimulatedPitchInHz = new Dictionary<string, double>();
 
     public static string GetSimulatedMicName(int index)
@@ -33,6 +34,18 @@ public class SimulatedMicrophoneAdapter : IMicrophoneAdapter
         else
         {
             deviceNameToIsRecording.Remove(deviceName);
+        }
+    }
+
+    public static void SetSimulatedDeviceIsSilent(string deviceName, bool isSilent)
+    {
+        if (isSilent)
+        {
+            deviceNameToIsSilent.Add(deviceName);
+        }
+        else
+        {
+            deviceNameToIsSilent.Remove(deviceName);
         }
     }
 
@@ -78,6 +91,7 @@ public class SimulatedMicrophoneAdapter : IMicrophoneAdapter
     }
 
     public bool IsRecording(string deviceName) => deviceNameToIsRecording.Contains(deviceName);
+    public bool IsSilent(string deviceName) => deviceNameToIsSilent.Contains(deviceName);
 
     public AudioClip Start(
         string inputDeviceName,
@@ -110,7 +124,8 @@ public class SimulatedMicrophoneAdapter : IMicrophoneAdapter
         int recordingPosition,
         float[] bufferToBeFilled)
     {
-        if (!IsRecording(deviceName))
+        if (!IsRecording(deviceName)
+            || IsSilent(deviceName))
         {
             return;
         }
