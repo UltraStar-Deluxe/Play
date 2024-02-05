@@ -22,6 +22,24 @@ public class ResponsibleVisualElementUtils
                     () => element.value = newValue)
                 .ContinueWith(ExpectElementHasValue(element, newValue)));
 
+    public static ITestInstruction<object> ClickButton(Button button)
+        => ExpectElementIsFocusableNow(button)
+            .ContinueWith(_ => Do(
+                $"click button '{button?.name}'",
+                () => button.Click()));
+
+    public static ITestInstruction<object> SendNavigationSubmitEvent(VisualElement visualElement)
+        => ExpectElementIsFocusableNow(visualElement)
+            .ContinueWith(_ => Do(
+                $"send NavigationSubmitEvent on '{visualElement?.name}'",
+                () => visualElement.SendNavigationSubmitEvent()));
+
+    public static ITestInstruction<object> SendPointerDownEvent(VisualElement visualElement)
+        => ExpectElementIsFocusableNow(visualElement)
+            .ContinueWith(_ => Do(
+                $"Send PointerDownEvent on '{visualElement?.name}'",
+                () => visualElement.SendPointerDownEvent()));
+
     public static ITestInstruction<object> ExpectElementIsFocusableNow(VisualElement element, double timeoutInSeconds = 1)
         => WaitForCondition(
                 $"UI element '{element?.name}' should be focusable",
