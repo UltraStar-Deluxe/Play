@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -18,15 +19,18 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     public static readonly int maxPerfectSentenceBonusScore = 1000;
     public static readonly int maxScoreForNotes = maxScore - maxPerfectSentenceBonusScore;
 
-    public int TotalScore => calculationData.TotalScore;
-
-    /**
-     * Publicly accessible part of the score for modding.
-     */
-    public int ModTotalScore
+    public int TotalScore
     {
-        get => calculationData.ModTotalScore;
-        set => calculationData.ModTotalScore = value;
+        get
+        {
+            if (onlineMultiplayerManager.IsOnlineGame
+                && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+            {
+                return singingResultsPlayerScoreFromOnlineMultiplayerPeer?.TotalScore ?? 0;
+            }
+
+            return calculationData.TotalScore;
+        }
     }
 
     [Inject]
@@ -38,14 +42,24 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     [Inject]
     private SingSceneMedleyControl medleyControl;
 
-    private readonly Subject<SentenceScoreEvent> sentenceScoreEventStream = new();
-    public IObservable<SentenceScoreEvent> SentenceScoreEventStream => sentenceScoreEventStream;
+    [Inject]
+    private PlayerProfile playerProfile;
 
-    private ScoreCalculationData calculationData;
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
+
+    private readonly Subject<ScoreChangedEvent> scoreChangedEventStream = new();
+    public IObservable<ScoreChangedEvent> ScoreChangedEventStream => scoreChangedEventStream;
+
+    private ScoreCalculationData calculationData = new();
     public ISingingResultsPlayerScore CalculationData => calculationData;
+
+    private ISingingResultsPlayerScore singingResultsPlayerScoreFromOnlineMultiplayerPeer;
 
     private readonly HashSet<int> processedBeats = new();
     private int firstBeatToScoreInclusive;
+
+    private readonly List<IDisposable> disposables = new();
 
     public void OnInjectionFinished()
     {
@@ -53,10 +67,24 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
         playerPerformanceAssessmentControl.NoteAssessedEventStream.Subscribe(evt => OnNoteAssessed(evt));
         playerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt => OnSentenceAssessed(evt));
+
+        InitOnlineMultiplayer();
+    }
+
+    private void OnDestroy()
+    {
+        disposables.ForEach(it => it.Dispose());
     }
 
     private void OnNoteAssessed(PlayerPerformanceAssessmentControl.NoteAssessedEvent noteAssessedEvent)
     {
+        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+            && lobbyMemberPlayerProfile.IsRemote)
+        {
+            // Calculate only the score of the own local player.
+            return;
+        }
+
         Note note = noteAssessedEvent.Note;
         if (!medleyControl.IsNoteInMedleyRange(note))
         {
@@ -105,6 +133,13 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
 
     private void OnSentenceAssessed(PlayerPerformanceAssessmentControl.SentenceAssessedEvent sentenceAssessedEvent)
     {
+        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+            && lobbyMemberPlayerProfile.IsRemote)
+        {
+            // Calculate only the score of the own local player.
+            return;
+        }
+
         Sentence sentence = sentenceAssessedEvent.Sentence;
         if (!medleyControl.IsSentenceInMedleyRange(sentence))
         {
@@ -120,6 +155,11 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
+        if (sentenceAssessedEvent.IsPerfect)
+        {
+            calculationData.PerfectSentenceCount++;
+        }
+
         // Check score is within expected bounds
         int totalScoreWithoutMods = calculationData.TotalScore - calculationData.ModTotalScore;
         if (totalScoreWithoutMods > maxScore)
@@ -131,7 +171,75 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
                              + $"NormalNoteLengthTotal {calculationData.NormalNoteLengthTotal}, GoldenNoteLengthTotal {calculationData.GoldenNoteLengthTotal})");
         }
 
-        sentenceScoreEventStream.OnNext(new SentenceScoreEvent(sentence, sentenceAssessedEvent.SentenceRating, TotalScore));
+        scoreChangedEventStream.OnNext(CreateScoreChangedEventWithCurrentScore());
+
+        if (onlineMultiplayerManager.IsOnlineGame
+            && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+        {
+            SendSingingResultsPlayerScoreMessage();
+        }
+    }
+
+    private void InitOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            GetSingingResultsPlayerScoreMessageName(),
+            message => OnSingingResultsPlayerScoreMessage(message)));
+    }
+
+    private void SendSingingResultsPlayerScoreMessage()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame
+            || playerProfile != onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+        {
+            return;
+        }
+
+        SingingResultsPlayerScoreRequestDto singingResultsPlayerScoreRequestDto = new()
+        {
+            SingingResultsPlayerScore = CreateSingingResultsPlayerScore(),
+        };
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            GetSingingResultsPlayerScoreMessageName(),
+            FastBufferWriterUtils.WriteJsonValuePacked(singingResultsPlayerScoreRequestDto),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
+    }
+
+    public ISingingResultsPlayerScore CreateSingingResultsPlayerScore()
+    {
+        if (onlineMultiplayerManager.IsOnlineGame
+            && playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+            && lobbyMemberPlayerProfile.IsRemote)
+        {
+            return new SingingResultsPlayerScore(singingResultsPlayerScoreFromOnlineMultiplayerPeer);
+        }
+
+        return new SingingResultsPlayerScore()
+        {
+            NormalNotesTotalScore = calculationData.NormalNotesTotalScore,
+            GoldenNotesTotalScore = calculationData.GoldenNotesTotalScore,
+            PerfectSentenceBonusTotalScore = calculationData.PerfectSentenceBonusTotalScore,
+            ModTotalScore = calculationData.ModTotalScore,
+        };
+    }
+
+    private void OnSingingResultsPlayerScoreMessage(NamedMessage message)
+    {
+        SingingResultsPlayerScoreRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<SingingResultsPlayerScoreRequestDto>(message.MessagePayload);
+        singingResultsPlayerScoreFromOnlineMultiplayerPeer = requestDto.SingingResultsPlayerScore;
+
+        scoreChangedEventStream.OnNext(CreateScoreChangedEventWithCurrentScore());
+    }
+
+    private string GetSingingResultsPlayerScoreMessageName()
+    {
+        return $"{nameof(SingingResultsPlayerScoreRequestDto)}-{playerProfile.Name}-{onlineMultiplayerManager.OwnLobbyMemberUnityNetcodeClientId}";
     }
 
     private void UpdateMaxScores(IReadOnlyCollection<Sentence> sentences)
@@ -220,21 +328,27 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    public class SentenceScoreEvent
+    public void SetModTotalScore(int newModTotalScore)
     {
-        public Sentence Sentence { get; private set; }
-        public SentenceRating SentenceRating { get; private set; }
+        calculationData.ModTotalScore = newModTotalScore;
+    }
+
+    private ScoreChangedEvent CreateScoreChangedEventWithCurrentScore()
+    {
+        return new ScoreChangedEvent(TotalScore);
+    }
+
+    public class ScoreChangedEvent
+    {
         public int TotalScore { get; private set; }
 
-        public SentenceScoreEvent(Sentence sentence, SentenceRating sentenceRating, int totalScore)
+        public ScoreChangedEvent(int totalScore)
         {
-            Sentence = sentence;
-            SentenceRating = sentenceRating;
             TotalScore = totalScore;
         }
     }
 
-    private struct ScoreCalculationData : ISingingResultsPlayerScore
+    private class ScoreCalculationData : ISingingResultsPlayerScore
     {
         public int HighestScoredBeat { get; set; }
 

@@ -18,5 +18,7 @@
         StartSongRequest,
         EndSingSceneRequest,
         AbortSingSceneRequest,
+
+        SingingResultsPlayerScoreRequest,
     }
 }

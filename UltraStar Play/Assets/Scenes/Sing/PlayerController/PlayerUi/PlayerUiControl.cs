@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
@@ -129,8 +127,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
             ShowTotalScore(playerScoreControl.TotalScore);
             playerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt =>
             {
-                ShowTotalScore(playerScoreControl.TotalScore);
                 ShowSentenceRating(evt.SentenceRating, sentenceRatingContainer);
+            });
+            playerScoreControl.ScoreChangedEventStream.Subscribe(evt =>
+            {
+                ShowTotalScore(evt.TotalScore);
             });
         }
         else if (settings.ScoreMode is EScoreMode.None)

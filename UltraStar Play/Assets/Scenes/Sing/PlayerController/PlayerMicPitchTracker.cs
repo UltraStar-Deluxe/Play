@@ -125,7 +125,7 @@ public class PlayerMicPitchTracker : AbstractMicPitchTracker, INeedInjection, II
 
     private string GetBeatAnalyzedEventMessageName()
     {
-        return $"{nameof(BeatAnalyzedEvent)}-{playerProfile.Name}";
+        return $"{nameof(BeatAnalyzedEvent)}-{playerProfile.Name}-{onlineMultiplayerManager.OwnLobbyMemberUnityNetcodeClientId}";
     }
 
     private void OnBeatAnalyzedEventMessage(NamedMessage message)

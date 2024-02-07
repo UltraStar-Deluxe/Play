@@ -21,7 +21,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private MicProfile micProfile;
 
     [Inject]
-    private SingingResultsPlayerScore singingResultsPlayerScore;
+    private ISingingResultsPlayerScore singingResultsPlayerScore;
 
     [Inject]
     private Statistics statistics;

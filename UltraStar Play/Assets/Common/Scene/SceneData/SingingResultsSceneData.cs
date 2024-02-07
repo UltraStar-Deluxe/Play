@@ -9,12 +9,12 @@ public class SingingResultsSceneData : SceneData
     public int SongDurationInMillis { get; set; }
     public List<PlayerProfile> PlayerProfiles { get; set; } = new();
     public Dictionary<PlayerProfile, MicProfile> PlayerProfileToMicProfileMap { get; set; } = new();
-    private readonly Dictionary<PlayerProfile, SingingResultsPlayerScore> playerProfileToScoreData = new();
+    private readonly Dictionary<PlayerProfile, ISingingResultsPlayerScore> playerProfileToScoreData = new();
     public PartyModeSceneData partyModeSceneData;
     public SceneData lastSceneData;
     public GameRoundSettings GameRoundSettings { get; set; } = new();
 
-    public void AddPlayerScores(PlayerProfile profile, SingingResultsPlayerScore score)
+    public void AddPlayerScores(PlayerProfile profile, ISingingResultsPlayerScore score)
     {
         if (!PlayerProfiles.Contains(profile))
         {
@@ -23,7 +23,7 @@ public class SingingResultsSceneData : SceneData
         playerProfileToScoreData[profile] = score;
     }
 
-    public SingingResultsPlayerScore GetPlayerScores(PlayerProfile playerProfile)
+    public ISingingResultsPlayerScore GetPlayerScores(PlayerProfile playerProfile)
     {
         if (playerProfile == null)
         {

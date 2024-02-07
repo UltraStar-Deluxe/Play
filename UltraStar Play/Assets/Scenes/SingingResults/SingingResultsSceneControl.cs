@@ -203,7 +203,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         // Play applause if there is any player with more than 1000 points.
         bool shouldPlayApplause = sceneData.PlayerProfiles.AnyMatch(playerProfile =>
         {
-            SingingResultsPlayerScore singingResultsPlayerScore = sceneData.GetPlayerScores(playerProfile);
+            ISingingResultsPlayerScore singingResultsPlayerScore = sceneData.GetPlayerScores(playerProfile);
             return singingResultsPlayerScore != null
                    && singingResultsPlayerScore.TotalScore > 1000;
         });
@@ -379,7 +379,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
             sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            SingingResultsPlayerScore singingResultsPlayerScore = sceneData.GetPlayerScores(playerProfile);
+            ISingingResultsPlayerScore singingResultsPlayerScore = sceneData.GetPlayerScores(playerProfile);
             SongRating songRating = GetSongRating(singingResultsPlayerScore.TotalScore);
 
             Injector childInjector = UniInjectUtils.CreateInjector(injector);

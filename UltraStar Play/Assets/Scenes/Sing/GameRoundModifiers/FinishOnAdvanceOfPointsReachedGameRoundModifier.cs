@@ -68,7 +68,7 @@ public class FinishOnAdvanceOfPointsReachedGameRoundModifier : GameRoundModifier
         private void Start()
         {
             singSceneControl.PlayerControls
-                .Select(playerControl => playerControl.PlayerScoreControl.SentenceScoreEventStream)
+                .Select(playerControl => playerControl.PlayerScoreControl.ScoreChangedEventStream)
                 .Merge()
                 .Subscribe(evt => UpdateFinish())
                 .AddTo(gameObject);
