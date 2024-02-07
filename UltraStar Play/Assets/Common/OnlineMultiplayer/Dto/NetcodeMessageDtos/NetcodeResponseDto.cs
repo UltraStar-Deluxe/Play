@@ -1,6 +1,6 @@
 ﻿namespace CommonOnlineMultiplayer
 {
-    public class NetcodeResponseDto : NetcodeMessageDto
+    public abstract class NetcodeResponseDto : NetcodeMessageDto
     {
         protected NetcodeResponseDto() : base(ENetcodeMessageType.Other)
         {

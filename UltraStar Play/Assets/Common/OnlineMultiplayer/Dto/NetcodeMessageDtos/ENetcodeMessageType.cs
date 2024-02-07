@@ -4,9 +4,6 @@
     {
         Other,
 
-        CurrentLobbyMembersRequest,
-        CurrentLobbyMembersResponse,
-
         PlayerHasSongLocallyRequest,
         PlayerHasSongLocallyResponse,
 
@@ -21,7 +18,5 @@
         StartSongRequest,
         EndSingSceneRequest,
         AbortSingSceneRequest,
-
-        BeatAnalyzedEventRequest,
     }
 }

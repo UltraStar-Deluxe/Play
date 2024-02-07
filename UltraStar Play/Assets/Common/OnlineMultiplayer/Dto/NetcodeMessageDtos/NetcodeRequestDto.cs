@@ -1,13 +1,13 @@
 ﻿namespace CommonOnlineMultiplayer
 {
-    public class NetcodeRequestDto : NetcodeMessageDto
+    public abstract class NetcodeRequestDto : NetcodeMessageDto
     {
-        public NetcodeRequestDto()
+        protected NetcodeRequestDto()
             : base(ENetcodeMessageType.Other)
         {
         }
 
-        public NetcodeRequestDto(ENetcodeMessageType messageType) : base(messageType)
+        protected NetcodeRequestDto(ENetcodeMessageType messageType) : base(messageType)
         {
         }
     }
