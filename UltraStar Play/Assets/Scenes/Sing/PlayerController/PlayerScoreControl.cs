@@ -18,81 +18,19 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     public static readonly int maxPerfectSentenceBonusScore = 1000;
     public static readonly int maxScoreForNotes = maxScore - maxPerfectSentenceBonusScore;
 
-    public int TotalScore
+    public int TotalScore => calculationData.TotalScore;
+
+    /**
+     * Publicly accessible part of the score for modding.
+     */
+    public int ModTotalScore
     {
-        get
-        {
-            int calculatedTotalScoreNoMods = NormalNotesTotalScore + GoldenNotesTotalScore + PerfectSentenceBonusTotalScore;
-            if (calculatedTotalScoreNoMods > maxScore)
-            {
-                Debug.LogWarning($"Total score is {calculatedTotalScoreNoMods}, returning max score of {maxScore} instead. "
-                                 + $"(NormalNotesTotalScore: {NormalNotesTotalScore}, GoldenNotesTotalScore: {GoldenNotesTotalScore}, PerfectSentenceBonusTotalScore: {PerfectSentenceBonusTotalScore}, "
-                                 + $"maxScoreForNormalNotes: {maxScoreForNormalNotes}, maxScoreForGoldenNotes: {maxScoreForGoldenNotes}, sum: {maxScoreForNormalNotes + maxScoreForGoldenNotes}, "
-                                 + $"NormalBeatData.PerfectAndGoodBeats: {ScoreData.NormalBeatData.PerfectAndGoodBeats}, GoldenBeatData.PerfectAndGoodBeats: {ScoreData.GoldenBeatData.PerfectAndGoodBeats}, "
-                                 + $"NormalNoteLengthTotal {ScoreData.NormalNoteLengthTotal}, GoldenNoteLengthTotal {ScoreData.GoldenNoteLengthTotal})");
-                return maxScore;
-            }
-
-            int calculatedTotalScoreWithMods = calculatedTotalScoreNoMods + ModTotalScore;
-            return calculatedTotalScoreWithMods;
-        }
+        get => calculationData.ModTotalScore;
+        set => calculationData.ModTotalScore = value;
     }
-
-    private int NormalNotesTotalScore
-    {
-        get
-        {
-            if (ScoreData.NormalBeatData.PerfectAndGoodBeats <= 0
-                || ScoreData.NormalNoteLengthTotal <= 0)
-            {
-                return 0;
-            }
-            return (int)(maxScoreForNormalNotes * ScoreData.NormalBeatData.PerfectAndGoodBeats / ScoreData.NormalNoteLengthTotal);
-        }
-    }
-
-    private int GoldenNotesTotalScore
-    {
-        get
-        {
-            if (ScoreData.GoldenBeatData.PerfectAndGoodBeats <= 0
-                || ScoreData.GoldenNoteLengthTotal <= 0)
-            {
-                return 0;
-            }
-            return (int)(maxScoreForGoldenNotes * ScoreData.GoldenBeatData.PerfectAndGoodBeats / ScoreData.GoldenNoteLengthTotal);
-        }
-    }
-
-    private int PerfectSentenceBonusTotalScore
-    {
-        get
-        {
-            int targetSentenceCount = ScoreData.TotalSentenceCount > 20
-                ? 20
-                : ScoreData.TotalSentenceCount;
-            if (targetSentenceCount <= 0)
-            {
-                return 0;
-            }
-            double score = (double)maxPerfectSentenceBonusScore * ScoreData.PerfectSentenceCount / targetSentenceCount;
-
-            // Round the score up
-            score = Math.Ceiling(score);
-            if (score > maxPerfectSentenceBonusScore)
-            {
-                score = maxPerfectSentenceBonusScore;
-            }
-            return (int)score;
-        }
-    }
-
-    public int ModTotalScore { get; set; }
-
-    public int NextBeatToScore { get; private set; }
 
     [Inject]
-    private PlayerMicPitchTracker playerMicPitchTracker;
+    private PlayerPerformanceAssessmentControl playerPerformanceAssessmentControl;
 
     [Inject]
     private Voice voice;
@@ -101,216 +39,99 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
     private SingSceneMedleyControl medleyControl;
 
     private readonly Subject<SentenceScoreEvent> sentenceScoreEventStream = new();
-    public IObservable<SentenceScoreEvent> SentenceScoreEventStream
-    {
-        get
-        {
-            return sentenceScoreEventStream;
-        }
-    }
+    public IObservable<SentenceScoreEvent> SentenceScoreEventStream => sentenceScoreEventStream;
 
-    private readonly Subject<NoteScoreEvent> noteScoreEventStream = new();
-    public IObservable<NoteScoreEvent> NoteScoreEventStream
-    {
-        get
-        {
-            return noteScoreEventStream;
-        }
-    }
+    private ScoreCalculationData calculationData;
+    public ISingingResultsPlayerScore CalculationData => calculationData;
 
-    private double maxScoreForNormalNotes;
-    private double maxScoreForGoldenNotes;
-
-    public PlayerScoreControlData scoreData = new();
-    public PlayerScoreControlData ScoreData
-    {
-        get => scoreData;
-        set
-        {
-            scoreData = value;
-
-            // Do not score sentences and notes again, e.g. when coming back from the song editor
-            List<Note> alreadyScoredNotes = scoreData
-                .NoteToNoteScoreMap.Keys
-                .ToList();
-            if (!alreadyScoredNotes.IsNullOrEmpty())
-            {
-                int alreadyScoredBeat = alreadyScoredNotes
-                    .Select(alreadyScoreNote => alreadyScoreNote.EndBeat)
-                    .Max();
-                SkipToBeat(alreadyScoredBeat);
-                Debug.Log($"Skipped to beat {alreadyScoredBeat} because it was already scored.");
-            }
-        }
-    }
-
-    private readonly HashSet<int> scoredBeats = new();
-    private readonly HashSet<int> normalNoteBeats = new();
-    private readonly HashSet<int> goldenNoteBeats = new();
+    private readonly HashSet<int> processedBeats = new();
     private int firstBeatToScoreInclusive;
-    private int lastBeatToScoreExclusive;
 
     public void OnInjectionFinished()
     {
         UpdateMaxScores(voice.Sentences);
 
-        playerMicPitchTracker.BeatAnalyzedEventStream.Subscribe(OnBeatAnalyzed);
-        playerMicPitchTracker.NoteAnalyzedEventStream.Subscribe(OnNoteAnalyzed);
-        playerMicPitchTracker.SentenceAnalyzedEventStream.Subscribe(OnSentenceAnalyzed);
+        playerPerformanceAssessmentControl.NoteAssessedEventStream.Subscribe(evt => OnNoteAssessed(evt));
+        playerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt => OnSentenceAssessed(evt));
     }
 
-    private void OnBeatAnalyzed(BeatAnalyzedEvent beatAnalyzedEvent)
+    private void OnNoteAssessed(PlayerPerformanceAssessmentControl.NoteAssessedEvent noteAssessedEvent)
     {
-        if (beatAnalyzedEvent.Beat < firstBeatToScoreInclusive
-            || beatAnalyzedEvent.Beat >= lastBeatToScoreExclusive
-            || !medleyControl.IsBeatInMedleyRange(beatAnalyzedEvent.Beat))
+        Note note = noteAssessedEvent.Note;
+        if (!medleyControl.IsNoteInMedleyRange(note))
         {
             return;
         }
 
-        // Check if pitch was detected where a note is expected in the song
-        if (beatAnalyzedEvent.PitchEvent == null
-            || beatAnalyzedEvent.NoteAtBeat == null)
+        foreach (int correctlySungBeat in noteAssessedEvent.CorrectlySungBeats)
         {
-            return;
-        }
-
-        if (beatAnalyzedEvent.Beat < NextBeatToScore)
-        {
-            return;
-        }
-
-        Note analyzedNote = beatAnalyzedEvent.NoteAtBeat;
-        if (analyzedNote == null)
-        {
-            return;
-        }
-
-        // Check if note was hit
-        if (Math.Abs(MidiUtils.GetRelativePitch(beatAnalyzedEvent.RoundedRecordedMidiNote)
-                     - MidiUtils.GetRelativePitch(analyzedNote.MidiNote)) > 0.1f)
-        {
-            return;
-        }
-
-        // The beat was sung correctly.
-        if (!ScoreData.NoteToNoteScoreMap.TryGetValue(analyzedNote, out NoteScore noteScore))
-        {
-            noteScore = new NoteScore(analyzedNote);
-            ScoreData.NoteToNoteScoreMap.Add(analyzedNote, noteScore);
-        }
-        noteScore.CorrectlySungBeats++;
-
-        Sentence analyzedSentence = beatAnalyzedEvent.NoteAtBeat.Sentence;
-        if (!ScoreData.SentenceToSentenceScoreMap.TryGetValue(analyzedSentence, out SentenceScore sentenceScore))
-        {
-            sentenceScore = CreateSentenceScore(analyzedSentence);
-            ScoreData.SentenceToSentenceScoreMap.Add(analyzedSentence, sentenceScore);
-        }
-
-        if (scoredBeats.Contains(beatAnalyzedEvent.Beat))
-        {
-            Debug.LogWarning($"Attempt to score beat multiple times: {beatAnalyzedEvent.Beat}");
-            return;
-        }
-        scoredBeats.Add(beatAnalyzedEvent.Beat);
-
-        if (!normalNoteBeats.Contains(beatAnalyzedEvent.Beat)
-            && !goldenNoteBeats.Contains(beatAnalyzedEvent.Beat))
-        {
-            Debug.LogWarning("Attempt to score a beat that is neither a normal nor golden note: " + beatAnalyzedEvent.Beat);
-            return;
-        }
-
-        if (IsPerfectHit(beatAnalyzedEvent))
-        {
-            ScoreData.GetBeatData(analyzedNote).IfNotNull(it => it.PerfectBeats++);
-            sentenceScore.GetBeatData(analyzedNote).IfNotNull(it => it.PerfectBeats++);
-        }
-        else if (IsGoodHit(beatAnalyzedEvent))
-        {
-            ScoreData.GetBeatData(analyzedNote).IfNotNull(it => it.GoodBeats++);
-            sentenceScore.GetBeatData(analyzedNote).IfNotNull(it => it.GoodBeats++);
+            ScoreCorrectlySungBeat(correctlySungBeat, note);
         }
     }
 
-    private bool IsPerfectHit(BeatAnalyzedEvent beatAnalyzedEvent)
+    private void ScoreCorrectlySungBeat(int beat, Note note)
     {
-        return Math.Abs(MidiUtils.GetRelativePitch(beatAnalyzedEvent.NoteAtBeat.MidiNote)
-                        - MidiUtils.GetRelativePitch(beatAnalyzedEvent.RecordedMidiNote)) < 0.1f;
-    }
-
-    private bool IsGoodHit(BeatAnalyzedEvent beatAnalyzedEvent)
-    {
-        return beatAnalyzedEvent.NoteAtBeat.MidiNote == beatAnalyzedEvent.RoundedRecordedMidiNote;
-    }
-
-    private void OnNoteAnalyzed(NoteAnalyzedEvent noteAnalyzedEvent)
-    {
-        if (noteAnalyzedEvent.Note.EndBeat < NextBeatToScore
-            || !medleyControl.IsNoteInMedleyRange(noteAnalyzedEvent.Note))
+        if (beat < firstBeatToScoreInclusive)
         {
             return;
         }
 
-        Note analyzedNote = noteAnalyzedEvent.Note;
-        if (ScoreData.NoteToNoteScoreMap.TryGetValue(analyzedNote, out NoteScore noteScore))
+        if (processedBeats.Contains(beat))
         {
-            if (noteScore.CorrectlySungBeats >= analyzedNote.Length)
-            {
-                noteScoreEventStream.OnNext(new NoteScoreEvent(noteScore));
-            }
+            Debug.LogWarning($"Attempt to score beat multiple times: {beat}");
+            return;
         }
-    }
+        processedBeats.Add(beat);
 
-    private void OnSentenceAnalyzed(SentenceAnalyzedEvent sentenceAnalyzedEvent)
-    {
-        if (sentenceAnalyzedEvent.Sentence.MaxBeat < NextBeatToScore
-            || !medleyControl.IsSentenceInMedleyRange(sentenceAnalyzedEvent.Sentence))
+        if (TotalScore >= maxScore)
         {
             return;
         }
 
-        Sentence analyzedSentence = sentenceAnalyzedEvent.Sentence;
-        int totalScorableNoteLength = analyzedSentence.Notes
+        if (note.IsNormal)
+        {
+            calculationData.CorrectlySungNormalNoteLengthTotal++;
+        }
+        else if (note.IsGolden)
+        {
+            calculationData.CorrectlySungGoldenNoteLengthTotal++;
+        }
+
+        if (calculationData.HighestScoredBeat < beat)
+        {
+            calculationData.HighestScoredBeat = beat;
+        }
+    }
+
+    private void OnSentenceAssessed(PlayerPerformanceAssessmentControl.SentenceAssessedEvent sentenceAssessedEvent)
+    {
+        Sentence sentence = sentenceAssessedEvent.Sentence;
+        if (!medleyControl.IsSentenceInMedleyRange(sentence))
+        {
+            return;
+        }
+
+        int totalScorableNoteLength = sentence.Notes
                 .Where(note => note.IsNormal || note.IsGolden)
                 .Select(note => note.Length)
                 .Sum();
-
         if (totalScorableNoteLength <= 0)
         {
             return;
         }
 
-        SentenceRating sentenceRating;
-        if (ScoreData.SentenceToSentenceScoreMap.TryGetValue(analyzedSentence, out SentenceScore sentenceScore))
+        // Check score is within expected bounds
+        int totalScoreWithoutMods = calculationData.TotalScore - calculationData.ModTotalScore;
+        if (totalScoreWithoutMods > maxScore)
         {
-            int correctlySungNoteLength = sentenceScore.NormalBeatData.PerfectAndGoodBeats + sentenceScore.GoldenBeatData.PerfectAndGoodBeats;
-            double correctNotesPercentage = (double)correctlySungNoteLength / totalScorableNoteLength;
-
-            // Score for a perfect sentence
-            if (correctNotesPercentage >= SentenceRating.perfect.PercentageThreshold)
-            {
-                ScoreData.PerfectSentenceCount++;
-            }
-
-            sentenceRating = SentenceRating.GetSentenceRating(correctNotesPercentage);
+            Debug.LogWarning($"Total score without mods is {totalScoreWithoutMods}, returning max score of {maxScore} instead. "
+                             + $"(NormalNotesTotalScore: {calculationData.TotalScore}, GoldenNotesTotalScore: {calculationData.GoldenNotesTotalScore}, PerfectSentenceBonusTotalScore: {calculationData.PerfectSentenceBonusTotalScore}, "
+                             + $"MaxScoreForNormalNotes: {calculationData.MaxScoreForNormalNotes}, MaxScoreForGoldenNotes: {calculationData.MaxScoreForGoldenNotes}, MaxScoreForNotes: {calculationData.MaxScoreForNotes}, "
+                             + $"CorrectlySungNormalNoteLengthTotal: {calculationData.CorrectlySungNormalNoteLengthTotal}, CorrectlySungGoldenNoteLengthTotal: {calculationData.CorrectlySungGoldenNoteLengthTotal}, "
+                             + $"NormalNoteLengthTotal {calculationData.NormalNoteLengthTotal}, GoldenNoteLengthTotal {calculationData.GoldenNoteLengthTotal})");
         }
-        else
-        {
-            sentenceScore = CreateSentenceScore(analyzedSentence);
-            sentenceRating = SentenceRating.GetSentenceRating(0);
-        }
-        sentenceScore.TotalScoreSoFar = TotalScore;
 
-        // Update the total score in the SceneData
-        ScoreData.TotalScore = TotalScore;
-        ScoreData.NormalNotesTotalScore = NormalNotesTotalScore;
-        ScoreData.GoldenNotesTotalScore = GoldenNotesTotalScore;
-        ScoreData.PerfectSentenceBonusTotalScore = PerfectSentenceBonusTotalScore;
-        ScoreData.ModTotalScore = ModTotalScore;
-
-        sentenceScoreEventStream.OnNext(new SentenceScoreEvent(sentenceScore, sentenceRating));
+        sentenceScoreEventStream.OnNext(new SentenceScoreEvent(sentence, sentenceAssessedEvent.SentenceRating, TotalScore));
     }
 
     private void UpdateMaxScores(IReadOnlyCollection<Sentence> sentences)
@@ -318,87 +139,44 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         if (sentences.IsNullOrEmpty())
         {
             // Everything is zero
-            ScoreData = new PlayerScoreControlData();
+            calculationData = new();
             return;
         }
 
         // Calculate the points for a single beat of a normal or golden note
-        ScoreData.NormalNoteLengthTotal = 0;
-        ScoreData.GoldenNoteLengthTotal = 0;
+        calculationData.NormalNoteLengthTotal = 0;
+        calculationData.GoldenNoteLengthTotal = 0;
         foreach (Sentence sentence in sentences)
         {
-            ScoreData.NormalNoteLengthTotal += GetNormalNoteLength(sentence);
-            ScoreData.GoldenNoteLengthTotal += GetGoldenNoteLength(sentence);
+            calculationData.NormalNoteLengthTotal += GetNormalNoteLength(sentence);
+            calculationData.GoldenNoteLengthTotal += GetGoldenNoteLength(sentence);
         }
 
-        double scoreForCorrectBeatOfNormalNotes = maxScoreForNotes / ((double)ScoreData.NormalNoteLengthTotal + (2 * ScoreData.GoldenNoteLengthTotal));
+        double scoreForCorrectBeatOfNormalNotes = maxScoreForNotes / ((double)calculationData.NormalNoteLengthTotal + (2 * calculationData.GoldenNoteLengthTotal));
         double scoreForCorrectBeatOfGoldenNotes = 2 * scoreForCorrectBeatOfNormalNotes;
 
-        maxScoreForNormalNotes = scoreForCorrectBeatOfNormalNotes * ScoreData.NormalNoteLengthTotal;
-        maxScoreForGoldenNotes = scoreForCorrectBeatOfGoldenNotes * ScoreData.GoldenNoteLengthTotal;
+        calculationData.MaxScoreForNormalNotes = scoreForCorrectBeatOfNormalNotes * calculationData.NormalNoteLengthTotal;
+        calculationData.MaxScoreForGoldenNotes = scoreForCorrectBeatOfGoldenNotes * calculationData.GoldenNoteLengthTotal;
 
         // Countercheck: The sum of all points must be equal to MaxScoreForNotes
-        double pointsForAllNotes = maxScoreForNormalNotes + maxScoreForGoldenNotes;
+        double pointsForAllNotes = calculationData.MaxScoreForNormalNotes + calculationData.MaxScoreForGoldenNotes;
         bool isSound = Math.Abs(maxScoreForNotes - pointsForAllNotes) <= 0.01;
         if (!isSound)
         {
             Debug.LogWarning("The definition of scores for normal or golden notes is not sound: "
-                + $"maxScoreForNormalNotes: {maxScoreForNormalNotes}, maxScoreForGoldenNotes: {maxScoreForGoldenNotes}, sum: {maxScoreForNormalNotes + maxScoreForGoldenNotes}");
+                + $"maxScoreForNormalNotes: {calculationData.MaxScoreForNormalNotes}, maxScoreForGoldenNotes: {calculationData.MaxScoreForGoldenNotes}, sum: {calculationData.MaxScoreForNormalNotes + calculationData.MaxScoreForGoldenNotes}");
         }
 
         // Round the values for the max score of normal / golden notes to avoid floating point inaccuracy.
-        maxScoreForNormalNotes = Math.Ceiling(maxScoreForNormalNotes);
-        maxScoreForGoldenNotes = Math.Ceiling(maxScoreForGoldenNotes);
+        calculationData.MaxScoreForNormalNotes = Math.Ceiling(calculationData.MaxScoreForNormalNotes);
+        calculationData.MaxScoreForGoldenNotes = Math.Ceiling(calculationData.MaxScoreForGoldenNotes);
         // The sum of the rounded points must not exceed the MaxScoreForNotes.
         // If the definition is sound then the overhang is at most 2 because of the above rounding.
-        int overhang = (int)(maxScoreForNormalNotes + maxScoreForGoldenNotes) - maxScoreForNotes;
-        maxScoreForNormalNotes -= overhang;
+        int overhang = (int)(calculationData.MaxScoreForNormalNotes + calculationData.MaxScoreForGoldenNotes) - maxScoreForNotes;
+        calculationData.MaxScoreForNormalNotes -= overhang;
 
         // Remember the sentence count to calculate the points for a perfect sentence.
-        ScoreData.TotalSentenceCount = sentences.Count;
-
-        // Setup checks for the beats to be analyzed
-        PrepareBeatToBeAnalyzedChecks();
-    }
-
-    private void PrepareBeatToBeAnalyzedChecks()
-    {
-        firstBeatToScoreInclusive = int.MaxValue;
-        lastBeatToScoreExclusive = int.MinValue;
-        scoredBeats.Clear();
-        normalNoteBeats.Clear();
-        goldenNoteBeats.Clear();
-        voice.Sentences.SelectMany(s => s.Notes).ForEach(n =>
-        {
-            // Remember first and last beat to be analyzed
-            if (n.StartBeat < firstBeatToScoreInclusive)
-            {
-                firstBeatToScoreInclusive = n.StartBeat;
-            }
-            if (n.EndBeat > lastBeatToScoreExclusive)
-            {
-                lastBeatToScoreExclusive = n.EndBeat;
-            }
-
-            // Remember the beats of the normal and golden notes to be analyzed
-            HashSet<int> hashSet = null;
-            if (n.IsNormal)
-            {
-                hashSet = normalNoteBeats;
-            }
-            if (n.IsGolden)
-            {
-                hashSet = goldenNoteBeats;
-            }
-
-            if (hashSet != null)
-            {
-                for (int beatIndex = n.StartBeat; beatIndex < n.StartBeat + n.Length; beatIndex++)
-                {
-                    hashSet.Add(beatIndex);
-                }
-            }
-        });
+        calculationData.TotalSentenceCount = sentences.Count;
     }
 
     private int GetNormalNoteLength(Sentence sentence)
@@ -417,46 +195,116 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             .Sum();
     }
 
-    private SentenceScore CreateSentenceScore(Sentence sentence)
-    {
-        SentenceScore sentenceScore = new(sentence);
-        sentenceScore.TotalScoreSoFar = TotalScore;
-        return sentenceScore;
-    }
-
     public void SkipToBeat(int beat)
     {
-        // Cannot skip to an old beat, otherwise notes may be scored multiple times.
-        if (beat > NextBeatToScore)
-        {
-            NextBeatToScore = beat;
-        }
-
-        if (beat > firstBeatToScoreInclusive)
+        if (beat >= firstBeatToScoreInclusive)
         {
             firstBeatToScoreInclusive = beat;
         }
     }
 
-    public class SentenceScoreEvent
+    public void SetCalculationData(ISingingResultsPlayerScore score)
     {
-        public SentenceScore SentenceScore { get; private set; }
-        public SentenceRating SentenceRating { get; private set; }
-
-        public SentenceScoreEvent(SentenceScore sentenceScore, SentenceRating sentenceRating)
+        if (score is not ScoreCalculationData newScorecalculationData)
         {
-            SentenceScore = sentenceScore;
-            SentenceRating = sentenceRating;
+            Debug.LogWarning($"Attempt to set incompatible score calculation data: actual: '{score}', expected: {typeof(ScoreCalculationData)}");
+            return;
+        }
+
+        calculationData = newScorecalculationData;
+
+        if (calculationData.HighestScoredBeat > 0)
+        {
+            SkipToBeat(calculationData.HighestScoredBeat);
+            Debug.Log($"Skipped to beat {calculationData.HighestScoredBeat} because it was already scored.");
         }
     }
 
-    public class NoteScoreEvent
+    public class SentenceScoreEvent
     {
-        public NoteScore NoteScore { get; private set; }
+        public Sentence Sentence { get; private set; }
+        public SentenceRating SentenceRating { get; private set; }
+        public int TotalScore { get; private set; }
 
-        public NoteScoreEvent(NoteScore noteScore)
+        public SentenceScoreEvent(Sentence sentence, SentenceRating sentenceRating, int totalScore)
         {
-            NoteScore = noteScore;
+            Sentence = sentence;
+            SentenceRating = sentenceRating;
+            TotalScore = totalScore;
         }
+    }
+
+    private struct ScoreCalculationData : ISingingResultsPlayerScore
+    {
+        public int HighestScoredBeat { get; set; }
+
+        public double MaxScoreForNormalNotes { get; set; }
+        public double MaxScoreForGoldenNotes { get; set; }
+        public double MaxScoreForNotes => MaxScoreForNormalNotes + MaxScoreForGoldenNotes;
+
+        public int NormalNoteLengthTotal { get; set; }
+        public int CorrectlySungNormalNoteLengthTotal { get; set; }
+
+        public int GoldenNoteLengthTotal { get; set; }
+        public int CorrectlySungGoldenNoteLengthTotal { get; set; }
+
+        public int TotalSentenceCount { get; set; }
+        public int PerfectSentenceCount { get; set; }
+
+        public int NormalNotesTotalScore
+        {
+            get
+            {
+                if (CorrectlySungNormalNoteLengthTotal <= 0
+                    || NormalNoteLengthTotal <= 0)
+                {
+                    return 0;
+                }
+                return (int)(MaxScoreForNormalNotes * CorrectlySungNormalNoteLengthTotal / NormalNoteLengthTotal);
+            }
+        }
+
+        public int GoldenNotesTotalScore
+        {
+            get
+            {
+                if (CorrectlySungGoldenNoteLengthTotal <= 0
+                    || GoldenNoteLengthTotal <= 0)
+                {
+                    return 0;
+                }
+                return (int)(MaxScoreForGoldenNotes * CorrectlySungGoldenNoteLengthTotal / GoldenNoteLengthTotal);
+            }
+        }
+
+        public int PerfectSentenceBonusTotalScore
+        {
+            get
+            {
+                int targetSentenceCount = TotalSentenceCount > 20
+                    ? 20
+                    : TotalSentenceCount;
+                if (targetSentenceCount <= 0)
+                {
+                    return 0;
+                }
+                double score = (double)maxPerfectSentenceBonusScore * PerfectSentenceCount / targetSentenceCount;
+
+                // Round the score up
+                score = Math.Ceiling(score);
+                if (score > maxPerfectSentenceBonusScore)
+                {
+                    score = maxPerfectSentenceBonusScore;
+                }
+                return (int)score;
+            }
+        }
+
+        public int ModTotalScore { get; set; }
+
+        public int TotalScore => NormalNotesTotalScore
+                                 + GoldenNotesTotalScore
+                                 + PerfectSentenceBonusTotalScore
+                                 + ModTotalScore;
     }
 }

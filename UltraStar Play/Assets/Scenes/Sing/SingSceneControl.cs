@@ -267,29 +267,26 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 continue;
             }
 
-            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<PlayerScoreControlData> scoreDatas))
+            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<ISingingResultsPlayerScore> scoreDatas))
             {
                 if (sceneData.MedleySongIndex < 0)
                 {
                     // No medley, select first score data
-                    playerControl.PlayerScoreControl.ScoreData = scoreDatas.FirstOrDefault();
+                    playerControl.PlayerScoreControl.SetCalculationData(scoreDatas.FirstOrDefault());
                 }
                 else if (sceneData.MedleySongIndex < scoreDatas.Count)
                 {
                     // This is a medley (or short song), select score data for this medley entry song
-                    playerControl.PlayerScoreControl.ScoreData = scoreDatas[sceneData.MedleySongIndex];
+                    playerControl.PlayerScoreControl.SetCalculationData(scoreDatas[sceneData.MedleySongIndex]);
                 }
 
-                if (playerControl.PlayerScoreControl.ScoreData != null)
-                {
-                    playerControl.PlayerUiControl.ShowTotalScore(playerControl.PlayerScoreControl.ScoreData.TotalScore, false);
-                }
+                playerControl.PlayerUiControl.ShowTotalScore(playerControl.PlayerScoreControl.CalculationData.TotalScore, false);
             }
 
             // Update leading player icon
             if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 1)
             {
-                playerControl.PlayerScoreControl.SentenceScoreEventStream
+                playerControl.PlayerMicPitchTracker.SentenceAnalyzedEventStream
                     .Subscribe(_ => UpdateLeadingPlayerIcon());
             }
         }
@@ -1024,14 +1021,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
-        int maxBeatToScore = PlayerControls
-            .Select(playerController => playerController.PlayerScoreControl.NextBeatToScore)
-            .Max();
-
         sceneData.PlayerProfileToScoreDataMap = new();
         foreach (PlayerControl playerController in PlayerControls)
         {
-            sceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, new List<PlayerScoreControlData> { playerController.PlayerScoreControl.ScoreData });
+            sceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, new List<ISingingResultsPlayerScore>
+            {
+                playerController.PlayerScoreControl.CalculationData
+            });
         }
 
         SongEditorSceneData songEditorSceneData = new()
@@ -1112,9 +1108,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             if (!newSingSceneData.PlayerProfileToScoreDataMap.ContainsKey(playerControl.PlayerProfile))
             {
-                newSingSceneData.PlayerProfileToScoreDataMap.Add(playerControl.PlayerProfile, new List<PlayerScoreControlData>());
+                newSingSceneData.PlayerProfileToScoreDataMap.Add(playerControl.PlayerProfile, new List<ISingingResultsPlayerScore>());
             }
-            newSingSceneData.PlayerProfileToScoreDataMap[playerControl.PlayerProfile].Add(playerControl.PlayerScoreControl.ScoreData);
+            newSingSceneData.PlayerProfileToScoreDataMap[playerControl.PlayerProfile].Add(playerControl.PlayerScoreControl.CalculationData);
         }
         // Continue with next medley song
         newSingSceneData.MedleySongIndex++;
@@ -1149,8 +1145,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap;
             PlayerControls.ForEach(playerControl =>
             {
-                PlayerScoreControlData playerScoreControlData = GetPlayerScoreDataForSingingResultsScene(playerControl);
-                singingResultsSceneData.AddPlayerScores(playerControl.PlayerProfile, playerScoreControlData);
+                SingingResultsPlayerScore singingResultsPlayerScore = GetSingingResultsPlayerScore(playerControl);
+                singingResultsSceneData.AddPlayerScores(playerControl.PlayerProfile, singingResultsPlayerScore);
             });
 
             highScoreEntries = PlayerControls
@@ -1163,8 +1159,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         else if (IsCommonScore)
         {
             // Add and record score as average of all players.
-            List<PlayerScoreControlData> scoreControlDatas = PlayerControls
-                .Select(playerControl => GetPlayerScoreDataForSingingResultsScene(playerControl))
+            List<SingingResultsPlayerScore> scoreControlDatas = PlayerControls
+                .Select(playerControl => GetSingingResultsPlayerScore(playerControl))
                 .ToList();
             string commonPlayerProfileName = PlayerControls
                 .Select(playerControl => playerControl.PlayerProfile.Name)
@@ -1174,8 +1170,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 .PlayerProfile.Difficulty;
             string commonProfileImagePath = uiManager.GetFinalPlayerProfileImagePath(PlayerControls.Select(it => it.PlayerProfile).FirstOrDefault());
             PlayerProfile commonPlayerProfile = new(commonPlayerProfileName, easiestPlayerProfileDifficulty, commonProfileImagePath);
-            PlayerScoreControlData commonScoreData = CreateAveragePlayerScoreControlData(scoreControlDatas);
-            singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScoreData);
+            SingingResultsPlayerScore commonScore = CreateAveragePlayerScoreControlData(scoreControlDatas);
+            singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScore);
 
             // Define common mic profile
             MicProfile commonMicProfile = PlayerControls
@@ -1189,7 +1185,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             HighScoreEntry commonHighScoreEntry = new HighScoreEntry(
                 commonPlayerProfileName,
                 easiestPlayerProfileDifficulty,
-                commonScoreData.TotalScore,
+                commonScore.TotalScore,
                 EScoreMode.CommonAverage);
             highScoreEntries = new() { commonHighScoreEntry };
         }
@@ -1217,39 +1213,42 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
 
-    private PlayerScoreControlData GetPlayerScoreDataForSingingResultsScene(PlayerControl playerControl)
+    private SingingResultsPlayerScore GetSingingResultsPlayerScore(PlayerControl playerControl)
     {
         if (sceneData.IsMedley)
         {
             // Use the average of all medley songs
-            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerControl.PlayerProfile, out List<PlayerScoreControlData> scoreDatas)
+            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerControl.PlayerProfile, out List<ISingingResultsPlayerScore> scoreDatas)
                 && scoreDatas.Count > 0)
             {
-                List<PlayerScoreControlData> allScoreDatas = new(scoreDatas);
+                List<ISingingResultsPlayerScore> allScoreDatas = new(scoreDatas);
                 // Include the score for the current song
-                allScoreDatas.Add(playerControl.PlayerScoreControl.ScoreData);
+                allScoreDatas.Add(playerControl.PlayerScoreControl.CalculationData);
                 return CreateAveragePlayerScoreControlData(allScoreDatas);
             }
         }
 
         // Use the current score data of the player
-        return playerControl.PlayerScoreControl.ScoreData;
+        return new SingingResultsPlayerScore()
+        {
+            NormalNotesTotalScore = playerControl.PlayerScoreControl.CalculationData.NormalNotesTotalScore,
+            GoldenNotesTotalScore = playerControl.PlayerScoreControl.CalculationData.GoldenNotesTotalScore,
+            PerfectSentenceBonusTotalScore = playerControl.PlayerScoreControl.CalculationData.PerfectSentenceBonusTotalScore,
+            ModTotalScore = playerControl.PlayerScoreControl.CalculationData.ModTotalScore,
+        };
     }
 
-    private PlayerScoreControlData CreateAveragePlayerScoreControlData(List<PlayerScoreControlData> scoreControlDatas)
+    private SingingResultsPlayerScore CreateAveragePlayerScoreControlData<T>(List<T> scoreDatas)
+        where T : ISingingResultsPlayerScore
     {
-        PlayerScoreControlData averageScoreData = new()
+        SingingResultsPlayerScore averageScore = new()
         {
-            TotalScore = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.TotalScore).Average(),
-            GoldenNotesTotalScore = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.GoldenNotesTotalScore).Average(),
-            NormalNotesTotalScore = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.NormalNotesTotalScore).Average(),
-            PerfectSentenceBonusTotalScore = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.PerfectSentenceBonusTotalScore).Average(),
-            PerfectSentenceCount = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.PerfectSentenceCount).Average(),
-            TotalSentenceCount = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.TotalSentenceCount).Average(),
-            NormalNoteLengthTotal = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.NormalNoteLengthTotal).Average(),
-            GoldenNoteLengthTotal = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.GoldenNoteLengthTotal).Average()
+            NormalNotesTotalScore = (int)scoreDatas.Select(scoreControlData => scoreControlData.NormalNotesTotalScore).Average(),
+            GoldenNotesTotalScore = (int)scoreDatas.Select(scoreData => scoreData.GoldenNotesTotalScore).Average(),
+            PerfectSentenceBonusTotalScore = (int)scoreDatas.Select(scoreControlData => scoreControlData.PerfectSentenceBonusTotalScore).Average(),
+            ModTotalScore = (int)scoreDatas.Select(scoreControlData => scoreControlData.ModTotalScore).Average(),
         };
-        return averageScoreData;
+        return averageScore;
     }
 
     private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
