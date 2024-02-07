@@ -4,6 +4,16 @@ using System.Text;
 
 public static class EncodingUtils
 {
+    public static readonly Encoding utf8Bom = Encoding.UTF8;
+    public static readonly Encoding utf8NoBom = new UTF8Encoding(false);
+
+    public static Encoding GetUtf8Encoding(bool writeByteOrderMark)
+    {
+        return writeByteOrderMark
+            ? utf8Bom
+            : utf8NoBom;
+    }
+
     public static Encoding GetEncoding(string name)
     {
         if (TryGetEncoding(name, out Encoding encoding))
@@ -44,8 +54,8 @@ public static class EncodingUtils
     {
         Dictionary<string, Encoding> nameToEncoding = new()
         {
-            { "utf32", System.Text.Encoding.UTF32 },
-            { "utf-32", System.Text.Encoding.UTF32 },
+            { "utf32", Encoding.UTF32 },
+            { "utf-32", Encoding.UTF32 },
         };
 
         foreach (KeyValuePair<string, Encoding> entry in nameToEncoding)

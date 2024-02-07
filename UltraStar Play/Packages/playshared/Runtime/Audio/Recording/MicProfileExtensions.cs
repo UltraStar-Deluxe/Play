@@ -7,8 +7,8 @@ public static class MicProfileExtensions
     {
         return (micProfile.IsInputFromConnectedClient && serverSideConnectRequestManager.TryGetConnectedClientHandler(micProfile.ConnectedClientId, out IConnectedClientHandler _))
                || (!micProfile.IsInputFromConnectedClient
-                   && MicrophoneAdapter.Devices.Contains(micProfile.Name)
-                   && (micProfile.ChannelIndex == 0 || MicrophoneAdapter.UsePortAudio));
+                   && IMicrophoneAdapter.Instance.Devices.Contains(micProfile.Name)
+                   && (micProfile.ChannelIndex == 0 || IMicrophoneAdapter.Instance.UsePortAudio));
     }
 
     public static bool IsEnabledAndConnected(this MicProfile micProfile, IServerSideConnectRequestManager serverSideConnectRequestManager)
@@ -33,9 +33,9 @@ public static class MicProfileExtensions
             if (ThreadUtils.IsMainThread())
             {
                 // Add channel to mic profile name only if the device is connected and has more than one channel.
-                if (MicrophoneAdapter.Devices.Contains(micProfile.Name))
+                if (IMicrophoneAdapter.Instance.Devices.Contains(micProfile.Name))
                 {
-                    MicrophoneAdapter.GetDeviceCaps(micProfile.Name, out int minSampleRate, out int maxSampleRate, out int channelCount);
+                    IMicrophoneAdapter.Instance.GetDeviceCaps(micProfile.Name, out int minSampleRate, out int maxSampleRate, out int channelCount);
                     if (channelCount > 1)
                     {
                         return $"{micProfile.Name} - Channel {micProfile.ChannelIndex}";

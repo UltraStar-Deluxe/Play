@@ -1,0 +1,8 @@
+#TITLE:ThreeQuartersA4OneQuarterC5-TestSong
+#ARTIST:SomeArtist
+#MP3:4s-TestAudio.ogg
+#BPM:120
+P1
+: 4 12 9 A4_
+: 22 4 12 C5
+E

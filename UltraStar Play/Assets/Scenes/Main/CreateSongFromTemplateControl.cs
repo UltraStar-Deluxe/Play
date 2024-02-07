@@ -133,7 +133,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
         }
 
         string newSongTxtFile = outputFolder + $"/{artistAndTitle}.txt";
-        File.WriteAllText(newSongTxtFile, txtFileContent);
+        File.WriteAllText(newSongTxtFile, txtFileContent, SettingsUtils.GetEncodingForWritingUltraStarTxtFile(settings));
 
         // Add song folder to settings if not done yet
         List<string> songDirs = settings.SongDirs;
@@ -141,7 +141,7 @@ public class CreateSongFromTemplateControl : MonoBehaviour, INeedInjection
             && !songDirs.Contains(persistentDataPathSongsFolder))
         {
             songDirs.Add(persistentDataPathSongsFolder);
-            settingsManager.Save();
+            settingsManager.SaveSettings();
         }
 
         if (PlatformUtils.IsStandalone)

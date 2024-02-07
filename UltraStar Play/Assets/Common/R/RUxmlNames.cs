@@ -838,6 +838,7 @@ public static partial class R
         public const string songTimeProgressBar = "songTimeProgressBar";
         public const string songTitle = "songTitle";
         public const string songVideoImage = "songVideoImage";
+        public const string songVideoPlaybackPicker = "songVideoPlaybackPicker";
         public const string soundfontPathTextField = "soundfontPathTextField";
         public const string soundfontPathTextFieldHintLabel = "soundfontPathTextFieldHintLabel";
         public const string soundOptionsButton = "soundOptionsButton";
@@ -1002,6 +1003,7 @@ public static partial class R
         public const string webViewGroup = "webViewGroup";
         public const string wideIcon = "wideIcon";
         public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
+        public const string writeUltraStarTxtFileWithByteOrderMarkToggle = "writeUltraStarTxtFileWithByteOrderMarkToggle";
         public const string yearPropertyToggle = "yearPropertyToggle";
     }
 }

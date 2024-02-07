@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Serilog.Events;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class Settings : ISettings
@@ -54,6 +55,7 @@ public class Settings : ISettings
     public int DefaultMedleyTargetDurationInSeconds { get; set; } = 30;
     public int ReducedAudioVolumePercent { get; set; } = 1;
     public float PassTheMicTimeInSeconds { get; set; } = 20;
+    public bool JokerRuleEnabled { get; set; } = true;
 
     // Player profile settings
     public List<PlayerProfile> PlayerProfiles { get; set; } = new();
@@ -115,7 +117,8 @@ public class Settings : ISettings
     // Technical settings
     public bool ShowFps { get; set; }
     public bool UseUniversalCharsetDetector { get; set; } = true;
-    public LogEventLevel MinimumLogLevel { get; set; }= LogEventLevel.Information;
+    public bool WriteUltraStarTxtFileWithByteOrderMark { get; set; }
+    public LogEventLevel MinimumLogLevel { get; set; } = LogEventLevel.Information;
 
     /**
      * Require explicit user action to use custom event system
@@ -147,6 +150,9 @@ public class Settings : ISettings
      // PortAudio settings
      public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
      public string PortAudioOutputDeviceName { get; set; } = "";
+
+    // Media format support settings
+    public ESongVideoPlayback SongVideoPlayback { get; set; } = ESongVideoPlayback.AlwaysEnabled;
 
     // Vlc settings
     public bool LogVlcOutput { get; set; }

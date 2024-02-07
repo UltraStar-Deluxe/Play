@@ -15,13 +15,16 @@ public static class FileUtils
         return File.ReadAllText(targetPath);
     }
 
-    public static void WriteAllText(string targetPath, string text)
+    public static void WriteAllText(string targetPath, string text, Encoding encoding = null)
     {
-        File.WriteAllText(targetPath, text);
+        encoding ??= Encoding.UTF8;
+        File.WriteAllText(targetPath, text, encoding);
     }
 
-    public static void WriteAllTextIfChanged(string targetPath, string text)
+    public static void WriteAllTextIfChanged(string targetPath, string text, Encoding encoding = null)
     {
+        encoding ??= Encoding.UTF8;
+
         string NormalizeText(string t)
         {
             // Normalize line endings.
@@ -35,7 +38,7 @@ public static class FileUtils
 
         if (NormalizeText(oldText) != NormalizeText(text))
         {
-            File.WriteAllText(targetPath, text, Encoding.UTF8);
+            File.WriteAllText(targetPath, text, encoding);
             Debug.Log("Updated file " + targetPath);
         }
         else
@@ -68,7 +71,7 @@ public static class FileUtils
     {
         if (sourcePath.IsNullOrEmpty()
             || targetPath.IsNullOrEmpty()
-            || (FileUtils.Exists(targetPath) && !overwrite)
+            || (Exists(targetPath) && !overwrite)
             || !File.Exists(sourcePath))
         {
             return;
