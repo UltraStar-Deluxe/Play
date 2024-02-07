@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using Responsible.Unity;
 using UnityEngine;
 using UnityEngine.InputSystem;
