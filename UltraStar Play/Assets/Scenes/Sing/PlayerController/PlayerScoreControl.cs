@@ -24,7 +24,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         get
         {
             if (onlineMultiplayerManager.IsOnlineGame
-                && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+                && CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
             {
                 return singingResultsPlayerScoreFromOnlineMultiplayerPeer?.TotalScore ?? 0;
             }
@@ -76,22 +76,21 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         disposables.ForEach(it => it.Dispose());
     }
 
-    private void OnNoteAssessed(PlayerPerformanceAssessmentControl.NoteAssessedEvent noteAssessedEvent)
+    private void OnNoteAssessed(PlayerPerformanceAssessmentControl.NoteAssessedEvent evt)
     {
-        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
-            && lobbyMemberPlayerProfile.IsRemote)
+        if (CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
         {
             // Calculate only the score of the own local player.
             return;
         }
 
-        Note note = noteAssessedEvent.Note;
+        Note note = evt.Note;
         if (!medleyControl.IsNoteInMedleyRange(note))
         {
             return;
         }
 
-        foreach (int correctlySungBeat in noteAssessedEvent.CorrectlySungBeats)
+        foreach (int correctlySungBeat in evt.CorrectlySungBeats)
         {
             ScoreCorrectlySungBeat(correctlySungBeat, note);
         }
@@ -131,16 +130,15 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    private void OnSentenceAssessed(PlayerPerformanceAssessmentControl.SentenceAssessedEvent sentenceAssessedEvent)
+    private void OnSentenceAssessed(PlayerPerformanceAssessmentControl.SentenceAssessedEvent evt)
     {
-        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
-            && lobbyMemberPlayerProfile.IsRemote)
+        if (CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
         {
             // Calculate only the score of the own local player.
             return;
         }
 
-        Sentence sentence = sentenceAssessedEvent.Sentence;
+        Sentence sentence = evt.Sentence;
         if (!medleyControl.IsSentenceInMedleyRange(sentence))
         {
             return;
@@ -155,7 +153,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
-        if (sentenceAssessedEvent.IsPerfect)
+        if (evt.IsPerfect)
         {
             calculationData.PerfectSentenceCount++;
         }
@@ -174,9 +172,9 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         scoreChangedEventStream.OnNext(CreateScoreChangedEventWithCurrentScore());
 
         if (onlineMultiplayerManager.IsOnlineGame
-            && playerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+            && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile))
         {
-            SendSingingResultsPlayerScoreMessage();
+            SendPlayerScoreMessage();
         }
     }
 
@@ -188,26 +186,26 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
 
         disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
-            GetSingingResultsPlayerScoreMessageName(),
-            message => OnSingingResultsPlayerScoreMessage(message)));
+            GetPlayerScoreMessageName(),
+            message => OnPlayerScoreMessage(message)));
     }
 
-    private void SendSingingResultsPlayerScoreMessage()
+    private void SendPlayerScoreMessage()
     {
         if (!onlineMultiplayerManager.IsOnlineGame
-            || playerProfile != onlineMultiplayerManager.OwnLobbyMemberPlayerProfile)
+            || CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(playerProfile))
         {
             return;
         }
 
-        SingingResultsPlayerScoreRequestDto singingResultsPlayerScoreRequestDto = new()
+        SingingResultsPlayerScoreRequestDto playerScoreRequestDto = new()
         {
             SingingResultsPlayerScore = CreateSingingResultsPlayerScore(),
         };
 
         onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
-            GetSingingResultsPlayerScoreMessageName(),
-            FastBufferWriterUtils.WriteJsonValuePacked(singingResultsPlayerScoreRequestDto),
+            GetPlayerScoreMessageName(),
+            FastBufferWriterUtils.WriteJsonValuePacked(playerScoreRequestDto),
             onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
     }
 
@@ -229,7 +227,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         };
     }
 
-    private void OnSingingResultsPlayerScoreMessage(NamedMessage message)
+    private void OnPlayerScoreMessage(NamedMessage message)
     {
         SingingResultsPlayerScoreRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<SingingResultsPlayerScoreRequestDto>(message.MessagePayload);
         singingResultsPlayerScoreFromOnlineMultiplayerPeer = requestDto.SingingResultsPlayerScore;
@@ -237,7 +235,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         scoreChangedEventStream.OnNext(CreateScoreChangedEventWithCurrentScore());
     }
 
-    private string GetSingingResultsPlayerScoreMessageName()
+    private string GetPlayerScoreMessageName()
     {
         return $"{nameof(SingingResultsPlayerScoreRequestDto)}-{playerProfile.Name}-{onlineMultiplayerManager.OwnLobbyMemberUnityNetcodeClientId}";
     }
