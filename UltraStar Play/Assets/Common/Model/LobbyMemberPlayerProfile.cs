@@ -7,6 +7,8 @@ public class LobbyMemberPlayerProfile : PlayerProfile
 {
     public UnityNetcodeClientId UnityNetcodeClientId { get; set; }
     public bool IsHost => UnityNetcodeClientId == NetworkManager.ServerClientId;
+    public bool IsLocal => UnityNetcodeClientId == NetworkManager.Singleton.LocalClientId;
+    public bool IsRemote => !IsLocal;
 
     public LobbyMemberPlayerProfile()
     {

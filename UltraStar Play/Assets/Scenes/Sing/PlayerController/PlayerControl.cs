@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
@@ -138,6 +139,11 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     private void InitAchievements()
     {
+        if (CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(PlayerProfile))
+        {
+            return;
+        }
+
         PlayerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt =>
         {
             if (evt.IsPerfect)

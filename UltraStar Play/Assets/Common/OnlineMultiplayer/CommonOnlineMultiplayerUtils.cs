@@ -10,7 +10,7 @@ namespace CommonOnlineMultiplayer
         public static Color32 GetPlayerColor(PlayerProfile playerProfile, MicProfile micProfile)
         {
             if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile
-                && lobbyMemberPlayerProfile.UnityNetcodeClientId != NetworkManager.Singleton.LocalClientId)
+                && lobbyMemberPlayerProfile.IsRemote)
             {
                 return ColorGenerationUtils.FromString(playerProfile.Name);
             }
@@ -64,6 +64,17 @@ namespace CommonOnlineMultiplayer
             }
 
             return lobbyMember.DisplayName;
+        }
+
+        public static bool IsLocalPlayerProfile(PlayerProfile playerProfile)
+        {
+            return playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                   || lobbyMemberPlayerProfile.IsLocal;
+        }
+
+        public static bool IsRemotePlayerProfile(PlayerProfile playerProfile)
+        {
+            return !IsLocalPlayerProfile(playerProfile);
         }
     }
 }

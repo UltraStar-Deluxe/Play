@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -187,9 +188,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void TriggerAchievementsOnSingingResultsStart()
     {
         if (sceneData.PlayerProfiles
-            .AnyMatch(playerProfile => playerProfile != null
-                                       && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
-                                       && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000))
+            .AnyMatch(playerProfile =>
+                playerProfile != null
+                && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
+                && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000
+                && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile)))
         {
             achievementEventStream.OnNext(AchievementId.getMoreThan9000Points);
         }
