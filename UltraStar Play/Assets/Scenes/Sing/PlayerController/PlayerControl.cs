@@ -19,6 +19,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     public PlayerMicPitchTracker PlayerMicPitchTracker { get; private set; }
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    public PlayerPerformanceAssessmentControl PlayerPerformanceAssessmentControl { get; private set; }
+
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerScoreControl PlayerScoreControl { get; private set; }
 
     [Inject]
@@ -135,9 +138,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     private void InitAchievements()
     {
-        PlayerScoreControl.SentenceScoreEventStream.Subscribe(evt =>
+        PlayerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt =>
         {
-            if (evt.SentenceRating.EnumValue is ESentenceRating.Perfect)
+            if (evt.IsPerfect)
             {
                 perfectSentenceCount++;
                 if (perfectSentenceCount > 10
@@ -210,6 +213,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         Injector newInjector = UniInjectUtils.CreateInjector(injector);
         newInjector.AddBindingForInstance(PlayerMicPitchTracker);
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
+        newInjector.AddBindingForInstance(PlayerPerformanceAssessmentControl);
         newInjector.AddBindingForInstance(PlayerScoreControl);
         newInjector.AddBindingForInstance(PlayerUiControl);
         newInjector.AddBindingForInstance(newInjector);

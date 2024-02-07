@@ -15,7 +15,7 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private GameObject gameObject;
-    
+
     [Inject(UxmlName = R.UxmlNames.commonScoreSentenceRatingContainer)]
     private VisualElement commonScoreSentenceRatingContainer;
 
@@ -58,17 +58,17 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
             .Merge()
             .Subscribe(sentenceScoreEvent =>
             {
-                if (ratedSentences.Contains(sentenceScoreEvent.SentenceScore.Sentence)
+                if (ratedSentences.Contains(sentenceScoreEvent.Sentence)
                     || sentenceScoreEvent.SentenceRating.PercentageThreshold < 0.25)
                 {
                     return;
                 }
 
-                ratedSentences.Add(sentenceScoreEvent.SentenceScore.Sentence);
+                ratedSentences.Add(sentenceScoreEvent.Sentence);
                 ShowSentenceRating(sentenceScoreEvent.SentenceRating);
             })
             .AddTo(singSceneControl.gameObject);
-        
+
         UpdateCommonScoreLabel(false);
     }
 

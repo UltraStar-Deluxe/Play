@@ -200,9 +200,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         // Play applause if there is any player with more than 1000 points.
         bool shouldPlayApplause = sceneData.PlayerProfiles.AnyMatch(playerProfile =>
         {
-            PlayerScoreControlData playerScoreControlData = sceneData.GetPlayerScores(playerProfile);
-            return playerScoreControlData != null
-                   && playerScoreControlData.TotalScore > 1000;
+            SingingResultsPlayerScore singingResultsPlayerScore = sceneData.GetPlayerScores(playerProfile);
+            return singingResultsPlayerScore != null
+                   && singingResultsPlayerScore.TotalScore > 1000;
         });
         if (shouldPlayApplause)
         {
@@ -376,14 +376,14 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
             sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            PlayerScoreControlData playerScoreData = sceneData.GetPlayerScores(playerProfile);
-            SongRating songRating = GetSongRating(playerScoreData.TotalScore);
+            SingingResultsPlayerScore singingResultsPlayerScore = sceneData.GetPlayerScores(playerProfile);
+            SongRating songRating = GetSongRating(singingResultsPlayerScore.TotalScore);
 
             Injector childInjector = UniInjectUtils.CreateInjector(injector);
             childInjector.AddBindingForInstance(childInjector);
             childInjector.AddBindingForInstance(playerProfile);
             childInjector.AddBindingForInstance(micProfile);
-            childInjector.AddBindingForInstance(playerScoreData);
+            childInjector.AddBindingForInstance(singingResultsPlayerScore);
             childInjector.AddBindingForInstance(songRating);
             childInjector.AddBinding(new UniInjectBinding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
 

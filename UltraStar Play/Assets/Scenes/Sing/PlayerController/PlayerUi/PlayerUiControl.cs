@@ -19,6 +19,9 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
     private PlayerScoreControl playerScoreControl;
 
     [Inject]
+    private PlayerPerformanceAssessmentControl playerPerformanceAssessmentControl;
+
+    [Inject]
     private ThemeManager themeManager;
 
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
@@ -124,10 +127,10 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         if (singSceneControl.IsIndividualScore)
         {
             ShowTotalScore(playerScoreControl.TotalScore);
-            playerScoreControl.SentenceScoreEventStream.Subscribe(sentenceScoreEvent =>
+            playerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt =>
             {
                 ShowTotalScore(playerScoreControl.TotalScore);
-                ShowSentenceRating(sentenceScoreEvent.SentenceRating, sentenceRatingContainer);
+                ShowSentenceRating(evt.SentenceRating, sentenceRatingContainer);
             });
         }
         else if (settings.ScoreMode is EScoreMode.None)
@@ -136,11 +139,11 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
         }
 
         // Show an effect for perfectly sung notes
-        playerScoreControl.NoteScoreEventStream.Subscribe(noteScoreEvent =>
+        playerPerformanceAssessmentControl.NoteAssessedEventStream.Subscribe(evt =>
         {
-            if (noteScoreEvent.NoteScore.IsPerfect)
+            if (evt.IsPerfect)
             {
-                CreatePerfectNoteEffect(noteScoreEvent.NoteScore.Note);
+                CreatePerfectNoteEffect(evt.Note);
             }
         });
 
@@ -156,18 +159,15 @@ public class PlayerUiControl : INeedInjection, IInjectionFinishedListener
 
         nextPlayerNameLabel.HideByDisplay();
 
-        // Create effect when there are at least two perfect sentences in a row.
-        // Therefor, consider the currently finished sentence and its predecessor.
-        playerScoreControl.SentenceScoreEventStream.Buffer(2, 1)
-            // All elements (i.e. the currently finished and its predecessor) must have been "perfect"
-            .Where(xs => xs.AllMatch(x => x.SentenceRating == SentenceRating.perfect))
-            // Create an effect for these.
-            .Subscribe(xs => CreateMultiplePerfectSentenceEffect());
-
         // Single perfect sentence effect
-        playerScoreControl.SentenceScoreEventStream
-            .Where(x => x.SentenceRating == SentenceRating.perfect)
+        playerPerformanceAssessmentControl.SentenceAssessedEventStream
+            .Where(evt => evt.IsPerfect)
             .Subscribe(xs => CreateSinglePerfectSentenceEffect());
+
+        // Create effect when there are at least two perfect sentences in a row.
+        playerPerformanceAssessmentControl.SentenceAssessedEventStream.Buffer(2, 1)
+            .Where(events => events.AllMatch(evt => evt.IsPerfect))
+            .Subscribe(evt => CreateMultiplePerfectSentenceEffect());
 
         ChangeLayoutByPlayerCount();
 
