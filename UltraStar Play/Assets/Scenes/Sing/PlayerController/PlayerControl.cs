@@ -117,11 +117,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         // Inject all children.
         // The injector hierarchy is searched from the bottom up.
         // Thus, we can create an injection hierarchy with elements that are not necessarily in the same VisualElement hierarchy.
-        Injector playerUiControlInjector = childrenInjector.CreateChildInjector()
-            .WithRootVisualElement(playerInfoUiVisualElement)
-            .CreateChildInjector()
-            .WithRootVisualElement(playerUiVisualElement);
-        playerUiControlInjector.Inject(PlayerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {
             if (childThatNeedsInjection is not PlayerControl)
@@ -129,6 +124,13 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
                 childrenInjector.Inject(childThatNeedsInjection);
             }
         }
+
+        // The UiControl must be injected last because it depends on the other controls
+        Injector playerUiControlInjector = childrenInjector.CreateChildInjector()
+            .WithRootVisualElement(playerInfoUiVisualElement)
+            .CreateChildInjector()
+            .WithRootVisualElement(playerUiVisualElement);
+        playerUiControlInjector.Inject(PlayerUiControl);
 
         PlayerMicPitchTracker.MicProfile = MicProfile;
 
