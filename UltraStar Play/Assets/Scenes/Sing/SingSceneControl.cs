@@ -96,6 +96,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private Statistics statistics;
 
     [Inject]
+    private SteamManager steamManager;
+
+    [Inject]
     private UltraStarPlayInputManager inputManager;
 
     [Inject(UxmlName = R.UxmlNames.topLyricsContainer)]
@@ -643,6 +646,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void OnDestroy()
     {
+        steamManager.UnmuteMicrophone();
         webcamControl?.Stop();
         singSceneGovernanceControl?.Dispose();
         audioFadeInControl?.Dispose();
@@ -1384,6 +1388,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
         songAudioPlayer.PauseAudio();
         PlayerControls.ForEach(playerControl => playerControl.PlayerMicPitchTracker.StopRecording());
+        steamManager.UnmuteMicrophone();
 
         // Trigger achievement
         if (songAudioPlayer.PositionInSongInMillis > 60000)
@@ -1410,6 +1415,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             playerControl.PlayerMicPitchTracker.StartRecording();
             playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
         });
+        steamManager.MuteMicrophone();
 
         if (sendOnlineMultiplayerMessage)
         {

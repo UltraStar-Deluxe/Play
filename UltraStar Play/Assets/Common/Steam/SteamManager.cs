@@ -63,7 +63,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             steamAchievementManager.SetAvailableAchievements(SteamUserStats.Achievements);
 
             connectedToSteamEventStream.OnNext(true);
-            Debug.Log("Steam successfully initialized, PlayerName: " + PlayerName);
+            Debug.Log($"Steam successfully initialized: PlayerName: {PlayerName}, SteamUser.VoiceRecord: {SteamUser.VoiceRecord}");
         }
         catch (Exception e)
         {
@@ -78,5 +78,27 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         SteamClient.Shutdown();
         Debug.Log("SteamClient shut down successfully");
         disconnectedFromSteamEventStream.OnNext(true);
+    }
+
+    public void MuteMicrophone()
+    {
+        if (!IsConnectedToSteam)
+        {
+            return;
+        }
+
+        Debug.Log("Muting Steam microphone");
+        SteamUser.VoiceRecord = false;
+    }
+
+    public void UnmuteMicrophone()
+    {
+        if (!IsConnectedToSteam)
+        {
+            return;
+        }
+
+        Debug.Log("Unmuting Steam microphone");
+        SteamUser.VoiceRecord = true;
     }
 }
