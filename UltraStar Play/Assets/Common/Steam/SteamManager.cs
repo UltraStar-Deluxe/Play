@@ -50,7 +50,6 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
                 throw new SteamException("SteamClient.IsLoggedOn is false");
             }
 
-            IsConnectedToSteam = true;
             PlayerName = SteamClient.Name;
             PlayerSteamId = SteamClient.SteamId;
             IsConnectedToSteam = true;
