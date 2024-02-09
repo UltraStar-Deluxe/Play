@@ -44,7 +44,8 @@
         "LibVLCSharp.dll",
         "Mono.CSharp.dll",
         "Mono.Data.Sqlite.dll",
-        "ICSharpCode.SharpZipLib.dll"
+        "ICSharpCode.SharpZipLib.dll",
+        "WindowsInput.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
