@@ -1,0 +1,9 @@
+name: Toggle Mic via Key Stroke
+version: 1.0.0
+description: |
+  Triggers the keyboard shortcut CTRL+F9 when starting and finishing to sing a song.
+  Intended to mute a voice chat microphone, e.g., in Discord.
+authors:
+  - email@melodymania.org
+requiredAssemblies:
+  - WindowsInput
