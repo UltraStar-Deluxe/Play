@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonOnlineMultiplayer;
-using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -407,12 +406,17 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         notAvailableInOnlineGameIcon.HideByDisplay();
         if (onlineMultiplayerManager.IsOnlineGame)
         {
-            CheckAllPlayersHaveSongLocally(songMeta);
+            CheckOtherPlayersHaveSongLocally(songMeta);
         }
     }
 
-    private void CheckAllPlayersHaveSongLocally(SongMeta songMeta)
+    private void CheckOtherPlayersHaveSongLocally(SongMeta songMeta)
     {
+        if (onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds.IsNullOrEmpty())
+        {
+            return;
+        }
+
         disposables.Add(onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
             nameof(HasSongRequestDto),
             FastBufferWriterUtils.WriteJsonValuePacked(new HasSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
@@ -420,7 +424,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to check whether all lobby members have song '{SongMetaUtils.GetArtistDashTitle(songMeta)}' locally: {ex.Message}");
+                Debug.LogError($"Failed to check whether other lobby members have song locally: song: '{SongMetaUtils.GetArtistDashTitle(songMeta)}', error: {ex.Message}");
             })
             .Subscribe(response =>
             {

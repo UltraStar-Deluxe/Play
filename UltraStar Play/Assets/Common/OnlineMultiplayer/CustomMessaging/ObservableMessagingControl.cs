@@ -44,6 +44,15 @@ namespace CommonOnlineMultiplayer
             EReliableNetworkDelivery reliableNetworkDelivery = EReliableNetworkDelivery.ReliableSequenced,
             long timeoutInMillis = DefaultMessageTimeoutInMillis)
         {
+            if (messageName.IsNullOrEmpty())
+            {
+                return Observable.Throw<NamedMessage>(new IllegalArgumentException($"{nameof(messageName)} cannot be empty"));
+            }
+            if (targetNetcodeClientIds.IsNullOrEmpty())
+            {
+                return Observable.Throw<NamedMessage>(new IllegalArgumentException($"{nameof(targetNetcodeClientIds)} cannot be empty"));
+            }
+
             string requestId = Guid.NewGuid().ToString();
 
             RunningRequestData runningRequestData = new RunningRequestData(
@@ -60,7 +69,7 @@ namespace CommonOnlineMultiplayer
 
             return Observable.Create<NamedMessage>(o =>
             {
-                Debug.Log($"Sending observable request to {targetNetcodeClientIds.ToCsv(", ", "", "")}:  messageName: {messageName}, requestId: {requestId}");
+                Log.Debug(() => $"Sending observable request to targetNetcodeClientIds {targetNetcodeClientIds.ToCsv(", ", "", "")}:  messageName: {messageName}, requestId: {requestId}");
 
                 IDisposable namedMessageHandlerDisposable = null;
                 runningRequestData.OnTimeout = () =>
@@ -75,7 +84,7 @@ namespace CommonOnlineMultiplayer
                     }
 
                     // Notify subscribers
-                    o.OnError(new TimeoutException($"Received no response for message {messageName} with requestId {requestId} within {timeoutInMillis} ms"));
+                    o.OnError(new TimeoutException($"Received no response for message {messageName} with requestId {requestId} within {timeoutInMillis} ms (targetNetcodeClientIds: {targetNetcodeClientIds.ToCsv(", ", "", "")}, networkDelivery: {reliableNetworkDelivery})"));
                 };
 
                 // Register handler for response message
@@ -150,7 +159,6 @@ namespace CommonOnlineMultiplayer
                     RunningRequestData runningRequestData = runningRequestDatas[i];
                     if (TimeUtils.IsDurationAboveThresholdInMillis(runningRequestData.MessageSendTimeInMillis, runningRequestData.TimeoutInMillis))
                     {
-                        Debug.Log($"Timeout of observable message response with messageName: {runningRequestData.MessageName}, requestId: {runningRequestData.RequestId}");
                         runningRequestData.OnTimeout?.Invoke();
                         runningRequestDatas.Remove(runningRequestData);
                     }
