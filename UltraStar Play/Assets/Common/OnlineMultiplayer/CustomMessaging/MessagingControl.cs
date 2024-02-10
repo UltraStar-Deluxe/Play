@@ -230,7 +230,7 @@ namespace CommonOnlineMultiplayer
 
             messageHandlers.Add(namedMessageHandler);
 
-            Debug.Log($"RegisterNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
+            Log.Debug(() => $"RegisterNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
 
             bool isDisposed = false;
             return Disposable.Create(() =>
@@ -247,7 +247,7 @@ namespace CommonOnlineMultiplayer
                     messageNameToHandlers.Remove(messageName);
                     messageNameToHandleNamedMessageHelper.Remove(messageName);
                 }
-                Debug.Log($"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
+                Log.Debug(() => $"RemoveNamedMessageHandler - new count of handlers for message name '{messageName}': {messageHandlers.Count}");
             });
         }
     }
