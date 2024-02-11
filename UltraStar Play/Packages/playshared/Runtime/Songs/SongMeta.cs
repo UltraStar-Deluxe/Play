@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 [Serializable]
@@ -265,13 +264,37 @@ public class SongMeta
         VocalsAudio = other.VocalsAudio;
         Website = other.Website;
         Year = other.Year;
-        if (VoiceCount > 0)
+        CopyVoices(other);
+        CopyAdditionalHeaderEntries(other);
+    }
+
+    private void CopyAdditionalHeaderEntries(SongMeta other)
+    {
+        additionalHeaderEntries.Clear();
+        other.additionalHeaderEntries.ForEach(entry =>
         {
-            other.Voices.ForEach(voice =>
-            {
-                Voice voiceClone = voice.CloneDeep();
-                AddVoice(voiceClone);
-            });
+            additionalHeaderEntries.Add(entry.Key, entry.Value);
+        });
+    }
+
+    private void CopyVoices(SongMeta other)
+    {
+        voiceIdToVoice.Clear();
+        voiceIdToDisplayName.Clear();
+        if (other.VoiceCount <= 0)
+        {
+            return;
         }
+
+        other.Voices.ForEach(voice =>
+        {
+            Voice voiceClone = voice.CloneDeep();
+            AddVoice(voiceClone);
+        });
+
+        other.voiceIdToDisplayName.ForEach(entry =>
+        {
+            voiceIdToDisplayName.Add(entry.Key, entry.Value);
+        });
     }
 }

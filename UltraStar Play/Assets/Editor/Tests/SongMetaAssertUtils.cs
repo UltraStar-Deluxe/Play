@@ -1,29 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
-using UnityEngine;
 
-public class LoadAndSaveSongTest
+public static class SongMetaAssertUtils
 {
-    private static readonly string folderPath = $"{Application.dataPath}/Editor/Tests/TestSongs";
-
-    [Test]
-    public void LoadAndSaveSongDoesNotChangeFields()
-    {
-        string originalFilePath = $"{folderPath}/LoadAndSaveProperties-TestSong.txt";
-        UltraStarSongMeta originalSongMeta = LoadSong(originalFilePath);
-
-        string savedFilePath = $"{Application.temporaryCachePath}/LoadAndSaveProperties-TestSong-Saved.txt";
-        UltraStarFormatWriter.WriteFile(savedFilePath, originalSongMeta);
-
-        UltraStarSongMeta savedSongMeta = LoadSong(savedFilePath);
-
-        AssertSongMetasAreEqual(originalSongMeta, savedSongMeta);
-    }
-
-    private void AssertSongMetasAreEqual(UltraStarSongMeta expected, UltraStarSongMeta actual)
+    public static void AssertSongMetasAreEqual(SongMeta expected, SongMeta actual)
     {
         Assert.AreEqual(expected.Artist, actual.Artist);
         Assert.AreEqual(expected.Background, actual.Background);
@@ -65,23 +46,18 @@ public class LoadAndSaveSongTest
         Assert.AreEqual(SongMetaUtils.GetLyrics(expected, EVoiceId.P1), SongMetaUtils.GetLyrics(actual, EVoiceId.P1));
         Assert.AreEqual(SongMetaUtils.GetLyrics(expected, EVoiceId.P2), SongMetaUtils.GetLyrics(actual, EVoiceId.P2));
 
-        // Remove FileInfo from data structure such that both should serialize to same JSON
-        FileInfo originalSongMetaFileInfo = expected.FileInfo;
-        expected.SetFileInfo((FileInfo)null);
-
-        FileInfo savedSongMetaFileInfo = actual.FileInfo;
-        actual.SetFileInfo((FileInfo)null);
-        string originalSongJson = JsonConverter.ToJson(expected);
-        string savedSongJson = JsonConverter.ToJson(actual);
+        // Compare without FileInfo such that both should serialize to same JSON
+        string originalSongJson = ToJsonWithoutFileInfo(expected);
+        string savedSongJson = ToJsonWithoutFileInfo(actual);
         Assert.AreEqual(originalSongJson, savedSongJson);
-
-        // Restore FileInfo
-        expected.SetFileInfo(originalSongMetaFileInfo);
-        actual.SetFileInfo(savedSongMetaFileInfo);
     }
 
-    private UltraStarSongMeta LoadSong(string path)
+    private static string ToJsonWithoutFileInfo(SongMeta songMeta)
     {
-        return UltraStarSongParser.ParseFile(path, out List<SongIssue> songIssues, null, true);
+        FileInfo fileInfo = songMeta.FileInfo;
+        songMeta.SetFileInfo((FileInfo)null);
+        string json = JsonConverter.ToJson(songMeta);
+        songMeta.SetFileInfo(fileInfo);
+        return json;
     }
 }
