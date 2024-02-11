@@ -50,9 +50,33 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
         Debug.Log($"{nameof(SongFileCacheLifeCycle)} - Loading {songsCache.CachedSongs.Count} songs from cache");
         foreach (CachedSong cachedSong in songsCache.CachedSongs)
         {
-            LazyLoadedFromFileSongMeta songMeta = new LazyLoadedFromFileSongMeta(cachedSong.FilePath);
-            songMetaManager.AddSongMeta(songMeta);
+            try
+            {
+                LoadCachedSong(cachedSong);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to load cached song '{cachedSong.FilePath}', error: {ex.Message}");
+            }
         }
+    }
+
+    private void LoadCachedSong(CachedSong cachedSong)
+    {
+        SongMeta songMeta;
+        if (cachedSong.FileContent.IsNullOrEmpty())
+        {
+            // Lazy load file content on demand
+            songMeta = new LazyLoadedFromFileSongMeta(cachedSong.FilePath);
+        }
+        else
+        {
+            // Load already cached file content now
+            songMeta = UltraStarSongParser.ParseString(cachedSong.FileContent, out _);
+            songMeta.SetFileInfo(cachedSong.FilePath);
+        }
+        songMetaManager.AddSongMeta(songMeta);
     }
 
     private List<string> SearchTxtFiles(string songFolder)
@@ -71,9 +95,10 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
 
     private void UpdateSongsCache(List<string> txtFiles, string cacheFilePath)
     {
-        SongCache newSongsCache = new SongCache(txtFiles);
+        SongCache newSongsCache = new SongCache(txtFiles, modSettings.cacheFileContent);
 
-        if (loadedSongsCache != null)
+        if (loadedSongsCache != null
+            && HasEqualSettings(loadedSongsCache, modSettings))
         {
             // Quick and dirty JSON comparison to determine whether songs changed
             string loadedSongsCacheJson = NewtonsoftJsonConverter.ToJson(loadedSongsCache);
@@ -93,6 +118,11 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
         {
             UiManager.CreateNotification("UltraStar txt files changed.\nPlease restart the game to load them from cache.");
         }
+    }
+
+    private bool HasEqualSettings(SongCache loadedSongsCache, SongFileCacheModSettings modSettings)
+    {
+        return loadedSongsCache.CacheFileContent == modSettings.cacheFileContent;
     }
 
     private void SaveCache(SongCache songsCache, string cacheFilePath)
@@ -136,33 +166,40 @@ public class SongFileCacheLifeCycle : IOnLoadMod, IOnDisableMod
 public class SongCache
 {
     public List<CachedSong> CachedSongs { get; set; } = new List<CachedSong>();
+    public bool CacheFileContent { get; set; }
 
     public SongCache()
     {
         // Empty constructor for JSON deserialization
     }
 
-    public SongCache(IReadOnlyCollection<string> txtFiles)
+    public SongCache(IReadOnlyCollection<string> txtFiles, bool cacheFileContent)
     {
-        txtFiles.ForEach(txtFile =>
+        CacheFileContent = cacheFileContent;
+        foreach (string txtFile in txtFiles)
         {
-            CachedSong songCache = new CachedSong(txtFile);
+            string fileContent = cacheFileContent
+                ? FileUtils.ReadAllText(txtFile)
+                : "";
+            CachedSong songCache = new CachedSong(txtFile, fileContent);
             CachedSongs.Add(songCache);
-        });
+        };
     }
 }
 
 public class CachedSong
 {
     public string FilePath { get; set; }
+    public string FileContent { get; set; }
 
     public CachedSong()
     {
         // Empty constructor for JSON deserialization
     }
 
-    public CachedSong(string filePath)
+    public CachedSong(string filePath, string fileContent)
     {
         FilePath = filePath;
+        FileContent = fileContent;
     }
 }
