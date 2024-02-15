@@ -87,8 +87,8 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        Debug.Log("Muting Steam microphone");
-        SteamUser.VoiceRecord = false;
+        Log.Debug(() => "Muting Steam microphone of own player");
+        SteamFriends.SetInGameVoiceSpeaking(PlayerSteamId, true);
     }
 
     public void UnmuteMicrophone()
@@ -98,7 +98,7 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
             return;
         }
 
-        Debug.Log("Unmuting Steam microphone");
-        SteamUser.VoiceRecord = true;
+        Log.Debug(() => "Unmuting Steam microphone of own player");
+        SteamFriends.SetInGameVoiceSpeaking(PlayerSteamId, false);
     }
 }
