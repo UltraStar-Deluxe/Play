@@ -31,7 +31,7 @@ namespace SteamOnlineMultiplayer
 
         public static LobbyQuery WithPassword(this LobbyQuery lobbyQuery, string value)
         {
-            return lobbyQuery.WithKeyValue("password", value ?? "");
+            return lobbyQuery.WithKeyValue("password", value);
         }
 
         public static void SetVisibility(this Lobby lobby, ESteamLobbyVisibility visibility)

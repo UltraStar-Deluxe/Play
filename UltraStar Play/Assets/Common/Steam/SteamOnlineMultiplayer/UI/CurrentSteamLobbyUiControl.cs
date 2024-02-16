@@ -96,7 +96,7 @@ namespace SteamOnlineMultiplayer
             SteamLobby lobby = steamLobbyManager.CurrentSteamLobby;
             if (lobby != null)
             {
-                string passwordInfo = !lobby.Password.IsNullOrEmpty()
+                string passwordInfo = SteamLobbyManager.IsNonEmptyPassword(lobby.Password)
                     ? $"Online game is hidden with password: {lobby.Password}"
                     : "";
                 SetLobbyInfo(passwordInfo);

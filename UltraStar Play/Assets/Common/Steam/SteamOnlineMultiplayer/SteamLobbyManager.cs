@@ -14,6 +14,8 @@ namespace SteamOnlineMultiplayer
     {
         public static SteamLobbyManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamLobbyManager>();
 
+        public const string EmptyPassword = "EMPTY_PASSWORD";
+
         [Inject]
         private SteamManager steamManager;
 
@@ -105,16 +107,18 @@ namespace SteamOnlineMultiplayer
 
             Debug.Log($"Creating new lobby with config: {JsonConverter.ToJson(config)}");
 
+            string passwordOrEmpty = GetPasswordOrEmptyPassword(config.password);
+
             Lobby lobby = await SteamMatchmaking.CreateLobbyAsync(config.maxMembers)
                           ?? throw new OnlineMultiplayerException("Failed to create new lobby.");
             lobby.SetVisibility(ESteamLobbyVisibility.Public);
             lobby.SetJoinable(config.joinable);
             lobby.SetName(config.name);
-            lobby.SetPassword(config.password ?? "");
+            lobby.SetPassword(passwordOrEmpty);
 
             CurrentSteamLobby = new SteamLobby(lobby);
 
-            Debug.Log($"Successfully created new lobby with id {lobby.Id} and owner {lobby.Owner} from config: {JsonConverter.ToJson(config)}");
+            Debug.Log($"Successfully created new lobby with id {lobby.Id} and owner {lobby.Owner} and password {passwordOrEmpty} from config: {JsonConverter.ToJson(config)}");
 
             return lobby;
         }
@@ -147,15 +151,17 @@ namespace SteamOnlineMultiplayer
                 return Array.Empty<Lobby>();
             }
 
+            string passwordOrEmpty = GetPasswordOrEmptyPassword(password);
+
             LobbyQuery lobbyQuery = SteamMatchmaking.LobbyList
                 .FilterDistanceWorldwide()
                 .WithMaxResults(100)
-                .WithPassword(password);
+                .WithPassword(passwordOrEmpty);
 
             Lobby[] lobbies = await lobbyQuery.RequestAsync()
                                    ?? Array.Empty<Lobby>();
 
-            Debug.Log($"Found {lobbies.Length} Steam lobbies. password: {password}");
+            Debug.Log($"Found {lobbies.Length} Steam lobbies. password: {passwordOrEmpty}");
 
             return lobbies;
         }
@@ -251,5 +257,17 @@ namespace SteamOnlineMultiplayer
         }
 
         #endregion
+
+        public static bool IsNonEmptyPassword(string lobbyPassword)
+        {
+            return !lobbyPassword.IsNullOrEmpty() && lobbyPassword != EmptyPassword;
+        }
+
+        private static string GetPasswordOrEmptyPassword(string password)
+        {
+            // Steam does not list lobbies when password is set to the empty string, even when searching for this.
+            // As workaround, the empty string is replaced here.
+            return password.IsNullOrEmpty() ? EmptyPassword : password;
+        }
     }
 }
