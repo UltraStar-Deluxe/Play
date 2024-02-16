@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CommonOnlineMultiplayer;
-using Steamworks.Data;
 using UniInject;
 using UniRx;
 using Unity.Netcode;
@@ -18,6 +17,12 @@ namespace SteamOnlineMultiplayer
     {
         [Inject(UxmlName = R.UxmlNames.connectedClientsListTitle)]
         private Label connectedClientsListTitle;
+
+        [Inject(UxmlName = R.UxmlNames.lobbyInfoContainer)]
+        private VisualElement lobbyInfoContainer;
+
+        [Inject(UxmlName = R.UxmlNames.lobbyInfoLabel)]
+        private Label lobbyInfoLabel;
 
         [Inject(UxmlName = R.UxmlNames.connectedClientsListScrollView)]
         private VisualElement connectedClientsListScrollView;
@@ -51,6 +56,7 @@ namespace SteamOnlineMultiplayer
         {
             connectedClientsListTitle.text = "Connected Players";
             connectedClientsListScrollView.Clear();
+            SetLobbyInfo("");
 
             disconnectOnlineGameButton.RegisterCallbackButtonTriggered(_ => steamLobbyManager.LeaveCurrentLobby());
 
@@ -74,6 +80,12 @@ namespace SteamOnlineMultiplayer
             UpdateLobbyMemberList();
         }
 
+        private void SetLobbyInfo(string text)
+        {
+            lobbyInfoLabel.text = text;
+            lobbyInfoContainer.SetVisibleByDisplay(!text.IsNullOrEmpty());
+        }
+
         private void OnLobbyMembersChanged()
         {
             UpdateLobbyMemberList();
@@ -81,9 +93,14 @@ namespace SteamOnlineMultiplayer
 
         private void OnSteamLobbyChanged()
         {
-            if (steamLobbyManager.CurrentSteamLobby != null)
+            SteamLobby lobby = steamLobbyManager.CurrentSteamLobby;
+            if (lobby != null)
             {
-                connectedClientsListTitle.text = $"Members of \"{steamLobbyManager.CurrentSteamLobby.Name}\"";
+                string passwordInfo = !lobby.Password.IsNullOrEmpty()
+                    ? $"Online game is hidden with password: {lobby.Password}"
+                    : "";
+                SetLobbyInfo(passwordInfo);
+                connectedClientsListTitle.text = $"Members of \"{lobby.Name}\"";
                 UpdateLobbyMemberList();
             }
             else

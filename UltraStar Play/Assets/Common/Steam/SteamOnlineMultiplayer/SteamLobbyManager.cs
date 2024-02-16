@@ -107,10 +107,10 @@ namespace SteamOnlineMultiplayer
 
             Lobby lobby = await SteamMatchmaking.CreateLobbyAsync(config.maxMembers)
                           ?? throw new OnlineMultiplayerException("Failed to create new lobby.");
-            lobby.SetVisibility(config.visibility);
+            lobby.SetVisibility(ESteamLobbyVisibility.Public);
             lobby.SetJoinable(config.joinable);
             lobby.SetName(config.name);
-            lobby.SetPassword(config.password);
+            lobby.SetPassword(config.password ?? "");
 
             CurrentSteamLobby = new SteamLobby(lobby);
 
@@ -148,13 +148,16 @@ namespace SteamOnlineMultiplayer
             }
 
             LobbyQuery lobbyQuery = SteamMatchmaking.LobbyList
-                .WithMaxResults(100);
-            if (!password.IsNullOrEmpty())
-            {
-                lobbyQuery.WithPassword(password);
-            }
-            return await lobbyQuery.RequestAsync()
-                   ?? Array.Empty<Lobby>();
+                .FilterDistanceWorldwide()
+                .WithMaxResults(100)
+                .WithPassword(password);
+
+            Lobby[] lobbies = await lobbyQuery.RequestAsync()
+                                   ?? Array.Empty<Lobby>();
+
+            Debug.Log($"Found {lobbies.Length} Steam lobbies. password: {password}");
+
+            return lobbies;
         }
 
         public void LeaveCurrentLobby()

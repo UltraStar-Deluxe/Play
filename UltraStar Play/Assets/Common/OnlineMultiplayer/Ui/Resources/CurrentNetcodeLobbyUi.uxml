@@ -9,6 +9,6 @@
             <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
             <ui:Instance template="PlayerProfileListEntryUi" name="PlayerProfileListEntryUi" />
         </ui:ScrollView>
-        <ui:Button text="Leave Lobby" parse-escape-sequences="true" display-tooltip-when-elided="true" name="disconnectOnlineGameButton" />
+        <ui:Button text="Leave Online Game" parse-escape-sequences="true" display-tooltip-when-elided="true" name="disconnectOnlineGameButton" />
     </ui:VisualElement>
 </ui:UXML>

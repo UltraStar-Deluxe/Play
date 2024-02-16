@@ -368,6 +368,8 @@ public static partial class R
         public const string loadedSceneContent = "loadedSceneContent";
         public const string loadedSceneTitle = "loadedSceneTitle";
         public const string loadingLabel = "loadingLabel";
+        public const string lobbyInfoContainer = "lobbyInfoContainer";
+        public const string lobbyInfoLabel = "lobbyInfoLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logFfmpegOutputToggle = "logFfmpegOutputToggle";
         public const string logo = "logo";
