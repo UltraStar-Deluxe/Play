@@ -18,6 +18,9 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private SteamAchievementManager steamAchievementManager;
 
+    [Inject]
+    private Settings settings;
+
     private readonly Subject<bool> connectedToSteamEventStream = new();
     public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
 
@@ -82,23 +85,26 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
     public void MuteMicrophone()
     {
-        if (!IsConnectedToSteam)
-        {
-            return;
-        }
-
-        Log.Debug(() => "Muting Steam microphone of own player");
-        SteamFriends.SetInGameVoiceSpeaking(PlayerSteamId, true);
+        SetVoiceChatMicrophoneEnabled(settings.MuteSteamVoiceChatMicrophone is EMuteSteamVoiceChatMicrophone.WhenSingingInverted);
     }
 
     public void UnmuteMicrophone()
     {
-        if (!IsConnectedToSteam)
+        SetVoiceChatMicrophoneEnabled(settings.MuteSteamVoiceChatMicrophone is not EMuteSteamVoiceChatMicrophone.WhenSingingInverted);
+    }
+
+    private void SetVoiceChatMicrophoneEnabled(bool isEnabled)
+    {
+        if (!IsConnectedToSteam
+            || settings.MuteSteamVoiceChatMicrophone is EMuteSteamVoiceChatMicrophone.DoNotMute)
         {
             return;
         }
 
-        Log.Debug(() => "Unmuting Steam microphone of own player");
-        SteamFriends.SetInGameVoiceSpeaking(PlayerSteamId, false);
+        Log.Debug(() => $"SetVoiceChatMicrophoneEnabled: {isEnabled}");
+
+        // InGameVoiceSpeaking is true means microphone is muted,
+        // then this will suppress the microphone for all voice communication in the Steam UI.
+        SteamFriends.SetInGameVoiceSpeaking(PlayerSteamId, !isEnabled);
     }
 }
