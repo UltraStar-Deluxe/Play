@@ -359,8 +359,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
             .SelectMany(uri =>
             {
-                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
-                    || songSelectSongEntry.SongMeta != songMeta)
+                if (SongEntryChanged(songMeta))
                 {
                     // The entry changed in the meantime
                     return Observable.Return<Sprite>(null);
@@ -377,8 +376,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             {
                 Debug.LogException(ex);
 
-                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
-                    || songSelectSongEntry.SongMeta != songMeta)
+                if (SongEntryChanged(songMeta))
                 {
                     // The entry changed in the meantime
                     return;
@@ -387,8 +385,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             })
             .Subscribe(sprite =>
             {
-                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
-                    || songSelectSongEntry.SongMeta != songMeta)
+                if (SongEntryChanged(songMeta))
                 {
                     // The entry changed in the meantime
                     return;
@@ -428,6 +425,11 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             })
             .Subscribe(response =>
             {
+                if (SongEntryChanged(songMeta))
+                {
+                    return;
+                }
+
                 HasSongResponseDto responseDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongResponseDto>(response.MessagePayload);
                 if (!responseDto.HasSong)
                 {
@@ -435,6 +437,17 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
                     notAvailableInOnlineGameIcon.ShowByDisplay();
                 }
             }));
+    }
+
+    private bool SongEntryChanged(SongMeta songMeta)
+    {
+        return !IsSongEntry(songMeta);
+    }
+
+    private bool IsSongEntry(SongMeta songMeta)
+    {
+        return SongSelectEntry is SongSelectSongEntry songSelectSongEntry
+               && songSelectSongEntry.SongMeta == songMeta;
     }
 
     private void SetDefaultFolderImage()
