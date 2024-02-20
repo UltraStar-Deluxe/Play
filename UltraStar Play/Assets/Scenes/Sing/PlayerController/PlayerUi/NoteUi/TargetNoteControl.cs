@@ -1,4 +1,5 @@
-﻿using UniInject;
+﻿using CommonOnlineMultiplayer;
+using UniInject;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -36,6 +37,9 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(Optional = true)]
     private MicProfile micProfile;
+
+    [Inject]
+    private PlayerProfile playerProfile;
 
     [Inject]
     private SingSceneControl singSceneControl;
@@ -76,18 +80,28 @@ public class TargetNoteControl : INeedInjection, IInjectionFinishedListener
 
     private void SetStyleByMicProfile()
     {
-        if (micProfile == null)
-        {
-            return;
-        }
-
-        Color color = Note.IsGolden
+        Color32 color = Note.IsGolden
             ? themeManager.GetGoldenColor()
-            : micProfile.Color;
+            : GetColorForPlayer();
 
-        image.style.unityBackgroundImageTintColor = color;
+        image.style.unityBackgroundImageTintColor = new StyleColor(color);
         image.SetBorderColor(color);
         targetNoteBorder.SetBorderColor(color);
+    }
+
+    private Color32 GetColorForPlayer()
+    {
+        if (micProfile != null)
+        {
+            return micProfile.Color;
+        }
+
+        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
+        {
+            return ColorGenerationUtils.FromString(lobbyMemberPlayerProfile.Name);
+        }
+
+        return Colors.white;
     }
 
     private void CreateGoldenNoteParticleEffect()

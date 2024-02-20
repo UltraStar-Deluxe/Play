@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
@@ -17,6 +18,9 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerMicPitchTracker PlayerMicPitchTracker { get; private set; }
+
+    [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
+    public PlayerPerformanceAssessmentControl PlayerPerformanceAssessmentControl { get; private set; }
 
     [Inject(SearchMethod = SearchMethods.GetComponentInChildren)]
     public PlayerScoreControl PlayerScoreControl { get; private set; }
@@ -65,11 +69,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     [Inject]
     private Injector injector;
 
-    // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
-    private Injector childrenInjector;
-
-    public PlayerUiControl PlayerUiControl { get; private set; }
-
     [Inject]
     private SongMeta songMeta;
 
@@ -79,14 +78,27 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
     [Inject]
     private AchievementEventStream achievementEventStream;
 
+    public PlayerUiControl PlayerUiControl { get; private set; } = new();
+
+    // An injector with additional bindings, such as the PlayerProfile and the MicProfile.
+    private Injector childrenInjector;
+
     private int displaySentenceIndex;
 
     private int perfectSentenceCount;
 
+    private List<Note> sortedNotesInVoice;
+    private List<Sentence> sortedSentencesInVoice;
+
     public void OnInjectionFinished()
     {
-        this.PlayerUiControl = new PlayerUiControl();
-        this.childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
+        childrenInjector = CreateChildrenInjectorWithAdditionalBindings();
+
+        sortedNotesInVoice = SongMetaUtils.GetAllNotes(Voice);
+        sortedNotesInVoice.Sort(Note.comparerByStartBeat);
+
+        sortedSentencesInVoice = Voice.Sentences.ToList();
+        sortedSentencesInVoice.Sort(Sentence.comparerByStartBeat);
 
         SortedSentences = Voice.Sentences.ToList();
         SortedSentences.Sort(Sentence.comparerByStartBeat);
@@ -105,11 +117,6 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         // Inject all children.
         // The injector hierarchy is searched from the bottom up.
         // Thus, we can create an injection hierarchy with elements that are not necessarily in the same VisualElement hierarchy.
-        Injector playerUiControlInjector = childrenInjector.CreateChildInjector()
-            .WithRootVisualElement(playerInfoUiVisualElement)
-            .CreateChildInjector()
-            .WithRootVisualElement(playerUiVisualElement);
-        playerUiControlInjector.Inject(PlayerUiControl);
         foreach (INeedInjection childThatNeedsInjection in gameObject.GetComponentsInChildren<INeedInjection>(true))
         {
             if (childThatNeedsInjection is not PlayerControl)
@@ -117,6 +124,13 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
                 childrenInjector.Inject(childThatNeedsInjection);
             }
         }
+
+        // The UiControl must be injected last because it depends on the other controls
+        Injector playerUiControlInjector = childrenInjector.CreateChildInjector()
+            .WithRootVisualElement(playerInfoUiVisualElement)
+            .CreateChildInjector()
+            .WithRootVisualElement(playerUiVisualElement);
+        playerUiControlInjector.Inject(PlayerUiControl);
 
         PlayerMicPitchTracker.MicProfile = MicProfile;
 
@@ -127,9 +141,14 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
     private void InitAchievements()
     {
-        PlayerScoreControl.SentenceScoreEventStream.Subscribe(evt =>
+        if (CommonOnlineMultiplayerUtils.IsRemotePlayerProfile(PlayerProfile))
         {
-            if (evt.SentenceRating.EnumValue is ESentenceRating.Perfect)
+            return;
+        }
+
+        PlayerPerformanceAssessmentControl.SentenceAssessedEventStream.Subscribe(evt =>
+        {
+            if (evt.IsPerfect)
             {
                 perfectSentenceCount++;
                 if (perfectSentenceCount > 10
@@ -202,6 +221,7 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
         Injector newInjector = UniInjectUtils.CreateInjector(injector);
         newInjector.AddBindingForInstance(PlayerMicPitchTracker);
         newInjector.AddBindingForInstance(PlayerNoteRecorder);
+        newInjector.AddBindingForInstance(PlayerPerformanceAssessmentControl);
         newInjector.AddBindingForInstance(PlayerScoreControl);
         newInjector.AddBindingForInstance(PlayerUiControl);
         newInjector.AddBindingForInstance(newInjector);
@@ -237,6 +257,16 @@ public class PlayerControl : MonoBehaviour, INeedInjection, IInjectionFinishedLi
 
         // Update the UI
         enterSentenceEventStream.OnNext(new EnterSentenceEvent(displaySentence, displaySentenceIndex));
+    }
+
+    public IReadOnlyList<Note> GetSortedNotesInVoice()
+    {
+        return sortedNotesInVoice;
+    }
+
+    public IReadOnlyList<Sentence> GetSortedSentencesInVoice()
+    {
+        return sortedSentencesInVoice;
     }
 
     public Sentence GetSentence(int index)

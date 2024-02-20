@@ -1,4 +1,7 @@
-﻿using UniInject;
+﻿using System;
+using CommonOnlineMultiplayer;
+using SteamOnlineMultiplayer;
+using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -44,8 +47,18 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
     [Inject(Key = Injector.RootVisualElementInjectionKey)]
     private VisualElement image;
 
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
+
+    private LobbyMember lobbyMember;
+
     public void OnInjectionFinished()
     {
+        if (playerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
+        {
+            lobbyMember = onlineMultiplayerManager.LobbyMemberManager.GetLobbyMember(lobbyMemberPlayerProfile.UnityNetcodeClientId);
+        }
+
         UpdatePlayerProfileImage();
     }
 
@@ -56,11 +69,43 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
             return;
         }
 
-        UpdatePlayerImageBackgroundColor();
+        UpdatePlayerImageColors();
 
-        string finalImagePath = uiManager.GetFinalPlayerProfileImagePath(playerProfile);
-        uiManager.LoadPlayerProfileImage(finalImagePath)
-            .Subscribe(loadedSprite => image.style.backgroundImage = new StyleBackground(loadedSprite));
+        if (lobbyMember == null)
+        {
+            string finalImagePath = uiManager.GetFinalPlayerProfileImagePath(playerProfile);
+            uiManager.LoadPlayerProfileImage(finalImagePath)
+                .Subscribe(loadedSprite => image.style.backgroundImage = new StyleBackground(loadedSprite));
+        }
+        else if (lobbyMember is SteamLobbyMember steamLobbyMember)
+        {
+            SteamOnlineMultiplayerUtils.GetAvatarTextureAsObservable(steamLobbyMember.SteamId)
+                .CatchIgnore((Exception ex) =>
+                {
+                    Debug.LogException(ex);
+                    Debug.LogError(
+                        $"Failed to get avatar image of player with Steam id {steamLobbyMember.SteamId}: {ex.Message}");
+                })
+                .Subscribe(texture =>
+                {
+                    image.style.backgroundImage = new StyleBackground(texture);
+                });
+        }
+    }
+
+    private void UpdatePlayerImageColors()
+    {
+        UpdatePlayerImageBackgroundColor();
+        UpdatePlayerImageTintColor();
+    }
+
+    private void UpdatePlayerImageTintColor()
+    {
+        if (lobbyMember != null
+            && lobbyMember is not SteamLobbyMember)
+        {
+            image.style.unityBackgroundImageTintColor = new StyleColor(CommonOnlineMultiplayerUtils.GetPlayerColor(playerProfile, micProfile));
+        }
     }
 
     private void UpdatePlayerImageBackgroundColor()
@@ -68,10 +113,9 @@ public class PlayerProfileImageControl : INeedInjection, IInjectionFinishedListe
         if (micProfile != null)
         {
             image.style.backgroundColor = new StyleColor(micProfile.Color);
+            return;
         }
-        else
-        {
-            image.style.backgroundColor = new StyleColor(Color.clear);
-        }
+
+        image.style.backgroundColor =  new StyleColor(Color.clear);
     }
 }

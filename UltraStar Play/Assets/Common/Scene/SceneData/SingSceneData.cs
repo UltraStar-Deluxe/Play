@@ -15,7 +15,8 @@ public class SingSceneData : SceneData
 
     public double PositionInSongInMillis { get; set; }
     public bool IsRestart { get; set; }
-    public Dictionary<PlayerProfile, List<PlayerScoreControlData>> PlayerProfileToScoreDataMap { get; set; } = new();
+    public bool StartPaused { get; set; }
+    public Dictionary<PlayerProfile, List<ISingingResultsPlayerScore>> PlayerProfileToScoreDataMap { get; set; } = new();
 
     public SingSceneData()
     {

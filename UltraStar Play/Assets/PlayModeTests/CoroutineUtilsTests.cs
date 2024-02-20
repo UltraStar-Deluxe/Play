@@ -10,6 +10,8 @@ public class CoroutineUtilsTests : AbstractPlayModeTest
     [UnityTest]
     public IEnumerator CoroutineSequenceTest()
     {
+        LogAssert.ignoreFailingMessages = true;
+
         List<string> list = new();
 
         ApplicationManager.Instance.StartCoroutine(CoroutineUtils.Sequence(

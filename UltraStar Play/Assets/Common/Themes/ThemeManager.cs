@@ -1248,7 +1248,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         return sceneRecipeManager.GetCurrentScene();
     }
 
-    public Color GetGoldenColor()
+    public Color32 GetGoldenColor()
     {
         return GetCurrentTheme().ThemeJson.goldenColor
             .OrIfDefault(defaultGoldenColor);

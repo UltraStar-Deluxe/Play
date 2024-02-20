@@ -8,7 +8,10 @@ public abstract class AbstractRestControl : AbstractSingletonBehaviour, INeedInj
 {
     [Inject]
     protected HttpServer httpServer;
-    
+
     [Inject]
     protected Settings settings;
+
+    [Inject]
+    protected NonPersistentSettings nonPersistentSettings;
 }

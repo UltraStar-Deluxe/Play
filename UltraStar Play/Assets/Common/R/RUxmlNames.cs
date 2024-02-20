@@ -48,6 +48,7 @@ public static partial class R
         public const string backIcon = "backIcon";
         public const string banner = "banner";
         public const string basicPitchCommandTextField = "basicPitchCommandTextField";
+        public const string beatAnalyzedEventNetworkDeliveryPicker = "beatAnalyzedEventNetworkDeliveryPicker";
         public const string bestMatchnigTrackAndChannelLabel = "bestMatchnigTrackAndChannelLabel";
         public const string bonusLabel = "bonusLabel";
         public const string bottomBarsOverlay = "bottomBarsOverlay";
@@ -110,6 +111,8 @@ public static partial class R
         public const string connectedClientCountLabel = "connectedClientCountLabel";
         public const string connectedClientList = "connectedClientList";
         public const string connectedClientListEntryUiRoot = "connectedClientListEntryUiRoot";
+        public const string connectedClientsListScrollView = "connectedClientsListScrollView";
+        public const string connectedClientsListTitle = "connectedClientsListTitle";
         public const string connectionEndpointLabel = "connectionEndpointLabel";
         public const string contentContainer = "contentContainer";
         public const string continueButton = "continueButton";
@@ -129,10 +132,14 @@ public static partial class R
         public const string CreditsEntryUi = "CreditsEntryUi";
         public const string creditsIcon = "creditsIcon";
         public const string creditsSummaryLabel = "creditsSummaryLabel";
+        public const string currentConnectionControlsContainer = "currentConnectionControlsContainer";
         public const string currentDifficultyLabel = "currentDifficultyLabel";
+        public const string currentNetcodeLobbyUiRoot = "currentNetcodeLobbyUiRoot";
         public const string currentSentenceContainer = "currentSentenceContainer";
+        public const string currentSteamLobbyUiRoot = "currentSteamLobbyUiRoot";
         public const string customEventSystemOptInOnAndroidToggle = "customEventSystemOptInOnAndroidToggle";
         public const string dateLabel = "dateLabel";
+        public const string defaultCloseDialogButton = "defaultCloseDialogButton";
         public const string defaultMedleyTargetDurationPicker = "defaultMedleyTargetDurationPicker";
         public const string delayPicker = "delayPicker";
         public const string deleteButton = "deleteButton";
@@ -158,6 +165,7 @@ public static partial class R
         public const string dialogTitleImageAndTextContainer = "dialogTitleImageAndTextContainer";
         public const string difficultyChooser = "difficultyChooser";
         public const string difficultyPicker = "difficultyPicker";
+        public const string disconnectOnlineGameButton = "disconnectOnlineGameButton";
         public const string doPitchDetectionInSelectionButton = "doPitchDetectionInSelectionButton";
         public const string doSpeechRecognitionButton = "doSpeechRecognitionButton";
         public const string downloadSongArchiveButton = "downloadSongArchiveButton";
@@ -169,6 +177,9 @@ public static partial class R
         public const string duetLegend = "duetLegend";
         public const string duetLegendIcon = "duetLegendIcon";
         public const string duetLegendLabel = "duetLegendLabel";
+        public const string dummyCurrentLobbyControls = "dummyCurrentLobbyControls";
+        public const string dummyHostLobbyControls = "dummyHostLobbyControls";
+        public const string dummyJoinLobbyControls = "dummyJoinLobbyControls";
         public const string dummyPermissionToggle = "dummyPermissionToggle";
         public const string durationLabel = "durationLabel";
         public const string editingGroup = "editingGroup";
@@ -235,6 +246,18 @@ public static partial class R
         public const string horizontalGrid = "horizontalGrid";
         public const string horizontalGridLabelContainer = "horizontalGridLabelContainer";
         public const string horizontalGridLineContainer = "horizontalGridLineContainer";
+        public const string hostedGameList = "hostedGameList";
+        public const string hostedGameListScrollView = "hostedGameListScrollView";
+        public const string hostedGameListTitle = "hostedGameListTitle";
+        public const string hostGameNameField = "hostGameNameField";
+        public const string hostHiddenGamePasswordField = "hostHiddenGamePasswordField";
+        public const string hostHiddenGameToggle = "hostHiddenGameToggle";
+        public const string hostNetcodeLobbyUiRoot = "hostNetcodeLobbyUiRoot";
+        public const string hostOnlineGameButton = "hostOnlineGameButton";
+        public const string hostOnlineGameControlsContainer = "hostOnlineGameControlsContainer";
+        public const string hostOnlineGameDirectlyButton = "hostOnlineGameDirectlyButton";
+        public const string hostOnlineGameTabButton = "hostOnlineGameTabButton";
+        public const string hostSteamLobbyUiRoot = "hostSteamLobbyUiRoot";
         public const string httpEndpointExampleLabel = "httpEndpointExampleLabel";
         public const string httpServerHostTextField = "httpServerHostTextField";
         public const string httpServerPortTextField = "httpServerPortTextField";
@@ -296,6 +319,13 @@ public static partial class R
         public const string jobProgressBar = "jobProgressBar";
         public const string jobRunningIcon = "jobRunningIcon";
         public const string jobStatusIconContainer = "jobStatusIconContainer";
+        public const string joinHiddenGamePasswordField = "joinHiddenGamePasswordField";
+        public const string joinHostedGameButton = "joinHostedGameButton";
+        public const string joinNetcodeLobbyUiRoot = "joinNetcodeLobbyUiRoot";
+        public const string joinOnlineGameControlsContainer = "joinOnlineGameControlsContainer";
+        public const string joinOnlineGameDirectlyButton = "joinOnlineGameDirectlyButton";
+        public const string joinOnlineGameTabButton = "joinOnlineGameTabButton";
+        public const string joinSteamLobbyUiRoot = "joinSteamLobbyUiRoot";
         public const string knockOutLabel = "knockOutLabel";
         public const string knockOutLabelOverlay = "knockOutLabelOverlay";
         public const string knockOutTournamentItemToggle = "knockOutTournamentItemToggle";
@@ -338,6 +368,8 @@ public static partial class R
         public const string loadedSceneContent = "loadedSceneContent";
         public const string loadedSceneTitle = "loadedSceneTitle";
         public const string loadingLabel = "loadingLabel";
+        public const string lobbyInfoContainer = "lobbyInfoContainer";
+        public const string lobbyInfoLabel = "lobbyInfoLabel";
         public const string localHighScoreContainer = "localHighScoreContainer";
         public const string logFfmpegOutputToggle = "logFfmpegOutputToggle";
         public const string logo = "logo";
@@ -462,6 +494,7 @@ public static partial class R
         public const string noSongsFoundContainer = "noSongsFoundContainer";
         public const string noSongsFoundIcon = "noSongsFoundIcon";
         public const string noSongsFoundLabel = "noSongsFoundLabel";
+        public const string notAvailableInOnlineGameIcon = "notAvailableInOnlineGameIcon";
         public const string notConnectedContainer = "notConnectedContainer";
         public const string notConnectedLabel = "notConnectedLabel";
         public const string note = "note";
@@ -485,6 +518,11 @@ public static partial class R
         public const string nPlayerLayout = "nPlayerLayout";
         public const string okButton = "okButton";
         public const string onePlayerLayout = "onePlayerLayout";
+        public const string onlineGameButton = "onlineGameButton";
+        public const string onlineMultiplayerDialogUiRoot = "onlineMultiplayerDialogUiRoot";
+        public const string onlineMultiplayerGroup = "onlineMultiplayerGroup";
+        public const string onlinePlayerProfileIcon = "onlinePlayerProfileIcon";
+        public const string onlinePlayerProfileIconContainer = "onlinePlayerProfileIconContainer";
         public const string openControlsMenuButton = "openControlsMenuButton";
         public const string openFileIcon = "openFileIcon";
         public const string openFolderButton = "openFolderButton";
@@ -644,6 +682,8 @@ public static partial class R
         public const string searchBarContainer = "searchBarContainer";
         public const string searchContainer = "searchContainer";
         public const string searchErrorIcon = "searchErrorIcon";
+        public const string searchHostedGamesButton = "searchHostedGamesButton";
+        public const string searchLobbiesIcon = "searchLobbiesIcon";
         public const string searchMidiFilesWithLyricsToggle = "searchMidiFilesWithLyricsToggle";
         public const string searchNextButton = "searchNextButton";
         public const string searchNextIcon = "searchNextIcon";
@@ -833,6 +873,7 @@ public static partial class R
         public const string sum = "sum";
         public const string syncLyricsAreaToggle = "syncLyricsAreaToggle";
         public const string systemAudioBackendDelayPicker = "systemAudioBackendDelayPicker";
+        public const string tabGroup = "tabGroup";
         public const string takeWebCamImageButton = "takeWebCamImageButton";
         public const string takeWebCamImageIcon = "takeWebCamImageIcon";
         public const string targetFpsPicker = "targetFpsPicker";
@@ -890,6 +931,7 @@ public static partial class R
         public const string toggleMicCheckButton = "toggleMicCheckButton";
         public const string toggleMicCheckButtonLabel = "toggleMicCheckButtonLabel";
         public const string toggleModifiersOverlayButton = "toggleModifiersOverlayButton";
+        public const string toggleOnlineMultiplayerBackendButton = "toggleOnlineMultiplayerBackendButton";
         public const string togglePlaybackButton = "togglePlaybackButton";
         public const string togglePlayerSelectedButton = "togglePlayerSelectedButton";
         public const string toggleRecordingButton = "toggleRecordingButton";
@@ -918,6 +960,8 @@ public static partial class R
         public const string undoButton = "undoButton";
         public const string unexpectedErrorContainer = "unexpectedErrorContainer";
         public const string unexpectedErrorLabel = "unexpectedErrorLabel";
+        public const string unityTransportIpAddressField = "unityTransportIpAddressField";
+        public const string unityTransportPortField = "unityTransportPortField";
         public const string unityVersionLabel = "unityVersionLabel";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";

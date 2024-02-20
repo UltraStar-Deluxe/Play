@@ -10,6 +10,7 @@ public static partial class R_PlayShared
         public const string asset = "asset";
         public const string backgroundTransition = "backgroundTransition";
         public const string bootstrapIcon = "bootstrapIcon";
+        public const string borderBottom = "borderBottom";
         public const string bottomLineSeparator = "bottomLineSeparator";
         public const string centerVerticalByMargin = "centerVerticalByMargin";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
@@ -106,6 +107,7 @@ public static partial class R_PlayShared
         public const string noBackgroundInHierarchy = "noBackgroundInHierarchy";
         public const string noSearchResults = "noSearchResults";
         public const string noTextShadow = "noTextShadow";
+        public const string onlineMultiplayerHost = "onlineMultiplayerHost";
         public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";

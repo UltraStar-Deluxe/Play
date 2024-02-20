@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -187,9 +188,11 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
     private void TriggerAchievementsOnSingingResultsStart()
     {
         if (sceneData.PlayerProfiles
-            .AnyMatch(playerProfile => playerProfile != null
-                                       && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
-                                       && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000))
+            .AnyMatch(playerProfile =>
+                playerProfile != null
+                && playerProfile.Difficulty is EDifficulty.Medium or EDifficulty.Hard
+                && sceneData.GetPlayerScores(playerProfile)?.TotalScore > 9000
+                && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile)))
         {
             achievementEventStream.OnNext(AchievementId.getMoreThan9000Points);
         }
@@ -200,9 +203,9 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         // Play applause if there is any player with more than 1000 points.
         bool shouldPlayApplause = sceneData.PlayerProfiles.AnyMatch(playerProfile =>
         {
-            PlayerScoreControlData playerScoreControlData = sceneData.GetPlayerScores(playerProfile);
-            return playerScoreControlData != null
-                   && playerScoreControlData.TotalScore > 1000;
+            ISingingResultsPlayerScore singingResultsPlayerScore = sceneData.GetPlayerScores(playerProfile);
+            return singingResultsPlayerScore != null
+                   && singingResultsPlayerScore.TotalScore > 1000;
         });
         if (shouldPlayApplause)
         {
@@ -376,14 +379,14 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
         foreach (PlayerProfile playerProfile in sceneData.PlayerProfiles)
         {
             sceneData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            PlayerScoreControlData playerScoreData = sceneData.GetPlayerScores(playerProfile);
-            SongRating songRating = GetSongRating(playerScoreData.TotalScore);
+            ISingingResultsPlayerScore singingResultsPlayerScore = sceneData.GetPlayerScores(playerProfile);
+            SongRating songRating = GetSongRating(singingResultsPlayerScore.TotalScore);
 
             Injector childInjector = UniInjectUtils.CreateInjector(injector);
             childInjector.AddBindingForInstance(childInjector);
             childInjector.AddBindingForInstance(playerProfile);
             childInjector.AddBindingForInstance(micProfile);
-            childInjector.AddBindingForInstance(playerScoreData);
+            childInjector.AddBindingForInstance(singingResultsPlayerScore);
             childInjector.AddBindingForInstance(songRating);
             childInjector.AddBinding(new UniInjectBinding("playerProfileIndex", new ExistingInstanceProvider<int>(i)));
 

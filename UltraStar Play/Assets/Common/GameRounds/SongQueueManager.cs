@@ -38,6 +38,9 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private Settings settings;
 
+    [Inject]
+    private NonPersistentSettings nonPersistentSettings;
+
     protected override object GetInstance()
     {
         return Instance;
@@ -90,7 +93,7 @@ public class SongQueueManager : AbstractSingletonBehaviour, INeedInjection
 
         SingSceneData singSceneData = new();
         singSceneData.SongMetas = songMetas;
-        singSceneData.SingScenePlayerData = DtoConverter.FromDto(firstEntry.SingScenePlayerDataDto, settings);
+        singSceneData.SingScenePlayerData = DtoConverter.FromDto(firstEntry.SingScenePlayerDataDto, settings, nonPersistentSettings);
         singSceneData.gameRoundSettings = DtoConverter.FromDto(firstEntry.GameRoundSettingsDto);
         singSceneData.partyModeSceneData = partyModeSceneData;
         if (nextEntries.Count > 1)

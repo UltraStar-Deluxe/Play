@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniInject.Extensions;
 using UniRx;
@@ -50,6 +51,9 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
 
     [Inject]
     protected SingSceneMedleyControl medleyControl;
+
+    [Inject]
+    protected PlayerProfile playerProfile;
 
     [Inject(Optional = true)]
     protected MicProfile micProfile;
@@ -371,6 +375,7 @@ public abstract class AbstractSingSceneNoteDisplayer : INeedInjection, IInjectio
         recordedNoteControl.EndBeat = recordedNote.StartBeat + (recordedNoteControl.LifeTimeInSeconds * beatsPerSecond);
 
         recordedNoteControl.MidiNote = midiNote;
+        recordedNoteControl.Color = CommonOnlineMultiplayerUtils.GetPlayerColor(playerProfile, micProfile);
 
         Label label = recordedNoteControl.Label;
         if (showPitchOfNotes)

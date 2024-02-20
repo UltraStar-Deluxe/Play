@@ -7,11 +7,6 @@ using UnityEngine;
 
 public static class SongMetaUtils
 {
-    private static readonly HashBasedColorGenerator colorGenerator = new(
-        o => o?.GetHashCode() ?? 0,
-        new Vector2(0.4f, 1f),
-        new Vector2(0.7f, 1f));
-
     public static bool SongMetaFileExists(SongMeta songMeta)
     {
         return songMeta?.FileInfo?.Exists ?? false;
@@ -210,7 +205,16 @@ public static class SongMetaUtils
         {
             return null;
         }
-        return voice.Sentences.FirstOrDefault(sentence => IsBeatInSentence(sentence, beat, inclusiveMinBeat, inclusiveMaxBeat));
+        return GetSentenceAtBeat(voice.Sentences, beat, inclusiveMinBeat, inclusiveMaxBeat);
+    }
+
+    public static Sentence GetSentenceAtBeat(IReadOnlyCollection<Sentence> sentences, int beat, bool inclusiveMinBeat = true, bool inclusiveMaxBeat = true)
+    {
+        if (sentences.IsNullOrEmpty())
+        {
+            return null;
+        }
+        return sentences.FirstOrDefault(sentence => IsBeatInSentence(sentence, beat, inclusiveMinBeat, inclusiveMaxBeat));
     }
 
     public static Note GetNoteAtBeat(IEnumerable<Note> notes, int beat, bool inclusiveStartBeat = true, bool inclusiveEndBeat = true)
@@ -788,13 +792,7 @@ public static class SongMetaUtils
 
     public static Color32 CreateColorForSongMeta(SongMeta songMeta)
     {
-        string artistDashTitle = GetArtistDashTitle(songMeta);
-        if (artistDashTitle.IsNullOrEmpty())
-        {
-            return Color.white;
-        }
-
-        return colorGenerator.ToColor(artistDashTitle);
+        return ColorGenerationUtils.FromString(GetArtistDashTitle(songMeta));
     }
 
     public static string ComputeScoreRelevantSongHash(SongMeta songMeta)

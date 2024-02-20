@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -51,6 +52,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     [Inject]
     private Injector injector;
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     [Inject]
     private Settings settings;
@@ -140,6 +144,9 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
     private int lastUpdateAllMicPitchTrackersFrameCount;
 
+    public bool CanSelectMic => PlayerProfile is not LobbyMemberPlayerProfile
+                                || PlayerProfile == onlineMultiplayerManager.OwnLobbyMemberPlayerProfile;
+
     public void OnInjectionFinished()
     {
         InitVoiceSelection();
@@ -149,7 +156,17 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         injector.Inject(micProgressBarRecordingControl);
         micProgressBarRecordingControl.MicProfile = MicProfile;
 
-        togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ => IsSelected.Value = !IsSelected.Value);
+        togglePlayerSelectedButton.RegisterCallbackButtonTriggered(_ =>
+        {
+            if (PlayerProfile is LobbyMemberPlayerProfile)
+            {
+                // Online multiplayer players cannot be disabled
+                IsSelected.Value = true;
+                return;
+            }
+
+            IsSelected.Value = !IsSelected.Value;
+        });
         micButton.RegisterCallbackButtonTriggered(_ => OpenMicSelectionDialog());
 
         focusableNavigator.AddCustomNavigationTarget(micButton, Vector2.left, togglePlayerSelectedButton, true);
@@ -159,17 +176,10 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
 
         IsSelected.Subscribe(newValue =>
         {
-            if (newValue)
-            {
-                playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
-                noMicIcon.ShowByVisibility();
-            }
-            else
-            {
-                playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
-                noMicIcon.HideByVisibility();
-            }
-            micButton.SetVisibleByDisplay(newValue);
+            UpdateBackgroundImageTintColor();
+
+            micButton.SetVisibleByDisplay(newValue
+                                          && CanSelectMic);
 
             if (PlayerProfile != null)
             {
@@ -178,6 +188,27 @@ public class SongSelectPlayerEntryControl : INeedInjection, IInjectionFinishedLi
         });
 
         nonPersistentSettings.MicTestActive.Subscribe(_ => UpdateAllMicPitchTrackers());
+    }
+
+    private void UpdateBackgroundImageTintColor()
+    {
+        if (PlayerProfile is LobbyMemberPlayerProfile lobbyMemberPlayerProfile)
+        {
+            // Online multiplayer players cannot be disabled.
+            playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+            return;
+        }
+
+        if (IsSelected.Value)
+        {
+            playerImage.style.unityBackgroundImageTintColor = new StyleColor(Colors.white);
+            noMicIcon.ShowByVisibility();
+        }
+        else
+        {
+            playerImage.style.unityBackgroundImageTintColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
+            noMicIcon.HideByVisibility();
+        }
     }
 
     private void InitVoiceSelection()

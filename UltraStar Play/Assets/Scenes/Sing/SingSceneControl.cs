@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using ProTrans;
 using UniInject;
 using UniInject.Extensions;
@@ -95,6 +96,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private Statistics statistics;
 
     [Inject]
+    private SteamManager steamManager;
+
+    [Inject]
     private UltraStarPlayInputManager inputManager;
 
     [Inject(UxmlName = R.UxmlNames.topLyricsContainer)]
@@ -134,6 +138,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     private AudioSeparationManager audioSeparationManager;
 
     [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
+
+    [Inject]
     private AchievementEventStream achievementEventStream;
 
     public List<PlayerControl> PlayerControls { get; private set; } = new();
@@ -154,7 +161,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 if (sceneData.MedleySongIndex >= sceneData.SongMetas.Count)
                 {
                     Debug.LogWarning($"Cannot start medley song at index {sceneData.MedleySongIndex} because there are only {sceneData.SongMetas.Count} songs selected for the medley. Exiting SingScene.");
-                    FinishScene(false, false);
+                    FinishScene(false, false, true);
                     return null;
                 }
 
@@ -206,6 +213,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public ReactiveProperty<int> ModifiedVolumePercent { get; private set; } = new(100);
 
+    private readonly List<IDisposable> disposables = new();
+
     public void OnInjectionFinished()
     {
         // PassTheMicControl may not be executed.
@@ -242,7 +251,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             PlayerProfile playerProfile = sceneData.SingScenePlayerData.SelectedPlayerProfiles[i];
             sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap.TryGetValue(playerProfile, out MicProfile micProfile);
-            if (micProfile == null)
+            if (micProfile == null
+                && (playerProfile is not LobbyMemberPlayerProfile lobbyMemberPlayerProfile
+                    || lobbyMemberPlayerProfile.UnityNetcodeClientId == onlineMultiplayerManager.OwnLobbyMemberUnityNetcodeClientId))
             {
                 playerProfilesWithoutMic.Add(playerProfile);
             }
@@ -259,29 +270,26 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 continue;
             }
 
-            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<PlayerScoreControlData> scoreDatas))
+            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerProfile, out List<ISingingResultsPlayerScore> scoreDatas))
             {
                 if (sceneData.MedleySongIndex < 0)
                 {
                     // No medley, select first score data
-                    playerControl.PlayerScoreControl.ScoreData = scoreDatas.FirstOrDefault();
+                    playerControl.PlayerScoreControl.SetCalculationData(scoreDatas.FirstOrDefault());
                 }
                 else if (sceneData.MedleySongIndex < scoreDatas.Count)
                 {
                     // This is a medley (or short song), select score data for this medley entry song
-                    playerControl.PlayerScoreControl.ScoreData = scoreDatas[sceneData.MedleySongIndex];
+                    playerControl.PlayerScoreControl.SetCalculationData(scoreDatas[sceneData.MedleySongIndex]);
                 }
 
-                if (playerControl.PlayerScoreControl.ScoreData != null)
-                {
-                    playerControl.PlayerUiControl.ShowTotalScore(playerControl.PlayerScoreControl.ScoreData.TotalScore, false);
-                }
+                playerControl.PlayerUiControl.ShowTotalScore(playerControl.PlayerScoreControl.CalculationData.TotalScore, false);
             }
 
             // Update leading player icon
             if (sceneData.SingScenePlayerData.SelectedPlayerProfiles.Count > 1)
             {
-                playerControl.PlayerScoreControl.SentenceScoreEventStream
+                playerControl.PlayerMicPitchTracker.SentenceAnalyzedEventStream
                     .Subscribe(_ => UpdateLeadingPlayerIcon());
             }
         }
@@ -353,7 +361,210 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             injector.Inject(passTheMicControl);
         }
 
+        InitOnlineMultiplayer();
+
         TriggerAchievementsAtSongStart();
+    }
+
+    private void InitOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        if (onlineMultiplayerManager.IsHost)
+        {
+            SendInitialUnpauseMessageWhenAllReadyToStartForOnlineMultiplayer(0);
+        }
+
+        InitOnlineMultiplayerMessageHandlers();
+    }
+
+    private void SendEndSingSceneMessageForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(EndSingSceneRequest),
+            FastBufferWriterUtils.WriteJsonValuePacked(new EndSingSceneRequest()),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
+    }
+
+    private void SendAbortSingSceneMessageForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(AbortSingSceneRequest),
+            FastBufferWriterUtils.WriteJsonValuePacked(new AbortSingSceneRequest()),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
+    }
+
+    private void SendPauseMessageForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(PauseRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new PauseRequestDto()),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
+    }
+
+    private void SendUnpauseMessageToOthersForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(UnpauseRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new UnpauseRequestDto()),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds);
+    }
+
+    private void SendInitialUnpauseMessageWhenAllReadyToStartForOnlineMultiplayer(int failedAttempts)
+    {
+        if (!onlineMultiplayerManager.IsHost)
+        {
+            // Only the host sends the unpause message to all (including itself)
+            // to start singing with all peers roughly at the same time.
+            return;
+        }
+
+        int maxFailedAttempts = 6;
+        long timeoutInMillis = 500;
+
+        // Send message to all lobby members to start playback when all clients are ready
+        onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
+                nameof(SingSceneReadyRequestDto),
+                FastBufferWriterUtils.WriteJsonValuePacked(new SingSceneReadyRequestDto()),
+                onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds,
+                EReliableNetworkDelivery.ReliableSequenced,
+                timeoutInMillis)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to check readiness of lobby members at {failedAttempts + 1} attempt: {ex.Message}");
+
+                if (failedAttempts >= maxFailedAttempts)
+                {
+                    // Failed for good, go back to song select
+                    Debug.LogError($"Failed to check readiness of lobby members too many times. Going back to song select.");
+                    AbortSceneToSongSelect(true);
+                }
+                else
+                {
+                    // Try again after short delay (if this error was not triggered by a timeout already)
+                    float delayInSeconds = ex is TimeoutException
+                        ? 0
+                        : timeoutInMillis / 1000f;
+                    StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(delayInSeconds,
+                        () => SendInitialUnpauseMessageWhenAllReadyToStartForOnlineMultiplayer(failedAttempts + 1)));
+                }
+            })
+            .DoOnCompleted(() =>
+            {
+                Debug.Log($"All Netcode clients are ready to start. Sending start message");
+                onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+                    nameof(UnpauseRequestDto),
+                    FastBufferWriterUtils.WriteJsonValuePacked(new UnpauseRequestDto()
+                    {
+                        ShowSenderName = false,
+                    }),
+                    onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
+            })
+            .Subscribe(response =>
+            {
+                SingSceneReadyResponseDto responseDto = FastBufferReaderUtils.ReadJsonValuePacked<SingSceneReadyResponseDto>(response.MessagePayload);
+                Debug.Log($"Netcode client {response.SenderNetcodeClientId} is ready to start");
+            });
+    }
+
+    private void InitOnlineMultiplayerMessageHandlers()
+    {
+        if (!onlineMultiplayerManager.IsOnlineGame)
+        {
+            return;
+        }
+
+        // Send response that SingScene is ready
+        disposables.Add(onlineMultiplayerManager.ObservableMessagingControl.RegisterObservedMessageHandler(
+            nameof(SingSceneReadyRequestDto),
+            observedMessage =>
+            {
+                onlineMultiplayerManager.ObservableMessagingControl.SendResponseMessage(
+                    observedMessage,
+                    FastBufferWriterUtils.WriteJsonValuePacked(new SingSceneReadyResponseDto()));
+            }));
+
+        // Handle messages to pause and resume the game
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(PauseRequestDto),
+            message =>
+            {
+                PauseRequestDto pauseRequestDto = FastBufferReaderUtils.ReadJsonValuePacked<PauseRequestDto>(message.MessagePayload);
+                if (pauseRequestDto.ShowSenderName)
+                {
+                    UiManager.CreateNotification(
+                        $"Paused by {CommonOnlineMultiplayerUtils.GetPlayerDisplayName(onlineMultiplayerManager, message)}");
+                }
+
+                Pause(false);
+            }));
+
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(UnpauseRequestDto),
+            message =>
+            {
+                UnpauseRequestDto unpauseRequestDto = FastBufferReaderUtils.ReadJsonValuePacked<UnpauseRequestDto>(message.MessagePayload);
+                if (unpauseRequestDto.ShowSenderName)
+                {
+                    UiManager.CreateNotification($"Resumed by {CommonOnlineMultiplayerUtils.GetPlayerDisplayName(onlineMultiplayerManager, message)}");
+                }
+
+                Unpause(false);
+            }));
+
+        // Handle messages to end singing
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(EndSingSceneRequest),
+            message =>
+            {
+                FinishScene(false, false, false);
+            }));
+
+        disposables.Add(onlineMultiplayerManager.MessagingControl.RegisterNamedMessageHandler(
+            nameof(AbortSingSceneRequest),
+            message =>
+            {
+                Debug.Log("Abort singing because of online multiplayer request. See log of host player for details.");
+                AbortSceneToSongSelect(false);
+            }));
+    }
+
+    private void AbortSceneToSongSelect(bool sendOnlineMultiplayerMessage)
+    {
+        sceneNavigator.LoadScene(EScene.SongSelectScene, new SongSelectSceneData()
+        {
+            SongMeta = SongMeta,
+            partyModeSceneData = PartyModeSceneData,
+        });
+
+        if (sendOnlineMultiplayerMessage)
+        {
+            SendAbortSingSceneMessageForOnlineMultiplayer();
+        }
     }
 
     private void CreateGameRoundModifiers()
@@ -438,6 +649,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         webcamControl?.Stop();
         singSceneGovernanceControl?.Dispose();
         audioFadeInControl?.Dispose();
+        disposables.ForEach(it => it.Dispose());
     }
 
     private void InitDummySingers()
@@ -710,7 +922,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
     {
         if (sceneData.IsMedley)
         {
-            // Skipping is not allowed in a medley.
+            UiManager.CreateNotification("Cannot skip during medley.");
+            return;
+        }
+
+        if (onlineMultiplayerManager.IsOnlineGame)
+        {
+            UiManager.CreateNotification("Cannot skip during online game.");
             return;
         }
 
@@ -763,8 +981,34 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
 
     public void Restart()
     {
+        if (onlineMultiplayerManager.IsOnlineGame
+            && !onlineMultiplayerManager.IsHost)
+        {
+            UiManager.CreateNotification("The host player must restart.");
+            return;
+        }
+
         sceneData.IsRestart = true;
         sceneNavigator.LoadScene(EScene.SingScene, sceneData);
+
+        SendRestartMessageForOnlineMultiplayer();
+    }
+
+    private void SendRestartMessageForOnlineMultiplayer()
+    {
+        if (!onlineMultiplayerManager.IsHost)
+        {
+            return;
+        }
+
+        SingSceneDataDto singSceneDataDto = NetcodeMessageDtoConverterUtils.ToDto(sceneData);
+        onlineMultiplayerManager.MessagingControl.SendNamedMessageToClients(
+            nameof(StartSingSceneRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new StartSingSceneRequestDto()
+            {
+                SingSceneDataDto = singSceneDataDto,
+            }),
+            onlineMultiplayerManager.AllLobbyMembersUnityNetcodeClientIds);
     }
 
     public void OpenSongInEditor()
@@ -780,14 +1024,13 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             return;
         }
 
-        int maxBeatToScore = PlayerControls
-            .Select(playerController => playerController.PlayerScoreControl.NextBeatToScore)
-            .Max();
-
         sceneData.PlayerProfileToScoreDataMap = new();
         foreach (PlayerControl playerController in PlayerControls)
         {
-            sceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, new List<PlayerScoreControlData> { playerController.PlayerScoreControl.ScoreData });
+            sceneData.PlayerProfileToScoreDataMap.Add(playerController.PlayerProfile, new List<ISingingResultsPlayerScore>
+            {
+                playerController.PlayerScoreControl.CalculationData
+            });
         }
 
         SongEditorSceneData songEditorSceneData = new()
@@ -803,7 +1046,10 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         sceneNavigator.LoadScene(EScene.SongEditorScene, songEditorSceneData);
     }
 
-    public void FinishScene(bool isAfterEndOfSong, bool continueWithNextMedleySong)
+    public void FinishScene(
+        bool isAfterEndOfSong,
+        bool continueWithNextMedleySong,
+        bool sendOnlineMultiplayerMessage)
     {
         if (hasFinishedScene)
         {
@@ -833,6 +1079,11 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             FinishSceneToSingingResults(isAfterEndOfSong);
         }
+
+        if (sendOnlineMultiplayerMessage)
+        {
+            SendEndSingSceneMessageForOnlineMultiplayer();
+        }
     }
 
     private void TriggerAchievementsAfterEndOfSong()
@@ -860,9 +1111,9 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             if (!newSingSceneData.PlayerProfileToScoreDataMap.ContainsKey(playerControl.PlayerProfile))
             {
-                newSingSceneData.PlayerProfileToScoreDataMap.Add(playerControl.PlayerProfile, new List<PlayerScoreControlData>());
+                newSingSceneData.PlayerProfileToScoreDataMap.Add(playerControl.PlayerProfile, new List<ISingingResultsPlayerScore>());
             }
-            newSingSceneData.PlayerProfileToScoreDataMap[playerControl.PlayerProfile].Add(playerControl.PlayerScoreControl.ScoreData);
+            newSingSceneData.PlayerProfileToScoreDataMap[playerControl.PlayerProfile].Add(playerControl.PlayerScoreControl.CalculationData);
         }
         // Continue with next medley song
         newSingSceneData.MedleySongIndex++;
@@ -897,8 +1148,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             singingResultsSceneData.PlayerProfileToMicProfileMap = sceneData.SingScenePlayerData.PlayerProfileToMicProfileMap;
             PlayerControls.ForEach(playerControl =>
             {
-                PlayerScoreControlData playerScoreControlData = GetPlayerScoreDataForSingingResultsScene(playerControl);
-                singingResultsSceneData.AddPlayerScores(playerControl.PlayerProfile, playerScoreControlData);
+                ISingingResultsPlayerScore singingResultsPlayerScore = GetSingingResultsPlayerScore(playerControl);
+                singingResultsSceneData.AddPlayerScores(playerControl.PlayerProfile, singingResultsPlayerScore);
             });
 
             highScoreEntries = PlayerControls
@@ -911,8 +1162,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         else if (IsCommonScore)
         {
             // Add and record score as average of all players.
-            List<PlayerScoreControlData> scoreControlDatas = PlayerControls
-                .Select(playerControl => GetPlayerScoreDataForSingingResultsScene(playerControl))
+            List<ISingingResultsPlayerScore> scoreControlDatas = PlayerControls
+                .Select(playerControl => GetSingingResultsPlayerScore(playerControl))
                 .ToList();
             string commonPlayerProfileName = PlayerControls
                 .Select(playerControl => playerControl.PlayerProfile.Name)
@@ -922,8 +1173,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
                 .PlayerProfile.Difficulty;
             string commonProfileImagePath = uiManager.GetFinalPlayerProfileImagePath(PlayerControls.Select(it => it.PlayerProfile).FirstOrDefault());
             PlayerProfile commonPlayerProfile = new(commonPlayerProfileName, easiestPlayerProfileDifficulty, commonProfileImagePath);
-            PlayerScoreControlData commonScoreData = CreateAveragePlayerScoreControlData(scoreControlDatas);
-            singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScoreData);
+            ISingingResultsPlayerScore commonScore = CreateAveragePlayerScoreControlData(scoreControlDatas);
+            singingResultsSceneData.AddPlayerScores(commonPlayerProfile, commonScore);
 
             // Define common mic profile
             MicProfile commonMicProfile = PlayerControls
@@ -937,7 +1188,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             HighScoreEntry commonHighScoreEntry = new HighScoreEntry(
                 commonPlayerProfileName,
                 easiestPlayerProfileDifficulty,
-                commonScoreData.TotalScore,
+                commonScore.TotalScore,
                 EScoreMode.CommonAverage);
             highScoreEntries = new() { commonHighScoreEntry };
         }
@@ -965,39 +1216,36 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         sceneNavigator.LoadScene(EScene.SingingResultsScene, singingResultsSceneData);
     }
 
-    private PlayerScoreControlData GetPlayerScoreDataForSingingResultsScene(PlayerControl playerControl)
+    private ISingingResultsPlayerScore GetSingingResultsPlayerScore(PlayerControl playerControl)
     {
         if (sceneData.IsMedley)
         {
             // Use the average of all medley songs
-            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerControl.PlayerProfile, out List<PlayerScoreControlData> scoreDatas)
+            if (sceneData.PlayerProfileToScoreDataMap.TryGetValue(playerControl.PlayerProfile, out List<ISingingResultsPlayerScore> scoreDatas)
                 && scoreDatas.Count > 0)
             {
-                List<PlayerScoreControlData> allScoreDatas = new(scoreDatas);
+                List<ISingingResultsPlayerScore> allScoreDatas = new(scoreDatas);
                 // Include the score for the current song
-                allScoreDatas.Add(playerControl.PlayerScoreControl.ScoreData);
+                allScoreDatas.Add(playerControl.PlayerScoreControl.CalculationData);
                 return CreateAveragePlayerScoreControlData(allScoreDatas);
             }
         }
 
         // Use the current score data of the player
-        return playerControl.PlayerScoreControl.ScoreData;
+        return playerControl.PlayerScoreControl.CreateSingingResultsPlayerScore();
     }
 
-    private PlayerScoreControlData CreateAveragePlayerScoreControlData(List<PlayerScoreControlData> scoreControlDatas)
+    private ISingingResultsPlayerScore CreateAveragePlayerScoreControlData<T>(List<T> scoreDatas)
+        where T : ISingingResultsPlayerScore
     {
-        PlayerScoreControlData averageScoreData = new()
+        SingingResultsPlayerScore averageScore = new()
         {
-            TotalScore = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.TotalScore).Average(),
-            GoldenNotesTotalScore = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.GoldenNotesTotalScore).Average(),
-            NormalNotesTotalScore = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.NormalNotesTotalScore).Average(),
-            PerfectSentenceBonusTotalScore = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.PerfectSentenceBonusTotalScore).Average(),
-            PerfectSentenceCount = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.PerfectSentenceCount).Average(),
-            TotalSentenceCount = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.TotalSentenceCount).Average(),
-            NormalNoteLengthTotal = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.NormalNoteLengthTotal).Average(),
-            GoldenNoteLengthTotal = (int)scoreControlDatas.Select(scoreControlData => scoreControlData.GoldenNoteLengthTotal).Average()
+            NormalNotesTotalScore = (int)scoreDatas.Select(scoreControlData => scoreControlData.NormalNotesTotalScore).Average(),
+            GoldenNotesTotalScore = (int)scoreDatas.Select(scoreData => scoreData.GoldenNotesTotalScore).Average(),
+            PerfectSentenceBonusTotalScore = (int)scoreDatas.Select(scoreControlData => scoreControlData.PerfectSentenceBonusTotalScore).Average(),
+            ModTotalScore = (int)scoreDatas.Select(scoreControlData => scoreControlData.ModTotalScore).Average(),
         };
-        return averageScoreData;
+        return averageScore;
     }
 
     private List<ConnectedClientHandlerAndMicProfile> GetConnectedClientHandlers()
@@ -1130,7 +1378,7 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         return extendedVoiceIds[voiceIndex];
     }
 
-    public void Pause()
+    public void Pause(bool sendOnlineMultiplayerMessage)
     {
         if (IsPaused)
         {
@@ -1145,9 +1393,14 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         {
             achievementEventStream.OnNext(AchievementId.pauseSingingAfterOneMinute);
         }
+
+        if (sendOnlineMultiplayerMessage)
+        {
+            SendPauseMessageForOnlineMultiplayer();
+        }
     }
 
-    public void Unpause()
+    public void Unpause(bool sendOnlineMultiplayerMessage)
     {
         if (!IsPaused)
         {
@@ -1160,17 +1413,22 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             playerControl.PlayerMicPitchTracker.StartRecording();
             playerControl.PlayerMicPitchTracker.SendPositionInSongToClientRapidly();
         });
+
+        if (sendOnlineMultiplayerMessage)
+        {
+            SendUnpauseMessageToOthersForOnlineMultiplayer();
+        }
     }
 
     public void TogglePlayPause()
     {
         if (songAudioPlayer.IsPlaying)
         {
-            Pause();
+            Pause(true);
         }
         else
         {
-            Unpause();
+            Unpause(true);
         }
     }
 
@@ -1195,7 +1453,15 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             {
                 timeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
                 governanceOverlayTimeBarControl?.UpdateTimeBarRectangles(SongMeta, PlayerControls, DurationOfSongInMillis);
-                songAudioPlayer.PlayAudio();
+
+                if (sceneData.StartPaused)
+                {
+                    songAudioPlayer.PauseAudio();
+                }
+                else
+                {
+                    songAudioPlayer.PlayAudio();
+                }
             });
 
         SkipToPositionInSong(startPositionInSongInMillis);

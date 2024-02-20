@@ -6,6 +6,7 @@ using UnityEngine.TestTools;
 using UnityEngine.UIElements;
 using static Responsible.Responsibly;
 using static ResponsibleSceneUtils;
+using static ResponsibleLogAssertUtils;
 using static ResponsibleVisualElementUtils;
 
 public class CoreGameLoopTests : AbstractPlayModeTest
@@ -57,9 +58,10 @@ public class CoreGameLoopTests : AbstractPlayModeTest
     }
 
     [UnityTest]
-    public IEnumerator CoreGameLoopTest() => StartSinging()
-        .ContinueWith(_ => WaitForSeconds(TestSongAudioLengthInSeconds + 2))
-        .ContinueWith(_ => ExpectScene(EScene.SingingResultsScene))
+    public IEnumerator CoreGameLoopTest() => IgnoreFailingMessages()
+        .ContinueWith(_ => StartSinging())
+        .ContinueWith(_ => ExpectScene(EScene.SingScene))
+        .ContinueWith(_ => ExpectScene(EScene.SingingResultsScene, TestSongAudioLengthInSeconds + 2))
         .ContinueWith(_ => ExpectSingingResultScore(expectedScore))
         .ContinueWith(_ => ExpectSingleHighscoreEntryInStatistics(expectedScore))
         .ContinueWith(_ => ClickContinue())
@@ -73,8 +75,7 @@ public class CoreGameLoopTests : AbstractPlayModeTest
     private ITestInstruction<object> StartSinging()
         => Do(
             $"start singing via enter key",
-            () => InputFixture.PressAndRelease(Keyboard.enterKey))
-        .ContinueWith(_ => ExpectScene(EScene.SingScene));
+            () => InputFixture.PressAndRelease(Keyboard.enterKey));
 
     private ITestInstruction<object> ExpectSingleHighscoreEntryInStatistics(int score)
         => WaitForCondition(

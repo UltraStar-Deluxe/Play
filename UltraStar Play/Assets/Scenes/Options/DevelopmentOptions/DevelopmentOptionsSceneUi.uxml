@@ -50,13 +50,16 @@
                 <ui:Toggle name="wipeLyricsEffectToggle" label="Wipe Lyrics Effect" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="analyzeBeatsWithoutTargetNoteToggle" label="Analyze Beats Without Target Note" class="noBackgroundInHierarchy" />
             </AccordionItem>
-            <AccordionItem name="clientConnectionGroup" label="Client Connections" class="child-mb-3">
+            <AccordionItem name="clientConnectionGroup" label="Companion Client Connections" class="child-mb-3">
                 <ui:IntegerField label="Connection Port¹&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />
                 <ui:Label text="Connection endpoint: ????" name="connectionEndpointLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
                 <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
                 <ui:TextField label="HTTP Server Host¹&#10;(leave empty for automatic value)" name="httpServerHostTextField" class="noBackgroundInHierarchy mb-3" />
                 <ui:IntegerField label="HTTP Server Port¹&#10;(default: 6789)" name="httpServerPortTextField" class="noBackgroundInHierarchy mb-3" />
                 <ui:Label text="HTTP Endpoint Example: ????" name="httpEndpointExampleLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+            </AccordionItem>
+            <AccordionItem name="onlineMultiplayerGroup" label="Online Multiplayer" class="child-mb-3">
+                <ItemPicker name="beatAnalyzedEventNetworkDeliveryPicker" label="Beat Analyzed Event Network Delivery" class="noBackgroundInHierarchy" />
             </AccordionItem>
             <AccordionItem name="externalToolsGroup" label="External Tools" class="child-mb-3">
                 <ui:TextField name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />
