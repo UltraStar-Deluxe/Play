@@ -454,7 +454,6 @@ public static partial class R
         public const string musicPlaybackSpeedSlider = "musicPlaybackSpeedSlider";
         public const string musicVolumeChooser = "musicVolumeChooser";
         public const string musicVolumeSlider = "musicVolumeSlider";
-        public const string muteSteamVoiceChatMicrophonePicker = "muteSteamVoiceChatMicrophonePicker";
         public const string nameCharacterContainer = "nameCharacterContainer";
         public const string nameLabel = "nameLabel";
         public const string nameTextField = "nameTextField";

@@ -155,15 +155,12 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     [Inject(UxmlName = R.UxmlNames.writeUltraStarTxtFileWithByteOrderMarkToggle)]
     private Toggle writeUltraStarTxtFileWithByteOrderMarkToggle;
-
+    
     [Inject(UxmlName = R.UxmlNames.beatAnalyzedEventNetworkDeliveryPicker)]
     private ItemPicker beatAnalyzedEventNetworkDeliveryPicker;
 
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
-
-    [Inject(UxmlName = R.UxmlNames.muteSteamVoiceChatMicrophonePicker)]
-    private ItemPicker muteSteamVoiceChatMicrophonePicker;
 
     protected override void Start()
     {
@@ -432,10 +429,6 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         new EnumItemPickerControl<NetworkDelivery>(beatAnalyzedEventNetworkDeliveryPicker)
             .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
                 newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
-
-        new EnumItemPickerControl<EMuteSteamVoiceChatMicrophone>(muteSteamVoiceChatMicrophonePicker)
-            .Bind(() => settings.MuteSteamVoiceChatMicrophone,
-                newValue => settings.MuteSteamVoiceChatMicrophone = newValue);
 
     }
 
