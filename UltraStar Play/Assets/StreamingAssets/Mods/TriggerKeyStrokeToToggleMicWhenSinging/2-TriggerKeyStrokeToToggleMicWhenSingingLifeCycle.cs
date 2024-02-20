@@ -8,8 +8,6 @@ using WindowsInput.Native;
 
 public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDisableMod, IDisposable, IOnModInstanceBecomesObsolete
 {
-    private static readonly string shortcutName = "CTRL+F9";
-
     [Inject]
     private SceneNavigator sceneNavigator;
 
@@ -17,6 +15,18 @@ public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDi
     private TriggerKeyStrokeToToggleMicWhenSingingModSettings modSettings;
 
     private List<IDisposable> disposables = new List<IDisposable>();
+
+    private string ShortcutName
+    {
+        get
+        {
+            if (modSettings.requireControlModifier)
+            {
+                return $"CTRL+{modSettings.keyCode}";
+            }
+            return $"{modSettings.keyCode}";
+        }
+    }
 
     private InputSimulator inputSimulator;
     private InputSimulator InputSimulator {
@@ -50,11 +60,18 @@ public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDi
     private void TriggerKeyStroke()
     {
         Debug.Log($"{nameof(TriggerKeyStrokeToToggleMicWhenSingingLifeCycle)}.TriggerKeyStroke");
-        InputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.LCONTROL, VirtualKeyCode.F9);
+        if (modSettings.requireControlModifier)
+        {
+            InputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.LCONTROL, modSettings.keyCode);
+        }
+        else
+        {
+            InputSimulator.Keyboard.KeyPress(modSettings.keyCode);
+        }
 
         if (modSettings.showNotificationOnTriggerKeyStroke)
         {
-            UiManager.CreateNotification($"Triggered shortcut {shortcutName}");
+            UiManager.CreateNotification($"Triggered shortcut '{ShortcutName}'");
         }
     }
 
