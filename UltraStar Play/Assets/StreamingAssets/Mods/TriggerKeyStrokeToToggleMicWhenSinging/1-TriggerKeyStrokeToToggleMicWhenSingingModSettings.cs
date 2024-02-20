@@ -1,15 +1,15 @@
+using System;
 using System.Collections.Generic;
+using UniInject;
 using WindowsInput.Native;
 
-// Add settings to your mod by implementing IModSettings.
-// IModSettings extends IAutoBoundMod,
-// which makes an object of the type available in other scripts via Inject attribute.
-// Mod settings are saved to file when the app is closed.
 public class TriggerKeyStrokeToToggleMicWhenSingingModSettings : IModSettings
 {
     public VirtualKeyCode keyCode = VirtualKeyCode.F9;
-    public bool requireControlModifier;
+    public bool requireControlModifier = true;
     public bool showNotificationOnTriggerKeyStroke = true;
+    
+    public Action OnTriggerShortcut { get; set; }
 
     public List<IModSettingControl> GetModSettingControls()
     {
@@ -18,6 +18,7 @@ public class TriggerKeyStrokeToToggleMicWhenSingingModSettings : IModSettings
             new BoolModSettingControl(() => showNotificationOnTriggerKeyStroke, newValue => showNotificationOnTriggerKeyStroke = newValue) { Label = "Show notifications" },
             new BoolModSettingControl(() => requireControlModifier, newValue => requireControlModifier = newValue) { Label = "Required pressed Control / Ctrl" },
             new EnumModSettingControl<VirtualKeyCode>(() => keyCode, newValue => keyCode = newValue) { Label = "KeyCode" },
+            new ButtonModSettingControl("Test Shortcut", evt => OnTriggerShortcut?.Invoke()),
         };
     }
 }

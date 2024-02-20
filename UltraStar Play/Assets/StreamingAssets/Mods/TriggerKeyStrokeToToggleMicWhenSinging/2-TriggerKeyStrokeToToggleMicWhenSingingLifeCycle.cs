@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using WindowsInput;
 using WindowsInput.Native;
 
-public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDisableMod, IDisposable, IOnModInstanceBecomesObsolete
+public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDisableMod, IDisposable, IOnModInstanceBecomesObsolete, IAutoBoundMod
 {
     [Inject]
     private SceneNavigator sceneNavigator;
@@ -46,6 +46,8 @@ public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDi
         Debug.Log($"{nameof(TriggerKeyStrokeToToggleMicWhenSingingLifeCycle)}.OnLoadMod");
         disposables.Add(sceneNavigator.BeforeSceneChangeEventStream
             .Subscribe(evt => OnBeforeSceneChanged(evt)));
+
+        modSettings.OnTriggerShortcut = TriggerKeyStroke;
     }
 
     private void OnBeforeSceneChanged(BeforeSceneChangeEvent evt)
@@ -57,16 +59,16 @@ public class TriggerKeyStrokeToToggleMicWhenSingingLifeCycle : IOnLoadMod, IOnDi
         }
     }
 
-    private void TriggerKeyStroke()
+    public void TriggerKeyStroke()
     {
-        Debug.Log($"{nameof(TriggerKeyStrokeToToggleMicWhenSingingLifeCycle)}.TriggerKeyStroke");
+        Debug.Log($"{nameof(TriggerKeyStrokeToToggleMicWhenSingingLifeCycle)}.TriggerKeyStroke '{ShortcutName}'");
         if (modSettings.requireControlModifier)
         {
             InputSimulator.Keyboard.ModifiedKeyStroke(VirtualKeyCode.LCONTROL, modSettings.keyCode);
         }
         else
         {
-            InputSimulator.Keyboard.KeyPress(modSettings.keyCode);
+            InputSimulator.Keyboard.ModifiedKeyStroke(new List<VirtualKeyCode>(), modSettings.keyCode);
         }
 
         if (modSettings.showNotificationOnTriggerKeyStroke)
