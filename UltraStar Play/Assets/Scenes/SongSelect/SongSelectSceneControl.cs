@@ -1780,7 +1780,7 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
                     {
                         LobbyMemberPlayerProfile lobbyMemberPlayerProfile = nonPersistentSettings.LobbyMemberPlayerProfiles
                             .FirstOrDefault(it => it.UnityNetcodeClientId == response.SenderNetcodeClientId);
-                        result.AddPlayerThatDoesNotHaveSongLocally(lobbyMemberPlayerProfile.Name);
+                        result.AddPlayerThatDoesNotHaveSongLocally(lobbyMemberPlayerProfile?.Name);
                     }
                 });
 
