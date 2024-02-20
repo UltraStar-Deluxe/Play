@@ -79,26 +79,4 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         Debug.Log("SteamClient shut down successfully");
         disconnectedFromSteamEventStream.OnNext(true);
     }
-
-    public void MuteMicrophone()
-    {
-        if (!IsConnectedToSteam)
-        {
-            return;
-        }
-
-        Log.Debug(() => "Muting Steam microphone of own player");
-        SteamFriends.SetInGameVoiceSpeaking(PlayerSteamId, true);
-    }
-
-    public void UnmuteMicrophone()
-    {
-        if (!IsConnectedToSteam)
-        {
-            return;
-        }
-
-        Log.Debug(() => "Unmuting Steam microphone of own player");
-        SteamFriends.SetInGameVoiceSpeaking(PlayerSteamId, false);
-    }
 }
