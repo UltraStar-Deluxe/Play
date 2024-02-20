@@ -64,13 +64,13 @@
       "hash": "abb643e689195bb4f1fb57ec013da680b141007d"
     },
     "com.community.netcode.transport.facepunch": {
-      "version": "https://github.com/achimmihca/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.facepunch#c692500c4c8957f65aa96014d90452c909350c12",
+      "version": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.facepunch",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.netcode.gameobjects": "1.0.0-pre.4"
       },
-      "hash": "c692500c4c8957f65aa96014d90452c909350c12"
+      "hash": "b2265b5a650ccc1c4ea4526351839b1c6e3263e0"
     },
     "com.singularitygroup.hotreload": {
       "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.5",
