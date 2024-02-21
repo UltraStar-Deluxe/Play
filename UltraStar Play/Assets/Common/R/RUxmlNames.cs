@@ -723,6 +723,7 @@ public static partial class R
         public const string selectRandomSongIcon = "selectRandomSongIcon";
         public const string selectSoundfontButton = "selectSoundfontButton";
         public const string selectSoundfontIcon = "selectSoundfontIcon";
+        public const string selectWorkshopItemFolderButton = "selectWorkshopItemFolderButton";
         public const string semanticVersionLabel = "semanticVersionLabel";
         public const string sentence = "sentence";
         public const string sentenceImage = "sentenceImage";
@@ -963,6 +964,8 @@ public static partial class R
         public const string unityTransportIpAddressField = "unityTransportIpAddressField";
         public const string unityTransportPortField = "unityTransportPortField";
         public const string unityVersionLabel = "unityVersionLabel";
+        public const string uploadProgressLabel = "uploadProgressLabel";
+        public const string uploadWorkshopItemButton = "uploadWorkshopItemButton";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";
         public const string urlTextFieldHint = "urlTextFieldHint";
@@ -1005,6 +1008,10 @@ public static partial class R
         public const string webViewGroup = "webViewGroup";
         public const string wideIcon = "wideIcon";
         public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
+        public const string workshopItemDescriptionTextField = "workshopItemDescriptionTextField";
+        public const string workshopItemFolderTextField = "workshopItemFolderTextField";
+        public const string workshopItemTagCsvTextField = "workshopItemTagCsvTextField";
+        public const string workshopItemTitleTextField = "workshopItemTitleTextField";
         public const string writeUltraStarTxtFileWithByteOrderMarkToggle = "writeUltraStarTxtFileWithByteOrderMarkToggle";
         public const string yearPropertyToggle = "yearPropertyToggle";
     }
