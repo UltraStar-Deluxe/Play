@@ -180,13 +180,11 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     private void OpenSelectFolderDialog()
     {
-        string selectedFolder = FileSystemDialogUtils.OpenFolderDialog("Open Content Folder of Workshop Item", ModManager.GetAbsoluteUserDefinedModsRootFolder());
-        if (selectedFolder.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        workshopItemFolderTextField.value = selectedFolder;
+        FileSystemDialogUtils.OpenFolderDialogToSetPath(
+            "Open Content Folder of Workshop Item",
+            ModManager.GetAbsoluteUserDefinedModsRootFolder(),
+            () => workshopItemFolderTextField.value,
+            newValue => workshopItemFolderTextField.value = newValue);
     }
 
     private void OpenSelectPreviewImageDialog()
