@@ -1,9 +1,15 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="root" class="child-mb-3" style="flex-grow: 1;">
-        <ui:VisualElement name="row">
-            <ui:TextField name="workshopItemFolderTextField" placeholder-text="Enter path to folder content" is-delayed="true" style="align-items: center; flex-grow: 1;" />
+        <ui:VisualElement name="row" style="flex-shrink: 0;">
+            <ui:TextField name="workshopItemFolderTextField" placeholder-text="Enter path to folder content" is-delayed="true" style="align-items: center; flex-grow: 1; flex-shrink: 1;" />
             <ui:Button name="selectWorkshopItemFolderButton" class="comboButton comboBoxButton squareButton">
-                <MaterialIcon picking-mode="Ignore" name="openFolderIcon" icon="folder_open" />
+                <MaterialIcon picking-mode="Ignore" name="selectFolderIcon" icon="folder_open" />
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:VisualElement name="row" style="flex-shrink: 0;">
+            <ui:TextField name="workshopItemImageTextField" placeholder-text="Enter path to preview image" is-delayed="true" style="align-items: center; flex-shrink: 1; flex-grow: 1;" />
+            <ui:Button name="selectWorkshopItemImageButton" class="comboButton comboBoxButton squareButton">
+                <MaterialIcon picking-mode="Ignore" name="selectImageIcon" icon="image" />
             </ui:Button>
         </ui:VisualElement>
         <ui:TextField label="Title" name="workshopItemTitleTextField" style="align-items: center;" />

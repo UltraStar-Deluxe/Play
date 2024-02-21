@@ -19,6 +19,12 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.workshopItemTitleTextField)]
     private TextField workshopItemTitleTextField;
 
+    [Inject(UxmlName = R.UxmlNames.workshopItemImageTextField)]
+    private TextField workshopItemImageTextField;
+
+    [Inject(UxmlName = R.UxmlNames.selectWorkshopItemImageButton)]
+    private Button selectWorkshopItemImageButton;
+
     [Inject(UxmlName = R.UxmlNames.workshopItemDescriptionTextField)]
     private TextField workshopItemDescriptionTextField;
 
@@ -37,6 +43,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     public void OnInjectionFinished()
     {
         selectWorkshopItemFolderButton.RegisterCallbackButtonTriggered(_ => OpenSelectFolderDialog());
+        selectWorkshopItemImageButton.RegisterCallbackButtonTriggered(_ => OpenSelectPreviewImageDialog());
         workshopItemFolderTextField.RegisterValueChangedCallback(evt => FillTextFieldWithDefaultsFromFolder(evt.newValue));
         uploadProgressLabel.text = "";
     }
@@ -44,6 +51,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     public void PublishWorkshopItem()
     {
         string contentFolderPath = workshopItemFolderTextField.value.Trim();
+        string previewImagePath = workshopItemImageTextField.value.Trim();
         string title = workshopItemTitleTextField.value.Trim();
         string description = workshopItemDescriptionTextField.value.Trim();
         List<string> tags = workshopItemTagCsvTextField.value
@@ -53,6 +61,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
         string errorMessage = GetInputFieldsOrConnectionErrorMessage(
             contentFolderPath,
+            previewImagePath,
             title);
         if (!errorMessage.IsNullOrEmpty())
         {
@@ -65,6 +74,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         uploadProgressLabel.text = "Uploading...";
         ObservableUtils.RunOnNewTaskAsObservable(async () => await PublishWorkshopItemAsync(
                 contentFolderPath,
+                previewImagePath,
                 title,
                 description,
                 tags,
@@ -81,6 +91,8 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
                 {
                     Debug.Log($"Successfully uploaded Steam Workshop Item. Result: {publishResult.Result}, FileId: {publishResult.FileId}");
                     ShowUploadSuccess();
+
+                    ApplicationUtils.OpenUrl($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishResult.FileId}");
                 }
                 else
                 {
@@ -92,11 +104,17 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     private string GetInputFieldsOrConnectionErrorMessage(
         string contentFolderPath,
+        string imagePath,
         string title)
     {
         if (!DirectoryUtils.Exists(contentFolderPath))
         {
             return "Folder does not exist";
+        }
+
+        if (!FileUtils.Exists(imagePath))
+        {
+            return "Preview image does not exist";
         }
 
         if (title.IsNullOrEmpty())
@@ -138,6 +156,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     private async Task<PublishResult> PublishWorkshopItemAsync(
         string contentFolderPath,
+        string previewImagePath,
         string title,
         string description,
         List<string> tags,
@@ -149,7 +168,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             .WithTitle(title)
             .WithDescription(description)
             .WithContent(contentFolderPath)
-            .WithPreviewFile($"{contentFolderPath}/workshop-preview.jpg");
+            .WithPreviewFile(previewImagePath);
         foreach (string tag in tags)
         {
             editor.WithTag(tag);
@@ -170,6 +189,16 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         workshopItemFolderTextField.value = selectedFolder;
     }
 
+    private void OpenSelectPreviewImageDialog()
+    {
+        FileSystemDialogUtils.OpenFileDialogToSetPath(
+            "Select Preview Image",
+            ModManager.GetAbsoluteUserDefinedModsRootFolder(),
+            FileSystemDialogUtils.CreateExtensionFilters("Image files", ApplicationUtils.supportedImageFiles),
+            () => workshopItemImageTextField.value,
+            newValue => workshopItemImageTextField.value = newValue);
+    }
+
     private void FillTextFieldWithDefaultsFromFolder(string folder)
     {
         if (!DirectoryUtils.Exists(folder))
@@ -177,8 +206,9 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             uploadProgressLabel.text = $"Folder does not exist.";
             return;
         }
-
         uploadProgressLabel.text = $"";
+
+        workshopItemTitleTextField.value = PathUtils.GetFileName(folder);
 
         List<string> ymlFiles = FileScannerUtils.ScanForFiles(
             new List<string>() { folder },
@@ -187,10 +217,16 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         if (FileUtils.Exists(modInfoFilePath))
         {
             FillTextFieldWithDefaultsFromModInfoFile(modInfoFilePath);
-            return;
         }
 
-        workshopItemTitleTextField.value = PathUtils.GetFileName(folder);
+        List<string> imageFiles = FileScannerUtils.ScanForFiles(
+            new List<string>() { folder },
+            ApplicationUtils.supportedImageFiles.Select(extension => $"*.{extension}").ToList());
+        string previewImagePath = imageFiles.FirstOrDefault();
+        if (FileUtils.Exists(previewImagePath))
+        {
+            workshopItemImageTextField.value = previewImagePath;
+        }
     }
 
     private void FillTextFieldWithDefaultsFromModInfoFile(string modInfoFilePath)

@@ -715,6 +715,7 @@ public static partial class R
         public const string selectedSongTitle = "selectedSongTitle";
         public const string selectFolderButton = "selectFolderButton";
         public const string selectFolderIcon = "selectFolderIcon";
+        public const string selectImageIcon = "selectImageIcon";
         public const string selectionIndicator = "selectionIndicator";
         public const string selectionIndicatorInner = "selectionIndicatorInner";
         public const string selectMidiFileButton = "selectMidiFileButton";
@@ -724,6 +725,7 @@ public static partial class R
         public const string selectSoundfontButton = "selectSoundfontButton";
         public const string selectSoundfontIcon = "selectSoundfontIcon";
         public const string selectWorkshopItemFolderButton = "selectWorkshopItemFolderButton";
+        public const string selectWorkshopItemImageButton = "selectWorkshopItemImageButton";
         public const string semanticVersionLabel = "semanticVersionLabel";
         public const string sentence = "sentence";
         public const string sentenceImage = "sentenceImage";
@@ -1010,6 +1012,7 @@ public static partial class R
         public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
         public const string workshopItemDescriptionTextField = "workshopItemDescriptionTextField";
         public const string workshopItemFolderTextField = "workshopItemFolderTextField";
+        public const string workshopItemImageTextField = "workshopItemImageTextField";
         public const string workshopItemTagCsvTextField = "workshopItemTagCsvTextField";
         public const string workshopItemTitleTextField = "workshopItemTitleTextField";
         public const string writeUltraStarTxtFileWithByteOrderMarkToggle = "writeUltraStarTxtFileWithByteOrderMarkToggle";
