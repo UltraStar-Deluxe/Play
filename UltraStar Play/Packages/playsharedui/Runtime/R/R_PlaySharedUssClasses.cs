@@ -191,6 +191,7 @@ public static partial class R_PlayShared
         public const string unity_base_slider__vertical = "unity-base-slider--vertical";
         public const string unity_base_text_field = "unity-base-text-field";
         public const string unity_base_text_field__input = "unity-base-text-field__input";
+        public const string unity_base_text_field__input__placeholder = "unity-base-text-field__input--placeholder";
         public const string unity_button = "unity-button";
         public const string unity_collection_view = "unity-collection-view";
         public const string unity_collection_view__item = "unity-collection-view__item";
