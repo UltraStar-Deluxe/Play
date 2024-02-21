@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using PortAudioForUnity;
 using ProTrans;
 using UnityEditor;
@@ -142,8 +143,13 @@ public static class ApplicationUtils
 
     public static void OpenDirectory(string path)
     {
-        Debug.Log($"Open folder: {path}");
-        Application.OpenURL("file://" + path);
+        OpenUrl("file://" + path);
+    }
+
+    public static void OpenUrl(string url)
+    {
+        Debug.Log($"Open url: {url}");
+        ThreadUtils.RunOnMainThread(() => Application.OpenURL(url));
     }
 
     public static void QuitOrStopPlayMode()
