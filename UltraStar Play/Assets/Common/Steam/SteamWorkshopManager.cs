@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +12,6 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
 {
     public static SteamWorkshopManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamWorkshopManager>();
 
-    private readonly ConcurrentBag<Item> downloadedItems = new();
     private readonly UseSteamWorkshopItemsControl useSteamWorkshopItemsControl = new();
     private readonly Subject<bool> finishDownloadWorkshopItemsEventStream = new();
     public IObservable<bool> FinishDownloadWorkshopItemsEventStream => finishDownloadWorkshopItemsEventStream
@@ -23,15 +21,8 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     private Injector injector;
 
     public EDownloadState DownloadState { get; private set; } = EDownloadState.Pending;
-    public List<Item> DownloadedWorkshopItems
-    {
-        get
-        {
-            return downloadedItems
-                .Distinct()
-                .ToList();
-        }
-    }
+
+    public IReadOnlyList<Item> DownloadedWorkshopItems { get; private set; } = new List<Item>();
 
     protected override object GetInstance()
     {
@@ -45,7 +36,11 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
 
     public void DownloadWorkshopItems()
     {
-        downloadedItems.Clear();
+        if (DownloadState is not EDownloadState.Pending)
+        {
+            return;
+        }
+
         ObservableUtils.RunOnNewTaskAsObservable(async () =>
                 await DownloadSubscribedWorkshopItemsAsync())
             .ObserveOnMainThread()
@@ -55,11 +50,12 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
                 Debug.LogError($"Failed to download Steam Workshop items: {ex.Message}");
                 FireDownloadFinishedEvent();
             })
-            .Subscribe(_ =>
+            .Subscribe(items =>
             {
-                Debug.Log($"Successfully downloaded {downloadedItems.Count} Steam Workshop Items");
+                Debug.Log($"Successfully downloaded {items.Count} Steam Workshop Items");
+                DownloadedWorkshopItems = items;
                 FireDownloadFinishedEvent();
-                useSteamWorkshopItemsControl.UseWorkshopItems(DownloadedWorkshopItems);
+                useSteamWorkshopItemsControl.UseWorkshopItems(items);
             });
     }
 
@@ -76,19 +72,16 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         }
     }
 
-    private async Task DownloadSubscribedWorkshopItemsAsync()
+    private async Task<List<Item>> DownloadSubscribedWorkshopItemsAsync()
     {
-        if (DownloadState is not EDownloadState.Pending)
-        {
-            return;
-        }
-
         try
         {
             DownloadState = EDownloadState.Started;
-            List<Item> subscribedWorkshopItems = await QuerySubscribedWorkshopItemsAsync();
-            Debug.Log($"Downloading or updating {subscribedWorkshopItems.Count} Steam Workshop items");
-            await DownloadWorkshopItemsAsync(subscribedWorkshopItems);
+            List<Item> workshopItems = await QuerySubscribedWorkshopItemsAsync();
+            Debug.Log($"Downloading or updating {workshopItems.Count} Steam Workshop items");
+            await DownloadWorkshopItemsAsync(workshopItems);
+
+            return workshopItems;
         }
         finally
         {
@@ -101,19 +94,17 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     {
         for (int i = 0; i < items.Count; i++)
         {
-            Item workshopItem = items[i];
+            Item item = items[i];
             try
             {
-                Debug.Log($"Downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {workshopItem.Id}");
-                await workshopItem.DownloadAsync();
-                Debug.Log($"Finished downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {workshopItem.Id}. Folder: {workshopItem.Directory}");
-
-                downloadedItems.Add(workshopItem);
+                Debug.Log($"Downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {item.Id}");
+                await item.DownloadAsync();
+                Debug.Log($"Finished downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {item.Id}. Folder: {item.Directory}");
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to download Steam Workshop item {i + 1}/{items.Count} with id {workshopItem.Id}: {ex.Message}");
+                Debug.LogError($"Failed to download Steam Workshop item {i + 1}/{items.Count} with id {item.Id}: {ex.Message}");
             }
         }
     }
