@@ -12,6 +12,10 @@ public class UseSteamWorkshopItemsControl : INeedInjection
 
     public void UseWorkshopItems(List<Item> items)
     {
+        if (items.IsNullOrEmpty())
+        {
+            return;
+        }
         UseDownloadedWorkshopItemsForWebView(items);
         UseDownloadedWorkshopItemsForPlayerProfileImages(items);
         UseDownloadedWorkshopItemsForMods(items);
@@ -26,12 +30,13 @@ public class UseSteamWorkshopItemsControl : INeedInjection
                 ThemeFolderUtils.AdditionalThemeFolders,
                 items,
                 ThemeFolderUtils.ThemeFolderName);
+            Debug.Log($"Using Steam Workshop items for additional theme folders: {ThemeFolderUtils.AdditionalThemeFolders.ToCsv()}");
             ThemeManager.Instance.ReloadThemes();
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError($"Failed to make use of downloaded Workshop Items for player profile images: {ex.Message}");
+            Debug.LogError($"Failed to make use of downloaded Workshop Items for themes: {ex.Message}");
         }
     }
 
@@ -43,12 +48,13 @@ public class UseSteamWorkshopItemsControl : INeedInjection
                 ModFolderUtils.AdditionalModRootFolders,
                 items,
                 ModFolderUtils.ModsRootFolderName);
+            Debug.Log($"Using Steam Workshop items for additional mod folders: {ModFolderUtils.AdditionalModRootFolders.ToCsv()}");
             ModManager.Instance.ReloadMods();
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
-            Debug.LogError($"Failed to make use of downloaded Workshop Items for player profile images: {ex.Message}");
+            Debug.LogError($"Failed to make use of downloaded Workshop Items for mods: {ex.Message}");
         }
     }
 
@@ -60,6 +66,7 @@ public class UseSteamWorkshopItemsControl : INeedInjection
                 PlayerProfileUtils.AdditionalPlayerProfileImageFolders,
                 items,
                 PlayerProfileUtils.PlayerProfileImagesFolderName);
+            Debug.Log($"Using Steam Workshop items for additional player profile image folders: {PlayerProfileUtils.AdditionalPlayerProfileImageFolders.ToCsv()}");
             UiManager.Instance.UpdatePlayerProfileImagePaths();
         }
         catch (Exception ex)
@@ -77,6 +84,7 @@ public class UseSteamWorkshopItemsControl : INeedInjection
                 WebViewUtils.AdditionalWebViewScriptsFolders,
                 items,
                 WebViewUtils.WebViewScriptsFolderName);
+            Debug.Log($"Using Steam Workshop items for additional web view script folders: {WebViewUtils.AdditionalWebViewScriptsFolders.ToCsv()}");
             WebViewManager.Instance.ReloadScripts();
         }
         catch (Exception ex)
