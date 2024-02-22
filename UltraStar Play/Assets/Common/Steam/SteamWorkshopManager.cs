@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Steamworks.Ugc;
@@ -158,7 +159,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         return result;
     }
 
-    public async Task<PublishResult> PublishNewWorkshopItemAsync(
+    public async Task<PublishResult> PublishWorkshopItemAsync(
         string contentFolderPath,
         string previewImagePath,
         string title,
@@ -166,31 +167,85 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         List<string> tags,
         Action<float> onProgress)
     {
-        // Check Workshop item titles are unique.
-        // Steam allows multiple Workshop Items with the same title.
-        // However, this is probably not what the user wanted.
-        List<Item> publishedWorkshopItemsAsync = await QueryPublishedWorkshopItemsAsync();
-        if (publishedWorkshopItemsAsync.AnyMatch(item => string.Equals(item.Title, title, StringComparison.CurrentCultureIgnoreCase)))
+        ulong existingWorkshopItemId = GetExistingWorkshopItemIdFromWorkshopItemContentFolder(contentFolderPath);
+        bool isNewWorkshopItem = existingWorkshopItemId <= 0;
+
+        if (isNewWorkshopItem)
         {
-            throw new SteamException($"Steam Workshop item with title '{title}' already exists for this user. "
-                                     + $"Choose a different title to upload a new Workshop item or create an update for the existing Workshop item.");
+            if (title.IsNullOrEmpty())
+            {
+                throw new SteamException("Title cannot be empty");
+            }
+
+            // Check Workshop item titles are unique.
+            // Steam allows multiple Workshop Items with the same title.
+            // However, this is probably not what the user wanted.
+            List<Item> publishedWorkshopItemsAsync = await QueryPublishedWorkshopItemsAsync();
+            if (publishedWorkshopItemsAsync.AnyMatch(item => string.Equals(item.Title, title, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                throw new SteamException($"Steam Workshop item with title '{title}' already exists for this user. "
+                                         + $"Choose a different title to upload a new Workshop item or create an update for the existing Workshop item.");
+            }
         }
 
-        Debug.Log($"Publishing new Steam Workshop item. Title: '{title}', Content folder: '{contentFolderPath}'");
-        Editor ugcEditor = Editor.NewCommunityFile
+        Debug.Log($"Publishing Steam Workshop item. Existing item id: {existingWorkshopItemId}, Title: '{title}', Content folder: '{contentFolderPath}'");
+        Editor ugcEditor = isNewWorkshopItem
+            ? Editor.NewCommunityFile.WithPublicVisibility()
+            : new Editor(existingWorkshopItemId);
+
+        ugcEditor
             .ForAppId(SteamConstants.MelodyManiaSteamAppId)
-            .WithPublicVisibility()
-            .WithTitle(title)
-            .WithDescription(description)
-            .WithContent(contentFolderPath)
-            .WithPreviewFile(previewImagePath);
-        foreach (string tag in tags)
+            .WithContent(contentFolderPath);
+
+        // When updating a workshop item, then only the provided properties are updated.
+        // Other properties are unchanged and keep their old value.
+        // Thus, only set properties when a value is provided.
+        if (!title.IsNullOrEmpty())
         {
-            ugcEditor.WithTag(tag);
+            ugcEditor.WithTitle(title);
+        }
+
+        if (description.IsNullOrEmpty())
+        {
+            ugcEditor.WithDescription(description);
+        }
+
+        if (!previewImagePath.IsNullOrEmpty())
+        {
+            if (!FileUtils.Exists(previewImagePath))
+            {
+                throw new SteamException($"Preview image does not exist: {previewImagePath}");
+            }
+            ugcEditor.WithPreviewFile(previewImagePath);
+        }
+
+        if (!tags.IsNullOrEmpty())
+        {
+            foreach (string tag in tags)
+            {
+                ugcEditor.WithTag(tag);
+            }
         }
 
         return await ugcEditor
             .SubmitAsync(new ActionProgress(onProgress));
+    }
+
+    private ulong GetExistingWorkshopItemIdFromWorkshopItemContentFolder(string contentFolderPath)
+    {
+        // Steam Workshop Items are installed in a folder "steamapps\workshop\content\<steam-app-od>\<workshop-item-id>"
+        List<DirectoryInfo> directoryInfos = DirectoryUtils.GetParentDirectories(new DirectoryInfo(contentFolderPath), true);
+        if (directoryInfos.Count >= 5
+            && directoryInfos[4].Name.ToLowerInvariant() == "steamapps"
+            && directoryInfos[3].Name.ToLowerInvariant() == "workshop"
+            && directoryInfos[2].Name.ToLowerInvariant() == "content"
+            && directoryInfos[1].Name == SteamConstants.MelodyManiaSteamAppId.ToString()
+            && ulong.TryParse(directoryInfos[0].Name, out ulong workshopItemId))
+        {
+            return workshopItemId;
+        }
+
+        return 0;
     }
 
     public enum EDownloadState

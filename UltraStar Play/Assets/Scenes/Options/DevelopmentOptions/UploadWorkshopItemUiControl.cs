@@ -73,7 +73,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         }
 
         uploadProgressLabel.text = "Uploading...";
-        ObservableUtils.RunOnNewTaskAsObservable(async () => await steamWorkshopManager.PublishNewWorkshopItemAsync(
+        ObservableUtils.RunOnNewTaskAsObservable(async () => await steamWorkshopManager.PublishWorkshopItemAsync(
                 contentFolderPath,
                 previewImagePath,
                 title,
