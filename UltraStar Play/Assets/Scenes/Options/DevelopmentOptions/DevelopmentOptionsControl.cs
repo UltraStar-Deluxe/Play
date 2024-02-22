@@ -300,7 +300,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         // Open WebView scripts path
         if (PlatformUtils.IsStandalone)
         {
-            openWebViewScriptsPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(ApplicationUtils.GetWebViewScriptsAbsolutePath()));
+            openWebViewScriptsPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(WebViewUtils.GetDefaultWebViewScriptsAbsolutePath()));
         }
         else
         {

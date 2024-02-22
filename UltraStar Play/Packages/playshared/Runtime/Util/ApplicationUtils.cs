@@ -338,11 +338,6 @@ public static class ApplicationUtils
         return GetStreamingAssetsPath("DemoSongs");
     }
 
-    public static string GetWebViewScriptsAbsolutePath()
-    {
-        return GetStreamingAssetsPath("WebViewScripts");
-    }
-
     public static bool IsGeneratedAudioFile(string audioFile)
     {
         // Audio separation creates files called "vocals.ogg" and "instrumental.ogg"

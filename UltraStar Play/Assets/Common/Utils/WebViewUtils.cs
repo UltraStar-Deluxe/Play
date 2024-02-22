@@ -6,6 +6,8 @@ using UnityEngine;
 
 public static class WebViewUtils
 {
+    public const string WebViewScriptsFolderName = "WebViewScripts";
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void StaticInit()
     {
@@ -15,6 +17,8 @@ public static class WebViewUtils
     private static readonly Dictionary<string, string> hostToWebViewScript = new();
     private static readonly Dictionary<string, CachedWebViewScript> hostToCachedWebViewScript = new();
     private static readonly Dictionary<string, CachedWebViewScript> urlToCachedWebViewScript = new();
+
+    public static List<string> AdditionalWebViewScriptsFolders { get; set; } = new();
 
     public static bool CanHandleWebViewUrl(string url)
     {
@@ -107,15 +111,44 @@ public static class WebViewUtils
         }
         hasScannedJavaScriptFiles = true;
 
-        string webViewScriptsFolder = ApplicationUtils.GetWebViewScriptsAbsolutePath();
-        DirectoryUtils.CreateDirectory(webViewScriptsFolder);
+        List<string> webViewScriptsFolders = GetWebViewScriptsFolders();
 
-        string[] webViewScriptPaths = Directory.GetFiles(webViewScriptsFolder, "*.js");
-        foreach (string webViewScriptPath in webViewScriptPaths)
+        foreach (string scriptsFolder in webViewScriptsFolders)
         {
-            string host = Path.GetFileNameWithoutExtension(webViewScriptPath);
-            hostToWebViewScript[host] = webViewScriptPath;
+            if (!DirectoryUtils.Exists(scriptsFolder))
+            {
+                continue;
+            }
+            Debug.Log($"Loading WebView scripts from folder '{scriptsFolder}'");
+            string[] webViewScriptPaths = Directory.GetFiles(scriptsFolder, "*.js");
+            Debug.Log($"Found {webViewScriptPaths.Length} WebView scripts in folder '{scriptsFolder}'");
+            foreach (string webViewScriptPath in webViewScriptPaths)
+            {
+                string host = Path.GetFileNameWithoutExtension(webViewScriptPath);
+                hostToWebViewScript[host] = webViewScriptPath;
+            }
         }
+    }
+
+    public static List<string> GetWebViewScriptsFolders()
+    {
+        return new List<string>()
+        {
+            GetDefaultWebViewScriptsAbsolutePath(),
+            GetUserDefinedWebViewScriptsAbsolutePath(),
+        }
+        .Union(AdditionalWebViewScriptsFolders)
+        .ToList();
+    }
+
+    public static string GetDefaultWebViewScriptsAbsolutePath()
+    {
+        return ApplicationUtils.GetStreamingAssetsPath(WebViewScriptsFolderName);
+    }
+
+    public static string GetUserDefinedWebViewScriptsAbsolutePath()
+    {
+        return ApplicationUtils.GetPersistentDataPath(WebViewScriptsFolderName);
     }
 
     private class CachedWebViewScript
