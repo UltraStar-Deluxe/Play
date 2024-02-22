@@ -87,6 +87,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     [Inject]
     private BackgroundLightManager backgroundLightManager;
 
+    [Inject]
+    private SteamWorkshopManager steamWorkshopManager;
+
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     private string lastThemeDynamicBackgroundJson;
@@ -133,6 +136,9 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     () => ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement)));
             })
             .AddTo(gameObject);
+
+        steamWorkshopManager.FinishDownloadWorkshopItemsEventStream
+            .Subscribe(_ => ReloadThemes());
     }
 
     private void ApplyThemeToContextMenuPopup(ContextMenuPopupControl contextMenuPopupControl)
@@ -731,6 +737,11 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             GetAbsoluteUserDefinedThemesFolder(),
         };
 
+        // Add Steam Workshop folders
+        themeFolders.AddRange(steamWorkshopManager.DownloadedWorkshopItems
+            .Select(item => $"{item.Directory}/{ThemeFolderName}")
+            .Where(folder => DirectoryUtils.Exists(folder)));
+
         themeFolders.ForEach(themeFolder =>
         {
             if (Directory.Exists(themeFolder))
@@ -1240,6 +1251,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public void ReloadThemes()
     {
         themeMetas.Clear();
+        failedToLoadThemeNames.Clear();
         LoadCurrentTheme();
     }
 

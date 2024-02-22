@@ -6,6 +6,7 @@ using System.Reflection;
 using IngameDebugConsole;
 using UniInject;
 using UniInject.Extensions;
+using UniRx;
 using UnityEngine;
 
 // Disable warning about fields that are never assigned, their values are injected.
@@ -27,6 +28,9 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
+
+    [Inject]
+    private SteamWorkshopManager steamWorkshopManager;
 
     private readonly Dictionary<IMod, ModObjectContext> modObjectToContext = new();
     private readonly Dictionary<Type, string> typeToModFolder = new();
@@ -120,6 +124,9 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         CreateOrUpdateModFolderFileSystemWatchers();
 
         lastEnabledMods = settings.EnabledMods.ToList();
+
+        steamWorkshopManager.FinishDownloadWorkshopItemsEventStream
+            .Subscribe(_ => ReloadMods());
 
         LoadAndInstantiateMods();
     }
@@ -484,19 +491,24 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public List<string> GetModFolders()
     {
-        List<string> modParentFolders = new()
+        List<string> modRootFolders = new()
         {
             GetAbsoluteDefaultModsRootFolder(),
             GetAbsoluteUserDefinedModsRootFolder(),
         };
+
+        // Add Steam Workshop folders
+        modRootFolders.AddRange(steamWorkshopManager.DownloadedWorkshopItems
+            .Select(item => $"{item.Directory}/{ModsRootFolderName}")
+            .Where(folder => DirectoryUtils.Exists(folder)));
 
         HashSet<string> ignoredFolderNames = new HashSet<string>()
         {
             TemplateModFolderName,
         };
 
-        return modParentFolders
-            .SelectMany(modParentFolder => Directory.GetDirectories(modParentFolder))
+        return modRootFolders
+            .SelectMany(modRootFolder => Directory.GetDirectories(modRootFolder))
             .Where(modFolder => !ignoredFolderNames.Contains(Path.GetFileName(modFolder)))
             .Where(modFolder => GetModInfo(modFolder) != null)
             .ToList();

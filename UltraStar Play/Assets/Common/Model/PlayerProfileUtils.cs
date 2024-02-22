@@ -23,14 +23,8 @@ public static class PlayerProfileUtils
         return $"{Application.persistentDataPath}/{PlayerProfileImagesFolderName}";
     }
 
-    public static Dictionary<string, string> FindPlayerProfileImages()
+    public static Dictionary<string, string> FindPlayerProfileImages(List<string> folders)
     {
-        List<string> folders = new List<string>
-        {
-            ApplicationUtils.GetStreamingAssetsPath(PlayerProfileImagesFolderName),
-            GetAbsolutePlayerProfileImagesFolder(),
-        };
-
         Dictionary<string, string> result = new();
         folders.ForEach(folder =>
         {

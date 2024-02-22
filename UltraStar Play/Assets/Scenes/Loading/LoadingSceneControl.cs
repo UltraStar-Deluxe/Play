@@ -25,6 +25,12 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
     [Inject]
     private PlaylistManager playlistManager;
 
+    [Inject]
+    private SteamManager steamManager;
+
+    [Inject]
+    private SteamWorkshopManager steamWorkshopManager;
+
     [Inject(UxmlName = R.UxmlNames.unexpectedErrorLabel)]
     private Label unexpectedErrorLabel;
 
@@ -39,6 +45,9 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
     [Inject(UxmlName = R.UxmlNames.hiddenContinueButton)]
     private Button hiddenContinueButton;
+
+    private bool IsAllPreloadingFinished => IsSteamWorkshopItemsDownloadFinished;
+    private bool IsSteamWorkshopItemsDownloadFinished => steamWorkshopManager.DownloadState is SteamWorkshopManager.EDownloadState.Finished;
 
     private void Start()
     {
@@ -114,7 +123,12 @@ public class LoadingSceneControl : MonoBehaviour, INeedInjection
 
         Debug.Log("Supported file extensions by ffmpeg: " + ApplicationUtils.ffmpegSupportedFileExtensions.ToCsv());
 
-        StartCoroutine(CoroutineUtils.ExecuteAfterDelayInSeconds(1f, () => FinishScene()));
+        // Continue to next scene when preloading data has finished.
+        long maxWaitTimeInMillis = 1200;
+        long startTimeInMillis = TimeUtils.GetUnixTimeMilliseconds();
+        StartCoroutine(CoroutineUtils.ExecuteWhenConditionIsTrue(
+            () => IsAllPreloadingFinished || TimeUtils.IsDurationAboveThresholdInMillis(startTimeInMillis, maxWaitTimeInMillis),
+            () => FinishScene()));
     }
 
     private void PreloadSongMedia()
