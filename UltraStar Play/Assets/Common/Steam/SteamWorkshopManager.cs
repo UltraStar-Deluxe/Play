@@ -15,7 +15,8 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection
     private readonly ConcurrentBag<Item> downloadedItems = new();
 
     private readonly Subject<bool> finishDownloadWorkshopItemsEventStream = new();
-    public IObservable<bool> FinishDownloadWorkshopItemsEventStream => finishDownloadWorkshopItemsEventStream;
+    public IObservable<bool> FinishDownloadWorkshopItemsEventStream => finishDownloadWorkshopItemsEventStream
+        .ObserveOnMainThread();
 
     public EDownloadState DownloadState { get; private set; } = EDownloadState.Pending;
     public List<Item> DownloadedWorkshopItems

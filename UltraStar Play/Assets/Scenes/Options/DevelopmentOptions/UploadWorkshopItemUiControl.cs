@@ -80,6 +80,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
                 description,
                 tags,
                 ShowUploadProgress))
+            .ObserveOnMainThread()
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
