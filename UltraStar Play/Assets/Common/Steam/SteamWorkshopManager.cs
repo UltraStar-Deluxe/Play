@@ -39,7 +39,63 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection
         downloadedItems.Clear();
         ObservableUtils.RunOnNewTaskAsObservable(async () =>
                 await DownloadSubscribedWorkshopItemsAsync())
-            .Subscribe(_ => Debug.Log($"Downloaded {downloadedItems.Count} Steam Workshop Items"));
+            .ObserveOnMainThread()
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to download Steam Workshop items: {ex.Message}");
+                FireDownloadFinishedEvent();
+            })
+            .Subscribe(_ =>
+            {
+                Debug.Log($"Successfully downloaded {downloadedItems.Count} Steam Workshop Items");
+                FireDownloadFinishedEvent();
+                UseDownloadedWorkshopItems();
+            });
+    }
+
+    private void FireDownloadFinishedEvent()
+    {
+        try
+        {
+            finishDownloadWorkshopItemsEventStream.OnNext(true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to notify subscribers about downloaded workshop items: {ex.Message}");
+        }
+    }
+
+    private List<string> GetFolderPathInDownloadedWorkshopItems(string folderName)
+    {
+        return DownloadedWorkshopItems
+            .Select(item => $"{item.Directory}/{folderName}")
+            .Distinct()
+            .Where(folder => DirectoryUtils.Exists(folder))
+            .ToList();
+    }
+
+    private void UseDownloadedWorkshopItems()
+    {
+        UseDownloadedWorkshopItemsForWebView();
+    }
+
+    private void UseDownloadedWorkshopItemsForWebView()
+    {
+        try
+        {
+            WebViewUtils.AdditionalWebViewScriptsFolders = WebViewUtils.AdditionalWebViewScriptsFolders
+                .Union(GetFolderPathInDownloadedWorkshopItems(WebViewUtils.WebViewScriptsFolderName))
+                .Distinct()
+                .ToList();
+            WebViewManager.Instance.ReloadScripts();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.LogError($"Failed to make use of downloaded Workshop Items in WebView: {ex.Message}");
+        }
     }
 
     private async Task DownloadSubscribedWorkshopItemsAsync()
