@@ -121,19 +121,19 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         {
             { TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes_title),
                 TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes,
-                    "path", ApplicationUtils.ReplacePathsWithDisplayString(ThemeManager.GetAbsoluteUserDefinedThemesFolder())) },
+                    "path", ApplicationUtils.ReplacePathsWithDisplayString(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath())) },
         };
          MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
             TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_title),
             titleToContentMap);
 
         helpDialogControl.AddButton("Custom Themes Folder",
-            _ => ApplicationUtils.OpenDirectory(ThemeManager.GetAbsoluteUserDefinedThemesFolder()));
+            _ => ApplicationUtils.OpenDirectory(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath()));
 
         if (PlatformUtils.IsStandalone)
         {
             helpDialogControl.AddButton("Default Themes Folder",
-                        _ => ApplicationUtils.OpenDirectory(ThemeManager.GetAbsoluteDefaultThemesFolder()));
+                        _ => ApplicationUtils.OpenDirectory(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath()));
         }
         return helpDialogControl;
     }

@@ -160,7 +160,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     {
         FileSystemDialogUtils.OpenFolderDialogToSetPath(
             "Open Content Folder of Workshop Item",
-            ModManager.GetAbsoluteUserDefinedModsRootFolder(),
+            ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath(),
             () => workshopItemFolderTextField.value,
             newValue => workshopItemFolderTextField.value = newValue);
     }
@@ -169,7 +169,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     {
         FileSystemDialogUtils.OpenFileDialogToSetPath(
             "Select Preview Image",
-            ModManager.GetAbsoluteUserDefinedModsRootFolder(),
+            ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath(),
             FileSystemDialogUtils.CreateExtensionFilters("Image files", ApplicationUtils.supportedImageFiles),
             () => workshopItemImageTextField.value,
             newValue => workshopItemImageTextField.value = newValue);
