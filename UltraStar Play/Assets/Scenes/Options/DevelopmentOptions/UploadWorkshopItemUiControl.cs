@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Steamworks.Ugc;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -40,6 +38,9 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     [Inject]
     private SteamManager steamManager;
 
+    [Inject]
+    private SteamWorkshopManager steamWorkshopManager;
+
     public void OnInjectionFinished()
     {
         selectWorkshopItemFolderButton.RegisterCallbackButtonTriggered(_ => OpenSelectFolderDialog());
@@ -72,7 +73,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         }
 
         uploadProgressLabel.text = "Uploading...";
-        ObservableUtils.RunOnNewTaskAsObservable(async () => await PublishWorkshopItemAsync(
+        ObservableUtils.RunOnNewTaskAsObservable(async () => await steamWorkshopManager.PublishNewWorkshopItemAsync(
                 contentFolderPath,
                 previewImagePath,
                 title,
@@ -154,30 +155,6 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         });
     }
 
-    private async Task<PublishResult> PublishWorkshopItemAsync(
-        string contentFolderPath,
-        string previewImagePath,
-        string title,
-        string description,
-        List<string> tags,
-        Action<float> onProgress)
-    {
-        Editor editor = Editor.NewCommunityFile
-            .ForAppId(SteamConstants.MelodyManiaSteamAppId)
-            .WithPublicVisibility()
-            .WithTitle(title)
-            .WithDescription(description)
-            .WithContent(contentFolderPath)
-            .WithPreviewFile(previewImagePath);
-        foreach (string tag in tags)
-        {
-            editor.WithTag(tag);
-        }
-
-        return await editor
-            .SubmitAsync(new ActionProgress(onProgress));
-    }
-
     private void OpenSelectFolderDialog()
     {
         FileSystemDialogUtils.OpenFolderDialogToSetPath(
@@ -240,21 +217,6 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to fill text fields with content from '{modInfoFilePath}': {ex.Message}");
-        }
-    }
-
-    private class ActionProgress : IProgress<float>
-    {
-        private readonly Action<float> onProgress;
-
-        public ActionProgress(Action<float> onProgress)
-        {
-            this.onProgress = onProgress;
-        }
-
-        public void Report(float progress)
-        {
-            onProgress?.Invoke(progress);
         }
     }
 }
