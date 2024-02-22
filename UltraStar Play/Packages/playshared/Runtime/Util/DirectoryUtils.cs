@@ -226,4 +226,21 @@ public static class DirectoryUtils
         }
         return false;
     }
+
+    public static List<DirectoryInfo> GetParentDirectories(DirectoryInfo directory, bool includeInitialDirectory = false)
+    {
+        List<DirectoryInfo> result = new List<DirectoryInfo>();
+        if (includeInitialDirectory)
+        {
+            result.Add(directory);
+        }
+
+        while (directory != null
+               && directory.Parent != null)
+        {
+            result.Add(directory.Parent);
+            directory = directory.Parent;
+        }
+        return result;
+    }
 }
