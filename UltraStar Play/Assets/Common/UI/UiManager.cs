@@ -63,9 +63,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     private Injector injector;
 
     [Inject]
-    private SteamWorkshopManager steamWorkshopManager;
-
-    [Inject]
     private UIDocument uiDocument;
 
     [Inject]
@@ -86,9 +83,6 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 
     protected override void StartSingleton()
     {
-        steamWorkshopManager.FinishDownloadWorkshopItemsEventStream
-            .Subscribe(_ => UpdatePlayerProfileImagePaths());
-
         UpdatePlayerProfileImagePaths();
     }
 
@@ -122,19 +116,14 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         return notificationLabel;
     }
 
+    public void ReloadPlayerProfileImages()
+    {
+        UpdatePlayerProfileImagePaths();
+    }
+
     public void UpdatePlayerProfileImagePaths()
     {
-        List<string> folders = new List<string>
-        {
-            ApplicationUtils.GetStreamingAssetsPath(PlayerProfileUtils.PlayerProfileImagesFolderName),
-            PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder(),
-        };
-
-        // Add Steam Workshop folders
-        folders.AddRange(steamWorkshopManager.DownloadedWorkshopItems
-            .Select(item => $"{item.Directory}/{PlayerProfileUtils.PlayerProfileImagesFolderName}")
-            .Where(folder => DirectoryUtils.Exists(folder)));
-
+        List<string> folders = PlayerProfileUtils.GetPlayerProfileImageFolders();
         relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages(folders);
     }
 

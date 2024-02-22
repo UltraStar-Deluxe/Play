@@ -200,7 +200,7 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
     public override bool HasHelpDialog => true;
     public override MessageDialogControl CreateHelpDialogControl()
     {
-        string absolutePlayerProfileImagesFolder = PlayerProfileUtils.GetAbsolutePlayerProfileImagesFolder();
+        string absolutePlayerProfileImagesFolder = PlayerProfileUtils.GetDefaultPlayerProfileImageFolderAbsolutePath();
 
         Dictionary<string, string> titleToContentMap = new()
         {

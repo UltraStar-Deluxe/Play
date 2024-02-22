@@ -8,15 +8,18 @@ using UniInject;
 using UniRx;
 using UnityEngine;
 
-public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection
+public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, IInjectionFinishedListener
 {
     public static SteamWorkshopManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamWorkshopManager>();
 
     private readonly ConcurrentBag<Item> downloadedItems = new();
-
+    private readonly UseSteamWorkshopItemsControl useSteamWorkshopItemsControl = new();
     private readonly Subject<bool> finishDownloadWorkshopItemsEventStream = new();
     public IObservable<bool> FinishDownloadWorkshopItemsEventStream => finishDownloadWorkshopItemsEventStream
         .ObserveOnMainThread();
+
+    [Inject]
+    private Injector injector;
 
     public EDownloadState DownloadState { get; private set; } = EDownloadState.Pending;
     public List<Item> DownloadedWorkshopItems
@@ -32,6 +35,11 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection
     protected override object GetInstance()
     {
         return Instance;
+    }
+
+    public void OnInjectionFinished()
+    {
+        injector.Inject(useSteamWorkshopItemsControl);
     }
 
     public void DownloadWorkshopItems()
@@ -50,7 +58,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection
             {
                 Debug.Log($"Successfully downloaded {downloadedItems.Count} Steam Workshop Items");
                 FireDownloadFinishedEvent();
-                UseDownloadedWorkshopItems();
+                useSteamWorkshopItemsControl.UseWorkshopItems(DownloadedWorkshopItems);
             });
     }
 
@@ -64,37 +72,6 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to notify subscribers about downloaded workshop items: {ex.Message}");
-        }
-    }
-
-    private List<string> GetFolderPathInDownloadedWorkshopItems(string folderName)
-    {
-        return DownloadedWorkshopItems
-            .Select(item => $"{item.Directory}/{folderName}")
-            .Distinct()
-            .Where(folder => DirectoryUtils.Exists(folder))
-            .ToList();
-    }
-
-    private void UseDownloadedWorkshopItems()
-    {
-        UseDownloadedWorkshopItemsForWebView();
-    }
-
-    private void UseDownloadedWorkshopItemsForWebView()
-    {
-        try
-        {
-            WebViewUtils.AdditionalWebViewScriptsFolders = WebViewUtils.AdditionalWebViewScriptsFolders
-                .Union(GetFolderPathInDownloadedWorkshopItems(WebViewUtils.WebViewScriptsFolderName))
-                .Distinct()
-                .ToList();
-            WebViewManager.Instance.ReloadScripts();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to make use of downloaded Workshop Items in WebView: {ex.Message}");
         }
     }
 

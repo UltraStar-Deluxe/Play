@@ -17,7 +17,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
     public static ModManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ModManager>();
 
     public const string ModInfoFileName = "modinfo.yml";
-    private const string ModsRootFolderName = "Mods";
     private const string ModsPersistentDataFolderName = "ModsPersistentData";
     private const string TemplateModFolderName = "TemplateMod";
     private const string TemplateModNamePlaceholder = "MODNAME";
@@ -28,9 +27,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private Settings settings;
-
-    [Inject]
-    private SteamWorkshopManager steamWorkshopManager;
 
     private readonly Dictionary<IMod, ModObjectContext> modObjectToContext = new();
     private readonly Dictionary<Type, string> typeToModFolder = new();
@@ -114,8 +110,8 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
-        DirectoryUtils.CreateDirectory(GetAbsoluteDefaultModsRootFolder());
-        DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedModsRootFolder());
+        DirectoryUtils.CreateDirectory(ModFolderUtils.GetDefaultModsRootFolderAbsolutePath());
+        DirectoryUtils.CreateDirectory(ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath());
 
         // CopyDefaultModToPersistentDataPath("DemoMod");
 
@@ -125,15 +121,12 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
         lastEnabledMods = settings.EnabledMods.ToList();
 
-        steamWorkshopManager.FinishDownloadWorkshopItemsEventStream
-            .Subscribe(_ => ReloadMods());
-
         LoadAndInstantiateMods();
     }
 
     private void CreateOrUpdateModFolderFileSystemWatchers()
     {
-        foreach (string modFolder in GetModFolders())
+        foreach (string modFolder in GetEnabledModFolders())
         {
             CreateOrUpdateModFolderFileSystemWatcher(modFolder);
         }
@@ -173,7 +166,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         }
     }
 
-    private void ReloadMods()
+    public void ReloadMods()
     {
         // Notify mods about reload
         foreach (IOnReloadMod modObject in GetModObjects<IOnReloadMod>())
@@ -222,7 +215,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         DebugLogConsole.AddCommand("mod.path", "Copy and log path to folder with mods",
             () =>
             {
-                string text = GetAbsoluteUserDefinedModsRootFolder();
+                string text = ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath();
                 ClipboardUtils.CopyToClipboard(text);
                 Debug.Log($"Mods folder: {text}");
             });
@@ -298,7 +291,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
     public string CreateModFolderFromTemplate(string modName)
     {
-        string targetModFolder = $"{GetAbsoluteUserDefinedModsRootFolder()}/{modName}";
+        string targetModFolder = $"{ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath()}/{modName}";
         DirectoryInfo targetModFolderInfo = new(targetModFolder);
         if (targetModFolderInfo.Exists)
         {
@@ -307,7 +300,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
             return "";
         }
 
-        string templateModFolder = ApplicationUtils.GetStreamingAssetsPath($"{ModsRootFolderName}/{TemplateModFolderName}");
+        string templateModFolder = ApplicationUtils.GetStreamingAssetsPath($"{ModFolderUtils.ModsRootFolderName}/{TemplateModFolderName}");
         if (!Directory.Exists(templateModFolder))
         {
             throw new Exception($"Template mod folder not found: '{templateModFolder}'");
@@ -432,7 +425,7 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
 
         failedToLoadModFolders.Clear();
 
-        List<string> modFolders = GetModFolders();
+        List<string> modFolders = GetEnabledModFolders();
         foreach (string modFolder in modFolders)
         {
             if (!onlyEnabledMods
@@ -489,18 +482,9 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
         return IsModEnabled(mod.GetType());
     }
 
-    public List<string> GetModFolders()
+    public List<string> GetEnabledModFolders()
     {
-        List<string> modRootFolders = new()
-        {
-            GetAbsoluteDefaultModsRootFolder(),
-            GetAbsoluteUserDefinedModsRootFolder(),
-        };
-
-        // Add Steam Workshop folders
-        modRootFolders.AddRange(steamWorkshopManager.DownloadedWorkshopItems
-            .Select(item => $"{item.Directory}/{ModsRootFolderName}")
-            .Where(folder => DirectoryUtils.Exists(folder)));
+        List<string> modRootFolders = ModFolderUtils.GetModRootFolders();
 
         HashSet<string> ignoredFolderNames = new HashSet<string>()
         {
@@ -899,16 +883,6 @@ public class ModManager : AbstractSingletonBehaviour, INeedInjection
                 compilerWrapper.ImportTypes(foundTypes.ToArray());
             }
         }
-    }
-
-    public static string GetAbsoluteDefaultModsRootFolder()
-    {
-        return ApplicationUtils.GetStreamingAssetsPath(ModsRootFolderName);
-    }
-
-    public static string GetAbsoluteUserDefinedModsRootFolder()
-    {
-        return ApplicationUtils.GetPersistentDataPath(ModsRootFolderName);
     }
 
     public static string GetModPersistentDataFolder(string modFolder)

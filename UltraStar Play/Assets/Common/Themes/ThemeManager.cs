@@ -17,7 +17,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
      * Filename without extension of the theme that should be loaded by default
      */
     public const string DefaultThemeName = "vinyl";
-    private const string ThemeFolderName = "Themes";
     public const string UiRenderTextureName = "ThemeManager.UiRenderTexture";
     public const string ParticleRenderTextureName = "ThemeManager.ParticleRenderTexture";
     private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
@@ -87,9 +86,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     [Inject]
     private BackgroundLightManager backgroundLightManager;
 
-    [Inject]
-    private SteamWorkshopManager steamWorkshopManager;
-
     private HashSet<VisualElement> registeredSfxVisualElements = new();
 
     private string lastThemeDynamicBackgroundJson;
@@ -111,7 +107,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     protected override void StartSingleton()
     {
-        DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedThemesFolder());
+        DirectoryUtils.CreateDirectory(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath());
         ImageManager.AddSpriteHolder(this);
 
         settings.ObserveEveryValueChanged(it => it.AnimatedBackground)
@@ -136,9 +132,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                     () => ApplyThemeSpecificStylesToVisualElements(dialogControl.DialogRootVisualElement)));
             })
             .AddTo(gameObject);
-
-        steamWorkshopManager.FinishDownloadWorkshopItemsEventStream
-            .Subscribe(_ => ReloadThemes());
     }
 
     private void ApplyThemeToContextMenuPopup(ContextMenuPopupControl contextMenuPopupControl)
@@ -173,7 +166,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         string exampleThemeFileName = Path.GetFileName(ExampleThemeFilePathInStreamingAssets);
-        string targetExampleThemeFilePath = $"{GetAbsoluteUserDefinedThemesFolder()}/{exampleThemeFileName}";
+        string targetExampleThemeFilePath = $"{ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath()}/{exampleThemeFileName}";
         if (!FileUtils.Exists(targetExampleThemeFilePath))
         {
             Debug.Log("Copy example theme to user defined themes folder.");
@@ -731,16 +724,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return themeMetas;
         }
 
-        List<string> themeFolders = new List<string>
-        {
-            GetAbsoluteDefaultThemesFolder(),
-            GetAbsoluteUserDefinedThemesFolder(),
-        };
-
-        // Add Steam Workshop folders
-        themeFolders.AddRange(steamWorkshopManager.DownloadedWorkshopItems
-            .Select(item => $"{item.Directory}/{ThemeFolderName}")
-            .Where(folder => DirectoryUtils.Exists(folder)));
+        List<string> themeFolders = ThemeFolderUtils.GetThemeFolders();
 
         themeFolders.ForEach(themeFolder =>
         {
@@ -1137,16 +1121,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         {
             return loadedSprites;
         }
-    }
-
-    public static string GetAbsoluteUserDefinedThemesFolder()
-    {
-        return $"{Application.persistentDataPath}/{ThemeFolderName}";
-    }
-
-    public static string GetAbsoluteDefaultThemesFolder()
-    {
-        return ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName);
     }
 
     private void DisableDynamicBackground()

@@ -7,10 +7,22 @@ public static class PlayerProfileUtils
 {
     public const string PlayerProfileImagesFolderName = "PlayerProfileImages";
     public const string PlayerProfileWebCamImagesFolderName = "WebcamImages";
+    public static List<string> AdditionalPlayerProfileImageFolders { get; set; } = new();
+
+    public static List<string> GetPlayerProfileImageFolders()
+    {
+        return new List<string>
+            {
+                PlayerProfileUtils.GetDefaultPlayerProfileImageFolderAbsolutePath(),
+                PlayerProfileUtils.GetUserDefinedPlayerProfileImageFolderAbsolutePath(),
+            }
+            .Union(AdditionalPlayerProfileImageFolders)
+            .ToList();
+    }
 
     public static string GetAbsoluteWebCamImageFolder()
     {
-        return $"{GetAbsolutePlayerProfileImagesFolder()}/WebcamImages";
+        return $"{GetDefaultPlayerProfileImageFolderAbsolutePath()}/WebcamImages";
     }
 
     public static string GetAbsoluteWebCamImagePath(int playerProfileIndex)
@@ -18,9 +30,14 @@ public static class PlayerProfileUtils
         return $"{GetAbsoluteWebCamImageFolder()}/Player-{playerProfileIndex}.png";
     }
 
-    public static string GetAbsolutePlayerProfileImagesFolder()
+    public static string GetDefaultPlayerProfileImageFolderAbsolutePath()
     {
-        return $"{Application.persistentDataPath}/{PlayerProfileImagesFolderName}";
+        return ApplicationUtils.GetStreamingAssetsPath(PlayerProfileImagesFolderName);
+    }
+
+    public static string GetUserDefinedPlayerProfileImageFolderAbsolutePath()
+    {
+        return ApplicationUtils.GetPersistentDataPath(PlayerProfileImagesFolderName);
     }
 
     public static Dictionary<string, string> FindPlayerProfileImages(List<string> folders)
