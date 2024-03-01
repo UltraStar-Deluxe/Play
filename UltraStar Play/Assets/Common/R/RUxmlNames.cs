@@ -285,6 +285,7 @@ public static partial class R
         public const string importSongsIcon = "importSongsIcon";
         public const string importSongsLabel = "importSongsLabel";
         public const string infoIcon = "infoIcon";
+        public const string infoLabel = "infoLabel";
         public const string innerSongEntryUi = "innerSongEntryUi";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputAndPitchDetectionGroup = "inputAndPitchDetectionGroup";
@@ -1010,6 +1011,7 @@ public static partial class R
         public const string webViewGroup = "webViewGroup";
         public const string wideIcon = "wideIcon";
         public const string wipeLyricsEffectToggle = "wipeLyricsEffectToggle";
+        public const string workshopItemChooser = "workshopItemChooser";
         public const string workshopItemDescriptionTextField = "workshopItemDescriptionTextField";
         public const string workshopItemFolderTextField = "workshopItemFolderTextField";
         public const string workshopItemImageTextField = "workshopItemImageTextField";

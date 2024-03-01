@@ -457,9 +457,15 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         uploadWorkshopItemDialogControl = uiManager.CreateDialogControl("Upload New Steam Workshop Item");
         uploadWorkshopItemDialogControl.AddVisualElement(visualElement);
         uploadWorkshopItemDialogControl.DialogClosedEventStream
-            .Subscribe(evt => uploadWorkshopItemDialogControl = null);
+            .Subscribe(evt =>
+            {
+                uploadWorkshopItemUiControl.Dispose();
+                uploadWorkshopItemDialogControl = null;
+            });
         uploadWorkshopItemDialogControl.AddButton("Publish Workshop Item",
             _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
+        uploadWorkshopItemDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
+            _ => uploadWorkshopItemDialogControl.CloseDialog());
     }
 
     private List<string> GetAvailablePortAudioOutputDeviceNames()

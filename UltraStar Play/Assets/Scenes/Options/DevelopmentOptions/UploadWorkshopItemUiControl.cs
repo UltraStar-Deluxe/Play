@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Steamworks.Ugc;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -9,8 +10,11 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedListener
+public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    [Inject(UxmlName = R.UxmlNames.workshopItemChooser)]
+    private DropdownField workshopItemChooser;
+
     [Inject(UxmlName = R.UxmlNames.workshopItemFolderTextField)]
     private TextField workshopItemFolderTextField;
 
@@ -35,14 +39,23 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.uploadProgressLabel)]
     private Label uploadProgressLabel;
 
+    [Inject(UxmlName = R.UxmlNames.infoLabel)]
+    private Label infoLabel;
+
     [Inject]
     private SteamManager steamManager;
 
     [Inject]
     private SteamWorkshopManager steamWorkshopManager;
 
+    private readonly List<IDisposable> disposables = new();
+
+    private DropdownFieldControl<WorkshopItemChooserEntry> workshopItemChooserControl;
+
     public void OnInjectionFinished()
     {
+        InitWorkshopItemChooserControl();
+
         selectWorkshopItemFolderButton.RegisterCallbackButtonTriggered(_ => OpenSelectFolderDialog());
         selectWorkshopItemImageButton.RegisterCallbackButtonTriggered(_ => OpenSelectPreviewImageDialog());
         workshopItemFolderTextField.RegisterValueChangedCallback(evt => FillTextFieldWithDefaultsFromFolder(evt.newValue));
@@ -51,6 +64,9 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     public void PublishWorkshopItem()
     {
+        ulong itemId = workshopItemChooserControl.SelectedItem.IsNewItem
+            ? 0
+            : workshopItemChooserControl.SelectedItem.SteamWorkshopItem.Id;
         string contentFolderPath = workshopItemFolderTextField.value.Trim();
         string previewImagePath = workshopItemImageTextField.value.Trim();
         string title = workshopItemTitleTextField.value.Trim();
@@ -74,6 +90,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
         uploadProgressLabel.text = "Uploading...";
         ObservableUtils.RunOnNewTaskAsObservable(async () => await steamWorkshopManager.PublishWorkshopItemAsync(
+                itemId,
                 contentFolderPath,
                 previewImagePath,
                 title,
@@ -104,29 +121,88 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             });
     }
 
+    private void InitWorkshopItemChooserControl()
+    {
+        List<WorkshopItemChooserEntry> entries = GetWorkshopItemChooserEntries();
+        workshopItemChooserControl = new DropdownFieldControl<WorkshopItemChooserEntry>(
+            workshopItemChooser,
+            entries,
+            entries[0],
+            item => item.DisplayName);
+        workshopItemChooserControl.Selection
+            .Subscribe(newValue => OnWorkshopItemChooserSelectionChanged(newValue));
+
+        if (steamWorkshopManager.DownloadState is not SteamWorkshopManager.EDownloadState.Finished)
+        {
+            disposables.Add(steamWorkshopManager.FinishDownloadWorkshopItemsEventStream
+                .Subscribe(_ => workshopItemChooserControl.Items = GetWorkshopItemChooserEntries()));
+        }
+    }
+
+    private void OnWorkshopItemChooserSelectionChanged(WorkshopItemChooserEntry newValue)
+    {
+        workshopItemFolderTextField.value = "";
+        workshopItemImageTextField.value = "";
+        workshopItemTitleTextField.value = "";
+        workshopItemDescriptionTextField.value = "";
+        workshopItemTagCsvTextField.value = "";
+
+        infoLabel.text = newValue.IsNewItem
+            ? "A folder, image, and title is mandatory"
+            : "Only set the values that you want to change";
+    }
+
+    private List<WorkshopItemChooserEntry> GetWorkshopItemChooserEntries()
+    {
+        return new List<WorkshopItemChooserEntry>() { new WorkshopItemChooserEntry() }
+            .Union(steamWorkshopManager.DownloadedWorkshopItems
+                .Where(item => item.Owner.Id == steamManager.PlayerSteamId)
+                .Select(item => new WorkshopItemChooserEntry(item)))
+            .ToList();
+    }
+
     private string GetInputFieldsOrConnectionErrorMessage(
         string contentFolderPath,
         string imagePath,
         string title)
     {
-        if (!DirectoryUtils.Exists(contentFolderPath))
-        {
-            return "Folder does not exist";
-        }
-
-        if (!FileUtils.Exists(imagePath))
-        {
-            return "Preview image does not exist";
-        }
-
-        if (title.IsNullOrEmpty())
-        {
-            return "Title cannot be empty";
-        }
-
         if (!steamManager.IsConnectedToSteam)
         {
             return "Not connected to Steam.";
+        }
+
+        if (workshopItemChooserControl.SelectedItem.IsNewItem)
+        {
+            // For an new item, all mandatory fields must be set.
+            if (!DirectoryUtils.Exists(contentFolderPath))
+            {
+                return "Folder does not exist";
+            }
+
+            if (!FileUtils.Exists(imagePath))
+            {
+                return "Preview image does not exist";
+            }
+
+            if (title.IsNullOrEmpty())
+            {
+                return "Title cannot be empty";
+            }
+        }
+        else
+        {
+            // For an existing item, only fields that should be changed need to be set.
+            if (!contentFolderPath.IsNullOrEmpty()
+                && !DirectoryUtils.Exists(contentFolderPath))
+            {
+                return "Folder does not exist";
+            }
+
+            if (!imagePath.IsNullOrEmpty()
+                && !FileUtils.Exists(imagePath))
+            {
+                return "Preview image does not exist";
+            }
         }
 
         return "";
@@ -218,6 +294,31 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         {
             Debug.LogException(ex);
             Debug.LogError($"Failed to fill text fields with content from '{modInfoFilePath}': {ex.Message}");
+        }
+    }
+
+    public void Dispose()
+    {
+        disposables.ForEach(it => it.Dispose());
+    }
+
+    private class WorkshopItemChooserEntry
+    {
+        private const string NewItemDisplayText = "New Item";
+
+        public Item SteamWorkshopItem { get; private set; }
+        public bool IsNewItem { get; private set; }
+        public string DisplayName => IsNewItem ? NewItemDisplayText : SteamWorkshopItem.Title;
+
+        public WorkshopItemChooserEntry()
+        {
+            IsNewItem = true;
+        }
+
+        public WorkshopItemChooserEntry(Item steamWorkshopItem)
+        {
+            SteamWorkshopItem = steamWorkshopItem;
+            IsNewItem = false;
         }
     }
 }
