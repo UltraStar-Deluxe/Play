@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PrimeInputActions;
 using Steamworks.Ugc;
 using UniInject;
 using UniRx;
@@ -27,6 +26,9 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     [Inject(UxmlName = R.UxmlNames.selectWorkshopItemImageButton)]
     private Button selectWorkshopItemImageButton;
+
+    [Inject(UxmlName = R.UxmlNames.openWorkshopItemFolderButton)]
+    private Button openWorkshopItemFolderButton;
 
     [Inject(UxmlName = R.UxmlNames.workshopItemDescriptionTextField)]
     private TextField workshopItemDescriptionTextField;
@@ -62,6 +64,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
         selectWorkshopItemFolderButton.RegisterCallbackButtonTriggered(_ => OpenSelectFolderDialog());
         selectWorkshopItemImageButton.RegisterCallbackButtonTriggered(_ => OpenSelectPreviewImageDialog());
+        openWorkshopItemFolderButton.RegisterCallbackButtonTriggered(_ => OpenWorkshopItemFolder());
         workshopItemFolderTextField.RegisterValueChangedCallback(evt => FillTextFieldWithDefaultsFromFolder(evt.newValue));
         uploadProgressLabel.text = "";
     }
@@ -249,6 +252,15 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         {
             uploadProgressLabel.text = $"{progress:F2} %";
         });
+    }
+
+    private void OpenWorkshopItemFolder()
+    {
+        if (!DirectoryUtils.Exists(workshopItemFolderTextField.value))
+        {
+            return;
+        }
+        ApplicationUtils.OpenDirectory(workshopItemFolderTextField.value);
     }
 
     private void OpenSelectFolderDialog()

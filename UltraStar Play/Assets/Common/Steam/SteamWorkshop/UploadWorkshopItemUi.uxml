@@ -1,10 +1,13 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="root" class="child-mb-2">
-        <ui:DropdownField name="workshopItemChooser" choices="New Item" />
+        <ui:DropdownField name="workshopItemChooser" choices="New Item" style="flex-grow: 1;" />
         <ui:VisualElement name="row" style="flex-shrink: 0;">
             <ui:TextField name="workshopItemFolderTextField" placeholder-text="Enter path to content folder" is-delayed="true" style="align-items: center; flex-grow: 1; flex-shrink: 1;" />
             <ui:Button name="selectWorkshopItemFolderButton" class="comboButton comboBoxButton squareButton">
                 <MaterialIcon picking-mode="Ignore" name="selectFolderIcon" icon="folder_open" />
+            </ui:Button>
+            <ui:Button name="openWorkshopItemFolderButton" class="comboButton squareButton ml-1">
+                <MaterialIcon picking-mode="Ignore" name="selectFolderIcon" icon="open_in_new" />
             </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="row" style="flex-shrink: 0;">

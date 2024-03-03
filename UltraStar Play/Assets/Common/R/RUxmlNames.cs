@@ -539,6 +539,7 @@ public static partial class R
         public const string openSongMenuIcon = "openSongMenuIcon";
         public const string openWebViewScriptsPathButton = "openWebViewScriptsPathButton";
         public const string openWebViewScriptsPathLabel = "openWebViewScriptsPathLabel";
+        public const string openWorkshopItemFolderButton = "openWorkshopItemFolderButton";
         public const string optionsSceneScrollView = "optionsSceneScrollView";
         public const string orderChooserTitle = "orderChooserTitle";
         public const string otherTeamsScrollView = "otherTeamsScrollView";
