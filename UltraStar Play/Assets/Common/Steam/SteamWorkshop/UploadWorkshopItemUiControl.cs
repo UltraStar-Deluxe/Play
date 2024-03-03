@@ -260,16 +260,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         }
         uploadProgressLabel.text = $"";
 
-        workshopItemTitleTextField.value = PathUtils.GetFileName(folder);
-
-        List<string> ymlFiles = FileScannerUtils.ScanForFiles(
-            new List<string>() { folder },
-            new List<string>() { "*.yml" });
-        string modInfoFilePath = ymlFiles.FirstOrDefault(path => PathUtils.GetFileName(path) == ModManager.ModInfoFileName);
-        if (FileUtils.Exists(modInfoFilePath))
-        {
-            FillTextFieldWithDefaultsFromModInfoFile(modInfoFilePath);
-        }
+        SetValueIfEmpty(workshopItemTitleTextField, StringUtils.ToTitleCase(PathUtils.GetFileName(folder)));
 
         List<string> imageFiles = FileScannerUtils.ScanForFiles(
             new List<string>() { folder },
@@ -277,29 +268,21 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         string previewImagePath = imageFiles.FirstOrDefault();
         if (FileUtils.Exists(previewImagePath))
         {
-            workshopItemImageTextField.value = previewImagePath;
-        }
-    }
-
-    private void FillTextFieldWithDefaultsFromModInfoFile(string modInfoFilePath)
-    {
-        try
-        {
-            string modInfoFileContent = FileUtils.ReadAllText(modInfoFilePath);
-            ModInfo fromYaml = YamlConverter.FromYaml<ModInfo>(modInfoFileContent);
-            workshopItemTitleTextField.value = PathUtils.GetFileName(fromYaml.name);
-            workshopItemDescriptionTextField.value = PathUtils.GetFileName(fromYaml.description);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogException(ex);
-            Debug.LogError($"Failed to fill text fields with content from '{modInfoFilePath}': {ex.Message}");
+            SetValueIfEmpty(workshopItemImageTextField, previewImagePath);
         }
     }
 
     public void Dispose()
     {
         disposables.ForEach(it => it.Dispose());
+    }
+
+    private static void SetValueIfEmpty(TextField textField, string newValue)
+    {
+        if (textField.value.IsNullOrEmpty())
+        {
+            textField.value = newValue;
+        }
     }
 
     private class WorkshopItemChooserEntry
