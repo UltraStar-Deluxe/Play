@@ -95,14 +95,14 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
             Item item = items[i];
             try
             {
-                Debug.Log($"Downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {item.Id}");
+                Debug.Log($"Downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {item.Id} and title '{item.Title}'");
                 await item.DownloadAsync();
-                Debug.Log($"Finished downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {item.Id}. Folder: {item.Directory}");
+                Debug.Log($"Finished downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {item.Id} title '{item.Title}'. Folder: {item.Directory}");
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to download Steam Workshop item {i + 1}/{items.Count} with id {item.Id}: {ex.Message}");
+                Debug.LogError($"Failed to download Steam Workshop item {i + 1}/{items.Count} with id {item.Id} title '{item.Title}': {ex.Message}");
             }
         }
     }
