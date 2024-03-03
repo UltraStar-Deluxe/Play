@@ -7,7 +7,7 @@
         <ui:Label text="75 %" name="uploadProgressLabel" style="-unity-text-align: upper-center;" />
         <ui:DropdownField name="workshopItemChooser" choices="New Item" />
         <ui:VisualElement name="row" style="flex-shrink: 0;">
-            <ui:TextField name="workshopItemFolderTextField" placeholder-text="Enter path to folder content" is-delayed="true" style="align-items: center; flex-grow: 1; flex-shrink: 1;" />
+            <ui:TextField name="workshopItemFolderTextField" placeholder-text="Enter path to content folder" is-delayed="true" style="align-items: center; flex-grow: 1; flex-shrink: 1;" />
             <ui:Button name="selectWorkshopItemFolderButton" class="comboButton comboBoxButton squareButton">
                 <MaterialIcon picking-mode="Ignore" name="selectFolderIcon" icon="folder_open" />
             </ui:Button>

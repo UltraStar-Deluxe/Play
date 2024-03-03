@@ -462,6 +462,8 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 uploadWorkshopItemUiControl.Dispose();
                 uploadWorkshopItemDialogControl = null;
             });
+        uploadWorkshopItemDialogControl.AddButton("Learn More",
+            _ => ApplicationUtils.OpenUrl(TranslationManager.GetTranslation(R.Messages.uri_howToSteamWorkshop)));
         uploadWorkshopItemDialogControl.AddButton("Publish Workshop Item",
             _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
         uploadWorkshopItemDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
