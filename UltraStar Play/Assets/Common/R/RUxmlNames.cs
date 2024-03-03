@@ -284,6 +284,7 @@ public static partial class R
         public const string importSongsButton = "importSongsButton";
         public const string importSongsIcon = "importSongsIcon";
         public const string importSongsLabel = "importSongsLabel";
+        public const string infoContainer = "infoContainer";
         public const string infoIcon = "infoIcon";
         public const string infoLabel = "infoLabel";
         public const string innerSongEntryUi = "innerSongEntryUi";

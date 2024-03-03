@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeInputActions;
 using Steamworks.Ugc;
 using UniInject;
 using UniRx;
@@ -41,6 +42,9 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     [Inject(UxmlName = R.UxmlNames.infoLabel)]
     private Label infoLabel;
+
+    [Inject(UxmlName = R.UxmlNames.infoContainer)]
+    private VisualElement infoContainer;
 
     [Inject]
     private SteamManager steamManager;
@@ -141,15 +145,30 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     private void OnWorkshopItemChooserSelectionChanged(WorkshopItemChooserEntry newValue)
     {
-        workshopItemFolderTextField.value = "";
-        workshopItemImageTextField.value = "";
-        workshopItemTitleTextField.value = "";
-        workshopItemDescriptionTextField.value = "";
-        workshopItemTagCsvTextField.value = "";
+        UpdateMandatoryFieldsInfo(newValue.IsNewItem);
+        if (newValue.IsNewItem)
+        {
+            workshopItemFolderTextField.value = "";
+            workshopItemImageTextField.value = "";
+            workshopItemTitleTextField.value = "";
+            workshopItemDescriptionTextField.value = "";
+            workshopItemTagCsvTextField.value = "";
+        }
+        else
+        {
+            workshopItemFolderTextField.value = newValue.SteamWorkshopItem.Directory;
+            workshopItemTitleTextField.value = newValue.SteamWorkshopItem.Title;
+            workshopItemDescriptionTextField.value = newValue.SteamWorkshopItem.Description;
+            workshopItemTagCsvTextField.value = newValue.SteamWorkshopItem.Tags.ToCsv(", ", "", "");
+        }
+    }
 
-        infoLabel.text = newValue.IsNewItem
-            ? "A folder, image, and title is mandatory"
+    private void UpdateMandatoryFieldsInfo(bool isCreatingNewWorkshopItem)
+    {
+        infoLabel.text = isCreatingNewWorkshopItem
+            ? ""
             : "Only set the values that you want to change";
+        infoContainer.SetVisibleByDisplay(!infoLabel.text.IsNullOrEmpty());
     }
 
     private List<WorkshopItemChooserEntry> GetWorkshopItemChooserEntries()
