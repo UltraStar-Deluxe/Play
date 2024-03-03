@@ -169,7 +169,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
                              + $"NormalNoteLengthTotal {calculationData.NormalNoteLengthTotal}, GoldenNoteLengthTotal {calculationData.GoldenNoteLengthTotal})");
         }
 
-        scoreChangedEventStream.OnNext(CreateScoreChangedEventWithCurrentScore());
+        FireScoreChangedEventWithCurrentScore();
 
         if (onlineMultiplayerManager.IsOnlineGame
             && CommonOnlineMultiplayerUtils.IsLocalPlayerProfile(playerProfile))
@@ -232,7 +232,7 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         SingingResultsPlayerScoreRequestDto requestDto = FastBufferReaderUtils.ReadJsonValuePacked<SingingResultsPlayerScoreRequestDto>(message.MessagePayload);
         singingResultsPlayerScoreFromOnlineMultiplayerPeer = requestDto.SingingResultsPlayerScore;
 
-        scoreChangedEventStream.OnNext(CreateScoreChangedEventWithCurrentScore());
+        FireScoreChangedEventWithCurrentScore();
     }
 
     private string GetPlayerScoreMessageName()
@@ -331,14 +331,23 @@ public class PlayerScoreControl : MonoBehaviour, INeedInjection, IInjectionFinis
         }
     }
 
-    public void SetModTotalScore(int newModTotalScore)
+    public void SetModTotalScore(int newModTotalScore, bool fireScoreChangedEvent = false)
     {
         calculationData.ModTotalScore = newModTotalScore;
+        if (fireScoreChangedEvent)
+        {
+            FireScoreChangedEventWithCurrentScore();
+        }
     }
 
     private ScoreChangedEvent CreateScoreChangedEventWithCurrentScore()
     {
         return new ScoreChangedEvent(TotalScore);
+    }
+
+    private void FireScoreChangedEventWithCurrentScore()
+    {
+        scoreChangedEventStream.OnNext(CreateScoreChangedEventWithCurrentScore());
     }
 
     public class ScoreChangedEvent
