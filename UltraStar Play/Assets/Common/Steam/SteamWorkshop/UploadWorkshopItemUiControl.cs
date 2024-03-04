@@ -95,46 +95,42 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
-        ulong newlyPublishedFileId = 0;
-
         uploadProgressLabel.text = "Uploading...";
-        ObservableUtils.RunOnNewTaskAsObservable(async () => await steamWorkshopManager.PublishWorkshopItemAsync(
-                itemId,
-                contentFolderPath,
-                previewImagePath,
-                title,
-                description,
-                tags,
-                ShowUploadProgress))
+        ObservableUtils.RunOnNewTaskAsObservable<ulong>(async () =>
+            {
+                PublishResult publishResult = await steamWorkshopManager.PublishWorkshopItemAsync(
+                    itemId,
+                    contentFolderPath,
+                    previewImagePath,
+                    title,
+                    description,
+                    tags,
+                    progress => ShowProgressMessage($"{progress:F2} %"));
+
+                if (!publishResult.Success)
+                {
+                    throw new SteamException("Upload was not successful.");
+                }
+                Debug.Log($"Successfully uploaded Steam Workshop Item. Result: {publishResult.Result}, FileId: {publishResult.FileId}");
+
+                ApplicationUtils.OpenUrl($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishResult.FileId}");
+
+                ShowProgressMessage("Upload successful. Downloading...");
+
+                await steamWorkshopManager.SubscribeAndDownloadWorkshopItemAsync(publishResult.FileId);
+                return publishResult.FileId;
+            })
             .ObserveOnMainThread()
             .CatchIgnore((Exception ex) =>
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to upload Steam Workshop item: {ex.Message}");
-                ShowUploadFailure();
+                ShowProgressMessage("Upload failed. See log for details.");
             })
-            .SelectMany(publishResult =>
+            .Subscribe(newlyPublishedFileId =>
             {
-                if (publishResult.Success)
-                {
-                    Debug.Log($"Successfully uploaded Steam Workshop Item. Result: {publishResult.Result}, FileId: {publishResult.FileId}");
-                    ShowUploadSuccess();
+                ShowProgressMessage("Download successful. All done.");
 
-                    ApplicationUtils.OpenUrl($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishResult.FileId}");
-                    newlyPublishedFileId = publishResult.FileId;
-
-                    // Download newly created Workshop Item
-                    return steamWorkshopManager.DownloadWorkshopItemsAsObservable();
-                }
-                else
-                {
-                    Debug.LogError($"Upload of Steam Workshop Item not successful. Result: {publishResult.Result}");
-                    ShowUploadFailure();
-                    return Observable.Empty<IReadOnlyList<Item>>();
-                }
-            })
-            .Subscribe(_ =>
-            {
                 // Update dropdown and select newly created Workshop Item
                 UpdateWorkshopItemChooserEntries();
 
@@ -255,28 +251,9 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         return "";
     }
 
-    private void ShowUploadSuccess()
+    private void ShowProgressMessage(string message)
     {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            uploadProgressLabel.text = "Upload successful.";
-        });
-    }
-
-    private void ShowUploadFailure()
-    {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            uploadProgressLabel.text = $"Upload failed. See log for details.";
-        });
-    }
-
-    private void ShowUploadProgress(float progress)
-    {
-        ThreadUtils.RunOnMainThread(() =>
-        {
-            uploadProgressLabel.text = $"{progress:F2} %";
-        });
+        ThreadUtils.RunOnMainThread(() => uploadProgressLabel.text = message);
     }
 
     private void OpenWorkshopItemFolder()

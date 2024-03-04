@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Steamworks.Ugc;
 using UniInject;
@@ -97,14 +98,14 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
             Item item = items[i];
             try
             {
-                Debug.Log($"Downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {item.Id} and title '{item.Title}'");
+                Debug.Log($"Downloading or updating Steam Workshop item {i + 1}/{items.Count} '{item.Title}' with id {item.Id}");
                 await item.DownloadAsync();
-                Debug.Log($"Finished downloading or updating Steam Workshop item {i + 1}/{items.Count} with id {item.Id} title '{item.Title}'. Folder: {item.Directory}");
+                Debug.Log($"Finished downloading or updating Steam Workshop item {i + 1}/{items.Count} '{item.Title}' with id {item.Id}. Folder: {item.Directory}");
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to download Steam Workshop item {i + 1}/{items.Count} with id {item.Id} title '{item.Title}': {ex.Message}");
+                Debug.LogError($"Failed to download Steam Workshop item {i + 1}/{items.Count} '{item.Title}' with id {item.Id}: {ex.Message}");
             }
         }
     }
@@ -112,7 +113,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     private async Task<List<Item>> QuerySubscribedWorkshopItemsAsync()
     {
         Debug.Log($"Querying subscribed Steam Workshop items");
-        List<Item> result = await ReadAllPages(Query.All.WhereUserSubscribed());
+        List<Item> result = await ReadAllPages(Query.Items.WhereUserSubscribed());
         Debug.Log($"Found {result.Count} subscribed Steam Workshop items");
         return result;
     }
@@ -120,7 +121,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     private async Task<List<Item>> QueryPublishedWorkshopItemsAsync()
     {
         Debug.Log($"Querying published Steam Workshop items");
-        List<Item> result = await ReadAllPages(Query.All.WhereUserPublished());
+        List<Item> result = await ReadAllPages(Query.Items.WhereUserPublished());
         Debug.Log($"Found {result.Count} published Steam Workshop items");
         return result;
     }
@@ -227,6 +228,30 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
 
         return await ugcEditor
             .SubmitAsync(new ActionProgress(onProgress));
+    }
+
+    public async Task SubscribeAndDownloadWorkshopItemAsync(ulong workshopItemFileId)
+    {
+        ResultPage? resultPage = await Query.Items.WithFileId(workshopItemFileId).GetPageAsync(1);
+        if (!resultPage.HasValue)
+        {
+            return;
+        }
+        await resultPage.Value.Entries.FirstOrDefault().Subscribe();
+
+        await DownloadWorkshopItemsAsObservable();
+    }
+
+    public async Task UnsubscribeAndDownloadWorkshopItemAsync(ulong workshopItemFileId)
+    {
+        ResultPage? resultPage = await Query.Items.WithFileId(workshopItemFileId).GetPageAsync(1);
+        if (!resultPage.HasValue)
+        {
+            return;
+        }
+        await resultPage.Value.Entries.FirstOrDefault().Unsubscribe();
+
+        await DownloadWorkshopItemsAsObservable();
     }
 
     private async Task<string> GetNewWorkshopItemErrorMessage(string contentFolderPath, string previewImagePath, string title)
