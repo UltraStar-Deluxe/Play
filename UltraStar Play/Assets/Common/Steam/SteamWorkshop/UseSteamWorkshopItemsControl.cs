@@ -16,6 +16,8 @@ public class UseSteamWorkshopItemsControl : INeedInjection
         {
             return;
         }
+
+        Debug.Log($"Using content from {items.Count} Steam Workshop items: {items.Select(it => it.Title).ToCsv(", ", "", "")}");
         UseDownloadedWorkshopItemsForWebView(items);
         UseDownloadedWorkshopItemsForPlayerProfileImages(items);
         UseDownloadedWorkshopItemsForMods(items);

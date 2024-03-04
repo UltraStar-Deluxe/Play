@@ -95,6 +95,8 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             return;
         }
 
+        ulong newlyPublishedFileId = 0;
+
         uploadProgressLabel.text = "Uploading...";
         ObservableUtils.RunOnNewTaskAsObservable(async () => await steamWorkshopManager.PublishWorkshopItemAsync(
                 itemId,
@@ -111,7 +113,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
                 Debug.LogError($"Failed to upload Steam Workshop item: {ex.Message}");
                 ShowUploadFailure();
             })
-            .Subscribe(publishResult =>
+            .SelectMany(publishResult =>
             {
                 if (publishResult.Success)
                 {
@@ -119,11 +121,29 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
                     ShowUploadSuccess();
 
                     ApplicationUtils.OpenUrl($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishResult.FileId}");
+                    newlyPublishedFileId = publishResult.FileId;
+
+                    // Download newly created Workshop Item
+                    return steamWorkshopManager.DownloadWorkshopItemsAsObservable();
                 }
                 else
                 {
                     Debug.LogError($"Upload of Steam Workshop Item not successful. Result: {publishResult.Result}");
                     ShowUploadFailure();
+                    return Observable.Empty<IReadOnlyList<Item>>();
+                }
+            })
+            .Subscribe(_ =>
+            {
+                // Update dropdown and select newly created Workshop Item
+                UpdateWorkshopItemChooserEntries();
+
+                WorkshopItemChooserEntry newlyPublishedWorkshopItemChooserEntry = workshopItemChooserControl.Items
+                    .FirstOrDefault(item => !item.IsNewItem
+                                            && item.SteamWorkshopItem.Id.Value == newlyPublishedFileId);
+                if (newlyPublishedWorkshopItemChooserEntry != null)
+                {
+                    workshopItemChooserControl.SetSelection(newlyPublishedWorkshopItemChooserEntry);
                 }
             });
     }
@@ -142,8 +162,13 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         if (steamWorkshopManager.DownloadState is not SteamWorkshopManager.EDownloadState.Finished)
         {
             disposables.Add(steamWorkshopManager.FinishDownloadWorkshopItemsEventStream
-                .Subscribe(_ => workshopItemChooserControl.Items = GetWorkshopItemChooserEntries()));
+                .Subscribe(_ => UpdateWorkshopItemChooserEntries()));
         }
+    }
+
+    private void UpdateWorkshopItemChooserEntries()
+    {
+        workshopItemChooserControl.Items = GetWorkshopItemChooserEntries();
     }
 
     private void OnWorkshopItemChooserSelectionChanged(WorkshopItemChooserEntry newValue)

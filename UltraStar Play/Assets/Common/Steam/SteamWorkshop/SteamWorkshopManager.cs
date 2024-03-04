@@ -34,12 +34,13 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
 
     public void DownloadWorkshopItems()
     {
-        if (DownloadState is not EDownloadState.Pending)
-        {
-            return;
-        }
+        DownloadWorkshopItemsAsObservable()
+            .Subscribe(_ => Debug.Log("Download workshop items done"));
+    }
 
-        ObservableUtils.RunOnNewTaskAsObservable(async () =>
+    public IObservable<IReadOnlyList<Item>> DownloadWorkshopItemsAsObservable()
+    {
+        return ObservableUtils.RunOnNewTaskAsObservable(async () =>
                 await DownloadSubscribedWorkshopItemsAsync())
             .ObserveOnMainThread()
             .CatchIgnore((Exception ex) =>
@@ -48,12 +49,13 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
                 Debug.LogError($"Failed to download Steam Workshop items: {ex.Message}");
                 FireDownloadFinishedEvent();
             })
-            .Subscribe(items =>
+            .Select(items =>
             {
                 Debug.Log($"Successfully downloaded {items.Count} Steam Workshop Items");
                 DownloadedWorkshopItems = items;
                 FireDownloadFinishedEvent();
                 useSteamWorkshopItemsControl.UseWorkshopItems(items);
+                return DownloadedWorkshopItems;
             });
     }
 
@@ -126,6 +128,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
     private async Task<List<Item>> ReadAllPages(Query ugcQuery)
     {
         List<Item> result = new List<Item>();
+        HashSet<ulong> resultIds = new HashSet<ulong>();
 
         // Page number starts at 1
         int page = 1;
@@ -137,7 +140,15 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
             if (resultPage != null)
             {
                 hasMorePages = resultPage?.ResultCount > 0 && resultPage?.TotalCount > result.Count;
-                result.AddRange(resultPage?.Entries);
+                foreach (Item resultPageEntry in resultPage?.Entries)
+                {
+                    // TODO: Some entries are returned multiple times. Workaround: only add if item with this ID has not been added yet.
+                    if (!resultIds.Contains(resultPageEntry.Id))
+                    {
+                        resultIds.Add(resultPageEntry.Id);
+                        result.Add(resultPageEntry);
+                    }
+                }
             }
             else
             {
