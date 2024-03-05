@@ -10,7 +10,7 @@ public class IpAddressUtils
     {
         return SimpleHttpServerForUnity.IpAddressUtils.GetIpAddress(addressFamily, networkInterfaceTypes);
     }
-    
+
     public static IPAddress GetLocalIpAddress()
     {
         try
@@ -24,10 +24,11 @@ public class IpAddressUtils
         catch (Exception e)
         {
             Debug.LogException(e);
-            Debug.LogError("Failed to determine local IP address by creating a connection wit a socket.");
-            
+            Debug.LogError("Failed to determine local IP address by creating a connection with a socket. Maybe not connected to any LAN.");
+
             string localIpAddressAsString = IpAddressUtils.GetIpAddress(SimpleHttpServerForUnity.AddressFamily.IPv4);
-            if (localIpAddressAsString.IsNullOrEmpty())
+            if (localIpAddressAsString.IsNullOrEmpty()
+                || localIpAddressAsString == "localhost")
             {
                 return IPAddress.Loopback;
             }

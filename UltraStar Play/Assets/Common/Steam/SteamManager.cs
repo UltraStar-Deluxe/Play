@@ -18,6 +18,9 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
     [Inject]
     private SteamAchievementManager steamAchievementManager;
 
+    [Inject]
+    private SteamWorkshopManager steamWorkshopManager;
+
     private readonly Subject<bool> connectedToSteamEventStream = new();
     public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
 
@@ -62,13 +65,16 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 
             steamAchievementManager.SetAvailableAchievements(SteamUserStats.Achievements);
 
+            steamWorkshopManager.DownloadWorkshopItems();
+
             connectedToSteamEventStream.OnNext(true);
             Debug.Log($"Steam successfully initialized: PlayerName: {PlayerName}, SteamUser.VoiceRecord: {SteamUser.VoiceRecord}");
         }
         catch (Exception e)
         {
-            IsConnectedToSteam = false;
             Debug.LogException(e);
+            Debug.LogError($"Failed to initialize Steam, maybe not connected to Steam client: {e.Message}");
+            IsConnectedToSteam = false;
         }
     }
 

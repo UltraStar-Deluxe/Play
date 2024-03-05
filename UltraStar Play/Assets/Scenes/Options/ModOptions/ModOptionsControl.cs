@@ -48,7 +48,7 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
             () => settings.ReloadModsOnFileChange,
             newValue => settings.ReloadModsOnFileChange = newValue);
 
-        List<string> modFolders = modManager.GetModFolders();
+        List<string> modFolders = modManager.GetEnabledModFolders();
         if (modFolders.IsNullOrEmpty())
         {
             modList.Add(new Label("No mods found."));
@@ -84,7 +84,7 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
                 TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_intro) },
             { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_install_title),
                 TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_install,
-                    "modsRootFolderPath", ModManager.GetAbsoluteUserDefinedModsRootFolder()) },
+                    "modsRootFolderPath", ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath()) },
             { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_developMods_title),
                 TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_developMods) },
             { TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_modLoading_title),
@@ -94,7 +94,7 @@ public class ModOptionsControl : AbstractOptionsSceneControl, INeedInjection, IB
             TranslationManager.GetTranslation(R.Messages.options_mod_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.action_openModsRootFolder),
-            _ => ApplicationUtils.OpenDirectory(ModManager.GetAbsoluteUserDefinedModsRootFolder()));
+            _ => ApplicationUtils.OpenDirectory(ModFolderUtils.GetUserDefinedModsRootFolderAbsolutePath()));
         helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
             _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToMods)));
         return helpDialogControl;

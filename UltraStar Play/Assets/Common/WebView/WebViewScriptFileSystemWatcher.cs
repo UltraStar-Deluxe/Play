@@ -14,9 +14,9 @@ public class WebViewScriptFileSystemWatcher : AbstractSingletonBehaviour, INeedI
 
     [Inject]
     private WebViewManager webViewManager;
-    
+
     private readonly List<IDisposable> disposables = new();
-    
+
     protected override object GetInstance()
     {
         return Instance;
@@ -25,12 +25,18 @@ public class WebViewScriptFileSystemWatcher : AbstractSingletonBehaviour, INeedI
 #if UNITY_STANDALONE
     protected override void StartSingleton()
     {
-        string folder = ApplicationUtils.GetWebViewScriptsAbsolutePath();
-        Debug.Log($"Watching WebView script files in {folder}");
-        disposables.Add(FileSystemWatcherUtils.CreateFileSystemWatcher(
-            folder,
-            "*.js",
-            OnWebViewScriptChanged));
+        foreach (string folder in WebViewUtils.GetWebViewScriptsFolders())
+        {
+            if (!DirectoryUtils.Exists(folder))
+            {
+                continue;
+            }
+            Debug.Log($"Watching WebView script files in {folder}");
+            disposables.Add(FileSystemWatcherUtils.CreateFileSystemWatcher(
+                folder,
+                "*.js",
+                OnWebViewScriptChanged));
+        }
     }
 
     private void OnWebViewScriptChanged(object sender, FileSystemEventArgs e)
@@ -39,7 +45,7 @@ public class WebViewScriptFileSystemWatcher : AbstractSingletonBehaviour, INeedI
         MainThreadDispatcher.Send(_ => webViewManager.ReloadScripts(), null);
     }
 #endif
-    
+
     private void OnDestroy()
     {
         disposables.ForEach(it => it.Dispose());

@@ -10,12 +10,33 @@ public static class FileSystemDialogUtils
     {
         return new ExtensionFilter[] { new ExtensionFilter(filterName, extensions) };
     }
-    
+
     public static ExtensionFilter[] CreateExtensionFilters(string filterName, IEnumerable<string> extensions)
     {
         return CreateExtensionFilters(filterName, extensions.ToArray());
     }
-    
+
+    public static void OpenFolderDialogToSetPath(
+        string dialogTitle,
+        string fallbackDirectory,
+        Func<string> getter,
+        Action<string> setter)
+    {
+        string oldValue = getter();
+        string directory = DirectoryUtils.Exists(oldValue)
+            ? oldValue
+            : fallbackDirectory;
+        if (!DirectoryUtils.Exists(directory))
+        {
+            directory = "";
+        }
+        string selectedPath = OpenFolderDialog(dialogTitle, directory);
+        if (!selectedPath.IsNullOrEmpty())
+        {
+            setter(selectedPath);
+        }
+    }
+
     public static void OpenFileDialogToSetPath(
         string dialogTitle,
         string fallbackDirectory,
@@ -37,7 +58,7 @@ public static class FileSystemDialogUtils
             setter(selectedPath);
         }
     }
-    
+
     public static string OpenFolderDialog(string title, string directory)
     {
 #if UNITY_STANDALONE
@@ -45,7 +66,7 @@ public static class FileSystemDialogUtils
         {
             directory = "";
         }
-        
+
         string[] selectedPaths = StandaloneFileBrowser.OpenFolderPanel(title, directory, false);
         if (selectedPaths.IsNullOrEmpty()
             || !DirectoryUtils.Exists(selectedPaths.FirstOrDefault()))
@@ -59,7 +80,7 @@ public static class FileSystemDialogUtils
         return "";
 #endif
     }
-    
+
     public static string OpenFileDialog(string title, string directory, ExtensionFilter[] extensionFilters)
     {
 #if UNITY_STANDALONE
@@ -67,7 +88,7 @@ public static class FileSystemDialogUtils
         {
             directory = "";
         }
-        
+
         string[] selectedPaths = StandaloneFileBrowser.OpenFilePanel(title, directory, extensionFilters, false);
         if (selectedPaths.IsNullOrEmpty()
             || !FileUtils.Exists(selectedPaths.FirstOrDefault()))

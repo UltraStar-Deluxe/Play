@@ -17,7 +17,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
      * Filename without extension of the theme that should be loaded by default
      */
     public const string DefaultThemeName = "vinyl";
-    private const string ThemeFolderName = "Themes";
     public const string UiRenderTextureName = "ThemeManager.UiRenderTexture";
     public const string ParticleRenderTextureName = "ThemeManager.ParticleRenderTexture";
     private const string ExampleThemeFilePathInStreamingAssets = "Themes/example_theme.json.txt";
@@ -108,7 +107,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
     protected override void StartSingleton()
     {
-        DirectoryUtils.CreateDirectory(GetAbsoluteUserDefinedThemesFolder());
+        DirectoryUtils.CreateDirectory(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath());
         ImageManager.AddSpriteHolder(this);
 
         settings.ObserveEveryValueChanged(it => it.AnimatedBackground)
@@ -167,7 +166,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
 
         string exampleThemeFileName = Path.GetFileName(ExampleThemeFilePathInStreamingAssets);
-        string targetExampleThemeFilePath = $"{GetAbsoluteUserDefinedThemesFolder()}/{exampleThemeFileName}";
+        string targetExampleThemeFilePath = $"{ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath()}/{exampleThemeFileName}";
         if (!FileUtils.Exists(targetExampleThemeFilePath))
         {
             Debug.Log("Copy example theme to user defined themes folder.");
@@ -725,11 +724,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             return themeMetas;
         }
 
-        List<string> themeFolders = new List<string>
-        {
-            GetAbsoluteDefaultThemesFolder(),
-            GetAbsoluteUserDefinedThemesFolder(),
-        };
+        List<string> themeFolders = ThemeFolderUtils.GetThemeFolders();
 
         themeFolders.ForEach(themeFolder =>
         {
@@ -1128,16 +1123,6 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
         }
     }
 
-    public static string GetAbsoluteUserDefinedThemesFolder()
-    {
-        return $"{Application.persistentDataPath}/{ThemeFolderName}";
-    }
-
-    public static string GetAbsoluteDefaultThemesFolder()
-    {
-        return ApplicationUtils.GetStreamingAssetsPath(ThemeFolderName);
-    }
-
     private void DisableDynamicBackground()
     {
         backgroundVideoPlayer.Stop();
@@ -1240,6 +1225,7 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
     public void ReloadThemes()
     {
         themeMetas.Clear();
+        failedToLoadThemeNames.Clear();
         LoadCurrentTheme();
     }
 

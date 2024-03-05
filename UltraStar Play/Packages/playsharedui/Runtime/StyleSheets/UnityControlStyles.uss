@@ -21,6 +21,10 @@
 /* TEXT FIELD */
 /**************************************************/
 
+.unity-base-text-field__input--placeholder {
+    -unity-font-style: italic;
+}
+
 .unity-base-text-field {
     margin: 0;
 }

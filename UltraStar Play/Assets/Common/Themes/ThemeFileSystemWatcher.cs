@@ -14,9 +14,9 @@ public class ThemeFileSystemWatcher : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private ThemeManager themeManager;
-    
+
     private readonly List<IDisposable> disposables = new();
-    
+
     protected override object GetInstance()
     {
         return Instance;
@@ -25,15 +25,14 @@ public class ThemeFileSystemWatcher : AbstractSingletonBehaviour, INeedInjection
 #if UNITY_STANDALONE
     protected override void StartSingleton()
     {
-        Debug.Log($"Watching theme files in {ThemeManager.GetAbsoluteUserDefinedThemesFolder()} and {ThemeManager.GetAbsoluteDefaultThemesFolder()}");
-        disposables.Add(FileSystemWatcherUtils.CreateFileSystemWatcher(
-            ThemeManager.GetAbsoluteUserDefinedThemesFolder(),
-            "*.json",
-            OnThemeFileChanged));
-        disposables.Add(FileSystemWatcherUtils.CreateFileSystemWatcher(
-            ThemeManager.GetAbsoluteDefaultThemesFolder(),
-            "*.json",
-            OnThemeFileChanged));
+        foreach (string themeFolder in ThemeFolderUtils.GetThemeFolders())
+        {
+            Debug.Log($"Watching theme files in '{themeFolder}'");
+            disposables.Add(FileSystemWatcherUtils.CreateFileSystemWatcher(
+                themeFolder,
+                "*.json",
+                OnThemeFileChanged));
+        }
     }
 
     private void OnThemeFileChanged(object sender, FileSystemEventArgs e)
@@ -42,7 +41,7 @@ public class ThemeFileSystemWatcher : AbstractSingletonBehaviour, INeedInjection
         MainThreadDispatcher.Send(_ => themeManager.ReloadThemes(), null);
     }
 #endif
-    
+
     private void OnDestroy()
     {
         disposables.ForEach(it => it.Dispose());

@@ -5664,6 +5664,7 @@ public static partial class R
         public const string bottom_px = "bottom-px";
         public const string _bottom_px = "-bottom-px";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
+        public const string child_mb_1 = "child-mb-1";
         public const string child_mb_2 = "child-mb-2";
         public const string child_mb_3 = "child-mb-3";
         public const string child_ml_2 = "child-ml-2";
@@ -5672,6 +5673,7 @@ public static partial class R
         public const string circle = "circle";
         public const string circleButton = "circleButton";
         public const string comboBoxButton = "comboBoxButton";
+        public const string comboButton = "comboButton";
         public const string container = "container";
         public const string content_auto = "content-auto";
         public const string content_center = "content-center";

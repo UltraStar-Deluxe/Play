@@ -79,6 +79,10 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     protected override void AwakeSingleton()
     {
         LeanTween.init(10000);
+    }
+
+    protected override void StartSingleton()
+    {
         UpdatePlayerProfileImagePaths();
     }
 
@@ -112,9 +116,15 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         return notificationLabel;
     }
 
+    public void ReloadPlayerProfileImages()
+    {
+        UpdatePlayerProfileImagePaths();
+    }
+
     public void UpdatePlayerProfileImagePaths()
     {
-        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages();
+        List<string> folders = PlayerProfileUtils.GetPlayerProfileImageFolders();
+        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages(folders);
     }
 
     public static void CreateNotification(string text)
