@@ -115,7 +115,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
                     title,
                     description,
                     tags,
-                    progress => ShowProgressMessage($"{progress:F2} %"));
+                    progress => ShowProgressMessage($"{progress * 100:F0} %"));
 
                 if (!publishResult.Success)
                 {
@@ -237,7 +237,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     {
         infoLabel.text = isCreatingNewWorkshopItem
             ? ""
-            : "Only set the values that you want to change";
+            : "You only need to set the values that you want to change";
         infoContainer.SetVisibleByDisplay(!infoLabel.text.IsNullOrEmpty());
     }
 
