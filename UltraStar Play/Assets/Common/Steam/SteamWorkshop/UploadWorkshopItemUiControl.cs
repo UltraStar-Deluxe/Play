@@ -74,6 +74,8 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         selectWorkshopItemImageButton.RegisterCallbackButtonTriggered(_ => OpenSelectPreviewImageDialog());
         openWorkshopItemFolderButton.RegisterCallbackButtonTriggered(_ => OpenWorkshopItemFolder());
         workshopItemFolderTextField.RegisterValueChangedCallback(evt => OnContentFolderChanged(evt.newValue));
+        new TextFieldHintControl(workshopItemFolderTextField);
+        new TextFieldHintControl(workshopItemImageTextField);
         uploadProgressLabel.text = "";
     }
 

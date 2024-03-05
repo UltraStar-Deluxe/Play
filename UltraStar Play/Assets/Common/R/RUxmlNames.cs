@@ -1016,7 +1016,9 @@ public static partial class R
         public const string workshopItemChooser = "workshopItemChooser";
         public const string workshopItemDescriptionTextField = "workshopItemDescriptionTextField";
         public const string workshopItemFolderTextField = "workshopItemFolderTextField";
+        public const string workshopItemFolderTextFieldHint = "workshopItemFolderTextFieldHint";
         public const string workshopItemImageTextField = "workshopItemImageTextField";
+        public const string workshopItemImageTextFieldHint = "workshopItemImageTextFieldHint";
         public const string workshopItemTagCsvTextField = "workshopItemTagCsvTextField";
         public const string workshopItemTitleTextField = "workshopItemTitleTextField";
         public const string writeUltraStarTxtFileWithByteOrderMarkToggle = "writeUltraStarTxtFileWithByteOrderMarkToggle";
