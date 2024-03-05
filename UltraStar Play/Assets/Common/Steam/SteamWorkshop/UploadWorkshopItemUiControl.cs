@@ -12,6 +12,14 @@ using UnityEngine.UIElements;
 
 public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    private static readonly List<string> expectedContentFolderSubfolders = new()
+    {
+        PlayerProfileUtils.PlayerProfileImagesFolderName,
+        ThemeFolderUtils.ThemeFolderName,
+        ModFolderUtils.ModsRootFolderName,
+        WebViewUtils.WebViewScriptsFolderName,
+    };
+
     [Inject(UxmlName = R.UxmlNames.workshopItemChooser)]
     private DropdownField workshopItemChooser;
 
@@ -65,7 +73,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         selectWorkshopItemFolderButton.RegisterCallbackButtonTriggered(_ => OpenSelectFolderDialog());
         selectWorkshopItemImageButton.RegisterCallbackButtonTriggered(_ => OpenSelectPreviewImageDialog());
         openWorkshopItemFolderButton.RegisterCallbackButtonTriggered(_ => OpenWorkshopItemFolder());
-        workshopItemFolderTextField.RegisterValueChangedCallback(evt => FillTextFieldWithDefaultsFromFolder(evt.newValue));
+        workshopItemFolderTextField.RegisterValueChangedCallback(evt => OnContentFolderChanged(evt.newValue));
         uploadProgressLabel.text = "";
     }
 
@@ -142,6 +150,42 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
                     workshopItemChooserControl.SetSelection(newlyPublishedWorkshopItemChooserEntry);
                 }
             });
+    }
+
+    private void OnContentFolderChanged(string newContentFolder)
+    {
+        string errorMessage = GetContentFolderErrorMessage(newContentFolder);
+        if (errorMessage.IsNullOrEmpty())
+        {
+            string expectedSubfoldersCsv = GetExistingContentFolderSubfolders(newContentFolder).ToCsv(", ", "", "");
+            uploadProgressLabel.text = $"Found subfolders {expectedSubfoldersCsv}";
+            FillTextFieldWithDefaultsFromFolder(newContentFolder);
+        }
+        else
+        {
+            uploadProgressLabel.text = errorMessage;
+        }
+    }
+
+    private string GetContentFolderErrorMessage(string folder)
+    {
+        if (!DirectoryUtils.Exists(folder))
+        {
+            return "Folder does not exist.";
+        }
+
+        if (GetExistingContentFolderSubfolders(folder).IsNullOrEmpty())
+        {
+            return $"Found none of the expected subfolders {expectedContentFolderSubfolders.ToCsv(", ", "", "")}";
+        }
+        return "";
+    }
+
+    private List<string> GetExistingContentFolderSubfolders(string contentFolder)
+    {
+        return expectedContentFolderSubfolders
+            .Where(subfolder => DirectoryUtils.Exists(contentFolder + "/" + subfolder))
+            .ToList();
     }
 
     private void InitWorkshopItemChooserControl()
@@ -286,13 +330,6 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     private void FillTextFieldWithDefaultsFromFolder(string folder)
     {
-        if (!DirectoryUtils.Exists(folder))
-        {
-            uploadProgressLabel.text = $"Folder does not exist.";
-            return;
-        }
-        uploadProgressLabel.text = $"";
-
         SetValueIfEmpty(workshopItemTitleTextField, StringUtils.ToTitleCase(PathUtils.GetFileName(folder)));
 
         List<string> imageFiles = FileScannerUtils.ScanForFiles(
