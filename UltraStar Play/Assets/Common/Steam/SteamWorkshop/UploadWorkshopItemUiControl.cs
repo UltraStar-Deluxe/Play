@@ -135,7 +135,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to upload Steam Workshop item: {ex.Message}");
-                ShowProgressMessage("Upload failed. See log for details.");
+                ShowProgressMessage($"Upload failed: {ex.Message}");
             })
             .Subscribe(newlyPublishedFileId =>
             {

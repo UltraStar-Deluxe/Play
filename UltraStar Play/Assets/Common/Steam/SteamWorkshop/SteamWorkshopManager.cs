@@ -175,7 +175,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
             string errorMessage = await GetNewWorkshopItemErrorMessage(contentFolderPath, previewImagePath, title);
             if (!errorMessage.IsNullOrEmpty())
             {
-                throw new SteamException($"Cannot publish workshop item: {errorMessage}");
+                throw new SteamException(errorMessage);
             }
         }
 
