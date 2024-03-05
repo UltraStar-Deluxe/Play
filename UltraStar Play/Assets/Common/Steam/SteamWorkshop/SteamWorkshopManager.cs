@@ -216,7 +216,7 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
             ugcEditor.WithTitle(title);
         }
 
-        if (description.IsNullOrEmpty())
+        if (!description.IsNullOrEmpty())
         {
             ugcEditor.WithDescription(description);
         }
