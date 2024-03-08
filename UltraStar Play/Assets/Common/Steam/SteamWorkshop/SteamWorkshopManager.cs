@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Steamworks;
+using Steamworks.ServerList;
 using Steamworks.Ugc;
 using UniInject;
 using UniRx;
@@ -286,5 +288,10 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
         Pending,
         Started,
         Finished
+    }
+
+    public void OpenSteamWorkshopOverlay(string uri)
+    {
+        SteamFriends.OpenWebOverlay(uri);
     }
 }

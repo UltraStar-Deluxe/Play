@@ -114,6 +114,8 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         themePicker.Label = TranslationManager.GetTranslation(R.Messages.options_design_theme);
     }
 
+    public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=Theme";
+
     public override bool HasHelpDialog => true;
     public override MessageDialogControl CreateHelpDialogControl()
     {

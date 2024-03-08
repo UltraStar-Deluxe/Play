@@ -535,6 +535,7 @@ public static partial class R
         public const string openSongFolderButton = "openSongFolderButton";
         public const string openSongMenuButton = "openSongMenuButton";
         public const string openSongMenuIcon = "openSongMenuIcon";
+        public const string openSteamWorkshopButton = "openSteamWorkshopButton";
         public const string openWebViewScriptsPathButton = "openWebViewScriptsPathButton";
         public const string openWebViewScriptsPathLabel = "openWebViewScriptsPathLabel";
         public const string openWorkshopItemFolderButton = "openWorkshopItemFolderButton";

@@ -197,6 +197,8 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
         }
     }
 
+    public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=PlayerProfileImage";
+
     public override bool HasHelpDialog => true;
     public override MessageDialogControl CreateHelpDialogControl()
     {

@@ -76,4 +76,6 @@ public abstract class AbstractOptionsSceneControl : MonoBehaviour, INeedInjectio
     {
         return null;
     }
+
+    public virtual string SteamWorkshopUri => "";
 }
