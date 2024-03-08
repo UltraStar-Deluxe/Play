@@ -306,7 +306,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     private void ShowProgress(int progressZeroToHundred)
     {
-        uploadProgressBar.value = progressZeroToHundred;
+        ThreadUtils.RunOnMainThread(() => uploadProgressBar.value = progressZeroToHundred);
     }
 
     private void ShowMessage(string message)
