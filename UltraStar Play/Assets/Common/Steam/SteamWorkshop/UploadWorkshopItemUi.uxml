@@ -2,7 +2,7 @@
     <ui:VisualElement name="root" class="child-mb-2">
         <ui:DropdownField name="workshopItemChooser" choices="New Item" style="flex-grow: 1;" />
         <ui:VisualElement name="row" style="flex-shrink: 0;">
-            <ui:TextField name="workshopItemFolderTextField" is-delayed="true" style="align-items: center; flex-grow: 1; flex-shrink: 1;">
+            <ui:TextField name="workshopItemFolderTextField" style="align-items: center; flex-grow: 1; flex-shrink: 1;">
                 <ui:Label tabindex="-1" text="Enter path to content folder" display-tooltip-when-elided="true" name="workshopItemFolderTextFieldHint" picking-mode="Ignore" class="textFieldHint secondaryFontColor" />
             </ui:TextField>
             <ui:Button name="selectWorkshopItemFolderButton" class="comboButton comboBoxButton squareButton">
@@ -13,7 +13,7 @@
             </ui:Button>
         </ui:VisualElement>
         <ui:VisualElement name="row" style="flex-shrink: 0;">
-            <ui:TextField name="workshopItemImageTextField" is-delayed="true" style="align-items: center; flex-shrink: 1; flex-grow: 1;">
+            <ui:TextField name="workshopItemImageTextField" style="align-items: center; flex-shrink: 1; flex-grow: 1;">
                 <ui:Label tabindex="-1" text="Enter path to preview image" display-tooltip-when-elided="true" name="workshopItemImageTextFieldHint" picking-mode="Ignore" class="textFieldHint secondaryFontColor" />
             </ui:TextField>
             <ui:Button name="selectWorkshopItemImageButton" class="comboButton comboBoxButton squareButton">
