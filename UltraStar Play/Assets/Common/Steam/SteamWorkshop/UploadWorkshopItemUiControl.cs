@@ -115,7 +115,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
                 if (!publishResult.Success)
                 {
-                    throw new SteamException("Upload was not successful.");
+                    throw new SteamException($"Publish result is {publishResult.Result.ToString()}");
                 }
                 Debug.Log($"Successfully uploaded Steam Workshop Item. Result: {publishResult.Result}, FileId: {publishResult.FileId}");
 
