@@ -284,9 +284,7 @@ public static partial class R
         public const string importSongsButton = "importSongsButton";
         public const string importSongsIcon = "importSongsIcon";
         public const string importSongsLabel = "importSongsLabel";
-        public const string infoContainer = "infoContainer";
         public const string infoIcon = "infoIcon";
-        public const string infoLabel = "infoLabel";
         public const string innerSongEntryUi = "innerSongEntryUi";
         public const string innerTimeBarSentenceEntryContainer = "innerTimeBarSentenceEntryContainer";
         public const string inputAndPitchDetectionGroup = "inputAndPitchDetectionGroup";
@@ -969,7 +967,7 @@ public static partial class R
         public const string unityTransportIpAddressField = "unityTransportIpAddressField";
         public const string unityTransportPortField = "unityTransportPortField";
         public const string unityVersionLabel = "unityVersionLabel";
-        public const string uploadProgressLabel = "uploadProgressLabel";
+        public const string uploadProgressBar = "uploadProgressBar";
         public const string uploadWorkshopItemButton = "uploadWorkshopItemButton";
         public const string urlChooserButton = "urlChooserButton";
         public const string urlTextField = "urlTextField";
@@ -1019,7 +1017,6 @@ public static partial class R
         public const string workshopItemFolderTextFieldHint = "workshopItemFolderTextFieldHint";
         public const string workshopItemImageTextField = "workshopItemImageTextField";
         public const string workshopItemImageTextFieldHint = "workshopItemImageTextFieldHint";
-        public const string workshopItemTagCsvTextField = "workshopItemTagCsvTextField";
         public const string workshopItemTitleTextField = "workshopItemTitleTextField";
         public const string writeUltraStarTxtFileWithByteOrderMarkToggle = "writeUltraStarTxtFileWithByteOrderMarkToggle";
         public const string yearPropertyToggle = "yearPropertyToggle";

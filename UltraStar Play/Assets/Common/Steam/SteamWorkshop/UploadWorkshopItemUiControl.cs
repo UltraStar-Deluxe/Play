@@ -20,6 +20,11 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         WebViewUtils.WebViewScriptsFolderName,
     };
 
+    private static readonly string PlayerProfileImageTag = "PlayerProfileImage";
+    private static readonly string ThemeTag = "Theme";
+    private static readonly string ModTag = "Mod";
+    private static readonly string WebViewScriptTag = "WebViewScript";
+
     [Inject(UxmlName = R.UxmlNames.workshopItemChooser)]
     private DropdownField workshopItemChooser;
 
@@ -41,20 +46,14 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
     [Inject(UxmlName = R.UxmlNames.workshopItemDescriptionTextField)]
     private TextField workshopItemDescriptionTextField;
 
-    [Inject(UxmlName = R.UxmlNames.workshopItemTagCsvTextField)]
-    private TextField workshopItemTagCsvTextField;
-
     [Inject(UxmlName = R.UxmlNames.selectWorkshopItemFolderButton)]
     private Button selectWorkshopItemFolderButton;
 
-    [Inject(UxmlName = R.UxmlNames.uploadProgressLabel)]
-    private Label uploadProgressLabel;
+    [Inject(UxmlName = R.UxmlNames.statusLabel)]
+    private Label statusLabel;
 
-    [Inject(UxmlName = R.UxmlNames.infoLabel)]
-    private Label infoLabel;
-
-    [Inject(UxmlName = R.UxmlNames.infoContainer)]
-    private VisualElement infoContainer;
+    [Inject(UxmlName = R.UxmlNames.uploadProgressBar)]
+    private ProgressBar uploadProgressBar;
 
     [Inject]
     private SteamManager steamManager;
@@ -76,7 +75,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         workshopItemFolderTextField.RegisterValueChangedCallback(evt => OnContentFolderChanged(evt.newValue));
         new TextFieldHintControl(workshopItemFolderTextField);
         new TextFieldHintControl(workshopItemImageTextField);
-        uploadProgressLabel.text = "";
+        statusLabel.text = "";
     }
 
     public void PublishWorkshopItem()
@@ -88,10 +87,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         string previewImagePath = workshopItemImageTextField.value.Trim();
         string title = workshopItemTitleTextField.value.Trim();
         string description = workshopItemDescriptionTextField.value.Trim();
-        List<string> tags = workshopItemTagCsvTextField.value
-            .Split(",")
-            .Select(tag => tag.Trim())
-            .ToList();
+        List<string> tags = GetTagsFromContentFolder(contentFolderPath);
 
         string errorMessage = GetInputFieldsOrConnectionErrorMessage(
             contentFolderPath,
@@ -101,11 +97,11 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         {
             string fullErrorMessage = $"Upload failed. {errorMessage}";
             Debug.LogError(fullErrorMessage);
-            uploadProgressLabel.text = fullErrorMessage;
+            statusLabel.text = fullErrorMessage;
             return;
         }
 
-        uploadProgressLabel.text = "Uploading...";
+        statusLabel.text = "Uploading...";
         ObservableUtils.RunOnNewTaskAsObservable<ulong>(async () =>
             {
                 PublishResult publishResult = await steamWorkshopManager.PublishWorkshopItemAsync(
@@ -115,7 +111,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
                     title,
                     description,
                     tags,
-                    progress => ShowProgressMessage($"{progress * 100:F0} %"));
+                    progress => ShowProgress((int)(progress * 100)));
 
                 if (!publishResult.Success)
                 {
@@ -125,7 +121,7 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
                 ApplicationUtils.OpenUrl($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishResult.FileId}");
 
-                ShowProgressMessage("Upload successful. Downloading...");
+                ShowMessage("Upload successful. Downloading...");
 
                 await steamWorkshopManager.SubscribeAndDownloadWorkshopItemAsync(publishResult.FileId);
                 return publishResult.FileId;
@@ -135,11 +131,11 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to upload Steam Workshop item: {ex.Message}");
-                ShowProgressMessage($"Upload failed: {ex.Message}");
+                ShowMessage($"Upload failed: {ex.Message}");
             })
             .Subscribe(newlyPublishedFileId =>
             {
-                ShowProgressMessage("Download successful. All done.");
+                ShowMessage("Download successful. All done.");
 
                 // Update dropdown and select newly created Workshop Item
                 UpdateWorkshopItemChooserEntries();
@@ -160,12 +156,12 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         if (errorMessage.IsNullOrEmpty())
         {
             string expectedSubfoldersCsv = GetExistingContentFolderSubfolders(newContentFolder).ToCsv(", ", "", "");
-            uploadProgressLabel.text = $"Found subfolders {expectedSubfoldersCsv}";
+            statusLabel.text = $"Found subfolders {expectedSubfoldersCsv}";
             FillTextFieldWithDefaultsFromFolder(newContentFolder);
         }
         else
         {
-            uploadProgressLabel.text = errorMessage;
+            statusLabel.text = errorMessage;
         }
     }
 
@@ -188,6 +184,28 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         return expectedContentFolderSubfolders
             .Where(subfolder => DirectoryUtils.Exists(contentFolder + "/" + subfolder))
             .ToList();
+    }
+
+    private List<string> GetTagsFromContentFolder(string folder)
+    {
+        List<string> tags = new();
+        List<string> actualSubfolders = GetExistingContentFolderSubfolders(folder);
+        Dictionary<string, string> subfolderToTagName = new Dictionary<string, string>()
+        {
+            { PlayerProfileUtils.PlayerProfileImagesFolderName, PlayerProfileImageTag },
+            { ThemeFolderUtils.ThemeFolderName, ThemeTag },
+            { ModFolderUtils.ModsRootFolderName, ModTag },
+            { WebViewUtils.WebViewScriptsFolderName, WebViewScriptTag },
+        };
+        foreach (string expectedSubfolder in expectedContentFolderSubfolders)
+        {
+            if (actualSubfolders.Contains(expectedSubfolder)
+                && subfolderToTagName.TryGetValue(expectedSubfolder, out string tag))
+            {
+                tags.Add(tag);
+            }
+        }
+        return tags;
     }
 
     private void InitWorkshopItemChooserControl()
@@ -215,30 +233,19 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
 
     private void OnWorkshopItemChooserSelectionChanged(WorkshopItemChooserEntry newValue)
     {
-        UpdateMandatoryFieldsInfo(newValue.IsNewItem);
         if (newValue.IsNewItem)
         {
             workshopItemFolderTextField.value = "";
             workshopItemImageTextField.value = "";
             workshopItemTitleTextField.value = "";
             workshopItemDescriptionTextField.value = "";
-            workshopItemTagCsvTextField.value = "";
         }
         else
         {
             workshopItemFolderTextField.value = newValue.SteamWorkshopItem.Directory;
             workshopItemTitleTextField.value = newValue.SteamWorkshopItem.Title;
             workshopItemDescriptionTextField.value = newValue.SteamWorkshopItem.Description;
-            workshopItemTagCsvTextField.value = newValue.SteamWorkshopItem.Tags.ToCsv(", ", "", "");
         }
-    }
-
-    private void UpdateMandatoryFieldsInfo(bool isCreatingNewWorkshopItem)
-    {
-        infoLabel.text = isCreatingNewWorkshopItem
-            ? ""
-            : "You only need to set the values that you want to change";
-        infoContainer.SetVisibleByDisplay(!infoLabel.text.IsNullOrEmpty());
     }
 
     private List<WorkshopItemChooserEntry> GetWorkshopItemChooserEntries()
@@ -297,9 +304,14 @@ public class UploadWorkshopItemUiControl : INeedInjection, IInjectionFinishedLis
         return "";
     }
 
-    private void ShowProgressMessage(string message)
+    private void ShowProgress(int progressZeroToHundred)
     {
-        ThreadUtils.RunOnMainThread(() => uploadProgressLabel.text = message);
+        uploadProgressBar.value = progressZeroToHundred;
+    }
+
+    private void ShowMessage(string message)
+    {
+        ThreadUtils.RunOnMainThread(() => statusLabel.text = message);
     }
 
     private void OpenWorkshopItemFolder()

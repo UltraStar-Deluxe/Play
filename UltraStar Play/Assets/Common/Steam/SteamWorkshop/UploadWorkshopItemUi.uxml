@@ -22,11 +22,7 @@
         </ui:VisualElement>
         <ui:TextField label="Title" name="workshopItemTitleTextField" style="align-items: center;" />
         <ui:TextField label="Description" name="workshopItemDescriptionTextField" multiline="true" class="multiline" style="align-items: center; min-height: 32px;" />
-        <ui:TextField label="Tags&#10;(comma separated)" name="workshopItemTagCsvTextField" style="align-items: center;" />
-        <ui:VisualElement name="infoContainer" style="align-items: center; flex-shrink: 0; justify-content: center; flex-direction: row;">
-            <MaterialIcon icon="info_outline" name="infoIcon" class="mr-1" style="font-size: 18px;" />
-            <ui:Label text="Info Label" name="infoLabel" class="smallFont" />
-        </ui:VisualElement>
-        <ui:Label text="75 %" name="uploadProgressLabel" style="-unity-text-align: upper-center;" />
+        <ui:Label text="All done." name="statusLabel" style="-unity-text-align: upper-center;" />
+        <ui:ProgressBar name="uploadProgressBar" />
     </ui:VisualElement>
 </ui:UXML>
