@@ -128,8 +128,8 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
 
     private async Task<List<Item>> ReadAllPages(Query ugcQuery)
     {
-        List<Item> result = new List<Item>();
-        HashSet<ulong> resultIds = new HashSet<ulong>();
+        // Some entries are returned multiple times. Thus, Use dictionary with unique ID as key.
+        Dictionary<ulong, Item> itemIdToItem = new();
 
         // Page number starts at 1
         int page = 1;
@@ -140,15 +140,10 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
                 .GetPageAsync(page);
             if (resultPage != null)
             {
-                hasMorePages = resultPage?.ResultCount > 0 && resultPage?.TotalCount > result.Count;
+                hasMorePages = resultPage?.ResultCount > 0 && resultPage?.TotalCount > itemIdToItem.Count;
                 foreach (Item resultPageEntry in resultPage?.Entries)
                 {
-                    // TODO: Some entries are returned multiple times. Workaround: only add if item with this ID has not been added yet.
-                    if (!resultIds.Contains(resultPageEntry.Id))
-                    {
-                        resultIds.Add(resultPageEntry.Id);
-                        result.Add(resultPageEntry);
-                    }
+                    itemIdToItem[resultPageEntry.Id] = resultPageEntry;
                 }
             }
             else
@@ -157,7 +152,9 @@ public class SteamWorkshopManager : AbstractSingletonBehaviour, INeedInjection, 
             }
         } while (hasMorePages);
 
-        return result;
+        return itemIdToItem.Values
+            .OrderBy(it => it.Id)
+            .ToList();
     }
 
     public async Task<PublishResult> PublishWorkshopItemAsync(
