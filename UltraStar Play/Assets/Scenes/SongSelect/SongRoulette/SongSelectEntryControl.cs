@@ -12,6 +12,8 @@ using UnityEngine.UIElements;
 
 public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    public const float MaxClickDistanceThresholdInPx = 5f;
+
     [Inject]
     private SongRouletteControl songRouletteControl;
 
@@ -114,7 +116,6 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new();
 
     private Vector2 pointerDownMousePosition;
-    private bool wasSelectedOnPointerDown;
 
     private string lastSongMetaCover;
     private string lastSongMetaBackground;
@@ -177,14 +178,12 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void OnPointerDownOnSongImage(PointerDownEvent evt)
     {
         pointerDownMousePosition = evt.position;
-        wasSelectedOnPointerDown = songRouletteControl.SelectedEntryControl == this;
     }
 
     private void OnPointerUpOnSongImage(PointerUpEvent evt)
     {
         if (evt.button == 0
-            && Vector2.Distance(pointerDownMousePosition ,evt.position) < 5f
-            && wasSelectedOnPointerDown)
+            && Vector2.Distance(pointerDownMousePosition ,evt.position) < MaxClickDistanceThresholdInPx)
         {
             clickOnSongImageEventStream.OnNext(true);
         }
