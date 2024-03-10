@@ -7,11 +7,11 @@ public static class NoteDisplayModeExtensions
         switch (noteDisplayMode)
         {
             case ENoteDisplayMode.SentenceBySentence:
-                return TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode_sentenceBySentence);
+                return Translation.Get(R.Messages.options_noteDisplayMode_sentenceBySentence);
             case ENoteDisplayMode.ScrollingNoteStream:
-                return TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode_scrollingNoteStream);
+                return Translation.Get(R.Messages.options_noteDisplayMode_scrollingNoteStream);
             case ENoteDisplayMode.None:
-                return TranslationManager.GetTranslation(R.Messages.options_noteDisplayMode_none);
+                return Translation.Get(R.Messages.options_noteDisplayMode_none);
             default:
                 return noteDisplayMode.ToString();
         }

@@ -10,7 +10,7 @@ public class SampleRatePickerControl : LabeledItemPickerControl<int>
         : base(itemPicker, new List<int>{0, 48000, 44100, 22050, 16000 })
     {
         GetLabelTextFunction = item => item <= 0
-            ? TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto)
+            ? Translation.Get(R.Messages.options_sampleRate_auto)
             : item.ToString();
     }
 }

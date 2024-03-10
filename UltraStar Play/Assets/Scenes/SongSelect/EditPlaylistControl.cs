@@ -102,15 +102,15 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
         {
             case EPlaylistNameIssue.Invalid:
                 editPlaylistDialogTitle.text = "Invalid playlist name";
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.cancel);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.cancel);
                 break;
             case EPlaylistNameIssue.Duplicate:
                 editPlaylistDialogTitle.text = "Duplicate playlist name";
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.cancel);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.cancel);
                 break;
             default:
                 editPlaylistDialogTitle.text = titleText;
-                submitEditPlaylistButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
+                submitEditPlaylistButton.text = Translation.Get(R.Messages.continue_);
                 break;
         }
     }
@@ -178,6 +178,6 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        playlistChooserDropdownTitle.text = TranslationManager.GetTranslation(R.Messages.songSelectScene_playlistDropdownTitle);
+        playlistChooserDropdownTitle.text = Translation.Get(R.Messages.songSelectScene_playlistDropdownTitle);
     }
 }

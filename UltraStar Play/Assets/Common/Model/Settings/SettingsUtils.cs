@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using NHyphenator;
@@ -7,6 +9,18 @@ using UnityEngine;
 
 public static class SettingsUtils
 {
+    public static CultureInfo GetCultureInfo(ISettings settings)
+    {
+        try
+        {
+            return new CultureInfo(settings.CultureInfoName);
+        }
+        catch (Exception ex)
+        {
+            return new CultureInfo("en");
+        };
+    }
+
     public static void SimplifySettings(Settings settings)
     {
         // Remove permission list if empty

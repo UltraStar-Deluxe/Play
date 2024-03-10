@@ -168,7 +168,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
             return;
         }
 
-        string title = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_archiveUrlLabel);
+        string title = Translation.Get(R.Messages.contentDownloadScene_archiveUrlLabel);
         urlChooserDialogControl = uiManager.CreateDialogControl(title);
         urlChooserDialogControl.DialogClosedEventStream.Subscribe(_ => urlChooserDialogControl = null);
 
@@ -200,12 +200,12 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     private void SetFinishedStatus()
     {
-        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_finished);
+        statusLabel.text = Translation.Get(R.Messages.contentDownloadScene_status_finished);
     }
 
     private void SetErrorStatus(string errorMessage)
     {
-        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_failed);    
+        statusLabel.text = Translation.Get(R.Messages.contentDownloadScene_status_failed);    
         if (!errorMessage.IsNullOrEmpty())
         {
             statusLabel.text += $": {errorMessage}";
@@ -214,7 +214,7 @@ public class DownloadSongArchiveUiControl : INeedInjection, IInjectionFinishedLi
 
     private void SetCanceledStatus()
     {
-        statusLabel.text = TranslationManager.GetTranslation(R.Messages.contentDownloadScene_status_canceled);
+        statusLabel.text = Translation.Get(R.Messages.contentDownloadScene_status_canceled);
     }
     
     private void UpdateDownloadProgressText(FileDownloadControl.DownloadProgressEvent evt)

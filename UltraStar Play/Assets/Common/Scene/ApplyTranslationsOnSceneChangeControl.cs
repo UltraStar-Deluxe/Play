@@ -1,10 +1,10 @@
 using System.Diagnostics;
+using System.Globalization;
 using ProTrans;
 using UniInject;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
 
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
@@ -12,16 +12,16 @@ using Debug = UnityEngine.Debug;
 public class ApplyTranslationsOnSceneChangeControl : AbstractSingletonBehaviour, INeedInjection
 {
     public static ApplyTranslationsOnSceneChangeControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<ApplyTranslationsOnSceneChangeControl>();
-    
+
     [Inject]
     private ISettings settings;
 
     [Inject]
     private TranslationManager translationManager;
-    
+
     [Inject]
     private SceneNavigator sceneNavigator;
-    
+
     protected override object GetInstance()
     {
         return Instance;
@@ -34,13 +34,14 @@ public class ApplyTranslationsOnSceneChangeControl : AbstractSingletonBehaviour,
             .Subscribe(_ => ApplyTranslations())
             .AddTo(gameObject);
     }
-    
+
     public void ApplyTranslations()
     {
-        if (translationManager.currentLanguage != settings.Language)
+        CultureInfo settingsCultureInfo = SettingsUtils.GetCultureInfo(settings);
+        if (!Equals(TranslationConfig.Singleton.CurrentCultureInfo, settingsCultureInfo))
         {
-            translationManager.currentLanguage = settings.Language;
-            translationManager.ReloadTranslationsAndUpdateScene();
+            TranslationConfig.Singleton.CurrentCultureInfo = settingsCultureInfo;
+            TranslationManager.ReloadTranslationsAndUpdateScene();
         }
 
         if (Application.isPlaying)
@@ -69,12 +70,6 @@ public class ApplyTranslationsOnSceneChangeControl : AbstractSingletonBehaviour,
                     count++;
                 });
             }
-        }
-
-        if ((translationManager.logInfoInEditMode && !Application.isPlaying)
-            || (translationManager.logInfoInPlayMode && Application.isPlaying))
-        {
-            Debug.Log($"Updated {count} ITranslator instances in scene took {stopwatch.ElapsedMilliseconds} ms");
         }
     }
 }

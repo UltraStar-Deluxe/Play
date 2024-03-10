@@ -276,7 +276,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         }
         else
         {
-            httpEndpointExampleLabel.text = TranslationManager.GetTranslation(R.Messages.options_httpServerNotSupported);
+            httpEndpointExampleLabel.text = Translation.Get(R.Messages.options_httpServerNotSupported);
         }
 
         // View and copy log
@@ -463,10 +463,10 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                 uploadWorkshopItemDialogControl = null;
             });
         uploadWorkshopItemDialogControl.AddButton("Learn More",
-            _ => ApplicationUtils.OpenUrl(TranslationManager.GetTranslation(R.Messages.uri_howToSteamWorkshop)));
+            _ => ApplicationUtils.OpenUrl(Translation.Get(R.Messages.uri_howToSteamWorkshop)));
         uploadWorkshopItemDialogControl.AddButton("Publish Workshop Item",
             _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
-        uploadWorkshopItemDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
+        uploadWorkshopItemDialogControl.AddButton(Translation.Get(R.Messages.cancel),
             _ => uploadWorkshopItemDialogControl.CloseDialog());
     }
 
@@ -648,9 +648,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
 
     public void UpdateTranslation()
     {
-        showFpsToggle.label = TranslationManager.GetTranslation(R.Messages.options_showFps);
-        pitchDetectionAlgorithmPicker.Label = TranslationManager.GetTranslation(R.Messages.options_pitchDetectionAlgorithm);
-        analyzeBeatsWithoutTargetNoteToggle.label = TranslationManager.GetTranslation(R.Messages.options_analyzeBeatsWithoutTargetNote);
+        showFpsToggle.label = Translation.Get(R.Messages.options_showFps);
+        pitchDetectionAlgorithmPicker.Label = Translation.Get(R.Messages.options_pitchDetectionAlgorithm);
+        analyzeBeatsWithoutTargetNoteToggle.label = Translation.Get(R.Messages.options_analyzeBeatsWithoutTargetNote);
     }
 
     public List<IBinding> GetBindings()

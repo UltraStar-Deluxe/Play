@@ -17,7 +17,7 @@ public class SentenceRating
     {
         get
         {
-            return TranslationManager.GetTranslation(i18nCode);
+            return Translation.Get(i18nCode);
         }
     }
 

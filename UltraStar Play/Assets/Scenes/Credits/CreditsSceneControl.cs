@@ -34,7 +34,7 @@ public class CreditsSceneControl : MonoBehaviour, INeedInjection, ITranslator, I
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.aboutScene_title);
+        sceneTitle.text = Translation.Get(R.Messages.aboutScene_title);
     }
 
     public List<IBinding> GetBindings()

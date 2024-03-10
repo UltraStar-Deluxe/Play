@@ -10,11 +10,11 @@ public class BoolPickerControl : LabeledItemPickerControl<bool>
         {
             if (item)
             {
-                return TranslationManager.GetTranslation("yes");
+                return Translation.Get("yes");
             }
             else
             {
-                return TranslationManager.GetTranslation("no");
+                return Translation.Get("no");
             }
         };
     }

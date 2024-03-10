@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Serilog.Events;
 using Unity.Netcode;
 using UnityEngine;
@@ -47,7 +48,7 @@ public class Settings : ISettings
         ;
 
     // Game settings
-    public SystemLanguage Language { get; set; } = SystemLanguage.English;
+    public string CultureInfoName { get; set; } = "en";
     public EScoreMode ScoreMode { get; set; } = EScoreMode.Individual;
     public EDifficulty Difficulty { get; set; } = EDifficulty.Medium;
     public EPitchDetectionAlgorithm PitchDetectionAlgorithm { get; set; } = EPitchDetectionAlgorithm.Dywa;

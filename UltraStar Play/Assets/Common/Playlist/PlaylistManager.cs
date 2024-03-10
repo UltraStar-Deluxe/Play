@@ -415,7 +415,7 @@ public class PlaylistManager : AbstractSingletonBehaviour, INeedInjection
 
         if (playlist is UltraStarAllSongsPlaylist)
         {
-            return TranslationManager.GetTranslation(R.Messages.playlistName_allSongs);
+            return Translation.Get(R.Messages.playlistName_allSongs);
         }
 
         return playlist.Name;

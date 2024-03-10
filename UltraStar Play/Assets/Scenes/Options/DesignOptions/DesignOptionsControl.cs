@@ -111,7 +111,7 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     public void UpdateTranslation()
     {
-        themePicker.Label = TranslationManager.GetTranslation(R.Messages.options_design_theme);
+        themePicker.Label = Translation.Get(R.Messages.options_design_theme);
     }
 
     public override string SteamWorkshopUri => "https://steamcommunity.com/workshop/browse/?appid=2394070&requiredtags[]=Theme";
@@ -121,12 +121,12 @@ public class DesignOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     {
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes_title),
-                TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_customThemes,
+            { Translation.Get(R.Messages.options_design_helpDialog_customThemes_title),
+                Translation.Get(R.Messages.options_design_helpDialog_customThemes,
                     "path", ApplicationUtils.ReplacePathsWithDisplayString(ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath())) },
         };
          MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_design_helpDialog_title),
+            Translation.Get(R.Messages.options_design_helpDialog_title),
             titleToContentMap);
 
         helpDialogControl.AddButton("Custom Themes Folder",

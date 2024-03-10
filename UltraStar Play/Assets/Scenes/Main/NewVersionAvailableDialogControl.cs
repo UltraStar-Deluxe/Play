@@ -83,9 +83,9 @@ public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInj
         string displayName = releaseName.IsNullOrEmpty()
             ? remoteRelease.NullToEmpty()
             : releaseName.NullToEmpty();
-        dialogMessage.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink.NullToEmpty());
-        dialogTitle.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_title);
-        ignoreThisVersionButton.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_ignoreThisVersion);
-        ignoreAllFutureVersionsButton.text = TranslationManager.GetTranslation(R.Messages.newVersionAvailableDialog_ignoreAllFutureVersions);
+        dialogMessage.text = Translation.Get(R.Messages.newVersionAvailableDialog_message, "remoteRelease", displayName, "websiteLink", websiteLink.NullToEmpty());
+        dialogTitle.text = Translation.Get(R.Messages.newVersionAvailableDialog_title);
+        ignoreThisVersionButton.text = Translation.Get(R.Messages.newVersionAvailableDialog_ignoreThisVersion);
+        ignoreAllFutureVersionsButton.text = Translation.Get(R.Messages.newVersionAvailableDialog_ignoreAllFutureVersions);
     }
 }

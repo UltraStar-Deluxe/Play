@@ -127,6 +127,9 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     private void Start()
     {
+        TextAsset textAsset = Resources.Load<TextAsset>("Translations/messages_de");
+        Debug.Log("messages_de: " + textAsset.text);
+
         if (!hasLoggedVersionInfo)
         {
             hasLoggedVersionInfo = true;
@@ -209,8 +212,8 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
 
     public void UpdateTranslation()
     {
-        startButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_sing_label);
-        partyButton.text = TranslationManager.GetTranslation(R.Messages.mainScene_button_party_label);
+        startButton.text = Translation.Get(R.Messages.mainScene_button_sing_label);
+        partyButton.text = Translation.Get(R.Messages.mainScene_button_party_label);
     }
 
     public void CloseQuitGameDialog()
@@ -232,12 +235,12 @@ public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishe
             return;
         }
 
-        quitGameDialogControl = uiManager.CreateDialogControl(TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_title));
+        quitGameDialogControl = uiManager.CreateDialogControl(Translation.Get(R.Messages.mainScene_quitDialog_title));
         quitGameDialogControl.DialogClosedEventStream.Subscribe(_ => quitGameDialogControl = null);
-        quitGameDialogControl.Message = $"\n{TranslationManager.GetTranslation(R.Messages.mainScene_quitDialog_message)}\n";
+        quitGameDialogControl.Message = $"\n{Translation.Get(R.Messages.mainScene_quitDialog_message)}\n";
 
-        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.no), _ => CloseQuitGameDialog());
-        quitGameDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
+        quitGameDialogControl.AddButton(Translation.Get(R.Messages.no), _ => CloseQuitGameDialog());
+        quitGameDialogControl.AddButton(Translation.Get(R.Messages.yes), _ => ApplicationUtils.QuitOrStopPlayMode());
 
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(quitGameDialogControl.DialogRootVisualElement);
     }

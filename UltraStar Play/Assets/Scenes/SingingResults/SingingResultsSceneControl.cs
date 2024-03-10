@@ -576,7 +576,7 @@ public class SingingResultsSceneControl : MonoBehaviour, INeedInjection, IInject
 
     public void UpdateTranslation()
     {
-        continueButton.text = TranslationManager.GetTranslation(R.Messages.continue_);
+        continueButton.text = Translation.Get(R.Messages.continue_);
         singingResultsPlayerUiControls.ForEach(singingResultsPlayerUiControl => singingResultsPlayerUiControl.UpdateTranslation());
 
         if (HasPartyModeSceneData)

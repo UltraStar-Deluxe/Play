@@ -333,9 +333,9 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
     private void FillRegularContextMenu(ContextMenuPopupControl contextMenuPopup)
     {
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics), "skip_next",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.action_skipToNextLyrics), "skip_next",
             () => singSceneControl.SkipToNextSingableNoteOrEndOfSong());
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_restart), "replay",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.action_restart), "replay",
             () => singSceneControl.Restart());
 
         contextMenuPopup.AddButton("Appearance", "filter_b_and_w", () =>
@@ -355,11 +355,11 @@ public class SingSceneGovernanceControl : INeedInjection, IInjectionFinishedList
 
         if (!singSceneControl.HasPartyModeSceneData)
         {
-            contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_openSongEditor), "edit",
+            contextMenuPopup.AddButton(Translation.Get(R.Messages.action_openSongEditor), "edit",
                 () => singSceneControl.OpenSongInEditor());
         }
 
-        contextMenuPopup.AddButton(TranslationManager.GetTranslation(R.Messages.action_exitSong), "logout",
+        contextMenuPopup.AddButton(Translation.Get(R.Messages.action_exitSong), "logout",
             () => singSceneControl.FinishScene(false, false, true));
 
         contextMenuPopup.AddSeparator();

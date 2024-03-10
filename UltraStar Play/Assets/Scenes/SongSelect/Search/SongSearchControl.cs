@@ -206,19 +206,19 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
         switch (searchProperty)
         {
             case ESearchProperty.Artist:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_artist);
+                return Translation.Get(R.Messages.songProperty_artist);
             case ESearchProperty.Title:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_title);
+                return Translation.Get(R.Messages.songProperty_title);
             case ESearchProperty.Year:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_year);
+                return Translation.Get(R.Messages.songProperty_year);
             case ESearchProperty.Genre:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_genre);
+                return Translation.Get(R.Messages.songProperty_genre);
             case ESearchProperty.Language:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_language);
+                return Translation.Get(R.Messages.songProperty_language);
             case ESearchProperty.Edition:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_edition);
+                return Translation.Get(R.Messages.songProperty_edition);
             case ESearchProperty.Lyrics:
-                return TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
+                return Translation.Get(R.Messages.songProperty_lyrics);
             default:
                 return searchProperty.ToString();
         }
@@ -253,7 +253,7 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             {
                 Debug.Log($"Invalid search expression '{searchExp}': {e.Message}. Stack trace:\n{e.StackTrace}");
                 searchErrorIcon.ShowByDisplay();
-                searchErrorIconTooltipControl.TooltipText = TranslationManager.GetTranslation(R.Messages.songSelectScene_searchExpressionError,
+                searchErrorIconTooltipControl.TooltipText = Translation.Get(R.Messages.songSelectScene_searchExpressionError,
                     "errorDetails", e.Message);
                 return new List<SongMeta>();
             }
@@ -450,13 +450,13 @@ public class SongSearchControl : INeedInjection, IInjectionFinishedListener, ITr
             return;
         }
 
-        artistPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_artist);
-        titlePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_title);
-        editionPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_edition);
-        genrePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_genre);
-        languagePropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_language);
-        lyricsPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_lyrics);
-        yearPropertyToggle.label = TranslationManager.GetTranslation(R.Messages.songProperty_year);
+        artistPropertyToggle.label = Translation.Get(R.Messages.songProperty_artist);
+        titlePropertyToggle.label = Translation.Get(R.Messages.songProperty_title);
+        editionPropertyToggle.label = Translation.Get(R.Messages.songProperty_edition);
+        genrePropertyToggle.label = Translation.Get(R.Messages.songProperty_genre);
+        languagePropertyToggle.label = Translation.Get(R.Messages.songProperty_language);
+        lyricsPropertyToggle.label = Translation.Get(R.Messages.songProperty_lyrics);
+        yearPropertyToggle.label = Translation.Get(R.Messages.songProperty_year);
         searchTextFieldHint.text = "What do you want to sing today?";
     }
 }

@@ -50,7 +50,7 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
         {
             if (newValue <= 0)
             {
-                return TranslationManager.GetTranslation(R.Messages.options_sampleRate_auto);
+                return Translation.Get(R.Messages.options_sampleRate_auto);
             }
 
             return newValue.ToString();
@@ -61,9 +61,9 @@ public class GraphicOptionsSceneControl : AbstractOptionsSceneControl, INeedInje
 
     public void UpdateTranslation()
     {
-        resolutionPicker.Label = TranslationManager.GetTranslation(R.Messages.options_resolution);
-        targetFpsPicker.Label = TranslationManager.GetTranslation(R.Messages.options_targetFps);
-        fullscreenModePicker.Label = TranslationManager.GetTranslation(R.Messages.options_fullscreenMode);
+        resolutionPicker.Label = Translation.Get(R.Messages.options_resolution);
+        targetFpsPicker.Label = Translation.Get(R.Messages.options_targetFps);
+        fullscreenModePicker.Label = Translation.Get(R.Messages.options_fullscreenMode);
     }
 
     private void ApplyGraphicSettings()

@@ -55,7 +55,7 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
                 connectedClientList.Add(CreateClientEntry(clientHandler));
             });
 
-        connectedClientCountLabel.text = TranslationManager.GetTranslation(R.Messages.options_connectedClientCount,
+        connectedClientCountLabel.text = Translation.Get(R.Messages.options_connectedClientCount,
             "count", serverSideConnectRequestManager.ConnectedClientCount);
 
         bool noConnectedClients = serverSideConnectRequestManager.ConnectedClientCount <= 0;
@@ -84,16 +84,16 @@ public class CompanionAppOptionsControl : AbstractOptionsSceneControl, INeedInje
     {
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_features_title),
-                TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_features) },
-            { TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_install_title),
-                TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_install) },
+            { Translation.Get(R.Messages.options_companionApp_helpDialog_features_title),
+                Translation.Get(R.Messages.options_companionApp_helpDialog_features) },
+            { Translation.Get(R.Messages.options_companionApp_helpDialog_install_title),
+                Translation.Get(R.Messages.options_companionApp_helpDialog_install) },
         };
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_companionApp_helpDialog_title),
+            Translation.Get(R.Messages.options_companionApp_helpDialog_title),
             titleToContentMap);
-        helpDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.viewMore),
-            _ => Application.OpenURL(TranslationManager.GetTranslation(R.Messages.uri_howToCompanionApp)));
+        helpDialogControl.AddButton(Translation.Get(R.Messages.viewMore),
+            _ => Application.OpenURL(Translation.Get(R.Messages.uri_howToCompanionApp)));
         return helpDialogControl;
     }
 }

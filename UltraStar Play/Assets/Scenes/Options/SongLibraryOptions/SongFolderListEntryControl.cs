@@ -172,16 +172,16 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         if (!androidInternalStoragePath.IsNullOrEmpty()
             && androidDrivePath.Value == androidInternalStoragePath)
         {
-            driveButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidInternalStorage);
+            driveButton.text = Translation.Get(R.Messages.options_songLibrary_androidInternalStorage);
         }
         else if (!androidSdCardPath.IsNullOrEmpty()
                  && androidDrivePath.Value == androidSdCardPath)
         {
-            driveButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidSdCardStorage);
+            driveButton.text = Translation.Get(R.Messages.options_songLibrary_androidSdCardStorage);
         }
         else
         {
-            driveButton.text = TranslationManager.GetTranslation(R.Messages.options_songLibrary_androidOtherStorage);
+            driveButton.text = Translation.Get(R.Messages.options_songLibrary_androidOtherStorage);
         }
     }
 
@@ -246,11 +246,11 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
             // Check this song folder is not already added, either directly or indirectly as subfolder.
             if (SettingsProblemHintControl.IsDuplicateFolder(FullPath, settings.SongDirs))
             {
-                ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_duplicate));
+                ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_duplicate));
             }
             else if (SettingsProblemHintControl.IsSubfolderOfAnyOtherFolder(FullPath, settings.SongDirs, out string parentFolder))
             {
-                ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_subfolderOfOtherFolder,
+                ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_subfolderOfOtherFolder,
                     "parentFolder", parentFolder));
             }
             else
@@ -260,15 +260,15 @@ public class SongFolderListEntryControl : INeedInjection, IInjectionFinishedList
         }
         else if (FullPath.IsNullOrEmpty())
         {
-            ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_missingValue));
+            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_missingValue));
         }
         else if (File.Exists(FullPath))
         {
-            ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_noFolder));
+            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_noFolder));
         }
         else
         {
-            ShowWarning(TranslationManager.GetTranslation(R.Messages.options_songLibrary_songFolder_doesNotExist));
+            ShowWarning(Translation.Get(R.Messages.options_songLibrary_songFolder_doesNotExist));
         }
     }
 }

@@ -206,16 +206,16 @@ public class PlayerProfileOptionsSceneControl : AbstractOptionsSceneControl, INe
 
         Dictionary<string, string> titleToContentMap = new()
         {
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_activateProfile) },
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages) },
-            { TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages_title),
-                TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
+            { Translation.Get(R.Messages.options_playerProfiles_helpDialog_activateProfile_title),
+                Translation.Get(R.Messages.options_playerProfiles_helpDialog_activateProfile) },
+            { Translation.Get(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages_title),
+                Translation.Get(R.Messages.options_playerProfiles_helpDialog_webcamProfileImages) },
+            { Translation.Get(R.Messages.options_playerProfiles_helpDialog_customProfileImages_title),
+                Translation.Get(R.Messages.options_playerProfiles_helpDialog_customProfileImages,
                     "path", ApplicationUtils.ReplacePathsWithDisplayString(absolutePlayerProfileImagesFolder)) },
         };
         MessageDialogControl helpDialogControl = uiManager.CreateHelpDialogControl(
-            TranslationManager.GetTranslation(R.Messages.options_playerProfiles_helpDialog_title),
+            Translation.Get(R.Messages.options_playerProfiles_helpDialog_title),
             titleToContentMap);
         helpDialogControl.AddButton("Images Folder",
             _ =>

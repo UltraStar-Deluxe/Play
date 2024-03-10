@@ -156,6 +156,6 @@ public class AboutSceneControl : MonoBehaviour, INeedInjection, ITranslator
 
     public void UpdateTranslation()
     {
-        sceneTitle.text = TranslationManager.GetTranslation(R.Messages.aboutScene_title);
+        sceneTitle.text = Translation.Get(R.Messages.aboutScene_title);
     }
 }

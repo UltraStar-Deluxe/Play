@@ -33,10 +33,10 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
 
     public void UpdateTranslation()
     {
-        useWebcamToggle.label = TranslationManager.GetTranslation(R.Messages.options_webcam_useAsBackGroundInSingingScene);
+        useWebcamToggle.label = Translation.Get(R.Messages.options_webcam_useAsBackGroundInSingingScene);
         useWebcamToggle.value = settings.UseWebcamAsBackgroundInSingScene;
         useWebcamToggle.RegisterValueChangedCallback(evt => settings.UseWebcamAsBackgroundInSingScene = evt.newValue);
-        devicePicker.Label = TranslationManager.GetTranslation(R.Messages.options_webcam_device);
+        devicePicker.Label = Translation.Get(R.Messages.options_webcam_device);
     }
 
     private void InitWebcamPicker()
@@ -60,7 +60,7 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
         else
         {
             Debug.Log("No webcam found");
-            devicePickerControl.GetLabelTextFunction = nullDevice => TranslationManager.GetTranslation(R.Messages.options_webcam_noWebcamsAvailable);
+            devicePickerControl.GetLabelTextFunction = nullDevice => Translation.Get(R.Messages.options_webcam_noWebcamsAvailable);
             devicePickerControl.Items.Add(new WebCamDevice());
         }
     }

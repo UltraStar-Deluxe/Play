@@ -138,8 +138,8 @@ public class SoundOptionsControl : AbstractOptionsSceneControl, INeedInjection, 
 
     public void UpdateTranslation()
     {
-        backgroundMusicVolumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_backgroundMusicEnabled);
-        previewVolumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_previewVolume);
-        volumeChooser.Label = TranslationManager.GetTranslation(R.Messages.options_volume);
+        backgroundMusicVolumeChooser.Label = Translation.Get(R.Messages.options_backgroundMusicEnabled);
+        previewVolumeChooser.Label = Translation.Get(R.Messages.options_previewVolume);
+        volumeChooser.Label = Translation.Get(R.Messages.options_volume);
     }
 }

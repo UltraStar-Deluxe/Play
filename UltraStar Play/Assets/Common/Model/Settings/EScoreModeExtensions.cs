@@ -8,11 +8,11 @@ public static class ScoreModeExtensions
         switch (scoreMode)
         {
             case EScoreMode.Individual:
-                return TranslationManager.GetTranslation(R.Messages.enum_scoreMode_individual);
+                return Translation.Get(R.Messages.enum_scoreMode_individual);
             case EScoreMode.CommonAverage:
-                return TranslationManager.GetTranslation(R.Messages.enum_scoreMode_commonAverage);
+                return Translation.Get(R.Messages.enum_scoreMode_commonAverage);
             case EScoreMode.None:
-                return TranslationManager.GetTranslation(R.Messages.enum_scoreMode_none);
+                return Translation.Get(R.Messages.enum_scoreMode_none);
             default:
                 throw new ArgumentOutOfRangeException(nameof(scoreMode), scoreMode, null);
         }

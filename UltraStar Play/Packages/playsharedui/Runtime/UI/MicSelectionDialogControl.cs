@@ -30,7 +30,7 @@ public class MicSelectionDialogControl : MessageDialogControl, INeedInjection, I
     public override void OnInjectionFinished()
     {
         base.OnInjectionFinished();
-        AddButton(TranslationManager.GetTranslation("cancel"), _ => CloseDialog());
+        AddButton(Translation.Get("cancel"), _ => CloseDialog());
     }
 
     public void Update()

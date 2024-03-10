@@ -633,8 +633,8 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
             .Select(it => it.Name)
             .ToList()
             .JoinWith(", ");
-        string title = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_title);
-        string message = TranslationManager.GetTranslation(R.Messages.singScene_missingMicrophones_message,
+        string title = Translation.Get(R.Messages.singScene_missingMicrophones_title);
+        string message = Translation.Get(R.Messages.singScene_missingMicrophones_message,
             "playerNameCsv", playerNameCsv);
 
         dialogControl = UiManager.Instance.CreateDialogControl(title);
@@ -1549,29 +1549,29 @@ public class SingSceneControl : MonoBehaviour, INeedInjection, IBinder, IInjecti
         //     .ForEach(label => label.RemoveFromHierarchy());
         //
         // InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_back,
-        //     TranslationManager.GetTranslation(R.Messages.back),
+        //     Translation.Get(R.Messages.back),
         //     inputLegend);
         // InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_openSongEditor,
-        //     TranslationManager.GetTranslation(R.Messages.action_openSongEditor),
+        //     Translation.Get(R.Messages.action_openSongEditor),
         //     inputLegend);
         // InputLegendControl.TryAddInputActionInfo(R.InputActions.usplay_restartSong,
-        //     TranslationManager.GetTranslation(R.Messages.action_restart),
+        //     Translation.Get(R.Messages.action_restart),
         //     inputLegend);
         //
         // if (inputManager.InputDeviceEnum == EInputDevice.Touch)
         // {
         //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-        //         TranslationManager.GetTranslation(R.Messages.continue_),
-        //         TranslationManager.GetTranslation(R.Messages.action_doubleTap))));
+        //         Translation.Get(R.Messages.continue_),
+        //         Translation.Get(R.Messages.action_doubleTap))));
         //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-        //         TranslationManager.GetTranslation(R.Messages.action_openContextMenu),
-        //         TranslationManager.GetTranslation(R.Messages.action_longPress))));
+        //         Translation.Get(R.Messages.action_openContextMenu),
+        //         Translation.Get(R.Messages.action_longPress))));
         // }
         // else
         // {
         //     inputLegend.Add(InputLegendControl.CreateInputActionInfoUi(new InputActionInfo(
-        //         TranslationManager.GetTranslation(R.Messages.action_skipToNextLyrics),
-        //         TranslationManager.GetTranslation(R.Messages.action_navigateRight))));
+        //         Translation.Get(R.Messages.action_skipToNextLyrics),
+        //         Translation.Get(R.Messages.action_navigateRight))));
         // }
     }
 

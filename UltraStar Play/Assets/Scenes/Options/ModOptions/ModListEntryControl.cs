@@ -132,7 +132,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         }
 
         modSettingsDialogControl = uiManager.CreateDialogControl($"{ModDisplayName} Settings");
-        modSettingsDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.ok),
+        modSettingsDialogControl.AddButton(Translation.Get(R.Messages.ok),
             _ => modSettingsDialogControl.CloseDialog());
         modSettingsDialogControl.DialogClosedEventStream.Subscribe(_ => modSettingsDialogControl = null);
 
@@ -158,7 +158,7 @@ public class ModListEntryControl : INeedInjection, IInjectionFinishedListener
         }
 
         modInfoDialogControl = uiManager.CreateDialogControl($"{ModDisplayName}");
-        modInfoDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.close),
+        modInfoDialogControl.AddButton(Translation.Get(R.Messages.close),
             _ => modInfoDialogControl.CloseDialog());
         modInfoDialogControl.DialogClosedEventStream.Subscribe(_ => modInfoDialogControl = null);
 
