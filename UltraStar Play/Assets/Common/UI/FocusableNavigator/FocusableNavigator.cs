@@ -186,16 +186,22 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
             return;
         }
 
-        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController))
+        if (VisualElementUtils.IsDropdownListFocused(uiDocument.rootVisualElement.focusController, out VisualElement unityBaseDropdown))
         {
-            FocusedVisualElement.SendEvent(NavigationSubmitEvent.GetPooled());
+            // TODO: Submit does not work ( https://forum.unity.com/threads/navigation-and-dropdownfield.1195423/ )
+            FocusedVisualElement.SendEvent(new NavigationSubmitEvent() { target = FocusedVisualElement });
             return;
         }
 
         VisualElement focusedVisualElement = FocusedVisualElement;
         if (focusedVisualElement != null)
         {
-            focusedVisualElement.SendEvent(new NavigationSubmitEvent());
+            using NavigationSubmitEvent evt = new NavigationSubmitEvent()
+            {
+                target = focusedVisualElement
+
+            };
+            focusedVisualElement.SendEvent(evt);
         }
         else
         {
@@ -438,14 +444,8 @@ public class FocusableNavigator : MonoBehaviour, INeedInjection, IInjectionFinis
     {
         Log.WithLevel(logLevel, () => "NavigateDropdownList");
 
-        if (navigationDirection.y > 0)
-        {
-            focusedVisualElement.SendEvent(NavigationMoveEvent.GetPooled(NavigationMoveEvent.Direction.Up));
-        }
-        else if (navigationDirection.y < 0)
-        {
-            focusedVisualElement.SendEvent(NavigationMoveEvent.GetPooled(NavigationMoveEvent.Direction.Down));
-        }
+        ListView dropdownListView = focusedVisualElement.Q<ListView>(null, "unity-base-dropdown__container-inner");
+        TryNavigateListView(dropdownListView, navigationDirection);
     }
 
     private void NavigateToBestMatchingNavigationTarget(VisualElement focusedVisualElement, Vector2 navigationDirection)

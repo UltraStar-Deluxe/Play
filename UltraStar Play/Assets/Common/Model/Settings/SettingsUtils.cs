@@ -68,9 +68,24 @@ public static class SettingsUtils
         settings.HttpApiPermissions[clientId].Remove(permission);
     }
 
-    public static PlayerProfile GetPlayerProfile(Settings settings, string profileName)
+    public static List<PlayerProfile> GetPlayerProfiles(Settings settings, NonPersistentSettings nonPersistentSettings)
     {
-        return settings.PlayerProfiles.FirstOrDefault(playerProfile => playerProfile.Name == profileName);
+        if (!nonPersistentSettings.LobbyMemberPlayerProfiles.IsNullOrEmpty())
+        {
+            return nonPersistentSettings.LobbyMemberPlayerProfiles
+                .Cast<PlayerProfile>()
+                .ToList();
+        }
+        else
+        {
+            return settings.PlayerProfiles;
+        }
+    }
+
+    public static PlayerProfile GetPlayerProfile(Settings settings, NonPersistentSettings nonPersistentSettings, string profileName)
+    {
+        return GetPlayerProfiles(settings, nonPersistentSettings)
+            .FirstOrDefault(playerProfile => playerProfile.Name == profileName);
     }
 
     public static List<MicProfile> GetMicProfiles(Settings settings, string profileName)

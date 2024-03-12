@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Random = System.Random;
 
 public static class SongMetaImageUtils
 {
+    private static YouTubeOembedCoverImageProvider youTubeOembedCoverImageProvider = new();
+
     public static IObservable<string> GetBackgroundOrCoverImageUri(SongMeta songMeta)
     {
         string uri = SongMetaUtils.GetBackgroundUri(songMeta);
@@ -33,6 +33,7 @@ public static class SongMetaImageUtils
         return songBackgroundImageProviders
             .Select(songBackgroundImageProvider => songBackgroundImageProvider.GetBackgroundImageUri(songMeta))
             .Merge()
+            .Where(it => !it.IsNullOrEmpty())
             .FirstOrDefault()
             .ObserveOnMainThread();
     }
@@ -53,7 +54,9 @@ public static class SongMetaImageUtils
         }
 
         // Try to find an image via mods
-        List<ISongCoverImageProvider> songCoverImageProviders = ModManager.GetModObjects<ISongCoverImageProvider>();
+        List<ISongCoverImageProvider> songCoverImageProviders = ModManager.GetModObjects<ISongCoverImageProvider>()
+            .Union(new List<ISongCoverImageProvider>() { youTubeOembedCoverImageProvider })
+            .ToList();
         if (songCoverImageProviders.IsNullOrEmpty())
         {
             return Observable.Return("");
@@ -61,6 +64,7 @@ public static class SongMetaImageUtils
         return songCoverImageProviders
             .Select(songCoverImageProvider => songCoverImageProvider.GetCoverImageUri(songMeta))
             .Merge()
+            .Where(it => !it.IsNullOrEmpty())
             .FirstOrDefault()
             .ObserveOnMainThread();
     }

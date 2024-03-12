@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using Steamworks;
-using Steamworks.Data;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -12,65 +10,30 @@ using UnityEngine;
 public class SteamManager : AbstractSingletonBehaviour, INeedInjection
 {
     public static SteamManager Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SteamManager>();
-    
-    private const int MelodyManiaSteamAppId = 2394070;
 
     public bool IsConnectedToSteam { get; private set; }
     public SteamId PlayerSteamId { get; private set; }
-    public string PlayerName { get; private set; } = "";
+    public string PlayerName { get; private set; } = "Player";
 
     [Inject]
-    private AchievementEventStream achievementEventStream;
-    
-    private readonly Dictionary<string, Achievement> achievementIdToAchievement = new();
-    private Subject<bool> connectedToSteamEventStream = new();
+    private SteamAchievementManager steamAchievementManager;
+
+    [Inject]
+    private SteamWorkshopManager steamWorkshopManager;
+
+    private readonly Subject<bool> connectedToSteamEventStream = new();
     public IObservable<bool> ConnectedToSteamEventStream => connectedToSteamEventStream;
 
-    private Subject<bool> disconnectedFromSteamEventStream = new();
+    private readonly Subject<bool> disconnectedFromSteamEventStream = new();
     public IObservable<bool> DisconnectedFromSteamEventStream => disconnectedFromSteamEventStream;
-
-    private string playerSteamIdString;
-    private List<Lobby> activeUnrankedLobbies;
-    private List<Lobby> activeRankedLobbies;
-
-    private HashSet<AchievementId> triggeredAchievementsSinceAppStart = new();
 
     protected override object GetInstance()
     {
         return Instance;
     }
 
-    protected override void OnEnableSingleton()
-    {
-        // SteamMatchmaking.OnLobbyGameCreated += OnLobbyGameCreatedCallback;
-        // SteamMatchmaking.OnLobbyCreated += OnLobbyCreatedCallback;
-        // SteamMatchmaking.OnLobbyEntered += OnLobbyEnteredCallback;
-        // SteamMatchmaking.OnLobbyMemberJoined += OnLobbyMemberJoinedCallback;
-        // SteamMatchmaking.OnChatMessage += OnChatMessageCallback;
-        // SteamMatchmaking.OnLobbyMemberDisconnected += OnLobbyMemberDisconnectedCallback;
-        // SteamMatchmaking.OnLobbyMemberLeave += OnLobbyMemberLeaveCallback;
-        // SteamFriends.OnGameLobbyJoinRequested += OnGameLobbyJoinRequestedCallback;
-        // SteamApps.OnDlcInstalled += OnDlcInstalledCallback;
-    }
-
-    protected override void OnDisableSingleton()
-    {
-        // SteamMatchmaking.OnLobbyGameCreated -= OnLobbyGameCreatedCallback;
-        // SteamMatchmaking.OnLobbyCreated -= OnLobbyCreatedCallback;
-        // SteamMatchmaking.OnLobbyEntered -= OnLobbyEnteredCallback;
-        // SteamMatchmaking.OnLobbyMemberJoined -= OnLobbyMemberJoinedCallback;
-        // SteamMatchmaking.OnChatMessage -= OnChatMessageCallback;
-        // SteamMatchmaking.OnLobbyMemberDisconnected -= OnLobbyMemberDisconnectedCallback;
-        // SteamMatchmaking.OnLobbyMemberLeave -= OnLobbyMemberLeaveCallback;
-        // SteamFriends.OnGameLobbyJoinRequested -= OnGameLobbyJoinRequestedCallback;
-        // SteamApps.OnDlcInstalled -= OnDlcInstalledCallback;
-    }
-
     protected override void StartSingleton()
     {
-        achievementEventStream
-            .Subscribe(achievementId => TriggerAchievement(achievementId))
-            .AddTo(gameObject);
         InitSteamClient();
     }
 
@@ -83,66 +46,36 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
                 Debug.LogWarning("Already connected to Steam");
                 return;
             }
-            
-            Debug.Log("Initializing SteamClient");
 
-            if (Application.isEditor)
+            // SteamClient is initialized in FacepunchTransport.Awake()
+            if (!SteamClient.IsLoggedOn)
             {
-                // Steam is not expected to run in the editor. Only log a warning.
-                try
-                {
-                    SteamClient.Init(MelodyManiaSteamAppId);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning(ex.Message);
-                    return;
-                }
-            }
-            else
-            {
-                SteamClient.Init(MelodyManiaSteamAppId);
-                if (!SteamClient.IsValid)
-                {
-                    throw new SteamException("Steam client not valid");
-                }
+                throw new SteamException("SteamClient.IsLoggedOn is false");
             }
 
             PlayerName = SteamClient.Name;
             PlayerSteamId = SteamClient.SteamId;
-            playerSteamIdString = PlayerSteamId.ToString();
-            activeUnrankedLobbies = new List<Lobby>();
-            activeRankedLobbies = new List<Lobby>();
             IsConnectedToSteam = true;
-            
+
             bool requestCurrentStatsSuccess = SteamUserStats.RequestCurrentStats();
             if (!requestCurrentStatsSuccess)
             {
                 Debug.LogError("Connected to Steam but failed to request current stats");
             }
-            
-            achievementIdToAchievement.Clear();
-            SteamUserStats.Achievements.ForEach(achievement => achievementIdToAchievement[achievement.Identifier] = achievement);
+
+            steamAchievementManager.SetAvailableAchievements(SteamUserStats.Achievements);
+
+            steamWorkshopManager.DownloadWorkshopItems();
 
             connectedToSteamEventStream.OnNext(true);
-            Debug.Log("Steam successfully initialized, PlayerName: " + PlayerName);
+            Debug.Log($"Steam successfully initialized: PlayerName: {PlayerName}, SteamUser.VoiceRecord: {SteamUser.VoiceRecord}");
         }
         catch (Exception e)
         {
-            IsConnectedToSteam = false;
-            playerSteamIdString = "NoSteamId";
             Debug.LogException(e);
+            Debug.LogError($"Failed to initialize Steam, maybe not connected to Steam client: {e.Message}");
+            IsConnectedToSteam = false;
         }
-    }
-
-    private void Update()
-    {
-        if (this != Instance)
-        {
-            return;
-        }
-
-        SteamClient.RunCallbacks();
     }
 
     protected override void OnDestroySingleton()
@@ -151,52 +84,5 @@ public class SteamManager : AbstractSingletonBehaviour, INeedInjection
         SteamClient.Shutdown();
         Debug.Log("SteamClient shut down successfully");
         disconnectedFromSteamEventStream.OnNext(true);
-    }
-
-    private void TriggerAchievement(AchievementId achievementId)
-    {
-        if (triggeredAchievementsSinceAppStart.Contains(achievementId))
-        {
-            return;
-        }
-        triggeredAchievementsSinceAppStart.Add(achievementId);
-
-        if (!IsConnectedToSteam)
-        {
-            // Maybe next time
-            Debug.LogWarning($"Attempt to trigger {achievementId}, but not connected to SteamClient");
-            return;
-        }
-        
-        if (!TryGetAchievement(achievementId, out Achievement achievement))
-        {
-            Debug.LogError($"No achievement found for id: {achievementId.Id}");
-            return;
-        }
-
-        if (achievement.State)
-        {
-            Debug.Log($"Skipping already unlocked achievement {achievementId.Id}");
-            return;
-        }
-        
-        try
-        {
-            Debug.Log("Unlocking achievement: " + achievementId.Id);
-            bool success = achievement.Trigger();
-            if (!success)
-            {
-                Debug.LogWarning($"Failed to unlock achievement: {achievementId.Id}");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
-    }
-
-    private bool TryGetAchievement(AchievementId achievementId, out Achievement achievement)
-    {
-        return achievementIdToAchievement.TryGetValue(achievementId.Id, out achievement);
     }
 }

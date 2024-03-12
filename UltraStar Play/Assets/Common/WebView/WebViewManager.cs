@@ -151,6 +151,8 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
 
     protected override void StartSingleton()
     {
+        DirectoryUtils.CreateDirectory(WebViewUtils.GetDefaultWebViewScriptsAbsolutePath());
+
         // By default browsers block web pages from autoplaying video or audio.
         // Explicitly allow playback of video or audio without user interaction.
         // This must be called early, e.g. in Awake.
@@ -436,12 +438,13 @@ public class WebViewManager : AbstractSingletonBehaviour, INeedInjection
         if (settings == null
             || !settings.EnableWebView)
         {
+            Debug.LogWarning($"WebView cannot load URL because WebView is disabled in settings.");
             return false;
         }
 
         if (!WebViewUtils.CanHandleWebViewUrl(url))
         {
-            Debug.Log($"Cannot handle URL: {url}");
+            Debug.LogWarning($"Cannot handle URL: {url}");
             return false;
         }
 

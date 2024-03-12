@@ -5,7 +5,10 @@
         "Unity.InputSystem",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime",
+        "Unity.Networking.Transport",
         "Unity.Netcode.Runtime",
+        "Unity.Netcode.Components",
+        "Unity.Collections",
         "Facepunch Transport for Netcode for GameObjects",
         "Serilog",
         "Plugins",
@@ -41,7 +44,8 @@
         "LibVLCSharp.dll",
         "Mono.CSharp.dll",
         "Mono.Data.Sqlite.dll",
-        "ICSharpCode.SharpZipLib.dll"
+        "ICSharpCode.SharpZipLib.dll",
+        "WindowsInput.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

@@ -53,6 +53,11 @@ VisualElement
     border-radius: 5px;
 }
 
+.borderBottom {
+    border-color: var(--font-color);
+    border-bottom-width: 1px;
+}
+
 .overlay {
     width: 100%;
     height: 100%;
@@ -444,4 +449,9 @@ Toggle.smallControl {
 {
     width: auto;
     margin-right: 16px;
+}
+
+.onlineMultiplayerHost {
+    -unity-text-outline-width: 12px;
+    -unity-text-outline-color: #0dcaf0;
 }

@@ -13,6 +13,9 @@ using IBinding = UniInject.IBinding;
 
 public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
 {
+    private const float NotificationFadeOutDelayInSeconds = 4;
+    private const float NotificationFadeOutDurationInSeconds = 1;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()
     {
@@ -76,6 +79,10 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
     protected override void AwakeSingleton()
     {
         LeanTween.init(10000);
+    }
+
+    protected override void StartSingleton()
+    {
         UpdatePlayerProfileImagePaths();
     }
 
@@ -104,14 +111,20 @@ public class UiManager : AbstractSingletonBehaviour, INeedInjection, IBinder
         notificationOverlay.Add(notification);
 
         // Fade out then remove
-        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, 2, 1));
+        StartCoroutine(AnimationUtils.FadeOutThenRemoveVisualElementCoroutine(notification, NotificationFadeOutDelayInSeconds, NotificationFadeOutDurationInSeconds));
 
         return notificationLabel;
     }
 
+    public void ReloadPlayerProfileImages()
+    {
+        UpdatePlayerProfileImagePaths();
+    }
+
     public void UpdatePlayerProfileImagePaths()
     {
-        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages();
+        List<string> folders = PlayerProfileUtils.GetPlayerProfileImageFolders();
+        relativePlayerProfileImagePathToAbsolutePath = PlayerProfileUtils.FindPlayerProfileImages(folders);
     }
 
     public static void CreateNotification(string text)

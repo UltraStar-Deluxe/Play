@@ -15,13 +15,17 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
 
     [Inject]
     private GameObject gameObject;
-    
+
     [Inject(UxmlName = R.UxmlNames.commonScoreSentenceRatingContainer)]
     private VisualElement commonScoreSentenceRatingContainer;
 
     private IEnumerable<PlayerScoreControl> ScoreControls => singSceneControl.PlayerControls
         .Select(playerControl => playerControl.PlayerScoreControl)
         .Where(scoreControl => scoreControl != null);
+
+    private IEnumerable<PlayerPerformanceAssessmentControl> PerformanceAssessmentControls => singSceneControl.PlayerControls
+        .Select(playerControl => playerControl.PlayerPerformanceAssessmentControl)
+        .Where(control => control != null);
 
     private int totalScoreAnimationId;
 
@@ -48,27 +52,27 @@ public class CommonScoreControl : INeedInjection, IInjectionFinishedListener
     {
         ScoreControls.ForEach(scoreControl =>
         {
-            scoreControl.SentenceScoreEventStream
+            scoreControl.ScoreChangedEventStream
                 .Subscribe(_ => UpdateCommonScoreLabel())
                 .AddTo(gameObject);
         });
 
         // Show only "friendly" sentence ratings.
-        ScoreControls.Select(scoreControl => scoreControl.SentenceScoreEventStream)
+        PerformanceAssessmentControls.Select(scoreControl => scoreControl.SentenceAssessedEventStream)
             .Merge()
             .Subscribe(sentenceScoreEvent =>
             {
-                if (ratedSentences.Contains(sentenceScoreEvent.SentenceScore.Sentence)
+                if (ratedSentences.Contains(sentenceScoreEvent.Sentence)
                     || sentenceScoreEvent.SentenceRating.PercentageThreshold < 0.25)
                 {
                     return;
                 }
 
-                ratedSentences.Add(sentenceScoreEvent.SentenceScore.Sentence);
+                ratedSentences.Add(sentenceScoreEvent.Sentence);
                 ShowSentenceRating(sentenceScoreEvent.SentenceRating);
             })
             .AddTo(singSceneControl.gameObject);
-        
+
         UpdateCommonScoreLabel(false);
     }
 

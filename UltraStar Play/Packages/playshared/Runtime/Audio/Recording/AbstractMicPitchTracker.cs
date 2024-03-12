@@ -90,7 +90,7 @@ public abstract class AbstractMicPitchTracker : MonoBehaviour, INeedInjection, I
         }
     }
 
-    protected MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
+    protected virtual MicSampleRecorder MicSampleRecorder => micSampleRecorderManager.GetOrCreateMicSampleRecorder(micProfile);
 
     protected readonly Subject<PitchEvent> pitchEventStream = new();
     public IObservable<PitchEvent> PitchEventStream => pitchEventStream;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using CommonOnlineMultiplayer;
 using ProTrans;
 using UniInject;
 using UniRx;
@@ -20,7 +21,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private MicProfile micProfile;
 
     [Inject]
-    private PlayerScoreControlData playerScoreData;
+    private ISingingResultsPlayerScore singingResultsPlayerScore;
 
     [Inject]
     private Statistics statistics;
@@ -78,10 +79,10 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private readonly float bounceAnimTimeInSeconds = 1f;
     private readonly float maxScoreAnimationTimeInSeconds = 5f;
-    private float NormalNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.NormalNotesTotalScore / PlayerScoreControl.maxScore);
-    private float GoldenNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.GoldenNoteLengthTotal / PlayerScoreControl.maxScore);
-    private float PerfectSentenceBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)playerScoreData.PerfectSentenceBonusTotalScore / PlayerScoreControl.maxScore);
-    private float ModBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)Math.Abs(playerScoreData.ModTotalScore) / PlayerScoreControl.maxScore);
+    private float NormalNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)singingResultsPlayerScore.NormalNotesTotalScore / PlayerScoreControl.maxScore);
+    private float GoldenNoteAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)singingResultsPlayerScore.GoldenNotesTotalScore / PlayerScoreControl.maxScore);
+    private float PerfectSentenceBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)singingResultsPlayerScore.PerfectSentenceBonusTotalScore / PlayerScoreControl.maxScore);
+    private float ModBonusAnimTimeInSeconds => maxScoreAnimationTimeInSeconds * ((float)Math.Abs(singingResultsPlayerScore.ModTotalScore) / PlayerScoreControl.maxScore);
     private float TotalScoreAnimTimeInSeconds => NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds + ModBonusAnimTimeInSeconds;
 
     private readonly List<int> animationIds = new();
@@ -140,32 +141,30 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
         // Score texts (animated)
         ResetScoreRowLabelTexts();
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.NormalNotesTotalScore, NormalNoteAnimTimeInSeconds)
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.NormalNotesTotalScore, NormalNoteAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(normalNoteScoreContainer, interpolatedValue));
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.GoldenNotesTotalScore, GoldenNoteAnimTimeInSeconds)
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.GoldenNotesTotalScore, GoldenNoteAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(goldenNoteScoreContainer, interpolatedValue))
             .setDelay(NormalNoteAnimTimeInSeconds);
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.PerfectSentenceBonusTotalScore, PerfectSentenceBonusAnimTimeInSeconds)
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.PerfectSentenceBonusTotalScore, PerfectSentenceBonusAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(phraseBonusScoreContainer, interpolatedValue))
             .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds);
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.ModTotalScore, ModBonusAnimTimeInSeconds)
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.ModTotalScore, ModBonusAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => SetScoreRowLabelText(modBonusScoreContainer, interpolatedValue))
             .setDelay(NormalNoteAnimTimeInSeconds + GoldenNoteAnimTimeInSeconds + PerfectSentenceBonusAnimTimeInSeconds);
-        LeanTween.value(singingResultsSceneControl.gameObject, 0f, playerScoreData.TotalScore, TotalScoreAnimTimeInSeconds)
+        LeanTween.value(singingResultsSceneControl.gameObject, 0f, singingResultsPlayerScore.TotalScore, TotalScoreAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => totalScoreLabel.text = interpolatedValue.ToStringInvariantCulture("0"));
 
         // Score bar (animated)
-        if (micProfile != null)
-        {
-            playerScoreProgressBar.ProgressColor = micProfile.Color;
-        }
-        else
+        Color32 scoreBarColor = CommonOnlineMultiplayerUtils.GetPlayerColor(PlayerProfile, micProfile);
+        playerScoreProgressBar.ProgressColor = scoreBarColor;
+        if (scoreBarColor == Color.clear)
         {
             // Do not show border because it looks bad without a fill color
             playerImage.SetBorderWidth(0);
         }
 
-        float playerScoreFactor = (float)playerScoreData.TotalScore / PlayerScoreControl.maxScore;
+        float playerScoreFactor = (float)singingResultsPlayerScore.TotalScore / PlayerScoreControl.maxScore;
         animationIds.Add(LeanTween.value(singingResultsSceneControl.gameObject, 0, 100f * playerScoreFactor, TotalScoreAnimTimeInSeconds)
             .setOnUpdate(interpolatedValue => playerScoreProgressBar.ProgressInPercent = interpolatedValue)
             .setEaseOutSine()
@@ -193,7 +192,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
     private void AnimateStarRatingIcons()
     {
         songRatingStarIcons.ForEach(it => it.style.scale = Vector2.zero);
-        int starCount = SongSelectSongRatingIconControl.GetStarCount(playerScoreData.TotalScore);
+        int starCount = SongSelectSongRatingIconControl.GetStarCount(singingResultsPlayerScore.TotalScore);
 
         // Skip the center star if even number of stars visible
         List<VisualElement> visibleStarIcons = starCount % 2 == 1
@@ -214,7 +213,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
 
     private bool IsNewHighscore()
     {
-        if (playerScoreData.TotalScore <= 0
+        if (singingResultsPlayerScore.TotalScore <= 0
             || sceneData.GameRoundSettings == null
             || sceneData.GameRoundSettings.AnyModifierActive)
         {
@@ -240,7 +239,7 @@ public class SingingResultsPlayerControl : INeedInjection, ITranslator, IInjecti
             return false;
         }
 
-        return highScoreEntry.Score == playerScoreData.TotalScore;
+        return highScoreEntry.Score == singingResultsPlayerScore.TotalScore;
     }
 
     private IObservable<Sprite> LoadSongRatingSprite(ESongRating songRatingEnumValue)

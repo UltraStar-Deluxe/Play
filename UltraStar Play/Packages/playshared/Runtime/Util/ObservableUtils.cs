@@ -12,8 +12,10 @@ public static class ObservableUtils
         return Observable.Throw<T>(exception);
     }
 
-    public static IObservable<T> RunOnNewTaskAsObservable<T>(Func<T> function, IDisposable disposable)
+    public static IObservable<T> RunOnNewTaskAsObservable<T>(Func<T> function, IDisposable disposable = null)
     {
+        disposable ??= Disposable.Empty;
+
         return Observable.Create<T>(o =>
         {
             Task.Run(() =>
@@ -39,8 +41,10 @@ public static class ObservableUtils
         });
     }
 
-    public static IObservable<T> RunOnNewTaskAsObservableElements<T>(Func<List<T>> function, IDisposable disposable)
+    public static IObservable<T> RunOnNewTaskAsObservableElements<T>(Func<List<T>> function, IDisposable disposable = null)
     {
+        disposable ??= Disposable.Empty;
+
         return Observable.Create<T>(o =>
         {
             Task.Run(() =>
@@ -66,8 +70,10 @@ public static class ObservableUtils
         });
     }
 
-    public static IObservable<T> RunOnNewTaskAsObservableElements<T>(Func<Task<List<T>>> function, IDisposable disposable)
+    public static IObservable<T> RunOnNewTaskAsObservableElements<T>(Func<Task<List<T>>> function, IDisposable disposable = null)
     {
+        disposable ??= Disposable.Empty;
+
         return Observable.Create<T>(o =>
         {
             Task.Run(async () =>
@@ -93,8 +99,10 @@ public static class ObservableUtils
         });
     }
 
-    public static IObservable<T> RunOnNewTaskAsObservable<T>(Func<Task<T>> function, IDisposable disposable)
+    public static IObservable<T> RunOnNewTaskAsObservable<T>(Func<Task<T>> function, IDisposable disposable = null)
     {
+        disposable = disposable ?? Disposable.Empty;
+
         return Observable.Create<T>(o =>
         {
             Task.Run(async () =>

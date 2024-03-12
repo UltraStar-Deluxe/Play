@@ -1,17 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement name="loadedOptionsRoot">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1">
-            <ui:VisualElement name="buttonRow" class="ml-auto mb-3" style="justify-content: flex-start;">
-                <ui:Button text="View Log" display-tooltip-when-elided="true" name="showLogButton" class="controlMinWidth" style="margin-right: 5px;" />
-                <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="controlMinWidth" style="margin-right: 5px;" />
-                <ui:Button display-tooltip-when-elided="true" name="openPersistentDataPathButton" style="margin-right: 5px; flex-direction: row;">
-                    <ui:Label tabindex="-1" text="Data Folder" display-tooltip-when-elided="true" name="openPersistentDataPathLabel" />
-                    <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
-                </ui:Button>
-                <ui:Button display-tooltip-when-elided="true" name="openWebViewScriptsPathButton" style="margin-right: 5px; flex-direction: row;">
-                    <ui:Label tabindex="-1" text="Browser Scripts" display-tooltip-when-elided="true" name="openWebViewScriptsPathLabel" />
-                    <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
-                </ui:Button>
+            <ui:VisualElement name="buttonContainer" class="child-mb-1" style="flex-wrap: wrap; flex-direction: row-reverse; width: 100%;">
+                <ui:VisualElement name="row">
+                    <ui:Button display-tooltip-when-elided="true" name="openPersistentDataPathButton" style="margin-right: 5px; flex-direction: row;">
+                        <ui:Label tabindex="-1" text="Data Folder" display-tooltip-when-elided="true" name="openPersistentDataPathLabel" />
+                        <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
+                    </ui:Button>
+                    <ui:Button display-tooltip-when-elided="true" name="openWebViewScriptsPathButton" style="margin-right: 5px; flex-direction: row;">
+                        <ui:Label tabindex="-1" text="Browser Scripts" display-tooltip-when-elided="true" name="openWebViewScriptsPathLabel" />
+                        <MaterialIcon tabindex="-1" icon="open_in_new" name="openFolderIcon" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="row">
+                    <ui:Button text="View Log" display-tooltip-when-elided="true" name="showLogButton" class="controlMinWidth" style="margin-right: 5px;" />
+                    <ui:Button text="Copy Log" display-tooltip-when-elided="true" name="copyLogButton" class="controlMinWidth" style="margin-right: 5px;" />
+                </ui:VisualElement>
+                <ui:Button text="Publish Steam Workshop Item" name="uploadWorkshopItemButton" class="controlMinWidth" style="margin-right: 5px; align-self: flex-end;" />
             </ui:VisualElement>
             <ItemPicker name="minimumLogLevelPicker" label="Minimum Log Level¹" wrap-around="true" class="noBackgroundInHierarchy" />
             <ui:TextField picking-mode="Ignore" label="Absolute Path to Folder&#10;with Generated Files¹" name="generatedFolderPathTextField" is-delayed="true" class="noBackgroundInHierarchy" style="align-items: center; flex-grow: 1; margin-bottom: 4px;">
@@ -29,6 +34,7 @@
             <AccordionItem name="mediaFileFormatGroup" label="Media File Format Support" class="child-mb-3">
                 <ui:Toggle name="useUniversalCharsetDetectorToggle" label="Use Universal Charset Detector.&#10;Better but slower detection of&#10;non-Unicode encodings¹" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="writeUltraStarTxtFileWithByteOrderMarkToggle" label="Write UltraStar txt with BOM" stepValue="10" wrap-around="true" class="noBackgroundInHierarchy" />
+                <ItemPicker name="songVideoPlaybackPicker" label="Song Video Playback" class="noBackgroundInHierarchy" />
                 <ItemPicker name="useVlcToPlayMediaFilesPicker" label="Use VLC to Play Audio&#10;and Video Files¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="logVlcOutputToggle" label="Log VLC Output" class="noBackgroundInHierarchy" />
                 <ItemPicker name="useFfmpegToPlayMediaFilesPicker" label="Use ffmpeg to Play Audio&#10;and Video Files (unstable)¹" wrap-around="true" min-value="0" max-value="100" step-value="10" class="noBackgroundInHierarchy" />
@@ -49,13 +55,16 @@
                 <ui:Toggle name="wipeLyricsEffectToggle" label="Wipe Lyrics Effect" class="noBackgroundInHierarchy" />
                 <ui:Toggle name="analyzeBeatsWithoutTargetNoteToggle" label="Analyze Beats Without Target Note" class="noBackgroundInHierarchy" />
             </AccordionItem>
-            <AccordionItem name="clientConnectionGroup" label="Client Connections" class="child-mb-3">
+            <AccordionItem name="clientConnectionGroup" label="Companion Client Connections" class="child-mb-3">
                 <ui:IntegerField label="Connection Port¹&#10;(default 34567)" name="clientDiscoveryPortTextField" value="34567" class="noBackgroundInHierarchy mb-3" />
                 <ui:Label text="Connection endpoint: ????" name="connectionEndpointLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" />
                 <ui:IntegerField name="messageBufferTimeTextField" label="Message Buffer Time (ms)&#10;for Companion App" value="150" class="noBackgroundInHierarchy mb-3" />
                 <ui:TextField label="HTTP Server Host¹&#10;(leave empty for automatic value)" name="httpServerHostTextField" class="noBackgroundInHierarchy mb-3" />
                 <ui:IntegerField label="HTTP Server Port¹&#10;(default: 6789)" name="httpServerPortTextField" class="noBackgroundInHierarchy mb-3" />
                 <ui:Label text="HTTP Endpoint Example: ????" name="httpEndpointExampleLabel" class="controlLabel optionsLabelAndItemPicker noBackgroundInHierarchy" style="margin-bottom: 10px;" />
+            </AccordionItem>
+            <AccordionItem name="onlineMultiplayerGroup" label="Online Multiplayer" class="child-mb-3">
+                <ItemPicker name="beatAnalyzedEventNetworkDeliveryPicker" label="Beat Analyzed Event Network Delivery" class="noBackgroundInHierarchy" />
             </AccordionItem>
             <AccordionItem name="externalToolsGroup" label="External Tools" class="child-mb-3">
                 <ui:TextField name="audioSeparationCommandTextField" is-delayed="true" label="Spleeter Command&#10;(audio separation)" value="python -m spleeter" class="noBackgroundInHierarchy mb-3" style="flex-grow: 1;" />

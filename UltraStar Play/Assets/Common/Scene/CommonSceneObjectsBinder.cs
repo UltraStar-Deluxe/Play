@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
+using CommonOnlineMultiplayer;
+using Netcode.Transports.Facepunch;
 using PrimeInputActions;
 using ProTrans;
 using SimpleHttpServerForUnity;
+using SteamOnlineMultiplayer;
 using UniInject;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -38,7 +42,6 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(InGameDebugConsoleManager.Instance);
         bb.BindExistingInstance(BackgroundLightManager.Instance);
         bb.BindExistingInstance(DefaultFocusableNavigator.Instance);
-        bb.BindExistingInstance(SteamManager.Instance);
         bb.BindExistingInstance(MicSampleRecorderManager.Instance);
         bb.BindExistingInstance(AchievementEventStream.Instance);
         bb.BindExistingInstance(WebViewManager.Instance);
@@ -47,6 +50,32 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstance(RuntimeUiInspectionManager.Instance);
         bb.BindExistingInstance(VlcManager.Instance);
         bb.Bind(typeof(FocusableNavigator)).ToExistingInstance(DefaultFocusableNavigator.Instance);
+
+        // Steam
+        bb.BindExistingInstance(SteamManager.Instance);
+        bb.BindExistingInstance(SteamAchievementManager.Instance);
+        bb.BindExistingInstance(SteamWorkshopManager.Instance);
+
+        // Online Multiplayer
+        bb.BindExistingInstance(OnlineMultiplayerManager.Instance);
+        bb.BindExistingInstance(OnlineMultiplayerBackendManager.Instance);
+
+        // Netcode online multiplayer (direct connection without Steam lobby)
+        bb.BindExistingInstance(NetcodeLobbyManager.Instance);
+        bb.BindExistingInstance(NetcodeLobbyMemberManager.Instance);
+        bb.BindExistingInstance(NetcodeOnlineMultiplayerBackendConfigurator.Instance);
+
+        // Steam online multiplayer
+        bb.BindExistingInstance(SteamLobbyManager.Instance);
+        bb.BindExistingInstance(SteamLobbyMemberManager.Instance);
+        bb.BindExistingInstance(SteamOnlineMultiplayerBackendConfigurator.Instance);
+        bb.BindExistingInstance(DontDestroyOnLoadManager.Instance.FindComponentOrThrow<FacepunchTransport>());
+
+        if (NetworkManager.Singleton == null)
+        {
+            FindOrCreateNetworkManager().SetSingleton();
+        }
+        bb.BindExistingInstance(NetworkManager.Singleton);
 
         bb.BindExistingInstance(SpeechRecognitionManager.Instance);
         bb.BindExistingInstance(AudioSeparationManager.Instance);
@@ -77,5 +106,20 @@ public class CommonSceneObjectsBinder : MonoBehaviour, IBinder
         bb.BindExistingInstanceLazy(() => StatisticsManager.Instance.Statistics);
 
         return bb.GetBindings();
+    }
+
+    private NetworkManager FindOrCreateNetworkManager()
+    {
+        NetworkManager networkManager = FindObjectOfType<NetworkManager>();
+        if (networkManager != null)
+        {
+            return networkManager;
+        }
+
+        GameObject networkManagerGameObject = new GameObject();
+        networkManagerGameObject.name = "NetworkManager-RuntimeCreated";
+        networkManager = networkManagerGameObject.AddComponent<NetworkManager>();
+        return networkManager;
+
     }
 }

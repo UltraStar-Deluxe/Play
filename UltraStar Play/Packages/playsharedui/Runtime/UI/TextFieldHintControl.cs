@@ -20,10 +20,10 @@ public class TextFieldHintControl
         {
             throw new Exception("Hint label of TextField not found in children");
         }
-        
+
         Init();
     }
-    
+
     public TextFieldHintControl(Label hintLabel)
     {
         this.hintLabel = hintLabel;
@@ -51,7 +51,7 @@ public class TextFieldHintControl
     {
         hintLabel.SetVisibleByDisplay(textField.value.IsNullOrEmpty()
             && (isBlurEvent ||
-                (textField.focusController != null
-                 && textField.focusController.focusedElement != textField)));
+                (textField.focusController == null
+                 || textField.focusController.focusedElement != textField)));
     }
 }

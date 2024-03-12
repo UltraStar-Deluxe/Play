@@ -8,6 +8,7 @@ using Serilog.Events;
 using SimpleHttpServerForUnity;
 using UniInject;
 using UniRx;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IBinding = UniInject.IBinding;
@@ -17,6 +18,9 @@ using IBinding = UniInject.IBinding;
 
 public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator, IBinder
 {
+    [InjectedInInspector]
+    public VisualTreeAsset uploadWorkshopItemDialogUi;
+
     [Inject(UxmlName = R.UxmlNames.showFpsToggle)]
     private Toggle showFpsToggle;
 
@@ -128,6 +132,9 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.ffmpegConversionCommandsJsonPicker)]
     private TextField ffmpegConversionCommandsJsonPicker;
 
+    [Inject(UxmlName = R.UxmlNames.songVideoPlaybackPicker)]
+    private ItemPicker songVideoPlaybackPicker;
+
     [Inject(UxmlName = R.UxmlNames.useFfmpegToPlayMediaFilesPicker)]
     private ItemPicker useFfmpegToPlayMediaFilesPicker;
 
@@ -152,8 +159,16 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
     [Inject(UxmlName = R.UxmlNames.writeUltraStarTxtFileWithByteOrderMarkToggle)]
     private Toggle writeUltraStarTxtFileWithByteOrderMarkToggle;
 
+    [Inject(UxmlName = R.UxmlNames.beatAnalyzedEventNetworkDeliveryPicker)]
+    private ItemPicker beatAnalyzedEventNetworkDeliveryPicker;
+
     [Inject(UxmlClass = "accordionItem")]
     private List<AccordionItem> accordionItems;
+
+    [Inject(UxmlName = R.UxmlNames.uploadWorkshopItemButton)]
+    private Button uploadWorkshopItemButton;
+
+    private MessageDialogControl uploadWorkshopItemDialogControl;
 
     protected override void Start()
     {
@@ -285,7 +300,7 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         // Open WebView scripts path
         if (PlatformUtils.IsStandalone)
         {
-            openWebViewScriptsPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(ApplicationUtils.GetWebViewScriptsAbsolutePath()));
+            openWebViewScriptsPathButton.RegisterCallbackButtonTriggered(_ => ApplicationUtils.OpenDirectory(WebViewUtils.GetDefaultWebViewScriptsAbsolutePath()));
         }
         else
         {
@@ -347,6 +362,13 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
                         $"Failed to update ffmpeg conversion commands with the following JSON: '{newValueAsString}', error message: {ex.Message}");
                 }
             });
+
+        // SongVideoPlayback
+        new EnumItemPickerControl<ESongVideoPlayback>(songVideoPlaybackPicker)
+        {
+            GetLabelTextFunction = item => item.ToDisplayString()
+        }.Bind(() => settings.SongVideoPlayback,
+                newValue => settings.SongVideoPlayback = newValue);
 
         // VLC
         new EnumItemPickerControl<EThirdPartyLibraryUsage>(useVlcToPlayMediaFilesPicker)
@@ -410,6 +432,42 @@ public class DevelopmentOptionsControl : AbstractOptionsSceneControl, INeedInjec
         FieldBindingUtils.Bind(vfxEnabledToggle,
             () => settings.EnableVfx,
             newValue => settings.EnableVfx = newValue);
+
+        // Online multiplayer
+        new EnumItemPickerControl<NetworkDelivery>(beatAnalyzedEventNetworkDeliveryPicker)
+            .Bind(() => settings.BeatAnalyzedEventNetworkDelivery,
+                newValue => settings.BeatAnalyzedEventNetworkDelivery = newValue);
+
+        // Mods
+        uploadWorkshopItemButton.RegisterCallbackButtonTriggered(evt => ShowUploadNewModDialog());
+    }
+
+    private void ShowUploadNewModDialog()
+    {
+        if (uploadWorkshopItemDialogControl != null)
+        {
+            return;
+        }
+
+        VisualElement visualElement = uploadWorkshopItemDialogUi.CloneTreeAndGetFirstChild();
+        UploadWorkshopItemUiControl uploadWorkshopItemUiControl = injector
+            .WithRootVisualElement(visualElement)
+            .CreateAndInject<UploadWorkshopItemUiControl>();
+
+        uploadWorkshopItemDialogControl = uiManager.CreateDialogControl("Upload New Steam Workshop Item");
+        uploadWorkshopItemDialogControl.AddVisualElement(visualElement);
+        uploadWorkshopItemDialogControl.DialogClosedEventStream
+            .Subscribe(evt =>
+            {
+                uploadWorkshopItemUiControl.Dispose();
+                uploadWorkshopItemDialogControl = null;
+            });
+        uploadWorkshopItemDialogControl.AddButton("Learn More",
+            _ => ApplicationUtils.OpenUrl(TranslationManager.GetTranslation(R.Messages.uri_howToSteamWorkshop)));
+        uploadWorkshopItemDialogControl.AddButton("Publish Workshop Item",
+            _ => uploadWorkshopItemUiControl.PublishWorkshopItem());
+        uploadWorkshopItemDialogControl.AddButton(TranslationManager.GetTranslation(R.Messages.cancel),
+            _ => uploadWorkshopItemDialogControl.CloseDialog());
     }
 
     private List<string> GetAvailablePortAudioOutputDeviceNames()

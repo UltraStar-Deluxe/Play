@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
@@ -38,6 +40,9 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
     [Inject]
     private SceneRecipeManager sceneRecipeManager;
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     public bool logSceneChangeDuration;
 
@@ -83,6 +88,14 @@ public class SceneNavigator : AbstractSingletonBehaviour, INeedInjection
 
     public void LoadScene(EScene scene, bool skipAnimation=false)
     {
+        if (onlineMultiplayerManager.IsOnlineGame
+            && (scene is EScene.PartyModeScene or EScene.SongEditorScene))
+        {
+            Debug.Log($"Cannot open {scene} when connected to online game");
+            UiManager.CreateNotification("Not (yet) available during online game");
+            return;
+        }
+
         EScene currentScene = sceneRecipeManager.GetCurrentScene();
 
         beforeSceneChangeEventStream.OnNext(new BeforeSceneChangeEvent(scene));

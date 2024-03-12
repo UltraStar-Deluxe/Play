@@ -14,7 +14,7 @@
             }
         ]
     },
-    
+
     /* UltraStar Play Contributors (searched via "git shortlog -ns") */
     {
         "Name": "UltraStar Play Contributors",
@@ -121,6 +121,10 @@
             {
                 "Name": "Pascal K.",
                 "Comment": "brand advice"
+            },
+            {
+                "Name": "Maximilian Groth",
+                "Comment": "Testing online multiplayer"
             },
             {
                 "Name": "ChillerTyp",

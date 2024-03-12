@@ -88,6 +88,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.helpButton)]
     private Button helpButton;
 
+    [Inject(UxmlName = R.UxmlNames.openSteamWorkshopButton)]
+    private Button openSteamWorkshopButton;
+
     [Inject(UxmlName = R.UxmlNames.issuesButton)]
     private Button issuesButton;
 
@@ -111,6 +114,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
 
     [Inject]
     private OptionsSceneData sceneData;
+
+    [Inject]
+    private SteamWorkshopManager steamWorkshopManager;
 
     private SceneRecipe loadedSceneRecipe;
     private readonly List<GameObject> loadedGameObjects = new();
@@ -149,12 +155,23 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             }
         });
 
+        openSteamWorkshopButton.RegisterCallbackButtonTriggered(_ => OpenSteamWorkshop());
         helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
         issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
 
         backButton.RegisterCallbackButtonTriggered(_ => OnBack());
         InputManager.GetInputAction(R.InputActions.usplay_back).PerformedAsObservable()
             .Subscribe(_ => OnBack());
+    }
+
+    private void OpenSteamWorkshop()
+    {
+        if (LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        steamWorkshopManager.OpenSteamWorkshopOverlay(LoadedOptionsSceneControl.SteamWorkshopUri);
     }
 
     private void OnBack()
@@ -223,6 +240,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         // Hide buttons in top row
         helpButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasHelpDialog);
         issuesButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasIssuesDialog);
+        openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
 
         // Apply theme to loaded UI
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);

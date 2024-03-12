@@ -10,13 +10,13 @@ using UnityEngine;
 public class SongQueueRestControl : AbstractRestControl, INeedInjection
 {
     public static SongQueueRestControl Instance => DontDestroyOnLoadManager.Instance.FindComponentOrThrow<SongQueueRestControl>();
-    
+
     [Inject]
     private ServerSideConnectRequestManager serverSideConnectRequestManager;
-    
+
     [Inject]
     private SongQueueManager songQueueManager;
-    
+
     [Inject]
     private SongMetaManager songMetaManager;
 
@@ -32,7 +32,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
             .SetRemoveOnDestroy(gameObject)
             .SetCallbackAndAdd(requestData =>
             {
-                List<string> playerProfileNames = settings.PlayerProfiles
+                List<string> playerProfileNames = SettingsUtils.GetPlayerProfiles(settings, nonPersistentSettings)
                     .Where(playerProfile => playerProfile.IsEnabled)
                     .Select(playerProfile => playerProfile.Name)
                     .ToList();
@@ -70,7 +70,7 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                 };
                 requestData.Context.Response.WriteJson(dto);
             });
-        
+
         httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.SongQueueEntry)
             .SetDescription($"Add entry song queue to the song queue.")
             .SetRemoveOnDestroy(gameObject)
@@ -86,10 +86,10 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                     Debug.LogError($"Invalid song queue entry: {errorMessage}");
                     return;
                 }
-                
+
                 songQueueManager.AddSongQueueEntry(songQueueEntryDto);
             });
-        
+
         httpServer.CreateEndpoint(HttpMethod.Delete, HttpApiEndpointPaths.SongQueueEntryIndex)
             .SetDescription($"Remove song queue entry at given index.")
             .SetRemoveOnDestroy(gameObject)
@@ -102,11 +102,11 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                     Debug.LogError("Cannot delete song queue entry. Invalid index");
                     return;
                 }
-                
+
                 SongQueueEntryDto songQueueEntryDto = songQueueManager.GetSongQueueEntries()[index];
                 songQueueManager.RemoveSongQueueEntry(songQueueEntryDto);
             });
-        
+
         httpServer.CreateEndpoint(HttpMethod.Post, HttpApiEndpointPaths.SongQueueEntryIndex)
             .SetDescription($"Update song queue entry at given index.")
             .SetRemoveOnDestroy(gameObject)
@@ -119,10 +119,10 @@ public class SongQueueRestControl : AbstractRestControl, INeedInjection
                     Debug.LogError("Cannot update song queue entry. Invalid index");
                     return;
                 }
-                
+
                 string json = requestData.Context.Request.GetBodyAsString();
                 SongQueueEntryDto newSongQueueEntryDto = JsonConverter.FromJson<SongQueueEntryDto>(json, false);
-                
+
                 SongQueueEntryDto oldSongQueueEntryDto = songQueueManager.GetSongQueueEntries()[index];
                 songQueueManager.UpdateSongQueueEntry(oldSongQueueEntryDto, newSongQueueEntryDto);
             });

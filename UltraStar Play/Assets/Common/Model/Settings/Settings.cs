@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using Serilog.Events;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public class Settings : ISettings
@@ -149,6 +151,9 @@ public class Settings : ISettings
      public PortAudioHostApi PortAudioHostApi { get; set; } = PortAudioHostApi.Default;
      public string PortAudioOutputDeviceName { get; set; } = "";
 
+    // Media format support settings
+    public ESongVideoPlayback SongVideoPlayback { get; set; } = ESongVideoPlayback.AlwaysEnabled;
+
     // Vlc settings
     public bool LogVlcOutput { get; set; }
     public EThirdPartyLibraryUsage VlcToPlayMediaFilesUsage { get; set; } = EThirdPartyLibraryUsage.WhenUnsupportedByUnity;
@@ -177,4 +182,10 @@ public class Settings : ISettings
     // Mods
     public List<string> EnabledMods { get; private set; } = new();
     public bool ReloadModsOnFileChange { get; set; }
+
+    // Online multiplayer
+    public EOnlineMultiplayerBackend EOnlineMultiplayerBackend { get; set; } = EOnlineMultiplayerBackend.Steam;
+    public string UnityTransportIpAddress { get; set; } = "127.0.0.1";
+    public ushort UnityTransportPort { get; set; } = 7777;
+    public NetworkDelivery BeatAnalyzedEventNetworkDelivery { get; set; } = NetworkDelivery.ReliableSequenced;
 }

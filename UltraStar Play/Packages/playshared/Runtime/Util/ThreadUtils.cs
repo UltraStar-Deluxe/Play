@@ -11,7 +11,14 @@ public static class ThreadUtils
 
     public static void RunOnMainThread(Action action)
     {
-        MainThreadDispatcher.Send(_ => action(), null);
+        if (IsMainThread())
+        {
+            action();
+        }
+        else
+        {
+            MainThreadDispatcher.Send(_ => action(), null);
+        }
     }
 
     public static void Sleep(int millis)

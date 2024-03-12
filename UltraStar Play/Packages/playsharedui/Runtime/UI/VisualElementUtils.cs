@@ -93,7 +93,7 @@ public static class VisualElementUtils
     {
         VisualElement focusedVisualElement = GetFocusedVisualElement(focusController);
         if (focusedVisualElement == null
-            || focusedVisualElement.name !="unity-content-container")
+            || !focusedVisualElement.ClassListContains("unity-base-dropdown__container-inner"))
         {
             unityBaseDropdown = null;
             return false;

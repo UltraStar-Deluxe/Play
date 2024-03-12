@@ -10,6 +10,7 @@ public static partial class R_PlayShared
         public const string asset = "asset";
         public const string backgroundTransition = "backgroundTransition";
         public const string bootstrapIcon = "bootstrapIcon";
+        public const string borderBottom = "borderBottom";
         public const string bottomLineSeparator = "bottomLineSeparator";
         public const string centerVerticalByMargin = "centerVerticalByMargin";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
@@ -106,6 +107,7 @@ public static partial class R_PlayShared
         public const string noBackgroundInHierarchy = "noBackgroundInHierarchy";
         public const string noSearchResults = "noSearchResults";
         public const string noTextShadow = "noTextShadow";
+        public const string onlineMultiplayerHost = "onlineMultiplayerHost";
         public const string optionsLabelAndItemPicker = "optionsLabelAndItemPicker";
         public const string optionsOverviewButton = "optionsOverviewButton";
         public const string optionsOverviewButtonRow = "optionsOverviewButtonRow";
@@ -189,6 +191,7 @@ public static partial class R_PlayShared
         public const string unity_base_slider__vertical = "unity-base-slider--vertical";
         public const string unity_base_text_field = "unity-base-text-field";
         public const string unity_base_text_field__input = "unity-base-text-field__input";
+        public const string unity_base_text_field__input__placeholder = "unity-base-text-field__input--placeholder";
         public const string unity_button = "unity-button";
         public const string unity_collection_view = "unity-collection-view";
         public const string unity_collection_view__item = "unity-collection-view__item";

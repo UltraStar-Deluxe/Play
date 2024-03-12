@@ -24,8 +24,8 @@ public static class GradientManager
             return texture;
         }
 
-        Texture2D texture2D = TextureUtils.CreateGradientTexture(16, 16);
-        TextureUtils.FillTextureWithGradient(texture2D, gradientConfig.startColor, gradientConfig.endColor, gradientConfig.angleDegrees);
+        Texture2D texture2D = GradientUtils.CreateGradientTexture(16, 16);
+        GradientUtils.FillTextureWithGradient(texture2D, gradientConfig.startColor, gradientConfig.endColor, gradientConfig.angleDegrees);
         gradientConfigToTexture[gradientConfig] = texture2D;
         return texture2D;
     }

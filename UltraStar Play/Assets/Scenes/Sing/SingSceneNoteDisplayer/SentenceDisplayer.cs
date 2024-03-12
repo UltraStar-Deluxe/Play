@@ -167,7 +167,8 @@ public class SentenceDisplayer : AbstractSingSceneNoteDisplayer
         int sentenceLengthInBeat = currentSentence.LengthInBeats;
         double sentenceStartInMillis = SongMetaBpmUtils.BeatsToMillis(songMeta, sentenceStartBeat);
         double sentenceLengthInMillis = SongMetaBpmUtils.MillisPerBeat(songMeta) * sentenceLengthInBeat;
-        double xPercent = (float)(positionInSongInMillis - sentenceStartInMillis - micProfile.DelayInMillis) / sentenceLengthInMillis;
+        double delayInMillis = micProfile?.DelayInMillis ?? 0;
+        double xPercent = (float)(positionInSongInMillis - sentenceStartInMillis - delayInMillis) / sentenceLengthInMillis;
         return (float)xPercent;
     }
 

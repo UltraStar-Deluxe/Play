@@ -243,6 +243,16 @@ public static class BuildUtils
         string steamPassword = GetEnvironmentVariableOrThrow(SteamPasswordEnvironmentVariable);
         string steamContentFolder = GetEnvironmentVariableOrThrow(SteamContentFolderEnvironmentVariable);
 
+        string steamGuardCode = EditorInputDialog.Show(
+        "Steam Guard",
+        "Enter Steam Guard Code",
+        "");
+        if (steamGuardCode.IsNullOrEmpty())
+        {
+            Debug.Log("No Steam Guard Code provided. Cannot login to Steam.");
+            return;
+        }
+
         // Update Steam VDF file
         string vdfFileContent = File.ReadAllText(vdfFilePath);
         // Update desc filed
@@ -270,7 +280,7 @@ public static class BuildUtils
 
         // Run Steam upload tool
         if (!ProcessUtils.RunProcess($"steamcmd.exe",
-                $"+login {steamUsername} {steamPassword} +run_app_build \"{vdfFilePath}\" +quit",
+                $"+login {steamUsername} {steamPassword} {steamGuardCode} +run_app_build \"{vdfFilePath}\" +quit",
                 out string steamcmdOutput,
                 out string steamcmdErrorOutput,
                 LogEventLevel.Information,

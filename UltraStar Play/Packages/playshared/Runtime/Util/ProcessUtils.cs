@@ -13,7 +13,7 @@ public static class ProcessUtils
         LogEventLevel errorOutputLogLevel = LogEventLevel.Debug)
     {
         Log.WithLevel(outputLogLevel, () => $"Executing process '{executable} {arguments}'");
-        
+
         // Set up our processInfo to run the git command and log to output and errorOutput.
         ProcessStartInfo processInfo = new(executable, arguments)
         {
@@ -35,14 +35,14 @@ public static class ProcessUtils
         {
             // For now just assume its failed cause it can't find git.
             UnityEngine.Debug.LogException(e);
-            UnityEngine.Debug.LogError("Git is not set-up correctly, required to be on PATH, and to be a git project.");
+            UnityEngine.Debug.LogError($"Failed to execute process '{executable} {arguments}': {e.Message}");
             output = "";
             errorOutput = "";
             return false;
         }
 
         process.WaitForExit(); // Make sure we wait till the process has fully finished.
-        
+
         // Read the results back from the process so we can get the output and check for errors
         string processOutput = process.StandardOutput.ReadToEnd();
         string processErrorOutput = process.StandardError.ReadToEnd();
@@ -53,7 +53,7 @@ public static class ProcessUtils
         {
             Log.WithLevel(outputLogLevel, () => $"Output of '{executable} {arguments}':\n{processOutput}");
         }
-        
+
         if (!processErrorOutput.IsNullOrEmpty())
         {
             Log.WithLevel(errorOutputLogLevel, () => $"Error output of '{executable} {arguments}':\n{processErrorOutput}");
@@ -63,7 +63,7 @@ public static class ProcessUtils
         {
             return false;
         }
-        
+
         return true;
     }
 }

@@ -339,6 +339,7 @@ public static partial class R
         public static readonly string uri_howToConfigureMicsAndSpeaker = "uri_howToConfigureMicsAndSpeaker";
         public static readonly string uri_howToMods = "uri_howToMods";
         public static readonly string uri_howToSongEditor = "uri_howToSongEditor";
+        public static readonly string uri_howToSteamWorkshop = "uri_howToSteamWorkshop";
         public static readonly string uri_logFiles = "uri_logFiles";
         public static readonly string uri_songEditorVideoTutorials = "uri_songEditorVideoTutorials";
         public static readonly string version = "version";

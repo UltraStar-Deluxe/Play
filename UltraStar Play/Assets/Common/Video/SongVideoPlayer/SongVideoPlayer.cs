@@ -821,6 +821,13 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
     public void LoadAndPlaySongVideoOrShowBackgroundImage(SongMeta songMeta)
     {
+        if (!HasVideoUri(songMeta)
+            || IsSongVideoPlaybackDisabled())
+        {
+            ShowBackgroundImage(songMeta);
+            return;
+        }
+
         LoadAndPlaySongVideoAsObservable(songMeta)
             .CatchIgnore((Exception ex) =>
             {
@@ -841,6 +848,21 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
 
                 ShowVideoImageVisualElement();
             });
+    }
+
+    private bool IsSongVideoPlaybackDisabled()
+    {
+        switch (settings.SongVideoPlayback)
+        {
+            case ESongVideoPlayback.DisabledInSongSelect:
+                return sceneNavigator.CurrentScene is EScene.SongSelectScene;
+            case ESongVideoPlayback.DisabledInSongSelectAndSing:
+                return sceneNavigator.CurrentScene
+                    is EScene.SongSelectScene
+                    or EScene.SingScene;
+            default:
+                return false;
+        }
     }
 
     public IObservable<SongVideoLoadedEvent> LoadAndPlaySongVideoAsObservable(SongMeta songMeta)
@@ -1065,5 +1087,11 @@ public class SongVideoPlayer : MonoBehaviour, INeedInjection, IInjectionFinished
     public static void AddIgnoredVideoFile(string uri)
     {
         ignoredVideoFiles.Add(uri);
+    }
+
+    private static bool HasVideoUri(SongMeta songMeta)
+    {
+        string videoUri = SongMetaUtils.GetVideoUriPreferAudioUriIfWebView(songMeta, WebViewUtils.CanHandleWebViewUrl);
+        return !videoUri.IsNullOrEmpty();
     }
 }

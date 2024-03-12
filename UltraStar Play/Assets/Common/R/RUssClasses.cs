@@ -4122,6 +4122,7 @@ public static partial class R
         public const string border_b_orange_700 = "border-b-orange-700";
         public const string border_b_orange_800 = "border-b-orange-800";
         public const string border_b_orange_900 = "border-b-orange-900";
+        public const string borderBottom = "borderBottom";
         public const string border_b_pink_100 = "border-b-pink-100";
         public const string border_b_pink_200 = "border-b-pink-200";
         public const string border_b_pink_300 = "border-b-pink-300";
@@ -5663,13 +5664,16 @@ public static partial class R
         public const string bottom_px = "bottom-px";
         public const string _bottom_px = "-bottom-px";
         public const string characterQuickJumpCharacter = "characterQuickJumpCharacter";
+        public const string child_mb_1 = "child-mb-1";
         public const string child_mb_2 = "child-mb-2";
         public const string child_mb_3 = "child-mb-3";
         public const string child_ml_2 = "child-ml-2";
+        public const string child_mr_1 = "child-mr-1";
         public const string child_mr_2 = "child-mr-2";
         public const string circle = "circle";
         public const string circleButton = "circleButton";
         public const string comboBoxButton = "comboBoxButton";
+        public const string comboButton = "comboButton";
         public const string container = "container";
         public const string content_auto = "content-auto";
         public const string content_center = "content-center";
@@ -13923,6 +13927,7 @@ public static partial class R
         public const string noteAreaGridLabel = "noteAreaGridLabel";
         public const string noTextShadow = "noTextShadow";
         public const string not_italic = "not-italic";
+        public const string onlineMultiplayerHost = "onlineMultiplayerHost";
         public const string opacity_0 = "opacity-0";
         public const string opacity_10 = "opacity-10";
         public const string opacity_100 = "opacity-100";

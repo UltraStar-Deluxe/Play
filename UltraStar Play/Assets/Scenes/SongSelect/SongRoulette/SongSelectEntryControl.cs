@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using ProTrans;
+using CommonOnlineMultiplayer;
 using UniInject;
 using UniRx;
 using UnityEngine;
@@ -11,6 +12,8 @@ using UnityEngine.UIElements;
 
 public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener, IDisposable
 {
+    public const float MaxClickDistanceThresholdInPx = 5f;
+
     [Inject]
     private SongRouletteControl songRouletteControl;
 
@@ -49,6 +52,12 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     [Inject(UxmlName = R.UxmlNames.openSongMenuButton)]
     private Button openSongMenuButton;
+
+    [Inject(UxmlName = R.UxmlNames.notAvailableInOnlineGameIcon)]
+    private VisualElement notAvailableInOnlineGameIcon;
+
+    [Inject]
+    private OnlineMultiplayerManager onlineMultiplayerManager;
 
     [Inject]
     private CreateSingAlongSongControl createSingAlongSongControl;
@@ -107,10 +116,11 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private readonly SongSelectSongRatingIconControl songRatingIconControl = new();
 
     private Vector2 pointerDownMousePosition;
-    private bool wasSelectedOnPointerDown;
 
     private string lastSongMetaCover;
     private string lastSongMetaBackground;
+
+    private readonly List<IDisposable> disposables = new();
 
     public void OnInjectionFinished()
     {
@@ -168,14 +178,12 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     private void OnPointerDownOnSongImage(PointerDownEvent evt)
     {
         pointerDownMousePosition = evt.position;
-        wasSelectedOnPointerDown = songRouletteControl.SelectedEntryControl == this;
     }
 
     private void OnPointerUpOnSongImage(PointerUpEvent evt)
     {
         if (evt.button == 0
-            && Vector2.Distance(pointerDownMousePosition ,evt.position) < 5f
-            && wasSelectedOnPointerDown)
+            && Vector2.Distance(pointerDownMousePosition ,evt.position) < MaxClickDistanceThresholdInPx)
         {
             clickOnSongImageEventStream.OnNext(true);
         }
@@ -325,6 +333,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
     private void UpdateCover()
     {
+        notAvailableInOnlineGameIcon.HideByDisplay();
+
         if (SongSelectEntry is SongSelectSongEntry songEntry)
         {
             UpdateSongCover(songEntry);
@@ -348,8 +358,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
         SongMetaImageUtils.GetCoverOrBackgroundImageUri(songMeta)
             .SelectMany(uri =>
             {
-                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
-                    || songSelectSongEntry.SongMeta != songMeta)
+                if (SongEntryChanged(songMeta))
                 {
                     // The entry changed in the meantime
                     return Observable.Return<Sprite>(null);
@@ -366,8 +375,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             {
                 Debug.LogException(ex);
 
-                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
-                    || songSelectSongEntry.SongMeta != songMeta)
+                if (SongEntryChanged(songMeta))
                 {
                     // The entry changed in the meantime
                     return;
@@ -376,8 +384,7 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
             })
             .Subscribe(sprite =>
             {
-                if (SongSelectEntry is not SongSelectSongEntry songSelectSongEntry
-                    || songSelectSongEntry.SongMeta != songMeta)
+                if (SongEntryChanged(songMeta))
                 {
                     // The entry changed in the meantime
                     return;
@@ -391,6 +398,55 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
 
                 SongMetaImageUtils.SetCoverOrBackgroundImage(sprite, songImageOuter, songImageInner);
             });
+
+        notAvailableInOnlineGameIcon.HideByDisplay();
+        if (onlineMultiplayerManager.IsOnlineGame)
+        {
+            CheckOtherPlayersHaveSongLocally(songMeta);
+        }
+    }
+
+    private void CheckOtherPlayersHaveSongLocally(SongMeta songMeta)
+    {
+        if (onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        disposables.Add(onlineMultiplayerManager.ObservableMessagingControl.SendNamedMessageToClientsAsObservable(
+            nameof(HasSongRequestDto),
+            FastBufferWriterUtils.WriteJsonValuePacked(new HasSongRequestDto(SongIdManager.GetAndCacheGloballyUniqueId(songMeta))),
+            onlineMultiplayerManager.OtherLobbyMembersUnityNetcodeClientIds)
+            .CatchIgnore((Exception ex) =>
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to check whether other lobby members have song locally: song: '{SongMetaUtils.GetArtistDashTitle(songMeta)}', error: {ex.Message}");
+            })
+            .Subscribe(response =>
+            {
+                if (SongEntryChanged(songMeta))
+                {
+                    return;
+                }
+
+                HasSongResponseDto responseDto = FastBufferReaderUtils.ReadJsonValuePacked<HasSongResponseDto>(response.MessagePayload);
+                if (!responseDto.HasSong)
+                {
+                    Debug.Log($"Netcode client {response.SenderNetcodeClientId} does not have the song '{SongMetaUtils.GetArtistDashTitle(songMeta)}', showing corresponding icon.");
+                    notAvailableInOnlineGameIcon.ShowByDisplay();
+                }
+            }));
+    }
+
+    private bool SongEntryChanged(SongMeta songMeta)
+    {
+        return !IsSongEntry(songMeta);
+    }
+
+    private bool IsSongEntry(SongMeta songMeta)
+    {
+        return SongSelectEntry is SongSelectSongEntry songSelectSongEntry
+               && songSelectSongEntry.SongMeta == songMeta;
     }
 
     private void SetDefaultFolderImage()
@@ -466,6 +522,8 @@ public class SongSelectEntryControl : INeedInjection, IInjectionFinishedListener
     {
         SongSelectEntry = null;
         UnregisterCallbacks();
+        disposables.ForEach(it => it.Dispose());
+        disposables.Clear();
     }
 
     public void OpenContextMenu()
