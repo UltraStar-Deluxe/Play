@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
+public class EditPlaylistControl : MonoBehaviour, INeedInjection
 {
     [Inject(UxmlName = R.UxmlNames.editPlaylistButton)]
     private Button editPlaylistButton;
@@ -17,7 +17,7 @@ public class EditPlaylistControl : MonoBehaviour, INeedInjection, ITranslator
 
     [Inject(UxmlName = R.UxmlNames.editPlaylistOverlay)]
     private VisualElement editPlaylistOverlay;
-    
+
     [Inject(UxmlName = R.UxmlNames.searchPropertyDropdownOverlay)]
     private VisualElement searchPropertyDropdownOverlay;
 

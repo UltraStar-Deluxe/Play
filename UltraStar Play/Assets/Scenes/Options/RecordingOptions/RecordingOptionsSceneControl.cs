@@ -12,7 +12,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, ITranslator, IBinder
+public class RecordingOptionsSceneControl : AbstractOptionsSceneControl, IBinder
 {
     private static readonly List<int> amplificationItems = new() { 0, 3, 6, 9, 12, 15, 18 };
     private static readonly List<int> noiseSuppressionItems= new() { 0, 1, 3, 5, 10, 15, 20, 25, 30 };

@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection, ITranslator
+public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection
 {
     [Inject(UxmlName = R.UxmlNames.devicePicker)]
     private ItemPicker devicePicker;
@@ -27,7 +27,7 @@ public class WebcamOptionsControl : AbstractOptionsSceneControl, INeedInjection,
     protected override void Start()
     {
         base.Start();
-        
+
         InitWebcamPicker();
     }
 

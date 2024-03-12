@@ -97,13 +97,6 @@ public class SceneRecipeManager : AbstractSingletonBehaviour, INeedInjection
         }
         UltraStarPlaySceneInjectionManager.FireSceneInjectionFinishedEvent(new SceneInjectionFinishedEvent(loadedSceneInjector));
 
-        // Update translations
-        foreach (GameObject loadedGameObject in loadedGameObjects)
-        {
-            loadedGameObject.GetComponentsInChildren<ITranslator>()
-                .ForEach(it => it.UpdateTranslation());
-        }
-
         // Apply theme to loaded UI
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
     }

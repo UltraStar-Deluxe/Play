@@ -13,7 +13,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, ITranslator, IBinder
+public class MainSceneControl : MonoBehaviour, INeedInjection, IInjectionFinishedListener, IBinder
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void StaticInit()

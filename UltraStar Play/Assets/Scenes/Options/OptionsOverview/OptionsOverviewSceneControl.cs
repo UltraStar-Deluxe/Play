@@ -13,7 +13,7 @@ using IBinding = UniInject.IBinding;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITranslator, IBinder
+public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, IBinder
 {
     private const EScene DefaultOptionsScene = EScene.OptionsGameScene;
 
@@ -228,10 +228,6 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
             loadedSceneInjector
                 .WithRootVisualElement(loadedSceneVisualElement)
                 .InjectAllComponentsInChildren(loadedGameObject, true);
-
-            // Update translations
-            loadedGameObject.GetComponentsInChildren<ITranslator>()
-                .ForEach(it => it.UpdateTranslation());
         }
 
         // Set loaded scene title

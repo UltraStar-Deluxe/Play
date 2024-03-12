@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 // Disable warning about fields that are never assigned, their values are injected.
 #pragma warning disable CS0649
 
-public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInjectionFinishedListener, ITranslator
+public class NewVersionAvailableDialogControl : AbstractModalDialogControl, IInjectionFinishedListener
 {
     [Inject(UxmlName = R.UxmlNames.dialogTitle)]
     private Label dialogTitle;
