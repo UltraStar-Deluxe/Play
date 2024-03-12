@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public static class SongMetaImageUtils
 {
-    private static YouTubeOembedCoverImageProvider youTubeOembedCoverImageProvider = new();
+    private static YouTubeCoverImageProvider youTubeCoverImageProvider = new();
 
     public static IObservable<string> GetBackgroundOrCoverImageUri(SongMeta songMeta)
     {
@@ -55,7 +55,7 @@ public static class SongMetaImageUtils
 
         // Try to find an image via mods
         List<ISongCoverImageProvider> songCoverImageProviders = ModManager.GetModObjects<ISongCoverImageProvider>()
-            .Union(new List<ISongCoverImageProvider>() { youTubeOembedCoverImageProvider })
+            .Union(new List<ISongCoverImageProvider>() { youTubeCoverImageProvider })
             .ToList();
         if (songCoverImageProviders.IsNullOrEmpty())
         {
