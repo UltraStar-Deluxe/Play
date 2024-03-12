@@ -275,11 +275,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
             .ObserveOnMainThread()
             .Subscribe(evt =>
             {
-                InitSongMetas();
-                UpdateFilteredSongs();
-                UpdateSongScanLabels(SongMetaManager.IsSongScanFinished || evt != null);
+                UpdateAvailableSongsAndUi(SongMetaManager.IsSongScanFinished || evt != null);
             })
             .AddTo(gameObject);
+        songMetaManager.AddedSongMetaEventStream
+            .Throttle(new TimeSpan(0, 0, 0, 0, 1000))
+            .ObserveOnMainThread()
+            .Subscribe(_ => UpdateAvailableSongsAndUi(SongMetaManager.IsSongScanFinished));
         UpdateSongScanLabels(SongMetaManager.IsSongScanFinished);
 
         InitSongMetas();
@@ -371,6 +373,13 @@ public class SongSelectSceneControl : MonoBehaviour, INeedInjection, IBinder, IT
         InitHideSlideInControlsViaClick();
 
         InitOnlineMultiplayer();
+    }
+
+    private void UpdateAvailableSongsAndUi(bool isSongScanFinished)
+    {
+        InitSongMetas();
+        UpdateFilteredSongs();
+        UpdateSongScanLabels(isSongScanFinished);
     }
 
     private void OnDestroy()
