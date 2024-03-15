@@ -91,6 +91,9 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
     [Inject(UxmlName = R.UxmlNames.openSteamWorkshopButton)]
     private Button openSteamWorkshopButton;
 
+    [Inject(UxmlName = R.UxmlNames.updateSteamWorkshopItemsButton)]
+    private Button updateSteamWorkshopItemsButton;
+
     [Inject(UxmlName = R.UxmlNames.issuesButton)]
     private Button issuesButton;
 
@@ -156,6 +159,10 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         });
 
         openSteamWorkshopButton.RegisterCallbackButtonTriggered(_ => OpenSteamWorkshop());
+
+        updateSteamWorkshopItemsButton.RegisterCallbackButtonTriggered(_ => UpdateSteamWorkshopItems());
+        new TooltipControl(updateSteamWorkshopItemsButton, "Update Steam Workshop items.");
+
         helpButton.RegisterCallbackButtonTriggered(_ => ShowHelp());
         issuesButton.RegisterCallbackButtonTriggered(_ => ShowIssuesDialog());
 
@@ -172,6 +179,26 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         }
 
         steamWorkshopManager.OpenSteamWorkshopOverlay(LoadedOptionsSceneControl.SteamWorkshopUri);
+    }
+
+    private void UpdateSteamWorkshopItems()
+    {
+        steamWorkshopManager.DownloadWorkshopItemsAsObservable()
+            .Subscribe(_ =>
+            {
+                if (GameObjectUtils.IsDestroyed(this))
+                {
+                    return;
+                }
+
+                Debug.Log("Reloading current options scene because Steam Workshop items update finished");
+                ReloadCurrentOptionsScene();
+            });
+    }
+
+    private void ReloadCurrentOptionsScene()
+    {
+        sceneNavigator.LoadScene(EScene.OptionsScene, new OptionsSceneData(loadedSceneRecipe.scene));
     }
 
     private void OnBack()
@@ -241,6 +268,7 @@ public class OptionsOverviewSceneControl : MonoBehaviour, INeedInjection, ITrans
         helpButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasHelpDialog);
         issuesButton.SetVisibleByDisplay(LoadedOptionsSceneControl.HasIssuesDialog);
         openSteamWorkshopButton.SetVisibleByDisplay(!LoadedOptionsSceneControl.SteamWorkshopUri.IsNullOrEmpty());
+        updateSteamWorkshopItemsButton.SetVisibleByDisplay(openSteamWorkshopButton.IsVisibleByDisplay());
 
         // Apply theme to loaded UI
         ThemeManager.ApplyThemeSpecificStylesToVisualElements(loadedSceneVisualElement);
