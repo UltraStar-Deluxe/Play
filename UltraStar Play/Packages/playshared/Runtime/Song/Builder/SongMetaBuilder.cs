@@ -155,49 +155,50 @@ public static class SongMetaBuilder
             );
             foreach (var item in otherFields)
             {
+                string trimmedValue = item.Value.Trim();
                 switch (item.Key)
                 {
                     case "background":
-                        songMeta.Background = item.Value;
+                        songMeta.Background = trimmedValue;
                         break;
                     case "cover":
-                        songMeta.Cover = item.Value;
+                        songMeta.Cover = trimmedValue;
                         break;
                     case "edition":
-                        songMeta.Edition = item.Value;
+                        songMeta.Edition = trimmedValue;
                         break;
                     case "end":
-                        songMeta.End = ConvertToFloat(item.Value);
+                        songMeta.End = ConvertToFloat(trimmedValue);
                         break;
                     case "gap":
-                        songMeta.Gap = ConvertToFloat(item.Value);
+                        songMeta.Gap = ConvertToFloat(trimmedValue);
                         break;
                     case "genre":
-                        songMeta.Genre = item.Value;
+                        songMeta.Genre = trimmedValue;
                         break;
                     case "language":
-                        songMeta.Language = item.Value;
+                        songMeta.Language = trimmedValue;
                         break;
                     case "previewstart":
-                        songMeta.PreviewStart = ConvertToFloat(item.Value);
+                        songMeta.PreviewStart = ConvertToFloat(trimmedValue);
                         break;
                     case "previewend":
-                        songMeta.PreviewEnd = ConvertToFloat(item.Value);
+                        songMeta.PreviewEnd = ConvertToFloat(trimmedValue);
                         break;
                     case "start":
-                        songMeta.Start = ConvertToFloat(item.Value);
+                        songMeta.Start = ConvertToFloat(trimmedValue);
                         break;
                     case "video":
-                        songMeta.Video = item.Value;
+                        songMeta.Video = trimmedValue;
                         break;
                     case "videogap":
-                        songMeta.VideoGap = ConvertToFloat(item.Value);
+                        songMeta.VideoGap = ConvertToFloat(trimmedValue);
                         break;
                     case "year":
-                        songMeta.Year = ConvertToUInt32(item.Value);
+                        songMeta.Year = ConvertToUInt32(trimmedValue);
                         break;
                     default:
-                        songMeta.SetUnknownHeaderEntry(item.Key, item.Value);
+                        songMeta.SetUnknownHeaderEntry(item.Key, trimmedValue);
                         break;
                 }
             }
