@@ -136,18 +136,13 @@ public static class SongMetaUtils
         return WebRequestUtils.AbsoluteFilePathToUri(absoluteFilePath);
     }
 
-    public static string GetAbsoluteFilePath(SongMeta songMeta, string path)
+    public static string GetAbsoluteFilePath(SongMeta songMeta, string pathOrUri)
     {
-        if (PathUtils.IsAbsolutePath(path))
-        {
-            return path;
-        }
-
         if (songMeta == null)
         {
             return "";
         }
-        return $"{GetDirectoryPath(songMeta)}/{path}";
+        return PathUtils.GetAbsoluteFilePath(GetDirectoryPath(songMeta), pathOrUri);
     }
 
     public static bool IsGeneratedAndSaved(SongMeta songMeta, string generatedSongFolderAbsolutePath)

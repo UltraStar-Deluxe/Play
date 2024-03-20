@@ -738,6 +738,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
             }
         });
 
+        ResolveThemeMetaUtils.ResolveThemes(themeMetas);
+
         string themeNamesCsv = themeMetas.Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
         Debug.Log($"Found {themeMetas.Count} themes: {themeNamesCsv}");
 
