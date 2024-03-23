@@ -1,4 +1,4 @@
-﻿#TITLE:SomeTitle
+#TITLE:SomeTitle
 #ARTIST:SomeArtist
 #MP3:ogg-TestAudio.ogg
 #INSTRUMENTALAUDIO:SomeInstrumentalAudio.ogg
@@ -6,10 +6,10 @@
 #BPM:200
 #GAP:1500
 #GENRE:SomeGenre
-#BACKGROUND:SomeBackground
-#VIDEO:SomeVideo
+#BACKGROUND:SomeBackground.jpg
+#VIDEO:SomeVideo.mp4
 #VIDEOGAP:0.5
-#COVER:SomeCover
+#COVER:SomeCover.jpg
 #WEBSITE:https://SomeWebsite.com
 #EDITION:SomeEdition
 #LANGUAGE:English
