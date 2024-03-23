@@ -6,9 +6,9 @@ using UnityEngine;
 
 public static class ObservableUtils
 {
-    public static IObservable<T> LogErrorThenThrow<T>(Exception exception)
+    public static IObservable<T> LogExceptionThenThrow<T>(Exception exception)
     {
-        Debug.LogError(exception.Message);
+        Debug.LogException(exception);
         return Observable.Throw<T>(exception);
     }
 

@@ -455,7 +455,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         string audioUri = SongMetaUtils.GetAudioUri(songMeta);
         if (!SongMetaUtils.AudioResourceExists(songMeta))
         {
-            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Audio resource does not exist: {audioUri}"));
         }
 
@@ -516,7 +516,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         }
         else
         {
-            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Unsupported audio resource '{audioUri}'."));
         }
     }
@@ -545,7 +545,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         if (audioClip == null)
         {
             audioSource.Stop();
-            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Failed to load audio clip from MIDI file {audioUri}"));
         }
 
@@ -607,7 +607,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         if (videoPlayer.url.IsNullOrEmpty())
         {
             videoPlayer.Stop();
-            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Failed to load video from {audioUri}"));
         }
 
@@ -705,7 +705,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
             Debug.LogException(e);
             Debug.LogError($"Failed to load '{audioUri}' using ffmpeg");
-            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Failed to load '{audioUri}'"));
         }
 
@@ -780,7 +780,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
 
             Debug.LogException(e);
             Debug.LogError($"Failed to load '{audioUri}' using vlc");
-            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Failed to load '{audioUri}'"));
         }
 
@@ -851,7 +851,7 @@ public class SongAudioPlayer : MonoBehaviour, INeedInjection
         bool success = webViewManager.LoadUrl(audioUri);
         if (!success)
         {
-            return ObservableUtils.LogErrorThenThrow<SongAudioLoadedEvent>(
+            return ObservableUtils.LogExceptionThenThrow<SongAudioLoadedEvent>(
                 new SongAudioPlayerException($"Failed to load audio via WebView with URL {audioUri}"));
         }
 
