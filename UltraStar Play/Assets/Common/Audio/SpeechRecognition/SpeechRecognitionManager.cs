@@ -14,7 +14,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
 
     [InjectedInInspector]
     public WhisperManager whisperManagerPrefab;
-    
+
     [Inject]
     private Settings settings;
 
@@ -37,7 +37,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             errorMessage = "Speech recognition is not yet supported on this hardware.\nPlease wait for a future release.";
             return false;
         }
-    
+
         if (parametersToSpeechRecognizer.TryGetValue(parameters, out SpeechRecognizer speechRecognizer))
         {
             if (!speechRecognizer.IsLoaded)
@@ -59,7 +59,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
         {
             return true;
         }
-        
+
         // Run the avx-check.exe to check if the hardware supports AVX instructions.
         // This is necessary because the Whisper library uses AVX instructions.
         try
@@ -106,9 +106,9 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             errorMessage = "Speech recognition model path is not a valid file path.";
             return false;
         }
-        
+
         speechRecognizer = CreateSpeechRecognizer(parameters);
-        
+
         errorMessage = "";
         return true;
     }
@@ -155,7 +155,7 @@ public class SpeechRecognitionManager : MonoBehaviour, INeedInjection
             Thread.Sleep(500);
         }
     }
-    
+
     private class AvxCheckResultJson
     {
         public int avx;

@@ -76,8 +76,8 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
         IObservable<AudioSeparationResult> audioSeparationObservable = audioSeparationManager.ProcessSongMetaAsObservable(songMeta, saveSongFile, audioSeparationJob);
 
         SpeechRecognitionParameters speechRecognitionParameters = new(
-            settings.SongEditorSettings.SpeechRecognitionModelPath,
-            "auto",
+            SettingsUtils.GetSpeechRecognitionModelPath(settings),
+            SettingsUtils.GetSpeechRecognitionLanguage(settings),
             settings.SongEditorSettings.SpeechRecognitionPrompt);
 
         // Load speech recognition model in parallel while doing audio separation.
@@ -93,10 +93,14 @@ public class CreateSingAlongSongControl : INeedInjection, IInjectionFinishedList
                 audioSeparationObservable)
             .CatchIgnore((Exception ex) =>
             {
+                Debug.LogException(ex);
+                string errorMessage = $"Failed to create sing-along data.\n{ex.Message}";
+                Debug.Log(errorMessage);
+                UiManager.CreateNotification(errorMessage);
+
                 audioSeparationJob.SetResult(EJobResult.Error);
                 speechRecognitionJob.SetResult(EJobResult.Error);
                 pitchDetectionJob.SetResult(EJobResult.Error);
-                UiManager.CreateNotification($"Failed to create sing-along data.\n{ex.Message}");
             })
             .SelectMany(_ =>
             {
