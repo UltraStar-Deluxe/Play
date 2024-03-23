@@ -121,7 +121,7 @@ public class CoinCollectorGameModifierPlayerControl : INeedInjection, IInjection
     private void GiveCoinBonusPoints()
     {
         collectedCoinCountSinceLastBonus -= CollectedCoinCountBonusThreshold;
-        playerControl.PlayerScoreControl.ModTotalScore += 100;
+        playerControl.PlayerScoreControl.SetModTotalScore(playerControl.PlayerScoreControl.CalculationData.ModTotalScore + 100);
         playerControl.PlayerUiControl.ShowTotalScore(playerControl.PlayerScoreControl.TotalScore);
         
         Debug.Log($"Added 100 points to score of player '{playerControl.PlayerProfile?.Name}'");
