@@ -13,7 +13,10 @@
             </ui:VisualElement>
             <ui:Label text="Loaded Scene" name="loadedSceneTitle" class="noBackgroundInHierarchy" style="-unity-font-style: bold; margin-left: 20px;" />
             <ui:VisualElement name="topButtonRow" class="ml-auto" style="background-color: rgba(0, 0, 0, 0); flex-direction: row;">
-                <ui:Button name="openSteamWorkshopButton" text="Steam Workshop" class="mr-2" />
+                <ui:Button name="openSteamWorkshopButton" text="Steam Workshop" />
+                <ui:Button name="updateSteamWorkshopItemsButton" class="mr-2 squareButton">
+                    <MaterialIcon name="updateSteamWorkshopItemsIcon" icon="replay" />
+                </ui:Button>
                 <ui:Button display-tooltip-when-elided="true" name="issuesButton" class="squareButton mr-2">
                     <MaterialIcon tabindex="-1" name="issuesIcon" icon="warning" class="rounded" />
                 </ui:Button>

@@ -287,8 +287,8 @@ public class SpeechRecognitionAction : AbstractAudioClipAction
     public SpeechRecognitionParameters CreateSpeechRecognizerParameters()
     {
         return new SpeechRecognitionParameters(
-            settings.SongEditorSettings.SpeechRecognitionModelPath,
-            settings.SongEditorSettings.SpeechRecognitionLanguage,
+            SettingsUtils.GetSpeechRecognitionModelPath(settings),
+            SettingsUtils.GetSpeechRecognitionLanguage(settings),
             settings.SongEditorSettings.SpeechRecognitionPrompt);
     }
 }

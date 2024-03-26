@@ -1,9 +1,18 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
 public class WebViewTests : AbstractMediaFileFormatTests
 {
+    protected override void ConfigureTestSettings(TestSettings settings)
+    {
+        settings.AcceptedWebViewHosts = new List<string>()
+        {
+            "youtube.com",
+        };
+    }
+
     [UnityTest]
     public IEnumerator WebViewOnlyTest()
     {

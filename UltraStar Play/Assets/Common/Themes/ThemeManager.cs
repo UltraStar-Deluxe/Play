@@ -167,11 +167,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
 
         string exampleThemeFileName = Path.GetFileName(ExampleThemeFilePathInStreamingAssets);
         string targetExampleThemeFilePath = $"{ThemeFolderUtils.GetUserDefinedThemesFolderAbsolutePath()}/{exampleThemeFileName}";
-        if (!FileUtils.Exists(targetExampleThemeFilePath))
-        {
-            Debug.Log("Copy example theme to user defined themes folder.");
-            File.Copy(sourceExampleThemeFilePath, targetExampleThemeFilePath);
-        }
+        FileUtils.Copy(sourceExampleThemeFilePath, targetExampleThemeFilePath, true);
+        Debug.Log($"Copied example theme to user defined themes folder: {targetExampleThemeFilePath}");
     }
 
     protected void LateUpdate()
@@ -737,6 +734,8 @@ public class ThemeManager : AbstractSingletonBehaviour, ISpriteHolder, INeedInje
                 themeMetas.AddRange(themeMetasInFolder);
             }
         });
+
+        ResolveThemeMetaUtils.ResolveThemes(themeMetas);
 
         string themeNamesCsv = themeMetas.Select(themeMeta => themeMeta.FileNameWithoutExtension).ToCsv();
         Debug.Log($"Found {themeMetas.Count} themes: {themeNamesCsv}");
